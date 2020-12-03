@@ -1,6 +1,6 @@
 #Creative Tab
-itemGroup.tabsignaleform= Formsignale
-itemGroup.tabsignalehv= HV Signale
-itemGroup.tabsignalehl=Hl Signale
-itemGroup.tabsignaleks=Ks Signale
-itemGroup.tabsignalesh=Sh Signale
+itemGroup.tabsignaleform= Semaphore Signals
+itemGroup.tabsignalehv= HV Signals
+itemGroup.tabsignalehl=Hl Signals
+itemGroup.tabsignaleks=Ks Signals
+itemGroup.tabsignalesh=Sh Signals
