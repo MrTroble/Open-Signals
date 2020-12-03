@@ -2,7 +2,7 @@
 {
   "modid": "girsignals",
   "name": "GIRSignals",
-  "description": "Signal mod for GIR Server",
+  "description": "The official Signal-Mod for the GIR-Server",
   "version": "${version}",
   "mcversion": "${mcversion}",
   "url": "https://discord.gg/UdxeFgG",
