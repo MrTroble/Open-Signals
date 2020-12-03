@@ -1,0 +1,16 @@
+[
+{
+  "modid": "girsignals",
+  "name": "GIRSignals",
+  "description": "Signal mod for GIR Server",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "https://discord.gg/UdxeFgG",
+  "updateUrl": "",
+  "authorList": ["Mc_Jeronimo, FGBxRamel"],
+  "credits": "",
+  "logoFile": "icon.png",
+  "screenshots": [],
+  "dependencies": []
+}
+]
