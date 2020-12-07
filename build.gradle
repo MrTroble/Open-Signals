@@ -65,7 +65,7 @@ dependencies {
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
     // compile "some.group:artifact:version"
-    //compile "li.cil.oc:OpenComputers:MC1.12.2-1.7.5.+:api"
+    compile "li.cil.oc:OpenComputers:MC1.12.2-1.7.5.+:api"
 
     // Real examples
     // compile 'com.mod-buildcraft:buildcraft:6.0.8:dev'  // adds buildcraft to the dev env
@@ -113,7 +113,7 @@ publishing {
     repositories {
         maven {
             url "file:///${project.projectDir}/mcmodsrepo"
-            //url "http://maven.cil.li/"
+            url "http://maven.cil.li/"
         }
     }
 }
