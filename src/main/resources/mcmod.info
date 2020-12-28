@@ -1,7 +1,7 @@
 [
 {
-  "modid": "girsignals",
-  "name": "GIRSignals",
+  "modid": "${modid}",
+  "name": "${name}",
   "description": "The official Signal Mod for GIR.",
   "version": "${version}",
   "mcversion": "${mcversion}",

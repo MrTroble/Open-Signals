@@ -1,0 +1,5 @@
+#Creative Tab
+itemGroup.GIRSignals = GIRSignals
+
+#Items
+item.hvsignalcontrolleritem.name = HV Signal-Controller
