@@ -10,7 +10,7 @@ public class Models {
 	
 	@SubscribeEvent
 	public static void register(ModelRegistryEvent event) {
-		registerModel(Items.hv_signal_controller_item);
+		registerModel(Items.linking_tool);
 		registerModel(Item.getItemFromBlock(Blocks.HV_SIGNAL_CONTROLLER));
 	}
 

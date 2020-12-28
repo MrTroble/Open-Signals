@@ -2,7 +2,7 @@
 itemGroup.GIRSignals=GIRSignals
 
 #Items
-item.hvsignalcontrolleritem.name=HV Signal-Controller
+item.linkingtool.name=Linking Tool
 
 #Blocks
-tile.hvsignalcontroller.name=HV Signal-Controller
+tile.hvsignalcontroller.name=HV-Signal-Controller
