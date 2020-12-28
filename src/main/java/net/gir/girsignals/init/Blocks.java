@@ -15,7 +15,7 @@ public class Blocks {
 	public static final HVSignalController HV_SIGNAL_CONTROLLER = new HVSignalController();
 	
 	public static void BlockInit() {
-		setBlockName(HV_SIGNAL_CONTROLLER, "HV Signal-Controller");
+		setBlockName(HV_SIGNAL_CONTROLLER, "hvsignalcontroller");
 	}
 	
 	@SubscribeEvent

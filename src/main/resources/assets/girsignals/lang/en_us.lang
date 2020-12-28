@@ -1,8 +1,8 @@
 #Creative Tab
-itemGroup.GIRSignals = GIRSignals
+itemGroup.GIRSignals=GIRSignals
 
 #Items
-item.hvsignalcontrolleritem.name = HV Signal-Controller
+item.hvsignalcontrolleritem.name=HV Signal-Controller
 
 #Blocks
-tile.HV Signal-Controller.name = "HV Signal-Controller"
+tile.hvsignalcontroller.name=HV Signal-Controller
