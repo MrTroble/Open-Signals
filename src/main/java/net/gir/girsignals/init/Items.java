@@ -12,7 +12,7 @@ public class Items {
 	
 	public static final hvsignalcontrolleritem hv_signal_controller_item = new hvsignalcontrolleritem();
 	
-	public static void init() {
+	public static void ItemInit() {
 		setItemName(hv_signal_controller_item, "hvsignalcontrolleritem");
 	}
 	

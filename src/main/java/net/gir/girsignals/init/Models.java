@@ -10,10 +10,11 @@ public class Models {
 	
 	@SubscribeEvent
 	public static void register(ModelRegistryEvent event) {
-		registerItemModel(Items.hv_signal_controller_item);
+		registerModel(Items.hv_signal_controller_item);
+		registerModel(Item.getItemFromBlock(Blocks.HV_SIGNAL_CONTROLLER));
 	}
 
-	private static void registerItemModel(Item item) {
+	private static void registerModel(Item item) {
 		ModelLoader.setCustomModelResourceLocation(item, 0, new ModelResourceLocation(item.getRegistryName(), "inventory"));
 	}
 }
