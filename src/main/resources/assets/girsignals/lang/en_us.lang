@@ -5,4 +5,4 @@ itemGroup.GIRSignals = GIRSignals
 item.hvsignalcontrolleritem.name = HV Signal-Controller
 
 #Blocks
-tile.HV Signal-Controller.name = HV Signal-Controller
+tile.HV Signal-Controller.name = "HV Signal-Controller"
