@@ -128,8 +128,6 @@ task update(type: Copy) {
 	if(copyName != "") {
     	from copyName
     	into 'run/mods'
-    } else {
-    	update()
     }
 }
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
