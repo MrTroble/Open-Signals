@@ -12,18 +12,18 @@ public class CommonProxy {
 	public void preinit(FMLPreInitializationEvent event) {
 		Items.ItemInit();
 		Blocks.BlockInit();
-		
+
 		MinecraftForge.EVENT_BUS.register(Items.class);
 		MinecraftForge.EVENT_BUS.register(Blocks.class);
-		
+
 	}
 
 	public void init(FMLInitializationEvent event) {
-		
+
 	}
 
 	public void postinit(FMLPostInitializationEvent event) {
-		
+
 	}
 
 }

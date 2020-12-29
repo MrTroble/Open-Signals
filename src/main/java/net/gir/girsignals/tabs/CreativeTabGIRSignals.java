@@ -9,7 +9,7 @@ public class CreativeTabGIRSignals extends CreativeTabs {
 	public CreativeTabGIRSignals() {
 		super("GIRSignals");
 	}
- 
+
 	@Override
 	public ItemStack getTabIconItem() {
 		return new ItemStack(Blocks.BEDROCK);
