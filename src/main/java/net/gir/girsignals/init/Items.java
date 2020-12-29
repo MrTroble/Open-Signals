@@ -1,7 +1,7 @@
 package net.gir.girsignals.init;
 
 import net.gir.girsignals.GirsignalsMain;
-import net.gir.girsignals.items.linkingtool;
+import net.gir.girsignals.items.Linkingtool;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -10,7 +10,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class Items {
 
-	public static final linkingtool linking_tool = new linkingtool();
+	public static final Linkingtool linking_tool = new Linkingtool();
 
 	public static void ItemInit() {
 		setItemName(linking_tool, "linkingtool");

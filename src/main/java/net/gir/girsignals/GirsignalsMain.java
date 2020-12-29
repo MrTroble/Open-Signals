@@ -1,6 +1,8 @@
 package net.gir.girsignals;
 
+import net.gir.girsignals.controllers.SignalControllerTileEntity;
 import net.gir.girsignals.proxy.CommonProxy;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -27,6 +29,7 @@ public class GirsignalsMain {
 	@EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
 		proxy.preinit(event);
+		TileEntity.register("SignalControllerTileEntity", SignalControllerTileEntity.class);
 	}
 
 	@EventHandler

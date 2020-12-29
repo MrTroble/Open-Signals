@@ -1,7 +1,8 @@
 package net.gir.girsignals.init;
 
 import net.gir.girsignals.GirsignalsMain;
-import net.gir.girsignals.controllers.HVSignalController;
+import net.gir.girsignals.controllers.SignalController;
+import net.gir.girsignals.controllers.SignalType;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -12,7 +13,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class Blocks {
 
-	public static final HVSignalController HV_SIGNAL_CONTROLLER = new HVSignalController();
+	public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController(SignalType.HV_TYPE);
 
 	public static void BlockInit() {
 		setBlockName(HV_SIGNAL_CONTROLLER, "hvsignalcontroller");
