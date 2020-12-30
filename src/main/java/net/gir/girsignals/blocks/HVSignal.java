@@ -4,9 +4,11 @@ import net.gir.girsignals.EnumsHV.BinaryExtensionSignals;
 import net.gir.girsignals.EnumsHV.HPVR;
 import net.gir.girsignals.EnumsHV.ZS2;
 import net.gir.girsignals.EnumsHV.ZS3;
+import net.gir.girsignals.init.Tabs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyEnum;
@@ -19,29 +21,41 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.common.property.Properties.PropertyAdapter;
 
 public class HVSignal extends Block {
 
 	public HVSignal() {
 		super(Material.ROCK);
+		setCreativeTab(Tabs.tab);
 		setDefaultState(getDefaultState().withProperty(FACING, EnumFacing.NORTH));
 	}
 
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
-	public static final PropertyEnum<HPVR> HAUPTSIGNAL = PropertyEnum.create("Hauptsignale", HPVR.class);
-	public static final PropertyEnum<HPVR> VORSIGNAL = PropertyEnum.create("Vorsignale", HPVR.class);
-	public static final PropertyBool RANGIERSIGNAL = PropertyBool.create("Rangiersignale");
-	public static final PropertyEnum<ZS3> ZUSATZSIGNAL3 = PropertyEnum.create("Zusatzsignale 3", ZS3.class);
-	public static final PropertyBool ZS3VLS = PropertyBool.create("Zusatzsignale 3 VLS");
-	public static final PropertyEnum<BinaryExtensionSignals> ZS1 = PropertyEnum.create("Zusatzsignale 1",
-			BinaryExtensionSignals.class);
-	public static final PropertyEnum<BinaryExtensionSignals> ZS6 = PropertyEnum.create("Zusatzsignale 6",
-			BinaryExtensionSignals.class);
-	public static final PropertyEnum<BinaryExtensionSignals> ZS8 = PropertyEnum.create("Zusatzsignale 8",
-			BinaryExtensionSignals.class);
-	public static final PropertyEnum<BinaryExtensionSignals> ZS7 = PropertyEnum.create("Zusatzsignale 7",
-			BinaryExtensionSignals.class);
-	public static final PropertyEnum<ZS2> ZS2 = PropertyEnum.create("Zusatzsignale 2", ZS2.class);
+	public static final PropertyAdapter<HPVR> HAUPTSIGNAL = new PropertyAdapter<HPVR>(
+			PropertyEnum.create("hauptsignale", HPVR.class));
+	public static final PropertyAdapter<HPVR> VORSIGNAL = new PropertyAdapter<HPVR>(
+			PropertyEnum.create("vorsignale", HPVR.class));
+	public static final PropertyAdapter<Boolean> RANGIERSIGNAL = new PropertyAdapter<Boolean>(
+			PropertyBool.create("rangiersignale"));
+	public static final PropertyAdapter<ZS3> ZS3 = new PropertyAdapter<ZS3>(
+			PropertyEnum.create("zs3", ZS3.class));
+	public static final PropertyAdapter<Boolean> ZS3LS = new PropertyAdapter<Boolean>(PropertyBool.create("zs3ls"));
+	public static final PropertyAdapter<ZS3> ZS3V = new PropertyAdapter<ZS3>(
+			PropertyEnum.create("zs3v", ZS3.class));
+	public static final PropertyAdapter<Boolean> ZS3VLS = new PropertyAdapter<Boolean>(PropertyBool.create("zs3vls"));
+	public static final PropertyAdapter<BinaryExtensionSignals> ZS1 = new PropertyAdapter<BinaryExtensionSignals>(
+			PropertyEnum.create("zs1", BinaryExtensionSignals.class));
+	public static final PropertyAdapter<BinaryExtensionSignals> ZS6 = new PropertyAdapter<BinaryExtensionSignals>(
+			PropertyEnum.create("zs6", BinaryExtensionSignals.class));
+	public static final PropertyAdapter<BinaryExtensionSignals> ZS8 = new PropertyAdapter<BinaryExtensionSignals>(
+			PropertyEnum.create("zs8", BinaryExtensionSignals.class));
+	public static final PropertyAdapter<ZS2> ZS2 = new PropertyAdapter<ZS2>(PropertyEnum.create("zs2", ZS2.class));
+	public static final PropertyAdapter<ZS2> ZS2V = new PropertyAdapter<ZS2>(PropertyEnum.create("zs2v", ZS2.class));
+	public static final PropertyAdapter<BinaryExtensionSignals> ZS7 = new PropertyAdapter<BinaryExtensionSignals>(
+			PropertyEnum.create("zs7", BinaryExtensionSignals.class));
 
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
@@ -71,7 +85,8 @@ public class HVSignal extends Block {
 
 	@Override
 	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, FACING);
+		return new ExtendedBlockState(this, new IProperty<?>[] {FACING}, new IUnlistedProperty<?>[] { HAUPTSIGNAL, VORSIGNAL, RANGIERSIGNAL, 
+			ZS1, ZS2, ZS2V, ZS3, ZS3LS, ZS3V, ZS3VLS, ZS6, ZS7, ZS8});
 	}
 
 }

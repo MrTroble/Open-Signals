@@ -8,13 +8,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 public class SignalController extends Block implements ITileEntityProvider{
-
-	private final SignalType type;
 	
-	public SignalController(SignalType type) {
+	public SignalController() {
 		super(Material.ROCK);
 		setCreativeTab(Tabs.tab);
-		this.type = type;
 	}
 
 	@Override

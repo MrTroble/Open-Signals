@@ -14,7 +14,7 @@ public class CommonProxy {
 	public void preinit(FMLPreInitializationEvent event) {
 		TileEntity.register("SignalControllerTileEntity", SignalControllerTileEntity.class);
 		Items.ItemInit();
-		Blocks.BlockInit();
+		Blocks.init();
 
 		MinecraftForge.EVENT_BUS.register(Items.class);
 		MinecraftForge.EVENT_BUS.register(Blocks.class);
