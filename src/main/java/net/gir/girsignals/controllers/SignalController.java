@@ -19,7 +19,7 @@ public class SignalController extends Block implements ITileEntityProvider{
 
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new SignalControllerTileEntity(type);
+		return new SignalControllerTileEntity();
 	}
 
 }
