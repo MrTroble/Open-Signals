@@ -63,7 +63,7 @@ repositories {
     maven { url = "http://maven.cil.li/" }
 }
 
-def ocVersion = "MC1.12.2-1.7.5.213"
+def ocVersion = "MC1.12.2-1.7.5.192"
 
 def copyName = ""
 
@@ -117,17 +117,20 @@ task update(type: Copy) {
 	dependsOn "eclipse"
 	def username = System.properties['user.home']
     println("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
-    new File("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/").eachDir() {
-        dire -> dire.eachFileMatch("OpenComputers-$ocVersion" + ".jar") {
-            file2 -> copyName = file2.getAbsolutePath() 
-        }
-    }
-	new File('run/mods').eachFile {
-		file -> file.delete()
-	}
-	if(copyName != "") {
-    	from copyName
-    	into 'run/mods'
+    def fl = new File("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
+    if(fl.exists()) {
+    	fl.eachDir() {
+        	dire -> dire.eachFileMatch("OpenComputers-$ocVersion" + ".jar") {
+         	   file2 -> copyName = file2.getAbsolutePath() 
+        	}
+    	}
+		new File('run/mods').eachFile {
+			file -> file.delete()
+		}
+		if(copyName != "") {
+    		from copyName
+    		into 'run/mods'
+    	}
     }
 }
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing

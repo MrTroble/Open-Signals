@@ -13,7 +13,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class Blocks {
 
-	public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController(SignalType.HV_TYPE);
+	public static SignalController HV_SIGNAL_CONTROLLER = new SignalController(SignalType.HV_TYPE);
 
 	public static void BlockInit() {
 		setBlockName(HV_SIGNAL_CONTROLLER, "hvsignalcontroller");

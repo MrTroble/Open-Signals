@@ -16,7 +16,7 @@ import net.minecraftforge.fml.common.Optional;
 public class SignalControllerTileEntity extends TileEntity implements SimpleComponent {
 
 	private BlockPos linkedSignalPosition = null;
-	private final SignalType signalType;
+	private SignalType signalType;
 
 	public SignalControllerTileEntity() {
 		this.signalType = null;

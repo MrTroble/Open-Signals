@@ -24,6 +24,8 @@ public class Linkingtool extends Item {
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand,
 			EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if(worldIn.isRemote)
+			return EnumActionResult.PASS;
 		Block block = worldIn.getBlockState(pos).getBlock();
 		if (block instanceof BlockDirt) { // TODO Change this to the actual Signal Block
 			NBTTagCompound comp = new NBTTagCompound();
@@ -32,8 +34,8 @@ public class Linkingtool extends Item {
 			player.sendMessage(new TextComponentTranslation("lt.added.block.pos", pos.toString()));
 			return EnumActionResult.SUCCESS;
 		} else if(block instanceof SignalController) {
-			((SignalControllerTileEntity)worldIn.getTileEntity(pos)).link(player.getHeldItem(hand));
-			player.sendMessage(new TextComponentTranslation("lt.set.block.pos", pos.toString()));
+			if(((SignalControllerTileEntity)worldIn.getTileEntity(pos)).link(player.getHeldItem(hand)))
+				player.sendMessage(new TextComponentTranslation("lt.set.block.pos", pos.toString()));
 			return EnumActionResult.SUCCESS;
 		}
 		return EnumActionResult.PASS;
