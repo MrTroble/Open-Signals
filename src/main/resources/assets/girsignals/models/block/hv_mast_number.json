@@ -1,0 +1,91 @@
+{
+	"credit": "Made with Blockbench by Mc_Jeronimo",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "girsignals:blocks/mast",
+		"6": "girsignals:blocks/white",
+		"7": "girsignals:blocks/template",
+		"particle": "girsignals:blocks/mast"
+	},
+	"elements": [
+		{
+			"name": "mast1",
+			"from": [7, 0, 12],
+			"to": [9, 16, 13],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 8.5], "texture": "#0"},
+				"east": {"uv": [0, 0, 0.5, 8.5], "texture": "#0"},
+				"south": {"uv": [0, 0, 1, 8.5], "texture": "#0"},
+				"west": {"uv": [0, 0, 0.5, 8.5], "texture": "#0"},
+				"up": {"uv": [0, 0, 1, 0.5], "texture": "#0"},
+				"down": {"uv": [0, 0, 1, 0.5], "texture": "#0"}
+			}
+		},
+		{
+			"name": "mast2",
+			"from": [7, 0, 8],
+			"to": [9, 16, 9],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 8.5], "texture": "#0"},
+				"east": {"uv": [0, 0, 0.5, 8.5], "texture": "#0"},
+				"south": {"uv": [0, 0, 1, 8.5], "texture": "#0"},
+				"west": {"uv": [0, 0, 0.5, 8.5], "texture": "#0"},
+				"up": {"uv": [0, 0, 1, 0.5], "texture": "#0"},
+				"down": {"uv": [0, 0, 1, 0.5], "texture": "#0"}
+			}
+		},
+		{
+			"name": "mast3",
+			"from": [7, 14, 9],
+			"to": [9, 15, 12],
+			"faces": {
+				"east": {"uv": [0, 0, 1.5, 0.5], "texture": "#0"},
+				"west": {"uv": [0, 0, 1.5, 0.5], "texture": "#0"},
+				"up": {"uv": [0, 0, 1, 1.5], "texture": "#0"},
+				"down": {"uv": [0, 0, 1, 1.5], "texture": "#0"}
+			}
+		},
+		{
+			"name": "mast4",
+			"from": [7, 8, 9],
+			"to": [9, 9, 12],
+			"faces": {
+				"east": {"uv": [0, 0, 1.5, 0.5], "texture": "#0"},
+				"west": {"uv": [0, 0, 1.5, 0.5], "texture": "#0"},
+				"up": {"uv": [0, 0, 1, 1.5], "texture": "#0"},
+				"down": {"uv": [0, 0, 1, 1.5], "texture": "#0"}
+			}
+		},
+		{
+			"name": "mast5",
+			"from": [7, 2, 9],
+			"to": [9, 3, 12],
+			"faces": {
+				"east": {"uv": [0, 0, 1.5, 0.5], "texture": "#0"},
+				"west": {"uv": [0, 0, 1.5, 0.5], "texture": "#0"},
+				"up": {"uv": [0, 0, 1, 1.5], "texture": "#0"},
+				"down": {"uv": [0, 0, 1, 1.5], "texture": "#0"}
+			}
+		},
+		{
+			"name": "sign",
+			"from": [6, 8, 6.9],
+			"to": [10, 13, 7.9],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#7"},
+				"east": {"uv": [0, 0, 2, 2.5], "texture": "#6"},
+				"south": {"uv": [0, 0, 2, 2.5], "texture": "#missing"},
+				"west": {"uv": [0, 0, 2, 2.5], "texture": "#6"},
+				"up": {"uv": [0, 0, 2, 2.5], "texture": "#6"},
+				"down": {"uv": [0, 0, 2, 2.5], "texture": "#6"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "mast_sign",
+			"origin": [10, 26, 23],
+			"children": [0, 1, 2, 3, 4, 5]
+		}
+	]
+}
