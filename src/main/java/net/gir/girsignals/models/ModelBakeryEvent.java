@@ -1,9 +1,10 @@
 package net.gir.girsignals.models;
 
 import java.util.HashMap;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import net.gir.girsignals.GirsignalsMain;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -16,7 +17,7 @@ import net.minecraftforge.fml.relauncher.Side;
 @EventBusSubscriber(value = Side.CLIENT)
 public class ModelBakeryEvent implements ICustomModelLoader {
 	
-	private static HashMap<String, IModel> registeredModels = new HashMap<>(); 
+	private static HashMap<String, Supplier<IModel>> registeredModels = new HashMap<>(); 
 	
 	@SubscribeEvent
 	public void onModelBakeStart(ModelBakeEvent event) {
@@ -25,19 +26,18 @@ public class ModelBakeryEvent implements ICustomModelLoader {
 	@Override
 	public void onResourceManagerReload(IResourceManager resourceManager) {
 		registeredModels.clear();
-		registeredModels.put("hvsignal", new SignalCustomModel());
+		registeredModels.put("hvsignal", SignalCustomModel::new);
 	}
 
 	@Override
 	public boolean accepts(ResourceLocation modelLocation) {
 		if(!modelLocation.getResourceDomain().equals(GirsignalsMain.MODID)) return false;
-		System.out.println(modelLocation.getResourcePath());
 		return registeredModels.containsKey(modelLocation.getResourcePath());
 	}
 
 	@Override
 	public IModel loadModel(ResourceLocation modelLocation) throws Exception {
-		return registeredModels.get(modelLocation.getResourcePath());
+		return registeredModels.get(modelLocation.getResourcePath()).get();
 	}
 
 }
