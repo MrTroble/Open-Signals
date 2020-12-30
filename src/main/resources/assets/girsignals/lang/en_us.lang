@@ -1,0 +1,8 @@
+#Creative Tab
+itemGroup.GIRSignals=GIRSignals
+
+#Items
+item.linkingtool.name=Linking Tool
+
+#Blocks
+tile.hvsignalcontroller.name=HV-Signal-Controller

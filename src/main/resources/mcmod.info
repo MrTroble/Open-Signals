@@ -1,14 +1,14 @@
 [
 {
-  "modid": "examplemod",
-  "name": "Example Mod",
-  "description": "Example placeholder mod.",
-  "version": "${version}",
+  "modid": "girsignals",
+  "name": "GIRSignals",
+  "description": "The official Signal Mod for GIR.",
+  "version": "",
   "mcversion": "${mcversion}",
-  "url": "",
+  "url": "https://discord.gg/Va5P7KBry6",
   "updateUrl": "",
-  "authorList": ["ExampleDude"],
-  "credits": "The Forge and FML guys, for making this example",
+  "authorList": ["FGBxRamel", "Jeronimo"],
+  "credits": "Big thanks to HyCraftHD for the great help!",
   "logoFile": "",
   "screenshots": [],
   "dependencies": []
