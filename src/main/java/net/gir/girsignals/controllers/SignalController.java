@@ -12,7 +12,7 @@ public class SignalController extends Block implements ITileEntityProvider{
 	private final SignalType type;
 	
 	public SignalController(SignalType type) {
-		super(Material.CACTUS); // TODO WTF?
+		super(Material.ROCK);
 		setCreativeTab(Tabs.tab);
 		this.type = type;
 	}
