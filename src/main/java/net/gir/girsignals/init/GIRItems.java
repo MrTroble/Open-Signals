@@ -19,15 +19,17 @@ public class GIRItems {
 	private static ArrayList<Item> registeredItems = new ArrayList<>();
 	
 	public static void init() {
-		Field[] fields = GIRBlocks.class.getFields();
+		Field[] fields = GIRItems.class.getFields();
 		for(Field field : fields) {
 			int modifiers = field.getModifiers();
 			if(Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && Modifier.isPublic(modifiers)) {
 				String name = field.getName().toLowerCase().replace("_", "");
+				System.out.println(name);
 				try {
-					Item block = (Item) field.get(null);
-					setItemName(block, name);
-					registeredItems.add(block);
+					Item item = (Item) field.get(null);
+					item.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
+					item.setUnlocalizedName(name);
+					registeredItems.add(item);
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					e.printStackTrace();
 				}
@@ -39,11 +41,6 @@ public class GIRItems {
 	public static void registerItem(RegistryEvent.Register<Item> event) {
 		IForgeRegistry<Item> registry = event.getRegistry();
 		registeredItems.forEach(registry::register);
-	}
-
-	public static void setItemName(Item item, String name) {
-		item.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
-		item.setUnlocalizedName(name);
 	}
 
 }

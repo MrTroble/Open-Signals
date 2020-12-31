@@ -17,8 +17,8 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class GIRBlocks {
 
-	public static SignalController HV_SIGNAL_CONTROLLER = new SignalController();
-	public static HVSignal HV_SIGNAL = new HVSignal();
+	public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
+	public static final HVSignal HV_SIGNAL = new HVSignal();
 	
 	private static ArrayList<Block> blocksToRegister = new ArrayList<>();
 	
@@ -30,7 +30,8 @@ public class GIRBlocks {
 				String name = field.getName().toLowerCase().replace("_", "");
 				try {
 					Block block = (Block) field.get(null);
-					setBlockName(block, name);
+					block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
+					block.setUnlocalizedName(name);
 					blocksToRegister.add(block);
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					e.printStackTrace();
@@ -49,10 +50,5 @@ public class GIRBlocks {
 	public static void registerItem(RegistryEvent.Register<Item> event) {
 		IForgeRegistry<Item> registry = event.getRegistry();
 		blocksToRegister.forEach(block -> registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
-	}
-
-	private static void setBlockName(Block block, String name) {
-		block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
-		block.setUnlocalizedName(name);
 	}
 }
