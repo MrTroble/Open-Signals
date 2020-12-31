@@ -15,7 +15,7 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class Blocks {
+public class GIRBlocks {
 
 	public static SignalController HV_SIGNAL_CONTROLLER = new SignalController();
 	public static HVSignal HV_SIGNAL = new HVSignal();
@@ -23,10 +23,10 @@ public class Blocks {
 	private static ArrayList<Block> blocksToRegister = new ArrayList<>();
 	
 	public static void init() {
-		Field[] fields = Blocks.class.getFields();
+		Field[] fields = GIRBlocks.class.getFields();
 		for(Field field : fields) {
 			int modifiers = field.getModifiers();
-			if(Modifier.isStatic(modifiers) && Modifier.isStatic(modifiers)) {
+			if(Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && Modifier.isPublic(modifiers)) {
 				String name = field.getName().toLowerCase().replace("_", "");
 				try {
 					Block block = (Block) field.get(null);

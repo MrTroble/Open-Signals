@@ -4,7 +4,7 @@ import net.gir.girsignals.EnumsHV.BinaryExtensionSignals;
 import net.gir.girsignals.EnumsHV.HPVR;
 import net.gir.girsignals.EnumsHV.ZS2;
 import net.gir.girsignals.EnumsHV.ZS3;
-import net.gir.girsignals.init.Tabs;
+import net.gir.girsignals.init.GIRTabs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.material.Material;
@@ -30,7 +30,7 @@ public class HVSignal extends Block {
 
 	public HVSignal() {
 		super(Material.ROCK);
-		setCreativeTab(Tabs.tab);
+		setCreativeTab(GIRTabs.tab);
 		setDefaultState(getDefaultState().withProperty(FACING, EnumFacing.NORTH));
 	}
 

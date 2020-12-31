@@ -1,6 +1,6 @@
 package net.gir.girsignals.controllers;
 
-import net.gir.girsignals.init.Tabs;
+import net.gir.girsignals.init.GIRTabs;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -11,7 +11,7 @@ public class SignalController extends Block implements ITileEntityProvider{
 	
 	public SignalController() {
 		super(Material.ROCK);
-		setCreativeTab(Tabs.tab);
+		setCreativeTab(GIRTabs.tab);
 	}
 
 	@Override

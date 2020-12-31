@@ -3,10 +3,8 @@ package net.gir.girsignals.items;
 import net.gir.girsignals.blocks.HVSignal;
 import net.gir.girsignals.controllers.SignalController;
 import net.gir.girsignals.controllers.SignalControllerTileEntity;
-import net.gir.girsignals.init.Blocks;
-import net.gir.girsignals.init.Tabs;
+import net.gir.girsignals.init.GIRTabs;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
@@ -20,7 +18,7 @@ import net.minecraft.world.World;
 public class Linkingtool extends Item {
 
 	public Linkingtool() {
-		setCreativeTab(Tabs.tab);
+		setCreativeTab(GIRTabs.tab);
 	}
 
 	@Override
