@@ -4,7 +4,7 @@
 	"textures": {
 		"0": "girsignals:blocks/mast",
 		"1": "girsignals:blocks/shield_black",
-		"7": "girsignals:blocks/zs3v_3",
+		"7": "girsignals:blocks/zs13",
 		"particle": "girsignals:blocks/mast"
 	},
 	"elements": [
@@ -61,7 +61,7 @@
 			"from": [5.5, 0, 4.9],
 			"to": [10.5, 7, 4.9],
 			"faces": {
-				"north": {"uv": [0, 0, 10, 14], "texture": "#7"}
+				"north": {"uv": [0, 0, 5, 7], "texture": "#7"}
 			}
 		},
 		{
