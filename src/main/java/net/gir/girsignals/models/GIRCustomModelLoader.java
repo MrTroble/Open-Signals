@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 
 import net.gir.girsignals.GirsignalsMain;
+import net.gir.girsignals.blocks.HVSignal;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.EnumFacing;
@@ -27,8 +28,10 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast_number", ebs -> true, 2);
 			cm.register("hv_zs3v", ebs -> true, 3);
 			cm.register("hv_vr", ebs -> true, 4);
-			cm.register("hv_zs3", ebs -> true, 5);
-			cm.register("hv_hp", ebs -> true /*ebs.getValue(HVSignal.HAUPTSIGNAL) != null*/, 6);
+			cm.register("hv_zs1", ebs -> ebs.getValue(HVSignal.ZS1) != null, 5f);
+			cm.register("hv_zs7", ebs -> true, 4.6f);
+			cm.register("hv_hp", ebs -> true /*ebs.getValue(HVSignal.HAUPTSIGNAL) != null*/, 5.4f);
+			cm.register("hv_zs3", ebs -> true, 6.9f);
 		});
 	}
 
