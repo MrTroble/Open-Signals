@@ -15,6 +15,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.Mirror;
@@ -82,7 +83,17 @@ public class HVSignal extends Block {
 	public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
 		return state.withMirror(mirrorIn);
 	}
+	
+	@Override
+	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+		return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
+	}
 
+	@Override
+	public boolean isOpaqueCube(IBlockState state) {
+		return false;
+	}
+	
 	@Override
 	protected BlockStateContainer createBlockState() {
 		return new ExtendedBlockState(this, new IProperty<?>[] {FACING}, new IUnlistedProperty<?>[] { HAUPTSIGNAL, VORSIGNAL, RANGIERSIGNAL, 
