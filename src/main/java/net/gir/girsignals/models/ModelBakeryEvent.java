@@ -1,7 +1,6 @@
 package net.gir.girsignals.models;
 
 import java.util.HashMap;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import net.gir.girsignals.GirsignalsMain;
