@@ -6,12 +6,12 @@ import net.minecraft.world.World;
 
 public class SignalType {
 	
-	public static int[] getSupportedHVSignals(World world, BlockPos pos, IBlockState state) {
+	public static long[] getSupportedHVSignals(World world, BlockPos pos, IBlockState state) {
 		//TODO ZS/ZSV in LS /// Maybe even FS
-		return new int[] {0, 1, 2};
+		return new long[] {0, 1, 2};
 	}
 	
-	public static IBlockState getChangedBlockStateHV(World world, BlockPos pos, IBlockState state, int newid) {
+	public static IBlockState getChangedBlockStateHV(World world, BlockPos pos, IBlockState state, int newid, int type) {
 		// TODO Change statet of LS//FS
 		return state;
 	}
@@ -32,14 +32,14 @@ public class SignalType {
 	@FunctionalInterface
 	public interface SignalChangeCallback {
 		
-		public IBlockState getNewState(World world, BlockPos pos, IBlockState state, int newid);
+		public IBlockState getNewState(World world, BlockPos pos, IBlockState state, int newid, int type);
 		
 	}
 	
 	@FunctionalInterface
 	public interface SupportedSignalCallback {
 		
-		public int[] getSupportedSignalStates(World world, BlockPos pos, IBlockState state); 
+		public long[] getSupportedSignalStates(World world, BlockPos pos, IBlockState state); 
 		
 	}
 	

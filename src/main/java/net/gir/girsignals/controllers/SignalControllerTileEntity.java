@@ -17,16 +17,11 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	private BlockPos linkedSignalPosition = null;
 	private SignalType signalType;
-
-	public SignalControllerTileEntity() {
-		this.signalType = null;
-	}
-
-	public SignalControllerTileEntity(SignalType signalType) {
-		this.signalType = signalType;
-	}
+	private long[] supportedSignaleStates = null;
 
 	public static BlockPos readBlockPosFromNBT(NBTTagCompound compound) {
+		if (compound == null)
+			return null;
 		if (compound.hasKey("x") && compound.hasKey("y") && compound.hasKey("z")) {
 			BlockPos pos = new BlockPos(compound.getInteger("x"), compound.getInteger("y"), compound.getInteger("z"));
 			return pos;
@@ -54,9 +49,21 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return super.writeToNBT(compound);
 	}
 
+	private void onLink() {
+		signalType = SignalType.HV_TYPE; // AutoDetect
+		supportedSignaleStates = signalType.supportedSignalStates.getSupportedSignalStates(world,
+				linkedSignalPosition, world.getBlockState(linkedSignalPosition));
+	}
+	
 	public boolean link(ItemStack stack) {
 		if (stack.getItem() instanceof Linkingtool) {
-			return (linkedSignalPosition = readBlockPosFromNBT(stack.getTagCompound())) != null;
+			BlockPos old = linkedSignalPosition;
+			boolean flag = (linkedSignalPosition = readBlockPosFromNBT(stack.getTagCompound())) != null
+					&& (old == null || !old.equals(linkedSignalPosition));
+			if (flag) {
+				onLink();
+			}
+			return flag;
 		}
 		return false;
 	}
@@ -78,23 +85,22 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSupportedSignalStates(Context context, Arguments args) {
-		int[] in = getSupportedSignalStatesImpl();
-		Integer[] newin = new Integer[in.length];
+		long[] in = getSupportedSignalStatesImpl();
+		Long[] newin = new Long[in.length];
 		for (int i = 0; i < newin.length; i++) {
 			newin[i] = in[i];
 		}
 		return newin;
 	}
 
-	public int[] getSupportedSignalStatesImpl() {
+	public long[] getSupportedSignalStatesImpl() {
 		if (!hasLinkImpl())
-			return new int[] {};
-		return signalType.supportedSignalStates.getSupportedSignalStates(world, linkedSignalPosition,
-				world.getBlockState(linkedSignalPosition));
+			return new long[] {};
+		return supportedSignaleStates;
 	}
 
-	public static boolean find(int[] arr, int i) {
-		for (int x : arr)
+	public static boolean find(long[] arr, long i) {
+		for (long x : arr)
 			if (x == i)
 				return true;
 		return false;
@@ -103,14 +109,14 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] changeSignal(Context context, Arguments args) {
-		return new Object[] { changeSignalImpl(args.checkInteger(0)) };
+		return new Object[] { changeSignalImpl(args.checkInteger(0), args.checkInteger(1)) };
 	}
 
-	public boolean changeSignalImpl(int newSignal) {
-		if (!hasLinkImpl() || !find(getSupportedSignalStatesImpl(), newSignal))
+	public boolean changeSignalImpl(int newSignal, int type) {
+		if (!hasLinkImpl() || !find(getSupportedSignalStatesImpl(), type))
 			return false;
 		IBlockState oldState = world.getBlockState(linkedSignalPosition);
-		IBlockState state = signalType.onSignalChange.getNewState(world, linkedSignalPosition, oldState, newSignal);
+		IBlockState state = signalType.onSignalChange.getNewState(world, linkedSignalPosition, oldState, newSignal, type);
 		if (oldState == state)
 			return false;
 		return world.setBlockState(linkedSignalPosition, state);
@@ -128,7 +134,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	@Override
 	public String getComponentName() {
-		return "signaltile";
+		return "signalcontroller";
 	}
 
 }
