@@ -1,10 +1,10 @@
 package net.gir.girsignals.items;
 
+import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.controllers.SignalController;
 import net.gir.girsignals.controllers.SignalControllerTileEntity;
-import net.gir.girsignals.init.Tabs;
+import net.gir.girsignals.init.GIRTabs;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockDirt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,24 +18,34 @@ import net.minecraft.world.World;
 public class Linkingtool extends Item {
 
 	public Linkingtool() {
-		setCreativeTab(Tabs.tab);
+		setCreativeTab(GIRTabs.tab);
 	}
 
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand,
 			EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if(worldIn.isRemote)
+		if (worldIn.isRemote)
 			return EnumActionResult.PASS;
 		Block block = worldIn.getBlockState(pos).getBlock();
-		if (block instanceof BlockDirt) { // TODO Change this to the actual Signal Block
+		if (block instanceof SignalHV) {
 			NBTTagCompound comp = new NBTTagCompound();
 			SignalControllerTileEntity.writeBlockPosToNBT(pos, comp);
 			player.getHeldItem(hand).setTagCompound(comp);
-			player.sendMessage(new TextComponentTranslation("lt.added.block.pos", pos.toString()));
+			player.sendMessage(new TextComponentTranslation("lt.added", pos.toString()));
 			return EnumActionResult.SUCCESS;
-		} else if(block instanceof SignalController) {
-			if(((SignalControllerTileEntity)worldIn.getTileEntity(pos)).link(player.getHeldItem(hand)))
-				player.sendMessage(new TextComponentTranslation("lt.set.block.pos", pos.toString()));
+		} else if (block instanceof SignalController) {
+			SignalControllerTileEntity controller = ((SignalControllerTileEntity) worldIn.getTileEntity(pos));
+			if (!player.isSneaking()) {
+				if (controller.link(player.getHeldItem(hand)))
+					player.sendMessage(new TextComponentTranslation("lt.set"));
+				else
+					player.sendMessage(new TextComponentTranslation("lt.linkfailed"));
+			} else {
+				if (controller.hasLinkImpl()) {
+					controller.unlink();
+					player.sendMessage(new TextComponentTranslation("lt.unlink"));
+				}
+			}
 			return EnumActionResult.SUCCESS;
 		}
 		return EnumActionResult.PASS;

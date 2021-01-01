@@ -6,12 +6,12 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class Models {
+public class GIRModels {
 
 	@SubscribeEvent
 	public static void register(ModelRegistryEvent event) {
-		registerModel(Items.linking_tool);
-		registerModel(Item.getItemFromBlock(Blocks.HV_SIGNAL_CONTROLLER));
+		registerModel(GIRItems.LINKING_TOOL);
+		registerModel(Item.getItemFromBlock(GIRBlocks.HV_SIGNAL_CONTROLLER));
 	}
 
 	private static void registerModel(Item item) {

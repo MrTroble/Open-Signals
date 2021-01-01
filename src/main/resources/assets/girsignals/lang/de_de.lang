@@ -6,3 +6,9 @@ item.linkingtool.name=Verlinker
 
 #Blocks
 tile.hvsignalcontroller.name=HV-Signal-Regler
+
+#Linktool
+lt.linkfailed=Link fehlgeschlagen!
+lt.set=Position vom Controller gesetzt
+lt.added=%s zum Linken gesetzt
+lt.unlink=Link zum Signal entfernt
