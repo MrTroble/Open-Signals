@@ -80,13 +80,13 @@ public class SignalCustomModel implements IModel {
 	}
 	
 	protected void register(String name, Predicate<IExtendedBlockState> state, float yOffset) {
-		this.register(name, state, new Vector3f(0, yOffset, 0));
+		this.register(name, state, 0, yOffset, 0);
 	}
 
-	protected void register(String name, Predicate<IExtendedBlockState> state, Vector3f translation) {
+	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z) {
 		IModel m = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
 				"Couldn't find " + name);
 		textures.addAll(m.getTextures());
-		modelCache.put(state, Pair.of(m, translation));
+		modelCache.put(state, Pair.of(m, new Vector3f(x, y, z)));
 	}
 }
