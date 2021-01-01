@@ -4,8 +4,10 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
+import net.gir.girsignals.EnumsHV.HPVR;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.SignalHV;
+import net.gir.girsignals.blocks.SignalTileEnity;
 import net.gir.girsignals.items.Linkingtool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
@@ -26,7 +28,10 @@ public class GIRItems {
 			if(state.getBlock() instanceof SignalHV) {
 				IExtendedBlockState ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
 				System.out.println("======== HP " + ebs.getValue(SignalHV.HAUPTSIGNAL));
-				
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.HAUPTSIGNAL, HPVR.HpVr0);
+				ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
+				System.out.println("======== HP " + ebs.getValue(SignalHV.HAUPTSIGNAL));
+				worldIn.notifyBlockUpdate(pos, state, state, 3);
 			}
 			return EnumActionResult.PASS;
 		};

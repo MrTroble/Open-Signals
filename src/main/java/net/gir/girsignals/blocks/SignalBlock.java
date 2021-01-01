@@ -32,8 +32,11 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
 
-	public SignalBlock() {
+	private final String signalTypeName;
+	
+	public SignalBlock(String signalTypeName) {
 		super(Material.ROCK);
+		this.signalTypeName = signalTypeName;
 		setCreativeTab(GIRTabs.tab);
 		setDefaultState(getDefaultState().withProperty(FACING, EnumFacing.NORTH));
 	}
@@ -131,7 +134,6 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 				}
 			}
 		}
-		System.out.println(prop.toString());
 		return new ExtendedBlockState(this, new IProperty<?>[] { FACING },
 				prop.toArray(new IUnlistedProperty[prop.size()]));
 	}
@@ -141,4 +143,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		return new SignalTileEnity();
 	}
 
+	public String getSignalTypeName() {
+		return signalTypeName;
+	}
 }

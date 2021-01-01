@@ -1,6 +1,5 @@
 package net.gir.girsignals.blocks;
 
-import net.gir.girsignals.EnumsHV.BinaryExtensionSignals;
 import net.gir.girsignals.EnumsHV.HPVR;
 import net.gir.girsignals.EnumsHV.ZS2;
 import net.gir.girsignals.EnumsHV.ZS3;
@@ -10,6 +9,9 @@ import net.minecraftforge.common.property.Properties.PropertyAdapter;
 
 public class SignalHV extends SignalBlock {
 
+	public SignalHV() {
+		super("HV");
+	}
 	public static final PropertyAdapter<HPVR> HAUPTSIGNAL = new PropertyAdapter<HPVR>(
 			PropertyEnum.create("hauptsignale", HPVR.class));
 	public static final PropertyAdapter<HPVR> VORSIGNAL = new PropertyAdapter<HPVR>(
@@ -20,16 +22,11 @@ public class SignalHV extends SignalBlock {
 	public static final PropertyAdapter<Boolean> ZS3LS = new PropertyAdapter<Boolean>(PropertyBool.create("zs3ls"));
 	public static final PropertyAdapter<ZS3> ZS3V = new PropertyAdapter<ZS3>(PropertyEnum.create("zs3v", ZS3.class));
 	public static final PropertyAdapter<Boolean> ZS3VLS = new PropertyAdapter<Boolean>(PropertyBool.create("zs3vls"));
-	public static final PropertyAdapter<BinaryExtensionSignals> ZS1 = new PropertyAdapter<BinaryExtensionSignals>(
-			PropertyEnum.create("zs1", BinaryExtensionSignals.class));
-	public static final PropertyAdapter<BinaryExtensionSignals> ZS6 = new PropertyAdapter<BinaryExtensionSignals>(
-			PropertyEnum.create("zs6", BinaryExtensionSignals.class));
-	public static final PropertyAdapter<BinaryExtensionSignals> ZS8 = new PropertyAdapter<BinaryExtensionSignals>(
-			PropertyEnum.create("zs8", BinaryExtensionSignals.class));
+	public static final PropertyAdapter<Boolean> ZS1 = new PropertyAdapter<Boolean>(PropertyBool.create("zs1"));
+	public static final PropertyAdapter<Boolean> ZS6 = new PropertyAdapter<Boolean>(PropertyBool.create("zs6"));
+	public static final PropertyAdapter<Boolean> ZS8 = new PropertyAdapter<Boolean>(PropertyBool.create("zs8"));
 	public static final PropertyAdapter<ZS2> ZS2 = new PropertyAdapter<ZS2>(PropertyEnum.create("zs2", ZS2.class));
 	public static final PropertyAdapter<ZS2> ZS2V = new PropertyAdapter<ZS2>(PropertyEnum.create("zs2v", ZS2.class));
-	public static final PropertyAdapter<BinaryExtensionSignals> ZS7 = new PropertyAdapter<BinaryExtensionSignals>(
-			PropertyEnum.create("zs7", BinaryExtensionSignals.class));
-
+	public static final PropertyAdapter<Boolean> ZS7 = new PropertyAdapter<Boolean>(PropertyBool.create("zs7"));
 
 }

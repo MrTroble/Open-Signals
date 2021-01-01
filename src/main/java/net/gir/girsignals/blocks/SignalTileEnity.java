@@ -49,7 +49,7 @@ public class SignalTileEnity extends TileEntity {
 		super.readFromNBT(compound);
 	}
 
-	public void setProprty(IUnlistedProperty<?> prop, Object opt) {
+	public void setProperty(IUnlistedProperty<?> prop, Object opt) {
 		map.put(prop, opt);
 	}
 	
@@ -66,7 +66,7 @@ public class SignalTileEnity extends TileEntity {
 		return bs;
 	}
 
-	public Optional<?> getProprty(IUnlistedProperty<?> prop) {
+	public Optional<?> getProperty(IUnlistedProperty<?> prop) {
 		if (map.containsKey(prop))
 			return Optional.of(map.get(prop));
 		return Optional.empty();
