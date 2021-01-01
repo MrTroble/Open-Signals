@@ -4,9 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
-import net.gir.girsignals.EnumsHV.HPVR;
 import net.gir.girsignals.GirsignalsMain;
-import net.gir.girsignals.blocks.HVSignal;
+import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.items.Linkingtool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
@@ -24,9 +23,10 @@ public class GIRItems {
 	public static final Item DEBUG_TOOL = new Item() {
 		public EnumActionResult onItemUse(net.minecraft.entity.player.EntityPlayer player, net.minecraft.world.World worldIn, net.minecraft.util.math.BlockPos pos, net.minecraft.util.EnumHand hand, net.minecraft.util.EnumFacing facing, float hitX, float hitY, float hitZ) {
 			IBlockState state = worldIn.getBlockState(pos);
-			if(state.getBlock() instanceof HVSignal) {
+			if(state.getBlock() instanceof SignalHV) {
 				IExtendedBlockState ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
-				System.out.println("======== HP " + ebs.getValue(HVSignal.HAUPTSIGNAL));
+				System.out.println("======== HP " + ebs.getValue(SignalHV.HAUPTSIGNAL));
+				
 			}
 			return EnumActionResult.PASS;
 		};

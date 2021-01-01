@@ -6,7 +6,7 @@ import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
-import net.gir.girsignals.blocks.HVSignal;
+import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.items.Linkingtool;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -58,7 +58,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	private void onLink() {
 		Block b = world.getBlockState(linkedSignalPosition).getBlock();
-		if(b instanceof HVSignal)
+		if(b instanceof SignalHV)
 			signalType = SignalType.HV_TYPE;
 		else
 			throw new IllegalArgumentException("Block is not a signal!");
