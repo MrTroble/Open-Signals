@@ -30,7 +30,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 public class SignalCustomModel implements IModel {
 
 	private ArrayList<ResourceLocation> textures = new ArrayList<>();
-	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Float>> modelCache = new HashMap<>();
+	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
 	private IBakedModel cachedModel = null;
 	private EnumFacing facing = EnumFacing.NORTH;
 	
@@ -51,7 +51,10 @@ public class SignalCustomModel implements IModel {
 						if(trs.isPresent()) {
 							TRSRTransformation trsr = trs.get();
 							ItemTransformVec3f itf = trsr.toItemTransform();
-							itf.translation.y += m.second();
+							Vector3f vec = m.second();
+							itf.translation.x += vec.x;
+							itf.translation.y += vec.y;
+							itf.translation.z += vec.z;
 							if(facing != EnumFacing.NORTH)
 								itf.rotation.y += facing.getHorizontalAngle();
 							trsr = TRSRTransformation.from(itf);
@@ -75,11 +78,15 @@ public class SignalCustomModel implements IModel {
 	public Collection<ResourceLocation> getTextures() {
 		return ImmutableList.copyOf(textures);
 	}
-
+	
 	protected void register(String name, Predicate<IExtendedBlockState> state, float yOffset) {
+		this.register(name, state, 0, yOffset, 0);
+	}
+
+	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z) {
 		IModel m = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
 				"Couldn't find " + name);
 		textures.addAll(m.getTextures());
-		modelCache.put(state, Pair.of(m, yOffset));
+		modelCache.put(state, Pair.of(m, new Vector3f(x, y, z)));
 	}
 }

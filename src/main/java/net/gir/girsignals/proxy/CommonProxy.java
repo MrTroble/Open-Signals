@@ -1,5 +1,6 @@
 package net.gir.girsignals.proxy;
 
+import net.gir.girsignals.blocks.SignalTileEnity;
 import net.gir.girsignals.controllers.SignalControllerTileEntity;
 import net.gir.girsignals.init.GIRBlocks;
 import net.gir.girsignals.init.GIRItems;
@@ -13,6 +14,8 @@ public class CommonProxy {
 
 	public void preinit(FMLPreInitializationEvent event) {
 		TileEntity.register("SignalControllerTileEntity", SignalControllerTileEntity.class);
+		TileEntity.register("SignalTileEntity", SignalTileEnity.class);
+
 		GIRItems.init();
 		GIRBlocks.init();
 

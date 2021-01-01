@@ -5,7 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import net.gir.girsignals.GirsignalsMain;
-import net.gir.girsignals.blocks.HVSignal;
+import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.controllers.SignalController;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -18,7 +18,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class GIRBlocks {
 
 	public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
-	public static final HVSignal HV_SIGNAL = new HVSignal();
+	public static final SignalHV HV_SIGNAL = new SignalHV();
 	
 	private static ArrayList<Block> blocksToRegister = new ArrayList<>();
 	
