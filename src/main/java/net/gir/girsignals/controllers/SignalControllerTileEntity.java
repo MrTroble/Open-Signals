@@ -143,7 +143,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			tile.setProperty(prop, newSignal == 0 ? Boolean.FALSE : Boolean.TRUE);
 		else if (prop.getType().isEnum())
 			tile.setProperty(prop, (IStringSerializable) prop.getType().getEnumConstants()[newSignal]);
-		world.notifyBlockUpdate(linkedSignalPosition, blockstate, blockstate, 3);
+		world.markAndNotifyBlock(linkedSignalPosition, null, blockstate, blockstate, 3);
 		return true;
 	}
 
@@ -157,6 +157,32 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return ((SignalBlock)world.getBlockState(linkedSignalPosition).getBlock()).getSignalTypeName();
 	}
 
+	@Callback
+	@Optional.Method(modid = "opencomputers")
+	public Object[] getSignalState(Context context, Arguments args) {
+		return new Object[] { getSignalStateImpl(args.checkInteger(0)) };
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public int getSignalStateImpl(int type) {
+		if (!hasLinkImpl() || !find(getSupportedSignalTypesImpl(), type))
+			return -1;
+		SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(linkedSignalPosition);
+		IBlockState blockstate = world.getBlockState(linkedSignalPosition);
+		SignalBlock block = (SignalBlock) blockstate.getBlock();
+		IUnlistedProperty<?> prop = block.getPropertyFromID(type);
+		if (prop.getType().equals(Boolean.class)) {
+			java.util.Optional<Boolean> bool = (java.util.Optional<Boolean>) tile.getProperty(prop);
+			if(bool.isPresent())
+				return bool.get() ? 1:0;
+		} else if (prop.getType().isEnum()) {
+			java.util.Optional<Enum> bool = (java.util.Optional<Enum>) tile.getProperty(prop);
+			if(bool.isPresent())
+				return bool.get().ordinal();
+		}
+		return -1;
+	}
+	
 	@Override
 	public String getComponentName() {
 		return "signalcontroller";

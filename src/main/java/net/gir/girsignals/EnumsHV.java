@@ -3,32 +3,32 @@ package net.gir.girsignals;
 import net.minecraft.util.IStringSerializable;
 
 public class EnumsHV {
-
-	public enum HPVR implements IStringSerializable {
-		None, Off, HpVr0, HpVr1, HpVr2, FHpVr0, FHpVr1, FHpVr2;
-
+	
+	public interface Offable<T extends Enum<T>> extends IStringSerializable {
+	
+		@SuppressWarnings({ "unchecked" })
 		@Override
-		public String getName() {
-			return this.name();
+		public default String getName() {
+			return ((Enum<T>)this).name();
 		}
+		
+		@SuppressWarnings("unchecked")
+		public default T getOffState() {
+			return (T) Enum.valueOf((Class<T>) this.getClass(), "OFF");
+		}
+		
 	}
 
-	public enum ZS2 implements IStringSerializable {
-		None, Off, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
-
-		@Override
-		public String getName() {
-			return this.name();
-		}
+	public enum HPVR implements Offable<HPVR> {
+		OFF, HPVR0, HPVR1, HPVR2;
 	}
 
-	public enum ZS3 implements IStringSerializable {
-		None, Off, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13;
+	public enum ZS2 implements Offable<ZS2> {
+		OFF, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
+	}
 
-		@Override
-		public String getName() {
-			return this.name();
-		}
+	public enum ZS3 implements Offable<ZS3> {
+		OFF, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13;
 	}
 
 }
