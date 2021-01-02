@@ -146,4 +146,11 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	public String getSignalTypeName() {
 		return signalTypeName;
 	}
+	
+	@Override
+	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+		super.breakBlock(worldIn, pos, state);
+		
+		GhostBlock.destroyUpperBlock(worldIn, pos);
+	}
 }
