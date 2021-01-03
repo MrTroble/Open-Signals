@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import net.gir.girsignals.init.GIRBlocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -30,17 +29,25 @@ public class SignalTileEnity extends TileEntity {
 				comp.setBoolean(prop.getName(), ((Boolean) in).booleanValue());
 		});
 		compound.setTag(PROPERTIES, comp);
-		System.out.println(world != null ? world.isRemote:null);
-		System.out.println(comp.toString());
 		return super.writeToNBT(compound);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private NBTTagCompound __tmp = null;
+	
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
-		// TODO FIX ME Block may not have been placed
-		((ExtendedBlockState)GIRBlocks.HV_SIGNAL.getBlockState()).getUnlistedProperties().parallelStream().forEach(prop -> {
+		if(world == null) {
+			__tmp = comp;
+		} else {
+			read(comp);
+		}
+		super.readFromNBT(compound);
+	}
+		
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void read(NBTTagCompound comp) {
+		((ExtendedBlockState)world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties().parallelStream().forEach(prop -> {
 			if(comp.hasKey(prop.getName())) {
 				Object opt = null;
 				if(prop.getType().isEnum()) {
@@ -50,39 +57,30 @@ public class SignalTileEnity extends TileEntity {
 				}
 				map.put(prop, opt);
 			}
-		});		
-		System.out.println(world != null ? world.isRemote:null);
-		System.out.println(comp.toString());
-		super.readFromNBT(compound);
+		});
 	}
 
 	@Override
+	public void onLoad() {
+		 if(__tmp != null) {
+			 read(__tmp);
+			 __tmp = null;
+		 }
+	}
+	
+	@Override
 	public SPacketUpdateTileEntity getUpdatePacket() {
-		System.out.println("Update package!");
 		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
 	}
 	
 	@Override
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-		System.out.println("On data packet!");
 		this.readFromNBT(pkt.getNbtCompound());
 		world.markBlockRangeForRenderUpdate(pos, pos);
 	}
-	
-	@Override
-	public void handleUpdateTag(NBTTagCompound tag) {
-		System.out.println("Handle tag!");
-		this.readFromNBT(tag);
-	}
-	
-	@Override
-	public boolean receiveClientEvent(int id, int type) {
-		return true;
-	}
-	
+			
 	@Override
 	public NBTTagCompound getUpdateTag() {
-		System.out.println("Update tag!");
 		return writeToNBT(new NBTTagCompound());
 	}
 	

@@ -62,7 +62,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 	private static Predicate<IExtendedBlockState> hasAndIsNot(IUnlistedProperty<Boolean> property) {
 		return ebs -> {
 			Boolean bool = ebs.getValue(property);
-			return bool != null && bool.booleanValue();
+			return bool == null || !bool.booleanValue();
 		};
 	}
 	
@@ -74,6 +74,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast_sign", ebs -> true, 1);
 			cm.register("hv_mast_number", ebs -> true, 2);
 			cm.register("hv_zs3v", has(SignalHV.ZS3V), 3);
+			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS3V).negate(), 3);
 			cm.register("hv_vr", has(SignalHV.VORSIGNAL), 4);
 			cm.register("hv_zs1", has(SignalHV.ZS1), 4.4f);
 			cm.register("hv_zs7", has(SignalHV.ZS7), 4.6f);
@@ -97,27 +98,24 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("lamp_black", with(SignalHV.VORSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), -(13.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// RS
-			Predicate<IExtendedBlockState> rsPred = hasAndIsNot(SignalHV.RANGIERSIGNAL);
-			cm.register("lamp_black_small", rsPred, -(6.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", rsPred, (3.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIsNot(SignalHV.RANGIERSIGNAL), -(6.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIsNot(SignalHV.RANGIERSIGNAL), (3.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// Status light TODO implement
 			cm.register("lamp_black_small", ebs -> false, (3.5f/32.0f), 5 + (7/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// ZS 1
-			Predicate<IExtendedBlockState> zs1Pred = hasAndIs(SignalHV.ZS1);
-			cm.register("lamp_black_small", zs1Pred, -(1.5f/32.0f), 4 + (21/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", zs1Pred, -(4.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", zs1Pred, (1.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1), -(1.5f/32.0f), 4 + (21/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1), -(4.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1), (1.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// VR Short distance lamp TODO implement
 			cm.register("lamp_black_small", ebs -> false, (8.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// ZS 7
-			Predicate<IExtendedBlockState> zs7Pred = hasAndIs(SignalHV.ZS7);
-			cm.register("lamp_black_small", zs7Pred, -(1.5f/32.0f), 4 + (15.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", zs7Pred, -(4.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", zs7Pred, (1.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7), -(1.5f/32.0f), 4 + (15.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7), -(4.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7), (1.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 		});
 	}
 

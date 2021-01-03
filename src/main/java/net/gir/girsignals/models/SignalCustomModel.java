@@ -15,7 +15,6 @@ import com.mojang.realmsclient.util.Pair;
 
 import net.gir.girsignals.GirsignalsMain;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -53,7 +52,7 @@ public class SignalCustomModel implements IModel {
 						Optional<TRSRTransformation> trs = state.apply(part);
 						if(trs.isPresent()) {
 							TRSRTransformation trsr = trs.get();
-							ItemTransformVec3f itf = trsr.toItemTransform();
+							net.minecraft.client.renderer.block.model.ItemTransformVec3f itf = trsr.toItemTransform();
 							Vector3f vec = m.second().first();
 							itf.translation.x += (facing != EnumFacing.SOUTH && facing != EnumFacing.NORTH) ? ((facing == EnumFacing.WEST ? 1:-1)*vec.z) : ((facing == EnumFacing.NORTH ? 1:-1)* vec.x);
 							itf.translation.y += vec.y;
