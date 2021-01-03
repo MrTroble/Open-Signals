@@ -28,7 +28,8 @@ public class GIRItems {
 			if(state.getBlock() instanceof SignalHV) {
 				IExtendedBlockState ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
 				System.out.println("======== HP " + ebs.getValue(SignalHV.HAUPTSIGNAL));
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.HAUPTSIGNAL, HPVR.HpVr0);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.HAUPTSIGNAL, HPVR.HPVR0);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.VORSIGNAL, HPVR.HPVR0);
 				ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
 				System.out.println("======== HP " + ebs.getValue(SignalHV.HAUPTSIGNAL));
 				worldIn.notifyBlockUpdate(pos, state, state, 3);

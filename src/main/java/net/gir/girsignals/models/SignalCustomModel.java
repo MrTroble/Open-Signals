@@ -15,7 +15,6 @@ import com.mojang.realmsclient.util.Pair;
 
 import net.gir.girsignals.GirsignalsMain;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemTransformVec3f;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
@@ -26,11 +25,14 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class SignalCustomModel implements IModel {
 
 	private ArrayList<ResourceLocation> textures = new ArrayList<>();
-	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
+	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Pair<Vector3f, Vector3f>>> modelCache = new HashMap<>();
 	private IBakedModel cachedModel = null;
 	private EnumFacing facing = EnumFacing.NORTH;
 	
@@ -50,11 +52,16 @@ public class SignalCustomModel implements IModel {
 						Optional<TRSRTransformation> trs = state.apply(part);
 						if(trs.isPresent()) {
 							TRSRTransformation trsr = trs.get();
-							ItemTransformVec3f itf = trsr.toItemTransform();
-							Vector3f vec = m.second();
-							itf.translation.x += vec.x;
+							net.minecraft.client.renderer.block.model.ItemTransformVec3f itf = trsr.toItemTransform();
+							Vector3f vec = m.second().first();
+							itf.translation.x += (facing != EnumFacing.SOUTH && facing != EnumFacing.NORTH) ? ((facing == EnumFacing.WEST ? 1:-1)*vec.z) : ((facing == EnumFacing.NORTH ? 1:-1)* vec.x);
 							itf.translation.y += vec.y;
-							itf.translation.z += vec.z;
+							itf.translation.z += (facing != EnumFacing.SOUTH && facing != EnumFacing.NORTH) ? ((facing == EnumFacing.WEST ? -1:1)*vec.x) : ((facing == EnumFacing.NORTH ? 1:-1)* vec.z);
+
+							Vector3f scale = m.second().second();
+							itf.scale.x += scale.x;
+							itf.scale.y += scale.y;
+							itf.scale.z += scale.z;
 							if(facing != EnumFacing.NORTH)
 								itf.rotation.y += facing.getHorizontalAngle();
 							trsr = TRSRTransformation.from(itf);
@@ -84,9 +91,13 @@ public class SignalCustomModel implements IModel {
 	}
 
 	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z) {
+		this.register(name, state, x, y, z, 0, 0, 0);
+	}
+	
+	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z, float xs, float ys, float zs) {
 		IModel m = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
 				"Couldn't find " + name);
 		textures.addAll(m.getTextures());
-		modelCache.put(state, Pair.of(m, new Vector3f(x, y, z)));
+		modelCache.put(state, Pair.of(m, Pair.of(new Vector3f(x, y, z), new Vector3f(xs, ys, zs))));
 	}
 }
