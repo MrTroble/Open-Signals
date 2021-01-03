@@ -36,14 +36,13 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		
 		public ModelPred(IUnlistedProperty<T> property, Predicate<T> t) {
 			this.property = property;
-			this.t = t;
+			this.t = t.negate();
 		}
 		
-		@SuppressWarnings("unlikely-arg-type")
 		@Override
 		public boolean test(IExtendedBlockState bs) {
 			T test = bs.getValue(this.property);
-			return test != null && (test.getOffState().equals(test) || t.test(test));
+			return test != null && (test.getOffState() == test || t.test(test));
 		}
 		
 	}
@@ -57,6 +56,13 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		return ebs -> {
 			Boolean bool = ebs.getValue(property);
 			return bool != null && !bool.booleanValue();
+		};
+	}
+	
+	private static Predicate<IExtendedBlockState> hasAndIsNot(IUnlistedProperty<Boolean> property) {
+		return ebs -> {
+			Boolean bool = ebs.getValue(property);
+			return bool != null && bool.booleanValue();
 		};
 	}
 	
@@ -75,24 +81,23 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_zs3", has(SignalHV.ZS3), 6.9f);
 			
 			// HP 2
-			cm.register("lamp_black", with(SignalHV.HAUPTSIGNAL, hpvr -> !hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 5 - (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", with(SignalHV.HAUPTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 5 - (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			// HP 0
-			Predicate<IExtendedBlockState> hp0 = with(SignalHV.HAUPTSIGNAL, hpvr -> !hpvr.equals(HPVR.HPVR0));
-			cm.register("lamp_black", hp0, (3.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black", hp0, -(6.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", with(SignalHV.HAUPTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), (3.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", with(SignalHV.HAUPTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), -(6.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			// HP 1/2 (green)
-			cm.register("lamp_black", with(SignalHV.HAUPTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), (3.5f/32.0f), 6 + (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", with(SignalHV.HAUPTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 6 + (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// VR0
-			cm.register("lamp_black", with(SignalHV.VORSIGNAL, hpvr -> !(hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2))), (10.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black", with(SignalHV.VORSIGNAL, hpvr -> !hpvr.equals(HPVR.HPVR0)), -(5.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", with(SignalHV.VORSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0) || hpvr.equals(HPVR.HPVR2)), (10.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", with(SignalHV.VORSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), -(5.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// VR1
-			cm.register("lamp_black", with(SignalHV.VORSIGNAL, hpvr -> !hpvr.equals(HPVR.HPVR1)), (2.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black", with(SignalHV.VORSIGNAL, hpvr -> !(hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2))), -(13.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", with(SignalHV.VORSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1)), (2.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", with(SignalHV.VORSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), -(13.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// RS
-			Predicate<IExtendedBlockState> rsPred = hasAndIs(SignalHV.RANGIERSIGNAL);
+			Predicate<IExtendedBlockState> rsPred = hasAndIsNot(SignalHV.RANGIERSIGNAL);
 			cm.register("lamp_black_small", rsPred, -(6.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			cm.register("lamp_black_small", rsPred, (3.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			

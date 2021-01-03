@@ -58,7 +58,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		writeBlockPosToNBT(linkedSignalPosition, compound);
 		return super.writeToNBT(compound);
 	}
-
+	
 	private void onLink() {
 		IBlockState state = world.getBlockState(linkedSignalPosition);
 		SignalBlock b = (SignalBlock) state.getBlock();
@@ -75,6 +75,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		for (int i = 0; set.hasNext(); i++) {
 			Entry<String, Integer> entry = set.next();
 			tableOfSupportedSignalTypes[i] = new Object[] {entry.getKey(), entry.getValue()};
+		}
+	}
+	
+	@Override
+	public void onLoad() {
+		if(linkedSignalPosition != null && !world.isRemote) {
+			onLink();
 		}
 	}
 
