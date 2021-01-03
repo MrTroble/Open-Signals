@@ -3,6 +3,7 @@ itemGroup.GIRSignals=GIRSignals
 
 #Items
 item.linkingtool.name=Verlinker
+item.placementtool.name=Signal-Platzierer
 
 #Blocks
 tile.hvsignalcontroller.name=HV-Signal-Regler
@@ -12,3 +13,5 @@ lt.linkfailed=Link fehlgeschlagen!
 lt.set=Position vom Controller gesetzt
 lt.added=%s zum Linken gesetzt
 lt.unlink=Link zum Signal entfernt
+
+#Placementtool

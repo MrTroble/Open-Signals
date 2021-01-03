@@ -9,6 +9,7 @@ import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.blocks.SignalTileEnity;
 import net.gir.girsignals.items.Linkingtool;
+import net.gir.girsignals.items.Placementtool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
 import net.minecraft.util.EnumActionResult;
@@ -21,6 +22,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class GIRItems {
 
 	public static final Linkingtool LINKING_TOOL = new Linkingtool();
+	public static final Placementtool PLACEMENT_TOOL = new Placementtool();
 	// TODO Remove in production
 	public static final Item DEBUG_TOOL = new Item() {
 		public EnumActionResult onItemUse(net.minecraft.entity.player.EntityPlayer player, net.minecraft.world.World worldIn, net.minecraft.util.math.BlockPos pos, net.minecraft.util.EnumHand hand, net.minecraft.util.EnumFacing facing, float hitX, float hitY, float hitZ) {
