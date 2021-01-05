@@ -15,6 +15,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.b3d.B3DLoader.B3DState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
@@ -99,9 +100,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			
 			for(ZS3 zs3 : ZS3.values()) {
 				cm.register("hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)), 6.9f, "7", "girsignals:blocks/zs3_" + zs3.name().substring(1));
-				cm.register("hv_zs3v", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)), 3f, "7", zs3.equals(ZS3.OFF) ? "girsignals:blocks/zs3_":"girsignals:blocks/zs3v_" + zs3.name().substring(1));
+				cm.register("hv_zs3v", with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)), 3f, "7", zs3.equals(ZS3.OFF) ? "girsignals:blocks/zs3_":"girsignals:blocks/zs3v_" + zs3.name().substring(1));
 			}
-			
+
 			// HP 2
 			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 5 - (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			// HP 0
