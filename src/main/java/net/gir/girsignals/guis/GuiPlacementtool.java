@@ -4,15 +4,17 @@ import java.util.Collection;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.init.GIRBlocks;
 import net.gir.girsignals.init.GIRNetworkHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.server.SPacketCustomPayload;
+import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class GuiPlacementtool extends GuiScreen {
 
@@ -28,7 +30,7 @@ public class GuiPlacementtool extends GuiScreen {
 
 	@Override
 	public void initGui() {
-
+		// TODO Block change
 		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) GIRBlocks.HV_SIGNAL.getBlockState();
 		Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
 		int maxWidth = 0;
@@ -52,22 +54,16 @@ public class GuiPlacementtool extends GuiScreen {
 
 	@Override
 	public void onGuiClosed() {
-
-		/*
-		 * NBTTagCompound tagCompound = new NBTTagCompound(); for (GuiButton button :
-		 * buttonList) { GuiCheckBox buttonCheckBox = (GuiCheckBox) button;
-		 * tagCompound.setBoolean(button.displayString, buttonCheckBox.isChecked()); }
-		 */
 		ByteBuf buffer = Unpooled.buffer();
 		buffer.writeInt(GIRBlocks.HV_SIGNAL.getID()); // TODO Automatisieren für alle Signale
 		for (GuiButton button : buttonList) {
+			if(!(button instanceof GuiCheckBox)) continue;
 			GuiCheckBox buttonCheckBox = (GuiCheckBox) button;
 			buffer.writeBoolean(buttonCheckBox.isChecked());
 		}
-		SPacketCustomPayload payload = new SPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
+		CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
 				new PacketBuffer(buffer));
-		mc.player.connection.sendPacket(payload);
-
+		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
 	}
 
 }
