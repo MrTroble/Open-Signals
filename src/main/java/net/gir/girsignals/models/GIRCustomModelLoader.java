@@ -113,7 +113,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1), -(4.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1), (1.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
-			// VR Short distance lamp TODO implement
+			// VR Short distance lamp
 			cm.register("lamp_black_small", hasAndIs(SignalHV.VR_LIGHT), (8.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// ZS 7
