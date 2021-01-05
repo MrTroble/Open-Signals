@@ -90,6 +90,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast_number", hasAndIs(SignalHV.MAST_NUMBER), 2);
 			cm.register("hv_mast_without_number", hasAndIs(SignalHV.MAST_NUMBER).negate(), 2);
 			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS3V).negate(), 3);
+			cm.register("hv_mast_without_vr", has(SignalHV.DISTANTSIGNAL).negate(), 4);
 			cm.register("hv_vr", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT).negate()), 4);
 			cm.register("hv_vr_kennlicht", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT)), 4);
 			cm.register("hv_zs1", has(SignalHV.ZS1), 4.4f);
