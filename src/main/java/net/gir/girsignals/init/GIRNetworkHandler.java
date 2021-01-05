@@ -22,13 +22,12 @@ public class GIRNetworkHandler {
 	public void onCustomPacket(ServerCustomPacketEvent event) {
 		FMLProxyPacket packet = event.getPacket();
 		ByteBuf payBuf = packet.payload();
-		int blockType = payBuf.getInt(0);
+		int blockType = payBuf.readInt();
 		SignalBlock block = SignalBlock.SIGNALLIST.get(blockType);
 		ExtendedBlockState blockState = (ExtendedBlockState) block.getBlockState();
 		NBTTagCompound tagCompound = new NBTTagCompound();
-		int n = 1;
 		for (IUnlistedProperty<?> property : blockState.getUnlistedProperties()) {
-			tagCompound.setBoolean(property.getName(), payBuf.getBoolean(n++));
+			tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
 		}
 
 		EntityPlayer player = ((NetHandlerPlayServer) event.getHandler()).player;
