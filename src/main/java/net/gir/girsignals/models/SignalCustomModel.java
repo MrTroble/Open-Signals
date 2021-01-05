@@ -41,6 +41,7 @@ public class SignalCustomModel implements IModel {
 
 	public SignalCustomModel(Consumer<SignalCustomModel> init, EnumFacing facing) {
 		init.accept(this);
+		modelCache.entrySet().forEach(set -> set.getValue().first().getTextures().forEach(System.out::println));
 		this.facing = facing;
 	}
 
@@ -125,7 +126,7 @@ public class SignalCustomModel implements IModel {
 				build.put(strings[i * 2], strings[i * 2 + 1]);
 			m = m.retexture(build.build());
 		}
-		textures.addAll(m.getTextures());
+		m.getTextures().stream().filter(rs -> !textures.contains(rs)).forEach(textures::add);
 		modelCache.put(state, Pair.of(m, Pair.of(new Vector3f(x, y, z), new Vector3f(xs, ys, zs))));
 	}
 }

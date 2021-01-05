@@ -6,6 +6,7 @@ import java.util.function.Predicate;
 
 import net.gir.girsignals.EnumsHV.HPVR;
 import net.gir.girsignals.EnumsHV.Offable;
+import net.gir.girsignals.EnumsHV.ZS3;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.SignalHV;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -33,23 +34,35 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		
 		private final IUnlistedProperty<T> property;
 		private final Predicate<T> t;
+		private final Predicate<T> offPred;
 		
-		public ModelPred(IUnlistedProperty<T> property, Predicate<T> t) {
+		public ModelPred(IUnlistedProperty<T> property, Predicate<T> t, boolean negate) {
 			this.property = property;
-			this.t = t.negate();
+			if(negate) {
+				this.t = t.negate();
+				this.offPred = test -> test.getOffState() == test;
+			} else {
+				this.t = t;
+				this.offPred = test -> false;
+			}
 		}
 		
 		@Override
 		public boolean test(IExtendedBlockState bs) {
 			T test = bs.getValue(this.property);
-			return test != null && (test.getOffState() == test || t.test(test));
+			return test != null && t.or(offPred).test(test);
 		}
 		
 	}
 	
 	@SuppressWarnings("rawtypes")
+	private static <T extends Offable> Predicate<IExtendedBlockState> withNot(IUnlistedProperty<T> property, Predicate<T> t) {
+		return new ModelPred<T>(property, t, true);
+	}
+	
+	@SuppressWarnings("rawtypes")
 	private static <T extends Offable> Predicate<IExtendedBlockState> with(IUnlistedProperty<T> property, Predicate<T> t) {
-		return new ModelPred<T>(property, t);
+		return new ModelPred<T>(property, t, false);
 	}
 	
 	private static Predicate<IExtendedBlockState> hasAndIs(IUnlistedProperty<Boolean> property) {
@@ -83,23 +96,27 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_zs1", has(SignalHV.ZS1), 4.4f);
 			cm.register("hv_zs7", has(SignalHV.ZS7), 4.6f);
 			cm.register("hv_hp", has(SignalHV.STOPSIGNAL), 5.4f);
-			cm.register("hv_zs3", has(SignalHV.ZS3), 6.9f);
+			cm.register("hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(ZS3.OFF)), 6.9f, "7", "girsignals:blocks/zs3_0");
+			for(ZS3 zs3 : ZS3.values()) {
+				if(zs3 == ZS3.OFF) continue;
+				cm.register("hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)), 6.9f, "7", "girsignals:blocks/zs3_" + zs3.name().substring(1));
+			}
 			
 			// HP 2
-			cm.register("lamp_black", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 5 - (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 5 - (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			// HP 0
-			cm.register("lamp_black", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), (3.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), -(6.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), (3.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), -(6.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			// HP 1/2 (green)
-			cm.register("lamp_black", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 6 + (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 6 + (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// VR0
-			cm.register("lamp_black", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0) || hpvr.equals(HPVR.HPVR2)), (10.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), -(5.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0) || hpvr.equals(HPVR.HPVR2)), (10.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), -(5.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// VR1
-			cm.register("lamp_black", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1)), (2.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), -(13.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1)), (2.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), -(13.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// RS
 			cm.register("lamp_black_small", hasAndIsNot(SignalHV.SHUNTINGSIGNAL).and(has(SignalHV.STOPSIGNAL)), -(6.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
