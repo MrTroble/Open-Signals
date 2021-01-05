@@ -89,7 +89,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast_sign", has(SignalHV.STOPSIGNAL).negate(), 1);
 			cm.register("hv_mast_number", hasAndIs(SignalHV.MAST_NUMBER), 2);
 			cm.register("hv_mast_without_number", hasAndIs(SignalHV.MAST_NUMBER).negate(), 2);
-			cm.register("hv_zs3v", has(SignalHV.ZS3V), 3);
 			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS3V).negate(), 3);
 			cm.register("hv_vr", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT).negate()), 4);
 			cm.register("hv_vr_kennlicht", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT)), 4);
@@ -100,6 +99,12 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			for(ZS3 zs3 : ZS3.values()) {
 				if(zs3 == ZS3.OFF) continue;
 				cm.register("hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)), 6.9f, "7", "girsignals:blocks/zs3_" + zs3.name().substring(1));
+			}
+			
+			cm.register("hv_zs3v", with(SignalHV.ZS3, pZs3 -> pZs3.equals(ZS3.OFF)), 3f, "7", "girsignals:blocks/zs3v_0");
+			for(ZS3 zs3 : ZS3.values()) {
+				if(zs3 == ZS3.OFF) continue;
+				cm.register("hv_zs3v", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)), 3f, "7", "girsignals:blocks/zs3v_" + zs3.name().substring(1));
 			}
 			
 			// HP 2
