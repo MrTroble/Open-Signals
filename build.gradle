@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0.0'
+version = System.getenv("APPVEYOR_BUILD_VERSION")
 group = 'net.gir.girsignals' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'GIRSignals'
 
