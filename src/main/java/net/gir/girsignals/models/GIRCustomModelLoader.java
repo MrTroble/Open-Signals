@@ -96,11 +96,10 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_zs1", has(SignalHV.ZS1), 4.4f);
 			cm.register("hv_zs7", has(SignalHV.ZS7), 4.6f);
 			cm.register("hv_hp", has(SignalHV.STOPSIGNAL), 5.4f);
+			
 			for(ZS3 zs3 : ZS3.values()) {
 				cm.register("hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)), 6.9f, "7", "girsignals:blocks/zs3_" + zs3.name().substring(1));
-			}
-			for(ZS3 zs3 : ZS3.values()) {
-				cm.register("hv_zs3v", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)), 3f, "7", "girsignals:blocks/zs3v_" + zs3.name().substring(1));
+				cm.register("hv_zs3v", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)), 3f, "7", zs3.equals(ZS3.OFF) ? "girsignals:blocks/zs3_":"girsignals:blocks/zs3v_" + zs3.name().substring(1));
 			}
 			
 			// HP 2
