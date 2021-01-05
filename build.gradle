@@ -14,7 +14,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0.0'
+version = System.getenv("APPVEYOR_BUILD_VERSION")
 group = 'net.gir.girsignals' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'GIRSignals'
 
@@ -124,13 +124,16 @@ task update(type: Copy) {
          	   file2 -> copyName = file2.getAbsolutePath() 
         	}
     	}
-		new File('run/mods').eachFile {
-			file -> file.delete()
-		}
-		if(copyName != "") {
-    		from copyName
-    		into 'run/mods'
-    	}
+        def filef = new File('run/mods')
+        if(filef.exists()) {
+		    filef.eachFile {
+		    	file -> file.delete()
+		    }
+		    if(copyName != "") {
+    	    	from copyName
+    	    	into 'run/mods'
+    	    }
+        }
     }
 }
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
