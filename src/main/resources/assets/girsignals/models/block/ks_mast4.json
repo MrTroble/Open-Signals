@@ -1,0 +1,30 @@
+{
+	"credit": "Made with Blockbench by Mc_Jeronimo",
+	"texture_size": [32, 32],
+	"textures": {
+		"0": "girsignals:blocks/mast",
+		"particle": "girsignals:blocks/mast"
+	},
+	"elements": [
+		{
+			"name": "mast7",
+			"from": [7, 0, 10],
+			"to": [9, 16, 13],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 24, 10]},
+			"faces": {
+				"north": {"uv": [0, 0, 1, 8], "texture": "#0"},
+				"east": {"uv": [0, 0, 0.5, 8], "texture": "#0"},
+				"south": {"uv": [0, 0, 1, 8], "texture": "#0"},
+				"west": {"uv": [0, 0, 0.5, 8], "texture": "#0"},
+				"down": {"uv": [0, 0, 1, 0.5], "texture": "#0"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "mast5",
+			"origin": [-8, 80, -27],
+			"children": [0]
+		}
+	]
+}
