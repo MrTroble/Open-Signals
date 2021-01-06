@@ -11,8 +11,8 @@ public class SignalHL extends SignalBlock {
 	public SignalHL() {
 		super("HL");
 	}
-	public static final PropertyAdapter<HL> LICHTHAUPTSIGNAL = new PropertyAdapter<HL>(
-			PropertyEnum.create("lichthauptsignale", HL.class));
+	public static final PropertyAdapter<HL> STOPSIGNAL = new PropertyAdapter<HL>(
+			PropertyEnum.create("stopsignal", HL.class));
 	public static final PropertyAdapter<Boolean> ZS1 = new PropertyAdapter<Boolean>(PropertyBool.create("zs1"));
 	public static final PropertyAdapter<Boolean> ZS6 = new PropertyAdapter<Boolean>(PropertyBool.create("zs6"));
 	public static final PropertyAdapter<Boolean> ZS8 = new PropertyAdapter<Boolean>(PropertyBool.create("zs8"));

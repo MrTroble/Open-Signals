@@ -12,8 +12,8 @@ public class SignalKS extends SignalBlock {
 	public SignalKS() {
 		super("KS");
 	}
-	public static final PropertyAdapter<KS> KOMBISIGNAL = new PropertyAdapter<KS>(
-			PropertyEnum.create("kombisignale", KS.class));
+	public static final PropertyAdapter<KS> STOPSIGNAL = new PropertyAdapter<KS>(
+			PropertyEnum.create("stopsignal", KS.class));
 	public static final PropertyAdapter<ZS3> ZS3 = new PropertyAdapter<ZS3>(PropertyEnum.create("zs3", ZS3.class));
 	public static final PropertyAdapter<Boolean> ZS3LS = new PropertyAdapter<Boolean>(PropertyBool.create("zs3ls"));
 	public static final PropertyAdapter<ZS3> ZS3V = new PropertyAdapter<ZS3>(PropertyEnum.create("zs3v", ZS3.class));
