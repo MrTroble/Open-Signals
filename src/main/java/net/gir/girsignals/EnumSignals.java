@@ -2,7 +2,7 @@ package net.gir.girsignals;
 
 import net.minecraft.util.IStringSerializable;
 
-public class Enums {
+public class EnumSignals {
 
 	public interface Offable<T extends Enum<T>> extends IStringSerializable {
 

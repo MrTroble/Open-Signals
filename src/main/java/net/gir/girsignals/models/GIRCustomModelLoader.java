@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import net.gir.girsignals.Enums.HPVR;
-import net.gir.girsignals.Enums.Offable;
-import net.gir.girsignals.Enums.ZS3;
+import net.gir.girsignals.EnumSignals.HPVR;
+import net.gir.girsignals.EnumSignals.Offable;
+import net.gir.girsignals.EnumSignals.ZS3;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.blocks.SignalKS;
