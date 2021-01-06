@@ -4,8 +4,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
-import net.gir.girsignals.Enums.HPVR;
-import net.gir.girsignals.Enums.ZS3;
+import net.gir.girsignals.EnumSignals.HPVR;
+import net.gir.girsignals.EnumSignals.ZS3;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.blocks.SignalTileEnity;

@@ -1,9 +1,9 @@
 package net.gir.girsignals.blocks;
 
-import net.gir.girsignals.Enums.HPVR;
-import net.gir.girsignals.Enums.MAST_SIGN;
-import net.gir.girsignals.Enums.ZS2;
-import net.gir.girsignals.Enums.ZS3;
+import net.gir.girsignals.EnumSignals.HPVR;
+import net.gir.girsignals.EnumSignals.MAST_SIGN;
+import net.gir.girsignals.EnumSignals.ZS2;
+import net.gir.girsignals.EnumSignals.ZS3;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraftforge.common.property.Properties.PropertyAdapter;
