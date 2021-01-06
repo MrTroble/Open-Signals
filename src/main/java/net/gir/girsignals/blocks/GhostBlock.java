@@ -41,7 +41,7 @@ public class GhostBlock extends Block {
 	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
 		return layer == BlockRenderLayer.CUTOUT;
 	}
-	
+
 	public static void destroyUpperBlock(World worldIn, BlockPos pos) {
 		BlockPos posup = pos.up();
 		Block upperBlock = worldIn.getBlockState(posup).getBlock();
@@ -53,7 +53,7 @@ public class GhostBlock extends Block {
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
 		super.breakBlock(worldIn, pos, state);
-		
+
 		destroyUpperBlock(worldIn, pos);
 
 		BlockPos posdown = pos.down();
