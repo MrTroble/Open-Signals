@@ -6,7 +6,9 @@ import java.util.ArrayList;
 
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.GhostBlock;
+import net.gir.girsignals.blocks.SignalHL;
 import net.gir.girsignals.blocks.SignalHV;
+import net.gir.girsignals.blocks.SignalKS;
 import net.gir.girsignals.controllers.SignalController;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
@@ -21,14 +23,16 @@ public class GIRBlocks {
 	public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
 	public static final SignalHV HV_SIGNAL = new SignalHV();
 	public static final GhostBlock GHOST_BLOCK = new GhostBlock();
-	
+	public static final SignalKS KS_SIGNAL = new SignalKS();
+	public static final SignalHL HL_SIGNAL = new SignalHL();
+
 	private static ArrayList<Block> blocksToRegister = new ArrayList<>();
-	
+
 	public static void init() {
 		Field[] fields = GIRBlocks.class.getFields();
-		for(Field field : fields) {
+		for (Field field : fields) {
 			int modifiers = field.getModifiers();
-			if(Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && Modifier.isPublic(modifiers)) {
+			if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && Modifier.isPublic(modifiers)) {
 				String name = field.getName().toLowerCase().replace("_", "");
 				try {
 					Block block = (Block) field.get(null);
@@ -51,6 +55,7 @@ public class GIRBlocks {
 	@SubscribeEvent
 	public static void registerItem(RegistryEvent.Register<Item> event) {
 		IForgeRegistry<Item> registry = event.getRegistry();
-		blocksToRegister.forEach(block -> registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
+		blocksToRegister
+				.forEach(block -> registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
 	}
 }
