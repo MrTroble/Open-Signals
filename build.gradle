@@ -22,6 +22,9 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 
 repositories {
     maven { url = "http://maven.cil.li/" }
+    maven { url = 'https://files.minecraftforge.net/maven' }
+    jcenter()
+    mavenCentral()
 }
 
 minecraft {
