@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+	maven { url = "http://maven.cil.li/" }
         jcenter()
         mavenCentral()
     }
@@ -59,9 +60,6 @@ minecraft {
         }
     }
 }
-repositories {
-    maven { url = "http://maven.cil.li/" }
-}
 
 def ocVersion = "MC1.12.2-1.7.5.192"
 
@@ -111,11 +109,12 @@ jar {
 
 // Example configuration to allow publishing using the maven-publish task
 // This is the preferred method to reobfuscate your jar file
-tasks.getByName("eclipse").finalizedBy('update')
 jar.finalizedBy('reobfJar')
+
+tasks.getByName("eclipse").finalizedBy('update')
 task update(type: Copy) {
 	dependsOn "eclipse"
-	def username = System.properties['user.home']
+	def username = System.getenv("user.home")
     println("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     def fl = new File("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     if(fl.exists()) {
@@ -128,11 +127,11 @@ task update(type: Copy) {
         if(filef.exists()) {
 		    filef.eachFile {
 		    	file -> file.delete()
-		    }
-		    if(copyName != "") {
+			}	
+			if(copyName != "") {
     	    	from copyName
     	    	into 'run/mods'
-    	    }
+    		}
         }
     }
 }
