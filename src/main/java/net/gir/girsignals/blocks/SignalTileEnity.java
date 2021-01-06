@@ -53,7 +53,7 @@ public class SignalTileEnity extends TileEntity {
 				if(prop.getType().isEnum()) {
 					opt = Enum.valueOf((Class) prop.getType(), comp.getString(prop.getName()));
 				} else if(prop.getType().equals(Boolean.class)) {
-					opt = Optional.of(comp.getBoolean(prop.getName()));
+					opt = comp.getBoolean(prop.getName());
 				}
 				map.put(prop, opt);
 			}
@@ -84,7 +84,7 @@ public class SignalTileEnity extends TileEntity {
 		return writeToNBT(new NBTTagCompound());
 	}
 	
-	public void setProperty(IUnlistedProperty<?> prop, Object opt) {
+	public <T> void setProperty(IUnlistedProperty<T> prop, T opt) {
 		map.put(prop, opt);
 		this.markDirty();
 	}
@@ -95,7 +95,8 @@ public class SignalTileEnity extends TileEntity {
 		
 	}
 	
-	public IExtendedBlockState accumulate(BiAccumulater<IExtendedBlockState, IUnlistedProperty<?>, Object> bic, IExtendedBlockState bs) {
+	@SuppressWarnings("rawtypes")
+	public IExtendedBlockState accumulate(BiAccumulater<IExtendedBlockState, IUnlistedProperty, Object> bic, IExtendedBlockState bs) {
 		for(Map.Entry<IUnlistedProperty<?>, Object> entry : map.entrySet()) {
 			bs = bic.accept(bs, entry.getKey(), entry.getValue());
 		}
