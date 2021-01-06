@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import net.gir.girsignals.EnumsHV.HPVR;
+import net.gir.girsignals.EnumsHV.ZS3;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.blocks.SignalTileEnity;
@@ -27,10 +28,12 @@ public class GIRItems {
 			IBlockState state = worldIn.getBlockState(pos);
 			if(state.getBlock() instanceof SignalHV) {
 				IExtendedBlockState ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
-				System.out.println("======== HP " + ebs.getValue(SignalHV.HAUPTSIGNAL));
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.HAUPTSIGNAL, HPVR.HpVr0);
+				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.STOPSIGNAL, HPVR.HPVR0);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.DISTANTSIGNAL, HPVR.HPVR0);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS3, ZS3.Z6);
 				ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
-				System.out.println("======== HP " + ebs.getValue(SignalHV.HAUPTSIGNAL));
+				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
 				worldIn.notifyBlockUpdate(pos, state, state, 3);
 			}
 			return EnumActionResult.PASS;
@@ -46,7 +49,6 @@ public class GIRItems {
 			int modifiers = field.getModifiers();
 			if(Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && Modifier.isPublic(modifiers)) {
 				String name = field.getName().toLowerCase().replace("_", "");
-				System.out.println(name);
 				try {
 					Item item = (Item) field.get(null);
 					item.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));

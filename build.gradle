@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+	maven { url = "http://maven.cil.li/" }
         jcenter()
         mavenCentral()
     }
@@ -14,7 +15,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-version = '1.0.0'
+version = System.getenv("APPVEYOR_BUILD_VERSION")
 group = 'net.gir.girsignals' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'GIRSignals'
 
@@ -58,9 +59,6 @@ minecraft {
             property 'forge.logging.console.level', 'debug'
         }
     }
-}
-repositories {
-    maven { url = "http://maven.cil.li/" }
 }
 
 def ocVersion = "MC1.12.2-1.7.5.192"
@@ -111,11 +109,12 @@ jar {
 
 // Example configuration to allow publishing using the maven-publish task
 // This is the preferred method to reobfuscate your jar file
-tasks.getByName("eclipse").finalizedBy('update')
 jar.finalizedBy('reobfJar')
+
+tasks.getByName("eclipse").finalizedBy('update')
 task update(type: Copy) {
 	dependsOn "eclipse"
-	def username = System.properties['user.home']
+	def username = System.getenv("user.home")
     println("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     def fl = new File("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     if(fl.exists()) {
@@ -124,13 +123,16 @@ task update(type: Copy) {
          	   file2 -> copyName = file2.getAbsolutePath() 
         	}
     	}
-		new File('run/mods').eachFile {
-			file -> file.delete()
-		}
-		if(copyName != "") {
-    		from copyName
-    		into 'run/mods'
-    	}
+        def filef = new File('run/mods')
+        if(filef.exists()) {
+		    filef.eachFile {
+		    	file -> file.delete()
+			}	
+			if(copyName != "") {
+    	    	from copyName
+    	    	into 'run/mods'
+    		}
+        }
     }
 }
 // However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
