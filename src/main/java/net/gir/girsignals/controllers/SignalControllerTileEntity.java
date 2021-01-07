@@ -1,8 +1,7 @@
 package net.gir.girsignals.controllers;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -26,7 +25,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	private BlockPos linkedSignalPosition = null;
 	private Integer[] listOfSupportedIndicies;
-	private Object[] tableOfSupportedSignalTypes;
+	private Map<String, Integer> tableOfSupportedSignalTypes;
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
@@ -70,12 +69,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		listOfSupportedIndicies = supportedSignaleStates.values().toArray(new Integer[supportedSignaleStates.size()]);
 		System.out.println(listOfSupportedIndicies);
 		
-		tableOfSupportedSignalTypes = new Object[supportedSignaleStates.size()];
-		Iterator<Entry<String, Integer>> set = supportedSignaleStates.entrySet().iterator();
-		for (int i = 0; set.hasNext(); i++) {
-			Entry<String, Integer> entry = set.next();
-			tableOfSupportedSignalTypes[i] = new Object[] {entry.getKey(), entry.getValue()};
-		}
+		tableOfSupportedSignalTypes = supportedSignaleStates;
 	}
 	
 	@Override
@@ -117,7 +111,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSupportedSignalTypes(Context context, Arguments args) {
-		return tableOfSupportedSignalTypes;
+		return new Object[] { tableOfSupportedSignalTypes };
 	}
 
 	public Integer[] getSupportedSignalTypesImpl() {
@@ -140,7 +134,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public boolean changeSignalImpl(int newSignal, int type) {
+	public boolean changeSignalImpl(int type, int newSignal) {
 		if (!hasLinkImpl() || !find(getSupportedSignalTypesImpl(), type))
 			return false;
 		SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(linkedSignalPosition);
