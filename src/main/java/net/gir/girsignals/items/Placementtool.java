@@ -29,8 +29,9 @@ public class Placementtool extends Item {
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand,
 			EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (player.isSneaking()) {
-			if(!worldIn.isRemote) return EnumActionResult.PASS;
+			if(!worldIn.isRemote) return EnumActionResult.SUCCESS;
 			player.openGui(GirsignalsMain.MODID, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
+			return EnumActionResult.SUCCESS;
 		} else {
 			final BlockPos setPosition = pos.offset(facing);
 			if(!worldIn.isAirBlock(setPosition)) return EnumActionResult.FAIL;
@@ -59,8 +60,8 @@ public class Placementtool extends Item {
 				else
 					sig.setProperty((IUnlistedProperty)iup, false);
 			});
+			return EnumActionResult.SUCCESS;
 		}
-		return EnumActionResult.PASS;
 	}
 
 }
