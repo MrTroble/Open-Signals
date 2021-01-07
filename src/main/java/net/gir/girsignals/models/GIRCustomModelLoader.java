@@ -6,7 +6,7 @@ import java.util.function.Predicate;
 
 import net.gir.girsignals.EnumSignals.HPVR;
 import net.gir.girsignals.EnumSignals.Offable;
-import net.gir.girsignals.EnumSignals.ZS3;
+import net.gir.girsignals.EnumSignals.ZS32;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.SignalHV;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -89,7 +89,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast_sign", has(SignalHV.STOPSIGNAL).negate(), 1);
 			cm.register("hv_mast_number", hasAndIs(SignalHV.MAST_NUMBER), 2);
 			cm.register("hv_mast_without_number", hasAndIs(SignalHV.MAST_NUMBER).negate(), 2);
-			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS3V).negate(), 3);
+			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS32V).negate(), 3);
 			cm.register("hv_mast_without_vr", has(SignalHV.DISTANTSIGNAL).negate(), 4);
 			cm.register("hv_vr", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT).negate()), 4);
 			cm.register("hv_vr_kennlicht", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT)), 4);
@@ -97,11 +97,16 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_zs7", has(SignalHV.ZS7), 4.6f);
 			cm.register("hv_hp", has(SignalHV.STOPSIGNAL), 5.4f);
 			
-			for(ZS3 zs3 : ZS3.values()) {
-				cm.register("hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)), 6.9f, "7", "girsignals:blocks/zs3_" + zs3.name().substring(1));
-				cm.register("hv_zs3v", with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)), 3f, "7", zs3.equals(ZS3.OFF) ? "girsignals:blocks/zs3_":"girsignals:blocks/zs3v_" + zs3.name().substring(1));
-			}
+			cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(ZS32.OFF)), 6.9f, "7", "girsignals:blocks/zs32_off");
+			cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(ZS32.OFF)), 3f, "7", "girsignals:blocks/zs32_off");
 
+			ZS32[] values = ZS32.values();
+			for (int i = 1; i < values.length; i++) {
+				ZS32 zs3 = values[i];
+				cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(zs3)), 6.9f, "7", "girsignals:blocks/zs32_" + zs3.name());
+				cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(zs3)), 3f, "7", "girsignals:blocks/zs32v_" + zs3.name());
+			}
+			
 			// HP 2
 			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 5 - (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			// HP 0
