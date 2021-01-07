@@ -62,7 +62,6 @@ minecraft {
 }
 
 def ocVersion = "MC1.12.2-1.7.5.192"
-
 def copyName = ""
 
 dependencies {   
@@ -114,7 +113,7 @@ jar.finalizedBy('reobfJar')
 tasks.getByName("eclipse").finalizedBy('update')
 task update(type: Copy) {
 	dependsOn "eclipse"
-	def username = System.getenv("user.home")
+	def username = System.getenv("HOMEPATH")
     println("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     def fl = new File("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     if(fl.exists()) {
