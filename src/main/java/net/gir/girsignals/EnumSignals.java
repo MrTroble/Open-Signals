@@ -23,12 +23,8 @@ public class EnumSignals {
 		OFF, HPVR0, HPVR1, HPVR2;
 	}
 
-	public enum ZS2 implements Offable<ZS2> {
-		OFF, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
-	}
-
-	public enum ZS3 implements Offable<ZS3> {
-		OFF, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13;
+	public enum ZS32 implements Offable<ZS32> {
+		OFF, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13;
 	}
 
 	public enum MAST_SIGN implements Offable<MAST_SIGN> {
