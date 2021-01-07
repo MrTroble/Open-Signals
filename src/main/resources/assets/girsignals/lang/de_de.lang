@@ -15,3 +15,4 @@ lt.added=%s zum Linken gesetzt
 lt.unlink=Link zum Signal entfernt
 
 #Placementtool
+pt.itemnotset=Bitte stell das Tool vorher ein (Sneaken + Rechtsklick)

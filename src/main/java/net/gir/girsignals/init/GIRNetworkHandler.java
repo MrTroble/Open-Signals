@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 public class GIRNetworkHandler {
 
 	public static final String CHANNELNAME = "gir|setItemNBT";
+	public static final String BLOCK_TYPE_ID = "blockid";
 
 	@SubscribeEvent
 	public void onCustomPacket(ServerCustomPacketEvent event) {
@@ -26,6 +27,7 @@ public class GIRNetworkHandler {
 		SignalBlock block = SignalBlock.SIGNALLIST.get(blockType);
 		ExtendedBlockState blockState = (ExtendedBlockState) block.getBlockState();
 		NBTTagCompound tagCompound = new NBTTagCompound();
+		tagCompound.setInteger(BLOCK_TYPE_ID, blockType);
 		for (IUnlistedProperty<?> property : blockState.getUnlistedProperties()) {
 			tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
 		}
@@ -34,7 +36,6 @@ public class GIRNetworkHandler {
 		ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
 		if (stack.getItem() instanceof Placementtool) {
 			stack.setTagCompound(tagCompound);
-			System.out.println(tagCompound);
 		}
 	}
 
