@@ -24,7 +24,25 @@ public class EnumSignals {
 	}
 
 	public enum ZS32 implements Offable<ZS32> {
-		OFF, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13;
+		OFF(true), A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z2, Z3, Z4, Z5, Z6, Z7,
+		Z8, Z9, Z10, Z11, Z12, Z13, ZS13(true), ZS6(true), ZS8(true);
+
+		private final boolean test;
+
+		private ZS32() {
+			this.test = false;
+		}
+
+		private ZS32(boolean test) {
+			this.test = test;
+		}
+
+		public String getDistant() {
+			if (test)
+				return name();
+			else
+				return "v" + name();
+		}
 	}
 
 	public enum MAST_SIGN implements Offable<MAST_SIGN> {

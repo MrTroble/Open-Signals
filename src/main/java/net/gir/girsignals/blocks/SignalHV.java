@@ -30,11 +30,8 @@ public class SignalHV extends SignalBlock {
 	public static final PropertyAdapter<MAST_SIGN> MAST_SIGN = new PropertyAdapter<MAST_SIGN>(
 			PropertyEnum.create("mastsign", MAST_SIGN.class));
 	public static final PropertyAdapter<Boolean> NE1 = new PropertyAdapter<Boolean>(PropertyBool.create("ne1"));
-	public static final PropertyAdapter<Boolean> ZS1 = new PropertyAdapter<Boolean>(PropertyBool.create("zs1"));
 	public static final PropertyAdapter<ZS32> ZS32 = new PropertyAdapter<ZS32>(PropertyEnum.create("zs3", ZS32.class));
 	public static final PropertyAdapter<ZS32> ZS32V = new PropertyAdapter<ZS32>(PropertyEnum.create("zs3v", ZS32.class));
-	public static final PropertyAdapter<Boolean> ZS6 = new PropertyAdapter<Boolean>(PropertyBool.create("zs6"));
+	public static final PropertyAdapter<Boolean> ZS1 = new PropertyAdapter<Boolean>(PropertyBool.create("zs1"));
 	public static final PropertyAdapter<Boolean> ZS7 = new PropertyAdapter<Boolean>(PropertyBool.create("zs7"));
-	public static final PropertyAdapter<Boolean> ZS8 = new PropertyAdapter<Boolean>(PropertyBool.create("zs8"));
-	public static final PropertyAdapter<Boolean> ZS13 = new PropertyAdapter<Boolean>(PropertyBool.create("zs13"));
 }
