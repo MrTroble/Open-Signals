@@ -5,7 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import net.gir.girsignals.EnumSignals.HPVR;
-import net.gir.girsignals.EnumSignals.ZS3;
+import net.gir.girsignals.EnumSignals.ZS32;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.blocks.SignalTileEnity;
@@ -31,7 +31,9 @@ public class GIRItems {
 				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.STOPSIGNAL, HPVR.HPVR0);
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.DISTANTSIGNAL, HPVR.HPVR0);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS3, ZS3.Z6);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS32, ZS32.B);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS32V, ZS32.C);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS1, true);
 				ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
 				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
 				worldIn.notifyBlockUpdate(pos, state, state, 3);
@@ -43,7 +45,6 @@ public class GIRItems {
 	private static ArrayList<Item> registeredItems = new ArrayList<>();
 	
 	public static void init() {
-		DEBUG_TOOL.setCreativeTab(GIRTabs.tab);
 		Field[] fields = GIRItems.class.getFields();
 		for(Field field : fields) {
 			int modifiers = field.getModifiers();

@@ -72,13 +72,13 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		return layer.equals(BlockRenderLayer.CUTOUT);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 		IExtendedBlockState ebs = (IExtendedBlockState) super.getExtendedState(state, world, pos);
 		SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
 		if (entity != null)
-			return entity.accumulate((b, p, o) -> b.withProperty((IUnlistedProperty) p, o), ebs);
+			return entity.accumulate((b, p, o) -> b.withProperty(p, o), ebs);
 		return ebs;
 	}
 

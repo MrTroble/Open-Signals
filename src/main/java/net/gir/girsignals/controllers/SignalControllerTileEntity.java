@@ -139,13 +139,14 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return new Object[] { changeSignalImpl(args.checkInteger(0), args.checkInteger(1)) };
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean changeSignalImpl(int newSignal, int type) {
 		if (!hasLinkImpl() || !find(getSupportedSignalTypesImpl(), type))
 			return false;
 		SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(linkedSignalPosition);
 		IBlockState blockstate = world.getBlockState(linkedSignalPosition);
 		SignalBlock block = (SignalBlock) blockstate.getBlock();
-		IUnlistedProperty<?> prop = block.getPropertyFromID(type);
+		IUnlistedProperty prop = block.getPropertyFromID(type);
 		if (prop.getType().equals(Boolean.class))
 			tile.setProperty(prop, newSignal == 0 ? Boolean.FALSE : Boolean.TRUE);
 		else if (prop.getType().isEnum())
