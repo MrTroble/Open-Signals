@@ -97,14 +97,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_zs7", has(SignalHV.ZS7), 4.6f);
 			cm.register("hv_hp", has(SignalHV.STOPSIGNAL), 5.4f);
 			
-			cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(ZS32.OFF)), 6.9f, "7", "girsignals:blocks/zs32_off");
-			cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(ZS32.OFF)), 3f, "7", "girsignals:blocks/zs32_off");
-
-			ZS32[] values = ZS32.values();
-			for (int i = 1; i < values.length; i++) {
-				ZS32 zs3 = values[i];
-				cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(zs3)), 6.9f, "7", "girsignals:blocks/zs32_" + zs3.name());
-				cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(zs3)), 3f, "7", "girsignals:blocks/zs32v_" + zs3.name());
+			for(ZS32 zs3 : ZS32.values()) {
+				cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(zs3)), 6.9f, "7", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(zs3)), 3f, "7", "girsignals:blocks/zs3/" + zs3.getDistant());
 			}
 			
 			// HP 2
