@@ -89,17 +89,17 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast_sign", has(SignalHV.STOPSIGNAL).negate(), 1);
 			cm.register("hv_mast_number", hasAndIs(SignalHV.MAST_NUMBER), 2);
 			cm.register("hv_mast_without_number", hasAndIs(SignalHV.MAST_NUMBER).negate(), 2);
-			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS32V).negate(), 3);
+			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS32V).and(has(SignalHV.DISTANTSIGNAL)).negate(), 3);
 			cm.register("hv_mast_without_vr", has(SignalHV.DISTANTSIGNAL).negate(), 4);
 			cm.register("hv_vr", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT).negate()), 4);
 			cm.register("hv_vr_kennlicht", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT)), 4);
-			cm.register("hv_zs1", has(SignalHV.ZS1), 4.4f);
-			cm.register("hv_zs7", has(SignalHV.ZS7), 4.6f);
+			cm.register("hv_zs1", has(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f);
+			cm.register("hv_zs7", has(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f);
 			cm.register("hv_hp", has(SignalHV.STOPSIGNAL), 5.4f);
 			
 			for(ZS32 zs3 : ZS32.values()) {
-				cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(zs3)), 6.9f, "7", "girsignals:blocks/zs3/" + zs3.name());
-				cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(zs3)), 3f, "7", "girsignals:blocks/zs3/" + zs3.getDistant());
+				cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)), 6.9f, "7", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.DISTANTSIGNAL)), 3f, "7", "girsignals:blocks/zs3/" + zs3.getDistant());
 			}
 			
 			// HP 2
@@ -126,17 +126,17 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("lamp_black_small", hasAndIsNot(SignalHV.STATUS_LIGHT).and(has(SignalHV.STOPSIGNAL)), (3.5f/32.0f), 5 + (7/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// ZS 1
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1), -(1.5f/32.0f), 4 + (21/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1), -(4.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1), (1.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), -(1.5f/32.0f), 4 + (21/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), -(4.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), (1.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// VR Short distance lamp
-			cm.register("lamp_black_small", hasAndIs(SignalHV.VR_LIGHT), (8.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.VR_LIGHT).and(has(SignalHV.DISTANTSIGNAL)), (8.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// ZS 7
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7), -(1.5f/32.0f), 4 + (15.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7), -(4.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7), (1.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), -(1.5f/32.0f), 4 + (15.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), -(4.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), (1.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 		});
 		registeredModels.put("kssignal", cm -> {
 			cm.register("ks_base", ebs -> true, 0);

@@ -40,7 +40,7 @@ public class Placementtool extends Item {
 				if(!worldIn.isAirBlock(lastPos = lastPos.up())) return EnumActionResult.FAIL;
 			
 			NBTTagCompound compound = player.getHeldItemMainhand().getTagCompound();
-			if(compound != null && !compound.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID)) {
+			if(compound == null || !compound.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID)) {
 				player.sendMessage(new TextComponentTranslation("pt.itemnotset"));
 				return EnumActionResult.FAIL;
 			}
