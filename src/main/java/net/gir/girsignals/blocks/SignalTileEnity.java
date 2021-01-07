@@ -4,8 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-import net.gir.girsignals.init.GIRBlocks;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -31,11 +32,22 @@ public class SignalTileEnity extends TileEntity {
 		return super.writeToNBT(compound);
 	}
 
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private NBTTagCompound __tmp = null;
+	
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
-		((ExtendedBlockState)GIRBlocks.HV_SIGNAL.getBlockState()).getUnlistedProperties().parallelStream().forEach(prop -> {
+		if(world == null) {
+			__tmp = comp;
+		} else {
+			read(comp);
+		}
+		super.readFromNBT(compound);
+	}
+		
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void read(NBTTagCompound comp) {
+		((ExtendedBlockState)world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties().parallelStream().forEach(prop -> {
 			if(comp.hasKey(prop.getName())) {
 				Object opt = null;
 				if(prop.getType().isEnum()) {
@@ -45,12 +57,36 @@ public class SignalTileEnity extends TileEntity {
 				}
 				map.put(prop, opt);
 			}
-		});		
-		super.readFromNBT(compound);
+		});
 	}
 
+	@Override
+	public void onLoad() {
+		 if(__tmp != null) {
+			 read(__tmp);
+			 __tmp = null;
+		 }
+	}
+	
+	@Override
+	public SPacketUpdateTileEntity getUpdatePacket() {
+		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
+	}
+	
+	@Override
+	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+		this.readFromNBT(pkt.getNbtCompound());
+		world.markBlockRangeForRenderUpdate(pos, pos);
+	}
+			
+	@Override
+	public NBTTagCompound getUpdateTag() {
+		return writeToNBT(new NBTTagCompound());
+	}
+	
 	public void setProperty(IUnlistedProperty<?> prop, Object opt) {
 		map.put(prop, opt);
+		this.markDirty();
 	}
 	
 	public interface BiAccumulater<T, U, V> {
@@ -59,7 +95,7 @@ public class SignalTileEnity extends TileEntity {
 		
 	}
 	
-	public IExtendedBlockState foreach(BiAccumulater<IExtendedBlockState, IUnlistedProperty<?>, Object> bic, IExtendedBlockState bs) {
+	public IExtendedBlockState accumulate(BiAccumulater<IExtendedBlockState, IUnlistedProperty<?>, Object> bic, IExtendedBlockState bs) {
 		for(Map.Entry<IUnlistedProperty<?>, Object> entry : map.entrySet()) {
 			bs = bic.accept(bs, entry.getKey(), entry.getValue());
 		}

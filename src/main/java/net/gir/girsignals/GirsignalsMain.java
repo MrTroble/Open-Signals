@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = "girsignals", name = "GIRSignals", version = "1.0.0", dependencies = "required-after:opencomputers", acceptedMinecraftVersions = "[1.12.2]", modLanguage = "java")
+@Mod(modid = "girsignals", name = "GIRSignals", version = "1.0.0", dependencies = "after:opencomputers", acceptedMinecraftVersions = "[1.12.2]", modLanguage = "java")
 
 public class GirsignalsMain {
 

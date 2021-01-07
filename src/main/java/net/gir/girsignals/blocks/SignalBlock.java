@@ -84,7 +84,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		IExtendedBlockState ebs = (IExtendedBlockState) super.getExtendedState(state, world, pos);
 		SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
 		if (entity != null)
-			return entity.foreach((b, p, o) -> b.withProperty((IUnlistedProperty) p, o), ebs);
+			return entity.accumulate((b, p, o) -> b.withProperty((IUnlistedProperty) p, o), ebs);
 		return ebs;
 	}
 
@@ -143,7 +143,12 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		return new ExtendedBlockState(this, new IProperty<?>[] { FACING },
 				prop.toArray(new IUnlistedProperty[prop.size()]));
 	}
-
+	
+	@Override
+	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
+		return true;
+	}
+	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new SignalTileEnity();
@@ -155,5 +160,12 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 
 	public int getID() {
 		return ID;
+	}
+	
+	@Override
+	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+		super.breakBlock(worldIn, pos, state);
+		
+		GhostBlock.destroyUpperBlock(worldIn, pos);
 	}
 }

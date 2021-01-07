@@ -31,7 +31,6 @@ public class CommonProxy {
 
 		MinecraftForge.EVENT_BUS.register(GIRItems.class);
 		MinecraftForge.EVENT_BUS.register(GIRBlocks.class);
-
 	}
 
 	public void init(FMLInitializationEvent event) {
