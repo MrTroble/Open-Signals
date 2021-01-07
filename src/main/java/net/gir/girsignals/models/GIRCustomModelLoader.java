@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import javax.swing.text.html.ParagraphView;
+
 import net.gir.girsignals.EnumSignals.HPVR;
 import net.gir.girsignals.EnumSignals.Offable;
 import net.gir.girsignals.EnumSignals.ZS32;
@@ -95,20 +97,23 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_vr_kennlicht", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT)), 4);
 			cm.register("hv_zs1", has(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f);
 			cm.register("hv_zs7", has(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f);
-			cm.register("hv_hp", has(SignalHV.STOPSIGNAL), 5.4f);
+			// HP 0
+			cm.register("hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), 5.4f, "lamp_red_primarynorth", "girsignals:blocks/lamp_red", "lamp_red_secondarynorth", "girsignals:blocks/lamp_red");
+			// HP 1
+			cm.register("hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1)), 5.4f, "lamp_greennorth", "girsignals:blocks/lamp_green");
+			// HP 2
+			cm.register("hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR2)), 5.4f, "lamp_greennorth", "girsignals:blocks/lamp_green", "lamp_yellownorth", "girsignals:blocks/lamp_yellow");
+			// HP off
+			cm.register("hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.OFF)), 5.4f);
+			// HP Status light
+			cm.register("hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.OFF_STATUS_LIGHT)), 5.4f, "lamp_white_identifiernorth", "girsignals:blocks/lamp_white_small");
+			// HP RS
+			cm.register("hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0_RS)), 5.4f, "lamp_red_primarynorth", "girsignals:blocks/lamp_red", "lamp_white_sh_1north, \"girsignals:blocks/lamp_white_small");
 			
 			for(ZS32 zs3 : ZS32.values()) {
 				cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)), 6.9f, "7", "girsignals:blocks/zs3/" + zs3.name());
 				cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.DISTANTSIGNAL)), 3f, "7", "girsignals:blocks/zs3/" + zs3.getDistant());
 			}
-			
-			// HP 2
-			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 5 - (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			// HP 0
-			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), (3.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), -(6.5f/32.0f), 5 + (23/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			// HP 1/2 (green)
-			cm.register("lamp_black", withNot(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), (3.5f/32.0f), 6 + (1/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// VR0
 			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0) || hpvr.equals(HPVR.HPVR2)), (10.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
@@ -117,13 +122,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			// VR1
 			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1)), (2.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), -(13.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			
-			// RS
-			cm.register("lamp_black_small", hasAndIsNot(SignalHV.SHUNTINGSIGNAL).and(has(SignalHV.STOPSIGNAL)), -(6.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIsNot(SignalHV.SHUNTINGSIGNAL).and(has(SignalHV.STOPSIGNAL)), (3.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			
-			// Status light
-			cm.register("lamp_black_small", hasAndIsNot(SignalHV.STATUS_LIGHT).and(has(SignalHV.STOPSIGNAL)), (3.5f/32.0f), 5 + (7/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// ZS 1
 			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), -(1.5f/32.0f), 4 + (21/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
@@ -151,10 +149,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ks_zs3v", ebs -> true, 4);
 			cm.register("ks_number", ebs -> true, 4);
 			cm.register("ks_signal", ebs -> true, 5);
-			// cm.register("ks_signal", ebs -> {
-			// System.out.println(ebs.toString());
-			// return ebs.getValue(SignalKS.KOMBISIGNAL) != null;
-			// }, 5);
 			cm.register("ks_zs3", ebs -> true, 6);
 		});
 		registeredModels.put("hlsignal", cm -> {

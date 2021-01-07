@@ -4,7 +4,6 @@
 	"textures": {
 		"0": "girsignals:blocks/mast",
 		"6": "girsignals:blocks/white",
-		"7": "girsignals:blocks/template",
 		"particle": "girsignals:blocks/mast"
 	},
 	"elements": [
@@ -69,15 +68,16 @@
 		},
 		{
 			"name": "sign",
-			"from": [6, 8, 6.9],
-			"to": [10, 13, 7.9],
+			"from": [5, 8, 6.9],
+			"to": [11, 13, 7.9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 8, 8]},
 			"faces": {
-				"north": {"uv": [0, 0, 16, 16], "texture": "#7"},
-				"east": {"uv": [0, 0, 2, 2.5], "texture": "#6"},
-				"south": {"uv": [0, 0, 2, 2.5], "texture": "#missing"},
-				"west": {"uv": [0, 0, 2, 2.5], "texture": "#6"},
-				"up": {"uv": [0, 0, 2, 2.5], "texture": "#6"},
-				"down": {"uv": [0, 0, 2, 2.5], "texture": "#6"}
+				"north": {"uv": [0, 0, 3, 2.5], "texture": "#6"},
+				"east": {"uv": [0, 0, 0.5, 2.5], "texture": "#6"},
+				"south": {"uv": [0, 0, 3, 2.5], "texture": "#6"},
+				"west": {"uv": [0, 0, 0.5, 2.5], "texture": "#6"},
+				"up": {"uv": [0, 0, 3, 0.5], "texture": "#6"},
+				"down": {"uv": [0, 0, 3, 0.5], "texture": "#6"}
 			}
 		}
 	],

@@ -20,7 +20,7 @@ public class EnumSignals {
 	}
 
 	public enum HPVR implements Offable<HPVR> {
-		OFF, HPVR0, HPVR1, HPVR2;
+		OFF, HPVR0, HPVR1, HPVR2, OFF_STATUS_LIGHT, HPVR0_RS;
 	}
 
 	public enum ZS32 implements Offable<ZS32> {

@@ -17,12 +17,8 @@ public class SignalHV extends SignalBlock {
 			PropertyEnum.create("stopsignal", HPVR.class));
 	public static final PropertyAdapter<HPVR> DISTANTSIGNAL = new PropertyAdapter<HPVR>(
 			PropertyEnum.create("distantsignal", HPVR.class));
-	public static final PropertyAdapter<Boolean> SHUNTINGSIGNAL = new PropertyAdapter<Boolean>(
-			PropertyBool.create("shuntingsignal"));
 	public static final PropertyAdapter<Boolean> VR_LIGHT = new PropertyAdapter<Boolean>(
 			PropertyBool.create("vrlight"));
-	public static final PropertyAdapter<Boolean> STATUS_LIGHT = new PropertyAdapter<Boolean>(
-			PropertyBool.create("statuslight"));
 	public static final PropertyAdapter<Boolean> DISTANTS_STATUS_LIGHT = new PropertyAdapter<Boolean>(
 			PropertyBool.create("distantsstatuslight"));
 	public static final PropertyAdapter<Boolean> MAST_NUMBER = new PropertyAdapter<Boolean>(
