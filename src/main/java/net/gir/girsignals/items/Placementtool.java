@@ -16,6 +16,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class Placementtool extends Item {
 
@@ -23,6 +24,7 @@ public class Placementtool extends Item {
 		setCreativeTab(GIRTabs.tab);
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand,
 			EnumFacing facing, float hitX, float hitY, float hitZ) {
@@ -30,7 +32,6 @@ public class Placementtool extends Item {
 			if(!worldIn.isRemote) return EnumActionResult.PASS;
 			player.openGui(GirsignalsMain.MODID, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
 		} else {
-			if(worldIn.isRemote) return EnumActionResult.PASS;
 			final BlockPos setPosition = pos.offset(facing);
 			if(!worldIn.isAirBlock(setPosition)) return EnumActionResult.FAIL;
 			BlockPos lastPos = setPosition;
@@ -38,25 +39,25 @@ public class Placementtool extends Item {
 				if(!worldIn.isAirBlock(lastPos = lastPos.up())) return EnumActionResult.FAIL;
 			
 			NBTTagCompound compound = player.getHeldItemMainhand().getTagCompound();
-			if(compound.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID)) {
+			if(compound != null && !compound.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID)) {
 				player.sendMessage(new TextComponentTranslation("pt.itemnotset"));
 				return EnumActionResult.FAIL;
 			}
 			SignalBlock block = SignalBlock.SIGNALLIST.get(compound.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID));
 			
+			worldIn.setBlockState(setPosition, block.getStateForPlacement(worldIn, lastPos, facing, hitX, hitY, hitZ, 0, player, hand));
 			lastPos = setPosition;
-			worldIn.setBlockState(lastPos, block.getDefaultState());
-			for (int i = 0; i < 8; i++)
-				worldIn.setBlockState(lastPos, GIRBlocks.GHOST_BLOCK.getDefaultState());
+			for (int i = 0; i < 6; i++)
+				worldIn.setBlockState(lastPos = lastPos.up(), GIRBlocks.GHOST_BLOCK.getDefaultState());
 			
 			SignalTileEnity sig = (SignalTileEnity) worldIn.getTileEntity(setPosition);
 			ExtendedBlockState ebs = ((ExtendedBlockState)block.getBlockState());
 			ebs.getUnlistedProperties().forEach(iup -> {
 				if(!compound.hasKey(iup.getName()) || !compound.getBoolean(iup.getName())) return;
 				if(iup.getType().isEnum())
-					sig.setProperty(iup, iup.getType().getEnumConstants()[0]);
+					sig.setProperty((IUnlistedProperty)iup, iup.getType().getEnumConstants()[0]);
 				else
-					sig.setProperty(iup, false);
+					sig.setProperty((IUnlistedProperty)iup, false);
 			});
 		}
 		return EnumActionResult.PASS;
