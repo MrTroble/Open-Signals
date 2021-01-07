@@ -41,7 +41,6 @@ public class SignalCustomModel implements IModel {
 
 	public SignalCustomModel(Consumer<SignalCustomModel> init, EnumFacing facing) {
 		init.accept(this);
-		modelCache.entrySet().forEach(set -> set.getValue().first().getTextures().forEach(System.out::println));
 		this.facing = facing;
 	}
 

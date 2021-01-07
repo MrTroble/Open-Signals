@@ -29,8 +29,12 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class SignalBlock extends Block implements ITileEntityProvider {
+	
+	public static final ArrayList<SignalBlock> SIGNALLIST = new ArrayList<SignalBlock>();
 
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
+	
+	private final int ID;
 
 	private final String signalTypeName;
 	
@@ -39,6 +43,8 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		this.signalTypeName = signalTypeName;
 		setCreativeTab(GIRTabs.tab);
 		setDefaultState(getDefaultState().withProperty(FACING, EnumFacing.NORTH));
+		ID = SIGNALLIST.size();
+		SIGNALLIST.add(this);
 	}
 
 	@Override
@@ -72,13 +78,13 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		return layer.equals(BlockRenderLayer.CUTOUT);
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings("unchecked")
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
 		IExtendedBlockState ebs = (IExtendedBlockState) super.getExtendedState(state, world, pos);
 		SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
 		if (entity != null)
-			return entity.accumulate((b, p, o) -> b.withProperty((IUnlistedProperty) p, o), ebs);
+			return entity.accumulate((b, p, o) -> b.withProperty(p, o), ebs);
 		return ebs;
 	}
 
@@ -150,6 +156,10 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 
 	public String getSignalTypeName() {
 		return signalTypeName;
+	}
+
+	public int getID() {
+		return ID;
 	}
 	
 	@Override
