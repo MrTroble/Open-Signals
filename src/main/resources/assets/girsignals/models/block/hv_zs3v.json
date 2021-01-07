@@ -4,7 +4,7 @@
 	"textures": {
 		"0": "girsignals:blocks/mast",
 		"1": "girsignals:blocks/shield_black",
-		"7": "girsignals:blocks/zs3_ff",
+		"7": "girsignals:blocks/zs32_off",
 		"particle": "girsignals:blocks/mast"
 	},
 	"elements": [
