@@ -1,5 +1,6 @@
 package net.gir.girsignals.blocks;
 
+import net.gir.girsignals.init.GIRItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -48,7 +49,7 @@ public class GhostBlock extends Block {
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
 			EntityPlayer player) {
-		return ItemStack.EMPTY;
+		return new ItemStack(GIRItems.PLACEMENT_TOOL);
 	}
 	
 	@Override

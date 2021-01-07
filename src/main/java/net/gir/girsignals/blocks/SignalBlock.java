@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import net.gir.girsignals.init.GIRItems;
 import net.gir.girsignals.init.GIRTabs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
@@ -58,7 +59,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
 			EntityPlayer player) {
-		return ItemStack.EMPTY;
+		return new ItemStack(GIRItems.PLACEMENT_TOOL);
 	}
 
 	@Override
