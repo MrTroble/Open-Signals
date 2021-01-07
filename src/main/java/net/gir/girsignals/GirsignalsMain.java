@@ -22,20 +22,20 @@ public class GirsignalsMain {
 	}
 
 	@SidedProxy(serverSide = "net.gir.girsignals.proxy.CommonProxy", clientSide = "net.gir.girsignals.proxy.ClientProxy")
-	private static CommonProxy proxy;
+	public static CommonProxy PROXY;
 
 	@EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
-		proxy.preinit(event);
+		PROXY.preinit(event);
 	}
 
 	@EventHandler
 	public void init(FMLInitializationEvent event) {
-		proxy.init(event);
+		PROXY.init(event);
 	}
 
 	@EventHandler
 	public void postinit(FMLPostInitializationEvent event) {
-		proxy.postinit(event);
+		PROXY.postinit(event);
 	}
 }
