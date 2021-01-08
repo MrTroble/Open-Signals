@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import net.gir.girsignals.EnumSignals.HPVR;
+import net.gir.girsignals.EnumSignals.MAST_SIGN;
 import net.gir.girsignals.EnumSignals.ZS32;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.SignalHV;
@@ -31,8 +32,9 @@ public class GIRItems {
 			if(state.getBlock() instanceof SignalHV) {
 				IExtendedBlockState ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
 				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.STOPSIGNAL, HPVR.HPVR0);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.DISTANTSIGNAL, HPVR.HPVR0);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.STOPSIGNAL, HPVR.OFF_STATUS_LIGHT);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.DISTANTSIGNAL, HPVR.OFF);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.DISTANTS_STATUS_LIGHT, false);
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS32, ZS32.B);
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS32V, ZS32.C);
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS1, true);

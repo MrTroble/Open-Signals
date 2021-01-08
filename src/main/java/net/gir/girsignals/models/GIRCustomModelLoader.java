@@ -93,10 +93,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast_without_number", hasAndIs(SignalHV.MAST_NUMBER).negate(), 2);
 			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS32V).and(has(SignalHV.DISTANTSIGNAL)).negate(), 3);
 			cm.register("hv_mast_without_vr", has(SignalHV.DISTANTSIGNAL).negate(), 4);
-			cm.register("hv_vr", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT).negate()), 4);
-			cm.register("hv_vr_kennlicht", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT)), 4);
-			cm.register("hv_zs1", has(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f);
-			cm.register("hv_zs7", has(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f);
+			cm.register("hv_zs1", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f, "lamp1north", "girsignals:blocks/lamp_white_small");
+			cm.register("hv_zs7", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f, "lamp1north", "girsignals:blocks/lamp_white_small");
 			// HP 0
 			cm.register("hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), 5.4f, "lamp_red_primarynorth", "girsignals:blocks/lamp_red", "lamp_red_secondarynorth", "girsignals:blocks/lamp_red");
 			// HP 1
@@ -116,25 +114,16 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			}
 			
 			// VR0
-			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0) || hpvr.equals(HPVR.HPVR2)), (10.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), -(5.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			
+			cm.register("hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), 4, "lamp_yellow_1north", "girsignals:blocks/lamp_yellow", "lamp_yellow_2north", "girsignals:blocks/lamp_yellow");
 			// VR1
-			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1)), (2.5f/32.0f), 3 + (12.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), -(13.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			
-			// ZS 1
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), -(1.5f/32.0f), 4 + (21/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), -(4.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), (1.5f/32.0f), 4 + (15.3f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			
-			// VR Short distance lamp
-			cm.register("lamp_black_small", hasAndIs(SignalHV.VR_LIGHT).and(has(SignalHV.DISTANTSIGNAL)), (8.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			
-			// ZS 7
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), -(1.5f/32.0f), 4 + (15.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), -(4.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), (1.5f/32.0f), 4 + (21.5f/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			cm.register("hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1)), 4, "lamp_green_1north", "girsignals:blocks/lamp_green", "lamp_green_2north", "girsignals:blocks/lamp_green");
+			// VR2
+			cm.register("hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR2)), 4, "lamp_green_1north", "girsignals:blocks/lamp_green", "lamp_yellow_2north", "girsignals:blocks/lamp_yellow");
+			// VR off
+			cm.register("hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.OFF)), 4);
+			// VR Status light
+			cm.register("hv_vr_statuslight", hasAndIs(SignalHV.DISTANTS_STATUS_LIGHT).and(has(SignalHV.DISTANTSIGNAL)), 4, "lamp_white_identifiernorth", "girsignals:blocks/lamp_white_small");
+
 		});
 		registeredModels.put("kssignal", cm -> {
 			cm.register("ks_base", ebs -> true, 0);
