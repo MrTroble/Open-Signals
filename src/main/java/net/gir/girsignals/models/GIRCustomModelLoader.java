@@ -87,9 +87,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_ne2", has(SignalHV.STOPSIGNAL).negate().and(has(SignalHV.DISTANTSIGNAL)), 0);
 			cm.register("hv_mast_without_sign", has(SignalHV.STOPSIGNAL), 1);
 			cm.register("hv_mast_sign", has(SignalHV.STOPSIGNAL).negate(), 1);
-			cm.register("hv_mast_number", hasAndIs(SignalHV.MAST_NUMBER), 2);
-			cm.register("hv_mast_without_number", hasAndIs(SignalHV.MAST_NUMBER).negate(), 2);
-			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS32V).and(has(SignalHV.DISTANTSIGNAL)).negate(), 3);
+			//cm.register("hv_mast_number", hasAndIs(SignalHV.), 2);
+			cm.register("hv_mast_without_number", ebs -> true, 2);
+			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS3V).and(has(SignalHV.DISTANTSIGNAL)).negate(), 3);
 			cm.register("hv_mast_without_vr", has(SignalHV.DISTANTSIGNAL).negate(), 4);
 			cm.register("hv_vr", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT).negate()), 4);
 			cm.register("hv_vr_kennlicht", has(SignalHV.DISTANTSIGNAL).and(has(SignalHV.VR_LIGHT)), 4);
@@ -98,8 +98,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_hp", has(SignalHV.STOPSIGNAL), 5.4f);
 			
 			for(ZS32 zs3 : ZS32.values()) {
-				cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)), 6.9f, "7", "girsignals:blocks/zs3/" + zs3.name());
-				cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.DISTANTSIGNAL)), 3f, "7", "girsignals:blocks/zs3/" + zs3.getDistant());
+				cm.register("hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)), 6.9f, "7", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("hv_zs3v", with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.DISTANTSIGNAL)), 3f, "7", "girsignals:blocks/zs3/" + zs3.getDistant());
 			}
 			
 			// HP 2
@@ -119,11 +119,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("lamp_black", withNot(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR1) || hpvr.equals(HPVR.HPVR2)), -(13.5f/32.0f), 3 + (30.5f/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// RS
-			cm.register("lamp_black_small", hasAndIsNot(SignalHV.SHUNTINGSIGNAL).and(has(SignalHV.STOPSIGNAL)), -(6.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
-			cm.register("lamp_black_small", hasAndIsNot(SignalHV.SHUNTINGSIGNAL).and(has(SignalHV.STOPSIGNAL)), (3.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			//cm.register("lamp_black_small", hasAndIsNot(SignalHV.SHUNTINGSIGNAL).and(has(SignalHV.STOPSIGNAL)), -(6.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			//cm.register("lamp_black_small", hasAndIsNot(SignalHV.SHUNTINGSIGNAL).and(has(SignalHV.STOPSIGNAL)), (3.5f/32.0f), 5 + (15/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// Status light
-			cm.register("lamp_black_small", hasAndIsNot(SignalHV.STATUS_LIGHT).and(has(SignalHV.STOPSIGNAL)), (3.5f/32.0f), 5 + (7/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
+			//cm.register("lamp_black_small", hasAndIsNot(SignalHV.STATUS_LIGHT).and(has(SignalHV.STOPSIGNAL)), (3.5f/32.0f), 5 + (7/32.0f), -((6/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
 			
 			// ZS 1
 			cm.register("lamp_black_small", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), -(1.5f/32.0f), 4 + (21/32.0f), -((8/32.0f) + 0.01f), 0.1f, 0.1f, 0f);
