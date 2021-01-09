@@ -9,19 +9,45 @@ import net.gir.girsignals.init.GIRBlocks;
 import net.gir.girsignals.init.GIRNetworkHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class GuiPlacementtool extends GuiScreen {
 
+	@SuppressWarnings({ "rawtypes" })
+	private IUnlistedProperty[] properties;
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
+		Tessellator tes = Tessellator.getInstance();
+		BufferBuilder builder = tes.getBuffer();
+		// TODO Block change
+		IExtendedBlockState ebs =  (IExtendedBlockState) GIRBlocks.HV_SIGNAL.getDefaultState();
+		int i = 0;
+		for (GuiButton button : buttonList) {
+			if(!(button instanceof GuiCheckBox)) continue;
+			GuiCheckBox buttonCheckBox = (GuiCheckBox) button;
+			if(buttonCheckBox.isChecked()) {
+				IUnlistedProperty property = properties[i++];
+				if(property.getType().isEnum())
+					ebs.withProperty((IUnlistedProperty)property, property.getType().getEnumConstants()[0]);
+				else
+					ebs.withProperty((IUnlistedProperty)property, false);
+			}
+		}
+		this.mc.getBlockRendererDispatcher().renderBlock(ebs, BlockPos.ORIGIN, this.mc.world, builder);
+		tes.draw();
 	}
 
 	@Override
@@ -29,6 +55,7 @@ public class GuiPlacementtool extends GuiScreen {
 		// TODO Block change
 		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) GIRBlocks.HV_SIGNAL.getBlockState();
 		Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
+		properties = unlistedProperties.toArray(new IUnlistedProperty[unlistedProperties.size()]);
 		int maxWidth = 0;
 		for (IUnlistedProperty<?> lenIUnlistedProperty : unlistedProperties) {
 			int currentWidth = fontRenderer.getStringWidth(lenIUnlistedProperty.getName());
@@ -44,10 +71,12 @@ public class GuiPlacementtool extends GuiScreen {
 				xPos += maxWidth + 40;
 				yPos = 20;
 			}
-			addButton(new GuiCheckBox(0, xPos, yPos, property.getName().toUpperCase(), false));
+			addButton(new GuiCheckBox((yPos / 20) * (xPos / 50), xPos, yPos, property.getName().toUpperCase(), false));
 		}
 	}
-
+	
+	
+	
 	@Override
 	public void onGuiClosed() {
 		ByteBuf buffer = Unpooled.buffer();
