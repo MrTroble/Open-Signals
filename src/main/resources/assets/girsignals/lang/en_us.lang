@@ -15,3 +15,10 @@ lt.added=Added %s to the link tool
 lt.unlink=Unlinked controller from it's signal
 
 #Placementtool
+property.zs3.name=ZS3
+property.zs1.name=ZS1
+property.stopsignal.name=Stop signal
+property.distantsignal.name=Distant signal
+property.distantsstatuslight.name=Distant signal light
+property.zs3v.name=ZS3v
+property.zs7.name=ZS7
