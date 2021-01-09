@@ -1,6 +1,7 @@
 package net.gir.girsignals.items;
 
 import net.gir.girsignals.GirsignalsMain;
+import net.gir.girsignals.SEProperty;
 import net.gir.girsignals.blocks.SignalBlock;
 import net.gir.girsignals.blocks.SignalTileEnity;
 import net.gir.girsignals.init.GIRBlocks;
@@ -16,7 +17,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class Placementtool extends Item {
 
@@ -55,10 +55,8 @@ public class Placementtool extends Item {
 			ExtendedBlockState ebs = ((ExtendedBlockState)block.getBlockState());
 			ebs.getUnlistedProperties().forEach(iup -> {
 				if(!compound.hasKey(iup.getName()) || !compound.getBoolean(iup.getName())) return;
-				if(iup.getType().isEnum())
-					sig.setProperty((IUnlistedProperty)iup, iup.getType().getEnumConstants()[0]);
-				else
-					sig.setProperty((IUnlistedProperty)iup, false);
+				SEProperty sep = SEProperty.cst(iup);
+				sig.setProperty(sep, sep.getDefault());
 			});
 			return EnumActionResult.SUCCESS;
 		}

@@ -1,8 +1,11 @@
 package net.gir.girsignals;
 
+import com.google.common.base.Optional;
+
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
@@ -46,6 +49,23 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
         return parent.getName(value);
     }
     
+    public Optional<T> readFromNBT(NBTTagCompound comp) {
+    	if(comp.hasKey(this.getName())) {
+    		return parent.parseValue(comp.getString(this.getName()));
+    	}
+    	return Optional.absent();
+    }
+    
+    @SuppressWarnings("unchecked")
+	public NBTTagCompound writeToNBT(NBTTagCompound comp, Object value) {
+    	if(value != null && isValid((T) value))
+    		comp.setString(getName(), valueToString((T) value));
+    	return comp;
+    }
+    
+    public int getIDFromObj(Object obj) {
+    }
+    
     @SuppressWarnings("unchecked")
 	public T cast(Object value) {
 		return (T) value;
@@ -59,8 +79,9 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 		return this.stage.equals(stage);
 	}
 	
-	public static <T extends Comparable<T>> SEProperty<T> cast(IUnlistedProperty<T> iup) {
-		return (SEProperty<T>) iup;
+	@SuppressWarnings("rawtypes")
+	public static SEProperty<?> cst(Object iup) {
+		return (SEProperty) iup;
 	}
 	
 	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue) {

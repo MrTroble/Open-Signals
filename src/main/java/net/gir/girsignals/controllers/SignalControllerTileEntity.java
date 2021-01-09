@@ -67,7 +67,6 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				(prop, opt) -> opt.ifPresent(x -> supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop))));
 
 		listOfSupportedIndicies = supportedSignaleStates.values().toArray(new Integer[supportedSignaleStates.size()]);
-		System.out.println(listOfSupportedIndicies);
 		
 		tableOfSupportedSignalTypes = supportedSignaleStates;
 	}
