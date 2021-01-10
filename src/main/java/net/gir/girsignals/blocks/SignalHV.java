@@ -3,9 +3,8 @@ package net.gir.girsignals.blocks;
 import net.gir.girsignals.EnumSignals.HPVR;
 import net.gir.girsignals.EnumSignals.MAST_SIGN;
 import net.gir.girsignals.EnumSignals.ZS32;
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraftforge.common.property.Properties.PropertyAdapter;
+import net.gir.girsignals.SEProperty;
+import net.gir.girsignals.SEProperty.ChangeableStage;
 
 public class SignalHV extends SignalBlock {
 
@@ -13,25 +12,12 @@ public class SignalHV extends SignalBlock {
 		super("HV");
 	}
 
-	public static final PropertyAdapter<HPVR> STOPSIGNAL = new PropertyAdapter<HPVR>(
-			PropertyEnum.create("stopsignal", HPVR.class));
-	public static final PropertyAdapter<HPVR> DISTANTSIGNAL = new PropertyAdapter<HPVR>(
-			PropertyEnum.create("distantsignal", HPVR.class));
-	public static final PropertyAdapter<Boolean> SHUNTINGSIGNAL = new PropertyAdapter<Boolean>(
-			PropertyBool.create("shuntingsignal"));
-	public static final PropertyAdapter<Boolean> VR_LIGHT = new PropertyAdapter<Boolean>(
-			PropertyBool.create("vrlight"));
-	public static final PropertyAdapter<Boolean> STATUS_LIGHT = new PropertyAdapter<Boolean>(
-			PropertyBool.create("statuslight"));
-	public static final PropertyAdapter<Boolean> DISTANTS_STATUS_LIGHT = new PropertyAdapter<Boolean>(
-			PropertyBool.create("distantsstatuslight"));
-	public static final PropertyAdapter<Boolean> MAST_NUMBER = new PropertyAdapter<Boolean>(
-			PropertyBool.create("mastnumber"));
-	public static final PropertyAdapter<MAST_SIGN> MAST_SIGN = new PropertyAdapter<MAST_SIGN>(
-			PropertyEnum.create("mastsign", MAST_SIGN.class));
-	public static final PropertyAdapter<Boolean> NE1 = new PropertyAdapter<Boolean>(PropertyBool.create("ne1"));
-	public static final PropertyAdapter<ZS32> ZS32 = new PropertyAdapter<ZS32>(PropertyEnum.create("zs3", ZS32.class));
-	public static final PropertyAdapter<ZS32> ZS32V = new PropertyAdapter<ZS32>(PropertyEnum.create("zs3v", ZS32.class));
-	public static final PropertyAdapter<Boolean> ZS1 = new PropertyAdapter<Boolean>(PropertyBool.create("zs1"));
-	public static final PropertyAdapter<Boolean> ZS7 = new PropertyAdapter<Boolean>(PropertyBool.create("zs7"));
+	public static final SEProperty<HPVR> STOPSIGNAL = SEProperty.of("stopsignal", HPVR.OFF);
+	public static final SEProperty<HPVR> DISTANTSIGNAL = SEProperty.of("distantsignal", HPVR.OFF);
+	public static final SEProperty<Boolean> VR_LIGHT = SEProperty.of("vrlight", false);
+	public static final SEProperty<MAST_SIGN> MASTSIGN = SEProperty.of("mastsign", MAST_SIGN.OFF, ChangeableStage.GUISTAGE);
+	public static final SEProperty<ZS32> ZS3 = SEProperty.of("zs3", ZS32.OFF);
+	public static final SEProperty<ZS32> ZS3V = SEProperty.of("zs3v", ZS32.OFF);
+	public static final SEProperty<Boolean> ZS1 = SEProperty.of("zs1", false);
+	public static final SEProperty<Boolean> ZS7 = SEProperty.of("zs7", false);
 }
