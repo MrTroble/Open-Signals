@@ -4,7 +4,7 @@ import net.minecraft.util.IStringSerializable;
 
 public class EnumSignals {
 
-	public interface Offable<T extends Enum<T>> extends IStringSerializable {
+	public interface Offable<T extends Enum<T>> extends IStringSerializable, Comparable<T> {
 
 		@SuppressWarnings({ "unchecked" })
 		@Override

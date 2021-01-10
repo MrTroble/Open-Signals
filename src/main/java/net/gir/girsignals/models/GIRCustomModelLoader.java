@@ -89,9 +89,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_ne2", has(SignalHV.STOPSIGNAL).negate().and(has(SignalHV.DISTANTSIGNAL)), 0);
 			cm.register("hv_mast_without_sign", has(SignalHV.STOPSIGNAL), 1);
 			cm.register("hv_mast_sign", has(SignalHV.STOPSIGNAL).negate(), 1);
-			cm.register("hv_mast_number", hasAndIs(SignalHV.MAST_NUMBER), 2);
-			cm.register("hv_mast_without_number", hasAndIs(SignalHV.MAST_NUMBER).negate(), 2);
-			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS32V).and(has(SignalHV.DISTANTSIGNAL)).negate(), 3);
+			//cm.register("hv_mast_number", hasAndIs(SignalHV.), 2);
+			cm.register("hv_mast_without_number", ebs -> true, 2);
+			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS3V).and(has(SignalHV.DISTANTSIGNAL)).negate(), 3);
 			cm.register("hv_mast_without_vr", has(SignalHV.DISTANTSIGNAL).negate(), 4);
 			cm.register("hv_zs1", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f, "lamp1north", "girsignals:blocks/lamp_white_small");
 			cm.register("hv_zs7", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f, "lamp1north", "girsignals:blocks/lamp_yellow_small");
@@ -109,8 +109,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0_RS)), 5.4f, "lamp_red_primarynorth", "girsignals:blocks/lamp_red", "lamp_white_sh_1north, \"girsignals:blocks/lamp_white_small");
 			
 			for(ZS32 zs3 : ZS32.values()) {
-				cm.register("hv_zs3", with(SignalHV.ZS32, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)), 6.9f, "7", "girsignals:blocks/zs3/" + zs3.name());
-				cm.register("hv_zs3v", with(SignalHV.ZS32V, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.DISTANTSIGNAL)), 3f, "7", "girsignals:blocks/zs3/" + zs3.getDistant());
+				cm.register("hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)), 6.9f, "7", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("hv_zs3v", with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.DISTANTSIGNAL)), 3f, "7", "girsignals:blocks/zs3/" + zs3.getDistant());
 			}
 			
 			// VR0
