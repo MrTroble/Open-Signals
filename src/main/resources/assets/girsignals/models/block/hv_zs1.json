@@ -9,7 +9,7 @@
     "2": "girsignals:blocks/shield_gray",
     "6": "girsignals:blocks/lamp_dark_small",
     "particle": "girsignals:blocks/shield_black",
-    "lamp1north": "girsignals:blocks/lamp_dark_small",
+    "lamp1north": "girsignals:blocks/lamp_dark_small"
   },
   "elements": [
     {

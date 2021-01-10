@@ -7,9 +7,8 @@
   "textures": {
     "1": "girsignals:blocks/shield_black",
     "2": "girsignals:blocks/shield_gray",
-    "5": "girsignals:blocks/lamp_dark_small",
     "particle": "girsignals:blocks/shield_black",
-    "lamp1north": "girsignals:blocks/lamp_dark_small",
+    "lamp1north": "girsignals:blocks/lamp_dark_small"
   },
   "elements": [
     {

@@ -94,7 +94,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast_without_zs3v", has(SignalHV.ZS32V).and(has(SignalHV.DISTANTSIGNAL)).negate(), 3);
 			cm.register("hv_mast_without_vr", has(SignalHV.DISTANTSIGNAL).negate(), 4);
 			cm.register("hv_zs1", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f, "lamp1north", "girsignals:blocks/lamp_white_small");
-			cm.register("hv_zs7", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f, "lamp1north", "girsignals:blocks/lamp_white_small");
+			cm.register("hv_zs7", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f, "lamp1north", "girsignals:blocks/lamp_yellow_small");
 			// HP 0
 			cm.register("hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HPVR.HPVR0)), 5.4f, "lamp_red_primarynorth", "girsignals:blocks/lamp_red", "lamp_red_secondarynorth", "girsignals:blocks/lamp_red");
 			// HP 1

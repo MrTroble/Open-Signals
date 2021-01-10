@@ -32,12 +32,12 @@ public class GIRItems {
 			if(state.getBlock() instanceof SignalHV) {
 				IExtendedBlockState ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
 				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.STOPSIGNAL, HPVR.OFF_STATUS_LIGHT);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.STOPSIGNAL, HPVR.HPVR2);
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.DISTANTSIGNAL, HPVR.OFF);
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.DISTANTS_STATUS_LIGHT, false);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS32, ZS32.B);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS32V, ZS32.C);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS1, true);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS32, ZS32.Z12);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS32V, ZS32.H);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS1, false);
 				ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
 				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
 				worldIn.notifyBlockUpdate(pos, state, state, 3);
