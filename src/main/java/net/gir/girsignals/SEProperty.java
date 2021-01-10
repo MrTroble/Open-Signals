@@ -51,7 +51,7 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
     
     public Optional<T> readFromNBT(NBTTagCompound comp) {
     	if(comp.hasKey(this.getName())) {
-    		return parent.parseValue(comp.getString(this.getName()));
+    		return Optional.of(getObjFromID(comp.getInteger(this.getName())));
     	}
     	return Optional.absent();
     }
@@ -59,11 +59,39 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
     @SuppressWarnings("unchecked")
 	public NBTTagCompound writeToNBT(NBTTagCompound comp, Object value) {
     	if(value != null && isValid((T) value))
-    		comp.setString(getName(), valueToString((T) value));
+    		comp.setInteger(getName(), getIDFromObj(value));
     	return comp;
     }
     
-    public int getIDFromObj(Object obj) {
+    public boolean isValid(int id) {
+    	if(getType().isEnum()) {
+    		return getType().getEnumConstants().length > id && id > -1;
+    	} else if(getType().equals(Boolean.class)) {
+    		return id == 0 || id == 1;
+    	}
+    	return false;
+    }
+    
+    @SuppressWarnings("rawtypes")
+	public static int getIDFromObj(Object obj) {
+    	if(obj instanceof Enum) {
+    		return ((Enum) obj).ordinal();
+    	} else if(obj instanceof Boolean) {
+    		return ((Boolean) obj).booleanValue() ? 1:0;
+    	}
+    	throw new IllegalArgumentException("Given paramter is not a exceptable value!");
+    }
+    
+    @SuppressWarnings("unchecked")
+	public T getObjFromID(int obj) {
+    	if(!isValid(obj))
+        	throw new IllegalArgumentException("Given paramter is not a exceptable value!");
+    	if(getType().isEnum()) {
+    		return (T) getType().getEnumConstants()[obj];
+    	} else if(getType().equals(Boolean.class)) {
+    		return (T)(Boolean.valueOf(obj == 1));
+    	}
+    	throw new IllegalArgumentException("Wrong generic type!");
     }
     
     @SuppressWarnings("unchecked")
