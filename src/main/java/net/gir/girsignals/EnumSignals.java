@@ -50,7 +50,7 @@ public class EnumSignals {
 	}
 
 	public enum KS implements Offable<KS> {
-		OFF, HP0, KS1, KS2;
+		OFF, HP0, KS1, KS1_LIGHT, KS1_REPEAT, KS1_BLINK, KS1_BLINK_LIGHT, KS1_BLINK_REPEAT, KS2, KS2_LIGHT, KS2_REPEAT, KS_ZS1, KS_ZS7, KS_RS, KS_STATUS_LIGHT;
 	}
 
 	public enum HL implements Offable<HL> {

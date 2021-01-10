@@ -36,7 +36,7 @@ public class GIRItems {
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.DISTANTSIGNAL, HPVR.HPVR0);
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS3, ZS32.B);
 				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS3V, ZS32.C);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS1, true);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.VR_LIGHT, false);
 				ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
 				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
 				worldIn.notifyBlockUpdate(pos, state, state, 3);
