@@ -54,8 +54,10 @@ public class EnumSignals {
 	}
 
 	public enum HL implements Offable<HL> {
-		OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2, HL3A, HL3B, HL4, HL5, HL6A, HL6B, HL7, HL8, HL9A, HL9B, HL10, HL11,
-		HL12A, HL12B;
+		OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2_3, HL4, HL5_6, HL7, HL8_9, HL10, HL11_12, HL_ZS1, HL_RS, HL_STATUS_LIGHT;
+	}
+	public enum HL_LIGHTBAR implements Offable<HL_LIGHTBAR> {
+		OFF, GREEN, YELLOW;
 	}
 
 }

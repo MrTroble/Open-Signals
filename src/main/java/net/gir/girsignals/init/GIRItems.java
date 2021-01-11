@@ -4,11 +4,16 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
+import net.gir.girsignals.EnumSignals.HL;
+import net.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import net.gir.girsignals.EnumSignals.HPVR;
+import net.gir.girsignals.EnumSignals.KS;
 import net.gir.girsignals.EnumSignals.MAST_SIGN;
 import net.gir.girsignals.EnumSignals.ZS32;
 import net.gir.girsignals.GirsignalsMain;
+import net.gir.girsignals.blocks.SignalHL;
 import net.gir.girsignals.blocks.SignalHV;
+import net.gir.girsignals.blocks.SignalKS;
 import net.gir.girsignals.blocks.SignalTileEnity;
 import net.gir.girsignals.items.Linkingtool;
 import net.gir.girsignals.items.Placementtool;
@@ -29,16 +34,16 @@ public class GIRItems {
 	public static final Item DEBUG_TOOL = new Item() {
 		public EnumActionResult onItemUse(net.minecraft.entity.player.EntityPlayer player, net.minecraft.world.World worldIn, net.minecraft.util.math.BlockPos pos, net.minecraft.util.EnumHand hand, net.minecraft.util.EnumFacing facing, float hitX, float hitY, float hitZ) {
 			IBlockState state = worldIn.getBlockState(pos);
-			if(state.getBlock() instanceof SignalHV) {
+			if(state.getBlock() instanceof SignalHL) {
 				IExtendedBlockState ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
-				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.STOPSIGNAL, HPVR.HPVR0);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.DISTANTSIGNAL, HPVR.HPVR0);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS3, ZS32.B);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.ZS3V, ZS32.C);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHV.VR_LIGHT, false);
+				System.out.println("======== HL " + ebs.getValue(SignalHL.STOPSIGNAL));
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.STOPSIGNAL, HL.HL5_6);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.LIGHTBAR, HL_LIGHTBAR.GREEN);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.ZS2, ZS32.B);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.MASTSIGN, MAST_SIGN.WBWBW);
+				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.NE2_2, true);
 				ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
-				System.out.println("======== HP " + ebs.getValue(SignalHV.STOPSIGNAL));
+				System.out.println("======== HL " + ebs.getValue(SignalHL.STOPSIGNAL));
 				worldIn.notifyBlockUpdate(pos, state, state, 3);
 			}
 			return EnumActionResult.PASS;
