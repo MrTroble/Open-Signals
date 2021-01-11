@@ -20,7 +20,7 @@ public class EnumSignals {
 	}
 
 	public enum HPVR implements Offable<HPVR> {
-		OFF, HPVR0, HPVR1, HPVR2;
+		OFF, HPVR0, HPVR1, HPVR2, OFF_STATUS_LIGHT, HPVR0_RS;
 	}
 
 	public enum ZS32 implements Offable<ZS32> {
@@ -50,12 +50,14 @@ public class EnumSignals {
 	}
 
 	public enum KS implements Offable<KS> {
-		OFF, HP0, KS1, KS2;
+		OFF, HP0, KS1, KS1_LIGHT, KS1_REPEAT, KS1_BLINK, KS1_BLINK_LIGHT, KS1_BLINK_REPEAT, KS2, KS2_LIGHT, KS2_REPEAT, KS_ZS1, KS_ZS7, KS_RS, KS_STATUS_LIGHT;
 	}
 
 	public enum HL implements Offable<HL> {
-		OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2, HL3A, HL3B, HL4, HL5, HL6A, HL6B, HL7, HL8, HL9A, HL9B, HL10, HL11,
-		HL12A, HL12B;
+		OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2_3, HL4, HL5_6, HL7, HL8_9, HL10, HL11_12, HL_ZS1, HL_RS, HL_STATUS_LIGHT;
+	}
+	public enum HL_LIGHTBAR implements Offable<HL_LIGHTBAR> {
+		OFF, GREEN, YELLOW;
 	}
 
 }

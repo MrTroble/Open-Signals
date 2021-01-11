@@ -17,6 +17,7 @@ import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
@@ -56,10 +57,21 @@ public class SignalBlock extends Block implements ITileEntityProvider {
     {
     }
 	
+	public static ItemStack pickBlock(EntityPlayer player) {
+        for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k)
+        {
+        	if(player.inventory.getStackInSlot(k).getItem().equals(GIRItems.PLACEMENT_TOOL)) {
+        		player.inventory.pickItem(k);
+        		return ItemStack.EMPTY;
+        	}
+        }
+		return new ItemStack(GIRItems.PLACEMENT_TOOL);
+	}
+	
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
 			EntityPlayer player) {
-		return new ItemStack(GIRItems.PLACEMENT_TOOL);
+		return pickBlock(player);
 	}
 
 	@Override
