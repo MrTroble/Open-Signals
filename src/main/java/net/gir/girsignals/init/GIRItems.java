@@ -30,26 +30,7 @@ public class GIRItems {
 
 	public static final Linkingtool LINKING_TOOL = new Linkingtool();
 	public static final Placementtool PLACEMENT_TOOL = new Placementtool();
-	// TODO Remove in production
-	public static final Item DEBUG_TOOL = new Item() {
-		public EnumActionResult onItemUse(net.minecraft.entity.player.EntityPlayer player, net.minecraft.world.World worldIn, net.minecraft.util.math.BlockPos pos, net.minecraft.util.EnumHand hand, net.minecraft.util.EnumFacing facing, float hitX, float hitY, float hitZ) {
-			IBlockState state = worldIn.getBlockState(pos);
-			if(state.getBlock() instanceof SignalHL) {
-				IExtendedBlockState ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
-				System.out.println("======== HL " + ebs.getValue(SignalHL.STOPSIGNAL));
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.STOPSIGNAL, HL.HL5_6);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.LIGHTBAR, HL_LIGHTBAR.GREEN);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.ZS2, ZS32.B);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.MASTSIGN, MAST_SIGN.WBWBW);
-				((SignalTileEnity)worldIn.getTileEntity(pos)).setProperty(SignalHL.NE2_2, true);
-				ebs = (IExtendedBlockState) state.getBlock().getExtendedState(state, worldIn, pos);
-				System.out.println("======== HL " + ebs.getValue(SignalHL.STOPSIGNAL));
-				worldIn.notifyBlockUpdate(pos, state, state, 3);
-			}
-			return EnumActionResult.PASS;
-		};
-	};
-
+	
 	private static ArrayList<Item> registeredItems = new ArrayList<>();
 	
 	public static void init() {
