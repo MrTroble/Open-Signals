@@ -184,6 +184,7 @@ public class GuiPlacementtool extends GuiScreen {
 		int i = 0;
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 		for (GuiButton btn : this.buttonList) {
+			if(btn.id == -100) continue;
 			if (btn instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) btn;
 				if (buttonCheckBox.isChecked()) {
@@ -191,10 +192,12 @@ public class GuiPlacementtool extends GuiScreen {
 					ebs = ebs.withProperty(property, property.getDefault());
 				}
 			} else if(btn instanceof GUISettingsSlider) {
-				
-			} else {
-				i--;
-			}
+				GUISettingsSlider slider = (GUISettingsSlider) btn;
+				if(slider.value != 0) {
+					SEProperty property = (SEProperty) properties[i];
+					ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
+				}
+			} 
 			i++;
 		}
 		IBakedModel mdl = manager.getModelForState(ebs.getClean());
