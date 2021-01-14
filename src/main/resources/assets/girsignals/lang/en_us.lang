@@ -7,9 +7,9 @@ item.placementtool.name=Signal-Placer
 
 #Blocks
 tile.hvsignalcontroller.name=HV-Signal-Controller
-tile.hv_signal.name=HV Signal
-tile.ks_signal.name=KS Signal
-tile.hl_signal.name=HL Signal
+tile.hvsignal.name=HV Signal
+tile.kssignal.name=KS Signal
+tile.hlsignal.name=HL Signal
 
 #Linktool
 lt.linkfailed=Link failed!
