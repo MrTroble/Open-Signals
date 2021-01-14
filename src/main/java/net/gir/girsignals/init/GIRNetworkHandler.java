@@ -1,6 +1,8 @@
 package net.gir.girsignals.init;
 
 import io.netty.buffer.ByteBuf;
+import net.gir.girsignals.SEProperty;
+import net.gir.girsignals.SEProperty.ChangeableStage;
 import net.gir.girsignals.blocks.SignalBlock;
 import net.gir.girsignals.items.Placementtool;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,7 +31,12 @@ public class GIRNetworkHandler {
 		NBTTagCompound tagCompound = new NBTTagCompound();
 		tagCompound.setInteger(BLOCK_TYPE_ID, blockType);
 		for (IUnlistedProperty<?> property : blockState.getUnlistedProperties()) {
-			tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
+			SEProperty<?> prop = SEProperty.cst(property);
+			if(prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+				tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
+			} else if(prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+				tagCompound.setInteger(property.getName(), payBuf.readInt());
+			}
 		}
 
 		EntityPlayer player = ((NetHandlerPlayServer) event.getHandler()).player;

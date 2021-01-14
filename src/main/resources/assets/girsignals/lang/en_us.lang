@@ -22,3 +22,6 @@ property.distantsignal.name=Distant signal
 property.distantsstatuslight.name=Distant signal light
 property.zs3v.name=ZS3v
 property.zs7.name=ZS7
+property.vrlight.name=Vr Light
+property.signaltype.name=Signal type
+property.mastsign.name=Mast sign
