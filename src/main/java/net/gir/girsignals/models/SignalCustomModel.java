@@ -76,7 +76,6 @@ public class SignalCustomModel implements IModel {
 						}
 						return Optional.empty();
 					}, format, bakedTextureGetter)));
-			modelCache.clear();
 			return cachedModel = build.makeMultipartModel();
 		}
 		return cachedModel;
