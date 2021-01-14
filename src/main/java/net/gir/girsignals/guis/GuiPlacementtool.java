@@ -21,7 +21,6 @@ import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -49,7 +48,7 @@ public class GuiPlacementtool extends GuiScreen {
 
 	private BlockModelShapes manager;
 	private SignalBlock currentSelectedBlock;
-	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(5000));
+	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
 	
 	public GuiPlacementtool(NBTTagCompound comp) {
 		this.comp = comp;
@@ -61,18 +60,23 @@ public class GuiPlacementtool extends GuiScreen {
 	}
 
 	private float animationState = 0;
+	private int oldMouse = 0;
+	private boolean dragging = false;
 	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
-		animationState += partialTicks;
+		if(dragging) {
+			animationState += mouseX - oldMouse;
+			oldMouse = mouseX;
+		}
         mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
         mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
         GlStateManager.enableRescaleNormal();
-        GlStateManager.translate((float)this.width * (5/6.0f), (float)this.height * (2/3.0f), 100.0F + this.zLevel);
-        GlStateManager.scale(16.0F, -16.0F, 16.0F);
+        GlStateManager.translate((float)this.width * (5/6.0f), (float)this.height * (5/6.0f), 100.0F + this.zLevel);
+        GlStateManager.scale(22.0F, -22.0F, 22.0F);
         GlStateManager.enableLighting();
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.rotate(animationState, 0, 1, 0);
@@ -80,11 +84,6 @@ public class GuiPlacementtool extends GuiScreen {
         GlStateManager.enableDepth();
 		GlStateManager.pushMatrix();
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-		/*Tessellator tes = Tessellator.getInstance();
-		BufferBuilder bufferbuilder = tes.getBuffer();
-		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-		bufferbuilder.addVertexData(model.get().getByteBuffer());
-		tes.draw();*/
         DrawUtil.draw(model.get());
         GlStateManager.disableRescaleNormal();
         RenderHelper.enableGUIStandardItemLighting();
@@ -102,6 +101,7 @@ public class GuiPlacementtool extends GuiScreen {
 
 	@Override
 	public void initGui() {
+		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 		this.buttonList.clear();
 		ebs = (IExtendedBlockState) SignalBlock.SIGNALLIST.get(usedBlock).getDefaultState();
@@ -187,12 +187,17 @@ public class GuiPlacementtool extends GuiScreen {
 			if (btn instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) btn;
 				if (buttonCheckBox.isChecked()) {
-					SEProperty property = (SEProperty) properties[i++];
+					SEProperty property = (SEProperty) properties[i];
 					ebs = ebs.withProperty(property, property.getDefault());
 				}
+			} else if(btn instanceof GUISettingsSlider) {
+				
+			} else {
+				i--;
 			}
+			i++;
 		}
-		IBakedModel mdl = manager.getModelForState(ebs);
+		IBakedModel mdl = manager.getModelForState(ebs.getClean());
 		List<BakedQuad> lst = new ArrayList<>();
 		lst.addAll(mdl.getQuads(ebs, null, i++));
 		for (EnumFacing face : EnumFacing.VALUES)
@@ -205,7 +210,26 @@ public class GuiPlacementtool extends GuiScreen {
 		}
 		builder.finishDrawing();
 	}
+	
+	@Override
+	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+		super.mouseClicked(mouseX, mouseY, mouseButton);
+		if(mouseButton == 0) {
+			this.dragging = true;
+			oldMouse = mouseX;
+		}
+	}
+	
+	@Override
+	protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+	}
 
+    @Override
+    protected void mouseReleased(int mouseX, int mouseY, int state) {
+    	super.mouseReleased(mouseX, mouseY, state);
+    	dragging = false;
+    }
+	
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException {
 		applyModelChanges();
