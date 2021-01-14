@@ -10,7 +10,6 @@ import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.SEProperty;
 import net.gir.girsignals.SEProperty.ChangeableStage;
 import net.gir.girsignals.blocks.SignalBlock;
-import net.gir.girsignals.init.GIRBlocks;
 import net.gir.girsignals.init.GIRNetworkHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -92,7 +91,7 @@ public class GuiPlacementtool extends GuiScreen {
 	public void initGui() {
 		this.buttonList.clear();
 		ebs = (IExtendedBlockState) SignalBlock.SIGNALLIST.get(usedBlock).getDefaultState();
-		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) GIRBlocks.HV_SIGNAL.getBlockState();
+		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) SignalBlock.SIGNALLIST.get(usedBlock).getBlockState();
 		Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
 		properties = unlistedProperties.toArray(new IUnlistedProperty[unlistedProperties.size()]);
 		int maxWidth = 0;
@@ -114,7 +113,7 @@ public class GuiPlacementtool extends GuiScreen {
 			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
 				addButton(new GuiCheckBox(id, xPos, yPos, propName, comp.getBoolean(property.getName())));
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-				addButton(new GUISettingsSlider(prop, id, xPos, yPos, maxWidth, propName, comp.getInteger(property.getName())));
+				addButton(new GUISettingsSlider(prop, id, xPos, yPos, maxWidth - 20, propName, comp.getInteger(property.getName())));
 			}
 		}
 		
