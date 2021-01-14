@@ -1,52 +1,37 @@
 package net.gir.girsignals.guis;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.lwjgl.LWJGLUtil;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.vector.Quaternion;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.gir.girsignals.EnumSignals.HPVR;
 import net.gir.girsignals.EnumSignals.IIntegerable;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.SEProperty;
 import net.gir.girsignals.SEProperty.ChangeableStage;
 import net.gir.girsignals.blocks.SignalBlock;
-import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.init.GIRNetworkHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.RenderItem;
-import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldVertexBufferUploader;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.client.model.pipeline.ForgeBlockModelRenderer;
 import net.minecraftforge.client.model.pipeline.LightUtil;
-import net.minecraftforge.client.model.pipeline.LightUtil.ItemConsumer;
-import net.minecraftforge.client.model.pipeline.QuadGatheringTransformer;
-import net.minecraftforge.client.model.pipeline.VertexBufferConsumer;
-import net.minecraftforge.client.model.pipeline.VertexLighterFlat;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -65,7 +50,6 @@ public class GuiPlacementtool extends GuiScreen {
 	private BlockModelShapes manager;
 	private SignalBlock currentSelectedBlock;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(5000));
-	private WorldVertexBufferUploader uploader = new WorldVertexBufferUploader();
 	
 	public GuiPlacementtool(NBTTagCompound comp) {
 		this.comp = comp;
@@ -101,7 +85,7 @@ public class GuiPlacementtool extends GuiScreen {
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		bufferbuilder.addVertexData(model.get().getByteBuffer());
 		tes.draw();*/
-        uploader.draw(model.get());
+        DrawUtil.draw(model.get());
         GlStateManager.disableRescaleNormal();
         RenderHelper.enableGUIStandardItemLighting();
         GlStateManager.disableBlend();
@@ -192,6 +176,7 @@ public class GuiPlacementtool extends GuiScreen {
 		CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
 				new PacketBuffer(buffer));
 		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
+		model.get().reset();
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -208,13 +193,15 @@ public class GuiPlacementtool extends GuiScreen {
 			}
 		}
 		IBakedModel mdl = manager.getModelForState(ebs);
-		List<BakedQuad> lst = mdl.getQuads(ebs, null, 1);
+		List<BakedQuad> lst = new ArrayList<>();
+		lst.addAll(mdl.getQuads(ebs, null, i++));
+		for (EnumFacing face : EnumFacing.VALUES)
+			lst.addAll(mdl.getQuads(ebs, face, i++));
+		
 		BufferBuilder builder = model.get();
-		builder.reset();
 		builder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		for (BakedQuad quad : lst) {
 			LightUtil.renderQuadColor(builder, quad, 0xFFFFFFFF);
-			System.out.println("TEST");
 		}
 		builder.finishDrawing();
 	}
