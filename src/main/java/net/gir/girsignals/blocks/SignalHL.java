@@ -13,8 +13,8 @@ public class SignalHL extends SignalBlock {
 		super("HL");
 	}
 
-	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("Mainlightsignal", HL.OFF);
-	public static final SEProperty<HL_LIGHTBAR> LIGHTBAR = SEProperty.of("Mainlightsignallightbar", HL_LIGHTBAR.OFF);
+	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF);
+	public static final SEProperty<HL_LIGHTBAR> LIGHTBAR = SEProperty.of("mainlightsignallightbar", HL_LIGHTBAR.OFF);
 	public static final SEProperty<MAST_SIGN> MASTSIGN = SEProperty.of("mastsign", MAST_SIGN.OFF, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false);
 	public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false);

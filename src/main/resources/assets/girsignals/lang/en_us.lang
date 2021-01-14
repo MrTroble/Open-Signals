@@ -7,6 +7,9 @@ item.placementtool.name=Signal-Placer
 
 #Blocks
 tile.hvsignalcontroller.name=HV-Signal-Controller
+tile.hvsignal.name=HV Signal
+tile.kssignal.name=KS Signal
+tile.hlsignal.name=HL Signal
 
 #Linktool
 lt.linkfailed=Link failed!
@@ -22,3 +25,13 @@ property.distantsignal.name=Distant signal
 property.distantsstatuslight.name=Distant signal light
 property.zs3v.name=ZS3v
 property.zs7.name=ZS7
+property.vrlight.name=Vr Short distance
+property.signaltype.name=Signal type
+property.mastsign.name=Mast sign
+property.mainlightsignal.name=Main signal
+property.mainlightsignallightbar.name=Light bar
+property.mastsigndistant.name=Distant mast sign
+property.ne2.name=NE2
+property.ne2_2.name=NE2 Short distance
+property.zs2.name=ZS2
+property.kombisignal.name=Combination Signal

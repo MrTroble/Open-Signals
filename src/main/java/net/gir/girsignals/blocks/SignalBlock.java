@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import net.gir.girsignals.init.GIRItems;
-import net.gir.girsignals.init.GIRTabs;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.ITileEntityProvider;
@@ -46,7 +45,6 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	public SignalBlock(String signalTypeName) {
 		super(Material.ROCK);
 		this.signalTypeName = signalTypeName;
-		setCreativeTab(GIRTabs.tab);
 		setDefaultState(getDefaultState().withProperty(FACING, EnumFacing.NORTH));
 		ID = SIGNALLIST.size();
 		SIGNALLIST.add(this);
