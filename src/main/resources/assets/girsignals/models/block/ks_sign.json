@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"texture_size": [32, 32],
 	"textures": {
-		"13": "girsignals:blocks/mast_weiss-rot-weiss",
+		"13": "girsignals:blocks/wrw",
 		"14": "girsignals:blocks/white",
 		"particle": "girsignals:blocks/mast"
 	},
