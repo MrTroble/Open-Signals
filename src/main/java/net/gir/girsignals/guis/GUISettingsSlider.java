@@ -1,5 +1,7 @@
 package net.gir.girsignals.guis;
 
+import java.util.function.Consumer;
+
 import net.gir.girsignals.EnumSignals.IIntegerable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -12,8 +14,13 @@ public class GUISettingsSlider extends GuiButton {
 	protected int value = 0;
 	protected int max;
 	protected String buttonText;
+	protected Consumer<Integer> consumer;
 	
 	public GUISettingsSlider(IIntegerable<?> property, int buttonId, int x, int y, int width, String buttonText, int initialValue) {
+		this(property, buttonId, x, y, width, buttonText, initialValue, t -> {});
+	}
+	
+	public GUISettingsSlider(IIntegerable<?> property, int buttonId, int x, int y, int width, String buttonText, int initialValue, Consumer<Integer> consumer) {
 		super(buttonId, x, y, buttonText + ": " + property.getObjFromID(initialValue).toString());
 		this.buttonText = buttonText;
 		this.property = property;
@@ -21,6 +28,7 @@ public class GUISettingsSlider extends GuiButton {
 		this.max = property.count() - 1;
 		this.enabled = false;
 		this.width = width;
+		this.consumer = consumer;
 	}
 
 	public int getValue() {
@@ -28,7 +36,9 @@ public class GUISettingsSlider extends GuiButton {
 	}
 	
 	private int getValue(int mouseX) {
-		return Math.max(Math.min((int) (((mouseX - (this.x + 4)) / (float) (this.width - 8)) * this.max), this.max), 0);
+		int val = Math.max(Math.min((int) (((mouseX - (this.x + 4)) / (float) (this.width - 8)) * this.max), this.max), 0);
+		consumer.accept(val);
+		return val;
 	}
 	
 	private String getValueString(int id) {

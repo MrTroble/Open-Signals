@@ -93,7 +93,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast1", ebs -> true, 1);
 			cm.register("hv_sign", has(SignalHV.STOPSIGNAL), 1);
 			cm.register("hv_mast2", ebs -> true, 2);
-			//cm.register("hv_mast_number", hasAndIs(SignalHV.), 2);
 			cm.register("hv_mast3", ebs -> true, 3);
 			cm.register("hv_mast4", ebs -> true, 4);
 			// Zs1 on
