@@ -10,7 +10,7 @@ public class GIRModels {
 
 	@SubscribeEvent
 	public static void register(ModelRegistryEvent event) {
-		registerModel(GIRItems.LINKING_TOOL);
+		GIRItems.registeredItems.forEach(GIRModels::registerModel);
 		registerModel(Item.getItemFromBlock(GIRBlocks.HV_SIGNAL_CONTROLLER));
 	}
 
