@@ -4,6 +4,13 @@ import net.minecraft.util.IStringSerializable;
 
 public class EnumSignals {
 
+	public interface IIntegerable<T> {
+		
+		public T getObjFromID(int obj);
+		
+	    public int count();
+	}
+	
 	public interface Offable<T extends Enum<T>> extends IStringSerializable, Comparable<T> {
 
 		@SuppressWarnings({ "unchecked" })

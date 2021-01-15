@@ -2,6 +2,7 @@ package net.gir.girsignals;
 
 import com.google.common.base.Optional;
 
+import net.gir.girsignals.EnumSignals.IIntegerable;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
@@ -9,8 +10,8 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>{
-
+public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>, IIntegerable<T>{
+	
 	public enum ChangeableStage {
 		APISTAGE, GUISTAGE;
 	}
@@ -90,6 +91,15 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
     		return (T) getType().getEnumConstants()[obj];
     	} else if(getType().equals(Boolean.class)) {
     		return (T)(Boolean.valueOf(obj == 1));
+    	}
+    	throw new IllegalArgumentException("Wrong generic type!");
+    }
+    
+    public int count() {
+    	if(getType().isEnum()) {
+    		return getType().getEnumConstants().length;
+    	} else if(getType().equals(Boolean.class)) {
+    		return 2;
     	}
     	throw new IllegalArgumentException("Wrong generic type!");
     }

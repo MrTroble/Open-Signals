@@ -4,11 +4,6 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import javax.swing.text.html.ParagraphView;
-
-import org.apache.commons.io.filefilter.TrueFileFilter;
-
-import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import net.gir.girsignals.EnumSignals.HL;
 import net.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import net.gir.girsignals.EnumSignals.HPVR;
@@ -65,7 +60,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		
 	}
 	
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unused" })
 	private static <T extends Offable> Predicate<IExtendedBlockState> withNot(IUnlistedProperty<T> property, Predicate<T> t) {
 		return new ModelPred<T>(property, t, true);
 	}
