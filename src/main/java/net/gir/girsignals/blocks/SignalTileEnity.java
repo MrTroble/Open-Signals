@@ -22,7 +22,7 @@ public class SignalTileEnity extends TileEntity {
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = new NBTTagCompound();
-		map.forEach((prop, in) -> prop.writeToNBT(compound, in));
+		map.forEach((prop, in) -> prop.writeToNBT(comp, in));
 		compound.setTag(PROPERTIES, comp);
 		return super.writeToNBT(compound);
 	}
@@ -44,7 +44,7 @@ public class SignalTileEnity extends TileEntity {
 		((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties()
 				.parallelStream().forEach(prop -> {
 					SEProperty<?> sep = SEProperty.cst(prop);
-					sep.readFromNBT(comp).toJavaUtil().ifPresent(obj -> map.put(sep, obj));;
+					sep.readFromNBT(comp).toJavaUtil().ifPresent(obj -> map.put(sep, obj));
 				});
 	}
 
@@ -72,7 +72,7 @@ public class SignalTileEnity extends TileEntity {
 		return writeToNBT(new NBTTagCompound());
 	}
 
-	public <T> void setProperty(SEProperty<?> prop, T opt) {
+	public <T extends Comparable<T>> void setProperty(SEProperty<T> prop, T opt) {
 		map.put(prop, opt);
 		this.markDirty();
 	}
