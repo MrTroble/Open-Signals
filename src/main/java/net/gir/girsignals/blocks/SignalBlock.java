@@ -59,7 +59,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
         for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k)
         {
         	if(player.inventory.getStackInSlot(k).getItem().equals(GIRItems.PLACEMENT_TOOL)) {
-        		player.inventory.pickItem(k);
+        		player.inventory.currentItem = k;
         		return ItemStack.EMPTY;
         	}
         }
