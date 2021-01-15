@@ -11,6 +11,7 @@ import net.gir.girsignals.SEProperty;
 import net.gir.girsignals.blocks.SignalBlock;
 import net.gir.girsignals.blocks.SignalTileEnity;
 import net.gir.girsignals.items.Linkingtool;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -59,7 +60,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	
 	private void onLink() {
 		IBlockState state = world.getBlockState(linkedSignalPosition);
-		SignalBlock b = (SignalBlock) state.getBlock();
+		Block block = state.getBlock();
+		if(!(block instanceof SignalBlock)) {
+			unlink();
+			return;
+		}
+		
+		SignalBlock b = (SignalBlock) block;
 		
 		HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
 		((IExtendedBlockState) b.getExtendedState(state, world, linkedSignalPosition)).getUnlistedProperties().forEach(
@@ -131,7 +138,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return new Object[] { changeSignalImpl(args.checkInteger(0), args.checkInteger(1)) };
 	}
 
-	@SuppressWarnings("rawtypes")
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean changeSignalImpl(int type, int newSignal) {
 		if (!hasLinkImpl() || !find(getSupportedSignalTypesImpl(), type))
 			return false;

@@ -18,7 +18,7 @@ public class GIRItems {
 	public static final Linkingtool LINKING_TOOL = new Linkingtool();
 	public static final Placementtool PLACEMENT_TOOL = new Placementtool();
 	
-	private static ArrayList<Item> registeredItems = new ArrayList<>();
+	public static ArrayList<Item> registeredItems = new ArrayList<>();
 	
 	public static void init() {
 		Field[] fields = GIRItems.class.getFields();

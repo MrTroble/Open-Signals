@@ -1,12 +1,22 @@
 package net.gir.girsignals.guis;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.opengl.GL11;
+
+import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.util.EnumFacing;
+import net.minecraftforge.client.model.pipeline.LightUtil;
+import net.minecraftforge.common.property.IExtendedBlockState;
 
 public class DrawUtil {
 
@@ -34,6 +44,20 @@ public class DrawUtil {
                 vertexformatelement1.getUsage().postDraw(vertexformat, i1, i, bytebuffer);
             }
         }
+	}
+	
+	public static void addToBuffer(BufferBuilder builder, BlockModelShapes manager, IExtendedBlockState ebs) {
+		IBakedModel mdl = manager.getModelForState(ebs.getClean());
+		List<BakedQuad> lst = new ArrayList<>();
+		lst.addAll(mdl.getQuads(ebs, null, 0));
+		for (EnumFacing face : EnumFacing.VALUES)
+			lst.addAll(mdl.getQuads(ebs, face, 0));
+
+		builder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+		for (BakedQuad quad : lst) {
+			LightUtil.renderQuadColor(builder, quad, 0xFFFFFFFF);
+		}
+		builder.finishDrawing();
 	}
 	
 }

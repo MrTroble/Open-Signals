@@ -1,11 +1,7 @@
 package net.gir.girsignals.guis;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-
-import org.lwjgl.opengl.GL11;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -21,16 +17,11 @@ import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
-import net.minecraft.util.EnumFacing;
-import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -49,7 +40,7 @@ public class GuiPlacementtool extends GuiScreen {
 	private BlockModelShapes manager;
 	private SignalBlock currentSelectedBlock;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
-	
+
 	public GuiPlacementtool(NBTTagCompound comp) {
 		this.comp = comp;
 		if (comp == null)
@@ -62,35 +53,38 @@ public class GuiPlacementtool extends GuiScreen {
 	private float animationState = 0;
 	private int oldMouse = 0;
 	private boolean dragging = false;
-	
+
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
-		if(dragging) {
+		if (dragging) {
 			animationState += mouseX - oldMouse;
 			oldMouse = mouseX;
 		}
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.translate((float)this.width * (5/6.0f), (float)this.height * (5/6.0f), 100.0F + this.zLevel);
-        GlStateManager.scale(22.0F, -22.0F, 22.0F);
-        GlStateManager.enableLighting();
-        RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.rotate(animationState, 0, 1, 0);
-        GlStateManager.enableBlend();
-        GlStateManager.enableDepth();
+		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.enableRescaleNormal();
+		GlStateManager.translate((float) this.width * (5 / 6.0f), (float) this.height * (5 / 6.0f),
+				100.0F + this.zLevel);
+		GlStateManager.scale(22.0F, -22.0F, 22.0F);
+		GlStateManager.enableLighting();
+		RenderHelper.enableGUIStandardItemLighting();
+		GlStateManager.rotate(animationState, 0, 1, 0);
+		GlStateManager.enableBlend();
+		GlStateManager.enableDepth();
 		GlStateManager.pushMatrix();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        DrawUtil.draw(model.get());
-        GlStateManager.disableRescaleNormal();
-        RenderHelper.enableGUIStandardItemLighting();
-        GlStateManager.disableBlend();
-        GlStateManager.disableDepth();
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
+		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
+				GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
+				GlStateManager.DestFactor.ZERO);
+		DrawUtil.draw(model.get());
+		GlStateManager.disableRescaleNormal();
+		RenderHelper.enableGUIStandardItemLighting();
+		GlStateManager.disableBlend();
+		GlStateManager.disableDepth();
+		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 		GlStateManager.popMatrix();
 	}
 
@@ -131,7 +125,7 @@ public class GuiPlacementtool extends GuiScreen {
 				addButton(new GuiCheckBox(id, xPos, yPos, propName, comp.getBoolean(property.getName())));
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 				addButton(new GUISettingsSlider(prop, id, xPos, yPos, maxWidth - 20, propName,
-						comp.getInteger(property.getName())));
+						comp.getInteger(property.getName()), inp -> applyModelChanges()));
 			}
 		}
 
@@ -139,10 +133,6 @@ public class GuiPlacementtool extends GuiScreen {
 
 			@Override
 			public String getObjFromID(int obj) {
-				if (usedBlock != obj) {
-					usedBlock = obj;
-					initGui();
-				}
 				currentSelectedBlock = SignalBlock.SIGNALLIST.get(obj);
 				ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 				return currentSelectedBlock.getLocalizedName();
@@ -153,7 +143,12 @@ public class GuiPlacementtool extends GuiScreen {
 				return SignalBlock.SIGNALLIST.size();
 			}
 
-		}, -100, (this.width - 300) / 2, 10, 300, I18n.format("property.signaltype.name"), this.usedBlock));
+		}, -100, (this.width - 300) / 2, 10, 300, I18n.format("property.signaltype.name"), this.usedBlock, input -> {
+			if (usedBlock != input) {
+				usedBlock = input;
+				initGui();
+			}
+		}));
 
 		applyModelChanges();
 	}
@@ -184,55 +179,42 @@ public class GuiPlacementtool extends GuiScreen {
 		int i = 0;
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 		for (GuiButton btn : this.buttonList) {
-			if(btn.id == -100) continue;
+			if (btn.id == -100)
+				continue;
 			if (btn instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) btn;
 				if (buttonCheckBox.isChecked()) {
 					SEProperty property = (SEProperty) properties[i];
 					ebs = ebs.withProperty(property, property.getDefault());
 				}
-			} else if(btn instanceof GUISettingsSlider) {
+			} else if (btn instanceof GUISettingsSlider) {
 				GUISettingsSlider slider = (GUISettingsSlider) btn;
-				if(slider.value != 0) {
+				if (slider.value != 0) {
 					SEProperty property = (SEProperty) properties[i];
 					ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
 				}
-			} 
+			}
 			i++;
 		}
-		IBakedModel mdl = manager.getModelForState(ebs.getClean());
-		List<BakedQuad> lst = new ArrayList<>();
-		lst.addAll(mdl.getQuads(ebs, null, i++));
-		for (EnumFacing face : EnumFacing.VALUES)
-			lst.addAll(mdl.getQuads(ebs, face, i++));
 		
-		BufferBuilder builder = model.get();
-		builder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-		for (BakedQuad quad : lst) {
-			LightUtil.renderQuadColor(builder, quad, 0xFFFFFFFF);
-		}
-		builder.finishDrawing();
+		DrawUtil.addToBuffer(model.get(), manager, ebs);
 	}
-	
+
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
-		if(mouseButton == 0) {
+		if (mouseButton == 0) {
 			this.dragging = true;
 			oldMouse = mouseX;
 		}
 	}
-	
+
 	@Override
-	protected void mouseClickMove(int mouseX, int mouseY, int clickedMouseButton, long timeSinceLastClick) {
+	protected void mouseReleased(int mouseX, int mouseY, int state) {
+		super.mouseReleased(mouseX, mouseY, state);
+		dragging = false;
 	}
 
-    @Override
-    protected void mouseReleased(int mouseX, int mouseY, int state) {
-    	super.mouseReleased(mouseX, mouseY, state);
-    	dragging = false;
-    }
-	
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException {
 		applyModelChanges();
