@@ -6,6 +6,7 @@ import net.gir.girsignals.EnumSignals.IIntegerable;
 import net.gir.girsignals.guis.GuiPlacementtool.InternalUnlocalized;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
 public class GUISettingsSlider extends GuiButton implements InternalUnlocalized{
@@ -17,21 +18,18 @@ public class GUISettingsSlider extends GuiButton implements InternalUnlocalized{
 	protected String buttonText;
 	protected Consumer<Integer> consumer;
 	protected String unlocalized;
-	
-	public GUISettingsSlider(IIntegerable<?> property, int buttonId, int x, int y, int width, String buttonText, int initialValue) {
-		this(property, buttonId, x, y, width, "property." + buttonText + ".name", initialValue, t -> {});
-		this.unlocalized = buttonText;
-	}
-	
+		
 	public GUISettingsSlider(IIntegerable<?> property, int buttonId, int x, int y, int width, String buttonText, int initialValue, Consumer<Integer> consumer) {
-		super(buttonId, x, y, buttonText + ": " + property.getObjFromID(initialValue).toString());
-		this.buttonText = buttonText;
+		super(buttonId, x, y, "");
+		this.buttonText = I18n.format("property." + buttonText + ".name");
+		this.displayString = this.buttonText + ": " + property.getObjFromID(initialValue).toString();
 		this.property = property;
 		this.value = initialValue;
 		this.max = property.count() - 1;
 		this.enabled = false;
 		this.width = width;
 		this.consumer = consumer;
+		this.unlocalized = buttonText;
 	}
 
 	public int getValue() {

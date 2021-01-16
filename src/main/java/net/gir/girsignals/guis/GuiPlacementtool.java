@@ -1,7 +1,10 @@
 package net.gir.girsignals.guis;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
+
+import com.google.common.collect.Lists;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -58,6 +61,19 @@ public class GuiPlacementtool extends GuiScreen {
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
+		for (GuiButton guiButton : buttonList) {
+			if(guiButton instanceof InternalUnlocalized) {
+				if(guiButton.isMouseOver()) {
+					dragging = false;
+					String str = I18n.format("property." + ((InternalUnlocalized) guiButton).getUnlocalized() + ".desc");
+					if(str != null)
+						this.drawHoveringText(Arrays.asList(str.split("%n")), mouseX, mouseY);
+					break;
+				}
+			}
+			
+		}
+
 		if (dragging) {
 			animationState += mouseX - oldMouse;
 			oldMouse = mouseX;
@@ -87,10 +103,6 @@ public class GuiPlacementtool extends GuiScreen {
 		mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 		GlStateManager.popMatrix();
 		
-		for (GuiButton guiButton : buttonList) {
-			if(guiButton.id == -100) continue;
-			
-		}
 	}
 
 	@Override
@@ -149,7 +161,7 @@ public class GuiPlacementtool extends GuiScreen {
 			int id = (yPos / 20) * (xPos / 50);
 			String propName = property.getName();
 			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-				addButton(new InternalCheckBox(id, xPos, yPos, propName, comp.getBoolean(property.getName())));
+				addButton(new InternalCheckBox(id, xPos, yPos, propName, comp.getBoolean(propName)));
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 				addButton(new GUISettingsSlider(prop, id, xPos, yPos, maxWidth - 20, propName,
 						comp.getInteger(propName), inp -> applyModelChanges()));
@@ -170,7 +182,7 @@ public class GuiPlacementtool extends GuiScreen {
 				return SignalBlock.SIGNALLIST.size();
 			}
 
-		}, -100, (this.width - 300) / 2, 10, 300, I18n.format("property.signaltype.name"), this.usedBlock, input -> {
+		}, -100, (this.width - 300) / 2, 10, 300, "signaltype", this.usedBlock, input -> {
 			if (usedBlock != input) {
 				usedBlock = input;
 				initGui();

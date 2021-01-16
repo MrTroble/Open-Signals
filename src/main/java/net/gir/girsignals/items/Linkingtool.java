@@ -1,7 +1,6 @@
 package net.gir.girsignals.items;
 
 import net.gir.girsignals.blocks.SignalBlock;
-import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.controllers.SignalController;
 import net.gir.girsignals.controllers.SignalControllerTileEntity;
 import net.gir.girsignals.init.GIRTabs;
