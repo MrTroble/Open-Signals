@@ -86,13 +86,40 @@ public class GuiPlacementtool extends GuiScreen {
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 		GlStateManager.popMatrix();
+		
+		for (GuiButton guiButton : buttonList) {
+			if(guiButton.id == -100) continue;
+			
+		}
 	}
 
 	@Override
 	public boolean doesGuiPauseGame() {
 		return false;
 	}
+	
+	public interface InternalUnlocalized {
+		
+		String getUnlocalized();
+		
+	}
 
+	private static class InternalCheckBox extends GuiCheckBox implements InternalUnlocalized {
+
+		public String unlocalized;
+		
+		public InternalCheckBox(int id, int xPos, int yPos, String displayString, boolean isChecked) {
+			super(id, xPos, yPos, I18n.format("property." + displayString + ".name"), isChecked);
+			this.unlocalized = displayString;
+		}
+
+		@Override
+		public String getUnlocalized() {
+			return unlocalized;
+		}
+		
+	}
+	
 	@Override
 	public void initGui() {
 		animationState = 180.0f;
@@ -120,12 +147,12 @@ public class GuiPlacementtool extends GuiScreen {
 				yPos = 45;
 			}
 			int id = (yPos / 20) * (xPos / 50);
-			String propName = I18n.format("property." + property.getName() + ".name");
+			String propName = property.getName();
 			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-				addButton(new GuiCheckBox(id, xPos, yPos, propName, comp.getBoolean(property.getName())));
+				addButton(new InternalCheckBox(id, xPos, yPos, propName, comp.getBoolean(property.getName())));
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 				addButton(new GUISettingsSlider(prop, id, xPos, yPos, maxWidth - 20, propName,
-						comp.getInteger(property.getName()), inp -> applyModelChanges()));
+						comp.getInteger(propName), inp -> applyModelChanges()));
 			}
 		}
 

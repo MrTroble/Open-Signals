@@ -3,11 +3,12 @@ package net.gir.girsignals.guis;
 import java.util.function.Consumer;
 
 import net.gir.girsignals.EnumSignals.IIntegerable;
+import net.gir.girsignals.guis.GuiPlacementtool.InternalUnlocalized;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraftforge.fml.client.config.GuiUtils;
 
-public class GUISettingsSlider extends GuiButton {
+public class GUISettingsSlider extends GuiButton implements InternalUnlocalized{
 
 	protected IIntegerable<?> property;
 	protected boolean dragging = false;
@@ -15,9 +16,11 @@ public class GUISettingsSlider extends GuiButton {
 	protected int max;
 	protected String buttonText;
 	protected Consumer<Integer> consumer;
+	protected String unlocalized;
 	
 	public GUISettingsSlider(IIntegerable<?> property, int buttonId, int x, int y, int width, String buttonText, int initialValue) {
-		this(property, buttonId, x, y, width, buttonText, initialValue, t -> {});
+		this(property, buttonId, x, y, width, "property." + buttonText + ".name", initialValue, t -> {});
+		this.unlocalized = buttonText;
 	}
 	
 	public GUISettingsSlider(IIntegerable<?> property, int buttonId, int x, int y, int width, String buttonText, int initialValue, Consumer<Integer> consumer) {
@@ -36,7 +39,7 @@ public class GUISettingsSlider extends GuiButton {
 	}
 	
 	private int getValue(int mouseX) {
-		int val = Math.max(Math.min((int) (((mouseX - (this.x + 4)) / (float) (this.width - 8)) * this.max), this.max), 0);
+		int val = Math.max(Math.min((int) (((mouseX - (this.x + 4)) / (float) (this.width - 8)) * (this.max + 1)), this.max), 0);
 		consumer.accept(val);
 		return val;
 	}
@@ -54,7 +57,7 @@ public class GUISettingsSlider extends GuiButton {
 			}
 
 			GuiUtils.drawContinuousTexturedBox(BUTTON_TEXTURES,
-					this.x + (int) (this.value * (float) ((this.width - 8) / this.max)), this.y, 0, 66, 8, this.height, 200,
+					this.x + (int) (this.value * (float) ((this.width - 8) / (this.max + 1))), this.y, 0, 66, 8, this.height, 200,
 					20, 2, 3, 2, 2, this.zLevel);
 		}
 	}
@@ -80,6 +83,11 @@ public class GUISettingsSlider extends GuiButton {
     {
         this.dragging = false;
     }
+
+	@Override
+	public String getUnlocalized() {
+		return this.unlocalized;
+	}
 
 
 }

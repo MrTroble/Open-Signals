@@ -1,5 +1,6 @@
 package net.gir.girsignals.items;
 
+import net.gir.girsignals.blocks.SignalBlock;
 import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.controllers.SignalController;
 import net.gir.girsignals.controllers.SignalControllerTileEntity;
@@ -27,7 +28,7 @@ public class Linkingtool extends Item {
 		if (worldIn.isRemote)
 			return EnumActionResult.PASS;
 		Block block = worldIn.getBlockState(pos).getBlock();
-		if (block instanceof SignalHV) {
+		if (block instanceof SignalBlock) {
 			NBTTagCompound comp = new NBTTagCompound();
 			SignalControllerTileEntity.writeBlockPosToNBT(pos, comp);
 			player.getHeldItem(hand).setTagCompound(comp);
