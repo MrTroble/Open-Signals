@@ -1,6 +1,7 @@
 package net.gir.girsignals.guis;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Collection;
 
 import io.netty.buffer.ByteBuf;
@@ -58,6 +59,18 @@ public class GuiPlacementtool extends GuiScreen {
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
+		for (GuiButton guiButton : buttonList) {
+			if(guiButton instanceof InternalUnlocalized) {
+				if(guiButton.isMouseOver()) {
+					dragging = false;
+					String str = I18n.format("property." + ((InternalUnlocalized) guiButton).getUnlocalized() + ".desc");
+					this.drawHoveringText(Arrays.asList(str.split(System.lineSeparator())), mouseX, mouseY);
+					break;
+				}
+			}
+			
+		}
+
 		if (dragging) {
 			animationState += mouseX - oldMouse;
 			oldMouse = mouseX;
@@ -86,13 +99,36 @@ public class GuiPlacementtool extends GuiScreen {
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 		GlStateManager.popMatrix();
+		
 	}
 
 	@Override
 	public boolean doesGuiPauseGame() {
 		return false;
 	}
+	
+	public interface InternalUnlocalized {
+		
+		String getUnlocalized();
+		
+	}
 
+	private static class InternalCheckBox extends GuiCheckBox implements InternalUnlocalized {
+
+		public String unlocalized;
+		
+		public InternalCheckBox(int id, int xPos, int yPos, String displayString, boolean isChecked) {
+			super(id, xPos, yPos, I18n.format("property." + displayString + ".name"), isChecked);
+			this.unlocalized = displayString;
+		}
+
+		@Override
+		public String getUnlocalized() {
+			return unlocalized;
+		}
+		
+	}
+	
 	@Override
 	public void initGui() {
 		animationState = 180.0f;
@@ -120,12 +156,12 @@ public class GuiPlacementtool extends GuiScreen {
 				yPos = 45;
 			}
 			int id = (yPos / 20) * (xPos / 50);
-			String propName = I18n.format("property." + property.getName() + ".name");
+			String propName = property.getName();
 			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-				addButton(new GuiCheckBox(id, xPos, yPos, propName, comp.getBoolean(property.getName())));
+				addButton(new InternalCheckBox(id, xPos, yPos, propName, comp.getBoolean(propName)));
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 				addButton(new GUISettingsSlider(prop, id, xPos, yPos, maxWidth - 20, propName,
-						comp.getInteger(property.getName()), inp -> applyModelChanges()));
+						comp.getInteger(propName), inp -> applyModelChanges()));
 			}
 		}
 
@@ -143,7 +179,7 @@ public class GuiPlacementtool extends GuiScreen {
 				return SignalBlock.SIGNALLIST.size();
 			}
 
-		}, -100, (this.width - 300) / 2, 10, 300, I18n.format("property.signaltype.name"), this.usedBlock, input -> {
+		}, -100, (this.width - 300) / 2, 10, 300, "signaltype", this.usedBlock, input -> {
 			if (usedBlock != input) {
 				usedBlock = input;
 				initGui();
