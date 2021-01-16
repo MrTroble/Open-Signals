@@ -8,6 +8,7 @@ import net.gir.girsignals.EnumSignals.HL;
 import net.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import net.gir.girsignals.EnumSignals.HPVR;
 import net.gir.girsignals.EnumSignals.KS;
+import net.gir.girsignals.EnumSignals.MAST_SIGN;
 import net.gir.girsignals.EnumSignals.Offable;
 import net.gir.girsignals.EnumSignals.ZS32;
 import net.gir.girsignals.GirsignalsMain;
@@ -91,7 +92,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_base", ebs -> true, 0);
 			cm.register("hv_ne2", has(SignalHV.NE2).and(has(SignalHV.STOPSIGNAL).negate()), 0); //Ne2 ist nicht zwangsläufig dran, Vorsignalwiederholer
 			cm.register("hv_mast1", ebs -> true, 1);
-			cm.register("hv_sign", has(SignalHV.STOPSIGNAL), 1);
+			
+			for (MAST_SIGN sign : MAST_SIGN.values())
+				if(!sign.equals(MAST_SIGN.OFF))
+					cm.register("hv_sign", with(SignalHV.MASTSIGN, ms -> ms.equals(sign)), 1, "2", "girsignals:blocks/" + sign.getName());
+			
 			cm.register("hv_mast2", ebs -> true, 2);
 			cm.register("hv_mast3", ebs -> true, 3);
 			cm.register("hv_mast4", ebs -> true, 4);
@@ -139,7 +144,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ks_mast1", ebs -> true, 1);
 			cm.register("ks_sign_distant", has(SignalKS.MASTSIGNDISTANT), 1); //!!!
 			cm.register("ks_mast2", ebs -> true, 2);
-			cm.register("ks_sign", has(SignalKS.MASTSIGN), 2); //!!!
+
+			for (MAST_SIGN sign : MAST_SIGN.values())
+				if(!sign.equals(MAST_SIGN.OFF))
+					cm.register("ks_sign", with(SignalKS.MASTSIGN, ms -> ms.equals(sign)), 2, "13", "girsignals:blocks/" + sign.getName());
+			
 			cm.register("ks_mast3", ebs -> true, 3);
 			cm.register("ks_mast4", ebs -> true, 4);
 			//cm.register("ks_number", ebs -> true, 4);
@@ -188,7 +197,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hl_ne2_2", has(SignalHL.NE2).and(has(SignalHL.NE2_2)), 1);
 			cm.register("hl_sign_distant", has(SignalHL.MASTSIGNDISTANT), 1);
 			cm.register("hl_mast2", ebs -> true, 2);
-			cm.register("hl_sign_main", has(SignalHL.MASTSIGN), 2);
+			
+			for (MAST_SIGN sign : MAST_SIGN.values())
+				if(!sign.equals(MAST_SIGN.OFF))
+					cm.register("hl_sign_main", with(SignalHL.MASTSIGN, ms -> ms.equals(sign)), 2, "9", "girsignals:blocks/" + sign.getName());
+			
 			cm.register("hl_mast3", ebs -> true, 3);
 			for(ZS32 zs3 : ZS32.values()) {
 				cm.register("hl_zs2", with(SignalHL.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "signalnorth", "girsignals:blocks/zs3/" + zs3.name());
