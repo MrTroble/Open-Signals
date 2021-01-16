@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.google.common.collect.Lists;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.gir.girsignals.EnumSignals.IIntegerable;
@@ -66,8 +64,7 @@ public class GuiPlacementtool extends GuiScreen {
 				if(guiButton.isMouseOver()) {
 					dragging = false;
 					String str = I18n.format("property." + ((InternalUnlocalized) guiButton).getUnlocalized() + ".desc");
-					if(str != null)
-						this.drawHoveringText(Arrays.asList(str.split("%n")), mouseX, mouseY);
+					this.drawHoveringText(Arrays.asList(str.split(System.lineSeparator())), mouseX, mouseY);
 					break;
 				}
 			}
