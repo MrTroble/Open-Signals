@@ -7,6 +7,9 @@ item.placementtool.name=Signal-Platzierer
 
 #Blocks
 tile.hvsignalcontroller.name=HV-Signal-Regler
+tile.hvsignal.name=HV Signal
+tile.kssignal.name=KS Signal
+tile.hlsignal.name=HL Signal
 
 #Linktool
 lt.linkfailed=Link fehlgeschlagen!
@@ -16,3 +19,37 @@ lt.unlink=Link zum Signal entfernt
 
 #Placementtool
 pt.itemnotset=Bitte stell das Tool vorher ein (Sneaken + Rechtsklick)
+
+property.zs3.name=Zs3
+property.zs1.name=Zs1
+property.stopsignal.name=Hauptsignal
+property.distantsignal.name=Vorsignal
+property.zs3v.name=Zs3v
+property.zs7.name=Zs7
+property.vrlight.name=Zusatzlicht für Vorsignal
+property.signaltype.name=Signalsystem
+property.mastsign.name=Mastschild
+property.mainlightsignal.name=Hauptlichtsignal
+property.mainlightsignallightbar.name=Lichtleiste für Hauptlichtsignal
+property.mastsigndistant.name=Vorsignalmastschild
+property.ne2.name=Ne2
+property.ne2_2.name=Ne2 verkürtzer Bremsweg (benötigt Ne2) 
+property.zs2.name=ZS2
+property.kombisignal.name=Kombinationssignal
+
+property.zs3.desc=Zs 3  Ist ein Geschwindigkeitsanzeiger. Ab diesem Signal gilt die Geschwindigkeit, die angezeigt wird. %nZs 2 ist der Richtungsanzeiger und gibt an in welche Richtung der Fahrdienstleiter das Signal gestellt hat und der Buchstabe ist davon abhängig, wie der erste Buchstabe des nächsten Ortes ist. Kommt bei Ausfahrten häufig vor, wo man in 2 oder mehr unterschiedlichen Strecken fahren kann. %nZs6 wird meist an Ausfahrsignalen angebracht und ab dort fährt man entgegen der gewöhnlichen Fahrtrichtung, auf der selben Strecke ( 2 Gleisig). %nZs 8 ist meist an Ausfahrsignalen angebracht und gibt an, das der Zug am haltzeigenden oder getörten Hauptsignal vorbei fahren darf, aber in das Gegengleis (siehe Zs6) geleitet wird.
+property.zs1.desc=Zs 1 kann an jedem Hauptsignal vorhanden sein und gibt an, dass der Zug am haltzeigenden oder gestörten Signal mit maximal 40 km/h vorbeifahren darf, bis zu nächsten Hauptsignal.
+property.stopsignal.desc=Hauptsignale sind die Signale, die eine Strecke begrenzen. Zwischen 2 Hauptsignalen, darf sich immer nur 1 Zug befinden. Geben an wie man bis zum nächsten Hauptsignal zu fahren hat.
+property.distantsignal.desc=Vorsignale kündigen Hauptsignale an und haben die Funktion anzuzeigen, was das Hauptsignal anzeigt (Fahrt, Langsamfahrt oder Halt).
+property.zs3v.desc=Zs3v ist an einem Vorsignal oder einem Haupt-und Vorsignal und zeigt die Geschwindigkeit an, die am nächsten Hauptsignal gilt.( wo ein Zs3 hängt) Zs3v wird nur bei Geschwindigkeitsveringerungen angewendet. Ebenfalls kann Zs2v angezeigt werden, welches an einem Vorsignal oder Haupt-und Vorsignal und kündigt ein Zs2 an. Zudem kann Zs13 
+property.zs7.desc=Zs 7 kann an jedem Hauptsignal vorhanden sein und gibt an, dass der Zug am haltzeigenden oder gestörten Signal auf Sicht ( maximal 40 km/h) vorbeifahren darf, bis zu nächsten Hauptsignal.
+property.vrlight.desc=Gibt an, ob das Vorsignal im verkürzten Bremsweg steht.
+property.signaltype.desc=Hier sind die verschiedenen Signalsysteme. HV, Hl und Ks Signale.
+property.mastsign.desc=Mastschilder geben dem Lokführer an, wie er sich bei gestörtem Signal zu verhalten hat. %nWeiß-rot-weißes Mastschild hängt an Hauptsignalen und sagt aus, das der Zug, wenn das Signal kein Fahrtbegriff anzeigt, nur auf Zs1,Zs7,Zs8 oder per Befehl an dem signal vorbeifahren darf. %nWeiß-gelb-weiß-gelb-weißes Mastschild  hängt an Hauptsignalen und sagt aus, das der Lokführer, wenn das Signal kein Fahrtbegriff anzeigt, den Fahrdienstleiter anrufen muss, wenn dieser nicht ran geht, darf der Lokführer auf Sicht bis zum nächsten Hauptsignal fahren ( max. 40 km/h). %nWeiß-schwarz-weiß-schwarz-weißes Mastschild hängt an Hauptsignalen und sagt aus, das der Lokführer, wenn das Signal kein Fahrtbegriff anzeigt, an desem Hauptsignal anhält und dann auf Sicht bis zum nächsten Hauptsignal fährt ( max. 40 km/h).
+property.mainlightsignal.desc=Haupt-Vorsignale zeigen an, was man ab diesem Signal fahren darf und was das nächste Hauptsignal anzeigt (genauer bei Vor und Hauptsignal erklärt).
+property.mainlightsignallightbar.desc=Zusatz zum Hl Signal. Gibt zusätzliches Fahrverhalten im anschließenden Weichenbereich an.
+property.mastsigndistant.desc=Ein gelbes Dreieck gibt den Standort eines Haupt-Vorsignales an.
+property.ne2.desc=Kennzeichnet den Standort eines Vorsignals.
+property.ne2_2.desc=Zusatzkennzeichnung des Vorsignalschilds für verkürzten Bremsweg.
+property.zs2.desc=Zs2 ist der Richtungsanzeiger und gibt an in welche Richtung der Fahrdienstleiter das Signal gestellt hat und der Buchstabe ist davon abhängig, wie der erste Buchstabe des nächsten Ortes ist. Kommt bei Ausfahrten häufig vor, wo man in 2 oder mehr unterschiedlichen Strecken fahren kann.
+property.kombisignal.desc=Mehrabschnittssignale zeigen an, was man ab diesem Signal fahren darf und was das nächste Hauptsignal anzeigt (genauer bei Vor und Hauptsignal erklärt).
