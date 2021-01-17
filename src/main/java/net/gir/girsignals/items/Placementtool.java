@@ -68,6 +68,9 @@ public class Placementtool extends Item {
 					sig.setProperty(sep, sep.getDefault());
 				}
 			});
+			String str = compound.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME);
+			if (!str.isEmpty())
+				sig.setCustomName(str);
 			return EnumActionResult.SUCCESS;
 		}
 	}

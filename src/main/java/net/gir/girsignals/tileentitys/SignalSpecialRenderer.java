@@ -23,11 +23,11 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
 		FontRenderer font = getFontRenderer();
 		Vec3i vec = face.getDirectionVec();
 		
+		GlStateManager.pushMatrix();
 		GlStateManager.translate(x + 0.5, y + te.getCustomNameRenderHeight(), z + 0.5 + vec.getX()*0.5);
 		GlStateManager.rotate(angel, 0, 1, 0);
 		GlStateManager.translate(MAX_WIDTH * -0.0075f, 0, 0.07f);
 		GlStateManager.scale(0.015f * -(1 - face.getAxis().ordinal()), -0.015f, 0.015f);
-		GlStateManager.pushMatrix();
 		font.drawSplitString(display, 0, 0, MAX_WIDTH, 0);
 		GlStateManager.popMatrix();
 		

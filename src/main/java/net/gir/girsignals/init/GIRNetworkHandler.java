@@ -20,16 +20,22 @@ public class GIRNetworkHandler {
 
 	public static final String CHANNELNAME = "gir|setItemNBT";
 	public static final String BLOCK_TYPE_ID = "blockid";
+	public static final String SIGNAL_CUSTOMNAME = "customname";
 
 	@SubscribeEvent
 	public void onCustomPacket(ServerCustomPacketEvent event) {
 		FMLProxyPacket packet = event.getPacket();
 		ByteBuf payBuf = packet.payload();
 		int blockType = payBuf.readInt();
+		int length = payBuf.readInt();
+		byte[] strBuff = new byte[length];
+		payBuf.readBytes(strBuff);
+		String customName = new String(strBuff);
 		SignalBlock block = SignalBlock.SIGNALLIST.get(blockType);
 		ExtendedBlockState blockState = (ExtendedBlockState) block.getBlockState();
 		NBTTagCompound tagCompound = new NBTTagCompound();
 		tagCompound.setInteger(BLOCK_TYPE_ID, blockType);
+		tagCompound.setString(SIGNAL_CUSTOMNAME, customName);
 		for (IUnlistedProperty<?> property : blockState.getUnlistedProperties()) {
 			SEProperty<?> prop = SEProperty.cst(property);
 			if(prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {

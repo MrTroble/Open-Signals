@@ -50,7 +50,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 			read(comp);
 		}
 		if(compound.hasKey(CUSTOMNAME))
-			formatCustomName = compound.getString(CUSTOMNAME);
+			setCustomName(compound.getString(CUSTOMNAME));
 		super.readFromNBT(compound);
 	}
 
