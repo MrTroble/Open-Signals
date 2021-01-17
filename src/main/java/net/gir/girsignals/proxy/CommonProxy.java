@@ -1,12 +1,12 @@
 package net.gir.girsignals.proxy;
 
 import net.gir.girsignals.GirsignalsMain;
-import net.gir.girsignals.blocks.SignalTileEnity;
-import net.gir.girsignals.controllers.SignalControllerTileEntity;
 import net.gir.girsignals.guis.GUIHandler;
 import net.gir.girsignals.init.GIRBlocks;
 import net.gir.girsignals.init.GIRItems;
 import net.gir.girsignals.init.GIRNetworkHandler;
+import net.gir.girsignals.tileentitys.SignalControllerTileEntity;
+import net.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;

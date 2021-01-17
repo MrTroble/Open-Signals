@@ -1,4 +1,4 @@
-package net.gir.girsignals.controllers;
+package net.gir.girsignals.tileentitys;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -9,7 +9,6 @@ import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
 import net.gir.girsignals.SEProperty;
 import net.gir.girsignals.blocks.SignalBlock;
-import net.gir.girsignals.blocks.SignalTileEnity;
 import net.gir.girsignals.items.Linkingtool;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -104,7 +103,11 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	public boolean hasLinkImpl() {
-		return linkedSignalPosition != null;
+		if(linkedSignalPosition == null) return false;
+		if(world.getBlockState(linkedSignalPosition).getBlock() instanceof SignalBlock)
+			return true;
+		unlink();
+		return false;
 	}
 
 	public void unlink() {

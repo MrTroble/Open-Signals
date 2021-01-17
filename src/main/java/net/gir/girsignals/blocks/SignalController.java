@@ -1,6 +1,7 @@
-package net.gir.girsignals.controllers;
+package net.gir.girsignals.blocks;
 
 import net.gir.girsignals.init.GIRTabs;
+import net.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;

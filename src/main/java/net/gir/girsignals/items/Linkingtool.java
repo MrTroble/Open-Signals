@@ -1,9 +1,9 @@
 package net.gir.girsignals.items;
 
 import net.gir.girsignals.blocks.SignalBlock;
-import net.gir.girsignals.controllers.SignalController;
-import net.gir.girsignals.controllers.SignalControllerTileEntity;
+import net.gir.girsignals.blocks.SignalController;
 import net.gir.girsignals.init.GIRTabs;
+import net.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;

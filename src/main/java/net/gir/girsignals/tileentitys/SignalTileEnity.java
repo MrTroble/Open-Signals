@@ -1,4 +1,4 @@
-package net.gir.girsignals.blocks;
+package net.gir.girsignals.tileentitys;
 
 import java.util.HashMap;
 import java.util.Map;
