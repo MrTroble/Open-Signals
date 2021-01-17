@@ -13,7 +13,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>, IIntegerable<T>{
 	
 	public enum ChangeableStage {
-		APISTAGE, GUISTAGE;
+		APISTAGE, GUISTAGE, AUTOMATICSTAGE;
 	}
 	
     private final IProperty<T> parent;
