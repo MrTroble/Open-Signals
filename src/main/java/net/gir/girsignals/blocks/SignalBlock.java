@@ -14,6 +14,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
@@ -56,6 +57,8 @@ public class SignalBlock extends Block implements ITileEntityProvider {
     }
 	
 	public static ItemStack pickBlock(EntityPlayer player) {
+		// Compatibility issues with other mods ...
+		if(!Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown()) return ItemStack.EMPTY;
         for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k)
         {
         	if(player.inventory.getStackInSlot(k).getItem().equals(GIRItems.PLACEMENT_TOOL)) {
