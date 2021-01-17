@@ -4,10 +4,10 @@ import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.SEProperty;
 import net.gir.girsignals.SEProperty.ChangeableStage;
 import net.gir.girsignals.blocks.SignalBlock;
-import net.gir.girsignals.blocks.SignalTileEnity;
 import net.gir.girsignals.init.GIRBlocks;
 import net.gir.girsignals.init.GIRNetworkHandler;
 import net.gir.girsignals.init.GIRTabs;
+import net.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
@@ -68,6 +68,9 @@ public class Placementtool extends Item {
 					sig.setProperty(sep, sep.getDefault());
 				}
 			});
+			String str = compound.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME);
+			if (!str.isEmpty())
+				sig.setCustomName(str);
 			return EnumActionResult.SUCCESS;
 		}
 	}

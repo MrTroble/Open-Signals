@@ -7,7 +7,10 @@ import java.util.ArrayList;
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.items.Linkingtool;
 import net.gir.girsignals.items.Placementtool;
+import net.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.item.Item;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -17,6 +20,16 @@ public class GIRItems {
 
 	public static final Linkingtool LINKING_TOOL = new Linkingtool();
 	public static final Placementtool PLACEMENT_TOOL = new Placementtool();
+	public static final Item DEBUG_ITEM = new Item() {
+		public net.minecraft.util.EnumActionResult onItemUse(net.minecraft.entity.player.EntityPlayer player, net.minecraft.world.World worldIn, net.minecraft.util.math.BlockPos pos, net.minecraft.util.EnumHand hand, net.minecraft.util.EnumFacing facing, float hitX, float hitY, float hitZ) {
+			TileEntity ent = worldIn.getTileEntity(pos);
+			if(ent != null && ent instanceof SignalTileEnity) {
+				SignalTileEnity tile = (SignalTileEnity) ent;
+				tile.setCustomName(" AA ");
+			}
+			return EnumActionResult.PASS;
+		};
+	};
 	
 	public static ArrayList<Item> registeredItems = new ArrayList<>();
 	

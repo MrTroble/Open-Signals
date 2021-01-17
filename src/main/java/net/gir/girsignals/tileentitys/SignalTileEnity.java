@@ -1,28 +1,40 @@
-package net.gir.girsignals.blocks;
+package net.gir.girsignals.tileentitys;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import net.gir.girsignals.SEProperty;
+import net.gir.girsignals.blocks.SignalBlock;
+import net.gir.girsignals.init.GIRBlocks;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.IWorldNameable;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SignalTileEnity extends TileEntity {
+public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	private HashMap<SEProperty<?>, Object> map = new HashMap<>();
 
 	private static final String PROPERTIES = "properties";
+	private static final String CUSTOMNAME = "customname";
 
+	private String formatCustomName = null;
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = new NBTTagCompound();
 		map.forEach((prop, in) -> prop.writeToNBT(comp, in));
+		if(formatCustomName != null)
+			compound.setString(CUSTOMNAME, formatCustomName);
 		compound.setTag(PROPERTIES, comp);
 		return super.writeToNBT(compound);
 	}
@@ -37,6 +49,8 @@ public class SignalTileEnity extends TileEntity {
 		} else {
 			read(comp);
 		}
+		if(compound.hasKey(CUSTOMNAME))
+			setCustomName(compound.getString(CUSTOMNAME));
 		super.readFromNBT(compound);
 	}
 
@@ -55,7 +69,7 @@ public class SignalTileEnity extends TileEntity {
 			__tmp = null;
 		}
 	}
-
+	
 	@Override
 	public SPacketUpdateTileEntity getUpdatePacket() {
 		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
@@ -98,4 +112,45 @@ public class SignalTileEnity extends TileEntity {
 		return Optional.empty();
 	}
 
+	@Override
+	public String getName() {
+		return formatCustomName;
+	}
+
+	@Override
+	public boolean hasCustomName() {
+		return formatCustomName != null;
+	}
+	
+	@Override
+	public ITextComponent getDisplayName() {
+		return new TextComponentString(String.format(formatCustomName));
+	}
+
+	public void setCustomName(String str) {
+		this.formatCustomName = str;
+		if(str == null && map.containsKey(SignalBlock.CUSTOMNAME)) {
+			map.remove(SignalBlock.CUSTOMNAME);
+		} else if(str != null) {
+			map.put(SignalBlock.CUSTOMNAME, true);
+		}
+		this.markDirty();
+		world.markBlockRangeForRenderUpdate(pos, pos);
+	}
+	
+	
+	@SideOnly(Side.CLIENT)
+	private float renderHeight = 0;
+	
+	@SideOnly(Side.CLIENT)
+	public float getCustomNameRenderHeight() {
+		if(renderHeight == 0) {
+			int id = ((SignalBlock)world.getBlockState(pos).getBlock()).getID();
+			if(id == GIRBlocks.HV_SIGNAL.getID()) renderHeight = 2.75f;
+			else if(id == GIRBlocks.HL_SIGNAL.getID()) renderHeight = 1.15f;
+			else if(id == GIRBlocks.KS_SIGNAL.getID()) renderHeight = 4.85f;
+			else throw new IllegalArgumentException("Signal has not been added to the height list!");
+		}
+		return renderHeight;
+	}
 }

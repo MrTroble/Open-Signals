@@ -5,7 +5,10 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import net.gir.girsignals.SEProperty;
+import net.gir.girsignals.SEProperty.ChangeableStage;
 import net.gir.girsignals.init.GIRItems;
+import net.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.ITileEntityProvider;
@@ -25,6 +28,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
@@ -38,7 +42,8 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	public static final ArrayList<SignalBlock> SIGNALLIST = new ArrayList<SignalBlock>();
 
 	public static final PropertyDirection FACING = BlockHorizontal.FACING;
-	
+	public static final SEProperty<Boolean> CUSTOMNAME = SEProperty.of("customname", false, ChangeableStage.AUTOMATICSTAGE);
+
 	private final int ID;
 
 	private final String signalTypeName;
@@ -55,6 +60,18 @@ public class SignalBlock extends Block implements ITileEntityProvider {
     public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
     {
     }
+	
+	private static AxisAlignedBB BOUNDING_BOX = FULL_BLOCK_AABB.expand(0, 6, 0);
+	
+	@Override
+	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		return BOUNDING_BOX;
+	}
+	
+	@Override
+	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+		return BOUNDING_BOX;
+	}
 	
 	public static ItemStack pickBlock(EntityPlayer player) {
 		// Compatibility issues with other mods ...
@@ -168,6 +185,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 				}
 			}
 		}
+		prop.add(CUSTOMNAME);
 		return new ExtendedBlockState(this, new IProperty<?>[] { FACING },
 				prop.toArray(new IUnlistedProperty[prop.size()]));
 	}

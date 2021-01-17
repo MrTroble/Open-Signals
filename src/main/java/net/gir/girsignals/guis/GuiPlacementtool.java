@@ -14,10 +14,10 @@ import net.gir.girsignals.blocks.SignalBlock;
 import net.gir.girsignals.init.GIRNetworkHandler;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
@@ -54,69 +54,60 @@ public class GuiPlacementtool extends GuiScreen {
 	private float animationState = 0;
 	private int oldMouse = 0;
 	private boolean dragging = false;
+	private GuiTextField textField;
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
-		for (GuiButton guiButton : buttonList) {
-			if(guiButton instanceof InternalUnlocalized) {
-				if(guiButton.isMouseOver()) {
-					dragging = false;
-					String str = I18n.format("property." + ((InternalUnlocalized) guiButton).getUnlocalized() + ".desc");
-					this.drawHoveringText(Arrays.asList(str.split(System.lineSeparator())), mouseX, mouseY);
-					break;
-				}
-			}
-			
-		}
+
+		textField.drawTextBox();
 
 		if (dragging) {
 			animationState += mouseX - oldMouse;
 			oldMouse = mouseX;
 		}
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-		mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).setBlurMipmap(false, false);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
 		GlStateManager.enableRescaleNormal();
-		GlStateManager.translate((float) this.width * (5 / 6.0f), (float) this.height * (5 / 6.0f),
-				100.0F + this.zLevel);
-		GlStateManager.scale(22.0F, -22.0F, 22.0F);
-		GlStateManager.enableLighting();
-		RenderHelper.enableGUIStandardItemLighting();
-		GlStateManager.rotate(animationState, 0, 1, 0);
-		GlStateManager.enableBlend();
-		GlStateManager.enableDepth();
 		GlStateManager.pushMatrix();
-		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-				GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
-				GlStateManager.DestFactor.ZERO);
+		GlStateManager.translate((float) this.width * (5 / 6.0f), (float) this.height * (5 / 6.0f),
+				100 + this.zLevel);
+		GlStateManager.scale(22.0F, -22.0F, 22.0F);
+		GlStateManager.rotate(animationState, 0, 1, 0);
 		DrawUtil.draw(model.get());
-		GlStateManager.disableRescaleNormal();
-		RenderHelper.enableGUIStandardItemLighting();
-		GlStateManager.disableBlend();
-		GlStateManager.disableDepth();
-		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-		mc.getTextureManager().getTexture(TextureMap.LOCATION_BLOCKS_TEXTURE).restoreLastBlurMipmap();
 		GlStateManager.popMatrix();
-		
+		GlStateManager.disableRescaleNormal();
+
+		for (GuiButton guiButton : buttonList) {
+			if (guiButton instanceof InternalUnlocalized) {
+				if (guiButton.isMouseOver()) {
+					dragging = false;
+					String str = I18n
+							.format("property." + ((InternalUnlocalized) guiButton).getUnlocalized() + ".desc");
+					this.drawHoveringText(Arrays.asList(str.split(System.lineSeparator())), mouseX, mouseY);
+					break;
+				}
+			}
+
+		}
 	}
 
 	@Override
 	public boolean doesGuiPauseGame() {
 		return false;
 	}
-	
+
 	public interface InternalUnlocalized {
-		
+
 		String getUnlocalized();
-		
+
 	}
 
 	private static class InternalCheckBox extends GuiCheckBox implements InternalUnlocalized {
 
 		public String unlocalized;
-		
+
 		public InternalCheckBox(int id, int xPos, int yPos, String displayString, boolean isChecked) {
 			super(id, xPos, yPos, I18n.format("property." + displayString + ".name"), isChecked);
 			this.unlocalized = displayString;
@@ -126,11 +117,13 @@ public class GuiPlacementtool extends GuiScreen {
 		public String getUnlocalized() {
 			return unlocalized;
 		}
-		
+
 	}
-	
+
 	@Override
 	public void initGui() {
+		textField = new GuiTextField(-200, fontRenderer, 10, 10, 100, 20);
+		textField.setText(comp.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME));
 		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 		this.buttonList.clear();
@@ -179,7 +172,7 @@ public class GuiPlacementtool extends GuiScreen {
 				return SignalBlock.SIGNALLIST.size();
 			}
 
-		}, -100, (this.width - 300) / 2, 10, 300, "signaltype", this.usedBlock, input -> {
+		}, -100, (this.width - 150) / 2, 10, 150, "signaltype", this.usedBlock, input -> {
 			if (usedBlock != input) {
 				usedBlock = input;
 				initGui();
@@ -193,6 +186,9 @@ public class GuiPlacementtool extends GuiScreen {
 	public void onGuiClosed() {
 		ByteBuf buffer = Unpooled.buffer();
 		buffer.writeInt(usedBlock);
+		byte[] str = textField.getText().getBytes();
+		buffer.writeInt(str.length);
+		buffer.writeBytes(str);
 		for (GuiButton button : buttonList) {
 			if (button.id == -100)
 				continue;
@@ -232,13 +228,14 @@ public class GuiPlacementtool extends GuiScreen {
 			}
 			i++;
 		}
-		
+
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
 	}
 
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
+		textField.mouseClicked(mouseX, mouseY, mouseButton);
 		if (mouseButton == 0) {
 			this.dragging = true;
 			oldMouse = mouseX;
@@ -254,6 +251,12 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException {
 		applyModelChanges();
+	}
+	
+	@Override
+	protected void keyTyped(char typedChar, int keyCode) throws IOException {
+		super.keyTyped(typedChar, keyCode);
+		textField.textboxKeyTyped(typedChar, keyCode);
 	}
 
 }
