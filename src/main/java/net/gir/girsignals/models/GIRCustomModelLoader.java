@@ -12,6 +12,7 @@ import net.gir.girsignals.EnumSignals.MAST_SIGN;
 import net.gir.girsignals.EnumSignals.Offable;
 import net.gir.girsignals.EnumSignals.ZS32;
 import net.gir.girsignals.GirsignalsMain;
+import net.gir.girsignals.blocks.SignalBlock;
 import net.gir.girsignals.blocks.SignalHL;
 import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.blocks.SignalKS;
@@ -100,6 +101,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv_mast2", ebs -> true, 2);
 			cm.register("hv_mast3", ebs -> true, 3);
 			cm.register("hv_mast4", ebs -> true, 4);
+			
+			cm.register("hv_number", has(SignalBlock.CUSTOMNAME), 2);
+
 			// Zs1 on
 			cm.register("hv_zs1", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f, "lamp1north", "girsignals:blocks/lamp_white_small");
 			// Zs1 off
@@ -145,6 +149,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ks_sign_distant", has(SignalKS.MASTSIGNDISTANT), 1); //!!!
 			cm.register("ks_mast2", ebs -> true, 2);
 
+			cm.register("ks_number", has(SignalBlock.CUSTOMNAME), 4);
+			
 			for (MAST_SIGN sign : MAST_SIGN.values())
 				if(!sign.equals(MAST_SIGN.OFF))
 					cm.register("ks_sign", with(SignalKS.MASTSIGN, ms -> ms.equals(sign)), 2, "13", "girsignals:blocks/" + sign.getName());
@@ -197,6 +203,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hl_ne2_2", has(SignalHL.NE2).and(has(SignalHL.NE2_2)), 1);
 			cm.register("hl_sign_distant", has(SignalHL.MASTSIGNDISTANT), 1);
 			cm.register("hl_mast2", ebs -> true, 2);
+			
+			cm.register("hl_number", has(SignalBlock.CUSTOMNAME), 0);
 			
 			for (MAST_SIGN sign : MAST_SIGN.values())
 				if(!sign.equals(MAST_SIGN.OFF))
