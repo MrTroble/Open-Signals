@@ -20,16 +20,6 @@ public class GIRItems {
 
 	public static final Linkingtool LINKING_TOOL = new Linkingtool();
 	public static final Placementtool PLACEMENT_TOOL = new Placementtool();
-	public static final Item DEBUG_ITEM = new Item() {
-		public net.minecraft.util.EnumActionResult onItemUse(net.minecraft.entity.player.EntityPlayer player, net.minecraft.world.World worldIn, net.minecraft.util.math.BlockPos pos, net.minecraft.util.EnumHand hand, net.minecraft.util.EnumFacing facing, float hitX, float hitY, float hitZ) {
-			TileEntity ent = worldIn.getTileEntity(pos);
-			if(ent != null && ent instanceof SignalTileEnity) {
-				SignalTileEnity tile = (SignalTileEnity) ent;
-				tile.setCustomName(" AA ");
-			}
-			return EnumActionResult.PASS;
-		};
-	};
 	
 	public static ArrayList<Item> registeredItems = new ArrayList<>();
 	
