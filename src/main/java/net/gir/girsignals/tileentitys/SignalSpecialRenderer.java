@@ -24,10 +24,13 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
 		Vec3i vec = face.getDirectionVec();
 		
 		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + 0.5, y + te.getCustomNameRenderHeight(), z + 0.5 + vec.getX()*0.5);
+		GlStateManager.translate(x + 0.5, y + te.getCustomNameRenderHeight(), z + 0.5f + vec.getX()*0.5);
+		int ordinalFactor = -(1 - face.getAxis().ordinal());
+		int ordinal = face.getAxis().ordinal() / 2;
+		int nordinal = 1 - ordinal;
 		GlStateManager.rotate(angel, 0, 1, 0);
-		GlStateManager.translate(MAX_WIDTH * -0.0075f, 0, 0.07f);
-		GlStateManager.scale(0.015f * -(1 - face.getAxis().ordinal()), -0.015f, 0.015f);
+		GlStateManager.translate(MAX_WIDTH*0.0075f*-ordinalFactor - nordinal*0.5, 0, ordinalFactor * 0.07f);
+		GlStateManager.scale(0.015f * ordinalFactor, -0.015f, 0.015f);
 		font.drawSplitString(display, 0, 0, MAX_WIDTH, 0);
 		GlStateManager.popMatrix();
 		

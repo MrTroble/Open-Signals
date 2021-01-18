@@ -138,17 +138,16 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		world.markBlockRangeForRenderUpdate(pos, pos);
 	}
 	
-	
-	@SideOnly(Side.CLIENT)
 	private float renderHeight = 0;
 	
 	@SideOnly(Side.CLIENT)
 	public float getCustomNameRenderHeight() {
+		renderHeight = 0;
 		if(renderHeight == 0) {
 			int id = ((SignalBlock)world.getBlockState(pos).getBlock()).getID();
-			if(id == GIRBlocks.HV_SIGNAL.getID()) renderHeight = 2.75f;
+			if(id == GIRBlocks.HV_SIGNAL.getID()) renderHeight = 2.775f;
 			else if(id == GIRBlocks.HL_SIGNAL.getID()) renderHeight = 1.15f;
-			else if(id == GIRBlocks.KS_SIGNAL.getID()) renderHeight = 4.85f;
+			else if(id == GIRBlocks.KS_SIGNAL.getID()) renderHeight = 4.95f;
 			else throw new IllegalArgumentException("Signal has not been added to the height list!");
 		}
 		return renderHeight;
