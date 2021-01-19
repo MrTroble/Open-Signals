@@ -34,7 +34,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		NBTTagCompound comp = new NBTTagCompound();
 		map.forEach((prop, in) -> prop.writeToNBT(comp, in));
 		if(formatCustomName != null)
-			compound.setString(CUSTOMNAME, formatCustomName);
+			comp.setString(CUSTOMNAME, formatCustomName);
 		compound.setTag(PROPERTIES, comp);
 		return super.writeToNBT(compound);
 	}
@@ -49,8 +49,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		} else {
 			read(comp);
 		}
-		if(compound.hasKey(CUSTOMNAME))
-			setCustomName(compound.getString(CUSTOMNAME));
 		super.readFromNBT(compound);
 	}
 
@@ -60,6 +58,8 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 					SEProperty<?> sep = SEProperty.cst(prop);
 					sep.readFromNBT(comp).toJavaUtil().ifPresent(obj -> map.put(sep, obj));
 				});
+		if(comp.hasKey(CUSTOMNAME))
+			setCustomName(comp.getString(CUSTOMNAME));
 	}
 
 	@Override
