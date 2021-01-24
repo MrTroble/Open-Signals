@@ -1,24 +1,22 @@
-package net.gir.girsignals.controllers;
+package net.gir.girsignals.tileentitys;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map.Entry;
+import java.util.Map;
 
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
+import net.gir.girsignals.SEProperty;
 import net.gir.girsignals.blocks.SignalBlock;
-import net.gir.girsignals.blocks.SignalTileEnity;
 import net.gir.girsignals.items.Linkingtool;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
@@ -26,7 +24,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	private BlockPos linkedSignalPosition = null;
 	private Integer[] listOfSupportedIndicies;
-	private Object[] tableOfSupportedSignalTypes;
+	private Map<String, Integer> tableOfSupportedSignalTypes;
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
@@ -61,21 +59,21 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	
 	private void onLink() {
 		IBlockState state = world.getBlockState(linkedSignalPosition);
-		SignalBlock b = (SignalBlock) state.getBlock();
+		Block block = state.getBlock();
+		if(!(block instanceof SignalBlock)) {
+			unlink();
+			return;
+		}
+		
+		SignalBlock b = (SignalBlock) block;
 		
 		HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
 		((IExtendedBlockState) b.getExtendedState(state, world, linkedSignalPosition)).getUnlistedProperties().forEach(
 				(prop, opt) -> opt.ifPresent(x -> supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop))));
 
 		listOfSupportedIndicies = supportedSignaleStates.values().toArray(new Integer[supportedSignaleStates.size()]);
-		System.out.println(listOfSupportedIndicies);
 		
-		tableOfSupportedSignalTypes = new Object[supportedSignaleStates.size()];
-		Iterator<Entry<String, Integer>> set = supportedSignaleStates.entrySet().iterator();
-		for (int i = 0; set.hasNext(); i++) {
-			Entry<String, Integer> entry = set.next();
-			tableOfSupportedSignalTypes[i] = new Object[] {entry.getKey(), entry.getValue()};
-		}
+		tableOfSupportedSignalTypes = supportedSignaleStates;
 	}
 	
 	@Override
@@ -105,7 +103,11 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	public boolean hasLinkImpl() {
-		return linkedSignalPosition != null;
+		if(linkedSignalPosition == null) return false;
+		if(world.getBlockState(linkedSignalPosition).getBlock() instanceof SignalBlock)
+			return true;
+		unlink();
+		return false;
 	}
 
 	public void unlink() {
@@ -117,7 +119,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSupportedSignalTypes(Context context, Arguments args) {
-		return tableOfSupportedSignalTypes;
+		return new Object[] { tableOfSupportedSignalTypes };
 	}
 
 	public Integer[] getSupportedSignalTypesImpl() {
@@ -140,17 +142,14 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public boolean changeSignalImpl(int newSignal, int type) {
+	public boolean changeSignalImpl(int type, int newSignal) {
 		if (!hasLinkImpl() || !find(getSupportedSignalTypesImpl(), type))
 			return false;
 		SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(linkedSignalPosition);
 		IBlockState blockstate = world.getBlockState(linkedSignalPosition);
 		SignalBlock block = (SignalBlock) blockstate.getBlock();
-		IUnlistedProperty prop = block.getPropertyFromID(type);
-		if (prop.getType().equals(Boolean.class))
-			tile.setProperty(prop, newSignal == 0 ? Boolean.FALSE : Boolean.TRUE);
-		else if (prop.getType().isEnum())
-			tile.setProperty(prop, (IStringSerializable) prop.getType().getEnumConstants()[newSignal]);
+		SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
+		tile.setProperty(prop, prop.getObjFromID(newSignal));
 		world.markAndNotifyBlock(linkedSignalPosition, null, blockstate, blockstate, 3);
 		return true;
 	}
@@ -171,23 +170,17 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return new Object[] { getSignalStateImpl(args.checkInteger(0)) };
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings("rawtypes")
 	public int getSignalStateImpl(int type) {
 		if (!hasLinkImpl() || !find(getSupportedSignalTypesImpl(), type))
 			return -1;
 		SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(linkedSignalPosition);
 		IBlockState blockstate = world.getBlockState(linkedSignalPosition);
 		SignalBlock block = (SignalBlock) blockstate.getBlock();
-		IUnlistedProperty<?> prop = block.getPropertyFromID(type);
-		if (prop.getType().equals(Boolean.class)) {
-			java.util.Optional<Boolean> bool = (java.util.Optional<Boolean>) tile.getProperty(prop);
-			if(bool.isPresent())
-				return bool.get() ? 1:0;
-		} else if (prop.getType().isEnum()) {
-			java.util.Optional<Enum> bool = (java.util.Optional<Enum>) tile.getProperty(prop);
-			if(bool.isPresent())
-				return bool.get().ordinal();
-		}
+		SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
+		java.util.Optional bool = tile.getProperty(prop);
+		if(bool.isPresent())
+			return SEProperty.getIDFromObj(bool.get());
 		return -1;
 	}
 	

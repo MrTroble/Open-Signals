@@ -3,12 +3,54 @@ itemGroup.GIRSignals=GIRSignals
 
 #Items
 item.linkingtool.name=Linking Tool
+item.placementtool.name=Signal-Placer
 
 #Blocks
 tile.hvsignalcontroller.name=HV-Signal-Controller
+tile.hvsignal.name=HV Signal
+tile.kssignal.name=KS Signal
+tile.hlsignal.name=HL Signal
 
 #Linktool
 lt.linkfailed=Link failed!
 lt.set=Set position to controller
 lt.added=Added %s to the link tool
 lt.unlink=Unlinked controller from it's signal
+
+#Placementtool
+pt.itemnotset=Bitte stell das Tool vorher ein (Sneaken + Rechtsklick)
+
+property.zs3.name=ZS3
+property.zs1.name=ZS1
+property.stopsignal.name=Stop signal
+property.distantsignal.name=Distant signal
+property.zs3v.name=ZS3v
+property.zs7.name=ZS7
+property.vrlight.name=Vr Short distance
+property.signaltype.name=Signal type
+property.mastsign.name=Mast sign
+property.mainlightsignal.name=Main signal
+property.mainlightsignallightbar.name=Light bar
+property.mastsigndistant.name=Distant mast sign
+property.ne2.name=NE2
+property.ne2_2.name=NE2 Short distance
+property.zs2.name=ZS2
+property.kombisignal.name=Combination Signal
+
+property.zs3.desc=§nZS3§r%n%nAdds a subsignal that can be used to display speed (or in some cases Letters and other symbols [if used as ZS2 or ZS13])
+property.zs1.desc=ZS1
+property.stopsignal.desc=Stop signal
+property.distantsignal.desc=Distant signal
+property.distantsstatuslight.desc=Distant signal light
+property.zs3v.desc=ZS3v
+property.zs7.desc=ZS7
+property.vrlight.desc=Vr Short distance
+property.signaltype.desc=Signal type
+property.mastsign.desc=Mast sign
+property.mainlightsignal.desc=Main signal
+property.mainlightsignallightbar.desc=Light bar
+property.mastsigndistant.desc=Distant mast sign
+property.ne2.desc=NE2
+property.ne2_2.desc=NE2 Short distance
+property.zs2.desc=ZS2
+property.kombisignal.desc=Combination Signal

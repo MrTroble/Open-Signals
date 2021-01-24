@@ -2,22 +2,21 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"texture_size": [32, 32],
 	"textures": {
-		"10": "girsignals:blocks/template",
 		"14": "girsignals:blocks/white",
 		"particle": "girsignals:blocks/mast"
 	},
 	"elements": [
 		{
 			"name": "number",
-			"from": [6, 11, 6.5],
-			"to": [10, 16, 7.5],
-			"rotation": {"angle": 0, "axis": "y", "origin": [6, 11, 7]},
+			"from": [5, 11, 7],
+			"to": [11, 16, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [5, 5, 7]},
 			"faces": {
-				"north": {"uv": [0, 0, 2, 2.5], "texture": "#10"},
+				"north": {"uv": [0, 0, 3, 2.5], "texture": "#14"},
 				"east": {"uv": [0, 0, 0.5, 2.5], "texture": "#14"},
-				"south": {"uv": [0, 0, 2, 2.5], "texture": "#14"},
+				"south": {"uv": [0, 0, 3, 2.5], "texture": "#14"},
 				"west": {"uv": [0, 0, 0.5, 2.5], "texture": "#14"},
-				"down": {"uv": [0, 0, 2, 0.5], "texture": "#14"}
+				"down": {"uv": [0, 0, 3, 0.5], "texture": "#14"}
 			}
 		}
 	],

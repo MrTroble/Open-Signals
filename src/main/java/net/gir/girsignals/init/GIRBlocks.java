@@ -6,10 +6,10 @@ import java.util.ArrayList;
 
 import net.gir.girsignals.GirsignalsMain;
 import net.gir.girsignals.blocks.GhostBlock;
+import net.gir.girsignals.blocks.SignalController;
 import net.gir.girsignals.blocks.SignalHL;
 import net.gir.girsignals.blocks.SignalHV;
 import net.gir.girsignals.blocks.SignalKS;
-import net.gir.girsignals.controllers.SignalController;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;

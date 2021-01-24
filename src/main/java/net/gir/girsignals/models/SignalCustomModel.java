@@ -76,7 +76,6 @@ public class SignalCustomModel implements IModel {
 						}
 						return Optional.empty();
 					}, format, bakedTextureGetter)));
-			modelCache.clear();
 			return cachedModel = build.makeMultipartModel();
 		}
 		return cachedModel;
@@ -119,6 +118,7 @@ public class SignalCustomModel implements IModel {
 			float ys, float zs, @Nullable String... strings) {
 		IModel m = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
 				"Couldn't find " + name);
+		m = m.smoothLighting(false);
 		if (strings != null && strings.length > 0) {
 			Builder<String, String> build = ImmutableMap.builder();
 			for (int i = 0; i < (int) Math.floor(strings.length / 2); i++)
