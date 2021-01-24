@@ -185,6 +185,7 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	public void onGuiClosed() {
 		ByteBuf buffer = Unpooled.buffer();
+		buffer.writeByte(GIRNetworkHandler.PLACEMENT_GUI_SET_NBT);
 		buffer.writeInt(usedBlock);
 		byte[] str = textField.getText().getBytes();
 		buffer.writeInt(str.length);

@@ -39,7 +39,7 @@ public class Placementtool extends Item {
 			if (!worldIn.isAirBlock(setPosition))
 				return EnumActionResult.FAIL;
 			BlockPos lastPos = setPosition;
-			for (int i = 0; i < 8; i++)
+			for (int i = 0; i < 6; i++)
 				if (!worldIn.isAirBlock(lastPos = lastPos.up()))
 					return EnumActionResult.FAIL;
 

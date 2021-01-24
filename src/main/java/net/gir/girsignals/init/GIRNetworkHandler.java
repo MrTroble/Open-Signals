@@ -18,14 +18,27 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class GIRNetworkHandler {
 
-	public static final String CHANNELNAME = "gir|setItemNBT";
+	public static final String CHANNELNAME = "gir|eventhandled";
 	public static final String BLOCK_TYPE_ID = "blockid";
 	public static final String SIGNAL_CUSTOMNAME = "customname";
 
+	public static final byte PLACEMENT_GUI_SET_NBT = 0;
+	
 	@SubscribeEvent
 	public void onCustomPacket(ServerCustomPacketEvent event) {
 		FMLProxyPacket packet = event.getPacket();
 		ByteBuf payBuf = packet.payload();
+		byte id = payBuf.readByte();
+		switch (id) {
+		case PLACEMENT_GUI_SET_NBT:
+			readItemNBTSET(payBuf, ((NetHandlerPlayServer) event.getHandler()).player);
+			break;
+		default:
+			throw new IllegalArgumentException("Wrong packet ID in network recive!");
+		}
+	}
+	
+	private static void readItemNBTSET(ByteBuf payBuf, EntityPlayer player) {
 		int blockType = payBuf.readInt();
 		int length = payBuf.readInt();
 		byte[] strBuff = new byte[length];
@@ -44,8 +57,6 @@ public class GIRNetworkHandler {
 				tagCompound.setInteger(property.getName(), payBuf.readInt());
 			}
 		}
-
-		EntityPlayer player = ((NetHandlerPlayServer) event.getHandler()).player;
 		ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
 		if (stack.getItem() instanceof Placementtool) {
 			stack.setTagCompound(tagCompound);
