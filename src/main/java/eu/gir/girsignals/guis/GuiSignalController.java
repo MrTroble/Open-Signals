@@ -1,11 +1,10 @@
 package eu.gir.girsignals.guis;
 
-import java.util.HashMap;
-import java.util.Map.Entry;
+import java.util.ArrayList;
 import java.util.function.Consumer;
 
-import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.IIntegerable;
+import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.block.state.IBlockState;
@@ -17,16 +16,11 @@ import net.minecraft.world.World;
 public class GuiSignalController extends GuiScreen
 		implements IIntegerable<GuiSignalController.Stages>, Consumer<Integer> {
 
-	private final GUISettingsSlider slider = new GUISettingsSlider(this, -100, (this.width - 150) / 2, 10, 150,
-			"stagetype", 0, this);
-	private final BlockPos pos;
-	private final World world;
+	private GUISettingsSlider slider;
 	private final SignalBlock block;
 	private final SignalControllerTileEntity tile;
 	
 	public GuiSignalController(BlockPos pos, World world) {
-		this.pos = pos;
-		this.world = world;
 		this.tile = (SignalControllerTileEntity) world.getTileEntity(pos);
 		if(!this.tile.hasLinkImpl()) {
 			this.block = null;
@@ -45,6 +39,9 @@ public class GuiSignalController extends GuiScreen
 
 	@Override
 	public void initGui() {
+		this.slider = new GUISettingsSlider(this, -100, (this.width - 150) / 2, 10, 150,
+				"stagetype", 0, this);
+		
 		if(block == null) {
 			// TODO No link message
 			System.out.println("NOBLOCK");
@@ -67,21 +64,21 @@ public class GuiSignalController extends GuiScreen
 	}
 
 	private void initManuell() {
-		HashMap<SEProperty<?>, String> availableProps = new HashMap<>();
+		ArrayList<SEProperty<?>> availableProps = new ArrayList<>();
 
 		int maxWidth = 0;
 
 		for (int x : tile.getSupportedSignalTypesImpl()) {
 			SEProperty<?> prop = (SEProperty<?>) block.getPropertyFromID(x);
 			String format = I18n.format("property." + prop.getName() + ".name");
-			availableProps.put((SEProperty<?>) prop, format);
+			availableProps.add((SEProperty<?>) prop);
 			maxWidth = Math.max(fontRenderer.getStringWidth(format), maxWidth);
 		}
 
 		int y = 30;
 		int x = 30;
-		for (Entry<SEProperty<?>, String> entry : availableProps.entrySet()) {
-			this.addButton(new GUISettingsSlider(entry.getKey(), 0, x, (y += 30), maxWidth, entry.getValue(), 0, in -> {
+		for (SEProperty<?> entry : availableProps) {
+			this.addButton(new GUISettingsSlider(entry, 0, x, (y += 30), maxWidth, entry.getName(), 0, in -> {
 			}));
 			if (y >= 250) {
 				y = 30;

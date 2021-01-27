@@ -52,6 +52,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
 		super.readFromNBT(compound);
+		if(world != null && world.isRemote)
+			onLink();
 	}
 
 	@Override
@@ -83,6 +85,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			unlink();
 			return;
 		}
+		System.out.println(world.isRemote);
 
 		SignalBlock b = (SignalBlock) block;
 
@@ -99,9 +102,10 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	@Override
 	public void onLoad() {
-		if (linkedSignalPosition != null && !world.isRemote) {
+		if (linkedSignalPosition != null) {
 			onLink();
-			this.markDirty();
+			IBlockState state = world.getBlockState(pos);
+			this.world.notifyBlockUpdate(pos, state, state, 3);
 		}
 	}
 
@@ -112,7 +116,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 					&& (old == null || !old.equals(linkedSignalPosition));
 			if (flag) {
 				onLink();
-				this.markDirty();
+				IBlockState state = world.getBlockState(pos);
+				this.world.notifyBlockUpdate(pos, state, state, 3);
 			}
 			return flag;
 		}

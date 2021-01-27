@@ -21,7 +21,7 @@ public class GirsignalsMain {
 		return instance;
 	}
 
-	@SidedProxy(serverSide = "net.gir.girsignals.proxy.CommonProxy", clientSide = "net.gir.girsignals.proxy.ClientProxy")
+	@SidedProxy(serverSide = "eu.gir.girsignals.proxy.CommonProxy", clientSide = "eu.gir.girsignals.proxy.ClientProxy")
 	public static CommonProxy PROXY;
 
 	@EventHandler
