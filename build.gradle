@@ -2,18 +2,36 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
 	maven { url = "http://maven.cil.li/" }
+	maven {
+      url "https://plugins.gradle.org/m2/"
+    }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+        classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
     }
 }
-        
+
 apply plugin: 'net.minecraftforge.gradle'
 // Only edit below this line, the above code adds and enables the necessary things for Forge to be setup.
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+
+apply plugin: "com.matthewprenger.cursegradle"
+
+def key = System.getenv("CURSETOKEN")
+if(key == null)
+	key = 'ddd'
+curseforge {
+  apiKey = key
+  project {
+    id = '440990'
+    changelog = file('changelog.txt')
+    releaseType = 'beta'
+  }
+}
 
 version = System.getenv("APPVEYOR_BUILD_VERSION")
 group = 'net.gir.girsignals' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
