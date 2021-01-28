@@ -7,6 +7,7 @@ import java.util.Optional;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.init.GIRBlocks;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -60,6 +61,10 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 				});
 		if(comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));
+		if(!world.isRemote) {
+			IBlockState state = world.getBlockState(pos);
+			world.notifyBlockUpdate(pos, state, state, 3);
+		}
 	}
 
 	@Override

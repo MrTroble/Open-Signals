@@ -72,6 +72,7 @@ public class Placementtool extends Item {
 			String str = compound.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME);
 			if (!str.isEmpty())
 				sig.setCustomName(str);
+			worldIn.notifyBlockUpdate(setPosition, ebs.getBaseState(), ebs.getBaseState(), 3);
 			return EnumActionResult.SUCCESS;
 		}
 	}
