@@ -8,8 +8,6 @@
     "0": "girsignals:blocks/mast",
     "1": "girsignals:blocks/shield_black",
     "2": "girsignals:blocks/shield_gray",
-    "3": "girsignals:blocks/lamp_dark",
-    "6": "girsignals:blocks/lamp_dark_small",
     "particle": "girsignals:blocks/mast",
     "lamp_rednorth": "girsignals:blocks/lamp_dark",
     "lamp_greennorth": "girsignals:blocks/lamp_dark",
