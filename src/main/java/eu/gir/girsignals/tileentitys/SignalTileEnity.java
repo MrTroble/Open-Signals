@@ -29,12 +29,17 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	private static final String CUSTOMNAME = "customname";
 
 	private String formatCustomName = null;
-	
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = new NBTTagCompound();
 		map.forEach((prop, in) -> prop.writeToNBT(comp, in));
-		if(formatCustomName != null)
+		if (map.size() == 1) {
+			System.out.println("========WRITE=========");
+			System.out.println(pos);
+			map.entrySet().forEach(System.out::println);
+		}
+		if (formatCustomName != null)
 			comp.setString(CUSTOMNAME, formatCustomName);
 		compound.setTag(PROPERTIES, comp);
 		return super.writeToNBT(compound);
@@ -46,35 +51,43 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public void readFromNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
 		if (world == null) {
-			__tmp = comp;
+			__tmp = comp.copy();
 		} else {
+			System.out.println("Early read from pos: " + pos);
+			System.out.println("Side: " + world.isRemote);
+			if(comp.getSize() == 1) {
+				System.err.println("FUUUUUUUUUCKKKKKKKK");
+			}
 			read(comp);
 		}
 		super.readFromNBT(compound);
 	}
 
 	private void read(NBTTagCompound comp) {
-		((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties()
-				.parallelStream().forEach(prop -> {
+		((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties().stream()
+				.forEach(prop -> {
 					SEProperty<?> sep = SEProperty.cst(prop);
 					sep.readFromNBT(comp).toJavaUtil().ifPresent(obj -> map.put(sep, obj));
 				});
-		if(comp.hasKey(CUSTOMNAME))
+		if (comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));
-		if(!world.isRemote) {
-			IBlockState state = world.getBlockState(pos);
-			world.notifyBlockUpdate(pos, state, state, 3);
-		}
 	}
 
 	@Override
 	public void onLoad() {
 		if (__tmp != null) {
+			System.out.println("Late read from pos: " + pos);
+			System.out.println("Side: " + world.isRemote);
+			System.out.println(__tmp);
 			read(__tmp);
+			if (!world.isRemote) {
+				IBlockState state = world.getBlockState(pos);
+				world.notifyBlockUpdate(pos, state, state, 3);
+			}
 			__tmp = null;
 		}
 	}
-	
+
 	@Override
 	public SPacketUpdateTileEntity getUpdatePacket() {
 		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
@@ -84,6 +97,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 		this.readFromNBT(pkt.getNbtCompound());
 		world.markBlockRangeForRenderUpdate(pos, pos);
+		System.out.println("Recive package: " + pkt.getNbtCompound());
 	}
 
 	@Override
@@ -126,7 +140,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public boolean hasCustomName() {
 		return formatCustomName != null;
 	}
-	
+
 	@Override
 	public ITextComponent getDisplayName() {
 		return new TextComponentString(String.format(formatCustomName));
@@ -134,25 +148,29 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	public void setCustomName(String str) {
 		this.formatCustomName = str;
-		if(str == null && map.containsKey(SignalBlock.CUSTOMNAME)) {
+		if (str == null && map.containsKey(SignalBlock.CUSTOMNAME)) {
 			map.remove(SignalBlock.CUSTOMNAME);
-		} else if(str != null) {
+		} else if (str != null) {
 			map.put(SignalBlock.CUSTOMNAME, true);
 		}
 		this.markDirty();
 		world.markBlockRangeForRenderUpdate(pos, pos);
 	}
-	
+
 	private float renderHeight = 0;
-	
+
 	@SideOnly(Side.CLIENT)
 	public float getCustomNameRenderHeight() {
-		if(renderHeight == 0) {
-			int id = ((SignalBlock)world.getBlockState(pos).getBlock()).getID();
-			if(id == GIRBlocks.HV_SIGNAL.getID()) renderHeight = 2.775f;
-			else if(id == GIRBlocks.HL_SIGNAL.getID()) renderHeight = 1.15f;
-			else if(id == GIRBlocks.KS_SIGNAL.getID()) renderHeight = 4.95f;
-			else throw new IllegalArgumentException("Signal has not been added to the height list!");
+		if (renderHeight == 0) {
+			int id = ((SignalBlock) world.getBlockState(pos).getBlock()).getID();
+			if (id == GIRBlocks.HV_SIGNAL.getID())
+				renderHeight = 2.775f;
+			else if (id == GIRBlocks.HL_SIGNAL.getID())
+				renderHeight = 1.15f;
+			else if (id == GIRBlocks.KS_SIGNAL.getID())
+				renderHeight = 4.95f;
+			else
+				throw new IllegalArgumentException("Signal has not been added to the height list!");
 		}
 		return renderHeight;
 	}
