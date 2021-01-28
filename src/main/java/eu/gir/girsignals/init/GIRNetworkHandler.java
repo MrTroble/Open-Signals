@@ -4,12 +4,15 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.items.Placementtool;
+import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -23,7 +26,8 @@ public class GIRNetworkHandler {
 	public static final String SIGNAL_CUSTOMNAME = "customname";
 
 	public static final byte PLACEMENT_GUI_SET_NBT = 0;
-	
+	public static final byte PLACEMENT_GUI_MANUELL_SET = 1;
+
 	@SubscribeEvent
 	public void onCustomPacket(ServerCustomPacketEvent event) {
 		FMLProxyPacket packet = event.getPacket();
@@ -33,8 +37,22 @@ public class GIRNetworkHandler {
 		case PLACEMENT_GUI_SET_NBT:
 			readItemNBTSET(payBuf, ((NetHandlerPlayServer) event.getHandler()).player);
 			break;
+		case PLACEMENT_GUI_MANUELL_SET:
+			readManuellSet(payBuf, ((NetHandlerPlayServer)event.getHandler()).player.world);
+			break;
 		default:
 			throw new IllegalArgumentException("Wrong packet ID in network recive!");
+		}
+	}
+	
+	private static void readManuellSet(ByteBuf payBuf, World world) {
+		BlockPos pos = new BlockPos(payBuf.readInt(), payBuf.readInt(), payBuf.readInt());
+		SignalControllerTileEntity tile = (SignalControllerTileEntity) world.getTileEntity(pos);
+		if(tile != null) {
+			int size = payBuf.readInt();
+			for (int i = 0; i < size; i++) {
+				tile.changeSignalImpl(payBuf.readInt(), payBuf.readInt());
+			}
 		}
 	}
 	

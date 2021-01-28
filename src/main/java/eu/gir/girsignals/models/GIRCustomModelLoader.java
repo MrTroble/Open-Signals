@@ -262,8 +262,12 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 	@Override
 	public IModel loadModel(ResourceLocation modelLocation) throws Exception {
 		ModelResourceLocation mrl = (ModelResourceLocation) modelLocation;
+		String[] strs = mrl.getVariant().split("=");
+		if(strs.length < 2)
+			return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
+					EnumFacing.NORTH);
 		return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
-				EnumFacing.byName(mrl.getVariant().split("=")[1]));
+				EnumFacing.byName(strs[1]));
 	}
 
 }
