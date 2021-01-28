@@ -22,7 +22,8 @@ apply plugin: 'maven-publish'
 apply plugin: "com.matthewprenger.cursegradle"
 
 def key = System.getenv("CURSETOKEN")
-print(key)
+if(key == null)
+	key = 'ddd'
 curseforge {
   apiKey = key
   project {
