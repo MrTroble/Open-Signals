@@ -54,3 +54,6 @@ property.ne2.desc=NE2
 property.ne2_2.desc=NE2 Short distance
 property.zs2.desc=ZS2
 property.kombisignal.desc=Combination Signal
+property.stagetype.name=Mode: 
+
+btn.apply=Apply

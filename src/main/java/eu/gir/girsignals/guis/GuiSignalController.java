@@ -53,7 +53,7 @@ public class GuiSignalController extends GuiScreen
 	@Override
 	public void initGui() {
 		this.slider = new GUISettingsSlider(this, -100, (this.width - 150) / 2, 10, 150,
-				"stagetype", this.slider != null ? this.slider.getValue():0, this);
+				"stagetype", currentStage.ordinal(), this);
 		
 		if(block == null) {
 			// TODO No link message
@@ -75,7 +75,9 @@ public class GuiSignalController extends GuiScreen
 			break;
 		}
 		
-		GuiButton apply = new GuiButton(-200, (this.width - 150) / 2, this.height - 50, "");
+		String applyStr = I18n.format("btn.apply");
+		int applyWidth = fontRenderer.getStringWidth(applyStr) + 30;
+		GuiButton apply = new GuiButton(-200, (this.width - applyWidth) / 2, this.height - 30, applyWidth, 20, applyStr);
 		addButton(apply);
 	}
 
@@ -94,14 +96,15 @@ public class GuiSignalController extends GuiScreen
 			maxWidth = Math.max(fontRenderer.getStringWidth(format) + maxProp, maxWidth);
 			properties.put(prop, tile.getSignalStateImpl(block.getIDFromProperty(prop)));
 		}
+		maxWidth += 40;
 
 		int y = 30;
 		int x = 30;
 		for (Entry<SEProperty<?>, Integer> entry : properties.entrySet()) {
 			SEProperty<?> prop = entry.getKey();
-			this.addButton(new GUISettingsSlider(prop, 0, x, (y += 30), maxWidth, prop.getName(), entry.getValue().intValue(), in -> properties.put(prop, in)));
-			if (y >= 250) {
-				y = 30;
+			this.addButton(new GUISettingsSlider(prop, 0, x, (y += 25), maxWidth, prop.getName(), entry.getValue().intValue(), in -> properties.put(prop, in)));
+			if (y >= 220) {
+				y = 55;
 				x += maxWidth + 20;
 			}
 		}
@@ -113,6 +116,12 @@ public class GuiSignalController extends GuiScreen
 
 	private void initScripting() {
 		// TODO Add scripting
+	}
+	
+	@Override
+	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+		this.drawDefaultBackground();
+		super.drawScreen(mouseX, mouseY, partialTicks);
 	}
 	
 	private void packManuell(ByteBuf buffer) {
@@ -129,27 +138,35 @@ public class GuiSignalController extends GuiScreen
 		});
 	}
 	
+	private void send() {
+		ByteBuf buffer = Unpooled.buffer();
+		switch (currentStage) {
+		case MANUELL:
+			packManuell(buffer);
+			break;
+		case REDSTONE:
+			return;
+		case SCRIPTING:
+			return;
+		default:
+			return;
+		}
+		CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
+				new PacketBuffer(buffer));
+		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
+	}
+	
+	@Override
+	public void onGuiClosed() {
+		send();
+	}
+	
 	@Override
 	protected void actionPerformed(GuiButton button) throws IOException {
 		switch (button.id) {
 		case -200:
-			ByteBuf buffer = Unpooled.buffer();
-			switch (currentStage) {
-			case MANUELL:
-				packManuell(buffer);
-				break;
-			case REDSTONE:
-				return;
-			case SCRIPTING:
-				return;
-			default:
-				return;
-			}
-			CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
-					new PacketBuffer(buffer));
-			GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
+			send();
 			break;
-
 		default:
 			break;
 		}

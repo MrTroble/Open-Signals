@@ -52,7 +52,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
 		super.readFromNBT(compound);
-		if(world != null && world.isRemote)
+		if(world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
 	}
 
