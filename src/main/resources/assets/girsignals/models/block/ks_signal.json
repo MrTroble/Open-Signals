@@ -8,8 +8,6 @@
     "0": "girsignals:blocks/mast",
     "1": "girsignals:blocks/shield_black",
     "2": "girsignals:blocks/shield_gray",
-    "3": "girsignals:blocks/lamp_dark",
-    "6": "girsignals:blocks/lamp_dark_small",
     "particle": "girsignals:blocks/mast",
     "lamp_rednorth": "girsignals:blocks/lamp_dark",
     "lamp_greennorth": "girsignals:blocks/lamp_dark",
@@ -17,7 +15,7 @@
     "lamp_white_identifiernorth": "girsignals:blocks/lamp_dark_small",
     "lamp_white_sh_zsnorth": "girsignals:blocks/lamp_dark_small",
     "lamp_white_shnorth": "girsignals:blocks/lamp_dark_small",
-    "lamp_zs7north": "girsignals:blocks/lamp_dark_small"
+    "lamp_white_zs7north": "girsignals:blocks/lamp_dark_small"
   },
   "elements": [
     {
@@ -247,7 +245,7 @@
             2,
             2
           ],
-          "texture": "lamp_zs7north"
+          "texture": "lamp_white_zs7north"
         }
       }
     },
@@ -280,7 +278,7 @@
             2,
             2
           ],
-          "texture": "lamp_zs7north"
+          "texture": "lamp_white_zs7north"
         }
       }
     },
@@ -313,7 +311,7 @@
             2,
             2
           ],
-          "texture": "lamp_zs7north"
+          "texture": "lamp_white_zs7north"
         }
       }
     },
@@ -2322,12 +2320,12 @@
       "name": "shield1",
       "from": [
         8.5,
-        12,
+        9,
         8
       ],
       "to": [
         12.5,
-        16,
+        13,
         10
       ],
       "rotation": {
@@ -2335,7 +2333,7 @@
         "axis": "y",
         "origin": [
           8,
-          8,
+          5,
           9
         ]
       },
@@ -2382,75 +2380,6 @@
             0,
             2.5,
             1
-          ],
-          "texture": "#0"
-        }
-      }
-    },
-    {
-      "name": "shield2",
-      "from": [
-        9.5,
-        9,
-        8
-      ],
-      "to": [
-        11.5,
-        11,
-        9
-      ],
-      "rotation": {
-        "angle": 0,
-        "axis": "y",
-        "origin": [
-          8,
-          8,
-          9
-        ]
-      },
-      "faces": {
-        "east": {
-          "uv": [
-            0,
-            0,
-            0.5,
-            1
-          ],
-          "texture": "#0"
-        },
-        "south": {
-          "uv": [
-            0,
-            0,
-            1,
-            1
-          ],
-          "texture": "#0"
-        },
-        "west": {
-          "uv": [
-            0,
-            0,
-            0.5,
-            1
-          ],
-          "texture": "#0"
-        },
-        "up": {
-          "uv": [
-            0,
-            0,
-            1,
-            0.5
-          ],
-          "texture": "#0"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            1,
-            0.5
           ],
           "texture": "#0"
         }
@@ -2459,13 +2388,13 @@
     {
       "name": "shield3",
       "from": [
-        9.5,
-        5,
+        10,
+        1,
         8
       ],
       "to": [
-        11.5,
-        7,
+        12,
+        3,
         9
       ],
       "rotation": {
@@ -2473,7 +2402,7 @@
         "axis": "y",
         "origin": [
           8,
-          8,
+          4,
           9
         ]
       },
@@ -2528,13 +2457,82 @@
     {
       "name": "shield4",
       "from": [
-        4.5,
-        9,
+        10,
+        18,
         8
       ],
       "to": [
-        6.5,
-        11,
+        12,
+        20,
+        9
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          8,
+          21,
+          9
+        ]
+      },
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            1
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            1
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1,
+            0.5
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1,
+            0.5
+          ],
+          "texture": "#0"
+        }
+      }
+    },
+    {
+      "name": "shield4",
+      "from": [
+        10,
+        5,
+        8
+      ],
+      "to": [
+        12,
+        7,
         9
       ],
       "rotation": {
@@ -2597,20 +2595,20 @@
     {
       "name": "shield5",
       "from": [
-        8.5,
-        1,
+        7,
+        5,
         8
       ],
       "to": [
-        12.5,
-        5,
-        10
+        9,
+        7,
+        9
       ],
       "rotation": {
         "angle": 0,
         "axis": "y",
         "origin": [
-          8,
+          5,
           8,
           9
         ]
@@ -2620,8 +2618,8 @@
           "uv": [
             0,
             0,
-            1,
-            2
+            0.5,
+            1
           ],
           "texture": "#0"
         },
@@ -2629,8 +2627,8 @@
           "uv": [
             0,
             0,
-            2,
-            2
+            1,
+            1
           ],
           "texture": "#0"
         },
@@ -2638,8 +2636,8 @@
           "uv": [
             0,
             0,
-            1,
-            2
+            0.5,
+            1
           ],
           "texture": "#0"
         },
@@ -2647,8 +2645,8 @@
           "uv": [
             0,
             0,
-            2,
-            1
+            1,
+            0.5
           ],
           "texture": "#0"
         },
@@ -2656,8 +2654,146 @@
           "uv": [
             0,
             0,
-            2,
+            1,
+            0.5
+          ],
+          "texture": "#0"
+        }
+      }
+    },
+    {
+      "name": "shield6",
+      "from": [
+        7,
+        1,
+        8
+      ],
+      "to": [
+        9,
+        3,
+        9
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          5,
+          4,
+          9
+        ]
+      },
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
             1
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            1
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1,
+            0.5
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1,
+            0.5
+          ],
+          "texture": "#0"
+        }
+      }
+    },
+    {
+      "name": "shield6",
+      "from": [
+        4,
+        5,
+        8
+      ],
+      "to": [
+        6,
+        7,
+        9
+      ],
+      "rotation": {
+        "angle": 0,
+        "axis": "y",
+        "origin": [
+          2,
+          8,
+          9
+        ]
+      },
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            1
+          ],
+          "texture": "#0"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            1,
+            1
+          ],
+          "texture": "#0"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            0.5,
+            1
+          ],
+          "texture": "#0"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            1,
+            0.5
+          ],
+          "texture": "#0"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            1,
+            0.5
           ],
           "texture": "#0"
         }
@@ -2667,12 +2803,12 @@
       "name": "shield6",
       "from": [
         3.5,
-        12,
+        9,
         8
       ],
       "to": [
         7.5,
-        16,
+        13,
         10
       ],
       "rotation": {
@@ -2680,7 +2816,7 @@
         "axis": "y",
         "origin": [
           8,
-          8,
+          5,
           9
         ]
       },
@@ -2735,21 +2871,21 @@
     {
       "name": "shield7",
       "from": [
-        8.5,
-        17,
+        6,
+        14,
         8
       ],
       "to": [
-        12.5,
-        21,
+        10,
+        18,
         10
       ],
       "rotation": {
         "angle": 0,
         "axis": "y",
         "origin": [
-          8,
-          8,
+          5,
+          5,
           9
         ]
       },
@@ -3715,7 +3851,9 @@
             52,
             53,
             54,
-            55
+            55,
+            56,
+            57
           ]
         }
       ]
