@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.collect.ImmutableSet;
+
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.init.GIRBlocks;
@@ -34,11 +36,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = new NBTTagCompound();
 		map.forEach((prop, in) -> prop.writeToNBT(comp, in));
-		if (map.size() == 1) {
-			System.out.println("========WRITE=========");
-			System.out.println(pos);
-			map.entrySet().forEach(System.out::println);
-		}
 		if (formatCustomName != null)
 			comp.setString(CUSTOMNAME, formatCustomName);
 		compound.setTag(PROPERTIES, comp);
@@ -53,17 +50,13 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		if (world == null) {
 			__tmp = comp.copy();
 		} else {
-			System.out.println("Early read from pos: " + pos);
-			System.out.println("Side: " + world.isRemote);
-			if(comp.getSize() == 1) {
-				System.err.println("FUUUUUUUUUCKKKKKKKK");
-			}
 			read(comp);
 		}
 		super.readFromNBT(compound);
 	}
 
 	private void read(NBTTagCompound comp) {
+		ImmutableSet.of().parallelStream();
 		((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties().stream()
 				.forEach(prop -> {
 					SEProperty<?> sep = SEProperty.cst(prop);
@@ -76,9 +69,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	@Override
 	public void onLoad() {
 		if (__tmp != null) {
-			System.out.println("Late read from pos: " + pos);
-			System.out.println("Side: " + world.isRemote);
-			System.out.println(__tmp);
 			read(__tmp);
 			if (!world.isRemote) {
 				IBlockState state = world.getBlockState(pos);
