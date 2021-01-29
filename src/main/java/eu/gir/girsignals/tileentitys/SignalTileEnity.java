@@ -87,7 +87,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 		this.readFromNBT(pkt.getNbtCompound());
 		world.markBlockRangeForRenderUpdate(pos, pos);
-		System.out.println("Recive package: " + pkt.getNbtCompound());
 	}
 
 	@Override
