@@ -47,6 +47,10 @@ public class GuiSignalController extends GuiScreen
 	public static enum Stages {
 		MANUELL, REDSTONE, SCRIPTING
 	}
+	
+	public static enum RedstoneMode {
+		INCREMENTAL, MUX, SINGEL
+	}
 
 	private Stages currentStage = Stages.MANUELL;
 
