@@ -53,3 +53,6 @@ property.ne2.desc=§lNe2 Vorsignaltafel§r%nNe2 Schilder kennzeichnen den Stando
 property.ne2_2.desc=Zusatz für Ne2 Signale mit verkürztem Bremsweg%nEin auf der Spitze stehendes Dreieck.
 property.zs2.desc=§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.
 property.kombisignal.desc=§lKombinationssignale (Ks)§r%nKs sind Lichtsignale, die die Fahrtaufträge mit einem Signallicht anzeigen. Die Signale können die Funktionen eines Hauptsignals, eines Vorsignals oder eines Haupt- und Vorsignals haben.
+property.stagetype.name=Mode: 
+
+btn.apply=Apply
