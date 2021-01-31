@@ -6,9 +6,9 @@ import java.util.Collection;
 
 import org.lwjgl.opengl.GL11;
 
+import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.init.GIRNetworkHandler;
