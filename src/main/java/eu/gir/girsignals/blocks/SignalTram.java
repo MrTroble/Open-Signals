@@ -6,7 +6,7 @@ import eu.gir.girsignals.EnumSignals.TRAM;
 public class SignalTram extends SignalBlock {
 
 	public SignalTram() {
-		super("TramSignal");
+		super("TramSignal", 0);
 	}
 
 	public static final SEProperty<TRAM> TRAMSIGNAL = SEProperty.of("signaltram", TRAM.OFF);

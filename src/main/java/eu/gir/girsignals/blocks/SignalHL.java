@@ -10,7 +10,7 @@ import eu.gir.girsignals.SEProperty.ChangeableStage;
 public class SignalHL extends SignalBlock {
 
 	public SignalHL() {
-		super("HL");
+		super("HL", 6);
 	}
 
 	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF);
