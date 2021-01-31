@@ -22,9 +22,9 @@
 		},
 		{
 			"name": "sign",
-			"from": [4, 0, 6],
-			"to": [12, 11, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [12, 8, 14]},
+			"from": [3, 0, 6],
+			"to": [13, 14, 7],
+			"rotation": {"angle": 0, "axis": "y", "origin": [11, 8, 14]},
 			"faces": {
 				"north": {"uv": [4, 5, 12, 16], "texture": "#2"},
 				"east": {"uv": [0, 0, 9, 1.5], "texture": "#1"},

@@ -10,6 +10,8 @@ import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.SignalHL;
 import eu.gir.girsignals.blocks.SignalHV;
 import eu.gir.girsignals.blocks.SignalKS;
+import eu.gir.girsignals.blocks.SignalSHLight;
+import eu.gir.girsignals.blocks.SignalTram;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -25,6 +27,8 @@ public class GIRBlocks {
 	public static final GhostBlock GHOST_BLOCK = new GhostBlock();
 	public static final SignalKS KS_SIGNAL = new SignalKS();
 	public static final SignalHL HL_SIGNAL = new SignalHL();
+	public static final SignalSHLight SH_LIGHT = new SignalSHLight();
+	public static final SignalTram TRAM_SIGNAL = new SignalTram();
 
 	private static ArrayList<Block> blocksToRegister = new ArrayList<>();
 

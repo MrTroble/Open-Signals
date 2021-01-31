@@ -9,10 +9,11 @@ import eu.gir.girsignals.SEProperty.ChangeableStage;
 public class SignalKS extends SignalBlock {
 
 	public SignalKS() {
-		super("KS");
+		super("KS", 6);
 	}
 
 	public static final SEProperty<KS> STOPSIGNAL = SEProperty.of("kombisignal", KS.OFF);
+	public static final SEProperty<KS> DISTANTSIGNAL = SEProperty.of("kombisignal_distant", KS.OFF);
 	public static final SEProperty<MAST_SIGN> MASTSIGN = SEProperty.of("mastsign", MAST_SIGN.OFF, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false);
 	public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false);

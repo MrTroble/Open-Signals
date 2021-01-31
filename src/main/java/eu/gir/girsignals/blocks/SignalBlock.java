@@ -22,6 +22,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -45,15 +46,17 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	public static final SEProperty<Boolean> CUSTOMNAME = SEProperty.of("customname", false, ChangeableStage.AUTOMATICSTAGE);
 
 	private final int ID;
+	private final int height;
 
 	private final String signalTypeName;
 	
-	public SignalBlock(String signalTypeName) {
+	public SignalBlock(String signalTypeName, int height) {
 		super(Material.ROCK);
 		this.signalTypeName = signalTypeName;
 		setDefaultState(getDefaultState().withProperty(FACING, EnumFacing.NORTH));
 		ID = SIGNALLIST.size();
 		SIGNALLIST.add(this);
+		this.height =height;
 	}
 	
 	@Override
@@ -213,5 +216,9 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		super.breakBlock(worldIn, pos, state);
 		
 		GhostBlock.destroyUpperBlock(worldIn, pos);
+	}
+	
+	public int getHeight(NBTTagCompound comp) {
+		return height;
 	}
 }
