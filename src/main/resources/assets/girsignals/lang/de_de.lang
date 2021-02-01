@@ -4,12 +4,15 @@ itemGroup.GIRSignals=GIRSignals
 #Items
 item.linkingtool.name=Verlinker
 item.placementtool.name=Signal-Platzierer
+item.platetool.name=Signaltafel-Platzierer
 
 #Blocks
 tile.hvsignalcontroller.name=Signal Steuerer
 tile.hvsignal.name=HV Signal
 tile.kssignal.name=KS Signal
 tile.hlsignal.name=HL Signal
+tile.shlight.name=Rangiersignal
+tile.tramsignal.name=Straßenbahnsignal
 
 #Linktool
 lt.linkfailed=Link fehlgeschlagen!
@@ -36,6 +39,12 @@ property.ne2.name=Ne2
 property.ne2_2.name=Ne2 verkürtzer Bremsweg (benötigt Ne2) 
 property.zs2.name=Zs2
 property.kombisignal.name=Kombinationssignal
+property.kombisignal-distant.name=Kombinationsvorsignal
+property.mainlightsignal_distant.name=Hauptlichtvorsignal
+property.sh_light_bottom.name=Rangiersignal 1 Block hoch
+property.sh_light_top.name=Rangiersignal 3 Block hoch
+property.signaltram.name=Straßenbahnsignal
+property.signalcar.name=Auto Ampel
 
 property.zs3.desc=Über das §lZs3§r lassen sich folgende Zusatzsignale anzeigen:%n%n§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.%n§nZs3 Geschwindigkeitsanzeiger§r - Das Zs3 gibt durch eine Kennziffer an, welche Geschwindigkeit (Ziffer x 10 in km/h) ab dem Signal im anschließenden Weichenbereich oder bis zum nächsten Hauptsignal nicht überschritten werden darf. Die Kennziffer §l3§r kann anzeigen, dass der Fahrweg auf ein Stumpfgleis führt. Die Kennziffer §n2§r kann anzeigen, dass besonders früh gehalten werden muss oder auf ein besetztes Gleis eingefahren wird.    
 property.zs1.desc=§lZs1 Ersatzsignal§r%nAm Signal Hp 0 oder am gestörten Lichthauptsignal darf ohne schriftlichen Befehl vom zuständigen Fahrdienstleiter mit maximal 40 km/h vorbeigefahren werden. Das Signal gilt auch, wenn es erlischt bevor die Zugspitze vorbeigefahren ist. Das Signal gilt entweder für den anschließenden Weichenbereich oder bis zum nächsten Hauptsignal.
@@ -53,3 +62,12 @@ property.ne2.desc=§lNe2 Vorsignaltafel§r%nNe2 Schilder kennzeichnen den Stando
 property.ne2_2.desc=Zusatz für Ne2 Signale mit verkürztem Bremsweg%nEin auf der Spitze stehendes Dreieck.
 property.zs2.desc=§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.
 property.kombisignal.desc=§lKombinationssignale (Ks)§r%nKs sind Lichtsignale, die die Fahrtaufträge mit einem Signallicht anzeigen. Die Signale können die Funktionen eines Hauptsignals, eines Vorsignals oder eines Haupt- und Vorsignals haben.
+property.stagetype.name=Modus: 
+property.kombisignal-distant.desc=Vorsignal zu dem Ks Signal
+property.mainlightsignal_distant.desc=Vorsignal zu dem Hauptlichtsignal
+property.sh_light_bottom.desc=
+property.sh_light_top.desc=
+property.signaltram.desc=
+property.signalcar.desc=
+
+btn.apply=Anwenden
