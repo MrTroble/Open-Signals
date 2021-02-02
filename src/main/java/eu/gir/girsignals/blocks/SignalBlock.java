@@ -10,11 +10,10 @@ import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyDirection;
+import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -27,6 +26,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
@@ -40,9 +40,37 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class SignalBlock extends Block implements ITileEntityProvider {
 	
+	public static enum SignalAngel implements IStringSerializable {
+		ANGEL0,
+		ANGEL22P5, 
+		ANGEL45, 
+		ANGEL67P5, 
+		ANGEL90, 
+		ANGEL112P5,
+		ANGEL135,
+		ANGEL157P5,
+		ANGEL180,
+		ANGEL202P5,
+		ANGEL225,
+		ANGEL247P5,
+		ANGEL270,
+		ANGEL292P5,
+		ANGEL315,
+		ANGEL337P5;
+		
+		@Override
+		public String getName() {
+			return this.name().toLowerCase();
+		}
+		
+		public float getAngel() {
+			return this.ordinal() * 22.5f;
+		}
+	}
+	
 	public static final ArrayList<SignalBlock> SIGNALLIST = new ArrayList<SignalBlock>();
 
-	public static final PropertyDirection FACING = BlockHorizontal.FACING;
+	public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel", SignalAngel.class);
 	public static final SEProperty<Boolean> CUSTOMNAME = SEProperty.of("customname", false, ChangeableStage.AUTOMATICSTAGE);
 
 	private final int ID;
@@ -53,7 +81,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	public SignalBlock(String signalTypeName, int height) {
 		super(Material.ROCK);
 		this.signalTypeName = signalTypeName;
-		setDefaultState(getDefaultState().withProperty(FACING, EnumFacing.NORTH));
+		setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
 		ID = SIGNALLIST.size();
 		SIGNALLIST.add(this);
 		this.height =height;
@@ -73,7 +101,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	
 	@Override
 	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-		return BOUNDING_BOX;
+		return getBoundingBox(blockState, worldIn, pos);
 	}
 	
 	public static ItemStack pickBlock(EntityPlayer player) {
@@ -98,17 +126,18 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
 			float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-		return getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+		float fl = placer.getMirroredYaw(Mirror.FRONT_BACK);
+		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[(int)(fl/22.5f)]);
 	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(FACING, EnumFacing.getHorizontal(meta));
+		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[meta]);
 	}
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(FACING).getHorizontalIndex();
+		return state.getValue(ANGEL).ordinal();
 	}
 
 	@Override
@@ -189,7 +218,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 			}
 		}
 		prop.add(CUSTOMNAME);
-		return new ExtendedBlockState(this, new IProperty<?>[] { FACING },
+		return new ExtendedBlockState(this, new IProperty<?>[] { ANGEL },
 				prop.toArray(new IUnlistedProperty[prop.size()]));
 	}
 	

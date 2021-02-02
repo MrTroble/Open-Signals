@@ -17,15 +17,24 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.mojang.realmsclient.util.Pair;
 
 import eu.gir.girsignals.GirsignalsMain;
+import eu.gir.girsignals.blocks.SignalBlock.SignalAngel;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockPart;
+import net.minecraft.client.renderer.block.model.BlockPartFace;
+import net.minecraft.client.renderer.block.model.BlockPartRotation;
+import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
+import net.minecraft.client.renderer.block.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
+import net.minecraftforge.common.model.ITransformation;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
@@ -37,11 +46,18 @@ public class SignalCustomModel implements IModel {
 	private ArrayList<ResourceLocation> textures = new ArrayList<>();
 	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Pair<Vector3f, Vector3f>>> modelCache = new HashMap<>();
 	private IBakedModel cachedModel = null;
-	private EnumFacing facing = EnumFacing.NORTH;
+	private SignalAngel angel = SignalAngel.ANGEL0;
+	FaceBakery faceBakery = new FaceBakery();
 
-	public SignalCustomModel(Consumer<SignalCustomModel> init, EnumFacing facing) {
+	public SignalCustomModel(Consumer<SignalCustomModel> init, SignalAngel facing) {
 		init.accept(this);
-		this.facing = facing;
+		this.angel = facing;
+	}
+
+	protected BakedQuad makeBakedQuad(BlockPartRotation rot, BlockPart bp, BlockPartFace bpf, TextureAtlasSprite tas,
+			EnumFacing face, ITransformation transform, boolean flag) {
+		return this.faceBakery.makeBakedQuad(bp.positionFrom, bp.positionTo, bpf, tas, face, transform, rot, flag,
+				bp.shade);
 	}
 
 	@SuppressWarnings("deprecation")
@@ -50,32 +66,32 @@ public class SignalCustomModel implements IModel {
 			Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 		if (cachedModel == null) {
 			MultipartBakedModel.Builder build = new MultipartBakedModel.Builder();
-			modelCache
-					.forEach((pr, m) -> build.putModel(br -> pr.test((IExtendedBlockState) br), m.first().bake(part -> {
-						Optional<TRSRTransformation> trs = state.apply(part);
-						if (trs.isPresent()) {
-							TRSRTransformation trsr = trs.get();
-							net.minecraft.client.renderer.block.model.ItemTransformVec3f itf = trsr.toItemTransform();
-							Vector3f vec = m.second().first();
-							itf.translation.x += (facing != EnumFacing.SOUTH && facing != EnumFacing.NORTH)
-									? ((facing == EnumFacing.WEST ? 1 : -1) * vec.z)
-									: ((facing == EnumFacing.NORTH ? 1 : -1) * vec.x);
-							itf.translation.y += vec.y;
-							itf.translation.z += (facing != EnumFacing.SOUTH && facing != EnumFacing.NORTH)
-									? ((facing == EnumFacing.WEST ? -1 : 1) * vec.x)
-									: ((facing == EnumFacing.NORTH ? 1 : -1) * vec.z);
+			modelCache.forEach((pr, m) -> {
+				IModel model = m.first();
+				model.asVanillaModel().ifPresent(mdl -> {
+                    
+					SimpleBakedModel.Builder buil = new SimpleBakedModel.Builder(mdl, mdl.createOverrides());
+		            final TRSRTransformation baseState = new TRSRTransformation(m.second().first(), null, null, null);
+					mdl.getElements().forEach(bp -> {
+						bp.mapFaces.forEach((face, bpf) -> {
+							TextureAtlasSprite tas = bakedTextureGetter.apply(new ResourceLocation(mdl.resolveTextureName(bpf.texture)));
+				            buil.setTexture(tas);
+							BlockPartRotation prt = new BlockPartRotation(new org.lwjgl.util.vector.Vector3f(), Axis.Y, angel.getAngel(), false);
+							if(bp.partRotation != null)
+								prt = new BlockPartRotation(bp.partRotation.origin, Axis.Y, angel.getAngel(), false);
+							buil.addGeneralQuad(makeBakedQuad(prt, bp, bpf, tas, face, baseState, false));
+						});
+					});
+					build.putModel(blockstate -> pr.test((IExtendedBlockState) blockstate), buil.makeBakedModel());
+				});
+				if(model.asVanillaModel().isPresent())return;
 
-							Vector3f scale = m.second().second();
-							itf.scale.x += scale.x;
-							itf.scale.y += scale.y;
-							itf.scale.z += scale.z;
-							if (facing != EnumFacing.NORTH)
-								itf.rotation.y += facing.getHorizontalAngle();
-							trsr = TRSRTransformation.from(itf);
-							return Optional.of(trsr);
-						}
+				build.putModel(blockstate -> pr.test((IExtendedBlockState) blockstate), model.bake(ms -> {
+					if (ms.isPresent())
 						return Optional.empty();
-					}, format, bakedTextureGetter)));
+					return Optional.of(new TRSRTransformation(m.second().first(), null, null, null));
+				}, format, bakedTextureGetter));
+			});
 			return cachedModel = build.makeMultipartModel();
 		}
 		return cachedModel;
@@ -83,9 +99,7 @@ public class SignalCustomModel implements IModel {
 
 	@Override
 	public IModelState getDefaultState() {
-		if (facing != EnumFacing.NORTH)
-			return TRSRTransformation.from(facing);
-		return TRSRTransformation.identity();
+		return TRSRTransformation.blockCenterToCorner(TRSRTransformation.identity());
 	}
 
 	@Override
@@ -96,24 +110,25 @@ public class SignalCustomModel implements IModel {
 	protected void register(String name, Predicate<IExtendedBlockState> state, float yOffset) {
 		this.register(name, state, 0, yOffset, 0);
 	}
-	
+
 	protected void register(String name, Predicate<IExtendedBlockState> state, float yOffset, String... strings) {
 		this.register(name, state, 0, yOffset, 0, strings);
 	}
 
-	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z, String... strings) {
+	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z,
+			String... strings) {
 		this.register(name, state, x, y, z, 0, 0, 0, strings);
 	}
-	
+
 	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z) {
 		this.register(name, state, x, y, z, 0, 0, 0);
 	}
 
 	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z, float xs,
 			float ys, float zs) {
-		this.register(name, state, x, y, z, xs, ys, zs, (String[])null);
+		this.register(name, state, x, y, z, xs, ys, zs, (String[]) null);
 	}
-	
+
 	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z, float xs,
 			float ys, float zs, @Nullable String... strings) {
 		IModel m = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(GirsignalsMain.MODID, "block/" + name),

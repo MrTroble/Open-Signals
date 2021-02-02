@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import eu.gir.girsignals.EnumSignals.HPVR;
@@ -14,7 +13,9 @@ import eu.gir.girsignals.EnumSignals.Offable;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
 import eu.gir.girsignals.EnumSignals.TRAM;
 import eu.gir.girsignals.EnumSignals.ZS32;
+import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.SignalBlock.SignalAngel;
 import eu.gir.girsignals.blocks.SignalHL;
 import eu.gir.girsignals.blocks.SignalHV;
 import eu.gir.girsignals.blocks.SignalKS;
@@ -22,7 +23,6 @@ import eu.gir.girsignals.blocks.SignalSHLight;
 import eu.gir.girsignals.blocks.SignalTram;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.IResourceManager;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
@@ -340,9 +340,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		String[] strs = mrl.getVariant().split("=");
 		if(strs.length < 2)
 			return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
-					EnumFacing.NORTH);
+					SignalAngel.ANGEL0);
 		return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
-				EnumFacing.byName(strs[1]));
+				SignalAngel.valueOf(strs[1].toUpperCase()));
 	}
 
 }
