@@ -24,6 +24,7 @@ import net.minecraft.client.renderer.block.model.BlockPartFace;
 import net.minecraft.client.renderer.block.model.BlockPartRotation;
 import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
 import net.minecraft.client.renderer.block.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -44,7 +45,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class SignalCustomModel implements IModel {
 
 	private ArrayList<ResourceLocation> textures = new ArrayList<>();
-	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Pair<Vector3f, Vector3f>>> modelCache = new HashMap<>();
+	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
 	private IBakedModel cachedModel = null;
 	private SignalAngel angel = SignalAngel.ANGEL0;
 	FaceBakery faceBakery = new FaceBakery();
@@ -60,36 +61,43 @@ public class SignalCustomModel implements IModel {
 				bp.shade);
 	}
 
-	@SuppressWarnings("deprecation")
 	@Override
 	public IBakedModel bake(IModelState state, VertexFormat format,
 			Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
 		if (cachedModel == null) {
-			MultipartBakedModel.Builder build = new MultipartBakedModel.Builder();
+			final MultipartBakedModel.Builder build = new MultipartBakedModel.Builder();
 			modelCache.forEach((pr, m) -> {
-				IModel model = m.first();
-				model.asVanillaModel().ifPresent(mdl -> {
-                    
-					SimpleBakedModel.Builder buil = new SimpleBakedModel.Builder(mdl, mdl.createOverrides());
-		            final TRSRTransformation baseState = new TRSRTransformation(m.second().first(), null, null, null);
+				final IModel model = m.first();
+				final ModelBlock mdl = model.asVanillaModel().orElse(null);
+				final TRSRTransformation baseState = new TRSRTransformation(m.second(), null, null, null);
+
+				if (mdl != null) {
+					if (mdl.getElements().isEmpty())
+						return;
+					final SimpleBakedModel.Builder buil = new SimpleBakedModel.Builder(mdl, mdl.createOverrides());
+					final String part = mdl.getElements().get(0).mapFaces.values().iterator().next().texture;
+					buil.setTexture(bakedTextureGetter.apply(new ResourceLocation(mdl.resolveTextureName(part))));
+
 					mdl.getElements().forEach(bp -> {
 						bp.mapFaces.forEach((face, bpf) -> {
-							TextureAtlasSprite tas = bakedTextureGetter.apply(new ResourceLocation(mdl.resolveTextureName(bpf.texture)));
-				            buil.setTexture(tas);
-							BlockPartRotation prt = new BlockPartRotation(new org.lwjgl.util.vector.Vector3f(), Axis.Y, angel.getAngel(), false);
-							if(bp.partRotation != null)
+							final TextureAtlasSprite tas = bakedTextureGetter
+									.apply(new ResourceLocation(mdl.resolveTextureName(bpf.texture)));
+							buil.setTexture(tas);
+							BlockPartRotation prt = new BlockPartRotation(new org.lwjgl.util.vector.Vector3f(), Axis.Y,
+									angel.getAngel(), false);
+							if (bp.partRotation != null)
 								prt = new BlockPartRotation(bp.partRotation.origin, Axis.Y, angel.getAngel(), false);
 							buil.addGeneralQuad(makeBakedQuad(prt, bp, bpf, tas, face, baseState, false));
 						});
 					});
 					build.putModel(blockstate -> pr.test((IExtendedBlockState) blockstate), buil.makeBakedModel());
-				});
-				if(model.asVanillaModel().isPresent())return;
+					return;
+				}
 
 				build.putModel(blockstate -> pr.test((IExtendedBlockState) blockstate), model.bake(ms -> {
 					if (ms.isPresent())
 						return Optional.empty();
-					return Optional.of(new TRSRTransformation(m.second().first(), null, null, null));
+					return Optional.of(baseState);
 				}, format, bakedTextureGetter));
 			});
 			return cachedModel = build.makeMultipartModel();
@@ -99,7 +107,7 @@ public class SignalCustomModel implements IModel {
 
 	@Override
 	public IModelState getDefaultState() {
-		return TRSRTransformation.blockCenterToCorner(TRSRTransformation.identity());
+		return TRSRTransformation.identity();
 	}
 
 	@Override
@@ -115,22 +123,12 @@ public class SignalCustomModel implements IModel {
 		this.register(name, state, 0, yOffset, 0, strings);
 	}
 
-	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z,
-			String... strings) {
-		this.register(name, state, x, y, z, 0, 0, 0, strings);
-	}
 
 	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z) {
-		this.register(name, state, x, y, z, 0, 0, 0);
+		this.register(name, state, x, y, z);
 	}
 
-	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z, float xs,
-			float ys, float zs) {
-		this.register(name, state, x, y, z, xs, ys, zs, (String[]) null);
-	}
-
-	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z, float xs,
-			float ys, float zs, @Nullable String... strings) {
+	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z, @Nullable String... strings) {
 		IModel m = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
 				"Couldn't find " + name);
 		m = m.smoothLighting(false);
@@ -141,6 +139,6 @@ public class SignalCustomModel implements IModel {
 			m = m.retexture(build.build());
 		}
 		m.getTextures().stream().filter(rs -> !textures.contains(rs)).forEach(textures::add);
-		modelCache.put(state, Pair.of(m, Pair.of(new Vector3f(x, y, z), new Vector3f(xs, ys, zs))));
+		modelCache.put(state, Pair.of(m, new Vector3f(x, y, z)));
 	}
 }
