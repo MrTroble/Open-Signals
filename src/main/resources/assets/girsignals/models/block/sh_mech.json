@@ -12,7 +12,6 @@
 			"name": "body",
 			"from": [3, 2, 5],
 			"to": [13, 12, 11],
-			"rotation": {"angle": 0, "axis": "y", "origin": [11, 10, 13]},
 			"faces": {
 				"north": {"uv": [0, 0, 10, 10], "texture": "#0"},
 				"east": {"uv": [0, 0, 3, 5], "texture": "#0"},
@@ -37,7 +36,6 @@
 			"name": "sh",
 			"from": [4, 3, 4.9],
 			"to": [12, 11, 4.9],
-			"rotation": {"angle": 0, "axis": "z", "origin": [8, 7, 5]},
 			"faces": {
 				"north": {"uv": [0, 0, 16, 16], "texture": "#2"}
 			}

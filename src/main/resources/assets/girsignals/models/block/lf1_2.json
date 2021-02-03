@@ -10,7 +10,6 @@
 		{
 			"from": [7, 0, 7],
 			"to": [9, 5, 9],
-			"rotation": {"angle": 0, "axis": "y", "origin": [15, 8, 15]},
 			"faces": {
 				"north": {"uv": [0, 0, 2, 5], "texture": "#0"},
 				"east": {"uv": [0, 0, 2, 5], "texture": "#0"},
@@ -24,7 +23,6 @@
 			"name": "sign",
 			"from": [3, 0, 6],
 			"to": [13, 14, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [11, 8, 14]},
 			"faces": {
 				"north": {"uv": [4, 5, 12, 16], "texture": "#2"},
 				"east": {"uv": [0, 0, 9, 1.5], "texture": "#1"},
