@@ -11,7 +11,6 @@
 			"name": "sign_main",
 			"from": [7, 7, 7],
 			"to": [9, 27, 8],
-			"rotation": {"angle": 0, "axis": "y", "origin": [7, 7, 7]},
 			"faces": {
 				"north": {"uv": [0, 0, 1, 16], "texture": "#9"},
 				"east": {"uv": [0, 0, 0.5, 10], "texture": "#15"},
