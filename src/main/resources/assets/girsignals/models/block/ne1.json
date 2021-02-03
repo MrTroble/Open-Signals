@@ -11,7 +11,6 @@
 		{
 			"from": [7, 0, 7],
 			"to": [9, 12, 9],
-			"rotation": {"angle": 0, "axis": "y", "origin": [15, -8, 15]},
 			"faces": {
 				"north": {"uv": [0, 0, 2, 12], "texture": "#0"},
 				"east": {"uv": [0, 0, 2, 12], "texture": "#0"},
@@ -25,7 +24,6 @@
 			"name": "sign",
 			"from": [3, 9, 6],
 			"to": [13, 11, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [11, 17, 14]},
 			"faces": {
 				"north": {"uv": [3, 14, 13, 16], "texture": "#2"},
 				"east": {"uv": [0, 0, 1, 2], "texture": "#1"},
@@ -39,7 +37,6 @@
 			"name": "sign",
 			"from": [3.56, 11, 6],
 			"to": [12.56, 13, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [12, 19, 14]},
 			"faces": {
 				"north": {"uv": [3.5, 12, 12.5, 14], "texture": "#2"},
 				"east": {"uv": [0, 0, 1, 2], "texture": "#1"},
@@ -53,7 +50,6 @@
 			"name": "sign",
 			"from": [4, 13, 6],
 			"to": [12, 15, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [12, 21, 14]},
 			"faces": {
 				"north": {"uv": [4, 10, 12, 12], "texture": "#2"},
 				"east": {"uv": [0, 0, 1, 2], "texture": "#1"},
@@ -67,7 +63,6 @@
 			"name": "mast_sign",
 			"from": [7, -12, 6],
 			"to": [9, 8, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [15, -4, 14]},
 			"faces": {
 				"north": {"uv": [0, 0, 2, 16], "texture": "#3"},
 				"east": {"uv": [0, 0, 1, 16], "texture": "#1"},

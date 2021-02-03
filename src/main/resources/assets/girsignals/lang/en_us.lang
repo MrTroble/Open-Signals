@@ -4,12 +4,15 @@ itemGroup.GIRSignals=GIRSignals
 #Items
 item.linkingtool.name=Linking Tool
 item.placementtool.name=Signal-Placer
+item.platetool.name=Signalplate-Placer
 
 #Blocks
-tile.hvsignalcontroller.name=HV-Signal-Controller
+tile.hvsignalcontroller.name=Signal-Controller
 tile.hvsignal.name=HV Signal
 tile.kssignal.name=KS Signal
 tile.hlsignal.name=HL Signal
+tile.shlight.name=Shounting signal
+tile.tramsignal.name=Tram signal
 
 #Linktool
 lt.linkfailed=Link failed!
@@ -29,13 +32,19 @@ property.zs7.name=ZS7
 property.vrlight.name=Vr Short distance
 property.signaltype.name=Signal type
 property.mastsign.name=Mast sign
-property.mainlightsignal.name=Main signal
+property.mainlightsignal.name=Main light signal
 property.mainlightsignallightbar.name=Light bar
 property.mastsigndistant.name=Distant mast sign
 property.ne2.name=NE2
 property.ne2_2.name=NE2 Short distance
 property.zs2.name=ZS2
 property.kombisignal.name=Combination Signal
+property.kombisignal-distant.name=Combination distant signal
+property.mainlightsignal_distant.name=Main light distant signal
+property.sh_light_bottom.name=Shunting Signal 1 block high
+property.sh_light_top.name=Shunting Signal 3 blocks high
+property.signaltram.name=Tram signal
+property.signalcar.name=Car traffic light
 
 property.zs3.desc=Über das §lZs3§r lassen sich folgende Zusatzsignale anzeigen:%n%n§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.%n§nZs3 Geschwindigkeitsanzeiger§r - Das Zs3 gibt durch eine Kennziffer an, welche Geschwindigkeit (Ziffer x 10 in km/h) ab dem Signal im anschließenden Weichenbereich oder bis zum nächsten Hauptsignal nicht überschritten werden darf. Die Kennziffer §l3§r kann anzeigen, dass der Fahrweg auf ein Stumpfgleis führt. Die Kennziffer §n2§r kann anzeigen, dass besonders früh gehalten werden muss oder auf ein besetztes Gleis eingefahren wird.    
 property.zs1.desc=§lZs1 Ersatzsignal§r%nAm Signal Hp 0 oder am gestörten Lichthauptsignal darf ohne schriftlichen Befehl vom zuständigen Fahrdienstleiter mit maximal 40 km/h vorbeigefahren werden. Das Signal gilt auch, wenn es erlischt bevor die Zugspitze vorbeigefahren ist. Das Signal gilt entweder für den anschließenden Weichenbereich oder bis zum nächsten Hauptsignal.
@@ -54,5 +63,11 @@ property.ne2_2.desc=Zusatz für Ne2 Signale mit verkürztem Bremsweg%nEin auf de
 property.zs2.desc=§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.
 property.kombisignal.desc=§lKombinationssignale (Ks)§r%nKs sind Lichtsignale, die die Fahrtaufträge mit einem Signallicht anzeigen. Die Signale können die Funktionen eines Hauptsignals, eines Vorsignals oder eines Haupt- und Vorsignals haben.
 property.stagetype.name=Mode: 
+property.kombisignal-distant.desc=Distant signal for Combination signal
+property.mainlightsignal_distant.desc=Distant signal for Main light signal
+property.sh_light_bottom.desc=
+property.sh_light_top.desc=
+property.signaltram.desc=
+property.signalcar.desc=
 
 btn.apply=Apply

@@ -11,7 +11,6 @@
 			"name": "sign_main_distant",
 			"from": [7, 2, 9],
 			"to": [9, 18, 10],
-			"rotation": {"angle": 0, "axis": "y", "origin": [7, 2, 9]},
 			"faces": {
 				"north": {"uv": [0, 0, 16, 16], "texture": "#12"},
 				"east": {"uv": [0, 0, 0.5, 8], "texture": "#14"},
