@@ -20,7 +20,7 @@
 		{
 			"name": "lamp_green",
 			"from": [3.5, 17, 4.9],
-			"to": [7.5, 21, 4.9],,
+			"to": [7.5, 21, 4.9],
 			"faces": {
 				"north": {"uv": [0, 0, 4, 4], "texture": "#lamp_greennorth"}
 			}
