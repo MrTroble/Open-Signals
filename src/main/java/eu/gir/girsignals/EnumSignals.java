@@ -66,5 +66,11 @@ public class EnumSignals {
 	public enum HL_LIGHTBAR implements Offable<HL_LIGHTBAR> {
 		OFF, GREEN, YELLOW;
 	}
+	public enum SH_LIGHT implements Offable<SH_LIGHT> {
+		OFF, SH0, SH1;
+	}
+	public enum TRAM implements Offable<TRAM> {
+		OFF, F0, F1, F2, F3, F4, F5, RED, YELLOW, GREEN;
+	}
 
 }

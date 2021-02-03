@@ -9,7 +9,7 @@ public class GIRTabs {
 		
 		@Override
 		public ItemStack getTabIconItem() {
-			return new ItemStack(GIRBlocks.HV_SIGNAL_CONTROLLER);
+			return new ItemStack(GIRItems.PLACEMENT_TOOL);
 		}
 	};
 

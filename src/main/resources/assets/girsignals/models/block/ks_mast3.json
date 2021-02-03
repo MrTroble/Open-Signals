@@ -10,7 +10,6 @@
 			"name": "mast6",
 			"from": [7, 0, 10],
 			"to": [9, 16, 13],
-			"rotation": {"angle": 0, "axis": "y", "origin": [8, 24, 10]},
 			"faces": {
 				"north": {"uv": [0, 0, 1, 8], "texture": "#0"},
 				"east": {"uv": [0, 0, 0.5, 8], "texture": "#0"},

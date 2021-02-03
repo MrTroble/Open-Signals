@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.items.Linkingtool;
 import eu.gir.girsignals.items.Placementtool;
+import eu.gir.girsignals.items.Platetool;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -17,6 +18,7 @@ public class GIRItems {
 
 	public static final Linkingtool LINKING_TOOL = new Linkingtool();
 	public static final Placementtool PLACEMENT_TOOL = new Placementtool();
+	public static final Platetool PLATE_TOOL = new Platetool();
 	
 	public static ArrayList<Item> registeredItems = new ArrayList<>();
 	
