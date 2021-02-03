@@ -3,7 +3,7 @@
 [
 ![Curseforge Downloads](https://cf.way2muchnoise.eu/gir-signal-mod.svg)
 ![Curseforge Versions](http://cf.way2muchnoise.eu/versions/gir-signal-mod.svg)
-](https://www.curseforge.com/minecraft/mc-mods/useful-backpacks)
+](https://www.curseforge.com/minecraft/mc-mods/gir-signal-mod)
 [
 ![Discord](https://img.shields.io/discord/690967067855421470)
 ](https://discord.gg/UdxeFgG)
@@ -11,7 +11,7 @@
 ## This mod adds a lot of commonly used german signal systems as controllable signals
 
 - Download on [curseforge](https://www.curseforge.com/minecraft/mc-mods/gir-signal-mod).  
-- Find more information on our [website](https://u-team.info/mods/usefulbackpacks).
+- Find more information on our [website](https://girc.eu/wordpress/).
 - Updates can be found in the [changelog](changelog.txt).
 
 ## How to build this mod
