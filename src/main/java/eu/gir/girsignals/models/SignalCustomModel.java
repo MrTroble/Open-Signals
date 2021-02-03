@@ -1,5 +1,6 @@
 package eu.gir.girsignals.models;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -26,7 +27,6 @@ import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
-import net.minecraft.client.renderer.block.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.EnumFacing;
@@ -48,8 +48,18 @@ public class SignalCustomModel implements IModel {
 	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
 	private IBakedModel cachedModel = null;
 	private SignalAngel angel = SignalAngel.ANGEL0;
-	FaceBakery faceBakery = new FaceBakery();
-
+	private FaceBakery faceBakery = new FaceBakery();
+	
+	private static Field rotationField;
+	static {
+		for(Field fdl : BlockPart.class.getFields()) {
+			if(fdl.getType().equals(BlockPartRotation.class)) {
+				fdl.setAccessible(true);
+				rotationField = fdl;
+			}
+		}
+	}
+	
 	public SignalCustomModel(Consumer<SignalCustomModel> init, SignalAngel facing) {
 		init.accept(this);
 		this.angel = facing;
@@ -69,32 +79,21 @@ public class SignalCustomModel implements IModel {
 			modelCache.forEach((pr, m) -> {
 				final IModel model = m.first();
 				final ModelBlock mdl = model.asVanillaModel().orElse(null);
-				Vector3f f = m.second();
+				final Vector3f f = m.second();
 				f.x += angel.getX();
 				f.z += angel.getY();
 				final TRSRTransformation baseState = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(f, null, null, null));
 
 				if (mdl != null) {
-					if (mdl.getElements().isEmpty())
-						return;
-					final SimpleBakedModel.Builder buil = new SimpleBakedModel.Builder(mdl, mdl.createOverrides());
-					final String part = mdl.getElements().get(0).mapFaces.values().iterator().next().texture;
-					buil.setTexture(bakedTextureGetter.apply(new ResourceLocation(mdl.resolveTextureName(part))));
-
 					mdl.getElements().forEach(bp -> {
-						bp.mapFaces.forEach((face, bpf) -> {
-							final TextureAtlasSprite tas = bakedTextureGetter
-									.apply(new ResourceLocation(mdl.resolveTextureName(bpf.texture)));
-							buil.setTexture(tas);
-							BlockPartRotation prt = new BlockPartRotation(new org.lwjgl.util.vector.Vector3f(), Axis.Y,
-									angel.getAngel(), false);
-							if (bp.partRotation != null)
-								prt = new BlockPartRotation(bp.partRotation.origin, Axis.Y, angel.getAngel(), false);
-							buil.addGeneralQuad(makeBakedQuad(prt, bp, bpf, tas, face, baseState, false));
-						});
+						final BlockPartRotation prt = bp.partRotation == null ? new BlockPartRotation(new org.lwjgl.util.vector.Vector3f(), Axis.Y,
+								angel.getAngel(), false) : new BlockPartRotation(bp.partRotation.origin, Axis.Y, angel.getAngel(), false);
+						try {
+							rotationField.set(bp, prt);
+						} catch (IllegalArgumentException | IllegalAccessException e) {
+							e.printStackTrace();
+						}
 					});
-					build.putModel(blockstate -> pr.test((IExtendedBlockState) blockstate), buil.makeBakedModel());
-					return;
 				}
 
 				build.putModel(blockstate -> pr.test((IExtendedBlockState) blockstate), model.bake(ms -> {
