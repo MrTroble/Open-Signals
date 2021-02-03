@@ -123,11 +123,6 @@ public class SignalCustomModel implements IModel {
 		this.register(name, state, 0, yOffset, 0, strings);
 	}
 
-
-	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z) {
-		this.register(name, state, x, y, z);
-	}
-
 	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z, @Nullable String... strings) {
 		IModel m = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
 				"Couldn't find " + name);
