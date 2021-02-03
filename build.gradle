@@ -30,6 +30,11 @@ curseforge {
     id = '440990'
     changelog = file('changelog.txt')
     releaseType = 'beta'
+    mainArtifact(jar) {
+      relations {
+        optionalDependency 'opencomputers'
+      }
+    }
   }
 }
 
