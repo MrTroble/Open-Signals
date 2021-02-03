@@ -39,84 +39,90 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class SignalBlock extends Block implements ITileEntityProvider {
-	
+
 	public static enum SignalAngel implements IStringSerializable {
-		ANGEL0,
-		ANGEL22P5, 
-		ANGEL45, 
-		ANGEL67P5, 
-		ANGEL90, 
-		ANGEL112P5,
-		ANGEL135,
-		ANGEL157P5,
-		ANGEL180,
-		ANGEL202P5,
-		ANGEL225,
-		ANGEL247P5,
-		ANGEL270,
-		ANGEL292P5,
-		ANGEL315,
-		ANGEL337P5;
-		
+		ANGEL0(0.000000, 0.000000), ANGEL22P5(0.000000, 0.382683), ANGEL45(0.000000, 0.707107),
+		ANGEL67P5(0.000000, 0.923880), ANGEL90(0.000000, 1.000000), ANGEL112P5(0.076120, 1.000000),
+		ANGEL135(0.292893, 1.000000), ANGEL157P5(0.617317, 1.000000), ANGEL180(1.000000, 1.000000),
+		ANGEL202P5(0.382683, 0.000000), ANGEL225(0.707107, 0.000000), ANGEL247P5(0.923880, 0.000000),
+		ANGEL270(1.000000, 0.000000), ANGEL292P5(0.923880, 0.000000), ANGEL315(0.707107, 0.000000),
+		ANGEL337P5(0.382683, 0.000000);
+
+		private final float x;
+		private final float y;
+
+		private SignalAngel(double x, double y) {
+			this.x = (float) x;
+			this.y = (float) y;
+		}
+
 		@Override
 		public String getName() {
 			return this.name().toLowerCase();
 		}
-		
+
 		public float getAngel() {
 			return this.ordinal() * 22.5f;
 		}
+
+		public float getX() {
+			return x;
+		}
+
+		public float getY() {
+			return y;
+		}
 	}
-	
+
 	public static final ArrayList<SignalBlock> SIGNALLIST = new ArrayList<SignalBlock>();
 
 	public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel", SignalAngel.class);
-	public static final SEProperty<Boolean> CUSTOMNAME = SEProperty.of("customname", false, ChangeableStage.AUTOMATICSTAGE);
+	public static final SEProperty<Boolean> CUSTOMNAME = SEProperty.of("customname", false,
+			ChangeableStage.AUTOMATICSTAGE);
 
 	private final int ID;
 	private final int height;
 
 	private final String signalTypeName;
-	
+
 	public SignalBlock(String signalTypeName, int height) {
 		super(Material.ROCK);
 		this.signalTypeName = signalTypeName;
 		setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
 		ID = SIGNALLIST.size();
 		SIGNALLIST.add(this);
-		this.height =height;
+		this.height = height;
 	}
-	
+
 	@Override
-    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
-    {
-    }
-	
+	public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {
+	}
+
 	private static AxisAlignedBB BOUNDING_BOX = FULL_BLOCK_AABB.expand(0, 6, 0);
-	
+
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		return BOUNDING_BOX;
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
 		return getBoundingBox(blockState, worldIn, pos);
 	}
-	
+
 	public static ItemStack pickBlock(EntityPlayer player) {
 		// Compatibility issues with other mods ...
-		if(!Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown()) return ItemStack.EMPTY;
-        for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k)
-        {
-        	if(player.inventory.getStackInSlot(k).getItem().equals(GIRItems.PLACEMENT_TOOL)) {
-        		player.inventory.currentItem = k;
-        		return ItemStack.EMPTY;
-        	}
-        }
+		if (!Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown())
+			return ItemStack.EMPTY;
+		for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k) {
+			if (player.inventory.getStackInSlot(k).getItem().equals(GIRItems.PLACEMENT_TOOL)) {
+				player.inventory.currentItem = k;
+				return ItemStack.EMPTY;
+			}
+		}
 		return new ItemStack(GIRItems.PLACEMENT_TOOL);
 	}
-	
+
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
 			EntityPlayer player) {
@@ -126,8 +132,8 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
 			float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-		float fl = placer.getMirroredYaw(Mirror.FRONT_BACK);
-		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[(int)(fl/22.5f)]);
+		int x = Math.abs((int) (placer.rotationYaw / 22.5f)) % 16;
+		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[x]);
 	}
 
 	@Override
@@ -221,12 +227,12 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		return new ExtendedBlockState(this, new IProperty<?>[] { ANGEL },
 				prop.toArray(new IUnlistedProperty[prop.size()]));
 	}
-	
+
 	@Override
 	public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id, int param) {
 		return true;
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new SignalTileEnity();
@@ -239,14 +245,14 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	public int getID() {
 		return ID;
 	}
-	
+
 	@Override
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
 		super.breakBlock(worldIn, pos, state);
-		
+
 		GhostBlock.destroyUpperBlock(worldIn, pos);
 	}
-	
+
 	public int getHeight(NBTTagCompound comp) {
 		return height;
 	}

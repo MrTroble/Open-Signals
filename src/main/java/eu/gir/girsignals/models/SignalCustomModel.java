@@ -69,7 +69,10 @@ public class SignalCustomModel implements IModel {
 			modelCache.forEach((pr, m) -> {
 				final IModel model = m.first();
 				final ModelBlock mdl = model.asVanillaModel().orElse(null);
-				final TRSRTransformation baseState = new TRSRTransformation(m.second(), null, null, null);
+				Vector3f f = m.second();
+				f.x += angel.getX();
+				f.z += angel.getY();
+				final TRSRTransformation baseState = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(f, null, null, null));
 
 				if (mdl != null) {
 					if (mdl.getElements().isEmpty())
