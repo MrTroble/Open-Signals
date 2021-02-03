@@ -60,7 +60,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		public String getName() {
 			return this.name().toLowerCase();
 		}
-
+		
 		public float getAngel() {
 			return this.ordinal() * 22.5f;
 		}
