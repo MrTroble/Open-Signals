@@ -21,6 +21,9 @@ import eu.gir.girsignals.blocks.SignalHV;
 import eu.gir.girsignals.blocks.SignalKS;
 import eu.gir.girsignals.blocks.SignalSHLight;
 import eu.gir.girsignals.blocks.SignalTram;
+import net.minecraft.client.renderer.block.model.BuiltInModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.block.model.ItemOverrideList;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -331,11 +334,13 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 	public boolean accepts(ResourceLocation modelLocation) {
 		if (!modelLocation.getResourceDomain().equals(GirsignalsMain.MODID))
 			return false;
-		return registeredModels.containsKey(modelLocation.getResourcePath());
+		return registeredModels.containsKey(modelLocation.getResourcePath()) || modelLocation.getResourcePath().equals("ghostblock");
 	}
 
 	@Override
 	public IModel loadModel(ResourceLocation modelLocation) throws Exception {
+		if(modelLocation.getResourcePath().equals("ghostblock"))
+			return (state, format, bak) -> new BuiltInModel(ItemCameraTransforms.DEFAULT, ItemOverrideList.NONE);
 		ModelResourceLocation mrl = (ModelResourceLocation) modelLocation;
 		String[] strs = mrl.getVariant().split("=");
 		if(strs.length < 2)
