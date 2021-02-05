@@ -80,13 +80,11 @@ public class SignalCustomModel implements IModel {
 				final IModel model = m.first();
 				final ModelBlock mdl = model.asVanillaModel().orElse(null);
 				final Vector3f f = m.second();
-				f.x += angel.getX();
-				f.z += angel.getY();
 				final TRSRTransformation baseState = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(f, null, null, null));
 
 				if (mdl != null) {
 					mdl.getElements().forEach(bp -> {
-						final BlockPartRotation prt = bp.partRotation == null ? new BlockPartRotation(new org.lwjgl.util.vector.Vector3f(), Axis.Y,
+						final BlockPartRotation prt = bp.partRotation == null ? new BlockPartRotation(new org.lwjgl.util.vector.Vector3f(0.5f, 0.5f, 0.5f), Axis.Y,
 								angel.getAngel(), false) : new BlockPartRotation(bp.partRotation.origin, Axis.Y, angel.getAngel(), false);
 						try {
 							rotationField.set(bp, prt);

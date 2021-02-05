@@ -41,20 +41,12 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 public class SignalBlock extends Block implements ITileEntityProvider {
 
 	public static enum SignalAngel implements IStringSerializable {
-		ANGEL0(0.000000, 0.000000), ANGEL22P5(0.000000, 0.382683), ANGEL45(0.000000, 0.707107),
-		ANGEL67P5(0.000000, 0.923880), ANGEL90(0.000000, 1.000000), ANGEL112P5(0.076120, 1.000000),
-		ANGEL135(0.292893, 1.000000), ANGEL157P5(0.617317, 1.000000), ANGEL180(1.000000, 1.000000),
-		ANGEL202P5(0.382683, 0.000000), ANGEL225(0.707107, 0.000000), ANGEL247P5(0.923880, 0.000000),
-		ANGEL270(1.000000, 0.000000), ANGEL292P5(0.923880, 0.000000), ANGEL315(0.707107, 0.000000),
-		ANGEL337P5(0.382683, 0.000000);
-
-		private final float x;
-		private final float y;
-
-		private SignalAngel(double x, double y) {
-			this.x = (float) x;
-			this.y = (float) y;
-		}
+		ANGEL0, ANGEL22P5, ANGEL45,
+		ANGEL67P5, ANGEL90, ANGEL112P5,
+		ANGEL135, ANGEL157P5, ANGEL180,
+		ANGEL202P5, ANGEL225, ANGEL247P5,
+		ANGEL270, ANGEL292P5, ANGEL315,
+		ANGEL337P5;
 
 		@Override
 		public String getName() {
@@ -63,14 +55,6 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		
 		public float getAngel() {
 			return this.ordinal() * 22.5f;
-		}
-
-		public float getX() {
-			return x;
-		}
-
-		public float getY() {
-			return y;
 		}
 	}
 
@@ -132,7 +116,9 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
 			float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+		System.out.println(placer.rotationYaw);
 		int x = Math.abs((int) (placer.rotationYaw / 22.5f)) % 16;
+		System.out.println(x);
 		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[x]);
 	}
 
