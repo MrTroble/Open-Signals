@@ -13,6 +13,7 @@ import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -70,7 +71,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 		this.readFromNBT(pkt.getNbtCompound());
-		onLink();
+		if(hasLinkImpl())
+			onLink();
 	}
 
 	@Override
@@ -179,7 +181,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		SignalBlock block = (SignalBlock) blockstate.getBlock();
 		SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
 		tile.setProperty(prop, prop.getObjFromID(newSignal));
-		world.markAndNotifyBlock(linkedSignalPosition, null, blockstate, blockstate, 3);
+		Minecraft.getMinecraft().addScheduledTask(() -> world.markAndNotifyBlock(linkedSignalPosition, null, blockstate, blockstate, 3));
 		return true;
 	}
 

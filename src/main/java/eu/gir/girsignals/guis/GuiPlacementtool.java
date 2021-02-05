@@ -4,9 +4,11 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 
+import org.lwjgl.opengl.GL11;
+
+import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.init.GIRNetworkHandler;
@@ -19,6 +21,7 @@ import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
@@ -230,7 +233,9 @@ public class GuiPlacementtool extends GuiScreen {
 			i++;
 		}
 
+		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
+		model.get().finishDrawing();
 	}
 
 	@Override

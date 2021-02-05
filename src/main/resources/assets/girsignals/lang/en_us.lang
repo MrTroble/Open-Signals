@@ -71,3 +71,10 @@ property.signaltram.desc=
 property.signalcar.desc=
 
 btn.apply=Apply
+
+property.up.name=Up
+property.down.name=Down
+property.north.name=North
+property.south.name=South
+property.west.name=West
+property.east.name=East
