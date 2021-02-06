@@ -3,6 +3,7 @@ package eu.gir.girsignals.guis;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.FloatBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
@@ -37,7 +38,6 @@ import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.config.GuiUtils;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
-import scala.actors.threadpool.Arrays;
 
 public class GuiSignalController extends GuiScreen implements GuiResponder {
 
@@ -216,8 +216,6 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 	private BufferBuilder builder = null;
 
 	private void initRedstone() {
-		for (EnumFacing face : EnumFacing.VALUES) {
-		}
 	}
 
 	private void initScripting() {

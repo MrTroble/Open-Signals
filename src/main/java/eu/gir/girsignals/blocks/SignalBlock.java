@@ -116,9 +116,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
 			float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-		System.out.println(placer.rotationYaw);
 		int x = Math.abs((int) (placer.rotationYaw / 22.5f)) % 16;
-		System.out.println(x);
 		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[x]);
 	}
 
