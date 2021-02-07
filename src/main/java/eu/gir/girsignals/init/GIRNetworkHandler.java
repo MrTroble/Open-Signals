@@ -7,9 +7,11 @@ import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -32,26 +34,31 @@ public class GIRNetworkHandler {
 	public void onCustomPacket(ServerCustomPacketEvent event) {
 		FMLProxyPacket packet = event.getPacket();
 		ByteBuf payBuf = packet.payload();
+		EntityPlayerMP mp = ((NetHandlerPlayServer) event.getHandler()).player;
+		World world = mp.world;
+		MinecraftServer server = mp.getServer();
 		byte id = payBuf.readByte();
 		switch (id) {
 		case PLACEMENT_GUI_SET_NBT:
-			readItemNBTSET(payBuf, ((NetHandlerPlayServer) event.getHandler()).player);
+			readItemNBTSET(payBuf, mp);
 			break;
 		case PLACEMENT_GUI_MANUELL_SET:
-			readManuellSet(payBuf, ((NetHandlerPlayServer)event.getHandler()).player.world);
+			readManuellSet(payBuf, world, server);
 			break;
 		default:
 			throw new IllegalArgumentException("Wrong packet ID in network recive!");
 		}
 	}
 	
-	private static void readManuellSet(ByteBuf payBuf, World world) {
-		BlockPos pos = new BlockPos(payBuf.readInt(), payBuf.readInt(), payBuf.readInt());
-		SignalControllerTileEntity tile = (SignalControllerTileEntity) world.getTileEntity(pos);
+	private static void readManuellSet(ByteBuf payBuf, World world, MinecraftServer server) {
+		final BlockPos pos = new BlockPos(payBuf.readInt(), payBuf.readInt(), payBuf.readInt());
+		final SignalControllerTileEntity tile = (SignalControllerTileEntity) world.getTileEntity(pos);
 		if(tile != null) {
 			int size = payBuf.readInt();
 			for (int i = 0; i < size; i++) {
-				tile.changeSignalImpl(payBuf.readInt(), payBuf.readInt());
+				final int type = payBuf.readInt();
+				final int change = payBuf.readInt();
+				server.addScheduledTask(() -> tile.changeSignalImpl(type, change));
 			}
 		}
 	}
