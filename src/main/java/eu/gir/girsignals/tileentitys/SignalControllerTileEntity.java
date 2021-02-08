@@ -26,7 +26,7 @@ import net.minecraftforge.fml.common.Optional;
 public class SignalControllerTileEntity extends TileEntity implements SimpleComponent {
 
 	private BlockPos linkedSignalPosition = null;
-	private Integer[] listOfSupportedIndicies;
+	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
 
 	private static final String ID_X = "xLinkedPos";
@@ -79,14 +79,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return writeToNBT(new NBTTagCompound());
 	}
 
-	private void onLink() {
+	public void onLink() {
 		IBlockState state = world.getBlockState(linkedSignalPosition);
 		Block block = state.getBlock();
 		if (!(block instanceof SignalBlock)) {
 			unlink();
 			return;
 		}
-		System.out.println(world.isRemote);
 
 		SignalBlock b = (SignalBlock) block;
 
@@ -96,8 +95,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 					if (prop instanceof SEProperty && ((SEProperty<?>) prop).isChangabelAtStage(ChangeableStage.APISTAGE))
 						supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop));
 				}));
-		listOfSupportedIndicies = supportedSignaleStates.values().toArray(new Integer[supportedSignaleStates.size()]);
-
+		listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 		tableOfSupportedSignalTypes = supportedSignaleStates;
 	}
 
@@ -152,13 +150,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return new Object[] { tableOfSupportedSignalTypes };
 	}
 
-	public Integer[] getSupportedSignalTypesImpl() {
+	public int[] getSupportedSignalTypesImpl() {
 		if (!hasLinkImpl())
-			return new Integer[] {};
+			return new int[] {};
 		return listOfSupportedIndicies;
 	}
 
-	public static boolean find(Integer[] arr, int i) {
+	public static boolean find(int[] arr, int i) {
 		for (int x : arr)
 			if (x == i)
 				return true;

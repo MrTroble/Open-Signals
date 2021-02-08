@@ -59,7 +59,8 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 			this.state = null;
 			this.block = null;
 			return;
-		}
+		}		
+		this.tile.onLink();
 		this.state = world.getBlockState(this.tile.getLinkedPosition());
 		this.block = (SignalBlock) state.getBlock();
 	}
