@@ -9,6 +9,7 @@ import java.util.Date;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.internal.Streams;
@@ -50,7 +51,10 @@ public class NetworkDebug {
 		if(json == null)
 			return;
 		JsonObject obj = combine(compound, additionalInfo);
-		obj.addProperty("Client", world.isRemote);
+		if(world != null)
+			obj.addProperty("Client", world.isRemote);
+		else
+			obj.add("Client", JsonNull.INSTANCE);
 		obj.addProperty("Mode", "read");
 		json.add(obj);
 	}
