@@ -16,6 +16,7 @@ import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
@@ -45,6 +46,13 @@ public class NetworkDebug {
 			json = null;
 			sender.sendMessage(new TextComponentString("Saved Logging and Stoped!"));
 		}
+	}
+	
+	public static void mark(ICommandSender sender) throws WrongUsageException {
+		if(json == null)
+			throw new WrongUsageException("Logging not running!");
+		sender.sendMessage(new TextComponentString("Set mark!"));
+		json.add("===================MARK===================");
 	}
 	
 	public static void networkReadHook(NBTTagCompound compound, World world, Object additionalInfo) {

@@ -1,9 +1,10 @@
 package eu.gir.girsignals;
 
+import static eu.gir.girsignals.debug.Debug.DEBUG;
+import static eu.gir.girsignals.debug.Debug.INSTANCE;
+import static eu.gir.girsignals.debug.Debug.SUBCOMMANDS;
+
 import eu.gir.girsignals.debug.NetworkDebug;
-
-import static eu.gir.girsignals.debug.Debug.*;
-
 import eu.gir.girsignals.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -50,6 +51,7 @@ public class GirsignalsMain {
 			return;
 		SUBCOMMANDS.clear();
 		SUBCOMMANDS.put("network", NetworkDebug::trigger);
+		SUBCOMMANDS.put("networkmark", NetworkDebug::mark);
 		event.registerServerCommand(INSTANCE);
 	}
 
