@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.debug.NetworkDebug;
 import eu.gir.girsignals.init.GIRBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -39,7 +40,9 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		if (formatCustomName != null)
 			comp.setString(CUSTOMNAME, formatCustomName);
 		compound.setTag(PROPERTIES, comp);
-		return super.writeToNBT(compound);
+		super.writeToNBT(compound);
+		NetworkDebug.networkWriteHook(compound, world, this);
+		return compound;
 	}
 
 	private NBTTagCompound __tmp = null;
@@ -47,12 +50,12 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
+		super.readFromNBT(compound);
 		if (world == null) {
 			__tmp = comp.copy();
 		} else {
 			read(comp);
 		}
-		super.readFromNBT(compound);
 	}
 
 	private void read(NBTTagCompound comp) {

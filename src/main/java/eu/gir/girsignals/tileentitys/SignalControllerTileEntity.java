@@ -6,6 +6,7 @@ import java.util.Map;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.debug.NetworkDebug;
 import eu.gir.girsignals.items.Linkingtool;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -54,12 +55,15 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		super.readFromNBT(compound);
 		if(world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
+		NetworkDebug.networkReadHook(compound, world, this);
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		writeBlockPosToNBT(linkedSignalPosition, compound);
-		return super.writeToNBT(compound);
+		super.writeToNBT(compound);
+		NetworkDebug.networkWriteHook(compound, world, this);
+		return compound;
 	}
 	
 	@Override
