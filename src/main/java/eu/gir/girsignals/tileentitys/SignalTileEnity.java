@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.gson.JsonPrimitive;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.SignalBlock;
@@ -67,6 +68,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 				});
 		if (comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));
+		NetworkDebug.networkReadHook(comp, world, new Object[] { this, new JsonPrimitive(__tmp == null) } );
 	}
 
 	@Override

@@ -10,30 +10,17 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-@EventBusSubscriber
 public class Debug extends CommandBase {
 
-	public static final boolean DEBUG = false;
+	public static final boolean DEBUG = true;
 
 	public static final HashMap<String, Runnable> SUBCOMMANDS = new HashMap<>();
 
 	private Debug() {
 	}
 
-	private static final Debug INSTANCE = new Debug();
-
-	@SubscribeEvent
-	public static void register(FMLServerStartingEvent event) {
-		if (!DEBUG)
-			return;
-		SUBCOMMANDS.clear();
-		SUBCOMMANDS.put("network", NetworkDebug::trigger);
-		event.registerServerCommand(INSTANCE);
-	}
+	public static final Debug INSTANCE = new Debug();
 
 	@Override
 	public String getName() {

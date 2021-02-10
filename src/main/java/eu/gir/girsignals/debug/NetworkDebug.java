@@ -28,7 +28,7 @@ public class NetworkDebug {
 			json = new JsonArray();
 		} else {
 			@SuppressWarnings("deprecation")
-			Path path = Paths.get("NetworkLog " + new Date().toLocaleString());
+			Path path = Paths.get("NetworkLog " + new Date().toLocaleString().replace(":", "-") + ".json");
 			try {
 				JsonWriter writer = new JsonWriter(Files.newBufferedWriter(path));
 				writer.setIndent("    ");
