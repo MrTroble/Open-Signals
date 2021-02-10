@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import io.netty.util.internal.shaded.org.jctools.queues.MessagePassingQueue.Consumer;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -15,7 +16,7 @@ public class Debug extends CommandBase {
 
 	public static final boolean DEBUG = true;
 
-	public static final HashMap<String, Runnable> SUBCOMMANDS = new HashMap<>();
+	public static final HashMap<String, Consumer<ICommandSender>> SUBCOMMANDS = new HashMap<>();
 
 	private Debug() {
 	}
@@ -39,13 +40,13 @@ public class Debug extends CommandBase {
 		String name = args[0];
 		if (!SUBCOMMANDS.containsKey(name))
 			throw new WrongUsageException("Subcommand does not exist!");
-		SUBCOMMANDS.get(name).run();
+		SUBCOMMANDS.get(name).accept(sender);
 	}
 
 	@Override
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
 			BlockPos targetPos) {
-		if (args.length < 1)
+		if (args.length < 2)
 			return new ArrayList<>(SUBCOMMANDS.keySet());
 		return super.getTabCompletions(server, sender, args, targetPos);
 	}

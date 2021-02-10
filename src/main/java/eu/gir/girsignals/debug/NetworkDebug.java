@@ -14,7 +14,9 @@ import com.google.gson.JsonParser;
 import com.google.gson.internal.Streams;
 import com.google.gson.stream.JsonWriter;
 
+import net.minecraft.command.ICommandSender;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 public class NetworkDebug {
@@ -23,9 +25,10 @@ public class NetworkDebug {
 	private static final Gson GSON = new Gson();
 	private static final JsonParser PARSER = new JsonParser();
 
-	public static void trigger() {
+	public static void trigger(ICommandSender sender) {
 		if(json == null) {
 			json = new JsonArray();
+			sender.sendMessage(new TextComponentString("Started Logging!"));
 		} else {
 			@SuppressWarnings("deprecation")
 			Path path = Paths.get("NetworkLog " + new Date().toLocaleString().replace(":", "-") + ".json");
@@ -39,6 +42,7 @@ public class NetworkDebug {
 				return;
 			}
 			json = null;
+			sender.sendMessage(new TextComponentString("Saved Logging and Stoped!"));
 		}
 	}
 	
