@@ -21,6 +21,7 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
  		String display = te.getDisplayName().getFormattedText();
  		FontRenderer font = getFontRenderer();
  		
+ 		GlStateManager.enableAlpha();
  		GlStateManager.pushMatrix();
  		GlStateManager.translate(x + 0.5f, y + te.getCustomNameRenderHeight(), z + 0.5f);
  		GlStateManager.scale(0.015f, -0.015f, 0.015f);
