@@ -6,6 +6,7 @@ import java.util.Map;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.debug.NetworkDebug;
 import eu.gir.girsignals.items.Linkingtool;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -13,7 +14,6 @@ import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.Optional;
 public class SignalControllerTileEntity extends TileEntity implements SimpleComponent {
 
 	private BlockPos linkedSignalPosition = null;
-	private Integer[] listOfSupportedIndicies;
+	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
 
 	private static final String ID_X = "xLinkedPos";
@@ -55,12 +55,15 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		super.readFromNBT(compound);
 		if(world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
+		NetworkDebug.networkReadHook(compound, world, this);
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		writeBlockPosToNBT(linkedSignalPosition, compound);
-		return super.writeToNBT(compound);
+		super.writeToNBT(compound);
+		NetworkDebug.networkWriteHook(compound, world, this);
+		return compound;
 	}
 	
 	@Override
@@ -80,14 +83,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return writeToNBT(new NBTTagCompound());
 	}
 
-	private void onLink() {
+	public void onLink() {
 		IBlockState state = world.getBlockState(linkedSignalPosition);
 		Block block = state.getBlock();
 		if (!(block instanceof SignalBlock)) {
 			unlink();
 			return;
 		}
-		System.out.println(world.isRemote);
 
 		SignalBlock b = (SignalBlock) block;
 
@@ -97,8 +99,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 					if (prop instanceof SEProperty && ((SEProperty<?>) prop).isChangabelAtStage(ChangeableStage.APISTAGE))
 						supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop));
 				}));
-		listOfSupportedIndicies = supportedSignaleStates.values().toArray(new Integer[supportedSignaleStates.size()]);
-
+		listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 		tableOfSupportedSignalTypes = supportedSignaleStates;
 	}
 
@@ -153,13 +154,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return new Object[] { tableOfSupportedSignalTypes };
 	}
 
-	public Integer[] getSupportedSignalTypesImpl() {
+	public int[] getSupportedSignalTypesImpl() {
 		if (!hasLinkImpl())
-			return new Integer[] {};
+			return new int[] {};
 		return listOfSupportedIndicies;
 	}
 
-	public static boolean find(Integer[] arr, int i) {
+	public static boolean find(int[] arr, int i) {
 		for (int x : arr)
 			if (x == i)
 				return true;
@@ -181,7 +182,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		SignalBlock block = (SignalBlock) blockstate.getBlock();
 		SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
 		tile.setProperty(prop, prop.getObjFromID(newSignal));
-		Minecraft.getMinecraft().addScheduledTask(() -> world.markAndNotifyBlock(linkedSignalPosition, null, blockstate, blockstate, 3));
+		world.markAndNotifyBlock(linkedSignalPosition, null, blockstate, blockstate, 3);
 		return true;
 	}
 

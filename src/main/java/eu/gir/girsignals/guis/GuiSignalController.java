@@ -34,6 +34,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.client.config.GuiUtils;
@@ -47,19 +48,21 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 	private final HashMap<SEProperty<?>, Integer> properties = new HashMap<>();
 	private final BlockPos pos;
 	private final World world;
+	private final IBlockState state;
 
 	public GuiSignalController(BlockPos pos, World world) {
 		this.pos = pos;
 		this.world = world;
 		this.tile = (SignalControllerTileEntity) world.getTileEntity(pos);
+		Arrays.fill(RSMODES, RedstoneMode.SINGEL);
 		if (!this.tile.hasLinkImpl()) {
+			this.state = null;
 			this.block = null;
 			return;
-		}
-		IBlockState state = world.getBlockState(this.tile.getLinkedPosition());
+		}		
+		this.tile.onLink();
+		this.state = world.getBlockState(this.tile.getLinkedPosition());
 		this.block = (SignalBlock) state.getBlock();
-
-		Arrays.fill(RSMODES, RedstoneMode.SINGEL);
 	}
 
 	public static enum Stages {
@@ -186,17 +189,17 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 	public interface ObjGetter<D> {
 		D getObjFrom(int x);
 	}
-	
+
 	public static class SizeIntegerables<T> implements IIntegerable<T> {
 
 		private final int count;
 		private final ObjGetter<T> getter;
-		
+
 		private SizeIntegerables(final int count, final ObjGetter<T> getter) {
 			this.count = count;
 			this.getter = getter;
 		}
-		
+
 		@Override
 		public T getObjFromID(int obj) {
 			return this.getter.getObjFrom(obj);
@@ -206,13 +209,13 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 		public int count() {
 			return count;
 		}
-		
+
 		public static <T> IIntegerable<T> of(final int count, final ObjGetter<T> get) {
 			return new SizeIntegerables<T>(count, get);
 		}
-		
+
 	}
-	
+
 	private BufferBuilder builder = null;
 
 	private void initRedstone() {
@@ -253,13 +256,13 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 			DrawUtil.draw(builder);
 
 			Matrix4f matrix = new Matrix4f();
-			Matrix4f.setIdentity(matrix);
-			matrix.scale(new Vector3f(scale, -scale, scale));
+			//matrix.load(floatbuff);
+			matrix.setIdentity();
+			//matrix.scale(new Vector3f(scale, -scale, scale));
 			matrix.rotate(rotateY, new Vector3f(1, 0, 0));			
 			matrix.rotate(rotateX, new Vector3f(0, 1, 0));
 						
 			Vector4f pvec = new Vector4f((mouseX / (float)this.width) - 0.5f, (mouseY / (float)this.height) - 0.5f, 10, 1);
-			System.out.println(pvec);
 
 			for (EnumFacing face : EnumFacing.VALUES) {
 				Vec3i vec = face.getDirectionVec();
@@ -267,10 +270,10 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 				Vector4f normal = Matrix4f.transform(matrix, new Vector4f(vec.getX(), vec.getY(), vec.getZ(), 1), null);
 				Matrix4f.transform(matrix, spann1, spann1);
 				float b = Vector4f.dot(spann1, normal);
-				System.out.println(b);
-				System.out.println(spann1);
-				System.out.println(normal);
-
+				Vector4f vec2 = new Vector4f(mouseX/width, mouseY/height, 100, 1);
+				Matrix4f.transform(matrix, vec2, vec2);
+				//System.out.println(face);
+				System.out.println(state.collisionRayTrace(world, pos, new Vec3d(vec2.x, vec2.y, vec2.z), new Vec3d(pos).addVector(0.5, 0.5, 0.5)));
 			}
 			GlStateManager.popMatrix();
 			GlStateManager.disableRescaleNormal();
