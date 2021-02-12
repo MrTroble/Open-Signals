@@ -28,7 +28,7 @@ curseforge {
   apiKey = key
   project {
     id = '440990'
-    changelog = file('changelog.txt')
+    changelog = file('changelog.md')
     releaseType = 'beta'
     mainArtifact(jar) {
       relations {

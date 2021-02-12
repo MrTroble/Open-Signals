@@ -87,7 +87,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		IBlockState state = world.getBlockState(linkedSignalPosition);
 		Block block = state.getBlock();
 		if (!(block instanceof SignalBlock)) {
-			unlink();
+			if(!world.isRemote)
+				unlink();
 			return;
 		}
 

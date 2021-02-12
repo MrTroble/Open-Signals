@@ -263,6 +263,9 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 			matrix.rotate(rotateX, new Vector3f(0, 1, 0));
 						
 			Vector4f pvec = new Vector4f((mouseX / (float)this.width) - 0.5f, (mouseY / (float)this.height) - 0.5f, 10, 1);
+			
+			Vec3d pvec2 = new Vec3d((mouseX / (float)this.width) - 0.5f, (mouseY / (float)this.height) - 0.5f, -10);
+			Vec3d pvec3 = new Vec3d((mouseX / (float)this.width) - 0.5f, (mouseY / (float)this.height) - 0.5f, 10);
 
 			for (EnumFacing face : EnumFacing.VALUES) {
 				Vec3i vec = face.getDirectionVec();
@@ -273,7 +276,7 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 				Vector4f vec2 = new Vector4f(mouseX/width, mouseY/height, 100, 1);
 				Matrix4f.transform(matrix, vec2, vec2);
 				//System.out.println(face);
-				System.out.println(state.collisionRayTrace(world, pos, new Vec3d(vec2.x, vec2.y, vec2.z), new Vec3d(pos).addVector(0.5, 0.5, 0.5)));
+				System.out.println(state.collisionRayTrace(world, pos, pvec2, pvec3));
 			}
 			GlStateManager.popMatrix();
 			GlStateManager.disableRescaleNormal();
