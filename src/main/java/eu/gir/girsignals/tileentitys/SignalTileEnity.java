@@ -132,7 +132,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	@Override
 	public boolean hasCustomName() {
-		return formatCustomName != null;
+		return formatCustomName != null && getCustomNameRenderHeight() != -1;
 	}
 
 	@Override
@@ -153,18 +153,17 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	private float renderHeight = 0;
 
-	@SideOnly(Side.CLIENT)
 	public float getCustomNameRenderHeight() {
 		if (renderHeight == 0) {
-			int id = ((SignalBlock) world.getBlockState(pos).getBlock()).getID();
-			if (id == GIRBlocks.HV_SIGNAL.getID())
-				renderHeight = 2.775f;
-			else if (id == GIRBlocks.HL_SIGNAL.getID())
-				renderHeight = 1.15f;
-			else if (id == GIRBlocks.KS_SIGNAL.getID())
-				renderHeight = 4.95f;
-			else
-				throw new IllegalArgumentException("Signal has not been added to the height list!");
+			renderHeight = ((SignalBlock) world.getBlockState(pos).getBlock()).getCustomnameRenderHeight();
+//			if (id == GIRBlocks.HV_SIGNAL.getID())
+//				renderHeight = 2.775f;
+//			else if (id == GIRBlocks.HL_SIGNAL.getID())
+//				renderHeight = 1.15f;
+//			else if (id == GIRBlocks.KS_SIGNAL.getID())
+//				renderHeight = 4.95f;
+//			else
+//				throw new IllegalArgumentException("Signal has not been added to the height list!");
 		}
 		return renderHeight;
 	}

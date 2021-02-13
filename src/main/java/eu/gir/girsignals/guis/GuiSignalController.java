@@ -34,6 +34,7 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
@@ -227,6 +228,18 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 
 	private float rotateY = 0, rotateX = 0, lastX = 0, lastY = 0, amountScrolled = 0;
 
+	private void test(int mouseX, int mouseY) {
+		double ver = this.width/(float)this.height;
+		double d1 = (mouseX / (float)this.width) -0.5;
+		double d2 = (mouseY / (float)this.height) * ver -0.5;
+		Vec3d pvec2 = new Vec3d(d1, d2, -10);
+		Vec3d pvec3 = new Vec3d(d1, d2, 10);
+		RayTraceResult result = state.collisionRayTrace(world, pos, pvec2.add(new Vec3d(pos)), pvec3.add(new Vec3d(pos)));
+		if(result != null) {
+			drawGradientRect(mouseX, mouseY, mouseX + 4, mouseY + 4, 0xFFFFFFFF, 0xFFFFFFFF);
+		}
+	}
+	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		this.drawDefaultBackground();
@@ -237,6 +250,12 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 			
 			GlStateManager.enableRescaleNormal();
 			GlStateManager.pushMatrix();
+			for (int i = 0; i < this.width; i++) {
+				for (int j = 0; j < this.height; j++) {
+					test(i, j);
+				}
+			}
+
 			GlStateManager.translate((float) this.width * 0.5f, (float) this.height * 0.5f, 100);
 			float scale = 32.0F + amountScrolled;
 			GlStateManager.scale(scale, -scale, scale);
@@ -264,9 +283,6 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 						
 			Vector4f pvec = new Vector4f((mouseX / (float)this.width) - 0.5f, (mouseY / (float)this.height) - 0.5f, 10, 1);
 			
-			Vec3d pvec2 = new Vec3d((mouseX / (float)this.width) - 0.5f, (mouseY / (float)this.height) - 0.5f, -10);
-			Vec3d pvec3 = new Vec3d((mouseX / (float)this.width) - 0.5f, (mouseY / (float)this.height) - 0.5f, 10);
-
 			for (EnumFacing face : EnumFacing.VALUES) {
 				Vec3i vec = face.getDirectionVec();
 				Vector4f spann1 = new Vector4f(vec.getX() == 0 ? 1000:0, vec.getY() == 0 ? 1000:0, vec.getZ() == 0 ? 1000:0, 1);
@@ -276,7 +292,7 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 				Vector4f vec2 = new Vector4f(mouseX/width, mouseY/height, 100, 1);
 				Matrix4f.transform(matrix, vec2, vec2);
 				//System.out.println(face);
-				System.out.println(state.collisionRayTrace(world, pos, pvec2, pvec3));
+				//System.out.println();
 			}
 			GlStateManager.popMatrix();
 			GlStateManager.disableRescaleNormal();

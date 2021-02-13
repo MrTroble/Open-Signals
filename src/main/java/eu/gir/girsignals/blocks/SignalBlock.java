@@ -37,6 +37,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SignalBlock extends Block implements ITileEntityProvider {
 
@@ -68,14 +70,20 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	private final int height;
 
 	private final String signalTypeName;
+	private final float customNameRenderHeight;
 
 	public SignalBlock(String signalTypeName, int height) {
+		this(signalTypeName, height, -1);
+	}
+	
+	public SignalBlock(String signalTypeName, int height, float customNameRenderHeight) {
 		super(Material.ROCK);
 		this.signalTypeName = signalTypeName;
 		setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
 		ID = SIGNALLIST.size();
 		SIGNALLIST.add(this);
 		this.height = height;
+		this.customNameRenderHeight = customNameRenderHeight;
 	}
 
 	@Override
@@ -207,7 +215,8 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 				}
 			}
 		}
-		prop.add(CUSTOMNAME);
+		if(customNameRenderHeight != -1)
+			prop.add(CUSTOMNAME);
 		return new ExtendedBlockState(this, new IProperty<?>[] { ANGEL },
 				prop.toArray(new IUnlistedProperty[prop.size()]));
 	}
@@ -239,5 +248,14 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 
 	public int getHeight(NBTTagCompound comp) {
 		return height;
+	}
+	
+	public boolean canHaveCustomname() {
+		return customNameRenderHeight != -1;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public float getCustomnameRenderHeight() {
+		return customNameRenderHeight;
 	}
 }
