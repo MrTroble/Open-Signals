@@ -90,11 +90,12 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {
 	}
 
-	private static AxisAlignedBB BOUNDING_BOX = FULL_BLOCK_AABB.expand(0, 6, 0);
-
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		return BOUNDING_BOX;
+		IExtendedBlockState ebs = (IExtendedBlockState) this.getExtendedState(state, source, pos);
+		NBTTagCompound comp = new NBTTagCompound();
+		ebs.getUnlistedProperties().forEach((prop, opt) -> comp.setBoolean(prop.getName(), opt.isPresent()));
+		return FULL_BLOCK_AABB.expand(0, getHeight(comp), 0);
 	}
 
 	@Override
