@@ -9,7 +9,7 @@ import eu.gir.girsignals.SEProperty.ChangeableStage;
 public class SignalHV extends SignalBlock {
 
 	public SignalHV() {
-		super("HV", 6);
+		super("HV", 6, 2.775f);
 	}
 
 	public static final SEProperty<HPVR> STOPSIGNAL = SEProperty.of("stopsignal", HPVR.OFF);

@@ -64,7 +64,8 @@ public class GuiPlacementtool extends GuiScreen {
 		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
-		textField.drawTextBox();
+		if(currentSelectedBlock.getCustomnameRenderHeight() != -1)
+			textField.drawTextBox();
 
 		if (dragging) {
 			animationState += mouseX - oldMouse;
@@ -241,7 +242,8 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
-		textField.mouseClicked(mouseX, mouseY, mouseButton);
+		if(currentSelectedBlock.getCustomnameRenderHeight() != -1)
+			textField.mouseClicked(mouseX, mouseY, mouseButton);
 		if (mouseButton == 0) {
 			this.dragging = true;
 			oldMouse = mouseX;
@@ -262,7 +264,8 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		super.keyTyped(typedChar, keyCode);
-		textField.textboxKeyTyped(typedChar, keyCode);
+		if(currentSelectedBlock.getCustomnameRenderHeight() != -1)
+			textField.textboxKeyTyped(typedChar, keyCode);
 	}
 
 }

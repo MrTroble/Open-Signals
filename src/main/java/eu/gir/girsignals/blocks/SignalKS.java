@@ -9,7 +9,7 @@ import eu.gir.girsignals.SEProperty.ChangeableStage;
 public class SignalKS extends SignalBlock {
 
 	public SignalKS() {
-		super("KS", 6);
+		super("KS", 6, 4.95f);
 	}
 
 	public static final SEProperty<KS> STOPSIGNAL = SEProperty.of("kombisignal", KS.OFF);
