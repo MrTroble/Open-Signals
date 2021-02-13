@@ -10,7 +10,6 @@ import com.google.gson.JsonPrimitive;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.debug.NetworkDebug;
-import eu.gir.girsignals.init.GIRBlocks;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -22,8 +21,6 @@ import net.minecraft.world.IWorldNameable;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
@@ -141,6 +138,8 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	}
 
 	public void setCustomName(String str) {
+		if(getCustomNameRenderHeight() == -1)
+			return;
 		this.formatCustomName = str;
 		if (str == null && map.containsKey(SignalBlock.CUSTOMNAME)) {
 			map.remove(SignalBlock.CUSTOMNAME);
@@ -156,14 +155,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public float getCustomNameRenderHeight() {
 		if (renderHeight == 0) {
 			renderHeight = ((SignalBlock) world.getBlockState(pos).getBlock()).getCustomnameRenderHeight();
-//			if (id == GIRBlocks.HV_SIGNAL.getID())
-//				renderHeight = 2.775f;
-//			else if (id == GIRBlocks.HL_SIGNAL.getID())
-//				renderHeight = 1.15f;
-//			else if (id == GIRBlocks.KS_SIGNAL.getID())
-//				renderHeight = 4.95f;
-//			else
-//				throw new IllegalArgumentException("Signal has not been added to the height list!");
 		}
 		return renderHeight;
 	}
