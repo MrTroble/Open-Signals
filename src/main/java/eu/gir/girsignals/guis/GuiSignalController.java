@@ -50,11 +50,13 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 	private final BlockPos pos;
 	private final World world;
 	private final IBlockState state;
+	private final IBlockState ownState;
 
 	public GuiSignalController(BlockPos pos, World world) {
 		this.pos = pos;
 		this.world = world;
 		this.tile = (SignalControllerTileEntity) world.getTileEntity(pos);
+		this.ownState = world.getBlockState(pos);
 		Arrays.fill(RSMODES, RedstoneMode.SINGEL);
 		if (!this.tile.hasLinkImpl()) {
 			this.state = null;
@@ -234,7 +236,7 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 		double d2 = (mouseY / (float)this.height) * ver -0.5;
 		Vec3d pvec2 = new Vec3d(d1, d2, -10);
 		Vec3d pvec3 = new Vec3d(d1, d2, 10);
-		RayTraceResult result = state.collisionRayTrace(world, pos, pvec2.add(new Vec3d(pos)), pvec3.add(new Vec3d(pos)));
+		RayTraceResult result = ownState.collisionRayTrace(world, pos, pvec2.add(new Vec3d(pos)), pvec3.add(new Vec3d(pos)));
 		if(result != null) {
 			drawGradientRect(mouseX, mouseY, mouseX + 4, mouseY + 4, 0xFFFFFFFF, 0xFFFFFFFF);
 		}

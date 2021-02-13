@@ -52,8 +52,9 @@ public class GuiPlacementtool extends GuiScreen {
 		if (comp == null)
 			this.comp = new NBTTagCompound();
 		tool = (Placementtool) stack.getItem();
-		usedBlock = tool.getTransform(this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID));
-		currentSelectedBlock = SignalBlock.SIGNALLIST.get(usedBlock);
+		int signalBlockID = this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID);
+		usedBlock = tool.getTransform(signalBlockID);
+		currentSelectedBlock = SignalBlock.SIGNALLIST.get(signalBlockID);
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 	}
 
@@ -168,6 +169,7 @@ public class GuiPlacementtool extends GuiScreen {
 		addButton(new GUISettingsSlider(tool, -100, (this.width - 150) / 2, 10, 150, "signaltype", this.usedBlock, input -> {
 			if (usedBlock != input) {
 				usedBlock = input;
+				currentSelectedBlock = tool.getObjFromID(usedBlock);
 				initGui();
 			}
 		}));
