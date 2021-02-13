@@ -6,12 +6,12 @@ import java.util.Collection;
 
 import org.lwjgl.opengl.GL11;
 
-import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.init.GIRNetworkHandler;
+import eu.gir.girsignals.items.Placementtool;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.GuiButton;
@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
@@ -44,12 +45,14 @@ public class GuiPlacementtool extends GuiScreen {
 	private BlockModelShapes manager;
 	private SignalBlock currentSelectedBlock;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
-
-	public GuiPlacementtool(NBTTagCompound comp) {
-		this.comp = comp;
+	private Placementtool tool;
+	
+	public GuiPlacementtool(ItemStack stack) {
+		this.comp = stack.getTagCompound();
 		if (comp == null)
 			this.comp = new NBTTagCompound();
-		usedBlock = this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID);
+		tool = (Placementtool) stack.getItem();
+		usedBlock = tool.getTransform(this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID));
 		currentSelectedBlock = SignalBlock.SIGNALLIST.get(usedBlock);
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 	}
@@ -162,21 +165,7 @@ public class GuiPlacementtool extends GuiScreen {
 			}
 		}
 
-		addButton(new GUISettingsSlider(new IIntegerable<String>() {
-
-			@Override
-			public String getObjFromID(int obj) {
-				currentSelectedBlock = SignalBlock.SIGNALLIST.get(obj);
-				ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
-				return currentSelectedBlock.getLocalizedName();
-			}
-
-			@Override
-			public int count() {
-				return SignalBlock.SIGNALLIST.size();
-			}
-
-		}, -100, (this.width - 150) / 2, 10, 150, "signaltype", this.usedBlock, input -> {
+		addButton(new GUISettingsSlider(tool, -100, (this.width - 150) / 2, 10, 150, "signaltype", this.usedBlock, input -> {
 			if (usedBlock != input) {
 				usedBlock = input;
 				initGui();
@@ -190,7 +179,7 @@ public class GuiPlacementtool extends GuiScreen {
 	public void onGuiClosed() {
 		ByteBuf buffer = Unpooled.buffer();
 		buffer.writeByte(GIRNetworkHandler.PLACEMENT_GUI_SET_NBT);
-		buffer.writeInt(usedBlock);
+		buffer.writeInt(tool.getObjFromID(usedBlock).getID());
 		byte[] str = textField.getText().getBytes();
 		buffer.writeInt(str.length);
 		buffer.writeBytes(str);

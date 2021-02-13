@@ -259,4 +259,9 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	public float getCustomnameRenderHeight() {
 		return customNameRenderHeight;
 	}
+	
+	@Override
+	public String toString() {
+		return this.getLocalizedName();
+	}
 }

@@ -1,5 +1,6 @@
 package eu.gir.girsignals.items;
 
+import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -20,9 +21,12 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
-public class Placementtool extends Item {
+public class Placementtool extends Item implements IIntegerable<SignalBlock> {
 
-	public Placementtool() {
+	private SignalBlock[] blocks;
+	
+	public Placementtool(SignalBlock... blocks) {
+		this.blocks = blocks;
 		setCreativeTab(GIRTabs.tab);
 	}
 
@@ -77,6 +81,26 @@ public class Placementtool extends Item {
 			worldIn.notifyBlockUpdate(setPosition, ebs.getBaseState(), ebs.getBaseState(), 3);
 			return EnumActionResult.SUCCESS;
 		}
+	}
+
+	@Override
+	public SignalBlock getObjFromID(int obj) {
+		return blocks[obj];
+	}
+	
+	public int getTransform(int obj) {
+		int x = 0;
+		for (SignalBlock signalBlock : blocks) {
+			if(signalBlock.getID() == obj)
+				return x;
+			x++;
+		}
+		return x;
+	}
+
+	@Override
+	public int count() {
+		return blocks.length;
 	}
 
 }
