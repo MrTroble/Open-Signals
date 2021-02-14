@@ -19,7 +19,7 @@ public class GUIHandler implements IGuiHandler {
 	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z) {
 		switch (ID) {
 		case GUI_PLACEMENTTOOL:
-			return new GuiPlacementtool(player.getHeldItemMainhand().getTagCompound());
+			return new GuiPlacementtool(player.getHeldItemMainhand());
 		case GUI_SIGNAL_CONTROLLER:
 			return new GuiSignalController(new BlockPos(x, y, z), world);
 		default:
