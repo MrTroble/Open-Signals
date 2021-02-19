@@ -135,8 +135,8 @@ public class GuiPlacementtool extends GuiScreen {
 		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 		this.buttonList.clear();
-		ebs = (IExtendedBlockState) SignalBlock.SIGNALLIST.get(usedBlock).getDefaultState();
-		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) SignalBlock.SIGNALLIST.get(usedBlock)
+		ebs = (IExtendedBlockState) tool.getObjFromID(usedBlock).getDefaultState();
+		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) tool.getObjFromID(usedBlock)
 				.getBlockState();
 		Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
 		properties = unlistedProperties.toArray(new IUnlistedProperty[unlistedProperties.size()]);
@@ -170,6 +170,7 @@ public class GuiPlacementtool extends GuiScreen {
 			if (usedBlock != input) {
 				usedBlock = input;
 				currentSelectedBlock = tool.getObjFromID(usedBlock);
+				ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 				initGui();
 			}
 		}));
