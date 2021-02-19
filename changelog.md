@@ -1,5 +1,9 @@
 # Changelog
 
+## [Fixes] 19.02.2021 - 1
+
+* Fixed issue with placement tool leading to game crash
+
 ## [Backend] 14.02.2021 - 1
 
 * Backend changes
