@@ -32,7 +32,6 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
@@ -337,8 +336,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.GREEN)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/lamp_green");
 		});
 		registeredModels.put("lfsignal", cm -> {
+			cm.register("mast_lamps", ebs -> true, 0);
 			for(LF1 lf1 : LF1.values())
-				cm.register("lf1", withN(SignalLF.INDICATOR, lf1::equals), 0, "4", "girsignals:blocks/zs3/n" + lf1.getName().toLowerCase());
+				cm.register("lf1", withN(SignalLF.INDICATOR, lf1::equals), 1, "4", "girsignals:blocks/zs3/n" + lf1.getName().toLowerCase());
 		});
 	}
 

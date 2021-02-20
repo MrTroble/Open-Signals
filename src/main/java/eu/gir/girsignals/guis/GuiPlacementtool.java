@@ -218,10 +218,8 @@ public class GuiPlacementtool extends GuiScreen {
 				}
 			} else if (btn instanceof GUISettingsSlider) {
 				GUISettingsSlider slider = (GUISettingsSlider) btn;
-				if (slider.value != 0) {
-					SEProperty property = (SEProperty) properties[i];
-					ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
-				}
+				SEProperty property = (SEProperty) properties[i];
+				ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
 			}
 			i++;
 		}

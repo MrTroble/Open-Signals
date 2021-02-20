@@ -14,9 +14,12 @@ import eu.gir.girsignals.blocks.SignalLF;
 import eu.gir.girsignals.blocks.SignalSHLight;
 import eu.gir.girsignals.blocks.SignalTram;
 import net.minecraft.block.Block;
+import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -52,6 +55,15 @@ public class GIRBlocks {
 		}
 	}
 
+	@SubscribeEvent
+	public static void addColor(ColorHandlerEvent.Block event) {
+		BlockColors colors = event.getBlockColors();
+		blocksToRegister.forEach(block -> {
+			if(block instanceof IBlockColor)
+				colors.registerBlockColorHandler((IBlockColor)block, block);
+		});
+	}
+	
 	@SubscribeEvent
 	public static void registerBlock(RegistryEvent.Register<Block> event) {
 		IForgeRegistry<Block> registry = event.getRegistry();
