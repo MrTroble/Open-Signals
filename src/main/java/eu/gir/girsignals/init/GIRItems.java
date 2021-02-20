@@ -18,6 +18,7 @@ public class GIRItems {
 	public static final Linkingtool LINKING_TOOL = new Linkingtool();
 	public static final Placementtool PLACEMENT_TOOL = new Placementtool(GIRBlocks.HV_SIGNAL, GIRBlocks.HL_SIGNAL, 
 			GIRBlocks.KS_SIGNAL, GIRBlocks.SH_LIGHT, GIRBlocks.TRAM_SIGNAL);
+	public static final Placementtool SIGN_PLACEMENT_TOOL = new Placementtool(GIRBlocks.LF_SIGNAL);
 	
 	public static ArrayList<Item> registeredItems = new ArrayList<>();
 	

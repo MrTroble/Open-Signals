@@ -4,10 +4,12 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import eu.gir.girsignals.EnumSignals.DefaultName;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import eu.gir.girsignals.EnumSignals.HPVR;
 import eu.gir.girsignals.EnumSignals.KS;
+import eu.gir.girsignals.EnumSignals.LF1;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.Offable;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
@@ -19,6 +21,7 @@ import eu.gir.girsignals.blocks.SignalBlock.SignalAngel;
 import eu.gir.girsignals.blocks.SignalHL;
 import eu.gir.girsignals.blocks.SignalHV;
 import eu.gir.girsignals.blocks.SignalKS;
+import eu.gir.girsignals.blocks.SignalLF;
 import eu.gir.girsignals.blocks.SignalSHLight;
 import eu.gir.girsignals.blocks.SignalTram;
 import net.minecraft.client.renderer.block.model.BuiltInModel;
@@ -77,6 +80,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 	@SuppressWarnings("rawtypes")
 	private static <T extends Offable> Predicate<IExtendedBlockState> with(IUnlistedProperty<T> property, Predicate<T> t) {
 		return new ModelPred<T>(property, t, false);
+	}
+	
+	@SuppressWarnings("rawtypes")
+	private static <T extends DefaultName> Predicate<IExtendedBlockState> withN(IUnlistedProperty<T> property, Predicate<T> t) {
+		return ebs -> t.test(ebs.getValue(property));
 	}
 	
 	private static Predicate<IExtendedBlockState> hasAndIs(IUnlistedProperty<Boolean> property) {
@@ -327,7 +335,10 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			// Car green
 			cm.register("trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.GREEN)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/lamp_green");
 		});
-		
+		registeredModels.put("lfsignal", cm -> {
+			for(LF1 lf1 : LF1.values())
+				cm.register("lf1", withN(SignalLF.INDICATOR, lf1::equals), 0);
+		});
 	}
 
 	@Override
