@@ -338,7 +338,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		});
 		registeredModels.put("lfsignal", cm -> {
 			for(LF1 lf1 : LF1.values())
-				cm.register("lf1", withN(SignalLF.INDICATOR, lf1::equals), 0);
+				cm.register("lf1", withN(SignalLF.INDICATOR, lf1::equals), 0, "4", "girsignals:blocks/zs3/n" + lf1.getName().toLowerCase());
 		});
 	}
 
