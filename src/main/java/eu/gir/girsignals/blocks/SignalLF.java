@@ -15,6 +15,8 @@ public class SignalLF extends SignalBlock implements IBlockColor {
 	}
 
 	public static final SEProperty<LF1> INDICATOR = SEProperty.of("indicator", LF1.Z2, ChangeableStage.GUISTAGE);
+	public static final SEProperty<Boolean> PRESIGNAL = SEProperty.of("presignal", true, ChangeableStage.GUISTAGE);
+	public static final SEProperty<Boolean> LAMPS = SEProperty.of("lamps", true, ChangeableStage.GUISTAGE);
 
 	@Override
 	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {

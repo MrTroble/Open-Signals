@@ -4,10 +4,18 @@
 		"0": "girsignals:blocks/shield_gray",
 		"1": "girsignals:blocks/shield_black",
 		"2": "girsignals:blocks/lf1",
-		"4": "girsignals:blocks/zs3/nz8",
+		"overlay": "girsignals:blocks/zs3/nz8",
 		"particle": "girsignals:blocks/shield_gray"
 	},
 	"elements": [
+		{
+			"name": "overlay",
+			"from": [6.5, 4, 5.99],
+			"to": [9.5, 8, 7],
+			"faces": {
+				"north": {"uv": [0, 0, 5, 7], "texture": "#overlay", "tintindex": 0}
+			}
+		},
 		{
 			"from": [7, 0, 7],
 			"to": [9, 5, 9],
@@ -91,14 +99,6 @@
 				"west": {"uv": [0, 0, 11, 1.5], "texture": "#1"},
 				"up": {"uv": [0, 0, 11, 1.5], "texture": "#1"},
 				"down": {"uv": [0, 0, 11, 1.5], "texture": "#1"}
-			}
-		},
-		{
-			"name": "overlay",
-			"from": [6.5, 4, 5.999],
-			"to": [9.5, 8, 5.999],
-			"faces": {
-				"north": {"uv": [0, 0, 5, 7], "texture": "#4", "tintindex": 0}
 			}
 		}
 	],

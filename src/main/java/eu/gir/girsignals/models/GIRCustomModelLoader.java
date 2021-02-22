@@ -336,9 +336,12 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.GREEN)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/lamp_green");
 		});
 		registeredModels.put("lfsignal", cm -> {
-			cm.register("mast_lamps", ebs -> true, 0);
-			for(LF1 lf1 : LF1.values())
-				cm.register("lf1", withN(SignalLF.INDICATOR, lf1::equals), 1, "4", "girsignals:blocks/zs3/n" + lf1.getName().toLowerCase());
+			cm.register("mast_lamps", hasAndIs(SignalLF.LAMPS), 0);
+			cm.register("mast", hasAndIsNot(SignalLF.LAMPS), 0);
+			for(LF1 lf1 : LF1.values()) {
+				cm.register("lf1", hasAndIs(SignalLF.PRESIGNAL).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, "4", "girsignals:blocks/zs3/n" + lf1.getName().toLowerCase());
+				cm.register("lf1_2", hasAndIsNot(SignalLF.PRESIGNAL).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, "overlay", "girsignals:blocks/zs3/n" + lf1.getName().toLowerCase());
+			}
 		});
 	}
 

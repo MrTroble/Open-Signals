@@ -1,10 +1,12 @@
 {
-	"credit": "Made with Blockbench by Mc_Jeronimo",
+	"parent": "block/block",
+	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "girsignals:blocks/shield_gray",
 		"1": "girsignals:blocks/shield_black",
 		"2": "girsignals:blocks/lf1_2",
-		"particle": "girsignals:blocks/shield_gray"
+        "particle": "girsignals:blocks/shield_gray",
+		"overlay": "girsignals:blocks/zs3/nz12"
 	},
 	"elements": [
 		{
@@ -20,7 +22,6 @@
 			}
 		},
 		{
-			"name": "sign",
 			"from": [3, 0, 6],
 			"to": [13, 14, 7],
 			"faces": {
@@ -31,13 +32,13 @@
 				"up": {"uv": [0, 0, 9, 1.5], "texture": "#1"},
 				"down": {"uv": [0, 0, 9, 1.5], "texture": "#1"}
 			}
-		}
-	],
-	"groups": [0,
+		},
 		{
-			"name": "sign",
-			"origin": [8, 8, 8],
-			"children": [1]
+			"from": [4.5, 2, 5.99],
+			"to": [11.5, 12, 7],
+			"faces": {
+				"north": {"uv": [0, 0, 5, 7], "texture": "#overlay", "tintindex": 0}
+			}
 		}
 	]
 }
