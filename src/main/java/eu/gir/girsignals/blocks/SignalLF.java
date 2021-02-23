@@ -23,4 +23,9 @@ public class SignalLF extends SignalBlock implements IBlockColor {
 		return 0;
 	}
 	
+	@Override
+	public boolean canBeLinked() {
+		return false;
+	}
+	
 }

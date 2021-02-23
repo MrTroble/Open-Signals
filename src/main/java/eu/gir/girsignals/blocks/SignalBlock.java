@@ -261,4 +261,9 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	public String toString() {
 		return this.getLocalizedName();
 	}
+	
+	public boolean canBeLinked() {
+		return true;
+	}
+	
 }
