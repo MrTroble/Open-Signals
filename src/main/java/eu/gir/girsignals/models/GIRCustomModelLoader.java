@@ -9,7 +9,8 @@ import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import eu.gir.girsignals.EnumSignals.HPVR;
 import eu.gir.girsignals.EnumSignals.KS;
-import eu.gir.girsignals.EnumSignals.LF1;
+import eu.gir.girsignals.EnumSignals.LF;
+import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.Offable;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
@@ -338,9 +339,13 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		registeredModels.put("lfsignal", cm -> {
 			cm.register("mast_lamps", hasAndIs(SignalLF.LAMPS), 0);
 			cm.register("mast", hasAndIsNot(SignalLF.LAMPS), 0);
-			for(LF1 lf1 : LF1.values()) {
-				cm.register("lf1", hasAndIs(SignalLF.PRESIGNAL).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, "overlay", "girsignals:blocks/zs3/n" + lf1.getName().toLowerCase());
-				cm.register("lf1_2", hasAndIsNot(SignalLF.PRESIGNAL).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, "overlay", "girsignals:blocks/zs3/n" + lf1.getName().toLowerCase());
+			for(LF lf1 : LF.values()) {
+				String[] rename = lf1.getOverlayRename();
+				cm.register("lf1", withN(SignalLF.LFTYPE, LFBACKGROUND.LF1::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+				cm.register("lf1_2", withN(SignalLF.LFTYPE, LFBACKGROUND.LF2::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+				cm.register("lf3_5_7", withN(SignalLF.LFTYPE, LFBACKGROUND.LF3::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+				cm.register("lf4", withN(SignalLF.LFTYPE, LFBACKGROUND.LF4::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+				cm.register("lf6", withN(SignalLF.LFTYPE, LFBACKGROUND.LF6::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
 			}
 		});
 	}

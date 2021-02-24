@@ -9,7 +9,6 @@
 	},
 	"elements": [
 		{
-			"name": "overlay",
 			"from": [6.5, 4, 5.99],
 			"to": [9.5, 8, 7],
 			"faces": {

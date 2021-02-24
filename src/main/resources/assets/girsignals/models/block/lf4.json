@@ -4,9 +4,17 @@
 		"0": "girsignals:blocks/shield_gray",
 		"1": "girsignals:blocks/shield_black",
 		"2": "girsignals:blocks/lf4",
+		"overlay": "girsignals:blocks/zs3/nz8",
 		"particle": "girsignals:blocks/shield_gray"
 	},
 	"elements": [
+		{
+			"from": [6.5, 4, 5.99],
+			"to": [9.5, 8, 7],
+			"faces": {
+				"north": {"uv": [0, 0, 5, 7], "texture": "#overlay", "tintindex": 0}
+			}
+		},
 		{
 			"from": [7, 0, 7],
 			"to": [9, 5, 9],

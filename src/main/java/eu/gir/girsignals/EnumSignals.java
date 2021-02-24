@@ -74,8 +74,17 @@ public class EnumSignals {
 		OFF, F0, F1, F2, F3, F4, F5, RED, YELLOW, GREEN;
 	}
 
-	public enum LF1 implements DefaultName<LF1> {
-		Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, A, E
+	public enum LF implements DefaultName<LF> {
+		Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, A, E;
+		
+		public String[] getOverlayRename() {
+			return new String[] { "overlay", "girsignals:blocks/zs3/n" + this.getName().toLowerCase()};
+		}
+		
+	}
+	
+	public enum LFBACKGROUND implements DefaultName<LFBACKGROUND> {
+		LF1, LF2, LF3, LF4, LF6;
 	}
 	
 }
