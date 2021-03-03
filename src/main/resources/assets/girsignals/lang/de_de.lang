@@ -4,7 +4,7 @@ itemGroup.GIRSignals=GIRSignals
 #Items
 item.linkingtool.name=Verlinker
 item.placementtool.name=Signal-Platzierer
-item.platetool.name=Signaltafel-Platzierer
+item.signplacementtool.name=Signaltafel-Platzierer
 
 #Blocks
 tile.hvsignalcontroller.name=Signal Steuerer
@@ -23,6 +23,9 @@ lt.unlink=Link zum Signal entfernt
 #Placementtool
 pt.itemnotset=Bitte stell das Tool vorher ein (Sneaken + Rechtsklick)
 
+#Sign Placementtool
+
+#Signal Names
 property.zs3.name=Zs3
 property.zs1.name=Zs1
 property.stopsignal.name=Hauptsignal
@@ -36,7 +39,8 @@ property.mainlightsignal.name=Hauptlichtsignal
 property.mainlightsignallightbar.name=Lichtleiste für Hauptlichtsignal
 property.mastsigndistant.name=Vorsignalmastschild
 property.ne2.name=Ne2
-property.ne2_2.name=Ne2 verkürtzer Bremsweg (benötigt Ne2) 
+property.ne2_2.name=Ne2 verkürtzer Bremsweg (benötigt Ne2)
+property.ne2_4.name=Vorsignalwiederholer
 property.zs2.name=Zs2
 property.kombisignal.name=Kombinationssignal
 property.kombisignal-distant.name=Kombinationsvorsignal
@@ -46,6 +50,7 @@ property.sh_light_top.name=Rangiersignal 3 Block hoch
 property.signaltram.name=Straßenbahnsignal
 property.signalcar.name=Auto Ampel
 
+#Signal Descs
 property.zs3.desc=Über das §lZs3§r lassen sich folgende Zusatzsignale anzeigen:%n%n§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.%n§nZs3 Geschwindigkeitsanzeiger§r - Das Zs3 gibt durch eine Kennziffer an, welche Geschwindigkeit (Ziffer x 10 in km/h) ab dem Signal im anschließenden Weichenbereich oder bis zum nächsten Hauptsignal nicht überschritten werden darf. Die Kennziffer §l3§r kann anzeigen, dass der Fahrweg auf ein Stumpfgleis führt. Die Kennziffer §n2§r kann anzeigen, dass besonders früh gehalten werden muss oder auf ein besetztes Gleis eingefahren wird.    
 property.zs1.desc=§lZs1 Ersatzsignal§r%nAm Signal Hp 0 oder am gestörten Lichthauptsignal darf ohne schriftlichen Befehl vom zuständigen Fahrdienstleiter mit maximal 40 km/h vorbeigefahren werden. Das Signal gilt auch, wenn es erlischt bevor die Zugspitze vorbeigefahren ist. Das Signal gilt entweder für den anschließenden Weichenbereich oder bis zum nächsten Hauptsignal.
 property.stopsignal.desc=§lHauptsignal (Hp)§r%nHauptsignale geben an, ob der anschließende Streckenabschnitt befahren werden kann (Halt Hp 0) und wenn ja, mit welcher Geschwindigkeit (Fahrt Hp 1 oder Langsamfahrt Hp 2). Für eine genauere Geschwindigkeitsangabe kann zusätzlich ein Zs3 angebracht sein. Leuchtet nur das weiße Kennlicht am Hauptsignal, gilt dieses nicht. Besondere Beachtung gilt, wenn keine Lampe aufleuchtet, dann ist ein sofortiger Halt vorzunehmen. Wird am Signal Hp 0 zusätzlich das Signal Sh1 angezeigt, ist das Halteverbot für Rangierfahrten aufgehoben.
@@ -60,6 +65,7 @@ property.mainlightsignallightbar.desc=§lLichtleiste für Hl Signale§r%nZusatz 
 property.mastsigndistant.desc=§lVorsignalmastschild§r%nEin gelbes Dreieck gibt den Standort eines Hauptsignals mit Vorsignalfunktion an. An reinen Vorsignalen sind Ne2 Schilder angebracht.
 property.ne2.desc=§lNe2 Vorsignaltafel§r%nNe2 Schilder kennzeichnen den Standort eines Vorsignals.
 property.ne2_2.desc=Zusatz für Ne2 Signale mit verkürztem Bremsweg%nEin auf der Spitze stehendes Dreieck.
+property.ne2_4.desc=
 property.zs2.desc=§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.
 property.kombisignal.desc=§lKombinationssignale (Ks)§r%nKs sind Lichtsignale, die die Fahrtaufträge mit einem Signallicht anzeigen. Die Signale können die Funktionen eines Hauptsignals, eines Vorsignals oder eines Haupt- und Vorsignals haben.
 property.stagetype.name=Modus: 
@@ -70,4 +76,13 @@ property.sh_light_top.desc=
 property.signaltram.desc=
 property.signalcar.desc=
 
+#Other
 btn.apply=Anwenden
+
+#Directions
+property.up.name=Oben
+property.down.name=Unten
+property.north.name=Norden
+property.south.name=Süden
+property.west.name=Westen
+property.east.name=Osten
