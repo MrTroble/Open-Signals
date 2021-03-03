@@ -10,6 +10,7 @@ import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.SignalHL;
 import eu.gir.girsignals.blocks.SignalHV;
 import eu.gir.girsignals.blocks.SignalKS;
+import eu.gir.girsignals.blocks.SignalLF;
 import eu.gir.girsignals.blocks.SignalSHLight;
 import eu.gir.girsignals.blocks.SignalTram;
 import net.minecraft.block.Block;
@@ -29,8 +30,9 @@ public class GIRBlocks {
 	public static final SignalHL HL_SIGNAL = new SignalHL();
 	public static final SignalSHLight SH_LIGHT = new SignalSHLight();
 	public static final SignalTram TRAM_SIGNAL = new SignalTram();
+	public static final SignalLF LF_SIGNAL = new SignalLF();
 
-	private static ArrayList<Block> blocksToRegister = new ArrayList<>();
+	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
 	public static void init() {
 		Field[] fields = GIRBlocks.class.getFields();
@@ -49,7 +51,7 @@ public class GIRBlocks {
 			}
 		}
 	}
-
+	
 	@SubscribeEvent
 	public static void registerBlock(RegistryEvent.Register<Block> event) {
 		IForgeRegistry<Block> registry = event.getRegistry();

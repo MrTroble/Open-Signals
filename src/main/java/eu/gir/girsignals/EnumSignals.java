@@ -10,14 +10,15 @@ public class EnumSignals {
 		
 	    public int count();
 	}
-	
-	public interface Offable<T extends Enum<T>> extends IStringSerializable, Comparable<T> {
 
-		@SuppressWarnings({ "unchecked" })
+	public interface DefaultName<T extends Enum<T>> extends IStringSerializable, Comparable<T>{
 		@Override
 		public default String getName() {
-			return ((Enum<T>) this).name();
+			return this.toString();
 		}
+	}
+	
+	public interface Offable<T extends Enum<T>> extends DefaultName<T> {
 
 		@SuppressWarnings("unchecked")
 		public default T getOffState() {
@@ -73,4 +74,17 @@ public class EnumSignals {
 		OFF, F0, F1, F2, F3, F4, F5, RED, YELLOW, GREEN;
 	}
 
+	public enum LF implements DefaultName<LF> {
+		Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, A, E;
+		
+		public String[] getOverlayRename() {
+			return new String[] { "overlay", "girsignals:blocks/zs3/n" + this.getName().toLowerCase()};
+		}
+		
+	}
+	
+	public enum LFBACKGROUND implements DefaultName<LFBACKGROUND> {
+		LF1, LF2, LF3, LF4, LF6;
+	}
+	
 }

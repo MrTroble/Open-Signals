@@ -28,6 +28,10 @@ public class Linkingtool extends Item {
 			return EnumActionResult.PASS;
 		Block block = worldIn.getBlockState(pos).getBlock();
 		if (block instanceof SignalBlock) {
+			if(!((SignalBlock) block).canBeLinked()) {
+				player.sendMessage(new TextComponentTranslation("lt.notaddable", pos.toString()));
+				return EnumActionResult.FAIL;
+			}
 			NBTTagCompound comp = new NBTTagCompound();
 			SignalControllerTileEntity.writeBlockPosToNBT(pos, comp);
 			player.getHeldItem(hand).setTagCompound(comp);
@@ -49,7 +53,8 @@ public class Linkingtool extends Item {
 			}
 			return EnumActionResult.SUCCESS;
 		}
-		return EnumActionResult.PASS;
+		player.sendMessage(new TextComponentTranslation("lt.nosignal", pos.toString()));
+		return EnumActionResult.FAIL;
 	}
 
 }

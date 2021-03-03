@@ -1,5 +1,11 @@
 # Changelog
 
+## [Additions] 3.3.2021 - 1
+
+* Added LF Signs aswell as a new placement tool
+* Added new coloring API
+* Signs can not be linked to a controller
+
 ## [Fixes] 19.02.2021 - 1
 
 * Fixed issue with placement tool leading to game crash

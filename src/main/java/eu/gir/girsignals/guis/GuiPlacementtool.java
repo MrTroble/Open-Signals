@@ -52,7 +52,7 @@ public class GuiPlacementtool extends GuiScreen {
 		if (comp == null)
 			this.comp = new NBTTagCompound();
 		tool = (Placementtool) stack.getItem();
-		int signalBlockID = this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID);
+		int signalBlockID = this.comp.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID) ? this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID):tool.getObjFromID(0).getID();
 		usedBlock = tool.getTransform(signalBlockID);
 		currentSelectedBlock = SignalBlock.SIGNALLIST.get(signalBlockID);
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
@@ -218,10 +218,8 @@ public class GuiPlacementtool extends GuiScreen {
 				}
 			} else if (btn instanceof GUISettingsSlider) {
 				GUISettingsSlider slider = (GUISettingsSlider) btn;
-				if (slider.value != 0) {
-					SEProperty property = (SEProperty) properties[i];
-					ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
-				}
+				SEProperty property = (SEProperty) properties[i];
+				ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
 			}
 			i++;
 		}

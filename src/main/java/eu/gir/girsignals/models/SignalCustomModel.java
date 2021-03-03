@@ -19,23 +19,18 @@ import com.mojang.realmsclient.util.Pair;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.SignalBlock.SignalAngel;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockPart;
-import net.minecraft.client.renderer.block.model.BlockPartFace;
 import net.minecraft.client.renderer.block.model.BlockPartRotation;
-import net.minecraft.client.renderer.block.model.FaceBakery;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.ModelBlock;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumFacing.Axis;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
-import net.minecraftforge.common.model.ITransformation;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
@@ -48,7 +43,6 @@ public class SignalCustomModel implements IModel {
 	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
 	private IBakedModel cachedModel = null;
 	private SignalAngel angel = SignalAngel.ANGEL0;
-	private FaceBakery faceBakery = new FaceBakery();
 	
 	private static Field rotationField;
 	static {
@@ -63,12 +57,6 @@ public class SignalCustomModel implements IModel {
 	public SignalCustomModel(Consumer<SignalCustomModel> init, SignalAngel facing) {
 		init.accept(this);
 		this.angel = facing;
-	}
-
-	protected BakedQuad makeBakedQuad(BlockPartRotation rot, BlockPart bp, BlockPartFace bpf, TextureAtlasSprite tas,
-			EnumFacing face, ITransformation transform, boolean flag) {
-		return this.faceBakery.makeBakedQuad(bp.positionFrom, bp.positionTo, bpf, tas, face, transform, rot, flag,
-				bp.shade);
 	}
 
 	@Override

@@ -4,7 +4,7 @@ itemGroup.GIRSignals=GIRSignals
 #Items
 item.linkingtool.name=Verlinker
 item.placementtool.name=Signal-Platzierer
-item.platetool.name=Signaltafel-Platzierer
+item.signplacementtool.name=Signaltafel-Platzierer
 
 #Blocks
 tile.hvsignalcontroller.name=Signal Steuerer
@@ -13,16 +13,21 @@ tile.kssignal.name=KS Signal
 tile.hlsignal.name=HL Signal
 tile.shlight.name=Rangiersignal
 tile.tramsignal.name=Straßenbahnsignal
+tile.lfsignal.name=Lf Signal
 
 #Linktool
 lt.linkfailed=Link fehlgeschlagen!
 lt.set=Position vom Controller gesetzt
 lt.added=%s zum Linken gesetzt
 lt.unlink=Link zum Signal entfernt
+lt.nosignal=Dieser Block ist kein Signal
 
 #Placementtool
 pt.itemnotset=Bitte stell das Tool vorher ein (Sneaken + Rechtsklick)
 
+#Sign Placementtool
+
+#Signal Names
 property.zs3.name=Zs3
 property.zs1.name=Zs1
 property.stopsignal.name=Hauptsignal
@@ -36,7 +41,8 @@ property.mainlightsignal.name=Hauptlichtsignal
 property.mainlightsignallightbar.name=Lichtleiste für Hauptlichtsignal
 property.mastsigndistant.name=Vorsignalmastschild
 property.ne2.name=Ne2
-property.ne2_2.name=Ne2 verkürtzer Bremsweg (benötigt Ne2) 
+property.ne2_2.name=Ne2 verkürtzer Bremsweg (benötigt Ne2)
+property.ne2_4.name=Vorsignalwiederholer
 property.zs2.name=Zs2
 property.kombisignal.name=Kombinationssignal
 property.kombisignal-distant.name=Kombinationsvorsignal
@@ -45,7 +51,12 @@ property.sh_light_bottom.name=Rangiersignal 1 Block hoch
 property.sh_light_top.name=Rangiersignal 3 Block hoch
 property.signaltram.name=Straßenbahnsignal
 property.signalcar.name=Auto Ampel
+property.indicator.name=Aufschrift
+property.lftype.name=Lf Signal
+property.lamps.name=Lampen
 
+#Signal Descs
+property.signaltype.desc=Hier kannst du die verschiedenen Signaltypen wählen.
 property.zs3.desc=Über das §lZs3§r lassen sich folgende Zusatzsignale anzeigen:%n%n§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.%n§nZs3 Geschwindigkeitsanzeiger§r - Das Zs3 gibt durch eine Kennziffer an, welche Geschwindigkeit (Ziffer x 10 in km/h) ab dem Signal im anschließenden Weichenbereich oder bis zum nächsten Hauptsignal nicht überschritten werden darf. Die Kennziffer §l3§r kann anzeigen, dass der Fahrweg auf ein Stumpfgleis führt. Die Kennziffer §n2§r kann anzeigen, dass besonders früh gehalten werden muss oder auf ein besetztes Gleis eingefahren wird.    
 property.zs1.desc=§lZs1 Ersatzsignal§r%nAm Signal Hp 0 oder am gestörten Lichthauptsignal darf ohne schriftlichen Befehl vom zuständigen Fahrdienstleiter mit maximal 40 km/h vorbeigefahren werden. Das Signal gilt auch, wenn es erlischt bevor die Zugspitze vorbeigefahren ist. Das Signal gilt entweder für den anschließenden Weichenbereich oder bis zum nächsten Hauptsignal.
 property.stopsignal.desc=§lHauptsignal (Hp)§r%nHauptsignale geben an, ob der anschließende Streckenabschnitt befahren werden kann (Halt Hp 0) und wenn ja, mit welcher Geschwindigkeit (Fahrt Hp 1 oder Langsamfahrt Hp 2). Für eine genauere Geschwindigkeitsangabe kann zusätzlich ein Zs3 angebracht sein. Leuchtet nur das weiße Kennlicht am Hauptsignal, gilt dieses nicht. Besondere Beachtung gilt, wenn keine Lampe aufleuchtet, dann ist ein sofortiger Halt vorzunehmen. Wird am Signal Hp 0 zusätzlich das Signal Sh1 angezeigt, ist das Halteverbot für Rangierfahrten aufgehoben.
@@ -53,21 +64,33 @@ property.distantsignal.desc=§lVorsignal (Vr)§r%nVorsignale geben an, welches S
 property.zs3v.desc=Über das Signal §lZs3v§r lassen sich folgende Zusatzsignale angezeigt werden:%n%n§nZs2v Richtungsvoranzeiger§r - Das Zs2v gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg ab dem nächsten Hauptsignal verläuft.%n§nZs3v Geschwindigkeitsvoranzeiger§r - Das Zs3v gibt durch eine Kennziffer an, welche Geschwindigkeit ab dem nächsten Hauptsignal nicht überschritten werden darf.%n§nZs6 Gegengleisanzeiger§r - Das Zs6 gibt an, dass der Fahrweg in das Streckengleis entgegen der gewöhnlichen Fahrtrichtung führt. Der Auftrag gilt bis zum nächsten Bahnhof oder bis zur nächsten Überleitstelle.%n§nZs8 Gegengleisfahrt-Ersatzsignal§r - Das Zs8 gibt wie das Zs1 an, dass am Signal Hp 0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vom zuständigen Fahrdienstleiter mit maximal 40 km/h vorbeigefahren werden darf und der Fahrweg in das Gegengleis führt.%n§nZs13 Stumpfgleis- und Frühhaltanzeiger§r - Das Zs13 gibt an, dass dass der Fahrweg in ein Stumpfgleis oder einem Gleis mit verkürztem Einfahrtsweg führt (ausgenommen für Kopfbahnhöfe).
 property.zs7.desc=§lZs 7 Vorsichtssignal§r%nAm Signal Hp 0 oder am gestörten Lichtsignal darf ohne schriftlichen Befehl vom zuständigen Fahrdienstleiter vorbeigefahren werden. Die Weiterfahrt erfolgt auf Sicht bis zum nächsten Hauptsignal. Das bedeutet, dass die Geschwindigkeit so angepasst werden muss, sodass der Zug innerhalb des Sichtbereichs zum Stehen gebracht werden kann, aber maximal 40 km/h gefahren werden dürfen. Das Signal gilt auch, wenn es erlischt bevor die Zugspitze vorbeigefahren ist.
 property.vrlight.desc=§lVr Zusatzlicht§r%nDas Zusatzlicht gibt an, ob das Signal im verkürztem Bremswegabstand zum dazugehörigen Hauptsignal steht oder das Vorsignal ein Vorsignalwiederholer ist. Bei abgeschalteten Vorsignal leuchtet nur diese Lampe auf.
-property.signaltype.desc=Hier kannst du die verschiedenen Signaltypen wählen. Verfügbar sind H/V Lichtsignal, Ks Signal und Hl Signal.
 property.mastsign.desc=§lMastschilder§r regeln das Verhalten bei gestörten oder Halt zeigenden Signalen. Es gibt folgende Varianten:%n%n§nweiß-rot-weiß§r - Züge dürfen nur mit Zs1, Zs7, Zs8 oder schriftlichen Befehl vorbeifahren. Rangierfahrten dürfen nur mit Zustimmung des zuständigen Wärters am Signal vorbeifahren.%n§nweiß-gelb-weiß-gelb-weiß§r - Züge dürfen, wenn nach dem Anhalten vor diesem Signal eine Verständigung mit dem Fahrdienstleiter nicht möglich ist, ohne Zustimmung auf Sicht vorbeifahren. Hauptsignale mit diesem Mastschild besitzen zugleich eine Vorsignalfunktion.%n§nweiß-schwarz-weiß-schwarz-weiß§r - Züge dürfen nach dem Anhalten vor diesem Signal ohne Zustimmung auf Sicht vorbeifahren. Hauptsignale mit diesem Mastschild besitzen zugleich eine Vorsignalfunktion.
 property.mainlightsignal.desc=§lLichthaupt- und Lichtvorsignale (Hl)§r%nHl Signale geben an, ob der anschließende Streckenabschnitt befahren werden kann (Halt Hp 0) und wenn ja mit welcher Geschwindigkeit (Hl 1 bis Hl 12b). Hl Signale können gleichzeitig eine Haupt- und Vorsignalfunktion einnehmen, reine Vorsignale sind mit einem Ne2 Schild gekennzeichnet, kombinierte Signale besitzen ein Schild mit gelben nach unten zeigenden Dreieck. Leuchtet nur das weiße Kennlicht am Signal, gilt dieses nicht. Besondere Beachtung gilt, wenn keine Lampe aufleuchtet, dann ist ein sofortiger Halt vorzunehmen. Wird am Signal Hp 0 zusätzlich das Signal Sh1 angezeigt, ist das Halteverbot für Rangierfahrten aufgehoben.
 property.mainlightsignallightbar.desc=§lLichtleiste für Hl Signale§r%nZusatz für Hl Signale, um eine genauere Geschwindigkeitssignalisierung zu ermöglichen.
 property.mastsigndistant.desc=§lVorsignalmastschild§r%nEin gelbes Dreieck gibt den Standort eines Hauptsignals mit Vorsignalfunktion an. An reinen Vorsignalen sind Ne2 Schilder angebracht.
 property.ne2.desc=§lNe2 Vorsignaltafel§r%nNe2 Schilder kennzeichnen den Standort eines Vorsignals.
 property.ne2_2.desc=Zusatz für Ne2 Signale mit verkürztem Bremsweg%nEin auf der Spitze stehendes Dreieck.
+property.ne2_4.desc=Dieses Schild kennzeichnet, dass das Signal ein Vorsignalwiederholer ist.
 property.zs2.desc=§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.
 property.kombisignal.desc=§lKombinationssignale (Ks)§r%nKs sind Lichtsignale, die die Fahrtaufträge mit einem Signallicht anzeigen. Die Signale können die Funktionen eines Hauptsignals, eines Vorsignals oder eines Haupt- und Vorsignals haben.
 property.stagetype.name=Modus: 
 property.kombisignal-distant.desc=Vorsignal zu dem Ks Signal
 property.mainlightsignal_distant.desc=Vorsignal zu dem Hauptlichtsignal
-property.sh_light_bottom.desc=
-property.sh_light_top.desc=
-property.signaltram.desc=
-property.signalcar.desc=
+property.sh_light_bottom.desc=Rangiersignal auf dem Boden stehend.
+property.sh_light_top.desc=Rangiersignal um 2 Blöcke erhöht.
+property.signaltram.desc=Verkehrsampel für Trams und Busse.%nF 0 - Halt!%nF 1 - Fahrt.%nF 2 - Fahrt Rechts.%nF 3 - Fahrt Links.%nF 4 - Halt erwarten.%nF 5 - Fahrt mit Beachtung der Abbiegeregeln.
+property.signalcar.desc=Einfache Verkehrsampel für Autos.
+property.indicator.desc=Aufschrift für Lf Signale. Möglich sind: 2,3,4,5,6,7,8,9,10,11,12,13,A,E
+property.lftype.desc=§nLf1 Langsamfahrscheibe§r - Es folgt eine vorübergehende Langsamfahrstelle, auf der die angezeigte Geschwindigkeit nicht überschritten werden darf.%n§nLf2 Anfangscheibe§r - Anfang der vorübergehenden Langsamfahrstelle.%n§nLf1/2 Langsamfahrbeginnscheibe§r - Auf dem am Signal beginnenden, in der Regel durch eine Endscheibe begrenzten Gleisabschnitt darf die angezeigte Geschwindigkeit nicht überschritten werden.%n§nLf3 Endscheibe§r - Ende der vorübergehenden Langsamfahrstelle.%n§nLf4 Geschwindigkeitstafel§r - Es folgt eine ständige Langsamfahrstelle, auf der die angezeigte Geschwindigkeit nicht überschritten werden darf.%n§nLf5 Anfangstafel§r - Die auf der Geschwindigkeitstafel (Lf 4) angezeigte Geschwindigkeitsbeschränkung muss durchgeführt sein.%n§nLf6 Geschwindigkeits-Ankündesignal§r - Ein Geschwindigkeitssignal (Lf 7) ist zu erwarten.%n§nLf7 Geschwindigkeitssignal§r - Die angezeigte Geschwindigkeit darf vom Signal ab nicht überschritten werden.
+property.lamps.desc=Nachtzeichen für Lf 1.
 
+#Other
 btn.apply=Anwenden
+
+#Directions
+property.up.name=Oben
+property.down.name=Unten
+property.north.name=Norden
+property.south.name=Süden
+property.west.name=Westen
+property.east.name=Osten
