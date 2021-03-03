@@ -37,6 +37,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SignalBlock extends Block implements ITileEntityProvider {
 
@@ -264,6 +266,16 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	
 	public boolean canBeLinked() {
 		return true;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
+		return 0;
+	}
+	
+	@SideOnly(Side.CLIENT)
+	public boolean hasCostumColor() {
+		return false;
 	}
 	
 }

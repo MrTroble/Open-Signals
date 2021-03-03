@@ -4,12 +4,8 @@ import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.renderer.color.IBlockColor;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 
-public class SignalLF extends SignalBlock implements IBlockColor {
+public class SignalLF extends SignalBlock {
 
 	public SignalLF() {
 		super("lfsignal", 1);
@@ -20,8 +16,8 @@ public class SignalLF extends SignalBlock implements IBlockColor {
 	public static final SEProperty<Boolean> LAMPS = SEProperty.of("lamps", true, ChangeableStage.GUISTAGE);
 
 	@Override
-	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-		return 0;
+	public boolean hasCostumColor() {
+		return true;
 	}
 	
 	@Override
