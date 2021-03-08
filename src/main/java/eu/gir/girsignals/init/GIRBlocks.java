@@ -7,10 +7,13 @@ import java.util.ArrayList;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
 import eu.gir.girsignals.blocks.SignalController;
+import eu.gir.girsignals.blocks.SignalEL;
 import eu.gir.girsignals.blocks.SignalHL;
 import eu.gir.girsignals.blocks.SignalHV;
 import eu.gir.girsignals.blocks.SignalKS;
 import eu.gir.girsignals.blocks.SignalLF;
+import eu.gir.girsignals.blocks.SignalRA;
+import eu.gir.girsignals.blocks.SignalSH;
 import eu.gir.girsignals.blocks.SignalSHLight;
 import eu.gir.girsignals.blocks.SignalTram;
 import net.minecraft.block.Block;
@@ -31,6 +34,9 @@ public class GIRBlocks {
 	public static final SignalSHLight SH_LIGHT = new SignalSHLight();
 	public static final SignalTram TRAM_SIGNAL = new SignalTram();
 	public static final SignalLF LF_SIGNAL = new SignalLF();
+	public static final SignalEL EL_SIGNAL = new SignalEL();
+	public static final SignalSH SH_SIGNAL = new SignalSH();
+	public static final SignalRA RA_SIGNAL = new SignalRA();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 

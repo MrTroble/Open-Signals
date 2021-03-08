@@ -87,4 +87,11 @@ public class EnumSignals {
 		LF1, LF2, LF3, LF4, LF6;
 	}
 	
+	public enum EL implements DefaultName<EL> {
+		EL1V, EL1, EL2, EL3, EL4, EL5, EL6;
+	}
+	
+	public enum RA implements Offable<RA> {
+		OFF, RA11A, RA11B;
+	}
 }

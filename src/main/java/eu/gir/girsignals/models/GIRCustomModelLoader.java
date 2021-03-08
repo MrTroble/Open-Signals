@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import eu.gir.girsignals.EnumSignals.DefaultName;
+import eu.gir.girsignals.EnumSignals.EL;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import eu.gir.girsignals.EnumSignals.HPVR;
@@ -13,16 +14,21 @@ import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.Offable;
+import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
 import eu.gir.girsignals.EnumSignals.TRAM;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.SignalEL;
 import eu.gir.girsignals.blocks.SignalBlock.SignalAngel;
+import io.netty.handler.codec.http.HttpHeaders.Values;
+import io.netty.handler.codec.http.websocketx.BinaryWebSocketFrame;
 import eu.gir.girsignals.blocks.SignalHL;
 import eu.gir.girsignals.blocks.SignalHV;
 import eu.gir.girsignals.blocks.SignalKS;
 import eu.gir.girsignals.blocks.SignalLF;
+import eu.gir.girsignals.blocks.SignalRA;
 import eu.gir.girsignals.blocks.SignalSHLight;
 import eu.gir.girsignals.blocks.SignalTram;
 import net.minecraft.client.renderer.block.model.BuiltInModel;
@@ -37,6 +43,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import scala.annotation.elidable;
 
 @SideOnly(Side.CLIENT)
 public class GIRCustomModelLoader implements ICustomModelLoader {
@@ -297,20 +304,20 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		});
 		registeredModels.put("shlight", cm -> {
 			// SH ground off
-			cm.register("sh_light", with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.OFF)).and(has(SignalSHLight.SHLIGHT_2).negate()), 0);
+			cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.OFF)).and(has(SignalSHLight.SHLIGHT_2).negate()), 0);
 			// SH ground sh0
-			cm.register("sh_light", with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.SH0)).and(has(SignalSHLight.SHLIGHT_2).negate()), 0, "lamp_rednorth", "girsignals:blocks/lamp_red_small");
+			cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.SH0)).and(has(SignalSHLight.SHLIGHT_2).negate()), 0, "lamp_rednorth", "girsignals:blocks/lamp_red_small");
 			// SH ground sh1
-			cm.register("sh_light", with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.SH1)).and(has(SignalSHLight.SHLIGHT_2).negate()), 0, "lamp_whitenorth", "girsignals:blocks/lamp_white_small");
+			cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.SH1)).and(has(SignalSHLight.SHLIGHT_2).negate()), 0, "lamp_whitenorth", "girsignals:blocks/lamp_white_small");
 			// Mast
-			cm.register("sh_mast", has(SignalSHLight.SHLIGHT_2).and(has(SignalSHLight.SHLIGHT_0).negate()), 0);
-			cm.register("sh_mast", has(SignalSHLight.SHLIGHT_2).and(has(SignalSHLight.SHLIGHT_0).negate()), 1);
+			cm.register("sh/sh_mast", has(SignalSHLight.SHLIGHT_2).and(has(SignalSHLight.SHLIGHT_0).negate()), 0);
+			cm.register("sh/sh_mast", has(SignalSHLight.SHLIGHT_2).and(has(SignalSHLight.SHLIGHT_0).negate()), 1);
 			// SH above off
-			cm.register("sh_light", with(SignalSHLight.SHLIGHT_2, sh -> sh.equals(SH_LIGHT.OFF)).and(has(SignalSHLight.SHLIGHT_0).negate()), 2);
+			cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_2, sh -> sh.equals(SH_LIGHT.OFF)).and(has(SignalSHLight.SHLIGHT_0).negate()), 2);
 			// SH above sh0
-			cm.register("sh_light", with(SignalSHLight.SHLIGHT_2, sh -> sh.equals(SH_LIGHT.SH0)).and(has(SignalSHLight.SHLIGHT_0).negate()), 2, "lamp_rednorth", "girsignals:blocks/lamp_red_small");
+			cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_2, sh -> sh.equals(SH_LIGHT.SH0)).and(has(SignalSHLight.SHLIGHT_0).negate()), 2, "lamp_rednorth", "girsignals:blocks/lamp_red_small");
 			// SH above sh1
-			cm.register("sh_light", with(SignalSHLight.SHLIGHT_2, sh -> sh.equals(SH_LIGHT.SH1)).and(has(SignalSHLight.SHLIGHT_0).negate()), 2, "lamp_whitenorth", "girsignals:blocks/lamp_white_small");
+			cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_2, sh -> sh.equals(SH_LIGHT.SH1)).and(has(SignalSHLight.SHLIGHT_0).negate()), 2, "lamp_whitenorth", "girsignals:blocks/lamp_white_small");
 		});
 		registeredModels.put("tramsignal", cm -> {
 			// TRAM off
@@ -341,12 +348,35 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("mast", hasAndIsNot(SignalLF.LAMPS), 0);
 			for(LF lf1 : LF.values()) {
 				String[] rename = lf1.getOverlayRename();
-				cm.register("lf1", withN(SignalLF.LFTYPE, LFBACKGROUND.LF1::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
-				cm.register("lf1_2", withN(SignalLF.LFTYPE, LFBACKGROUND.LF2::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
-				cm.register("lf3_5_7", withN(SignalLF.LFTYPE, LFBACKGROUND.LF3::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
-				cm.register("lf4", withN(SignalLF.LFTYPE, LFBACKGROUND.LF4::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
-				cm.register("lf6", withN(SignalLF.LFTYPE, LFBACKGROUND.LF6::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+				cm.register("lf/lf1", withN(SignalLF.LFTYPE, LFBACKGROUND.LF1::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+				cm.register("lf/lf1_2", withN(SignalLF.LFTYPE, LFBACKGROUND.LF2::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+				cm.register("lf/lf3_5_7", withN(SignalLF.LFTYPE, LFBACKGROUND.LF3::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+				cm.register("lf/lf4", withN(SignalLF.LFTYPE, LFBACKGROUND.LF4::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+				cm.register("lf/lf6", withN(SignalLF.LFTYPE, LFBACKGROUND.LF6::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
 			}
+		});
+		registeredModels.put("elsignal", cm -> {
+			cm.register("mast", ebs -> true, 0);
+			cm.register("mast", ebs -> true, 1);
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL1V::equals), 2, "2", "girsignals:blocks/el1v");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL1::equals), 2, "2", "girsignals:blocks/el1");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL2::equals), 2, "2", "girsignals:blocks/el2");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL3::equals), 2, "2", "girsignals:blocks/el3");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL4::equals), 2, "2", "girsignals:blocks/el4");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL5::equals), 2, "2", "girsignals:blocks/el5");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL6::equals), 2, "2", "girsignals:blocks/el6");
+		});
+		registeredModels.put("shsignal", cm -> {
+			cm.register("sh/sh2_mast", ebs -> true, 0);
+			cm.register("sh/sh2", ebs -> true, 1);
+		});
+		registeredModels.put("rasignal", cm -> {
+			cm.register("mast", has(SignalRA.RA12).negate(), 0);
+			cm.register("mast", has(SignalRA.RA12).negate().and(has(SignalRA.RA10).negate()), 1);
+			cm.register("ra/ra10", has(SignalRA.RA10), 1);
+			cm.register("ra/ra11", with(SignalRA.RATYPE, ra -> ra.equals(RA.RA11A)), 2, "2", "girsignals:blocks/ra11a");
+			cm.register("ra/ra11", with(SignalRA.RATYPE, ra -> ra.equals(RA.RA11B)), 2, "2", "girsignals:blocks/ra11b");
+			cm.register("ra/ra12", has(SignalRA.RA12), 0);;
 		});
 	}
 
