@@ -48,7 +48,7 @@ public class GhostBlock extends Block {
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
 			EntityPlayer player) {
-		return SignalBlock.pickBlock(player);
+		return Signal.pickBlock(player);
 	}
 	
 	@Override
@@ -88,7 +88,7 @@ public class GhostBlock extends Block {
 
 		BlockPos posdown = pos.down();
 		Block lowerBlock = worldIn.getBlockState(posdown).getBlock();
-		if (lowerBlock instanceof GhostBlock || lowerBlock instanceof SignalBlock) {
+		if (lowerBlock instanceof GhostBlock || lowerBlock instanceof Signal) {
 			worldIn.destroyBlock(posdown, false);
 		}
 	}

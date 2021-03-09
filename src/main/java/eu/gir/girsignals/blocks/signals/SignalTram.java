@@ -1,9 +1,10 @@
-package eu.gir.girsignals.blocks;
+package eu.gir.girsignals.blocks.signals;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.TRAM;
+import eu.gir.girsignals.blocks.Signal;
 
-public class SignalTram extends SignalBlock {
+public class SignalTram extends Signal {
 
 	public SignalTram() {
 		super("TramSignal", 0);

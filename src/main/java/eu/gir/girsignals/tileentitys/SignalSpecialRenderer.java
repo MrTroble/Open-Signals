@@ -1,7 +1,7 @@
 package eu.gir.girsignals.tileentitys;
 
-import eu.gir.girsignals.blocks.SignalBlock;
-import eu.gir.girsignals.blocks.SignalBlock.SignalAngel;
+import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
@@ -16,7 +16,7 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
 			float alpha) {
 		if(!te.hasCustomName()) return;
 		IBlockState state = te.getWorld().getBlockState(te.getPos());
- 		SignalAngel face = state.getValue(SignalBlock.ANGEL);
+ 		SignalAngel face = state.getValue(Signal.ANGEL);
  		float angel = face.getAngel();
  		String display = te.getDisplayName().getFormattedText();
  		FontRenderer font = getFontRenderer();

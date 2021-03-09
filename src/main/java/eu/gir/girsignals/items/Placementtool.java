@@ -4,7 +4,7 @@ import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.GUIHandler;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRNetworkHandler;
@@ -21,11 +21,11 @@ import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
-public class Placementtool extends Item implements IIntegerable<SignalBlock> {
+public class Placementtool extends Item implements IIntegerable<Signal> {
 
-	private SignalBlock[] blocks;
+	private Signal[] blocks;
 	
-	public Placementtool(SignalBlock... blocks) {
+	public Placementtool(Signal... blocks) {
 		this.blocks = blocks;
 		setCreativeTab(GIRTabs.tab);
 	}
@@ -50,7 +50,7 @@ public class Placementtool extends Item implements IIntegerable<SignalBlock> {
 				player.sendMessage(new TextComponentTranslation("pt.itemnotset"));
 				return EnumActionResult.FAIL;
 			}
-			SignalBlock block = SignalBlock.SIGNALLIST.get(compound.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID));
+			Signal block = Signal.SIGNALLIST.get(compound.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID));
 			int height = block.getHeight(compound);
 			BlockPos lastPos = setPosition;
 			for (int i = 0; i < height; i++)
@@ -84,13 +84,13 @@ public class Placementtool extends Item implements IIntegerable<SignalBlock> {
 	}
 
 	@Override
-	public SignalBlock getObjFromID(int obj) {
+	public Signal getObjFromID(int obj) {
 		return blocks[obj];
 	}
 	
 	public int getTransform(int obj) {
 		int x = 0;
-		for (SignalBlock signalBlock : blocks) {
+		for (Signal signalBlock : blocks) {
 			if(signalBlock.getID() == obj)
 				return x;
 			x++;

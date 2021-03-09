@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.mojang.realmsclient.util.Pair;
 
 import eu.gir.girsignals.GirsignalsMain;
-import eu.gir.girsignals.blocks.SignalBlock.SignalAngel;
+import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import net.minecraft.client.renderer.block.model.BlockPart;
 import net.minecraft.client.renderer.block.model.BlockPartRotation;
 import net.minecraft.client.renderer.block.model.IBakedModel;

@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonPrimitive;
 
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.debug.NetworkDebug;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -141,10 +141,10 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		if(getCustomNameRenderHeight() == -1)
 			return;
 		this.formatCustomName = str;
-		if (str == null && map.containsKey(SignalBlock.CUSTOMNAME)) {
-			map.remove(SignalBlock.CUSTOMNAME);
+		if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
+			map.remove(Signal.CUSTOMNAME);
 		} else if (str != null) {
-			map.put(SignalBlock.CUSTOMNAME, true);
+			map.put(Signal.CUSTOMNAME, true);
 		}
 		this.markDirty();
 		world.markBlockRangeForRenderUpdate(pos, pos);
@@ -154,7 +154,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	public float getCustomNameRenderHeight() {
 		if (renderHeight == 0) {
-			renderHeight = ((SignalBlock) world.getBlockState(pos).getBlock()).getCustomnameRenderHeight();
+			renderHeight = ((Signal) world.getBlockState(pos).getBlock()).getCustomnameRenderHeight();
 		}
 		return renderHeight;
 	}

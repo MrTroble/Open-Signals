@@ -14,7 +14,7 @@ import org.lwjgl.util.vector.Vector4f;
 import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import io.netty.buffer.ByteBuf;
@@ -44,7 +44,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 public class GuiSignalController extends GuiScreen implements GuiResponder {
 
 	private GUISettingsSlider slider;
-	private final SignalBlock block;
+	private final Signal block;
 	private final SignalControllerTileEntity tile;
 	private final HashMap<SEProperty<?>, Integer> properties = new HashMap<>();
 	private final BlockPos pos;
@@ -65,7 +65,7 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 		}		
 		this.tile.onLink();
 		this.state = world.getBlockState(this.tile.getLinkedPosition());
-		this.block = (SignalBlock) state.getBlock();
+		this.block = (Signal) state.getBlock();
 	}
 
 	public static enum Stages {

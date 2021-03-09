@@ -1,10 +1,11 @@
-package eu.gir.girsignals.blocks;
+package eu.gir.girsignals.blocks.signals;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
+import eu.gir.girsignals.blocks.Signal;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class SignalSHLight extends SignalBlock {
+public class SignalSHLight extends Signal {
 
 	public SignalSHLight() {
 		super("SHLight", 0);

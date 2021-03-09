@@ -40,7 +40,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SignalBlock extends Block implements ITileEntityProvider {
+public class Signal extends Block implements ITileEntityProvider {
 
 	public static enum SignalAngel implements IStringSerializable {
 		ANGEL0, ANGEL22P5, ANGEL45,
@@ -60,7 +60,7 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		}
 	}
 
-	public static final ArrayList<SignalBlock> SIGNALLIST = new ArrayList<SignalBlock>();
+	public static final ArrayList<Signal> SIGNALLIST = new ArrayList<Signal>();
 
 	public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel", SignalAngel.class);
 	public static final SEProperty<Boolean> CUSTOMNAME = SEProperty.of("customname", false,
@@ -72,11 +72,11 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 	private final String signalTypeName;
 	private final float customNameRenderHeight;
 
-	public SignalBlock(String signalTypeName, int height) {
+	public Signal(String signalTypeName, int height) {
 		this(signalTypeName, height, -1);
 	}
 	
-	public SignalBlock(String signalTypeName, int height, float customNameRenderHeight) {
+	public Signal(String signalTypeName, int height, float customNameRenderHeight) {
 		super(Material.ROCK);
 		this.signalTypeName = signalTypeName;
 		setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));

@@ -1,6 +1,6 @@
 package eu.gir.girsignals.init;
 
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.Item;
@@ -22,8 +22,8 @@ public class GIRModels {
 	public static void addColor(ColorHandlerEvent.Block event) {
 		BlockColors colors = event.getBlockColors();
 		GIRBlocks.blocksToRegister.forEach(block -> {
-			if(block instanceof SignalBlock) {
-				SignalBlock sb = (SignalBlock) block;
+			if(block instanceof Signal) {
+				Signal sb = (Signal) block;
 				if(sb.hasCostumColor())
 					colors.registerBlockColorHandler(sb::colorMultiplier, block);
 			}

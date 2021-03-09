@@ -5,7 +5,7 @@ import java.util.Map;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.debug.NetworkDebug;
 import eu.gir.girsignals.items.Linkingtool;
 import li.cil.oc.api.machine.Arguments;
@@ -86,13 +86,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public void onLink() {
 		IBlockState state = world.getBlockState(linkedSignalPosition);
 		Block block = state.getBlock();
-		if (!(block instanceof SignalBlock)) {
+		if (!(block instanceof Signal)) {
 			if(!world.isRemote)
 				unlink();
 			return;
 		}
 
-		SignalBlock b = (SignalBlock) block;
+		Signal b = (Signal) block;
 
 		HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
 		((IExtendedBlockState) b.getExtendedState(state, world, linkedSignalPosition)).getUnlistedProperties()
@@ -137,7 +137,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public boolean hasLinkImpl() {
 		if (linkedSignalPosition == null)
 			return false;
-		if (world.getBlockState(linkedSignalPosition).getBlock() instanceof SignalBlock)
+		if (world.getBlockState(linkedSignalPosition).getBlock() instanceof Signal)
 			return true;
 		unlink();
 		return false;
@@ -180,7 +180,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			return false;
 		SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(linkedSignalPosition);
 		IBlockState blockstate = world.getBlockState(linkedSignalPosition);
-		SignalBlock block = (SignalBlock) blockstate.getBlock();
+		Signal block = (Signal) blockstate.getBlock();
 		SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
 		tile.setProperty(prop, prop.getObjFromID(newSignal));
 		world.markAndNotifyBlock(linkedSignalPosition, null, blockstate, blockstate, 3);
@@ -194,7 +194,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	public String getSignalTypeImpl() {
-		return ((SignalBlock) world.getBlockState(linkedSignalPosition).getBlock()).getSignalTypeName();
+		return ((Signal) world.getBlockState(linkedSignalPosition).getBlock()).getSignalTypeName();
 	}
 
 	@Callback
@@ -209,7 +209,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			return -1;
 		SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(linkedSignalPosition);
 		IBlockState blockstate = world.getBlockState(linkedSignalPosition);
-		SignalBlock block = (SignalBlock) blockstate.getBlock();
+		Signal block = (Signal) blockstate.getBlock();
 		SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
 		java.util.Optional bool = tile.getProperty(prop);
 		if (bool.isPresent())
