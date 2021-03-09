@@ -24,7 +24,7 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 public class Placementtool extends Item implements IIntegerable<Signal> {
 
 	private Signal[] blocks;
-	
+
 	public Placementtool(Signal... blocks) {
 		this.blocks = blocks;
 		setCreativeTab(GIRTabs.tab);
@@ -71,7 +71,8 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 				SEProperty sep = SEProperty.cst(iup);
 				if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 					sig.setProperty(sep, sep.getObjFromID(compound.getInteger(iup.getName())));
-				} else if (sep.isChangabelAtStage(ChangeableStage.APISTAGE) && compound.getBoolean(iup.getName())) {
+				} else if ((sep.isChangabelAtStage(ChangeableStage.APISTAGE) && compound.getBoolean(iup.getName()))
+						|| sep.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
 					sig.setProperty(sep, sep.getDefault());
 				}
 			});
@@ -87,11 +88,11 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 	public Signal getObjFromID(int obj) {
 		return blocks[obj];
 	}
-	
+
 	public int getTransform(int obj) {
 		int x = 0;
 		for (Signal signalBlock : blocks) {
-			if(signalBlock.getID() == obj)
+			if (signalBlock.getID() == obj)
 				return x;
 			x++;
 		}

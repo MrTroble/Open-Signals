@@ -53,7 +53,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
 		super.readFromNBT(compound);
-		if(world != null && world.isRemote && linkedSignalPosition != null)
+		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
 		NetworkDebug.networkReadHook(compound, world, this);
 	}
@@ -65,7 +65,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		NetworkDebug.networkWriteHook(compound, world, this);
 		return compound;
 	}
-	
+
 	@Override
 	public SPacketUpdateTileEntity getUpdatePacket() {
 		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
@@ -74,7 +74,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 		this.readFromNBT(pkt.getNbtCompound());
-		if(hasLinkImpl())
+		if (hasLinkImpl())
 			onLink();
 	}
 
@@ -87,7 +87,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		IBlockState state = world.getBlockState(linkedSignalPosition);
 		Block block = state.getBlock();
 		if (!(block instanceof Signal)) {
-			if(!world.isRemote)
+			if (!world.isRemote)
 				unlink();
 			return;
 		}
@@ -97,8 +97,12 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
 		((IExtendedBlockState) b.getExtendedState(state, world, linkedSignalPosition)).getUnlistedProperties()
 				.forEach((prop, opt) -> opt.ifPresent(x -> {
-					if (prop instanceof SEProperty && ((SEProperty<?>) prop).isChangabelAtStage(ChangeableStage.APISTAGE))
-						supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop));
+					if (prop instanceof SEProperty) {
+						SEProperty<?> p = ((SEProperty<?>) prop);
+						if (p.isChangabelAtStage(ChangeableStage.APISTAGE)
+								|| p.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+							supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop));
+					}
 				}));
 		listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 		tableOfSupportedSignalTypes = supportedSignaleStates;
@@ -216,7 +220,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			return SEProperty.getIDFromObj(bool.get());
 		return -1;
 	}
-	
+
 	public BlockPos getLinkedPosition() {
 		return linkedSignalPosition;
 	}
