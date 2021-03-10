@@ -6,6 +6,7 @@ import java.util.ArrayList;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
+import eu.gir.girsignals.blocks.SignalBUE;
 import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.SignalEL;
 import eu.gir.girsignals.blocks.SignalHL;
@@ -37,6 +38,7 @@ public class GIRBlocks {
 	public static final SignalEL EL_SIGNAL = new SignalEL();
 	public static final SignalSH SH_SIGNAL = new SignalSH();
 	public static final SignalRA RA_SIGNAL = new SignalRA();
+	public static final SignalBUE BUE_SIGNAL = new SignalBUE();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 

@@ -13,11 +13,6 @@ public class SignalEL extends SignalBlock {
 
 	public static final SEProperty<EL> ELTYPE = SEProperty.of("eltype", EL.EL1V, ChangeableStage.GUISTAGE);
 	public static final SEProperty<EL_ARROW> ELARROW = SEProperty.of("elarrow", EL_ARROW.OFF, ChangeableStage.GUISTAGE);
-
-	@Override
-	public boolean hasCostumColor() {
-		return false;
-	}
 	
 	@Override
 	public boolean canBeLinked() {

@@ -17,6 +17,7 @@ tile.lfsignal.name=Lf Signal
 tile.elsignal.name=El Signal
 tile.shsignal.name=Sh Signal
 tile.rasignal.name=Ra Signal
+tile.buesignal.name=BÜ Signal
 
 #Linktool
 lt.linkfailed=Link fehlgeschlagen!
@@ -62,6 +63,9 @@ property.eltype.name=Fahrleitungssignale
 property.elarrow.name=Richtungspfeil
 property.sh2.name=Schutzsignale
 property.ratype.name=Signale für den Rangierdienst
+property.ralight.name=Sh1 Licht
+property.buetype.name=Bahnübergänge
+property.bueadd.name=Zwischenhalttafel
 
 #Signal Descs
 property.signaltype.desc=Hier kannst du die verschiedenen Signaltypen wählen.
@@ -95,6 +99,9 @@ property.eltype.desc=§nEl1 Ausschaltsignal§r - Das Triebfahrzeug und der Haupt
 property.elarrow.desc=Der Richtungspfeil gibt die Richtung an, in welcher die Fahrleitungssignale gelten.
 property.sh2.desc=§nSh2 Schutzhalt§r - Diese Tafel gebietet Halt und ersetzt ein haltzeigendes Hauptsignal.
 property.ratype.desc=§nRa10 Rangierhalttafel§r - Über die Tafel hinaus darf nicht rangiert werden.%n§nRa11 Wartezeichen§r%n§lRa11a§r - Bevor mit der Spitze einer Rangierfahrt am Wartezeichen vorbei gefahren werden darf, muss der Weichenwärter eine Zustimmung gegeben haben. Die Zustimmung erfolgt entweder durch das Lichtsignal Sh 1 oder einem mündlichen Befehl.%n§lRa11b§r(Besonderheit auf dem GIR Server) - Nach Rücksprache mit dem zuständigen Fahrdienstleiter stellt der Zugführer selbst die entsprechenden Weichen und darf nach erneuter Rücksprache die Rangierfahrt fortsetzen.%n§nRa12 Grenzzeichen§r - Markiert die Grenze, bis zu der bei zusammenlaufenden Gleisen das Gleis besetzt werden darf.
+property.ralight.desc=Lichtsignal Sh 1
+property.buetype.desc=
+property.bueadd.desc=Wenn der Zug zwischen BÜ4 Signal und Bahnübergang einen Halteplatz hat, steht hinter dem Halteplatz ein weiteres BÜ4. Auf dem BÜ4 vor dem Halteplatz ist dann dieses Schild angebracht und gilt nur für Züge, die nicht an dem Halteplatz halten.
 
 #Other
 btn.apply=Anwenden

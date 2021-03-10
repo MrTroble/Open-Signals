@@ -2,9 +2,9 @@ package eu.gir.girsignals.blocks;
 
 
 import eu.gir.girsignals.EnumSignals.RA;
+import eu.gir.girsignals.EnumSignals.RA_LIGHT;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
-import net.minecraft.nbt.NBTTagCompound;
 
 public class SignalRA extends SignalBlock {
 
@@ -13,10 +13,6 @@ public class SignalRA extends SignalBlock {
 	}
 	
 	public static final SEProperty<RA> RATYPE = SEProperty.of("ratype", RA.RA10, ChangeableStage.GUISTAGE);
-	
-	@Override
-	public boolean canBeLinked() {
-		return false;
-	}
+	public static final SEProperty<RA_LIGHT> RALIGHT = SEProperty.of("ralight", RA_LIGHT.OFF);
 	
 }

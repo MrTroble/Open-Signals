@@ -17,6 +17,7 @@ tile.lfsignal.name=Lf Signal
 tile.elsignal.name=El Signal
 tile.shsignal.name=Sh Signal
 tile.rasignal.name=Ra Signal
+tile.buesignal.name=BÜ Signal
 
 #Linktool
 lt.linkfailed=Link failed!
@@ -62,6 +63,9 @@ property.eltype.name=Catenary signals
 property.elarrow.name=Directional arrow
 property.sh2.name=Protection signals
 property.ratype.name=Signals for shunting service
+property.ralight.name=Sh1 Light
+property.buetype.name=Level crossings
+property.bueadd.name=Intermediate stop sign
 
 #Signal Descs
 property.signaltype.desc=Here you can select the different signal types.
@@ -95,6 +99,9 @@ property.eltype.desc=§nEl1 Switch-off signal§r - The locomotive and the main s
 property.elarrow.desc=The direction arrow indicates the direction in which the catenary signals apply.
 property.sh2.desc=§nSh2 Protective stop§r - This sign commands stop and replaces a stop pointing main signal.
 property.ratype.desc=§nRa10 Shunting stop sign§r - Shunting is not allowed beyond the sign.%n§nRa11 Waiting sign§r%n§lRa11a§r - Before the head of a shunting run is allowed to pass the waiting sign, the pointsman must have given his consent. The consent is given either by the light signal Sh 1 or a verbal command.%n§lRa11b§r(Special feature on the GIR server) - After consultation with the responsible dispatcher, the train driver himself sets the appropriate switches and, after renewed consultation, may continue the shunting movement.%n§nRa12 Fouling point marker§r - Marks the boundary up to which the track may be occupied in the case of merging tracks.
+property.ralight.desc=Light signal Sh 1
+property.buetype.desc=
+property.bueadd.desc=If the train has a halt between the BÜ4 signal and the level crossing, there is another BÜ4 behind the halt. This sign is then placed on the BÜ4 in front of the halt and only applies to trains that do not stop at the halt.
 
 #Other
 btn.apply=Apply

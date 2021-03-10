@@ -95,7 +95,15 @@ public class EnumSignals {
 		OFF, LEFT, RIGHT, LEFT_RIGHT, UP;
 	}
 	
-	public enum RA implements DefaultName<RA> {
-		RA10, RA11A, RA11B, RA12;
+	public enum RA implements Offable<RA> {
+		OFF, RA10, RA11A, RA11B, RA12;
+	}
+	
+	public enum RA_LIGHT implements Offable<RA_LIGHT> {
+		OFF, SH1
+	}
+	
+	public enum BUE implements DefaultName<BUE> {
+		BUE4, BUE5;
 	}
 }

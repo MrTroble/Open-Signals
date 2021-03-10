@@ -8,6 +8,7 @@ import javax.accessibility.AccessibleRelation;
 
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
+import eu.gir.girsignals.EnumSignals.BUE;
 import eu.gir.girsignals.EnumSignals.DefaultName;
 import eu.gir.girsignals.EnumSignals.EL;
 import eu.gir.girsignals.EnumSignals.EL_ARROW;
@@ -20,10 +21,12 @@ import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.Offable;
 import eu.gir.girsignals.EnumSignals.RA;
+import eu.gir.girsignals.EnumSignals.RA_LIGHT;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
 import eu.gir.girsignals.EnumSignals.TRAM;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.GirsignalsMain;
+import eu.gir.girsignals.blocks.SignalBUE;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.blocks.SignalEL;
 import eu.gir.girsignals.blocks.SignalBlock.SignalAngel;
@@ -379,13 +382,21 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("sh/sh2", ebs -> true, 1);
 		});
 		registeredModels.put("rasignal", cm -> {
-			cm.register("mast", withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate(), 0);
-			cm.register("mast", withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate().and(withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA10)).negate()), 1);
-			cm.register("mast", withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate().and(withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA10)).negate()), 2);
-			cm.register("ra/ra10", withN(SignalRA.RATYPE, ra -> ra.equals(RA.RA10)), 1);
-			cm.register("ra/ra11", withN(SignalRA.RATYPE, ra -> ra.equals(RA.RA11A)), 3, "2", "girsignals:blocks/ra11a");
-			cm.register("ra/ra11", withN(SignalRA.RATYPE, ra -> ra.equals(RA.RA11B)), 3, "2", "girsignals:blocks/ra11b");
-			cm.register("ra/ra12", withN(SignalRA.RATYPE, ra -> ra.equals(RA.RA12)), 0);
+			cm.register("mast", with(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate(), 0);
+			cm.register("mast", with(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate().and(with(SignalRA.RATYPE, mast -> mast.equals(RA.RA10)).negate()), 1);
+			cm.register("mast", with(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate().and(with(SignalRA.RATYPE, mast -> mast.equals(RA.RA10)).negate()), 2);
+			cm.register("ra/ra10", with(SignalRA.RATYPE, ra -> ra.equals(RA.RA10)), 1);
+			cm.register("ra/ra11", with(SignalRA.RATYPE, ra -> ra.equals(RA.RA11A)), 3, "2", "girsignals:blocks/ra11a");
+			cm.register("ra/ra11", with(SignalRA.RATYPE, ra -> ra.equals(RA.RA11B)), 3, "2", "girsignals:blocks/ra11b");
+			cm.register("ra/ra12", with(SignalRA.RATYPE, ra -> ra.equals(RA.RA12)), 0);
+			cm.register("ra/ra11_sh1", with(SignalRA.RALIGHT, ral -> ral.equals(RA_LIGHT.OFF)).and(with(SignalRA.RATYPE, ra -> ra.equals(RA.RA11A))), 3);
+			cm.register("ra/ra11_sh1", with(SignalRA.RALIGHT, ral -> ral.equals(RA_LIGHT.SH1)).and(with(SignalRA.RATYPE, ra -> ra.equals(RA.RA11A))), 3, "3", "girsignals:blocks/lamp_white_small");
+		});
+		registeredModels.put("buesignal", cm -> {
+			cm.register("mast", ebs -> true, 0);
+			cm.register("ne2", withN(SignalBUE.BUETYPE, BUE.BUE4::equals), 1, "2", "girsignals:blocks/bue4");
+			cm.register("ne2", withN(SignalBUE.BUETYPE, BUE.BUE5::equals), 1, "2", "girsignals:blocks/bue5");
+			cm.register("bue/bueadd", has(SignalBUE.BUEADD).and(withN(SignalBUE.BUETYPE, BUE.BUE4::equals).or(withN(SignalBUE.BUETYPE, BUE.BUE5::equals))), 2);
 		});
 	}
 
