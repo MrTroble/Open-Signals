@@ -57,8 +57,4 @@ public class TrackIOBlock extends Signal {
 		onNeighborChange(world, pos, fromPos);
 	}
 	
-	@Override
-	public void onNeighborChange(IBlockAccess world, BlockPos pos, BlockPos neighbor) {
-	}
-	
 }
