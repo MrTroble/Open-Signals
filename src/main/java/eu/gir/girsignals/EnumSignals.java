@@ -91,7 +91,11 @@ public class EnumSignals {
 		EL1V, EL1, EL2, EL3, EL4, EL5, EL6;
 	}
 	
-	public enum RA implements Offable<RA> {
-		OFF, RA11A, RA11B;
+	public enum EL_ARROW implements Offable<EL_ARROW> {
+		OFF, LEFT, RIGHT, LEFT_RIGHT, UP;
+	}
+	
+	public enum RA implements DefaultName<RA> {
+		RA10, RA11A, RA11B, RA12;
 	}
 }

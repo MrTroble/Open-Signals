@@ -4,8 +4,13 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import javax.accessibility.AccessibleRelation;
+
+import org.apache.commons.io.filefilter.TrueFileFilter;
+
 import eu.gir.girsignals.EnumSignals.DefaultName;
 import eu.gir.girsignals.EnumSignals.EL;
+import eu.gir.girsignals.EnumSignals.EL_ARROW;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import eu.gir.girsignals.EnumSignals.HPVR;
@@ -357,26 +362,30 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		});
 		registeredModels.put("elsignal", cm -> {
 			cm.register("mast", ebs -> true, 0);
-			cm.register("mast", ebs -> true, 1);
-			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL1V::equals), 2, "2", "girsignals:blocks/el1v");
-			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL1::equals), 2, "2", "girsignals:blocks/el1");
-			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL2::equals), 2, "2", "girsignals:blocks/el2");
-			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL3::equals), 2, "2", "girsignals:blocks/el3");
-			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL4::equals), 2, "2", "girsignals:blocks/el4");
-			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL5::equals), 2, "2", "girsignals:blocks/el5");
-			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL6::equals), 2, "2", "girsignals:blocks/el6");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL1V::equals), 1, "2", "girsignals:blocks/el1v");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL1::equals), 1, "2", "girsignals:blocks/el1");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL2::equals), 1, "2", "girsignals:blocks/el2");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL3::equals), 1, "2", "girsignals:blocks/el3");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL4::equals), 1, "2", "girsignals:blocks/el4");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL5::equals), 1, "2", "girsignals:blocks/el5");
+			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL6::equals), 1, "2", "girsignals:blocks/el6");
+			cm.register("el/el_arrow", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.LEFT_RIGHT)), 2, "2", "girsignals:blocks/el_arrow_lr");
+			cm.register("el/el_arrow", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.LEFT)), 2, "2", "girsignals:blocks/el_arrow_l");
+			cm.register("el/el_arrow", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.RIGHT)), 2, "2", "girsignals:blocks/el_arrow_r");
+			cm.register("el/el_arrow_up", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.UP)), 2, "2", "girsignals:blocks/el_arrow_up");
 		});
 		registeredModels.put("shsignal", cm -> {
 			cm.register("sh/sh2_mast", ebs -> true, 0);
 			cm.register("sh/sh2", ebs -> true, 1);
 		});
 		registeredModels.put("rasignal", cm -> {
-			cm.register("mast", has(SignalRA.RA12).negate(), 0);
-			cm.register("mast", has(SignalRA.RA12).negate().and(has(SignalRA.RA10).negate()), 1);
-			cm.register("ra/ra10", has(SignalRA.RA10), 1);
-			cm.register("ra/ra11", with(SignalRA.RATYPE, ra -> ra.equals(RA.RA11A)), 2, "2", "girsignals:blocks/ra11a");
-			cm.register("ra/ra11", with(SignalRA.RATYPE, ra -> ra.equals(RA.RA11B)), 2, "2", "girsignals:blocks/ra11b");
-			cm.register("ra/ra12", has(SignalRA.RA12), 0);;
+			cm.register("mast", withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate(), 0);
+			cm.register("mast", withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate().and(withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA10)).negate()), 1);
+			cm.register("mast", withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate().and(withN(SignalRA.RATYPE, mast -> mast.equals(RA.RA10)).negate()), 2);
+			cm.register("ra/ra10", withN(SignalRA.RATYPE, ra -> ra.equals(RA.RA10)), 1);
+			cm.register("ra/ra11", withN(SignalRA.RATYPE, ra -> ra.equals(RA.RA11A)), 3, "2", "girsignals:blocks/ra11a");
+			cm.register("ra/ra11", withN(SignalRA.RATYPE, ra -> ra.equals(RA.RA11B)), 3, "2", "girsignals:blocks/ra11b");
+			cm.register("ra/ra12", withN(SignalRA.RATYPE, ra -> ra.equals(RA.RA12)), 0);
 		});
 	}
 

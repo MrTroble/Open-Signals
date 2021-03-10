@@ -9,13 +9,8 @@ public class SignalSH extends SignalBlock {
 		super("shsignal", 1);
 	}
 
-	public static final SEProperty<Boolean> SH = SEProperty.of("sh2", true, ChangeableStage.GUISTAGE);
+	public static final SEProperty<Boolean> SH = SEProperty.of("sh2", false);
 
-	@Override
-	public boolean hasCostumColor() {
-		return false;
-	}
-	
 	@Override
 	public boolean canBeLinked() {
 		return false;
