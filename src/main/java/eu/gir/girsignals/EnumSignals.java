@@ -106,4 +106,11 @@ public class EnumSignals {
 	public enum BUE implements DefaultName<BUE> {
 		BUE4, BUE5;
 	}
+	
+	public enum BUE_LIGHT implements Offable<BUE_LIGHT> {
+		OFF, BUE_1;
+	}
+	public enum OTHER_SIGAL implements DefaultName<OTHER_SIGAL> {
+		HM, OB, CROSS;
+	}
 }

@@ -8,7 +8,9 @@ import javax.accessibility.AccessibleRelation;
 
 import org.apache.commons.io.filefilter.TrueFileFilter;
 
+import akka.actor.LightArrayRevolverScheduler;
 import eu.gir.girsignals.EnumSignals.BUE;
+import eu.gir.girsignals.EnumSignals.BUE_LIGHT;
 import eu.gir.girsignals.EnumSignals.DefaultName;
 import eu.gir.girsignals.EnumSignals.EL;
 import eu.gir.girsignals.EnumSignals.EL_ARROW;
@@ -19,6 +21,7 @@ import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
+import eu.gir.girsignals.EnumSignals.OTHER_SIGAL;
 import eu.gir.girsignals.EnumSignals.Offable;
 import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.RA_LIGHT;
@@ -27,6 +30,7 @@ import eu.gir.girsignals.EnumSignals.TRAM;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.SignalBUE;
+import eu.gir.girsignals.blocks.SignalBUELight;
 import eu.gir.girsignals.blocks.SignalBlock;
 import eu.gir.girsignals.blocks.SignalEL;
 import eu.gir.girsignals.blocks.SignalBlock.SignalAngel;
@@ -36,6 +40,7 @@ import eu.gir.girsignals.blocks.SignalHL;
 import eu.gir.girsignals.blocks.SignalHV;
 import eu.gir.girsignals.blocks.SignalKS;
 import eu.gir.girsignals.blocks.SignalLF;
+import eu.gir.girsignals.blocks.SignalOTHER;
 import eu.gir.girsignals.blocks.SignalRA;
 import eu.gir.girsignals.blocks.SignalSHLight;
 import eu.gir.girsignals.blocks.SignalTram;
@@ -329,27 +334,31 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		});
 		registeredModels.put("tramsignal", cm -> {
 			// TRAM off
-			cm.register("trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.OFF)).and(has(SignalTram.CARSIGNAL).negate()), 0);
+			cm.register("trafficlight/trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.OFF)).and(has(SignalTram.CARSIGNAL).negate()), 0);
 			// TRAM f0
-			cm.register("trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F0)).and(has(SignalTram.CARSIGNAL).negate()), 0, "rednorth", "girsignals:blocks/f_0");
+			cm.register("trafficlight/trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F0)).and(has(SignalTram.CARSIGNAL).negate()), 0, "rednorth", "girsignals:blocks/f_0");
 			// TRAM f4
-			cm.register("trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F4)).and(has(SignalTram.CARSIGNAL).negate()), 0, "yellownorth", "girsignals:blocks/f_4");
+			cm.register("trafficlight/trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F4)).and(has(SignalTram.CARSIGNAL).negate()), 0, "yellownorth", "girsignals:blocks/f_4");
 			// TRAM f5
-			cm.register("trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F5)).and(has(SignalTram.CARSIGNAL).negate()), 0, "yellownorth", "girsignals:blocks/f_5");
+			cm.register("trafficlight/trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F5)).and(has(SignalTram.CARSIGNAL).negate()), 0, "yellownorth", "girsignals:blocks/f_5");
 			// TRAM f1
-			cm.register("trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F1)).and(has(SignalTram.CARSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/f_1");
+			cm.register("trafficlight/trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F1)).and(has(SignalTram.CARSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/f_1");
 			// TRAM f2
-			cm.register("trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F2)).and(has(SignalTram.CARSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/f_2");
+			cm.register("trafficlight/trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F2)).and(has(SignalTram.CARSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/f_2");
 			// TRAM f3
-			cm.register("trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F3)).and(has(SignalTram.CARSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/f_3");
+			cm.register("trafficlight/trafficlight_tram", with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F3)).and(has(SignalTram.CARSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/f_3");
 			// CAR off
-			cm.register("trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.OFF)).and(has(SignalTram.TRAMSIGNAL).negate()), 0);
+			cm.register("trafficlight/trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.OFF)).and(has(SignalTram.TRAMSIGNAL).negate()), 0);
 			// Car red
-			cm.register("trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.RED)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "rednorth", "girsignals:blocks/lamp_red");
+			cm.register("trafficlight/trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.RED)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "rednorth", "girsignals:blocks/lamp_red");
 			// Car yellow
-			cm.register("trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.YELLOW)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "yellownorth", "girsignals:blocks/lamp_yellow");
+			cm.register("trafficlight/trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.YELLOW)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "yellownorth", "girsignals:blocks/lamp_yellow");
 			// Car green
-			cm.register("trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.GREEN)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/lamp_green");
+			cm.register("trafficlight/trafficlight_car", with(SignalTram.CARSIGNAL, tr -> tr.equals(TRAM.GREEN)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/lamp_green");
+			// Pedestrian Signal
+			cm.register("trafficlight/trafficlight_ped", with(SignalTram.PEDSIGNAL, tr -> tr.equals(TRAM.OFF)).and(has(SignalTram.TRAMSIGNAL).negate()), 0);
+			cm.register("trafficlight/trafficlight_ped", with(SignalTram.PEDSIGNAL, tr -> tr.equals(TRAM.RED)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "rednorth", "girsignals:blocks/lamp_red");
+			cm.register("trafficlight/trafficlight_ped", with(SignalTram.PEDSIGNAL, tr -> tr.equals(TRAM.GREEN)).and(has(SignalTram.TRAMSIGNAL).negate()), 0, "greennorth", "girsignals:blocks/lamp_green");
 		});
 		registeredModels.put("lfsignal", cm -> {
 			cm.register("mast_lamps", hasAndIs(SignalLF.LAMPS), 0);
@@ -397,6 +406,21 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ne2", withN(SignalBUE.BUETYPE, BUE.BUE4::equals), 1, "2", "girsignals:blocks/bue4");
 			cm.register("ne2", withN(SignalBUE.BUETYPE, BUE.BUE5::equals), 1, "2", "girsignals:blocks/bue5");
 			cm.register("bue/bueadd", has(SignalBUE.BUEADD).and(withN(SignalBUE.BUETYPE, BUE.BUE4::equals).or(withN(SignalBUE.BUETYPE, BUE.BUE5::equals))), 2);
+		});
+		registeredModels.put("buelight", cm -> {
+			cm.register("bue/bue_base", ebs -> true, 0);
+			cm.register("bue/bue_mast_1", ebs -> true, 1);
+			cm.register("bue/bue_mast_2", ebs -> true, 2);
+			cm.register("bue/bue_signal_head", with(SignalBUELight.BUELIGHT, light -> light.equals(BUE_LIGHT.OFF)), 3);
+			cm.register("bue/bue_signal_head", with(SignalBUELight.BUELIGHT, light -> light.equals(BUE_LIGHT.BUE_1)), 3, "7", "girsignals:blocks/lamp_white_blink");
+			cm.register("bue/bue_ne_2_2", has(SignalBUELight.NE2_2), 1);
+			cm.register("bue/bue_ne_2_4", has(SignalBUELight.NE2_4), 1);
+		});
+		registeredModels.put("othersignal", cm -> {
+			cm.register("mast", withN(SignalOTHER.OTHERTYPE, other -> other.equals(OTHER_SIGAL.CROSS)).negate(), 0);
+			cm.register("other_signals/hm_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.HM::equals), 1);
+			cm.register("other_signals/ob_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.OB::equals), 1);
+			cm.register("other_signals/cross_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.CROSS::equals), 0);
 		});
 	}
 

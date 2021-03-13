@@ -11,4 +11,5 @@ public class SignalTram extends SignalBlock {
 
 	public static final SEProperty<TRAM> TRAMSIGNAL = SEProperty.of("signaltram", TRAM.OFF);
 	public static final SEProperty<TRAM> CARSIGNAL = SEProperty.of("signalcar", TRAM.OFF);
+	public static final SEProperty<TRAM> PEDSIGNAL = SEProperty.of("signalped", TRAM.OFF);
 }

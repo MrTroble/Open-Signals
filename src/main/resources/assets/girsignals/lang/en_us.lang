@@ -18,6 +18,8 @@ tile.elsignal.name=El Signal
 tile.shsignal.name=Sh Signal
 tile.rasignal.name=Ra Signal
 tile.buesignal.name=BÜ Signal
+tile.othersignal.name=Other signals
+tile.buelight.name=BÜ Signal
 
 #Linktool
 lt.linkfailed=Link failed!
@@ -64,8 +66,11 @@ property.elarrow.name=Directional arrow
 property.sh2.name=Protection signals
 property.ratype.name=Signals for shunting service
 property.ralight.name=Sh1 Light
-property.buetype.name=Level crossings
+property.buetype.name=Level crossing signal
 property.bueadd.name=Intermediate stop sign
+property.othertype.name=Other signals
+property.signalped.name=Pedestrian lights
+property.buelight.name=Level crossing signal
 
 #Signal Descs
 property.signaltype.desc=Here you can select the different signal types.
@@ -102,6 +107,9 @@ property.ratype.desc=§nRa10 Shunting stop sign§r - Shunting is not allowed bey
 property.ralight.desc=Light signal Sh 1
 property.buetype.desc=
 property.bueadd.desc=If the train has a halt between the BÜ4 signal and the level crossing, there is another BÜ4 behind the halt. This sign is then placed on the BÜ4 in front of the halt and only applies to trains that do not stop at the halt.
+property.othertype.desc=Here you can find other signals that do not have their own labels.
+property.signalped.desc=
+property.buelight.desc=
 
 #Other
 btn.apply=Apply
