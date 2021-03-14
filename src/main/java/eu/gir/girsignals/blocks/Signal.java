@@ -20,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
@@ -103,23 +104,23 @@ public class Signal extends Block implements ITileEntityProvider {
 		return getBoundingBox(blockState, worldIn, pos);
 	}
 
-	public static ItemStack pickBlock(EntityPlayer player) {
+	public static ItemStack pickBlock(EntityPlayer player, Item item) {
 		// Compatibility issues with other mods ...
 		if (!Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown())
-			return new ItemStack(GIRItems.PLACEMENT_TOOL);
+			return new ItemStack(item);
 		for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k) {
 			if (player.inventory.getStackInSlot(k).getItem().equals(GIRItems.PLACEMENT_TOOL)) {
 				player.inventory.currentItem = k;
-				return ItemStack.EMPTY;
+				return new ItemStack(item);
 			}
 		}
-		return new ItemStack(GIRItems.PLACEMENT_TOOL);
+		return new ItemStack(item);
 	}
 
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
 			EntityPlayer player) {
-		return pickBlock(player);
+		return pickBlock(player, GIRItems.PLACEMENT_TOOL);
 	}
 
 	@Override
