@@ -79,6 +79,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 			String str = compound.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME);
 			if (!str.isEmpty())
 				sig.setCustomName(str);
+			sig.setBlockID();
 			worldIn.notifyBlockUpdate(setPosition, ebs.getBaseState(), ebs.getBaseState(), 3);
 			return EnumActionResult.SUCCESS;
 		}

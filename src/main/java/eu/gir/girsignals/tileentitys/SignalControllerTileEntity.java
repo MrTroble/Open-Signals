@@ -138,6 +138,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	public boolean loadChunkAndGetTile(BiConsumer<SignalTileEnity, Chunk> consumer) {
 		TileEntity entity = null;
+		if(linkedSignalPosition == null)
+			return false;
 		Chunk ch = world.getChunkFromBlockCoords(linkedSignalPosition);
 		boolean flag = !ch.isLoaded();
 		if (flag) {

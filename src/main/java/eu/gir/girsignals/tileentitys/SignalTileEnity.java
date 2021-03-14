@@ -164,7 +164,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	}
 	
 	public void setBlockID() {
-		
+		blockID = ((Signal)world.getBlockState(pos).getBlock()).getID();
 	}
 	
 	public int getBlockID() {
