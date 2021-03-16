@@ -117,6 +117,11 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 		return this.stage.equals(stage);
 	}
 	
+	@Override
+	public String toString() {
+		return "SEP[" + this.getName() + "]";
+	}
+	
 	@SuppressWarnings("rawtypes")
 	public static SEProperty<?> cst(Object iup) {
 		return (SEProperty) iup;
