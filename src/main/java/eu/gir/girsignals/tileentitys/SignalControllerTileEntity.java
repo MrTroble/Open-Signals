@@ -214,10 +214,10 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		if (!find(getSupportedSignalTypesImpl(), type))
 			return false;
 		loadChunkAndGetTile((tile, chunk) -> {
-			Signal block = (Signal) Signal.SIGNALLIST.get(tile.getBlockID());
+			IBlockState state = chunk.getBlockState(linkedSignalPosition);
+			Signal block = (Signal) state.getBlock();
 			SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
 			tile.setProperty(prop, prop.getObjFromID(newSignal));
-			IBlockState state = chunk.getBlockState(linkedSignalPosition);
 			world.markAndNotifyBlock(linkedSignalPosition, chunk, state, state, 3);
 		});
 		return true;
