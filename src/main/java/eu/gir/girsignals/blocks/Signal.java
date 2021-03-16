@@ -80,7 +80,8 @@ public class Signal extends Block implements ITileEntityProvider {
 	public Signal(String signalTypeName, int height, float customNameRenderHeight) {
 		super(Material.ROCK);
 		this.signalTypeName = signalTypeName;
-		setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
+		if(hasAngel())
+			setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
 		ID = SIGNALLIST.size();
 		SIGNALLIST.add(this);
 		this.height = height;
@@ -109,7 +110,7 @@ public class Signal extends Block implements ITileEntityProvider {
 		if (!Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown())
 			return new ItemStack(item);
 		for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k) {
-			if (player.inventory.getStackInSlot(k).getItem().equals(GIRItems.PLACEMENT_TOOL)) {
+			if (player.inventory.getStackInSlot(k).getItem().equals(item)) {
 				player.inventory.currentItem = k;
 				return new ItemStack(item);
 			}
@@ -126,18 +127,20 @@ public class Signal extends Block implements ITileEntityProvider {
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
 			float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+		if(!hasAngel())
+			return getDefaultState();
 		int x = Math.abs((int) (placer.rotationYaw / 22.5f)) % 16;
 		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[x]);
 	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[meta]);
+		return hasAngel() ? getDefaultState().withProperty(ANGEL, SignalAngel.values()[meta]):getDefaultState();
 	}
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return state.getValue(ANGEL).ordinal();
+		return hasAngel() ? state.getValue(ANGEL).ordinal():0;
 	}
 
 	@Override
@@ -152,7 +155,7 @@ public class Signal extends Block implements ITileEntityProvider {
 
 	@Override
 	public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
-		return layer.equals(BlockRenderLayer.CUTOUT);
+		return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -219,7 +222,7 @@ public class Signal extends Block implements ITileEntityProvider {
 		}
 		if(customNameRenderHeight != -1)
 			prop.add(CUSTOMNAME);
-		return new ExtendedBlockState(this, new IProperty<?>[] { ANGEL },
+		return new ExtendedBlockState(this, hasAngel() ? new IProperty<?>[] { ANGEL }:new IProperty<?>[] {},
 				prop.toArray(new IUnlistedProperty[prop.size()]));
 	}
 
@@ -266,6 +269,10 @@ public class Signal extends Block implements ITileEntityProvider {
 	}
 	
 	public boolean canBeLinked() {
+		return true;
+	}
+	
+	public boolean hasAngel() {
 		return true;
 	}
 	

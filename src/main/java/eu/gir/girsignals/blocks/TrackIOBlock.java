@@ -57,4 +57,8 @@ public class TrackIOBlock extends Signal {
 		onNeighborChange(world, pos, fromPos);
 	}
 	
+	@Override
+	public boolean hasAngel() {
+		return false;
+	}
 }
