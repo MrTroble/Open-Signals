@@ -39,7 +39,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		map.forEach((prop, in) -> prop.writeToNBT(comp, in));
 		if (formatCustomName != null)
 			comp.setString(CUSTOMNAME, formatCustomName);
-		comp.setInteger(BLOCKID, blockID);
+		compound.setInteger(BLOCKID, blockID);
 		compound.setTag(PROPERTIES, comp);
 		super.writeToNBT(compound);
 		NetworkDebug.networkWriteHook(compound, world, this);
@@ -52,6 +52,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public void readFromNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
 		super.readFromNBT(compound);
+		blockID = comp.getInteger(BLOCKID);
 		if (world == null) {
 			__tmp = comp.copy();
 		} else {
@@ -68,7 +69,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 				});
 		if (comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));
-		blockID = comp.getInteger(BLOCKID);
 		NetworkDebug.networkReadHook(comp, world, new Object[] { this, new JsonPrimitive(__tmp == null) } );
 	}
 
