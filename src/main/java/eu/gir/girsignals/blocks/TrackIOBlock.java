@@ -50,7 +50,6 @@ public class TrackIOBlock extends Signal {
 		IExtendedBlockState state = (IExtendedBlockState) getExtendedState(osstate, world, pos);
 		if (state != null && state.getValue(INPUTMODE) && !world.isRemote) {
 			boolean b = Arrays.stream(EnumFacing.VALUES).anyMatch(e -> world.isSidePowered(pos.offset(e), e.getOpposite()));
-			System.out.println(b);
 			SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
 			entity.setProperty(VALUE, b);
 		}

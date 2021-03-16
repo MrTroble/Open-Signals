@@ -31,7 +31,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	private static final String BLOCKID = "blockid";
 
 	private String formatCustomName = null;
-	private int blockID = 0;
+	private int blockID = -1;
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
