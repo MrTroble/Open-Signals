@@ -21,11 +21,18 @@ public class TrackIOTileEntity extends TileEntity implements SimpleComponent {
 			if (entity != null && entity instanceof Environment) {
 				final Environment env = (Environment) entity;
 				final Node node = env.node();
-				node.sendToReachable("computer.signal", signalname, objects);
+				if(node != null)
+					node.sendToReachable("computer.signal", signalname, objects);
 			}
 		}
 	}
 
+	@Override
+	public void onLoad() {
+		super.onLoad();
+		sendSignalReachable("test");
+	}
+	
 	@Override
 	public String getComponentName() {
 		return "trackio";
