@@ -15,8 +15,10 @@ import eu.gir.girsignals.blocks.signals.SignalLF;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalTram;
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -47,6 +49,15 @@ public class GIRBlocks {
 					block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
 					block.setUnlocalizedName(name);
 					blocksToRegister.add(block);
+					if(block instanceof ITileEntityProvider) {
+						ITileEntityProvider provider = (ITileEntityProvider) block;
+						try {
+							Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0).getClass();
+							TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
+						} catch(NullPointerException ex) {
+							GirsignalsMain.LOG.trace("All tileentity provide need to call back a default entity if the world is null!", ex);
+						}
+					}
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					e.printStackTrace();
 				}

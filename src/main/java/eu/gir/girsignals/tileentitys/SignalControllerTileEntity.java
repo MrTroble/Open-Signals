@@ -29,7 +29,7 @@ import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
 public class SignalControllerTileEntity extends TileEntity implements SimpleComponent {
-
+	
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
@@ -154,9 +154,10 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		if (ch == null)
 			return false;
 		entity = ch.getTileEntity(linkedSignalPosition, EnumCreateEntityType.IMMEDIATE);
-		boolean flag2 = entity instanceof SignalTileEnity;
-		if (flag2)
+		boolean flag2 = entity instanceof SignalTileEnity && ((SignalTileEnity)entity).getBlockID() != -1;
+		if (flag2) {
 			consumer.accept((SignalTileEnity) entity, ch);
+		}
 
 		if (flag) {
 			if (world.isRemote) {
