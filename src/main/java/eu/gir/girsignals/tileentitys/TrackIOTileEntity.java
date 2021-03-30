@@ -43,6 +43,8 @@ public class TrackIOTileEntity extends TileEntity implements SimpleComponent {
 	@Override
 	public void onLoad() {
 		super.onLoad();
+		if(world.isRemote)
+			return;
 		for (EnumFacing face : EnumFacing.VALUES) {
 			BlockPos npos = pos.offset(face);
 			EnumFacing opp = face.getOpposite();
@@ -52,10 +54,13 @@ public class TrackIOTileEntity extends TileEntity implements SimpleComponent {
 			if(driver == null)
 				continue;
 			ManagedEnvironment managed = driver.createEnvironment(world, npos, opp);
-			System.out.println(managed.node());
-			//foreach((env, node) -> managed.node());
+			System.out.println(managed);
+			foreach((env, node) -> {
+				managed.node().connect(node);
+				node.connect(managed.node());
+			});
 		}
-		sendSignalReachable("test2");
+		sendSignalReachable("test3");
 	}
 
 	@Override
