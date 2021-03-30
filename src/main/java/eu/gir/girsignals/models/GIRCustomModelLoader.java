@@ -348,6 +348,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 				cm.register("lf6", withN(SignalLF.LFTYPE, LFBACKGROUND.LF6::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1, rename);
 			}
 		});
+		
 	}
 
 	@Override
