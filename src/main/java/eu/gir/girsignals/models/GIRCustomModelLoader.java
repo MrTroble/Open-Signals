@@ -462,8 +462,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 					"rednorth", "girsignals:blocks/lamp_red");
 			// Car yellow
 			cm.register("trafficlight/trafficlight_car",
-					with(SignalTram.CARSIGNAL, tr -> tr.equals(CAR.YELLOW)).and(has(SignalTram.TRAMSIGNAL).negate()),
-					0, "yellownorth", "girsignals:blocks/lamp_yellow");
+					with(SignalTram.CARSIGNAL, tr -> tr.equals(CAR.YELLOW)).and(has(SignalTram.TRAMSIGNAL).negate()), 0,
+					"yellownorth", "girsignals:blocks/lamp_yellow");
 			// Car green
 			cm.register("trafficlight/trafficlight_car",
 					with(SignalTram.CARSIGNAL, tr -> tr.equals(CAR.GREEN)).and(has(SignalTram.TRAMSIGNAL).negate()), 0,
@@ -489,14 +489,17 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 				cm.register("lf/lf1_2",
 						withN(SignalLF.LFTYPE, LFBACKGROUND.LF2::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1,
 						rename);
-				cm.register("lf/lf3_5_7",
-						withN(SignalLF.LFTYPE, LFBACKGROUND.LF3_5_7::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1,
-						rename);
+				cm.register("lf/lf3_5",
+						withN(SignalLF.LFTYPE, LFBACKGROUND.LF3_5::equals).and(withN(SignalLF.INDICATOR, lf1::equals)),
+						1, rename);
 				cm.register("lf/lf4",
 						withN(SignalLF.LFTYPE, LFBACKGROUND.LF4::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1,
 						rename);
 				cm.register("lf/lf6",
 						withN(SignalLF.LFTYPE, LFBACKGROUND.LF6::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1,
+						rename);
+				cm.register("lf/lf7",
+						withN(SignalLF.LFTYPE, LFBACKGROUND.LF7::equals).and(withN(SignalLF.INDICATOR, lf1::equals)), 1,
 						rename);
 			}
 		});
@@ -509,14 +512,10 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL4::equals), 1, "2", "girsignals:blocks/el4");
 			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL5::equals), 1, "2", "girsignals:blocks/el5");
 			cm.register("el/el", withN(SignalEL.ELTYPE, EL.EL6::equals), 1, "2", "girsignals:blocks/el6");
-			cm.register("el/el_arrow", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.LEFT_RIGHT)), 2, "2",
-					"girsignals:blocks/el_arrow_lr");
-			cm.register("el/el_arrow", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.LEFT)), 2, "2",
-					"girsignals:blocks/el_arrow_l");
-			cm.register("el/el_arrow", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.RIGHT)), 2, "2",
-					"girsignals:blocks/el_arrow_r");
-			cm.register("el/el_arrow_up", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.UP)), 2, "2",
-					"girsignals:blocks/el_arrow_up");
+			cm.register("el/el_arrow_lr", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.LEFT_RIGHT)), 2);
+			cm.register("el/el_arrow_l", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.LEFT)), 2);
+			cm.register("el/el_arrow_r", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.RIGHT)), 2);
+			cm.register("el/el_arrow_up", with(SignalEL.ELARROW, ela -> ela.equals(EL_ARROW.UP)), 2);
 		});
 		registeredModels.put("shsignal", cm -> {
 			cm.register("sh/sh2_mast", ebs -> true, 0);
@@ -541,8 +540,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		});
 		registeredModels.put("buesignal", cm -> {
 			cm.register("mast", ebs -> true, 0);
-			cm.register("ne2", withN(SignalBUE.BUETYPE, BUE.BUE4::equals), 1, "2", "girsignals:blocks/bue4");
-			cm.register("ne2", withN(SignalBUE.BUETYPE, BUE.BUE5::equals), 1, "2", "girsignals:blocks/bue5");
+			cm.register("bue/bue4", withN(SignalBUE.BUETYPE, BUE.BUE4::equals), 1);
+			cm.register("bue/bue5", withN(SignalBUE.BUETYPE, BUE.BUE5::equals), 1);
 			cm.register("bue/bueadd",
 					has(SignalBUE.BUEADD).and(
 							withN(SignalBUE.BUETYPE, BUE.BUE4::equals).or(withN(SignalBUE.BUETYPE, BUE.BUE5::equals))),

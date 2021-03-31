@@ -3,7 +3,7 @@
 	"textures": {
 		"0": "girsignals:blocks/shield_gray",
 		"1": "girsignals:blocks/shield_black",
-		"2": "girsignals:blocks/lf1_2",
+		"2": "girsignals:blocks/lf3",
 		"particle": "girsignals:blocks/shield_gray",
 		"overlay": "girsignals:blocks/zs3/nz10"
 	},

@@ -36,8 +36,8 @@ public class EnumSignals {
 	}
 
 	public enum ZS32 implements Offable<ZS32> {
-		OFF(true), A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z1, Z2, Z3, Z4, Z5, Z6, Z7,
-		Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, ZS6(true), ZS8(true), ZS13(true);
+		OFF(true), A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z1, Z2, Z3, Z4, Z5, Z6,
+		Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, ZS6(true), ZS8(true), ZS13(true);
 
 		private final boolean test;
 
@@ -67,12 +67,12 @@ public class EnumSignals {
 	}
 
 	public enum KS_DISTANT implements Offable<KS_DISTANT> {
-		OFF, KS1, KS1_REPEAT, KS1_BLINK, KS1_BLINK_LIGHT, KS1_BLINK_REPEAT, KS2, KS2_LIGHT, KS2_REPEAT,
-		KS_STATUS_LIGHT;
+		OFF, KS1, KS1_REPEAT, KS1_BLINK, KS1_BLINK_LIGHT, KS1_BLINK_REPEAT, KS2, KS2_LIGHT, KS2_REPEAT, KS_STATUS_LIGHT;
 	}
 
 	public enum HL implements Offable<HL> {
-		OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2_3, HL4, HL5_6, HL7, HL8_9, HL10, HL11_12, HL_ZS1, HL_SHUNTING, HL_STATUS_LIGHT, MALFUNCTION;
+		OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2_3, HL4, HL5_6, HL7, HL8_9, HL10, HL11_12, HL_ZS1, HL_SHUNTING,
+		HL_STATUS_LIGHT, MALFUNCTION;
 	}
 
 	public enum HL_DISTANT implements Offable<HL_DISTANT> {
@@ -90,7 +90,7 @@ public class EnumSignals {
 	public enum TRAM implements Offable<TRAM> {
 		OFF, F0, F1, F2, F3, F4, F5;
 	}
-	
+
 	public enum CAR implements Offable<CAR> {
 		OFF, RED, YELLOW, GREEN;
 	}
@@ -109,7 +109,7 @@ public class EnumSignals {
 	}
 
 	public enum LFBACKGROUND implements DefaultName<LFBACKGROUND> {
-		LF1, LF2, LF3_5_7, LF4, LF6;
+		LF1, LF2, LF3_5, LF4, LF6, LF7;
 	}
 
 	public enum EL implements DefaultName<EL> {

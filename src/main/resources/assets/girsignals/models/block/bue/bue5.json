@@ -1,16 +1,15 @@
 {
-	"credit": "Made with Blockbench",
+	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"textures": {
 		"0": "girsignals:blocks/shield_gray",
 		"1": "girsignals:blocks/shield_black",
-		"2": "girsignals:blocks/lf3",
-		"particle": "girsignals:blocks/shield_gray",
-		"overlay": "girsignals:blocks/zs3/nz10"
+		"2": "girsignals:blocks/bue5",
+		"particle": "girsignals:blocks/shield_gray"
 	},
 	"elements": [
 		{
 			"from": [7, 0, 7],
-			"to": [9, 5, 9],
+			"to": [9, 12, 9],
 			"faces": {
 				"north": {"uv": [0, 0, 2, 5], "texture": "#0"},
 				"east": {"uv": [0, 0, 2, 5], "texture": "#0"},
@@ -21,18 +20,11 @@
 			}
 		},
 		{
-			"from": [4.5, 2, 5.99],
-			"to": [11.5, 12, 7],
-			"faces": {
-				"north": {"uv": [0, 0, 5, 7], "texture": "#overlay", "tintindex": 0}
-			}
-		},
-		{
 			"name": "sign",
-			"from": [3, 0, 6],
-			"to": [13, 14, 7],
+			"from": [3, 4, 6],
+			"to": [13, 18, 7],
 			"faces": {
-				"north": {"uv": [4, 5, 12, 16], "texture": "#2"},
+				"north": {"uv": [0, 0, 10, 14], "texture": "#2"},
 				"east": {"uv": [0, 0, 9, 1.5], "texture": "#1"},
 				"south": {"uv": [0, 0, 9, 1.5], "texture": "#1"},
 				"west": {"uv": [0, 0, 9, 1.5], "texture": "#1"},
@@ -41,11 +33,11 @@
 			}
 		}
 	],
-	"groups": [0, 1,
+	"groups": [0,
 		{
 			"name": "sign",
 			"origin": [8, 8, 8],
-			"children": [2]
+			"children": [1]
 		}
 	]
 }
