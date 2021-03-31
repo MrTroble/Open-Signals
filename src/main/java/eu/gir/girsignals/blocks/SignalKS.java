@@ -2,6 +2,7 @@ package eu.gir.girsignals.blocks;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.KS;
+import eu.gir.girsignals.EnumSignals.KS_DISTANT;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -13,7 +14,7 @@ public class SignalKS extends SignalBlock {
 	}
 
 	public static final SEProperty<KS> STOPSIGNAL = SEProperty.of("kombisignal", KS.OFF);
-	public static final SEProperty<KS> DISTANTSIGNAL = SEProperty.of("kombisignal_distant", KS.OFF);
+	public static final SEProperty<KS_DISTANT> DISTANTSIGNAL = SEProperty.of("kombisignal_distant", KS_DISTANT.OFF);
 	public static final SEProperty<MAST_SIGN> MASTSIGN = SEProperty.of("mastsign", MAST_SIGN.OFF, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false);
 	public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false);

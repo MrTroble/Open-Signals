@@ -2,7 +2,7 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"textures": {
 		"1": "girsignals:blocks/shield_black",
-		"2": "girsignals:blocks/el_arrow_u",
+		"2": "girsignals:blocks/el_arrow_up",
 		"particle": "girsignals:blocks/shield_black"
 	},
 	"elements": [

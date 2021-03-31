@@ -2,6 +2,7 @@ package eu.gir.girsignals.blocks;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.HL;
+import eu.gir.girsignals.EnumSignals.HL_DISTANT;
 import eu.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.ZS32;
@@ -14,12 +15,12 @@ public class SignalHL extends SignalBlock {
 	}
 
 	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF);
-	public static final SEProperty<HL> DISTANTSIGNAL = SEProperty.of("mainlightsignal_distant", HL.OFF);
+	public static final SEProperty<HL_DISTANT> DISTANTSIGNAL = SEProperty.of("mainlightsignal_distant", HL_DISTANT.OFF);
 	public static final SEProperty<HL_LIGHTBAR> LIGHTBAR = SEProperty.of("mainlightsignallightbar", HL_LIGHTBAR.OFF);
 	public static final SEProperty<MAST_SIGN> MASTSIGN = SEProperty.of("mastsign", MAST_SIGN.OFF, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false);
 	public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false);
 	public static final SEProperty<Boolean> NE2_2 = SEProperty.of("ne2_2", false);
 	public static final SEProperty<Boolean> NE2_4 = SEProperty.of("ne2_4", false);
-	public static final SEProperty<ZS32> ZS2 = SEProperty.of("zs3", ZS32.OFF);
+	public static final SEProperty<ZS32> ZS2 = SEProperty.of("zs2", ZS32.OFF);
 }
