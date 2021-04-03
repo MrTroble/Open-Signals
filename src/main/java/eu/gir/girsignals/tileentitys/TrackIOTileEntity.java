@@ -1,8 +1,6 @@
 package eu.gir.girsignals.tileentitys;
 
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import li.cil.oc.api.API;
 import li.cil.oc.api.driver.DriverBlock;
@@ -10,9 +8,6 @@ import li.cil.oc.api.network.Environment;
 import li.cil.oc.api.network.ManagedEnvironment;
 import li.cil.oc.api.network.Node;
 import li.cil.oc.api.network.SimpleComponent;
-import li.cil.oc.api.prefab.AbstractManagedEnvironment;
-import net.minecraft.block.BlockRedstoneLight;
-import net.minecraft.block.BlockRedstoneTorch;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;

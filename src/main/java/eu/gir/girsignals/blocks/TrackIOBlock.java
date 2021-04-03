@@ -1,6 +1,5 @@
 package eu.gir.girsignals.blocks;
 
-import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.tileentitys.TrackIOTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;

@@ -1,7 +1,7 @@
 package eu.gir.girsignals.blocks.signals;
 
-import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
+import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
 import net.minecraft.nbt.NBTTagCompound;
 
