@@ -12,7 +12,7 @@ public class TrackIOBlock extends Block implements ITileEntityProvider {
 
 	public TrackIOBlock() {
 		super(Material.GROUND);
-		setCreativeTab(GIRTabs.tab);
+		//setCreativeTab(GIRTabs.tab);
 	}
 
 	@Override
