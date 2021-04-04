@@ -1,11 +1,12 @@
-package eu.gir.girsignals.blocks;
+package eu.gir.girsignals.blocks.signals;
 
 import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.blocks.Signal;
 
-public class SignalLF extends SignalBlock {
+public class SignalLF extends Signal {
 
 	public SignalLF() {
 		super("lfsignal", 1);

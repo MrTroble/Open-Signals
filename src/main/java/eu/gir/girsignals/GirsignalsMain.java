@@ -4,6 +4,8 @@ import static eu.gir.girsignals.debug.Debug.DEBUG;
 import static eu.gir.girsignals.debug.Debug.INSTANCE;
 import static eu.gir.girsignals.debug.Debug.SUBCOMMANDS;
 
+import org.apache.logging.log4j.Logger;
+
 import eu.gir.girsignals.debug.NetworkDebug;
 import eu.gir.girsignals.proxy.CommonProxy;
 import net.minecraftforge.fml.common.Mod;
@@ -29,9 +31,11 @@ public class GirsignalsMain {
 
 	@SidedProxy(serverSide = "eu.gir.girsignals.proxy.CommonProxy", clientSide = "eu.gir.girsignals.proxy.ClientProxy")
 	public static CommonProxy PROXY;
+	public static Logger LOG;
 
 	@EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
+		LOG =event.getModLog();
 		PROXY.preinit(event);
 	}
 

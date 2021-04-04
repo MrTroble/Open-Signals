@@ -2,7 +2,7 @@ package eu.gir.girsignals.init;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import io.netty.buffer.ByteBuf;
@@ -69,7 +69,7 @@ public class GIRNetworkHandler {
 		byte[] strBuff = new byte[length];
 		payBuf.readBytes(strBuff);
 		String customName = new String(strBuff);
-		SignalBlock block = SignalBlock.SIGNALLIST.get(blockType);
+		Signal block = Signal.SIGNALLIST.get(blockType);
 		ExtendedBlockState blockState = (ExtendedBlockState) block.getBlockState();
 		NBTTagCompound tagCompound = new NBTTagCompound();
 		tagCompound.setInteger(BLOCK_TYPE_ID, blockType);

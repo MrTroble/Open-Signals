@@ -1,6 +1,10 @@
 # Changelog
 
-## [Internal changes] 4.3.2021 - 1
+## [Fixes] 4.4.2021 - 2
+* Fixed issue with signal controlling out of loaded chunks
+* Fixed issue with block pick returning null
+
+## [Internal changes] 4.4.2021 - 1
 
 ## [Additions] 3.3.2021 - 1
 

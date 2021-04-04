@@ -1,6 +1,6 @@
 package eu.gir.girsignals.items;
 
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
@@ -27,8 +27,8 @@ public class Linkingtool extends Item {
 		if (worldIn.isRemote)
 			return EnumActionResult.PASS;
 		Block block = worldIn.getBlockState(pos).getBlock();
-		if (block instanceof SignalBlock) {
-			if(!((SignalBlock) block).canBeLinked()) {
+		if (block instanceof Signal) {
+			if(!((Signal) block).canBeLinked()) {
 				player.sendMessage(new TextComponentTranslation("lt.notaddable", pos.toString()));
 				return EnumActionResult.FAIL;
 			}
