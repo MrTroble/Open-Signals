@@ -52,9 +52,8 @@ public class GuiPlacementtool extends GuiScreen {
 		if (comp == null)
 			this.comp = new NBTTagCompound();
 		tool = (Placementtool) stack.getItem();
-		int signalBlockID = this.comp.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID) ? this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID):tool.getObjFromID(0).getID();
-		usedBlock = tool.getTransform(signalBlockID);
-		currentSelectedBlock = Signal.SIGNALLIST.get(signalBlockID);
+		usedBlock = this.comp.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID) ? this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID):tool.getObjFromID(0).getID();
+		currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 	}
 
@@ -68,7 +67,7 @@ public class GuiPlacementtool extends GuiScreen {
 		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
-		if(currentSelectedBlock.getCustomnameRenderHeight() != -1)
+		if(currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
 			textField.drawTextBox();
 
 		if (dragging) {
@@ -232,7 +231,7 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
-		if(currentSelectedBlock.getCustomnameRenderHeight() != -1)
+		if(currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
 			textField.mouseClicked(mouseX, mouseY, mouseButton);
 		if (mouseButton == 0) {
 			this.dragging = true;
@@ -254,7 +253,7 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		super.keyTyped(typedChar, keyCode);
-		if(currentSelectedBlock.getCustomnameRenderHeight() != -1)
+		if(currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
 			textField.textboxKeyTyped(typedChar, keyCode);
 	}
 

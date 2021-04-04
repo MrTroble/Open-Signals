@@ -6,11 +6,12 @@ import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.init.GIRItems;
 
 public class SignalHV extends Signal {
 
 	public SignalHV() {
-		super("HV", 6, 2.775f);
+		super(GIRItems.PLACEMENT_TOOL, "HV", 6, 2.775f);
 	}
 
 	public static final SEProperty<HPVR> STOPSIGNAL = SEProperty.of("stopsignal", HPVR.OFF);

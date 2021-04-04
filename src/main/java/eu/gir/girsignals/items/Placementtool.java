@@ -1,6 +1,9 @@
 package eu.gir.girsignals.items;
 
 import eu.gir.girsignals.EnumSignals.IIntegerable;
+
+import java.util.ArrayList;
+
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -23,13 +26,16 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 
 public class Placementtool extends Item implements IIntegerable<Signal> {
 
-	private Signal[] blocks;
+	private final ArrayList<Integer> signalids = new ArrayList<>();
 
-	public Placementtool(Signal... blocks) {
-		this.blocks = blocks;
+	public Placementtool() {
 		setCreativeTab(GIRTabs.tab);
 	}
 
+	public void addSignal(final Signal sig) {
+		signalids.add(sig.getID());
+	}
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand,
@@ -87,22 +93,12 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 
 	@Override
 	public Signal getObjFromID(int obj) {
-		return blocks[obj];
-	}
-
-	public int getTransform(int obj) {
-		int x = 0;
-		for (Signal signalBlock : blocks) {
-			if (signalBlock.getID() == obj)
-				return x;
-			x++;
-		}
-		return x;
+		return Signal.SIGNALLIST.get(signalids.get(obj));
 	}
 
 	@Override
 	public int count() {
-		return blocks.length;
+		return signalids.size();
 	}
 
 }

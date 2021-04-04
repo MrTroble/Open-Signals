@@ -5,9 +5,12 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import javax.annotation.Nullable;
+
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -69,15 +72,16 @@ public class Signal extends Block implements ITileEntityProvider {
 
 	private final int ID;
 	private final int height;
+	private final Placementtool placementtool;
 
 	private final String signalTypeName;
 	private final float customNameRenderHeight;
 
-	public Signal(String signalTypeName, int height) {
-		this(signalTypeName, height, -1);
+	public Signal(final Placementtool placementtool, final String signalTypeName, final int height) {
+		this(placementtool, signalTypeName, height, -1);
 	}
 	
-	public Signal(String signalTypeName, int height, float customNameRenderHeight) {
+	public Signal(final Placementtool placementtool, final String signalTypeName, final int height, final float customNameRenderHeight) {
 		super(Material.ROCK);
 		this.signalTypeName = signalTypeName;
 		if(hasAngel())
@@ -86,6 +90,8 @@ public class Signal extends Block implements ITileEntityProvider {
 		SIGNALLIST.add(this);
 		this.height = height;
 		this.customNameRenderHeight = customNameRenderHeight;
+		this.placementtool = placementtool;
+		this.placementtool.addSignal(this);
 	}
 
 	@Override
@@ -259,7 +265,8 @@ public class Signal extends Block implements ITileEntityProvider {
 		return customNameRenderHeight != -1;
 	}
 	
-	public float getCustomnameRenderHeight() {
+	public float getCustomnameRenderHeight(@Nullable final World world, @Nullable final BlockPos pos, 
+			@Nullable final SignalTileEnity te) {
 		return customNameRenderHeight;
 	}
 	
@@ -284,6 +291,22 @@ public class Signal extends Block implements ITileEntityProvider {
 	@SideOnly(Side.CLIENT)
 	public boolean hasCostumColor() {
 		return false;
+	}
+	
+	public float getSignWidth(final World world, final BlockPos pos, final SignalTileEnity te) {
+		return 22;
+	}
+	
+	public float getOffsetX(final World world, final BlockPos pos, final SignalTileEnity te) {
+		return 0;
+	}
+	
+	public float getOffsetZ(final World world, final BlockPos pos, final SignalTileEnity te) {
+		return 0;
+	}
+
+	public Placementtool getPlacementtool() {
+		return placementtool;
 	}
 	
 }

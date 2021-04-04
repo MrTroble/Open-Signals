@@ -8,27 +8,29 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 
 public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileEnity> {
-
-	private static int MAX_WIDTH = 20;
 	
 	@Override
 	public void render(SignalTileEnity te, double x, double y, double z, float partialTicks, int destroyStage,
 			float alpha) {
-		if(!te.hasCustomName()) return;
-		IBlockState state = te.getWorld().getBlockState(te.getPos());
- 		SignalAngel face = state.getValue(Signal.ANGEL);
- 		float angel = face.getAngel();
- 		String display = te.getDisplayName().getFormattedText();
- 		FontRenderer font = getFontRenderer();
- 		
+		final float height = te.getCustomNameRenderHeight();
+		if(!te.hasCustomName() || height == 0) return;
+		final IBlockState state = te.getWorld().getBlockState(te.getPos());
+ 		final SignalAngel face = state.getValue(Signal.ANGEL);
+ 		final float angel = face.getAngel();
+ 		final String display = te.getDisplayName().getFormattedText();
+ 		final FontRenderer font = getFontRenderer();
+ 		final float width = te.getSignWidth();
+ 		final float offsetX = te.getOffsetX(); 
+ 		final float offsetZ = te.getOffsetZ(); 
+
  		GlStateManager.enableAlpha();
  		GlStateManager.pushMatrix();
- 		GlStateManager.translate(x + 0.5f, y + te.getCustomNameRenderHeight(), z + 0.5f);
+ 		GlStateManager.translate(x + 0.5f, y + height, z + 0.5f);
  		GlStateManager.scale(0.015f, -0.015f, 0.015f);
  		GlStateManager.rotate(angel, 0, 1, 0);
- 		GlStateManager.translate(MAX_WIDTH/2, 0, -4.2f);
+ 		GlStateManager.translate(width/2 + offsetX, 0, -4.2f + offsetZ);
  		GlStateManager.scale(-1f, 1f, 1f);
- 		font.drawSplitString(display, 0, 0, MAX_WIDTH, 0);
+ 		font.drawSplitString(display, 0, 0, (int) width, 0);
  		GlStateManager.popMatrix();
 	}
 	
