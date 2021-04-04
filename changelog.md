@@ -1,5 +1,9 @@
 # Changelog
 
+## [Additions] 4.4.2021 - 3
+* Added naming for SH signals
+* Fixed issues with placement tool
+
 ## [Fixes] 4.4.2021 - 2
 * Fixed issue with signal controlling out of loaded chunks
 * Fixed issue with block pick returning null
