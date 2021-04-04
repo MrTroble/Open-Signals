@@ -297,7 +297,11 @@ public class Signal extends Block implements ITileEntityProvider {
 		return 22;
 	}
 	
-	public float getOffset(final World world, final BlockPos pos, final SignalTileEnity te) {
+	public float getOffsetX(final World world, final BlockPos pos, final SignalTileEnity te) {
+		return 0;
+	}
+	
+	public float getOffsetZ(final World world, final BlockPos pos, final SignalTileEnity te) {
 		return 0;
 	}
 

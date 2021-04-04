@@ -20,14 +20,15 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
  		final String display = te.getDisplayName().getFormattedText();
  		final FontRenderer font = getFontRenderer();
  		final float width = te.getSignWidth();
- 		final float offsetX = te.getOffset(); 
- 		
+ 		final float offsetX = te.getOffsetX(); 
+ 		final float offsetZ = te.getOffsetZ(); 
+
  		GlStateManager.enableAlpha();
  		GlStateManager.pushMatrix();
  		GlStateManager.translate(x + 0.5f, y + height, z + 0.5f);
  		GlStateManager.scale(0.015f, -0.015f, 0.015f);
  		GlStateManager.rotate(angel, 0, 1, 0);
- 		GlStateManager.translate(width/2 + offsetX, 0, -4.2f);
+ 		GlStateManager.translate(width/2 + offsetX, 0, -4.2f + offsetZ);
  		GlStateManager.scale(-1f, 1f, 1f);
  		font.drawSplitString(display, 0, 0, (int) width, 0);
  		GlStateManager.popMatrix();

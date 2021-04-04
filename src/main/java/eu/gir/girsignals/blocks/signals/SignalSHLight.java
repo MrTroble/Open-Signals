@@ -33,13 +33,20 @@ public class SignalSHLight extends Signal {
 	}
 	
 	@Override
-	public float getOffset(World world, BlockPos pos, SignalTileEnity te) {
-		return 2;
+	public float getOffsetX(World world, BlockPos pos, SignalTileEnity te) {
+		return -12.5f;
+	}
+	
+	@Override
+	public float getOffsetZ(World world, BlockPos pos, SignalTileEnity te) {
+		return -6.3f;
 	}
 	
 	@Override
 	public float getCustomnameRenderHeight(World world, BlockPos pos, SignalTileEnity te) {
-		return 1.1f;
+		if(te != null && te.getProperty(SHLIGHT_2).isPresent())
+			return 2.35f;
+		return 0.35f;
 	}
 	
 }
