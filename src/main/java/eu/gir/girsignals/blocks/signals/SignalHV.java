@@ -1,12 +1,13 @@
-package eu.gir.girsignals.blocks;
+package eu.gir.girsignals.blocks.signals;
 
-import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.HPVR;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.ZS32;
+import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.blocks.Signal;
 
-public class SignalHV extends SignalBlock {
+public class SignalHV extends Signal {
 
 	public SignalHV() {
 		super("HV", 6, 2.775f);

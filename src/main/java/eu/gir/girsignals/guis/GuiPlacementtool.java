@@ -9,7 +9,7 @@ import org.lwjgl.opengl.GL11;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.items.Placementtool;
 import io.netty.buffer.ByteBuf;
@@ -43,7 +43,7 @@ public class GuiPlacementtool extends GuiScreen {
 	private int usedBlock = 0;
 
 	private BlockModelShapes manager;
-	private SignalBlock currentSelectedBlock;
+	private Signal currentSelectedBlock;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
 	private Placementtool tool;
 	
@@ -54,7 +54,7 @@ public class GuiPlacementtool extends GuiScreen {
 		tool = (Placementtool) stack.getItem();
 		int signalBlockID = this.comp.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID) ? this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID):tool.getObjFromID(0).getID();
 		usedBlock = tool.getTransform(signalBlockID);
-		currentSelectedBlock = SignalBlock.SIGNALLIST.get(signalBlockID);
+		currentSelectedBlock = Signal.SIGNALLIST.get(signalBlockID);
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 	}
 

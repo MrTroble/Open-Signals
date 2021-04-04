@@ -7,15 +7,18 @@ import java.util.ArrayList;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
 import eu.gir.girsignals.blocks.SignalController;
-import eu.gir.girsignals.blocks.SignalHL;
-import eu.gir.girsignals.blocks.SignalHV;
-import eu.gir.girsignals.blocks.SignalKS;
-import eu.gir.girsignals.blocks.SignalLF;
-import eu.gir.girsignals.blocks.SignalSHLight;
-import eu.gir.girsignals.blocks.SignalTram;
+import eu.gir.girsignals.blocks.TrackIOBlock;
+import eu.gir.girsignals.blocks.signals.SignalHL;
+import eu.gir.girsignals.blocks.signals.SignalHV;
+import eu.gir.girsignals.blocks.signals.SignalKS;
+import eu.gir.girsignals.blocks.signals.SignalLF;
+import eu.gir.girsignals.blocks.signals.SignalSHLight;
+import eu.gir.girsignals.blocks.signals.SignalTram;
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -31,6 +34,7 @@ public class GIRBlocks {
 	public static final SignalSHLight SH_LIGHT = new SignalSHLight();
 	public static final SignalTram TRAM_SIGNAL = new SignalTram();
 	public static final SignalLF LF_SIGNAL = new SignalLF();
+	public static final TrackIOBlock TRACK_IO = new TrackIOBlock();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
@@ -45,6 +49,15 @@ public class GIRBlocks {
 					block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
 					block.setUnlocalizedName(name);
 					blocksToRegister.add(block);
+					if(block instanceof ITileEntityProvider) {
+						ITileEntityProvider provider = (ITileEntityProvider) block;
+						try {
+							Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0).getClass();
+							TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
+						} catch(NullPointerException ex) {
+							GirsignalsMain.LOG.trace("All tileentity provide need to call back a default entity if the world is null!", ex);
+						}
+					}
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					e.printStackTrace();
 				}

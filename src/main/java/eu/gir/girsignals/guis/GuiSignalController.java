@@ -14,7 +14,7 @@ import org.lwjgl.util.vector.Vector4f;
 import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import io.netty.buffer.ByteBuf;
@@ -44,12 +44,11 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 public class GuiSignalController extends GuiScreen implements GuiResponder {
 
 	private GUISettingsSlider slider;
-	private final SignalBlock block;
+	private Signal block;
 	private final SignalControllerTileEntity tile;
 	private final HashMap<SEProperty<?>, Integer> properties = new HashMap<>();
 	private final BlockPos pos;
 	private final World world;
-	private final IBlockState state;
 	private final IBlockState ownState;
 
 	public GuiSignalController(BlockPos pos, World world) {
@@ -58,14 +57,10 @@ public class GuiSignalController extends GuiScreen implements GuiResponder {
 		this.tile = (SignalControllerTileEntity) world.getTileEntity(pos);
 		this.ownState = world.getBlockState(pos);
 		Arrays.fill(RSMODES, RedstoneMode.SINGEL);
-		if (!this.tile.hasLinkImpl()) {
-			this.state = null;
-			this.block = null;
-			return;
-		}		
 		this.tile.onLink();
-		this.state = world.getBlockState(this.tile.getLinkedPosition());
-		this.block = (SignalBlock) state.getBlock();
+		this.tile.loadChunkAndGetTile((tile, ch) -> {
+			this.block = Signal.SIGNALLIST.get(tile.getBlockID());
+		});
 	}
 
 	public static enum Stages {
