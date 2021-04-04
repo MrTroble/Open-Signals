@@ -278,4 +278,12 @@ public class SignalBlock extends Block implements ITileEntityProvider {
 		return false;
 	}
 	
+	public float getSignWidth(World world, BlockPos pos) {
+		return 22;
+	}
+	
+	public float getOffset(World world, BlockPos pos) {
+		return 0;
+	}
+	
 }

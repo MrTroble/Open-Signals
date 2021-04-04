@@ -158,4 +158,12 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		}
 		return renderHeight;
 	}
+	
+	public float getSignWidth() {
+		return 22;
+	}
+	
+	public float getOffset() {
+		return 8.8f;
+	}
 }
