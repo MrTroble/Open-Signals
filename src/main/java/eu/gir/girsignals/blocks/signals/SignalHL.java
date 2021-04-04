@@ -7,11 +7,12 @@ import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.init.GIRItems;
 
 public class SignalHL extends Signal {
 
 	public SignalHL() {
-		super("HL", 6, 1.15f);
+		super(GIRItems.PLACEMENT_TOOL, "HL", 6, 1.15f);
 	}
 
 	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF);

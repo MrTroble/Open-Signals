@@ -6,11 +6,12 @@ import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.init.GIRItems;
 
 public class SignalKS extends Signal {
 
 	public SignalKS() {
-		super("KS", 6, 4.95f);
+		super(GIRItems.PLACEMENT_TOOL, "KS", 6, 4.95f);
 	}
 
 	public static final SEProperty<KS> STOPSIGNAL = SEProperty.of("kombisignal", KS.OFF);

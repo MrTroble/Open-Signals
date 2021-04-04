@@ -3,12 +3,16 @@ package eu.gir.girsignals.blocks.signals;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class SignalSHLight extends Signal {
 
 	public SignalSHLight() {
-		super("SHLight", 0);
+		super(GIRItems.PLACEMENT_TOOL, "SHLight", 0);
 	}
 
 	public static final SEProperty<SH_LIGHT> SHLIGHT_0 = SEProperty.of("sh_light_bottom", SH_LIGHT.OFF);
@@ -21,4 +25,21 @@ public class SignalSHLight extends Signal {
 		}
 		return super.getHeight(comp);
 	}
+	
+	@Override
+	public float getSignWidth(World world, BlockPos pos, SignalTileEnity te) {
+		// TODO Auto-generated method stub
+		return super.getSignWidth(world, pos, te);
+	}
+	
+	@Override
+	public float getOffset(World world, BlockPos pos, SignalTileEnity te) {
+		return 2;
+	}
+	
+	@Override
+	public float getCustomnameRenderHeight(World world, BlockPos pos, SignalTileEnity te) {
+		return 1.1f;
+	}
+	
 }

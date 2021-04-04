@@ -70,6 +70,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		if (comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));
 		NetworkDebug.networkReadHook(comp, world, new Object[] { this, new JsonPrimitive(__tmp == null) } );
+		renderHeight = Signal.SIGNALLIST.get(blockID).getCustomnameRenderHeight(world, pos, this);
 	}
 
 	@Override
@@ -157,22 +158,21 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	private float renderHeight = 0;
 
 	public float getCustomNameRenderHeight() {
-		if (renderHeight == 0) {
-			renderHeight = ((Signal) world.getBlockState(pos).getBlock()).getCustomnameRenderHeight();
-		}
 		return renderHeight;
 	}
 	
 	public float getSignWidth() {
-		return 22;
+		return Signal.SIGNALLIST.get(blockID).getSignWidth(world, pos, this);
 	}
 	
 	public float getOffset() {
-		return 8.8f;
+		return Signal.SIGNALLIST.get(blockID).getOffset(world, pos, this);
 	}
 	
 	public void setBlockID() {
 		blockID = ((Signal)world.getBlockState(pos).getBlock()).getID();
+		renderHeight = Signal.SIGNALLIST.get(blockID).getCustomnameRenderHeight(world, pos, this);
+		System.out.println(blockID);
 	}
 	
 	public int getBlockID() {

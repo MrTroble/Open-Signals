@@ -12,7 +12,8 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
 	@Override
 	public void render(SignalTileEnity te, double x, double y, double z, float partialTicks, int destroyStage,
 			float alpha) {
-		if(!te.hasCustomName()) return;
+		final float height = te.getCustomNameRenderHeight();
+		if(!te.hasCustomName() || height == 0) return;
 		final IBlockState state = te.getWorld().getBlockState(te.getPos());
  		final SignalAngel face = state.getValue(Signal.ANGEL);
  		final float angel = face.getAngel();
@@ -23,7 +24,7 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
  		
  		GlStateManager.enableAlpha();
  		GlStateManager.pushMatrix();
- 		GlStateManager.translate(x + 0.5f, y + te.getCustomNameRenderHeight(), z + 0.5f);
+ 		GlStateManager.translate(x + 0.5f, y + height, z + 0.5f);
  		GlStateManager.scale(0.015f, -0.015f, 0.015f);
  		GlStateManager.rotate(angel, 0, 1, 0);
  		GlStateManager.translate(width/2 + offsetX, 0, -4.2f);
