@@ -1,5 +1,12 @@
 # Changelog
 
+## [Major additions] 4.5.2021 - 1
+* Added RA signs
+* Added BUE signs
+* Added EL signs
+* Added SH signs
+* Added other signs
+
 ## [Additions] 4.4.2021 - 3
 * Added naming for SH signals
 * Fixed issues with placement tool
