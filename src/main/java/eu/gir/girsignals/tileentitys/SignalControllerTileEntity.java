@@ -2,9 +2,11 @@ package eu.gir.girsignals.tileentitys;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
+import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
@@ -90,22 +92,26 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	public void onLink() {
-		loadChunkAndGetTile((sigtile, ch) -> {
-			Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
+		new Thread(() -> {
+			while(!world.isBlockLoaded(pos)) continue;
+			GirsignalsMain.LOG.info("Block loading finished!");
+			loadChunkAndGetTile((sigtile, ch) -> {
+				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
 
-			HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
-			sigtile.accumulate((bs, prop, obj) -> {
-				if (prop instanceof SEProperty && obj != null) {
-					SEProperty<?> p = ((SEProperty<?>) prop);
-					if (p.isChangabelAtStage(ChangeableStage.APISTAGE)
-							|| p.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-						supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop));
-				}
-				return null;
-			}, null);
-			listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
-			tableOfSupportedSignalTypes = supportedSignaleStates;
-		});
+				HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
+				sigtile.accumulate((bs, prop, obj) -> {
+					if (prop instanceof SEProperty && obj != null) {
+						SEProperty<?> p = ((SEProperty<?>) prop);
+						if (p.isChangabelAtStage(ChangeableStage.APISTAGE)
+								|| p.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+							supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop));
+					}
+					return null;
+				}, null);
+				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
+				tableOfSupportedSignalTypes = supportedSignaleStates;
+			});
+		}).start();
 	}
 
 	@Override
@@ -142,10 +148,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		if(linkedSignalPosition == null)
 			return false;
 		try {
-			MinecraftServer mcserver = world.getMinecraftServer();
-			if(mcserver == null)
-				mcserver = Minecraft.getMinecraft().getIntegratedServer();
-			return mcserver.callFromMainThread(() -> {
+			Callable<Boolean> call = () -> {
 				TileEntity entity = null;
 				Chunk ch = world.getChunkFromBlockCoords(linkedSignalPosition);
 				boolean flag = !ch.isLoaded();
@@ -176,7 +179,11 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 					}
 				}
 				return flag2;
-			}).get();
+			};
+			MinecraftServer mcserver = world.getMinecraftServer();
+			if(mcserver == null)
+				return Minecraft.getMinecraft().addScheduledTask(call).get();
+			return mcserver.callFromMainThread(call).get();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
