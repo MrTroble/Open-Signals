@@ -15,11 +15,13 @@ import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
@@ -137,38 +139,48 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	public boolean loadChunkAndGetTile(BiConsumer<SignalTileEnity, Chunk> consumer) {
-		TileEntity entity = null;
 		if(linkedSignalPosition == null)
 			return false;
-		Chunk ch = world.getChunkFromBlockCoords(linkedSignalPosition);
-		boolean flag = !ch.isLoaded();
-		if (flag) {
-			if (world.isRemote) {
-				ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
-				ch = client.loadChunk(ch.x, ch.z);
-			} else {
-				ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
-				ch = server.loadChunk(ch.x, ch.z);
-			}
-		}
-		if (ch == null)
-			return false;
-		entity = ch.getTileEntity(linkedSignalPosition, EnumCreateEntityType.IMMEDIATE);
-		boolean flag2 = entity instanceof SignalTileEnity && ((SignalTileEnity)entity).getBlockID() != -1;
-		if (flag2) {
-			consumer.accept((SignalTileEnity) entity, ch);
-		}
+		try {
+			MinecraftServer mcserver = world.getMinecraftServer();
+			if(mcserver == null)
+				mcserver = Minecraft.getMinecraft().getIntegratedServer();
+			return mcserver.callFromMainThread(() -> {
+				TileEntity entity = null;
+				Chunk ch = world.getChunkFromBlockCoords(linkedSignalPosition);
+				boolean flag = !ch.isLoaded();
+				if (flag) {
+					if (world.isRemote) {
+						ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
+						ch = client.loadChunk(ch.x, ch.z);
+					} else {
+						ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
+						ch = server.loadChunk(ch.x, ch.z);
+					}
+				}
+				if (ch == null)
+					return false;
+				entity = ch.getTileEntity(linkedSignalPosition, EnumCreateEntityType.IMMEDIATE);
+				boolean flag2 = entity instanceof SignalTileEnity && ((SignalTileEnity)entity).getBlockID() != -1;
+				if (flag2) {
+					consumer.accept((SignalTileEnity) entity, ch);
+				}
 
-		if (flag) {
-			if (world.isRemote) {
-				ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
-				client.unloadChunk(ch.x, ch.z);
-			} else {
-				ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
-				server.queueUnload(ch);
-			}
+				if (flag) {
+					if (world.isRemote) {
+						ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
+						client.unloadChunk(ch.x, ch.z);
+					} else {
+						ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
+						server.queueUnload(ch);
+					}
+				}
+				return flag2;
+			}).get();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-		return flag2;
+		return false;
 	}
 
 	public boolean hasLinkImpl() {
