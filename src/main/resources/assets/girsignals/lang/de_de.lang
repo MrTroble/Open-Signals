@@ -14,6 +14,12 @@ tile.hlsignal.name=HL Signal
 tile.shlight.name=Rangiersignal
 tile.tramsignal.name=Straßenbahnsignal
 tile.lfsignal.name=Lf Signal
+tile.elsignal.name=El Signal
+tile.shsignal.name=Sh Signal
+tile.rasignal.name=Ra Signal
+tile.buesignal.name=BÜ Signal
+tile.othersignal.name=Sonstige Signale
+tile.buelight.name=BÜ Signal
 
 #Linktool
 lt.linkfailed=Link fehlgeschlagen!
@@ -21,6 +27,7 @@ lt.set=Position vom Controller gesetzt
 lt.added=%s zum Linken gesetzt
 lt.unlink=Link zum Signal entfernt
 lt.nosignal=Dieser Block ist kein Signal
+lt.notaddable=Dieser Block kann nicht verlinkt werden
 
 #Placementtool
 pt.itemnotset=Bitte stell das Tool vorher ein (Sneaken + Rechtsklick)
@@ -52,8 +59,19 @@ property.sh_light_top.name=Rangiersignal 3 Block hoch
 property.signaltram.name=Straßenbahnsignal
 property.signalcar.name=Auto Ampel
 property.indicator.name=Aufschrift
-property.lftype.name=Lf Signal
+property.lftype.name=Langsamfahrsignale
 property.lamps.name=Lampen
+property.eltype.name=Fahrleitungssignale
+property.elarrow.name=Richtungspfeil
+property.sh2.name=Schutzsignale
+property.ratype.name=Signale für den Rangierdienst
+property.ralight.name=Sh1 Licht
+property.buetype.name=Bahnübergangssignal
+property.bueadd.name=Zwischenhalttafel
+property.othertype.name=Sonstige Signale
+property.signalped.name=Fußgängerampel
+property.buelight.name=Bahnübergangssignal
+
 
 #Signal Descs
 property.signaltype.desc=Hier kannst du die verschiedenen Signaltypen wählen.
@@ -83,6 +101,16 @@ property.signalcar.desc=Einfache Verkehrsampel für Autos.
 property.indicator.desc=Aufschrift für Lf Signale. Möglich sind: 2,3,4,5,6,7,8,9,10,11,12,13,A,E
 property.lftype.desc=§nLf1 Langsamfahrscheibe§r - Es folgt eine vorübergehende Langsamfahrstelle, auf der die angezeigte Geschwindigkeit nicht überschritten werden darf.%n§nLf2 Anfangscheibe§r - Anfang der vorübergehenden Langsamfahrstelle.%n§nLf1/2 Langsamfahrbeginnscheibe§r - Auf dem am Signal beginnenden, in der Regel durch eine Endscheibe begrenzten Gleisabschnitt darf die angezeigte Geschwindigkeit nicht überschritten werden.%n§nLf3 Endscheibe§r - Ende der vorübergehenden Langsamfahrstelle.%n§nLf4 Geschwindigkeitstafel§r - Es folgt eine ständige Langsamfahrstelle, auf der die angezeigte Geschwindigkeit nicht überschritten werden darf.%n§nLf5 Anfangstafel§r - Die auf der Geschwindigkeitstafel (Lf 4) angezeigte Geschwindigkeitsbeschränkung muss durchgeführt sein.%n§nLf6 Geschwindigkeits-Ankündesignal§r - Ein Geschwindigkeitssignal (Lf 7) ist zu erwarten.%n§nLf7 Geschwindigkeitssignal§r - Die angezeigte Geschwindigkeit darf vom Signal ab nicht überschritten werden.
 property.lamps.desc=Nachtzeichen für Lf 1.
+property.eltype.desc=§nEl1 Ausschaltsignal§r - Das Triebfahrzeug und der Hauptschalter muss an diesem Signal ausgeschaltet sein.%n§nEl1v Ausschaltvorsignal§r - Ein Ausschaltsignal ist zu erwarten.%n§nEl2 Einschaltsignal§r - Das Triebfahrzeug kann nach Vorbeifahrt dieses Signal wieder eingeschaltet werden.%n§nEl3 "Bügel ab"-Ankündesignal§r - Das Signal kündigt ein El4 an.%n§nEl4 "Bügel ab"-Signal§r - Das Signal kennzeichnet den Beginn eines Gleisabschnitts,der nur mit gesenktem Stromabnehmer befahren werden darf.%n§nEl5 "Bügel an"-Signal§r - Der Stromabnehmer darf nach Vorbeifahrt an diesem Signal wieder angelegt werden.%n§nEl6 Halt für Fahrzeuge mit gehobenen Stromabnehmer.§r - Das Signal zeigt an, dass Fahrten darüber hinaus für Triebfahrzeuge mit gehobenen Stromabnehmern verboten sind.
+property.elarrow.desc=Der Richtungspfeil gibt die Richtung an, in welcher die Fahrleitungssignale gelten.
+property.sh2.desc=§nSh2 Schutzhalt§r - Diese Tafel gebietet Halt und ersetzt ein haltzeigendes Hauptsignal.
+property.ratype.desc=§nRa10 Rangierhalttafel§r - Über die Tafel hinaus darf nicht rangiert werden.%n§nRa11 Wartezeichen§r%n§lRa11a§r - Bevor mit der Spitze einer Rangierfahrt am Wartezeichen vorbei gefahren werden darf, muss der Weichenwärter eine Zustimmung gegeben haben. Die Zustimmung erfolgt entweder durch das Lichtsignal Sh 1 oder einem mündlichen Befehl.%n§lRa11b§r(Besonderheit auf dem GIR Server) - Nach Rücksprache mit dem zuständigen Fahrdienstleiter stellt der Zugführer selbst die entsprechenden Weichen und darf nach erneuter Rücksprache die Rangierfahrt fortsetzen.%n§nRa12 Grenzzeichen§r - Markiert die Grenze, bis zu der bei zusammenlaufenden Gleisen das Gleis besetzt werden darf.
+property.ralight.desc=Lichtsignal Sh 1
+property.buetype.desc=
+property.bueadd.desc=Wenn der Zug zwischen BÜ4 Signal und Bahnübergang einen Halteplatz hat, steht hinter dem Halteplatz ein weiteres BÜ4. Auf dem BÜ4 vor dem Halteplatz ist dann dieses Schild angebracht und gilt nur für Züge, die nicht an dem Halteplatz halten.
+property.othertype.desc=Hier findest du andere Signale, die keine eigene Bezeichnung haben.
+property.signalped.desc=
+property.buelight.desc=
 
 #Other
 btn.apply=Anwenden

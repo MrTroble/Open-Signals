@@ -46,6 +46,7 @@ public class DrawUtil {
 	}
 	
 	public static void addToBuffer(BufferBuilder builder, BlockModelShapes manager, IBlockState ebs, int color) {
+		assert ebs != null;
 		IBakedModel mdl = manager
 				.getModelForState(ebs instanceof IExtendedBlockState ? ((IExtendedBlockState) ebs).getClean() : ebs);
 		List<BakedQuad> lst = new ArrayList<>();

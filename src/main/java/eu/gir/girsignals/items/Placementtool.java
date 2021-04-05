@@ -1,9 +1,8 @@
 package eu.gir.girsignals.items;
 
-import eu.gir.girsignals.EnumSignals.IIntegerable;
-
 import java.util.ArrayList;
 
+import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -26,7 +25,7 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 
 public class Placementtool extends Item implements IIntegerable<Signal> {
 
-	private final ArrayList<Integer> signalids = new ArrayList<>();
+	public final ArrayList<Integer> signalids = new ArrayList<>();
 
 	public Placementtool() {
 		setCreativeTab(GIRTabs.tab);
