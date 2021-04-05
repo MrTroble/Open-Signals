@@ -6,6 +6,8 @@
 * Added EL signs
 * Added SH signs
 * Added other signs
+* Fixed issue with block pick
+* Fixed issue with placement tools
 
 ## [Additions] 4.4.2021 - 3
 * Added naming for SH signals
