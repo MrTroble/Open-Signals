@@ -9,7 +9,6 @@ import javax.annotation.Nullable;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
-import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.Block;
@@ -118,7 +117,7 @@ public class Signal extends Block implements ITileEntityProvider {
 		for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k) {
 			if (player.inventory.getStackInSlot(k).getItem().equals(item)) {
 				player.inventory.currentItem = k;
-				return new ItemStack(item);
+				return ItemStack.EMPTY;
 			}
 		}
 		return new ItemStack(item);
@@ -127,7 +126,7 @@ public class Signal extends Block implements ITileEntityProvider {
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
 			EntityPlayer player) {
-		return pickBlock(player, GIRItems.PLACEMENT_TOOL);
+		return pickBlock(player, placementtool);
 	}
 
 	@Override

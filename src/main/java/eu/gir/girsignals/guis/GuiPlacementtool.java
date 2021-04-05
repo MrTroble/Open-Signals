@@ -46,13 +46,17 @@ public class GuiPlacementtool extends GuiScreen {
 	private Signal currentSelectedBlock;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
 	private Placementtool tool;
-	
+	private int implLastID = 0;
+
 	public GuiPlacementtool(ItemStack stack) {
 		this.comp = stack.getTagCompound();
 		if (comp == null)
 			this.comp = new NBTTagCompound();
 		tool = (Placementtool) stack.getItem();
-		usedBlock = this.comp.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID) ? this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID):tool.getObjFromID(0).getID();
+		usedBlock = this.comp.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID)
+				? this.comp.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID)
+				: tool.getObjFromID(0).getID();
+		implLastID = tool.signalids.indexOf(usedBlock);
 		currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 	}
@@ -67,7 +71,7 @@ public class GuiPlacementtool extends GuiScreen {
 		drawDefaultBackground();
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
-		if(currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
+		if (currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
 			textField.drawTextBox();
 
 		if (dragging) {
@@ -78,8 +82,7 @@ public class GuiPlacementtool extends GuiScreen {
 
 		GlStateManager.enableRescaleNormal();
 		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) this.width * (5 / 6.0f), (float) this.height * (5 / 6.0f),
-				100 + this.zLevel);
+		GlStateManager.translate((float) this.width * (5 / 6.0f), (float) this.height * (5 / 6.0f), 100 + this.zLevel);
 		GlStateManager.scale(22.0F, -22.0F, 22.0F);
 		GlStateManager.rotate(animationState, 0, 1, 0);
 		DrawUtil.draw(model.get());
@@ -134,9 +137,7 @@ public class GuiPlacementtool extends GuiScreen {
 		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 		this.buttonList.clear();
-		ebs = (IExtendedBlockState) tool.getObjFromID(usedBlock).getDefaultState();
-		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) tool.getObjFromID(usedBlock)
-				.getBlockState();
+		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock.getBlockState();
 		Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
 		properties = unlistedProperties.toArray(new IUnlistedProperty[unlistedProperties.size()]);
 		int maxWidth = 0;
@@ -165,14 +166,14 @@ public class GuiPlacementtool extends GuiScreen {
 			}
 		}
 
-		addButton(new GUISettingsSlider(tool, -100, (this.width - 150) / 2, 10, 150, "signaltype", this.usedBlock, input -> {
-			if (usedBlock != input) {
-				usedBlock = input;
-				currentSelectedBlock = tool.getObjFromID(usedBlock);
-				ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
-				initGui();
-			}
-		}));
+		addButton(new GUISettingsSlider(tool, -100, (this.width - 150) / 2, 10, 150, "signaltype", this.implLastID,
+				input -> {
+					implLastID = input;
+					currentSelectedBlock = tool.getObjFromID(input);
+					usedBlock = currentSelectedBlock.getID();
+					ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
+					initGui();
+				}));
 
 		applyModelChanges();
 	}
@@ -181,7 +182,7 @@ public class GuiPlacementtool extends GuiScreen {
 	public void onGuiClosed() {
 		ByteBuf buffer = Unpooled.buffer();
 		buffer.writeByte(GIRNetworkHandler.PLACEMENT_GUI_SET_NBT);
-		buffer.writeInt(tool.getObjFromID(usedBlock).getID());
+		buffer.writeInt(usedBlock);
 		byte[] str = textField.getText().getBytes();
 		buffer.writeInt(str.length);
 		buffer.writeBytes(str);
@@ -231,7 +232,7 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
-		if(currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
+		if (currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
 			textField.mouseClicked(mouseX, mouseY, mouseButton);
 		if (mouseButton == 0) {
 			this.dragging = true;
@@ -249,11 +250,11 @@ public class GuiPlacementtool extends GuiScreen {
 	protected void actionPerformed(GuiButton button) throws IOException {
 		applyModelChanges();
 	}
-	
+
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		super.keyTyped(typedChar, keyCode);
-		if(currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
+		if (currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
 			textField.textboxKeyTyped(typedChar, keyCode);
 	}
 

@@ -83,6 +83,8 @@ public class GhostBlock extends Block {
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
 		super.breakBlock(worldIn, pos, state);
 
+		if(worldIn.isRemote)
+			return;
 		destroyUpperBlock(worldIn, pos);
 
 		BlockPos posdown = pos.down();

@@ -138,7 +138,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv/hv_mast2", ebs -> true, 2);
 			cm.register("hv/hv_mast3", ebs -> true, 3);
 			cm.register("hv/hv_mast4", ebs -> true, 4);
-			
+
 			cm.register("hv/hv_number", has(Signal.CUSTOMNAME), 2);
 
 			// Zs1 on
@@ -206,7 +206,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ks/ks_mast2", ebs -> true, 2);
 
 			cm.register("ks/ks_number", has(Signal.CUSTOMNAME), 4);
-			
+
 			for (MAST_SIGN sign : MAST_SIGN.values())
 				if (!sign.equals(MAST_SIGN.OFF))
 					cm.register("ks/ks_sign", with(SignalKS.MASTSIGN, ms -> ms.equals(sign)), 2, "13",
@@ -306,9 +306,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hl/hl_ne2_2", has(SignalHL.NE2).and(has(SignalHL.NE2_2)).and(has(SignalHL.DISTANTSIGNAL)), 1);
 			cm.register("hl/hl_sign_distant", has(SignalHL.MASTSIGNDISTANT), 1);
 			cm.register("hl/hl_mast2", ebs -> true, 2);
-			
+
 			cm.register("hl/hl_number", has(Signal.CUSTOMNAME), 0);
-			
+
 			for (MAST_SIGN sign : MAST_SIGN.values())
 				if (!sign.equals(MAST_SIGN.OFF))
 					cm.register("hl/hl_sign_main", with(SignalHL.MASTSIGN, ms -> ms.equals(sign)), 2, "9",
