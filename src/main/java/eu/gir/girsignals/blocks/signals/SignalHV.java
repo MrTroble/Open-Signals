@@ -1,16 +1,18 @@
-package eu.gir.girsignals.blocks;
+package eu.gir.girsignals.blocks.signals;
 
-import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
+import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.init.GIRItems;
 
-public class SignalHV extends SignalBlock {
+public class SignalHV extends Signal {
 
 	public SignalHV() {
-		super("HV", 6, 2.775f);
+		super(GIRItems.PLACEMENT_TOOL, "HV", 6, 2.775f);
 	}
 
 	public static final SEProperty<HP> STOPSIGNAL = SEProperty.of("stopsignal", HP.OFF);

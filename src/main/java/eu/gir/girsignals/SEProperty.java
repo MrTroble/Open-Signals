@@ -13,7 +13,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>, IIntegerable<T> {
 
 	public enum ChangeableStage {
-		APISTAGE, GUISTAGE, AUTOMATICSTAGE(/* Special stage, does nothing */);
+		APISTAGE, GUISTAGE, APISTAGE_NONE_CONFIG(/*Not configurable in UI*/), AUTOMATICSTAGE(/*Special stage, does nothing*/);
 	}
 
 	private final IProperty<T> parent;
@@ -112,7 +112,12 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	public boolean isChangabelAtStage(ChangeableStage stage) {
 		return this.stage.equals(stage);
 	}
-
+	
+	@Override
+	public String toString() {
+		return "SEP[" + this.getName() + "]";
+	}
+	
 	@SuppressWarnings("rawtypes")
 	public static SEProperty<?> cst(Object iup) {
 		return (SEProperty) iup;

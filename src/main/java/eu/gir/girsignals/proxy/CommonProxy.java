@@ -5,9 +5,6 @@ import eu.gir.girsignals.guis.GUIHandler;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.init.GIRNetworkHandler;
-import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
-import eu.gir.girsignals.tileentitys.SignalTileEnity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -22,8 +19,6 @@ public class CommonProxy {
 	public void preinit(FMLPreInitializationEvent event) {
 		CHANNEL = NetworkRegistry.INSTANCE.newEventDrivenChannel(GIRNetworkHandler.CHANNELNAME);
 		CHANNEL.register(new GIRNetworkHandler());
-		TileEntity.register("SignalControllerTileEntity", SignalControllerTileEntity.class);
-		TileEntity.register("SignalTileEntity", SignalTileEnity.class);
 		NetworkRegistry.INSTANCE.registerGuiHandler(GirsignalsMain.MODID, new GUIHandler());
 
 		GIRItems.init();

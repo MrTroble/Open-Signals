@@ -10,18 +10,21 @@ import eu.gir.girsignals.blocks.SignalBUE;
 import eu.gir.girsignals.blocks.SignalBUELight;
 import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.SignalEL;
-import eu.gir.girsignals.blocks.SignalHL;
-import eu.gir.girsignals.blocks.SignalHV;
-import eu.gir.girsignals.blocks.SignalKS;
-import eu.gir.girsignals.blocks.SignalLF;
 import eu.gir.girsignals.blocks.SignalOTHER;
 import eu.gir.girsignals.blocks.SignalRA;
 import eu.gir.girsignals.blocks.SignalSH;
-import eu.gir.girsignals.blocks.SignalSHLight;
-import eu.gir.girsignals.blocks.SignalTram;
+import eu.gir.girsignals.blocks.TrackIOBlock;
+import eu.gir.girsignals.blocks.signals.SignalHL;
+import eu.gir.girsignals.blocks.signals.SignalHV;
+import eu.gir.girsignals.blocks.signals.SignalKS;
+import eu.gir.girsignals.blocks.signals.SignalLF;
+import eu.gir.girsignals.blocks.signals.SignalSHLight;
+import eu.gir.girsignals.blocks.signals.SignalTram;
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -43,6 +46,7 @@ public class GIRBlocks {
 	public static final SignalBUE BUE_SIGNAL = new SignalBUE();
 	public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
 	public static final SignalOTHER OTHER_SIGNAL = new SignalOTHER();
+	public static final TrackIOBlock TRACK_IO = new TrackIOBlock();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
@@ -57,6 +61,15 @@ public class GIRBlocks {
 					block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
 					block.setUnlocalizedName(name);
 					blocksToRegister.add(block);
+					if(block instanceof ITileEntityProvider) {
+						ITileEntityProvider provider = (ITileEntityProvider) block;
+						try {
+							Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0).getClass();
+							TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
+						} catch(NullPointerException ex) {
+							GirsignalsMain.LOG.trace("All tileentity provide need to call back a default entity if the world is null!", ex);
+						}
+					}
 				} catch (IllegalArgumentException | IllegalAccessException e) {
 					e.printStackTrace();
 				}

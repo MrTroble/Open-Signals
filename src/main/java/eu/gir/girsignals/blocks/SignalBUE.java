@@ -3,11 +3,12 @@ package eu.gir.girsignals.blocks;
 import eu.gir.girsignals.EnumSignals.BUE;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.init.GIRItems;
 
-public class SignalBUE extends SignalBlock {
+public class SignalBUE extends Signal {
 
 	public SignalBUE() {
-		super("buesignal", 2);
+		super(GIRItems.SIGN_PLACEMENT_TOOL,"buesignal", 2);
 	}
 
 	public static final SEProperty<BUE> BUETYPE = SEProperty.of("buetype", BUE.BUE4, ChangeableStage.GUISTAGE);
