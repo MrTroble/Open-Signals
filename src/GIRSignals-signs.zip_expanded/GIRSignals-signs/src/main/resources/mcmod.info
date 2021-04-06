@@ -1,0 +1,16 @@
+[
+{
+  "modid": "girsignals",
+  "name": "GIRSignals",
+  "description": "The official Signal Mod for GIR. This mod is intended for private use only!",
+  "version": "",
+  "mcversion": "${mcversion}",
+  "url": "https://discord.gg/Va5P7KBry6",
+  "updateUrl": "",
+  "authorList": ["FGBxRamel", "Jeronimo", "MrTroble"],
+  "credits": "Big thanks to HyCraftHD for the great help!",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]

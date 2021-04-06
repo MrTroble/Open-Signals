@@ -6,13 +6,20 @@ import java.util.ArrayList;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
+import eu.gir.girsignals.blocks.SignalBUE;
+import eu.gir.girsignals.blocks.SignalBUELight;
 import eu.gir.girsignals.blocks.SignalController;
+import eu.gir.girsignals.blocks.SignalEL;
 import eu.gir.girsignals.blocks.SignalHL;
 import eu.gir.girsignals.blocks.SignalHV;
 import eu.gir.girsignals.blocks.SignalKS;
 import eu.gir.girsignals.blocks.SignalLF;
+import eu.gir.girsignals.blocks.SignalOTHER;
+import eu.gir.girsignals.blocks.SignalRA;
+import eu.gir.girsignals.blocks.SignalSH;
 import eu.gir.girsignals.blocks.SignalSHLight;
 import eu.gir.girsignals.blocks.SignalTram;
+import eu.gir.girsignals.blocks.SignalNE;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -31,6 +38,13 @@ public class GIRBlocks {
 	public static final SignalSHLight SH_LIGHT = new SignalSHLight();
 	public static final SignalTram TRAM_SIGNAL = new SignalTram();
 	public static final SignalLF LF_SIGNAL = new SignalLF();
+	public static final SignalEL EL_SIGNAL = new SignalEL();
+	public static final SignalSH SH_SIGNAL = new SignalSH();
+	public static final SignalRA RA_SIGNAL = new SignalRA();
+	public static final SignalBUE BUE_SIGNAL = new SignalBUE();
+	public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
+	public static final SignalOTHER OTHER_SIGNAL = new SignalOTHER();
+	public static final SignalNE NE_SIGNAL = new SignalNE();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 

@@ -1,0 +1,18 @@
+{
+	"credit": "Made with Blockbench by Mc_Jeronimo",
+	"texture_size": [32, 32],
+	"textures": {
+		"7": "girsignals:blocks/lamp/lamp_dark",
+		"particle": "girsignals:blocks/lamp_dark"
+	},
+	"elements": [
+		{
+			"name": "lamp_black",
+			"from": [6, 6, 8],
+			"to": [10, 10, 8],
+			"faces": {
+				"north": {"uv": [0, 0, 4, 4], "texture": "#7"}
+			}
+		}
+	]
+}

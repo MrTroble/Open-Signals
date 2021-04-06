@@ -14,6 +14,13 @@ tile.hlsignal.name=HL Signal
 tile.shlight.name=Shounting signal
 tile.tramsignal.name=Tram signal
 tile.lfsignal.name=Lf Signal
+tile.elsignal.name=El Signal
+tile.shsignal.name=Sh Signal
+tile.rasignal.name=Ra Signal
+tile.buesignal.name=BÜ Signal
+tile.othersignal.name=Other signals
+tile.buelight.name=BÜ Signal
+tile.nesignal.name=Ne Signal
 
 #Linktool
 lt.linkfailed=Link failed!
@@ -21,6 +28,7 @@ lt.set=Set position to controller
 lt.added=Added %s to the link tool
 lt.unlink=Unlinked controller from it's signal
 lt.nosignal=This block is not a signal
+lt.notaddable=This block cannot be linked
 
 #Placementtool
 pt.itemnotset=Please set the tool before (sneak + right click)
@@ -52,8 +60,18 @@ property.sh_light_top.name=Shunting Signal 3 blocks high
 property.signaltram.name=Tram signal
 property.signalcar.name=Car traffic light
 property.indicator.name=Inscription
-property.lftype.name=Lf Signal
+property.lftype.name=Speed signals
 property.lamps.name=Lamps
+property.eltype.name=Catenary signals
+property.elarrow.name=Directional arrow
+property.sh2.name=Protection signals
+property.ratype.name=Signals for shunting service
+property.ralight.name=Sh1 Light
+property.buetype.name=Level crossing signal
+property.bueadd.name=Intermediate stop sign
+property.othertype.name=Other signals
+property.signalped.name=Pedestrian lights
+property.buelight.name=Level crossing signal
 
 #Signal Descs
 property.signaltype.desc=Here you can select the different signal types.
@@ -83,6 +101,16 @@ property.signalcar.desc=Simple traffic light for cars.
 property.indicator.desc=Inscription for Lf signals. Possible are: 2,3,4,5,6,7,8,9,10,11,12,13,A,E
 property.lftype.desc=§nLf1 Slow speed slice§r - A temporary slow speed section follows on which the indicated speed must not be exceeded.%n§nLf2 Start slice§r - Start of temporary slow speed section.%n§nLf1/2 Slow speed start slice§r - On the track section starting at the signal, usually delimited by an end slice, the indicated speed must not be exceeded.%n§nLf3 End slice§r - End of temporary slow speed section. %n§nLf4 Speed panel§r - A permanent slow speed section follows, on which the indicated speed must not be exceeded.%n§nLf5 Start panel§r - The speed restriction indicated on the speed panel (Lf 4) must have been carried out.%n§nLf6 Speed announcement signal§r - A speed signal (Lf 7) is to be expected.%n§nLf7 Speed signal§r - The indicated speed must not be exceeded from the signal.
 property.lamps.desc=Night signal for Lf 1.
+property.eltype.desc=§nEl1 Switch-off signal§r - The locomotive and the main switch must be switched off at this signal.%n§nEl1v Switch-off pre-signal§r - A switch-off signal is to be expected.%n§nEl2 Switch-on signal§r - The locomotive can be switched on again after passing this signal.%n§nEl3 "Pantograph down" announcement signal§r - The signal announces an El4. %n§nEl4 "Pantograph down" signal§r - The signal marks the beginning of a track section that may only be travelled on with the pantograph lowered.%n§nEl5 "Pantograph on" signal§r - The pantograph may be put back on after passing this signal.%n§nEl6 Stop for vehicles with raised pantographs.§r - The signal indicates that travel beyond this is prohibited for locomotives with raised pantographs.
+property.elarrow.desc=The direction arrow indicates the direction in which the catenary signals apply.
+property.sh2.desc=§nSh2 Protective stop§r - This sign commands stop and replaces a stop pointing main signal.
+property.ratype.desc=§nRa10 Shunting stop sign§r - Shunting is not allowed beyond the sign.%n§nRa11 Waiting sign§r%n§lRa11a§r - Before the head of a shunting run is allowed to pass the waiting sign, the pointsman must have given his consent. The consent is given either by the light signal Sh 1 or a verbal command.%n§lRa11b§r(Special feature on the GIR server) - After consultation with the responsible dispatcher, the train driver himself sets the appropriate switches and, after renewed consultation, may continue the shunting movement.%n§nRa12 Fouling point marker§r - Marks the boundary up to which the track may be occupied in the case of merging tracks.
+property.ralight.desc=Light signal Sh 1
+property.buetype.desc=
+property.bueadd.desc=If the train has a halt between the BÜ4 signal and the level crossing, there is another BÜ4 behind the halt. This sign is then placed on the BÜ4 in front of the halt and only applies to trains that do not stop at the halt.
+property.othertype.desc=Here you can find other signals that do not have their own labels.
+property.signalped.desc=
+property.buelight.desc=
 
 #Other
 btn.apply=Apply
