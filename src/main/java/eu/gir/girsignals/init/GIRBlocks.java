@@ -10,6 +10,7 @@ import eu.gir.girsignals.blocks.SignalBUE;
 import eu.gir.girsignals.blocks.SignalBUELight;
 import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.SignalEL;
+import eu.gir.girsignals.blocks.SignalNE;
 import eu.gir.girsignals.blocks.SignalOTHER;
 import eu.gir.girsignals.blocks.SignalRA;
 import eu.gir.girsignals.blocks.SignalSH;

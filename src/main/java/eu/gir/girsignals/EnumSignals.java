@@ -140,33 +140,6 @@ public class EnumSignals {
 		HM, OB, CROSS;
 	}
 	
-	public enum EL implements DefaultName<EL> {
-		EL1V, EL1, EL2, EL3, EL4, EL5, EL6;
-	}
-	
-	public enum EL_ARROW implements Offable<EL_ARROW> {
-		OFF, LEFT, RIGHT, LEFT_RIGHT, UP;
-	}
-	
-	public enum RA implements Offable<RA> {
-		OFF, RA10, RA11A, RA11B, RA12;
-	}
-	
-	public enum RA_LIGHT implements Offable<RA_LIGHT> {
-		OFF, SH1
-	}
-	
-	public enum BUE implements DefaultName<BUE> {
-		BUE4, BUE5;
-	}
-	
-	public enum BUE_LIGHT implements Offable<BUE_LIGHT> {
-		OFF, BUE_1;
-	}
-	public enum OTHER_SIGAL implements DefaultName<OTHER_SIGAL> {
-		HM, OB, CROSS;
-	}
-	
 	public enum NE implements DefaultName<NE> {
 		NE1, NE2, NE2_1, NE2_2, NE2_3, NE3_1, NE3_2, NE3_3, NE4, NE4_small, NE6;
 	}

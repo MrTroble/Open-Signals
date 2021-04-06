@@ -19,6 +19,7 @@ import eu.gir.girsignals.EnumSignals.KS_DISTANT;
 import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
+import eu.gir.girsignals.EnumSignals.NE;
 import eu.gir.girsignals.EnumSignals.OTHER_SIGAL;
 import eu.gir.girsignals.EnumSignals.Offable;
 import eu.gir.girsignals.EnumSignals.PED;
@@ -34,6 +35,7 @@ import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import eu.gir.girsignals.blocks.SignalBUE;
 import eu.gir.girsignals.blocks.SignalBUELight;
 import eu.gir.girsignals.blocks.SignalEL;
+import eu.gir.girsignals.blocks.SignalNE;
 import eu.gir.girsignals.blocks.SignalOTHER;
 import eu.gir.girsignals.blocks.SignalRA;
 import eu.gir.girsignals.blocks.signals.SignalHL;
@@ -54,7 +56,6 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import scala.annotation.elidable;
 
 @SideOnly(Side.CLIENT)
 public class GIRCustomModelLoader implements ICustomModelLoader {
