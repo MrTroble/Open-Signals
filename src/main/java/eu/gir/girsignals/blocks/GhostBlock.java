@@ -28,29 +28,28 @@ public class GhostBlock extends Block {
 	}
 
 	@Override
-    public EnumBlockRenderType getRenderType(IBlockState state)
-    {
-        return EnumBlockRenderType.INVISIBLE;
-    }
+	public EnumBlockRenderType getRenderType(IBlockState state) {
+		return EnumBlockRenderType.INVISIBLE;
+	}
 
-    @SideOnly(Side.CLIENT)
+	@SideOnly(Side.CLIENT)
 	@Override
-    public float getAmbientOcclusionLightValue(IBlockState state)
-    {
-        return 1.0F;
-    }
+	public float getAmbientOcclusionLightValue(IBlockState state) {
+		return 1.0F;
+	}
 
 	@Override
-    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune)
-    {
-    }
-	
+	public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state, float chance, int fortune) {
+	}
+
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
 			EntityPlayer player) {
-		return SignalBlock.pickBlock(player);
+		BlockPos downPos = pos.down();
+		Block lowerBlock = world.getBlockState(downPos).getBlock();
+		return lowerBlock.getPickBlock(state, target, world, downPos, player);
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;
@@ -84,11 +83,13 @@ public class GhostBlock extends Block {
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
 		super.breakBlock(worldIn, pos, state);
 
+		if(worldIn.isRemote)
+			return;
 		destroyUpperBlock(worldIn, pos);
 
 		BlockPos posdown = pos.down();
 		Block lowerBlock = worldIn.getBlockState(posdown).getBlock();
-		if (lowerBlock instanceof GhostBlock || lowerBlock instanceof SignalBlock) {
+		if (lowerBlock instanceof GhostBlock || lowerBlock instanceof Signal) {
 			worldIn.destroyBlock(posdown, false);
 		}
 	}

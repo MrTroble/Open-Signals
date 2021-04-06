@@ -2,20 +2,32 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"textures": {
 		"1": "girsignals:blocks/shield_black",
-		"2": "girsignals:blocks/el_arrow_u",
+		"2": "girsignals:blocks/el_arrow_up",
 		"particle": "girsignals:blocks/shield_black"
 	},
 	"elements": [
 		{
-			"from": [7, -1, 6],
-			"to": [9, 5, 7],
+			"from": [7.5, 6.5, 6],
+			"to": [8.5, 7, 7],
 			"faces": {
-				"north": {"uv": [0, 0, 2, 6], "texture": "#2"},
-				"east": {"uv": [0, 0, 6, 1], "rotation": 90, "texture": "#1"},
-				"south": {"uv": [0, 0, 6, 1], "rotation": 90, "texture": "#1"},
-				"west": {"uv": [0, 0, 6, 1], "rotation": 90, "texture": "#1"},
-				"up": {"uv": [0, 0, 1, 1], "rotation": 90, "texture": "#1"},
-				"down": {"uv": [0, 0, 1, 1], "rotation": 90, "texture": "#1"}
+				"north": {"uv": [1, 0, 3, 1], "texture": "#2"},
+				"east": {"uv": [0, 0, 1, 0.5], "texture": "#1"},
+				"south": {"uv": [0, 0, 1, 0.5], "texture": "#1"},
+				"west": {"uv": [0, 0, 1, 0.5], "texture": "#1"},
+				"up": {"uv": [0, 0, 1, 1], "texture": "#1"},
+				"down": {"uv": [0, 0, 1, 1], "texture": "#1"}
+			}
+		},
+		{
+			"from": [7, 0.5, 6],
+			"to": [9, 6.5, 7],
+			"faces": {
+				"north": {"uv": [0, 1, 4, 13], "texture": "#2"},
+				"east": {"uv": [0, 0, 1, 6], "texture": "#1"},
+				"south": {"uv": [0, 0, 2, 6], "texture": "#1"},
+				"west": {"uv": [0, 0, 1, 6], "texture": "#1"},
+				"up": {"uv": [0, 0, 2, 1], "texture": "#1"},
+				"down": {"uv": [0, 0, 2, 1], "texture": "#1"}
 			}
 		}
 	]

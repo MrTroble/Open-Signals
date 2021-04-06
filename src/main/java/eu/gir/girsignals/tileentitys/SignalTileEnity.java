@@ -8,7 +8,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.gson.JsonPrimitive;
 
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.SignalBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.debug.NetworkDebug;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -28,8 +28,10 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	private static final String PROPERTIES = "properties";
 	private static final String CUSTOMNAME = "customname";
+	private static final String BLOCKID = "blockid";
 
 	private String formatCustomName = null;
+	private int blockID = -1;
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
@@ -37,6 +39,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		map.forEach((prop, in) -> prop.writeToNBT(comp, in));
 		if (formatCustomName != null)
 			comp.setString(CUSTOMNAME, formatCustomName);
+		compound.setInteger(BLOCKID, blockID);
 		compound.setTag(PROPERTIES, comp);
 		super.writeToNBT(compound);
 		NetworkDebug.networkWriteHook(compound, world, this);
@@ -49,6 +52,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public void readFromNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
 		super.readFromNBT(compound);
+		blockID = comp.getInteger(BLOCKID);
 		if (world == null) {
 			__tmp = comp.copy();
 		} else {
@@ -66,6 +70,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		if (comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));
 		NetworkDebug.networkReadHook(comp, world, new Object[] { this, new JsonPrimitive(__tmp == null) } );
+		setBlockID();
 	}
 
 	@Override
@@ -141,10 +146,10 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		if(getCustomNameRenderHeight() == -1)
 			return;
 		this.formatCustomName = str;
-		if (str == null && map.containsKey(SignalBlock.CUSTOMNAME)) {
-			map.remove(SignalBlock.CUSTOMNAME);
+		if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
+			map.remove(Signal.CUSTOMNAME);
 		} else if (str != null) {
-			map.put(SignalBlock.CUSTOMNAME, true);
+			map.put(Signal.CUSTOMNAME, true);
 		}
 		this.markDirty();
 		world.markBlockRangeForRenderUpdate(pos, pos);
@@ -153,9 +158,27 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	private float renderHeight = 0;
 
 	public float getCustomNameRenderHeight() {
-		if (renderHeight == 0) {
-			renderHeight = ((SignalBlock) world.getBlockState(pos).getBlock()).getCustomnameRenderHeight();
-		}
 		return renderHeight;
+	}
+	
+	public float getSignWidth() {
+		return Signal.SIGNALLIST.get(blockID).getSignWidth(world, pos, this);
+	}
+	
+	public float getOffsetX() {
+		return Signal.SIGNALLIST.get(blockID).getOffsetX(world, pos, this);
+	}
+		
+	public float getOffsetZ() {
+		return Signal.SIGNALLIST.get(blockID).getOffsetZ(world, pos, this);
+	}
+	
+	public void setBlockID() {
+		blockID = ((Signal)world.getBlockState(pos).getBlock()).getID();
+		renderHeight = Signal.SIGNALLIST.get(blockID).getCustomnameRenderHeight(world, pos, this);
+	}
+	
+	public int getBlockID() {
+		return blockID;
 	}
 }

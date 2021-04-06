@@ -1,12 +1,12 @@
 package eu.gir.girsignals.blocks;
 
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.init.GIRItems;
 
-public class SignalSH extends SignalBlock {
+public class SignalSH extends Signal {
 
 	public SignalSH() {
-		super("shsignal", 1);
+		super(GIRItems.SIGN_PLACEMENT_TOOL, "shsignal", 1);
 	}
 
 	public static final SEProperty<Boolean> SH = SEProperty.of("sh2", false);
