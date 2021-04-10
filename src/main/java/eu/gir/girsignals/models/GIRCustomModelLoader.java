@@ -20,6 +20,7 @@ import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.NE;
+import eu.gir.girsignals.EnumSignals.NE_ADDITION;
 import eu.gir.girsignals.EnumSignals.OTHER_SIGAL;
 import eu.gir.girsignals.EnumSignals.Offable;
 import eu.gir.girsignals.EnumSignals.PED;
@@ -567,6 +568,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		});
 		registeredModels.put("nesignal", cm -> {
 			cm.register("mast", ebs -> true, 0);
+			cm.register("mast", withN(SignalNE.NETYPE, mast -> mast.equals(NE.NE6)).negate(), 0);
 			cm.register("ne1", withN(SignalNE.NETYPE, NE.NE1::equals), 1, "2", "girsignals:blocks/ne1");
 			cm.register("ne2", withN(SignalNE.NETYPE, NE.NE2::equals), 1, "2", "girsignals:blocks/ne2");
 			cm.register("ne2", withN(SignalNE.NETYPE, NE.NE2_1::equals), 1, "2", "girsignals:blocks/ne2");
@@ -574,10 +576,14 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_1::equals), 1, "2", "girsignals:blocks/ne3_1");
 			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_2::equals), 1, "2", "girsignals:blocks/ne3_2");
 			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_3::equals), 1, "2", "girsignals:blocks/ne3_3");
+			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_4::equals), 1, "2", "girsignals:blocks/ne3_4");
+			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_5::equals), 1, "2", "girsignals:blocks/ne3_5");
 			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE4::equals), 1, "2", "girsignals:blocks/ne4");
 			cm.register("ne4_small", withN(SignalNE.NETYPE, NE.NE4_small::equals), 1, "2", "girsignals:blocks/ne4_small");
 			cm.register("ne6_mast", withN(SignalNE.NETYPE, NE.NE6::equals), 1, "2", "girsignals:blocks/ne6");
 			cm.register("ne6", withN(SignalNE.NETYPE, NE.NE6::equals), 1, "2", "girsignals:blocks/ne6");
+			cm.register("ne2_2", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE1)), 2);
+			cm.register("ne2_3", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE2)), 2);
 		});
 	}
 
