@@ -1,5 +1,8 @@
 # Changelog
 
+## [Internal changes] 4.10.2021 - 1
+* Texture Cleanup
+
 ## [Major additions] 4.5.2021 - 1
 * Added RA signs
 * Added BUE signs
