@@ -1,7 +1,7 @@
 # Changelog
 
-## [Internal changes] 4.10.2021 - 1
-* Texture Cleanup
+## [Fixes] 4.5.2021 - 2
+* Fixed crash during startup
 
 ## [Major additions] 4.5.2021 - 1
 * Added RA signs
