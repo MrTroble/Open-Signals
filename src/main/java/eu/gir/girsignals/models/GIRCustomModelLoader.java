@@ -19,6 +19,8 @@ import eu.gir.girsignals.EnumSignals.KS_DISTANT;
 import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
+import eu.gir.girsignals.EnumSignals.NE;
+import eu.gir.girsignals.EnumSignals.NE_ADDITION;
 import eu.gir.girsignals.EnumSignals.OTHER_SIGAL;
 import eu.gir.girsignals.EnumSignals.Offable;
 import eu.gir.girsignals.EnumSignals.PED;
@@ -34,6 +36,7 @@ import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import eu.gir.girsignals.blocks.SignalBUE;
 import eu.gir.girsignals.blocks.SignalBUELight;
 import eu.gir.girsignals.blocks.SignalEL;
+import eu.gir.girsignals.blocks.SignalNE;
 import eu.gir.girsignals.blocks.SignalOTHER;
 import eu.gir.girsignals.blocks.SignalRA;
 import eu.gir.girsignals.blocks.signals.SignalHL;
@@ -562,6 +565,23 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("other_signals/hm_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.HM::equals), 1);
 			cm.register("other_signals/ob_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.OB::equals), 1);
 			cm.register("other_signals/cross_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.CROSS::equals), 0);
+		});
+		registeredModels.put("nesignal", cm -> {
+			cm.register("mast", withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE6)).or(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE4_small))).negate(), 0);
+			cm.register("ne1", withN(SignalNE.NETYPE, NE.NE1::equals), 1, "2", "girsignals:blocks/ne1");
+			cm.register("ne2", withN(SignalNE.NETYPE, NE.NE2::equals), 0, "2", "girsignals:blocks/ne2");
+			cm.register("ne2", withN(SignalNE.NETYPE, NE.NE2_1::equals), 0, "2", "girsignals:blocks/ne2_1");
+			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_1::equals), 1, "2", "girsignals:blocks/ne3_1");
+			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_2::equals), 1, "2", "girsignals:blocks/ne3_2");
+			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_3::equals), 1, "2", "girsignals:blocks/ne3_3");
+			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_4::equals), 1, "2", "girsignals:blocks/ne3_4");
+			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE3_5::equals), 1, "2", "girsignals:blocks/ne3_5");
+			cm.register("ne3_4", withN(SignalNE.NETYPE, NE.NE4::equals), 1, "2", "girsignals:blocks/ne4");
+			cm.register("ne4_small", withN(SignalNE.NETYPE, NE.NE4_small::equals), 0, "2", "girsignals:blocks/ne4_small");
+			cm.register("ne6", withN(SignalNE.NETYPE, NE.NE6::equals), 1, "2", "girsignals:blocks/ne6");
+			cm.register("ne6_mast", withN(SignalNE.NETYPE, NE.NE6::equals), 0, "2", "girsignals:blocks/ne6_mast");
+			cm.register("ne2_2", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE1)).and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);
+			cm.register("ne2_3", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE2)).and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);
 		});
 	}
 

@@ -20,6 +20,7 @@ tile.rasignal.name=Ra Signal
 tile.buesignal.name=BÜ Signal
 tile.othersignal.name=Other signals
 tile.buelight.name=BÜ Signal
+tile.nesignal.name=Ne Signal
 
 #Linktool
 lt.linkfailed=Link failed!

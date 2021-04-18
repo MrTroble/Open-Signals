@@ -139,4 +139,13 @@ public class EnumSignals {
 	public enum OTHER_SIGAL implements DefaultName<OTHER_SIGAL> {
 		HM, OB, CROSS;
 	}
+	
+	public enum NE implements DefaultName<NE> {
+		NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_small, NE6;
+	}
+	
+	public enum NE_ADDITION implements Offable<NE_ADDITION> {
+		OFF, PRE1, PRE2;
+	}
+	
 }
