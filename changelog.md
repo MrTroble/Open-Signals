@@ -1,5 +1,8 @@
 # Changelog
 
+## [additions] 4.18.2021 - 1
+* Added NE signs
+
 ## [Internal changes] 4.10.2021 - 1
 * Texture Cleanup
 
