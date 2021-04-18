@@ -6,7 +6,8 @@
     ],
     "textures": {
         "14": "girsignals:blocks/ne/ne2_2",
-        "15": "girsignals:blocks/default/shield_black"
+        "15": "girsignals:blocks/default/shield_black",
+		"particle": "girsignals:blocks/default/shield_gray"
     },
     "elements": [
         {

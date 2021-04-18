@@ -5,7 +5,8 @@
         32
     ],
     "textures": {
-        "0": "girsignals:blocks/default/shield_gray"
+        "0": "girsignals:blocks/default/shield_gray",
+		"particle": "girsignals:blocks/default/shield_gray"
     },
     "elements": [
         {
