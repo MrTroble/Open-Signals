@@ -24,13 +24,29 @@ public class SignalOTHER extends Signal {
 	
 	@Override
 	public float getCustomnameRenderHeight(World world, BlockPos pos, SignalTileEnity te) {
-		if(te.getProperty(OTHERTYPE).filter(OTHER_SIGAL.HM::equals).isPresent())
-			return 1.0f;
+		if(te == null || te.getProperty(OTHERTYPE).filter(OTHER_SIGAL.HM::equals).isPresent())
+			return 2.1f;
 		return super.getCustomnameRenderHeight(world, pos, te);
 	}
 	
 	@Override
 	public float getCustomnameScale(World world, BlockPos pos, SignalTileEnity te) {
-		return 1.5f;
+		return 3.5f;
 	}
+	
+	@Override
+	public float getCustomnameSignWidth(World world, BlockPos pos, SignalTileEnity te) {
+		return super.getCustomnameSignWidth(world, pos, te);
+	}
+	
+	@Override
+	public float getCustomnameOffsetX(World world, BlockPos pos, SignalTileEnity te) {
+		return -5;
+	}
+	
+	@Override
+	public float getCustomnameOffsetZ(World world, BlockPos pos, SignalTileEnity te) {
+		return 1.8f;
+	}
+	
 }

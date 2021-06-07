@@ -17,7 +17,7 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
 		final IBlockState state = te.getWorld().getBlockState(te.getPos());
  		final SignalAngel face = state.getValue(Signal.ANGEL);
  		final float angel = face.getAngel();
- 		final String display = te.getDisplayName().getFormattedText();
+ 		final String[] display = te.getDisplayName().getUnformattedComponentText().split("\\[n\\]");
  		final FontRenderer font = getFontRenderer();
  		final float width = te.getCustomnameSignWidth();
  		final float offsetX = te.getCustomnameOffsetX(); 
@@ -31,7 +31,9 @@ public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileE
  		GlStateManager.rotate(angel, 0, 1, 0);
  		GlStateManager.translate(width/2 + offsetX, 0, -4.2f + offsetZ);
  		GlStateManager.scale(-1f, 1f, 1f);
- 		font.drawSplitString(display, 0, 0, (int) width, 0);
+ 		for (int i = 0; i < display.length; i++) {
+			 font.drawSplitString(display[i], 0, (int) (i * scale * 2.8f), (int) width, 0);
+ 		}
  		GlStateManager.popMatrix();
 	}
 	
