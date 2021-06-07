@@ -1,5 +1,12 @@
 # Changelog
 
+## [Internal changes] 4.18.2021 - 2
+* Fixed textures and particles
+* NE Signs texture cleanup
+
+## [additions] 4.18.2021 - 1
+* Added NE signs
+
 ## [Internal changes] 4.10.2021 - 1
 * Texture Cleanup
 

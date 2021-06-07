@@ -10,6 +10,7 @@ import eu.gir.girsignals.blocks.SignalBUE;
 import eu.gir.girsignals.blocks.SignalBUELight;
 import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.SignalEL;
+import eu.gir.girsignals.blocks.SignalNE;
 import eu.gir.girsignals.blocks.SignalOTHER;
 import eu.gir.girsignals.blocks.SignalRA;
 import eu.gir.girsignals.blocks.SignalSH;
@@ -46,6 +47,7 @@ public class GIRBlocks {
 	public static final SignalBUE BUE_SIGNAL = new SignalBUE();
 	public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
 	public static final SignalOTHER OTHER_SIGNAL = new SignalOTHER();
+	public static final SignalNE NE_SIGNAL = new SignalNE();
 	public static final TrackIOBlock TRACK_IO = new TrackIOBlock();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
