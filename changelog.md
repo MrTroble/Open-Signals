@@ -1,5 +1,8 @@
 # Changelog
 
+## [Additions] 6.08.2021 - 1
+* Added NE 5 sign
+
 ## [Internal changes] 4.18.2021 - 2
 * Fixed textures and particles
 * NE Signs texture cleanup
