@@ -38,7 +38,7 @@ curseforge {
   }
 }
 
-version = System.getenv("APPVEYOR_BUILD_VERSION")
+def version = System.getenv("APPVEYOR_BUILD_VERSION")
 group = 'net.gir.girsignals' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'GIRSignals'
 
@@ -122,7 +122,7 @@ jar {
             "Specification-Vendor": "German Immersive Railroading Community",
             "Specification-Version": "1", // We are version 1 of ourselves
             "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
+            "Implementation-Version": (version == null) ? "dev":version,
             "Implementation-Vendor" :"German Immersive Railroading Community",
             "Implementation-Timestamp": new Date().format("dd-MM-yyyy'T'HH:mm:ssZ")
         ])

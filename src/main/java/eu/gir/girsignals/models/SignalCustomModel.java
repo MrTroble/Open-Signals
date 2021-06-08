@@ -43,17 +43,17 @@ public class SignalCustomModel implements IModel {
 	private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
 	private IBakedModel cachedModel = null;
 	private SignalAngel angel = SignalAngel.ANGEL0;
-	
+
 	private static Field rotationField;
 	static {
-		for(Field fdl : BlockPart.class.getFields()) {
-			if(fdl.getType().equals(BlockPartRotation.class)) {
+		for (Field fdl : BlockPart.class.getFields()) {
+			if (fdl.getType().equals(BlockPartRotation.class)) {
 				fdl.setAccessible(true);
 				rotationField = fdl;
 			}
 		}
 	}
-	
+
 	public SignalCustomModel(Consumer<SignalCustomModel> init, SignalAngel facing) {
 		init.accept(this);
 		this.angel = facing;
@@ -68,12 +68,15 @@ public class SignalCustomModel implements IModel {
 				final IModel model = m.first();
 				final ModelBlock mdl = model.asVanillaModel().orElse(null);
 				final Vector3f f = m.second();
-				final TRSRTransformation baseState = TRSRTransformation.blockCenterToCorner(new TRSRTransformation(f, null, null, null));
+				final TRSRTransformation baseState = TRSRTransformation
+						.blockCenterToCorner(new TRSRTransformation(f, null, null, null));
 
 				if (mdl != null) {
 					mdl.getElements().forEach(bp -> {
-						final BlockPartRotation prt = bp.partRotation == null ? new BlockPartRotation(new org.lwjgl.util.vector.Vector3f(0.5f, 0.5f, 0.5f), Axis.Y,
-								angel.getAngel(), false) : new BlockPartRotation(bp.partRotation.origin, Axis.Y, angel.getAngel(), false);
+						final BlockPartRotation prt = bp.partRotation == null
+								? new BlockPartRotation(new org.lwjgl.util.vector.Vector3f(0.5f, 0.5f, 0.5f), Axis.Y,
+										angel.getAngel(), false)
+								: new BlockPartRotation(bp.partRotation.origin, Axis.Y, angel.getAngel(), false);
 						try {
 							rotationField.set(bp, prt);
 						} catch (IllegalArgumentException | IllegalAccessException e) {
@@ -111,9 +114,15 @@ public class SignalCustomModel implements IModel {
 		this.register(name, state, 0, yOffset, 0, strings);
 	}
 
-	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z, @Nullable String... strings) {
-		IModel m = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
-				"Couldn't find " + name);
+	protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y, float z,
+			@Nullable String... strings) {
+		IModel m;
+		try {
+			m = ModelLoaderRegistry.getModel(new ResourceLocation(GirsignalsMain.MODID, "block/" + name + ".obj"));
+		} catch (Exception e) {
+			m = ModelLoaderRegistry.getModelOrLogError(new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
+					"Couldn't find " + name);
+		}
 		m = m.smoothLighting(false);
 		if (strings != null && strings.length > 0) {
 			Builder<String, String> build = ImmutableMap.builder();

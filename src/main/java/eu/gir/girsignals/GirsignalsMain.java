@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 
 import eu.gir.girsignals.debug.NetworkDebug;
 import eu.gir.girsignals.proxy.CommonProxy;
+import net.minecraftforge.client.model.obj.OBJLoader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.Mod.Instance;
@@ -35,6 +36,7 @@ public class GirsignalsMain {
 
 	@EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
+		OBJLoader.INSTANCE.addDomain(MODID);
 		LOG =event.getModLog();
 		PROXY.preinit(event);
 	}
