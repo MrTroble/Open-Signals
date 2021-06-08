@@ -31,6 +31,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	private static final String BLOCKID = "blockid";
 
 	private String formatCustomName = null;
+	private Signal cachedBlock = null;
 	private int blockID = -1;
 
 	@Override
@@ -69,7 +70,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 				});
 		if (comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));
-		NetworkDebug.networkReadHook(comp, world, new Object[] { this, new JsonPrimitive(__tmp == null) } );
+		NetworkDebug.networkReadHook(comp, world, new Object[] { this, new JsonPrimitive(__tmp == null) });
 		setBlockID();
 	}
 
@@ -143,7 +144,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	}
 
 	public void setCustomName(String str) {
-		if(getCustomNameRenderHeight() == -1)
+		if (getCustomNameRenderHeight() == -1)
 			return;
 		this.formatCustomName = str;
 		if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
@@ -160,24 +161,29 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public float getCustomNameRenderHeight() {
 		return renderHeight;
 	}
-	
-	public float getSignWidth() {
-		return Signal.SIGNALLIST.get(blockID).getSignWidth(world, pos, this);
+
+	public float getCustomnameSignWidth() {
+		return cachedBlock.getCustomnameSignWidth(world, pos, this);
 	}
-	
-	public float getOffsetX() {
-		return Signal.SIGNALLIST.get(blockID).getOffsetX(world, pos, this);
+
+	public float getCustomnameOffsetX() {
+		return cachedBlock.getCustomnameOffsetX(world, pos, this);
 	}
-		
-	public float getOffsetZ() {
-		return Signal.SIGNALLIST.get(blockID).getOffsetZ(world, pos, this);
+
+	public float getCustomnameOffsetZ() {
+		return cachedBlock.getCustomnameOffsetZ(world, pos, this);
 	}
-	
+
+	public float getCustomnameScale() {
+		return cachedBlock.getCustomnameScale(world, pos, this);
+	}
+
 	public void setBlockID() {
-		blockID = ((Signal)world.getBlockState(pos).getBlock()).getID();
-		renderHeight = Signal.SIGNALLIST.get(blockID).getCustomnameRenderHeight(world, pos, this);
+		blockID = ((Signal) world.getBlockState(pos).getBlock()).getID();
+		cachedBlock = Signal.SIGNALLIST.get(blockID);
+		renderHeight = cachedBlock.getCustomnameRenderHeight(world, pos, this);
 	}
-	
+
 	public int getBlockID() {
 		return blockID;
 	}

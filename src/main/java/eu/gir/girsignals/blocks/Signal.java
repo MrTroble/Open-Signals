@@ -253,7 +253,8 @@ public class Signal extends Block implements ITileEntityProvider {
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
 		super.breakBlock(worldIn, pos, state);
 
-		GhostBlock.destroyUpperBlock(worldIn, pos);
+		if(!worldIn.isRemote)
+			GhostBlock.destroyUpperBlock(worldIn, pos);
 	}
 
 	public int getHeight(NBTTagCompound comp) {
@@ -269,6 +270,22 @@ public class Signal extends Block implements ITileEntityProvider {
 		return customNameRenderHeight;
 	}
 	
+	public float getCustomnameSignWidth(final World world, final BlockPos pos, final SignalTileEnity te) {
+		return 22;
+	}
+	
+	public float getCustomnameOffsetX(final World world, final BlockPos pos, final SignalTileEnity te) {
+		return 0;
+	}
+	
+	public float getCustomnameOffsetZ(final World world, final BlockPos pos, final SignalTileEnity te) {
+		return 0;
+	}
+	
+	public float getCustomnameScale(final World world, final BlockPos pos, final SignalTileEnity te) {
+		return 1;
+	}
+
 	@Override
 	public String toString() {
 		return this.getLocalizedName();
@@ -290,18 +307,6 @@ public class Signal extends Block implements ITileEntityProvider {
 	@SideOnly(Side.CLIENT)
 	public boolean hasCostumColor() {
 		return false;
-	}
-	
-	public float getSignWidth(final World world, final BlockPos pos, final SignalTileEnity te) {
-		return 22;
-	}
-	
-	public float getOffsetX(final World world, final BlockPos pos, final SignalTileEnity te) {
-		return 0;
-	}
-	
-	public float getOffsetZ(final World world, final BlockPos pos, final SignalTileEnity te) {
-		return 0;
 	}
 
 	public Placementtool getPlacementtool() {
