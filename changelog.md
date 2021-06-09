@@ -1,5 +1,8 @@
 # Changelog
 
+## [Additions] 6.9.2021 - 1
+* Added NE5 sign
+
 ## [Internal changes] 6.8.2021 - 1
 * Model optimization
 
