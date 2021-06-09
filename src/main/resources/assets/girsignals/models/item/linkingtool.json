@@ -1,6 +1,1 @@
-{
-    "parent": "item/generated",
-    "textures": {
-        "layer0": "girsignals:items/linkingtool"
-    }
-}
+{"parent": "item/generated", "textures": {"layer0": "girsignals:items/linkingtool"}, "credit": "Made with Blockbench by Mc_Jeronimo"}

@@ -1,5 +1,8 @@
 # Changelog
 
+## [Internal changes] 6.8.2021 - 1
+* Model optimization
+
 ## [Additions] 6.7.2021 - 1
 * Added Hectometer
 
