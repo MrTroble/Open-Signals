@@ -108,7 +108,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 	@SuppressWarnings("rawtypes")
 	private static <T extends DefaultName> Predicate<IExtendedBlockState> withN(IUnlistedProperty<T> property,
 			Predicate<T> t) {
-		 ;
 		return ebs -> { 
 			T val = ebs.getValue(property);
 			return val != null && t.test(val);
