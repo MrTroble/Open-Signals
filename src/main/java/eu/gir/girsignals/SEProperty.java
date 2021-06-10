@@ -82,7 +82,7 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	@SuppressWarnings("unchecked")
 	public T getObjFromID(int obj) {
 		if (!isValid(obj))
-			throw new IllegalArgumentException("Given paramter is not a exceptable value!");
+			throw new IllegalArgumentException("Given paramter is not a exceptable value! Val: " + obj);
 		if (getType().isEnum()) {
 			return (T) getType().getEnumConstants()[obj];
 		} else if (getType().equals(Boolean.class)) {

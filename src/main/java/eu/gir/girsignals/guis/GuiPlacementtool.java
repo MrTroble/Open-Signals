@@ -1,15 +1,20 @@
 package eu.gir.girsignals.guis;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
 import org.lwjgl.opengl.GL11;
 
+import com.google.common.collect.Lists;
+
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.guis.GuiSignalController.SizeIntegerables;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.items.Placementtool;
 import io.netty.buffer.ByteBuf;
@@ -155,12 +160,11 @@ public class GuiPlacementtool extends GuiScreen {
 
 	}
 
+	private ArrayList<ArrayList<GuiButton>> pageList = new ArrayList<>();
+	private int indexCurrentlyUsed = 0;
+
 	@Override
 	public void initGui() {
-		this.guiLeft = (this.width - this.xSize) / 2;
-		this.guiTop = (this.height - this.ySize) / 2;
-		System.out.println(guiLeft);
-		System.out.println(guiTop);
 		textField = new GuiTextField(-200, fontRenderer, 10, 10, 100, 20);
 		textField.setText(comp.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME));
 		animationState = 180.0f;
@@ -172,33 +176,23 @@ public class GuiPlacementtool extends GuiScreen {
 		Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
 		properties = unlistedProperties.toArray(new IUnlistedProperty[unlistedProperties.size()]);
 		int maxWidth = 0;
-		for (IUnlistedProperty<?> lenIUnlistedProperty : unlistedProperties)
+		for (IUnlistedProperty<?> lenIUnlistedProperty : unlistedProperties) {
 			maxWidth = Math.max(
 					fontRenderer.getStringWidth(I18n.format("property." + lenIUnlistedProperty.getName() + ".name")),
 					maxWidth);
-		maxWidth += 40;
-
-		int yPos = 20;
-		int xPos = 50;
-		for (IUnlistedProperty<?> property : unlistedProperties) {
-			SEProperty<?> prop = SEProperty.cst(property);
-			yPos += 25;
-			if (yPos >= 220) {
-				xPos += maxWidth;
-				yPos = 45;
-			}
-			int id = (yPos / 20) * (xPos / 50);
-			String propName = property.getName();
-			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-				addButton(new InternalCheckBox(id, xPos, yPos, propName, comp.getBoolean(propName)));
-			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-				addButton(new GUIEnumerableSetting(prop, id, xPos, yPos, maxWidth - 20, propName,
-						comp.getInteger(propName), inp -> applyModelChanges()));
-			}
 		}
+		maxWidth += 20;
 
-		final GUIEnumerableSetting settings = new GUIEnumerableSetting(tool, -100, (this.width - 150) / 2, 10, 150,
-				"signaltype", this.implLastID, null);
+		this.ySize = Math.min(290, this.height - 40);
+		this.xSize = maxWidth * 2 + 80;
+		this.guiLeft = (this.width - this.xSize) / 2;
+		this.guiTop = (this.height - this.ySize) / 2;
+
+		int yPos = this.guiTop + 20;
+		int xPos = this.guiLeft + 40;
+
+		final GUIEnumerableSetting settings = new GUIEnumerableSetting(tool, -100, xPos, yPos, 150, "signaltype",
+				this.implLastID, null);
 		settings.consumer = input -> {
 			settings.enabled = false;
 			implLastID = input;
@@ -208,6 +202,49 @@ public class GuiPlacementtool extends GuiScreen {
 			initGui();
 		};
 		addButton(settings);
+
+		pageList.clear();
+		pageList.add(Lists.newArrayList());
+		boolean visible = true;
+		int index = indexCurrentlyUsed = 0;
+		yPos += 30;
+		for (IUnlistedProperty<?> property : unlistedProperties) {
+			SEProperty<?> prop = SEProperty.cst(property);
+			if (yPos >= (this.guiTop + this.ySize - 40)) {
+				pageList.add(Lists.newArrayList());
+				index++;
+				yPos = this.guiTop + 50;
+				visible = false;
+			}
+			int id = (yPos / 20) * (xPos / 50);
+			String propName = property.getName();
+			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+				final InternalCheckBox checkbox = new InternalCheckBox(id, xPos, yPos, propName,
+						comp.getBoolean(propName));
+				addButton(checkbox).visible = visible;
+				pageList.get(index).add(checkbox);
+				yPos += 10;
+			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+				final GUIEnumerableSetting setting = new GUIEnumerableSetting(prop, id, xPos, yPos, maxWidth - 20,
+						propName, comp.getInteger(propName), inp -> applyModelChanges());
+				addButton(setting).visible = visible;
+				pageList.get(index).add(setting);
+				yPos += 20;
+			}
+			yPos += 10;
+		}
+
+		if (pageList.size() > 1) {
+			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
+					idx -> (String) (idx + "/" + (pageList.size() - 1)));
+			final GUIEnumerableSetting pageSelection = new GUIEnumerableSetting(sizeIn, -890, this.guiLeft + 40,
+					this.guiTop + this.ySize - 30, maxWidth - 20, "page", indexCurrentlyUsed, inp -> {
+						pageList.get(indexCurrentlyUsed).forEach(btn -> btn.visible = false);
+						pageList.get(inp).forEach(btn -> btn.visible = true);
+						indexCurrentlyUsed = inp;
+					});
+			addButton(pageSelection);
+		}
 
 		applyModelChanges();
 	}
@@ -242,7 +279,7 @@ public class GuiPlacementtool extends GuiScreen {
 		int i = 0;
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 		for (GuiButton btn : this.buttonList) {
-			if (btn.id == -100)
+			if (btn.id == -100 || btn.id == -890)
 				continue;
 			if (btn instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) btn;

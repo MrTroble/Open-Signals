@@ -58,25 +58,27 @@ public class GUIEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	@Override
 	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 		super.drawButton(mc, mouseX, mouseY, partialTicks);
-		this.rightButton.drawButton(mc, mouseX, mouseY, partialTicks);
-		this.leftButton.drawButton(mc, mouseX, mouseY, partialTicks);
-		if (lock && pressed) {
-			lock = false;
-			if (lor) {
-				this.value--;
-				if (this.value == 0)
-					this.leftButton.enabled = false;
-				if (!this.rightButton.enabled)
-					this.rightButton.enabled = true;
-			} else {
-				this.value++;
-				if (this.value == this.max)
-					this.rightButton.enabled = false;
-				if (!this.leftButton.enabled)
-					this.leftButton.enabled = true;
+		if (visible) {
+			this.rightButton.drawButton(mc, mouseX, mouseY, partialTicks);
+			this.leftButton.drawButton(mc, mouseX, mouseY, partialTicks);
+			if (lock && pressed) {
+				lock = false;
+				if (lor) {
+					this.value--;
+					if (this.value == 0)
+						this.leftButton.enabled = false;
+					if (!this.rightButton.enabled)
+						this.rightButton.enabled = true;
+				} else {
+					this.value++;
+					if (this.value == this.max)
+						this.rightButton.enabled = false;
+					if (!this.leftButton.enabled)
+						this.leftButton.enabled = true;
+				}
+				consumer.accept(this.value);
+				this.displayString = getValueString(this.value);
 			}
-			consumer.accept(this.value);
-			this.displayString = getValueString(this.value);
 		}
 	}
 
