@@ -1,5 +1,8 @@
 # Changelog
 
+## [Update] 6.10.2021 - 1
+* Updated UI to a more usable standard
+
 ## [Additions] 6.9.2021 - 1
 * Added NE5 sign
 
