@@ -21,8 +21,8 @@ public class GUIEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	protected final GuiButton leftButton;
 	protected final GuiButton rightButton;
 
-	private static final int OFFSET = 2;
-	private static final int BUTTON_SIZE = 20;
+	public static final int OFFSET = 2;
+	public static final int BUTTON_SIZE = 20;
 
 	public GUIEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
 			final String buttonText, final int initialValue, final Consumer<Integer> consumer) {

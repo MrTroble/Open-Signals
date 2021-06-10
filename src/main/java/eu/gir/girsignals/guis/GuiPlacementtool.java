@@ -4,14 +4,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.function.Consumer;
 
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 
+import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.GuiSignalController.SizeIntegerables;
@@ -44,6 +45,25 @@ public class GuiPlacementtool extends GuiScreen {
 	private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
 			"textures/gui/container/creative_inventory/tabs.png");
 	private static final float DIM = 256.0f;
+
+	private static final int TOP_STRING_OFFSET = 15;
+	private static final float STRING_SCALE = 1.5f;
+	private static final int STRING_COLOR = 4210752;
+	private static final int LEFT_OFFSET = 20;
+	private static final int SIGNALTYPE_FIXED_WIDTH = 150;
+	private static final int SIGNALTYPE_INSET = 20;
+	private static final int MAXIMUM_GUI_HEIGHT = 320;
+	private static final int GUI_INSET = 40;
+	private static final int SIGNAL_RENDER_WIDTH_AND_INSET = 180;
+	private static final int TOP_OFFSET = GUI_INSET;
+	private static final int SIGNAL_TYPE_ID = -100;
+	private static final int SETTINGS_HEIGHT = 20;
+	private static final int ELEMENT_SPACING = 10;
+	private static final int BOTTOM_OFFSET = TOP_OFFSET;
+	private static final int CHECK_BOX_HEIGHT = 10;
+	private static final int DEFAULT_ID = 200;
+	private static final int PAGE_SELECTION_ID = -890;
+	private static final int TEXT_FIELD_ID = -200;
 
 	@SuppressWarnings({ "rawtypes" })
 	private IUnlistedProperty[] properties;
@@ -101,8 +121,8 @@ public class GuiPlacementtool extends GuiScreen {
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
-//		if (currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
-//			textField.drawTextBox();
+		if (currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
+			textField.drawTextBox();
 
 		if (dragging) {
 			animationState += mouseX - oldMouse;
@@ -112,9 +132,10 @@ public class GuiPlacementtool extends GuiScreen {
 
 		GlStateManager.enableRescaleNormal();
 		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) this.width * (5 / 6.0f), (float) this.height * (5 / 6.0f), 100 + this.zLevel);
-		GlStateManager.scale(22.0F, -22.0F, 22.0F);
+		GlStateManager.translate(this.guiLeft + this.xSize - 70, this.guiTop + this.ySize / 2, 100.0f);
 		GlStateManager.rotate(animationState, 0, 1, 0);
+		GlStateManager.scale(22.0F, -22.0F, 22.0F);
+		GlStateManager.translate(-0.5f, -3.5f, -0.5f);
 		DrawUtil.draw(model.get());
 		GlStateManager.popMatrix();
 		GlStateManager.disableRescaleNormal();
@@ -131,6 +152,13 @@ public class GuiPlacementtool extends GuiScreen {
 			}
 
 		}
+
+		String s = I18n.format("property.signal.name");
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(this.guiLeft + LEFT_OFFSET, this.guiTop + TOP_STRING_OFFSET, 0);
+		GlStateManager.scale(STRING_SCALE, STRING_SCALE, STRING_SCALE);
+		this.fontRenderer.drawString(s, 0, 0, STRING_COLOR);
+		GlStateManager.popMatrix();
 	}
 
 	@Override
@@ -160,20 +188,22 @@ public class GuiPlacementtool extends GuiScreen {
 
 	}
 
-	private ArrayList<ArrayList<GuiButton>> pageList = new ArrayList<>();
+	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
 	private int indexCurrentlyUsed = 0;
 
 	@Override
 	public void initGui() {
-		textField = new GuiTextField(-200, fontRenderer, 10, 10, 100, 20);
+		textField = new GuiTextField(TEXT_FIELD_ID, fontRenderer, 10, 10,
+				SIGNALTYPE_FIXED_WIDTH + GUIEnumerableSetting.BUTTON_SIZE * 2 + GUIEnumerableSetting.OFFSET * 2,
+				SETTINGS_HEIGHT);
 		textField.setText(comp.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME));
 		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 
 		this.buttonList.clear();
 
-		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock.getBlockState();
-		Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
+		final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock.getBlockState();
+		final Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
 		properties = unlistedProperties.toArray(new IUnlistedProperty[unlistedProperties.size()]);
 		int maxWidth = 0;
 		for (IUnlistedProperty<?> lenIUnlistedProperty : unlistedProperties) {
@@ -181,18 +211,18 @@ public class GuiPlacementtool extends GuiScreen {
 					fontRenderer.getStringWidth(I18n.format("property." + lenIUnlistedProperty.getName() + ".name")),
 					maxWidth);
 		}
-		maxWidth += 20;
+		maxWidth = Math.max(SIGNALTYPE_FIXED_WIDTH, maxWidth);
 
-		this.ySize = Math.min(290, this.height - 40);
-		this.xSize = maxWidth * 2 + 80;
+		this.ySize = Math.min(MAXIMUM_GUI_HEIGHT, this.height - GUI_INSET);
+		this.xSize = maxWidth + SIGNAL_RENDER_WIDTH_AND_INSET + SIGNALTYPE_INSET;
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
 
-		int yPos = this.guiTop + 20;
-		int xPos = this.guiLeft + 40;
+		int yPos = this.guiTop + TOP_OFFSET;
+		final int xPos = this.guiLeft + LEFT_OFFSET;
 
-		final GUIEnumerableSetting settings = new GUIEnumerableSetting(tool, -100, xPos, yPos, 150, "signaltype",
-				this.implLastID, null);
+		final GUIEnumerableSetting settings = new GUIEnumerableSetting(tool, SIGNAL_TYPE_ID, xPos, yPos,
+				SIGNALTYPE_FIXED_WIDTH, "signaltype", this.implLastID, null);
 		settings.consumer = input -> {
 			settings.enabled = false;
 			implLastID = input;
@@ -207,46 +237,63 @@ public class GuiPlacementtool extends GuiScreen {
 		pageList.add(Lists.newArrayList());
 		boolean visible = true;
 		int index = indexCurrentlyUsed = 0;
-		yPos += 30;
+		yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
 		for (IUnlistedProperty<?> property : unlistedProperties) {
 			SEProperty<?> prop = SEProperty.cst(property);
-			if (yPos >= (this.guiTop + this.ySize - 40)) {
+			if (!prop.isChangabelAtStage(ChangeableStage.APISTAGE) && !prop.isChangabelAtStage(ChangeableStage.GUISTAGE)
+					&& !prop.equals(Signal.CUSTOMNAME))
+				continue;
+			if (yPos >= (this.guiTop + this.ySize - BOTTOM_OFFSET)) {
 				pageList.add(Lists.newArrayList());
 				index++;
-				yPos = this.guiTop + 50;
+				yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
 				visible = false;
 			}
-			int id = (yPos / 20) * (xPos / 50);
 			String propName = property.getName();
 			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-				final InternalCheckBox checkbox = new InternalCheckBox(id, xPos, yPos, propName,
+				final InternalCheckBox checkbox = new InternalCheckBox(DEFAULT_ID, xPos, yPos, propName,
 						comp.getBoolean(propName));
 				addButton(checkbox).visible = visible;
 				pageList.get(index).add(checkbox);
-				yPos += 10;
+				yPos += CHECK_BOX_HEIGHT;
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-				final GUIEnumerableSetting setting = new GUIEnumerableSetting(prop, id, xPos, yPos, maxWidth - 20,
+				final GUIEnumerableSetting setting = new GUIEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
 						propName, comp.getInteger(propName), inp -> applyModelChanges());
 				addButton(setting).visible = visible;
 				pageList.get(index).add(setting);
-				yPos += 20;
+				yPos += SETTINGS_HEIGHT;
+			} else {
+				textField.x = xPos;
+				textField.y = yPos;
+				yPos += SETTINGS_HEIGHT;
+				textField.setVisible(visible);
+				pageList.get(index).add(textField);
 			}
-			yPos += 10;
+			yPos += ELEMENT_SPACING;
 		}
 
 		if (pageList.size() > 1) {
 			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
 					idx -> (String) (idx + "/" + (pageList.size() - 1)));
-			final GUIEnumerableSetting pageSelection = new GUIEnumerableSetting(sizeIn, -890, this.guiLeft + 40,
-					this.guiTop + this.ySize - 30, maxWidth - 20, "page", indexCurrentlyUsed, inp -> {
-						pageList.get(indexCurrentlyUsed).forEach(btn -> btn.visible = false);
-						pageList.get(inp).forEach(btn -> btn.visible = true);
+			final GUIEnumerableSetting pageSelection = new GUIEnumerableSetting(sizeIn, PAGE_SELECTION_ID, xPos,
+					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, maxWidth, "page", indexCurrentlyUsed,
+					inp -> {
+						pageList.get(indexCurrentlyUsed).forEach(visible(false));
+						pageList.get(inp).forEach(visible(true));
 						indexCurrentlyUsed = inp;
 					});
 			addButton(pageSelection);
 		}
-
 		applyModelChanges();
+	}
+
+	private static Consumer<Object> visible(final boolean b) {
+		return obj -> {
+			if (obj instanceof GuiButton)
+				((GuiButton) obj).visible = b;
+			if (obj instanceof GuiTextField)
+				((GuiTextField) obj).setVisible(b);
+		};
 	}
 
 	@Override
@@ -279,7 +326,7 @@ public class GuiPlacementtool extends GuiScreen {
 		int i = 0;
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 		for (GuiButton btn : this.buttonList) {
-			if (btn.id == -100 || btn.id == -890)
+			if (btn.id != DEFAULT_ID)
 				continue;
 			if (btn instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) btn;
