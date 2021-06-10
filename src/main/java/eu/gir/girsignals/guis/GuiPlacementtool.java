@@ -112,6 +112,13 @@ public class GuiPlacementtool extends GuiScreen {
 
 		drawRect(xLeft + 4, yTop + 4, xRight, yBottom, 0xFFC6C6C6);
 	}
+	
+	private void drawBack2(final int xLeft, final int xRight, final int yTop, final int yBottom) {
+		mc.getTextureManager().bindTexture( new ResourceLocation(
+				"textures/gui/container/creative_inventory/tab_inventory.png"));
+
+		drawScaledCustomSizeModalRect(xLeft, yTop, 72, 5, 34, 44, xRight, yBottom, DIM, DIM);
+	}
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
@@ -119,6 +126,8 @@ public class GuiPlacementtool extends GuiScreen {
 
 		drawBack(guiLeft, guiLeft + xSize, guiTop, guiTop + ySize);
 
+		drawBack2(guiLeft + this.xSize - 70 - xSize / 8, xSize / 4, guiTop + 20, ySize - 40);
+		
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
 		if (currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
@@ -193,7 +202,7 @@ public class GuiPlacementtool extends GuiScreen {
 
 	@Override
 	public void initGui() {
-		textField = new GuiTextField(TEXT_FIELD_ID, fontRenderer, 10, 10,
+		textField = new GuiTextField(TEXT_FIELD_ID, fontRenderer, 0, 0,
 				SIGNALTYPE_FIXED_WIDTH + GUIEnumerableSetting.BUTTON_SIZE * 2 + GUIEnumerableSetting.OFFSET * 2,
 				SETTINGS_HEIGHT);
 		textField.setText(comp.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME));
@@ -275,13 +284,16 @@ public class GuiPlacementtool extends GuiScreen {
 		if (pageList.size() > 1) {
 			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
 					idx -> (String) (idx + "/" + (pageList.size() - 1)));
-			final GUIEnumerableSetting pageSelection = new GUIEnumerableSetting(sizeIn, PAGE_SELECTION_ID, xPos,
-					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, maxWidth, "page", indexCurrentlyUsed,
+			final GUIEnumerableSetting pageSelection = new GUIEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
+					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", indexCurrentlyUsed,
 					inp -> {
 						pageList.get(indexCurrentlyUsed).forEach(visible(false));
 						pageList.get(inp).forEach(visible(true));
 						indexCurrentlyUsed = inp;
-					});
+					}, false);
+			pageSelection.setWidth(mc.fontRenderer.getStringWidth(pageSelection.displayString) + GUIEnumerableSetting.OFFSET * 2);
+			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GUIEnumerableSetting.BUTTON_SIZE;
+			pageSelection.update();
 			addButton(pageSelection);
 		}
 		applyModelChanges();

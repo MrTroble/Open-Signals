@@ -18,15 +18,22 @@ public class GUIEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	protected final int max;
 	protected final String buttonText;
 	protected final String unlocalized;
-	protected final GuiButton leftButton;
-	protected final GuiButton rightButton;
+	protected GuiButton leftButton;
+	protected GuiButton rightButton;
+	protected final boolean middleButton;
 
 	public static final int OFFSET = 2;
 	public static final int BUTTON_SIZE = 20;
+	private static final int STRING_COLOR = 14737632;
 
 	public GUIEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
 			final String buttonText, final int initialValue, final Consumer<Integer> consumer) {
-		super(id, x + BUTTON_SIZE + OFFSET, y, I18n.format("property." + buttonText + ".name"));
+		this(property, id, x, y, width, buttonText, initialValue, consumer, true);
+	}
+	
+	public GUIEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
+			final String buttonText, final int initialValue, final Consumer<Integer> consumer, final boolean middleButton) {
+		super(id, x, y, I18n.format("property." + buttonText + ".name"));
 		this.buttonText = I18n.format("property." + buttonText + ".name");
 		this.displayString = this.buttonText + ": " + property.getObjFromID(initialValue).toString();
 		this.property = property;
@@ -35,18 +42,24 @@ public class GUIEnumerableSetting extends GuiButton implements InternalUnlocaliz
 		this.width = width;
 		this.consumer = consumer;
 		this.unlocalized = buttonText;
+		this.middleButton = middleButton;
+		update();
+	}
+
+	public void update() {
 		this.leftButton = new GuiButton(-130992398, x, y, "<");
 		this.rightButton = new GuiButton(-130992398, x + width + BUTTON_SIZE + OFFSET * 2, y, ">");
 		this.rightButton.setWidth(BUTTON_SIZE);
 		this.leftButton.setWidth(BUTTON_SIZE);
-		if (initialValue <= 0) {
+		x += BUTTON_SIZE + OFFSET;
+		if (this.value <= 0) {
 			this.leftButton.enabled = false;
 		}
-		if (initialValue >= max) {
+		if (this.value >= max) {
 			this.rightButton.enabled = false;
 		}
 	}
-
+	
 	public int getValue() {
 		return this.value;
 	}
@@ -57,7 +70,11 @@ public class GUIEnumerableSetting extends GuiButton implements InternalUnlocaliz
 
 	@Override
 	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-		super.drawButton(mc, mouseX, mouseY, partialTicks);
+		if(middleButton) {
+			super.drawButton(mc, mouseX, mouseY, partialTicks);
+		} else {
+            this.drawCenteredString(mc.fontRenderer, this.displayString, this.x + this.width / 2, this.y + (this.height - 8) / 2, STRING_COLOR);
+		}
 		if (visible) {
 			this.rightButton.drawButton(mc, mouseX, mouseY, partialTicks);
 			this.leftButton.drawButton(mc, mouseX, mouseY, partialTicks);
@@ -102,5 +119,5 @@ public class GUIEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	public String getUnlocalized() {
 		return this.unlocalized;
 	}
-
+	
 }
