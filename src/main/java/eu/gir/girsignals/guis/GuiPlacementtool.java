@@ -27,6 +27,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -35,18 +36,28 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class GuiPlacementtool extends GuiScreen {
 
+	private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
+			"textures/gui/container/creative_inventory/tabs.png");
+	private static final float DIM = 256.0f;
+
 	@SuppressWarnings({ "rawtypes" })
 	private IUnlistedProperty[] properties;
 	private IExtendedBlockState ebs;
-
 	private NBTTagCompound comp;
 	private int usedBlock = 0;
-
 	private BlockModelShapes manager;
 	private Signal currentSelectedBlock;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
 	private Placementtool tool;
 	private int implLastID = 0;
+	private int guiLeft;
+	private int guiTop;
+	private int xSize = 340;
+	private int ySize = 230;
+	private float animationState = 0;
+	private int oldMouse = 0;
+	private boolean dragging = false;
+	private GuiTextField textField;
 
 	public GuiPlacementtool(ItemStack stack) {
 		this.comp = stack.getTagCompound();
@@ -61,18 +72,32 @@ public class GuiPlacementtool extends GuiScreen {
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 	}
 
-	private float animationState = 0;
-	private int oldMouse = 0;
-	private boolean dragging = false;
-	private GuiTextField textField;
+	private void drawBack(final int xLeft, final int xRight, final int yTop, final int yBottom) {
+		mc.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
+
+		drawTexturedModalRect(xLeft, yTop, 0, 32, 4, 4);
+		drawTexturedModalRect(xLeft, yBottom, 0, 124, 4, 4);
+		drawTexturedModalRect(xRight, yTop, 24, 32, 4, 4);
+		drawTexturedModalRect(xRight, yBottom, 24, 124, 4, 4);
+
+		drawScaledCustomSizeModalRect(xLeft + 4, yBottom, 4, 124, 1, 4, xRight - 4 - xLeft, 4, DIM, DIM);
+		drawScaledCustomSizeModalRect(xLeft + 4, yTop, 4, 32, 1, 4, xRight - 4 - xLeft, 4, DIM, DIM);
+		drawScaledCustomSizeModalRect(xLeft, yTop + 4, 0, 36, 4, 1, 4, yBottom - 4 - yTop, DIM, DIM);
+		drawScaledCustomSizeModalRect(xRight, yTop + 4, 24, 36, 4, 1, 4, yBottom - 4 - yTop, DIM, DIM);
+
+		drawRect(xLeft + 4, yTop + 4, xRight, yBottom, 0xFFC6C6C6);
+	}
 
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
+
+		drawBack(guiLeft, guiLeft + xSize, guiTop, guiTop + ySize);
+
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
-		if (currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
-			textField.drawTextBox();
+//		if (currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
+//			textField.drawTextBox();
 
 		if (dragging) {
 			animationState += mouseX - oldMouse;
@@ -132,11 +157,17 @@ public class GuiPlacementtool extends GuiScreen {
 
 	@Override
 	public void initGui() {
+		this.guiLeft = (this.width - this.xSize) / 2;
+		this.guiTop = (this.height - this.ySize) / 2;
+		System.out.println(guiLeft);
+		System.out.println(guiTop);
 		textField = new GuiTextField(-200, fontRenderer, 10, 10, 100, 20);
 		textField.setText(comp.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME));
 		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
+
 		this.buttonList.clear();
+
 		ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock.getBlockState();
 		Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
 		properties = unlistedProperties.toArray(new IUnlistedProperty[unlistedProperties.size()]);
@@ -161,19 +192,22 @@ public class GuiPlacementtool extends GuiScreen {
 			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
 				addButton(new InternalCheckBox(id, xPos, yPos, propName, comp.getBoolean(propName)));
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-				addButton(new GUISettingsSlider(prop, id, xPos, yPos, maxWidth - 20, propName,
+				addButton(new GUIEnumerableSetting(prop, id, xPos, yPos, maxWidth - 20, propName,
 						comp.getInteger(propName), inp -> applyModelChanges()));
 			}
 		}
 
-		addButton(new GUISettingsSlider(tool, -100, (this.width - 150) / 2, 10, 150, "signaltype", this.implLastID,
-				input -> {
-					implLastID = input;
-					currentSelectedBlock = tool.getObjFromID(input);
-					usedBlock = currentSelectedBlock.getID();
-					ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
-					initGui();
-				}));
+		final GUIEnumerableSetting settings = new GUIEnumerableSetting(tool, -100, (this.width - 150) / 2, 10, 150,
+				"signaltype", this.implLastID, null);
+		settings.consumer = input -> {
+			settings.enabled = false;
+			implLastID = input;
+			currentSelectedBlock = tool.getObjFromID(input);
+			usedBlock = currentSelectedBlock.getID();
+			ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
+			initGui();
+		};
+		addButton(settings);
 
 		applyModelChanges();
 	}
@@ -192,8 +226,8 @@ public class GuiPlacementtool extends GuiScreen {
 			if (button instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) button;
 				buffer.writeBoolean(buttonCheckBox.isChecked());
-			} else if (button instanceof GUISettingsSlider) {
-				GUISettingsSlider buttonCheckBox = (GUISettingsSlider) button;
+			} else if (button instanceof GUIEnumerableSetting) {
+				GUIEnumerableSetting buttonCheckBox = (GUIEnumerableSetting) button;
 				buffer.writeInt(buttonCheckBox.getValue());
 			}
 		}
@@ -216,8 +250,8 @@ public class GuiPlacementtool extends GuiScreen {
 					SEProperty property = (SEProperty) properties[i];
 					ebs = ebs.withProperty(property, property.getDefault());
 				}
-			} else if (btn instanceof GUISettingsSlider) {
-				GUISettingsSlider slider = (GUISettingsSlider) btn;
+			} else if (btn instanceof GUIEnumerableSetting) {
+				GUIEnumerableSetting slider = (GUIEnumerableSetting) btn;
 				SEProperty property = (SEProperty) properties[i];
 				ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
 			}
