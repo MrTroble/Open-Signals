@@ -182,7 +182,7 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	public void initGui() {
 		textField = new GuiTextField(TEXT_FIELD_ID, fontRenderer, 0, 0,
-				SIGNALTYPE_FIXED_WIDTH + GUIEnumerableSetting.BUTTON_SIZE * 2 + GUIEnumerableSetting.OFFSET * 2,
+				SIGNALTYPE_FIXED_WIDTH + GuiEnumerableSetting.BUTTON_SIZE * 2 + GuiEnumerableSetting.OFFSET * 2,
 				SETTINGS_HEIGHT);
 		textField.setText(comp.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME));
 		animationState = 180.0f;
@@ -209,7 +209,7 @@ public class GuiPlacementtool extends GuiScreen {
 		int yPos = this.guiTop + TOP_OFFSET;
 		final int xPos = this.guiLeft + LEFT_OFFSET;
 
-		final GUIEnumerableSetting settings = new GUIEnumerableSetting(tool, SIGNAL_TYPE_ID, xPos, yPos,
+		final GuiEnumerableSetting settings = new GuiEnumerableSetting(tool, SIGNAL_TYPE_ID, xPos, yPos,
 				SIGNALTYPE_FIXED_WIDTH, "signaltype", this.implLastID, null);
 		settings.consumer = input -> {
 			settings.enabled = false;
@@ -245,7 +245,7 @@ public class GuiPlacementtool extends GuiScreen {
 				pageList.get(index).add(checkbox);
 				yPos += CHECK_BOX_HEIGHT;
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-				final GUIEnumerableSetting setting = new GUIEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
+				final GuiEnumerableSetting setting = new GuiEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
 						propName, comp.getInteger(propName), inp -> applyModelChanges());
 				addButton(setting).visible = visible;
 				pageList.get(index).add(setting);
@@ -263,15 +263,15 @@ public class GuiPlacementtool extends GuiScreen {
 		if (pageList.size() > 1) {
 			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
 					idx -> (String) (idx + "/" + (pageList.size() - 1)));
-			final GUIEnumerableSetting pageSelection = new GUIEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
+			final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
 					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", indexCurrentlyUsed, inp -> {
 						pageList.get(indexCurrentlyUsed).forEach(visible(false));
 						pageList.get(inp).forEach(visible(true));
 						indexCurrentlyUsed = inp;
 					}, false);
 			pageSelection.setWidth(
-					mc.fontRenderer.getStringWidth(pageSelection.displayString) + GUIEnumerableSetting.OFFSET * 2);
-			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GUIEnumerableSetting.BUTTON_SIZE;
+					mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
+			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GuiEnumerableSetting.BUTTON_SIZE;
 			pageSelection.update();
 			addButton(pageSelection);
 		}
@@ -301,8 +301,8 @@ public class GuiPlacementtool extends GuiScreen {
 			if (button instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) button;
 				buffer.writeBoolean(buttonCheckBox.isChecked());
-			} else if (button instanceof GUIEnumerableSetting) {
-				GUIEnumerableSetting buttonCheckBox = (GUIEnumerableSetting) button;
+			} else if (button instanceof GuiEnumerableSetting) {
+				GuiEnumerableSetting buttonCheckBox = (GuiEnumerableSetting) button;
 				buffer.writeInt(buttonCheckBox.getValue());
 			}
 		}
@@ -325,8 +325,8 @@ public class GuiPlacementtool extends GuiScreen {
 					SEProperty property = (SEProperty) properties[i];
 					ebs = ebs.withProperty(property, property.getDefault());
 				}
-			} else if (btn instanceof GUIEnumerableSetting) {
-				GUIEnumerableSetting slider = (GUIEnumerableSetting) btn;
+			} else if (btn instanceof GuiEnumerableSetting) {
+				GuiEnumerableSetting slider = (GuiEnumerableSetting) btn;
 				SEProperty property = (SEProperty) properties[i];
 				ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
 			}

@@ -7,7 +7,7 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.GUIHandler;
+import eu.gir.girsignals.guis.GuiHandler;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.init.GIRTabs;
@@ -42,7 +42,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 		if (player.isSneaking()) {
 			if (!worldIn.isRemote)
 				return EnumActionResult.SUCCESS;
-			player.openGui(GirsignalsMain.MODID, GUIHandler.GUI_PLACEMENTTOOL, worldIn, pos.getX(), pos.getY(),
+			player.openGui(GirsignalsMain.MODID, GuiHandler.GUI_PLACEMENTTOOL, worldIn, pos.getX(), pos.getY(),
 					pos.getZ());
 			return EnumActionResult.SUCCESS;
 		} else {

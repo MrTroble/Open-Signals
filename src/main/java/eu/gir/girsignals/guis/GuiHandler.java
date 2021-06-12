@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 
-public class GUIHandler implements IGuiHandler {
+public class GuiHandler implements IGuiHandler {
 
 	public static final int GUI_PLACEMENTTOOL = 0;
 	public static final int GUI_SIGNAL_CONTROLLER = 1;
