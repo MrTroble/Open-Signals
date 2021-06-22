@@ -45,24 +45,24 @@ public class GuiPlacementtool extends GuiScreen {
 	private static final ResourceLocation CREATIVE_TAB = new ResourceLocation(
 			"textures/gui/container/creative_inventory/tab_inventory.png");
 
-	private static final int TOP_STRING_OFFSET = 15;
-	private static final float STRING_SCALE = 1.5f;
-	private static final int STRING_COLOR = 4210752;
-	private static final int LEFT_OFFSET = 20;
-	private static final int SIGNALTYPE_FIXED_WIDTH = 150;
-	private static final int SIGNALTYPE_INSET = 20;
-	private static final int MAXIMUM_GUI_HEIGHT = 320;
-	private static final int GUI_INSET = 40;
-	private static final int SIGNAL_RENDER_WIDTH_AND_INSET = 180;
-	private static final int TOP_OFFSET = GUI_INSET;
-	private static final int SIGNAL_TYPE_ID = -100;
-	private static final int SETTINGS_HEIGHT = 20;
-	private static final int ELEMENT_SPACING = 10;
-	private static final int BOTTOM_OFFSET = TOP_OFFSET;
-	private static final int CHECK_BOX_HEIGHT = 10;
-	private static final int DEFAULT_ID = 200;
-	private static final int PAGE_SELECTION_ID = -890;
-	private static final int TEXT_FIELD_ID = -200;
+	public static final int TOP_STRING_OFFSET = 15;
+	public static final float STRING_SCALE = 1.5f;
+	public static final int STRING_COLOR = 4210752;
+	public static final int LEFT_OFFSET = 20;
+	public static final int SIGNALTYPE_FIXED_WIDTH = 150;
+	public static final int SIGNALTYPE_INSET = 20;
+	public static final int MAXIMUM_GUI_HEIGHT = 320;
+	public static final int GUI_INSET = 40;
+	public static final int SIGNAL_RENDER_WIDTH_AND_INSET = 180;
+	public static final int TOP_OFFSET = GUI_INSET;
+	public static final int SIGNAL_TYPE_ID = -100;
+	public static final int SETTINGS_HEIGHT = 20;
+	public static final int ELEMENT_SPACING = 10;
+	public static final int BOTTOM_OFFSET = TOP_OFFSET;
+	public static final int CHECK_BOX_HEIGHT = 10;
+	public static final int DEFAULT_ID = 200;
+	public static final int PAGE_SELECTION_ID = -890;
+	public static final int TEXT_FIELD_ID = -200;
 
 	@SuppressWarnings({ "rawtypes" })
 	private IUnlistedProperty[] properties;
@@ -82,6 +82,8 @@ public class GuiPlacementtool extends GuiScreen {
 	private int oldMouse = 0;
 	private boolean dragging = false;
 	private GuiTextField textField;
+	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
+	private int indexCurrentlyUsed = 0;
 
 	public GuiPlacementtool(ItemStack stack) {
 		this.comp = stack.getTagCompound();
@@ -175,9 +177,6 @@ public class GuiPlacementtool extends GuiScreen {
 		}
 
 	}
-
-	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
-	private int indexCurrentlyUsed = 0;
 
 	@Override
 	public void initGui() {
@@ -278,7 +277,7 @@ public class GuiPlacementtool extends GuiScreen {
 		applyModelChanges();
 	}
 
-	private static Consumer<Object> visible(final boolean b) {
+	public static Consumer<Object> visible(final boolean b) {
 		return obj -> {
 			if (obj instanceof GuiButton)
 				((GuiButton) obj).visible = b;

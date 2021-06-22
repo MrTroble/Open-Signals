@@ -6,7 +6,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
-import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
@@ -94,7 +93,6 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public void onLink() {
 		new Thread(() -> {
 			while(!world.isBlockLoaded(pos)) continue;
-			GirsignalsMain.LOG.info("Block loading finished!");
 			loadChunkAndGetTile((sigtile, ch) -> {
 				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
 
@@ -246,14 +244,14 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSignalType(Context context, Arguments args) {
-		return new Object[] { getSignalTypeImpl() };
+		return new Object[] { Signal.SIGNALLIST.get(getSignalTypeImpl()).getSignalTypeName() };
 	}
 
-	private String signalTypeCache = null;
+	private int signalTypeCache = -1;
 
-	public String getSignalTypeImpl() {
-		if (signalTypeCache == null)
-			loadChunkAndGetTile((tile, ch) -> signalTypeCache = Signal.SIGNALLIST.get(tile.getBlockID()).getSignalTypeName());
+	public int getSignalTypeImpl() {
+		if (signalTypeCache == -1)
+			loadChunkAndGetTile((tile, ch) -> signalTypeCache = tile.getBlockID());
 		return signalTypeCache;
 	}
 
