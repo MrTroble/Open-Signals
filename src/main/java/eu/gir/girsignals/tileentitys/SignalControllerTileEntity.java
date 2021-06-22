@@ -251,7 +251,11 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	public int getSignalTypeImpl() {
 		if (signalTypeCache == -1)
-			loadChunkAndGetTile((tile, ch) -> signalTypeCache = tile.getBlockID());
+			loadChunkAndGetTile((tile, ch) -> { 
+				tile.setBlockID(); 
+				signalTypeCache = tile.getBlockID();
+			});
+		while(signalTypeCache == -1) continue;
 		return signalTypeCache;
 	}
 

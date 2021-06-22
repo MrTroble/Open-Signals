@@ -237,7 +237,7 @@ public class GuiPlacementtool extends GuiScreen {
 				visible = false;
 			}
 			String propName = property.getName();
-			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE) || (prop.getType().equals(Boolean.class) && !prop.equals(Signal.CUSTOMNAME))) {
 				final InternalCheckBox checkbox = new InternalCheckBox(DEFAULT_ID, xPos, yPos, propName,
 						comp.getBoolean(propName));
 				addButton(checkbox).visible = visible;

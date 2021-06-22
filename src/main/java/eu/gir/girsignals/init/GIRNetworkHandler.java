@@ -76,7 +76,11 @@ public class GIRNetworkHandler {
 			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
 				tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-				tagCompound.setInteger(property.getName(), payBuf.readInt());
+				if(!prop.getType().equals(Boolean.class)) {
+					tagCompound.setInteger(property.getName(), payBuf.readInt());
+				} else {
+					tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
+				}
 			}
 		}
 		ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);

@@ -2,6 +2,7 @@ package eu.gir.girsignals.guis;
 
 import java.util.Arrays;
 
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -26,11 +27,11 @@ public class ContainerSignalController extends Container {
 	public ContainerSignalController(final SignalControllerTileEntity entity, final GuiSignalController guiSig) {
 		this.entity = entity;
 		this.supportedSigTypes = this.entity.getSupportedSignalTypesImpl();
-		this.signalType = this.entity.getSignalTypeImpl();
 		if (this.supportedSigTypes == null) {
 			this.supportedSigStates = null;
 			return;
 		}
+		this.signalType = ((Signal) entity.getWorld().getBlockState(entity.getLinkedPosition()).getBlock()).getID();
 		this.hasLink = true;
 		this.supportedSigStates = new int[this.supportedSigTypes.length];
 		Arrays.fill(supportedSigStates, -1);
@@ -86,6 +87,7 @@ public class ContainerSignalController extends Container {
 			this.hasLink = data != 0;
 		} else if (id == SIGNAL_TYPE_MSG) {
 			this.signalType = data;
+			System.out.println(data);
 		}
 		this.guiSig.initGui();
 	}
