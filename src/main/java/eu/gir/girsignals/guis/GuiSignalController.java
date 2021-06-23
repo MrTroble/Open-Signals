@@ -20,7 +20,6 @@ import static eu.gir.girsignals.guis.GuiPlacementtool.visible;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.lwjgl.opengl.GL11;
 
