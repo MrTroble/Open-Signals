@@ -72,6 +72,8 @@ property.bueadd.name=Intermediate stop sign
 property.othertype.name=Other signals
 property.signalped.name=Pedestrian lights
 property.buelight.name=Level crossing signal
+property.signal.name=Signal
+property.page.name=Page
 
 #Signal Descs
 property.signaltype.desc=Here you can select the different signal types.
@@ -111,9 +113,6 @@ property.bueadd.desc=If the train has a halt between the BÜ4 signal and the lev
 property.othertype.desc=Here you can find other signals that do not have their own labels.
 property.signalped.desc=
 property.buelight.desc=
-
-#Other
-btn.apply=Apply
 
 #Directions
 property.up.name=Up

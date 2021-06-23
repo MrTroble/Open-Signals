@@ -1,5 +1,14 @@
 # Changelog
 
+## [Update] 6.10.2021 - 1
+* Updated UI to a more usable standard
+
+## [Additions] 6.9.2021 - 1
+* Added NE5 sign
+
+## [Internal changes] 6.8.2021 - 1
+* Model optimization
+
 ## [Additions] 6.7.2021 - 1
 * Added Hectometer
 

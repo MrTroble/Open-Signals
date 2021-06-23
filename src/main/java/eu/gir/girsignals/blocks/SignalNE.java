@@ -16,6 +16,11 @@ public class SignalNE extends Signal {
 	public static final SEProperty<NE_ADDITION> NEADDITION = SEProperty.of("neaddition", NE_ADDITION.OFF, ChangeableStage.GUISTAGE);
 
 	@Override
+	public boolean hasCostumColor() {
+		return true;
+	}
+
+	@Override
 	public boolean canBeLinked() {
 		return false;
 	}

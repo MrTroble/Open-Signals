@@ -94,7 +94,6 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public void onLink() {
 		new Thread(() -> {
 			while(!world.isBlockLoaded(pos)) continue;
-			GirsignalsMain.LOG.info("Block loading finished!");
 			loadChunkAndGetTile((sigtile, ch) -> {
 				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
 

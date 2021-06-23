@@ -581,6 +581,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ne/ne3_4", withN(SignalNE.NETYPE, NE.NE3_5::equals), 1, "2", "girsignals:blocks/ne/ne3_5");
 			cm.register("ne/ne3_4", withN(SignalNE.NETYPE, NE.NE4::equals), 1, "2", "girsignals:blocks/ne/ne4");
 			cm.register("ne/ne4_small", withN(SignalNE.NETYPE, NE.NE4_small::equals), 0);
+			cm.register("lf/lf3_5", withN(SignalNE.NETYPE, NE.NE5::equals) , 1, "overlay", "girsignals:blocks/zs3/nh");
 			cm.register("ne/ne6", withN(SignalNE.NETYPE, NE.NE6::equals), 1, "2", "girsignals:blocks/ne/ne6");
 			cm.register("ne/ne6_mast", withN(SignalNE.NETYPE, NE.NE6::equals), 0);
 			cm.register("ne/ne2_2", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE1)).and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);

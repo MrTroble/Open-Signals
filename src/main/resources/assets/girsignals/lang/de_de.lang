@@ -72,7 +72,8 @@ property.bueadd.name=Zwischenhalttafel
 property.othertype.name=Sonstige Signale
 property.signalped.name=Fußgängerampel
 property.buelight.name=Bahnübergangssignal
-
+property.signal.name=Signal
+property.page.name=Seite
 
 #Signal Descs
 property.signaltype.desc=Hier kannst du die verschiedenen Signaltypen wählen.
@@ -112,9 +113,6 @@ property.bueadd.desc=Wenn der Zug zwischen BÜ4 Signal und Bahnübergang einen H
 property.othertype.desc=Hier findest du andere Signale, die keine eigene Bezeichnung haben.
 property.signalped.desc=
 property.buelight.desc=
-
-#Other
-btn.apply=Anwenden
 
 #Directions
 property.up.name=Oben
