@@ -1,8 +1,10 @@
 package eu.gir.girsignals.guis;
 
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 
-import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
@@ -13,12 +15,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class ContainerSignalController extends Container {
 
 	public final SignalControllerTileEntity entity;
-	protected final int[] supportedSigTypes;
-	protected final int[] supportedSigStates;
+	protected int[] supportedSigTypes;
+	protected int[] supportedSigStates;
 	protected boolean hasLink = false;
 	protected int signalType;
+	private final ArrayList<Map.Entry<Integer, Integer>> stateCacheList = new ArrayList<>();
+	private final ArrayList<Map.Entry<Integer, Integer>> typeCacheList = new ArrayList<>();
 
-	private GuiSignalController guiSig;
+	private final GuiSignalController guiSig;
 
 	public ContainerSignalController(final SignalControllerTileEntity entity) {
 		this(entity, null);
@@ -27,27 +31,34 @@ public class ContainerSignalController extends Container {
 	public ContainerSignalController(final SignalControllerTileEntity entity, final GuiSignalController guiSig) {
 		this.entity = entity;
 		this.supportedSigTypes = this.entity.getSupportedSignalTypesImpl();
+		this.guiSig = guiSig;
 		if (this.supportedSigTypes == null) {
 			this.supportedSigStates = null;
 			return;
 		}
-		this.signalType = ((Signal) entity.getWorld().getBlockState(entity.getLinkedPosition()).getBlock()).getID();
+		this.signalType = entity.getSignalTypeImpl();
 		this.hasLink = true;
 		this.supportedSigStates = new int[this.supportedSigTypes.length];
 		Arrays.fill(supportedSigStates, -1);
-		this.guiSig = guiSig;
 	}
 
-	private static final int LINK_MSG = -1, SIGNAL_TYPE_MSG = -2;
+	private static final int LINK_MSG = -1, SIGNAL_TYPE_MSG = -2, UPDATE_ARRAY = -3, TYPE_OFFSET = 4096;
 
 	@Override
 	public void addListener(IContainerListener listener) {
 		super.addListener(listener);
+		listener.sendWindowProperty(this, UPDATE_ARRAY, this.supportedSigTypes.length);
 		if (supportedSigStates != null) {
 			for (int i = 0; i < supportedSigStates.length; i++) {
 				final int signalType = this.supportedSigTypes[i];
 				final int signalState = this.entity.getSignalStateImpl(signalType);
 				listener.sendWindowProperty(this, i, signalState);
+			}
+		}
+		if (supportedSigTypes != null) {
+			for (int i = 0; i < supportedSigTypes.length; i++) {
+				final int signalType = this.supportedSigTypes[i];
+				listener.sendWindowProperty(this, i + TYPE_OFFSET, signalType);
 			}
 		}
 		listener.sendWindowProperty(this, LINK_MSG, hasLink ? 1 : 0);
@@ -81,13 +92,34 @@ public class ContainerSignalController extends Container {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void updateProgressBar(int id, int data) {
-		if (id >= 0)
-			this.supportedSigStates[id] = data;
+		if (id >= 0 && id < 4096) {
+			if (this.supportedSigStates != null) {
+				this.supportedSigStates[id] = data;
+			} else {
+				stateCacheList.add(new AbstractMap.SimpleEntry<>(id, data));
+			}
+		} else if (id >= TYPE_OFFSET) {
+			if (this.supportedSigTypes != null) {
+				this.supportedSigTypes[id - TYPE_OFFSET] = data;
+			} else {
+				typeCacheList.add(new AbstractMap.SimpleEntry<>(id - TYPE_OFFSET, data));
+			}
+		}
 		if (id == LINK_MSG) {
 			this.hasLink = data != 0;
 		} else if (id == SIGNAL_TYPE_MSG) {
 			this.signalType = data;
-			System.out.println(data);
+		} else if (id == UPDATE_ARRAY) {
+			this.supportedSigStates = new int[data];
+			this.supportedSigTypes = new int[data];
+			for (Map.Entry<Integer, Integer> entry : stateCacheList) {
+				this.supportedSigStates[entry.getKey()] = entry.getValue();
+			}
+			for (Map.Entry<Integer, Integer> entry : typeCacheList) {
+				this.supportedSigTypes[entry.getKey()] = entry.getValue();
+			}
+			stateCacheList.clear();
+			typeCacheList.clear();
 		}
 		this.guiSig.initGui();
 	}

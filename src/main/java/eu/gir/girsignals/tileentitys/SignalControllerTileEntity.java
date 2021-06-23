@@ -36,6 +36,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
+	private int signalTypeCache = -1;
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
@@ -108,6 +109,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				}, null);
 				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 				tableOfSupportedSignalTypes = supportedSignaleStates;
+				signalTypeCache = ((Signal)ch.getBlockState(linkedSignalPosition).getBlock()).getID();
 			});
 		}).start();
 	}
@@ -247,15 +249,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return new Object[] { Signal.SIGNALLIST.get(getSignalTypeImpl()).getSignalTypeName() };
 	}
 
-	private int signalTypeCache = -1;
-
 	public int getSignalTypeImpl() {
-		if (signalTypeCache == -1)
-			loadChunkAndGetTile((tile, ch) -> { 
-				tile.setBlockID(); 
-				signalTypeCache = tile.getBlockID();
-			});
-		while(signalTypeCache == -1) continue;
 		return signalTypeCache;
 	}
 

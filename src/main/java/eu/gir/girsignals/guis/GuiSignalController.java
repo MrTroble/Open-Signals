@@ -20,6 +20,7 @@ import static eu.gir.girsignals.guis.GuiPlacementtool.visible;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import org.lwjgl.opengl.GL11;
 
@@ -81,17 +82,23 @@ public class GuiSignalController extends GuiContainer {
 		this.buttonList.clear();
 
 		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
-		if(sigController.signalType < 0 || !sigController.hasLink)
+		if (sigController.signalType < 0 || !sigController.hasLink)
 			return;
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 
 		properties.clear();
 		int maxWidth = 0;
 		for (final int id : sigController.supportedSigTypes) {
-			final IUnlistedProperty<?> lenIUnlistedProperty = signal.getPropertyFromID(id);
+			final SEProperty<?> lenIUnlistedProperty = (SEProperty<?>) signal.getPropertyFromID(id);
 			properties.add(lenIUnlistedProperty);
+			int maxSelection = 0;
+			for (int i = 0; i < lenIUnlistedProperty.count(); i++) {
+				final String name = lenIUnlistedProperty.getObjFromID(i).toString();
+				maxSelection = Math.max(maxSelection, fontRenderer.getStringWidth(name));
+			}
 			maxWidth = Math.max(
-					fontRenderer.getStringWidth(I18n.format("property." + lenIUnlistedProperty.getName() + ".name")),
+					fontRenderer.getStringWidth(I18n.format("property." + lenIUnlistedProperty.getName() + ".name"))
+							+ maxSelection + 15,
 					maxWidth);
 		}
 		maxWidth = Math.max(SIGNALTYPE_FIXED_WIDTH, maxWidth);
@@ -107,7 +114,7 @@ public class GuiSignalController extends GuiContainer {
 		final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
 
 		final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable, SIGNAL_TYPE_ID, xPos, yPos,
-				SIGNALTYPE_FIXED_WIDTH, "signaltype", this.indexMode, null);
+				maxWidth, "signaltype", this.indexMode, null);
 		settings.consumer = input -> {
 		};
 		addButton(settings);
@@ -256,7 +263,6 @@ public class GuiSignalController extends GuiContainer {
 		GlStateManager.popMatrix();
 		GlStateManager.disableRescaleNormal();
 
-		
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 		final String s = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name");
 		GlStateManager.pushMatrix();
@@ -275,7 +281,7 @@ public class GuiSignalController extends GuiContainer {
 		for (int i = 0; i < properties.size(); i++) {
 			SEProperty prop = SEProperty.cst(properties.get(i));
 			int sigState = sigController.supportedSigStates[i];
-			if(sigState < 0)
+			if (sigState < 0)
 				continue;
 			ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
 		}
@@ -283,7 +289,7 @@ public class GuiSignalController extends GuiContainer {
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
 		model.get().finishDrawing();
 	}
-	
+
 	public void sendChanges(final int id, final int data) {
 		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
 
