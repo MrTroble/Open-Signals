@@ -6,7 +6,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
-import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
@@ -37,6 +36,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
+	private int signalTypeCache = -1;
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
@@ -109,6 +109,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				}, null);
 				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 				tableOfSupportedSignalTypes = supportedSignaleStates;
+				signalTypeCache = ((Signal)ch.getBlockState(linkedSignalPosition).getBlock()).getID();
 			});
 		}).start();
 	}
@@ -245,14 +246,10 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSignalType(Context context, Arguments args) {
-		return new Object[] { getSignalTypeImpl() };
+		return new Object[] { Signal.SIGNALLIST.get(getSignalTypeImpl()).getSignalTypeName() };
 	}
 
-	private String signalTypeCache = null;
-
-	public String getSignalTypeImpl() {
-		if (signalTypeCache == null)
-			loadChunkAndGetTile((tile, ch) -> signalTypeCache = Signal.SIGNALLIST.get(tile.getBlockID()).getSignalTypeName());
+	public int getSignalTypeImpl() {
 		return signalTypeCache;
 	}
 

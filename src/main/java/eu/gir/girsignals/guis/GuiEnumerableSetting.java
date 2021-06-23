@@ -8,7 +8,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.resources.I18n;
 
-public class GUIEnumerableSetting extends GuiButton implements InternalUnlocalized {
+public class GuiEnumerableSetting extends GuiButton implements InternalUnlocalized {
 
 	protected int value = 0;
 	protected boolean pressed = false, lor = false, lock = true;
@@ -26,12 +26,12 @@ public class GUIEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	public static final int BUTTON_SIZE = 20;
 	private static final int STRING_COLOR = 14737632;
 
-	public GUIEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
+	public GuiEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
 			final String buttonText, final int initialValue, final Consumer<Integer> consumer) {
 		this(property, id, x, y, width, buttonText, initialValue, consumer, true);
 	}
 	
-	public GUIEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
+	public GuiEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
 			final String buttonText, final int initialValue, final Consumer<Integer> consumer, final boolean middleButton) {
 		super(id, x, y, I18n.format("property." + buttonText + ".name"));
 		this.buttonText = I18n.format("property." + buttonText + ".name");

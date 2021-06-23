@@ -1,105 +1,168 @@
 package eu.gir.girsignals.guis;
 
+import static eu.gir.girsignals.guis.GuiPlacementtool.BOTTOM_OFFSET;
+import static eu.gir.girsignals.guis.GuiPlacementtool.DEFAULT_ID;
+import static eu.gir.girsignals.guis.GuiPlacementtool.ELEMENT_SPACING;
+import static eu.gir.girsignals.guis.GuiPlacementtool.GUI_INSET;
+import static eu.gir.girsignals.guis.GuiPlacementtool.LEFT_OFFSET;
+import static eu.gir.girsignals.guis.GuiPlacementtool.MAXIMUM_GUI_HEIGHT;
+import static eu.gir.girsignals.guis.GuiPlacementtool.PAGE_SELECTION_ID;
+import static eu.gir.girsignals.guis.GuiPlacementtool.SETTINGS_HEIGHT;
+import static eu.gir.girsignals.guis.GuiPlacementtool.SIGNALTYPE_FIXED_WIDTH;
+import static eu.gir.girsignals.guis.GuiPlacementtool.SIGNALTYPE_INSET;
+import static eu.gir.girsignals.guis.GuiPlacementtool.SIGNAL_RENDER_WIDTH_AND_INSET;
+import static eu.gir.girsignals.guis.GuiPlacementtool.SIGNAL_TYPE_ID;
+import static eu.gir.girsignals.guis.GuiPlacementtool.STRING_COLOR;
+import static eu.gir.girsignals.guis.GuiPlacementtool.STRING_SCALE;
+import static eu.gir.girsignals.guis.GuiPlacementtool.TOP_OFFSET;
+import static eu.gir.girsignals.guis.GuiPlacementtool.TOP_STRING_OFFSET;
+import static eu.gir.girsignals.guis.GuiPlacementtool.visible;
+
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 
 import org.lwjgl.opengl.GL11;
+
+import com.google.common.collect.Lists;
 
 import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3i;
-import net.minecraft.world.World;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
-public class GuiSignalController extends GuiScreen {
+public class GuiSignalController extends GuiContainer {
 
-	private final SignalControllerTileEntity tile;
-	private final HashMap<SEProperty<?>, Integer> properties = new HashMap<>();
+	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
+	private int indexCurrentlyUsed = 0;
+	private int indexMode = 0;
 	private final BlockPos pos;
-	private final World world;
+	private BlockModelShapes manager;
+	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
+	private final ArrayList<IUnlistedProperty<?>> properties = new ArrayList<>();
 
-	private GUIEnumerableSetting slider;
-	private Signal block;
-	private BufferBuilder builder = null;
-
-	public GuiSignalController(BlockPos pos, World world) {
-		this.pos = pos;
-		this.world = world;
-		this.tile = (SignalControllerTileEntity) world.getTileEntity(pos);
-		Arrays.fill(RSMODES, RedstoneMode.SINGEL);
-		this.tile.onLink();
-		this.tile.loadChunkAndGetTile((tile, ch) -> {
-			this.block = Signal.SIGNALLIST.get(tile.getBlockID());
-		});
+	public GuiSignalController(final SignalControllerTileEntity entity) {
+		super(null);
+		this.inventorySlots = new ContainerSignalController(entity, this);
+		this.pos = entity.getPos();
 	}
 
-	public static enum Stages {
-		MANUELL, REDSTONE, SCRIPTING
+	public static enum EnumMode {
+		MANUELL, REDSTONE
 	}
-
-	public static enum RedstoneMode {
-		INCREMENTAL, MUX, SINGEL
-	}
-
-	private Stages currentStage = Stages.MANUELL;
 
 	@Override
 	public void initGui() {
+		this.manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 
-		if (builder == null) {
-			builder = new BufferBuilder(50);
-			BlockModelShapes shapes = mc.getBlockRendererDispatcher().getBlockModelShapes();
+		this.ySize = Math.min(MAXIMUM_GUI_HEIGHT, this.height - GUI_INSET);
+		this.xSize = Math.round(this.width * 3.0f / 6.0f);
+		this.guiLeft = (this.width - this.xSize) / 2;
+		this.guiTop = (this.height - this.ySize) / 2;
+		this.mc.player.openContainer = this.inventorySlots;
 
-			builder.reset();
-			builder.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-			builder.setTranslation(0, 0, 0);
-			DrawUtil.addToBuffer(builder, shapes, world.getBlockState(pos));
+		this.buttonList.clear();
 
-			for (EnumFacing face : EnumFacing.VALUES) {
-				BlockPos curPos = pos.offset(face);
-				IBlockState state2 = world.getBlockState(curPos);
-				if (state2 != null && !state2.getBlock().isAir(state2, world, curPos)) {
-					Vec3i dirVec = face.getDirectionVec();
-					builder.setTranslation(dirVec.getX(), dirVec.getY(), dirVec.getZ());
-					DrawUtil.addToBuffer(builder, shapes, state2, 0x1FFFFFFF);
-				}
-			}
-			builder.finishDrawing();
-		}
-
-		EnumIntegerable<Stages> enumToInt = new EnumIntegerable<Stages>(Stages.class);
-		this.slider = new GUIEnumerableSetting(enumToInt, -100, (this.width - 150) / 2, 10, 150, "stagetype",
-				currentStage.ordinal(), in -> {
-					currentStage = enumToInt.getObjFromID(in);
-					this.buttonList.clear();
-					initGui();
-				});
-
-		if (block == null) {
-			// TODO No link message
-			System.out.println("NOBLOCK");
+		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
+		if (sigController.signalType < 0 || !sigController.hasLink)
 			return;
-		}
-		this.addButton(slider);
-	}
+		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 
-	private RedstoneMode[] RSMODES = new RedstoneMode[EnumFacing.VALUES.length];
+		properties.clear();
+		int maxWidth = 0;
+		for (final int id : sigController.supportedSigTypes) {
+			final SEProperty<?> lenIUnlistedProperty = (SEProperty<?>) signal.getPropertyFromID(id);
+			properties.add(lenIUnlistedProperty);
+			int maxSelection = 0;
+			for (int i = 0; i < lenIUnlistedProperty.count(); i++) {
+				final String name = lenIUnlistedProperty.getObjFromID(i).toString();
+				maxSelection = Math.max(maxSelection, fontRenderer.getStringWidth(name));
+			}
+			maxWidth = Math.max(
+					fontRenderer.getStringWidth(I18n.format("property." + lenIUnlistedProperty.getName() + ".name"))
+							+ maxSelection + 15,
+					maxWidth);
+		}
+		maxWidth = Math.max(SIGNALTYPE_FIXED_WIDTH, maxWidth);
+
+		this.ySize = Math.min(MAXIMUM_GUI_HEIGHT, this.height - GUI_INSET);
+		this.xSize = maxWidth + SIGNAL_RENDER_WIDTH_AND_INSET + SIGNALTYPE_INSET;
+		this.guiLeft = (this.width - this.xSize) / 2;
+		this.guiTop = (this.height - this.ySize) / 2;
+
+		int yPos = this.guiTop + TOP_OFFSET;
+		final int xPos = this.guiLeft + LEFT_OFFSET;
+
+		final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
+
+		final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable, SIGNAL_TYPE_ID, xPos, yPos,
+				maxWidth, "signaltype", this.indexMode, null);
+		settings.consumer = input -> {
+		};
+		addButton(settings);
+
+		pageList.clear();
+		pageList.add(Lists.newArrayList());
+		boolean visible = true;
+		int index = indexCurrentlyUsed = 0;
+		yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
+		for (int i = 0; i < properties.size(); i++) {
+			final int id = i;
+			final int state = sigController.supportedSigStates[i];
+			if (state < 0)
+				continue;
+			SEProperty<?> prop = SEProperty.cst(properties.get(i));
+			if (!prop.isChangabelAtStage(ChangeableStage.APISTAGE))
+				continue;
+			if (yPos >= (this.guiTop + this.ySize - BOTTOM_OFFSET)) {
+				pageList.add(Lists.newArrayList());
+				index++;
+				yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
+				visible = false;
+			}
+			String propName = prop.getName();
+			final GuiEnumerableSetting setting = new GuiEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
+					propName, state, inp -> sendChanges(id, inp));
+			addButton(setting).visible = visible;
+			pageList.get(index).add(setting);
+			yPos += SETTINGS_HEIGHT;
+			yPos += ELEMENT_SPACING;
+		}
+
+		if (pageList.size() > 1) {
+			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
+					idx -> (String) (idx + "/" + (pageList.size() - 1)));
+			final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
+					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", indexCurrentlyUsed, inp -> {
+						pageList.get(indexCurrentlyUsed).forEach(visible(false));
+						pageList.get(inp).forEach(visible(true));
+						indexCurrentlyUsed = inp;
+					}, false);
+			pageSelection.setWidth(
+					mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
+			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GuiEnumerableSetting.BUTTON_SIZE;
+			pageSelection.update();
+			addButton(pageSelection);
+		}
+		updateDraw();
+	}
 
 	public static class EnumIntegerable<T extends Enum<T>> implements IIntegerable<T> {
 
@@ -151,46 +214,7 @@ public class GuiSignalController extends GuiScreen {
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		super.drawScreen(mouseX, mouseY, partialTicks);
-
-	}
-
-	private void packManuell(ByteBuf buffer) {
-		buffer.writeByte(GIRNetworkHandler.PLACEMENT_GUI_MANUELL_SET);
-
-		buffer.writeInt(pos.getX());
-		buffer.writeInt(pos.getY());
-		buffer.writeInt(pos.getZ());
-
-		buffer.writeInt(properties.size());
-		properties.forEach((prop, id) -> {
-			buffer.writeInt(block.getIDFromProperty(prop));
-			buffer.writeInt(id);
-		});
-	}
-
-	private void send() {
-		ByteBuf buffer = Unpooled.buffer();
-		switch (currentStage) {
-		case MANUELL:
-			packManuell(buffer);
-			break;
-		case REDSTONE:
-			return;
-		case SCRIPTING:
-			return;
-		default:
-			return;
-		}
-		CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
-				new PacketBuffer(buffer));
-		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
-	}
-
-	@Override
 	public void onGuiClosed() {
-		send();
 	}
 
 	@Override
@@ -206,6 +230,79 @@ public class GuiSignalController extends GuiScreen {
 	@Override
 	public boolean doesGuiPauseGame() {
 		return false;
+	}
+
+	@Override
+	protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+		this.drawDefaultBackground();
+
+		DrawUtil.drawBack(this, this.guiLeft, this.guiLeft + this.xSize, this.guiTop, this.guiTop + this.ySize);
+		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
+
+		if (!sigController.hasLink) {
+			final String s = "No Signal connected!";
+			final int width = mc.fontRenderer.getStringWidth(s);
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(this.guiLeft + (this.xSize - width * 2) / 2,
+					this.guiTop + (this.ySize - mc.fontRenderer.FONT_HEIGHT) / 2 - 20, 0);
+			GlStateManager.scale(2, 2, 2);
+			mc.fontRenderer.drawStringWithShadow(s, 0, 0, 0xFFFF0000);
+			GlStateManager.popMatrix();
+			return;
+		}
+
+		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		GlStateManager.enableRescaleNormal();
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(this.guiLeft + this.xSize - 70, this.guiTop + this.ySize / 2, 100.0f);
+		GlStateManager.rotate(180, 0, 1, 0);
+		GlStateManager.scale(22.0F, -22.0F, 22.0F);
+		GlStateManager.translate(-0.5f, -3.5f, -0.5f);
+		DrawUtil.draw(model.get());
+		GlStateManager.popMatrix();
+		GlStateManager.disableRescaleNormal();
+
+		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
+		final String s = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name");
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(this.guiLeft + LEFT_OFFSET, this.guiTop + TOP_STRING_OFFSET, 0);
+		GlStateManager.scale(STRING_SCALE, STRING_SCALE, STRING_SCALE);
+		this.fontRenderer.drawString(s, 0, 0, STRING_COLOR);
+		GlStateManager.popMatrix();
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public void updateDraw() {
+		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
+		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
+		IExtendedBlockState ebs = (IExtendedBlockState) signal.getDefaultState();
+
+		for (int i = 0; i < properties.size(); i++) {
+			SEProperty prop = SEProperty.cst(properties.get(i));
+			int sigState = sigController.supportedSigStates[i];
+			if (sigState < 0)
+				continue;
+			ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
+		}
+		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+		DrawUtil.addToBuffer(model.get(), manager, ebs);
+		model.get().finishDrawing();
+	}
+
+	public void sendChanges(final int id, final int data) {
+		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
+
+		ByteBuf buffer = Unpooled.buffer();
+		buffer.writeByte(GIRNetworkHandler.PLACEMENT_GUI_MANUELL_SET);
+		buffer.writeInt(pos.getX());
+		buffer.writeInt(pos.getY());
+		buffer.writeInt(pos.getZ());
+		buffer.writeInt(sigController.supportedSigTypes[id]);
+		buffer.writeInt(data);
+		CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
+				new PacketBuffer(buffer));
+		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
+		updateDraw();
 	}
 
 }

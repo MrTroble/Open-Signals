@@ -1,5 +1,12 @@
 # Changelog
 
+## [Update/Fixes] 6.23.2021 - 1
+* Updated UI for our signal controller
+* Fixed issues with UI usage when the signal is in an unloaded chunk
+* Fixed Sync issues
+* Added visual feedback for changes in UI
+* Fixed some properties
+
 ## [Update] 6.10.2021 - 1
 * Updated UI to a more usable standard
 

@@ -42,28 +42,27 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class GuiPlacementtool extends GuiScreen {
 
-	private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
-			"textures/gui/container/creative_inventory/tabs.png");
-	private static final float DIM = 256.0f;
+	private static final ResourceLocation CREATIVE_TAB = new ResourceLocation(
+			"textures/gui/container/creative_inventory/tab_inventory.png");
 
-	private static final int TOP_STRING_OFFSET = 15;
-	private static final float STRING_SCALE = 1.5f;
-	private static final int STRING_COLOR = 4210752;
-	private static final int LEFT_OFFSET = 20;
-	private static final int SIGNALTYPE_FIXED_WIDTH = 150;
-	private static final int SIGNALTYPE_INSET = 20;
-	private static final int MAXIMUM_GUI_HEIGHT = 320;
-	private static final int GUI_INSET = 40;
-	private static final int SIGNAL_RENDER_WIDTH_AND_INSET = 180;
-	private static final int TOP_OFFSET = GUI_INSET;
-	private static final int SIGNAL_TYPE_ID = -100;
-	private static final int SETTINGS_HEIGHT = 20;
-	private static final int ELEMENT_SPACING = 10;
-	private static final int BOTTOM_OFFSET = TOP_OFFSET;
-	private static final int CHECK_BOX_HEIGHT = 10;
-	private static final int DEFAULT_ID = 200;
-	private static final int PAGE_SELECTION_ID = -890;
-	private static final int TEXT_FIELD_ID = -200;
+	public static final int TOP_STRING_OFFSET = 15;
+	public static final float STRING_SCALE = 1.5f;
+	public static final int STRING_COLOR = 4210752;
+	public static final int LEFT_OFFSET = 20;
+	public static final int SIGNALTYPE_FIXED_WIDTH = 150;
+	public static final int SIGNALTYPE_INSET = 20;
+	public static final int MAXIMUM_GUI_HEIGHT = 320;
+	public static final int GUI_INSET = 40;
+	public static final int SIGNAL_RENDER_WIDTH_AND_INSET = 180;
+	public static final int TOP_OFFSET = GUI_INSET;
+	public static final int SIGNAL_TYPE_ID = -100;
+	public static final int SETTINGS_HEIGHT = 20;
+	public static final int ELEMENT_SPACING = 10;
+	public static final int BOTTOM_OFFSET = TOP_OFFSET;
+	public static final int CHECK_BOX_HEIGHT = 10;
+	public static final int DEFAULT_ID = 200;
+	public static final int PAGE_SELECTION_ID = -890;
+	public static final int TEXT_FIELD_ID = -200;
 
 	@SuppressWarnings({ "rawtypes" })
 	private IUnlistedProperty[] properties;
@@ -83,6 +82,8 @@ public class GuiPlacementtool extends GuiScreen {
 	private int oldMouse = 0;
 	private boolean dragging = false;
 	private GuiTextField textField;
+	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
+	private int indexCurrentlyUsed = 0;
 
 	public GuiPlacementtool(ItemStack stack) {
 		this.comp = stack.getTagCompound();
@@ -97,37 +98,17 @@ public class GuiPlacementtool extends GuiScreen {
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 	}
 
-	private void drawBack(final int xLeft, final int xRight, final int yTop, final int yBottom) {
-		mc.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
-
-		drawTexturedModalRect(xLeft, yTop, 0, 32, 4, 4);
-		drawTexturedModalRect(xLeft, yBottom, 0, 124, 4, 4);
-		drawTexturedModalRect(xRight, yTop, 24, 32, 4, 4);
-		drawTexturedModalRect(xRight, yBottom, 24, 124, 4, 4);
-
-		drawScaledCustomSizeModalRect(xLeft + 4, yBottom, 4, 124, 1, 4, xRight - 4 - xLeft, 4, DIM, DIM);
-		drawScaledCustomSizeModalRect(xLeft + 4, yTop, 4, 32, 1, 4, xRight - 4 - xLeft, 4, DIM, DIM);
-		drawScaledCustomSizeModalRect(xLeft, yTop + 4, 0, 36, 4, 1, 4, yBottom - 4 - yTop, DIM, DIM);
-		drawScaledCustomSizeModalRect(xRight, yTop + 4, 24, 36, 4, 1, 4, yBottom - 4 - yTop, DIM, DIM);
-
-		drawRect(xLeft + 4, yTop + 4, xRight, yBottom, 0xFFC6C6C6);
-	}
-	
-	private void drawBack2(final int xLeft, final int xRight, final int yTop, final int yBottom) {
-		mc.getTextureManager().bindTexture( new ResourceLocation(
-				"textures/gui/container/creative_inventory/tab_inventory.png"));
-
-		drawScaledCustomSizeModalRect(xLeft, yTop, 72, 5, 34, 44, xRight, yBottom, DIM, DIM);
-	}
-
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
 
-		drawBack(guiLeft, guiLeft + xSize, guiTop, guiTop + ySize);
+		mc.getTextureManager().bindTexture(CREATIVE_TAB);
 
-		drawBack2(guiLeft + this.xSize - 70 - xSize / 8, xSize / 4, guiTop + 20, ySize - 40);
-		
+		drawScaledCustomSizeModalRect(guiLeft + this.xSize - 70 - xSize / 8, xSize / 4, 72, 5, 34, 44, guiTop + 20,
+				ySize - 40, DrawUtil.DIM, DrawUtil.DIM);
+
+		DrawUtil.drawBack(this, guiLeft, guiLeft + xSize, guiTop, guiTop + ySize);
+
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
 		if (currentSelectedBlock.getCustomnameRenderHeight(null, null, null) != -1)
@@ -197,13 +178,10 @@ public class GuiPlacementtool extends GuiScreen {
 
 	}
 
-	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
-	private int indexCurrentlyUsed = 0;
-
 	@Override
 	public void initGui() {
 		textField = new GuiTextField(TEXT_FIELD_ID, fontRenderer, 0, 0,
-				SIGNALTYPE_FIXED_WIDTH + GUIEnumerableSetting.BUTTON_SIZE * 2 + GUIEnumerableSetting.OFFSET * 2,
+				SIGNALTYPE_FIXED_WIDTH + GuiEnumerableSetting.BUTTON_SIZE * 2 + GuiEnumerableSetting.OFFSET * 2,
 				SETTINGS_HEIGHT);
 		textField.setText(comp.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME));
 		animationState = 180.0f;
@@ -230,7 +208,7 @@ public class GuiPlacementtool extends GuiScreen {
 		int yPos = this.guiTop + TOP_OFFSET;
 		final int xPos = this.guiLeft + LEFT_OFFSET;
 
-		final GUIEnumerableSetting settings = new GUIEnumerableSetting(tool, SIGNAL_TYPE_ID, xPos, yPos,
+		final GuiEnumerableSetting settings = new GuiEnumerableSetting(tool, SIGNAL_TYPE_ID, xPos, yPos,
 				SIGNALTYPE_FIXED_WIDTH, "signaltype", this.implLastID, null);
 		settings.consumer = input -> {
 			settings.enabled = false;
@@ -259,14 +237,14 @@ public class GuiPlacementtool extends GuiScreen {
 				visible = false;
 			}
 			String propName = property.getName();
-			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE) || (prop.getType().equals(Boolean.class) && !prop.equals(Signal.CUSTOMNAME))) {
 				final InternalCheckBox checkbox = new InternalCheckBox(DEFAULT_ID, xPos, yPos, propName,
 						comp.getBoolean(propName));
 				addButton(checkbox).visible = visible;
 				pageList.get(index).add(checkbox);
 				yPos += CHECK_BOX_HEIGHT;
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-				final GUIEnumerableSetting setting = new GUIEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
+				final GuiEnumerableSetting setting = new GuiEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
 						propName, comp.getInteger(propName), inp -> applyModelChanges());
 				addButton(setting).visible = visible;
 				pageList.get(index).add(setting);
@@ -284,22 +262,22 @@ public class GuiPlacementtool extends GuiScreen {
 		if (pageList.size() > 1) {
 			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
 					idx -> (String) (idx + "/" + (pageList.size() - 1)));
-			final GUIEnumerableSetting pageSelection = new GUIEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
-					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", indexCurrentlyUsed,
-					inp -> {
+			final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
+					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", indexCurrentlyUsed, inp -> {
 						pageList.get(indexCurrentlyUsed).forEach(visible(false));
 						pageList.get(inp).forEach(visible(true));
 						indexCurrentlyUsed = inp;
 					}, false);
-			pageSelection.setWidth(mc.fontRenderer.getStringWidth(pageSelection.displayString) + GUIEnumerableSetting.OFFSET * 2);
-			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GUIEnumerableSetting.BUTTON_SIZE;
+			pageSelection.setWidth(
+					mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
+			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GuiEnumerableSetting.BUTTON_SIZE;
 			pageSelection.update();
 			addButton(pageSelection);
 		}
 		applyModelChanges();
 	}
 
-	private static Consumer<Object> visible(final boolean b) {
+	public static Consumer<Object> visible(final boolean b) {
 		return obj -> {
 			if (obj instanceof GuiButton)
 				((GuiButton) obj).visible = b;
@@ -322,8 +300,8 @@ public class GuiPlacementtool extends GuiScreen {
 			if (button instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) button;
 				buffer.writeBoolean(buttonCheckBox.isChecked());
-			} else if (button instanceof GUIEnumerableSetting) {
-				GUIEnumerableSetting buttonCheckBox = (GUIEnumerableSetting) button;
+			} else if (button instanceof GuiEnumerableSetting) {
+				GuiEnumerableSetting buttonCheckBox = (GuiEnumerableSetting) button;
 				buffer.writeInt(buttonCheckBox.getValue());
 			}
 		}
@@ -346,8 +324,8 @@ public class GuiPlacementtool extends GuiScreen {
 					SEProperty property = (SEProperty) properties[i];
 					ebs = ebs.withProperty(property, property.getDefault());
 				}
-			} else if (btn instanceof GUIEnumerableSetting) {
-				GUIEnumerableSetting slider = (GUIEnumerableSetting) btn;
+			} else if (btn instanceof GuiEnumerableSetting) {
+				GuiEnumerableSetting slider = (GuiEnumerableSetting) btn;
 				SEProperty property = (SEProperty) properties[i];
 				ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
 			}
