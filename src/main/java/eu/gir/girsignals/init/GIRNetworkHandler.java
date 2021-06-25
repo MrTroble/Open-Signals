@@ -49,20 +49,17 @@ public class GIRNetworkHandler {
 			throw new IllegalArgumentException("Wrong packet ID in network recive!");
 		}
 	}
-	
+
 	private static void readManuellSet(ByteBuf payBuf, World world, MinecraftServer server) {
 		final BlockPos pos = new BlockPos(payBuf.readInt(), payBuf.readInt(), payBuf.readInt());
 		final SignalControllerTileEntity tile = (SignalControllerTileEntity) world.getTileEntity(pos);
-		if(tile != null) {
-			int size = payBuf.readInt();
-			for (int i = 0; i < size; i++) {
-				final int type = payBuf.readInt();
-				final int change = payBuf.readInt();
-				server.addScheduledTask(() -> tile.changeSignalImpl(type, change));
-			}
+		if (tile != null) {
+			final int type = payBuf.readInt();
+			final int change = payBuf.readInt();
+			server.addScheduledTask(() -> tile.changeSignalImpl(type, change));
 		}
 	}
-	
+
 	private static void readItemNBTSET(ByteBuf payBuf, EntityPlayer player) {
 		int blockType = payBuf.readInt();
 		int length = payBuf.readInt();
@@ -76,10 +73,14 @@ public class GIRNetworkHandler {
 		tagCompound.setString(SIGNAL_CUSTOMNAME, customName);
 		for (IUnlistedProperty<?> property : blockState.getUnlistedProperties()) {
 			SEProperty<?> prop = SEProperty.cst(property);
-			if(prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
 				tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
-			} else if(prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-				tagCompound.setInteger(property.getName(), payBuf.readInt());
+			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+				if(!prop.getType().equals(Boolean.class)) {
+					tagCompound.setInteger(property.getName(), payBuf.readInt());
+				} else {
+					tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
+				}
 			}
 		}
 		ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);

@@ -7,7 +7,7 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.GUIHandler;
+import eu.gir.girsignals.guis.GuiHandler;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.init.GIRTabs;
@@ -34,7 +34,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 	public void addSignal(final Signal sig) {
 		signalids.add(sig.getID());
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand,
@@ -42,10 +42,12 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 		if (player.isSneaking()) {
 			if (!worldIn.isRemote)
 				return EnumActionResult.SUCCESS;
-			player.openGui(GirsignalsMain.MODID, GUIHandler.GUI_PLACEMENTTOOL, worldIn, pos.getX(), pos.getY(),
+			player.openGui(GirsignalsMain.MODID, GuiHandler.GUI_PLACEMENTTOOL, worldIn, pos.getX(), pos.getY(),
 					pos.getZ());
 			return EnumActionResult.SUCCESS;
 		} else {
+			if (worldIn.isRemote)
+				return EnumActionResult.SUCCESS;
 			final BlockPos setPosition = pos.offset(facing);
 			if (!worldIn.isAirBlock(setPosition))
 				return EnumActionResult.FAIL;
@@ -75,7 +77,12 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 					return;
 				SEProperty sep = SEProperty.cst(iup);
 				if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-					sig.setProperty(sep, sep.getObjFromID(compound.getInteger(iup.getName())));
+					if (sep.getType().equals(Boolean.class)) {
+						if (compound.getBoolean(iup.getName()))
+							sig.setProperty(sep, true);
+					} else {
+						sig.setProperty(sep, sep.getObjFromID(compound.getInteger(iup.getName())));
+					}
 				} else if ((sep.isChangabelAtStage(ChangeableStage.APISTAGE) && compound.getBoolean(iup.getName()))
 						|| sep.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
 					sig.setProperty(sep, sep.getDefault());

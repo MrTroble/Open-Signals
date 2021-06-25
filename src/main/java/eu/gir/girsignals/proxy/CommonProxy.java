@@ -1,7 +1,7 @@
 package eu.gir.girsignals.proxy;
 
 import eu.gir.girsignals.GirsignalsMain;
-import eu.gir.girsignals.guis.GUIHandler;
+import eu.gir.girsignals.guis.GuiHandler;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.init.GIRNetworkHandler;
@@ -19,7 +19,7 @@ public class CommonProxy {
 	public void preinit(FMLPreInitializationEvent event) {
 		CHANNEL = NetworkRegistry.INSTANCE.newEventDrivenChannel(GIRNetworkHandler.CHANNELNAME);
 		CHANNEL.register(new GIRNetworkHandler());
-		NetworkRegistry.INSTANCE.registerGuiHandler(GirsignalsMain.MODID, new GUIHandler());
+		NetworkRegistry.INSTANCE.registerGuiHandler(GirsignalsMain.MODID, new GuiHandler());
 
 		GIRItems.init();
 		GIRBlocks.init();

@@ -12,7 +12,7 @@ public class SignalBUE extends Signal {
 	}
 
 	public static final SEProperty<BUE> BUETYPE = SEProperty.of("buetype", BUE.BUE4, ChangeableStage.GUISTAGE);
-	public static final SEProperty<Boolean> BUEADD = SEProperty.of("bueadd", false);
+	public static final SEProperty<Boolean> BUEADD = SEProperty.of("bueadd", false, ChangeableStage.GUISTAGE);
 
 	@Override
 	public boolean canBeLinked() {
