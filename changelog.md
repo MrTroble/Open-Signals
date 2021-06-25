@@ -1,5 +1,8 @@
 # Changelog
 
+## [Fix] 6.25.2021 - 1
+* Fixed potential NPE in renderer
+
 ## [Update/Fixes] 6.23.2021 - 1
 * Updated UI for our signal controller
 * Fixed issues with UI usage when the signal is in an unloaded chunk
