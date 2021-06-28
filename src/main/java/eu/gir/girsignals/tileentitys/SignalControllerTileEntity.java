@@ -25,18 +25,20 @@ import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class SignalControllerTileEntity extends TileEntity implements SimpleComponent {
+public class SignalControllerTileEntity extends TileEntity implements SimpleComponent, IWorldNameable{
 	
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
 	private int signalTypeCache = -1;
+	private String signame = null;
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
@@ -110,6 +112,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 				tableOfSupportedSignalTypes = supportedSignaleStates;
 				signalTypeCache = ((Signal)ch.getBlockState(linkedSignalPosition).getBlock()).getID();
+				signame = sigtile.getName();
 			});
 		}).start();
 	}
@@ -283,6 +286,16 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public String getComponentName() {
 		return "signalcontroller";
+	}
+
+	@Override
+	public String getName() {
+		return this.signame;
+	}
+
+	@Override
+	public boolean hasCustomName() {
+		return this.signame != null;
 	}
 
 }

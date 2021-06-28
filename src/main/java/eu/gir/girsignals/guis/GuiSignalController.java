@@ -52,7 +52,7 @@ public class GuiSignalController extends GuiContainer {
 
 	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
 	private int indexCurrentlyUsed = 0;
-	private int indexMode = 0;
+	private EnumMode indexMode = EnumMode.MANUELL;
 	private final BlockPos pos;
 	private BlockModelShapes manager;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
@@ -71,14 +71,6 @@ public class GuiSignalController extends GuiContainer {
 	@Override
 	public void initGui() {
 		this.manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
-
-		this.ySize = Math.min(MAXIMUM_GUI_HEIGHT, this.height - GUI_INSET);
-		this.xSize = Math.round(this.width * 3.0f / 6.0f);
-		this.guiLeft = (this.width - this.xSize) / 2;
-		this.guiTop = (this.height - this.ySize) / 2;
-		this.mc.player.openContainer = this.inventorySlots;
-
-		this.buttonList.clear();
 
 		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
 		if (sigController.signalType < 0 || !sigController.hasLink)
@@ -101,11 +93,13 @@ public class GuiSignalController extends GuiContainer {
 					maxWidth);
 		}
 		maxWidth = Math.max(SIGNALTYPE_FIXED_WIDTH, maxWidth);
-
-		this.ySize = Math.min(MAXIMUM_GUI_HEIGHT, this.height - GUI_INSET);
 		this.xSize = maxWidth + SIGNAL_RENDER_WIDTH_AND_INSET + SIGNALTYPE_INSET;
+		this.ySize = Math.min(MAXIMUM_GUI_HEIGHT, this.height - GUI_INSET);
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
+		this.mc.player.openContainer = this.inventorySlots;
+
+		this.buttonList.clear();
 
 		int yPos = this.guiTop + TOP_OFFSET;
 		final int xPos = this.guiLeft + LEFT_OFFSET;
@@ -113,54 +107,61 @@ public class GuiSignalController extends GuiContainer {
 		final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
 
 		final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable, SIGNAL_TYPE_ID, xPos, yPos,
-				maxWidth, "signaltype", this.indexMode, null);
+				maxWidth, "signaltype", this.indexMode.ordinal(), null);
 		settings.consumer = input -> {
+			this.indexMode = EnumMode.values()[input];
+			initGui();
 		};
 		addButton(settings);
 
-		pageList.clear();
-		pageList.add(Lists.newArrayList());
-		boolean visible = true;
-		int index = indexCurrentlyUsed = 0;
-		yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
-		for (int i = 0; i < properties.size(); i++) {
-			final int id = i;
-			final int state = sigController.supportedSigStates[i];
-			if (state < 0)
-				continue;
-			SEProperty<?> prop = SEProperty.cst(properties.get(i));
-			if (!prop.isChangabelAtStage(ChangeableStage.APISTAGE))
-				continue;
-			if (yPos >= (this.guiTop + this.ySize - BOTTOM_OFFSET)) {
-				pageList.add(Lists.newArrayList());
-				index++;
-				yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
-				visible = false;
+		if (this.indexMode == EnumMode.MANUELL) {
+			pageList.clear();
+			pageList.add(Lists.newArrayList());
+			boolean visible = true;
+			int index = 0;
+			yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
+			for (int i = 0; i < properties.size(); i++) {
+				final int id = i;
+				final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
+				final int state = sigController.supportedSigStates[i];
+				if (state < 0 || state >= prop.count())
+					continue;
+				if (!prop.isChangabelAtStage(ChangeableStage.APISTAGE))
+					continue;
+				if (yPos >= (this.guiTop + this.ySize - BOTTOM_OFFSET)) {
+					pageList.add(Lists.newArrayList());
+					index++;
+					yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
+				}
+				visible = index == this.indexCurrentlyUsed;
+				String propName = prop.getName();
+				final GuiEnumerableSetting setting = new GuiEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
+						propName, state, inp -> sendChanges(id, inp));
+				addButton(setting).visible = visible;
+				pageList.get(index).add(setting);
+				yPos += SETTINGS_HEIGHT;
+				yPos += ELEMENT_SPACING;
 			}
-			String propName = prop.getName();
-			final GuiEnumerableSetting setting = new GuiEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
-					propName, state, inp -> sendChanges(id, inp));
-			addButton(setting).visible = visible;
-			pageList.get(index).add(setting);
-			yPos += SETTINGS_HEIGHT;
-			yPos += ELEMENT_SPACING;
+
+			if (pageList.size() > 1) {
+				final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
+						idx -> (String) (idx + "/" + (pageList.size() - 1)));
+				final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
+						this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", this.indexCurrentlyUsed,
+						inp -> {
+							pageList.get(indexCurrentlyUsed).forEach(visible(false));
+							pageList.get(inp).forEach(visible(true));
+							indexCurrentlyUsed = inp;
+						}, false);
+				pageSelection.setWidth(
+						mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
+				pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2)
+						+ GuiEnumerableSetting.BUTTON_SIZE;
+				pageSelection.update();
+				addButton(pageSelection);
+			}
 		}
 
-		if (pageList.size() > 1) {
-			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
-					idx -> (String) (idx + "/" + (pageList.size() - 1)));
-			final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
-					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", indexCurrentlyUsed, inp -> {
-						pageList.get(indexCurrentlyUsed).forEach(visible(false));
-						pageList.get(inp).forEach(visible(true));
-						indexCurrentlyUsed = inp;
-					}, false);
-			pageSelection.setWidth(
-					mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
-			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GuiEnumerableSetting.BUTTON_SIZE;
-			pageSelection.update();
-			addButton(pageSelection);
-		}
 		updateDraw();
 	}
 
@@ -263,7 +264,7 @@ public class GuiSignalController extends GuiContainer {
 		GlStateManager.disableRescaleNormal();
 
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-		final String s = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name");
+		final String s = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name") + (sigController.entity.hasCustomName() ? " - " + sigController.entity.getName():"");
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(this.guiLeft + LEFT_OFFSET, this.guiTop + TOP_STRING_OFFSET, 0);
 		GlStateManager.scale(STRING_SCALE, STRING_SCALE, STRING_SCALE);
@@ -280,7 +281,7 @@ public class GuiSignalController extends GuiContainer {
 		for (int i = 0; i < properties.size(); i++) {
 			SEProperty prop = SEProperty.cst(properties.get(i));
 			int sigState = sigController.supportedSigStates[i];
-			if (sigState < 0)
+			if (sigState < 0 || sigState >= prop.count())
 				continue;
 			ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
 		}
