@@ -24,12 +24,14 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.Optional;
+import scala.actors.threadpool.Arrays;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
 public class SignalControllerTileEntity extends TileEntity implements SimpleComponent, IWorldNameable{
@@ -39,11 +41,23 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	private Map<String, Integer> tableOfSupportedSignalTypes;
 	private int signalTypeCache = -1;
 	private String signame = null;
+	private EnumRedstoneMode rsMode = EnumRedstoneMode.SINGLE;
+	private final int[] facingRedstoneModes = new int[EnumFacing.values().length];
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
 	private static final String ID_Z = "zLinkedPos";
+	private static final String RS_MODE = "rsMode";
+	private static final String FACEING_MODES = "faceModes";
 
+	public SignalControllerTileEntity() {
+		Arrays.fill(facingRedstoneModes, -1);
+	}
+	
+	public static enum EnumRedstoneMode {
+		SINGLE, MUX
+	}
+	
 	public static BlockPos readBlockPosFromNBT(NBTTagCompound compound) {
 		if (compound != null && compound.hasKey(ID_X) && compound.hasKey(ID_Y) && compound.hasKey(ID_Z)) {
 			return new BlockPos(compound.getInteger(ID_X), compound.getInteger(ID_Y), compound.getInteger(ID_Z));
@@ -62,6 +76,10 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
+		rsMode = EnumRedstoneMode.values()[compound.getInteger(RS_MODE)];
+		int[] newArr = compound.getIntArray(FACEING_MODES);
+		if(newArr.length == facingRedstoneModes.length);
+			System.arraycopy(facingRedstoneModes, 0, newArr, 0, facingRedstoneModes.length);
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
@@ -71,6 +89,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		writeBlockPosToNBT(linkedSignalPosition, compound);
+		compound.setInteger(RS_MODE, rsMode.ordinal());
+		compound.setIntArray(FACEING_MODES, facingRedstoneModes);
 		super.writeToNBT(compound);
 		NetworkDebug.networkWriteHook(compound, world, this);
 		return compound;
@@ -298,4 +318,27 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return this.signame != null;
 	}
 
+	public EnumRedstoneMode getRsMode() {
+		return rsMode;
+	}
+
+	public void setRsMode(EnumRedstoneMode rsMode) {
+		this.rsMode = rsMode;
+	}
+	
+	public void setFacingData(final EnumFacing face, final int data) {
+		facingRedstoneModes[face.ordinal()] = data;
+	}
+
+	public void redstoneUpdate(final EnumFacing face, final boolean state) {
+		if(rsMode == EnumRedstoneMode.SINGLE) {
+			final int id = facingRedstoneModes[face.ordinal()];
+			if(id < 0)
+				return;
+			final int signalId = id & 0x000000FF;
+			final int signalData = (id & 0x0000FF00) >> 8;
+			final int signalDataOff = (id & 0x00FF0000) >> 16;
+			this.changeSignalImpl(signalId, state ? signalData:signalDataOff);
+		}
+	}
 }

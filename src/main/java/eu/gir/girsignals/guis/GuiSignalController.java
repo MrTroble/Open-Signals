@@ -20,6 +20,7 @@ import static eu.gir.girsignals.guis.GuiPlacementtool.visible;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import org.lwjgl.opengl.GL11;
 
@@ -32,6 +33,7 @@ import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
+import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.gui.inventory.GuiContainer;
@@ -43,6 +45,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -52,7 +55,10 @@ public class GuiSignalController extends GuiContainer {
 
 	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
 	private int indexCurrentlyUsed = 0;
+	private EnumRedstoneMode rsModeUsed = EnumRedstoneMode.SINGLE;
+	private EnumFacing faceUsed = EnumFacing.DOWN;
 	private EnumMode indexMode = EnumMode.MANUELL;
+	private int currentSigType = 0;
 	private final BlockPos pos;
 	private BlockModelShapes manager;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
@@ -70,6 +76,7 @@ public class GuiSignalController extends GuiContainer {
 
 	@Override
 	public void initGui() {
+		this.mc.player.openContainer = this.inventorySlots;
 		this.manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 
 		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
@@ -97,7 +104,6 @@ public class GuiSignalController extends GuiContainer {
 		this.ySize = Math.min(MAXIMUM_GUI_HEIGHT, this.height - GUI_INSET);
 		this.guiLeft = (this.width - this.xSize) / 2;
 		this.guiTop = (this.height - this.ySize) / 2;
-		this.mc.player.openContainer = this.inventorySlots;
 
 		this.buttonList.clear();
 
@@ -107,11 +113,10 @@ public class GuiSignalController extends GuiContainer {
 		final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
 
 		final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable, SIGNAL_TYPE_ID, xPos, yPos,
-				maxWidth, "signaltype", this.indexMode.ordinal(), null);
-		settings.consumer = input -> {
-			this.indexMode = EnumMode.values()[input];
-			initGui();
-		};
+				maxWidth, "signaltype", this.indexMode.ordinal(), input -> {
+					this.indexMode = EnumMode.values()[input];
+					initGui();
+				});
 		addButton(settings);
 
 		if (this.indexMode == EnumMode.MANUELL) {
@@ -160,6 +165,45 @@ public class GuiSignalController extends GuiContainer {
 				pageSelection.update();
 				addButton(pageSelection);
 			}
+		} else if (this.indexMode == EnumMode.REDSTONE) {
+			rsModeUsed = sigController.rsMode;
+			final EnumIntegerable<EnumRedstoneMode> rsModeIntegerable = new EnumIntegerable<>(EnumRedstoneMode.class);
+
+			yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
+
+			final GuiEnumerableSetting rsModeSetting = new GuiEnumerableSetting(rsModeIntegerable, SIGNAL_TYPE_ID + 1, xPos,
+					yPos, maxWidth, "rsmode", rsModeUsed.ordinal(), in -> {
+						rsModeUsed = EnumRedstoneMode.values()[in];
+						sendToPos(GIRNetworkHandler.SIG_CON_RS_SET, buffer -> {
+							buffer.writeInt(in);
+						});
+					});
+			addButton(rsModeSetting);
+			
+			final EnumIntegerable<EnumFacing> faceIntegerable = new EnumIntegerable<>(EnumFacing.class);
+
+			yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
+
+			final GuiEnumerableSetting faceSetting = new GuiEnumerableSetting(faceIntegerable, SIGNAL_TYPE_ID + 1, xPos,
+					yPos, maxWidth, "face", faceUsed.ordinal(), in -> {
+						faceUsed = EnumFacing.values()[in];
+					});
+			addButton(faceSetting);
+			
+			final SizeIntegerables<String> possibleSignalTypesIntegerable = new SizeIntegerables<>(sigController.supportedSigTypes.length, in -> {
+				final int type = sigController.supportedSigTypes[in];
+				final String name = signal.getPropertyFromID(type).getName();
+				return I18n.format("property." + name + ".name");
+			});
+
+			yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
+
+			final GuiEnumerableSetting pSignalTypes = new GuiEnumerableSetting(possibleSignalTypesIntegerable, SIGNAL_TYPE_ID + 1, xPos,
+					yPos, maxWidth, "sigtype", 0, in -> {
+						currentSigType = in;
+					});
+			addButton(pSignalTypes);
+			
 		}
 
 		updateDraw();
@@ -264,7 +308,8 @@ public class GuiSignalController extends GuiContainer {
 		GlStateManager.disableRescaleNormal();
 
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-		final String s = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name") + (sigController.entity.hasCustomName() ? " - " + sigController.entity.getName():"");
+		final String s = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name")
+				+ (sigController.entity.hasCustomName() ? " - " + sigController.entity.getName() : "");
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(this.guiLeft + LEFT_OFFSET, this.guiTop + TOP_STRING_OFFSET, 0);
 		GlStateManager.scale(STRING_SCALE, STRING_SCALE, STRING_SCALE);
@@ -289,21 +334,26 @@ public class GuiSignalController extends GuiContainer {
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
 		model.get().finishDrawing();
 	}
-
+	
 	public void sendChanges(final int id, final int data) {
 		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
 
-		ByteBuf buffer = Unpooled.buffer();
-		buffer.writeByte(GIRNetworkHandler.PLACEMENT_GUI_MANUELL_SET);
-		buffer.writeInt(pos.getX());
-		buffer.writeInt(pos.getY());
-		buffer.writeInt(pos.getZ());
-		buffer.writeInt(sigController.supportedSigTypes[id]);
-		buffer.writeInt(data);
-		CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
-				new PacketBuffer(buffer));
-		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
+		sendToPos(GIRNetworkHandler.SIG_CON_GUI_MANUELL_SET, buffer -> {
+			buffer.writeInt(sigController.supportedSigTypes[id]);
+			buffer.writeInt(data);
+		});
 		updateDraw();
 	}
 
+	private void sendToPos(final byte id, final Consumer<ByteBuf> consumer) {
+		ByteBuf buffer = Unpooled.buffer();
+		buffer.writeByte(id);
+		buffer.writeInt(pos.getX());
+		buffer.writeInt(pos.getY());
+		buffer.writeInt(pos.getZ());
+		consumer.accept(buffer);
+		CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
+				new PacketBuffer(buffer));
+		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
+	}
 }

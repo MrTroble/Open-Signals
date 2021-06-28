@@ -16,8 +16,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SignalController extends Block implements ITileEntityProvider{
-	
+public class SignalController extends Block implements ITileEntityProvider {
+
 	public SignalController() {
 		super(Material.ROCK);
 		setCreativeTab(GIRTabs.tab);
@@ -26,16 +26,32 @@ public class SignalController extends Block implements ITileEntityProvider{
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
 			EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if(!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
-			playerIn.openGui(GirsignalsMain.MODID, GuiHandler.GUI_SIGNAL_CONTROLLER, worldIn, pos.getX(), pos.getY(), pos.getZ());
+		if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
+			playerIn.openGui(GirsignalsMain.MODID, GuiHandler.GUI_SIGNAL_CONTROLLER, worldIn, pos.getX(), pos.getY(),
+					pos.getZ());
 			return true;
 		}
 		return false;
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new SignalControllerTileEntity();
+	}
+
+	@Override
+	public void observedNeighborChange(IBlockState observerState, World world, BlockPos observerPos, Block changedBlock,
+			BlockPos changedBlockPos) {
+		if(world.isRemote)
+			return;
+		final BlockPos offset = changedBlockPos.subtract(observerPos);
+		final EnumFacing face = EnumFacing.getFacingFromVector(offset.getX(), offset.getY(), offset.getZ());
+		final boolean bool = world.isSidePowered(observerPos, face);
+		final TileEntity entity = world.getTileEntity(observerPos);
+		if (entity instanceof SignalControllerTileEntity) {
+			final SignalControllerTileEntity controller = (SignalControllerTileEntity) entity;
+			controller.redstoneUpdate(face, bool);
+		}
 	}
 
 }
