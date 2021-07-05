@@ -34,8 +34,8 @@ import net.minecraftforge.fml.common.Optional;
 import scala.actors.threadpool.Arrays;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class SignalControllerTileEntity extends TileEntity implements SimpleComponent, IWorldNameable{
-	
+public class SignalControllerTileEntity extends TileEntity implements SimpleComponent, IWorldNameable {
+
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
@@ -51,13 +51,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	private static final String FACEING_MODES = "faceModes";
 
 	public SignalControllerTileEntity() {
-		Arrays.fill(facingRedstoneModes, -1);
+		Arrays.fill(facingRedstoneModes, 0xFF);
 	}
-	
+
 	public static enum EnumRedstoneMode {
 		SINGLE, MUX
 	}
-	
+
 	public static BlockPos readBlockPosFromNBT(NBTTagCompound compound) {
 		if (compound != null && compound.hasKey(ID_X) && compound.hasKey(ID_Y) && compound.hasKey(ID_Z)) {
 			return new BlockPos(compound.getInteger(ID_X), compound.getInteger(ID_Y), compound.getInteger(ID_Z));
@@ -78,8 +78,9 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		linkedSignalPosition = readBlockPosFromNBT(compound);
 		rsMode = EnumRedstoneMode.values()[compound.getInteger(RS_MODE)];
 		int[] newArr = compound.getIntArray(FACEING_MODES);
-		if(newArr.length == facingRedstoneModes.length);
-			System.arraycopy(facingRedstoneModes, 0, newArr, 0, facingRedstoneModes.length);
+		if (newArr.length == facingRedstoneModes.length)
+			;
+		System.arraycopy(newArr, 0, facingRedstoneModes, 0, facingRedstoneModes.length);
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
@@ -115,7 +116,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	public void onLink() {
 		new Thread(() -> {
-			while(!world.isBlockLoaded(pos)) continue;
+			while (!world.isBlockLoaded(pos))
+				continue;
 			loadChunkAndGetTile((sigtile, ch) -> {
 				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
 
@@ -129,9 +131,10 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 					}
 					return null;
 				}, null);
-				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
+				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue)
+						.toArray();
 				tableOfSupportedSignalTypes = supportedSignaleStates;
-				signalTypeCache = ((Signal)ch.getBlockState(linkedSignalPosition).getBlock()).getID();
+				signalTypeCache = ((Signal) ch.getBlockState(linkedSignalPosition).getBlock()).getID();
 				signame = sigtile.getName();
 			});
 		}).start();
@@ -168,7 +171,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	public boolean loadChunkAndGetTile(BiConsumer<SignalTileEnity, Chunk> consumer) {
-		if(linkedSignalPosition == null)
+		if (linkedSignalPosition == null)
 			return false;
 		try {
 			Callable<Boolean> call = () -> {
@@ -187,7 +190,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				if (ch == null)
 					return false;
 				entity = ch.getTileEntity(linkedSignalPosition, EnumCreateEntityType.IMMEDIATE);
-				boolean flag2 = entity instanceof SignalTileEnity && ((SignalTileEnity)entity).getBlockID() != -1;
+				boolean flag2 = entity instanceof SignalTileEnity && ((SignalTileEnity) entity).getBlockID() != -1;
 				if (flag2) {
 					consumer.accept((SignalTileEnity) entity, ch);
 				}
@@ -204,7 +207,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				return flag2;
 			};
 			MinecraftServer mcserver = world.getMinecraftServer();
-			if(mcserver == null)
+			if (mcserver == null)
 				return Minecraft.getMinecraft().addScheduledTask(call).get();
 			return mcserver.callFromMainThread(call).get();
 		} catch (Exception e) {
@@ -216,7 +219,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public boolean hasLinkImpl() {
 		if (linkedSignalPosition == null)
 			return false;
-		if (loadChunkAndGetTile((x,y) -> {}))
+		if (loadChunkAndGetTile((x, y) -> {
+		}))
 			return true;
 		if (!world.isRemote)
 			unlink();
@@ -286,10 +290,10 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public int getSignalStateImpl(int type) {
 		if (!find(getSupportedSignalTypesImpl(), type))
 			return -1;
-		AtomicReference<SignalTileEnity> entity = new AtomicReference<SignalTileEnity>();
+		final AtomicReference<SignalTileEnity> entity = new AtomicReference<SignalTileEnity>();
 		loadChunkAndGetTile((sig, ch) -> entity.set(sig));
-		SignalTileEnity tile = entity.get();
-		if(tile == null)
+		final SignalTileEnity tile = entity.get();
+		if (tile == null)
 			return -1;
 		Signal block = (Signal) Signal.SIGNALLIST.get(tile.getBlockID());
 		SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
@@ -325,20 +329,27 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public void setRsMode(EnumRedstoneMode rsMode) {
 		this.rsMode = rsMode;
 	}
-	
+
 	public void setFacingData(final EnumFacing face, final int data) {
 		facingRedstoneModes[face.ordinal()] = data;
 	}
 
+	public int[] getFacingData() {
+		return facingRedstoneModes;
+	}
+
 	public void redstoneUpdate(final EnumFacing face, final boolean state) {
-		if(rsMode == EnumRedstoneMode.SINGLE) {
+		if (rsMode == EnumRedstoneMode.SINGLE) {
 			final int id = facingRedstoneModes[face.ordinal()];
-			if(id < 0)
+			if (id < 0)
 				return;
-			final int signalId = id & 0x000000FF;
-			final int signalData = (id & 0x0000FF00) >> 8;
-			final int signalDataOff = (id & 0x00FF0000) >> 16;
-			this.changeSignalImpl(signalId, state ? signalData:signalDataOff);
+			final int signalTypeId = id & 0x000000FF;
+			if (signalTypeId < listOfSupportedIndicies.length) {
+				final int signalData = (id & 0x0000FF00) >> 8;
+				final int signalDataOff = (id & 0x00FF0000) >> 16;
+				final int sigType = listOfSupportedIndicies[signalTypeId];
+				this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
+			}
 		}
 	}
 }

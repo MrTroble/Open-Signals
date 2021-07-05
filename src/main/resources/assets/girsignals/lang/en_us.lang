@@ -74,6 +74,9 @@ property.signalped.name=Pedestrian lights
 property.buelight.name=Level crossing signal
 property.signal.name=Signal
 property.page.name=Page
+property.sigtype.name=Signal Type
+property.rsmode.name=Redstone Mode
+property.face.name=Facing
 
 #Signal Descs
 property.signaltype.desc=Here you can select the different signal types.

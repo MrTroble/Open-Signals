@@ -10,7 +10,6 @@ import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
-import net.minecraft.util.EnumFacing;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -24,7 +23,7 @@ public class ContainerSignalController extends Container {
 	protected EnumRedstoneMode rsMode;
 	private final ArrayList<Map.Entry<Integer, Integer>> stateCacheList = new ArrayList<>();
 	private final ArrayList<Map.Entry<Integer, Integer>> typeCacheList = new ArrayList<>();
-	protected final int[] facingRedstoneModes = new int[EnumFacing.values().length];
+	protected int[] facingRedstoneModes;
 
 	private final GuiSignalController guiSig;
 
@@ -35,6 +34,7 @@ public class ContainerSignalController extends Container {
 	public ContainerSignalController(final SignalControllerTileEntity entity, final GuiSignalController guiSig) {
 		this.entity = entity;
 		this.supportedSigTypes = this.entity.getSupportedSignalTypesImpl();
+		this.facingRedstoneModes = this.entity.getFacingData();
 		this.guiSig = guiSig;
 		if (this.supportedSigTypes == null) {
 			this.supportedSigStates = null;

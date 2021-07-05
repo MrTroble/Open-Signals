@@ -58,7 +58,6 @@ public class GuiSignalController extends GuiContainer {
 	private EnumRedstoneMode rsModeUsed = EnumRedstoneMode.SINGLE;
 	private EnumFacing faceUsed = EnumFacing.DOWN;
 	private EnumMode indexMode = EnumMode.MANUELL;
-	private int currentSigType = 0;
 	private final BlockPos pos;
 	private BlockModelShapes manager;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
@@ -187,10 +186,14 @@ public class GuiSignalController extends GuiContainer {
 			final GuiEnumerableSetting faceSetting = new GuiEnumerableSetting(faceIntegerable, SIGNAL_TYPE_ID + 1, xPos,
 					yPos, maxWidth, "face", faceUsed.ordinal(), in -> {
 						faceUsed = EnumFacing.values()[in];
+						initGui();
 					});
 			addButton(faceSetting);
 			
-			final SizeIntegerables<String> possibleSignalTypesIntegerable = new SizeIntegerables<>(sigController.supportedSigTypes.length, in -> {
+			final int fLen = sigController.supportedSigTypes.length;
+			final SizeIntegerables<String> possibleSignalTypesIntegerable = new SizeIntegerables<>(fLen + 1, in -> {
+				if(in >= fLen)
+					return "None";
 				final int type = sigController.supportedSigTypes[in];
 				final String name = signal.getPropertyFromID(type).getName();
 				return I18n.format("property." + name + ".name");
@@ -198,15 +201,31 @@ public class GuiSignalController extends GuiContainer {
 
 			yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
 
+			final int config = sigController.facingRedstoneModes[faceUsed.ordinal()];
+			final int sigType = config & 0x000000FF;
 			final GuiEnumerableSetting pSignalTypes = new GuiEnumerableSetting(possibleSignalTypesIntegerable, SIGNAL_TYPE_ID + 1, xPos,
-					yPos, maxWidth, "sigtype", 0, in -> {
-						currentSigType = in;
+					yPos, maxWidth, "sigtype", sigType > fLen ? fLen:sigType, in -> {
+						sigController.facingRedstoneModes[faceUsed.ordinal()] = pack(in, 0, 1); 
+						sendPacked();
+						initGui();
 					});
 			addButton(pSignalTypes);
 			
 		}
 
 		updateDraw();
+	}
+	
+	public void sendPacked() {
+		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
+		sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, buffer -> {
+			buffer.writeInt(faceUsed.ordinal());
+			buffer.writeInt(sigController.facingRedstoneModes[faceUsed.ordinal()]);
+		});
+	}
+	
+	public int pack(final int sigTypeID, final int onSig, final int offSig) {
+		return (sigTypeID & 0x000000FF) | ((onSig & 0x000000FF) << 8) | ((offSig & 0x000000FF) << 16);
 	}
 
 	public static class EnumIntegerable<T extends Enum<T>> implements IIntegerable<T> {
