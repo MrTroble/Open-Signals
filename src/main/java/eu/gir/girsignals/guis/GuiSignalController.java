@@ -73,6 +73,21 @@ public class GuiSignalController extends GuiContainer {
 		MANUELL, REDSTONE
 	}
 
+	public class Setting {
+		public final IIntegerable<?> iintg;
+		public final String name;
+		public final int defaultValue;
+		public final Consumer<Integer> consumer;
+
+		public Setting(final IIntegerable<?> iintg, final String name, final int defaultValue,
+				final Consumer<Integer> consumer) {
+			this.iintg = iintg;
+			this.name = name;
+			this.defaultValue = defaultValue;
+			this.consumer = consumer;
+		}
+	}
+
 	@Override
 	public void initGui() {
 		this.mc.player.openContainer = this.inventorySlots;
@@ -117,12 +132,12 @@ public class GuiSignalController extends GuiContainer {
 					initGui();
 				});
 		addButton(settings);
+		int index = 0;
+		pageList.clear();
 
 		if (this.indexMode == EnumMode.MANUELL) {
-			pageList.clear();
 			pageList.add(Lists.newArrayList());
 			boolean visible = true;
-			int index = 0;
 			yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
 			for (int i = 0; i < properties.size(); i++) {
 				final int id = i;
@@ -146,76 +161,72 @@ public class GuiSignalController extends GuiContainer {
 				yPos += SETTINGS_HEIGHT;
 				yPos += ELEMENT_SPACING;
 			}
-
-			if (pageList.size() > 1) {
-				final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
-						idx -> (String) (idx + "/" + (pageList.size() - 1)));
-				final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
-						this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", this.indexCurrentlyUsed,
-						inp -> {
-							pageList.get(indexCurrentlyUsed).forEach(visible(false));
-							pageList.get(inp).forEach(visible(true));
-							indexCurrentlyUsed = inp;
-						}, false);
-				pageSelection.setWidth(
-						mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
-				pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2)
-						+ GuiEnumerableSetting.BUTTON_SIZE;
-				pageSelection.update();
-				addButton(pageSelection);
-			}
 		} else if (this.indexMode == EnumMode.REDSTONE) {
 			rsModeUsed = sigController.rsMode;
-			final EnumIntegerable<EnumRedstoneMode> rsModeIntegerable = new EnumIntegerable<>(EnumRedstoneMode.class);
 
-			yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
-
-			final GuiEnumerableSetting rsModeSetting = new GuiEnumerableSetting(rsModeIntegerable, SIGNAL_TYPE_ID + 1, xPos,
-					yPos, maxWidth, "rsmode", rsModeUsed.ordinal(), in -> {
-						rsModeUsed = EnumRedstoneMode.values()[in];
-						sendToPos(GIRNetworkHandler.SIG_CON_RS_SET, buffer -> {
-							buffer.writeInt(in);
-						});
-					});
-			addButton(rsModeSetting);
-			
-			final EnumIntegerable<EnumFacing> faceIntegerable = new EnumIntegerable<>(EnumFacing.class);
-
-			yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
-
-			final GuiEnumerableSetting faceSetting = new GuiEnumerableSetting(faceIntegerable, SIGNAL_TYPE_ID + 1, xPos,
-					yPos, maxWidth, "face", faceUsed.ordinal(), in -> {
-						faceUsed = EnumFacing.values()[in];
-						initGui();
-					});
-			addButton(faceSetting);
-			
 			final int fLen = sigController.supportedSigTypes.length;
 			final SizeIntegerables<String> possibleSignalTypesIntegerable = new SizeIntegerables<>(fLen + 1, in -> {
-				if(in >= fLen)
+				if (in >= fLen)
 					return "None";
 				final int type = sigController.supportedSigTypes[in];
 				final String name = signal.getPropertyFromID(type).getName();
 				return I18n.format("property." + name + ".name");
 			});
-
-			yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
-
 			final int config = sigController.facingRedstoneModes[faceUsed.ordinal()];
 			final int sigType = config & 0x000000FF;
-			final GuiEnumerableSetting pSignalTypes = new GuiEnumerableSetting(possibleSignalTypesIntegerable, SIGNAL_TYPE_ID + 1, xPos,
-					yPos, maxWidth, "sigtype", sigType > fLen ? fLen:sigType, in -> {
-						sigController.facingRedstoneModes[faceUsed.ordinal()] = pack(in, 0, 1); 
+
+			final Setting[] settingList = new Setting[] {
+					new Setting(new EnumIntegerable<>(EnumRedstoneMode.class), "rsmode", rsModeUsed.ordinal(), in -> {
+						rsModeUsed = EnumRedstoneMode.values()[in];
+						sendToPos(GIRNetworkHandler.SIG_CON_RS_SET, buffer -> {
+							buffer.writeInt(in);
+						});
+					}), new Setting(new EnumIntegerable<>(EnumFacing.class), "face", faceUsed.ordinal(), in -> {
+						faceUsed = EnumFacing.values()[in];
+						initGui();
+					}), new Setting(possibleSignalTypesIntegerable, "sigtype", sigType > fLen ? fLen : sigType, in -> {
+						sigController.facingRedstoneModes[faceUsed.ordinal()] = pack(in, 0, 1);
 						sendPacked();
 						initGui();
-					});
-			addButton(pSignalTypes);
-			
+					}) };
+
+			pageList.add(Lists.newArrayList());
+			yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
+			for (final Setting set : settingList) {
+				if (yPos >= (this.guiTop + this.ySize - (SETTINGS_HEIGHT + ELEMENT_SPACING))) {
+					pageList.add(Lists.newArrayList());
+					index++;
+					yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
+				}
+				final GuiEnumerableSetting rsModeSetting = new GuiEnumerableSetting(set.iintg, SIGNAL_TYPE_ID + 1, xPos,
+						yPos, maxWidth, set.name, set.defaultValue, set.consumer);
+				addButton(rsModeSetting);
+				rsModeSetting.visible = index == indexCurrentlyUsed;
+				pageList.get(index).add(rsModeSetting);
+				yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
+			}
+		}
+		if (pageList.size() > 1) {
+			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
+					idx -> (String) (idx + "/" + (pageList.size() - 1)));
+			final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
+					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", this.indexCurrentlyUsed,
+					inp -> {
+						pageList.get(indexCurrentlyUsed).forEach(visible(false));
+						pageList.get(inp).forEach(visible(true));
+						indexCurrentlyUsed = inp;
+					}, false);
+			pageSelection.setWidth(
+					mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
+			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2)
+					+ GuiEnumerableSetting.BUTTON_SIZE;
+			pageSelection.update();
+			addButton(pageSelection);
 		}
 
 		updateDraw();
 	}
-	
+
 	public void sendPacked() {
 		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
 		sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, buffer -> {
@@ -223,7 +234,7 @@ public class GuiSignalController extends GuiContainer {
 			buffer.writeInt(sigController.facingRedstoneModes[faceUsed.ordinal()]);
 		});
 	}
-	
+
 	public int pack(final int sigTypeID, final int onSig, final int offSig) {
 		return (sigTypeID & 0x000000FF) | ((onSig & 0x000000FF) << 8) | ((offSig & 0x000000FF) << 16);
 	}
@@ -353,7 +364,7 @@ public class GuiSignalController extends GuiContainer {
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
 		model.get().finishDrawing();
 	}
-	
+
 	public void sendChanges(final int id, final int data) {
 		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
 
