@@ -129,6 +129,7 @@ public class GuiSignalController extends GuiContainer {
 		final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable, SIGNAL_TYPE_ID, xPos, yPos,
 				maxWidth, "signaltype", this.indexMode.ordinal(), input -> {
 					this.indexMode = EnumMode.values()[input];
+					indexCurrentlyUsed = 0;
 					initGui();
 				});
 		addButton(settings);
@@ -174,6 +175,14 @@ public class GuiSignalController extends GuiContainer {
 			});
 			final int config = sigController.facingRedstoneModes[faceUsed.ordinal()];
 			final int sigType = config & 0x000000FF;
+			final int sigOn = (config & 0x0000FF00) >> 8;
+			final int sigOff = (config & 0x00FF0000) >> 16;
+			System.out.println(sigOff);
+			System.out.println(sigOn);
+
+			final SEProperty<?> prop = sigType < sigController.supportedSigTypes.length
+					? SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]))
+					: null;
 
 			final Setting[] settingList = new Setting[] {
 					new Setting(new EnumIntegerable<>(EnumRedstoneMode.class), "rsmode", rsModeUsed.ordinal(), in -> {
@@ -185,7 +194,15 @@ public class GuiSignalController extends GuiContainer {
 						faceUsed = EnumFacing.values()[in];
 						initGui();
 					}), new Setting(possibleSignalTypesIntegerable, "sigtype", sigType > fLen ? fLen : sigType, in -> {
-						sigController.facingRedstoneModes[faceUsed.ordinal()] = pack(in, 0, 1);
+						sigController.facingRedstoneModes[faceUsed.ordinal()] = pack(in, sigOn, sigOff);
+						sendPacked();
+						initGui();
+					}), new Setting(prop, "sigon", sigOn, in -> {
+						sigController.facingRedstoneModes[faceUsed.ordinal()] = pack(sigType, in, sigOff);
+						sendPacked();
+						initGui();
+					}), new Setting(prop, "sigoff", sigOff, in -> {
+						sigController.facingRedstoneModes[faceUsed.ordinal()] = pack(sigType, sigOn, in);
 						sendPacked();
 						initGui();
 					}) };
@@ -193,13 +210,16 @@ public class GuiSignalController extends GuiContainer {
 			pageList.add(Lists.newArrayList());
 			yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
 			for (final Setting set : settingList) {
-				if (yPos >= (this.guiTop + this.ySize - (SETTINGS_HEIGHT + ELEMENT_SPACING))) {
+				if (set.iintg == null)
+					continue;
+				if (yPos >= (this.guiTop + this.ySize - BOTTOM_OFFSET)) {
 					pageList.add(Lists.newArrayList());
 					index++;
 					yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
 				}
 				final GuiEnumerableSetting rsModeSetting = new GuiEnumerableSetting(set.iintg, SIGNAL_TYPE_ID + 1, xPos,
-						yPos, maxWidth, set.name, set.defaultValue, set.consumer);
+						yPos, maxWidth, set.name, set.defaultValue < set.iintg.count() ? set.defaultValue : 0,
+						set.consumer);
 				addButton(rsModeSetting);
 				rsModeSetting.visible = index == indexCurrentlyUsed;
 				pageList.get(index).add(rsModeSetting);
@@ -218,8 +238,7 @@ public class GuiSignalController extends GuiContainer {
 					}, false);
 			pageSelection.setWidth(
 					mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
-			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2)
-					+ GuiEnumerableSetting.BUTTON_SIZE;
+			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GuiEnumerableSetting.BUTTON_SIZE;
 			pageSelection.update();
 			addButton(pageSelection);
 		}
@@ -236,6 +255,7 @@ public class GuiSignalController extends GuiContainer {
 	}
 
 	public int pack(final int sigTypeID, final int onSig, final int offSig) {
+		System.out.println(onSig);
 		return (sigTypeID & 0x000000FF) | ((onSig & 0x000000FF) << 8) | ((offSig & 0x000000FF) << 16);
 	}
 
