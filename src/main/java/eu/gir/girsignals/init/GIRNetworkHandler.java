@@ -5,6 +5,7 @@ import java.util.function.Consumer;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.guis.GuiSignalController.EnumMode;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
@@ -35,6 +36,7 @@ public class GIRNetworkHandler {
 	public static final byte SIG_CON_GUI_MANUELL_SET = 1;
 	public static final byte SIG_CON_RS_FACING_UPDATE_SET = 2;
 	public static final byte SIG_CON_RS_SET = 3;
+	public static final byte SIG_CON_SAVE_UI_STATE = 4;
 
 	@SubscribeEvent
 	public void onCustomPacket(ServerCustomPacketEvent event) {
@@ -65,6 +67,9 @@ public class GIRNetworkHandler {
 			break;
 		case SIG_CON_RS_SET:
 			readFromPos(payBuf, world, tile -> tile.setRsMode(EnumRedstoneMode.values()[payBuf.readInt()]));
+			break;
+		case SIG_CON_SAVE_UI_STATE:
+			readFromPos(payBuf, world, tile -> tile.setUIState(EnumMode.values()[payBuf.readInt()], EnumFacing.values()[payBuf.readInt()], payBuf.readInt()));
 			break;
 		default:
 			throw new IllegalArgumentException("Wrong packet ID in network recive!");

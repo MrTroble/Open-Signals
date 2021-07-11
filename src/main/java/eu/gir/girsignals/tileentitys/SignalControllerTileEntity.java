@@ -11,6 +11,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.debug.NetworkDebug;
+import eu.gir.girsignals.guis.GuiSignalController.EnumMode;
 import eu.gir.girsignals.items.Linkingtool;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -43,12 +44,19 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	private String signame = null;
 	private EnumRedstoneMode rsMode = EnumRedstoneMode.SINGLE;
 	private final int[] facingRedstoneModes = new int[EnumFacing.values().length];
+	public EnumMode mode = EnumMode.MANUELL;
+	public EnumFacing face = EnumFacing.DOWN;
+	public int indexUsed = 0;
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
 	private static final String ID_Z = "zLinkedPos";
 	private static final String RS_MODE = "rsMode";
 	private static final String FACEING_MODES = "faceModes";
+	
+	private static final String UI_FACE = "uiface";
+	private static final String UI_MODE = "uimode";
+	private static final String UI_INDEX = "uiindex";
 
 	public SignalControllerTileEntity() {
 		Arrays.fill(facingRedstoneModes, 0xFF);
@@ -78,8 +86,9 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		linkedSignalPosition = readBlockPosFromNBT(compound);
 		rsMode = EnumRedstoneMode.values()[compound.getInteger(RS_MODE)];
 		int[] newArr = compound.getIntArray(FACEING_MODES);
-		if (newArr.length == facingRedstoneModes.length)
-			;
+		this.face = EnumFacing.values()[compound.getInteger(UI_FACE)];
+		this.indexUsed = compound.getInteger(UI_INDEX);
+		this.mode = EnumMode.values()[compound.getInteger(UI_MODE)];
 		System.arraycopy(newArr, 0, facingRedstoneModes, 0, facingRedstoneModes.length);
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
@@ -92,6 +101,9 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		writeBlockPosToNBT(linkedSignalPosition, compound);
 		compound.setInteger(RS_MODE, rsMode.ordinal());
 		compound.setIntArray(FACEING_MODES, facingRedstoneModes);
+		compound.setInteger(UI_FACE, face.ordinal());
+		compound.setInteger(UI_INDEX, indexUsed);
+		compound.setInteger(UI_MODE, mode.ordinal());
 		super.writeToNBT(compound);
 		NetworkDebug.networkWriteHook(compound, world, this);
 		return compound;
@@ -351,5 +363,11 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
 			}
 		}
+	}
+	
+	public void setUIState(final EnumMode mode, final EnumFacing face, final int indexUsed) {
+		this.mode = mode;
+		this.face = face;
+		this.indexUsed = indexUsed;
 	}
 }
