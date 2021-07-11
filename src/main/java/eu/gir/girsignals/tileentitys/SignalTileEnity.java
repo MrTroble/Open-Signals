@@ -33,7 +33,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	private String formatCustomName = null;
 	private Signal cachedBlock = null;
 	private int blockID = -1;
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = new NBTTagCompound();
@@ -183,7 +183,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		cachedBlock = Signal.SIGNALLIST.get(blockID);
 		renderHeight = cachedBlock.getCustomnameRenderHeight(world, pos, this);
 	}
-
+	
 	public int getBlockID() {
 		return blockID;
 	}
