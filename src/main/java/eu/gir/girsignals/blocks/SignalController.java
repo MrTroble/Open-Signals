@@ -38,20 +38,18 @@ public class SignalController extends Block implements ITileEntityProvider {
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new SignalControllerTileEntity();
 	}
-
+	
 	@Override
-	public void observedNeighborChange(IBlockState observerState, World world, BlockPos observerPos, Block changedBlock,
-			BlockPos changedBlockPos) {
+    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
 		if(world.isRemote)
 			return;
-		final BlockPos offset = changedBlockPos.subtract(observerPos);
-		final EnumFacing face = EnumFacing.getFacingFromVector(offset.getX(), offset.getY(), offset.getZ());
-		final boolean bool = world.isSidePowered(observerPos, face);
-		final TileEntity entity = world.getTileEntity(observerPos);
+		final TileEntity entity = world.getTileEntity(pos);
 		if (entity instanceof SignalControllerTileEntity) {
 			final SignalControllerTileEntity controller = (SignalControllerTileEntity) entity;
-			controller.redstoneUpdate(face, bool);
+			for(final EnumFacing face : EnumFacing.VALUES) {
+				final boolean bool = world.isSidePowered(pos.offset(face), face);
+				controller.redstoneUpdate(face, bool);
+			}
 		}
-	}
-
+    }
 }
