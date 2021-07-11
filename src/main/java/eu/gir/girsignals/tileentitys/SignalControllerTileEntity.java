@@ -1,5 +1,6 @@
 package eu.gir.girsignals.tileentitys;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -31,7 +32,6 @@ import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.Optional;
-import scala.actors.threadpool.Arrays;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
 public class SignalControllerTileEntity extends TileEntity implements SimpleComponent, IWorldNameable {
