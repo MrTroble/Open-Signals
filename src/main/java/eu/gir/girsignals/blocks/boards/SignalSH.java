@@ -1,6 +1,7 @@
-package eu.gir.girsignals.blocks;
+package eu.gir.girsignals.blocks.boards;
 
 import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 
 public class SignalSH extends Signal {

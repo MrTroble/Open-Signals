@@ -138,6 +138,8 @@ public class GuiSignalController extends GuiContainer {
 				visible = false;
 			}
 			String propName = prop.getName();
+			if(!prop.isValid(state))
+				break;
 			final GuiEnumerableSetting setting = new GuiEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
 					propName, state, inp -> sendChanges(id, inp));
 			addButton(setting).visible = visible;
@@ -280,7 +282,7 @@ public class GuiSignalController extends GuiContainer {
 		for (int i = 0; i < properties.size(); i++) {
 			SEProperty prop = SEProperty.cst(properties.get(i));
 			int sigState = sigController.supportedSigStates[i];
-			if (sigState < 0)
+			if (sigState < 0 || !prop.isValid(sigState))
 				continue;
 			ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
 		}
