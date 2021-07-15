@@ -57,7 +57,8 @@ public class ContainerSignalController extends Container {
 	@Override
 	public void addListener(IContainerListener listener) {
 		super.addListener(listener);
-		listener.sendWindowProperty(this, UPDATE_ARRAY, this.supportedSigTypes.length);
+		if(this.supportedSigTypes != null)
+			listener.sendWindowProperty(this, UPDATE_ARRAY, this.supportedSigTypes.length);
 		if (supportedSigStates != null) {
 			for (int i = 0; i < supportedSigStates.length; i++) {
 				final int signalType = this.supportedSigTypes[i];
