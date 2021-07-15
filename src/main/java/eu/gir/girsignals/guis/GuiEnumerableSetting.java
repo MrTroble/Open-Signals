@@ -34,6 +34,8 @@ public class GuiEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	public GuiEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
 			final String buttonText, final int initialValue, final Consumer<Integer> consumer, final boolean middleButton) {
 		super(id, x, y, I18n.format("property." + buttonText + ".name"));
+		if(initialValue >= property.count())
+			throw new IllegalArgumentException(String.format("Initial value (%d) is not valid for property %s", initialValue, property.toString()));
 		this.buttonText = I18n.format("property." + buttonText + ".name");
 		this.displayString = this.buttonText + ": " + property.getObjFromID(initialValue).toString();
 		this.property = property;

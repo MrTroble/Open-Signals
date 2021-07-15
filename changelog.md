@@ -1,5 +1,9 @@
 # Changelog
 
+## [Additions] 7.11.2021 - 1
+* Added preview of redstone mode
+* Controller can now be customized to allow for it to be controlled via redstone
+
 ## [Fix] 6.25.2021 - 1
 * Fixed potential NPE in renderer
 
