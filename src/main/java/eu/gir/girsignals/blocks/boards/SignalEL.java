@@ -1,9 +1,10 @@
-package eu.gir.girsignals.blocks;
+package eu.gir.girsignals.blocks.boards;
 
 import eu.gir.girsignals.EnumSignals.EL;
 import eu.gir.girsignals.EnumSignals.EL_ARROW;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 
 public class SignalEL extends Signal {

@@ -6,15 +6,14 @@ import java.util.ArrayList;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
-import eu.gir.girsignals.blocks.SignalBUE;
-import eu.gir.girsignals.blocks.SignalBUELight;
 import eu.gir.girsignals.blocks.SignalController;
-import eu.gir.girsignals.blocks.SignalEL;
-import eu.gir.girsignals.blocks.SignalNE;
-import eu.gir.girsignals.blocks.SignalOTHER;
-import eu.gir.girsignals.blocks.SignalRA;
-import eu.gir.girsignals.blocks.SignalSH;
-import eu.gir.girsignals.blocks.TrackIOBlock;
+import eu.gir.girsignals.blocks.boards.SignalBUE;
+import eu.gir.girsignals.blocks.boards.SignalBUELight;
+import eu.gir.girsignals.blocks.boards.SignalEL;
+import eu.gir.girsignals.blocks.boards.SignalNE;
+import eu.gir.girsignals.blocks.boards.SignalOTHER;
+import eu.gir.girsignals.blocks.boards.SignalRA;
+import eu.gir.girsignals.blocks.boards.SignalSH;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
@@ -48,7 +47,6 @@ public class GIRBlocks {
 	public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
 	public static final SignalOTHER OTHER_SIGNAL = new SignalOTHER();
 	public static final SignalNE NE_SIGNAL = new SignalNE();
-	public static final TrackIOBlock TRACK_IO = new TrackIOBlock();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 

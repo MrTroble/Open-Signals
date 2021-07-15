@@ -1,16 +1,21 @@
 package eu.gir.girsignals.guis;
 
+import static net.minecraft.client.gui.Gui.drawRect;
+import static net.minecraft.client.gui.Gui.drawScaledCustomSizeModalRect;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
 import net.minecraft.util.EnumFacing;
@@ -18,14 +23,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.pipeline.LightUtil;
 import net.minecraftforge.common.property.IExtendedBlockState;
 
-import static net.minecraft.client.gui.GuiScreen.*;
-
 public class DrawUtil {
-	
+
 	private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
 			"textures/gui/container/creative_inventory/tabs.png");
 	public static final float DIM = 256.0f;
-	
+
 	public static void drawBack(GuiScreen gui, final int xLeft, final int xRight, final int yTop, final int yBottom) {
 		gui.mc.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);
 
@@ -66,20 +69,24 @@ public class DrawUtil {
 	}
 
 	public static void addToBuffer(BufferBuilder builder, BlockModelShapes manager, IBlockState ebs) {
-		addToBuffer(builder, manager, ebs, 0xFFFFFFFF);
+		addToBuffer(builder, manager, ebs, 0);
 	}
-	
+
 	public static void addToBuffer(BufferBuilder builder, BlockModelShapes manager, IBlockState ebs, int color) {
 		assert ebs != null;
-		IBakedModel mdl = manager
-				.getModelForState(ebs instanceof IExtendedBlockState ? ((IExtendedBlockState) ebs).getClean() : ebs);
+		IBlockState cleanState = ebs instanceof IExtendedBlockState ? ((IExtendedBlockState) ebs).getClean() : ebs;
+		IBakedModel mdl = manager.getModelForState(cleanState);
 		List<BakedQuad> lst = new ArrayList<>();
 		lst.addAll(mdl.getQuads(ebs, null, 0));
 		for (EnumFacing face : EnumFacing.VALUES)
 			lst.addAll(mdl.getQuads(ebs, face, 0));
 
+		final BlockColors blockColors = Minecraft.getMinecraft().getBlockColors();
 		for (BakedQuad quad : lst) {
-			LightUtil.renderQuadColor(builder, quad, color);
+			final int k = quad.hasTintIndex()
+					? (blockColors.colorMultiplier(cleanState, null, null, quad.getTintIndex()) + 0xFF000000)
+					: 0xFFFFFFFF;
+			LightUtil.renderQuadColor(builder, quad, color + k);
 		}
 	}
 

@@ -36,7 +36,6 @@ public class Linkingtool extends Item {
 			SignalControllerTileEntity.writeBlockPosToNBT(pos, comp);
 			player.getHeldItem(hand).setTagCompound(comp);
 			player.sendMessage(new TextComponentTranslation("lt.added", pos.toString()));
-			player.openGui(comp, maxStackSize, worldIn, maxStackSize, maxStackSize, maxStackSize);
 			return EnumActionResult.SUCCESS;
 		} else if (block instanceof SignalController) {
 			SignalControllerTileEntity controller = ((SignalControllerTileEntity) worldIn.getTileEntity(pos));

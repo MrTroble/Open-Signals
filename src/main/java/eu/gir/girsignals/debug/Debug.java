@@ -13,7 +13,7 @@ import net.minecraft.util.math.BlockPos;
 
 public class Debug extends CommandBase {
 
-	public static final boolean DEBUG = true;
+	public static final boolean DEBUG = false;
 
 	@FunctionalInterface
 	public static interface CommandConsumer {
