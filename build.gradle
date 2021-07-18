@@ -29,6 +29,7 @@ curseforge {
     id = '440990'
     changelog = file('changelog.md')
     releaseType = 'release'
+    changelogType = 'markdown'
     mainArtifact(jar) {
       relations {
         optionalDependency 'opencomputers'

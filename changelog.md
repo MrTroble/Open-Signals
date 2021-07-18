@@ -1,8 +1,12 @@
 # Changelog
 
-## [Update] 7.18.2021 - 3 
+## [Update/Fixes] 7.18.2021 - 3 
 * Updated Controller Texture
 * Updated Lang Keys
+* Fixed overlapping text
+* Fixed some text formatting
+* Updated information display
+* Fixed changelog
 
 ## [Release] 7.18.2021 - 2
 

@@ -1,6 +1,9 @@
 #Creative Tab
 itemGroup.GIRSignals=GIRSignals
 
+#Gui
+gui.keyprompt=Drücke [LSHIFT] für mehr Informationen!
+
 #Items
 item.linkingtool.name=Verlinker
 item.placementtool.name=Signal-Platzierer
@@ -12,7 +15,7 @@ tile.hvsignal.name=HV Signal
 tile.kssignal.name=KS Signal
 tile.hlsignal.name=HL Signal
 tile.shlight.name=Rangiersignal
-tile.tramsignal.name=Straßenbahnsignal
+tile.tramsignal.name=Straßenbahn
 tile.lfsignal.name=Lf Signal
 tile.elsignal.name=El Signal
 tile.shsignal.name=Sh Signal
@@ -57,7 +60,7 @@ property.kombisignal-distant.name=Kombinationsvorsignal
 property.mainlightsignal_distant.name=Hauptlichtvorsignal
 property.sh_light_bottom.name=Rangiersignal 1 Block hoch
 property.sh_light_top.name=Rangiersignal 3 Block hoch
-property.signaltram.name=Straßenbahnsignal
+property.signaltram.name=Straßenbahn
 property.signalcar.name=Auto Ampel
 property.indicator.name=Aufschrift
 property.lftype.name=Langsamfahrsignale
@@ -65,7 +68,7 @@ property.lamps.name=Lampen
 property.eltype.name=Fahrleitungssignale
 property.elarrow.name=Richtungspfeil
 property.sh2.name=Schutzsignale
-property.ratype.name=Signale für den Rangierdienst
+property.ratype.name=Rangierdienst Signale
 property.ralight.name=Sh1 Licht
 property.buetype.name=Bahnübergangssignal
 property.bueadd.name=Zwischenhalttafel
