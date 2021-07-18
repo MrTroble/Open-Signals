@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.function.Consumer;
 
+import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
@@ -130,25 +131,26 @@ public class GuiPlacementtool extends GuiScreen {
 		GlStateManager.popMatrix();
 		GlStateManager.disableRescaleNormal();
 
-		for (GuiButton guiButton : buttonList) {
-			if (guiButton instanceof InternalUnlocalized) {
-				if (guiButton.isMouseOver()) {
-					dragging = false;
-					String str = I18n
-							.format("property." + ((InternalUnlocalized) guiButton).getUnlocalized() + ".desc");
-					this.drawHoveringText(Arrays.asList(str.split(System.lineSeparator())), mouseX, mouseY);
-					break;
-				}
-			}
-
-		}
-
 		String s = I18n.format("property.signal.name");
 		GlStateManager.pushMatrix();
 		GlStateManager.translate(this.guiLeft + LEFT_OFFSET, this.guiTop + TOP_STRING_OFFSET, 0);
 		GlStateManager.scale(STRING_SCALE, STRING_SCALE, STRING_SCALE);
 		this.fontRenderer.drawString(s, 0, 0, STRING_COLOR);
 		GlStateManager.popMatrix();
+
+		for (GuiButton guiButton : buttonList) {
+			if (guiButton instanceof InternalUnlocalized) {
+				if (guiButton.isMouseOver()) {
+					dragging = false;
+					final String str = I18n.format(Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)
+							? ("property." + ((InternalUnlocalized) guiButton).getUnlocalized() + ".desc")
+							: "gui.keyprompt");
+					this.drawHoveringText(Arrays.asList(str.split(System.lineSeparator())), mouseX, mouseY);
+					break;
+				}
+			}
+		}
+
 	}
 
 	@Override
@@ -237,7 +239,8 @@ public class GuiPlacementtool extends GuiScreen {
 				visible = false;
 			}
 			String propName = property.getName();
-			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE) || (prop.getType().equals(Boolean.class) && !prop.equals(Signal.CUSTOMNAME))) {
+			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)
+					|| (prop.getType().equals(Boolean.class) && !prop.equals(Signal.CUSTOMNAME))) {
 				final InternalCheckBox checkbox = new InternalCheckBox(DEFAULT_ID, xPos, yPos, propName,
 						comp.getBoolean(propName));
 				addButton(checkbox).visible = visible;
