@@ -1,5 +1,8 @@
 # Changelog
 
+## [Fix] 7.18.2021 - 1
+* Fixed version not correctly used and shown by the forge system
+
 ## [Update/Fixes] 7.15.2021 - 1
 * Fixed quad color not showing in UI
 * Streamlined ZS3(v)/ZS2 renderer for better performance
