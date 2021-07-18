@@ -120,9 +120,9 @@ jar {
         attributes([
             "Specification-Title": "GIRSignals",
             "Specification-Vendor": "German Immersive Railroading Community",
-            "Specification-Version": "1", // We are version 1 of ourselves
+            "Specification-Version": System.getenv("APPVEYOR_BUILD_VERSION"),
             "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
+            "Implementation-Version": System.getenv("APPVEYOR_BUILD_VERSION"),
             "Implementation-Vendor" :"German Immersive Railroading Community",
             "Implementation-Timestamp": new Date().format("dd-MM-yyyy'T'HH:mm:ssZ")
         ])
