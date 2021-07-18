@@ -1,5 +1,9 @@
 # Changelog
 
+## [Update] 7.18.2021 - 3 
+* Updated Controller Texture
+* Updated Lang Keys
+
 ## [Release] 7.18.2021 - 2
 
 First release! (Removed debugging!)
