@@ -10,7 +10,6 @@ import java.util.function.BiConsumer;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.debug.NetworkDebug;
 import eu.gir.girsignals.guis.GuiSignalController.EnumMode;
 import eu.gir.girsignals.items.Linkingtool;
 import li.cil.oc.api.machine.Arguments;
@@ -93,7 +92,6 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
-		NetworkDebug.networkReadHook(compound, world, this);
 	}
 
 	@Override
@@ -105,7 +103,6 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		compound.setInteger(UI_INDEX, indexUsed);
 		compound.setInteger(UI_MODE, mode.ordinal());
 		super.writeToNBT(compound);
-		NetworkDebug.networkWriteHook(compound, world, this);
 		return compound;
 	}
 

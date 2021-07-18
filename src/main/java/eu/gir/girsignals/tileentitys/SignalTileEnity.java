@@ -5,11 +5,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.gson.JsonPrimitive;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.debug.NetworkDebug;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -43,7 +41,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		compound.setInteger(BLOCKID, blockID);
 		compound.setTag(PROPERTIES, comp);
 		super.writeToNBT(compound);
-		NetworkDebug.networkWriteHook(compound, world, this);
 		return compound;
 	}
 
@@ -70,7 +67,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 				});
 		if (comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));
-		NetworkDebug.networkReadHook(comp, world, new Object[] { this, new JsonPrimitive(__tmp == null) });
 		setBlockID();
 	}
 
