@@ -28,7 +28,7 @@ curseforge {
   project {
     id = '440990'
     changelog = file('changelog.md')
-    releaseType = 'beta'
+    releaseType = 'release'
     mainArtifact(jar) {
       relations {
         optionalDependency 'opencomputers'
