@@ -17,8 +17,7 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = "girsignals", name = "GIRSignals", version = "1.0.0", dependencies = "after:opencomputers", acceptedMinecraftVersions = "[1.12.2]", modLanguage = "java")
-
+@Mod(modid = GirsignalsMain.MODID, dependencies = "after:opencomputers", acceptedMinecraftVersions = "[1.12.2]")
 public class GirsignalsMain {
 
 	@Instance
