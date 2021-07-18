@@ -1,5 +1,9 @@
 # Changelog
 
+## [Release] 7.18.2021 - 2
+
+First release! (Removed debugging!)
+
 ## [Fix] 7.18.2021 - 1
 * Fixed version not correctly used and shown by the forge system
 
