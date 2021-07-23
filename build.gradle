@@ -89,15 +89,6 @@ jar {
     }
 }
 
-processResources {
-    from(sourceSets.main.resources.srcDirs) {
-        include "mcmod.info"               
-        expand "version":System.getenv("APPVEYOR_BUILD_VERSION")
-    }
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "mcmod.info"
-    }
-}
 
 jar.finalizedBy('reobfJar')
 
