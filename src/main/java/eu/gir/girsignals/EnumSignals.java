@@ -36,25 +36,8 @@ public class EnumSignals {
 	}
 
 	public enum ZS32 implements Offable<ZS32> {
-		OFF(true), A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z1, Z2, Z3, Z4, Z5, Z6,
-		Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, ZS6(true), ZS8(true), ZS13(true);
-
-		private final boolean test;
-
-		private ZS32() {
-			this.test = false;
-		}
-
-		private ZS32(boolean test) {
-			this.test = test;
-		}
-
-		public String getDistant() {
-			if (test)
-				return name();
-			else
-				return "v" + name();
-		}
+		OFF, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z1, Z2, Z3, Z4, Z5, Z6,
+		Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, ZS6, ZS8, ZS13;
 	}
 
 	public enum MAST_SIGN implements Offable<MAST_SIGN> {
@@ -103,7 +86,7 @@ public class EnumSignals {
 		Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, A, E;
 
 		public String[] getOverlayRename() {
-			return new String[] { "overlay", "girsignals:blocks/zs3/n" + this.getName().toLowerCase() };
+			return new String[] { "overlay", "girsignals:blocks/zs3/" + this.getName().toLowerCase() };
 		}
 
 	}
@@ -141,7 +124,7 @@ public class EnumSignals {
 	}
 	
 	public enum NE implements DefaultName<NE> {
-		NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_small, NE6;
+		NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_small, NE5, NE6;
 	}
 	
 	public enum NE_ADDITION implements Offable<NE_ADDITION> {

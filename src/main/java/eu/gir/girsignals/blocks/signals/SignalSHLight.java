@@ -27,18 +27,18 @@ public class SignalSHLight extends Signal {
 	}
 	
 	@Override
-	public float getSignWidth(World world, BlockPos pos, SignalTileEnity te) {
+	public float getCustomnameSignWidth(World world, BlockPos pos, SignalTileEnity te) {
 		// TODO Auto-generated method stub
-		return super.getSignWidth(world, pos, te);
+		return super.getCustomnameSignWidth(world, pos, te);
 	}
 	
 	@Override
-	public float getOffsetX(World world, BlockPos pos, SignalTileEnity te) {
+	public float getCustomnameOffsetX(World world, BlockPos pos, SignalTileEnity te) {
 		return -12.5f;
 	}
 	
 	@Override
-	public float getOffsetZ(World world, BlockPos pos, SignalTileEnity te) {
+	public float getCustomnameOffsetZ(World world, BlockPos pos, SignalTileEnity te) {
 		return -6.3f;
 	}
 	

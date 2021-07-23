@@ -33,12 +33,12 @@ import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalAngel;
-import eu.gir.girsignals.blocks.SignalBUE;
-import eu.gir.girsignals.blocks.SignalBUELight;
-import eu.gir.girsignals.blocks.SignalEL;
-import eu.gir.girsignals.blocks.SignalNE;
-import eu.gir.girsignals.blocks.SignalOTHER;
-import eu.gir.girsignals.blocks.SignalRA;
+import eu.gir.girsignals.blocks.boards.SignalBUE;
+import eu.gir.girsignals.blocks.boards.SignalBUELight;
+import eu.gir.girsignals.blocks.boards.SignalEL;
+import eu.gir.girsignals.blocks.boards.SignalNE;
+import eu.gir.girsignals.blocks.boards.SignalOTHER;
+import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
@@ -108,7 +108,10 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 	@SuppressWarnings("rawtypes")
 	private static <T extends DefaultName> Predicate<IExtendedBlockState> withN(IUnlistedProperty<T> property,
 			Predicate<T> t) {
-		return ebs -> t.test(ebs.getValue(property));
+		return ebs -> { 
+			T val = ebs.getValue(property);
+			return val != null && t.test(val);
+		};
 	}
 
 	private static Predicate<IExtendedBlockState> hasAndIs(IUnlistedProperty<Boolean> property) {
@@ -180,9 +183,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			// Zs2, Zs2v, Zs3, Zs3v
 			for (ZS32 zs3 : ZS32.values()) {
 				cm.register("hv/hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)),
-						6.9f, "7", "girsignals:blocks/zs3/" + zs3.name());
-				cm.register("hv/hv_zs3v", with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)), 3f, "7",
-						"girsignals:blocks/zs3/" + zs3.getDistant());
+						6.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("hv/hv_zs3v", with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)), 3f, "overlay",
+						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			// VR0
 			cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR0)), 4, "lamp_yellow_1north",
@@ -219,11 +222,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ks/ks_mast4", ebs -> true, 4);
 			// Zs2, Zs2v, Zs3, Zs3v
 			for (ZS32 zs3 : ZS32.values()) {
-				cm.register("ks/ks_zs3", with(SignalKS.ZS3, pZs3 -> pZs3.equals(zs3)), 6, "15",
+				cm.register("ks/ks_zs3", with(SignalKS.ZS3, pZs3 -> pZs3.equals(zs3)), 6, "overlay",
 						"girsignals:blocks/zs3/" + zs3.name());
-				cm.register("ks/ks_zs3v", with(SignalKS.ZS3V, pZs3 -> pZs3.equals(zs3)), 4, "15",
-						"girsignals:blocks/zs3/" + zs3.getDistant());
-				cm.register("ks/ks_zs2", with(SignalKS.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "15",
+				cm.register("ks/ks_zs3v", with(SignalKS.ZS3V, pZs3 -> pZs3.equals(zs3)), 4, "overlay",
+						"girsignals:blocks/zs3/" + zs3.name());
+				cm.register("ks/ks_zs2", with(SignalKS.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			// KS off
@@ -319,7 +322,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
 			cm.register("hl/hl_mast3", ebs -> true, 3);
 			for (ZS32 zs3 : ZS32.values()) {
-				cm.register("hl/hl_zs2", with(SignalHL.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "signalnorth",
+				cm.register("hl/hl_zs2", with(SignalHL.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			cm.register("hl/hl_mast4", ebs -> true, 4);
@@ -578,6 +581,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ne/ne3_4", withN(SignalNE.NETYPE, NE.NE3_5::equals), 1, "2", "girsignals:blocks/ne/ne3_5");
 			cm.register("ne/ne3_4", withN(SignalNE.NETYPE, NE.NE4::equals), 1, "2", "girsignals:blocks/ne/ne4");
 			cm.register("ne/ne4_small", withN(SignalNE.NETYPE, NE.NE4_small::equals), 0);
+			cm.register("lf/lf3_5", withN(SignalNE.NETYPE, NE.NE5::equals) , 1, "overlay", "girsignals:blocks/zs3/h");
 			cm.register("ne/ne6", withN(SignalNE.NETYPE, NE.NE6::equals), 1, "2", "girsignals:blocks/ne/ne6");
 			cm.register("ne/ne6_mast", withN(SignalNE.NETYPE, NE.NE6::equals), 0);
 			cm.register("ne/ne2_2", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE1)).and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);

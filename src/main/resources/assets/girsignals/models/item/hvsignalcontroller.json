@@ -1,3 +1,1 @@
-{ 
-	"parent": "girsignals:block/hvsignalcontroller"
-}
+{"parent": "girsignals:block/hvsignalcontroller", "credit": "Made with Blockbench by Mc_Jeronimo"}

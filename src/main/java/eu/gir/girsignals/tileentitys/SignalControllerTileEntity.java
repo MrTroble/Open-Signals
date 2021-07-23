@@ -1,16 +1,16 @@
 package eu.gir.girsignals.tileentitys;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
-import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.debug.NetworkDebug;
+import eu.gir.girsignals.guis.GuiSignalController.EnumMode;
 import eu.gir.girsignals.items.Linkingtool;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -25,22 +25,45 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
 import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class SignalControllerTileEntity extends TileEntity implements SimpleComponent {
-	
+public class SignalControllerTileEntity extends TileEntity implements SimpleComponent, IWorldNameable {
+
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
+	private int signalTypeCache = -1;
+	private String signame = null;
+	private EnumRedstoneMode rsMode = EnumRedstoneMode.SINGLE;
+	private final int[] facingRedstoneModes = new int[EnumFacing.values().length];
+	public EnumMode mode = EnumMode.MANUELL;
+	public EnumFacing face = EnumFacing.DOWN;
+	public int indexUsed = 0;
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
 	private static final String ID_Z = "zLinkedPos";
+	private static final String RS_MODE = "rsMode";
+	private static final String FACEING_MODES = "faceModes";
+	
+	private static final String UI_FACE = "uiface";
+	private static final String UI_MODE = "uimode";
+	private static final String UI_INDEX = "uiindex";
+
+	public SignalControllerTileEntity() {
+		Arrays.fill(facingRedstoneModes, 0xFF);
+	}
+
+	public static enum EnumRedstoneMode {
+		SINGLE, MUX
+	}
 
 	public static BlockPos readBlockPosFromNBT(NBTTagCompound compound) {
 		if (compound != null && compound.hasKey(ID_X) && compound.hasKey(ID_Y) && compound.hasKey(ID_Z)) {
@@ -60,17 +83,26 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
+		rsMode = EnumRedstoneMode.values()[compound.getInteger(RS_MODE)];
+		int[] newArr = compound.getIntArray(FACEING_MODES);
+		this.face = EnumFacing.values()[compound.getInteger(UI_FACE)];
+		this.indexUsed = compound.getInteger(UI_INDEX);
+		this.mode = EnumMode.values()[compound.getInteger(UI_MODE)];
+		System.arraycopy(newArr, 0, facingRedstoneModes, 0, facingRedstoneModes.length);
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
-		NetworkDebug.networkReadHook(compound, world, this);
 	}
 
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		writeBlockPosToNBT(linkedSignalPosition, compound);
+		compound.setInteger(RS_MODE, rsMode.ordinal());
+		compound.setIntArray(FACEING_MODES, facingRedstoneModes);
+		compound.setInteger(UI_FACE, face.ordinal());
+		compound.setInteger(UI_INDEX, indexUsed);
+		compound.setInteger(UI_MODE, mode.ordinal());
 		super.writeToNBT(compound);
-		NetworkDebug.networkWriteHook(compound, world, this);
 		return compound;
 	}
 
@@ -93,8 +125,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	public void onLink() {
 		new Thread(() -> {
-			while(!world.isBlockLoaded(pos)) continue;
-			GirsignalsMain.LOG.info("Block loading finished!");
+			while (!world.isBlockLoaded(pos))
+				continue;
 			loadChunkAndGetTile((sigtile, ch) -> {
 				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
 
@@ -108,8 +140,11 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 					}
 					return null;
 				}, null);
-				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
+				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue)
+						.toArray();
 				tableOfSupportedSignalTypes = supportedSignaleStates;
+				signalTypeCache = ((Signal) ch.getBlockState(linkedSignalPosition).getBlock()).getID();
+				signame = sigtile.getName();
 			});
 		}).start();
 	}
@@ -145,7 +180,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	public boolean loadChunkAndGetTile(BiConsumer<SignalTileEnity, Chunk> consumer) {
-		if(linkedSignalPosition == null)
+		if (linkedSignalPosition == null)
 			return false;
 		try {
 			Callable<Boolean> call = () -> {
@@ -164,7 +199,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				if (ch == null)
 					return false;
 				entity = ch.getTileEntity(linkedSignalPosition, EnumCreateEntityType.IMMEDIATE);
-				boolean flag2 = entity instanceof SignalTileEnity && ((SignalTileEnity)entity).getBlockID() != -1;
+				boolean flag2 = entity instanceof SignalTileEnity && ((SignalTileEnity) entity).getBlockID() != -1;
 				if (flag2) {
 					consumer.accept((SignalTileEnity) entity, ch);
 				}
@@ -181,7 +216,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				return flag2;
 			};
 			MinecraftServer mcserver = world.getMinecraftServer();
-			if(mcserver == null)
+			if (mcserver == null)
 				return Minecraft.getMinecraft().addScheduledTask(call).get();
 			return mcserver.callFromMainThread(call).get();
 		} catch (Exception e) {
@@ -193,7 +228,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public boolean hasLinkImpl() {
 		if (linkedSignalPosition == null)
 			return false;
-		if (loadChunkAndGetTile((x,y) -> {}))
+		if (loadChunkAndGetTile((x, y) -> {
+		}))
 			return true;
 		if (!world.isRemote)
 			unlink();
@@ -246,14 +282,10 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSignalType(Context context, Arguments args) {
-		return new Object[] { getSignalTypeImpl() };
+		return new Object[] { Signal.SIGNALLIST.get(getSignalTypeImpl()).getSignalTypeName() };
 	}
 
-	private String signalTypeCache = null;
-
-	public String getSignalTypeImpl() {
-		if (signalTypeCache == null)
-			loadChunkAndGetTile((tile, ch) -> signalTypeCache = Signal.SIGNALLIST.get(tile.getBlockID()).getSignalTypeName());
+	public int getSignalTypeImpl() {
 		return signalTypeCache;
 	}
 
@@ -267,10 +299,10 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public int getSignalStateImpl(int type) {
 		if (!find(getSupportedSignalTypesImpl(), type))
 			return -1;
-		AtomicReference<SignalTileEnity> entity = new AtomicReference<SignalTileEnity>();
+		final AtomicReference<SignalTileEnity> entity = new AtomicReference<SignalTileEnity>();
 		loadChunkAndGetTile((sig, ch) -> entity.set(sig));
-		SignalTileEnity tile = entity.get();
-		if(tile == null)
+		final SignalTileEnity tile = entity.get();
+		if (tile == null)
 			return -1;
 		Signal block = (Signal) Signal.SIGNALLIST.get(tile.getBlockID());
 		SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
@@ -289,4 +321,50 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return "signalcontroller";
 	}
 
+	@Override
+	public String getName() {
+		return this.signame;
+	}
+
+	@Override
+	public boolean hasCustomName() {
+		return this.signame != null;
+	}
+
+	public EnumRedstoneMode getRsMode() {
+		return rsMode;
+	}
+
+	public void setRsMode(EnumRedstoneMode rsMode) {
+		this.rsMode = rsMode;
+	}
+
+	public void setFacingData(final EnumFacing face, final int data) {
+		facingRedstoneModes[face.ordinal()] = data;
+	}
+
+	public int[] getFacingData() {
+		return facingRedstoneModes;
+	}
+
+	public void redstoneUpdate(final EnumFacing face, final boolean state) {
+		if (rsMode == EnumRedstoneMode.SINGLE) {
+			final int id = facingRedstoneModes[face.ordinal()];
+			if (id < 0)
+				return;
+			final int signalTypeId = id & 0x000000FF;
+			if (signalTypeId < listOfSupportedIndicies.length) {
+				final int signalData = (id & 0x0000FF00) >> 8;
+				final int signalDataOff = (id & 0x00FF0000) >> 16;
+				final int sigType = listOfSupportedIndicies[signalTypeId];
+				this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
+			}
+		}
+	}
+	
+	public void setUIState(final EnumMode mode, final EnumFacing face, final int indexUsed) {
+		this.mode = mode;
+		this.face = face;
+		this.indexUsed = indexUsed;
+	}
 }

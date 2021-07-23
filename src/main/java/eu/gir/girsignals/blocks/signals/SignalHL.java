@@ -25,4 +25,5 @@ public class SignalHL extends Signal {
 	public static final SEProperty<Boolean> NE2_2 = SEProperty.of("ne2_2", false);
 	public static final SEProperty<Boolean> NE2_4 = SEProperty.of("ne2_4", false);
 	public static final SEProperty<ZS32> ZS2 = SEProperty.of("zs2", ZS32.OFF);
+	
 }

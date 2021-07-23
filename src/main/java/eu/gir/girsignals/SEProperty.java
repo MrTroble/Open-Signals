@@ -76,13 +76,13 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 		} else if (obj instanceof Boolean) {
 			return ((Boolean) obj).booleanValue() ? 1 : 0;
 		}
-		throw new IllegalArgumentException("Given paramter is not a exceptable value!");
+		throw new IllegalArgumentException("Given parameter is not a exceptable value!");
 	}
 
 	@SuppressWarnings("unchecked")
 	public T getObjFromID(int obj) {
 		if (!isValid(obj))
-			throw new IllegalArgumentException("Given paramter is not a exceptable value!");
+			throw new IllegalArgumentException("Given parameter is not a exceptable value! Val: " + obj + " - Prop: " + this.getName());
 		if (getType().isEnum()) {
 			return (T) getType().getEnumConstants()[obj];
 		} else if (getType().equals(Boolean.class)) {

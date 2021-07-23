@@ -8,6 +8,9 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 
 public class SignalHV extends Signal {
 
@@ -25,4 +28,15 @@ public class SignalHV extends Signal {
 	public static final SEProperty<ZS32> ZS3V = SEProperty.of("zs3v", ZS32.OFF);
 	public static final SEProperty<Boolean> ZS1 = SEProperty.of("zs1", false);
 	public static final SEProperty<Boolean> ZS7 = SEProperty.of("zs7", false);
+	
+	@Override
+	public boolean hasCostumColor() {
+		return true;
+	}
+	
+	@Override
+	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
+		return tintIndex == 1 ? 0xFF9323:0xFFFFFF;
+	}
+
 }
