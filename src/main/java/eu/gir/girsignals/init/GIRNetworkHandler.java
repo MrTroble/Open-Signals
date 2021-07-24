@@ -6,6 +6,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.GuiSignalController.EnumMode;
+import eu.gir.girsignals.guis.GuiSignalController.EnumMuxMode;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
@@ -68,7 +69,7 @@ public class GIRNetworkHandler {
 			readFromPos(payBuf, world, tile -> tile.setRsMode(EnumRedstoneMode.values()[payBuf.readInt()]));
 			break;
 		case SIG_CON_SAVE_UI_STATE:
-			readFromPos(payBuf, world, tile -> tile.setUIState(EnumMode.values()[payBuf.readInt()], EnumFacing.values()[payBuf.readInt()], payBuf.readInt()));
+			readFromPos(payBuf, world, tile -> tile.setUIState(EnumMode.values()[payBuf.readInt()], EnumFacing.values()[payBuf.readInt()], payBuf.readInt(), EnumMuxMode.values()[payBuf.readInt()]));
 			break;
 		default:
 			throw new IllegalArgumentException("Wrong packet ID in network recive!");

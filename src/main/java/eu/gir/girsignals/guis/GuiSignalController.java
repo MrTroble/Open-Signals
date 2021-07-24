@@ -69,6 +69,10 @@ public class GuiSignalController extends GuiContainer {
 		MANUELL, REDSTONE
 	}
 
+	public static enum EnumMuxMode {
+		MUX_CONTROL, SIGNAL_CONTROL
+	}
+
 	public class Setting {
 		public final IIntegerable<?> iintg;
 		public final String name;
@@ -176,28 +180,65 @@ public class GuiSignalController extends GuiContainer {
 					? SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]))
 					: null;
 
-			final Setting[] settingList = new Setting[] {
-					new Setting(new EnumIntegerable<>(EnumRedstoneMode.class), "rsmode", sigController.rsMode.ordinal(), in -> {
+			final Setting rs_mode_setting = new Setting(new EnumIntegerable<>(EnumRedstoneMode.class), "rsmode",
+					sigController.rsMode.ordinal(), in -> {
 						sigController.rsMode = EnumRedstoneMode.values()[in];
 						sendToPos(GIRNetworkHandler.SIG_CON_RS_SET, buffer -> {
 							buffer.writeInt(in);
 						});
-					}), new Setting(new EnumIntegerable<>(EnumFacing.class), "face", sigController.faceUsed.ordinal(), in -> {
-						sigController.faceUsed = EnumFacing.values()[in];
-						initGui();
-					}), new Setting(possibleSignalTypesIntegerable, "sigtype", sigType > fLen ? fLen : sigType, in -> {
-						sigController.facingRedstoneModes[sigController.faceUsed.ordinal()] = pack(in, sigOn, sigOff);
-						sendPacked();
-						initGui();
-					}), new Setting(prop, "sigon", sigOn, in -> {
-						sigController.facingRedstoneModes[sigController.faceUsed.ordinal()] = pack(sigType, in, sigOff);
-						sendPacked();
-						initGui();
-					}), new Setting(prop, "sigoff", sigOff, in -> {
-						sigController.facingRedstoneModes[sigController.faceUsed.ordinal()] = pack(sigType, sigOn, in);
-						sendPacked();
-						initGui();
-					}) };
+					});
+
+			final Setting[] settingList = sigController.rsMode == EnumRedstoneMode.SINGLE
+					? new Setting[] { rs_mode_setting, new Setting(new EnumIntegerable<>(EnumFacing.class), "face",
+							sigController.faceUsed.ordinal(), in -> {
+								sigController.faceUsed = EnumFacing.values()[in];
+								initGui();
+							}), new Setting(possibleSignalTypesIntegerable, "sigtype", sigType > fLen ? fLen : sigType,
+									in -> {
+										sigController.facingRedstoneModes[sigController.faceUsed.ordinal()] = pack(in,
+												sigOn, sigOff);
+										sendPacked();
+										initGui();
+									}),
+							new Setting(prop, "sigon", sigOn, in -> {
+								sigController.facingRedstoneModes[sigController.faceUsed.ordinal()] = pack(sigType, in,
+										sigOff);
+								sendPacked();
+								initGui();
+							}), new Setting(prop, "sigoff", sigOff, in -> {
+								sigController.facingRedstoneModes[sigController.faceUsed.ordinal()] = pack(sigType,
+										sigOn, in);
+								sendPacked();
+								initGui();
+							}) }
+					: new Setting[] { rs_mode_setting, new Setting(new EnumIntegerable<>(EnumMuxMode.class), "muxmode",
+							sigController.muxMode.ordinal(), in -> {
+								sigController.muxMode = EnumMuxMode.values()[in];
+								for(int i = 0; i < sigController.facingRedstoneModes.length; i++) {
+									if(sigController.facingRedstoneModes[i] == in) {
+										sigController.faceUsed = EnumFacing.values()[i];
+										break;
+									}
+								}
+								initGui();
+							}), new Setting(new EnumIntegerable<>(EnumFacing.class), "face",
+									sigController.faceUsed.ordinal(), in -> {
+										sigController.faceUsed = EnumFacing.values()[in];
+										for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
+											if(sigController.facingRedstoneModes[i] == sigController.muxMode.ordinal()) {
+												final int idx = i;
+												sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, bf -> {
+													bf.writeInt(idx);
+													bf.writeInt(3);
+												});
+											}
+										}
+										sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, bf -> {
+											bf.writeInt(in);
+											bf.writeInt(sigController.muxMode.ordinal());
+										});
+										initGui();
+									}) };
 
 			pageList.add(Lists.newArrayList());
 			yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
@@ -222,8 +263,8 @@ public class GuiSignalController extends GuiContainer {
 			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
 					idx -> (String) (idx + "/" + (pageList.size() - 1)));
 			final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
-					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", sigController.indexCurrentlyUsed,
-					inp -> {
+					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page",
+					sigController.indexCurrentlyUsed, inp -> {
 						pageList.get(sigController.indexCurrentlyUsed).forEach(visible(false));
 						pageList.get(inp).forEach(visible(true));
 						sigController.indexCurrentlyUsed = inp;
@@ -306,6 +347,7 @@ public class GuiSignalController extends GuiContainer {
 			buf.writeInt(sigController.indexMode.ordinal());
 			buf.writeInt(sigController.faceUsed.ordinal());
 			buf.writeInt(sigController.indexCurrentlyUsed);
+			buf.writeInt(sigController.muxMode.ordinal());
 		});
 	}
 
@@ -391,7 +433,7 @@ public class GuiSignalController extends GuiContainer {
 		});
 		updateDraw();
 	}
-	
+
 	private void sendToPos(final byte id, final Consumer<ByteBuf> consumer) {
 		ByteBuf buffer = Unpooled.buffer();
 		buffer.writeByte(id);
