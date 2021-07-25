@@ -1,5 +1,9 @@
 # Changelog
 
+## [Addition] 7.24.2021 - 1
+* Added Multiplex Modus to Signal Controller
+(You maybe need to study IT to use it tho)
+
 ## [Update/Fixes] 7.18.2021 - 3 
 * Updated Controller Texture
 * Updated Lang Keys

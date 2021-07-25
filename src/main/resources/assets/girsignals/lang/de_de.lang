@@ -129,3 +129,5 @@ property.north.name=Norden
 property.south.name=Süden
 property.west.name=Westen
 property.east.name=Osten
+
+property.muxmode.name=Mux Modus

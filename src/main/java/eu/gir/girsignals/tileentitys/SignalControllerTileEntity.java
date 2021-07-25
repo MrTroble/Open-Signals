@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
@@ -11,6 +12,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.GuiSignalController.EnumMode;
+import eu.gir.girsignals.guis.GuiSignalController.EnumMuxMode;
 import eu.gir.girsignals.items.Linkingtool;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -45,17 +47,21 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	private final int[] facingRedstoneModes = new int[EnumFacing.values().length];
 	public EnumMode mode = EnumMode.MANUELL;
 	public EnumFacing face = EnumFacing.DOWN;
+	public EnumMuxMode muxmode = EnumMuxMode.MUX_CONTROL;
+	public int nextSignal = 0;
 	public int indexUsed = 0;
+	public int lastMuxState = 0;
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
 	private static final String ID_Z = "zLinkedPos";
 	private static final String RS_MODE = "rsMode";
 	private static final String FACEING_MODES = "faceModes";
-	
+
 	private static final String UI_FACE = "uiface";
 	private static final String UI_MODE = "uimode";
 	private static final String UI_INDEX = "uiindex";
+	private static final String UI_MUX = "uimux";
 
 	public SignalControllerTileEntity() {
 		Arrays.fill(facingRedstoneModes, 0xFF);
@@ -88,6 +94,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		this.face = EnumFacing.values()[compound.getInteger(UI_FACE)];
 		this.indexUsed = compound.getInteger(UI_INDEX);
 		this.mode = EnumMode.values()[compound.getInteger(UI_MODE)];
+		this.muxmode = EnumMuxMode.values()[compound.getInteger(UI_MUX)];
 		System.arraycopy(newArr, 0, facingRedstoneModes, 0, facingRedstoneModes.length);
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
@@ -102,6 +109,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		compound.setInteger(UI_FACE, face.ordinal());
 		compound.setInteger(UI_INDEX, indexUsed);
 		compound.setInteger(UI_MODE, mode.ordinal());
+		compound.setInteger(UI_MUX, muxmode.ordinal());
 		super.writeToNBT(compound);
 		return compound;
 	}
@@ -269,14 +277,19 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public boolean changeSignalImpl(int type, int newSignal) {
 		if (!find(getSupportedSignalTypesImpl(), type))
 			return false;
+		final AtomicBoolean rtc = new AtomicBoolean(true);
 		loadChunkAndGetTile((tile, chunk) -> {
 			IBlockState state = chunk.getBlockState(linkedSignalPosition);
 			Signal block = (Signal) state.getBlock();
 			SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
+			if(!prop.isValid(newSignal)) {
+				rtc.set(false);
+				return;
+			}
 			tile.setProperty(prop, prop.getObjFromID(newSignal));
 			world.markAndNotifyBlock(linkedSignalPosition, chunk, state, state, 3);
 		});
-		return true;
+		return rtc.get();
 	}
 
 	@Callback
@@ -337,6 +350,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	public void setRsMode(EnumRedstoneMode rsMode) {
 		this.rsMode = rsMode;
+		Arrays.fill(facingRedstoneModes, rsMode == EnumRedstoneMode.MUX ? 3:listOfSupportedIndicies.length);
 	}
 
 	public void setFacingData(final EnumFacing face, final int data) {
@@ -359,12 +373,36 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				final int sigType = listOfSupportedIndicies[signalTypeId];
 				this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
 			}
+		} else if (rsMode == EnumRedstoneMode.MUX) {
+			final int id = facingRedstoneModes[face.ordinal()];
+			if (id < 0 || id >= EnumMuxMode.values().length)
+				return;
+			final EnumMuxMode muxmode = EnumMuxMode.values()[id];
+			if (muxmode == EnumMuxMode.MUX_CONTROL) {
+				final boolean lastState = (lastMuxState & 1) != 0;
+				if(lastState == state)
+					return;
+				lastMuxState = state ? 1 + (lastMuxState & 2):lastMuxState & 2;
+				nextSignal++;
+				if (nextSignal >= listOfSupportedIndicies.length)
+					nextSignal = 0;
+			} else if(muxmode == EnumMuxMode.SIGNAL_CONTROL) {			
+				final boolean lastState = (lastMuxState & 2) != 0;
+				if(lastState == state)
+					return;
+				lastMuxState = state ? 2 + (lastMuxState & 1):lastMuxState & 1;
+				final int sigType = listOfSupportedIndicies[nextSignal];
+				final int newSignal = this.getSignalStateImpl(sigType) + 1;
+				if(!this.changeSignalImpl(sigType, newSignal))
+					this.changeSignalImpl(sigType, 0);
+			}
 		}
 	}
-	
-	public void setUIState(final EnumMode mode, final EnumFacing face, final int indexUsed) {
+
+	public void setUIState(final EnumMode mode, final EnumFacing face, final int indexUsed, final EnumMuxMode muxmode) {
 		this.mode = mode;
 		this.face = face;
 		this.indexUsed = indexUsed;
+		this.muxmode = muxmode;
 	}
 }
