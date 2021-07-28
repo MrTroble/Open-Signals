@@ -1,5 +1,8 @@
 # Changelog
 
+## [Hotfix] 7.28.2021 - 1
+* Fixed an issue while block loading!
+
 ## [Addition] 7.24.2021 - 1
 * Added Multiplex Modus to Signal Controller
 (You maybe need to study IT to use it tho)

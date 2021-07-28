@@ -95,7 +95,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		this.indexUsed = compound.getInteger(UI_INDEX);
 		this.mode = EnumMode.values()[compound.getInteger(UI_MODE)];
 		this.muxmode = EnumMuxMode.values()[compound.getInteger(UI_MUX)];
-		System.arraycopy(newArr, 0, facingRedstoneModes, 0, facingRedstoneModes.length);
+		if(newArr != null && newArr.length == facingRedstoneModes.length)
+			System.arraycopy(newArr, 0, facingRedstoneModes, 0, facingRedstoneModes.length);
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
