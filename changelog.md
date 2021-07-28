@@ -1,5 +1,8 @@
 # Changelog
 
+## [Fixed] 7.28.2021 - 2
+* Fixed issue with startup
+
 ## [Hotfix] 7.28.2021 - 1
 * Fixed an issue while block loading!
 
