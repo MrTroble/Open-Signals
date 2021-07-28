@@ -363,6 +363,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	}
 
 	public void redstoneUpdate(final EnumFacing face, final boolean state) {
+		if(listOfSupportedIndicies == null)
+			return;
 		if (rsMode == EnumRedstoneMode.SINGLE) {
 			final int id = facingRedstoneModes[face.ordinal()];
 			if (id < 0)
