@@ -38,7 +38,7 @@ public class GIRNetworkHandler {
 	public static final byte SIG_CON_RS_FACING_UPDATE_SET = 2;
 	public static final byte SIG_CON_RS_SET = 3;
 	public static final byte SIG_CON_SAVE_UI_STATE = 4;
-
+	
 	@SubscribeEvent
 	public void onCustomPacket(ServerCustomPacketEvent event) {
 		FMLProxyPacket packet = event.getPacket();

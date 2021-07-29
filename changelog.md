@@ -1,5 +1,8 @@
 # Changelog
 
+## [Fixed] 7.30.2021 - 1
+* Fixed issue with server client sync on redstone single mode
+
 ## [Fixed] 7.28.2021 - 2
 * Fixed issue with startup
 

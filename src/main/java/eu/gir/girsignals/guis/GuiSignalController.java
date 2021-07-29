@@ -172,9 +172,10 @@ public class GuiSignalController extends GuiContainer {
 				return I18n.format("property." + name + ".name");
 			});
 			final int config = sigController.facingRedstoneModes[sigController.faceUsed.ordinal()];
-			final int sigType = config & 0x000000FF;
-			final int sigOn = (config & 0x0000FF00) >> 8;
-			final int sigOff = (config & 0x00FF0000) >> 16;
+			final int[] unpacked = SignalControllerTileEntity.unpack(config);
+			final int sigType = unpacked[0];
+			final int sigOn = unpacked[1];
+			final int sigOff = unpacked[2];
 
 			final SEProperty<?> prop = sigType < sigController.supportedSigTypes.length
 					? SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]))
@@ -193,29 +194,16 @@ public class GuiSignalController extends GuiContainer {
 							sigController.faceUsed.ordinal(), in -> {
 								sigController.faceUsed = EnumFacing.values()[in];
 								initGui();
-							}), new Setting(possibleSignalTypesIntegerable, "sigtype", sigType > fLen ? fLen : sigType,
-									in -> {
-										sigController.facingRedstoneModes[sigController.faceUsed.ordinal()] = pack(in,
-												sigOn, sigOff);
-										sendPacked();
-										initGui();
-									}),
-							new Setting(prop, "sigon", sigOn, in -> {
-								sigController.facingRedstoneModes[sigController.faceUsed.ordinal()] = pack(sigType, in,
-										sigOff);
-								sendPacked();
-								initGui();
-							}), new Setting(prop, "sigoff", sigOff, in -> {
-								sigController.facingRedstoneModes[sigController.faceUsed.ordinal()] = pack(sigType,
-										sigOn, in);
-								sendPacked();
-								initGui();
-							}) }
+							}),
+							new Setting(possibleSignalTypesIntegerable, "sigtype", sigType > fLen ? fLen : sigType,
+									in -> sendPacked(pack(in, sigOn, sigOff))),
+							new Setting(prop, "sigon", sigOn, in -> sendPacked(pack(sigType, in, sigOff))),
+							new Setting(prop, "sigoff", sigOff, in -> sendPacked(pack(sigType, sigOn, in))) }
 					: new Setting[] { rs_mode_setting, new Setting(new EnumIntegerable<>(EnumMuxMode.class), "muxmode",
 							sigController.muxMode.ordinal(), in -> {
 								sigController.muxMode = EnumMuxMode.values()[in];
-								for(int i = 0; i < sigController.facingRedstoneModes.length; i++) {
-									if(sigController.facingRedstoneModes[i] == in) {
+								for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
+									if (sigController.facingRedstoneModes[i] == in) {
 										sigController.faceUsed = EnumFacing.values()[i];
 										break;
 									}
@@ -225,7 +213,8 @@ public class GuiSignalController extends GuiContainer {
 									sigController.faceUsed.ordinal(), in -> {
 										sigController.faceUsed = EnumFacing.values()[in];
 										for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
-											if(sigController.facingRedstoneModes[i] == sigController.muxMode.ordinal()) {
+											if (sigController.facingRedstoneModes[i] == sigController.muxMode
+													.ordinal()) {
 												final int idx = i;
 												sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, bf -> {
 													bf.writeInt(idx);
@@ -279,16 +268,17 @@ public class GuiSignalController extends GuiContainer {
 		updateDraw();
 	}
 
-	public void sendPacked() {
+	public void sendPacked(final int packed) {
 		final ContainerSignalController sigController = ((ContainerSignalController) this.inventorySlots);
 		sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, buffer -> {
 			buffer.writeInt(sigController.faceUsed.ordinal());
-			buffer.writeInt(sigController.facingRedstoneModes[sigController.faceUsed.ordinal()]);
+			buffer.writeInt(packed);
 		});
 	}
 
 	public int pack(final int sigTypeID, final int onSig, final int offSig) {
-		return (sigTypeID & 0x000000FF) | ((onSig & 0x000000FF) << 8) | ((offSig & 0x000000FF) << 16);
+		return (sigTypeID & 0b00000000000000000000000000001111) | ((onSig & 0b00000000000000000000000000111111) << 4)
+				| ((offSig & 0b00000000000000000000000000111111) << 10);
 	}
 
 	public static class EnumIntegerable<T extends Enum<T>> implements IIntegerable<T> {
