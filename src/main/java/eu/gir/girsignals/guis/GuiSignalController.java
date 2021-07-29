@@ -172,13 +172,10 @@ public class GuiSignalController extends GuiContainer {
 				return I18n.format("property." + name + ".name");
 			});
 			final int config = sigController.facingRedstoneModes[sigController.faceUsed.ordinal()];
-			final int sigType = config & 0x000000FF;
-			final int sigOn = (config & 0x0000FF00) >> 8;
-			final int sigOff = (config & 0x00FF0000) >> 16;
-			
-			System.out.println(sigType);
-			System.out.println(sigOn);
-			System.out.println(sigOff);
+			final int[] unpacked = SignalControllerTileEntity.unpack(config);
+			final int sigType = unpacked[0];
+			final int sigOn = unpacked[1];
+			final int sigOff = unpacked[2];
 
 			final SEProperty<?> prop = sigType < sigController.supportedSigTypes.length
 					? SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]))
@@ -280,7 +277,8 @@ public class GuiSignalController extends GuiContainer {
 	}
 
 	public int pack(final int sigTypeID, final int onSig, final int offSig) {
-		return (sigTypeID & 0x000000FF) | ((onSig & 0x000000FF) << 8) | ((offSig & 0x000000FF) << 16);
+		return (sigTypeID & 0b00000000000000000000000000001111) | ((onSig & 0b00000000000000000000000000111111) << 4)
+				| ((offSig & 0b00000000000000000000000000111111) << 10);
 	}
 
 	public static class EnumIntegerable<T extends Enum<T>> implements IIntegerable<T> {

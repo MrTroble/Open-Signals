@@ -362,6 +362,14 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return facingRedstoneModes;
 	}
 
+	public static int[] unpack(final int x) {
+		return new int[] {
+				 (x & 0b00000000000000000000000000001111),
+				((x & 0b00000000000000000000001111110000) >> 4),
+				((x & 0b00000000000000001111110000000000) >> 10)
+		};
+	}
+
 	public void redstoneUpdate(final EnumFacing face, final boolean state) {
 		if(listOfSupportedIndicies == null)
 			return;
@@ -369,10 +377,11 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			final int id = facingRedstoneModes[face.ordinal()];
 			if (id < 0)
 				return;
-			final int signalTypeId = id & 0x000000FF;
+			final int[] unpacked = unpack(id);
+			final int signalTypeId = unpacked[0];
 			if (signalTypeId < listOfSupportedIndicies.length) {
-				final int signalData = (id & 0x0000FF00) >> 8;
-				final int signalDataOff = (id & 0x00FF0000) >> 16;
+				final int signalData = unpacked[1];
+				final int signalDataOff = unpacked[2];
 				final int sigType = listOfSupportedIndicies[signalTypeId];
 				this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
 			}

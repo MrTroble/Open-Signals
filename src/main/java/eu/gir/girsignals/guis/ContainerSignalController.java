@@ -111,7 +111,6 @@ public class ContainerSignalController extends Container {
 		for (int i = 0; i < facingRedstoneModes.length; i++) {
 			if (rsmodeface[i] != facingRedstoneModes[i]) {
 				facingRedstoneModes[i] = rsmodeface[i];
-				System.out.println("SEND " + i);
 				for (final IContainerListener listener : listeners) {
 					listener.sendWindowProperty(this, i + RS_MODES_OFFSET, facingRedstoneModes[i]);
 				}
@@ -147,7 +146,6 @@ public class ContainerSignalController extends Container {
 			}
 		} else if (id >= RS_MODES_OFFSET) {
 			facingRedstoneModes[id - RS_MODES_OFFSET] = data;
-			System.out.println(Arrays.toString(facingRedstoneModes));
 		} else {
 			switch (id) {
 			case LINK_MSG:
