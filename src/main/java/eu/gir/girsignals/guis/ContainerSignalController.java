@@ -107,7 +107,7 @@ public class ContainerSignalController extends Container {
 			}
 		}
 
-		final int[] rsmodeface = this.entity.getFacingData();
+		final int[] rsmodeface = this.entity.getFacingData().clone();
 		for (int i = 0; i < facingRedstoneModes.length; i++) {
 			if (rsmodeface[i] != facingRedstoneModes[i]) {
 				facingRedstoneModes[i] = rsmodeface[i];

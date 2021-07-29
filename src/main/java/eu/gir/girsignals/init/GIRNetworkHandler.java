@@ -62,6 +62,7 @@ public class GIRNetworkHandler {
 			readFromPos(payBuf, world, tile -> {
 				final EnumFacing facing = EnumFacing.values()[payBuf.readInt()];
 				final int data = payBuf.readInt();
+				System.out.println("RCV DATA" + data);
 				tile.setFacingData(facing, data);
 			});
 			break;
