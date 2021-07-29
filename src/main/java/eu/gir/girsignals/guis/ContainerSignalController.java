@@ -54,7 +54,7 @@ public class ContainerSignalController extends Container {
 	}
 
 	private static final int LINK_MSG = -1, SIGNAL_TYPE_MSG = -2, UPDATE_ARRAY = -3, TYPE_OFFSET = 4096,
-			RS_MODE_MSG = -4, RS_MODES_OFFSET = 8192, UI_MODE = -5, UI_FACE = -6, UI_INDEX = -7, UI_MUX = -8;
+			RS_MODE_MSG = -4, RS_MODES_OFFSET = 4196, UI_MODE = -5, UI_FACE = -6, UI_INDEX = -7, UI_MUX = -8;
 
 	@Override
 	public void addListener(IContainerListener listener) {
@@ -111,6 +111,7 @@ public class ContainerSignalController extends Container {
 		for (int i = 0; i < facingRedstoneModes.length; i++) {
 			if (rsmodeface[i] != facingRedstoneModes[i]) {
 				facingRedstoneModes[i] = rsmodeface[i];
+				System.out.println("SEND " + i);
 				for (final IContainerListener listener : listeners) {
 					listener.sendWindowProperty(this, i + RS_MODES_OFFSET, facingRedstoneModes[i]);
 				}
