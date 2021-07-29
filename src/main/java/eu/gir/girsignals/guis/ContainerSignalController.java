@@ -146,6 +146,7 @@ public class ContainerSignalController extends Container {
 			}
 		} else if (id >= RS_MODES_OFFSET) {
 			facingRedstoneModes[id - RS_MODES_OFFSET] = data;
+			System.out.println(Arrays.toString(facingRedstoneModes));
 		} else {
 			switch (id) {
 			case LINK_MSG:

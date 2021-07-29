@@ -351,7 +351,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	public void setRsMode(EnumRedstoneMode rsMode) {
 		this.rsMode = rsMode;
-		Arrays.fill(facingRedstoneModes, rsMode == EnumRedstoneMode.MUX ? 3:listOfSupportedIndicies.length);
+		Arrays.fill(facingRedstoneModes, rsMode == EnumRedstoneMode.MUX ? 3:0);
 	}
 
 	public void setFacingData(final EnumFacing face, final int data) {

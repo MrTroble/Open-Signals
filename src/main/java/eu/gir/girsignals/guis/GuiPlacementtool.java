@@ -98,7 +98,7 @@ public class GuiPlacementtool extends GuiScreen {
 		currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 	}
-
+	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
