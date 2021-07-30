@@ -20,10 +20,10 @@ public class SignalHL extends Signal {
 	public static final SEProperty<HL_DISTANT> DISTANTSIGNAL = SEProperty.of("mainlightsignal_distant", HL_DISTANT.OFF);
 	public static final SEProperty<HL_LIGHTBAR> LIGHTBAR = SEProperty.of("mainlightsignallightbar", HL_LIGHTBAR.OFF);
 	public static final SEProperty<MAST_SIGN> MASTSIGN = SEProperty.of("mastsign", MAST_SIGN.OFF, ChangeableStage.GUISTAGE);
-	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false);
-	public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false);
-	public static final SEProperty<Boolean> NE2_2 = SEProperty.of("ne2_2", false);
-	public static final SEProperty<Boolean> NE2_4 = SEProperty.of("ne2_4", false);
+	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false, ChangeableStage.GUISTAGE);
+	public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false, ChangeableStage.GUISTAGE);
+	public static final SEProperty<Boolean> NE2_2 = SEProperty.of("ne2_2", false, ChangeableStage.GUISTAGE);
+	public static final SEProperty<Boolean> NE2_4 = SEProperty.of("ne2_4", false, ChangeableStage.GUISTAGE);
 	public static final SEProperty<ZS32> ZS2 = SEProperty.of("zs2", ZS32.OFF);
 	
 }
