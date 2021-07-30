@@ -1,7 +1,6 @@
 package eu.gir.girsignals.blocks.boards;
 
-import eu.gir.girsignals.EnumSignals.OTHER_SIGAL;
-import eu.gir.girsignals.EnumSignals.ST_NUMBER;
+import eu.gir.girsignals.EnumSignals.OTHER_SIGNAL;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
@@ -16,15 +15,14 @@ public class SignalOTHER extends Signal {
 				.build());
 	}
 
-	public static final SEProperty<OTHER_SIGAL> OTHERTYPE = SEProperty.of("othertype", OTHER_SIGAL.HM,
+	public static final SEProperty<OTHER_SIGNAL> OTHERTYPE = SEProperty.of("othertype", OTHER_SIGNAL.HM,
 			ChangeableStage.GUISTAGE);
-	public static final SEProperty<ST_NUMBER> STATIONNUMBER = SEProperty.of("stationnumber", ST_NUMBER.Z1,
-			ChangeableStage.GUISTAGE);
+
 
 	@Override
 	public void renderOverlay(double x, double y, double z, SignalTileEnity te, FontRenderer font) {
 		super.renderOverlay(x, y, z, te, font,
-				te.getProperty(OTHERTYPE).filter(OTHER_SIGAL.HM::equals).isPresent() ? 2.1f
+				te.getProperty(OTHERTYPE).filter(OTHER_SIGNAL.HM::equals).isPresent() ? 2.1f
 						: this.prop.customNameRenderHeight);
 	}
 }

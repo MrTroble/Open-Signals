@@ -115,8 +115,8 @@ public class EnumSignals {
 		OFF, ADD, BUE4;
 	}
 
-	public enum OTHER_SIGAL implements DefaultName<OTHER_SIGAL> {
-		HM, OB, CROSS, STATION_NUMBER, STATION_NAME;
+	public enum OTHER_SIGNAL implements DefaultName<OTHER_SIGNAL> {
+		HM, OB, CROSS;
 	}
 
 	public enum ST_NUMBER implements DefaultName<ST_NUMBER> {
