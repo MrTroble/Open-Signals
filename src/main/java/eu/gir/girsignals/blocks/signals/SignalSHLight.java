@@ -5,14 +5,13 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class SignalSHLight extends Signal {
 
 	public SignalSHLight() {
-		super(GIRItems.PLACEMENT_TOOL, "SHLight", 0);
+		super(builder(GIRItems.PLACEMENT_TOOL, "SHLight").height(0).offsetX(-12.5f).offsetY(-6.3f).signHeight(0.35f).build());
 	}
 
 	public static final SEProperty<SH_LIGHT> SHLIGHT_0 = SEProperty.of("sh_light_bottom", SH_LIGHT.OFF);
@@ -27,26 +26,10 @@ public class SignalSHLight extends Signal {
 	}
 	
 	@Override
-	public float getCustomnameSignWidth(World world, BlockPos pos, SignalTileEnity te) {
-		// TODO Auto-generated method stub
-		return super.getCustomnameSignWidth(world, pos, te);
-	}
-	
-	@Override
-	public float getCustomnameOffsetX(World world, BlockPos pos, SignalTileEnity te) {
-		return -12.5f;
-	}
-	
-	@Override
-	public float getCustomnameOffsetZ(World world, BlockPos pos, SignalTileEnity te) {
-		return -6.3f;
-	}
-	
-	@Override
-	public float getCustomnameRenderHeight(World world, BlockPos pos, SignalTileEnity te) {
-		if(te != null && te.getProperty(SHLIGHT_2).isPresent())
-			return 2.35f;
-		return 0.35f;
-	}
-	
+	public void renderOverlay(double x, double y, double z, SignalTileEnity te, FontRenderer font) {
+		super.renderOverlay(x, y, z, te, font,
+				te.getProperty(SHLIGHT_2).isPresent() ? 2.35f
+						: this.prop.customNameRenderHeight);
+	}	
+		
 }

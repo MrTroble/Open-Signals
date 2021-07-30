@@ -15,7 +15,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalHV extends Signal {
 
 	public SignalHV() {
-		super(GIRItems.PLACEMENT_TOOL, "HV", 6, 2.775f);
+		super(builder(GIRItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f).build());
 	}
 
 	public static final SEProperty<HP> STOPSIGNAL = SEProperty.of("stopsignal", HP.OFF);
@@ -28,15 +28,15 @@ public class SignalHV extends Signal {
 	public static final SEProperty<ZS32> ZS3V = SEProperty.of("zs3v", ZS32.OFF);
 	public static final SEProperty<Boolean> ZS1 = SEProperty.of("zs1", false);
 	public static final SEProperty<Boolean> ZS7 = SEProperty.of("zs7", false);
-	
+
 	@Override
 	public boolean hasCostumColor() {
 		return true;
 	}
-	
+
 	@Override
 	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-		return tintIndex == 1 ? 0xFF9323:0xFFFFFF;
+		return tintIndex == 1 ? 0xFF9323 : 0xFFFFFF;
 	}
 
 }

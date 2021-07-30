@@ -7,13 +7,13 @@ import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.gui.FontRenderer;
 
 public class SignalOTHER extends Signal {
 
 	public SignalOTHER() {
-		super(GIRItems.SIGN_PLACEMENT_TOOL, "othersignal", 1);
+		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "othersignal").signScale(3.5f).offsetX(-5).offsetY(1.8f).noLink()
+				.build());
 	}
 
 	public static final SEProperty<OTHER_SIGAL> OTHERTYPE = SEProperty.of("othertype", OTHER_SIGAL.HM,
@@ -22,35 +22,9 @@ public class SignalOTHER extends Signal {
 			ChangeableStage.GUISTAGE);
 
 	@Override
-	public boolean canBeLinked() {
-		return false;
+	public void renderOverlay(double x, double y, double z, SignalTileEnity te, FontRenderer font) {
+		super.renderOverlay(x, y, z, te, font,
+				te.getProperty(OTHERTYPE).filter(OTHER_SIGAL.HM::equals).isPresent() ? 2.1f
+						: this.prop.customNameRenderHeight);
 	}
-
-	@Override
-	public float getCustomnameRenderHeight(World world, BlockPos pos, SignalTileEnity te) {
-		if (te == null || te.getProperty(OTHERTYPE).filter(OTHER_SIGAL.HM::equals).isPresent())
-			return 2.1f;
-		return super.getCustomnameRenderHeight(world, pos, te);
-	}
-
-	@Override
-	public float getCustomnameScale(World world, BlockPos pos, SignalTileEnity te) {
-		return 3.5f;
-	}
-
-	@Override
-	public float getCustomnameSignWidth(World world, BlockPos pos, SignalTileEnity te) {
-		return super.getCustomnameSignWidth(world, pos, te);
-	}
-
-	@Override
-	public float getCustomnameOffsetX(World world, BlockPos pos, SignalTileEnity te) {
-		return -5;
-	}
-
-	@Override
-	public float getCustomnameOffsetZ(World world, BlockPos pos, SignalTileEnity te) {
-		return 1.8f;
-	}
-
 }

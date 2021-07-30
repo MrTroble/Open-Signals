@@ -10,7 +10,7 @@ import eu.gir.girsignals.init.GIRItems;
 public class SignalTram extends Signal {
 
 	public SignalTram() {
-		super(GIRItems.PLACEMENT_TOOL, "TramSignal", 0);
+		super(builder(GIRItems.PLACEMENT_TOOL, "TramSignal").height(0).build());
 	}
 
 	public static final SEProperty<TRAM> TRAMSIGNAL = SEProperty.of("signaltram", TRAM.OFF);

@@ -10,7 +10,7 @@ import eu.gir.girsignals.init.GIRItems;
 public class SignalRA extends Signal {
 
 	public SignalRA() {
-		super(GIRItems.SIGN_PLACEMENT_TOOL, "rasignal", 0);
+		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0).build());
 	}
 
 	public static final SEProperty<RA> RATYPE = SEProperty.of("ratype", RA.RA10, ChangeableStage.GUISTAGE);

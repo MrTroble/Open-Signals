@@ -13,7 +13,7 @@ import eu.gir.girsignals.init.GIRItems;
 public class SignalHL extends Signal {
 
 	public SignalHL() {
-		super(GIRItems.PLACEMENT_TOOL, "HL", 6, 1.15f);
+		super(builder(GIRItems.PLACEMENT_TOOL, "HL").height(6).signHeight(1.15f).build());
 	}
 
 	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF);

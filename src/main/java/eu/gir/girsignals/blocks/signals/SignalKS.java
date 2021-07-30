@@ -15,7 +15,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalKS extends Signal {
 
 	public SignalKS() {
-		super(GIRItems.PLACEMENT_TOOL, "KS", 6, 4.95f);
+		super(builder(GIRItems.PLACEMENT_TOOL, "KS").height(6).signHeight(4.95f).build());
 	}
 
 	public static final SEProperty<KS> STOPSIGNAL = SEProperty.of("kombisignal", KS.OFF);

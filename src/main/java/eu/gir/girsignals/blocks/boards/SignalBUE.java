@@ -10,15 +10,10 @@ import eu.gir.girsignals.init.GIRItems;
 public class SignalBUE extends Signal {
 
 	public SignalBUE() {
-		super(GIRItems.SIGN_PLACEMENT_TOOL, "buesignal", 2);
+		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "buesignal").height(2).noLink().build());
 	}
 
 	public static final SEProperty<BUE> BUETYPE = SEProperty.of("buetype", BUE.BUE4, ChangeableStage.GUISTAGE);
 	public static final SEProperty<BUE_ADD> BUEADD = SEProperty.of("bueadd", BUE_ADD.ADD, ChangeableStage.GUISTAGE);
-
-	@Override
-	public boolean canBeLinked() {
-		return false;
-	}
 
 }

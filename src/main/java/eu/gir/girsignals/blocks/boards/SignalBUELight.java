@@ -9,7 +9,7 @@ import eu.gir.girsignals.init.GIRItems;
 public class SignalBUELight extends Signal {
 
 	public SignalBUELight() {
-		super(GIRItems.SIGN_PLACEMENT_TOOL, "buelight", 4);
+		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "buelight").height(4).build());
 	}
 
 	public static final SEProperty<BUE_LIGHT> BUELIGHT = SEProperty.of("buelight", BUE_LIGHT.OFF);
