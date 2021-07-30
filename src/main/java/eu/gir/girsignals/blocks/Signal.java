@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -24,7 +25,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -159,10 +159,10 @@ public class Signal extends Block implements ITileEntityProvider {
 
 	public Signal(final SignalProperties prop) {
 		super(Material.ROCK);
+		this.prop = prop;
 		setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
 		ID = SIGNALLIST.size();
 		SIGNALLIST.add(this);
-		this.prop = prop;
 		prop.placementtool.addSignal(this);
 	}
 
@@ -172,10 +172,10 @@ public class Signal extends Block implements ITileEntityProvider {
 
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		IExtendedBlockState ebs = (IExtendedBlockState) this.getExtendedState(state, source, pos);
-		NBTTagCompound comp = new NBTTagCompound();
-		ebs.getUnlistedProperties().forEach((prop, opt) -> comp.setBoolean(prop.getName(), opt.isPresent()));
-		return FULL_BLOCK_AABB.expand(0, getHeight(comp), 0);
+		final SignalTileEnity te = (SignalTileEnity) source.getTileEntity(pos);
+		if(te == null)
+			return FULL_BLOCK_AABB;
+		return FULL_BLOCK_AABB.expand(0, getHeight(te.getProperties()), 0);
 	}
 
 	@Override
@@ -296,8 +296,7 @@ public class Signal extends Block implements ITileEntityProvider {
 				}
 			}
 		}
-		if (this.prop.customNameRenderHeight != -1)
-			prop.add(CUSTOMNAME);
+		prop.add(CUSTOMNAME);
 		return new ExtendedBlockState(this, new IProperty<?>[] { ANGEL },
 				prop.toArray(new IUnlistedProperty[prop.size()]));
 	}
@@ -328,7 +327,7 @@ public class Signal extends Block implements ITileEntityProvider {
 			GhostBlock.destroyUpperBlock(worldIn, pos);
 	}
 
-	public int getHeight(NBTTagCompound comp) {
+	public int getHeight(final HashMap<SEProperty<?>, Object> map) {
 		return this.prop.height;
 	}
 
@@ -370,7 +369,7 @@ public class Signal extends Block implements ITileEntityProvider {
 		final SignalAngel face = state.getValue(Signal.ANGEL);
 		final float angel = face.getAngel();
 
-		final String[] display = toString().split("\\[n\\]");
+		final String[] display = te.getDisplayName().getFormattedText().split("\\[n\\]");
 		final float width = this.prop.signWidth;
 		final float offsetX = this.prop.offsetX;
 		final float offsetZ = this.prop.offsetY;

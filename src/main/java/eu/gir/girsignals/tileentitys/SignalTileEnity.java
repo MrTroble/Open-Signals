@@ -32,7 +32,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	private static final String BLOCKID = "blockid";
 
 	private String formatCustomName = null;
-	private Signal cachedBlock = null;
 	private int blockID = -1;
 	
 	@Override
@@ -106,6 +105,10 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		this.markDirty();
 	}
 
+	public HashMap<SEProperty<?>, Object> getProperties() {
+		return map;
+	}
+	
 	public interface BiAccumulater<T, U, V> {
 
 		T accept(T t, U u, V v);
@@ -134,7 +137,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	@Override
 	public boolean hasCustomName() {
-		return formatCustomName != null && cachedBlock.canHaveCustomname();
+		return formatCustomName != null && getSignal().canHaveCustomname();
 	}
 
 	@Override
@@ -143,7 +146,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	}
 
 	public void setCustomName(String str) {
-		if (cachedBlock.canHaveCustomname())
+		if (!getSignal().canHaveCustomname())
 			return;
 		this.formatCustomName = str;
 		if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
@@ -153,16 +156,20 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		}
 		this.markDirty();
 		world.markBlockRangeForRenderUpdate(pos, pos);
+		
 	}
 	
 	@SideOnly(Side.CLIENT)
 	public void renderOverlay(final double x, final double y, final double z, final FontRenderer font) {
-		cachedBlock.renderOverlay(x, y, z, this, font);
+		getSignal().renderOverlay(x, y, z, this, font);
 	}
 
 	public void setBlockID() {
 		blockID = ((Signal) world.getBlockState(pos).getBlock()).getID();
-		cachedBlock = Signal.SIGNALLIST.get(blockID);
+	}
+	
+	public Signal getSignal() {
+		return (Signal) super.getBlockType();
 	}
 	
 	public int getBlockID() {

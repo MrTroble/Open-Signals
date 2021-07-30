@@ -57,25 +57,21 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 				player.sendMessage(new TextComponentTranslation("pt.itemnotset"));
 				return EnumActionResult.FAIL;
 			}
-			Signal block = Signal.SIGNALLIST.get(compound.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID));
-			int height = block.getHeight(compound);
-			BlockPos lastPos = setPosition;
-			for (int i = 0; i < height; i++)
-				if (!worldIn.isAirBlock(lastPos = lastPos.up()))
-					return EnumActionResult.FAIL;
+			final Signal block = Signal.SIGNALLIST.get(compound.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID));
 
+			BlockPos lastPos = setPosition;
 			worldIn.setBlockState(setPosition,
 					block.getStateForPlacement(worldIn, lastPos, facing, hitX, hitY, hitZ, 0, player, hand));
-			lastPos = setPosition;
 
-			for (int i = 0; i < height; i++)
-				worldIn.setBlockState(lastPos = lastPos.up(), GIRBlocks.GHOST_BLOCK.getDefaultState());
-			SignalTileEnity sig = (SignalTileEnity) worldIn.getTileEntity(setPosition);
-			ExtendedBlockState ebs = ((ExtendedBlockState) block.getBlockState());
+			final SignalTileEnity sig = (SignalTileEnity) worldIn.getTileEntity(setPosition);
+			final ExtendedBlockState ebs = ((ExtendedBlockState) block.getBlockState());
 			ebs.getUnlistedProperties().forEach(iup -> {
+				SEProperty sep = SEProperty.cst(iup);
+				if(sep.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+					sig.setProperty(sep, sep.getDefault());
+				}
 				if (!compound.hasKey(iup.getName()))
 					return;
-				SEProperty sep = SEProperty.cst(iup);
 				if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 					if (sep.getType().equals(Boolean.class)) {
 						if (compound.getBoolean(iup.getName()))
@@ -83,11 +79,22 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 					} else {
 						sig.setProperty(sep, sep.getObjFromID(compound.getInteger(iup.getName())));
 					}
-				} else if ((sep.isChangabelAtStage(ChangeableStage.APISTAGE) && compound.getBoolean(iup.getName()))
-						|| sep.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+				} else if ((sep.isChangabelAtStage(ChangeableStage.APISTAGE) && compound.getBoolean(iup.getName()))) {
 					sig.setProperty(sep, sep.getDefault());
 				}
 			});
+			int height = block.getHeight(sig.getProperties());
+			System.out.println(sig.getProperties());
+			for (int i = 0; i < height; i++)
+				if (!worldIn.isAirBlock(lastPos = lastPos.up())) {
+					worldIn.setBlockToAir(setPosition);
+					return EnumActionResult.FAIL;
+				}
+			System.out.println(height);
+			lastPos = setPosition;
+			for (int i = 0; i < height; i++)
+				worldIn.setBlockState(lastPos = lastPos.up(), GIRBlocks.GHOST_BLOCK.getDefaultState());
+
 			String str = compound.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME);
 			if (!str.isEmpty())
 				sig.setCustomName(str);

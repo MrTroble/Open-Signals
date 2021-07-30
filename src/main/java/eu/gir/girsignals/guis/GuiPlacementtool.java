@@ -98,7 +98,7 @@ public class GuiPlacementtool extends GuiScreen {
 		currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
 		ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 	}
-	
+
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		drawDefaultBackground();
@@ -334,7 +334,14 @@ public class GuiPlacementtool extends GuiScreen {
 			}
 			i++;
 		}
-
+		for (IUnlistedProperty prop : properties) {
+			final SEProperty property = SEProperty.cst(prop);
+			if(property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+				ebs = ebs.withProperty(property, property.getDefault());
+			}
+		}
+		if(currentSelectedBlock.canHaveCustomname() && !textField.getText().isEmpty())
+			ebs = ebs.withProperty(Signal.CUSTOMNAME, true);
 		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
 		model.get().finishDrawing();
@@ -366,7 +373,8 @@ public class GuiPlacementtool extends GuiScreen {
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		super.keyTyped(typedChar, keyCode);
 		if (currentSelectedBlock.canHaveCustomname())
-			textField.textboxKeyTyped(typedChar, keyCode);
+			if(textField.textboxKeyTyped(typedChar, keyCode))
+				applyModelChanges();
 	}
 
 }

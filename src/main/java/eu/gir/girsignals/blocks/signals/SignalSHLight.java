@@ -1,12 +1,13 @@
 package eu.gir.girsignals.blocks.signals;
 
+import java.util.HashMap;
+
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.nbt.NBTTagCompound;
 
 public class SignalSHLight extends Signal {
 
@@ -18,11 +19,11 @@ public class SignalSHLight extends Signal {
 	public static final SEProperty<SH_LIGHT> SHLIGHT_2 = SEProperty.of("sh_light_top", SH_LIGHT.OFF);
 
 	@Override
-	public int getHeight(NBTTagCompound comp) {
-		if (comp.getBoolean(SHLIGHT_2.getName())) {
+	public int getHeight(final HashMap<SEProperty<?>, Object> map) {
+		if (map.containsKey(SHLIGHT_2)) {
 			return 2;
 		}
-		return super.getHeight(comp);
+		return super.getHeight(map);
 	}
 	
 	@Override

@@ -1,5 +1,15 @@
 # Changelog
 
+## [Fixes/Update] 7.31.2021 - 1
+* Fixed issue with BU Lightsignal that could be without the actual signal
+* Fixed issue with crash on old worlds
+* Removed confusing off states
+* Removed unused states
+* Fixed issues with Changable Stage
+* Updated internal rendering for name renderer
+* Fixed issue with height on RA signals
+* In GUI renderer now shows custom name plate
+
 ## [Fixed] 7.30.2021 - 1
 * Fixed issue with server client sync on redstone single mode
 
