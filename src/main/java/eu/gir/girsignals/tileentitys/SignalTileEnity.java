@@ -137,7 +137,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	@Override
 	public boolean hasCustomName() {
-		return formatCustomName != null && getSignal().canHaveCustomname();
+		return formatCustomName != null && getSignal().canHaveCustomname(this.map);
 	}
 
 	@Override
@@ -146,7 +146,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	}
 
 	public void setCustomName(String str) {
-		if (!getSignal().canHaveCustomname())
+		if (!getSignal().canHaveCustomname(this.map))
 			return;
 		this.formatCustomName = str;
 		if (str == null && map.containsKey(Signal.CUSTOMNAME)) {

@@ -9,6 +9,9 @@
 * Updated internal rendering for name renderer
 * Fixed issue with height on RA signals
 * In GUI renderer now shows custom name plate
+* Compacted RS Signal options
+
+**A lot was done to remove blank states that could confuse the user. This however could possible break some states, so you might need to reset some signals. Impacted Signals are (but not limited to): Tram Signals, RS Signals, BUE Light Signals, RA Signals, SH Signal**
 
 ## [Fixed] 7.30.2021 - 1
 * Fixed issue with server client sync on redstone single mode

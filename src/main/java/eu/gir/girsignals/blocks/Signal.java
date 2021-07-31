@@ -331,7 +331,7 @@ public class Signal extends Block implements ITileEntityProvider {
 		return this.prop.height;
 	}
 
-	public boolean canHaveCustomname() {
+	public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
 		return this.prop.customNameRenderHeight != -1;
 	}
 
@@ -363,6 +363,8 @@ public class Signal extends Block implements ITileEntityProvider {
 	@SideOnly(Side.CLIENT)
 	public void renderOverlay(final double x, final double y, final double z, final SignalTileEnity te,
 			final FontRenderer font, final float renderHeight) {
+		if(renderHeight == -1)
+			return;
 		final World world = te.getWorld();
 		final BlockPos pos = te.getPos();
 		final IBlockState state = world.getBlockState(pos);

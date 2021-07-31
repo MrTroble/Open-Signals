@@ -2,6 +2,9 @@ package eu.gir.girsignals.blocks.boards;
 
 import eu.gir.girsignals.EnumSignals.OTHER_SIGAL;
 import eu.gir.girsignals.EnumSignals.ST_NUMBER;
+
+import java.util.HashMap;
+
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
@@ -20,6 +23,12 @@ public class SignalOTHER extends Signal {
 			ChangeableStage.GUISTAGE);
 	public static final SEProperty<ST_NUMBER> STATIONNUMBER = SEProperty.of("stationnumber", ST_NUMBER.Z1,
 			ChangeableStage.GUISTAGE);
+
+	@Override
+	public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
+		return map.entrySet().stream()
+				.anyMatch(entry -> entry.getKey().equals(OTHERTYPE) && entry.getValue().equals(OTHER_SIGAL.HM));
+	}
 
 	@Override
 	public void renderOverlay(double x, double y, double z, SignalTileEnity te, FontRenderer font) {

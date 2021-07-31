@@ -410,32 +410,31 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		registeredModels.put("shlight", cm -> {
 			// SH ground off
 			cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.OFF))
-					.and(has(SignalSHLight.SHLIGHT_2).negate()), 0);
+					.and(hasAndIsNot(SignalSHLight.SH_HIGH)), 0);
 			// SH ground sh0
 			cm.register("sh/sh_light",
 					with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.SH0))
-							.and(has(SignalSHLight.SHLIGHT_2).negate()),
+							.and(hasAndIsNot(SignalSHLight.SH_HIGH)),
 					0, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red_small");
 			// SH ground sh1
 			cm.register("sh/sh_light",
 					with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.SH1))
-							.and(has(SignalSHLight.SHLIGHT_2).negate()),
+							.and(hasAndIsNot(SignalSHLight.SH_HIGH)),
 					0, "lamp_whitenorth", "girsignals:blocks/lamps/lamp_white_small");
 			// Mast
-			cm.register("sh/sh_mast", has(SignalSHLight.SHLIGHT_2).and(has(SignalSHLight.SHLIGHT_0).negate()), 0);
-			cm.register("sh/sh_mast", has(SignalSHLight.SHLIGHT_2).and(has(SignalSHLight.SHLIGHT_0).negate()), 1);
+			cm.register("sh/sh_mast", hasAndIs(SignalSHLight.SH_HIGH), 0);
+			cm.register("sh/sh_mast", hasAndIs(SignalSHLight.SH_HIGH), 1);
 			// SH above off
-			cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_2, sh -> sh.equals(SH_LIGHT.OFF))
-					.and(has(SignalSHLight.SHLIGHT_0).negate()), 2);
+			cm.register("sh/sh_light",
+					with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.OFF)).and(hasAndIs(SignalSHLight.SH_HIGH)),
+					2);
 			// SH above sh0
 			cm.register("sh/sh_light",
-					with(SignalSHLight.SHLIGHT_2, sh -> sh.equals(SH_LIGHT.SH0))
-							.and(has(SignalSHLight.SHLIGHT_0).negate()),
+					with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.SH0)).and(hasAndIs(SignalSHLight.SH_HIGH)),
 					2, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red_small");
 			// SH above sh1
 			cm.register("sh/sh_light",
-					with(SignalSHLight.SHLIGHT_2, sh -> sh.equals(SH_LIGHT.SH1))
-							.and(has(SignalSHLight.SHLIGHT_0).negate()),
+					with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SH_LIGHT.SH1)).and(hasAndIs(SignalSHLight.SH_HIGH)),
 					2, "lamp_whitenorth", "girsignals:blocks/lamps/lamp_white_small");
 		});
 		registeredModels.put("tramsignal", cm -> {
@@ -578,8 +577,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("bue/bue_mast_1", ebs -> true, 1);
 			cm.register("bue/bue_mast_2", ebs -> true, 2);
 			cm.register("bue/bue_signal_head", hasAndIsNot(SignalBUELight.BUELIGHT), 3);
-			cm.register("bue/bue_signal_head", hasAndIs(SignalBUELight.BUELIGHT), 3,
-					"7", "girsignals:blocks/lamps/lamp_white_blink");
+			cm.register("bue/bue_signal_head", hasAndIs(SignalBUELight.BUELIGHT), 3, "7",
+					"girsignals:blocks/lamps/lamp_white_blink");
 			cm.register("bue/bue_ne_2_2", has(SignalBUELight.NE2_2), 1);
 			cm.register("bue/bue_ne_2_4", has(SignalBUELight.NE2_4), 1);
 		});

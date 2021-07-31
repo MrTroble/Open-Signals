@@ -74,8 +74,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 					return;
 				if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 					if (sep.getType().equals(Boolean.class)) {
-						if (compound.getBoolean(iup.getName()))
-							sig.setProperty(sep, true);
+						sig.setProperty(sep, compound.getBoolean(iup.getName()));
 					} else {
 						sig.setProperty(sep, sep.getObjFromID(compound.getInteger(iup.getName())));
 					}

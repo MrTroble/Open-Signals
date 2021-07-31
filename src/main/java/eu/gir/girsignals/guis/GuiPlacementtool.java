@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.function.Consumer;
 
 import org.lwjgl.input.Keyboard;
@@ -85,6 +86,7 @@ public class GuiPlacementtool extends GuiScreen {
 	private GuiTextField textField;
 	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
 	private int indexCurrentlyUsed = 0;
+	private HashMap<SEProperty<?>, Object> map = new HashMap<>();
 
 	public GuiPlacementtool(ItemStack stack) {
 		this.comp = stack.getTagCompound();
@@ -112,7 +114,7 @@ public class GuiPlacementtool extends GuiScreen {
 
 		super.drawScreen(mouseX, mouseY, partialTicks);
 
-		if (currentSelectedBlock.canHaveCustomname())
+		if (currentSelectedBlock.canHaveCustomname(map))
 			textField.drawTextBox();
 
 		if (dragging) {
@@ -196,9 +198,12 @@ public class GuiPlacementtool extends GuiScreen {
 		properties = unlistedProperties.toArray(new IUnlistedProperty[unlistedProperties.size()]);
 		int maxWidth = 0;
 		for (IUnlistedProperty<?> lenIUnlistedProperty : unlistedProperties) {
-			maxWidth = Math.max(
-					fontRenderer.getStringWidth(I18n.format("property." + lenIUnlistedProperty.getName() + ".name")),
-					maxWidth);
+			final SEProperty<?> sep = SEProperty.cst(lenIUnlistedProperty);
+			for (int i = 0; i < sep.count(); i++) {
+				maxWidth = Math.max(
+						fontRenderer.getStringWidth(I18n.format("property." + lenIUnlistedProperty.getName() + ".name") + ": " + sep.getObjFromID(i)),
+						maxWidth);
+			}
 		}
 		maxWidth = Math.max(SIGNALTYPE_FIXED_WIDTH, maxWidth);
 
@@ -211,7 +216,7 @@ public class GuiPlacementtool extends GuiScreen {
 		final int xPos = this.guiLeft + LEFT_OFFSET;
 
 		final GuiEnumerableSetting settings = new GuiEnumerableSetting(tool, SIGNAL_TYPE_ID, xPos, yPos,
-				SIGNALTYPE_FIXED_WIDTH, "signaltype", this.implLastID, null);
+				maxWidth, "signaltype", this.implLastID, null);
 		settings.consumer = input -> {
 			settings.enabled = false;
 			implLastID = input;
@@ -321,15 +326,19 @@ public class GuiPlacementtool extends GuiScreen {
 		for (GuiButton btn : this.buttonList) {
 			if (btn.id != DEFAULT_ID)
 				continue;
+			SEProperty property;
+			while((property = (SEProperty) properties[i]).isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+				i++;
 			if (btn instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) btn;
-				if (buttonCheckBox.isChecked()) {
-					SEProperty property = (SEProperty) properties[i];
+				System.out.println(property);
+				if(property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+					ebs = ebs.withProperty(property, buttonCheckBox.isChecked());
+				} else if (buttonCheckBox.isChecked()) {
 					ebs = ebs.withProperty(property, property.getDefault());
 				}
 			} else if (btn instanceof GuiEnumerableSetting) {
 				GuiEnumerableSetting slider = (GuiEnumerableSetting) btn;
-				SEProperty property = (SEProperty) properties[i];
 				ebs = ebs.withProperty(property, property.getObjFromID(slider.value));
 			}
 			i++;
@@ -340,7 +349,11 @@ public class GuiPlacementtool extends GuiScreen {
 				ebs = ebs.withProperty(property, property.getDefault());
 			}
 		}
-		if(currentSelectedBlock.canHaveCustomname() && !textField.getText().isEmpty())
+		
+		map.clear();
+		ebs.getUnlistedProperties().forEach((prop, opt) -> opt.ifPresent(val -> map.put(SEProperty.cst(prop), val)));
+		
+		if(currentSelectedBlock.canHaveCustomname(map) && !textField.getText().isEmpty())
 			ebs = ebs.withProperty(Signal.CUSTOMNAME, true);
 		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
@@ -350,7 +363,7 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
 		super.mouseClicked(mouseX, mouseY, mouseButton);
-		if (currentSelectedBlock.canHaveCustomname())
+		if (currentSelectedBlock.canHaveCustomname(map))
 			textField.mouseClicked(mouseX, mouseY, mouseButton);
 		if (mouseButton == 0) {
 			this.dragging = true;
@@ -372,7 +385,7 @@ public class GuiPlacementtool extends GuiScreen {
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		super.keyTyped(typedChar, keyCode);
-		if (currentSelectedBlock.canHaveCustomname())
+		if (currentSelectedBlock.canHaveCustomname(map))
 			if(textField.textboxKeyTyped(typedChar, keyCode))
 				applyModelChanges();
 	}
