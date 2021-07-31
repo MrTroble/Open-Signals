@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableSet;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -19,6 +20,8 @@ import net.minecraft.world.IWorldNameable;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
@@ -29,7 +32,6 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	private static final String BLOCKID = "blockid";
 
 	private String formatCustomName = null;
-	private Signal cachedBlock = null;
 	private int blockID = -1;
 	
 	@Override
@@ -103,6 +105,10 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		this.markDirty();
 	}
 
+	public HashMap<SEProperty<?>, Object> getProperties() {
+		return map;
+	}
+	
 	public interface BiAccumulater<T, U, V> {
 
 		T accept(T t, U u, V v);
@@ -131,7 +137,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	@Override
 	public boolean hasCustomName() {
-		return formatCustomName != null && getCustomNameRenderHeight() != -1;
+		return formatCustomName != null && getSignal().canHaveCustomname(this.map);
 	}
 
 	@Override
@@ -140,7 +146,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	}
 
 	public void setCustomName(String str) {
-		if (getCustomNameRenderHeight() == -1)
+		if (!getSignal().canHaveCustomname(this.map))
 			return;
 		this.formatCustomName = str;
 		if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
@@ -150,34 +156,20 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		}
 		this.markDirty();
 		world.markBlockRangeForRenderUpdate(pos, pos);
+		
 	}
-
-	private float renderHeight = 0;
-
-	public float getCustomNameRenderHeight() {
-		return renderHeight;
-	}
-
-	public float getCustomnameSignWidth() {
-		return cachedBlock.getCustomnameSignWidth(world, pos, this);
-	}
-
-	public float getCustomnameOffsetX() {
-		return cachedBlock.getCustomnameOffsetX(world, pos, this);
-	}
-
-	public float getCustomnameOffsetZ() {
-		return cachedBlock.getCustomnameOffsetZ(world, pos, this);
-	}
-
-	public float getCustomnameScale() {
-		return cachedBlock.getCustomnameScale(world, pos, this);
+	
+	@SideOnly(Side.CLIENT)
+	public void renderOverlay(final double x, final double y, final double z, final FontRenderer font) {
+		getSignal().renderOverlay(x, y, z, this, font);
 	}
 
 	public void setBlockID() {
 		blockID = ((Signal) world.getBlockState(pos).getBlock()).getID();
-		cachedBlock = Signal.SIGNALLIST.get(blockID);
-		renderHeight = cachedBlock.getCustomnameRenderHeight(world, pos, this);
+	}
+	
+	public Signal getSignal() {
+		return (Signal) super.getBlockType();
 	}
 	
 	public int getBlockID() {

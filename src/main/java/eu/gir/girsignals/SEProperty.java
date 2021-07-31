@@ -48,7 +48,10 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 
 	public Optional<T> readFromNBT(NBTTagCompound comp) {
 		if (comp.hasKey(this.getName())) {
-			return Optional.of(getObjFromID(comp.getInteger(this.getName())));
+			int id = comp.getInteger(this.getName());
+			if(!this.isValid(id))
+				return Optional.absent();
+			return Optional.of(getObjFromID(id));
 		}
 		return Optional.absent();
 	}
@@ -82,7 +85,7 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	@SuppressWarnings("unchecked")
 	public T getObjFromID(int obj) {
 		if (!isValid(obj))
-			throw new IllegalArgumentException("Given parameter is not a exceptable value! Val: " + obj + " - Prop: " + this.getName());
+			obj = 0;
 		if (getType().isEnum()) {
 			return (T) getType().getEnumConstants()[obj];
 		} else if (getType().equals(Boolean.class)) {

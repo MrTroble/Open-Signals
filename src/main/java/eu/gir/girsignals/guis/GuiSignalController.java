@@ -146,7 +146,7 @@ public class GuiSignalController extends GuiContainer {
 				final int state = sigController.supportedSigStates[i];
 				if (state < 0 || state >= prop.count())
 					continue;
-				if (!prop.isChangabelAtStage(ChangeableStage.APISTAGE))
+				if (!prop.isChangabelAtStage(ChangeableStage.APISTAGE) && !prop.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
 					continue;
 				if (yPos >= (this.guiTop + this.ySize - BOTTOM_OFFSET)) {
 					pageList.add(Lists.newArrayList());

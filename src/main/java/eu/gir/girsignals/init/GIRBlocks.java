@@ -10,14 +10,15 @@ import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalBUELight;
 import eu.gir.girsignals.blocks.boards.SignalEL;
+import eu.gir.girsignals.blocks.boards.SignalLF;
 import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalOTHER;
 import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalSH;
+import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
-import eu.gir.girsignals.blocks.signals.SignalLF;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalTram;
 import net.minecraft.block.Block;
@@ -47,6 +48,7 @@ public class GIRBlocks {
 	public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
 	public static final SignalOTHER OTHER_SIGNAL = new SignalOTHER();
 	public static final SignalNE NE_SIGNAL = new SignalNE();
+	public static final StationNumberPlate STATION_NUMBER_PLATE = new StationNumberPlate();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 

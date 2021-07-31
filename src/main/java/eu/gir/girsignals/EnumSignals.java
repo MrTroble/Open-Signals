@@ -36,8 +36,8 @@ public class EnumSignals {
 	}
 
 	public enum ZS32 implements Offable<ZS32> {
-		OFF, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z1, Z2, Z3, Z4, Z5, Z6,
-		Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, ZS6, ZS8, ZS13;
+		OFF, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z1, Z2, Z3, Z4, Z5, Z6, Z7,
+		Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19, Z20, ZS6, ZS8, ZS13;
 	}
 
 	public enum MAST_SIGN implements Offable<MAST_SIGN> {
@@ -69,6 +69,10 @@ public class EnumSignals {
 	public enum SH_LIGHT implements Offable<SH_LIGHT> {
 		OFF, SH0, SH1;
 	}
+	
+	public enum TRAMTYPE implements DefaultName<TRAMTYPE> {
+		TRAM, CAR, PEDESTRIAN
+	}
 
 	public enum TRAM implements Offable<TRAM> {
 		OFF, F0, F1, F2, F3, F4, F5;
@@ -83,7 +87,7 @@ public class EnumSignals {
 	}
 
 	public enum LF implements DefaultName<LF> {
-		Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, A, E;
+		Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19, Z20, A, E;
 
 		public String[] getOverlayRename() {
 			return new String[] { "overlay", "girsignals:blocks/zs3/" + this.getName().toLowerCase() };
@@ -103,32 +107,38 @@ public class EnumSignals {
 		OFF, LEFT, RIGHT, LEFT_RIGHT, UP;
 	}
 
-	public enum RA implements Offable<RA> {
-		OFF, RA10, RA11A, RA11B, RA12;
-	}
-
-	public enum RA_LIGHT implements Offable<RA_LIGHT> {
-		OFF, SH1
+	public enum RA implements DefaultName<RA> {
+		RA10, RA11A, RA11B, RA12;
 	}
 
 	public enum BUE implements DefaultName<BUE> {
-		BUE4, BUE5;
+		BUE2_1, BUE2_2, BUE2_3, BUE2_4, BUE3, BUE4, BUE5;
 	}
 
-	public enum BUE_LIGHT implements Offable<BUE_LIGHT> {
-		OFF, BUE_1;
+	public enum BUE_ADD implements Offable<BUE_ADD> {
+		OFF, ADD, BUE4;
 	}
 
-	public enum OTHER_SIGAL implements DefaultName<OTHER_SIGAL> {
+	public enum OTHER_SIGNAL implements DefaultName<OTHER_SIGNAL> {
 		HM, OB, CROSS;
 	}
-	
+
+	public enum ST_NUMBER implements DefaultName<ST_NUMBER> {
+		Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19, Z20, A, B, C, D, E, F, G,
+		H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
+
+		public String[] getOverlayRename() {
+			return new String[] { "overlay", "girsignals:blocks/zs3/" + this.getName().toLowerCase() };
+		}
+
+	}
+
 	public enum NE implements DefaultName<NE> {
 		NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_small, NE5, NE6;
 	}
-	
+
 	public enum NE_ADDITION implements Offable<NE_ADDITION> {
 		OFF, PRE1, PRE2;
 	}
-	
+
 }

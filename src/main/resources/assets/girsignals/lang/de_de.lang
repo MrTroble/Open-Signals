@@ -24,6 +24,7 @@ tile.buesignal.name=BÜ Signal
 tile.othersignal.name=Sonstige Signale
 tile.buelight.name=BÜ Signal
 tile.nesignal.name=Ne Signal
+tile.stationnumberplate.name=Bahnsteignummern
 
 #Linktool
 lt.linkfailed=Link fehlgeschlagen!
@@ -82,6 +83,11 @@ property.rsmode.name=Redstone Mode
 property.face.name=Seite
 property.sigon.name=An-Status
 property.sigoff.name=Aus-Status
+property.netype.name=Ne Signale
+property.neaddition.name=Ne2 Zusatz
+property.stationnumber.name=Nummer
+property.sh_high.name=Rangiersignal 3 Block hoch
+property.signaltramtype.name=Straßen- und TRAM Ampeln
 
 #Signal Descs
 property.signaltype.desc=Hier kannst du die verschiedenen Signaltypen wählen.
@@ -119,8 +125,13 @@ property.ralight.desc=Lichtsignal Sh 1
 property.buetype.desc=§nBü4 Pfeiftafel§r - Etwa 3 Sekunden lang pfeifen. %n§nBü5 Läuttafel§r - Es ist zu läuten.
 property.bueadd.desc=Wenn der Zug zwischen BÜ4 Signal und Bahnübergang einen Halteplatz hat, steht hinter dem Halteplatz ein weiteres BÜ4. Auf dem BÜ4 vor dem Halteplatz ist dann dieses Schild angebracht und gilt nur für Züge, die nicht an dem Halteplatz halten.
 property.othertype.desc=Hier findest du andere Signale, die keine eigene Bezeichnung haben.
-property.signalped.desc=Fügängerampel
+property.signalped.desc=Fußgängerampel
 property.buelight.desc=§nBü0§r - Halt vor dem Bahnübergang! Weiterfahrt nach Sicherung. %n§nBü1§r - Der Bahnübergang darf befahren werden.
+property.netype.desc=
+property.neaddition.desc=
+property.stationnumber.desc=
+property.sh_high.desc=Rangiersignal um 3 Blöcke erhöht.
+property.signaltramtype.desc=
 
 #Directions
 property.up.name=Oben

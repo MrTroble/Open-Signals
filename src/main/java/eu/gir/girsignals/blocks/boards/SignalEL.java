@@ -10,15 +10,10 @@ import eu.gir.girsignals.init.GIRItems;
 public class SignalEL extends Signal {
 
 	public SignalEL() {
-		super(GIRItems.SIGN_PLACEMENT_TOOL, "elsignal", 2);
+		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "elsignal").height(2).noLink().build());
 	}
 
 	public static final SEProperty<EL> ELTYPE = SEProperty.of("eltype", EL.EL1V, ChangeableStage.GUISTAGE);
 	public static final SEProperty<EL_ARROW> ELARROW = SEProperty.of("elarrow", EL_ARROW.OFF, ChangeableStage.GUISTAGE);
-	
-	@Override
-	public boolean canBeLinked() {
-		return false;
-	}
-	
+
 }

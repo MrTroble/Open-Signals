@@ -30,12 +30,12 @@ public class GuiEnumerableSetting extends GuiButton implements InternalUnlocaliz
 			final String buttonText, final int initialValue, final Consumer<Integer> consumer) {
 		this(property, id, x, y, width, buttonText, initialValue, consumer, true);
 	}
-	
+
 	public GuiEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
-			final String buttonText, final int initialValue, final Consumer<Integer> consumer, final boolean middleButton) {
+			final String buttonText, int initialValue, final Consumer<Integer> consumer, final boolean middleButton) {
 		super(id, x, y, I18n.format("property." + buttonText + ".name"));
-		if(initialValue >= property.count())
-			throw new IllegalArgumentException(String.format("Initial value (%d) is not valid for property %s", initialValue, property.toString()));
+		if (initialValue >= property.count())
+			initialValue = 0;
 		this.buttonText = I18n.format("property." + buttonText + ".name");
 		this.displayString = this.buttonText + ": " + property.getObjFromID(initialValue).toString();
 		this.property = property;
@@ -61,7 +61,7 @@ public class GuiEnumerableSetting extends GuiButton implements InternalUnlocaliz
 			this.rightButton.enabled = false;
 		}
 	}
-	
+
 	public int getValue() {
 		return this.value;
 	}
@@ -72,10 +72,11 @@ public class GuiEnumerableSetting extends GuiButton implements InternalUnlocaliz
 
 	@Override
 	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-		if(middleButton) {
+		if (middleButton) {
 			super.drawButton(mc, mouseX, mouseY, partialTicks);
 		} else {
-            this.drawCenteredString(mc.fontRenderer, this.displayString, this.x + this.width / 2, this.y + (this.height - 8) / 2, STRING_COLOR);
+			this.drawCenteredString(mc.fontRenderer, this.displayString, this.x + this.width / 2,
+					this.y + (this.height - 8) / 2, STRING_COLOR);
 		}
 		if (visible) {
 			this.rightButton.drawButton(mc, mouseX, mouseY, partialTicks);
@@ -121,5 +122,5 @@ public class GuiEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	public String getUnlocalized() {
 		return this.unlocalized;
 	}
-	
+
 }

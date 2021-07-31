@@ -4,8 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import javax.annotation.Nullable;
+import java.util.HashMap;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -19,12 +18,13 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -46,21 +46,106 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class Signal extends Block implements ITileEntityProvider {
 
 	public static enum SignalAngel implements IStringSerializable {
-		ANGEL0, ANGEL22P5, ANGEL45,
-		ANGEL67P5, ANGEL90, ANGEL112P5,
-		ANGEL135, ANGEL157P5, ANGEL180,
-		ANGEL202P5, ANGEL225, ANGEL247P5,
-		ANGEL270, ANGEL292P5, ANGEL315,
-		ANGEL337P5;
+		ANGEL0, ANGEL22P5, ANGEL45, ANGEL67P5, ANGEL90, ANGEL112P5, ANGEL135, ANGEL157P5, ANGEL180, ANGEL202P5,
+		ANGEL225, ANGEL247P5, ANGEL270, ANGEL292P5, ANGEL315, ANGEL337P5;
 
 		@Override
 		public String getName() {
 			return this.name().toLowerCase();
 		}
-		
+
 		public float getAngel() {
 			return this.ordinal() * 22.5f;
 		}
+	}
+
+	public static class SignalProperties {
+		public final Placementtool placementtool;
+		public final String signalTypeName;
+		public final float customNameRenderHeight;
+		public final int height;
+		public final float signWidth;
+		public final float offsetX;
+		public final float offsetY;
+		public final float signScale;
+		public final boolean canLink;
+
+		public SignalProperties(final Placementtool placementtool, final String signalTypeName,
+				final float customNameRenderHeight, final int height, final float signWidth, final float offsetX,
+				final float offsetY, final float signScale, final boolean canLink) {
+			this.placementtool = placementtool;
+			this.signalTypeName = signalTypeName;
+			this.customNameRenderHeight = customNameRenderHeight;
+			this.height = height;
+			this.signWidth = signWidth;
+			this.offsetX = offsetX;
+			this.offsetY = offsetY;
+			this.signScale = signScale;
+			this.canLink = canLink;
+		}
+	}
+
+	public static class SignalPropertiesBuilder {
+		private Placementtool placementtool = null;
+		private String signalTypeName = null;
+		private int height = 1;
+		private float customNameRenderHeight = -1;
+		private float signWidth = 22;
+		private float offsetX = 0;
+		private float offsetY = 0;
+		private float signScale = 1;
+		private boolean canLink = true;
+
+		public SignalPropertiesBuilder(final Placementtool placementtool, final String signalTypeName) {
+			this.placementtool = placementtool;
+			this.signalTypeName = signalTypeName;
+		}
+
+		public SignalProperties build() {
+			return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight, height, signWidth,
+					offsetX, offsetY, signScale, canLink);
+		}
+
+		public SignalPropertiesBuilder signWidth(float signWidth) {
+			this.signWidth = signWidth;
+			return this;
+		}
+
+		public SignalPropertiesBuilder offsetX(float offsetX) {
+			this.offsetX = offsetX;
+			return this;
+		}
+
+		public SignalPropertiesBuilder offsetY(float offsetY) {
+			this.offsetY = offsetY;
+			return this;
+		}
+
+		public SignalPropertiesBuilder signScale(float signScale) {
+			this.signScale = signScale;
+			return this;
+		}
+
+		public SignalPropertiesBuilder height(int height) {
+			this.height = height;
+			return this;
+		}
+
+		public SignalPropertiesBuilder signHeight(float customNameRenderHeight) {
+			this.customNameRenderHeight = customNameRenderHeight;
+			return this;
+		}
+		
+		public SignalPropertiesBuilder noLink() {
+			this.canLink = false;
+			return this;
+		}
+
+	}
+
+	public static final SignalPropertiesBuilder builder(final Placementtool placementtool,
+			final String signalTypeName) {
+		return new SignalPropertiesBuilder(placementtool, signalTypeName);
 	}
 
 	public static final ArrayList<Signal> SIGNALLIST = new ArrayList<Signal>();
@@ -70,27 +155,15 @@ public class Signal extends Block implements ITileEntityProvider {
 			ChangeableStage.AUTOMATICSTAGE);
 
 	private final int ID;
-	private final int height;
-	private final Placementtool placementtool;
+	protected final SignalProperties prop;
 
-	private final String signalTypeName;
-	private final float customNameRenderHeight;
-
-	public Signal(final Placementtool placementtool, final String signalTypeName, final int height) {
-		this(placementtool, signalTypeName, height, -1);
-	}
-	
-	public Signal(final Placementtool placementtool, final String signalTypeName, final int height, final float customNameRenderHeight) {
+	public Signal(final SignalProperties prop) {
 		super(Material.ROCK);
-		this.signalTypeName = signalTypeName;
-		if(hasAngel())
-			setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
+		this.prop = prop;
+		setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
 		ID = SIGNALLIST.size();
 		SIGNALLIST.add(this);
-		this.height = height;
-		this.customNameRenderHeight = customNameRenderHeight;
-		this.placementtool = placementtool;
-		this.placementtool.addSignal(this);
+		prop.placementtool.addSignal(this);
 	}
 
 	@Override
@@ -99,10 +172,10 @@ public class Signal extends Block implements ITileEntityProvider {
 
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		IExtendedBlockState ebs = (IExtendedBlockState) this.getExtendedState(state, source, pos);
-		NBTTagCompound comp = new NBTTagCompound();
-		ebs.getUnlistedProperties().forEach((prop, opt) -> comp.setBoolean(prop.getName(), opt.isPresent()));
-		return FULL_BLOCK_AABB.expand(0, getHeight(comp), 0);
+		final SignalTileEnity te = (SignalTileEnity) source.getTileEntity(pos);
+		if(te == null)
+			return FULL_BLOCK_AABB;
+		return FULL_BLOCK_AABB.expand(0, getHeight(te.getProperties()), 0);
 	}
 
 	@Override
@@ -126,26 +199,24 @@ public class Signal extends Block implements ITileEntityProvider {
 	@Override
 	public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos,
 			EntityPlayer player) {
-		return pickBlock(player, placementtool);
+		return pickBlock(player, prop.placementtool);
 	}
 
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
 			float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-		if(!hasAngel())
-			return getDefaultState();
-		int x = Math.abs((int) (placer.rotationYaw / 22.5f)) % 16;
+		int x = Math.abs((int) (Math.abs(placer.rotationYaw) / 22.5f)) % 16;
 		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[x]);
 	}
 
 	@Override
 	public IBlockState getStateFromMeta(int meta) {
-		return hasAngel() ? getDefaultState().withProperty(ANGEL, SignalAngel.values()[meta]):getDefaultState();
+		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[meta]);
 	}
 
 	@Override
 	public int getMetaFromState(IBlockState state) {
-		return hasAngel() ? state.getValue(ANGEL).ordinal():0;
+		return state.getValue(ANGEL).ordinal();
 	}
 
 	@Override
@@ -225,9 +296,8 @@ public class Signal extends Block implements ITileEntityProvider {
 				}
 			}
 		}
-		if(customNameRenderHeight != -1)
-			prop.add(CUSTOMNAME);
-		return new ExtendedBlockState(this, hasAngel() ? new IProperty<?>[] { ANGEL }:new IProperty<?>[] {},
+		prop.add(CUSTOMNAME);
+		return new ExtendedBlockState(this, new IProperty<?>[] { ANGEL },
 				prop.toArray(new IUnlistedProperty[prop.size()]));
 	}
 
@@ -242,7 +312,7 @@ public class Signal extends Block implements ITileEntityProvider {
 	}
 
 	public String getSignalTypeName() {
-		return signalTypeName;
+		return this.prop.signalTypeName;
 	}
 
 	public int getID() {
@@ -253,64 +323,75 @@ public class Signal extends Block implements ITileEntityProvider {
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
 		super.breakBlock(worldIn, pos, state);
 
-		if(!worldIn.isRemote)
+		if (!worldIn.isRemote)
 			GhostBlock.destroyUpperBlock(worldIn, pos);
 	}
 
-	public int getHeight(NBTTagCompound comp) {
-		return height;
+	public int getHeight(final HashMap<SEProperty<?>, Object> map) {
+		return this.prop.height;
 	}
-	
-	public boolean canHaveCustomname() {
-		return customNameRenderHeight != -1;
-	}
-	
-	public float getCustomnameRenderHeight(@Nullable final World world, @Nullable final BlockPos pos, 
-			@Nullable final SignalTileEnity te) {
-		return customNameRenderHeight;
-	}
-	
-	public float getCustomnameSignWidth(final World world, final BlockPos pos, final SignalTileEnity te) {
-		return 22;
-	}
-	
-	public float getCustomnameOffsetX(final World world, final BlockPos pos, final SignalTileEnity te) {
-		return 0;
-	}
-	
-	public float getCustomnameOffsetZ(final World world, final BlockPos pos, final SignalTileEnity te) {
-		return 0;
-	}
-	
-	public float getCustomnameScale(final World world, final BlockPos pos, final SignalTileEnity te) {
-		return 1;
+
+	public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
+		return this.prop.customNameRenderHeight != -1;
 	}
 
 	@Override
 	public String toString() {
 		return this.getLocalizedName();
 	}
-	
-	public boolean canBeLinked() {
-		return true;
+
+	public final boolean canBeLinked() {
+		return this.prop.canLink;
 	}
-	
-	public boolean hasAngel() {
-		return true;
-	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
 		return 0;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public boolean hasCostumColor() {
 		return false;
 	}
 
-	public Placementtool getPlacementtool() {
-		return placementtool;
+	@SideOnly(Side.CLIENT)
+	public void renderOverlay(final double x, final double y, final double z, final SignalTileEnity te,
+			final FontRenderer font) {
+		this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight);
 	}
-	
+
+	@SideOnly(Side.CLIENT)
+	public void renderOverlay(final double x, final double y, final double z, final SignalTileEnity te,
+			final FontRenderer font, final float renderHeight) {
+		if(renderHeight == -1)
+			return;
+		final World world = te.getWorld();
+		final BlockPos pos = te.getPos();
+		final IBlockState state = world.getBlockState(pos);
+		final SignalAngel face = state.getValue(Signal.ANGEL);
+		final float angel = face.getAngel();
+
+		final String[] display = te.getDisplayName().getFormattedText().split("\\[n\\]");
+		final float width = this.prop.signWidth;
+		final float offsetX = this.prop.offsetX;
+		final float offsetZ = this.prop.offsetY;
+		final float scale = this.prop.signScale;
+
+		GlStateManager.enableAlpha();
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(x + 0.5f, y + renderHeight, z + 0.5f);
+		GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
+		GlStateManager.rotate(angel, 0, 1, 0);
+		GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
+		GlStateManager.scale(-1f, 1f, 1f);
+		for (int i = 0; i < display.length; i++) {
+			font.drawSplitString(display[i], 0, (int) (i * scale * 2.8f), (int) width, 0);
+		}
+		GlStateManager.popMatrix();
+	}
+
+	public Placementtool getPlacementtool() {
+		return this.prop.placementtool;
+	}
+
 }

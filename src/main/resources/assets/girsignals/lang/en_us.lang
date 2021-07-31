@@ -24,6 +24,7 @@ tile.buesignal.name=BÜ Signal
 tile.othersignal.name=Other signals
 tile.buelight.name=BÜ Signal
 tile.nesignal.name=Ne Signal
+tile.stationnumberplate.name=Platform Number
 
 #Linktool
 lt.linkfailed=Link failed!
@@ -82,6 +83,11 @@ property.rsmode.name=Redstone Mode
 property.face.name=Facing
 property.sigon.name=On state
 property.sigoff.name=Off state
+property.netype.name=Ne signals
+property.neaddition.name=Ne2 addition
+property.stationnumber.name=Number
+property.sh_high.name=Shunting Signal 3 blocks high
+property.signaltramtype.name=Traffic- and TRAM lights
 
 #Signal Descs
 property.signaltype.desc=Here you can select the different signal types.
@@ -121,6 +127,11 @@ property.bueadd.desc=If the train has a halt between the BÜ4 signal and the lev
 property.othertype.desc=Here you can find other signals that do not have their own labels.
 property.signalped.desc=Pedestrian traffic light
 property.buelight.desc=§nBü0§r - Stop before the level crossing! Continue driving after securing. %n§nBü1§r - The level crossing may be driven over.
+property.netype.desc=
+property.neaddition.desc=
+property.stationnumber.desc=
+property.sh_high.desc=Shunting signal 3 blocks high.
+property.signaltramtype.desc=
 
 #Directions
 property.up.name=Up
