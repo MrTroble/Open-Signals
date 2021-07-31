@@ -593,8 +593,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("bue/bue_signal_head", hasAndIsNot(SignalBUELight.BUELIGHT), 3);
 			cm.register("bue/bue_signal_head", hasAndIs(SignalBUELight.BUELIGHT), 3, "7",
 					"girsignals:blocks/lamps/lamp_white_blink");
-			cm.register("bue/bue_ne_2_2", has(SignalBUELight.NE2_2), 1);
-			cm.register("bue/bue_ne_2_4", has(SignalBUELight.NE2_4), 1);
+			cm.register("bue/bue_ne_2_2", hasAndIs(SignalBUELight.NE2_2), 1);
+			cm.register("bue/bue_ne_2_4", hasAndIs(SignalBUELight.NE2_4), 1);
 		});
 		registeredModels.put("othersignal", cm -> {
 			cm.register("mast", withN(SignalOTHER.OTHERTYPE, other -> other.equals(OTHER_SIGNAL.CROSS)).negate(), 0);
