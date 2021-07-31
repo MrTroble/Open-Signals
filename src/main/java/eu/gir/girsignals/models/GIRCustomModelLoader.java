@@ -28,6 +28,7 @@ import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
 import eu.gir.girsignals.EnumSignals.ST_NUMBER;
 import eu.gir.girsignals.EnumSignals.TRAM;
+import eu.gir.girsignals.EnumSignals.TRAMTYPE;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.GirsignalsMain;
@@ -441,54 +442,66 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		registeredModels.put("tramsignal", cm -> {
 			// TRAM off
 			cm.register("trafficlight/trafficlight_tram",
-					with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.OFF)).and(has(SignalTram.CARSIGNAL).negate()), 0);
+					with(SignalTram.TRAMSIGNAL, TRAM.OFF::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.TRAM::equals)), 0);
 			// TRAM f0
 			cm.register("trafficlight/trafficlight_tram",
-					with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F0)).and(has(SignalTram.CARSIGNAL).negate()), 0,
+					with(SignalTram.TRAMSIGNAL, TRAM.F0::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.TRAM::equals)), 0,
 					"rednorth", "girsignals:blocks/tram/f_0");
 			// TRAM f4
 			cm.register("trafficlight/trafficlight_tram",
-					with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F4)).and(has(SignalTram.CARSIGNAL).negate()), 0,
+					with(SignalTram.TRAMSIGNAL, TRAM.F4::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.TRAM::equals)), 0,
 					"yellownorth", "girsignals:blocks/tram/f_4");
 			// TRAM f5
 			cm.register("trafficlight/trafficlight_tram",
-					with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F5)).and(has(SignalTram.CARSIGNAL).negate()), 0,
+					with(SignalTram.TRAMSIGNAL, TRAM.F5::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.TRAM::equals)), 0,
 					"yellownorth", "girsignals:blocks/tram/f_5");
 			// TRAM f1
 			cm.register("trafficlight/trafficlight_tram",
-					with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F1)).and(has(SignalTram.CARSIGNAL).negate()), 0,
+					with(SignalTram.TRAMSIGNAL, TRAM.F1::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.TRAM::equals)), 0,
 					"greennorth", "girsignals:blocks/tram/f_1");
 			// TRAM f2
 			cm.register("trafficlight/trafficlight_tram",
-					with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F2)).and(has(SignalTram.CARSIGNAL).negate()), 0,
+					with(SignalTram.TRAMSIGNAL, TRAM.F2::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.TRAM::equals)), 0,
 					"greennorth", "girsignals:blocks/tram/f_2");
 			// TRAM f3
 			cm.register("trafficlight/trafficlight_tram",
-					with(SignalTram.TRAMSIGNAL, tr -> tr.equals(TRAM.F3)).and(has(SignalTram.CARSIGNAL).negate()), 0,
+					with(SignalTram.TRAMSIGNAL, TRAM.F3::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.TRAM::equals)), 0,
 					"greennorth", "girsignals:blocks/tram/f_3");
 			// CAR off
-			cm.register("trafficlight/trafficlight_car",
-					with(SignalTram.CARSIGNAL, tr -> tr.equals(CAR.OFF)).and(has(SignalTram.TRAMSIGNAL).negate()), 0);
+			cm.register("trafficlight/trafficlight_car", with(SignalTram.CARSIGNAL, CAR.OFF::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.CAR::equals)), 0);
 			// Car red
 			cm.register("trafficlight/trafficlight_car",
-					with(SignalTram.CARSIGNAL, tr -> tr.equals(CAR.RED)).and(has(SignalTram.TRAMSIGNAL).negate()), 0,
-					"rednorth", "girsignals:blocks/lamps/lamp_red");
+					with(SignalTram.CARSIGNAL, CAR.RED::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.CAR::equals)),
+					0, "rednorth", "girsignals:blocks/lamps/lamp_red");
 			// Car yellow
 			cm.register("trafficlight/trafficlight_car",
-					with(SignalTram.CARSIGNAL, tr -> tr.equals(CAR.YELLOW)).and(has(SignalTram.TRAMSIGNAL).negate()), 0,
-					"yellownorth", "girsignals:blocks/lamps/lamp_yellow");
+					with(SignalTram.CARSIGNAL, CAR.YELLOW::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.CAR::equals)),
+					0, "yellownorth", "girsignals:blocks/lamps/lamp_yellow");
 			// Car green
 			cm.register("trafficlight/trafficlight_car",
-					with(SignalTram.CARSIGNAL, tr -> tr.equals(CAR.GREEN)).and(has(SignalTram.TRAMSIGNAL).negate()), 0,
-					"greennorth", "girsignals:blocks/lamps/lamp_green");
+					with(SignalTram.CARSIGNAL, CAR.GREEN::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.CAR::equals)),
+					0, "greennorth", "girsignals:blocks/lamps/lamp_green");
 			// Pedestrian Signal
+			cm.register("trafficlight/trafficlight_ped", with(SignalTram.PEDSIGNAL, PED.OFF::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.PEDESTRIAN::equals)), 0);
 			cm.register("trafficlight/trafficlight_ped",
-					with(SignalTram.PEDSIGNAL, tr -> tr.equals(PED.OFF)).and(has(SignalTram.TRAMSIGNAL).negate()), 0);
-			cm.register("trafficlight/trafficlight_ped",
-					with(SignalTram.PEDSIGNAL, tr -> tr.equals(PED.RED)).and(has(SignalTram.TRAMSIGNAL).negate()), 0,
+					with(SignalTram.PEDSIGNAL, PED.RED::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.PEDESTRIAN::equals)), 0,
 					"rednorth", "girsignals:blocks/lamps/lamp_red");
 			cm.register("trafficlight/trafficlight_ped",
-					with(SignalTram.PEDSIGNAL, tr -> tr.equals(PED.GREEN)).and(has(SignalTram.TRAMSIGNAL).negate()), 0,
+					with(SignalTram.PEDSIGNAL, PED.GREEN::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.PEDESTRIAN::equals)), 0,
 					"greennorth", "girsignals:blocks/lamps/lamp_green");
 		});
 		registeredModels.put("lfsignal", cm -> {

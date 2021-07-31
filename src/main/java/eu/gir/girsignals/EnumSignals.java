@@ -69,6 +69,10 @@ public class EnumSignals {
 	public enum SH_LIGHT implements Offable<SH_LIGHT> {
 		OFF, SH0, SH1;
 	}
+	
+	public enum TRAMTYPE implements DefaultName<TRAMTYPE> {
+		TRAM, CAR, PEDESTRIAN
+	}
 
 	public enum TRAM implements Offable<TRAM> {
 		OFF, F0, F1, F2, F3, F4, F5;
