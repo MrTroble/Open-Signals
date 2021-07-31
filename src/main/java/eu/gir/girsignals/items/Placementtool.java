@@ -83,13 +83,11 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 				}
 			});
 			int height = block.getHeight(sig.getProperties());
-			System.out.println(sig.getProperties());
 			for (int i = 0; i < height; i++)
 				if (!worldIn.isAirBlock(lastPos = lastPos.up())) {
 					worldIn.setBlockToAir(setPosition);
 					return EnumActionResult.FAIL;
 				}
-			System.out.println(height);
 			lastPos = setPosition;
 			for (int i = 0; i < height; i++)
 				worldIn.setBlockState(lastPos = lastPos.up(), GIRBlocks.GHOST_BLOCK.getDefaultState());

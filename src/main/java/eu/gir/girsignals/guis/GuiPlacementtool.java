@@ -331,7 +331,6 @@ public class GuiPlacementtool extends GuiScreen {
 				i++;
 			if (btn instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) btn;
-				System.out.println(property);
 				if(property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 					ebs = ebs.withProperty(property, buttonCheckBox.isChecked());
 				} else if (buttonCheckBox.isChecked()) {
