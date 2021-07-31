@@ -21,7 +21,7 @@ import eu.gir.girsignals.EnumSignals.LFBACKGROUND;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.NE;
 import eu.gir.girsignals.EnumSignals.NE_ADDITION;
-import eu.gir.girsignals.EnumSignals.OTHER_SIGAL;
+import eu.gir.girsignals.EnumSignals.OTHER_SIGNAL;
 import eu.gir.girsignals.EnumSignals.Offable;
 import eu.gir.girsignals.EnumSignals.PED;
 import eu.gir.girsignals.EnumSignals.RA;
@@ -40,6 +40,7 @@ import eu.gir.girsignals.blocks.boards.SignalLF;
 import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalOTHER;
 import eu.gir.girsignals.blocks.boards.SignalRA;
+import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
@@ -583,19 +584,10 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("bue/bue_ne_2_4", has(SignalBUELight.NE2_4), 1);
 		});
 		registeredModels.put("othersignal", cm -> {
-			cm.register("mast", withN(SignalOTHER.OTHERTYPE, other -> other.equals(OTHER_SIGAL.CROSS)).negate(), 0);
-			cm.register("other_signals/hm_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.HM::equals), 1);
-			cm.register("other_signals/ob_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.OB::equals), 1);
-			cm.register("other_signals/cross_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.CROSS::equals), 0);
-			for (ST_NUMBER num : ST_NUMBER.values()) {
-				String[] rename = num.getOverlayRename();
-				cm.register("other_signals/station_number",
-						withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.STATION_NUMBER::equals)
-								.and(withN(SignalOTHER.STATIONNUMBER, num::equals)),
-						0, rename);
-			}
-			cm.register("other_signals/station_name", withN(SignalOTHER.OTHERTYPE, OTHER_SIGAL.STATION_NAME::equals),
-					0);
+			cm.register("mast", withN(SignalOTHER.OTHERTYPE, other -> other.equals(OTHER_SIGNAL.CROSS)).negate(), 0);
+			cm.register("other_signals/hm_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGNAL.HM::equals), 1);
+			cm.register("other_signals/ob_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGNAL.OB::equals), 1);
+			cm.register("other_signals/cross_sign", withN(SignalOTHER.OTHERTYPE, OTHER_SIGNAL.CROSS::equals), 0);
 		});
 		registeredModels.put("nesignal", cm -> {
 			cm.register("mast", withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE6))
@@ -617,6 +609,13 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 					.and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);
 			cm.register("ne/ne2_3", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE2))
 					.and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);
+		});
+		registeredModels.put("stationnumberplate", cm -> {
+			for (ST_NUMBER num : ST_NUMBER.values()) {
+				String[] rename = num.getOverlayRename();
+				cm.register("other_signals/station_number", (withN(StationNumberPlate.STATIONNUMBER, num::equals)), 0,
+						rename);
+			}
 		});
 	}
 
