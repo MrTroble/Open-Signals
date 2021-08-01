@@ -108,7 +108,11 @@ public class EnumSignals {
 	}
 
 	public enum RA implements DefaultName<RA> {
-		RA10, RA11A, RA11B, RA12;
+		RA10, RA11A, RA11B, RA12, RA6_9;
+	}
+	
+	public enum RA_LIGHT implements Offable<RA_LIGHT> {
+		OFF, RA6, RA7, RA8, RA9;
 	}
 
 	public enum BUE implements DefaultName<BUE> {
@@ -139,6 +143,14 @@ public class EnumSignals {
 
 	public enum NE_ADDITION implements Offable<NE_ADDITION> {
 		OFF, PRE1, PRE2;
+	}
+	
+	public enum WN implements Offable<WN> {
+		OFF, WN1, WN2;
+	}
+	
+	public enum WN_CROSS implements Offable<WN_CROSS> {
+		OFF, WN3, WN4, WN5, WN6;
 	}
 
 }
