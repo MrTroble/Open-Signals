@@ -1,5 +1,10 @@
 # Changelog
 
+## [Fixes/Update/Addition] 8.02.2021 - 1
+* Fixed some texture flickering
+* Removed unused models
+* Updated SH Signal
+
 ## [Fixes/Update/Additions] 7.31.2021 - 1
 * Fixed issue with BU Lightsignal that could be without the actual signal
 * Fixed issue with crash on old worlds
