@@ -4,6 +4,12 @@
 * Fixed some texture flickering
 * Removed unused models
 * Updated SH Signal
+* Added WN Signals
+* Added Ra Signal (Hump Shunting Signal)
+* Added ZP8 and ZP9
+* Add dependency system
+* Fixed issue with gui stage not being shown in renderer for controller
+* Fixed signals
 
 ## [Fixes/Update/Additions] 7.31.2021 - 1
 * Fixed issue with BU Lightsignal that could be without the actual signal

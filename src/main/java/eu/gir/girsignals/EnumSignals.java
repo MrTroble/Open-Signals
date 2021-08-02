@@ -37,7 +37,7 @@ public class EnumSignals {
 
 	public enum ZS32 implements Offable<ZS32> {
 		OFF, A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z, Z1, Z2, Z3, Z4, Z5, Z6, Z7,
-		Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19, Z20, ZS6, ZS8, ZS13;
+		Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19, Z20, ZS6, ZS8, ZS13, ZP8, ZP9;
 	}
 
 	public enum MAST_SIGN implements Offable<MAST_SIGN> {

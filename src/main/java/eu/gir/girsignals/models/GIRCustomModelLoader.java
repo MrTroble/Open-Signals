@@ -69,7 +69,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
 	private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
-	private static <T> Predicate<IExtendedBlockState> has(IUnlistedProperty<T> property) {
+	private static <T extends Enum<?>> Predicate<IExtendedBlockState> has(IUnlistedProperty<T> property) {
 		return ebs -> ebs.getValue(property) != null;
 	}
 
@@ -139,7 +139,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		registeredModels.clear();
 		registeredModels.put("hvsignal", cm -> {
 			cm.register("hv/hv_base", ebs -> true, 0);
-			cm.register("hv/hv_ne2", has(SignalHV.NE2).and(has(SignalHV.STOPSIGNAL).negate()), 0);
+			cm.register("hv/hv_ne2", hasAndIs(SignalHV.NE2).and(has(SignalHV.STOPSIGNAL).negate()), 0);
 			cm.register("hv/hv_mast1", ebs -> true, 1);
 
 			for (MAST_SIGN sign : MAST_SIGN.values())
@@ -151,7 +151,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hv/hv_mast3", ebs -> true, 3);
 			cm.register("hv/hv_mast4", ebs -> true, 4);
 
-			cm.register("hv/hv_number", has(Signal.CUSTOMNAME), 2);
+			cm.register("hv/hv_number", hasAndIs(Signal.CUSTOMNAME), 2);
 
 			// Zs1 on
 			cm.register("hv/hv_zs1", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f, "lamp1north",
@@ -212,12 +212,12 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		});
 		registeredModels.put("kssignal", cm -> {
 			cm.register("ks/ks_base", ebs -> true, 0);
-			cm.register("ks/ks_ne2", has(SignalKS.NE2).and(has(SignalKS.DISTANTSIGNAL)), 0);
+			cm.register("ks/ks_ne2", hasAndIs(SignalKS.NE2).and(has(SignalKS.DISTANTSIGNAL)), 0);
 			cm.register("ks/ks_mast1", ebs -> true, 1);
-			cm.register("ks/ks_sign_distant", has(SignalKS.MASTSIGNDISTANT), 1);
+			cm.register("ks/ks_sign_distant", hasAndIs(SignalKS.MASTSIGNDISTANT), 1);
 			cm.register("ks/ks_mast2", ebs -> true, 2);
 
-			cm.register("ks/ks_number", has(Signal.CUSTOMNAME), 4);
+			cm.register("ks/ks_number", hasAndIs(Signal.CUSTOMNAME), 4);
 
 			for (MAST_SIGN sign : MAST_SIGN.values())
 				if (!sign.equals(MAST_SIGN.OFF))
@@ -315,14 +315,14 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		});
 		registeredModels.put("hlsignal", cm -> {
 			cm.register("hl/hl_base", ebs -> true, 0);
-			cm.register("hl/hl_ne2", has(SignalHL.NE2).and(has(SignalHL.DISTANTSIGNAL)), 0);
-			cm.register("hl/hl_ne2_4", has(SignalHL.NE2_4).and(has(SignalHL.DISTANTSIGNAL)), 1);
+			cm.register("hl/hl_ne2", hasAndIs(SignalHL.NE2).and(has(SignalHL.DISTANTSIGNAL)), 0);
+			cm.register("hl/hl_ne2_4", hasAndIs(SignalHL.NE2_4).and(has(SignalHL.DISTANTSIGNAL)), 1);
 			cm.register("hl/hl_mast1", ebs -> true, 1);
-			cm.register("hl/hl_ne2_2", has(SignalHL.NE2).and(has(SignalHL.NE2_2)).and(has(SignalHL.DISTANTSIGNAL)), 1);
-			cm.register("hl/hl_sign_distant", has(SignalHL.MASTSIGNDISTANT), 1);
+			cm.register("hl/hl_ne2_2", hasAndIs(SignalHL.NE2).and(hasAndIs(SignalHL.NE2_2)).and(has(SignalHL.DISTANTSIGNAL)), 1);
+			cm.register("hl/hl_sign_distant", hasAndIs(SignalHL.MASTSIGNDISTANT), 1);
 			cm.register("hl/hl_mast2", ebs -> true, 2);
 
-			cm.register("hl/hl_number", has(Signal.CUSTOMNAME), 0);
+			cm.register("hl/hl_number", hasAndIs(Signal.CUSTOMNAME), 0);
 
 			for (MAST_SIGN sign : MAST_SIGN.values())
 				if (!sign.equals(MAST_SIGN.OFF))

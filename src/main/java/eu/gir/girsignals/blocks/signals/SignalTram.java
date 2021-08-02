@@ -16,7 +16,7 @@ public class SignalTram extends Signal {
 	}
 
 	public static final SEProperty<TRAMTYPE> TRAMSIGNAL_TYPE = SEProperty.of("signaltramtype", TRAMTYPE.TRAM, ChangeableStage.GUISTAGE);
-	public static final SEProperty<TRAM> TRAMSIGNAL = SEProperty.of("signaltram", TRAM.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
-	public static final SEProperty<CAR> CARSIGNAL = SEProperty.of("signalcar", CAR.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
-	public static final SEProperty<PED> PEDSIGNAL = SEProperty.of("signalped", PED.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
+	public static final SEProperty<TRAM> TRAMSIGNAL = SEProperty.of("signaltram", TRAM.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(TRAMSIGNAL_TYPE) && e.getValue().equals(TRAMTYPE.TRAM))));
+	public static final SEProperty<CAR> CARSIGNAL = SEProperty.of("signalcar", CAR.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(TRAMSIGNAL_TYPE) && e.getValue().equals(TRAMTYPE.CAR))));
+	public static final SEProperty<PED> PEDSIGNAL = SEProperty.of("signalped", PED.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(TRAMSIGNAL_TYPE) && e.getValue().equals(TRAMTYPE.PEDESTRIAN))));
 }
