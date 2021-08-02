@@ -1,10 +1,14 @@
 package eu.gir.girsignals.guis;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 
+import com.google.common.collect.Maps;
+
+import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.GuiSignalController.EnumMode;
 import eu.gir.girsignals.guis.GuiSignalController.EnumMuxMode;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
@@ -21,11 +25,13 @@ public class ContainerSignalController extends Container {
 	public final SignalControllerTileEntity entity;
 	protected int[] supportedSigTypes;
 	protected int[] supportedSigStates;
+	protected int[] guiStageSigStates;
 	protected boolean hasLink = false;
 	protected int signalType;
 	protected EnumRedstoneMode rsMode;
 	private final ArrayList<Map.Entry<Integer, Integer>> stateCacheList = new ArrayList<>();
 	private final ArrayList<Map.Entry<Integer, Integer>> typeCacheList = new ArrayList<>();
+	public final ArrayList<Map.Entry<Integer, Integer>> guiCacheList = new ArrayList<>();
 	protected int[] facingRedstoneModes;
 	protected EnumFacing faceUsed = EnumFacing.DOWN;
 	protected EnumMode indexMode = EnumMode.MANUELL;
@@ -53,8 +59,9 @@ public class ContainerSignalController extends Container {
 		Arrays.fill(supportedSigStates, -1);
 	}
 
-	private static final int LINK_MSG = -1, SIGNAL_TYPE_MSG = -2, UPDATE_ARRAY = -3, TYPE_OFFSET = 4096,
-			RS_MODE_MSG = -4, RS_MODES_OFFSET = 4196, UI_MODE = -5, UI_FACE = -6, UI_INDEX = -7, UI_MUX = -8;
+	private static final int LINK_MSG = -1, SIGNAL_TYPE_MSG = -2, UPDATE_ARRAY = -3, TYPE_OFFSET = 200,
+			RS_MODE_MSG = -4, RS_MODES_OFFSET = 400, GUI_CHANGABLE_OFFSET = 600, UI_MODE = -5, UI_FACE = -6,
+			UI_INDEX = -7, UI_MUX = -8;
 
 	@Override
 	public void addListener(IContainerListener listener) {
@@ -81,10 +88,26 @@ public class ContainerSignalController extends Container {
 		listener.sendWindowProperty(this, SIGNAL_TYPE_MSG, signalType);
 		listener.sendWindowProperty(this, RS_MODE_MSG, this.entity.getRsMode().ordinal());
 
+		final Signal signal = Signal.SIGNALLIST.get(signalType);
+		guiCacheList.clear();
+		this.entity.loadChunkAndGetTile((t, c) -> {
+			t.accumulate((ebs, prop, obj) -> {
+				SEProperty<?> se = SEProperty.cst(prop);
+				if (se.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+					final int id = signal.getIDFromProperty(se);
+					guiCacheList.add(Maps.immutableEntry(id, SEProperty.getIDFromObj(obj)));
+				}
+				return ebs;
+			}, null);
+		});
 		listener.sendWindowProperty(this, UI_MODE, this.entity.mode.ordinal());
 		listener.sendWindowProperty(this, UI_FACE, this.entity.face.ordinal());
 		listener.sendWindowProperty(this, UI_INDEX, this.entity.indexUsed);
 		listener.sendWindowProperty(this, UI_MUX, this.entity.muxmode.ordinal());
+		
+		guiCacheList.forEach(entry -> {
+			listener.sendWindowProperty(this, entry.getKey() + GUI_CHANGABLE_OFFSET, entry.getValue());
+		});
 	}
 
 	@Override
@@ -132,20 +155,22 @@ public class ContainerSignalController extends Container {
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void updateProgressBar(int id, int data) {
-		if (id >= 0 && id < 4096) {
+		if (id >= 0 && id < TYPE_OFFSET) {
 			if (this.supportedSigStates != null) {
 				this.supportedSigStates[id] = data;
 			} else {
-				stateCacheList.add(new AbstractMap.SimpleEntry<>(id, data));
+				stateCacheList.add(Maps.immutableEntry(id, data));
 			}
 		} else if (id >= TYPE_OFFSET && id < RS_MODES_OFFSET) {
 			if (this.supportedSigTypes != null) {
 				this.supportedSigTypes[id - TYPE_OFFSET] = data;
 			} else {
-				typeCacheList.add(new AbstractMap.SimpleEntry<>(id - TYPE_OFFSET, data));
+				typeCacheList.add(Maps.immutableEntry(id - TYPE_OFFSET, data));
 			}
-		} else if (id >= RS_MODES_OFFSET) {
+		} else if (id >= RS_MODES_OFFSET && id < GUI_CHANGABLE_OFFSET) {
 			facingRedstoneModes[id - RS_MODES_OFFSET] = data;
+		} else if(id >= GUI_CHANGABLE_OFFSET) {
+			guiCacheList.add(Maps.immutableEntry(id - GUI_CHANGABLE_OFFSET, data));
 		} else {
 			switch (id) {
 			case LINK_MSG:
