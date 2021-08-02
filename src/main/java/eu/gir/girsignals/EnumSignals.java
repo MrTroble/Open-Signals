@@ -145,12 +145,16 @@ public class EnumSignals {
 		OFF, PRE1, PRE2;
 	}
 	
-	public enum WN implements Offable<WN> {
-		OFF, WN1, WN2;
+	public enum WN implements DefaultName<WN> {
+		WN1_2l, WN1_2r, WN3_6;
+	}
+	
+	public enum WN_NORMAL implements Offable<WN_NORMAL> {
+		OFF, WN1, WN2, BLINK;
 	}
 	
 	public enum WN_CROSS implements Offable<WN_CROSS> {
-		OFF, WN3, WN4, WN5, WN6;
+		OFF, WN3, WN4, WN5, WN6, BLINK;
 	}
 
 }
