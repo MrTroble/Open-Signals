@@ -14,7 +14,11 @@ public class SignalWN extends Signal {
 	}
 
 	public static final SEProperty<Boolean> WNTYPE = SEProperty.of("wntype", false, ChangeableStage.GUISTAGE);
-	public static final SEProperty<WN_NORMAL> WNNORMAL = SEProperty.of("wnnormal", WN_NORMAL.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
-	public static final SEProperty<WN_CROSS> WNCROSS = SEProperty.of("wncross", WN_CROSS.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
+	public static final SEProperty<WN_NORMAL> WNNORMAL = SEProperty.of("wnnormal", WN_NORMAL.OFF,
+			ChangeableStage.APISTAGE_NONE_CONFIG,
+			t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(WNTYPE) && !(Boolean) e.getValue())));
+	public static final SEProperty<WN_CROSS> WNCROSS = SEProperty.of("wncross", WN_CROSS.OFF,
+			ChangeableStage.APISTAGE_NONE_CONFIG,
+			t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(WNTYPE) && (Boolean) e.getValue())));
 
 }

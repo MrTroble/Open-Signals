@@ -140,6 +140,11 @@ public class GuiSignalController extends GuiContainer {
 		pageList.clear();
 
 		final HashMap<SEProperty<?>, Object> map = Maps.newHashMap();
+		for(Entry<Integer, Integer> entry : sigController.guiCacheList) {
+			SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
+			map.put(prop, prop.getObjFromID(entry.getValue()));
+		}
+
 		for (int i = 0; i < properties.size(); i++) {
 			SEProperty<?> prop = SEProperty.cst(properties.get(i));
 			int sigState = sigController.supportedSigStates[i];
