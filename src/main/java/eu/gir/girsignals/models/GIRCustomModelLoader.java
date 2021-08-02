@@ -31,7 +31,6 @@ import eu.gir.girsignals.EnumSignals.ST_NUMBER;
 import eu.gir.girsignals.EnumSignals.TRAM;
 import eu.gir.girsignals.EnumSignals.TRAMTYPE;
 import eu.gir.girsignals.EnumSignals.VR;
-import eu.gir.girsignals.EnumSignals.WN;
 import eu.gir.girsignals.EnumSignals.WN_CROSS;
 import eu.gir.girsignals.EnumSignals.WN_NORMAL;
 import eu.gir.girsignals.EnumSignals.ZS32;
@@ -669,64 +668,40 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			}
 		});
 		registeredModels.put("wnsignal", cm -> {
-			cm.register("wn/wn1_2l", withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN1_2l))
-					.and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.OFF))), 0);
-			cm.register("wn/wn1_2l",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN1_2l))
-							.and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.WN1))),
-					0, "lamp_1", "girsignals:blocks/lamps/lamp_white_small", "lamp_3",
+			cm.register("wn/wn1_2",
+					hasAndIsNot(SignalWN.WNTYPE).and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.OFF))), 0);
+			cm.register("wn/wn1_2",
+					hasAndIsNot(SignalWN.WNTYPE).and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.WN1))), 0,
+					"lamp_1", "girsignals:blocks/lamps/lamp_white_small", "lamp_3",
 					"girsignals:blocks/lamps/lamp_white_small");
-			cm.register("wn/wn1_2l",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN1_2l))
-							.and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.WN2))),
-					0, "lamp_2", "girsignals:blocks/lamps/lamp_white_small", "lamp_3",
+			cm.register("wn/wn1_2",
+					hasAndIsNot(SignalWN.WNTYPE).and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.WN2))), 0,
+					"lamp_2", "girsignals:blocks/lamps/lamp_white_small", "lamp_3",
 					"girsignals:blocks/lamps/lamp_white_small");
-			cm.register("wn/wn1_2l",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN1_2l))
-							.and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.BLINK))),
-					0, "lamp_3", "girsignals:blocks/lamps/lamp_white_small_blink");
-			cm.register("wn/wn1_2r", withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN1_2r))
-					.and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.OFF))), 0);
-			cm.register("wn/wn1_2r",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN1_2r))
-							.and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.WN1))),
-					0, "lamp_1", "girsignals:blocks/lamps/lamp_white_small", "lamp_2",
-					"girsignals:blocks/lamps/lamp_white_small");
-			cm.register("wn/wn1_2r",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN1_2r))
-							.and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.WN2))),
-					0, "lamp_2", "girsignals:blocks/lamps/lamp_white_small", "lamp_3",
-					"girsignals:blocks/lamps/lamp_white_small");
-			cm.register("wn/wn1_2r",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN1_2r))
-							.and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.BLINK))),
-					0, "lamp_2", "girsignals:blocks/lamps/lamp_white_small_blink");
-			cm.register("wn/wn3_6", withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN3_6))
-					.and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.OFF))), 0);
+			cm.register("wn/wn1_2",
+					hasAndIsNot(SignalWN.WNTYPE).and(withN(SignalWN.WNNORMAL, wn -> wn.equals(WN_NORMAL.BLINK))), 0,
+					"lamp_3", "girsignals:blocks/lamps/lamp_white_small_blink");
 			cm.register("wn/wn3_6",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN3_6))
-							.and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.WN3))),
-					0, "lamp_1", "girsignals:blocks/lamps/lamp_white_small", "lamp_3",
-					"girsignals:blocks/lamps/lamp_white_small", "lamp_5", "girsignals:blocks/lamps/lamp_white_small");
+					hasAndIs(SignalWN.WNTYPE).and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.OFF))), 0);
 			cm.register("wn/wn3_6",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN3_6))
-							.and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.WN4))),
-					0, "lamp_1", "girsignals:blocks/lamps/lamp_white_small", "lamp_2",
-					"girsignals:blocks/lamps/lamp_white_small", "lamp_4", "girsignals:blocks/lamps/lamp_white_small");
+					hasAndIs(SignalWN.WNTYPE).and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.WN3))), 0, "lamp_1",
+					"girsignals:blocks/lamps/lamp_white_small", "lamp_3", "girsignals:blocks/lamps/lamp_white_small",
+					"lamp_5", "girsignals:blocks/lamps/lamp_white_small");
 			cm.register("wn/wn3_6",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN3_6))
-							.and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.WN5))),
-					0, "lamp_1", "girsignals:blocks/lamps/lamp_white_small", "lamp_3",
-					"girsignals:blocks/lamps/lamp_white_small", "lamp_4", "girsignals:blocks/lamps/lamp_white_small");
+					hasAndIs(SignalWN.WNTYPE).and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.WN4))), 0, "lamp_1",
+					"girsignals:blocks/lamps/lamp_white_small", "lamp_2", "girsignals:blocks/lamps/lamp_white_small",
+					"lamp_4", "girsignals:blocks/lamps/lamp_white_small");
 			cm.register("wn/wn3_6",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN3_6))
-							.and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.WN6))),
-					0, "lamp_1", "girsignals:blocks/lamps/lamp_white_small", "lamp_2",
-					"girsignals:blocks/lamps/lamp_white_small", "lamp_5", "girsignals:blocks/lamps/lamp_white_small");
+					hasAndIs(SignalWN.WNTYPE).and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.WN5))), 0, "lamp_1",
+					"girsignals:blocks/lamps/lamp_white_small", "lamp_3", "girsignals:blocks/lamps/lamp_white_small",
+					"lamp_4", "girsignals:blocks/lamps/lamp_white_small");
 			cm.register("wn/wn3_6",
-					withN(SignalWN.WNTYPE, wnt -> wnt.equals(WN.WN3_6))
-							.and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.BLINK))),
-					0, "lamp_1", "girsignals:blocks/lamps/lamp_white_small_blink");
+					hasAndIs(SignalWN.WNTYPE).and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.WN6))), 0, "lamp_1",
+					"girsignals:blocks/lamps/lamp_white_small", "lamp_2", "girsignals:blocks/lamps/lamp_white_small",
+					"lamp_5", "girsignals:blocks/lamps/lamp_white_small");
+			cm.register("wn/wn3_6",
+					hasAndIs(SignalWN.WNTYPE).and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.BLINK))), 0,
+					"lamp_1", "girsignals:blocks/lamps/lamp_white_small_blink");
 		});
 	}
 

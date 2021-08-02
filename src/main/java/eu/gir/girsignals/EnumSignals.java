@@ -69,7 +69,7 @@ public class EnumSignals {
 	public enum SH_LIGHT implements Offable<SH_LIGHT> {
 		OFF, SH0, SH1;
 	}
-	
+
 	public enum TRAMTYPE implements DefaultName<TRAMTYPE> {
 		TRAM, CAR, PEDESTRIAN
 	}
@@ -110,7 +110,7 @@ public class EnumSignals {
 	public enum RA implements DefaultName<RA> {
 		RA10, RA11A, RA11B, RA12, RA6_9;
 	}
-	
+
 	public enum RA_LIGHT implements Offable<RA_LIGHT> {
 		OFF, RA6, RA7, RA8, RA9;
 	}
@@ -144,15 +144,11 @@ public class EnumSignals {
 	public enum NE_ADDITION implements Offable<NE_ADDITION> {
 		OFF, PRE1, PRE2;
 	}
-	
-	public enum WN implements DefaultName<WN> {
-		WN1_2l, WN1_2r, WN3_6;
-	}
-	
+
 	public enum WN_NORMAL implements Offable<WN_NORMAL> {
 		OFF, WN1, WN2, BLINK;
 	}
-	
+
 	public enum WN_CROSS implements Offable<WN_CROSS> {
 		OFF, WN3, WN4, WN5, WN6, BLINK;
 	}
