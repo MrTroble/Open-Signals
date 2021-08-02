@@ -20,12 +20,14 @@ import static eu.gir.girsignals.guis.GuiPlacementtool.visible;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
@@ -137,6 +139,15 @@ public class GuiSignalController extends GuiContainer {
 		int index = 0;
 		pageList.clear();
 
+		final HashMap<SEProperty<?>, Object> map = Maps.newHashMap();
+		for (int i = 0; i < properties.size(); i++) {
+			SEProperty<?> prop = SEProperty.cst(properties.get(i));
+			int sigState = sigController.supportedSigStates[i];
+			if (sigState < 0 || sigState >= prop.count())
+				continue;
+			map.put(prop, prop.getObjFromID(sigState));
+		}
+		
 		if (sigController.indexMode == EnumMode.MANUELL) {
 			pageList.add(Lists.newArrayList());
 			boolean visible = true;
@@ -145,7 +156,7 @@ public class GuiSignalController extends GuiContainer {
 				final int id = i;
 				final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
 				final int state = sigController.supportedSigStates[i];
-				if (state < 0 || state >= prop.count())
+				if (state < 0 || state >= prop.count() || !prop.test(map))
 					continue;
 				if (!prop.isChangabelAtStage(ChangeableStage.APISTAGE) && !prop.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
 					continue;
