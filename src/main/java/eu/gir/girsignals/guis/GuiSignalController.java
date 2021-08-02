@@ -20,6 +20,7 @@ import static eu.gir.girsignals.guis.GuiPlacementtool.visible;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 
 import org.lwjgl.opengl.GL11;
@@ -402,6 +403,11 @@ public class GuiSignalController extends GuiContainer {
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 		IExtendedBlockState ebs = (IExtendedBlockState) signal.getDefaultState();
 
+		for(Entry<Integer, Integer> entry : sigController.guiCacheList) {
+			SEProperty prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
+			ebs = ebs.withProperty(prop, prop.getObjFromID(entry.getValue()));
+		}
+		
 		for (int i = 0; i < properties.size(); i++) {
 			SEProperty prop = SEProperty.cst(properties.get(i));
 			int sigState = sigController.supportedSigStates[i];
