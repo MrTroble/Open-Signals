@@ -1,5 +1,8 @@
 package eu.gir.girsignals;
 
+import java.util.HashMap;
+import java.util.function.Predicate;
+
 import com.google.common.base.Optional;
 
 import eu.gir.girsignals.EnumSignals.IIntegerable;
@@ -10,7 +13,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>, IIntegerable<T> {
+public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>, IIntegerable<T>, Predicate<HashMap<SEProperty<?>, Object>> {
 
 	public enum ChangeableStage {
 		APISTAGE, GUISTAGE, APISTAGE_NONE_CONFIG(/*Not configurable in UI*/), AUTOMATICSTAGE(/*Special stage, does nothing*/);
@@ -19,11 +22,13 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	private final IProperty<T> parent;
 	private final T defaultValue;
 	private final ChangeableStage stage;
+	private final Predicate<HashMap<SEProperty<?>, Object>> deps;
 
-	public SEProperty(IProperty<T> parent, T defaultValue, ChangeableStage stage) {
+	public SEProperty(IProperty<T> parent, T defaultValue, ChangeableStage stage, Predicate<HashMap<SEProperty<?>, Object>> deps) {
 		this.parent = parent;
 		this.defaultValue = defaultValue;
 		this.stage = stage;
+		this.deps = deps;
 	}
 
 	@Override
@@ -133,14 +138,28 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	public static SEProperty<Boolean> of(String name, boolean defaultValue) {
 		return of(name, defaultValue, ChangeableStage.APISTAGE);
 	}
-
-	@SuppressWarnings("unchecked")
-	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue,
-			ChangeableStage stage) {
-		return new SEProperty<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage);
+	
+	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue, ChangeableStage stage) {
+		return of(name, defaultValue, stage, t -> true);
 	}
 
 	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage) {
-		return new SEProperty<Boolean>(PropertyBool.create(name), defaultValue, stage);
+		return of(name, defaultValue, stage, t -> true);
 	}
+
+	@SuppressWarnings("unchecked")
+	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue,
+			ChangeableStage stage, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+		return new SEProperty<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage, deps);
+	}
+
+	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+		return new SEProperty<Boolean>(PropertyBool.create(name), defaultValue, stage, deps);
+	}
+
+	@Override
+	public boolean test(HashMap<SEProperty<?>, Object> t) {
+		return this.deps.test(t);
+	}
+
 }

@@ -25,6 +25,7 @@ tile.othersignal.name=Other signals
 tile.buelight.name=BÜ Signal
 tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Platform Number
+tile.wnsignal.name=WN Signal
 
 #Linktool
 lt.linkfailed=Link failed!
@@ -88,6 +89,11 @@ property.neaddition.name=Ne2 addition
 property.stationnumber.name=Number
 property.sh_high.name=Shunting Signal 3 blocks high
 property.signaltramtype.name=Traffic- and TRAM lights
+property.wntype.name=WN Signal Type
+property.wnnormal.name=Normal Switch
+property.wncross.name=Double crossing switch
+property.ralightsignal.name=Hump Shunting Signal
+
 
 #Signal Descs
 property.signaltype.desc=Here you can select the different signal types.
@@ -132,6 +138,10 @@ property.neaddition.desc=
 property.stationnumber.desc=
 property.sh_high.desc=Shunting signal 3 blocks high.
 property.signaltramtype.desc=
+property.wntype.desc=
+property.wnnormal.desc=
+property.wncross.desc=
+property.ralightsignal.desc=
 
 #Directions
 property.up.name=Up

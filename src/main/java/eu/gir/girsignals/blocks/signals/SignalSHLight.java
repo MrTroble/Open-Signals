@@ -13,7 +13,7 @@ import net.minecraft.client.gui.FontRenderer;
 public class SignalSHLight extends Signal {
 
 	public SignalSHLight() {
-		super(builder(GIRItems.PLACEMENT_TOOL, "SHLight").height(0).offsetX(-12.5f).offsetY(-6.3f).signHeight(0.35f).build());
+		super(builder(GIRItems.PLACEMENT_TOOL, "SHLight").height(0).offsetX(-7.5f).offsetY(-6.3f).signHeight(0.35f).build());
 	}
 
 	public static final SEProperty<SH_LIGHT> SHLIGHT_0 = SEProperty.of("sh_light_bottom", SH_LIGHT.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);

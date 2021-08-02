@@ -25,6 +25,7 @@ tile.othersignal.name=Sonstige Signale
 tile.buelight.name=BÜ Signal
 tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Bahnsteignummern
+tile.wnsignal.name=WN Signal
 
 #Linktool
 lt.linkfailed=Link fehlgeschlagen!
@@ -88,6 +89,10 @@ property.neaddition.name=Ne2 Zusatz
 property.stationnumber.name=Nummer
 property.sh_high.name=Rangiersignal 3 Block hoch
 property.signaltramtype.name=Straßen- und TRAM Ampeln
+property.wntype.name=WN Signal Art
+property.wnnormal.name=Normale Weiche
+property.wncross.name=Doppelte Kreuzungsweiche
+property.ralightsignal.name=Abdrücksignal
 
 #Signal Descs
 property.signaltype.desc=Hier kannst du die verschiedenen Signaltypen wählen.
@@ -132,6 +137,10 @@ property.neaddition.desc=
 property.stationnumber.desc=
 property.sh_high.desc=Rangiersignal um 3 Blöcke erhöht.
 property.signaltramtype.desc=
+property.wntype.desc=
+property.wnnormal.desc=
+property.wncross.desc=
+property.ralightsignal.desc=
 
 #Directions
 property.up.name=Oben
