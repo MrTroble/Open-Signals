@@ -12,12 +12,10 @@ import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 
-import eu.gir.girsignals.EnumSignals.IIntegerable;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.GuiSignalController.SizeIntegerables;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.items.Placementtool;
 import io.netty.buffer.ByteBuf;
@@ -199,11 +197,9 @@ public class GuiPlacementtool extends GuiScreen {
 		int maxWidth = 0;
 		for (IUnlistedProperty<?> lenIUnlistedProperty : unlistedProperties) {
 			final SEProperty<?> sep = SEProperty.cst(lenIUnlistedProperty);
-			for (int i = 0; i < sep.count(); i++) {
-				maxWidth = Math.max(
-						fontRenderer.getStringWidth(I18n.format("property." + lenIUnlistedProperty.getName() + ".name") + ": " + sep.getObjFromID(i)),
-						maxWidth);
-			}
+			final int newMax = sep.getMaxWidth(this.fontRenderer);
+			if (maxWidth < newMax)
+				maxWidth = newMax;
 		}
 		maxWidth = Math.max(SIGNALTYPE_FIXED_WIDTH, maxWidth);
 
@@ -215,8 +211,8 @@ public class GuiPlacementtool extends GuiScreen {
 		int yPos = this.guiTop + TOP_OFFSET;
 		final int xPos = this.guiLeft + LEFT_OFFSET;
 
-		final GuiEnumerableSetting settings = new GuiEnumerableSetting(tool, SIGNAL_TYPE_ID, xPos, yPos,
-				maxWidth, "signaltype", this.implLastID, null);
+		final GuiEnumerableSetting settings = new GuiEnumerableSetting(tool, SIGNAL_TYPE_ID, xPos, yPos, maxWidth,
+				this.implLastID, null);
 		settings.consumer = input -> {
 			settings.enabled = false;
 			implLastID = input;
@@ -253,7 +249,7 @@ public class GuiPlacementtool extends GuiScreen {
 				yPos += CHECK_BOX_HEIGHT;
 			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 				final GuiEnumerableSetting setting = new GuiEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
-						propName, comp.getInteger(propName), inp -> applyModelChanges());
+						comp.getInteger(propName), inp -> applyModelChanges());
 				addButton(setting).visible = visible;
 				pageList.get(index).add(setting);
 				yPos += SETTINGS_HEIGHT;
@@ -267,21 +263,9 @@ public class GuiPlacementtool extends GuiScreen {
 			yPos += ELEMENT_SPACING;
 		}
 
-		if (pageList.size() > 1) {
-			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
-					idx -> (String) (idx + "/" + (pageList.size() - 1)));
-			final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
-					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page", indexCurrentlyUsed, inp -> {
-						pageList.get(indexCurrentlyUsed).forEach(visible(false));
-						pageList.get(inp).forEach(visible(true));
-						indexCurrentlyUsed = inp;
-					}, false);
-			pageSelection.setWidth(
-					mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
-			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GuiEnumerableSetting.BUTTON_SIZE;
-			pageSelection.update();
-			addButton(pageSelection);
-		}
+		DrawUtil.getPageSelect(pageList, indexCurrentlyUsed, this.guiLeft + maxWidth / 2, this.guiTop + this.ySize,
+				fontRenderer, inp -> indexCurrentlyUsed = inp).ifPresent(this::addButton);
+
 		applyModelChanges();
 	}
 
@@ -327,11 +311,11 @@ public class GuiPlacementtool extends GuiScreen {
 			if (btn.id != DEFAULT_ID)
 				continue;
 			SEProperty property;
-			while((property = (SEProperty) properties[i]).isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+			while ((property = (SEProperty) properties[i]).isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
 				i++;
 			if (btn instanceof GuiCheckBox) {
 				GuiCheckBox buttonCheckBox = (GuiCheckBox) btn;
-				if(property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+				if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 					ebs = ebs.withProperty(property, buttonCheckBox.isChecked());
 				} else if (buttonCheckBox.isChecked()) {
 					ebs = ebs.withProperty(property, property.getDefault());
@@ -344,15 +328,15 @@ public class GuiPlacementtool extends GuiScreen {
 		}
 		for (IUnlistedProperty prop : properties) {
 			final SEProperty property = SEProperty.cst(prop);
-			if(property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+			if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
 				ebs = ebs.withProperty(property, property.getDefault());
 			}
 		}
-		
+
 		map.clear();
 		ebs.getUnlistedProperties().forEach((prop, opt) -> opt.ifPresent(val -> map.put(SEProperty.cst(prop), val)));
-		
-		if(currentSelectedBlock.canHaveCustomname(map) && !textField.getText().isEmpty())
+
+		if (currentSelectedBlock.canHaveCustomname(map) && !textField.getText().isEmpty())
 			ebs = ebs.withProperty(Signal.CUSTOMNAME, true);
 		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
@@ -385,7 +369,7 @@ public class GuiPlacementtool extends GuiScreen {
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		super.keyTyped(typedChar, keyCode);
 		if (currentSelectedBlock.canHaveCustomname(map))
-			if(textField.textboxKeyTyped(typedChar, keyCode))
+			if (textField.textboxKeyTyped(typedChar, keyCode))
 				applyModelChanges();
 	}
 

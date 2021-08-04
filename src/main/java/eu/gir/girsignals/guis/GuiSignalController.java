@@ -6,7 +6,6 @@ import static eu.gir.girsignals.guis.GuiPlacementtool.ELEMENT_SPACING;
 import static eu.gir.girsignals.guis.GuiPlacementtool.GUI_INSET;
 import static eu.gir.girsignals.guis.GuiPlacementtool.LEFT_OFFSET;
 import static eu.gir.girsignals.guis.GuiPlacementtool.MAXIMUM_GUI_HEIGHT;
-import static eu.gir.girsignals.guis.GuiPlacementtool.PAGE_SELECTION_ID;
 import static eu.gir.girsignals.guis.GuiPlacementtool.SETTINGS_HEIGHT;
 import static eu.gir.girsignals.guis.GuiPlacementtool.SIGNALTYPE_FIXED_WIDTH;
 import static eu.gir.girsignals.guis.GuiPlacementtool.SIGNALTYPE_INSET;
@@ -16,7 +15,6 @@ import static eu.gir.girsignals.guis.GuiPlacementtool.STRING_COLOR;
 import static eu.gir.girsignals.guis.GuiPlacementtool.STRING_SCALE;
 import static eu.gir.girsignals.guis.GuiPlacementtool.TOP_OFFSET;
 import static eu.gir.girsignals.guis.GuiPlacementtool.TOP_STRING_OFFSET;
-import static eu.gir.girsignals.guis.GuiPlacementtool.visible;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -78,14 +76,12 @@ public class GuiSignalController extends GuiContainer {
 
 	public class Setting {
 		public final IIntegerable<?> iintg;
-		public final String name;
 		public final int defaultValue;
 		public final Consumer<Integer> consumer;
 
-		public Setting(final IIntegerable<?> iintg, final String name, final int defaultValue,
+		public Setting(final IIntegerable<?> iintg, final int defaultValue,
 				final Consumer<Integer> consumer) {
 			this.iintg = iintg;
-			this.name = name;
 			this.defaultValue = defaultValue;
 			this.consumer = consumer;
 		}
@@ -130,7 +126,7 @@ public class GuiSignalController extends GuiContainer {
 		final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
 
 		final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable, SIGNAL_TYPE_ID, xPos, yPos,
-				maxWidth, "signaltype", sigController.indexMode.ordinal(), input -> {
+				maxWidth, sigController.indexMode.ordinal(), input -> {
 					sigController.indexMode = EnumMode.values()[input];
 					sigController.indexCurrentlyUsed = 0;
 					initGui();
@@ -140,7 +136,7 @@ public class GuiSignalController extends GuiContainer {
 		pageList.clear();
 
 		final HashMap<SEProperty<?>, Object> map = Maps.newHashMap();
-		for(Entry<Integer, Integer> entry : sigController.guiCacheList) {
+		for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
 			SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
 			map.put(prop, prop.getObjFromID(entry.getValue()));
 		}
@@ -152,7 +148,7 @@ public class GuiSignalController extends GuiContainer {
 				continue;
 			map.put(prop, prop.getObjFromID(sigState));
 		}
-		
+
 		if (sigController.indexMode == EnumMode.MANUELL) {
 			pageList.add(Lists.newArrayList());
 			boolean visible = true;
@@ -163,7 +159,8 @@ public class GuiSignalController extends GuiContainer {
 				final int state = sigController.supportedSigStates[i];
 				if (state < 0 || state >= prop.count() || !prop.test(map))
 					continue;
-				if (!prop.isChangabelAtStage(ChangeableStage.APISTAGE) && !prop.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+				if (!prop.isChangabelAtStage(ChangeableStage.APISTAGE)
+						&& !prop.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
 					continue;
 				if (yPos >= (this.guiTop + this.ySize - BOTTOM_OFFSET)) {
 					pageList.add(Lists.newArrayList());
@@ -171,9 +168,8 @@ public class GuiSignalController extends GuiContainer {
 					yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
 				}
 				visible = index == sigController.indexCurrentlyUsed;
-				String propName = prop.getName();
 				final GuiEnumerableSetting setting = new GuiEnumerableSetting(prop, DEFAULT_ID, xPos, yPos, maxWidth,
-						propName, state, inp -> sendChanges(id, inp));
+						state, inp -> sendChanges(id, inp));
 				addButton(setting).visible = visible;
 				pageList.get(index).add(setting);
 				yPos += SETTINGS_HEIGHT;
@@ -181,12 +177,12 @@ public class GuiSignalController extends GuiContainer {
 			}
 		} else if (sigController.indexMode == EnumMode.REDSTONE) {
 			final int fLen = sigController.supportedSigTypes.length;
-			final SizeIntegerables<String> possibleSignalTypesIntegerable = new SizeIntegerables<>(fLen + 1, in -> {
+			final IIntegerable<?> possibleSignalTypesIntegerable = SizeIntegerables.of("sigtype", fLen + 1, in -> {
 				if (in >= fLen)
 					return "None";
 				final int type = sigController.supportedSigTypes[in];
 				final String name = signal.getPropertyFromID(type).getName();
-				return I18n.format("property." + name + ".name");
+				return name;
 			});
 			final int config = sigController.facingRedstoneModes[sigController.faceUsed.ordinal()];
 			final int[] unpacked = SignalControllerTileEntity.unpack(config);
@@ -198,7 +194,7 @@ public class GuiSignalController extends GuiContainer {
 					? SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]))
 					: null;
 
-			final Setting rs_mode_setting = new Setting(new EnumIntegerable<>(EnumRedstoneMode.class), "rsmode",
+			final Setting rs_mode_setting = new Setting(new EnumIntegerable<>(EnumRedstoneMode.class),
 					sigController.rsMode.ordinal(), in -> {
 						sigController.rsMode = EnumRedstoneMode.values()[in];
 						sendToPos(GIRNetworkHandler.SIG_CON_RS_SET, buffer -> {
@@ -207,16 +203,16 @@ public class GuiSignalController extends GuiContainer {
 					});
 
 			final Setting[] settingList = sigController.rsMode == EnumRedstoneMode.SINGLE
-					? new Setting[] { rs_mode_setting, new Setting(new EnumIntegerable<>(EnumFacing.class), "face",
+					? new Setting[] { rs_mode_setting, new Setting(new EnumIntegerable<>(EnumFacing.class),
 							sigController.faceUsed.ordinal(), in -> {
 								sigController.faceUsed = EnumFacing.values()[in];
 								initGui();
 							}),
-							new Setting(possibleSignalTypesIntegerable, "sigtype", sigType > fLen ? fLen : sigType,
+							new Setting(possibleSignalTypesIntegerable, sigType > fLen ? fLen : sigType,
 									in -> sendPacked(pack(in, sigOn, sigOff))),
-							new Setting(prop, "sigon", sigOn, in -> sendPacked(pack(sigType, in, sigOff))),
-							new Setting(prop, "sigoff", sigOff, in -> sendPacked(pack(sigType, sigOn, in))) }
-					: new Setting[] { rs_mode_setting, new Setting(new EnumIntegerable<>(EnumMuxMode.class), "muxmode",
+							new Setting(prop, sigOn, in -> sendPacked(pack(sigType, in, sigOff))),
+							new Setting(prop, sigOff, in -> sendPacked(pack(sigType, sigOn, in))) }
+					: new Setting[] { rs_mode_setting, new Setting(new EnumIntegerable<>(EnumMuxMode.class),
 							sigController.muxMode.ordinal(), in -> {
 								sigController.muxMode = EnumMuxMode.values()[in];
 								for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
@@ -226,7 +222,7 @@ public class GuiSignalController extends GuiContainer {
 									}
 								}
 								initGui();
-							}), new Setting(new EnumIntegerable<>(EnumFacing.class), "face",
+							}), new Setting(new EnumIntegerable<>(EnumFacing.class),
 									sigController.faceUsed.ordinal(), in -> {
 										sigController.faceUsed = EnumFacing.values()[in];
 										for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
@@ -257,7 +253,7 @@ public class GuiSignalController extends GuiContainer {
 					yPos = this.guiTop + SETTINGS_HEIGHT + ELEMENT_SPACING + TOP_OFFSET;
 				}
 				final GuiEnumerableSetting rsModeSetting = new GuiEnumerableSetting(set.iintg, SIGNAL_TYPE_ID + 1, xPos,
-						yPos, maxWidth, set.name, set.defaultValue < set.iintg.count() ? set.defaultValue : 0,
+						yPos, maxWidth, set.defaultValue < set.iintg.count() ? set.defaultValue : 0,
 						set.consumer);
 				addButton(rsModeSetting);
 				rsModeSetting.visible = index == sigController.indexCurrentlyUsed;
@@ -265,23 +261,10 @@ public class GuiSignalController extends GuiContainer {
 				yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
 			}
 		}
-		if (pageList.size() > 1) {
-			final IIntegerable<String> sizeIn = SizeIntegerables.of(pageList.size(),
-					idx -> (String) (idx + "/" + (pageList.size() - 1)));
-			final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
-					this.guiTop + this.ySize - BOTTOM_OFFSET + ELEMENT_SPACING, 0, "page",
-					sigController.indexCurrentlyUsed, inp -> {
-						pageList.get(sigController.indexCurrentlyUsed).forEach(visible(false));
-						pageList.get(inp).forEach(visible(true));
-						sigController.indexCurrentlyUsed = inp;
-					}, false);
-			pageSelection.setWidth(
-					mc.fontRenderer.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
-			pageSelection.x = this.guiLeft + ((maxWidth - pageSelection.width) / 2) + GuiEnumerableSetting.BUTTON_SIZE;
-			pageSelection.update();
-			addButton(pageSelection);
-		}
 
+		DrawUtil.getPageSelect(pageList, sigController.indexCurrentlyUsed, this.guiLeft + maxWidth / 2, this.guiTop + this.ySize,
+				fontRenderer, inp -> sigController.indexCurrentlyUsed = inp).ifPresent(this::addButton);
+		
 		updateDraw();
 	}
 
@@ -315,6 +298,11 @@ public class GuiSignalController extends GuiContainer {
 		public int count() {
 			return t.getEnumConstants().length;
 		}
+
+		@Override
+		public String getName() {
+			return t.getSimpleName().toLowerCase();
+		}
 	}
 
 	public interface ObjGetter<D> {
@@ -325,10 +313,12 @@ public class GuiSignalController extends GuiContainer {
 
 		private final int count;
 		private final ObjGetter<T> getter;
+		private final String name;
 
-		private SizeIntegerables(final int count, final ObjGetter<T> getter) {
+		public SizeIntegerables(final String name, final int count, final ObjGetter<T> getter) {
 			this.count = count;
 			this.getter = getter;
+			this.name = name;
 		}
 
 		@Override
@@ -341,8 +331,13 @@ public class GuiSignalController extends GuiContainer {
 			return count;
 		}
 
-		public static <T> IIntegerable<T> of(final int count, final ObjGetter<T> get) {
-			return new SizeIntegerables<T>(count, get);
+		public static <T> IIntegerable<T> of(final String name, final int count, final ObjGetter<T> get) {
+			return new SizeIntegerables<T>(name, count, get);
+		}
+
+		@Override
+		public String getName() {
+			return this.name;
 		}
 
 	}
@@ -419,11 +414,11 @@ public class GuiSignalController extends GuiContainer {
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 		IExtendedBlockState ebs = (IExtendedBlockState) signal.getDefaultState();
 
-		for(Entry<Integer, Integer> entry : sigController.guiCacheList) {
+		for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
 			SEProperty prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
 			ebs = ebs.withProperty(prop, prop.getObjFromID(entry.getValue()));
 		}
-		
+
 		for (int i = 0; i < properties.size(); i++) {
 			SEProperty prop = SEProperty.cst(properties.get(i));
 			int sigState = sigController.supportedSigStates[i];

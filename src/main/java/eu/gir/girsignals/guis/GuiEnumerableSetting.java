@@ -3,12 +3,10 @@ package eu.gir.girsignals.guis;
 import java.util.function.Consumer;
 
 import eu.gir.girsignals.EnumSignals.IIntegerable;
-import eu.gir.girsignals.guis.GuiPlacementtool.InternalUnlocalized;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.resources.I18n;
 
-public class GuiEnumerableSetting extends GuiButton implements InternalUnlocalized {
+public class GuiEnumerableSetting extends GuiButton {
 
 	protected int value = 0;
 	protected boolean pressed = false, lor = false, lock = true;
@@ -16,8 +14,6 @@ public class GuiEnumerableSetting extends GuiButton implements InternalUnlocaliz
 
 	protected final IIntegerable<?> property;
 	protected final int max;
-	protected final String buttonText;
-	protected final String unlocalized;
 	protected GuiButton leftButton;
 	protected GuiButton rightButton;
 	protected final boolean middleButton;
@@ -26,24 +22,22 @@ public class GuiEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	public static final int BUTTON_SIZE = 20;
 	private static final int STRING_COLOR = 14737632;
 
-	public GuiEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
-			final String buttonText, final int initialValue, final Consumer<Integer> consumer) {
-		this(property, id, x, y, width, buttonText, initialValue, consumer, true);
+	public GuiEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width
+			, final int initialValue, final Consumer<Integer> consumer) {
+		this(property, id, x, y, width, initialValue, consumer, true);
 	}
 
 	public GuiEnumerableSetting(final IIntegerable<?> property, final int id, final int x, final int y, final int width,
-			final String buttonText, int initialValue, final Consumer<Integer> consumer, final boolean middleButton) {
-		super(id, x, y, I18n.format("property." + buttonText + ".name"));
+		int initialValue, final Consumer<Integer> consumer, final boolean middleButton) {
+		super(id, x, y, null);
 		if (initialValue >= property.count())
 			initialValue = 0;
-		this.buttonText = I18n.format("property." + buttonText + ".name");
-		this.displayString = this.buttonText + ": " + property.getObjFromID(initialValue).toString();
 		this.property = property;
+		this.displayString = this.getValueString(initialValue);
 		this.value = initialValue;
 		this.max = property.count() - 1;
 		this.width = width;
 		this.consumer = consumer;
-		this.unlocalized = buttonText;
 		this.middleButton = middleButton;
 		update();
 	}
@@ -67,9 +61,9 @@ public class GuiEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	}
 
 	private String getValueString(int id) {
-		return buttonText + ": " + property.getObjFromID(id).toString();
+		return this.property.getNamedObj(id);
 	}
-
+	
 	@Override
 	public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
 		if (middleButton) {
@@ -116,11 +110,6 @@ public class GuiEnumerableSetting extends GuiButton implements InternalUnlocaliz
 	public void mouseReleased(int mouseX, int mouseY) {
 		lock = true;
 		pressed = false;
-	}
-
-	@Override
-	public String getUnlocalized() {
-		return this.unlocalized;
 	}
 
 }

@@ -111,4 +111,9 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 		return signalids.size();
 	}
 
+	@Override
+	public String getName() {
+		return "signaltype";
+	}
+
 }

@@ -1,14 +1,23 @@
 package eu.gir.girsignals.guis;
 
+import static eu.gir.girsignals.guis.GuiPlacementtool.BOTTOM_OFFSET;
+import static eu.gir.girsignals.guis.GuiPlacementtool.ELEMENT_SPACING;
+import static eu.gir.girsignals.guis.GuiPlacementtool.PAGE_SELECTION_ID;
+import static eu.gir.girsignals.guis.GuiPlacementtool.visible;
 import static net.minecraft.client.gui.Gui.drawRect;
 import static net.minecraft.client.gui.Gui.drawScaledCustomSizeModalRect;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
 
+import eu.gir.girsignals.guis.GuiSignalController.SizeIntegerables;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -18,6 +27,7 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.client.renderer.vertex.VertexFormatElement;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.pipeline.LightUtil;
@@ -28,6 +38,32 @@ public class DrawUtil {
 	private static final ResourceLocation CREATIVE_INVENTORY_TABS = new ResourceLocation(
 			"textures/gui/container/creative_inventory/tabs.png");
 	public static final float DIM = 256.0f;
+
+	public static final Optional<GuiButton> getPageSelect(final ArrayList<ArrayList<Object>> pageList, final int inital,
+			final int x, final int y, final FontRenderer render, final Consumer<Integer> onTrigger) {
+		if (pageList.size() > 1) {
+			final SizeIntegerables<String> sizeIn = new SizeIntegerables<String>("page", pageList.size(),
+					idx -> (String) (idx + "/" + (pageList.size() - 1))) {
+				
+				@Override
+				public String getNamedObj(int obj) {
+					return I18n.format("property." + this.getName() + ".name") + ": " + obj;
+				}
+			};
+			final GuiEnumerableSetting pageSelection = new GuiEnumerableSetting(sizeIn, PAGE_SELECTION_ID, 0,
+					y - BOTTOM_OFFSET + ELEMENT_SPACING, 0, inital, inp -> {
+						pageList.get(inital).forEach(visible(false));
+						pageList.get(inp).forEach(visible(true));
+						onTrigger.accept(inp);
+					}, false);
+			pageSelection
+					.setWidth(render.getStringWidth(pageSelection.displayString) + GuiEnumerableSetting.OFFSET * 2);
+			pageSelection.x = x - (pageSelection.width / 2) + GuiEnumerableSetting.BUTTON_SIZE;
+			pageSelection.update();
+			return Optional.of(pageSelection);
+		}
+		return Optional.empty();
+	}
 
 	public static void drawBack(GuiScreen gui, final int xLeft, final int xRight, final int yTop, final int yBottom) {
 		gui.mc.getTextureManager().bindTexture(CREATIVE_INVENTORY_TABS);

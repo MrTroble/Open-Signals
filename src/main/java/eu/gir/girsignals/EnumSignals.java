@@ -1,5 +1,7 @@
 package eu.gir.girsignals;
 
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.util.IStringSerializable;
 
 public class EnumSignals {
@@ -9,6 +11,23 @@ public class EnumSignals {
 		public T getObjFromID(int obj);
 
 		public int count();
+		
+		public String getName();
+		
+		default public String getNamedObj(int obj) {
+			return I18n.format("property." + this.getName() + ".name") + ": " + I18n.format("property.value." + getObjFromID(obj).toString());
+		}
+		
+		default public int getMaxWidth(final FontRenderer render) {
+			int ret = 0;
+			for (int i = 0; i < this.count(); i++) {
+				final int newVal = render.getStringWidth(getNamedObj(i));
+				if(ret < newVal)
+					ret = newVal;
+			}
+			return ret;
+		}
+
 	}
 
 	public interface DefaultName<T extends Enum<T>> extends IStringSerializable, Comparable<T> {
