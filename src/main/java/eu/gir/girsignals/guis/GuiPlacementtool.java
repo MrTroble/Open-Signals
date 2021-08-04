@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.function.Consumer;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.GL11;
@@ -83,7 +82,6 @@ public class GuiPlacementtool extends GuiScreen {
 	private boolean dragging = false;
 	private GuiTextField textField;
 	private ArrayList<ArrayList<Object>> pageList = new ArrayList<>();
-	private int indexCurrentlyUsed = 0;
 	private HashMap<SEProperty<?>, Object> map = new HashMap<>();
 
 	public GuiPlacementtool(ItemStack stack) {
@@ -226,7 +224,7 @@ public class GuiPlacementtool extends GuiScreen {
 		pageList.clear();
 		pageList.add(Lists.newArrayList());
 		boolean visible = true;
-		int index = indexCurrentlyUsed = 0;
+		int index = 0;
 		yPos += SETTINGS_HEIGHT + ELEMENT_SPACING;
 		for (IUnlistedProperty<?> property : unlistedProperties) {
 			SEProperty<?> prop = SEProperty.cst(property);
@@ -263,19 +261,10 @@ public class GuiPlacementtool extends GuiScreen {
 			yPos += ELEMENT_SPACING;
 		}
 
-		DrawUtil.getPageSelect(pageList, indexCurrentlyUsed, this.guiLeft + maxWidth / 2, this.guiTop + this.ySize,
-				fontRenderer, inp -> indexCurrentlyUsed = inp).ifPresent(this::addButton);
+		DrawUtil.getPageSelect(pageList, 0, this.guiLeft + maxWidth / 2, this.guiTop + this.ySize, fontRenderer,
+				inp -> { }).ifPresent(this::addButton);
 
 		applyModelChanges();
-	}
-
-	public static Consumer<Object> visible(final boolean b) {
-		return obj -> {
-			if (obj instanceof GuiButton)
-				((GuiButton) obj).visible = b;
-			if (obj instanceof GuiTextField)
-				((GuiTextField) obj).setVisible(b);
-		};
 	}
 
 	@Override

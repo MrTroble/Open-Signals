@@ -32,6 +32,9 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.guis.DrawUtil.EnumIntegerable;
+import eu.gir.girsignals.guis.DrawUtil.Setting;
+import eu.gir.girsignals.guis.DrawUtil.SizeIntegerables;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
@@ -74,19 +77,6 @@ public class GuiSignalController extends GuiContainer {
 		MUX_CONTROL, SIGNAL_CONTROL
 	}
 
-	public class Setting {
-		public final IIntegerable<?> iintg;
-		public final int defaultValue;
-		public final Consumer<Integer> consumer;
-
-		public Setting(final IIntegerable<?> iintg, final int defaultValue,
-				final Consumer<Integer> consumer) {
-			this.iintg = iintg;
-			this.defaultValue = defaultValue;
-			this.consumer = consumer;
-		}
-	}
-
 	@Override
 	public void initGui() {
 		this.mc.player.openContainer = this.inventorySlots;
@@ -98,19 +88,12 @@ public class GuiSignalController extends GuiContainer {
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 
 		properties.clear();
-		int maxWidth = 0;
+		final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
+		int maxWidth = modeIntegerable.getMaxWidth(fontRenderer);
 		for (final int id : sigController.supportedSigTypes) {
 			final SEProperty<?> lenIUnlistedProperty = (SEProperty<?>) signal.getPropertyFromID(id);
 			properties.add(lenIUnlistedProperty);
-			int maxSelection = 0;
-			for (int i = 0; i < lenIUnlistedProperty.count(); i++) {
-				final String name = lenIUnlistedProperty.getObjFromID(i).toString();
-				maxSelection = Math.max(maxSelection, fontRenderer.getStringWidth(name));
-			}
-			maxWidth = Math.max(
-					fontRenderer.getStringWidth(I18n.format("property." + lenIUnlistedProperty.getName() + ".name"))
-							+ maxSelection + 15,
-					maxWidth);
+			maxWidth = lenIUnlistedProperty.getMaxWidth(fontRenderer);
 		}
 		maxWidth = Math.max(SIGNALTYPE_FIXED_WIDTH, maxWidth);
 		this.xSize = maxWidth + SIGNAL_RENDER_WIDTH_AND_INSET + SIGNALTYPE_INSET;
@@ -122,8 +105,6 @@ public class GuiSignalController extends GuiContainer {
 
 		int yPos = this.guiTop + TOP_OFFSET;
 		final int xPos = this.guiLeft + LEFT_OFFSET;
-
-		final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
 
 		final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable, SIGNAL_TYPE_ID, xPos, yPos,
 				maxWidth, sigController.indexMode.ordinal(), input -> {
@@ -279,67 +260,6 @@ public class GuiSignalController extends GuiContainer {
 	public int pack(final int sigTypeID, final int onSig, final int offSig) {
 		return (sigTypeID & 0b00000000000000000000000000001111) | ((onSig & 0b00000000000000000000000000111111) << 4)
 				| ((offSig & 0b00000000000000000000000000111111) << 10);
-	}
-
-	public static class EnumIntegerable<T extends Enum<T>> implements IIntegerable<T> {
-
-		private Class<T> t;
-
-		public EnumIntegerable(Class<T> t) {
-			this.t = t;
-		}
-
-		@Override
-		public T getObjFromID(int obj) {
-			return t.getEnumConstants()[obj];
-		}
-
-		@Override
-		public int count() {
-			return t.getEnumConstants().length;
-		}
-
-		@Override
-		public String getName() {
-			return t.getSimpleName().toLowerCase();
-		}
-	}
-
-	public interface ObjGetter<D> {
-		D getObjFrom(int x);
-	}
-
-	public static class SizeIntegerables<T> implements IIntegerable<T> {
-
-		private final int count;
-		private final ObjGetter<T> getter;
-		private final String name;
-
-		public SizeIntegerables(final String name, final int count, final ObjGetter<T> getter) {
-			this.count = count;
-			this.getter = getter;
-			this.name = name;
-		}
-
-		@Override
-		public T getObjFromID(int obj) {
-			return this.getter.getObjFrom(obj);
-		}
-
-		@Override
-		public int count() {
-			return count;
-		}
-
-		public static <T> IIntegerable<T> of(final String name, final int count, final ObjGetter<T> get) {
-			return new SizeIntegerables<T>(name, count, get);
-		}
-
-		@Override
-		public String getName() {
-			return this.name;
-		}
-
 	}
 
 	@Override
