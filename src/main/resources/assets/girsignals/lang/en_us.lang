@@ -38,8 +38,6 @@ lt.notaddable=This block cannot be linked
 #Placementtool
 pt.itemnotset=Please set the tool before (sneak + right click)
 
-#Sign Placementtool
-
 #Signal Names
 property.zs3.name=ZS3
 property.zs1.name=ZS1
@@ -97,7 +95,7 @@ property.ralightsignal.name=Hump Shunting Signal
 
 #Signal Descs
 property.signaltype.desc=Here you can select the different signal types.
-property.zs3.desc=The following additional signals can be displayed via the §lZs3§r:%n%n§nZs2 Direction indicator§r - The Zs2 indicates by an indicator letter in which direction the track runs in the case of several adjacent tracks.%n§nZs3 Speed indicator§r - The Zs3 indicates by a code digit which speed (digit x 10 in km/h) may not be exceeded from the signal in the connected switch area or up to the next main signal. The code number §l3§r can indicate that the track leads onto a stub track. The code number §n2§r can indicate that the train must stop particularly early or that it is entering an occupied track.    
+property.zs3.desc=The following additional signals can be displayed via the §lZs3§r:%n%n§nZs2 Direction indicator§r - The Zs2 indicates by an indicator letter in which direction the track runs in the case of several adjacent tracks.%n§nZs3 Speed indicator§r - The Zs3 indicates by a code digit which speed (digit x 10 in km/h) may not be exceeded from the signal in the connected switch area or up to the next main signal. The code number §l3§r can indicate that the track leads onto a stub track. The code number §n2§r can indicate that the train must stop particularly early or that it is entering an occupied track.
 property.zs1.desc=§lZs1 Substitute signal§r%nThe signal Hp 0 or the disturbed main light signal may be passed at a maximum speed of 40 km/h without a written order from the responsible dispatcher. The signal is also valid if it goes out before the train has passed. The signal is valid either for the following switch area or until the next main signal.
 property.stopsignal.desc=§lMain signal (Hp)§r%nMain signals indicate whether the next section of track can be used (stop Hp 0) and if so, at what speed (speed Hp 1 or slow speed Hp 2). For a more precise speed indication, a Zs3 can also be attached. If only the white marker light on the main signal is lighted, it is not valid. Special attention is to be paid if no lamp lights up, then an immediate stop is to be made. If the signal Sh1 is additionally displayed at the signal Hp 0, the stopping prohibition for shunting is lifted.
 property.distantsignal.desc=§lAheading signal (Vr)§r%nAheading signals indicate which signal aspect the associated main signal indicates. Either stop expect Vr0, drive expect Vr 1 or slow drive Vr 2. Additionally a Zs3v can be attached, for a more exact speed indication. At a pure distant signal a Ne2 sign is attached, distant signal agains (these are marked by an additional light) have no Ne2 sign attached, as well as distant signals, which are attached to a main signal mast with. If only the marker light is on, the distant signal is switched off and is not valid.
@@ -113,7 +111,7 @@ property.ne2_2.desc=Addition for Ne2 signals with shortened braking distance%nA 
 property.ne2_4.desc=This sign indicates that the signal is a pre-signal repeater.
 property.zs2.desc=§nZs2 Direction indicator§r - The Zs2 indicates by an identifying letter in which direction the track runs in the case of several adjacent tracks.
 property.kombisignal.desc=§lCombination signals (Ks)§r%nKs are light signals that indicate the travel orders with a signal light. The signals can have the functions of a main signal, a distant signal or a main and distant signal.
-property.stagetype.name=Mode: 
+property.stagetype.name=Mode:
 property.kombisignal_distant.desc=Distant signal for Combination signal
 property.mainlightsignal_distant.desc=Distant signal for Main light signal
 property.sh_light_bottom.desc=Shunting signal standing on the ground.
@@ -152,3 +150,23 @@ property.west.name=West
 property.east.name=East
 
 property.muxmode.name=Mux Mode
+
+#Mast signs
+property.value.OFF=OFF
+property.value.WRW=WRW
+property.value.WYWYW=WYWYW
+property.value.WBWBW=WBWBW
+
+#Tram Type
+property.value.TRAM=Tram
+property.value.CAR=Car
+property.value.PEDESTRIAN=Pedestrian
+
+property.enummode.name=Mode
+property.enumredstonemode.name=Redstone mode
+property.enummuxmode.name=Mux mode
+property.enumfacing.name=Facing
+property.value.MANUELL=Manuell
+property.value.REDSTONE=Redstone
+property.value.MUX=MUX
+property.value.SINGLE=Single

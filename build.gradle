@@ -20,9 +20,13 @@ apply plugin: 'maven-publish'
 
 apply plugin: "com.matthewprenger.cursegradle"
 
+def ver = System.getenv("APPVEYOR_BUILD_VERSION")
+if(ver == null)
+	ver = 'dev'
+
 def key = System.getenv("CURSETOKEN")
 if(key == null)
-	key = 'ddd'
+	key = 'dev'
 curseforge {
   apiKey = key
   project {
@@ -38,7 +42,7 @@ curseforge {
   }
 }
 
-version = System.getenv("APPVEYOR_BUILD_VERSION")
+version = ver
 group = 'net.gir.girsignals'
 archivesBaseName = 'GIRSignals'
 
@@ -78,9 +82,9 @@ jar {
         attributes([
             "Specification-Title": "GIRSignals",
             "Specification-Vendor": "German Immersive Railroading Community",
-            "Specification-Version": System.getenv("APPVEYOR_BUILD_VERSION"),
+            "Specification-Version": ver,
             "Implementation-Title": project.name,
-            "Implementation-Version": System.getenv("APPVEYOR_BUILD_VERSION"),
+            "Implementation-Version": ver,
             "Implementation-Vendor" :"German Immersive Railroading Community",
             "Implementation-Timestamp": new Date().format("dd-MM-yyyy'T'HH:mm:ssZ")
         ])
@@ -90,7 +94,7 @@ jar {
 processResources {
     from(sourceSets.main.resources.srcDirs) {
         include "mcmod.info"               
-        expand "version":System.getenv("APPVEYOR_BUILD_VERSION")
+        expand "version":ver
     }
     from(sourceSets.main.resources.srcDirs) {
         exclude "mcmod.info"

@@ -9,6 +9,7 @@ import eu.gir.girsignals.EnumSignals.IIntegerable;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -140,26 +141,49 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	}
 	
 	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue, ChangeableStage stage) {
-		return of(name, defaultValue, stage, t -> true);
+		return of(name, defaultValue, stage, true);
+	}
+	
+	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue, ChangeableStage stage, boolean autoname) {
+		return of(name, defaultValue, stage, autoname, t -> true);
 	}
 
 	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage) {
-		return of(name, defaultValue, stage, t -> true);
+		return of(name, defaultValue, stage, true);
+	}
+	
+	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, boolean autoname) {
+		return of(name, defaultValue, stage, autoname, t -> true);
 	}
 
 	@SuppressWarnings("unchecked")
 	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue,
-			ChangeableStage stage, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+			ChangeableStage stage, boolean autoname, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+		if(autoname) return new SEAutoNameProp<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage, deps);
 		return new SEProperty<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage, deps);
 	}
 
-	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, boolean autoname, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+		if(autoname) return new SEAutoNameProp<Boolean>(PropertyBool.create(name), defaultValue, stage, deps);
 		return new SEProperty<Boolean>(PropertyBool.create(name), defaultValue, stage, deps);
 	}
 
 	@Override
 	public boolean test(HashMap<SEProperty<?>, Object> t) {
 		return this.deps.test(t);
+	}
+	
+	public static class SEAutoNameProp<T extends Comparable<T>> extends SEProperty<T>{
+
+		public SEAutoNameProp(IProperty<T> parent, T defaultValue, ChangeableStage stage,
+				Predicate<HashMap<SEProperty<?>, Object>> deps) {
+			super(parent, defaultValue, stage, deps);
+		}
+		
+		@Override
+		public String getNamedObj(int obj) {
+			return I18n.format("property." + this.getName() + ".name") + ": " + getObjFromID(obj);
+		}
 	}
 
 }

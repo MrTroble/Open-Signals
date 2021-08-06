@@ -334,10 +334,10 @@ public class Signal extends Block implements ITileEntityProvider {
 	public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
 		return this.prop.customNameRenderHeight != -1;
 	}
-
+	
 	@Override
 	public String toString() {
-		return this.getLocalizedName();
+		return this.getUnlocalizedName();
 	}
 
 	public final boolean canBeLinked() {

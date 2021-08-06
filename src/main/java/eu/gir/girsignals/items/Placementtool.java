@@ -12,6 +12,7 @@ import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.nbt.NBTTagCompound;
@@ -101,6 +102,11 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 		}
 	}
 
+	@Override
+	public String getNamedObj(int obj) {
+		return I18n.format("property." + this.getName() + ".name") + ": " + this.getObjFromID(obj).getLocalizedName();
+	}
+	
 	@Override
 	public Signal getObjFromID(int obj) {
 		return Signal.SIGNALLIST.get(signalids.get(obj));
