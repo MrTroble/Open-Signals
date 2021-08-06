@@ -84,7 +84,7 @@ property.rsmode.name=Redstone Mode
 property.face.name=Seite
 property.sigon.name=An-Status
 property.sigoff.name=Aus-Status
-property.netype.name=Ne Signale
+property.netype.name=Nebensignale
 property.neaddition.name=Ne2 Zusatz
 property.stationnumber.name=Nummer
 property.sh_high.name=Rangiersignal 3 Block hoch
@@ -96,6 +96,7 @@ property.ralightsignal.name=Abdrücksignal
 
 #Signal Descs
 property.signaltype.desc=Hier kannst du die verschiedenen Signaltypen wählen.
+----
 property.zs3.desc=Über das §lZs3§r lassen sich folgende Zusatzsignale anzeigen:%n%n§nZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg bei mehreren nebeneinanderliegenden Strecken verläuft.%n§nZs3 Geschwindigkeitsanzeiger§r - Das Zs3 gibt durch eine Kennziffer an, welche Geschwindigkeit (Ziffer x 10 in km/h) ab dem Signal im anschließenden Weichenbereich oder bis zum nächsten Hauptsignal nicht überschritten werden darf. Die Kennziffer §l3§r kann anzeigen, dass der Fahrweg auf ein Stumpfgleis führt. Die Kennziffer §n2§r kann anzeigen, dass besonders früh gehalten werden muss oder auf ein besetztes Gleis eingefahren wird.    
 property.zs1.desc=§lZs1 Ersatzsignal§r%nAm Signal Hp 0 oder am gestörten Lichthauptsignal darf ohne schriftlichen Befehl vom zuständigen Fahrdienstleiter mit maximal 40 km/h vorbeigefahren werden. Das Signal gilt auch, wenn es erlischt bevor die Zugspitze vorbeigefahren ist. Das Signal gilt entweder für den anschließenden Weichenbereich oder bis zum nächsten Hauptsignal.
 property.stopsignal.desc=§lHauptsignal (Hp)§r%nHauptsignale geben an, ob der anschließende Streckenabschnitt befahren werden kann (Halt Hp 0) und wenn ja, mit welcher Geschwindigkeit (Fahrt Hp 1 oder Langsamfahrt Hp 2). Für eine genauere Geschwindigkeitsangabe kann zusätzlich ein Zs3 angebracht sein. Leuchtet nur das weiße Kennlicht am Hauptsignal, gilt dieses nicht. Besondere Beachtung gilt, wenn keine Lampe aufleuchtet, dann ist ein sofortiger Halt vorzunehmen. Wird am Signal Hp 0 zusätzlich das Signal Sh1 angezeigt, ist das Halteverbot für Rangierfahrten aufgehoben.
@@ -151,3 +152,47 @@ property.west.name=Westen
 property.east.name=Osten
 
 property.muxmode.name=Mux Modus
+
+#Mast signs
+property.value.OFF=AUS
+property.value.WRW=WRW
+property.value.WYWYW=WGWGW
+property.value.WBWBW=WSWSW
+
+#Tram Type
+property.value.TRAM=Straßenbahn
+property.value.CAR=Auto
+property.value.PEDESTRIAN=Füßgänger
+
+property.enummode.name=Mode
+property.enumredstonemode.name=Redstone Modus
+property.enummuxmode.name=Mux Modus
+property.enumfacing.name=Seite
+property.value.MANUELL=Manuell
+property.value.REDSTONE=Redstone
+property.value.MUX=MUX
+property.value.SINGLE=Einzel
+
+property.value.F0=
+property.value.F1=
+property.value.F2=
+property.value.F3=
+property.value.F4=
+property.value.F5=
+
+property.value.WN1=
+property.value.WN2=
+property.value.WN3=
+property.value.WN4=
+property.value.WN5=
+property.value.WN6=
+property.value.BLINK=
+
+property.value.RA6=
+property.value.RA7=
+property.value.RA8=
+property.value.RA9=
+
+property.value.false=AUS
+property.value.true=AN
+

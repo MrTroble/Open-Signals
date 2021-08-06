@@ -1,0 +1,193 @@
+property.zs3.desc=
+Zs2 Richtungsanzeiger - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg führt.
+Zs3 Geschwindigkeitsanzeiger - Das Zs3 gibt durch eine Kennziffer an, welche Geschwindigkeit ab dem Signal für den anschließenden Weichenbereich oder bis zum nächsten Hauptsignal nicht überschritten werden darf.
+Zs6 Gleiswechselanzeiger - Der Fahrweg führt ins Gegengleis.
+Zs8 Gegengleisfahrt-Ersatzsignal - Der Fahrweg führt vom störten Signal ins Gegengleis.
+Zs13 Stumpfgleis- und Frühhaltanzeiger - Fahrt in ein Gleis mit verkürztem Einfahrweg oder in ein Stumpfgleis.
+Zp8 Türen schließen - Das Signal wird vom Zugführer gegeben und der Triebfahrzeugführer soll die Türen schließen.
+Zp9 Abfahren - Das Signal wird vom Zugführer gegeben und der Triebfahrzeugführer soll abfahren.
+
+property.zs1.desc=
+Zs1 Ersatzsignal - Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.
+
+property.stopsignal.desc=
+Hp Hauptsignal - Hauptsignale zeigen an, ob der anschließende Gleisabschnitt befahren werden darf.
+Hp0: Halt
+Hp1: Fahrt
+Hp2: Fahrt mit Geschwindigkeitsbeschränkung
+Statuslicht: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt
+Sh1: Rangierfahrt erlaubt
+
+property.distantsignal.desc=
+Vr Vorsignal - Vorsignale zeigen an, welches Signalbild am zugehörigen Hauptsignal zu erwarten ist.
+Vr0: Halt erwarten
+Vr1: Fahrt erwarten
+Vr2: Fahrt mit Geschwindigkeitsbeschränkung erwarten
+
+property.zs3v.desc=
+Zs2v Richtungsvoranzeiger - Ein Richtungsanzeiger (Zs2) mit dem gleichen Buchstaben ist zu erwarten.
+Zs3v Geschwindigkeitsvorzeiger - Ein Geschwindigkeitsanzeiger (Zs3) mit gleicher Ziffer ist zu erwarten
+
+property.zs7.desc=
+Zs7 Vorsichtsignal - Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren. Weiterfahrt auf Sicht.
+
+property.vrlight.desc=
+Vr Zusatzlicht - Das Vorsignal zusammen mit Ne2 steht im verkürztem Bremswegabstand, ohne Ne2 ist das Vorsignal ein Wiederholer oder ohne Vr Signalbild gilt das Vorsignal nicht für die Zugfahrt.
+
+property.mastsign.desc=
+Mastschild - Regelt das Verhalten bei gestörtem oder Halt zeigendem Signal.
+Weiß-rot-weiß: Züge dürfen nur mit Zs1, Zs7, Zs8 oder schriftlichen Befehl vorbeifahren. Rangierfahrten dürfen nur mit Zustimmung des zuständigen Wärters am Signal vorbeifahren.
+Weiß-gelb-weiß-gelb-weiß: Züge dürfen, wenn nach dem Anhalten vor diesem Signal eine Verständigung mit dem Fahrdienstleiter nicht möglich ist, ohne Zustimmung auf Sicht vorbeifahren. Hauptsignale mit diesem Mastschild besitzen zugleich eine Vorsignalfunktion.
+Weiß-schwarz-weiß-schwarz-weiß: Züge dürfen nach dem Anhalten vor diesem Signal ohne Zustimmung auf Sicht vorbeifahren. Hauptsignale mit diesem Mastschild besitzen zugleich eine Vorsignalfunktion.
+
+property.mainlightsignal.desc=
+Hl Lichthauptsignal - Hl Signale geben an, ob der anschließende Streckenabschnitt befahren werden kann. Hl Signale können gleichzeitig eine Haupt- und Vorsignalfunktion einnehmen. reine Vorsignale sind mit einem Ne2 Schild gekennzeichnet, kombinierte Signale besitzen ein Mehrabschnittssignalschild.
+Hp0: Halt
+Hl1: Fahrt mit Höchstgeschwindigkeit
+Hl2: Fahrt mit 100km/h, dann mit Höchstgeschwindigkeit
+Hl3: Fahrt mit 40/60km/h, dann mit Höchstgeschwindigkeit
+Hl4: Höchstgeschwindigkeit auf 100km/h ermäßigen
+Hl5: Fahrt mit 100km/h
+Hl6: Fahrt mit 40/60km/h, dann mit 100km/h
+Hl7: Fahrt auf 40/60km/h ermäßigen
+Hl8: Geschwindigkeit 100km/h auf 40/60km/h ermäßigen
+Hl9: Fahrt mit 60km/h, dann auf 40/60km/h ermäßigen
+Hl10: Halt erwarten
+Hl11: Fahrt mit 100km/h und Halt erwarten
+Hl12: Fahrt mit 40/60km/h und Halt erwarten
+Zs1: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.
+Sh1: Rangierfahrt erlaubt
+Statuslicht: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
+
+property.mainlightsignallightbar.desc=
+Lichtleiste für Hl Signale - Zusatz für Hl Signale, um eine genauere Geschwindigkeitssignalisierung zu ermöglichen.
+Aus: 40km/h
+Gelb: 60km/h
+Grün: 100km/h
+
+property.mastsigndistant.desc=
+Mehrabschnittssignalschild - Gibt den Standort eines Hauptsignals mit Vorsignalfunktion an. An reinen Vorsignalen sind Ne2 Schilder angebracht.
+
+property.ne2.desc=
+Ne2 Vorsignaltafel - Kennzeichnen den Standort eines Vorsignals. 
+
+property.ne2_2.desc=
+Zusatz für Ne2 Signale mit verkürztem Bremsweg.
+
+property.ne2_4.desc=
+Dieses Schild kennzeichnet, dass das Signal ein Vorsignalwiederholer ist.
+
+property.zs2.desc=
+Zs2 Richtungsanzeiger - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg führt.
+
+property.kombisignal.desc=
+Ks Kombinationssignal - Ks sind Lichtsignale, die die Fahrtaufträge mit einem Signallicht anzeigen. Die Signale können die Funktionen eines Hauptsignals, eines Vorsignals oder eines kombinierten Signals haben.
+Hp0: Halt
+Ks1: Fahrt/Fahrt erwarten
+Ks1 blinkend: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten.
+Ks1 blinkend+Licht: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten und verkürztem Bremsweg.
+Ks2: Halt erwarten
+Ks2 Licht: Halt erwarten mit verkürztem Bremsweg.
+Zs1: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.
+Zs7: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren. Weiterfahrt auf Sicht.
+Sh1: Rangierfahrt erlaubt
+Statuslicht: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
+
+property.kombisignal_distant.desc=
+Ks Vorsignal - Vorsignal zu dem Ks Signal
+Ks1: Fahrt erwarten
+Ks1 Wiederholer: Vorsignalwiederholer
+Ks1 blinkend: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten.
+Ks1 blinkend+Licht: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten und verkürztem Bremsweg.
+Ks1 blinkend+Wiederholer: Vorsignalwiederholer
+Ks2: Halt erwarten
+Ks2 Licht: Halt erwarten mit verkürztem Bremsweg.
+Ks2 Wiederholer: Vorsignalwiederholer
+Statuslicht: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
+
+property.mainlightsignal_distant.desc=
+Vorsignal zu dem Hauptlichtsignal. Signalbilder: Hl1, Hl4, Hl7, Hl10 und Statuslicht
+
+property.sh_high.desc=
+Erhöhtes Rangiersignal
+Sh0: Fahrverbot
+Sh1: Fahrtverbot aufgehoben
+
+property.signaltramtype.desc=
+Verkehrsampel für Autos, Fußgänger oder Straßenbahnen
+Rot, Gelb, Grün: Selbsterklärend
+F0: Halt
+F1: Fahrt
+F2: Fahrt Rechts
+F3: Fahrt Links
+F4: Halt erwarten
+F5: Fahrt mit Beachtung der Abbiegeregeln
+
+property.indicator.desc=
+Aufschrift für Lf Signale.1 bis 20 für die Geschwindigkeit. A für Anfang und E für Ende
+
+property.lftype.desc=
+Lf Langsamfahrtsignale - Langsamfahrsignale dienen zur Kennzeichnung von dauerhaften und vorübergehenden Langsamfahrtsellen.
+Lf1 Langsamfahrtscheibe: Es folgt eine vorübergehende Langsamfahrstelle.
+Lf1/2 Langsamfahrbeginnscheibe: Anfang der vorübergehenden Langsamfahrstelle.
+Lf2 Anfangscheibe: Anfang der vorübergehenden Langsamfahrstelle.
+Lf3 Endscheibe: Ende der vorübergehenden Langsamfahrstelle.
+Lf4 Geschwindigkeitstafel: Es folgt eine ständige Langsamfahrstelle. 
+Lf5 Anfangstafel: Die Geschwindigkeitsbeschränkung muss durchgeführt sein.
+Lf6 Geschwindigkeits-Ankündesignal: Ein Geschwindigkeitssignal (Lf7) ist zu erwarten.
+Lf7 Geschwindigkeitsignal: Die angezeigte Geschwindigkeit darf vom Signal ab nicht überschritten werden.
+
+property.eltype.desc=
+El Fahrleitungssignale
+El1v: Hauptschalter ausschalten erwarten.
+El1 Ausschaltsignal: Hauptschalter ausschalten.
+El2 Einschaltsignal: Hauptschalter einschalten.
+El3 Bügel-ab Ankündigungssignal: Stromabnehmer senken erwarten.
+El4 Bügel-ab Signal: Stromabnehmer senken.
+El5 Bügel-an Signal: Stromabnehmer heben.
+El6: Halt für Fahrzeuge mit gehobenen Stromabnehmer.
+
+property.elarrow.desc=
+Der Richtungspfeil gibt die Richtung an, in welcher die Fahrleitungssignale gelten.
+
+property.ratype.desc=
+Ra6-9 Abdrücksignale: Halt abdrücken verboten. Langsam abdrücken. Mäßig schnell abdrücken. Zurückziehen.
+Ra10 Rangierhalttafel: Über die Tafel hinaus darf nicht rangiert werden.
+Ra11a Wartezeichen: Zur Vorbeifahrt an diesem Signal muss das Lichtsignal Sh1 oder ein mündlicher Befehl vorliegen.
+Ra11b Wartezeichen: Zur Vorbeifahrt an diesem Signal muss ein mündlicher Befehl vorliegen.
+Ra12 Grenzzeichen: Über dieses Signal hinaus darf das Gleis nicht besetzt werden.
+
+property.ralight.desc=
+Lichtsignal Sh 1
+
+property.buetype.desc=
+
+
+property.bueadd.desc=
+
+
+property.buelight.desc=
+
+
+property.othertype.desc=
+
+
+property.netype.desc=
+
+
+property.neaddition.desc=
+
+
+property.stationnumber.desc=
+
+
+property.wntype.desc=
+
+
+property.wnnormal.desc=
+
+
+property.wncross.desc=
+
+
+property.ralightsignal.desc=
