@@ -69,23 +69,23 @@ property.signalped.name=Fußgängerampel
 
 #Signal Description
 property.stopsignal.desc=§lHp Hauptsignal§r - Hauptsignale zeigen an, ob der anschließende Gleisabschnitt befahren werden darf.%n§nHp0§r: Halt%n§nHp1§r: Fahrt%n§nHp2§r: Fahrt mit Geschwindigkeitsbeschränkung%n§nStatuslicht§r: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt%n§nSh1§r: Rangierfahrt erlaubt
-property.distantsignal.desc=
-property.vrlight.desc=
-property.ne2.desc=
-property.ne2_2.desc=
-property.ne2_4.desc=
-property.zs2.desc=
-property.zs3.desc=
-property.zs3v.desc=
-property.zs1.desc=
-property.zs7.desc=
-property.kombisignal.desc=
-property.kombisignal_distant.desc=
-property.mastsigndistant.desc=
-property.mainlightsignal.desc=
-property.mainlightsignallightbar.desc=
-property.mainlightsignal_distant.desc=
-property.sh_high.desc=
+property.distantsignal.desc=§lVr Vorsignal§r - Vorsignale zeigen an, welches Signalbild am zugehörigen Hauptsignal zu erwarten ist.%n§nVr0§r: Halt erwarten%n§nVr1§r: Fahrt erwarten%n§nVr2§r: Fahrt mit Geschwindigkeitsbeschränkung erwarten
+property.vrlight.desc=§lVr Zusatzlicht§r - Das Vorsignal zusammen mit Ne2 steht im verkürztem Bremswegabstand, ohne Ne2 ist das Vorsignal ein Wiederholer oder ohne Vr Signalbild gilt das Vorsignal nicht für die Zugfahrt.
+property.ne2.desc=§lNe2 Vorsignaltafel§r - Kennzeichnen den Standort eines Vorsignals.
+property.ne2_2.desc=Dieses Schild kennzeichnet, dass das Signal im verkürztem Bremswegabstand zum dazugehörigen Signal steht.
+property.ne2_4.desc=Dieses Schild kennzeichnet, dass das Signal ein Wiederholer ist.
+property.zs2.desc=§lZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg führt.
+property.zs3.desc=§lZs Zusatzsignal§r%n§nZs2 Richtungsanzeiger§r: Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg führt.%n§nZs3 Geschwindigkeitsanzeiger§r: Das Zs3 gibt durch eine Kennziffer an, welche Geschwindigkeit ab dem Signal für den anschließenden Weichenbereich oder bis zum nächsten Hauptsignal nicht überschritten werden darf.%n§nZs6 Gleiswechselanzeiger§r: Der Fahrweg führt ins Gegengleis.%n§nZs8 Gegengleisfahrt-Ersatzsignal§r: Der Fahrweg führt vom störten Signal ins Gegengleis.%n§nZs13 Stumpfgleis- und Frühhaltanzeiger§r: Fahrt in ein Gleis mit verkürztem Einfahrweg oder in ein Stumpfgleis.%n§nZp8 Türen schließen§r: Das Signal wird vom Zugführer gegeben und der Triebfahrzeugführer soll die Türen schließen.%n§nZp9 Abfahren§r: Das Signal wird vom Zugführer gegeben und der Triebfahrzeugführer soll abfahren.
+property.zs3v.desc=§lZs Zusatzvorsignal§r%n§nZs2v Richtungsvoranzeiger§r:Ein Richtungsanzeiger (Zs2) mit dem gleichen Buchstaben ist zu erwarten.%n§nZs3v Geschwindigkeitsvorzeiger§r: Ein Geschwindigkeitsanzeiger (Zs3) mit gleicher Ziffer ist zu erwarten
+property.zs1.desc=§lZs1 Ersatzsignal§r - Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.
+property.zs7.desc=§lZs7 Vorsichtsignal§r - Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren. Weiterfahrt auf Sicht.
+property.kombisignal.desc=§lKs Kombinationssignal§r - Ks sind Lichtsignale, die die Fahrtaufträge mit einem Signallicht anzeigen. Die Signale können die Funktionen eines Hauptsignals, eines Vorsignals oder eines kombinierten Signals haben.%n§nHp0§r: Halt%n§nKs1§r: Fahrt/Fahrt erwarten%n§nKs1 blinkend§r: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten.%n§nKs1 blinkend+Licht§r: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten und verkürztem Bremsweg.%n§nKs2§r: Halt erwarten%n§nKs2 Licht§r: Halt erwarten mit verkürztem Bremsweg.%n§nZs1§r: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.%n§nZs7§r: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren. Weiterfahrt auf Sicht.%n§nSh1§r: Rangierfahrt erlaubt%n§nStatuslicht§r: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
+property.kombisignal_distant.desc=§lKs Vorsignal§r - Vorsignal zu dem Ks Signal%n§nKs1§r: Fahrt erwarten%n§nKs1 Wiederholer§r: Vorsignalwiederholer%n§nKs1 blinkend§r: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten.%n§nKs1 blinkend+Licht§r: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten und verkürztem Bremsweg.%n§nKs1 blinkend+Wiederholer§r: Vorsignalwiederholer%n§nKs2§r: Halt erwarten%n§nKs2 Licht§r: Halt erwarten mit verkürztem Bremsweg.%n§nKs2 Wiederholer§r: Vorsignalwiederholer%n§nStatuslicht§r: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
+property.mastsigndistant.desc=§lMehrabschnittssignalschild§r - Gibt den Standort eines Hauptsignals mit Vorsignalfunktion an. An reinen Vorsignalen sind Ne2 Schilder angebracht.
+property.mainlightsignal.desc=$lHl Lichthauptsignal§r - Hl Signale geben an, ob der anschließende Streckenabschnitt befahren werden kann. Hl Signale können gleichzeitig eine Haupt- und Vorsignalfunktion einnehmen. reine Vorsignale sind mit einem Ne2 Schild gekennzeichnet, kombinierte Signale besitzen ein Mehrabschnittssignalschild.%n§nHp0§r: Halt%n§nHl1§r: Fahrt mit Höchstgeschwindigkeit%n§nHl2§r: Fahrt mit 100km/h, dann mit Höchstgeschwindigkeit%n§nHl3§r: Fahrt mit 40/60km/h, dann mit Höchstgeschwindigkeit%n§nHl4§r: Höchstgeschwindigkeit auf 100km/h ermäßigen%n§nHl5§r: Fahrt mit 100km/h%n§nHl6§r: Fahrt mit 40/60km/h, dann mit 100km/h%n§nHl7§r: Fahrt auf 40/60km/h ermäßigen%n§nHl8§r: Geschwindigkeit 100km/h auf 40/60km/h ermäßigen%n§nHl9§r: Fahrt mit 60km/h, dann auf 40/60km/h ermäßigen%n§nHl10§r: Halt erwarten%n§nHl11§r: Fahrt mit 100km/h und Halt erwarten%n§nHl12§r: Fahrt mit 40/60km/h und Halt erwarten%n§nZs1§r: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.%n§nSh1§r: Rangierfahrt erlaubt%n§nStatuslicht§r: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
+property.mainlightsignallightbar.desc=§lLichtleiste für Hl Signale§r - Zusatz für Hl Signale, um eine genauere Geschwindigkeitssignalisierung zu ermöglichen.%n§nAus§r: 40km/h%n§nGelb§r: 60km/h%n§nGrün§r: 100km/h
+property.mainlightsignal_distant.desc=Vorsignal zu dem Hauptlichtsignal. Signalbilder: Hl1, Hl4, Hl7, Hl10 und Statuslicht
+property.sh_high.desc=§lSh Schutzhaltsignal§r%n§nSh0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben
 
 #Sign Names
 property.indicator.name=Aufschrift
@@ -107,8 +107,8 @@ property.wnnormal.name=Weichensignal
 property.wncross.name=Doppelweichensignal
 
 #Sign Description
-property.ralight.desc=
-property.wntype.desc=
+property.ralight.desc=Lichtsignal Sh 1 für Signal Ra11a
+property.wntype.desc=Wechselt zwischen Wn Signalen für eine normale Weiche und eine Doppelkreuzungsweiche
 
 #Signalcontroller
 property.enummode.name=Modus
