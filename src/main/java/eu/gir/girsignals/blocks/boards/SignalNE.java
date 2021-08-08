@@ -13,9 +13,9 @@ public class SignalNE extends Signal {
 		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "ne").noLink().build());
 	}
 
-	public static final SEProperty<NE> NETYPE = SEProperty.of("netype", NE.NE1, ChangeableStage.GUISTAGE, true);
+	public static final SEProperty<NE> NETYPE = SEProperty.of("netype", NE.NE1, ChangeableStage.GUISTAGE);
 	public static final SEProperty<NE_ADDITION> NEADDITION = SEProperty.of("neaddition", NE_ADDITION.OFF,
-			ChangeableStage.GUISTAGE, true);
+			ChangeableStage.GUISTAGE);
 
 	@Override
 	public boolean hasCostumColor() {

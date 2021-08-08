@@ -158,13 +158,18 @@ public class GuiSignalController extends GuiContainer {
 			}
 		} else if (sigController.indexMode == EnumMode.REDSTONE) {
 			final int fLen = sigController.supportedSigTypes.length;
-			final IIntegerable<?> possibleSignalTypesIntegerable = SizeIntegerables.of("sigtype", fLen + 1, in -> {
+			final IIntegerable<?> possibleSignalTypesIntegerable = new SizeIntegerables<String>("sigtype", fLen + 1, in -> {
 				if (in >= fLen)
 					return "None";
 				final int type = sigController.supportedSigTypes[in];
 				final String name = signal.getPropertyFromID(type).getName();
 				return name;
-			});
+			}) {
+				@Override
+				public String getNamedObj(int obj) {
+					return I18n.format("property." + this.getName() + ".name") + ": " + getObjFromID(obj).toUpperCase();
+				}
+			};
 			final int config = sigController.facingRedstoneModes[sigController.faceUsed.ordinal()];
 			final int[] unpacked = SignalControllerTileEntity.unpack(config);
 			final int sigType = unpacked[0];

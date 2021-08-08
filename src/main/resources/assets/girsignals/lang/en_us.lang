@@ -149,7 +149,14 @@ property.south.name=South
 property.west.name=West
 property.east.name=East
 
-property.muxmode.name=Mux Mode
+
+property.value.up=Up
+property.value.down=Down
+property.value.north=North
+property.value.south=South
+property.value.west=West
+property.value.east=East
+
 
 #Mast signs
 property.value.OFF=OFF
@@ -162,11 +169,24 @@ property.value.TRAM=Tram
 property.value.CAR=Car
 property.value.PEDESTRIAN=Pedestrian
 
+#Enums
 property.enummode.name=Mode
 property.enumredstonemode.name=Redstone mode
 property.enummuxmode.name=Mux mode
 property.enumfacing.name=Facing
+
+#EL Arrow
+property.value.LEFT=Left
+property.value.RIGHT=Right
+property.value.LEFT_RIGHT=Left & Right
+property.value.UP=Ahead
+
+#General value
 property.value.MANUELL=Manuell
 property.value.REDSTONE=Redstone
 property.value.MUX=MUX
 property.value.SINGLE=Single
+property.value.true=On
+property.value.false=Off
+property.value.MUX_CONTROL=Mux
+property.value.SIGNAL_CONTROL=Data

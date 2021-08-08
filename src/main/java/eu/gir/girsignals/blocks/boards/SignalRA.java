@@ -15,7 +15,7 @@ public class SignalRA extends Signal {
 		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0).build());
 	}
 
-	public static final SEProperty<RA> RATYPE = SEProperty.of("ratype", RA.RA10, ChangeableStage.GUISTAGE, true);
+	public static final SEProperty<RA> RATYPE = SEProperty.of("ratype", RA.RA10, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> RALIGHT = SEProperty.of("ralight", false, ChangeableStage.APISTAGE, false,
 			t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(RATYPE) && e.getValue().equals(RA.RA11A))));
 	public static final SEProperty<RA_LIGHT> RALIGHTSIGNAL = SEProperty.of("ralightsignal", RA_LIGHT.OFF,

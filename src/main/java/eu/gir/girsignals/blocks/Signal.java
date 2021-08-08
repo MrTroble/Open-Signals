@@ -135,7 +135,7 @@ public class Signal extends Block implements ITileEntityProvider {
 			this.customNameRenderHeight = customNameRenderHeight;
 			return this;
 		}
-		
+
 		public SignalPropertiesBuilder noLink() {
 			this.canLink = false;
 			return this;
@@ -173,7 +173,7 @@ public class Signal extends Block implements ITileEntityProvider {
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 		final SignalTileEnity te = (SignalTileEnity) source.getTileEntity(pos);
-		if(te == null)
+		if (te == null)
 			return FULL_BLOCK_AABB;
 		return FULL_BLOCK_AABB.expand(0, getHeight(te.getProperties()), 0);
 	}
@@ -286,13 +286,15 @@ public class Signal extends Block implements ITileEntityProvider {
 	@Override
 	protected BlockStateContainer createBlockState() {
 		ArrayList<IUnlistedProperty> prop = new ArrayList<>();
-		for (Field f : this.getClass().getDeclaredFields()) {
-			int mods = f.getModifiers();
-			if (Modifier.isFinal(mods) && Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
-				try {
-					prop.add((IUnlistedProperty) f.get(null));
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
+		if (!this.getClass().equals(Signal.class)) {
+			for (Field f : this.getClass().getDeclaredFields()) {
+				int mods = f.getModifiers();
+				if (Modifier.isFinal(mods) && Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
+					try {
+						prop.add((IUnlistedProperty) f.get(null));
+					} catch (IllegalArgumentException | IllegalAccessException e) {
+						e.printStackTrace();
+					}
 				}
 			}
 		}
@@ -334,7 +336,7 @@ public class Signal extends Block implements ITileEntityProvider {
 	public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
 		return this.prop.customNameRenderHeight != -1;
 	}
-	
+
 	@Override
 	public String toString() {
 		return this.getUnlocalizedName();
@@ -363,7 +365,7 @@ public class Signal extends Block implements ITileEntityProvider {
 	@SideOnly(Side.CLIENT)
 	public void renderOverlay(final double x, final double y, final double z, final SignalTileEnity te,
 			final FontRenderer font, final float renderHeight) {
-		if(renderHeight == -1)
+		if (renderHeight == -1)
 			return;
 		final World world = te.getWorld();
 		final BlockPos pos = te.getPos();

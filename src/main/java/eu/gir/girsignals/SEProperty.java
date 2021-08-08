@@ -149,7 +149,7 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	}
 
 	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage) {
-		return of(name, defaultValue, stage, true);
+		return of(name, defaultValue, stage, false);
 	}
 	
 	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, boolean autoname) {
