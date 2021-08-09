@@ -90,9 +90,9 @@ property.mainlightsignal_distant.desc=Vorsignal zu dem Hauptlichtsignal. Signalb
 property.sh_high.desc=§lSh Schutzhaltsignal§r%n§nSh0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben
 property.signaltramtype.desc=Verkehrsampel für Autos, Fußgänger oder Straßenbahnen%n§nRot, Gelb, Grün: Selbsterklärend%n§nF0§r: Halt%n§nF1§r: Fahrt%n§nF2§r: Fahrt Rechts%n§nF3§r: Fahrt Links%n§nF4§r: Halt erwarten%n§nF5§r: Fahrt mit Beachtung der Abbiegeregeln
 property.sh_light_bottom.desc=§lSh Schutzhaltsignal§r%n§nSh0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben
-property.signaltram.desc=
-property.signalcar.desc
-property.signalped.desc=
+property.signaltram.desc=n§nF0§r: Halt%n§nF1§r: Fahrt%n§nF2§r: Fahrt Rechts%n§nF3§r: Fahrt Links%n§nF4§r: Halt erwarten%n§nF5§r: Fahrt mit Beachtung der Abbiegeregeln
+property.signalcar.desc=Verkehrsampel (Rot, Gelb, Grün)
+property.signalped.desc=Fußgängerampel (Rot, Grün)
 
 #Sign Names
 property.indicator.name=Aufschrift
@@ -114,23 +114,23 @@ property.wnnormal.name=Weichensignal
 property.wncross.name=Doppelweichensignal
 
 #Sign Description
-property.indicator.desc=
-property.lftype.desc=
-property.eltype.desc=
-property.elarrow.desc=
-property.ratype.desc=
+property.indicator.desc=Aufschrift für Lf Signale.1 bis 20 für die Geschwindigkeit. A für Anfang und E für Ende
+property.lftype.desc=§lLf Langsamfahrtsignale§r - Langsamfahrsignale dienen zur Kennzeichnung von dauerhaften und vorübergehenden Langsamfahrtsellen.%n§nLf1 Langsamfahrtscheibe§r: Es folgt eine vorübergehende Langsamfahrstelle.%n§nLf1/2 Langsamfahrbeginnscheibe§r: Anfang der vorübergehenden Langsamfahrstelle.%n§nLf2 Anfangscheibe§r: Anfang der vorübergehenden Langsamfahrstelle.%n§nLf3 Endscheibe§r: Ende der vorübergehenden Langsamfahrstelle.%n§nLf4 Geschwindigkeitstafel§r: Es folgt eine ständige Langsamfahrstelle. %n§nLf5 Anfangstafel§r: Die Geschwindigkeitsbeschränkung muss durchgeführt sein.%n§nLf6 Geschwindigkeits-Ankündesignal§r: Ein Geschwindigkeitssignal (Lf7) ist zu erwarten.%n§nLf7 Geschwindigkeitsignal§r: Die angezeigte Geschwindigkeit darf vom Signal ab nicht überschritten werden.
+property.eltype.desc=§lEl Fahrleitungssignale§r - Fahrleitungssignale geben Auskunft über die Fahrleitung/Oberleitung.%n§nEl1v§r: Hauptschalter ausschalten erwarten.%n§nEl1 Ausschaltsignal§r: Hauptschalter ausschalten.%n§nEl2 Einschaltsignal§r: Hauptschalter einschalten.%n§nEl3 Bügel-ab Ankündigungssignal§r: Stromabnehmer senken erwarten.%n§nEl4 Bügel-ab Signal§r: Stromabnehmer senken.%n§nEl5 Bügel-an Signal§r: Stromabnehmer heben.%n§nEl6§r: Halt für Fahrzeuge mit gehobenen Stromabnehmer.
+property.elarrow.desc=Gibt die Fahrtrichtung an, für die das Signal gilt.
+property.ratype.desc=§lRangiersignale§r%n§nRa6-9 Abdrücksignale§r: Halt abdrücken verboten. Langsam abdrücken. Mäßig schnell abdrücken. Zurückziehen.%n§nRa10 Rangierhalttafel§r: Über die Tafel hinaus darf nicht rangiert werden.%n§nRa11a Wartezeichen§r: Zur Vorbeifahrt an diesem Signal muss das Lichtsignal Sh1 oder ein mündlicher Befehl vorliegen.%n§nRa11b Wartezeichen§r: Zur Vorbeifahrt an diesem Signal muss ein mündlicher Befehl vorliegen.%n§nRa12 Grenzzeichen§r: Über dieses Signal hinaus darf das Gleis nicht besetzt werden.
 property.ralight.desc=Lichtsignal Sh 1 für Signal Ra11a
-property.ralightsignal.desc=
-property.buetype.desc=
-property.buelight.desc=
-property.bueadd.desc=
-property.othertype.desc=
-property.netype.desc=
-property.neaddition.desc=
-property.stationnumber.desc=
+property.ralightsignal.desc=n§nRa6§r: Halt abdrücken verboten.%n§nRa7§r: Langsam abdrücken.%n§nRa8§r: Mäßig schnell abdrücken.%n§nRa9§r: Zurückziehen.
+property.buetype.desc=§lBü Bahnübergangssignale§r%n§nBü2 Überwachungssignal erwarten§r: Ein Überwachungssignal ist zu erwarten.%n§nBü3 Einschaltkontakt der Bü-Anlage§r: Hier liegt der Einschaltkontakt der Bü-Anlage. Auf die Rautentafel mit 4 Rauten können 3 weitere Rautentafeln zur besseren Erkennung des Überwachungssignal folgen.%n§nBü4 Pfeiftafel§r: Pfeifen%n§nBü5 Läutetafel§r: Läuten
+property.buelight.desc=§lBü Überwachungssignal§r%n§nBü0§r: Halt vor dem Bahnübergang! Weiterfahrt nach Sicherung.%n§nBü1§r: Der Bahnübergang darf befahren werden.
+property.bueadd.desc=Zusatz für Bü4/5 Signal.%nZwei senkrechte schwarze Streifen: Liegt zwischen dem Bü4/5 Signal und dem BÜ ein Halteplatz, steht direkt am Halteplatz ein wiederholendes Bü4/5 Signal und das Signal vor dem Halteplatz erhält das Zusatzschild.%nZweites Bü4: Wenn zwei Bü4 Signale angebracht sind, ist an der Tafel und kurz vor dem Bü zu pfeifen.
+property.othertype.desc=§lSonstige Signale§r%n§nHM Hektormetertafel§r: Kennzeichnung der Streckenkilometrierung. Die obere Zahl gibt den Kilometer an, die untere den Hektometer.%n§nOB Ortstellbereich§r: Beginn des Bereiches, welcher nicht von einem Stellwerk aus bedient wird.%n§nUngültigkeitskreuz§r: Das Signal ist ungültig.
+property.netype.desc=§lNe Nebensignale§r%n§nNe1 Trapeztafel§r: %n§nNe2 Vorsignaltafel§r: Kennzeichnung eines Vorsignal-Standortes bzw. eines Signales mit Vorsignalfunktion.%n§nNe3 Vorsignalbaken§r: Ein Vorsignal ist zu erwarten. Die einstreifige Bake steht 100m vor dem Vorsignal, die mehrstreifigen stehen jeweils 75m weiter.%n§nNe4 Schachbretttafel§r: Das Hauptsignal befindet sich nicht unmittelbar rechts vom oder über dem Gleis.%n§nNe5 Haltetafel§r: Kennzeichnung des Halteplatzes der Spitze des Zuges.%n§nNe6 Haltepunkten§r: Ein Haltepunkt ist zu erwarten.
+property.neaddition.desc=§nNach unten zeigendes Dreieck§r: Dieses Schild kennzeichnet, dass das Signal im verkürztem Bremswegabstand zum dazugehörigen Signal steht.%n§nNach oben zeigendes Dreieck mit schwarzen Punkt§r: Dieses Schild kennzeichnet, dass das Signal ein Wiederholer ist.
+property.stationnumber.desc=Bahnsteignummer (Ziffer) oder Abschnitt (Buchstabe)
 property.wntype.desc=Wechselt zwischen Wn Signalen für eine normale Weiche und eine Doppelkreuzungsweiche
-property.wnnormal.desc=
-property.wncross.desc=
+property.wnnormal.desc=§lWn Weichensignale§r - Weichensignale zeigen an, für welchen Fahrweg die Weiche gestellt ist.%n§nWn1§r: Die Weiche liegt zur Fahrt durch den geraden Strang.%n§nWn2§r: Die Weiche liegt zur Fahrt durch den gebogenen Strang.
+property.wncross.desc=§lWn Weichensignale§r - Weichensignale zeigen an, für welchen Fahrweg die Weiche gestellt ist.%n§nWn3§r: Der Fahrweg führt vom linken in den rechten Zweig.%n§nWn4§r: Der Fahrweg führt vom rechten in den linken Zweig.%n§nWn5§r: Der Fahrweg führt vom linken in den linken Zweig.%n§nWn6§r: Der Fahrweg führt vom rechten in den rechten Zweig.
 
 #Signalcontroller Names
 property.enummode.name=Modus
@@ -147,11 +147,11 @@ property.value.SIGNAL_CONTROL=Signalbild
 property.value.None=Nichts
 
 #Signalcontroller Description
-property.enummode.desc=
-property.enumredstonemode.desc=
-property.enummuxmode.desc=
-property.enumfacing.desc=
-property.sigtype.desc=
+property.enummode.desc=Hier kannst du zwischen Manuellen Modus und Redstone Modus umschalten. im Manuellen Modus kannst du das Signal über die GUI ändern, im Redstone Modus kannst du an den Controller Redstone anschließen und darüber das Signal steuern. Zusätzlich kann ein Signal auch immer über einen Computer von OpenComputers angesteuert werden.
+property.enumredstonemode.desc=Hier kannst du zwischen Einzel Modus und MUX Modus umschalten.%nDer Einzelmodus erlaubt es dir für eine Seite und einen Signalteil einen ON/An und einen OFF/Aus Status festzulegen.%nMit dem MUX Modus kannst du die Signalteile über einen Eingang und die Signalbilder über einen anderen Eingang durchschalten.
+property.enummuxmode.desc=Wechselt den MUX Eingang zwischen Signalteil und Signalbild.
+property.enumfacing.desc=Hier kannst du die Seite, die angesteuert wird, des Controllers ändern.
+property.sigtype.desc=Hier kannst du den Signalteil ändern.
 
 #Directions
 property.value.up=Oben
