@@ -1,0 +1,3 @@
+[submodule "src/main/java/eu/gir/girsignals/guis/guilib"]
+	path = src/main/java/eu/gir/girsignals/guis/guilib
+	url = https://github.com/German-Immersive-Railroading-Community/guilib

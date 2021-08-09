@@ -12,9 +12,12 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.GuiElements.GuiEnumerableSetting;
-import eu.gir.girsignals.guis.GuiElements.GuiSettingCheckBox;
-import eu.gir.girsignals.guis.GuiElements.IIntegerable;
+import eu.gir.girsignals.guis.guilib.DrawUtil;
+import eu.gir.girsignals.guis.guilib.GuiBase;
+import eu.gir.girsignals.guis.guilib.GuiElements;
+import eu.gir.girsignals.guis.guilib.GuiElements.GuiEnumerableSetting;
+import eu.gir.girsignals.guis.guilib.GuiElements.GuiSettingCheckBox;
+import eu.gir.girsignals.guis.guilib.GuiElements.IIntegerable;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.items.Placementtool;
 import io.netty.buffer.ByteBuf;
@@ -83,15 +86,13 @@ public class GuiPlacementtool extends GuiBase {
 		DrawUtil.draw(model.get());
 		GlStateManager.popMatrix();
 		GlStateManager.disableRescaleNormal();
-
-		String s = I18n.format("property.signal.name");
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(this.guiLeft + LEFT_OFFSET, this.guiTop + TOP_STRING_OFFSET, 0);
-		GlStateManager.scale(STRING_SCALE, STRING_SCALE, STRING_SCALE);
-		this.fontRenderer.drawString(s, 0, 0, STRING_COLOR);
-		GlStateManager.popMatrix();
 	}
 
+	@Override
+	public String getTitle() {
+		return I18n.format("property.signal.name");
+	}
+	
 	@Override
 	public void initGui() {
 		animationState = 180.0f;

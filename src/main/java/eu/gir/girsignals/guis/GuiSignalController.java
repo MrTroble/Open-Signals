@@ -17,10 +17,13 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.DrawUtil.EnumIntegerable;
-import eu.gir.girsignals.guis.DrawUtil.SizeIntegerables;
-import eu.gir.girsignals.guis.GuiElements.GuiEnumerableSetting;
-import eu.gir.girsignals.guis.GuiElements.IIntegerable;
+import eu.gir.girsignals.guis.guilib.DrawUtil;
+import eu.gir.girsignals.guis.guilib.GuiBase;
+import eu.gir.girsignals.guis.guilib.GuiElements;
+import eu.gir.girsignals.guis.guilib.DrawUtil.EnumIntegerable;
+import eu.gir.girsignals.guis.guilib.DrawUtil.SizeIntegerables;
+import eu.gir.girsignals.guis.guilib.GuiElements.GuiEnumerableSetting;
+import eu.gir.girsignals.guis.guilib.GuiElements.IIntegerable;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
@@ -251,15 +254,13 @@ public class GuiSignalController extends GuiBase {
 		DrawUtil.draw(model.get());
 		GlStateManager.popMatrix();
 		GlStateManager.disableRescaleNormal();
+	}
 
+	@Override
+	public String getTitle() {
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-		final String s = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name")
+		return I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name")
 				+ (sigController.entity.hasCustomName() ? " - " + sigController.entity.getName() : "");
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(this.guiLeft + LEFT_OFFSET, this.guiTop + TOP_STRING_OFFSET, 0);
-		GlStateManager.scale(STRING_SCALE, STRING_SCALE, STRING_SCALE);
-		this.fontRenderer.drawString(s, 0, 0, STRING_COLOR);
-		GlStateManager.popMatrix();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
