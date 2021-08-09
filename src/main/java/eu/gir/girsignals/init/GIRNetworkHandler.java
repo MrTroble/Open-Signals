@@ -97,7 +97,6 @@ public class GIRNetworkHandler {
 			SEProperty<?> prop = SEProperty.cst(block.getPropertyFromID(nextInt));
 			tagCompound.setInteger(prop.getName(), payBuf.readInt());
 		}
-		System.out.println(tagCompound);
 		ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
 		if (stack.getItem() instanceof Placementtool) {
 			stack.setTagCompound(tagCompound);

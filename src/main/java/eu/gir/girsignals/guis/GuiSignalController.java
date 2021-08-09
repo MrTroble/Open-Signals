@@ -7,7 +7,6 @@ import java.util.function.Consumer;
 
 import org.lwjgl.opengl.GL11;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -39,7 +38,6 @@ import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class GuiSignalController extends GuiBase {
@@ -62,10 +60,8 @@ public class GuiSignalController extends GuiBase {
 		}
 
 		final ArrayList<Entry<SEProperty<?>, Integer>> idmap = Lists.newArrayList();
-		final ImmutableList<IUnlistedProperty<?>> properties = ((IExtendedBlockState) signal.getDefaultState())
-				.getUnlistedProperties().keySet().asList();
 		for (int i = 0; i < sigController.supportedSigTypes.length; i++) {
-			final SEProperty<?> prop = SEProperty.cst(properties.get(i));
+			final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
 			int sigState = sigController.supportedSigStates[i];
 			if (sigState < 0 || sigState >= prop.count())
 				sigState = 0;
@@ -75,10 +71,8 @@ public class GuiSignalController extends GuiBase {
 
 		for (int i = 0; i < idmap.size(); i++) {
 			final Entry<SEProperty<?>, Integer> entry = idmap.get(i);
-			final SEProperty<?> prop = SEProperty.cst(properties.get(i));
-			final int id = i;
-			System.out.println(prop);
-			System.out.println(prop.test(map));
+			final SEProperty<?> prop = entry.getKey();
+			final int id = signal.getIDFromProperty(prop);
 			if (prop.test(map))
 				of(prop, entry.getValue(), inp -> sendChanges(id, inp), ChangeableStage.APISTAGE)
 						.ifPresent(this::addButton);
@@ -261,7 +255,7 @@ public class GuiSignalController extends GuiBase {
 
 	@Override
 	public String getTitle() {
-		if(sigController.signalType < 0 || !sigController.hasLink)
+		if (sigController.signalType < 0 || !sigController.hasLink)
 			return "";
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 		return I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name")
@@ -270,6 +264,8 @@ public class GuiSignalController extends GuiBase {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void updateDraw() {
+		if (sigController.supportedSigStates == null || !sigController.hasLink)
+			return;
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 		IExtendedBlockState ebs = (IExtendedBlockState) signal.getDefaultState();
 
@@ -278,11 +274,9 @@ public class GuiSignalController extends GuiBase {
 			ebs = ebs.withProperty(prop, prop.getObjFromID(entry.getValue()));
 		}
 
-		final ImmutableList<IUnlistedProperty<?>> properties = ((IExtendedBlockState) signal.getDefaultState())
-				.getUnlistedProperties().keySet().asList();
 		for (int i = 0; i < sigController.supportedSigStates.length; i++) {
 			int sigState = sigController.supportedSigStates[i];
-			SEProperty prop = SEProperty.cst(properties.get(sigController.supportedSigTypes[i]));
+			SEProperty prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
 			if (sigState < 0 || sigState >= prop.count())
 				continue;
 			ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
@@ -294,10 +288,9 @@ public class GuiSignalController extends GuiBase {
 
 	public void sendChanges(final int id, final int data) {
 		sendToPos(GIRNetworkHandler.SIG_CON_GUI_MANUELL_SET, buffer -> {
-			buffer.writeInt(sigController.supportedSigTypes[id]);
+			buffer.writeInt(id);
 			buffer.writeInt(data);
 		});
-		updateDraw();
 	}
 
 	private void sendToPos(final byte id, final Consumer<ByteBuf> consumer) {
