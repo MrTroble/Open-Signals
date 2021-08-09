@@ -68,12 +68,14 @@ property.signalcar.name=Verkehrsampel
 property.signalped.name=Fußgängerampel
 
 #Signal Description
+property.signaltype.desc=Hier kannst du zwischen den verschiedenen Signaltypen wechseln.
 property.stopsignal.desc=§lHp Hauptsignal§r - Hauptsignale zeigen an, ob der anschließende Gleisabschnitt befahren werden darf.%n§nHp0§r: Halt%n§nHp1§r: Fahrt%n§nHp2§r: Fahrt mit Geschwindigkeitsbeschränkung%n§nStatuslicht§r: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt%n§nSh1§r: Rangierfahrt erlaubt
 property.distantsignal.desc=§lVr Vorsignal§r - Vorsignale zeigen an, welches Signalbild am zugehörigen Hauptsignal zu erwarten ist.%n§nVr0§r: Halt erwarten%n§nVr1§r: Fahrt erwarten%n§nVr2§r: Fahrt mit Geschwindigkeitsbeschränkung erwarten
 property.vrlight.desc=§lVr Zusatzlicht§r - Das Vorsignal zusammen mit Ne2 steht im verkürztem Bremswegabstand, ohne Ne2 ist das Vorsignal ein Wiederholer oder ohne Vr Signalbild gilt das Vorsignal nicht für die Zugfahrt.
 property.ne2.desc=§lNe2 Vorsignaltafel§r - Kennzeichnen den Standort eines Vorsignals.
 property.ne2_2.desc=Dieses Schild kennzeichnet, dass das Signal im verkürztem Bremswegabstand zum dazugehörigen Signal steht.
 property.ne2_4.desc=Dieses Schild kennzeichnet, dass das Signal ein Wiederholer ist.
+property.mastsign.desc=§lMastschild§r - Regelt das Verhalten bei gestörtem oder Halt zeigendem Signal.%n§nWeiß-rot-weiß§r: Züge dürfen nur mit Zs1, Zs7, Zs8 oder schriftlichen Befehl vorbeifahren. Rangierfahrten dürfen nur mit Zustimmung des zuständigen Wärters am Signal vorbeifahren.%n§nWeiß-gelb-weiß-gelb-weiß§r: Züge dürfen, wenn nach dem Anhalten vor diesem Signal eine Verständigung mit dem Fahrdienstleiter nicht möglich ist, ohne Zustimmung auf Sicht vorbeifahren. Hauptsignale mit diesem Mastschild besitzen zugleich eine Vorsignalfunktion.%n§nWeiß-schwarz-weiß-schwarz-weiß§r: Züge dürfen nach dem Anhalten vor diesem Signal ohne Zustimmung auf Sicht vorbeifahren. Hauptsignale mit diesem Mastschild besitzen zugleich eine Vorsignalfunktion.
 property.zs2.desc=§lZs2 Richtungsanzeiger§r - Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg führt.
 property.zs3.desc=§lZs Zusatzsignal§r%n§nZs2 Richtungsanzeiger§r: Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg führt.%n§nZs3 Geschwindigkeitsanzeiger§r: Das Zs3 gibt durch eine Kennziffer an, welche Geschwindigkeit ab dem Signal für den anschließenden Weichenbereich oder bis zum nächsten Hauptsignal nicht überschritten werden darf.%n§nZs6 Gleiswechselanzeiger§r: Der Fahrweg führt ins Gegengleis.%n§nZs8 Gegengleisfahrt-Ersatzsignal§r: Der Fahrweg führt vom störten Signal ins Gegengleis.%n§nZs13 Stumpfgleis- und Frühhaltanzeiger§r: Fahrt in ein Gleis mit verkürztem Einfahrweg oder in ein Stumpfgleis.%n§nZp8 Türen schließen§r: Das Signal wird vom Zugführer gegeben und der Triebfahrzeugführer soll die Türen schließen.%n§nZp9 Abfahren§r: Das Signal wird vom Zugführer gegeben und der Triebfahrzeugführer soll abfahren.
 property.zs3v.desc=§lZs Zusatzvorsignal§r%n§nZs2v Richtungsvoranzeiger§r:Ein Richtungsanzeiger (Zs2) mit dem gleichen Buchstaben ist zu erwarten.%n§nZs3v Geschwindigkeitsvorzeiger§r: Ein Geschwindigkeitsanzeiger (Zs3) mit gleicher Ziffer ist zu erwarten
@@ -82,10 +84,15 @@ property.zs7.desc=§lZs7 Vorsichtsignal§r - Am Signal Hp0 oder am gestörten Li
 property.kombisignal.desc=§lKs Kombinationssignal§r - Ks sind Lichtsignale, die die Fahrtaufträge mit einem Signallicht anzeigen. Die Signale können die Funktionen eines Hauptsignals, eines Vorsignals oder eines kombinierten Signals haben.%n§nHp0§r: Halt%n§nKs1§r: Fahrt/Fahrt erwarten%n§nKs1 blinkend§r: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten.%n§nKs1 blinkend+Licht§r: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten und verkürztem Bremsweg.%n§nKs2§r: Halt erwarten%n§nKs2 Licht§r: Halt erwarten mit verkürztem Bremsweg.%n§nZs1§r: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.%n§nZs7§r: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren. Weiterfahrt auf Sicht.%n§nSh1§r: Rangierfahrt erlaubt%n§nStatuslicht§r: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
 property.kombisignal_distant.desc=§lKs Vorsignal§r - Vorsignal zu dem Ks Signal%n§nKs1§r: Fahrt erwarten%n§nKs1 Wiederholer§r: Vorsignalwiederholer%n§nKs1 blinkend§r: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten.%n§nKs1 blinkend+Licht§r: Geschwindigkeitsbeschränkung mit der in Zs3v angegebenen Geschwindigkeit zu erwarten und verkürztem Bremsweg.%n§nKs1 blinkend+Wiederholer§r: Vorsignalwiederholer%n§nKs2§r: Halt erwarten%n§nKs2 Licht§r: Halt erwarten mit verkürztem Bremsweg.%n§nKs2 Wiederholer§r: Vorsignalwiederholer%n§nStatuslicht§r: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
 property.mastsigndistant.desc=§lMehrabschnittssignalschild§r - Gibt den Standort eines Hauptsignals mit Vorsignalfunktion an. An reinen Vorsignalen sind Ne2 Schilder angebracht.
-property.mainlightsignal.desc=$lHl Lichthauptsignal§r - Hl Signale geben an, ob der anschließende Streckenabschnitt befahren werden kann. Hl Signale können gleichzeitig eine Haupt- und Vorsignalfunktion einnehmen. reine Vorsignale sind mit einem Ne2 Schild gekennzeichnet, kombinierte Signale besitzen ein Mehrabschnittssignalschild.%n§nHp0§r: Halt%n§nHl1§r: Fahrt mit Höchstgeschwindigkeit%n§nHl2§r: Fahrt mit 100km/h, dann mit Höchstgeschwindigkeit%n§nHl3§r: Fahrt mit 40/60km/h, dann mit Höchstgeschwindigkeit%n§nHl4§r: Höchstgeschwindigkeit auf 100km/h ermäßigen%n§nHl5§r: Fahrt mit 100km/h%n§nHl6§r: Fahrt mit 40/60km/h, dann mit 100km/h%n§nHl7§r: Fahrt auf 40/60km/h ermäßigen%n§nHl8§r: Geschwindigkeit 100km/h auf 40/60km/h ermäßigen%n§nHl9§r: Fahrt mit 60km/h, dann auf 40/60km/h ermäßigen%n§nHl10§r: Halt erwarten%n§nHl11§r: Fahrt mit 100km/h und Halt erwarten%n§nHl12§r: Fahrt mit 40/60km/h und Halt erwarten%n§nZs1§r: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.%n§nSh1§r: Rangierfahrt erlaubt%n§nStatuslicht§r: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
+property.mainlightsignal.desc=§lHl Lichthauptsignal§r - Hl Signale geben an, ob der anschließende Streckenabschnitt befahren werden kann. Hl Signale können gleichzeitig eine Haupt- und Vorsignalfunktion einnehmen. reine Vorsignale sind mit einem Ne2 Schild gekennzeichnet, kombinierte Signale besitzen ein Mehrabschnittssignalschild.%n§nHp0§r: Halt%n§nHl1§r: Fahrt mit Höchstgeschwindigkeit%n§nHl2§r: Fahrt mit 100km/h, dann mit Höchstgeschwindigkeit%n§nHl3§r: Fahrt mit 40/60km/h, dann mit Höchstgeschwindigkeit%n§nHl4§r: Höchstgeschwindigkeit auf 100km/h ermäßigen%n§nHl5§r: Fahrt mit 100km/h%n§nHl6§r: Fahrt mit 40/60km/h, dann mit 100km/h%n§nHl7§r: Fahrt auf 40/60km/h ermäßigen%n§nHl8§r: Geschwindigkeit 100km/h auf 40/60km/h ermäßigen%n§nHl9§r: Fahrt mit 60km/h, dann auf 40/60km/h ermäßigen%n§nHl10§r: Halt erwarten%n§nHl11§r: Fahrt mit 100km/h und Halt erwarten%n§nHl12§r: Fahrt mit 40/60km/h und Halt erwarten%n§nZs1§r: Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.%n§nSh1§r: Rangierfahrt erlaubt%n§nStatuslicht§r: Das Signal ist ausgeschaltet und gilt nicht für die Zugfahrt.
 property.mainlightsignallightbar.desc=§lLichtleiste für Hl Signale§r - Zusatz für Hl Signale, um eine genauere Geschwindigkeitssignalisierung zu ermöglichen.%n§nAus§r: 40km/h%n§nGelb§r: 60km/h%n§nGrün§r: 100km/h
 property.mainlightsignal_distant.desc=Vorsignal zu dem Hauptlichtsignal. Signalbilder: Hl1, Hl4, Hl7, Hl10 und Statuslicht
 property.sh_high.desc=§lSh Schutzhaltsignal§r%n§nSh0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben
+property.signaltramtype.desc=Verkehrsampel für Autos, Fußgänger oder Straßenbahnen%n§nRot, Gelb, Grün: Selbsterklärend%n§nF0§r: Halt%n§nF1§r: Fahrt%n§nF2§r: Fahrt Rechts%n§nF3§r: Fahrt Links%n§nF4§r: Halt erwarten%n§nF5§r: Fahrt mit Beachtung der Abbiegeregeln
+property.sh_light_bottom.desc=§lSh Schutzhaltsignal§r%n§nSh0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben
+property.signaltram.desc=
+property.signalcar.desc
+property.signalped.desc=
 
 #Sign Names
 property.indicator.name=Aufschrift
@@ -94,35 +101,57 @@ property.eltype.name=Fahrleitungssignal
 property.elarrow.name=Richtungspfeil
 property.ratype.name=Rangierdienst Signal
 property.ralight.name=Sh1 Licht
+property.ralightsignal.name=Abdrücksignal
 property.buetype.name=Bahnübergangssignal
+property.buelight.name=Überwachungssignal
 property.bueadd.name=Bü4/Bü5 Zusatz
 property.othertype.name=Sonstiges Signal
 property.netype.name=Nebensignale
 property.neaddition.name=Ne2 Zusatz
 property.stationnumber.name=Nummer
 property.wntype.name=WN Signalart umschalten
-property.ralightsignal.name=Abdrücksignal
-property.buelight.name=Überwachungssignal
 property.wnnormal.name=Weichensignal
 property.wncross.name=Doppelweichensignal
 
 #Sign Description
+property.indicator.desc=
+property.lftype.desc=
+property.eltype.desc=
+property.elarrow.desc=
+property.ratype.desc=
 property.ralight.desc=Lichtsignal Sh 1 für Signal Ra11a
+property.ralightsignal.desc=
+property.buetype.desc=
+property.buelight.desc=
+property.bueadd.desc=
+property.othertype.desc=
+property.netype.desc=
+property.neaddition.desc=
+property.stationnumber.desc=
 property.wntype.desc=Wechselt zwischen Wn Signalen für eine normale Weiche und eine Doppelkreuzungsweiche
+property.wnnormal.desc=
+property.wncross.desc=
 
-#Signalcontroller
+#Signalcontroller Names
 property.enummode.name=Modus
 property.enumredstonemode.name=Redstone Modus
 property.enummuxmode.name=MUX Eingang
 property.enumfacing.name=Seite
+property.sigtype.name=Signal
 property.value.MANUELL=Manuell
 property.value.REDSTONE=Redstone
 property.value.SINGLE=Einzel
 property.value.MUX=MUX
 property.value.MUX_CONTROL=Signalteil
 property.value.SIGNAL_CONTROL=Signalbild
-property.sigtype.name=Signal
 property.value.None=Nichts
+
+#Signalcontroller Description
+property.enummode.desc=
+property.enumredstonemode.desc=
+property.enummuxmode.desc=
+property.enumfacing.desc=
+property.sigtype.desc=
 
 #Directions
 property.value.up=Oben
@@ -182,35 +211,3 @@ property.value.WN4=Wn4
 property.value.WN5=Wn5
 property.value.WN6=Wn6
 property.value.BLINK=blinkend
-
-
-#Verloren gegangen
-property.rsmode.name=Redstone Mode
-property.face.name=Seite
-property.sigon.name=An-Status
-property.sigoff.name=Aus-Status
-property.muxmode.name=Mux Modus
-
-property.value.WRW=WRW
-property.value.WYWYW=WGWGW
-property.value.WBWBW=WSWSW
-
-property.value.TRAM=Straßenbahn
-property.value.CAR=Auto
-property.value.PEDESTRIAN=Füßgänger
-
-property.signaltype.desc=
-property.mastsign.desc=
-property.signaltramtype.desc=
-
-property.indicator.desc=
-property.lftype.desc=
-property.eltype.desc=
-property.elarrow.desc=
-property.ratype.desc=
-property.buetype.desc=
-property.bueadd.desc=
-property.othertype.desc=
-property.netype.desc=
-property.neaddition.desc=
-property.stationnumber.desc=
