@@ -18,7 +18,7 @@
 
 **DON'T FORGET TO INTIALIZE THE SUBMODULES**
 
-- ``git submodule --init``
+- ``git submodule update --init``
 
 ### Setup Eclipse
 
