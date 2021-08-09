@@ -2,12 +2,12 @@ package eu.gir.girsignals.items;
 
 import java.util.ArrayList;
 
+import eu.gir.girsignals.EnumSignals;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.GuiHandler;
-import eu.gir.girsignals.guis.guilib.GuiElements.IIntegerable;
+import eu.gir.girsignals.guis.guilib.IIntegerable;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.init.GIRTabs;
@@ -23,6 +23,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Placementtool extends Item implements IIntegerable<Signal> {
 
@@ -43,7 +45,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 		if (player.isSneaking()) {
 			if (!worldIn.isRemote)
 				return EnumActionResult.SUCCESS;
-			player.openGui(GirsignalsMain.MODID, GuiHandler.GUI_PLACEMENTTOOL, worldIn, pos.getX(), pos.getY(),
+			player.openGui(GirsignalsMain.MODID, EnumSignals.GUI_PLACEMENTTOOL, worldIn, pos.getX(), pos.getY(),
 					pos.getZ());
 			return EnumActionResult.SUCCESS;
 		} else {
@@ -101,6 +103,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 		}
 	}
 
+	@SideOnly(Side.CLIENT)
 	@Override
 	public String getNamedObj(int obj) {
 		return I18n.format("property." + this.getName() + ".name") + ": " + this.getObjFromID(obj).getLocalizedName();

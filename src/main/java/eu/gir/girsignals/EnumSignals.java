@@ -4,6 +4,9 @@ import net.minecraft.util.IStringSerializable;
 
 public class EnumSignals {
 
+	public static final int GUI_PLACEMENTTOOL = 0;
+	public static final int GUI_SIGNAL_CONTROLLER = 1;
+	
 	public interface DefaultName<T extends Enum<T>> extends IStringSerializable, Comparable<T> {
 		@Override
 		public default String getName() {

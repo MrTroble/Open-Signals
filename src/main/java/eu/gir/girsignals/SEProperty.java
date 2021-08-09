@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Optional;
 
-import eu.gir.girsignals.guis.guilib.GuiElements.IIntegerable;
+import eu.gir.girsignals.guis.guilib.IIntegerable;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
@@ -13,6 +13,8 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.IStringSerializable;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>, IIntegerable<T>, Predicate<HashMap<SEProperty<?>, Object>> {
 
@@ -180,6 +182,7 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 			super(parent, defaultValue, stage, deps);
 		}
 		
+		@SideOnly(Side.CLIENT)
 		@Override
 		public String getNamedObj(int obj) {
 			return I18n.format("property." + this.getName() + ".name") + ": " + getObjFromID(obj);

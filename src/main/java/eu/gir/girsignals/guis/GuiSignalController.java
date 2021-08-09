@@ -21,7 +21,7 @@ import eu.gir.girsignals.guis.guilib.DrawUtil.EnumIntegerable;
 import eu.gir.girsignals.guis.guilib.DrawUtil.SizeIntegerables;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements.GuiEnumerableSetting;
-import eu.gir.girsignals.guis.guilib.GuiElements.IIntegerable;
+import eu.gir.girsignals.guis.guilib.IIntegerable;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
