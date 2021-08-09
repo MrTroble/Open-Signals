@@ -206,6 +206,7 @@ public class ContainerSignalController extends Container {
 				this.muxMode = EnumMuxMode.values()[data];
 			}
 		}
+		this.guiSig.initButtons();
 		this.guiSig.initGui();
 	}
 

@@ -66,16 +66,32 @@ public class GuiBase extends GuiScreen {
 		mc.getTextureManager().bindTexture(CREATIVE_TAB);
 
 		DrawUtil.drawBack(this, guiLeft, guiLeft + xSize, guiTop, guiTop + ySize);
-		super.drawScreen(mouseX, mouseY, partialTicks);
+
+		synchronized (buttonList) {
+			super.drawScreen(mouseX, mouseY, partialTicks);
+
+			for (GuiButton guiButton : buttonList) {
+				if (guiButton instanceof GuiEnumerableSetting) {
+					if (((GuiEnumerableSetting) guiButton).drawHoverText(mouseX, mouseY, fontRenderer, this.xSize,
+							this.ySize)) {
+						break;
+					}
+				}
+			}
+		}
 	}
 
 	public void initButtons() {
-		this.buttonList.clear();
-		this.buttonList.add(pageselect);
+		synchronized (buttonList) {
+			this.buttonList.clear();
+			this.buttonList.add(pageselect);
+		}
 	}
 
 	@Override
 	public void initGui() {
+		if (buttonList.isEmpty())
+			this.initButtons();
 		int maxWidth = 0;
 		for (GuiButton guiButton : buttonList) {
 			if (guiButton instanceof GuiEnumerableSetting) {
@@ -118,10 +134,10 @@ public class GuiBase extends GuiScreen {
 			}
 		}
 
+		this.pageselect.updatePos(this.guiLeft + maxWidth / 2, this.guiTop + this.ySize);
+		this.pageselect.update();
 		if (this.pageList.size() > 1) {
 			this.pageselect.visible = true;
-			this.pageselect.updatePos(this.guiLeft + maxWidth / 2, this.guiTop + this.ySize);
-			this.pageselect.update();
 		} else {
 			this.pageselect.visible = false;
 		}

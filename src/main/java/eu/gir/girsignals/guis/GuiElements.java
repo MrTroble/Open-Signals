@@ -63,6 +63,7 @@ public class GuiElements {
 
 	}
 
+	@SideOnly(Side.CLIENT)
 	public static class GuiEnumerableSetting extends GuiButton {
 
 		protected int value = 0;
@@ -115,6 +116,7 @@ public class GuiElements {
 		}
 
 		public void drawSelection(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+			System.out.println(this.displayString);
 			this.rightButton.drawButton(mc, mouseX, mouseY, partialTicks);
 			this.leftButton.drawButton(mc, mouseX, mouseY, partialTicks);
 			if (lock && pressed) {
@@ -166,7 +168,7 @@ public class GuiElements {
 			pressed = false;
 		}
 
-		public boolean drawHoverText(final int mouseX, final int mouseY, final FontRenderer font) {
+		public boolean drawHoverText(final int mouseX, final int mouseY, final FontRenderer font, final int width, final int height) {
 			if (!this.isMouseOver())
 				return false;
 			final String str = Keyboard.isKeyDown(Keyboard.KEY_LSHIFT) ? this.property.getDescription()
@@ -186,6 +188,7 @@ public class GuiElements {
 		
 	}
 
+	@SideOnly(Side.CLIENT)
 	public static class GuiPageSelect extends GuiEnumerableSetting {
 
 		protected final IntegerHolder holder;
@@ -237,6 +240,7 @@ public class GuiElements {
 
 	}
 
+	@SideOnly(Side.CLIENT)
 	public static class GuiSettingCheckBox extends GuiEnumerableSetting {
 
 		private final GuiCheckBox checkBox;
@@ -295,6 +299,7 @@ public class GuiElements {
 
 	}
 
+	@SideOnly(Side.CLIENT)
 	public static class GuiSettingTextbox extends GuiEnumerableSetting {
 
 		private final GuiTextField textfield = new GuiTextField(0, Minecraft.getMinecraft().fontRenderer, 0, 0, 100, 20);
@@ -354,6 +359,7 @@ public class GuiElements {
 
 	}
 
+	@SideOnly(Side.CLIENT)
 	public static Optional<GuiEnumerableSetting> of(SEProperty<?> property, int initialValue,
 			Consumer<Integer> consumer, ChangeableStage stage) {
 		if (property == null)

@@ -90,22 +90,10 @@ public class GuiPlacementtool extends GuiBase {
 		GlStateManager.scale(STRING_SCALE, STRING_SCALE, STRING_SCALE);
 		this.fontRenderer.drawString(s, 0, 0, STRING_COLOR);
 		GlStateManager.popMatrix();
-
-		for (GuiButton guiButton : buttonList) {
-			if (guiButton instanceof GuiEnumerableSetting) {
-				if (((GuiEnumerableSetting) guiButton).drawHoverText(mouseX, mouseY, fontRenderer)) {
-					dragging = false;
-					break;
-				}
-			}
-		}
-
 	}
 
 	@Override
 	public void initGui() {
-		if (buttonList.isEmpty())
-			initButtons();
 		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 		super.initGui();

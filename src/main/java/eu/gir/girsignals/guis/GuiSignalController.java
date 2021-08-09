@@ -7,6 +7,7 @@ import java.util.function.Consumer;
 
 import org.lwjgl.opengl.GL11;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -44,133 +45,153 @@ public class GuiSignalController extends GuiBase {
 	private final BlockPos pos;
 	private BlockModelShapes manager;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
-	private final ArrayList<IUnlistedProperty<?>> properties = new ArrayList<>();
 	public ContainerSignalController sigController;
 
 	public GuiSignalController(final SignalControllerTileEntity entity) {
 		this.sigController = new ContainerSignalController(entity, this);
 		this.pos = entity.getPos();
-		this.addButton(pageselect);
+	}
+
+	private void addManuellMode(final Signal signal) {
+		final HashMap<SEProperty<?>, Object> map = Maps.newHashMap();
+		for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
+			final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
+			map.put(prop, prop.getObjFromID(entry.getValue()));
+		}
+
+		final ArrayList<Entry<SEProperty<?>, Integer>> idmap = Lists.newArrayList();
+		final ImmutableList<IUnlistedProperty<?>> properties = ((IExtendedBlockState) signal.getDefaultState())
+				.getUnlistedProperties().keySet().asList();
+		for (int i = 0; i < sigController.supportedSigTypes.length; i++) {
+			final SEProperty<?> prop = SEProperty.cst(properties.get(i));
+			int sigState = sigController.supportedSigStates[i];
+			if (sigState < 0 || sigState >= prop.count())
+				sigState = 0;
+			map.put(prop, prop.getObjFromID(sigState));
+			idmap.add(Maps.immutableEntry(prop, sigState));
+		}
+
+		for (int i = 0; i < idmap.size(); i++) {
+			final Entry<SEProperty<?>, Integer> entry = idmap.get(i);
+			final SEProperty<?> prop = SEProperty.cst(properties.get(i));
+			final int id = i;
+			if (prop.test(map))
+				GuiElements.of(prop, entry.getValue(), inp -> sendChanges(id, inp), ChangeableStage.APISTAGE)
+						.ifPresent(this::addButton);
+		}
+	}
+
+	private void addSingleMode(final Signal signal) {
+		final int faceInt = sigController.faceUsed.ordinal();
+		addButton(new GuiEnumerableSetting(new EnumIntegerable<>(EnumFacing.class), faceInt, in -> {
+			sigController.faceUsed = EnumFacing.values()[in];
+			initButtons();
+			initGui();
+		}));
+
+		final int fLen = sigController.supportedSigTypes.length;
+		final IIntegerable<?> possibleSignalTypesIntegerable = new SizeIntegerables<String>("sigtype", fLen + 1, in -> {
+			if (in >= fLen)
+				return "None";
+			final int type = sigController.supportedSigTypes[in];
+			final String name = signal.getPropertyFromID(type).getName();
+			return name;
+		}) {
+			@Override
+			public String getNamedObj(int obj) {
+				return I18n.format("property." + this.getName() + ".name") + ": " + getObjFromID(obj).toUpperCase();
+			}
+		};
+		final int config = sigController.facingRedstoneModes[faceInt];
+		final int[] unpacked = SignalControllerTileEntity.unpack(config);
+		final int sigType = unpacked[0];
+		final int sigOn = unpacked[1];
+		final int sigOff = unpacked[2];
+		addButton(new GuiEnumerableSetting(possibleSignalTypesIntegerable, sigType > fLen ? fLen : sigType,
+				in -> sendPacked(pack(in, sigOn, sigOff))));
+
+		if (sigType < sigController.supportedSigTypes.length) {
+			final SEProperty<?> prop = SEProperty
+					.cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]));
+			GuiElements.of(prop, sigOn, in -> sendPacked(pack(sigType, in, sigOff)), ChangeableStage.APISTAGE)
+					.ifPresent(this::addButton);
+			GuiElements.of(prop, sigOff, in -> sendPacked(pack(sigType, sigOn, in)), ChangeableStage.APISTAGE)
+					.ifPresent(this::addButton);
+		}
+	}
+
+	private void addMUXMode() {
+		addButton(new GuiEnumerableSetting(new EnumIntegerable<>(EnumMuxMode.class), sigController.muxMode.ordinal(),
+				in -> {
+					sigController.muxMode = EnumMuxMode.values()[in];
+					for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
+						if (sigController.facingRedstoneModes[i] == in) {
+							sigController.faceUsed = EnumFacing.values()[i];
+							break;
+						}
+					}
+					initButtons();
+					initGui();
+				}));
+		addButton(new GuiEnumerableSetting(new EnumIntegerable<>(EnumFacing.class), sigController.faceUsed.ordinal(),
+				in -> {
+					sigController.faceUsed = EnumFacing.values()[in];
+					for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
+						if (sigController.facingRedstoneModes[i] == sigController.muxMode.ordinal()) {
+							final int idx = i;
+							sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, bf -> {
+								bf.writeInt(idx);
+								bf.writeInt(3);
+							});
+						}
+					}
+					sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, bf -> {
+						bf.writeInt(in);
+						bf.writeInt(sigController.muxMode.ordinal());
+					});
+					initButtons();
+					initGui();
+				}));
+	}
+
+	private void addRSMode(final Signal signal) {
+		final GuiEnumerableSetting rsModeSetting = new GuiEnumerableSetting(
+				new EnumIntegerable<>(EnumRedstoneMode.class), sigController.rsMode.ordinal(), in -> {
+					sigController.rsMode = EnumRedstoneMode.values()[in];
+					sendToPos(GIRNetworkHandler.SIG_CON_RS_SET, buffer -> {
+						buffer.writeInt(in);
+					});
+				});
+		addButton(rsModeSetting);
+		if (sigController.rsMode == EnumRedstoneMode.SINGLE) {
+			addSingleMode(signal);
+		} else if (sigController.rsMode == EnumRedstoneMode.MUX) {
+			addMUXMode();
+		}
 	}
 
 	@Override
 	public void initButtons() {
-		super.initButtons();
 		if (sigController.signalType < 0 || !sigController.hasLink)
 			return;
-		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
+		synchronized (buttonList) {
+			super.initButtons();
+			final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 
-		final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
-		final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable,
-				sigController.indexMode.ordinal(), input -> {
-					sigController.indexMode = EnumMode.values()[input];
-					sigController.indexCurrentlyUsed = 0;
-					initButtons();
-				});
-		addButton(settings);
-
-		if (EnumMode.MANUELL == sigController.indexMode) {
-			final HashMap<SEProperty<?>, Object> map = Maps.newHashMap();
-			for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
-				final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
-				map.put(prop, prop.getObjFromID(entry.getValue()));
-			}
-
-			final ArrayList<Entry<SEProperty<?>, Integer>> idmap = Lists.newArrayList();
-			for (int i = 0; i < sigController.supportedSigTypes.length; i++) {
-				final SEProperty<?> prop = SEProperty.cst(properties.get(i));
-				final int sigState = sigController.supportedSigStates[i];
-				if (sigState < 0 || sigState >= prop.count())
-					continue;
-				map.put(prop, prop.getObjFromID(sigState));
-				idmap.add(Maps.immutableEntry(prop, sigState));
-			}
-
-			for (int i = 0; i < idmap.size(); i++) {
-				final Entry<SEProperty<?>, Integer> entry = idmap.get(i);
-				final SEProperty<?> prop = SEProperty.cst(properties.get(i));
-				final int id = i;
-				if (prop.test(map))
-					GuiElements.of(prop, entry.getValue(), inp -> sendChanges(id, inp), ChangeableStage.APISTAGE)
-							.ifPresent(this::addButton);
-			}
-		} else if (EnumMode.REDSTONE == sigController.indexMode) {
-			final GuiEnumerableSetting rsModeSetting = new GuiEnumerableSetting(
-					new EnumIntegerable<>(EnumRedstoneMode.class), sigController.rsMode.ordinal(), in -> {
-						sigController.rsMode = EnumRedstoneMode.values()[in];
-						sendToPos(GIRNetworkHandler.SIG_CON_RS_SET, buffer -> {
-							buffer.writeInt(in);
-						});
+			final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
+			final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable,
+					sigController.indexMode.ordinal(), input -> {
+						sigController.indexMode = EnumMode.values()[input];
+						sigController.indexCurrentlyUsed = 0;
+						initButtons();
+						initGui();
 					});
-			addButton(rsModeSetting);
-			if (sigController.rsMode == EnumRedstoneMode.SINGLE) {
-				final int faceInt = sigController.faceUsed.ordinal();
-				addButton(new GuiEnumerableSetting(new EnumIntegerable<>(EnumFacing.class), faceInt, in -> {
-					sigController.faceUsed = EnumFacing.values()[in];
-					initButtons();
-				}));
+			addButton(settings);
 
-				final int fLen = sigController.supportedSigTypes.length;
-				final IIntegerable<?> possibleSignalTypesIntegerable = new SizeIntegerables<String>("sigtype", fLen + 1,
-						in -> {
-							if (in >= fLen)
-								return "None";
-							final int type = sigController.supportedSigTypes[in];
-							final String name = signal.getPropertyFromID(type).getName();
-							return name;
-						}) {
-					@Override
-					public String getNamedObj(int obj) {
-						return I18n.format("property." + this.getName() + ".name") + ": "
-								+ getObjFromID(obj).toUpperCase();
-					}
-				};
-				final int config = sigController.facingRedstoneModes[faceInt];
-				final int[] unpacked = SignalControllerTileEntity.unpack(config);
-				final int sigType = unpacked[0];
-				final int sigOn = unpacked[1];
-				final int sigOff = unpacked[2];
-				addButton(new GuiEnumerableSetting(possibleSignalTypesIntegerable, sigType > fLen ? fLen : sigType,
-						in -> sendPacked(pack(in, sigOn, sigOff))));
-
-				if (sigType < sigController.supportedSigTypes.length) {
-					final SEProperty<?> prop = SEProperty
-							.cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]));
-					GuiElements.of(prop, sigOn, in -> sendPacked(pack(sigType, in, sigOff)), ChangeableStage.APISTAGE)
-							.ifPresent(this::addButton);
-					GuiElements.of(prop, sigOff, in -> sendPacked(pack(sigType, sigOn, in)), ChangeableStage.APISTAGE)
-							.ifPresent(this::addButton);
-				}
-			} else if (sigController.rsMode == EnumRedstoneMode.MUX) {
-				addButton(new GuiEnumerableSetting(new EnumIntegerable<>(EnumMuxMode.class),
-						sigController.muxMode.ordinal(), in -> {
-							sigController.muxMode = EnumMuxMode.values()[in];
-							for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
-								if (sigController.facingRedstoneModes[i] == in) {
-									sigController.faceUsed = EnumFacing.values()[i];
-									break;
-								}
-							}
-							initButtons();
-						}));
-				addButton(new GuiEnumerableSetting(new EnumIntegerable<>(EnumFacing.class),
-						sigController.faceUsed.ordinal(), in -> {
-							sigController.faceUsed = EnumFacing.values()[in];
-							for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
-								if (sigController.facingRedstoneModes[i] == sigController.muxMode.ordinal()) {
-									final int idx = i;
-									sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, bf -> {
-										bf.writeInt(idx);
-										bf.writeInt(3);
-									});
-								}
-							}
-							sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, bf -> {
-								bf.writeInt(in);
-								bf.writeInt(sigController.muxMode.ordinal());
-							});
-							initButtons();
-						}));
+			if (EnumMode.MANUELL == sigController.indexMode) {
+				addManuellMode(signal);
+			} else if (EnumMode.REDSTONE == sigController.indexMode) {
+				addRSMode(signal);
 			}
 		}
 	}
@@ -219,7 +240,7 @@ public class GuiSignalController extends GuiBase {
 			GlStateManager.popMatrix();
 			return;
 		}
-		
+
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		GlStateManager.enableRescaleNormal();
 		GlStateManager.pushMatrix();
@@ -240,7 +261,7 @@ public class GuiSignalController extends GuiBase {
 		this.fontRenderer.drawString(s, 0, 0, STRING_COLOR);
 		GlStateManager.popMatrix();
 	}
-	
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void updateDraw() {
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
@@ -251,9 +272,11 @@ public class GuiSignalController extends GuiBase {
 			ebs = ebs.withProperty(prop, prop.getObjFromID(entry.getValue()));
 		}
 
-		for (int i = 0; i < properties.size(); i++) {
-			SEProperty prop = SEProperty.cst(properties.get(i));
+		final ImmutableList<IUnlistedProperty<?>> properties = ((IExtendedBlockState) signal.getDefaultState())
+				.getUnlistedProperties().keySet().asList();
+		for (int i = 0; i < sigController.supportedSigStates.length; i++) {
 			int sigState = sigController.supportedSigStates[i];
+			SEProperty prop = SEProperty.cst(properties.get(sigController.supportedSigTypes[i]));
 			if (sigState < 0 || sigState >= prop.count())
 				continue;
 			ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
