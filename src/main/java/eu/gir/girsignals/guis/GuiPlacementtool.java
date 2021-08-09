@@ -96,6 +96,7 @@ public class GuiPlacementtool extends GuiBase {
 	public void initGui() {
 		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
+		applyModelChanges();
 		super.initGui();
 	}
 
@@ -118,15 +119,10 @@ public class GuiPlacementtool extends GuiBase {
 			final SEProperty<?> prop = SEProperty.cst(property);
 			final String propName = property.getName();
 			final int value = comp.getInteger(propName);
-			GuiHandler.of(prop, value, inp -> applyModelChanges(), ChangeableStage.GUISTAGE)
-					.ifPresent(this::addButton);
+			GuiHandler.of(prop, value, inp -> applyModelChanges(), ChangeableStage.GUISTAGE).ifPresent(this::addButton);
 		}
 
-		if (currentSelectedBlock.canHaveCustomname(map))
-			addButton(textbox);
-
 		initGui();
-		applyModelChanges();
 	}
 
 	@Override
@@ -188,8 +184,16 @@ public class GuiPlacementtool extends GuiBase {
 		map.clear();
 		ebs.getUnlistedProperties().forEach((prop, opt) -> opt.ifPresent(val -> map.put(SEProperty.cst(prop), val)));
 
-		if (currentSelectedBlock.canHaveCustomname(map) && !textbox.getText().isEmpty())
-			ebs = ebs.withProperty(Signal.CUSTOMNAME, true);
+		if (currentSelectedBlock.canHaveCustomname(map)) {
+			if(!buttonList.contains(textbox)) {
+				addButton(textbox);
+				initGui();
+			}
+			if (!textbox.getText().isEmpty())
+				ebs = ebs.withProperty(Signal.CUSTOMNAME, true);
+		} else if(buttonList.contains(textbox)) {
+			buttonList.remove(textbox);
+		}
 		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
 		model.get().finishDrawing();
