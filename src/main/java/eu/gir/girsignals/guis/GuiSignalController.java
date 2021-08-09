@@ -74,7 +74,7 @@ public class GuiSignalController extends GuiBase {
 			final SEProperty<?> prop = entry.getKey();
 			final int id = signal.getIDFromProperty(prop);
 			if (prop.test(map))
-				of(prop, entry.getValue(), inp -> sendChanges(id, inp), ChangeableStage.APISTAGE)
+				GuiHandler.of(prop, entry.getValue(), inp -> sendChanges(id, inp), ChangeableStage.APISTAGE)
 						.ifPresent(this::addButton);
 		}
 	}
@@ -111,9 +111,9 @@ public class GuiSignalController extends GuiBase {
 		if (sigType < sigController.supportedSigTypes.length) {
 			final SEProperty<?> prop = SEProperty
 					.cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]));
-			of(prop, sigOn, in -> sendPacked(pack(sigType, in, sigOff)), ChangeableStage.APISTAGE)
+			GuiHandler.of(prop, sigOn, in -> sendPacked(pack(sigType, in, sigOff)), ChangeableStage.APISTAGE)
 					.ifPresent(this::addButton);
-			of(prop, sigOff, in -> sendPacked(pack(sigType, sigOn, in)), ChangeableStage.APISTAGE)
+			GuiHandler.of(prop, sigOff, in -> sendPacked(pack(sigType, sigOn, in)), ChangeableStage.APISTAGE)
 					.ifPresent(this::addButton);
 		}
 	}

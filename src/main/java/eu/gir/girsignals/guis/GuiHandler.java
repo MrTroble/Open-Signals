@@ -1,6 +1,13 @@
 package eu.gir.girsignals.guis;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import eu.gir.girsignals.EnumSignals;
+import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.guis.guilib.GuiElements.GuiEnumerableSetting;
+import eu.gir.girsignals.guis.guilib.GuiElements.GuiSettingCheckBox;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -38,4 +45,25 @@ public class GuiHandler implements IGuiHandler {
 		}
 	}
 
+	@SideOnly(Side.CLIENT)
+	public static Optional<GuiEnumerableSetting> of(SEProperty<?> property, int initialValue,
+			Consumer<Integer> consumer, ChangeableStage stage) {
+		if (property == null)
+			return Optional.empty();
+		if (ChangeableStage.GUISTAGE == stage) {
+			if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+				if (property.getType().equals(Boolean.class))
+					return Optional.of(new GuiSettingCheckBox(property, initialValue, consumer));
+				return Optional.of(new GuiEnumerableSetting(property, initialValue, consumer));
+			} else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+				return Optional.of(new GuiSettingCheckBox(property, initialValue, consumer));
+			}
+		} else if (ChangeableStage.APISTAGE == stage) {
+			if (property.isChangabelAtStage(ChangeableStage.APISTAGE)
+					|| property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+				return Optional.of(new GuiEnumerableSetting(property, initialValue, consumer));
+			}
+		}
+		return Optional.empty();
+	}
 }

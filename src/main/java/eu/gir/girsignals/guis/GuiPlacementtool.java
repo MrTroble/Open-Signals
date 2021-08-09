@@ -118,7 +118,7 @@ public class GuiPlacementtool extends GuiBase {
 			final SEProperty<?> prop = SEProperty.cst(property);
 			final String propName = property.getName();
 			final int value = comp.getInteger(propName);
-			of(prop, value, inp -> applyModelChanges(), ChangeableStage.GUISTAGE)
+			GuiHandler.of(prop, value, inp -> applyModelChanges(), ChangeableStage.GUISTAGE)
 					.ifPresent(this::addButton);
 		}
 
