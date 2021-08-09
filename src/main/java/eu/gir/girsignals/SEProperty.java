@@ -5,7 +5,7 @@ import java.util.function.Predicate;
 
 import com.google.common.base.Optional;
 
-import eu.gir.girsignals.EnumSignals.IIntegerable;
+import eu.gir.girsignals.guis.GuiElements.IIntegerable;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
