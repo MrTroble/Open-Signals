@@ -16,6 +16,10 @@
 
 ## How to build this mod
 
+**DON'T FORGET TO INTIALIZE THE SUBMODULES**
+
+- ``git submodule --init``
+
 ### Setup Eclipse
 
 - ``./gradlew genEclipseRuns eclipse``
