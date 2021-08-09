@@ -68,21 +68,20 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 			final ExtendedBlockState ebs = ((ExtendedBlockState) block.getBlockState());
 			ebs.getUnlistedProperties().forEach(iup -> {
 				SEProperty sep = SEProperty.cst(iup);
-				if(sep.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+				if (sep.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
 					sig.setProperty(sep, sep.getDefault());
+					return;
 				}
 				if (!compound.hasKey(iup.getName()))
 					return;
 				if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-					if (sep.getType().equals(Boolean.class)) {
-						sig.setProperty(sep, compound.getBoolean(iup.getName()));
-					} else {
-						sig.setProperty(sep, sep.getObjFromID(compound.getInteger(iup.getName())));
-					}
-				} else if ((sep.isChangabelAtStage(ChangeableStage.APISTAGE) && compound.getBoolean(iup.getName()))) {
+					sig.setProperty(sep, sep.getObjFromID(compound.getInteger(iup.getName())));
+				} else if (sep.isChangabelAtStage(ChangeableStage.APISTAGE)
+						&& compound.getInteger(iup.getName()) == 1) {
 					sig.setProperty(sep, sep.getDefault());
 				}
 			});
+
 			int height = block.getHeight(sig.getProperties());
 			for (int i = 0; i < height; i++)
 				if (!worldIn.isAirBlock(lastPos = lastPos.up())) {
@@ -106,7 +105,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 	public String getNamedObj(int obj) {
 		return I18n.format("property." + this.getName() + ".name") + ": " + this.getObjFromID(obj).getLocalizedName();
 	}
-	
+
 	@Override
 	public Signal getObjFromID(int obj) {
 		return Signal.SIGNALLIST.get(signalids.get(obj));

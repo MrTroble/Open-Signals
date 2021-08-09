@@ -18,10 +18,9 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.DrawUtil;
-import eu.gir.girsignals.guis.guilib.GuiBase;
-import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.DrawUtil.EnumIntegerable;
 import eu.gir.girsignals.guis.guilib.DrawUtil.SizeIntegerables;
+import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements.GuiEnumerableSetting;
 import eu.gir.girsignals.guis.guilib.GuiElements.IIntegerable;
 import eu.gir.girsignals.init.GIRNetworkHandler;
@@ -78,8 +77,10 @@ public class GuiSignalController extends GuiBase {
 			final Entry<SEProperty<?>, Integer> entry = idmap.get(i);
 			final SEProperty<?> prop = SEProperty.cst(properties.get(i));
 			final int id = i;
+			System.out.println(prop);
+			System.out.println(prop.test(map));
 			if (prop.test(map))
-				GuiElements.of(prop, entry.getValue(), inp -> sendChanges(id, inp), ChangeableStage.APISTAGE)
+				of(prop, entry.getValue(), inp -> sendChanges(id, inp), ChangeableStage.APISTAGE)
 						.ifPresent(this::addButton);
 		}
 	}
@@ -116,9 +117,9 @@ public class GuiSignalController extends GuiBase {
 		if (sigType < sigController.supportedSigTypes.length) {
 			final SEProperty<?> prop = SEProperty
 					.cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]));
-			GuiElements.of(prop, sigOn, in -> sendPacked(pack(sigType, in, sigOff)), ChangeableStage.APISTAGE)
+			of(prop, sigOn, in -> sendPacked(pack(sigType, in, sigOff)), ChangeableStage.APISTAGE)
 					.ifPresent(this::addButton);
-			GuiElements.of(prop, sigOff, in -> sendPacked(pack(sigType, sigOn, in)), ChangeableStage.APISTAGE)
+			of(prop, sigOff, in -> sendPacked(pack(sigType, sigOn, in)), ChangeableStage.APISTAGE)
 					.ifPresent(this::addButton);
 		}
 	}
@@ -175,8 +176,10 @@ public class GuiSignalController extends GuiBase {
 
 	@Override
 	public void initButtons() {
-		if (sigController.signalType < 0 || !sigController.hasLink)
+		if (sigController.signalType < 0 || !sigController.hasLink) {
+			buttonList.clear();
 			return;
+		}
 		synchronized (buttonList) {
 			super.initButtons();
 			final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
@@ -258,6 +261,8 @@ public class GuiSignalController extends GuiBase {
 
 	@Override
 	public String getTitle() {
+		if(sigController.signalType < 0 || !sigController.hasLink)
+			return "";
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
 		return I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name")
 				+ (sigController.entity.hasCustomName() ? " - " + sigController.entity.getName() : "");

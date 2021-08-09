@@ -5,7 +5,6 @@ import java.util.function.Consumer;
 import eu.gir.girsignals.EnumSignals.EnumMode;
 import eu.gir.girsignals.EnumSignals.EnumMuxMode;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
@@ -21,8 +20,6 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
@@ -92,22 +89,15 @@ public class GIRNetworkHandler {
 		payBuf.readBytes(strBuff);
 		String customName = new String(strBuff);
 		Signal block = Signal.SIGNALLIST.get(blockType);
-		ExtendedBlockState blockState = (ExtendedBlockState) block.getBlockState();
 		NBTTagCompound tagCompound = new NBTTagCompound();
 		tagCompound.setInteger(BLOCK_TYPE_ID, blockType);
 		tagCompound.setString(SIGNAL_CUSTOMNAME, customName);
-		for (IUnlistedProperty<?> property : blockState.getUnlistedProperties()) {
-			SEProperty<?> prop = SEProperty.cst(property);
-			if (prop.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-				tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
-			} else if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-				if (!prop.getType().equals(Boolean.class)) {
-					tagCompound.setInteger(property.getName(), payBuf.readInt());
-				} else {
-					tagCompound.setBoolean(property.getName(), payBuf.readBoolean());
-				}
-			}
+		int nextInt = 0;
+		while((nextInt = payBuf.readInt()) != 0xFFFFFFFF) {
+			SEProperty<?> prop = SEProperty.cst(block.getPropertyFromID(nextInt));
+			tagCompound.setInteger(prop.getName(), payBuf.readInt());
 		}
+		System.out.println(tagCompound);
 		ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
 		if (stack.getItem() instanceof Placementtool) {
 			stack.setTagCompound(tagCompound);

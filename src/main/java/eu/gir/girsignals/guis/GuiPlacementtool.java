@@ -36,7 +36,6 @@ import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.fml.client.config.GuiCheckBox;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class GuiPlacementtool extends GuiBase {
@@ -92,7 +91,7 @@ public class GuiPlacementtool extends GuiBase {
 	public String getTitle() {
 		return I18n.format("property.signal.name");
 	}
-	
+
 	@Override
 	public void initGui() {
 		animationState = 180.0f;
@@ -119,7 +118,7 @@ public class GuiPlacementtool extends GuiBase {
 			final SEProperty<?> prop = SEProperty.cst(property);
 			final String propName = property.getName();
 			final int value = comp.getInteger(propName);
-			GuiElements.of(prop, value, inp -> applyModelChanges(), ChangeableStage.GUISTAGE)
+			of(prop, value, inp -> applyModelChanges(), ChangeableStage.GUISTAGE)
 					.ifPresent(this::addButton);
 		}
 
@@ -139,16 +138,18 @@ public class GuiPlacementtool extends GuiBase {
 		buffer.writeInt(str.length);
 		buffer.writeBytes(str);
 		for (GuiButton button : buttonList) {
-			if (button.id == -100)
-				continue;
-			if (button instanceof GuiCheckBox) {
-				GuiCheckBox buttonCheckBox = (GuiCheckBox) button;
-				buffer.writeBoolean(buttonCheckBox.isChecked());
-			} else if (button instanceof GuiEnumerableSetting) {
-				GuiEnumerableSetting buttonCheckBox = (GuiEnumerableSetting) button;
-				buffer.writeInt(buttonCheckBox.getValue());
+			if (button instanceof GuiEnumerableSetting) {
+				if (!button.equals(super.pageselect)) {
+					GuiEnumerableSetting buttonCheckBox = (GuiEnumerableSetting) button;
+					IIntegerable<?> iint = buttonCheckBox.property;
+					if (iint instanceof SEProperty) {
+						buffer.writeInt(currentSelectedBlock.getIDFromProperty(SEProperty.cst(iint)));
+						buffer.writeInt(buttonCheckBox.getValue());
+					}
+				}
 			}
 		}
+		buffer.writeInt(0xFFFFFFFF);
 		CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
 				new PacketBuffer(buffer));
 		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
@@ -172,7 +173,7 @@ public class GuiPlacementtool extends GuiBase {
 						}
 					} else if (btn instanceof GuiEnumerableSetting) {
 						GuiEnumerableSetting slider = (GuiEnumerableSetting) btn;
-						ebs = ebs.withProperty(prop, prop.getObjFromID(slider.value));
+						ebs = ebs.withProperty(prop, prop.getObjFromID(slider.getValue()));
 					}
 				}
 			}
