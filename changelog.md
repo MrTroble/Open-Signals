@@ -4,6 +4,8 @@
 * Added additional localized information
 * Fixed issue with gui size
 * Streamlined UI System to give a more uniform look
+* Fixed Bü4 model
+* Update DE and EN language
 
 ## [Fixes/Update/Addition] 8.02.2021 - 1
 * Fixed some texture flickering
