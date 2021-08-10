@@ -8,11 +8,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
+import eu.gir.girsignals.EnumSignals.EnumMode;
+import eu.gir.girsignals.EnumSignals.EnumMuxMode;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.GuiSignalController.EnumMode;
-import eu.gir.girsignals.guis.GuiSignalController.EnumMuxMode;
 import eu.gir.girsignals.items.Linkingtool;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;

@@ -4,13 +4,9 @@ import net.minecraft.util.IStringSerializable;
 
 public class EnumSignals {
 
-	public interface IIntegerable<T> {
-
-		public T getObjFromID(int obj);
-
-		public int count();
-	}
-
+	public static final int GUI_PLACEMENTTOOL = 0;
+	public static final int GUI_SIGNAL_CONTROLLER = 1;
+	
 	public interface DefaultName<T extends Enum<T>> extends IStringSerializable, Comparable<T> {
 		@Override
 		public default String getName() {
@@ -151,6 +147,14 @@ public class EnumSignals {
 
 	public enum WN_CROSS implements Offable<WN_CROSS> {
 		OFF, WN3, WN4, WN5, WN6, BLINK;
+	}
+	
+	public static enum EnumMode {
+		MANUELL, REDSTONE
+	}
+
+	public static enum EnumMuxMode {
+		MUX_CONTROL, SIGNAL_CONTROL
 	}
 
 }

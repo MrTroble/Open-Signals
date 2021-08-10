@@ -14,6 +14,6 @@ public class SignalEL extends Signal {
 	}
 
 	public static final SEProperty<EL> ELTYPE = SEProperty.of("eltype", EL.EL1V, ChangeableStage.GUISTAGE);
-	public static final SEProperty<EL_ARROW> ELARROW = SEProperty.of("elarrow", EL_ARROW.OFF, ChangeableStage.GUISTAGE);
+	public static final SEProperty<EL_ARROW> ELARROW = SEProperty.of("elarrow", EL_ARROW.OFF, ChangeableStage.GUISTAGE, false);
 
 }

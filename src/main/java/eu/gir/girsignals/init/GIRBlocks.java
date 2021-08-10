@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalController;
-import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalBUELight;
 import eu.gir.girsignals.blocks.boards.SignalEL;
@@ -15,7 +15,7 @@ import eu.gir.girsignals.blocks.boards.SignalLF;
 import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalOTHER;
 import eu.gir.girsignals.blocks.boards.SignalRA;
-import eu.gir.girsignals.blocks.boards.SignalSH;
+import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
@@ -43,7 +43,7 @@ public class GIRBlocks {
 	public static final SignalTram TRAM_SIGNAL = new SignalTram();
 	public static final SignalLF LF_SIGNAL = new SignalLF();
 	public static final SignalEL EL_SIGNAL = new SignalEL();
-	public static final SignalSH SH_SIGNAL = new SignalSH();
+	public static final Signal SH_SIGNAL = new Signal(Signal.builder(GIRItems.SIGN_PLACEMENT_TOOL, "shsignal").noLink().build());
 	public static final SignalRA RA_SIGNAL = new SignalRA();
 	public static final SignalBUE BUE_SIGNAL = new SignalBUE();
 	public static final SignalBUELight BUE_LIGHT = new SignalBUELight();

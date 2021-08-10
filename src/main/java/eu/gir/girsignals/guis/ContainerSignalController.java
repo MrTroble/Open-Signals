@@ -6,11 +6,11 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
+import eu.gir.girsignals.EnumSignals.EnumMode;
+import eu.gir.girsignals.EnumSignals.EnumMuxMode;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.GuiSignalController.EnumMode;
-import eu.gir.girsignals.guis.GuiSignalController.EnumMuxMode;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
 import net.minecraft.entity.player.EntityPlayer;
@@ -206,6 +206,7 @@ public class ContainerSignalController extends Container {
 				this.muxMode = EnumMuxMode.values()[data];
 			}
 		}
+		this.guiSig.initButtons();
 		this.guiSig.initGui();
 	}
 
