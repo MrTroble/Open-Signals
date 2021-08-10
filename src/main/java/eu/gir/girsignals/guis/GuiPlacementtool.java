@@ -96,6 +96,8 @@ public class GuiPlacementtool extends GuiBase {
 	public void initGui() {
 		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
+		if (buttonList.isEmpty())
+			this.initButtons();
 		applyModelChanges();
 		super.initGui();
 	}
