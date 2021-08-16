@@ -19,7 +19,7 @@ public class GhostBlock extends Block {
 
 	public GhostBlock() {
 		super(Material.GLASS);
-		setLightLevel(0);
+		setLightLevel(1);
 	}
 
 	@Override
