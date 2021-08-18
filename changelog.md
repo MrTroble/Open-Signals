@@ -1,5 +1,8 @@
 # Changelog
 
+## [Minor update] 8.18.2021 - 1
+* Optimized images
+
 ## [Fixes/Update] 8.10.2021 - 1
 * Added additional localized information
 * Fixed issue with gui size
