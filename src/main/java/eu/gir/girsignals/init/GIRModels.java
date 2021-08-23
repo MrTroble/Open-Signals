@@ -15,7 +15,6 @@ public class GIRModels {
 	public static void register(ModelRegistryEvent event) {
 		GIRItems.registeredItems.forEach(GIRModels::registerModel);
 		registerModel(Item.getItemFromBlock(GIRBlocks.HV_SIGNAL_CONTROLLER));
-		registerModel(Item.getItemFromBlock(GIRBlocks.SIGNAL_BRIDGE));
 	}
 	
 
