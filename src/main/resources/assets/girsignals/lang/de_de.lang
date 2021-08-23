@@ -26,6 +26,7 @@ tile.buelight.name=Bü Signal
 tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Bahnsteignummern
 tile.wnsignal.name=Wn Signal
+tile.signalbridge.name=Signalbrücke
 
 #Linktool
 lt.linkfailed=Link fehlgeschlagen!

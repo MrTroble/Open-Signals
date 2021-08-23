@@ -1,0 +1,13 @@
+{
+	"variants": { 
+		"column=false": { 
+			"model": "girsignals:signalbridge_bridge"
+		},
+		"column=true": { 
+			"model": "girsignals:signalbridge_column"
+		},
+		"inventory": {
+			"model": "girsignals:signalbridge_bridge"
+		}
+	}
+}

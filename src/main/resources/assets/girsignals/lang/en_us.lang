@@ -26,6 +26,7 @@ tile.buelight.name=Bü Signal
 tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Platform Number
 tile.wnsignal.name=Wn Signal
+tile.signalbridge.name=Signal gantry
 
 #Linktool
 lt.linkfailed=Link failed!
