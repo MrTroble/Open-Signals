@@ -181,7 +181,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			// HP RS
 			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.SHUNTING)), 5.4f,
 					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_1north",
-					"girsignals:blocks/lamps/lamp_white");
+					"girsignals:blocks/lamps/lamp_white", "lamp_white_sh_2north", "girsignals:blocks/lamps/lamp_white");
 			// HP Malfunction
 			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.MALFUNCTION)), 5.4f,
 					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red", "lamp_greennorth",
@@ -411,7 +411,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 					"lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
 			// HL Status light Distant
 			cm.register("hl/hl_shield_dist", with(SignalHL.DISTANTSIGNAL, hl -> hl.equals(HL_DISTANT.HL_STATUS_LIGHT)),
-					5, "lamp_white_sh_1north", "girsignals:blocks/lamps/lamp_white");
+					5, "lamp_white_sh_2north", "girsignals:blocks/lamps/lamp_white");
 		});
 		registeredModels.put("shlight", cm -> {
 			// SH ground off

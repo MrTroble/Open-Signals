@@ -6,7 +6,13 @@
     "1" : "girsignals:blocks/default/shield_black",
     "2" : "girsignals:blocks/default/shield_gray",
     "particle" : "girsignals:blocks/default/mast",
-    "lamp_greennorth" : "girsignals:blocks/lamps/lamp_dark"
+    "lamp_greennorth" : "girsignals:blocks/lamps/lamp_dark",
+    "lamp_red_primarynorth" : "girsignals:blocks/lamps/lamp_dark",
+    "lamp_red_secondarynorth" : "girsignals:blocks/lamps/lamp_dark",
+    "lamp_white_identifiernorth" : "girsignals:blocks/lamps/lamp_dark",
+    "lamp_white_sh_1north" : "girsignals:blocks/lamps/lamp_dark",
+    "lamp_white_sh_2north" : "girsignals:blocks/lamps/lamp_dark",
+    "lamp_yellownorth" : "girsignals:blocks/lamps/lamp_dark"
   },
   "elements" : [ {
     "name" : "lamp_green",
@@ -25,7 +31,7 @@
     "faces" : {
       "north" : {
         "uv" : [ 0, 0, 4, 4 ],
-        "texture" : "#lamp_greennorth"
+        "texture" : "#lamp_red_primarynorth"
       }
     }
   }, {
@@ -35,7 +41,7 @@
     "faces" : {
       "north" : {
         "uv" : [ 0, 0, 4, 4 ],
-        "texture" : "#lamp_greennorth"
+        "texture" : "#lamp_red_secondarynorth"
       }
     }
   }, {
@@ -45,7 +51,7 @@
     "faces" : {
       "north" : {
         "uv" : [ 1, 1, 3, 3 ],
-        "texture" : "#lamp_greennorth"
+        "texture" : "#lamp_white_identifiernorth"
       }
     }
   }, {
@@ -55,7 +61,7 @@
     "faces" : {
       "north" : {
         "uv" : [ 1, 1, 3, 3 ],
-        "texture" : "#lamp_greennorth"
+        "texture" : "#lamp_white_sh_1north"
       }
     }
   }, {
@@ -65,7 +71,7 @@
     "faces" : {
       "north" : {
         "uv" : [ 1, 1, 3, 3 ],
-        "texture" : "#lamp_greennorth"
+        "texture" : "#lamp_white_sh_2north"
       }
     }
   }, {
@@ -75,7 +81,7 @@
     "faces" : {
       "north" : {
         "uv" : [ 0, 0, 4, 4 ],
-        "texture" : "#lamp_greennorth"
+        "texture" : "#lamp_yellownorth"
       }
     }
   }, {
