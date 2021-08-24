@@ -703,6 +703,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 					hasAndIs(SignalWN.WNTYPE).and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.BLINK))), 0,
 					"lamp_1", "girsignals:blocks/lamps/lamp_white_blink");
 		});
+		registeredModels.put("stationname", cm -> {
+			cm.register("other_signals/station_name", t -> true, 0);
+		});
 	}
 
 	@Override
