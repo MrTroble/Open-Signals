@@ -155,37 +155,37 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
 			// Zs1 on
 			cm.register("hv/hv_zs1", hasAndIs(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f, "lamp1north",
-					"girsignals:blocks/lamps/lamp_white");
+					"girsignals:blocks/lamps/lamp_white_e");
 			// Zs1 off
 			cm.register("hv/hv_zs1", hasAndIsNot(SignalHV.ZS1).and(has(SignalHV.STOPSIGNAL)), 4.4f);
 			// Zs7 on
 			cm.register("hv/hv_zs7", hasAndIs(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f, "lamp1north",
-					"girsignals:blocks/lamps/lamp_yellow");
+					"girsignals:blocks/lamps/lamp_yellow_e");
 			// Zs7 off
 			cm.register("hv/hv_zs7", hasAndIsNot(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f);
 			// HP 0
 			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP0)), 5.4f,
-					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red", "lamp_red_secondarynorth",
-					"girsignals:blocks/lamps/lamp_red");
+					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red_e", "lamp_red_secondarynorth",
+					"girsignals:blocks/lamps/lamp_red_e");
 			// HP 1
 			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP1)), 5.4f, "lamp_greennorth",
-					"girsignals:blocks/lamps/lamp_green");
+					"girsignals:blocks/lamps/lamp_green_e");
 			// HP 2
 			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP2)), 5.4f, "lamp_greennorth",
-					"girsignals:blocks/lamps/lamp_green", "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
+					"girsignals:blocks/lamps/lamp_green_e", "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow_e");
 			// HP off
 			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.OFF)), 5.4f);
 			// HP Status light
 			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.STATUS_LIGHT)), 5.4f,
-					"lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
+					"lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white_e");
 			// HP RS
 			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.SHUNTING)), 5.4f,
-					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_1north",
-					"girsignals:blocks/lamps/lamp_white");
+					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red_e", "lamp_white_sh_1north",
+					"girsignals:blocks/lamps/lamp_white_e", "lamp_white_sh_2north", "girsignals:blocks/lamps/lamp_white_e");
 			// HP Malfunction
 			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.MALFUNCTION)), 5.4f,
-					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red", "lamp_greennorth",
-					"girsignals:blocks/lamps/lamp_green");
+					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red_e", "lamp_greennorth",
+					"girsignals:blocks/lamps/lamp_green_e");
 			// Zs2, Zs2v, Zs3, Zs3v
 			for (ZS32 zs3 : ZS32.values()) {
 				cm.register("hv/hv_zs3", with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)),
@@ -195,18 +195,18 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			}
 			// VR0
 			cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR0)), 4, "lamp_yellow_1north",
-					"girsignals:blocks/lamps/lamp_yellow", "lamp_yellow_2north", "girsignals:blocks/lamps/lamp_yellow");
+					"girsignals:blocks/lamps/lamp_yellow_e", "lamp_yellow_2north", "girsignals:blocks/lamps/lamp_yellow_e");
 			// VR1
 			cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR1)), 4, "lamp_green_1north",
-					"girsignals:blocks/lamps/lamp_green", "lamp_green_2north", "girsignals:blocks/lamps/lamp_green");
+					"girsignals:blocks/lamps/lamp_green_e", "lamp_green_2north", "girsignals:blocks/lamps/lamp_green_e");
 			// VR2
 			cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR2)), 4, "lamp_green_1north",
-					"girsignals:blocks/lamps/lamp_green", "lamp_yellow_2north", "girsignals:blocks/lamps/lamp_yellow");
+					"girsignals:blocks/lamps/lamp_green_e", "lamp_yellow_2north", "girsignals:blocks/lamps/lamp_yellow_e");
 			// VR off
 			cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.OFF)), 4);
 			// VR Status light
 			cm.register("hv/hv_vr_statuslight", hasAndIs(SignalHV.VR_LIGHT).and(has(SignalHV.DISTANTSIGNAL)), 4,
-					"lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
+					"lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white_e");
 			// VR Status light off
 			cm.register("hv/hv_vr_statuslight", hasAndIsNot(SignalHV.VR_LIGHT).and(has(SignalHV.DISTANTSIGNAL)), 4);
 		});
