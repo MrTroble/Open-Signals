@@ -8,7 +8,6 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
 import eu.gir.girsignals.blocks.IConfigUpdatable;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.blocks.SignalBridge;
 import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalBUELight;
@@ -17,6 +16,7 @@ import eu.gir.girsignals.blocks.boards.SignalLF;
 import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalOTHER;
 import eu.gir.girsignals.blocks.boards.SignalRA;
+import eu.gir.girsignals.blocks.boards.SignalStationName;
 import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
@@ -30,8 +30,8 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.common.config.Config.Type;
+import net.minecraftforge.common.config.ConfigManager;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -56,7 +56,7 @@ public class GIRBlocks {
 	public static final SignalNE NE_SIGNAL = new SignalNE();
 	public static final StationNumberPlate STATION_NUMBER_PLATE = new StationNumberPlate();
 	public static final SignalWN WN_SIGNAL = new SignalWN();
-	public static final SignalBridge SIGNAL_BRIDGE = new SignalBridge();
+	public static final SignalStationName STATION_NAME = new SignalStationName();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 

@@ -411,7 +411,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 					"lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
 			// HL Status light Distant
 			cm.register("hl/hl_shield_dist", with(SignalHL.DISTANTSIGNAL, hl -> hl.equals(HL_DISTANT.HL_STATUS_LIGHT)),
-					5, "lamp_white_sh_1north", "girsignals:blocks/lamps/lamp_white");
+					5, "lamp_white_sh_2north", "girsignals:blocks/lamps/lamp_white");
 		});
 		registeredModels.put("shlight", cm -> {
 			// SH ground off
@@ -702,6 +702,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("wn/wn3_6",
 					hasAndIs(SignalWN.WNTYPE).and(withN(SignalWN.WNCROSS, wn -> wn.equals(WN_CROSS.BLINK))), 0,
 					"lamp_1", "girsignals:blocks/lamps/lamp_white_blink");
+		});
+		registeredModels.put("stationname", cm -> {
+			cm.register("other_signals/station_name", t -> true, 0);
 		});
 	}
 
