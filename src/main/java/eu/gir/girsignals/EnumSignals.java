@@ -102,6 +102,10 @@ public class EnumSignals {
 	public enum EL_ARROW implements Offable<EL_ARROW> {
 		OFF, LEFT, RIGHT, LEFT_RIGHT, UP;
 	}
+	
+	public enum ARROW implements Offable<ARROW> {
+		OFF, ARROW_LEFT, ARROW_RIGHT, ARROW_LEFT_RIGHT;
+	}
 
 	public enum RA implements DefaultName<RA> {
 		RA10, RA11A, RA11B, RA12, RA6_9;

@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import eu.gir.girsignals.EnumSignals.ARROW;
 import eu.gir.girsignals.EnumSignals.BUE;
 import eu.gir.girsignals.EnumSignals.BUE_ADD;
 import eu.gir.girsignals.EnumSignals.CAR;
@@ -659,6 +660,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 					.and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);
 			cm.register("ne/ne2_3", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE2))
 					.and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);
+			for(ARROW arrow : ARROW.values()) {
+				if(arrow == ARROW.OFF)
+					continue;
+				cm.register("arrow", withN(SignalNE.ARROWPROP, arrow::equals), 1, "1", "girsignals:blocks/arrows/" + arrow.name().toLowerCase());
+			}
 		});
 		registeredModels.put("stationnumberplate", cm -> {
 			for (ST_NUMBER num : ST_NUMBER.values()) {
