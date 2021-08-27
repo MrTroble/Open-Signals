@@ -27,6 +27,7 @@ tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Bahnsteignummern
 tile.wnsignal.name=Wn Signal
 tile.signalbridge.name=Signalbrücke
+tile.stationname.name=Bahnhofsname
 
 #Linktool
 lt.linkfailed=Link fehlgeschlagen!
@@ -113,6 +114,7 @@ property.stationnumber.name=Nummer
 property.wntype.name=Wn Signalart umschalten
 property.wnnormal.name=Weichensignal
 property.wncross.name=Doppelweichensignal
+property.arrow.name=Zuordnungstafel
 
 #Sign Description
 property.indicator.desc=Aufschrift für Lf Signale.1 bis 20 für die Geschwindigkeit. A für Anfang und E für Ende
@@ -132,6 +134,7 @@ property.stationnumber.desc=Bahnsteignummer (Ziffer) oder Abschnitt (Buchstabe)
 property.wntype.desc=Wechselt zwischen Wn Signalen für eine normale Weiche und eine Doppelkreuzungsweiche
 property.wnnormal.desc=§lWn Weichensignale§r - Weichensignale zeigen an, für welchen Fahrweg die Weiche gestellt ist.%n§nWn1§r: Die Weiche liegt zur Fahrt durch den geraden Strang.%n§nWn2§r: Die Weiche liegt zur Fahrt durch den gebogenen Strang.
 property.wncross.desc=§lWn Weichensignale§r - Weichensignale zeigen an, für welchen Fahrweg die Weiche gestellt ist.%n§nWn3§r: Der Fahrweg führt vom linken in den rechten Zweig.%n§nWn4§r: Der Fahrweg führt vom rechten in den linken Zweig.%n§nWn5§r: Der Fahrweg führt vom linken in den linken Zweig.%n§nWn6§r: Der Fahrweg führt vom rechten in den rechten Zweig.
+property.arrow.desc=Das dazugehörige Signale bezieht sich auf das Gleis auf der angezeigten Seite.
 
 #Signalcontroller Names
 property.enummode.name=Modus

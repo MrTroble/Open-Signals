@@ -26,7 +26,7 @@ tile.buelight.name=Bü Signal
 tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Platform Number
 tile.wnsignal.name=Wn Signal
-tile.signalbridge.name=Signal gantry
+tile.stationname.name=Stationname
 
 #Linktool
 lt.linkfailed=Link failed!
@@ -112,7 +112,8 @@ property.neaddition.name=Ne2 Addition
 property.stationnumber.name=Number
 property.wntype.name=Change Wn signal type
 property.wnnormal.name=Normal points
-property.wncross.name=Double slip points 
+property.wncross.name=Double slip points
+property.arrow.name=Assignment board
 
 #Sign Description
 property.indicator.desc=Inscription for Lf signals.1 to 20 for speed. A for start and E for end
@@ -132,6 +133,7 @@ property.stationnumber.desc=Platform number (digit) or section (letter)
 property.wntype.desc=Toggles between Wn signals for a normal point and a double-crossing point
 property.wnnormal.desc=§lWn Point signals§r - Point signals indicate for which track the switch is set.%n§nWn1§r: The switch is for driving through the straight track.%n§nWn2§r: The switch is for driving through the curved track.
 property.wncross.desc=§lWn Point signals§r - Point signals indicate for which route the switch is set.%n§nWn3§r: The track leads from the left track to the right track.%n§nWn4§r: The track leads from the right track to the left track.%n§nWn5§r: The track leads from the left track to the left track.%n§nWn6§r: The track leads from the right track to the right track.
+property.arrow.desc=Indicates which track a signal board is intended for.
 
 #Signalcontroller Names
 property.enummode.name=Mode
