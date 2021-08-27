@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 
+import eu.gir.girsignals.GIRSignalsConfig;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.items.Placementtool;
@@ -43,7 +44,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class Signal extends Block implements ITileEntityProvider {
+public class Signal extends Block implements ITileEntityProvider, IConfigUpdatable {
 
 	public static enum SignalAngel implements IStringSerializable {
 		ANGEL0, ANGEL22P5, ANGEL45, ANGEL67P5, ANGEL90, ANGEL112P5, ANGEL135, ANGEL157P5, ANGEL180, ANGEL202P5,
@@ -394,6 +395,11 @@ public class Signal extends Block implements ITileEntityProvider {
 
 	public Placementtool getPlacementtool() {
 		return this.prop.placementtool;
+	}
+
+	@Override
+	public void updateConfigValues() {
+		setLightLevel(GIRSignalsConfig.signalLightValue / 15.0f);
 	}
 
 }

@@ -28,7 +28,7 @@ public class GirsignalsMain {
 
 	@EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
-		LOG =event.getModLog();
+		LOG = event.getModLog();
 		PROXY.preinit(event);
 	}
 
@@ -40,6 +40,5 @@ public class GirsignalsMain {
 	@EventHandler
 	public void postinit(FMLPostInitializationEvent event) {
 		PROXY.postinit(event);
-	}
-	
+	}	
 }

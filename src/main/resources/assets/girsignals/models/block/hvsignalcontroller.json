@@ -1,6 +1,1 @@
-{
-    "parent": "block/cube_all",
-    "textures": {
-        "all": "girsignals:blocks/signalcontroller"
-    }
-}
+{"parent": "block/cube_all", "textures": {"all": "girsignals:blocks/signalcontroller"}, "credit": "Made with Blockbench by Mc_Jeronimo"}

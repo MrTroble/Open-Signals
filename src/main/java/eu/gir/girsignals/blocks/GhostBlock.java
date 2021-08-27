@@ -1,5 +1,6 @@
 package eu.gir.girsignals.blocks;
 
+import eu.gir.girsignals.GIRSignalsConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -15,13 +16,12 @@ import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class GhostBlock extends Block {
+public class GhostBlock extends Block implements IConfigUpdatable {
 
 	public GhostBlock() {
 		super(Material.GLASS);
-		setLightLevel(1);
 	}
-
+	
 	@Override
 	public boolean isTranslucent(IBlockState state) {
 		return true;
@@ -92,5 +92,10 @@ public class GhostBlock extends Block {
 		if (lowerBlock instanceof GhostBlock || lowerBlock instanceof Signal) {
 			worldIn.destroyBlock(posdown, false);
 		}
+	}
+
+	@Override
+	public void updateConfigValues() {
+		setLightLevel(GIRSignalsConfig.signalLightValue / 15.0f);
 	}
 }

@@ -186,15 +186,17 @@ public class GuiPlacementtool extends GuiBase {
 		map.clear();
 		ebs.getUnlistedProperties().forEach((prop, opt) -> opt.ifPresent(val -> map.put(SEProperty.cst(prop), val)));
 
-		if (currentSelectedBlock.canHaveCustomname(map)) {
-			if(!buttonList.contains(textbox)) {
-				addButton(textbox);
-				initGui();
+		synchronized (textbox) {
+			if (currentSelectedBlock.canHaveCustomname(map)) {
+				if (!buttonList.contains(textbox)) {
+					addButton(textbox);
+					initGui();
+				}
+				if (!textbox.getText().isEmpty())
+					ebs = ebs.withProperty(Signal.CUSTOMNAME, true);
+			} else if (buttonList.contains(textbox)) {
+				buttonList.remove(textbox);
 			}
-			if (!textbox.getText().isEmpty())
-				ebs = ebs.withProperty(Signal.CUSTOMNAME, true);
-		} else if(buttonList.contains(textbox)) {
-			buttonList.remove(textbox);
 		}
 		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
 		DrawUtil.addToBuffer(model.get(), manager, ebs);
@@ -203,10 +205,12 @@ public class GuiPlacementtool extends GuiBase {
 
 	@Override
 	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-		super.mouseClicked(mouseX, mouseY, mouseButton);
-		if (mouseButton == 0) {
-			this.dragging = true;
-			oldMouse = mouseX;
+		synchronized (textbox) {
+			super.mouseClicked(mouseX, mouseY, mouseButton);
+			if (mouseButton == 0) {
+				this.dragging = true;
+				oldMouse = mouseX;
+			}
 		}
 	}
 
@@ -219,7 +223,6 @@ public class GuiPlacementtool extends GuiBase {
 	@Override
 	protected void keyTyped(char typedChar, int keyCode) throws IOException {
 		super.keyTyped(typedChar, keyCode);
-		textbox.keyTyped(typedChar, keyCode);
 	}
 
 }
