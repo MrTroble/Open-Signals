@@ -29,12 +29,12 @@ tile.wnsignal.name=Wn Signal
 tile.stationname.name=Stationname
 
 #Linktool
-lt.linkfailed=Link failed!
-lt.set=Set position to controller
-lt.added=Added %s to the link tool
-lt.unlink=Unlinked controller from it's signal
-lt.nosignal=This block is not a signal
-lt.notaddable=This block cannot be linked
+lt.linkedpos=§2Linked to: {%d, %d, %d§2}§r
+lt.setpos=§2Set to: {%d, %d, %d§2}§r
+lt.setpos.msg=§l§9Please click on an emitter to set the link.§r
+lt.notlinked=§cNot linked!§r
+lt.notlinked.msg=§l§9Please click on an acceptor to link.§r
+lt.reset=§cThe tool has been reset.§r
 
 #Placementtool
 pt.itemnotset=Please set the tool before (sneak + right click on a block)
