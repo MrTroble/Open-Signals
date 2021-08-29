@@ -2,5 +2,5 @@
 	path = src/main/java/eu/gir/girsignals/guis/guilib
 	url = https://github.com/German-Immersive-Railroading-Community/guilib
 [submodule "srcmainjavaeugirgirsignalslinkableApi"]
-	path = srcmainjavaeugirgirsignalslinkableApi
+	path = src/main/java/eu/gir/girsignals/linkableApi
 	url = https://github.com/German-Immersive-Railroading-Community/linkableapi
