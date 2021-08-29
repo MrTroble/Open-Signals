@@ -36,6 +36,7 @@ lt.setpos.msg=§l§9Bitte klicke auf einen Signal-Sender um die Verknüpfung her
 lt.notlinked=§cNicht verlinkt!§r
 lt.notlinked.msg=§l§9Bitte klicke auf einen Signal-Akzeptor um zu verknüpfen.§r
 lt.reset=§cDer Verlinker ist zurückgesetzt.§r
+lt.unlink=Link zurückgesetzt
 
 #Placementtool
 pt.itemnotset=Bitte stell das Tool vorher ein (Sneaken + Rechtsklick auf einen Block)
