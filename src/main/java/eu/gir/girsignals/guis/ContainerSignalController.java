@@ -140,6 +140,8 @@ public class ContainerSignalController extends Container {
 			}
 		}
 
+		if(supportedSigStates == null)
+			return;
 		for (int i = 0; i < supportedSigStates.length; i++) {
 			final int signalType = this.supportedSigTypes[i];
 			final int signalState = this.entity.getSignalStateImpl(signalType);
