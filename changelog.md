@@ -2,6 +2,7 @@
 
 ## [Update] 8.30.2021 - 1
 
+* Better Linking between parts
 * Added linkable API
 
 ## [Addition/Fixes/Update] 8.27.2021 - 1

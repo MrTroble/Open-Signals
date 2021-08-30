@@ -31,12 +31,12 @@ tile.stationname.name=Stationname
 #Linktool
 lt.linkedpos=§2Linked to: {%d, %d, %d§2}§r
 lt.setpos=§2Set to: {%d, %d, %d§2}§r
-lt.setpos.msg=§l§9Please click on an linkable block (e.g. Signal) to set the link.§r
+lt.setpos.msg=§l§9Please click on an link acceptor (e.g. Controller) to set the link.§r
 lt.notlinked=§cNot linked!§r
-lt.notlinked.msg=§l§9Please click on an link acceptor (e.g. Controller) to link.§r
+lt.notlinked.msg=§l§9Please click on an linkable block (e.g. Signal) to link.§r
 lt.reset=§cThe tool has been reset.§r
 lt.unlink=§cLink reseted§r
-lt.notset=§cNo linked signal. Please click on a signal first.§r
+lt.notset=§cNo or wrong linked object. Please click on a valid object first.§r
 
 #Placementtool
 pt.itemnotset=Please set the tool before (sneak + right click on a block)
