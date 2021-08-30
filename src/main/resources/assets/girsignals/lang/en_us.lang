@@ -35,7 +35,8 @@ lt.setpos.msg=§l§9Please click on an emitter to set the link.§r
 lt.notlinked=§cNot linked!§r
 lt.notlinked.msg=§l§9Please click on an acceptor to link.§r
 lt.reset=§cThe tool has been reset.§r
-lt.unlink=Link reseted
+lt.unlink=§cLink reseted§r
+lt.notset=§cNo linked signal. Please click on a signal first.§r
 
 #Placementtool
 pt.itemnotset=Please set the tool before (sneak + right click on a block)
