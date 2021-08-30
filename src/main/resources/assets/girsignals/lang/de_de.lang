@@ -32,9 +32,9 @@ tile.stationname.name=Bahnhofsname
 #Linktool
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r
 lt.setpos=§2Gesetzt auf: {%d, %d, %d§2}§r
-lt.setpos.msg=§l§9Bitte klicke auf einen Signal-Sender um die Verknüpfung herzustellen.§r
+lt.setpos.msg=§l§9Bitte klicke auf einen verknüpfbaren Block (z.B. Signal) um die Verknüpfung herzustellen.§r
 lt.notlinked=§cNicht verlinkt!§r
-lt.notlinked.msg=§l§9Bitte klicke auf einen Signal-Akzeptor um zu verknüpfen.§r
+lt.notlinked.msg=§l§9Bitte klicke auf einen Verknüpfer Block (z.B. Controller) um zu verknüpfen.§r
 lt.reset=§cDer Verlinker ist zurückgesetzt.§r
 lt.unlink=§cVerlinkung zurückgesetzt§r
 lt.notset=§cKein verknüpftes Signal. Bitte klicke zuerst auf ein Signal.§r
