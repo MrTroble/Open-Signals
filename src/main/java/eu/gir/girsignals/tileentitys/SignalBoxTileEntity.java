@@ -3,6 +3,7 @@ package eu.gir.girsignals.tileentitys;
 import java.util.ArrayList;
 
 import eu.gir.girsignals.linkableApi.ILinkableTile;
+import net.minecraft.block.BlockLever;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -25,12 +26,12 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 		posList.forEach(pos -> list.appendTag(NBTUtil.createPosTag(pos)));
 		compound.setTag(name, list);
 	}
-	
+
 	private static void readList(ArrayList<BlockPos> posList, NBTTagCompound compound, String name) {
 		final NBTTagList list = compound.getTagList(POS_LIST, 10);
 		list.forEach(nbt -> posList.add(NBTUtil.getPosFromTag((NBTTagCompound) nbt)));
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		readList(linkedPositions, compound, POS_LIST);
@@ -48,7 +49,7 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 	}
 
 	private void onLink(final BlockPos pos) {
-		SignalControllerTileEntity entity = new SignalControllerTileEntity();
+		final SignalControllerTileEntity entity = new SignalControllerTileEntity();
 		entity.setWorld(world);
 		entity.setPos(this.pos);
 		entity.link(pos);
@@ -76,8 +77,14 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 		} else {
 			if (rsInput.contains(pos) || rsOutput.contains(pos))
 				return false;
-			rsInput.contains(pos);
+			// TODO compatibility with RS Mod
+			if (world.getBlockState(pos).getBlock() instanceof BlockLever)
+				rsOutput.add(pos);
+			else
+				rsInput.add(pos);
 		}
+		System.out.println(rsOutput);
+		System.out.println(rsInput);
 		return true;
 	}
 
