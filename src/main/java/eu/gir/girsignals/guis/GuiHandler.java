@@ -25,6 +25,8 @@ public class GuiHandler implements IGuiHandler {
 			final TileEntity entity = world.getTileEntity(new BlockPos(x, y, z));
 			if (entity instanceof SignalControllerTileEntity)
 				return new ContainerSignalController((SignalControllerTileEntity) entity);
+		} else if(ID == EnumSignals.GUI_SIGNAL_BOX) {
+			return new ContainerSignalBox();
 		}
 		return null;
 	}
@@ -40,6 +42,8 @@ public class GuiHandler implements IGuiHandler {
 			if (entity instanceof SignalControllerTileEntity)
 				return new GuiSignalController((SignalControllerTileEntity) entity);
 		}
+		case EnumSignals.GUI_SIGNAL_BOX:
+			return new GuiSignalBox();
 		default:
 			return null;
 		}

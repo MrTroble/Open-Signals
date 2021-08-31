@@ -49,6 +49,8 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 
 	private void onLink(final BlockPos pos) {
 		SignalControllerTileEntity entity = new SignalControllerTileEntity();
+		entity.setWorld(world);
+		entity.setPos(this.pos);
 		entity.link(pos);
 		controller.add(entity);
 	}

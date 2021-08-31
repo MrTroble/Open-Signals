@@ -6,7 +6,8 @@ public class EnumSignals {
 
 	public static final int GUI_PLACEMENTTOOL = 0;
 	public static final int GUI_SIGNAL_CONTROLLER = 1;
-	
+	public static final int GUI_SIGNAL_BOX = 2;
+
 	public interface DefaultName<T extends Enum<T>> extends IStringSerializable, Comparable<T> {
 		@Override
 		public default String getName() {

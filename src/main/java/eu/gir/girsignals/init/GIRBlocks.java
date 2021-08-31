@@ -8,6 +8,7 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
 import eu.gir.girsignals.blocks.IConfigUpdatable;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.blocks.SignalBox;
 import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalBUELight;
@@ -57,6 +58,7 @@ public class GIRBlocks {
 	public static final StationNumberPlate STATION_NUMBER_PLATE = new StationNumberPlate();
 	public static final SignalWN WN_SIGNAL = new SignalWN();
 	public static final SignalStationName STATION_NAME = new SignalStationName();
+	public static final SignalBox SIGNALBOX = new SignalBox();
 
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
