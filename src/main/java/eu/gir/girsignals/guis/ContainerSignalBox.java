@@ -9,5 +9,9 @@ public class ContainerSignalBox extends Container {
 	public boolean canInteractWith(EntityPlayer playerIn) {
 		return true;
 	}
+	
+	@Override
+	public void detectAndSendChanges() {
+	}
 
 }

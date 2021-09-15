@@ -72,7 +72,7 @@ public class GIRNetworkHandler {
 			throw new IllegalArgumentException("Wrong packet ID in network recive!");
 		}
 	}
-
+	
 	private static void readFromPos(final ByteBuf payBuf, final World world,
 			final Consumer<SignalControllerTileEntity> consumer) {
 		final BlockPos pos = new BlockPos(payBuf.readInt(), payBuf.readInt(), payBuf.readInt());

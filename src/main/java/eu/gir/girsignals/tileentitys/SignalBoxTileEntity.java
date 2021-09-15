@@ -1,16 +1,43 @@
 package eu.gir.girsignals.tileentitys;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import com.google.gson.Gson;
 
 import eu.gir.girsignals.linkableApi.ILinkableTile;
 import net.minecraft.block.BlockLever;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
 public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
+
+	public static final class PlanElement {
+		public int type;
+		public int xPos;
+		public int yPos;
+		public ArrayList<String> connectedElements;
+	}
+
+	public static final class TrackPlan {
+		public String name;
+		public int version;
+		public HashMap<String, PlanElement> elements;
+	}
+
+	public static final Gson GSON = new Gson();
 
 	private final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
 	private final ArrayList<SignalControllerTileEntity> controller = new ArrayList<>();
@@ -20,6 +47,8 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 	private static final String POS_LIST = "poslist";
 	private static final String RS_IN_LIST = "rsIn";
 	private static final String RS_OUT_LIST = "rsOut";
+	private static final String NAME = "name";
+	private static final String JSONDATA = "jsondata";
 
 	private static void writeList(ArrayList<BlockPos> posList, NBTTagCompound compound, String name) {
 		final NBTTagList list = new NBTTagList();
@@ -32,11 +61,31 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 		list.forEach(nbt -> posList.add(NBTUtil.getPosFromTag((NBTTagCompound) nbt)));
 	}
 
+	private TrackPlan plan = null;
+	private String name = null;
+
+	public void loadPlan(final String name) {
+		final Path path = Paths.get("trackplans", name);
+		try (final BufferedReader reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+			plan = GSON.fromJson(GSON.newJsonReader(reader), TrackPlan.class);
+			if (world != null) {
+				final IBlockState state = world.getBlockState(pos);
+				world.notifyBlockUpdate(pos, state, state, 3);
+			}
+		} catch (IOException e) {
+			e.printStackTrace(); // TODO default behaviour
+		}
+	}
+	
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		readList(linkedPositions, compound, POS_LIST);
 		readList(rsInput, compound, RS_IN_LIST);
 		readList(rsOutput, compound, RS_OUT_LIST);
+		name = "test.json";
+		if (compound.hasKey(NAME)) {
+			loadPlan(name);
+		}
 		super.readFromNBT(compound);
 	}
 
@@ -45,7 +94,27 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 		writeList(linkedPositions, compound, POS_LIST);
 		writeList(rsInput, compound, RS_IN_LIST);
 		writeList(rsOutput, compound, RS_OUT_LIST);
+		if (name != null)
+			compound.setString(NAME, name);
 		return super.writeToNBT(compound);
+	}
+
+	@Override
+	public SPacketUpdateTileEntity getUpdatePacket() {
+		final NBTTagCompound comp = getUpdateTag();
+		System.out.println("T");
+		if (plan != null)
+			comp.setByteArray(JSONDATA, GSON.toJson(plan).getBytes());
+		return new SPacketUpdateTileEntity(pos, 0, comp);
+	}
+
+	@Override
+	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+		final NBTTagCompound compound = pkt.getNbtCompound();
+		this.readFromNBT(compound);
+		if (compound.hasKey(JSONDATA)) {
+			plan = GSON.fromJson(new String(compound.getByteArray(JSONDATA), StandardCharsets.UTF_8), TrackPlan.class);
+		}
 	}
 
 	private void onLink(final BlockPos pos) {
@@ -60,6 +129,8 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 	public void onLoad() {
 		controller.clear();
 		linkedPositions.forEach(this::onLink);
+		final IBlockState state = world.getBlockState(pos);
+		world.notifyBlockUpdate(pos, state, state, 3);
 	}
 
 	@Override
@@ -83,14 +154,17 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 			else
 				rsInput.add(pos);
 		}
-		System.out.println(rsOutput);
-		System.out.println(rsInput);
+		loadPlan("test.json");
 		return true;
 	}
 
 	@Override
 	public boolean unlink() {
 		return false;
+	}
+
+	public TrackPlan getPlan() {
+		return plan;
 	}
 
 }

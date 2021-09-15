@@ -8,6 +8,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.guis.guilib.GuiElements.GuiEnumerableSetting;
 import eu.gir.girsignals.guis.guilib.GuiElements.GuiSettingCheckBox;
+import eu.gir.girsignals.tileentitys.SignalBoxTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
@@ -43,7 +44,9 @@ public class GuiHandler implements IGuiHandler {
 				return new GuiSignalController((SignalControllerTileEntity) entity);
 		}
 		case EnumSignals.GUI_SIGNAL_BOX:
-			return new GuiSignalBox();
+			final TileEntity entity = world.getTileEntity(new BlockPos(x, y, z));
+			if (entity instanceof SignalBoxTileEntity)
+				return new GuiSignalBox((SignalBoxTileEntity)entity);
 		default:
 			return null;
 		}
