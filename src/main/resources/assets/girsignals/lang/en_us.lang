@@ -27,6 +27,7 @@ tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Platform Number
 tile.wnsignal.name=Wn Signal
 tile.stationname.name=Stationname
+tile.signalbox.name=Signalbox
 
 #Linktool
 lt.linkedpos=§2Linked to: {%d, %d, %d§2}§r
