@@ -1,5 +1,9 @@
 # Changelog
 
+## [Fix] 9.22.2021 - 1
+
+* Fixed Wn signal
+
 ## [Update] 8.30.2021 - 1
 
 * Better Linking between parts
