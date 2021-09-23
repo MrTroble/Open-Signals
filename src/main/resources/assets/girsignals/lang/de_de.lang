@@ -28,6 +28,7 @@ tile.stationnumberplate.name=Bahnsteignummern
 tile.wnsignal.name=Wn Signal
 tile.signalbridge.name=Signalbrücke
 tile.stationname.name=Bahnhofsname
+tile.signalbox.name=Stellwerk
 
 #Linktool
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r
