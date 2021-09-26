@@ -16,6 +16,7 @@ import net.minecraft.block.BlockLever;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.NBTTagString;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -43,12 +44,15 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 	private final ArrayList<SignalControllerTileEntity> controller = new ArrayList<>();
 	private final ArrayList<BlockPos> rsInput = new ArrayList<>();
 	private final ArrayList<BlockPos> rsOutput = new ArrayList<>();
+	
+	public final ArrayList<String> strings = new ArrayList<>();
 
 	private static final String POS_LIST = "poslist";
 	private static final String RS_IN_LIST = "rsIn";
 	private static final String RS_OUT_LIST = "rsOut";
 	private static final String NAME = "name";
 	private static final String JSONDATA = "jsondata";
+	private static final String NAMELIST = "namelist";
 
 	private static void writeList(ArrayList<BlockPos> posList, NBTTagCompound compound, String name) {
 		final NBTTagList list = new NBTTagList();
@@ -102,7 +106,13 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 	@Override
 	public SPacketUpdateTileEntity getUpdatePacket() {
 		final NBTTagCompound comp = getUpdateTag();
-		System.out.println("T");
+		final NBTTagList list = new NBTTagList();
+		try {
+			Files.list(Paths.get("trackplans")).forEach(s -> list.appendTag(new NBTTagString(s.getFileName().toString())));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		comp.setTag(NAMELIST, list);
 		if (plan != null)
 			comp.setByteArray(JSONDATA, GSON.toJson(plan).getBytes());
 		return new SPacketUpdateTileEntity(pos, 0, comp);
@@ -114,6 +124,11 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 		this.readFromNBT(compound);
 		if (compound.hasKey(JSONDATA)) {
 			plan = GSON.fromJson(new String(compound.getByteArray(JSONDATA), StandardCharsets.UTF_8), TrackPlan.class);
+		}
+		if(compound.hasKey(NAMELIST)) {
+			final NBTTagList list = compound.getTagList(NAMELIST, 8);
+			strings.clear();
+			list.forEach(d -> strings.add(((NBTTagString)d).getString()));
 		}
 	}
 

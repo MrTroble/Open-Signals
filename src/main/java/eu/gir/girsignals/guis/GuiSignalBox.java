@@ -1,6 +1,8 @@
 package eu.gir.girsignals.guis;
 
+import eu.gir.girsignals.guis.guilib.DrawUtil.SizeIntegerables;
 import eu.gir.girsignals.guis.guilib.GuiBase;
+import eu.gir.girsignals.guis.guilib.GuiElements.GuiEnumerableSetting;
 import eu.gir.girsignals.tileentitys.SignalBoxTileEntity;
 import eu.gir.girsignals.tileentitys.SignalBoxTileEntity.PlanElement;
 import eu.gir.girsignals.tileentitys.SignalBoxTileEntity.TrackPlan;
@@ -15,9 +17,12 @@ public class GuiSignalBox extends GuiBase {
 	private String name;
 	private TrackPlan plan;
 
+	private final SignalBoxTileEntity box;
+
 	public GuiSignalBox(final SignalBoxTileEntity box) {
 		this.name = I18n.format("tile.signalbox.name");
 		this.plan = box.getPlan();
+		this.box = box;
 	}
 
 	@Override
@@ -36,6 +41,17 @@ public class GuiSignalBox extends GuiBase {
 
 	private final float transformY(final int x) {
 		return x * YOFFSET + this.guiTop + YSIZE + 15;
+	}
+
+	@Override
+	public void initButtons() {
+		super.initButtons();
+
+		if (box.strings.size() > 0) {
+			this.addButton(new GuiEnumerableSetting(
+					new SizeIntegerables<String>("test", box.strings.size(), box.strings::get), 0, s -> {
+					}));
+		}
 	}
 
 	@Override
