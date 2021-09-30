@@ -86,8 +86,7 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 		readList(linkedPositions, compound, POS_LIST);
 		readList(rsInput, compound, RS_IN_LIST);
 		readList(rsOutput, compound, RS_OUT_LIST);
-		name = "test.json";
-		if (compound.hasKey(NAME)) {
+		if (compound.hasKey(NAME) && world != null && !world.isRemote) {
 			loadPlan(name);
 		}
 		super.readFromNBT(compound);
@@ -146,6 +145,9 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 		linkedPositions.forEach(this::onLink);
 		final IBlockState state = world.getBlockState(pos);
 		world.notifyBlockUpdate(pos, state, state, 3);
+		if (name != null && world != null && !world.isRemote) {
+			loadPlan(name);
+		}
 	}
 
 	@Override
@@ -169,6 +171,7 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 			else
 				rsInput.add(pos);
 		}
+		name = "test.json";
 		loadPlan("test.json");
 		return true;
 	}
