@@ -29,13 +29,13 @@ public class SignalBoxTileEntity extends TileEntity implements ILinkableTile {
 		public int type;
 		public int xPos;
 		public int yPos;
-		public ArrayList<String> connectedElements;
 	}
 
 	public static final class TrackPlan {
 		public String name;
 		public int version;
 		public HashMap<String, PlanElement> elements;
+		public HashMap<String, String[]> connections;
 	}
 
 	public static final Gson GSON = new Gson();

@@ -75,9 +75,9 @@ public class GuiSignalBox extends GuiBase {
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		super.drawScreen(mouseX, mouseY, partialTicks);
-		if (plan == null || plan.elements == null)
+		if (plan == null || plan.elements == null || plan.connections == null)
 			return;
-
+		
 		final ScaledResolution res = new ScaledResolution(this.mc);
 		final double scale = (double) res.getScaleFactor();
 		GL11.glScissor((int) (this.guiLeft * scale), (int) (this.guiTop * scale), (int) (this.xSize * scale),
@@ -98,34 +98,32 @@ public class GuiSignalBox extends GuiBase {
 				}
 			}
 		}
+		
+		plan.connections.forEach((name, list) -> {
+			final PlanElement element = plan.elements.get(list[1]);
+			final PlanElement pel = plan.elements.get(list[0]);
+			
+			final double pos1_x = transformX(element.xPos);
+			final double pos1_y = transformY(element.yPos);
+			final double pos2_x = transformX(pel.xPos);
+			final double pos2_y = transformY(pel.yPos);
 
-		plan.elements.forEach((name, element) -> {
-			if (element.connectedElements == null)
-				return;
-			element.connectedElements.forEach(n -> {
-				final PlanElement pel = plan.elements.get(n);
-				final double pos1_x = transformX(element.xPos);
-				final double pos1_y = transformY(element.yPos);
-				final double pos2_x = transformX(pel.xPos);
-				final double pos2_y = transformY(pel.yPos);
-
-				Tessellator tessellator = Tessellator.getInstance();
-				BufferBuilder bufferbuilder = tessellator.getBuffer();
-				GlStateManager.enableBlend();
-				GlStateManager.disableTexture2D();
-				GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-						GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
-						GlStateManager.DestFactor.ZERO);
-				GlStateManager.color(1, 0, 0, 1);
-				bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
-				bufferbuilder.pos((double) pos1_x + 3, (double) pos1_y, 0.0D).endVertex();
-				bufferbuilder.pos((double) pos1_x, (double) pos1_y, 0.0D).endVertex();
-				bufferbuilder.pos((double) pos2_x, (double) pos2_y, 0.0D).endVertex();
-				bufferbuilder.pos((double) pos2_x + 3, (double) pos2_y, 0.0D).endVertex();
-				tessellator.draw();
-				GlStateManager.enableTexture2D();
-				GlStateManager.disableBlend();
-			});
+			Tessellator tessellator = Tessellator.getInstance();
+			BufferBuilder bufferbuilder = tessellator.getBuffer();
+			GlStateManager.enableBlend();
+			GlStateManager.disableTexture2D();
+			GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
+					GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
+					GlStateManager.DestFactor.ZERO);
+			GlStateManager.color(1, 0, 0, 1);
+			bufferbuilder.begin(7, DefaultVertexFormats.POSITION);
+			bufferbuilder.pos((double) pos1_x + 3, (double) pos1_y, 0.0D).endVertex();
+			bufferbuilder.pos((double) pos1_x, (double) pos1_y, 0.0D).endVertex();
+			bufferbuilder.pos((double) pos2_x, (double) pos2_y, 0.0D).endVertex();
+			bufferbuilder.pos((double) pos2_x + 3, (double) pos2_y, 0.0D).endVertex();
+			tessellator.draw();
+			GlStateManager.enableTexture2D();
+			GlStateManager.disableBlend();
 		});
 
 		plan.elements.forEach((name, element) -> {
@@ -135,7 +133,6 @@ public class GuiSignalBox extends GuiBase {
 		});
 
 		GL11.glDisable(GL11.GL_SCISSOR_TEST);
-
 	}
 
 }
