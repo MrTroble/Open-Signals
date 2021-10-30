@@ -28,6 +28,8 @@ public class SignalHV extends Signal {
 	public static final SEProperty<ZS32> ZS3V = SEProperty.of("zs3v", ZS32.OFF);
 	public static final SEProperty<Boolean> ZS1 = SEProperty.of("zs1", false);
 	public static final SEProperty<Boolean> ZS7 = SEProperty.of("zs7", false);
+	public static final SEProperty<ZS32> ZS3_PLATE = SEProperty.of("zs3plate", ZS32.OFF, ChangeableStage.GUISTAGE);
+	public static final SEProperty<ZS32> ZS3V_PLATE = SEProperty.of("zs3vplate", ZS32.OFF, ChangeableStage.GUISTAGE);
 
 	@Override
 	public boolean hasCostumColor() {
@@ -36,7 +38,7 @@ public class SignalHV extends Signal {
 
 	@Override
 	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-		return tintIndex == 1 ? 0xFF9323 : 0xFFFFFF;
+		return tintIndex == 1 ? 0xFFC200 : 0xFFFFFF;
 	}
 
 }
