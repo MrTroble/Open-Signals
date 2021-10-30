@@ -197,6 +197,13 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 				cm.register("hv/hv_zs3v", with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)), 3f, "overlay",
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
+			for (ZS32 zs3 : ZS32.values()) {
+				if (ZS32.OFF==zs3) continue;
+				cm.register("zs/zs3", with(SignalHV.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL).and(has(SignalHV.ZS3).negate())),
+						6.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("zs/zs3v", with(SignalHV.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.ZS3V).negate()), 2.9f, "overlay",
+						"girsignals:blocks/zs3/" + zs3.name());
+			}
 			// VR0
 			cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR0)), 4, "lamp_yellow_1north",
 					"girsignals:blocks/lamps/lamp_yellow", "lamp_yellow_2north", "girsignals:blocks/lamps/lamp_yellow");
@@ -237,6 +244,13 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 				cm.register("ks/ks_zs3v", with(SignalKS.ZS3V, pZs3 -> pZs3.equals(zs3)), 4, "overlay",
 						"girsignals:blocks/zs3/" + zs3.name());
 				cm.register("ks/ks_zs2", with(SignalKS.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
+						"girsignals:blocks/zs3/" + zs3.name());
+			}
+			for (ZS32 zs3 : ZS32.values()) {
+				if (ZS32.OFF==zs3) continue;
+				cm.register("zs/zs3", with(SignalKS.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3).negate()),
+						6.375f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("zs/zs3v", with(SignalKS.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3V).negate()), 3.9f, "overlay",
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			// KS off

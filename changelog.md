@@ -1,5 +1,8 @@
 # Changelog
 
+## [Addition] 10.30.2021 - 1
+* Added ZS plates for HV and KS signals
+
 ## [Fix] 9.22.2021 - 1
 
 * Fixed Wn signal

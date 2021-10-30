@@ -38,7 +38,7 @@ public class SignalHV extends Signal {
 
 	@Override
 	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-		return tintIndex == 1 ? 0xFF9323 : 0xFFFFFF;
+		return tintIndex == 1 ? 0xFFC200 : 0xFFFFFF;
 	}
 
 }
