@@ -128,7 +128,7 @@ public class EnumSignals {
 	}
 
 	public enum ST_NUMBER implements DefaultName<ST_NUMBER> {
-		Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19, Z20, A, B, C, D, E, F, G,
+		Z1, Z2, Z3, Z4, Z5, Z6, Z7, Z8, Z9, Z10, Z11, Z12, Z13, Z14, Z15, Z16, Z17, Z18, Z19, Z20, Z21, Z22, Z23, Z24, A, B, C, D, E, F, G,
 		H, I, J, K, L, M, N, O, P, Q, R, S, T, U, V, W, X, Y, Z;
 
 		public String[] getOverlayRename() {
