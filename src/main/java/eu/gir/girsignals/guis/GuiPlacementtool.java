@@ -11,7 +11,6 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.DrawUtil;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
-import eu.gir.girsignals.guis.guilib.GuiElements.UICheckBox;
 import eu.gir.girsignals.guis.guilib.GuiElements.UIEntity;
 import eu.gir.girsignals.guis.guilib.GuiElements.UIVBox;
 import eu.gir.girsignals.init.GIRNetworkHandler;
@@ -50,8 +49,21 @@ public class GuiPlacementtool extends GuiBase {
 				: tool.getObjFromID(0).getID();
 		implLastID = tool.signalids.indexOf(usedBlock);
 		currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
+		
+		init();
 	}
 
+	private void init() {
+		final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock.getBlockState();
+		final Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
+		for (IUnlistedProperty<?> property : unlistedProperties) {
+			final SEProperty<?> prop = SEProperty.cst(property);
+			of(prop, inp -> applyModelChanges());
+		}
+		list.add(new UIVBox(5));
+		this.entity.add(list);
+	}
+	
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		super.drawScreen(mouseX, mouseY, partialTicks);
@@ -73,25 +85,15 @@ public class GuiPlacementtool extends GuiBase {
 		GlStateManager.disableRescaleNormal();
 	}
 
-	private UIEntity createBoolElement(SEProperty<?> property, IntConsumer consumer) {
-		final UIEntity middle = new UIEntity();
-		middle.setBounds(this.fontRenderer.getStringWidth(property.getLocalizedName()) + 20, 20);
-
-		final UICheckBox middleButton = new UICheckBox(property.getNamedObj(0));
-		middleButton.setOnChange(consumer);
-		middle.add(middleButton);
-		return middle;
-	}
-
 	public void of(SEProperty<?> property, IntConsumer consumer) {
 		if (property == null)
 			return;
 		if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 			if (property.getType().equals(Boolean.class))
-				list.add(createBoolElement(property, consumer));
+				list.add(GuiElements.createBoolElement(property, consumer));
 			list.add(GuiElements.createEnumElement(property, consumer));
 		} else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-			list.add(createBoolElement(property, consumer));
+			list.add(GuiElements.createBoolElement(property, consumer));
 		}
 	}
 
@@ -108,16 +110,7 @@ public class GuiPlacementtool extends GuiBase {
 //			initButtons();
 //		};
 //		addButton(settings);
-
-		final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock.getBlockState();
-		final Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
-		for (IUnlistedProperty<?> property : unlistedProperties) {
-			final SEProperty<?> prop = SEProperty.cst(property);
-			of(prop, inp -> applyModelChanges());
-		}
-		list.setBounds(this.xSize, this.ySize);
-		list.add(new UIVBox(10));
-		this.entity.add(list);
+		list.setBounds(this.xSize, this.ySize);		
 		applyModelChanges();
 		super.initGui();
 	}
