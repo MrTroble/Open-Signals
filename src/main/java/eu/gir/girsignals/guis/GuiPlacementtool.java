@@ -77,7 +77,8 @@ public class GuiPlacementtool extends GuiBase {
 		final UIEntity middle = new UIEntity();
 		middle.setBounds(this.fontRenderer.getStringWidth(property.getLocalizedName()) + 20, 20);
 
-		final UICheckBox middleButton = new UICheckBox(property.getNamedObj(0));
+		final UICheckBox middleButton = new UICheckBox(property.getName());
+		middleButton.setText(property.getLocalizedName());
 		middleButton.setOnChange(consumer);
 		middle.add(middleButton);
 		return middle;
