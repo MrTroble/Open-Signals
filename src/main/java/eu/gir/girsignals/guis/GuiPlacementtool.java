@@ -11,17 +11,11 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.DrawUtil;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
-import eu.gir.girsignals.guis.guilib.GuiElements.UIButton;
 import eu.gir.girsignals.guis.guilib.GuiElements.UICheckBox;
-import eu.gir.girsignals.guis.guilib.GuiElements.UIClickable;
 import eu.gir.girsignals.guis.guilib.GuiElements.UIEntity;
-import eu.gir.girsignals.guis.guilib.GuiElements.UIEnumerable;
-import eu.gir.girsignals.guis.guilib.GuiElements.UIHBox;
 import eu.gir.girsignals.guis.guilib.GuiElements.UIVBox;
-import eu.gir.girsignals.guis.guilib.IIntegerable;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.items.Placementtool;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -121,9 +115,9 @@ public class GuiPlacementtool extends GuiBase {
 			final SEProperty<?> prop = SEProperty.cst(property);
 			of(prop, inp -> applyModelChanges());
 		}
-		this.entity.add(list);
 		list.setBounds(this.xSize, this.ySize);
 		list.add(new UIVBox(10));
+		this.entity.add(list);
 		applyModelChanges();
 		super.initGui();
 	}
