@@ -15,6 +15,8 @@ import eu.gir.girsignals.guis.guilib.GuiElements.UIEntity;
 import eu.gir.girsignals.guis.guilib.GuiElements.UIVBox;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.items.Placementtool;
+import net.minecraft.block.BlockWorkbench;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -22,6 +24,7 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
@@ -61,7 +64,14 @@ public class GuiPlacementtool extends GuiBase {
 			of(prop, inp -> applyModelChanges());
 		}
 		list.add(new UIVBox(5));
+		list.setInheritBounds(true);
+		final UIEntity entity = GuiElements.createEnumElement(tool, input -> {
+			implLastID = input;
+			currentSelectedBlock = tool.getObjFromID(input);
+		});
+		this.entity.add(entity);
 		this.entity.add(list);
+		this.entity.add(new UIVBox(5));
 	}
 	
 	@Override
@@ -85,7 +95,6 @@ public class GuiPlacementtool extends GuiBase {
 		GlStateManager.disableRescaleNormal();
 	}
 
-
 	public void of(SEProperty<?> property, IntConsumer consumer) {
 		if (property == null)
 			return;
@@ -102,16 +111,6 @@ public class GuiPlacementtool extends GuiBase {
 	public void initGui() {
 		animationState = 180.0f;
 		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
-
-//		final GuiEnumerableSetting settings = new GuiEnumerableSetting(tool, this.implLastID, null);
-//		settings.consumer = input -> {
-//			settings.enabled = false;
-//			implLastID = input;
-//			currentSelectedBlock = tool.getObjFromID(input);
-//			initButtons();
-//		};
-//		addButton(settings);
-		list.setBounds(this.xSize, this.ySize);		
 		applyModelChanges();
 		super.initGui();
 	}
