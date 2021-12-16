@@ -15,8 +15,6 @@ import eu.gir.girsignals.guis.guilib.GuiElements.UIEntity;
 import eu.gir.girsignals.guis.guilib.GuiElements.UIVBox;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.items.Placementtool;
-import net.minecraft.block.BlockWorkbench;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -24,7 +22,6 @@ import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
@@ -52,28 +49,37 @@ public class GuiPlacementtool extends GuiBase {
 				: tool.getObjFromID(0).getID();
 		implLastID = tool.signalids.indexOf(usedBlock);
 		currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
-		
+
 		init();
 	}
 
-	private void init() {
+	private void initList() {
 		final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock.getBlockState();
 		final Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState.getUnlistedProperties();
 		for (IUnlistedProperty<?> property : unlistedProperties) {
 			final SEProperty<?> prop = SEProperty.cst(property);
 			of(prop, inp -> applyModelChanges());
 		}
-		list.add(new UIVBox(5));
+	}
+
+	private void init() {
+		initList();
+		final UIVBox vbox = new UIVBox(5);
+		list.add(vbox);
 		list.setInheritBounds(true);
 		final UIEntity entity = GuiElements.createEnumElement(tool, input -> {
 			implLastID = input;
 			currentSelectedBlock = tool.getObjFromID(input);
+			list.clearChildren();
+			initList();
 		});
 		this.entity.add(entity);
 		this.entity.add(list);
 		this.entity.add(new UIVBox(5));
+
+		this.entity.add(GuiElements.createPageSelect(vbox));
 	}
-	
+
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
 		super.drawScreen(mouseX, mouseY, partialTicks);
@@ -99,8 +105,10 @@ public class GuiPlacementtool extends GuiBase {
 		if (property == null)
 			return;
 		if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-			if (property.getType().equals(Boolean.class))
+			if (property.getType().equals(Boolean.class)) {
 				list.add(GuiElements.createBoolElement(property, consumer));
+				return;
+			}
 			list.add(GuiElements.createEnumElement(property, consumer));
 		} else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
 			list.add(GuiElements.createBoolElement(property, consumer));
