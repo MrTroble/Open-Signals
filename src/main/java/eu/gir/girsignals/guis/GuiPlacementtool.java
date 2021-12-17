@@ -3,27 +3,43 @@ package eu.gir.girsignals.guis;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.function.IntConsumer;
 
+import org.lwjgl.opengl.GL11;
+
+import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.DrawUtil;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
+import eu.gir.girsignals.guis.guilib.GuiElements.UICheckBox;
 import eu.gir.girsignals.guis.guilib.GuiElements.UIEntity;
+import eu.gir.girsignals.guis.guilib.GuiElements.UIEnumerable;
 import eu.gir.girsignals.guis.guilib.GuiElements.UIVBox;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.items.Placementtool;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureMap;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class GuiPlacementtool extends GuiBase {
 
@@ -31,12 +47,11 @@ public class GuiPlacementtool extends GuiBase {
 	private Signal currentSelectedBlock;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
 	private Placementtool tool;
-	private int implLastID = 0;
 	private float animationState = 0;
 	private int oldMouse = 0;
 	private boolean dragging = false;
-	private HashMap<SEProperty<?>, Object> map = new HashMap<>();
 	private UIEntity list = new UIEntity();
+	private final HashMap<String, IUnlistedProperty<?>> lookup = new HashMap<String, IUnlistedProperty<?>>();
 
 	public GuiPlacementtool(ItemStack stack) {
 		super(I18n.format("property.signal.name"));
@@ -47,10 +62,11 @@ public class GuiPlacementtool extends GuiBase {
 		final int usedBlock = this.compound.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID)
 				? this.compound.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID)
 				: tool.getObjFromID(0).getID();
-		implLastID = tool.signalids.indexOf(usedBlock);
 		currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
+		manager = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes();
 
 		init();
+		this.entity.read(this.compound);
 	}
 
 	private void initList() {
@@ -68,10 +84,12 @@ public class GuiPlacementtool extends GuiBase {
 		list.add(vbox);
 		list.setInheritBounds(true);
 		final UIEntity entity = GuiElements.createEnumElement(tool, input -> {
-			implLastID = input;
+			final ExtendedBlockState bsc = (ExtendedBlockState) currentSelectedBlock.getBlockState();
+			bsc.getUnlistedProperties().forEach(p -> lookup.put(p.getName(), p));
 			currentSelectedBlock = tool.getObjFromID(input);
 			list.clearChildren();
 			initList();
+			applyModelChanges();
 		});
 		this.entity.add(entity);
 		this.entity.add(list);
@@ -118,85 +136,55 @@ public class GuiPlacementtool extends GuiBase {
 	@Override
 	public void initGui() {
 		animationState = 180.0f;
-		manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 		applyModelChanges();
 		super.initGui();
 	}
 
 	@Override
 	public void onGuiClosed() {
-//		ByteBuf buffer = Unpooled.buffer();
-//		buffer.writeByte(GIRNetworkHandler.PLACEMENT_GUI_SET_NBT);
-//		buffer.writeInt(currentSelectedBlock.getID());
-//		byte[] str = textbox.getText().getBytes();
-//		buffer.writeInt(str.length);
-//		buffer.writeBytes(str);
-//		for (GuiButton button : buttonList) {
-//			if (button instanceof GuiEnumerableSetting) {
-//				if (!button.equals(super.pageselect)) {
-//					GuiEnumerableSetting buttonCheckBox = (GuiEnumerableSetting) button;
-//					IIntegerable<?> iint = buttonCheckBox.property;
-//					if (iint instanceof SEProperty) {
-//						buffer.writeInt(currentSelectedBlock.getIDFromProperty(SEProperty.cst(iint)));
-//						buffer.writeInt(buttonCheckBox.getValue());
-//					}
-//				}
-//			}
-//		}
-//		buffer.writeInt(0xFFFFFFFF);
-//		CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
-//				new PacketBuffer(buffer));
-//		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
-//		model.get().reset();
+		final ByteBuf buffer = Unpooled.buffer();
+		buffer.writeByte(GIRNetworkHandler.PLACEMENT_GUI_SET_NBT);
+		compound.setInteger(GIRNetworkHandler.BLOCK_TYPE_ID, currentSelectedBlock.getID());
+		this.entity.write(compound);
+		final PacketBuffer packet = new PacketBuffer(buffer);
+		packet.writeCompoundTag(compound);
+		final CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME, packet);
+		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void applyModelChanges() {
-//		IExtendedBlockState ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
-//		for (GuiButton btn : this.buttonList) {
-//			if (btn instanceof GuiEnumerableSetting) {
-//				final IIntegerable<?> iint = ((GuiEnumerableSetting) btn).property;
-//				if (iint instanceof SEProperty) {
-//					final SEProperty prop = SEProperty.cst(iint);
-//					if (btn instanceof GuiSettingCheckBox) {
-//						GuiSettingCheckBox buttonCheckBox = (GuiSettingCheckBox) btn;
-//						if (prop.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-//							ebs = ebs.withProperty(prop, buttonCheckBox.isChecked());
-//						} else if (buttonCheckBox.isChecked()) {
-//							ebs = ebs.withProperty(prop, prop.getDefault());
-//						}
-//					} else if (btn instanceof GuiEnumerableSetting) {
-//						GuiEnumerableSetting slider = (GuiEnumerableSetting) btn;
-//						ebs = ebs.withProperty(prop, prop.getObjFromID(slider.getValue()));
-//					}
-//				}
-//			}
-//		}
-//		for (Entry<IUnlistedProperty<?>, Optional<?>> prop : ebs.getUnlistedProperties().entrySet()) {
-//			final SEProperty property = SEProperty.cst(prop.getKey());
-//			if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
-//				ebs = ebs.withProperty(property, property.getDefault());
-//			}
-//		}
-//
-//		map.clear();
-//		ebs.getUnlistedProperties().forEach((prop, opt) -> opt.ifPresent(val -> map.put(SEProperty.cst(prop), val)));
-//
-//		synchronized (textbox) {
-//			if (currentSelectedBlock.canHaveCustomname(map)) {
-//				if (!buttonList.contains(textbox)) {
-//					addButton(textbox);
-//					initGui();
-//				}
-//				if (!textbox.getText().isEmpty())
-//					ebs = ebs.withProperty(Signal.CUSTOMNAME, true);
-//			} else if (buttonList.contains(textbox)) {
-//				buttonList.remove(textbox);
-//			}
-//		}
-//		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-//		DrawUtil.addToBuffer(model.get(), manager, ebs);
-//		model.get().finishDrawing();
+		IExtendedBlockState ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
+		
+		final List<UIEnumerable> enumerables = this.list.findRecursive(UIEnumerable.class);
+		for(UIEnumerable enumerable : enumerables) {
+			SEProperty sep = (SEProperty) lookup.get(enumerable.getId());
+			if(sep == null)
+				return;
+			ebs = (IExtendedBlockState) ebs.withProperty(sep, sep.getObjFromID(enumerable.getIndex()));
+		}
+		
+		final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
+		for(UICheckBox checkb : checkbox) {
+			if(!checkb.isChecked())
+				continue;
+			SEProperty sep = (SEProperty) lookup.get(checkb.getId());
+			if(sep == null)
+				return;
+			ebs = (IExtendedBlockState) ebs.withProperty(sep, sep.getDefault());
+		}
+
+		
+		for (Entry<IUnlistedProperty<?>, Optional<?>> prop : ebs.getUnlistedProperties().entrySet()) {
+			final SEProperty property = SEProperty.cst(prop.getKey());
+			if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+				ebs = ebs.withProperty(property, property.getDefault());
+			}
+		}
+
+		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+		DrawUtil.addToBuffer(model.get(), manager, ebs);
+		model.get().finishDrawing();
 	}
 
 	@Override

@@ -1,11 +1,10 @@
 package eu.gir.girsignals.init;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 import eu.gir.girsignals.EnumSignals.EnumMode;
 import eu.gir.girsignals.EnumSignals.EnumMuxMode;
-import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
@@ -15,6 +14,7 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -39,7 +39,7 @@ public class GIRNetworkHandler {
 	@SubscribeEvent
 	public void onCustomPacket(ServerCustomPacketEvent event) {
 		FMLProxyPacket packet = event.getPacket();
-		ByteBuf payBuf = packet.payload();
+		PacketBuffer payBuf = new PacketBuffer(packet.payload());
 		EntityPlayerMP mp = ((NetHandlerPlayServer) event.getHandler()).player;
 		World world = mp.world;
 		MinecraftServer server = mp.getServer();
@@ -82,24 +82,15 @@ public class GIRNetworkHandler {
 		}
 	}
 
-	private static void readItemNBTSET(ByteBuf payBuf, EntityPlayer player) {
-		int blockType = payBuf.readInt();
-		int length = payBuf.readInt();
-		byte[] strBuff = new byte[length];
-		payBuf.readBytes(strBuff);
-		String customName = new String(strBuff);
-		Signal block = Signal.SIGNALLIST.get(blockType);
-		NBTTagCompound tagCompound = new NBTTagCompound();
-		tagCompound.setInteger(BLOCK_TYPE_ID, blockType);
-		tagCompound.setString(SIGNAL_CUSTOMNAME, customName);
-		int nextInt = 0;
-		while((nextInt = payBuf.readInt()) != 0xFFFFFFFF) {
-			SEProperty<?> prop = SEProperty.cst(block.getPropertyFromID(nextInt));
-			tagCompound.setInteger(prop.getName(), payBuf.readInt());
-		}
-		ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
-		if (stack.getItem() instanceof Placementtool) {
-			stack.setTagCompound(tagCompound);
+	private static void readItemNBTSET(PacketBuffer payBuf, EntityPlayer player) {
+		try {
+			final NBTTagCompound tagCompound = payBuf.readCompoundTag();
+			final ItemStack stack = player.getHeldItem(EnumHand.MAIN_HAND);
+			if (stack.getItem() instanceof Placementtool) {
+				stack.setTagCompound(tagCompound);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 
