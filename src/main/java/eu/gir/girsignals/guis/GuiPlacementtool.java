@@ -84,9 +84,10 @@ public class GuiPlacementtool extends GuiBase {
 		list.add(vbox);
 		list.setInheritBounds(true);
 		final UIEntity entity = GuiElements.createEnumElement(tool, input -> {
-			final ExtendedBlockState bsc = (ExtendedBlockState) currentSelectedBlock.getBlockState();
-			bsc.getUnlistedProperties().forEach(p -> lookup.put(p.getName(), p));
 			currentSelectedBlock = tool.getObjFromID(input);
+			final ExtendedBlockState bsc = (ExtendedBlockState) currentSelectedBlock.getBlockState();
+			lookup.clear();
+			bsc.getUnlistedProperties().forEach(p -> lookup.put(p.getName(), p));
 			list.clearChildren();
 			initList();
 			applyModelChanges();
@@ -155,26 +156,29 @@ public class GuiPlacementtool extends GuiBase {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void applyModelChanges() {
 		IExtendedBlockState ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
-		
+
 		final List<UIEnumerable> enumerables = this.list.findRecursive(UIEnumerable.class);
-		for(UIEnumerable enumerable : enumerables) {
+		for (UIEnumerable enumerable : enumerables) {
 			SEProperty sep = (SEProperty) lookup.get(enumerable.getId());
-			if(sep == null)
+			if (sep == null)
 				return;
 			ebs = (IExtendedBlockState) ebs.withProperty(sep, sep.getObjFromID(enumerable.getIndex()));
 		}
-		
+
 		final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
-		for(UICheckBox checkb : checkbox) {
-			if(!checkb.isChecked())
+		for (UICheckBox checkb : checkbox) {
+			if (!checkb.isChecked())
 				continue;
 			SEProperty sep = (SEProperty) lookup.get(checkb.getId());
-			if(sep == null)
+			if (sep == null)
 				return;
-			ebs = (IExtendedBlockState) ebs.withProperty(sep, sep.getDefault());
+			if (sep.getType().equals(Boolean.class)) {
+				ebs = (IExtendedBlockState) ebs.withProperty(sep, true);
+			} else {
+				ebs = (IExtendedBlockState) ebs.withProperty(sep, sep.getDefault());
+			}
 		}
 
-		
 		for (Entry<IUnlistedProperty<?>, Optional<?>> prop : ebs.getUnlistedProperties().entrySet()) {
 			final SEProperty property = SEProperty.cst(prop.getKey());
 			if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
