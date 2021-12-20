@@ -351,6 +351,13 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 				cm.register("hl/hl_zs2", with(SignalHL.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
+			for (ZS32 zs3 : ZS32.values()) {
+				if (ZS32.OFF==zs3) continue;
+				cm.register("zs/zs3", with(SignalHL.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHL.ZS2).negate()),
+						3.6875f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("zs/zs3v", with(SignalHL.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHL.ZS2).negate()), 3.6875f, "overlay",
+						"girsignals:blocks/zs3/" + zs3.name());
+			}
 			cm.register("hl/hl_mast4", ebs -> true, 4);
 			// HL Lightbar off
 			cm.register("hl/hl_shield2", with(SignalHL.LIGHTBAR, hllb -> hllb.equals(HL_LIGHTBAR.OFF)), 4);

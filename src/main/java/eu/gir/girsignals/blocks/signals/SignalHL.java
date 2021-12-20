@@ -9,6 +9,9 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 
 public class SignalHL extends Signal {
 
@@ -28,4 +31,14 @@ public class SignalHL extends Signal {
 	public static final SEProperty<ZS32> ZS3_PLATE = SEProperty.of("zs3plate", ZS32.OFF, ChangeableStage.GUISTAGE);
 	public static final SEProperty<ZS32> ZS3V_PLATE = SEProperty.of("zs3vplate", ZS32.OFF, ChangeableStage.GUISTAGE);
 	
+	
+	@Override
+	public boolean hasCostumColor() {
+		return true;
+	}
+	
+	@Override
+	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
+		return tintIndex == 1 ? 0xFFC200:0xFFFFFF;
+	}
 }
