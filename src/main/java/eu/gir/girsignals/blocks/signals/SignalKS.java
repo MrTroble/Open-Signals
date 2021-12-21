@@ -2,6 +2,8 @@ package eu.gir.girsignals.blocks.signals;
 
 import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KS_DISTANT;
+import eu.gir.girsignals.EnumSignals.KS_MAIN;
+import eu.gir.girsignals.EnumSignals.KS_TYPE;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
@@ -18,8 +20,10 @@ public class SignalKS extends Signal {
 		super(builder(GIRItems.PLACEMENT_TOOL, "KS").height(6).signHeight(4.95f).build());
 	}
 
-	public static final SEProperty<KS> STOPSIGNAL = SEProperty.of("kombisignal", KS.OFF);
-	public static final SEProperty<KS_DISTANT> DISTANTSIGNAL = SEProperty.of("kombisignal_distant", KS_DISTANT.OFF);
+	public static final SEProperty<KS_TYPE> KSTYPE = SEProperty.of("kombitype", KS_TYPE.MAIN, ChangeableStage.GUISTAGE);
+	public static final SEProperty<KS> STOPSIGNAL = SEProperty.of("kombisignal", KS.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
+	public static final SEProperty<KS_MAIN> MAINSIGNAL = SEProperty.of("kombisignal_main", KS_MAIN.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
+	public static final SEProperty<KS_DISTANT> DISTANTSIGNAL = SEProperty.of("kombisignal_distant", KS_DISTANT.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
 	public static final SEProperty<MAST_SIGN> MASTSIGN = SEProperty.of("mastsign", MAST_SIGN.OFF, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false, ChangeableStage.GUISTAGE);

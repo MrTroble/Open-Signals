@@ -3,6 +3,7 @@ package eu.gir.girsignals.blocks.signals;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HL_DISTANT;
 import eu.gir.girsignals.EnumSignals.HL_LIGHTBAR;
+import eu.gir.girsignals.EnumSignals.HL_TYPE;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
@@ -19,8 +20,9 @@ public class SignalHL extends Signal {
 		super(builder(GIRItems.PLACEMENT_TOOL, "HL").height(6).signHeight(1.15f).build());
 	}
 
-	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF);
-	public static final SEProperty<HL_DISTANT> DISTANTSIGNAL = SEProperty.of("mainlightsignal_distant", HL_DISTANT.OFF);
+	public static final SEProperty<HL_TYPE> HLTYPE = SEProperty.of("hltype", HL_TYPE.MAIN, ChangeableStage.GUISTAGE);
+	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
+	public static final SEProperty<HL_DISTANT> DISTANTSIGNAL = SEProperty.of("mainlightsignal_distant", HL_DISTANT.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
 	public static final SEProperty<HL_LIGHTBAR> LIGHTBAR = SEProperty.of("mainlightsignallightbar", HL_LIGHTBAR.OFF);
 	public static final SEProperty<MAST_SIGN> MASTSIGN = SEProperty.of("mastsign", MAST_SIGN.OFF, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false, ChangeableStage.GUISTAGE);

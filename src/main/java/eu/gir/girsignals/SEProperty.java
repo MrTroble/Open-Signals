@@ -93,7 +93,7 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	@SuppressWarnings("unchecked")
 	public T getObjFromID(int obj) {
 		if (!isValid(obj))
-			obj = 0;
+			obj = getIDFromObj(this.getDefault());
 		if (getType().isEnum()) {
 			return (T) getType().getEnumConstants()[obj];
 		} else if (getType().equals(Boolean.class)) {

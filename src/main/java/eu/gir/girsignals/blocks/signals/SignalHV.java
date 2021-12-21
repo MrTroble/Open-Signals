@@ -1,6 +1,9 @@
 package eu.gir.girsignals.blocks.signals;
 
 import eu.gir.girsignals.EnumSignals.HP;
+import eu.gir.girsignals.EnumSignals.HP_BLOCK;
+import eu.gir.girsignals.EnumSignals.HP_HOME;
+import eu.gir.girsignals.EnumSignals.HP_TYPE;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
@@ -18,7 +21,11 @@ public class SignalHV extends Signal {
 		super(builder(GIRItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f).build());
 	}
 
-	public static final SEProperty<HP> STOPSIGNAL = SEProperty.of("stopsignal", HP.OFF);
+	public static final SEProperty<HP_TYPE> HPTYPE = SEProperty.of("hptype", HP_TYPE.STOPSIGNAL, ChangeableStage.GUISTAGE);
+	public static final SEProperty<HP> STOPSIGNAL = SEProperty.of("stopsignal", HP.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
+	public static final SEProperty<HP_HOME> HPHOME = SEProperty.of("hphome", HP_HOME.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
+	public static final SEProperty<HP_BLOCK> HPBLOCK = SEProperty.of("hpblock", HP_BLOCK.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
+	public static final SEProperty<Boolean> IDENTIFIER = SEProperty.of("identifier", false);
 	public static final SEProperty<VR> DISTANTSIGNAL = SEProperty.of("distantsignal", VR.OFF);
 	public static final SEProperty<Boolean> VR_LIGHT = SEProperty.of("vrlight", false);
 	public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false, ChangeableStage.GUISTAGE);
