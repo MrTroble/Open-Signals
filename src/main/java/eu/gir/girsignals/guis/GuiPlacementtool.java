@@ -17,10 +17,10 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.DrawUtil;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
-import eu.gir.girsignals.guis.guilib.GuiElements.UICheckBox;
-import eu.gir.girsignals.guis.guilib.GuiElements.UIEntity;
-import eu.gir.girsignals.guis.guilib.GuiElements.UIEnumerable;
-import eu.gir.girsignals.guis.guilib.GuiElements.UIVBox;
+import eu.gir.girsignals.guis.guilib.UICheckBox;
+import eu.gir.girsignals.guis.guilib.UIEntity;
+import eu.gir.girsignals.guis.guilib.UIEnumerable;
+import eu.gir.girsignals.guis.guilib.UIVBox;
 import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.items.Placementtool;
 import io.netty.buffer.ByteBuf;
@@ -100,9 +100,7 @@ public class GuiPlacementtool extends GuiBase {
 	}
 
 	@Override
-	public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-		super.drawScreen(mouseX, mouseY, partialTicks);
-
+	public void draw(int mouseX, int mouseY, float partialTicks) {
 		if (dragging) {
 			animationState += mouseX - oldMouse;
 			oldMouse = mouseX;
@@ -137,8 +135,8 @@ public class GuiPlacementtool extends GuiBase {
 	@Override
 	public void initGui() {
 		animationState = 180.0f;
-		applyModelChanges();
 		super.initGui();
+		applyModelChanges();
 	}
 
 	@Override
@@ -167,14 +165,12 @@ public class GuiPlacementtool extends GuiBase {
 
 		final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
 		for (UICheckBox checkb : checkbox) {
-			if (!checkb.isChecked())
-				continue;
 			SEProperty sep = (SEProperty) lookup.get(checkb.getId());
 			if (sep == null)
 				return;
-			if (sep.getType().equals(Boolean.class)) {
-				ebs = (IExtendedBlockState) ebs.withProperty(sep, true);
-			} else {
+			if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+				ebs = (IExtendedBlockState) ebs.withProperty(sep, checkb.isChecked());
+			} else if(checkb.isChecked()) {
 				ebs = (IExtendedBlockState) ebs.withProperty(sep, sep.getDefault());
 			}
 		}
