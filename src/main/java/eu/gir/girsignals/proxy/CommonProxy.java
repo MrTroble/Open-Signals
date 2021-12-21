@@ -22,12 +22,12 @@ public class CommonProxy {
 		GuiHandler.addGui(GuiPlacementtool.class, (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
 		GuiHandler.addGui(GuiSignalController.class, (p, w, bp) -> {
 			final TileEntity entity = w.getTileEntity(bp);
-			if (entity == null || entity instanceof SignalControllerTileEntity)
+			if (entity == null || !(entity instanceof SignalControllerTileEntity))
 				return null;
 			return new GuiSignalController((SignalControllerTileEntity) entity);
 		}, (p, w, bp) -> {
 			final TileEntity entity = w.getTileEntity(bp);
-			if (entity == null || entity instanceof SignalControllerTileEntity)
+			if (entity == null || !(entity instanceof SignalControllerTileEntity))
 				return null;
 			return new ContainerSignalController((SignalControllerTileEntity) entity);
 		});

@@ -11,6 +11,7 @@ import java.util.function.BiConsumer;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.guis.guilib.ISyncable;
 import eu.gir.girsignals.linkableApi.ILinkableTile;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -33,7 +34,8 @@ import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class SignalControllerTileEntity extends TileEntity implements SimpleComponent, IWorldNameable, ILinkableTile {
+public class SignalControllerTileEntity extends TileEntity
+		implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile {
 
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
@@ -45,17 +47,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	public int nextSignal = 0;
 	public int indexUsed = 0;
 	public int lastMuxState = 0;
+	private NBTTagCompound compound = new NBTTagCompound();
+
+	public static final String UPDATE_FLAG = "updateflag";
 
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
 	private static final String ID_Z = "zLinkedPos";
-	private static final String RS_MODE = "rsMode";
-	private static final String FACEING_MODES = "faceModes";
-
-	private static final String UI_FACE = "uiface";
-	private static final String UI_MODE = "uimode";
-	private static final String UI_INDEX = "uiindex";
-	private static final String UI_MUX = "uimux";
 
 	public SignalControllerTileEntity() {
 		Arrays.fill(facingRedstoneModes, 0xFF);
@@ -79,11 +77,6 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
-		int[] newArr = compound.getIntArray(FACEING_MODES);
-		this.face = EnumFacing.values()[compound.getInteger(UI_FACE)];
-		this.indexUsed = compound.getInteger(UI_INDEX);
-		if (newArr != null && newArr.length == facingRedstoneModes.length)
-			System.arraycopy(newArr, 0, facingRedstoneModes, 0, facingRedstoneModes.length);
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
@@ -92,9 +85,6 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		writeBlockPosToNBT(linkedSignalPosition, compound);
-		compound.setIntArray(FACEING_MODES, facingRedstoneModes);
-		compound.setInteger(UI_FACE, face.ordinal());
-		compound.setInteger(UI_INDEX, indexUsed);
 		super.writeToNBT(compound);
 		return compound;
 	}
@@ -381,5 +371,24 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		tableOfSupportedSignalTypes = null;
 		listOfSupportedIndicies = null;
 		return true;
+	}
+
+	@Override
+	public void updateTag(NBTTagCompound compound) {
+		if (compound == null)
+			return;
+		compound.getKeySet().forEach(str -> {
+			if (tableOfSupportedSignalTypes.containsKey(str)) {
+				int type = compound.getInteger(str);
+				int id = tableOfSupportedSignalTypes.get(str);
+				changeSignalImpl(id, type);
+			}
+		});
+		this.compound = compound;
+	}
+
+	@Override
+	public NBTTagCompound getTag() {
+		return this.compound;
 	}
 }

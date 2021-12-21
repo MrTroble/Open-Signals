@@ -2,7 +2,6 @@ package eu.gir.girsignals.guis;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.function.IntConsumer;
 
 import org.lwjgl.opengl.GL11;
 
@@ -16,6 +15,9 @@ import eu.gir.girsignals.guis.guilib.DrawUtil;
 import eu.gir.girsignals.guis.guilib.DrawUtil.EnumIntegerable;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
+import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
+import eu.gir.girsignals.guis.guilib.entitys.UIButton;
+import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import eu.gir.girsignals.guis.guilib.entitys.UIVBox;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
@@ -40,6 +42,7 @@ public class GuiSignalController extends GuiBase {
 		super("TestTitle");
 		this.sigController = new ContainerSignalController(entity, this);
 		this.pos = entity.getPos();
+		compound = entity.getTag();
 		init();
 	}
 
@@ -70,14 +73,25 @@ public class GuiSignalController extends GuiBase {
 		final UIEntity rsMode = GuiElements.createEnumElement(enumMode, in -> {
 			list.clearChildren();
 			initMode(enumMode.getObjFromID(in), signal);
+			this.list.read(compound);
 		});
 		this.entity.add(rsMode);
-
+		
 		list.setInheritBounds(true);
 		list.add(new UIVBox(5));
-		initMode(EnumMode.MANUELL, signal);
 		this.entity.add(list);
 		this.entity.add(new UIVBox(5));
+		
+		final UIEntity applyButton = new UIEntity();
+		applyButton.add(new UIButton("Apply"));
+		applyButton.setBounds(100, 20);
+		applyButton.add(new UIClickable(e -> {
+			this.entity.write(compound);
+			GuiSyncNetwork.sendToPosServer(compound, pos);
+		}));
+		
+		this.entity.add(applyButton);
+		this.entity.read(compound);
 	}
 
 	private HashMap<SEProperty<?>, Object> createMap(Signal signal) {
@@ -100,16 +114,11 @@ public class GuiSignalController extends GuiBase {
 	private void addManuellMode(final Signal signal) {
 		HashMap<SEProperty<?>, Object> map = createMap(signal);
 		for (SEProperty<?> entry : map.keySet()) {
-			of(entry, map, n -> {
-			});
-		}
-	}
-
-	private void of(SEProperty<?> prop, HashMap<SEProperty<?>, Object> map, IntConsumer consumer) {
-		if (prop.test(map) && (prop.isChangabelAtStage(ChangeableStage.APISTAGE)
-				|| prop.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))) {
-			UIEntity guiEnum = GuiElements.createEnumElement(prop, consumer);
-			list.add(guiEnum);
+			if (entry.test(map) && (entry.isChangabelAtStage(ChangeableStage.APISTAGE)
+					|| entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))) {
+				final UIEntity guiEnum = GuiElements.createEnumElement(entry, e -> {});
+				list.add(guiEnum);
+			}
 		}
 	}
 
@@ -127,6 +136,8 @@ public class GuiSignalController extends GuiBase {
 
 	@Override
 	public void onGuiClosed() {
+		entity.write(compound);
+		GuiSyncNetwork.sendToPosServer(compound, pos);
 	}
 
 	@Override
