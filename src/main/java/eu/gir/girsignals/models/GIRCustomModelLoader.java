@@ -33,7 +33,9 @@ import eu.gir.girsignals.EnumSignals.RA_LIGHT;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
 import eu.gir.girsignals.EnumSignals.ST_NUMBER;
 import eu.gir.girsignals.EnumSignals.TRAM;
+import eu.gir.girsignals.EnumSignals.TRAMSWITCH;
 import eu.gir.girsignals.EnumSignals.TRAMTYPE;
+import eu.gir.girsignals.EnumSignals.TRAM_ADD;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.WN_CROSS;
 import eu.gir.girsignals.EnumSignals.WN_NORMAL;
@@ -168,26 +170,26 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			// Zs7 off
 			cm.register("hv/hv_zs7", hasAndIsNot(SignalHV.ZS7).and(has(SignalHV.STOPSIGNAL)), 4.6f);
 			// HP 0
-			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP0)), 5.4f,
+			cm.register("hv/hv_exit", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP0)), 5.4f,
 					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red", "lamp_red_secondarynorth",
 					"girsignals:blocks/lamps/lamp_red");
 			// HP 1
-			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP1)), 5.4f, "lamp_greennorth",
+			cm.register("hv/hv_exit", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP1)), 5.4f, "lamp_greennorth",
 					"girsignals:blocks/lamps/lamp_green");
 			// HP 2
-			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP2)), 5.4f, "lamp_greennorth",
+			cm.register("hv/hv_exit", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP2)), 5.4f, "lamp_greennorth",
 					"girsignals:blocks/lamps/lamp_green", "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
 			// HP off
-			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.OFF)), 5.4f);
+			cm.register("hv/hv_exit", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.OFF)), 5.4f);
 			// HP Status light
-			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.STATUS_LIGHT)), 5.4f,
+			cm.register("hv/hv_exit", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.STATUS_LIGHT)), 5.4f,
 					"lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
 			// HP RS
-			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.SHUNTING)), 5.4f,
+			cm.register("hv/hv_exit", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.SHUNTING)), 5.4f,
 					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_1north",
 					"girsignals:blocks/lamps/lamp_white", "lamp_white_sh_2north", "girsignals:blocks/lamps/lamp_white");
 			// HP Malfunction
-			cm.register("hv/hv_hp", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.MALFUNCTION)), 5.4f,
+			cm.register("hv/hv_exit", with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.MALFUNCTION)), 5.4f,
 					"lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red", "lamp_greennorth",
 					"girsignals:blocks/lamps/lamp_green");
 			// Zs2, Zs2v, Zs3, Zs3v
@@ -198,11 +200,15 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			for (ZS32 zs3 : ZS32.values()) {
-				if (ZS32.OFF==zs3) continue;
-				cm.register("zs/zs3", with(SignalHV.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL).and(has(SignalHV.ZS3).negate())),
+				if (ZS32.OFF == zs3)
+					continue;
+				cm.register("zs/zs3",
+						with(SignalHV.ZS3_PLATE, pZs3 -> pZs3.equals(zs3))
+								.and(has(SignalHV.STOPSIGNAL).and(has(SignalHV.ZS3).negate())),
 						6.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-				cm.register("zs/zs3v", with(SignalHV.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.ZS3V).negate()), 2.9f, "overlay",
-						"girsignals:blocks/zs3/" + zs3.name());
+				cm.register("zs/zs3v",
+						with(SignalHV.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.ZS3V).negate()), 2.9f,
+						"overlay", "girsignals:blocks/zs3/" + zs3.name());
 			}
 			// VR0
 			cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR0)), 4, "lamp_yellow_1north",
@@ -247,11 +253,14 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			for (ZS32 zs3 : ZS32.values()) {
-				if (ZS32.OFF==zs3) continue;
-				cm.register("zs/zs3", with(SignalKS.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3).negate()),
-						6.375f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-				cm.register("zs/zs3v", with(SignalKS.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3V).negate()), 3.9f, "overlay",
-						"girsignals:blocks/zs3/" + zs3.name());
+				if (ZS32.OFF == zs3)
+					continue;
+				cm.register("zs/zs3",
+						with(SignalKS.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3).negate()), 6.375f,
+						"overlay", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("zs/zs3v",
+						with(SignalKS.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3V).negate()), 3.9f,
+						"overlay", "girsignals:blocks/zs3/" + zs3.name());
 			}
 			// KS off
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.OFF)), 5);
@@ -352,11 +361,14 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			for (ZS32 zs3 : ZS32.values()) {
-				if (ZS32.OFF==zs3) continue;
-				cm.register("zs/zs3", with(SignalHL.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHL.ZS2).negate()),
-						3.6875f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-				cm.register("zs/zs3v", with(SignalHL.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHL.ZS2).negate()), 3.6875f, "overlay",
-						"girsignals:blocks/zs3/" + zs3.name());
+				if (ZS32.OFF == zs3)
+					continue;
+				cm.register("zs/zs3",
+						with(SignalHL.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHL.ZS2).negate()), 3.6875f,
+						"overlay", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("zs/zs3v",
+						with(SignalHL.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHL.ZS2).negate()), 3.6875f,
+						"overlay", "girsignals:blocks/zs3/" + zs3.name());
 			}
 			cm.register("hl/hl_mast4", ebs -> true, 4);
 			// HL Lightbar off
@@ -484,7 +496,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("trafficlight/trafficlight_tram",
 					with(SignalTram.TRAMSIGNAL, TRAM.F5::equals)
 							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.TRAM::equals)),
-					0, "yellownorth", "girsignals:blocks/tram/f_5");
+					0, "greennorth", "girsignals:blocks/tram/f_5");
 			// TRAM f1
 			cm.register("trafficlight/trafficlight_tram",
 					with(SignalTram.TRAMSIGNAL, TRAM.F1::equals)
@@ -500,6 +512,70 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 					with(SignalTram.TRAMSIGNAL, TRAM.F3::equals)
 							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.TRAM::equals)),
 					0, "greennorth", "girsignals:blocks/tram/f_3");
+			// TRAM addition
+			cm.register("trafficlight/trafficlight_tram_single",
+					with(SignalTram.TRAMSIGNAL_ADD, TRAM_ADD.A::equals).and(hasAndIsNot(SignalTram.TRAMSIGNAL_A))
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, tram -> tram.equals(TRAMTYPE.TRAM))),
+					1);
+			cm.register("trafficlight/trafficlight_tram_single",
+					with(SignalTram.TRAMSIGNAL_ADD, TRAM_ADD.A::equals).and(hasAndIs(SignalTram.TRAMSIGNAL_A))
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, tram -> tram.equals(TRAMTYPE.TRAM))),
+					1, "rednorth", "girsignals:blocks/tram/a");
+			cm.register("trafficlight/trafficlight_tram_single",
+					with(SignalTram.TRAMSIGNAL_ADD, TRAM_ADD.T::equals).and(hasAndIsNot(SignalTram.TRAMSIGNAL_T))
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, tram -> tram.equals(TRAMTYPE.TRAM))),
+					1);
+			cm.register("trafficlight/trafficlight_tram_single",
+					with(SignalTram.TRAMSIGNAL_ADD, TRAM_ADD.T::equals).and(hasAndIs(SignalTram.TRAMSIGNAL_T))
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, tram -> tram.equals(TRAMTYPE.TRAM))),
+					1, "rednorth", "girsignals:blocks/tram/t");
+			cm.register("trafficlight/trafficlight_tram_single",
+					with(SignalTram.TRAMSIGNAL_ADD, TRAM_ADD.AT::equals).and(hasAndIsNot(SignalTram.TRAMSIGNAL_T))
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, tram -> tram.equals(TRAMTYPE.TRAM))),
+					1);
+			cm.register("trafficlight/trafficlight_tram_single",
+					with(SignalTram.TRAMSIGNAL_ADD, TRAM_ADD.AT::equals).and(hasAndIs(SignalTram.TRAMSIGNAL_T))
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, tram -> tram.equals(TRAMTYPE.TRAM))),
+					1, "rednorth", "girsignals:blocks/tram/t");
+			cm.register("trafficlight/trafficlight_tram_single",
+					with(SignalTram.TRAMSIGNAL_ADD, TRAM_ADD.AT::equals).and(hasAndIsNot(SignalTram.TRAMSIGNAL_A))
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, tram -> tram.equals(TRAMTYPE.TRAM))),
+					1.375f);
+			cm.register("trafficlight/trafficlight_tram_single",
+					with(SignalTram.TRAMSIGNAL_ADD, TRAM_ADD.AT::equals).and(hasAndIs(SignalTram.TRAMSIGNAL_A))
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, tram -> tram.equals(TRAMTYPE.TRAM))),
+					1.375f, "rednorth", "girsignals:blocks/tram/a");
+			// TRAM Switch
+			cm.register("trafficlight/trafficlight_tram", with(SignalTram.TRAM_SWITCH, TRAMSWITCH.OFF::equals)
+					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.SWITCH::equals)), 0);
+			cm.register("trafficlight/trafficlight_tram",
+					with(SignalTram.TRAM_SWITCH, TRAMSWITCH.W1::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.SWITCH::equals)),
+					0, "rednorth", "girsignals:blocks/tram/w1");
+			cm.register("trafficlight/trafficlight_tram",
+					with(SignalTram.TRAM_SWITCH, TRAMSWITCH.W11::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.SWITCH::equals)),
+					0, "rednorth", "girsignals:blocks/tram/w11");
+			cm.register("trafficlight/trafficlight_tram",
+					with(SignalTram.TRAM_SWITCH, TRAMSWITCH.W2::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.SWITCH::equals)),
+					0, "yellownorth", "girsignals:blocks/tram/w2");
+			cm.register("trafficlight/trafficlight_tram",
+					with(SignalTram.TRAM_SWITCH, TRAMSWITCH.W12::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.SWITCH::equals)),
+					0, "yellownorth", "girsignals:blocks/tram/w12");
+			cm.register("trafficlight/trafficlight_tram",
+					with(SignalTram.TRAM_SWITCH, TRAMSWITCH.W3::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.SWITCH::equals)),
+					0, "greennorth", "girsignals:blocks/tram/w3");
+			cm.register("trafficlight/trafficlight_tram",
+					with(SignalTram.TRAM_SWITCH, TRAMSWITCH.W13::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.SWITCH::equals)),
+					0, "greennorth", "girsignals:blocks/tram/w13");
+			cm.register("trafficlight/trafficlight_tram",
+					with(SignalTram.TRAM_SWITCH, TRAMSWITCH.W14::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.SWITCH::equals)),
+					0, "greennorth", "girsignals:blocks/tram/w14");
 			// CAR off
 			cm.register("trafficlight/trafficlight_car", with(SignalTram.CARSIGNAL, CAR.OFF::equals)
 					.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.CAR::equals)), 0);
@@ -529,6 +605,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 					with(SignalTram.PEDSIGNAL, PED.GREEN::equals)
 							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.PEDESTRIAN::equals)),
 					0, "greennorth", "girsignals:blocks/lamps/lamp_green");
+			cm.register("trafficlight/trafficlight_ped",
+					with(SignalTram.PEDSIGNAL, PED.YELLOW::equals)
+							.and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.PEDESTRIAN::equals)),
+					0, "rednorth", "girsignals:blocks/lamps/lamp_yellow_blink", "greennorth",
+					"girsignals:blocks/lamps/lamp_yellow_blink_i");
 		});
 		registeredModels.put("lfsignal", cm -> {
 			cm.register("mast_lamps", withN(SignalLF.LFTYPE, lamps -> lamps.equals(LFBACKGROUND.LF1)), 0);
@@ -682,26 +763,20 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ne/ne2_3", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE2))
 					.and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);
 			@SuppressWarnings("unchecked")
-			final Map.Entry<NE, Float>[] entrys = new Map.Entry[] { 
-					Maps.immutableEntry(NE.NE5, 1.875f),
-					Maps.immutableEntry(NE.NE3_1, 3.0f),
-					Maps.immutableEntry(NE.NE3_2, 3.0f),
-					Maps.immutableEntry(NE.NE3_3, 3.0f),
-					Maps.immutableEntry(NE.NE3_4, 3.0f),
-					Maps.immutableEntry(NE.NE3_5, 3.0f),
-					Maps.immutableEntry(NE.NE4, 3.0f),
-					Maps.immutableEntry(NE.NE2_1, 1.125f),
-					Maps.immutableEntry(NE.NE2, 1.125f),
-					Maps.immutableEntry(NE.NE1, 1.9375f),
-					Maps.immutableEntry(NE.NE4_small, 0.875f),
-					Maps.immutableEntry(NE.NE6, 2.0f)
-			};
+			final Map.Entry<NE, Float>[] entrys = new Map.Entry[] { Maps.immutableEntry(NE.NE5, 1.875f),
+					Maps.immutableEntry(NE.NE3_1, 3.0f), Maps.immutableEntry(NE.NE3_2, 3.0f),
+					Maps.immutableEntry(NE.NE3_3, 3.0f), Maps.immutableEntry(NE.NE3_4, 3.0f),
+					Maps.immutableEntry(NE.NE3_5, 3.0f), Maps.immutableEntry(NE.NE4, 3.0f),
+					Maps.immutableEntry(NE.NE2_1, 1.125f), Maps.immutableEntry(NE.NE2, 1.125f),
+					Maps.immutableEntry(NE.NE1, 1.9375f), Maps.immutableEntry(NE.NE4_small, 0.875f),
+					Maps.immutableEntry(NE.NE6, 2.0f) };
 			for (Map.Entry<NE, Float> entry : entrys) {
 				for (ARROW arrow : ARROW.values()) {
 					if (arrow == ARROW.OFF)
 						continue;
-					cm.register("arrow", with(SignalNE.ARROWPROP, arrow::equals).and(withN(SignalNE.NETYPE, entry.getKey()::equals)), entry.getValue(), "1",
-							"girsignals:blocks/arrows/" + arrow.name().toLowerCase());
+					cm.register("arrow",
+							with(SignalNE.ARROWPROP, arrow::equals).and(withN(SignalNE.NETYPE, entry.getKey()::equals)),
+							entry.getValue(), "1", "girsignals:blocks/arrows/" + arrow.name().toLowerCase());
 				}
 			}
 		});

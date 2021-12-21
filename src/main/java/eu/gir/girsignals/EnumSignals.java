@@ -67,11 +67,19 @@ public class EnumSignals {
 	}
 
 	public enum TRAMTYPE implements DefaultName<TRAMTYPE> {
-		TRAM, CAR, PEDESTRIAN
+		TRAM, SWITCH, CAR, PEDESTRIAN;
 	}
 
 	public enum TRAM implements Offable<TRAM> {
 		OFF, F0, F1, F2, F3, F4, F5;
+	}
+	
+	public enum TRAM_ADD implements Offable<TRAM_ADD>{
+		OFF, A, T, AT;
+	}
+	
+	public enum TRAMSWITCH implements Offable<TRAMSWITCH> {
+		OFF, W1, W2, W3, W11, W12, W13, W14;
 	}
 
 	public enum CAR implements Offable<CAR> {
@@ -79,7 +87,7 @@ public class EnumSignals {
 	}
 
 	public enum PED implements Offable<PED> {
-		OFF, RED, GREEN;
+		OFF, RED, GREEN, YELLOW;
 	}
 
 	public enum LF implements DefaultName<LF> {
