@@ -2,14 +2,13 @@ package eu.gir.girsignals.items;
 
 import java.util.ArrayList;
 
-import eu.gir.girsignals.EnumSignals;
-import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.guis.GuiPlacementtool;
+import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.guis.guilib.IIntegerable;
 import eu.gir.girsignals.init.GIRBlocks;
-import eu.gir.girsignals.init.GIRNetworkHandler;
 import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.client.resources.I18n;
@@ -28,6 +27,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Placementtool extends Item implements IIntegerable<Signal> {
 
+	public static final String BLOCK_TYPE_ID = "blocktypeid";
+	public static final String SIGNAL_CUSTOMNAME = "customname";
+
 	public final ArrayList<Integer> signalids = new ArrayList<>();
 
 	public Placementtool() {
@@ -45,8 +47,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 		if (player.isSneaking()) {
 			if (!worldIn.isRemote)
 				return EnumActionResult.SUCCESS;
-			player.openGui(GirsignalsMain.MODID, EnumSignals.GUI_PLACEMENTTOOL, worldIn, pos.getX(), pos.getY(),
-					pos.getZ());
+			GuiHandler.invokeGui(GuiPlacementtool.class, player, worldIn, pos);
 			return EnumActionResult.SUCCESS;
 		} else {
 			if (worldIn.isRemote)
@@ -56,11 +57,11 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 				return EnumActionResult.FAIL;
 
 			NBTTagCompound compound = player.getHeldItemMainhand().getTagCompound();
-			if (compound == null || !compound.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID)) {
+			if (compound == null || !compound.hasKey(BLOCK_TYPE_ID)) {
 				player.sendMessage(new TextComponentTranslation("pt.itemnotset"));
 				return EnumActionResult.FAIL;
 			}
-			final Signal block = Signal.SIGNALLIST.get(compound.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID));
+			final Signal block = Signal.SIGNALLIST.get(compound.getInteger(BLOCK_TYPE_ID));
 
 			BlockPos lastPos = setPosition;
 			worldIn.setBlockState(setPosition,
@@ -94,7 +95,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 			for (int i = 0; i < height; i++)
 				worldIn.setBlockState(lastPos = lastPos.up(), GIRBlocks.GHOST_BLOCK.getDefaultState());
 
-			String str = compound.getString(GIRNetworkHandler.SIGNAL_CUSTOMNAME);
+			final String str = compound.getString(SIGNAL_CUSTOMNAME);
 			if (!str.isEmpty())
 				sig.setCustomName(str);
 			sig.setBlockID();

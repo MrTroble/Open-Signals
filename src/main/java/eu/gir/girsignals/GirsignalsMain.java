@@ -40,5 +40,5 @@ public class GirsignalsMain {
 	@EventHandler
 	public void postinit(FMLPostInitializationEvent event) {
 		PROXY.postinit(event);
-	}	
+	}
 }

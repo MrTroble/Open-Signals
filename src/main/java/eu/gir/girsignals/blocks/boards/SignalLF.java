@@ -14,11 +14,12 @@ public class SignalLF extends Signal {
 	}
 
 	public static final SEProperty<LF> INDICATOR = SEProperty.of("indicator", LF.Z1, ChangeableStage.GUISTAGE);
-	public static final SEProperty<LFBACKGROUND> LFTYPE = SEProperty.of("lftype", LFBACKGROUND.LF1, ChangeableStage.GUISTAGE);
+	public static final SEProperty<LFBACKGROUND> LFTYPE = SEProperty.of("lftype", LFBACKGROUND.LF1,
+			ChangeableStage.GUISTAGE);
 
 	@Override
 	public boolean hasCostumColor() {
 		return true;
 	}
-		
+
 }

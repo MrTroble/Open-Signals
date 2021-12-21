@@ -14,7 +14,8 @@ import net.minecraft.world.World;
 public class SignalStationName extends Signal {
 
 	public SignalStationName() {
-		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "signname").height(0).signHeight(0.5f).offsetY(2f).noLink().build());
+		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "signname").height(0).signHeight(0.5f).offsetY(2f).noLink()
+				.build());
 	}
 
 	@Override
@@ -29,7 +30,7 @@ public class SignalStationName extends Signal {
 	}
 
 	private static final float WIDTH_NORM = 56.0f;
-	
+
 	@Override
 	public void renderOverlay(double x, double y, double z, SignalTileEnity te, FontRenderer font,
 			final float renderHeight) {
@@ -40,9 +41,9 @@ public class SignalStationName extends Signal {
 		final float angel = face.getAngel();
 
 		final String display = te.getDisplayName().getFormattedText();
-		final float width = font.getStringWidth(display);		
-		final float scale = Math.min(1/ (22 * (width / WIDTH_NORM)), 0.1f);
-		
+		final float width = font.getStringWidth(display);
+		final float scale = Math.min(1 / (22 * (width / WIDTH_NORM)), 0.1f);
+
 		GlStateManager.enableAlpha();
 		GlStateManager.disableLighting();
 		GlStateManager.pushMatrix();

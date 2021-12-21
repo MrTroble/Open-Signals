@@ -20,7 +20,6 @@ public class SignalOTHER extends Signal {
 	public static final SEProperty<OTHER_SIGNAL> OTHERTYPE = SEProperty.of("othertype", OTHER_SIGNAL.HM,
 			ChangeableStage.GUISTAGE, false);
 
-
 	@Override
 	public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
 		return map.entrySet().stream()

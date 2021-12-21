@@ -198,11 +198,15 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			for (ZS32 zs3 : ZS32.values()) {
-				if (ZS32.OFF==zs3) continue;
-				cm.register("zs/zs3", with(SignalHV.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL).and(has(SignalHV.ZS3).negate())),
+				if (ZS32.OFF == zs3)
+					continue;
+				cm.register("zs/zs3",
+						with(SignalHV.ZS3_PLATE, pZs3 -> pZs3.equals(zs3))
+								.and(has(SignalHV.STOPSIGNAL).and(has(SignalHV.ZS3).negate())),
 						6.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-				cm.register("zs/zs3v", with(SignalHV.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.ZS3V).negate()), 2.9f, "overlay",
-						"girsignals:blocks/zs3/" + zs3.name());
+				cm.register("zs/zs3v",
+						with(SignalHV.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.ZS3V).negate()), 2.9f,
+						"overlay", "girsignals:blocks/zs3/" + zs3.name());
 			}
 			// VR0
 			cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR0)), 4, "lamp_yellow_1north",
@@ -247,11 +251,14 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			for (ZS32 zs3 : ZS32.values()) {
-				if (ZS32.OFF==zs3) continue;
-				cm.register("zs/zs3", with(SignalKS.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3).negate()),
-						6.375f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-				cm.register("zs/zs3v", with(SignalKS.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3V).negate()), 3.9f, "overlay",
-						"girsignals:blocks/zs3/" + zs3.name());
+				if (ZS32.OFF == zs3)
+					continue;
+				cm.register("zs/zs3",
+						with(SignalKS.ZS3_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3).negate()), 6.375f,
+						"overlay", "girsignals:blocks/zs3/" + zs3.name());
+				cm.register("zs/zs3v",
+						with(SignalKS.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3)).and(has(SignalKS.ZS3V).negate()), 3.9f,
+						"overlay", "girsignals:blocks/zs3/" + zs3.name());
 			}
 			// KS off
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.OFF)), 5);
@@ -675,26 +682,20 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("ne/ne2_3", with(SignalNE.NEADDITION, nea -> nea.equals(NE_ADDITION.PRE2))
 					.and(withN(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))), 1);
 			@SuppressWarnings("unchecked")
-			final Map.Entry<NE, Float>[] entrys = new Map.Entry[] { 
-					Maps.immutableEntry(NE.NE5, 1.875f),
-					Maps.immutableEntry(NE.NE3_1, 3.0f),
-					Maps.immutableEntry(NE.NE3_2, 3.0f),
-					Maps.immutableEntry(NE.NE3_3, 3.0f),
-					Maps.immutableEntry(NE.NE3_4, 3.0f),
-					Maps.immutableEntry(NE.NE3_5, 3.0f),
-					Maps.immutableEntry(NE.NE4, 3.0f),
-					Maps.immutableEntry(NE.NE2_1, 1.125f),
-					Maps.immutableEntry(NE.NE2, 1.125f),
-					Maps.immutableEntry(NE.NE1, 1.9375f),
-					Maps.immutableEntry(NE.NE4_small, 0.875f),
-					Maps.immutableEntry(NE.NE6, 2.0f)
-			};
+			final Map.Entry<NE, Float>[] entrys = new Map.Entry[] { Maps.immutableEntry(NE.NE5, 1.875f),
+					Maps.immutableEntry(NE.NE3_1, 3.0f), Maps.immutableEntry(NE.NE3_2, 3.0f),
+					Maps.immutableEntry(NE.NE3_3, 3.0f), Maps.immutableEntry(NE.NE3_4, 3.0f),
+					Maps.immutableEntry(NE.NE3_5, 3.0f), Maps.immutableEntry(NE.NE4, 3.0f),
+					Maps.immutableEntry(NE.NE2_1, 1.125f), Maps.immutableEntry(NE.NE2, 1.125f),
+					Maps.immutableEntry(NE.NE1, 1.9375f), Maps.immutableEntry(NE.NE4_small, 0.875f),
+					Maps.immutableEntry(NE.NE6, 2.0f) };
 			for (Map.Entry<NE, Float> entry : entrys) {
 				for (ARROW arrow : ARROW.values()) {
 					if (arrow == ARROW.OFF)
 						continue;
-					cm.register("arrow", with(SignalNE.ARROWPROP, arrow::equals).and(withN(SignalNE.NETYPE, entry.getKey()::equals)), entry.getValue(), "1",
-							"girsignals:blocks/arrows/" + arrow.name().toLowerCase());
+					cm.register("arrow",
+							with(SignalNE.ARROWPROP, arrow::equals).and(withN(SignalNE.NETYPE, entry.getKey()::equals)),
+							entry.getValue(), "1", "girsignals:blocks/arrows/" + arrow.name().toLowerCase());
 				}
 			}
 		});

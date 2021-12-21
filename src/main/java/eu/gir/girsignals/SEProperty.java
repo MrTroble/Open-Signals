@@ -16,10 +16,12 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>, IIntegerable<T>, Predicate<HashMap<SEProperty<?>, Object>> {
+public class SEProperty<T extends Comparable<T>>
+		implements IUnlistedProperty<T>, IIntegerable<T>, Predicate<HashMap<SEProperty<?>, Object>> {
 
 	public enum ChangeableStage {
-		APISTAGE, GUISTAGE, APISTAGE_NONE_CONFIG(/*Not configurable in UI*/), AUTOMATICSTAGE(/*Special stage, does nothing*/);
+		APISTAGE, GUISTAGE, APISTAGE_NONE_CONFIG(/* Not configurable in UI */),
+		AUTOMATICSTAGE(/* Special stage, does nothing */);
 	}
 
 	private final IProperty<T> parent;
@@ -27,7 +29,8 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	private final ChangeableStage stage;
 	private final Predicate<HashMap<SEProperty<?>, Object>> deps;
 
-	public SEProperty(IProperty<T> parent, T defaultValue, ChangeableStage stage, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+	public SEProperty(IProperty<T> parent, T defaultValue, ChangeableStage stage,
+			Predicate<HashMap<SEProperty<?>, Object>> deps) {
 		this.parent = parent;
 		this.defaultValue = defaultValue;
 		this.stage = stage;
@@ -57,7 +60,7 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	public Optional<T> readFromNBT(NBTTagCompound comp) {
 		if (comp.hasKey(this.getName())) {
 			int id = comp.getInteger(this.getName());
-			if(!this.isValid(id))
+			if (!this.isValid(id))
 				return Optional.absent();
 			return Optional.of(getObjFromID(id));
 		}
@@ -123,12 +126,12 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	public boolean isChangabelAtStage(ChangeableStage stage) {
 		return this.stage.equals(stage);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "SEP[" + this.getName() + "]";
 	}
-	
+
 	@SuppressWarnings("rawtypes")
 	public static SEProperty<?> cst(Object iup) {
 		return (SEProperty) iup;
@@ -141,19 +144,21 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	public static SEProperty<Boolean> of(String name, boolean defaultValue) {
 		return of(name, defaultValue, ChangeableStage.APISTAGE);
 	}
-	
-	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue, ChangeableStage stage) {
+
+	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue,
+			ChangeableStage stage) {
 		return of(name, defaultValue, stage, true);
 	}
-	
-	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue, ChangeableStage stage, boolean autoname) {
+
+	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue,
+			ChangeableStage stage, boolean autoname) {
 		return of(name, defaultValue, stage, autoname, t -> true);
 	}
 
 	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage) {
 		return of(name, defaultValue, stage, false);
 	}
-	
+
 	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, boolean autoname) {
 		return of(name, defaultValue, stage, autoname, t -> true);
 	}
@@ -161,12 +166,17 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	@SuppressWarnings("unchecked")
 	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue,
 			ChangeableStage stage, boolean autoname, Predicate<HashMap<SEProperty<?>, Object>> deps) {
-		if(autoname) return new SEAutoNameProp<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage, deps);
-		return new SEProperty<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage, deps);
+		if (autoname)
+			return new SEAutoNameProp<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue,
+					stage, deps);
+		return new SEProperty<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage,
+				deps);
 	}
 
-	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, boolean autoname, Predicate<HashMap<SEProperty<?>, Object>> deps) {
-		if(autoname) return new SEAutoNameProp<Boolean>(PropertyBool.create(name), defaultValue, stage, deps);
+	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, boolean autoname,
+			Predicate<HashMap<SEProperty<?>, Object>> deps) {
+		if (autoname)
+			return new SEAutoNameProp<Boolean>(PropertyBool.create(name), defaultValue, stage, deps);
 		return new SEProperty<Boolean>(PropertyBool.create(name), defaultValue, stage, deps);
 	}
 
@@ -174,14 +184,14 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	public boolean test(HashMap<SEProperty<?>, Object> t) {
 		return this.deps.test(t);
 	}
-	
-	public static class SEAutoNameProp<T extends Comparable<T>> extends SEProperty<T>{
+
+	public static class SEAutoNameProp<T extends Comparable<T>> extends SEProperty<T> {
 
 		public SEAutoNameProp(IProperty<T> parent, T defaultValue, ChangeableStage stage,
 				Predicate<HashMap<SEProperty<?>, Object>> deps) {
 			super(parent, defaultValue, stage, deps);
 		}
-		
+
 		@SideOnly(Side.CLIENT)
 		@Override
 		public String getNamedObj(int obj) {

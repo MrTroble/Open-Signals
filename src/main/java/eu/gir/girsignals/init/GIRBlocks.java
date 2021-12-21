@@ -48,7 +48,8 @@ public class GIRBlocks {
 	public static final SignalTram TRAM_SIGNAL = new SignalTram();
 	public static final SignalLF LF_SIGNAL = new SignalLF();
 	public static final SignalEL EL_SIGNAL = new SignalEL();
-	public static final Signal SH_SIGNAL = new Signal(Signal.builder(GIRItems.SIGN_PLACEMENT_TOOL, "shsignal").noLink().build());
+	public static final Signal SH_SIGNAL = new Signal(
+			Signal.builder(GIRItems.SIGN_PLACEMENT_TOOL, "shsignal").noLink().build());
 	public static final SignalRA RA_SIGNAL = new SignalRA();
 	public static final SignalBUE BUE_SIGNAL = new SignalBUE();
 	public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
@@ -71,13 +72,15 @@ public class GIRBlocks {
 					block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
 					block.setUnlocalizedName(name);
 					blocksToRegister.add(block);
-					if(block instanceof ITileEntityProvider) {
+					if (block instanceof ITileEntityProvider) {
 						ITileEntityProvider provider = (ITileEntityProvider) block;
 						try {
 							Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0).getClass();
 							TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
-						} catch(NullPointerException ex) {
-							GirsignalsMain.LOG.trace("All tileentity provide need to call back a default entity if the world is null!", ex);
+						} catch (NullPointerException ex) {
+							GirsignalsMain.LOG.trace(
+									"All tileentity provide need to call back a default entity if the world is null!",
+									ex);
 						}
 					}
 				} catch (IllegalArgumentException | IllegalAccessException e) {
@@ -86,7 +89,7 @@ public class GIRBlocks {
 			}
 		}
 	}
-	
+
 	@SubscribeEvent
 	public static void registerBlock(RegistryEvent.Register<Block> event) {
 		updateConfigs();
@@ -100,23 +103,21 @@ public class GIRBlocks {
 		blocksToRegister
 				.forEach(block -> registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
 	}
-	
+
 	private static void updateConfigs() {
-        blocksToRegister.forEach(b -> {
-        	if (b instanceof IConfigUpdatable) {
+		blocksToRegister.forEach(b -> {
+			if (b instanceof IConfigUpdatable) {
 				IConfigUpdatable configUpdate = (IConfigUpdatable) b;
 				configUpdate.updateConfigValues();
 			}
-        });
+		});
 	}
-	
-    @SubscribeEvent
-    public static void onConfigChangedEvent(OnConfigChangedEvent event)
-    {
-        if (event.getModID().equals(GirsignalsMain.MODID))
-        {
-            ConfigManager.sync(GirsignalsMain.MODID, Type.INSTANCE);
-            updateConfigs();
-        }
-    }
+
+	@SubscribeEvent
+	public static void onConfigChangedEvent(OnConfigChangedEvent event) {
+		if (event.getModID().equals(GirsignalsMain.MODID)) {
+			ConfigManager.sync(GirsignalsMain.MODID, Type.INSTANCE);
+			updateConfigs();
+		}
+	}
 }

@@ -8,8 +8,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
-import eu.gir.girsignals.EnumSignals.EnumMode;
-import eu.gir.girsignals.EnumSignals.EnumMuxMode;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
@@ -42,11 +40,8 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	private Map<String, Integer> tableOfSupportedSignalTypes;
 	private int signalTypeCache = -1;
 	private String signame = null;
-	private EnumRedstoneMode rsMode = EnumRedstoneMode.SINGLE;
 	private final int[] facingRedstoneModes = new int[EnumFacing.values().length];
-	public EnumMode mode = EnumMode.MANUELL;
 	public EnumFacing face = EnumFacing.DOWN;
-	public EnumMuxMode muxmode = EnumMuxMode.MUX_CONTROL;
 	public int nextSignal = 0;
 	public int indexUsed = 0;
 	public int lastMuxState = 0;
@@ -64,10 +59,6 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 
 	public SignalControllerTileEntity() {
 		Arrays.fill(facingRedstoneModes, 0xFF);
-	}
-
-	public static enum EnumRedstoneMode {
-		SINGLE, MUX
 	}
 
 	public static BlockPos readBlockPosFromNBT(NBTTagCompound compound) {
@@ -88,12 +79,9 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
-		rsMode = EnumRedstoneMode.values()[compound.getInteger(RS_MODE)];
 		int[] newArr = compound.getIntArray(FACEING_MODES);
 		this.face = EnumFacing.values()[compound.getInteger(UI_FACE)];
 		this.indexUsed = compound.getInteger(UI_INDEX);
-		this.mode = EnumMode.values()[compound.getInteger(UI_MODE)];
-		this.muxmode = EnumMuxMode.values()[compound.getInteger(UI_MUX)];
 		if (newArr != null && newArr.length == facingRedstoneModes.length)
 			System.arraycopy(newArr, 0, facingRedstoneModes, 0, facingRedstoneModes.length);
 		super.readFromNBT(compound);
@@ -104,12 +92,9 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		writeBlockPosToNBT(linkedSignalPosition, compound);
-		compound.setInteger(RS_MODE, rsMode.ordinal());
 		compound.setIntArray(FACEING_MODES, facingRedstoneModes);
 		compound.setInteger(UI_FACE, face.ordinal());
 		compound.setInteger(UI_INDEX, indexUsed);
-		compound.setInteger(UI_MODE, mode.ordinal());
-		compound.setInteger(UI_MUX, muxmode.ordinal());
 		super.writeToNBT(compound);
 		return compound;
 	}
@@ -312,15 +297,6 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		return this.signame != null;
 	}
 
-	public EnumRedstoneMode getRsMode() {
-		return rsMode;
-	}
-
-	public void setRsMode(EnumRedstoneMode rsMode) {
-		this.rsMode = rsMode;
-		Arrays.fill(facingRedstoneModes, rsMode == EnumRedstoneMode.MUX ? 3 : 0);
-	}
-
 	public void setFacingData(final EnumFacing face, final int data) {
 		facingRedstoneModes[face.ordinal()] = data;
 	}
@@ -334,54 +310,47 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				((x & 0b00000000000000001111110000000000) >> 10) };
 	}
 
-	public void redstoneUpdate(final EnumFacing face, final boolean state) {
-		if (listOfSupportedIndicies == null)
-			return;
-		if (rsMode == EnumRedstoneMode.SINGLE) {
-			final int id = facingRedstoneModes[face.ordinal()];
-			if (id < 0)
-				return;
-			final int[] unpacked = unpack(id);
-			final int signalTypeId = unpacked[0];
-			if (signalTypeId < listOfSupportedIndicies.length) {
-				final int signalData = unpacked[1];
-				final int signalDataOff = unpacked[2];
-				final int sigType = listOfSupportedIndicies[signalTypeId];
-				this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
-			}
-		} else if (rsMode == EnumRedstoneMode.MUX) {
-			final int id = facingRedstoneModes[face.ordinal()];
-			if (id < 0 || id >= EnumMuxMode.values().length)
-				return;
-			final EnumMuxMode muxmode = EnumMuxMode.values()[id];
-			if (muxmode == EnumMuxMode.MUX_CONTROL) {
-				final boolean lastState = (lastMuxState & 1) != 0;
-				if (lastState == state)
-					return;
-				lastMuxState = state ? 1 + (lastMuxState & 2) : lastMuxState & 2;
-				nextSignal++;
-				if (nextSignal >= listOfSupportedIndicies.length)
-					nextSignal = 0;
-			} else if (muxmode == EnumMuxMode.SIGNAL_CONTROL) {
-				final boolean lastState = (lastMuxState & 2) != 0;
-				if (lastState == state)
-					return;
-				lastMuxState = state ? 2 + (lastMuxState & 1) : lastMuxState & 1;
-				final int sigType = listOfSupportedIndicies[nextSignal];
-				final int newSignal = this.getSignalStateImpl(sigType) + 1;
-				if (!this.changeSignalImpl(sigType, newSignal))
-					this.changeSignalImpl(sigType, 0);
-			}
-		}
-	}
-
-	public void setUIState(final EnumMode mode, final EnumFacing face, final int indexUsed, final EnumMuxMode muxmode) {
-		this.mode = mode;
-		this.face = face;
-		this.indexUsed = indexUsed;
-		this.muxmode = muxmode;
-	}
-
+//	public void redstoneUpdate(final EnumFacing face, final boolean state) {
+//		if (listOfSupportedIndicies == null)
+//			return;
+//		if (rsMode == EnumRedstoneMode.SINGLE) {
+//			final int id = facingRedstoneModes[face.ordinal()];
+//			if (id < 0)
+//				return;
+//			final int[] unpacked = unpack(id);
+//			final int signalTypeId = unpacked[0];
+//			if (signalTypeId < listOfSupportedIndicies.length) {
+//				final int signalData = unpacked[1];
+//				final int signalDataOff = unpacked[2];
+//				final int sigType = listOfSupportedIndicies[signalTypeId];
+//				this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
+//			}
+//		} else if (rsMode == EnumRedstoneMode.MUX) {
+//			final int id = facingRedstoneModes[face.ordinal()];
+//			if (id < 0 || id >= EnumMuxMode.values().length)
+//				return;
+//			final EnumMuxMode muxmode = EnumMuxMode.values()[id];
+//			if (muxmode == EnumMuxMode.MUX_CONTROL) {
+//				final boolean lastState = (lastMuxState & 1) != 0;
+//				if (lastState == state)
+//					return;
+//				lastMuxState = state ? 1 + (lastMuxState & 2) : lastMuxState & 2;
+//				nextSignal++;
+//				if (nextSignal >= listOfSupportedIndicies.length)
+//					nextSignal = 0;
+//			} else if (muxmode == EnumMuxMode.SIGNAL_CONTROL) {
+//				final boolean lastState = (lastMuxState & 2) != 0;
+//				if (lastState == state)
+//					return;
+//				lastMuxState = state ? 2 + (lastMuxState & 1) : lastMuxState & 1;
+//				final int sigType = listOfSupportedIndicies[nextSignal];
+//				final int newSignal = this.getSignalStateImpl(sigType) + 1;
+//				if (!this.changeSignalImpl(sigType, newSignal))
+//					this.changeSignalImpl(sigType, 0);
+//			}
+//		}
+//	}
+//
 	@Override
 	public boolean hasLink() {
 		if (linkedSignalPosition == null)

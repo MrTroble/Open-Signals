@@ -33,7 +33,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	private String formatCustomName = null;
 	private int blockID = -1;
-	
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = new NBTTagCompound();
@@ -108,7 +108,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public HashMap<SEProperty<?>, Object> getProperties() {
 		return map;
 	}
-	
+
 	public interface BiAccumulater<T, U, V> {
 
 		T accept(T t, U u, V v);
@@ -156,9 +156,9 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		}
 		this.markDirty();
 		world.markBlockRangeForRenderUpdate(pos, pos);
-		
+
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	public void renderOverlay(final double x, final double y, final double z, final FontRenderer font) {
 		getSignal().renderOverlay(x, y, z, this, font);
@@ -167,11 +167,11 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public void setBlockID() {
 		blockID = ((Signal) world.getBlockState(pos).getBlock()).getID();
 	}
-	
+
 	public Signal getSignal() {
 		return (Signal) super.getBlockType();
 	}
-	
+
 	public int getBlockID() {
 		return blockID;
 	}

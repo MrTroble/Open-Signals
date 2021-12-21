@@ -21,7 +21,7 @@ public class GhostBlock extends Block implements IConfigUpdatable {
 	public GhostBlock() {
 		super(Material.GLASS);
 	}
-	
+
 	@Override
 	public boolean isTranslucent(IBlockState state) {
 		return true;
@@ -83,7 +83,7 @@ public class GhostBlock extends Block implements IConfigUpdatable {
 	public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
 		super.breakBlock(worldIn, pos, state);
 
-		if(worldIn.isRemote)
+		if (worldIn.isRemote)
 			return;
 		destroyUpperBlock(worldIn, pos);
 

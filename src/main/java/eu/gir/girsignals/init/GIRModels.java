@@ -16,15 +16,14 @@ public class GIRModels {
 		GIRItems.registeredItems.forEach(GIRModels::registerModel);
 		registerModel(Item.getItemFromBlock(GIRBlocks.HV_SIGNAL_CONTROLLER));
 	}
-	
 
 	@SubscribeEvent
 	public static void addColor(ColorHandlerEvent.Block event) {
 		BlockColors colors = event.getBlockColors();
 		GIRBlocks.blocksToRegister.forEach(block -> {
-			if(block instanceof Signal) {
+			if (block instanceof Signal) {
 				Signal sb = (Signal) block;
-				if(sb.hasCostumColor())
+				if (sb.hasCostumColor())
 					colors.registerBlockColorHandler(sb::colorMultiplier, block);
 			}
 		});

@@ -1,25 +1,36 @@
 package eu.gir.girsignals.proxy;
 
 import eu.gir.girsignals.GirsignalsMain;
-import eu.gir.girsignals.guis.GuiHandler;
+import eu.gir.girsignals.guis.ContainerSignalController;
+import eu.gir.girsignals.guis.GuiPlacementtool;
+import eu.gir.girsignals.guis.GuiSignalController;
+import eu.gir.girsignals.guis.guilib.GuiHandler;
+import eu.gir.girsignals.guis.guilib.UIInit;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRItems;
-import eu.gir.girsignals.init.GIRNetworkHandler;
+import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.network.FMLEventChannel;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
 
 public class CommonProxy {
 
-	public FMLEventChannel CHANNEL; 
-	
 	public void preinit(FMLPreInitializationEvent event) {
-		CHANNEL = NetworkRegistry.INSTANCE.newEventDrivenChannel(GIRNetworkHandler.CHANNELNAME);
-		CHANNEL.register(new GIRNetworkHandler());
-		NetworkRegistry.INSTANCE.registerGuiHandler(GirsignalsMain.MODID, new GuiHandler());
+		UIInit.initCommon(GirsignalsMain.MODID);
+		GuiHandler.addGui(GuiPlacementtool.class, (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
+		GuiHandler.addGui(GuiSignalController.class, (p, w, bp) -> {
+			final TileEntity entity = w.getTileEntity(bp);
+			if (entity == null || entity instanceof SignalControllerTileEntity)
+				return null;
+			return new GuiSignalController((SignalControllerTileEntity) entity);
+		}, (p, w, bp) -> {
+			final TileEntity entity = w.getTileEntity(bp);
+			if (entity == null || entity instanceof SignalControllerTileEntity)
+				return null;
+			return new ContainerSignalController((SignalControllerTileEntity) entity);
+		});
 
 		GIRItems.init();
 		GIRBlocks.init();

@@ -6,13 +6,10 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import eu.gir.girsignals.EnumSignals.EnumMode;
-import eu.gir.girsignals.EnumSignals.EnumMuxMode;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
-import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IContainerListener;
@@ -28,14 +25,11 @@ public class ContainerSignalController extends Container {
 	protected int[] guiStageSigStates;
 	protected boolean hasLink = false;
 	protected int signalType;
-	protected EnumRedstoneMode rsMode;
 	private final ArrayList<Map.Entry<Integer, Integer>> stateCacheList = new ArrayList<>();
 	private final ArrayList<Map.Entry<Integer, Integer>> typeCacheList = new ArrayList<>();
 	public final ArrayList<Map.Entry<Integer, Integer>> guiCacheList = new ArrayList<>();
 	protected int[] facingRedstoneModes;
 	protected EnumFacing faceUsed = EnumFacing.DOWN;
-	protected EnumMode indexMode = EnumMode.MANUELL;
-	protected EnumMuxMode muxMode = EnumMuxMode.MUX_CONTROL;
 	protected int indexCurrentlyUsed = 0;
 
 	private final GuiSignalController guiSig;
@@ -86,7 +80,6 @@ public class ContainerSignalController extends Container {
 		}
 		listener.sendWindowProperty(this, LINK_MSG, hasLink ? 1 : 0);
 		listener.sendWindowProperty(this, SIGNAL_TYPE_MSG, signalType);
-		listener.sendWindowProperty(this, RS_MODE_MSG, this.entity.getRsMode().ordinal());
 
 		final Signal signal = Signal.SIGNALLIST.get(signalType);
 		guiCacheList.clear();
@@ -100,11 +93,9 @@ public class ContainerSignalController extends Container {
 				return ebs;
 			}, null);
 		});
-		listener.sendWindowProperty(this, UI_MODE, this.entity.mode.ordinal());
 		listener.sendWindowProperty(this, UI_FACE, this.entity.face.ordinal());
 		listener.sendWindowProperty(this, UI_INDEX, this.entity.indexUsed);
-		listener.sendWindowProperty(this, UI_MUX, this.entity.muxmode.ordinal());
-		
+
 		guiCacheList.forEach(entry -> {
 			listener.sendWindowProperty(this, entry.getKey() + GUI_CHANGABLE_OFFSET, entry.getValue());
 		});
@@ -122,14 +113,6 @@ public class ContainerSignalController extends Container {
 		if (!hasLink)
 			return;
 
-		for (final IContainerListener listener : listeners) {
-			final EnumRedstoneMode nmode = this.entity.getRsMode();
-			if (this.rsMode != nmode) {
-				this.rsMode = nmode;
-				listener.sendWindowProperty(this, RS_MODE_MSG, this.rsMode.ordinal());
-			}
-		}
-
 		final int[] rsmodeface = this.entity.getFacingData().clone();
 		for (int i = 0; i < facingRedstoneModes.length; i++) {
 			if (rsmodeface[i] != facingRedstoneModes[i]) {
@@ -140,7 +123,7 @@ public class ContainerSignalController extends Container {
 			}
 		}
 
-		if(supportedSigStates == null)
+		if (supportedSigStates == null)
 			return;
 		for (int i = 0; i < supportedSigStates.length; i++) {
 			final int signalType = this.supportedSigTypes[i];
@@ -171,7 +154,7 @@ public class ContainerSignalController extends Container {
 			}
 		} else if (id >= RS_MODES_OFFSET && id < GUI_CHANGABLE_OFFSET) {
 			facingRedstoneModes[id - RS_MODES_OFFSET] = data;
-		} else if(id >= GUI_CHANGABLE_OFFSET) {
+		} else if (id >= GUI_CHANGABLE_OFFSET) {
 			guiCacheList.add(Maps.immutableEntry(id - GUI_CHANGABLE_OFFSET, data));
 		} else {
 			switch (id) {
@@ -193,19 +176,11 @@ public class ContainerSignalController extends Container {
 				stateCacheList.clear();
 				typeCacheList.clear();
 				break;
-			case RS_MODE_MSG:
-				this.rsMode = EnumRedstoneMode.values()[data];
-				break;
 			case UI_FACE:
 				this.faceUsed = EnumFacing.values()[data];
 				break;
-			case UI_MODE:
-				this.indexMode = EnumMode.values()[data];
-				break;
 			case UI_INDEX:
 				this.indexCurrentlyUsed = data;
-			case UI_MUX:
-				this.muxMode = EnumMuxMode.values()[data];
 			}
 		}
 		this.guiSig.initGui();

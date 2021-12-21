@@ -10,21 +10,18 @@ import java.util.function.IntConsumer;
 
 import org.lwjgl.opengl.GL11;
 
-import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.DrawUtil;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
-import eu.gir.girsignals.guis.guilib.UICheckBox;
-import eu.gir.girsignals.guis.guilib.UIEntity;
-import eu.gir.girsignals.guis.guilib.UIEnumerable;
-import eu.gir.girsignals.guis.guilib.UIVBox;
-import eu.gir.girsignals.init.GIRNetworkHandler;
+import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
+import eu.gir.girsignals.guis.guilib.entitys.UICheckBox;
+import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
+import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
+import eu.gir.girsignals.guis.guilib.entitys.UIVBox;
 import eu.gir.girsignals.items.Placementtool;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -34,12 +31,9 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public class GuiPlacementtool extends GuiBase {
 
@@ -59,8 +53,8 @@ public class GuiPlacementtool extends GuiBase {
 		if (this.compound == null)
 			this.compound = new NBTTagCompound();
 		tool = (Placementtool) stack.getItem();
-		final int usedBlock = this.compound.hasKey(GIRNetworkHandler.BLOCK_TYPE_ID)
-				? this.compound.getInteger(GIRNetworkHandler.BLOCK_TYPE_ID)
+		final int usedBlock = this.compound.hasKey(Placementtool.BLOCK_TYPE_ID)
+				? this.compound.getInteger(Placementtool.BLOCK_TYPE_ID)
 				: tool.getObjFromID(0).getID();
 		currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
 		manager = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes();
@@ -141,14 +135,9 @@ public class GuiPlacementtool extends GuiBase {
 
 	@Override
 	public void onGuiClosed() {
-		final ByteBuf buffer = Unpooled.buffer();
-		buffer.writeByte(GIRNetworkHandler.PLACEMENT_GUI_SET_NBT);
-		compound.setInteger(GIRNetworkHandler.BLOCK_TYPE_ID, currentSelectedBlock.getID());
+		compound.setInteger(Placementtool.BLOCK_TYPE_ID, currentSelectedBlock.getID());
 		this.entity.write(compound);
-		final PacketBuffer packet = new PacketBuffer(buffer);
-		packet.writeCompoundTag(compound);
-		final CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME, packet);
-		GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
+		GuiSyncNetwork.sendToItemServer(compound);
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -170,7 +159,7 @@ public class GuiPlacementtool extends GuiBase {
 				return;
 			if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 				ebs = (IExtendedBlockState) ebs.withProperty(sep, checkb.isChecked());
-			} else if(checkb.isChecked()) {
+			} else if (checkb.isChecked()) {
 				ebs = (IExtendedBlockState) ebs.withProperty(sep, sep.getDefault());
 			}
 		}

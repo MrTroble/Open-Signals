@@ -1,7 +1,7 @@
 package eu.gir.girsignals.blocks;
 
-import eu.gir.girsignals.EnumSignals;
-import eu.gir.girsignals.GirsignalsMain;
+import eu.gir.girsignals.guis.GuiSignalController;
+import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
@@ -27,8 +27,7 @@ public class SignalController extends Block implements ITileEntityProvider {
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
 			EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
-			playerIn.openGui(GirsignalsMain.MODID, EnumSignals.GUI_SIGNAL_CONTROLLER, worldIn, pos.getX(), pos.getY(),
-					pos.getZ());
+			GuiHandler.invokeGui(GuiSignalController.class, playerIn, worldIn, pos);
 			return true;
 		}
 		return false;
@@ -38,18 +37,18 @@ public class SignalController extends Block implements ITileEntityProvider {
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new SignalControllerTileEntity();
 	}
-	
+
 	@Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
-		if(world.isRemote)
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
+		if (world.isRemote)
 			return;
 		final TileEntity entity = world.getTileEntity(pos);
 		if (entity instanceof SignalControllerTileEntity) {
 			final SignalControllerTileEntity controller = (SignalControllerTileEntity) entity;
-			for(final EnumFacing face : EnumFacing.VALUES) {
+			for (final EnumFacing face : EnumFacing.VALUES) {
 				final boolean bool = world.isSidePowered(pos.offset(face), face);
-				controller.redstoneUpdate(face, bool);
+				// controller.redstoneUpdate(face, bool);
 			}
 		}
-    }
+	}
 }
