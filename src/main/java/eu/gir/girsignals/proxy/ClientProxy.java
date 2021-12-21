@@ -1,9 +1,11 @@
 package eu.gir.girsignals.proxy;
 
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.GuiPlacementtool;
 import eu.gir.girsignals.guis.GuiSignalController;
 import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.init.GIRModels;
+import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.models.GIRCustomModelLoader;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalSpecialRenderer;
@@ -20,8 +22,8 @@ public class ClientProxy extends CommonProxy {
 
 	public void preinit(FMLPreInitializationEvent event) {
 		super.preinit(event);
-		GuiHandler.addGui(GuiPlacementtool.class, (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
-		GuiHandler.addGui(GuiSignalController.class, (p, w, bp) -> {
+		GuiHandler.addGui(Placementtool.class, (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
+		GuiHandler.addGui(Signal.class, (p, w, bp) -> {
 			final TileEntity entity = w.getTileEntity(bp);
 			if (entity == null || !(entity instanceof SignalControllerTileEntity))
 				return null;

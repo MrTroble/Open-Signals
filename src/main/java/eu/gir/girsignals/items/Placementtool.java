@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.GuiPlacementtool;
 import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.guis.guilib.IIntegerable;
 import eu.gir.girsignals.init.GIRBlocks;
@@ -47,7 +46,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 		if (player.isSneaking()) {
 			if (!worldIn.isRemote)
 				return EnumActionResult.SUCCESS;
-			GuiHandler.invokeGui(GuiPlacementtool.class, player, worldIn, pos);
+			GuiHandler.invokeGui(Placementtool.class, player, worldIn, pos);
 			return EnumActionResult.SUCCESS;
 		} else {
 			if (worldIn.isRemote)

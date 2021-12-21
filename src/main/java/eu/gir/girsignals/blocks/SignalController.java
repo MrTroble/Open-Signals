@@ -1,6 +1,5 @@
 package eu.gir.girsignals.blocks;
 
-import eu.gir.girsignals.guis.GuiSignalController;
 import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.init.GIRTabs;
@@ -27,7 +26,7 @@ public class SignalController extends Block implements ITileEntityProvider {
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn,
 			EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
-			GuiHandler.invokeGui(GuiSignalController.class, playerIn, worldIn, pos);
+			GuiHandler.invokeGui(Signal.class, playerIn, worldIn, pos);
 			return true;
 		}
 		return false;

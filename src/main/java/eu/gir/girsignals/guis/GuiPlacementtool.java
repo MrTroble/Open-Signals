@@ -34,7 +34,10 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class GuiPlacementtool extends GuiBase {
 
 	private BlockModelShapes manager;
