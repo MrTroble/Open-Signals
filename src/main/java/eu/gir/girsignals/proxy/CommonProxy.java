@@ -2,8 +2,6 @@ package eu.gir.girsignals.proxy;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.guis.ContainerSignalController;
-import eu.gir.girsignals.guis.GuiPlacementtool;
-import eu.gir.girsignals.guis.GuiSignalController;
 import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.guis.guilib.UIInit;
 import eu.gir.girsignals.init.GIRBlocks;
@@ -19,13 +17,7 @@ public class CommonProxy {
 
 	public void preinit(FMLPreInitializationEvent event) {
 		UIInit.initCommon(GirsignalsMain.MODID);
-		GuiHandler.addGui(GuiPlacementtool.class, (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
-		GuiHandler.addGui(GuiSignalController.class, (p, w, bp) -> {
-			final TileEntity entity = w.getTileEntity(bp);
-			if (entity == null || !(entity instanceof SignalControllerTileEntity))
-				return null;
-			return new GuiSignalController((SignalControllerTileEntity) entity);
-		}, (p, w, bp) -> {
+		GuiHandler.addServer((p, w, bp) -> {
 			final TileEntity entity = w.getTileEntity(bp);
 			if (entity == null || !(entity instanceof SignalControllerTileEntity))
 				return null;
