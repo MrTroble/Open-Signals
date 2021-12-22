@@ -43,7 +43,7 @@ public class GuiSignalController extends GuiBase {
 
 	public GuiSignalController(final SignalControllerTileEntity entity) {
 		super("TestTitle");
-		this.sigController = new ContainerSignalController(entity, this);
+		this.sigController = new ContainerSignalController(entity);
 		this.pos = entity.getPos();
 		compound = entity.getTag();
 		init();
@@ -99,10 +99,10 @@ public class GuiSignalController extends GuiBase {
 
 	private HashMap<SEProperty<?>, Object> createMap(Signal signal) {
 		final HashMap<SEProperty<?>, Object> map = Maps.newHashMap();
-		for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
-			final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
-			map.put(prop, prop.getObjFromID(entry.getValue()));
-		}
+//		for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
+//			final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
+//			map.put(prop, prop.getObjFromID(entry.getValue()));
+//		}
 
 		for (int i = 0; i < sigController.supportedSigTypes.length; i++) {
 			final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
@@ -130,11 +130,6 @@ public class GuiSignalController extends GuiBase {
 		this.mc.player.openContainer = this.sigController;
 		this.manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 		super.initGui();
-	}
-
-	public int pack(final int sigTypeID, final int onSig, final int offSig) {
-		return (sigTypeID & 0b00000000000000000000000000001111) | ((onSig & 0b00000000000000000000000000111111) << 4)
-				| ((offSig & 0b00000000000000000000000000111111) << 10);
 	}
 
 	@Override
@@ -180,25 +175,25 @@ public class GuiSignalController extends GuiBase {
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void updateDraw() {
-		if (sigController.supportedSigStates == null || !sigController.hasLink)
-			return;
-		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-		IExtendedBlockState ebs = (IExtendedBlockState) signal.getDefaultState();
-
-		for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
-			SEProperty prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
-			ebs = ebs.withProperty(prop, prop.getObjFromID(entry.getValue()));
-		}
-
-		for (int i = 0; i < sigController.supportedSigStates.length; i++) {
-			int sigState = sigController.supportedSigStates[i];
-			SEProperty prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
-			if (sigState < 0 || sigState >= prop.count())
-				continue;
-			ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
-		}
-		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-		DrawUtil.addToBuffer(model.get(), manager, ebs);
-		model.get().finishDrawing();
+//		if (sigController.supportedSigStates == null || !sigController.hasLink)
+//			return;
+////		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
+////		IExtendedBlockState ebs = (IExtendedBlockState) signal.getDefaultState();
+////
+////		for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
+////			SEProperty prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
+////			ebs = ebs.withProperty(prop, prop.getObjFromID(entry.getValue()));
+////		}
+////
+////		for (int i = 0; i < sigController.supportedSigStates.length; i++) {
+////			int sigState = sigController.supportedSigStates[i];
+////			SEProperty prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
+////			if (sigState < 0 || sigState >= prop.count())
+////				continue;
+////			ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
+////		}
+//		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+//		DrawUtil.addToBuffer(model.get(), manager, ebs);
+//		model.get().finishDrawing();
 	}
 }
