@@ -1,9 +1,17 @@
 # Changelog
 
+## [Addition] 12.22.2021 - 1
+
+* Added more HV and KS signal shields
+* Added more tram signals
+* Added post block
+
 ## [Addition] 11.25.2021 - 1
+
 * Added more numbers for station number
 
 ## [Addition] 10.30.2021 - 1
+
 * Added ZS plates for HV and KS signals
 
 ## [Fix] 9.22.2021 - 1

@@ -11,6 +11,7 @@ item.signplacementtool.name=Signalplate-Placer
 
 #Blocks
 tile.hvsignalcontroller.name=Signal-Controller
+tile.post.name=Post Block
 tile.hvsignal.name=HV Signal
 tile.kssignal.name=Ks Signal
 tile.hlsignal.name=Hl Signal
