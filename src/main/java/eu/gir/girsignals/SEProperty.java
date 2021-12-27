@@ -58,8 +58,6 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	public Optional<T> readFromNBT(NBTTagCompound comp) {
 		if (comp.hasKey(this.getName())) {
 			int id = comp.getInteger(this.getName());
-			if(!this.isValid(id))
-				return Optional.absent();
 			return Optional.of(getObjFromID(id));
 		}
 		return Optional.absent();

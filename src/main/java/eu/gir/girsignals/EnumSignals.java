@@ -90,7 +90,7 @@ public class EnumSignals {
 	}
 
 	public enum TRAMTYPE implements DefaultName<TRAMTYPE> {
-		TRAM, SWITCH, CAR, PEDESTRIAN;
+		TRAM, CAR, PEDESTRIAN, SWITCH;
 	}
 
 	public enum TRAM implements Offable<TRAM> {
