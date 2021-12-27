@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
 import eu.gir.girsignals.blocks.IConfigUpdatable;
+import eu.gir.girsignals.blocks.Post;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
@@ -40,6 +41,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 public class GIRBlocks {
 
 	public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
+	public static final Post POST = new Post();
 	public static final SignalHV HV_SIGNAL = new SignalHV();
 	public static final GhostBlock GHOST_BLOCK = new GhostBlock();
 	public static final SignalKS KS_SIGNAL = new SignalKS();

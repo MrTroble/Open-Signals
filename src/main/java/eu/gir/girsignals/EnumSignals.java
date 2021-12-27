@@ -22,9 +22,21 @@ public class EnumSignals {
 		}
 
 	}
+	
+	public enum HP_TYPE implements Offable<HP_TYPE> {
+		OFF, STOPSIGNAL, HPHOME, HPBLOCK;
+	}
 
 	public enum HP implements Offable<HP> {
-		OFF, HP0, HP1, HP2, STATUS_LIGHT, SHUNTING, MALFUNCTION;
+		OFF, HP0, HP1, HP2, SHUNTING;
+	}
+	
+	public enum HP_HOME implements Offable<HP_HOME> {
+		OFF, HP0, HP0_ALTERNATE_RED, HP1, HP2;
+	}
+	
+	public enum HP_BLOCK implements Offable<HP_BLOCK> {
+		OFF, HP0, HP1;
 	}
 
 	public enum VR implements Offable<VR> {
@@ -39,19 +51,30 @@ public class EnumSignals {
 	public enum MAST_SIGN implements Offable<MAST_SIGN> {
 		OFF, WRW, WYWYW, WBWBW;
 	}
+	
+	public enum KS_TYPE implements Offable<KS_TYPE> {
+		OFF, STOPSIGNAL, MAIN, DISTANT;
+	}
 
 	public enum KS implements Offable<KS> {
-		OFF, HP0, KS1, KS1_BLINK, KS1_BLINK_LIGHT, KS2, KS2_LIGHT, KS_ZS1, KS_ZS7, KS_SHUNTING, KS_STATUS_LIGHT,
-		MALFUNCTION;
+		OFF, HP0, KS1, KS1_BLINK, KS1_BLINK_LIGHT, KS2, KS2_LIGHT, KS_ZS1, KS_ZS7, KS_SHUNTING, KS_STATUS_LIGHT;
+	}
+	
+	public enum KS_MAIN implements Offable<KS_MAIN> {
+		OFF, HP0, KS1, KS_ZS1, KS_ZS7, KS_SHUNTING, KS_STATUS_LIGHT;
 	}
 
 	public enum KS_DISTANT implements Offable<KS_DISTANT> {
 		OFF, KS1, KS1_REPEAT, KS1_BLINK, KS1_BLINK_LIGHT, KS1_BLINK_REPEAT, KS2, KS2_LIGHT, KS2_REPEAT, KS_STATUS_LIGHT;
 	}
+	
+	public enum HL_TYPE implements Offable<HL_TYPE> {
+		OFF, MAIN, DISTANT;
+	}
 
 	public enum HL implements Offable<HL> {
 		OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2_3, HL4, HL5_6, HL7, HL8_9, HL10, HL11_12, HL_ZS1, HL_SHUNTING,
-		HL_STATUS_LIGHT, MALFUNCTION;
+		HL_STATUS_LIGHT;
 	}
 
 	public enum HL_DISTANT implements Offable<HL_DISTANT> {
@@ -67,11 +90,19 @@ public class EnumSignals {
 	}
 
 	public enum TRAMTYPE implements DefaultName<TRAMTYPE> {
-		TRAM, CAR, PEDESTRIAN
+		TRAM, CAR, PEDESTRIAN, SWITCH;
 	}
 
 	public enum TRAM implements Offable<TRAM> {
 		OFF, F0, F1, F2, F3, F4, F5;
+	}
+	
+	public enum TRAM_ADD implements Offable<TRAM_ADD>{
+		OFF, A, T, AT;
+	}
+	
+	public enum TRAMSWITCH implements Offable<TRAMSWITCH> {
+		OFF, W1, W2, W3, W11, W12, W13, W14;
 	}
 
 	public enum CAR implements Offable<CAR> {
@@ -79,7 +110,7 @@ public class EnumSignals {
 	}
 
 	public enum PED implements Offable<PED> {
-		OFF, RED, GREEN;
+		OFF, RED, GREEN, YELLOW;
 	}
 
 	public enum LF implements DefaultName<LF> {

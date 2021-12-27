@@ -5,6 +5,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Predicate;
 
 import eu.gir.girsignals.GIRSignalsConfig;
 import eu.gir.girsignals.SEProperty;
@@ -400,6 +403,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 	@Override
 	public void updateConfigValues() {
 		setLightLevel(GIRSignalsConfig.signalLightValue / 15.0f);
+	}
+	
+	public static <T extends Comparable<T>> Predicate<Set<Entry<SEProperty<?>, Object>>> check(SEProperty<T> property, T type) {
+	    return t -> t.stream().noneMatch(e -> e.getKey().equals(property)) || t.stream().anyMatch((e -> e.getKey().equals(property) && e.getValue().equals(type)));
 	}
 
 }

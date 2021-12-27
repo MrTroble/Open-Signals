@@ -1,6 +1,7 @@
 package eu.gir.girsignals;
 
-import java.util.HashMap;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import com.google.common.base.Optional;
@@ -16,7 +17,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>, IIntegerable<T>, Predicate<HashMap<SEProperty<?>, Object>> {
+public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>, IIntegerable<T>, Predicate<Set<Entry<SEProperty<?>, Object>>> {
 
 	public enum ChangeableStage {
 		APISTAGE, GUISTAGE, APISTAGE_NONE_CONFIG(/*Not configurable in UI*/), AUTOMATICSTAGE(/*Special stage, does nothing*/);
@@ -25,9 +26,9 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	private final IProperty<T> parent;
 	private final T defaultValue;
 	private final ChangeableStage stage;
-	private final Predicate<HashMap<SEProperty<?>, Object>> deps;
+	private final Predicate<Set<Entry<SEProperty<?>, Object>>> deps;
 
-	public SEProperty(IProperty<T> parent, T defaultValue, ChangeableStage stage, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+	public SEProperty(IProperty<T> parent, T defaultValue, ChangeableStage stage, Predicate<Set<Entry<SEProperty<?>, Object>>> deps) {
 		this.parent = parent;
 		this.defaultValue = defaultValue;
 		this.stage = stage;
@@ -57,8 +58,6 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	public Optional<T> readFromNBT(NBTTagCompound comp) {
 		if (comp.hasKey(this.getName())) {
 			int id = comp.getInteger(this.getName());
-			if(!this.isValid(id))
-				return Optional.absent();
 			return Optional.of(getObjFromID(id));
 		}
 		return Optional.absent();
@@ -93,7 +92,7 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 	@SuppressWarnings("unchecked")
 	public T getObjFromID(int obj) {
 		if (!isValid(obj))
-			obj = 0;
+			obj = getIDFromObj(this.getDefault());
 		if (getType().isEnum()) {
 			return (T) getType().getEnumConstants()[obj];
 		} else if (getType().equals(Boolean.class)) {
@@ -160,25 +159,25 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 
 	@SuppressWarnings("unchecked")
 	public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(String name, T defaultValue,
-			ChangeableStage stage, boolean autoname, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+			ChangeableStage stage, boolean autoname, Predicate<Set<Entry<SEProperty<?>, Object>>> deps) {
 		if(autoname) return new SEAutoNameProp<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage, deps);
 		return new SEProperty<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage, deps);
 	}
 
-	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, boolean autoname, Predicate<HashMap<SEProperty<?>, Object>> deps) {
+	public static SEProperty<Boolean> of(String name, boolean defaultValue, ChangeableStage stage, boolean autoname, Predicate<Set<Entry<SEProperty<?>, Object>>> deps) {
 		if(autoname) return new SEAutoNameProp<Boolean>(PropertyBool.create(name), defaultValue, stage, deps);
 		return new SEProperty<Boolean>(PropertyBool.create(name), defaultValue, stage, deps);
 	}
 
 	@Override
-	public boolean test(HashMap<SEProperty<?>, Object> t) {
+	public boolean test(Set<Entry<SEProperty<?>, Object>> t) {
 		return this.deps.test(t);
 	}
 	
 	public static class SEAutoNameProp<T extends Comparable<T>> extends SEProperty<T>{
 
 		public SEAutoNameProp(IProperty<T> parent, T defaultValue, ChangeableStage stage,
-				Predicate<HashMap<SEProperty<?>, Object>> deps) {
+				Predicate<Set<Entry<SEProperty<?>, Object>>> deps) {
 			super(parent, defaultValue, stage, deps);
 		}
 		
