@@ -4,7 +4,6 @@ import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.HP_BLOCK;
 import eu.gir.girsignals.EnumSignals.HP_HOME;
 import eu.gir.girsignals.EnumSignals.HP_TYPE;
-import eu.gir.girsignals.EnumSignals.KS_TYPE;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;

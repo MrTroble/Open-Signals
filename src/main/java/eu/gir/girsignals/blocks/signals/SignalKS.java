@@ -5,7 +5,6 @@ import eu.gir.girsignals.EnumSignals.KS_DISTANT;
 import eu.gir.girsignals.EnumSignals.KS_MAIN;
 import eu.gir.girsignals.EnumSignals.KS_TYPE;
 import eu.gir.girsignals.EnumSignals.MAST_SIGN;
-import eu.gir.girsignals.EnumSignals.TRAMTYPE;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
