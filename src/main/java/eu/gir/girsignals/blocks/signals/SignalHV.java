@@ -22,9 +22,9 @@ public class SignalHV extends Signal {
 	}
 
 	public static final SEProperty<HP_TYPE> HPTYPE = SEProperty.of("hptype", HP_TYPE.STOPSIGNAL, ChangeableStage.GUISTAGE);
-	public static final SEProperty<HP> STOPSIGNAL = SEProperty.of("stopsignal", HP.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(HPTYPE) && e.getValue().equals(HP_TYPE.STOPSIGNAL))));
-	public static final SEProperty<HP_HOME> HPHOME = SEProperty.of("hphome", HP_HOME.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(HPTYPE) && e.getValue().equals(HP_TYPE.HPHOME))));
-	public static final SEProperty<HP_BLOCK> HPBLOCK = SEProperty.of("hpblock", HP_BLOCK.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(HPTYPE) && e.getValue().equals(HP_TYPE.HPBLOCK))));
+	public static final SEProperty<HP> STOPSIGNAL = SEProperty.of("stopsignal", HP.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(HPTYPE, HP_TYPE.STOPSIGNAL));
+	public static final SEProperty<HP_HOME> HPHOME = SEProperty.of("hphome", HP_HOME.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(HPTYPE, HP_TYPE.HPHOME));
+	public static final SEProperty<HP_BLOCK> HPBLOCK = SEProperty.of("hpblock", HP_BLOCK.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(HPTYPE, HP_TYPE.HPBLOCK));
 	public static final SEProperty<Boolean> IDENTIFIER = SEProperty.of("identifier", false);
 	public static final SEProperty<VR> DISTANTSIGNAL = SEProperty.of("distantsignal", VR.OFF);
 	public static final SEProperty<Boolean> VR_LIGHT = SEProperty.of("vrlight", false);

@@ -21,8 +21,8 @@ public class SignalHL extends Signal {
 	}
 
 	public static final SEProperty<HL_TYPE> HLTYPE = SEProperty.of("hltype", HL_TYPE.MAIN, ChangeableStage.GUISTAGE);
-	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(HLTYPE) && e.getValue().equals(HL_TYPE.MAIN))));
-	public static final SEProperty<HL_DISTANT> DISTANTSIGNAL = SEProperty.of("mainlightsignal_distant", HL_DISTANT.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(HLTYPE) && e.getValue().equals(HL_TYPE.DISTANT))));
+	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(HLTYPE, HL_TYPE.MAIN));
+	public static final SEProperty<HL_DISTANT> DISTANTSIGNAL = SEProperty.of("mainlightsignal_distant", HL_DISTANT.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(HLTYPE, HL_TYPE.DISTANT));
 	public static final SEProperty<HL_LIGHTBAR> LIGHTBAR = SEProperty.of("mainlightsignallightbar", HL_LIGHTBAR.OFF);
 	public static final SEProperty<MAST_SIGN> MASTSIGN = SEProperty.of("mastsign", MAST_SIGN.OFF, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false, ChangeableStage.GUISTAGE);
