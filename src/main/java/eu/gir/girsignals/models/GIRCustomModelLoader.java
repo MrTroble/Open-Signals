@@ -320,51 +320,51 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			}
 			// KS off
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.OFF))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5);
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5);
 			// HP 0
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.HP0))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_rednorth", "girsignals:blocks/lamps/lamp_red");
 			// KS 1
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS1))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
 			// KS 1 Blink
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS1_BLINK))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_greennorth", "girsignals:blocks/lamps/lamp_green_blink");
 			// KS 1 Blink Light
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS1_BLINK_LIGHT))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_greennorth", "girsignals:blocks/lamps/lamp_green_blink", "lamp_white_identifiernorth",
 					"girsignals:blocks/lamps/lamp_white");
 			// KS 2
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS2))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
 			// KS 2 Light
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS2_LIGHT))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow", "lamp_white_identifiernorth",
 					"girsignals:blocks/lamps/lamp_white");
 			// KS Zs1
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS_ZS1))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_zsnorth",
 					"girsignals:blocks/lamps/lamp_white_blink");
 			// KS Zs7
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS_ZS7))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_zs7north",
 					"girsignals:blocks/lamps/lamp_yellow");
 			// KS RS
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS_SHUNTING))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_zsnorth",
 					"girsignals:blocks/lamps/lamp_white", "lamp_white_shnorth", "girsignals:blocks/lamps/lamp_white");
 			// KS Status light
 			cm.register("ks/ks_signal", with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS_STATUS_LIGHT))
-					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL))).or(hasNot(SignalKS.KSTYPE)), 5,
+					.and(withN(SignalKS.KSTYPE, kst -> kst.equals(KS_TYPE.STOPSIGNAL)).or(hasNot(SignalKS.KSTYPE))), 5,
 					"lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
 			// KS MAIN
 			// KS off
