@@ -1,9 +1,6 @@
 package eu.gir.girsignals.guis;
 
 import java.util.HashMap;
-import java.util.Map.Entry;
-
-import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Maps;
 
@@ -16,19 +13,15 @@ import eu.gir.girsignals.guis.guilib.DrawUtil.EnumIntegerable;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
-import eu.gir.girsignals.guis.guilib.entitys.UIButton;
-import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
+import eu.gir.girsignals.guis.guilib.entitys.UIBox;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
-import eu.gir.girsignals.guis.guilib.entitys.UIVBox;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.client.renderer.BlockModelShapes;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -80,20 +73,14 @@ public class GuiSignalController extends GuiBase {
 		});
 		this.entity.add(rsMode);
 		
-		list.setInheritBounds(true);
-		list.add(new UIVBox(5));
+		list.setInheritHeight(true);
+		list.setInheritWidth(true);
+		final UIBox vbox = new UIBox(UIBox.VBoxMode.INSTANCE, 1);
+		list.add(vbox);
 		this.entity.add(list);
-		this.entity.add(new UIVBox(5));
-		
-		final UIEntity applyButton = new UIEntity();
-		applyButton.add(new UIButton("Apply"));
-		applyButton.setBounds(100, 20);
-		applyButton.add(new UIClickable(e -> {
-			this.entity.write(compound);
-			GuiSyncNetwork.sendToPosServer(compound, pos);
-		}));
-		
-		this.entity.add(applyButton);
+		this.entity.add(GuiElements.createPageSelect(vbox));
+
+		this.entity.add(new UIBox(UIBox.VBoxMode.INSTANCE, 1));
 		this.entity.read(compound);
 	}
 

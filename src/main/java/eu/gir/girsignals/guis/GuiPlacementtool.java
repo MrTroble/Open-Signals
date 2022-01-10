@@ -17,10 +17,10 @@ import eu.gir.girsignals.guis.guilib.DrawUtil;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
+import eu.gir.girsignals.guis.guilib.entitys.UIBox;
 import eu.gir.girsignals.guis.guilib.entitys.UICheckBox;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
-import eu.gir.girsignals.guis.guilib.entitys.UIVBox;
 import eu.gir.girsignals.items.Placementtool;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockModelShapes;
@@ -77,9 +77,10 @@ public class GuiPlacementtool extends GuiBase {
 
 	private void init() {
 		initList();
-		final UIVBox vbox = new UIVBox(5);
+		final UIBox vbox = new UIBox(UIBox.VBoxMode.INSTANCE, 5);
 		list.add(vbox);
-		list.setInheritBounds(true);
+		list.setInheritHeight(true);
+		list.setInheritWidth(true);
 		final UIEntity entity = GuiElements.createEnumElement(tool, input -> {
 			currentSelectedBlock = tool.getObjFromID(input);
 			final ExtendedBlockState bsc = (ExtendedBlockState) currentSelectedBlock.getBlockState();
@@ -91,8 +92,7 @@ public class GuiPlacementtool extends GuiBase {
 		});
 		this.entity.add(entity);
 		this.entity.add(list);
-		this.entity.add(new UIVBox(5));
-
+		this.entity.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
 		this.entity.add(GuiElements.createPageSelect(vbox));
 	}
 
@@ -133,7 +133,10 @@ public class GuiPlacementtool extends GuiBase {
 	public void initGui() {
 		animationState = 180.0f;
 		super.initGui();
+		this.entity.setWidth(this.xSize - 140);
 		applyModelChanges();
+		this.list.setWidth(this.entity.getWidth());
+		this.entity.update();
 	}
 
 	@Override
