@@ -1,5 +1,9 @@
 # Changelog
 
+## [Fix] 01.10.2022 - 1
+
+* Fixed signal turning
+
 ## [Addition] 12.22.2021 - 1
 
 * Added more HV and KS signal shields
