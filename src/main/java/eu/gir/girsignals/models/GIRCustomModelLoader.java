@@ -307,6 +307,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 						"girsignals:blocks/zs3/" + zs3.name());
 				cm.register("ks/ks_zs2", with(SignalKS.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
 						"girsignals:blocks/zs3/" + zs3.name());
+				cm.register("ks/ks_zs2v", with(SignalKS.ZS2V, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
+						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			for (ZS32 zs3 : ZS32.values()) {
 				if (ZS32.OFF == zs3)
@@ -490,6 +492,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("hl/hl_mast3", ebs -> true, 3);
 			for (ZS32 zs3 : ZS32.values()) {
 				cm.register("hl/hl_zs2", with(SignalHL.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
+						"girsignals:blocks/zs3/" + zs3.name());
+				cm.register("hl/hl_zs2v", with(SignalHL.ZS2V, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
 						"girsignals:blocks/zs3/" + zs3.name());
 			}
 			for (ZS32 zs3 : ZS32.values()) {
