@@ -38,6 +38,7 @@ import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -209,8 +210,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 	@Override
 	public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY,
 			float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-		int x = Math.abs((int) (Math.abs(placer.rotationYaw) / 22.5f)) % 16;
-		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[x]);
+		final int index = 15 - (MathHelper.floor((double) (placer.getRotationYawHead() * 16.0F / 360.0F) - 0.5D) & 15);
+		return getDefaultState().withProperty(ANGEL, SignalAngel.values()[index]);
 	}
 
 	@Override
@@ -404,9 +405,11 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 	public void updateConfigValues() {
 		setLightLevel(GIRSignalsConfig.signalLightValue / 15.0f);
 	}
-	
-	public static <T extends Comparable<T>> Predicate<Set<Entry<SEProperty<?>, Object>>> check(SEProperty<T> property, T type) {
-	    return t -> t.stream().noneMatch(e -> e.getKey().equals(property)) || t.stream().anyMatch((e -> e.getKey().equals(property) && e.getValue().equals(type)));
+
+	public static <T extends Comparable<T>> Predicate<Set<Entry<SEProperty<?>, Object>>> check(SEProperty<T> property,
+			T type) {
+		return t -> t.stream().noneMatch(e -> e.getKey().equals(property))
+				|| t.stream().anyMatch((e -> e.getKey().equals(property) && e.getValue().equals(type)));
 	}
 
 }
