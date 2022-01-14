@@ -1,5 +1,11 @@
 # Changelog
 
+## [Addition/Fix] 01.15.2022 - 1
+* Fixed missing Ne2 shield for H/V signals
+* Added SH status light
+* Added Ra11b shunting signal
+* Added Zs2v for HL and KS signals
+
 ## [Fix] 01.10.2022 - 1
 
 * Fixed signal turning
