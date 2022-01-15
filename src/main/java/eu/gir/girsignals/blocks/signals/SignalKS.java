@@ -28,6 +28,7 @@ public class SignalKS extends Signal {
 	public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant", false, ChangeableStage.GUISTAGE);
 	public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false, ChangeableStage.GUISTAGE);
 	public static final SEProperty<ZS32> ZS2 = SEProperty.of("zs2", ZS32.OFF);
+	public static final SEProperty<ZS32> ZS2V = SEProperty.of("zs2v", ZS32.OFF);
 	public static final SEProperty<ZS32> ZS3 = SEProperty.of("zs3", ZS32.OFF);
 	public static final SEProperty<ZS32> ZS3V = SEProperty.of("zs3v", ZS32.OFF);
 	public static final SEProperty<ZS32> ZS3_PLATE = SEProperty.of("zs3plate", ZS32.OFF, ChangeableStage.GUISTAGE);

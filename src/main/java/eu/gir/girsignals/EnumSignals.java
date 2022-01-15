@@ -86,7 +86,7 @@ public class EnumSignals {
 	}
 
 	public enum SH_LIGHT implements Offable<SH_LIGHT> {
-		OFF, SH0, SH1;
+		OFF, SH0, SH1, STATUS_LIGHT;
 	}
 
 	public enum TRAMTYPE implements DefaultName<TRAMTYPE> {
