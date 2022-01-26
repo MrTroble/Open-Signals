@@ -1,6 +1,5 @@
 package eu.gir.girsignals.guis;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -8,26 +7,23 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.IntConsumer;
 
-import org.lwjgl.opengl.GL11;
-
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.guilib.DrawUtil;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
+import eu.gir.girsignals.guis.guilib.entitys.UIBlockRender;
 import eu.gir.girsignals.guis.guilib.entitys.UIBox;
 import eu.gir.girsignals.guis.guilib.entitys.UICheckBox;
+import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
+import eu.gir.girsignals.guis.guilib.entitys.UIIndependentTranslate;
+import eu.gir.girsignals.guis.guilib.entitys.UIRotate;
+import eu.gir.girsignals.guis.guilib.entitys.UIScale;
+import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
 import eu.gir.girsignals.items.Placementtool;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockModelShapes;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -40,16 +36,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GuiPlacementtool extends GuiBase {
 
-	private BlockModelShapes manager;
 	private Signal currentSelectedBlock;
-	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
 	private Placementtool tool;
-	private float animationState = 0;
-	private int oldMouse = 0;
-	private boolean dragging = false;
-	private UIEntity list = new UIEntity();
-	private final HashMap<String, IUnlistedProperty<?>> lookup = new HashMap<String, IUnlistedProperty<?>>();
+	private final UIEntity list = new UIEntity();
+	private final UIBlockRender blockRender = new UIBlockRender();
 
+	private final HashMap<String, IUnlistedProperty<?>> lookup = new HashMap<String, IUnlistedProperty<?>>();
+	
 	public GuiPlacementtool(ItemStack stack) {
 		super(I18n.format("property.signal.name"));
 		this.compound = stack.getTagCompound();
@@ -60,10 +53,8 @@ public class GuiPlacementtool extends GuiBase {
 				? this.compound.getInteger(Placementtool.BLOCK_TYPE_ID)
 				: tool.getObjFromID(0).getID();
 		currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
-		manager = Minecraft.getMinecraft().getBlockRendererDispatcher().getBlockModelShapes();
 
 		init();
-		this.entity.read(this.compound);
 	}
 
 	private void initList() {
@@ -73,46 +64,56 @@ public class GuiPlacementtool extends GuiBase {
 			final SEProperty<?> prop = SEProperty.cst(property);
 			of(prop, inp -> applyModelChanges());
 		}
+		this.list.read(compound);
 	}
 
 	private void init() {
 		initList();
 		final UIBox vbox = new UIBox(UIBox.VBoxMode.INSTANCE, 5);
-		list.add(vbox);
-		list.setInheritHeight(true);
-		list.setInheritWidth(true);
-		final UIEntity entity = GuiElements.createEnumElement(tool, input -> {
+		this.list.add(vbox);
+		this.list.setInheritHeight(true);
+		this.list.setInheritWidth(true);
+		
+		final UIEntity selectBlockEntity = GuiElements.createEnumElement(tool, input -> {
 			currentSelectedBlock = tool.getObjFromID(input);
 			final ExtendedBlockState bsc = (ExtendedBlockState) currentSelectedBlock.getBlockState();
 			lookup.clear();
 			bsc.getUnlistedProperties().forEach(p -> lookup.put(p.getName(), p));
-			list.clearChildren();
+			this.list.clearChildren();
 			initList();
 			applyModelChanges();
+			this.entity.update();
 		});
-		this.entity.add(entity);
-		this.entity.add(list);
-		this.entity.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
-		this.entity.add(GuiElements.createPageSelect(vbox));
-	}
+		
+		final UIEntity leftSide = new UIEntity();
+		leftSide.setInheritHeight(true);
+		leftSide.setInheritWidth(true);
+		leftSide.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
+		
+		leftSide.add(selectBlockEntity);
+		leftSide.add(list);
+		leftSide.add(GuiElements.createPageSelect(vbox));
+		
+		final UIEntity blockRenderEntity = new UIEntity();
+		blockRenderEntity.setInheritHeight(true);
+		blockRenderEntity.setWidth(60);
 
-	@Override
-	public void draw(int mouseX, int mouseY, float partialTicks) {
-		if (dragging) {
-			animationState += mouseX - oldMouse;
-			oldMouse = mouseX;
-		}
-		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
+		final UIRotate rotation = new UIRotate();
+		blockRenderEntity.add(new UIDrag((x, y) -> rotation.setRotateY(rotation.getRotateY() + x)));
+		
+		blockRenderEntity.add(new UIScissor());
+		blockRenderEntity.add(new UIIndependentTranslate(35, 150, 40));
+		blockRenderEntity.add(rotation);
+	    blockRenderEntity.add(new UIIndependentTranslate(-0.5, -3.5, -0.5));
+		blockRenderEntity.add(new UIScale(20, -20, 20));
+		blockRenderEntity.add(blockRender);
+		
+		this.entity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 5));
 
-		GlStateManager.enableRescaleNormal();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(this.guiLeft + this.xSize - 70, this.guiTop + this.ySize / 2, 100.0f);
-		GlStateManager.rotate(animationState, 0, 1, 0);
-		GlStateManager.scale(22.0F, -22.0F, 22.0F);
-		GlStateManager.translate(-0.5f, -3.5f, -0.5f);
-		DrawUtil.draw(model.get());
-		GlStateManager.popMatrix();
-		GlStateManager.disableRescaleNormal();
+		this.entity.add(leftSide);
+		this.entity.add(blockRenderEntity);
+
+		this.entity.read(compound);
 	}
 
 	public void of(SEProperty<?> property, IntConsumer consumer) {
@@ -131,18 +132,14 @@ public class GuiPlacementtool extends GuiBase {
 
 	@Override
 	public void initGui() {
-		animationState = 180.0f;
 		super.initGui();
-		this.entity.setWidth(this.xSize - 140);
 		applyModelChanges();
-		this.list.setWidth(this.entity.getWidth());
-		this.entity.update();
 	}
 
 	@Override
 	public void onGuiClosed() {
 		compound.setInteger(Placementtool.BLOCK_TYPE_ID, currentSelectedBlock.getID());
-		this.entity.write(compound);
+		super.onGuiClosed();
 		GuiSyncNetwork.sendToItemServer(compound);
 	}
 
@@ -176,25 +173,7 @@ public class GuiPlacementtool extends GuiBase {
 				ebs = ebs.withProperty(property, property.getDefault());
 			}
 		}
-
-		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-		DrawUtil.addToBuffer(model.get(), manager, ebs);
-		model.get().finishDrawing();
+		
+		blockRender.setBlockState(ebs);
 	}
-
-	@Override
-	protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
-		super.mouseClicked(mouseX, mouseY, mouseButton);
-		if (mouseButton == 0) {
-			this.dragging = true;
-			oldMouse = mouseX;
-		}
-	}
-
-	@Override
-	protected void mouseReleased(int mouseX, int mouseY, int state) {
-		super.mouseReleased(mouseX, mouseY, state);
-		dragging = false;
-	}
-
 }

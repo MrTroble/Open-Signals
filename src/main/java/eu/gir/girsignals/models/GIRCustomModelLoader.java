@@ -139,7 +139,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 	}
 
 	@Override
-	public void onResourceManagerReload(IResourceManager resourceManager) {
+	public void onResourceManagerReload(IResourceManager resourceManager) {		
 		registeredModels.clear();
 		registeredModels.put("hvsignal", cm -> {
 			cm.register("hv/hv_base", ebs -> true, 0);
