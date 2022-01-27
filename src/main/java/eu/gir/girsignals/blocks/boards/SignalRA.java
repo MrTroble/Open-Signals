@@ -10,18 +10,15 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 
 public class SignalRA extends Signal {
-
+	
 	public SignalRA() {
 		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0).build());
 	}
-
+	
 	public static final SEProperty<RA> RATYPE = SEProperty.of("ratype", RA.RA10, ChangeableStage.GUISTAGE);
-	public static final SEProperty<Boolean> RALIGHT = SEProperty.of("ralight", false, ChangeableStage.APISTAGE, true,
-			t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(RATYPE) && e.getValue().equals(RA.RA11A))));
-	public static final SEProperty<RA_LIGHT> RALIGHTSIGNAL = SEProperty.of("ralightsignal", RA_LIGHT.OFF,
-			ChangeableStage.APISTAGE_NONE_CONFIG, true,
-			t -> t.entrySet().stream().anyMatch((e -> e.getKey().equals(RATYPE) && e.getValue().equals(RA.RA6_9))));
-
+	public static final SEProperty<Boolean> RALIGHT = SEProperty.of("ralight", false, ChangeableStage.APISTAGE, true, check(RATYPE, RA.RA11A).or(check(RATYPE, RA.RA11B)));
+	public static final SEProperty<RA_LIGHT> RALIGHTSIGNAL = SEProperty.of("ralightsignal", RA_LIGHT.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(RATYPE, RA.RA6_9));
+	
 	@Override
 	public int getHeight(final HashMap<SEProperty<?>, Object> map) {
 		final RA ra = (RA) map.get(RATYPE);
@@ -39,5 +36,5 @@ public class SignalRA extends Signal {
 			return super.getHeight(map);
 		}
 	}
-
+	
 }

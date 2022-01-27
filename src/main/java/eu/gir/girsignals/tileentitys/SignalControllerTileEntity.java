@@ -34,9 +34,8 @@ import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class SignalControllerTileEntity extends TileEntity
-		implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile {
-
+public class SignalControllerTileEntity extends TileEntity implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile {
+	
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
@@ -48,24 +47,24 @@ public class SignalControllerTileEntity extends TileEntity
 	public int indexUsed = 0;
 	public int lastMuxState = 0;
 	private NBTTagCompound compound = new NBTTagCompound();
-
+	
 	public static final String UPDATE_FLAG = "updateflag";
-
+	
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
 	private static final String ID_Z = "zLinkedPos";
-
+	
 	public SignalControllerTileEntity() {
 		Arrays.fill(facingRedstoneModes, 0xFF);
 	}
-
+	
 	public static BlockPos readBlockPosFromNBT(NBTTagCompound compound) {
 		if (compound != null && compound.hasKey(ID_X) && compound.hasKey(ID_Y) && compound.hasKey(ID_Z)) {
 			return new BlockPos(compound.getInteger(ID_X), compound.getInteger(ID_Y), compound.getInteger(ID_Z));
 		}
 		return null;
 	}
-
+	
 	public static void writeBlockPosToNBT(BlockPos pos, NBTTagCompound compound) {
 		if (pos != null && compound != null) {
 			compound.setInteger(ID_X, pos.getX());
@@ -73,7 +72,7 @@ public class SignalControllerTileEntity extends TileEntity
 			compound.setInteger(ID_Z, pos.getZ());
 		}
 	}
-
+	
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
@@ -81,57 +80,55 @@ public class SignalControllerTileEntity extends TileEntity
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		writeBlockPosToNBT(linkedSignalPosition, compound);
 		super.writeToNBT(compound);
 		return compound;
 	}
-
+	
 	@Override
 	public SPacketUpdateTileEntity getUpdatePacket() {
 		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
 	}
-
+	
 	@Override
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 		this.readFromNBT(pkt.getNbtCompound());
 		if (hasLink())
 			onLink();
 	}
-
+	
 	@Override
 	public NBTTagCompound getUpdateTag() {
 		return writeToNBT(new NBTTagCompound());
 	}
-
+	
 	public void onLink() {
 		new Thread(() -> {
 			while (!world.isBlockLoaded(pos))
 				continue;
 			loadChunkAndGetTile((sigtile, ch) -> {
 				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
-
+				
 				HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
 				sigtile.accumulate((bs, prop, obj) -> {
 					if (prop instanceof SEProperty && obj != null) {
 						SEProperty<?> p = ((SEProperty<?>) prop);
-						if (p.isChangabelAtStage(ChangeableStage.APISTAGE)
-								|| p.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+						if (p.isChangabelAtStage(ChangeableStage.APISTAGE) || p.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
 							supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop));
 					}
 					return null;
 				}, null);
-				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue)
-						.toArray();
+				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 				tableOfSupportedSignalTypes = supportedSignaleStates;
 				signalTypeCache = ((Signal) ch.getBlockState(linkedSignalPosition).getBlock()).getID();
 				signame = sigtile.getName();
 			});
 		}).start();
 	}
-
+	
 	@Override
 	public void onLoad() {
 		if (linkedSignalPosition != null) {
@@ -140,13 +137,13 @@ public class SignalControllerTileEntity extends TileEntity
 			this.world.notifyBlockUpdate(pos, state, state, 3);
 		}
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] hasLink(Context context, Arguments args) {
 		return new Object[] { hasLink() };
 	}
-
+	
 	public boolean loadChunkAndGetTile(BiConsumer<SignalTileEnity, Chunk> consumer) {
 		if (linkedSignalPosition == null)
 			return false;
@@ -171,7 +168,7 @@ public class SignalControllerTileEntity extends TileEntity
 				if (flag2) {
 					consumer.accept((SignalTileEnity) entity, ch);
 				}
-
+				
 				if (flag) {
 					if (world.isRemote) {
 						ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
@@ -192,30 +189,30 @@ public class SignalControllerTileEntity extends TileEntity
 		}
 		return false;
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSupportedSignalTypes(Context context, Arguments args) {
 		return new Object[] { tableOfSupportedSignalTypes };
 	}
-
+	
 	public int[] getSupportedSignalTypesImpl() {
 		return listOfSupportedIndicies;
 	}
-
+	
 	public static boolean find(int[] arr, int i) {
 		for (int x : arr)
 			if (x == i)
 				return true;
 		return false;
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] changeSignal(Context context, Arguments args) {
 		return new Object[] { changeSignalImpl(args.checkInteger(0), args.checkInteger(1)) };
 	}
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean changeSignalImpl(int type, int newSignal) {
 		if (!find(getSupportedSignalTypesImpl(), type))
@@ -234,23 +231,23 @@ public class SignalControllerTileEntity extends TileEntity
 		});
 		return rtc.get();
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSignalType(Context context, Arguments args) {
 		return new Object[] { Signal.SIGNALLIST.get(getSignalTypeImpl()).getSignalTypeName() };
 	}
-
+	
 	public int getSignalTypeImpl() {
 		return signalTypeCache;
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSignalState(Context context, Arguments args) {
 		return new Object[] { getSignalStateImpl(args.checkInteger(0)) };
 	}
-
+	
 	@SuppressWarnings("rawtypes")
 	public int getSignalStateImpl(int type) {
 		if (!find(getSupportedSignalTypesImpl(), type))
@@ -267,80 +264,79 @@ public class SignalControllerTileEntity extends TileEntity
 			return SEProperty.getIDFromObj(bool.get());
 		return -1;
 	}
-
+	
 	public BlockPos getLinkedPosition() {
 		return linkedSignalPosition;
 	}
-
+	
 	@Override
 	public String getComponentName() {
 		return "signalcontroller";
 	}
-
+	
 	@Override
 	public String getName() {
 		return this.signame;
 	}
-
+	
 	@Override
 	public boolean hasCustomName() {
 		return this.signame != null;
 	}
-
+	
 	public void setFacingData(final EnumFacing face, final int data) {
 		facingRedstoneModes[face.ordinal()] = data;
 	}
-
+	
 	public int[] getFacingData() {
 		return facingRedstoneModes;
 	}
-
+	
 	public static int[] unpack(final int x) {
-		return new int[] { (x & 0b00000000000000000000000000001111), ((x & 0b00000000000000000000001111110000) >> 4),
-				((x & 0b00000000000000001111110000000000) >> 10) };
+		return new int[] { (x & 0b00000000000000000000000000001111), ((x & 0b00000000000000000000001111110000) >> 4), ((x & 0b00000000000000001111110000000000) >> 10) };
 	}
-
-//	public void redstoneUpdate(final EnumFacing face, final boolean state) {
-//		if (listOfSupportedIndicies == null)
-//			return;
-//		if (rsMode == EnumRedstoneMode.SINGLE) {
-//			final int id = facingRedstoneModes[face.ordinal()];
-//			if (id < 0)
-//				return;
-//			final int[] unpacked = unpack(id);
-//			final int signalTypeId = unpacked[0];
-//			if (signalTypeId < listOfSupportedIndicies.length) {
-//				final int signalData = unpacked[1];
-//				final int signalDataOff = unpacked[2];
-//				final int sigType = listOfSupportedIndicies[signalTypeId];
-//				this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
-//			}
-//		} else if (rsMode == EnumRedstoneMode.MUX) {
-//			final int id = facingRedstoneModes[face.ordinal()];
-//			if (id < 0 || id >= EnumMuxMode.values().length)
-//				return;
-//			final EnumMuxMode muxmode = EnumMuxMode.values()[id];
-//			if (muxmode == EnumMuxMode.MUX_CONTROL) {
-//				final boolean lastState = (lastMuxState & 1) != 0;
-//				if (lastState == state)
-//					return;
-//				lastMuxState = state ? 1 + (lastMuxState & 2) : lastMuxState & 2;
-//				nextSignal++;
-//				if (nextSignal >= listOfSupportedIndicies.length)
-//					nextSignal = 0;
-//			} else if (muxmode == EnumMuxMode.SIGNAL_CONTROL) {
-//				final boolean lastState = (lastMuxState & 2) != 0;
-//				if (lastState == state)
-//					return;
-//				lastMuxState = state ? 2 + (lastMuxState & 1) : lastMuxState & 1;
-//				final int sigType = listOfSupportedIndicies[nextSignal];
-//				final int newSignal = this.getSignalStateImpl(sigType) + 1;
-//				if (!this.changeSignalImpl(sigType, newSignal))
-//					this.changeSignalImpl(sigType, 0);
-//			}
-//		}
-//	}
-//
+	
+	// public void redstoneUpdate(final EnumFacing face, final boolean state) {
+	// if (listOfSupportedIndicies == null)
+	// return;
+	// if (rsMode == EnumRedstoneMode.SINGLE) {
+	// final int id = facingRedstoneModes[face.ordinal()];
+	// if (id < 0)
+	// return;
+	// final int[] unpacked = unpack(id);
+	// final int signalTypeId = unpacked[0];
+	// if (signalTypeId < listOfSupportedIndicies.length) {
+	// final int signalData = unpacked[1];
+	// final int signalDataOff = unpacked[2];
+	// final int sigType = listOfSupportedIndicies[signalTypeId];
+	// this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
+	// }
+	// } else if (rsMode == EnumRedstoneMode.MUX) {
+	// final int id = facingRedstoneModes[face.ordinal()];
+	// if (id < 0 || id >= EnumMuxMode.values().length)
+	// return;
+	// final EnumMuxMode muxmode = EnumMuxMode.values()[id];
+	// if (muxmode == EnumMuxMode.MUX_CONTROL) {
+	// final boolean lastState = (lastMuxState & 1) != 0;
+	// if (lastState == state)
+	// return;
+	// lastMuxState = state ? 1 + (lastMuxState & 2) : lastMuxState & 2;
+	// nextSignal++;
+	// if (nextSignal >= listOfSupportedIndicies.length)
+	// nextSignal = 0;
+	// } else if (muxmode == EnumMuxMode.SIGNAL_CONTROL) {
+	// final boolean lastState = (lastMuxState & 2) != 0;
+	// if (lastState == state)
+	// return;
+	// lastMuxState = state ? 2 + (lastMuxState & 1) : lastMuxState & 1;
+	// final int sigType = listOfSupportedIndicies[nextSignal];
+	// final int newSignal = this.getSignalStateImpl(sigType) + 1;
+	// if (!this.changeSignalImpl(sigType, newSignal))
+	// this.changeSignalImpl(sigType, 0);
+	// }
+	// }
+	// }
+	//
 	@Override
 	public boolean hasLink() {
 		if (linkedSignalPosition == null)
@@ -352,7 +348,7 @@ public class SignalControllerTileEntity extends TileEntity
 			unlink();
 		return false;
 	}
-
+	
 	@Override
 	public boolean link(final BlockPos pos) {
 		final IBlockState state = world.getBlockState(pos);
@@ -364,7 +360,7 @@ public class SignalControllerTileEntity extends TileEntity
 		}
 		return false;
 	}
-
+	
 	@Override
 	public boolean unlink() {
 		linkedSignalPosition = null;
@@ -372,7 +368,7 @@ public class SignalControllerTileEntity extends TileEntity
 		listOfSupportedIndicies = null;
 		return true;
 	}
-
+	
 	@Override
 	public void updateTag(NBTTagCompound compound) {
 		if (compound == null)
@@ -386,7 +382,7 @@ public class SignalControllerTileEntity extends TileEntity
 		});
 		this.compound = compound;
 	}
-
+	
 	@Override
 	public NBTTagCompound getTag() {
 		return this.compound;

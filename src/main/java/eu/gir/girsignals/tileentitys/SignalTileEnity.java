@@ -24,16 +24,16 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class SignalTileEnity extends TileEntity implements IWorldNameable {
-
+	
 	private HashMap<SEProperty<?>, Object> map = new HashMap<>();
-
+	
 	public static final String PROPERTIES = "properties";
 	public static final String CUSTOMNAME = "customname";
 	public static final String BLOCKID = "blockid";
-
+	
 	private String formatCustomName = null;
 	private int blockID = -1;
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = new NBTTagCompound();
@@ -45,9 +45,9 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		super.writeToNBT(compound);
 		return compound;
 	}
-
+	
 	private NBTTagCompound __tmp = null;
-
+	
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
@@ -59,19 +59,18 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 			read(comp);
 		}
 	}
-
+	
 	private void read(NBTTagCompound comp) {
 		ImmutableSet.of().parallelStream();
-		((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties().stream()
-				.forEach(prop -> {
-					SEProperty<?> sep = SEProperty.cst(prop);
-					sep.readFromNBT(comp).toJavaUtil().ifPresent(obj -> map.put(sep, obj));
-				});
+		((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties().stream().forEach(prop -> {
+			SEProperty<?> sep = SEProperty.cst(prop);
+			sep.readFromNBT(comp).toJavaUtil().ifPresent(obj -> map.put(sep, obj));
+		});
 		if (comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));
 		setBlockID();
 	}
-
+	
 	@Override
 	public void onLoad() {
 		if (__tmp != null) {
@@ -83,68 +82,67 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 			__tmp = null;
 		}
 	}
-
+	
 	@Override
 	public SPacketUpdateTileEntity getUpdatePacket() {
 		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
 	}
-
+	
 	@Override
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 		this.readFromNBT(pkt.getNbtCompound());
 		world.markBlockRangeForRenderUpdate(pos, pos);
 	}
-
+	
 	@Override
 	public NBTTagCompound getUpdateTag() {
 		return writeToNBT(new NBTTagCompound());
 	}
-
+	
 	public <T extends Comparable<T>> void setProperty(SEProperty<T> prop, T opt) {
 		map.put(prop, opt);
 		this.markDirty();
 	}
-
+	
 	public HashMap<SEProperty<?>, Object> getProperties() {
 		return map;
 	}
-
+	
 	public interface BiAccumulater<T, U, V> {
-
+		
 		T accept(T t, U u, V v);
-
+		
 	}
-
+	
 	@SuppressWarnings("rawtypes")
-	public IExtendedBlockState accumulate(BiAccumulater<IExtendedBlockState, IUnlistedProperty, Object> bic,
-			IExtendedBlockState bs) {
+	public IExtendedBlockState accumulate(BiAccumulater<IExtendedBlockState, IUnlistedProperty, Object> bic, IExtendedBlockState bs) {
 		for (Map.Entry<SEProperty<?>, Object> entry : map.entrySet()) {
 			bs = bic.accept(bs, entry.getKey(), entry.getValue());
 		}
 		return bs;
 	}
-
+	
 	public Optional<?> getProperty(SEProperty<?> prop) {
 		if (map.containsKey(prop))
 			return Optional.of(map.get(prop));
 		return Optional.empty();
 	}
-
+	
 	@Override
 	public String getName() {
 		return formatCustomName;
 	}
-
+	
 	@Override
 	public boolean hasCustomName() {
 		return formatCustomName != null && getSignal().canHaveCustomname(this.map);
 	}
-
+	
 	@Override
 	public ITextComponent getDisplayName() {
 		return new TextComponentString(String.format(formatCustomName));
 	}
-
+	
 	public void setCustomName(String str) {
 		if (!getSignal().canHaveCustomname(this.map))
 			return;
@@ -156,22 +154,22 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		}
 		this.markDirty();
 		world.markBlockRangeForRenderUpdate(pos, pos);
-
+		
 	}
-
+	
 	@SideOnly(Side.CLIENT)
 	public void renderOverlay(final double x, final double y, final double z, final FontRenderer font) {
 		getSignal().renderOverlay(x, y, z, this, font);
 	}
-
+	
 	public void setBlockID() {
 		blockID = ((Signal) world.getBlockState(pos).getBlock()).getID();
 	}
-
+	
 	public Signal getSignal() {
 		return (Signal) super.getBlockType();
 	}
-
+	
 	public int getBlockID() {
 		return blockID;
 	}

@@ -27,13 +27,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiSignalController extends GuiBase {
-
+	
 	private final BlockPos pos;
 	private BlockModelShapes manager;
 	private ThreadLocal<BufferBuilder> model = ThreadLocal.withInitial(() -> new BufferBuilder(500));
 	public ContainerSignalController sigController;
 	private UIEntity list;
-
+	
 	public GuiSignalController(final SignalControllerTileEntity entity) {
 		super("TestTitle");
 		this.sigController = new ContainerSignalController(entity);
@@ -41,7 +41,7 @@ public class GuiSignalController extends GuiBase {
 		compound = entity.getTag();
 		init();
 	}
-
+	
 	private void initMode(EnumMode mode, Signal signal) {
 		switch (mode) {
 		case MANUELL:
@@ -55,16 +55,16 @@ public class GuiSignalController extends GuiBase {
 			break;
 		}
 	}
-
+	
 	private void init() {
 		if (sigController.signalType < 0 || !sigController.hasLink) {
 			buttonList.clear();
 			return;
 		}
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-
+		
 		list = new UIEntity();
-
+		
 		final EnumIntegerable<EnumMode> enumMode = new EnumIntegerable<EnumMode>(EnumMode.class);
 		final UIEntity rsMode = GuiElements.createEnumElement(enumMode, in -> {
 			list.clearChildren();
@@ -79,18 +79,18 @@ public class GuiSignalController extends GuiBase {
 		list.add(vbox);
 		this.entity.add(list);
 		this.entity.add(GuiElements.createPageSelect(vbox));
-
+		
 		this.entity.add(new UIBox(UIBox.VBoxMode.INSTANCE, 1));
 		this.entity.read(compound);
 	}
-
+	
 	private HashMap<SEProperty<?>, Object> createMap(Signal signal) {
 		final HashMap<SEProperty<?>, Object> map = Maps.newHashMap();
-//		for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
-//			final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
-//			map.put(prop, prop.getObjFromID(entry.getValue()));
-//		}
-
+		// for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
+		// final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
+		// map.put(prop, prop.getObjFromID(entry.getValue()));
+		// }
+		
 		for (int i = 0; i < sigController.supportedSigTypes.length; i++) {
 			final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
 			int sigState = sigController.supportedSigStates[i];
@@ -100,45 +100,44 @@ public class GuiSignalController extends GuiBase {
 		}
 		return map;
 	}
-
+	
 	private void addManuellMode(final Signal signal) {
 		HashMap<SEProperty<?>, Object> map = createMap(signal);
 		for (SEProperty<?> entry : map.keySet()) {
-			if (entry.test(map) && (entry.isChangabelAtStage(ChangeableStage.APISTAGE)
-					|| entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))) {
-				final UIEntity guiEnum = GuiElements.createEnumElement(entry, e -> {});
+			if (entry.test(map.entrySet()) && (entry.isChangabelAtStage(ChangeableStage.APISTAGE) || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))) {
+				final UIEntity guiEnum = GuiElements.createEnumElement(entry, e -> {
+				});
 				list.add(guiEnum);
 			}
 		}
 	}
-
+	
 	@Override
 	public void initGui() {
 		this.mc.player.openContainer = this.sigController;
 		this.manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
 		super.initGui();
 	}
-
+	
 	@Override
 	public void onGuiClosed() {
 		entity.write(compound);
 		GuiSyncNetwork.sendToPosServer(compound, pos);
 	}
-
+	
 	@Override
 	public void draw(int mouseX, int mouseY, float partialTicks) {
 		if (!sigController.hasLink) {
 			final String s = "No Signal connected!";
 			final int width = mc.fontRenderer.getStringWidth(s);
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(this.guiLeft + (this.xSize - width * 2) / 2,
-					this.guiTop + (this.ySize - mc.fontRenderer.FONT_HEIGHT) / 2 - 20, 0);
+			GlStateManager.translate(this.guiLeft + (this.xSize - width * 2) / 2, this.guiTop + (this.ySize - mc.fontRenderer.FONT_HEIGHT) / 2 - 20, 0);
 			GlStateManager.scale(2, 2, 2);
 			mc.fontRenderer.drawStringWithShadow(s, 0, 0, 0xFFFF0000);
 			GlStateManager.popMatrix();
 			return;
 		}
-
+		
 		mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		GlStateManager.enableRescaleNormal();
 		GlStateManager.pushMatrix();
@@ -150,37 +149,36 @@ public class GuiSignalController extends GuiBase {
 		GlStateManager.popMatrix();
 		GlStateManager.disableRescaleNormal();
 	}
-
+	
 	@Override
 	public String getTitle() {
 		if (sigController.signalType < 0 || !sigController.hasLink)
 			return "";
 		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-		return I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name")
-				+ (sigController.entity.hasCustomName() ? " - " + sigController.entity.getName() : "");
+		return I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name") + (sigController.entity.hasCustomName() ? " - " + sigController.entity.getName() : "");
 	}
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public void updateDraw() {
-//		if (sigController.supportedSigStates == null || !sigController.hasLink)
-//			return;
-////		final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-////		IExtendedBlockState ebs = (IExtendedBlockState) signal.getDefaultState();
-////
-////		for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
-////			SEProperty prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
-////			ebs = ebs.withProperty(prop, prop.getObjFromID(entry.getValue()));
-////		}
-////
-////		for (int i = 0; i < sigController.supportedSigStates.length; i++) {
-////			int sigState = sigController.supportedSigStates[i];
-////			SEProperty prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
-////			if (sigState < 0 || sigState >= prop.count())
-////				continue;
-////			ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
-////		}
-//		model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-//		DrawUtil.addToBuffer(model.get(), manager, ebs);
-//		model.get().finishDrawing();
+		// if (sigController.supportedSigStates == null || !sigController.hasLink)
+		// return;
+		//// final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
+		//// IExtendedBlockState ebs = (IExtendedBlockState) signal.getDefaultState();
+		////
+		//// for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
+		//// SEProperty prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
+		//// ebs = ebs.withProperty(prop, prop.getObjFromID(entry.getValue()));
+		//// }
+		////
+		//// for (int i = 0; i < sigController.supportedSigStates.length; i++) {
+		//// int sigState = sigController.supportedSigStates[i];
+		//// SEProperty prop = SEProperty.cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
+		//// if (sigState < 0 || sigState >= prop.count())
+		//// continue;
+		//// ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
+		//// }
+		// model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
+		// DrawUtil.addToBuffer(model.get(), manager, ebs);
+		// model.get().finishDrawing();
 	}
 }

@@ -1,9 +1,27 @@
 # Changelog
 
+## [Addition/Fix] 01.15.2022 - 1
+* Fixed missing Ne2 shield for H/V signals
+* Added SH status light
+* Added Ra11b shunting signal
+* Added Zs2v for HL and KS signals
+
+## [Fix] 01.10.2022 - 1
+
+* Fixed signal turning
+
+## [Addition] 12.22.2021 - 1
+
+* Added more HV and KS signal shields
+* Added more tram signals
+* Added post block
+
 ## [Addition] 11.25.2021 - 1
+
 * Added more numbers for station number
 
 ## [Addition] 10.30.2021 - 1
+
 * Added ZS plates for HV and KS signals
 
 ## [Fix] 9.22.2021 - 1

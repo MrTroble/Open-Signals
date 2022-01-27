@@ -11,7 +11,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ContainerSignalController extends Container {
-
+	
 	public final SignalControllerTileEntity entity;
 	protected int[] supportedSigTypes;
 	protected int[] supportedSigStates;
@@ -21,7 +21,7 @@ public class ContainerSignalController extends Container {
 	protected int[] facingRedstoneModes;
 	protected EnumFacing faceUsed = EnumFacing.DOWN;
 	protected int indexCurrentlyUsed = 0;
-
+	
 	public ContainerSignalController(final SignalControllerTileEntity entity) {
 		this.entity = entity;
 		this.supportedSigTypes = this.entity.getSupportedSignalTypesImpl();
@@ -35,22 +35,24 @@ public class ContainerSignalController extends Container {
 		this.supportedSigStates = new int[this.supportedSigTypes.length];
 		Arrays.fill(supportedSigStates, -1);
 	}
-
+	
 	@Override
 	public void addListener(IContainerListener listener) {
 		super.addListener(listener);
 	}
-
+	
 	@Override
-	public void detectAndSendChanges() {}
-
+	public void detectAndSendChanges() {
+	}
+	
 	@SideOnly(Side.CLIENT)
 	@Override
-	public void updateProgressBar(int id, int data) {}
-
+	public void updateProgressBar(int id, int data) {
+	}
+	
 	@Override
 	public boolean canInteractWith(EntityPlayer playerIn) {
 		return true;
 	}
-
+	
 }
