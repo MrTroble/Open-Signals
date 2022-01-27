@@ -25,7 +25,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.chunk.Chunk;
@@ -40,12 +39,6 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
 	private int signalTypeCache = -1;
-	private String signame = null;
-	private final int[] facingRedstoneModes = new int[EnumFacing.values().length];
-	public EnumFacing face = EnumFacing.DOWN;
-	public int nextSignal = 0;
-	public int indexUsed = 0;
-	public int lastMuxState = 0;
 	private NBTTagCompound compound = new NBTTagCompound();
 	
 	public static final String UPDATE_FLAG = "updateflag";
@@ -54,8 +47,9 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	private static final String ID_Y = "yLinkedPos";
 	private static final String ID_Z = "zLinkedPos";
 	
+	private static final String ID_COMP = "COMP";
+	
 	public SignalControllerTileEntity() {
-		Arrays.fill(facingRedstoneModes, 0xFF);
 	}
 	
 	public static BlockPos readBlockPosFromNBT(NBTTagCompound compound) {
@@ -76,6 +70,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
+		this.compound = compound.getCompoundTag(ID_COMP);
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
@@ -85,6 +80,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		writeBlockPosToNBT(linkedSignalPosition, compound);
 		super.writeToNBT(compound);
+		compound.setTag(ID_COMP, this.compound);
 		return compound;
 	}
 	
@@ -107,8 +103,6 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	
 	public void onLink() {
 		new Thread(() -> {
-			while (!world.isBlockLoaded(pos))
-				continue;
 			loadChunkAndGetTile((sigtile, ch) -> {
 				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
 				
@@ -124,7 +118,9 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 				tableOfSupportedSignalTypes = supportedSignaleStates;
 				signalTypeCache = ((Signal) ch.getBlockState(linkedSignalPosition).getBlock()).getID();
-				signame = sigtile.getName();
+				IBlockState nstate = this.world.getBlockState(pos);
+				this.markDirty();
+				this.world.notifyBlockUpdate(pos, nstate, nstate, 3);
 			});
 		}).start();
 	}
@@ -201,10 +197,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	}
 	
 	public static boolean find(int[] arr, int i) {
-		for (int x : arr)
-			if (x == i)
-				return true;
-		return false;
+		return Arrays.stream(arr).anyMatch(x -> i == x);
 	}
 	
 	@Callback
@@ -276,67 +269,14 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	
 	@Override
 	public String getName() {
-		return this.signame;
+		return ""; // TODO Replace with loading variant
 	}
 	
 	@Override
 	public boolean hasCustomName() {
-		return this.signame != null;
+		return false; // TODO Replace with loading variant
 	}
 	
-	public void setFacingData(final EnumFacing face, final int data) {
-		facingRedstoneModes[face.ordinal()] = data;
-	}
-	
-	public int[] getFacingData() {
-		return facingRedstoneModes;
-	}
-	
-	public static int[] unpack(final int x) {
-		return new int[] { (x & 0b00000000000000000000000000001111), ((x & 0b00000000000000000000001111110000) >> 4), ((x & 0b00000000000000001111110000000000) >> 10) };
-	}
-	
-	// public void redstoneUpdate(final EnumFacing face, final boolean state) {
-	// if (listOfSupportedIndicies == null)
-	// return;
-	// if (rsMode == EnumRedstoneMode.SINGLE) {
-	// final int id = facingRedstoneModes[face.ordinal()];
-	// if (id < 0)
-	// return;
-	// final int[] unpacked = unpack(id);
-	// final int signalTypeId = unpacked[0];
-	// if (signalTypeId < listOfSupportedIndicies.length) {
-	// final int signalData = unpacked[1];
-	// final int signalDataOff = unpacked[2];
-	// final int sigType = listOfSupportedIndicies[signalTypeId];
-	// this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
-	// }
-	// } else if (rsMode == EnumRedstoneMode.MUX) {
-	// final int id = facingRedstoneModes[face.ordinal()];
-	// if (id < 0 || id >= EnumMuxMode.values().length)
-	// return;
-	// final EnumMuxMode muxmode = EnumMuxMode.values()[id];
-	// if (muxmode == EnumMuxMode.MUX_CONTROL) {
-	// final boolean lastState = (lastMuxState & 1) != 0;
-	// if (lastState == state)
-	// return;
-	// lastMuxState = state ? 1 + (lastMuxState & 2) : lastMuxState & 2;
-	// nextSignal++;
-	// if (nextSignal >= listOfSupportedIndicies.length)
-	// nextSignal = 0;
-	// } else if (muxmode == EnumMuxMode.SIGNAL_CONTROL) {
-	// final boolean lastState = (lastMuxState & 2) != 0;
-	// if (lastState == state)
-	// return;
-	// lastMuxState = state ? 2 + (lastMuxState & 1) : lastMuxState & 1;
-	// final int sigType = listOfSupportedIndicies[nextSignal];
-	// final int newSignal = this.getSignalStateImpl(sigType) + 1;
-	// if (!this.changeSignalImpl(sigType, newSignal))
-	// this.changeSignalImpl(sigType, 0);
-	// }
-	// }
-	// }
-	//
 	@Override
 	public boolean hasLink() {
 		if (linkedSignalPosition == null)
@@ -355,7 +295,6 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 		if (state.getBlock() instanceof Signal) {
 			this.linkedSignalPosition = pos;
 			onLink();
-			this.world.notifyBlockUpdate(pos, state, state, 3);
 			return true;
 		}
 		return false;

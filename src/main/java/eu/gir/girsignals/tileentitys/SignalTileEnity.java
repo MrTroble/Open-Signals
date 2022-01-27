@@ -64,7 +64,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 		ImmutableSet.of().parallelStream();
 		((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties().stream().forEach(prop -> {
 			SEProperty<?> sep = SEProperty.cst(prop);
-			sep.readFromNBT(comp).toJavaUtil().ifPresent(obj -> map.put(sep, obj));
+			sep.readFromNBT(comp).ifPresent(obj -> map.put(sep, obj));
 		});
 		if (comp.hasKey(CUSTOMNAME))
 			setCustomName(comp.getString(CUSTOMNAME));

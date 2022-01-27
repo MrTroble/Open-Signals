@@ -1,10 +1,9 @@
 package eu.gir.girsignals;
 
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
-
-import com.google.common.base.Optional;
 
 import eu.gir.girsignals.guis.guilib.IIntegerable;
 import net.minecraft.block.properties.IProperty;
@@ -63,7 +62,7 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 			int id = comp.getInteger(this.getName());
 			return Optional.of(getObjFromID(id));
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 	
 	@SuppressWarnings("unchecked")

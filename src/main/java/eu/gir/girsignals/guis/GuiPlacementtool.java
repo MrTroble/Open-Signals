@@ -97,6 +97,7 @@ public class GuiPlacementtool extends GuiBase {
 		blockRenderEntity.setWidth(60);
 		
 		final UIRotate rotation = new UIRotate();
+		rotation.setRotateY(180);
 		blockRenderEntity.add(new UIDrag((x, y) -> rotation.setRotateY(rotation.getRotateY() + x)));
 		
 		blockRenderEntity.add(new UIScissor());
