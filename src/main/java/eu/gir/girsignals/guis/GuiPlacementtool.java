@@ -119,6 +119,8 @@ public class GuiPlacementtool extends GuiBase {
 	public void of(SEProperty<?> property, IntConsumer consumer) {
 		if (property == null)
 			return;
+		if(property.equals(Signal.CUSTOMNAME) && currentSelectedBlock.canHaveCustomname(new HashMap<SEProperty<?>, Object>()))
+			list.add(GuiElements.createInputElement(property, consumer));
 		if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 			if (property.getType().equals(Boolean.class)) {
 				list.add(GuiElements.createBoolElement(property, consumer));
@@ -157,7 +159,7 @@ public class GuiPlacementtool extends GuiBase {
 
 		final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
 		for (UICheckBox checkb : checkbox) {
-			SEProperty sep = (SEProperty) lookup.get(checkb.getId());
+			SEProperty<Boolean> sep = (SEProperty<Boolean>) lookup.get(checkb.getId());
 			if (sep == null)
 				return;
 			if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {

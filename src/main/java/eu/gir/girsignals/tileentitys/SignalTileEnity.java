@@ -27,9 +27,9 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 
 	private HashMap<SEProperty<?>, Object> map = new HashMap<>();
 
-	private static final String PROPERTIES = "properties";
-	private static final String CUSTOMNAME = "customname";
-	private static final String BLOCKID = "blockid";
+	public static final String PROPERTIES = "properties";
+	public static final String CUSTOMNAME = "customname";
+	public static final String BLOCKID = "blockid";
 
 	private String formatCustomName = null;
 	private int blockID = -1;
