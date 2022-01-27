@@ -67,8 +67,9 @@ public class GuiSignalController extends GuiBase {
 	}
 	
 	private void init() {
+		final IBlockState currentState = referenceBlockState.get();
 		final int typeId = this.tile.getSignalTypeImpl();
-		if (typeId < 0) {
+		if (typeId < 0 || currentState == null) {
 			this.entity.add(new UILabel("Not connected"));
 			return;
 		}
@@ -97,15 +98,15 @@ public class GuiSignalController extends GuiBase {
 		leftSide.add(GuiElements.createPageSelect(vbox));
 		leftSide.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
 		this.entity.add(leftSide);
-		
+				
 		final UIEntity rightSide = new UIEntity();
 		rightSide.setWidth(60);
 		rightSide.setInheritHeight(true);
 		final UIRotate rotation = new UIRotate();
-		rotation.setRotateY(180);
+		rotation.setRotateY(currentState.getValue(Signal.ANGEL).getAngel());
 		rightSide.add(new UIDrag((x, y) -> rotation.setRotateY(rotation.getRotateY() + x)));
 		
-		blockRender.setBlockState(referenceBlockState.get());
+		blockRender.setBlockState(currentState);
 		
 		rightSide.add(new UIScissor());
 		rightSide.add(new UIIndependentTranslate(35, 150, 40));
@@ -122,6 +123,8 @@ public class GuiSignalController extends GuiBase {
 	
 	private void addManuellMode(final Signal signal) {
 		final HashMap<SEProperty<?>, Object> map = reference.get();
+		if(map == null)
+			return;
 		for (SEProperty<?> entry : map.keySet()) {
 			if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE) || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) && entry.test(map.entrySet())) {
 				final UIEntity guiEnum = GuiElements.createEnumElement(entry, e -> {
@@ -130,12 +133,7 @@ public class GuiSignalController extends GuiBase {
 			}
 		}
 	}
-	
-	@Override
-	public void initGui() {
-		super.initGui();
-	}
-	
+		
 	@Override
 	public void onGuiClosed() {
 		entity.write(compound);
