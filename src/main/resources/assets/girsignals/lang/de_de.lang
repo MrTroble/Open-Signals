@@ -185,7 +185,7 @@ property.enumredstonemode.desc=Hier kannst du zwischen Einzel Modus und MUX Modu
 property.enummuxmode.desc=Wechselt den MUX Eingang zwischen Signalteil und Signalbild.
 property.enumfacing.desc=Hier kannst du die Seite, die angesteuert wird, des Controllers ändern.
 property.sigtype.desc=Hier kannst du den Signalteil ändern.
-controller.preview=Mit Rechtsklick wird geändert, ob die ausgewählten Signalbilder angezeit werden oder nicht.
+controller.preview=Mit Rechtsklick um Preview zu ändern. Preview-Modus: %b
 
 #Directions
 property.value.up=Oben

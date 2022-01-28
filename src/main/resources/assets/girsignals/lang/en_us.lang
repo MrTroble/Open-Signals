@@ -185,7 +185,7 @@ property.enumredstonemode.desc=Here you can switch between single mode and MUX m
 property.enummuxmode.desc=Switches the MUX input between signal part and signal aspect.
 property.enumfacing.desc=Here you can change the side of the controller that get controlled.
 property.sigtype.desc=Here you can change the signal part.
-controller.preview=Right-click to change whether the selected signal aspects are displayed or not.
+controller.preview=Right-click to change preview. Preview-Mode: %b
 
 #Directions
 property.value.up=Up
