@@ -20,7 +20,7 @@ public class SignalOTHER extends Signal {
 	
 	@Override
 	public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
-		return map.entrySet().stream().anyMatch(entry -> entry.getKey().equals(OTHERTYPE) && entry.getValue().equals(OTHER_SIGNAL.HM));
+		return true;
 	}
 	
 	@Override

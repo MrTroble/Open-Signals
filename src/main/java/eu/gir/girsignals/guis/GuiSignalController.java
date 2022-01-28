@@ -41,7 +41,7 @@ public class GuiSignalController extends GuiBase {
 
 	public GuiSignalController(final SignalControllerTileEntity tile) {
 		this.pos = tile.getPos();
-		this.controller = new ContainerSignalController(tile, this::init);
+		this.controller = new ContainerSignalController(this::init);
 		Minecraft.getMinecraft().player.openContainer = this.controller;
 		this.compound = tile.getTag();
 		init();

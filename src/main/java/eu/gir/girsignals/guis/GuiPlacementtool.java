@@ -37,12 +37,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GuiPlacementtool extends GuiBase {
 	
-	private Signal currentSelectedBlock;
-	private Placementtool tool;
 	private final UIEntity list = new UIEntity();
 	private final UIBlockRender blockRender = new UIBlockRender();
-	
 	private final HashMap<String, IUnlistedProperty<?>> lookup = new HashMap<String, IUnlistedProperty<?>>();
+	private Signal currentSelectedBlock;
+	private Placementtool tool;
 	
 	public GuiPlacementtool(ItemStack stack) {
 		this.compound = stack.getTagCompound();
@@ -62,6 +61,8 @@ public class GuiPlacementtool extends GuiBase {
 			final SEProperty<?> prop = SEProperty.cst(property);
 			of(prop, inp -> applyModelChanges());
 		}
+		if(currentSelectedBlock.canHaveCustomname(new HashMap<>()))
+			list.add(GuiElements.createInputElement(Signal.CUSTOMNAME, in -> applyModelChanges()));
 		this.list.read(compound);
 	}
 	
@@ -71,10 +72,10 @@ public class GuiPlacementtool extends GuiBase {
 		this.list.add(vbox);
 		this.list.setInheritHeight(true);
 		this.list.setInheritWidth(true);
-
+		
 		final UIEntity lowerEntity = new UIEntity();
 		lowerEntity.add(GuiElements.createSpacerH(10));
-
+		
 		final UIEntity selectBlockEntity = GuiElements.createEnumElement(tool, input -> {
 			currentSelectedBlock = tool.getObjFromID(input);
 			final ExtendedBlockState bsc = (ExtendedBlockState) currentSelectedBlock.getBlockState();
@@ -82,8 +83,8 @@ public class GuiPlacementtool extends GuiBase {
 			bsc.getUnlistedProperties().forEach(p -> lookup.put(p.getName(), p));
 			this.list.clearChildren();
 			initList();
-			applyModelChanges();
 			this.entity.update();
+			applyModelChanges();
 		});
 		final UIEntity leftSide = new UIEntity();
 		leftSide.setInheritHeight(true);
@@ -132,7 +133,7 @@ public class GuiPlacementtool extends GuiBase {
 		topPart.add(GuiElements.createSpacerH(10));
 		topPart.add(titel);
 		this.entity.add(topPart);
-
+		
 		this.entity.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
 		this.entity.add(lowerEntity);
 		this.entity.read(compound);
@@ -141,8 +142,6 @@ public class GuiPlacementtool extends GuiBase {
 	public void of(SEProperty<?> property, IntConsumer consumer) {
 		if (property == null)
 			return;
-		if (property.equals(Signal.CUSTOMNAME) && currentSelectedBlock.canHaveCustomname(new HashMap<SEProperty<?>, Object>()))
-			list.add(GuiElements.createInputElement(property, consumer));
 		if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
 			if (property.getType().equals(Boolean.class)) {
 				list.add(GuiElements.createBoolElement(property, consumer));
@@ -197,7 +196,7 @@ public class GuiPlacementtool extends GuiBase {
 				ebs = ebs.withProperty(property, property.getDefault());
 			}
 		}
-		
+				
 		blockRender.setBlockState(ebs);
 	}
 }

@@ -14,6 +14,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ContainerSignalController extends Container implements UIClientSync {
 	
@@ -33,8 +35,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 		});
 	}
 	
-	public ContainerSignalController(SignalControllerTileEntity tile, Runnable onUpdate) {
-		this(tile);
+	public ContainerSignalController(Runnable onUpdate) {
 		this.onUpdate = onUpdate;
 	}
 	
@@ -57,6 +58,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 		}
 	}
 	
+	@SideOnly(Side.CLIENT)
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		referenceBlock.set(Signal.SIGNALLIST.get(compound.getInteger("state")));
@@ -74,10 +76,12 @@ public class ContainerSignalController extends Container implements UIClientSync
 		this.onUpdate.run();
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public HashMap<SEProperty<?>, Object> getReference() {
 		return reference.get();
 	}
 	
+	@SideOnly(Side.CLIENT)
 	public Signal getSignal() {
 		return referenceBlock.get();
 	}
