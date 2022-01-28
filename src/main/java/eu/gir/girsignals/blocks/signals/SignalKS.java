@@ -15,11 +15,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 public class SignalKS extends Signal {
-
+	
 	public SignalKS() {
 		super(builder(GIRItems.PLACEMENT_TOOL, "KS").height(6).signHeight(4.95f).build());
 	}
-
+	
 	public static final SEProperty<KS_TYPE> KSTYPE = SEProperty.of("kombitype", KS_TYPE.MAIN, ChangeableStage.GUISTAGE);
 	public static final SEProperty<KS> STOPSIGNAL = SEProperty.of("kombisignal", KS.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(KSTYPE, KS_TYPE.STOPSIGNAL));
 	public static final SEProperty<KS_MAIN> MAINSIGNAL = SEProperty.of("kombisignal_main", KS_MAIN.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(KSTYPE, KS_TYPE.MAIN));
@@ -41,7 +41,7 @@ public class SignalKS extends Signal {
 	
 	@Override
 	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-		return tintIndex == 1 ? 0xFFC200:0xFFFFFF;
+		return tintIndex == 1 ? 0xFFC200 : 0xFFFFFF;
 	}
 	
 }

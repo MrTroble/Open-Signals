@@ -15,11 +15,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 
 public class SignalHL extends Signal {
-
+	
 	public SignalHL() {
 		super(builder(GIRItems.PLACEMENT_TOOL, "HL").height(6).signHeight(1.15f).build());
 	}
-
+	
 	public static final SEProperty<HL_TYPE> HLTYPE = SEProperty.of("hltype", HL_TYPE.MAIN, ChangeableStage.GUISTAGE);
 	public static final SEProperty<HL> STOPSIGNAL = SEProperty.of("mainlightsignal", HL.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(HLTYPE, HL_TYPE.MAIN));
 	public static final SEProperty<HL_DISTANT> DISTANTSIGNAL = SEProperty.of("mainlightsignal_distant", HL_DISTANT.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(HLTYPE, HL_TYPE.DISTANT));
@@ -34,7 +34,6 @@ public class SignalHL extends Signal {
 	public static final SEProperty<ZS32> ZS3_PLATE = SEProperty.of("zs3plate", ZS32.OFF, ChangeableStage.GUISTAGE);
 	public static final SEProperty<ZS32> ZS3V_PLATE = SEProperty.of("zs3vplate", ZS32.OFF, ChangeableStage.GUISTAGE);
 	
-	
 	@Override
 	public boolean hasCostumColor() {
 		return true;
@@ -42,6 +41,6 @@ public class SignalHL extends Signal {
 	
 	@Override
 	public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos, int tintIndex) {
-		return tintIndex == 1 ? 0xFFC200:0xFFFFFF;
+		return tintIndex == 1 ? 0xFFC200 : 0xFFFFFF;
 	}
 }

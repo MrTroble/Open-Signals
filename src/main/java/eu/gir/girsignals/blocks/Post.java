@@ -6,7 +6,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 
 public class Post extends Block {
-
+	
 	public Post() {
 		super(Material.ROCK);
 		setCreativeTab(GIRTabs.tab);
@@ -16,7 +16,7 @@ public class Post extends Block {
 	public boolean isOpaqueCube(IBlockState state) {
 		return false;
 	}
-
+	
 	@Override
 	public boolean isFullCube(IBlockState state) {
 		return false;

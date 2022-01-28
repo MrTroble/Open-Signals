@@ -6,7 +6,7 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 
 public class SignalBUELight extends Signal {
-
+	
 	public SignalBUELight() {
 		super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "buelight").height(4).build());
 	}

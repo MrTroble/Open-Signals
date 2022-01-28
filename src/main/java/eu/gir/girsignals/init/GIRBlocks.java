@@ -39,7 +39,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class GIRBlocks {
-
+	
 	public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
 	public static final Post POST = new Post();
 	public static final SignalHV HV_SIGNAL = new SignalHV();
@@ -59,9 +59,9 @@ public class GIRBlocks {
 	public static final StationNumberPlate STATION_NUMBER_PLATE = new StationNumberPlate();
 	public static final SignalWN WN_SIGNAL = new SignalWN();
 	public static final SignalStationName STATION_NAME = new SignalStationName();
-
+	
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
-
+	
 	public static void init() {
 		Field[] fields = GIRBlocks.class.getFields();
 		for (Field field : fields) {
@@ -73,12 +73,12 @@ public class GIRBlocks {
 					block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
 					block.setUnlocalizedName(name);
 					blocksToRegister.add(block);
-					if(block instanceof ITileEntityProvider) {
+					if (block instanceof ITileEntityProvider) {
 						ITileEntityProvider provider = (ITileEntityProvider) block;
 						try {
 							Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0).getClass();
 							TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
-						} catch(NullPointerException ex) {
+						} catch (NullPointerException ex) {
 							GirsignalsMain.LOG.trace("All tileentity provide need to call back a default entity if the world is null!", ex);
 						}
 					}
@@ -95,30 +95,27 @@ public class GIRBlocks {
 		IForgeRegistry<Block> registry = event.getRegistry();
 		blocksToRegister.forEach(registry::register);
 	}
-
+	
 	@SubscribeEvent
 	public static void registerItem(RegistryEvent.Register<Item> event) {
 		IForgeRegistry<Item> registry = event.getRegistry();
-		blocksToRegister
-				.forEach(block -> registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
+		blocksToRegister.forEach(block -> registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
 	}
 	
 	private static void updateConfigs() {
-        blocksToRegister.forEach(b -> {
-        	if (b instanceof IConfigUpdatable) {
+		blocksToRegister.forEach(b -> {
+			if (b instanceof IConfigUpdatable) {
 				IConfigUpdatable configUpdate = (IConfigUpdatable) b;
 				configUpdate.updateConfigValues();
 			}
-        });
+		});
 	}
 	
-    @SubscribeEvent
-    public static void onConfigChangedEvent(OnConfigChangedEvent event)
-    {
-        if (event.getModID().equals(GirsignalsMain.MODID))
-        {
-            ConfigManager.sync(GirsignalsMain.MODID, Type.INSTANCE);
-            updateConfigs();
-        }
-    }
+	@SubscribeEvent
+	public static void onConfigChangedEvent(OnConfigChangedEvent event) {
+		if (event.getModID().equals(GirsignalsMain.MODID)) {
+			ConfigManager.sync(GirsignalsMain.MODID, Type.INSTANCE);
+			updateConfigs();
+		}
+	}
 }

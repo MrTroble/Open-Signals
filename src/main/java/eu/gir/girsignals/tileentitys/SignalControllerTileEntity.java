@@ -8,11 +8,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
-import eu.gir.girsignals.EnumSignals.EnumMode;
-import eu.gir.girsignals.EnumSignals.EnumMuxMode;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.guis.guilib.ISyncable;
 import eu.gir.girsignals.linkableApi.ILinkableTile;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
@@ -26,7 +25,6 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.chunk.Chunk;
@@ -35,48 +33,32 @@ import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class SignalControllerTileEntity extends TileEntity implements SimpleComponent, IWorldNameable, ILinkableTile {
-
+public class SignalControllerTileEntity extends TileEntity implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile {
+	
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
 	private Map<String, Integer> tableOfSupportedSignalTypes;
 	private int signalTypeCache = -1;
-	private String signame = null;
-	private EnumRedstoneMode rsMode = EnumRedstoneMode.SINGLE;
-	private final int[] facingRedstoneModes = new int[EnumFacing.values().length];
-	public EnumMode mode = EnumMode.MANUELL;
-	public EnumFacing face = EnumFacing.DOWN;
-	public EnumMuxMode muxmode = EnumMuxMode.MUX_CONTROL;
-	public int nextSignal = 0;
-	public int indexUsed = 0;
-	public int lastMuxState = 0;
-
+	private NBTTagCompound compound = new NBTTagCompound();
+	
+	public static final String UPDATE_FLAG = "updateflag";
+	
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
 	private static final String ID_Z = "zLinkedPos";
-	private static final String RS_MODE = "rsMode";
-	private static final String FACEING_MODES = "faceModes";
-
-	private static final String UI_FACE = "uiface";
-	private static final String UI_MODE = "uimode";
-	private static final String UI_INDEX = "uiindex";
-	private static final String UI_MUX = "uimux";
-
+	
+	private static final String ID_COMP = "COMP";
+	
 	public SignalControllerTileEntity() {
-		Arrays.fill(facingRedstoneModes, 0xFF);
 	}
-
-	public static enum EnumRedstoneMode {
-		SINGLE, MUX
-	}
-
+	
 	public static BlockPos readBlockPosFromNBT(NBTTagCompound compound) {
 		if (compound != null && compound.hasKey(ID_X) && compound.hasKey(ID_Y) && compound.hasKey(ID_Z)) {
 			return new BlockPos(compound.getInteger(ID_X), compound.getInteger(ID_Y), compound.getInteger(ID_Z));
 		}
 		return null;
 	}
-
+	
 	public static void writeBlockPosToNBT(BlockPos pos, NBTTagCompound compound) {
 		if (pos != null && compound != null) {
 			compound.setInteger(ID_X, pos.getX());
@@ -84,79 +66,65 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			compound.setInteger(ID_Z, pos.getZ());
 		}
 	}
-
+	
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
 		linkedSignalPosition = readBlockPosFromNBT(compound);
-		rsMode = EnumRedstoneMode.values()[compound.getInteger(RS_MODE)];
-		int[] newArr = compound.getIntArray(FACEING_MODES);
-		this.face = EnumFacing.values()[compound.getInteger(UI_FACE)];
-		this.indexUsed = compound.getInteger(UI_INDEX);
-		this.mode = EnumMode.values()[compound.getInteger(UI_MODE)];
-		this.muxmode = EnumMuxMode.values()[compound.getInteger(UI_MUX)];
-		if (newArr != null && newArr.length == facingRedstoneModes.length)
-			System.arraycopy(newArr, 0, facingRedstoneModes, 0, facingRedstoneModes.length);
+		this.compound = compound.getCompoundTag(ID_COMP);
 		super.readFromNBT(compound);
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		writeBlockPosToNBT(linkedSignalPosition, compound);
-		compound.setInteger(RS_MODE, rsMode.ordinal());
-		compound.setIntArray(FACEING_MODES, facingRedstoneModes);
-		compound.setInteger(UI_FACE, face.ordinal());
-		compound.setInteger(UI_INDEX, indexUsed);
-		compound.setInteger(UI_MODE, mode.ordinal());
-		compound.setInteger(UI_MUX, muxmode.ordinal());
 		super.writeToNBT(compound);
+		compound.setTag(ID_COMP, this.compound);
 		return compound;
 	}
-
+	
 	@Override
 	public SPacketUpdateTileEntity getUpdatePacket() {
 		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
 	}
-
+	
 	@Override
 	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
 		this.readFromNBT(pkt.getNbtCompound());
 		if (hasLink())
 			onLink();
 	}
-
+	
 	@Override
 	public NBTTagCompound getUpdateTag() {
 		return writeToNBT(new NBTTagCompound());
 	}
-
+	
 	public void onLink() {
 		new Thread(() -> {
-			while (!world.isBlockLoaded(pos))
-				continue;
 			loadChunkAndGetTile((sigtile, ch) -> {
 				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
-
+				
 				HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
 				sigtile.accumulate((bs, prop, obj) -> {
 					if (prop instanceof SEProperty && obj != null) {
 						SEProperty<?> p = ((SEProperty<?>) prop);
-						if (p.isChangabelAtStage(ChangeableStage.APISTAGE)
-								|| p.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+						if (p.isChangabelAtStage(ChangeableStage.APISTAGE) || p.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
 							supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop));
 					}
 					return null;
 				}, null);
-				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue)
-						.toArray();
+				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 				tableOfSupportedSignalTypes = supportedSignaleStates;
 				signalTypeCache = ((Signal) ch.getBlockState(linkedSignalPosition).getBlock()).getID();
-				signame = sigtile.getName();
+				IBlockState nstate = this.world.getBlockState(pos);
+				this.markDirty();
+				this.world.notifyBlockUpdate(pos, nstate, nstate, 3);
 			});
 		}).start();
 	}
-
+	
 	@Override
 	public void onLoad() {
 		if (linkedSignalPosition != null) {
@@ -165,13 +133,13 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			this.world.notifyBlockUpdate(pos, state, state, 3);
 		}
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] hasLink(Context context, Arguments args) {
 		return new Object[] { hasLink() };
 	}
-
+	
 	public boolean loadChunkAndGetTile(BiConsumer<SignalTileEnity, Chunk> consumer) {
 		if (linkedSignalPosition == null)
 			return false;
@@ -196,7 +164,7 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 				if (flag2) {
 					consumer.accept((SignalTileEnity) entity, ch);
 				}
-
+				
 				if (flag) {
 					if (world.isRemote) {
 						ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
@@ -217,30 +185,27 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		}
 		return false;
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSupportedSignalTypes(Context context, Arguments args) {
 		return new Object[] { tableOfSupportedSignalTypes };
 	}
-
+	
 	public int[] getSupportedSignalTypesImpl() {
 		return listOfSupportedIndicies;
 	}
-
+	
 	public static boolean find(int[] arr, int i) {
-		for (int x : arr)
-			if (x == i)
-				return true;
-		return false;
+		return Arrays.stream(arr).anyMatch(x -> i == x);
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] changeSignal(Context context, Arguments args) {
 		return new Object[] { changeSignalImpl(args.checkInteger(0), args.checkInteger(1)) };
 	}
-
+	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean changeSignalImpl(int type, int newSignal) {
 		if (!find(getSupportedSignalTypesImpl(), type))
@@ -259,23 +224,23 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 		});
 		return rtc.get();
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSignalType(Context context, Arguments args) {
 		return new Object[] { Signal.SIGNALLIST.get(getSignalTypeImpl()).getSignalTypeName() };
 	}
-
+	
 	public int getSignalTypeImpl() {
 		return signalTypeCache;
 	}
-
+	
 	@Callback
 	@Optional.Method(modid = "opencomputers")
 	public Object[] getSignalState(Context context, Arguments args) {
 		return new Object[] { getSignalStateImpl(args.checkInteger(0)) };
 	}
-
+	
 	@SuppressWarnings("rawtypes")
 	public int getSignalStateImpl(int type) {
 		if (!find(getSupportedSignalTypesImpl(), type))
@@ -292,96 +257,26 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			return SEProperty.getIDFromObj(bool.get());
 		return -1;
 	}
-
+	
 	public BlockPos getLinkedPosition() {
 		return linkedSignalPosition;
 	}
-
+	
 	@Override
 	public String getComponentName() {
 		return "signalcontroller";
 	}
-
+	
 	@Override
 	public String getName() {
-		return this.signame;
+		return ""; // TODO Replace with loading variant
 	}
-
+	
 	@Override
 	public boolean hasCustomName() {
-		return this.signame != null;
+		return false; // TODO Replace with loading variant
 	}
-
-	public EnumRedstoneMode getRsMode() {
-		return rsMode;
-	}
-
-	public void setRsMode(EnumRedstoneMode rsMode) {
-		this.rsMode = rsMode;
-		Arrays.fill(facingRedstoneModes, rsMode == EnumRedstoneMode.MUX ? 3 : 0);
-	}
-
-	public void setFacingData(final EnumFacing face, final int data) {
-		facingRedstoneModes[face.ordinal()] = data;
-	}
-
-	public int[] getFacingData() {
-		return facingRedstoneModes;
-	}
-
-	public static int[] unpack(final int x) {
-		return new int[] { (x & 0b00000000000000000000000000001111), ((x & 0b00000000000000000000001111110000) >> 4),
-				((x & 0b00000000000000001111110000000000) >> 10) };
-	}
-
-	public void redstoneUpdate(final EnumFacing face, final boolean state) {
-		if (listOfSupportedIndicies == null)
-			return;
-		if (rsMode == EnumRedstoneMode.SINGLE) {
-			final int id = facingRedstoneModes[face.ordinal()];
-			if (id < 0)
-				return;
-			final int[] unpacked = unpack(id);
-			final int signalTypeId = unpacked[0];
-			if (signalTypeId < listOfSupportedIndicies.length) {
-				final int signalData = unpacked[1];
-				final int signalDataOff = unpacked[2];
-				final int sigType = listOfSupportedIndicies[signalTypeId];
-				this.changeSignalImpl(sigType, state ? signalData : signalDataOff);
-			}
-		} else if (rsMode == EnumRedstoneMode.MUX) {
-			final int id = facingRedstoneModes[face.ordinal()];
-			if (id < 0 || id >= EnumMuxMode.values().length)
-				return;
-			final EnumMuxMode muxmode = EnumMuxMode.values()[id];
-			if (muxmode == EnumMuxMode.MUX_CONTROL) {
-				final boolean lastState = (lastMuxState & 1) != 0;
-				if (lastState == state)
-					return;
-				lastMuxState = state ? 1 + (lastMuxState & 2) : lastMuxState & 2;
-				nextSignal++;
-				if (nextSignal >= listOfSupportedIndicies.length)
-					nextSignal = 0;
-			} else if (muxmode == EnumMuxMode.SIGNAL_CONTROL) {
-				final boolean lastState = (lastMuxState & 2) != 0;
-				if (lastState == state)
-					return;
-				lastMuxState = state ? 2 + (lastMuxState & 1) : lastMuxState & 1;
-				final int sigType = listOfSupportedIndicies[nextSignal];
-				final int newSignal = this.getSignalStateImpl(sigType) + 1;
-				if (!this.changeSignalImpl(sigType, newSignal))
-					this.changeSignalImpl(sigType, 0);
-			}
-		}
-	}
-
-	public void setUIState(final EnumMode mode, final EnumFacing face, final int indexUsed, final EnumMuxMode muxmode) {
-		this.mode = mode;
-		this.face = face;
-		this.indexUsed = indexUsed;
-		this.muxmode = muxmode;
-	}
-
+	
 	@Override
 	public boolean hasLink() {
 		if (linkedSignalPosition == null)
@@ -393,24 +288,42 @@ public class SignalControllerTileEntity extends TileEntity implements SimpleComp
 			unlink();
 		return false;
 	}
-
+	
 	@Override
 	public boolean link(final BlockPos pos) {
 		final IBlockState state = world.getBlockState(pos);
 		if (state.getBlock() instanceof Signal) {
 			this.linkedSignalPosition = pos;
 			onLink();
-			this.world.notifyBlockUpdate(pos, state, state, 3);
 			return true;
 		}
 		return false;
 	}
-
+	
 	@Override
 	public boolean unlink() {
 		linkedSignalPosition = null;
 		tableOfSupportedSignalTypes = null;
 		listOfSupportedIndicies = null;
 		return true;
+	}
+	
+	@Override
+	public void updateTag(NBTTagCompound compound) {
+		if (compound == null)
+			return;
+		compound.getKeySet().forEach(str -> {
+			if (tableOfSupportedSignalTypes.containsKey(str)) {
+				int type = compound.getInteger(str);
+				int id = tableOfSupportedSignalTypes.get(str);
+				changeSignalImpl(id, type);
+			}
+		});
+		this.compound = compound;
+	}
+	
+	@Override
+	public NBTTagCompound getTag() {
+		return this.compound;
 	}
 }

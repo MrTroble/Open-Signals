@@ -13,7 +13,6 @@ public class StationNumberPlate extends Signal {
 		
 	}
 	
-	public static final SEProperty<ST_NUMBER> STATIONNUMBER = SEProperty.of("stationnumber", ST_NUMBER.Z1,
-			ChangeableStage.GUISTAGE);
-
+	public static final SEProperty<ST_NUMBER> STATIONNUMBER = SEProperty.of("stationnumber", ST_NUMBER.Z1, ChangeableStage.GUISTAGE);
+	
 }

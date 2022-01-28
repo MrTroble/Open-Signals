@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class GIRItems {
-
+	
 	public static final Linkingtool LINKING_TOOL = new Linkingtool(GIRTabs.tab, (world, pos) -> {
 		final IBlockState state = world.getBlockState(pos);
 		final Block block = state.getBlock();
@@ -25,9 +25,9 @@ public class GIRItems {
 	});
 	public static final Placementtool PLACEMENT_TOOL = new Placementtool();
 	public static final Placementtool SIGN_PLACEMENT_TOOL = new Placementtool();
-
+	
 	public static ArrayList<Item> registeredItems = new ArrayList<>();
-
+	
 	public static void init() {
 		Field[] fields = GIRItems.class.getFields();
 		for (Field field : fields) {
@@ -45,11 +45,11 @@ public class GIRItems {
 			}
 		}
 	}
-
+	
 	@SubscribeEvent
 	public static void registerItem(RegistryEvent.Register<Item> event) {
 		IForgeRegistry<Item> registry = event.getRegistry();
 		registeredItems.forEach(registry::register);
 	}
-
+	
 }

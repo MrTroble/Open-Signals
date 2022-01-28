@@ -123,6 +123,7 @@ property.signaltramadd.desc=Hier kannst du zwischen A, T und A sowie T wählen.
 property.signaltrama.desc=Fahrtanforderung
 property.signaltramt.desc=Abfertigungsempfehlung
 property.signaltramswitch.desc=Links, rechts, gerade aus mit und ohne verschlossener Weiche
+property.customname.desc=Hier kann der Signalname bzw. die Signalbeschriftung eingetragen werden, welche auf dem Schild angezeigt werden.
 
 #Sign Names
 property.indicator.name=Aufschrift
@@ -172,18 +173,19 @@ property.enumfacing.name=Seite
 property.sigtype.name=Signal
 property.value.MANUELL=Manuell
 property.value.REDSTONE=Redstone
-property.value.SINGLE=Einzel
-property.value.MUX=MUX
+property.value.SINGLE=Redstone Einzel
+property.value.MUX=Redstone MUX
 property.value.MUX_CONTROL=Signalteil
 property.value.SIGNAL_CONTROL=Signalbild
 property.value.None=Nichts
 
 #Signalcontroller Description
-property.enummode.desc=Hier kannst du zwischen Manuellen Modus und Redstone Modus umschalten. im Manuellen Modus kannst du das Signal über die GUI ändern, im Redstone Modus kannst du an den Controller Redstone anschließen und darüber das Signal steuern. Zusätzlich kann ein Signal auch immer über einen Computer von OpenComputers angesteuert werden.
+property.enummode.desc=Hier kannst du zwischen Manuellen Modus und Redstone Einzel- bzw. MUX-Modus umschalten. im Manuellen Modus kannst du das Signal über die GUI ändern, im Redstone Modus kannst du an den Controller Redstone anschließen und darüber das Signal steuern. Zusätzlich kann ein Signal auch immer über einen Computer von OpenComputers angesteuert werden.
 property.enumredstonemode.desc=Hier kannst du zwischen Einzel Modus und MUX Modus umschalten.%nDer Einzelmodus erlaubt es dir für eine Seite und einen Signalteil einen ON/An und einen OFF/Aus Status festzulegen.%nMit dem MUX Modus kannst du die Signalteile über einen Eingang und die Signalbilder über einen anderen Eingang durchschalten.
 property.enummuxmode.desc=Wechselt den MUX Eingang zwischen Signalteil und Signalbild.
 property.enumfacing.desc=Hier kannst du die Seite, die angesteuert wird, des Controllers ändern.
 property.sigtype.desc=Hier kannst du den Signalteil ändern.
+controller.preview=Mit Rechtsklick um Preview zu ändern. Preview-Modus: %b
 
 #Directions
 property.value.up=Oben

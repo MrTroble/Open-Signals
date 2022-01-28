@@ -12,11 +12,11 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 
 public class SignalTram extends Signal {
-
+	
 	public SignalTram() {
 		super(builder(GIRItems.PLACEMENT_TOOL, "TramSignal").height(0).build());
 	}
-
+	
 	public static final SEProperty<TRAMTYPE> TRAMSIGNAL_TYPE = SEProperty.of("signaltramtype", TRAMTYPE.TRAM, ChangeableStage.GUISTAGE, true);
 	public static final SEProperty<TRAM> TRAMSIGNAL = SEProperty.of("signaltram", TRAM.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(TRAMSIGNAL_TYPE, TRAMTYPE.TRAM));
 	public static final SEProperty<TRAM_ADD> TRAMSIGNAL_ADD = SEProperty.of("signaltramadd", TRAM_ADD.OFF, ChangeableStage.GUISTAGE, true, check(TRAMSIGNAL_TYPE, TRAMTYPE.TRAM));

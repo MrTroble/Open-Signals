@@ -1,321 +1,189 @@
 package eu.gir.girsignals.guis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.function.Consumer;
-
-import org.lwjgl.opengl.GL11;
-
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.EnumSignals.EnumMode;
-import eu.gir.girsignals.EnumSignals.EnumMuxMode;
-import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.guilib.DrawUtil;
 import eu.gir.girsignals.guis.guilib.DrawUtil.EnumIntegerable;
-import eu.gir.girsignals.guis.guilib.DrawUtil.SizeIntegerables;
 import eu.gir.girsignals.guis.guilib.GuiBase;
-import eu.gir.girsignals.guis.guilib.GuiElements.GuiEnumerableSetting;
-import eu.gir.girsignals.guis.guilib.IIntegerable;
-import eu.gir.girsignals.init.GIRNetworkHandler;
+import eu.gir.girsignals.guis.guilib.GuiElements;
+import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
+import eu.gir.girsignals.guis.guilib.entitys.UIBlockRender;
+import eu.gir.girsignals.guis.guilib.entitys.UIBox;
+import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
+import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
+import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
+import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
+import eu.gir.girsignals.guis.guilib.entitys.UIIndependentTranslate;
+import eu.gir.girsignals.guis.guilib.entitys.UILabel;
+import eu.gir.girsignals.guis.guilib.entitys.UIRotate;
+import eu.gir.girsignals.guis.guilib.entitys.UIScale;
+import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
+import eu.gir.girsignals.guis.guilib.entitys.UIToolTip;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
-import eu.gir.girsignals.tileentitys.SignalControllerTileEntity.EnumRedstoneMode;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import net.minecraft.client.renderer.BlockModelShapes;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.client.CPacketCustomPayload;
-import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class GuiSignalController extends GuiBase {
+	
+	private final BlockPos pos;
+	private final ContainerSignalController controller;
+	private final UIEntity lowerEntity = new UIEntity();
+	private boolean previewMode = false;
 
-    private final BlockPos pos;
-    private BlockModelShapes manager;
-    private ThreadLocal<BufferBuilder> model = ThreadLocal
-            .withInitial(() -> new BufferBuilder(500));
-    public ContainerSignalController sigController;
+	public GuiSignalController(final SignalControllerTileEntity tile) {
+		this.pos = tile.getPos();
+		this.controller = new ContainerSignalController(this::init);
+		Minecraft.getMinecraft().player.openContainer = this.controller;
+		this.compound = tile.getTag();
+		init();
+	}
+	
+	private void initMode(EnumMode mode, Signal signal) {
+		switch (mode) {
+		case MANUELL:
+			addManuellMode();
+			break;
+		case SINGLE:
+			break;
+		case MUX:
+			break;
+		default:
+			break;
+		}
+	}
+	
+	private void init() {
+		this.entity.clear();
+		
+		final Signal signal = this.controller.getSignal();
+		if (signal == null) {
+			this.entity.add(new UILabel("Not connected"));
+			return;
+		}
+		lowerEntity.setInheritHeight(true);
+		lowerEntity.setInheritWidth(true);
+		
+		final String name = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name");
+		
+		final UILabel titlelabel = new UILabel(name);
+		titlelabel.setCenterX(false);
+		
+		final UIEntity titel = new UIEntity();
+		titel.add(new UIScale(1.2f, 1.2f, 1));
+		titel.add(titlelabel);
+		titel.setInheritHeight(true);
+		titel.setInheritWidth(true);
+		
+		final UIEntity header = new UIEntity();
+		header.setInheritWidth(true);
+		header.setHeight(45);
+		header.add(new UIBox(UIBox.VBoxMode.INSTANCE, 1));
+		header.add(titel);
+		final EnumIntegerable<EnumMode> enumMode = new EnumIntegerable<EnumMode>(EnumMode.class);
+		final UIEntity rsMode = GuiElements.createEnumElement(enumMode, in -> {
+			lowerEntity.clearChildren();
+			initMode(enumMode.getObjFromID(in), signal);
+		});
+		header.add(rsMode);
+		
+		final UIEntity middlePart = new UIEntity();
+		middlePart.setInheritHeight(true);
+		middlePart.setInheritWidth(true);
+		middlePart.add(new UIBox(UIBox.VBoxMode.INSTANCE, 1));
+		middlePart.add(header);
+		middlePart.add(lowerEntity);
+		
+		this.entity.add(GuiElements.createSpacerH(10));
+		this.entity.add(middlePart);
+		this.entity.add(GuiElements.createSpacerH(10));
+		this.entity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 1));
+		
+		this.entity.read(compound);
+	}
+	
+	private void addManuellMode() {
+		final UIEntity list = new UIEntity();
+		list.setInheritHeight(true);
+		list.setInheritWidth(true);
+		final UIBox vbox = new UIBox(UIBox.VBoxMode.INSTANCE, 1);
+		list.add(vbox);
+		
+		final UIEntity leftSide = new UIEntity();
+		leftSide.setInheritHeight(true);
+		leftSide.setInheritWidth(true);
+		leftSide.add(list);
+		leftSide.add(GuiElements.createPageSelect(vbox));
+		leftSide.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
+		lowerEntity.add(leftSide);
+		
+		final UIBlockRender blockRender = new UIBlockRender();
 
-    public GuiSignalController(final SignalControllerTileEntity entity) {
-        this.sigController = new ContainerSignalController(entity, this);
-        this.pos = entity.getPos();
-    }
+		final UIToolTip tooltip = new UIToolTip(I18n.format("controller.preview", previewMode));
+		
+		final UIEntity rightSide = new UIEntity();
+		rightSide.setWidth(60);
+		rightSide.setInheritHeight(true);
+		final UIRotate rotation = new UIRotate();
+		rotation.setRotateY(180);
+		rightSide.add(new UIClickable(e -> {
+			previewMode = !previewMode;
+			applyModelChange(blockRender);
+			tooltip.setDescripton(I18n.format("controller.preview", previewMode));
+		}, 1));
+		rightSide.add(new UIDrag((x, y) -> rotation.setRotateY(rotation.getRotateY() + x)));
+		rightSide.add(tooltip);
+		
+		rightSide.add(new UIScissor());
+		rightSide.add(new UIIndependentTranslate(35, 150, 40));
+		rightSide.add(rotation);
+		rightSide.add(new UIIndependentTranslate(-0.5, -3.5, -0.5));
+		rightSide.add(new UIScale(20, -20, 20));
+		rightSide.add(blockRender);
+		
+		lowerEntity.add(rightSide);
+		lowerEntity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 1));
 
-    private void addManuellMode(final Signal signal) {
-        final HashMap<SEProperty<?>, Object> map = Maps.newHashMap();
-        for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
-            final SEProperty<?> prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
-            map.put(prop, prop.getObjFromID(entry.getValue()));
-        }
+		final HashMap<SEProperty<?>, Object> map = this.controller.getReference();
+		if (map == null)
+			return;
+		for (SEProperty<?> entry : map.keySet()) {
+			if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE) || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) && entry.test(map.entrySet())) {
+				list.add(GuiElements.createEnumElement(entry, e -> applyModelChange(blockRender)));
+			}
+		}
+		applyModelChange(blockRender);
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void applyModelChange(final UIBlockRender blockRender) {
+		IExtendedBlockState currentState = (IExtendedBlockState) this.controller.getSignal().getDefaultState();
+		for(Entry<SEProperty<?>, Object> e : controller.getReference().entrySet()) {
+			currentState = currentState.withProperty((SEProperty)e.getKey(), e.getValue());
+		}
 
-        final ArrayList<Entry<SEProperty<?>, Integer>> idmap = Lists.newArrayList();
-        for (int i = 0; i < sigController.supportedSigTypes.length; i++) {
-            final SEProperty<?> prop = SEProperty
-                    .cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
-            int sigState = sigController.supportedSigStates[i];
-            if (sigState < 0 || sigState >= prop.count())
-                sigState = 0;
-            map.put(prop, prop.getObjFromID(sigState));
-            idmap.add(Maps.immutableEntry(prop, sigState));
-        }
-
-        final Set<Entry<SEProperty<?>, Object>> potential = map.entrySet();
-        for (int i = 0; i < idmap.size(); i++) {
-            final Entry<SEProperty<?>, Integer> entry = idmap.get(i);
-            final SEProperty<?> prop = entry.getKey();
-            final int id = signal.getIDFromProperty(prop);
-            if (prop.test(potential))
-                GuiHandler.of(prop, entry.getValue(), inp -> sendChanges(id, inp),
-                        ChangeableStage.APISTAGE).ifPresent(this::addButton);
-        }
-    }
-
-    private void addSingleMode(final Signal signal) {
-        final int faceInt = sigController.faceUsed.ordinal();
-        addButton(new GuiEnumerableSetting(new EnumIntegerable<>(EnumFacing.class), faceInt, in -> {
-            sigController.faceUsed = EnumFacing.values()[in];
-            initButtons();
-            initGui();
-        }));
-
-        final int fLen = sigController.supportedSigTypes.length;
-        final IIntegerable<?> possibleSignalTypesIntegerable = new SizeIntegerables<String>(
-                "sigtype", fLen + 1, in -> {
-                    if (in >= fLen)
-                        return "None";
-                    final int type = sigController.supportedSigTypes[in];
-                    final String name = signal.getPropertyFromID(type).getName();
-                    return name;
-                }) {
-            @Override
-            public String getNamedObj(int obj) {
-                return I18n.format("property." + this.getName() + ".name") + ": "
-                        + getObjFromID(obj).toUpperCase();
-            }
-        };
-        final int config = sigController.facingRedstoneModes[faceInt];
-        final int[] unpacked = SignalControllerTileEntity.unpack(config);
-        final int sigType = unpacked[0];
-        final int sigOn = unpacked[1];
-        final int sigOff = unpacked[2];
-        addButton(new GuiEnumerableSetting(possibleSignalTypesIntegerable,
-                sigType > fLen ? fLen : sigType, in -> sendPacked(pack(in, sigOn, sigOff))));
-
-        if (sigType < sigController.supportedSigTypes.length) {
-            final SEProperty<?> prop = SEProperty
-                    .cst(signal.getPropertyFromID(sigController.supportedSigTypes[sigType]));
-            GuiHandler.of(prop, sigOn, in -> sendPacked(pack(sigType, in, sigOff)),
-                    ChangeableStage.APISTAGE).ifPresent(this::addButton);
-            GuiHandler.of(prop, sigOff, in -> sendPacked(pack(sigType, sigOn, in)),
-                    ChangeableStage.APISTAGE).ifPresent(this::addButton);
-        }
-    }
-
-    private void addMUXMode() {
-        addButton(new GuiEnumerableSetting(new EnumIntegerable<>(EnumMuxMode.class),
-                sigController.muxMode.ordinal(), in -> {
-                    sigController.muxMode = EnumMuxMode.values()[in];
-                    for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
-                        if (sigController.facingRedstoneModes[i] == in) {
-                            sigController.faceUsed = EnumFacing.values()[i];
-                            break;
-                        }
-                    }
-                    initButtons();
-                    initGui();
-                }));
-        addButton(new GuiEnumerableSetting(new EnumIntegerable<>(EnumFacing.class),
-                sigController.faceUsed.ordinal(), in -> {
-                    sigController.faceUsed = EnumFacing.values()[in];
-                    for (int i = 0; i < sigController.facingRedstoneModes.length; i++) {
-                        if (sigController.facingRedstoneModes[i] == sigController.muxMode
-                                .ordinal()) {
-                            final int idx = i;
-                            sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, bf -> {
-                                bf.writeInt(idx);
-                                bf.writeInt(3);
-                            });
-                        }
-                    }
-                    sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, bf -> {
-                        bf.writeInt(in);
-                        bf.writeInt(sigController.muxMode.ordinal());
-                    });
-                    initButtons();
-                    initGui();
-                }));
-    }
-
-    private void addRSMode(final Signal signal) {
-        final GuiEnumerableSetting rsModeSetting = new GuiEnumerableSetting(
-                new EnumIntegerable<>(EnumRedstoneMode.class), sigController.rsMode.ordinal(),
-                in -> {
-                    sigController.rsMode = EnumRedstoneMode.values()[in];
-                    sendToPos(GIRNetworkHandler.SIG_CON_RS_SET, buffer -> {
-                        buffer.writeInt(in);
-                    });
-                });
-        addButton(rsModeSetting);
-        if (sigController.rsMode == EnumRedstoneMode.SINGLE) {
-            addSingleMode(signal);
-        } else if (sigController.rsMode == EnumRedstoneMode.MUX) {
-            addMUXMode();
-        }
-    }
-
-    @Override
-    public void initButtons() {
-        if (sigController.signalType < 0 || !sigController.hasLink) {
-            buttonList.clear();
-            return;
-        }
-        synchronized (buttonList) {
-            super.initButtons();
-            final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-
-            final EnumIntegerable<EnumMode> modeIntegerable = new EnumIntegerable<>(EnumMode.class);
-            final GuiEnumerableSetting settings = new GuiEnumerableSetting(modeIntegerable,
-                    sigController.indexMode.ordinal(), input -> {
-                        sigController.indexMode = EnumMode.values()[input];
-                        sigController.indexCurrentlyUsed = 0;
-                        initButtons();
-                        initGui();
-                    });
-            addButton(settings);
-
-            if (EnumMode.MANUELL == sigController.indexMode) {
-                addManuellMode(signal);
-            } else if (EnumMode.REDSTONE == sigController.indexMode) {
-                addRSMode(signal);
-            }
-        }
-    }
-
-    @Override
-    public void initGui() {
-        this.mc.player.openContainer = this.sigController;
-        this.manager = this.mc.getBlockRendererDispatcher().getBlockModelShapes();
-        super.initGui();
-        updateDraw();
-    }
-
-    public void sendPacked(final int packed) {
-        sendToPos(GIRNetworkHandler.SIG_CON_RS_FACING_UPDATE_SET, buffer -> {
-            buffer.writeInt(sigController.faceUsed.ordinal());
-            buffer.writeInt(packed);
-        });
-    }
-
-    public int pack(final int sigTypeID, final int onSig, final int offSig) {
-        return (sigTypeID & 0b00000000000000000000000000001111)
-                | ((onSig & 0b00000000000000000000000000111111) << 4)
-                | ((offSig & 0b00000000000000000000000000111111) << 10);
-    }
-
-    @Override
-    public void onGuiClosed() {
-        sendToPos(GIRNetworkHandler.SIG_CON_SAVE_UI_STATE, buf -> {
-            buf.writeInt(sigController.indexMode.ordinal());
-            buf.writeInt(sigController.faceUsed.ordinal());
-            buf.writeInt(sigController.indexCurrentlyUsed);
-            buf.writeInt(sigController.muxMode.ordinal());
-        });
-    }
-
-    @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
-        super.drawScreen(mouseX, mouseY, partialTicks);
-        if (!sigController.hasLink) {
-            final String s = "No Signal connected!";
-            final int width = mc.fontRenderer.getStringWidth(s);
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(this.guiLeft + (this.xSize - width * 2) / 2,
-                    this.guiTop + (this.ySize - mc.fontRenderer.FONT_HEIGHT) / 2 - 20, 0);
-            GlStateManager.scale(2, 2, 2);
-            mc.fontRenderer.drawStringWithShadow(s, 0, 0, 0xFFFF0000);
-            GlStateManager.popMatrix();
-            return;
-        }
-
-        mc.getTextureManager().bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
-        GlStateManager.enableRescaleNormal();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(this.guiLeft + this.xSize - 70, this.guiTop + this.ySize / 2,
-                100.0f);
-        GlStateManager.rotate(180, 0, 1, 0);
-        GlStateManager.scale(22.0F, -22.0F, 22.0F);
-        GlStateManager.translate(-0.5f, -3.5f, -0.5f);
-        DrawUtil.draw(model.get());
-        GlStateManager.popMatrix();
-        GlStateManager.disableRescaleNormal();
-    }
-
-    @Override
-    public String getTitle() {
-        if (sigController.signalType < 0 || !sigController.hasLink)
-            return "";
-        final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-        return I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name")
-                + (sigController.entity.hasCustomName() ? " - " + sigController.entity.getName()
-                        : "");
-    }
-
-    @SuppressWarnings({
-            "rawtypes", "unchecked"
-    })
-    public void updateDraw() {
-        if (sigController.supportedSigStates == null || !sigController.hasLink)
-            return;
-        final Signal signal = Signal.SIGNALLIST.get(sigController.signalType);
-        IExtendedBlockState ebs = (IExtendedBlockState) signal.getDefaultState();
-
-        for (Entry<Integer, Integer> entry : sigController.guiCacheList) {
-            SEProperty prop = SEProperty.cst(signal.getPropertyFromID(entry.getKey()));
-            ebs = ebs.withProperty(prop, prop.getObjFromID(entry.getValue()));
-        }
-
-        for (int i = 0; i < sigController.supportedSigStates.length; i++) {
-            int sigState = sigController.supportedSigStates[i];
-            SEProperty prop = SEProperty
-                    .cst(signal.getPropertyFromID(sigController.supportedSigTypes[i]));
-            if (sigState < 0 || sigState >= prop.count())
-                continue;
-            ebs = ebs.withProperty(prop, prop.getObjFromID(sigState));
-        }
-        model.get().begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        DrawUtil.addToBuffer(model.get(), manager, ebs);
-        model.get().finishDrawing();
-    }
-
-    public void sendChanges(final int id, final int data) {
-        sendToPos(GIRNetworkHandler.SIG_CON_GUI_MANUELL_SET, buffer -> {
-            buffer.writeInt(id);
-            buffer.writeInt(data);
-        });
-    }
-
-    private void sendToPos(final byte id, final Consumer<ByteBuf> consumer) {
-        ByteBuf buffer = Unpooled.buffer();
-        buffer.writeByte(id);
-        buffer.writeInt(pos.getX());
-        buffer.writeInt(pos.getY());
-        buffer.writeInt(pos.getZ());
-        consumer.accept(buffer);
-        CPacketCustomPayload payload = new CPacketCustomPayload(GIRNetworkHandler.CHANNELNAME,
-                new PacketBuffer(buffer));
-        GirsignalsMain.PROXY.CHANNEL.sendToServer(new FMLProxyPacket(payload));
-    }
+		if (!previewMode) {
+			for(UIEnumerable property : lowerEntity.findRecursive(UIEnumerable.class)) {
+				final SEProperty sep = SEProperty.cst(controller.lookup.get(property.getId()));
+				if(sep != null)
+					currentState = currentState.withProperty(sep, sep.getObjFromID(property.getIndex()));
+			}
+		}
+		blockRender.setBlockState(currentState);
+	}
+	
+	@Override
+	public void onGuiClosed() {
+		this.entity.write(compound);
+		GuiSyncNetwork.sendToPosServer(compound, pos);
+	}
+	
 }
