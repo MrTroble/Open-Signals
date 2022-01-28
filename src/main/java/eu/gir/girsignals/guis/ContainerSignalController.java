@@ -76,12 +76,10 @@ public class ContainerSignalController extends Container implements UIClientSync
 		this.onUpdate.run();
 	}
 	
-	@SideOnly(Side.CLIENT)
 	public HashMap<SEProperty<?>, Object> getReference() {
 		return reference.get();
 	}
 	
-	@SideOnly(Side.CLIENT)
 	public Signal getSignal() {
 		return referenceBlock.get();
 	}
