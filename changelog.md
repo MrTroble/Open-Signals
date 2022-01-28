@@ -1,6 +1,15 @@
 # Changelog
 
+## [Update/Fixes] 01.28.2022 - 1
+
+* Updated UI system
+* Updated synchronization system
+* Temporarily removed Redstone mode
+* Fixed various bugfixes
+* Fixed HV models
+
 ## [Addition/Fix] 01.15.2022 - 1
+
 * Fixed missing Ne2 shield for H/V signals
 * Added SH status light
 * Added Ra11b shunting signal

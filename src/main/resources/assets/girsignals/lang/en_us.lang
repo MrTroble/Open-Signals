@@ -123,6 +123,7 @@ property.signaltramadd.desc=Here you can select between A, T and A with T.
 property.signaltrama.desc=Drive request
 property.signaltramt.desc=Departure recommendation
 property.signaltramswitch.desc=Left, right, straight ahead with and without locked switch
+property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign.
 
 #Sign Names
 property.indicator.name=Indicator
@@ -172,18 +173,19 @@ property.enumfacing.name=Side
 property.sigtype.name=Signal
 property.value.MANUELL=Manual
 property.value.REDSTONE=Redstone
-property.value.SINGLE=Single
-property.value.MUX=MUX
+property.value.SINGLE=Redstone Single
+property.value.MUX=Redstone MUX
 property.value.MUX_CONTROL=Signal part
 property.value.SIGNAL_CONTROL=Signal aspect
 property.value.None=None
 
 #Signalcontroller Description
-property.enummode.desc=Here you can toggle between Manual mode and Redstone mode. In Manual mode you can change the signal via the GUI, in Redstone mode you can connect to the controller Redstone and control the signal via it. Additionally a signal can always be controlled by a computer from OpenComputers.
+property.enummode.desc=Here you can toggle between Manual mode and Redstone single- respectively MUX-mode. In Manual mode you can change the signal via the GUI, in Redstone mode you can connect to the controller Redstone and control the signal via it. Additionally a signal can always be controlled by a computer from OpenComputers.
 property.enumredstonemode.desc=Here you can switch between single mode and MUX mode.%nSingle mode allows you to set On and Off state for one side and one signal part.%nMUX mode allows you to iterate the signal parts and the signal aspects.
 property.enummuxmode.desc=Switches the MUX input between signal part and signal aspect.
 property.enumfacing.desc=Here you can change the side of the controller that get controlled.
 property.sigtype.desc=Here you can change the signal part.
+controller.preview=Right-click to change preview. Preview-Mode: %b
 
 #Directions
 property.value.up=Up
