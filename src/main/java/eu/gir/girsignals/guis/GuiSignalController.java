@@ -7,6 +7,7 @@ import eu.gir.girsignals.EnumSignals.EnumMode;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import eu.gir.girsignals.guis.guilib.DrawUtil.EnumIntegerable;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
@@ -46,7 +47,7 @@ public class GuiSignalController extends GuiBase {
 		this.tile = tile;
 		tile.loadChunkAndGetTile((t, c) -> {
 			reference.set(t.getProperties());
-			final IBlockState state = c.getBlockState(t.getPos());
+			final IBlockState state = c.getBlockState(t.getPos()).withProperty(Signal.ANGEL, SignalAngel.ANGEL0);
 			referenceBlockState.set(state.getBlock().getExtendedState(state, c.getWorld(), t.getPos()));
 		});
 		init();
@@ -103,7 +104,7 @@ public class GuiSignalController extends GuiBase {
 		rightSide.setWidth(60);
 		rightSide.setInheritHeight(true);
 		final UIRotate rotation = new UIRotate();
-		rotation.setRotateY(currentState.getValue(Signal.ANGEL).getAngel());
+		rotation.setRotateY(180);
 		rightSide.add(new UIDrag((x, y) -> rotation.setRotateY(rotation.getRotateY() + x)));
 		
 		blockRender.setBlockState(currentState);
