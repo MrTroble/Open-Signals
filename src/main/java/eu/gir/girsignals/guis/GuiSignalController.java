@@ -127,6 +127,8 @@ public class GuiSignalController extends GuiBase {
 		
 		final UIBlockRender blockRender = new UIBlockRender();
 
+		final UIToolTip tooltip = new UIToolTip(I18n.format("controller.preview", previewMode));
+		
 		final UIEntity rightSide = new UIEntity();
 		rightSide.setWidth(60);
 		rightSide.setInheritHeight(true);
@@ -135,9 +137,10 @@ public class GuiSignalController extends GuiBase {
 		rightSide.add(new UIClickable(e -> {
 			previewMode = !previewMode;
 			applyModelChange(blockRender);
+			tooltip.setDescripton(I18n.format("controller.preview", previewMode));
 		}, 1));
 		rightSide.add(new UIDrag((x, y) -> rotation.setRotateY(rotation.getRotateY() + x)));
-		rightSide.add(new UIToolTip(I18n.format("controller.preview", previewMode)));
+		rightSide.add(tooltip);
 		
 		rightSide.add(new UIScissor());
 		rightSide.add(new UIIndependentTranslate(35, 150, 40));
