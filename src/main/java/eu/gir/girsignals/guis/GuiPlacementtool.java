@@ -20,6 +20,7 @@ import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
 import eu.gir.girsignals.guis.guilib.entitys.UIIndependentTranslate;
+import eu.gir.girsignals.guis.guilib.entitys.UILabel;
 import eu.gir.girsignals.guis.guilib.entitys.UIRotate;
 import eu.gir.girsignals.guis.guilib.entitys.UIScale;
 import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
@@ -44,7 +45,6 @@ public class GuiPlacementtool extends GuiBase {
 	private final HashMap<String, IUnlistedProperty<?>> lookup = new HashMap<String, IUnlistedProperty<?>>();
 	
 	public GuiPlacementtool(ItemStack stack) {
-		super(I18n.format("property.signal.name"));
 		this.compound = stack.getTagCompound();
 		if (this.compound == null)
 			this.compound = new NBTTagCompound();
@@ -71,7 +71,10 @@ public class GuiPlacementtool extends GuiBase {
 		this.list.add(vbox);
 		this.list.setInheritHeight(true);
 		this.list.setInheritWidth(true);
-		
+
+		final UIEntity lowerEntity = new UIEntity();
+		lowerEntity.add(GuiElements.createSpacerH(10));
+
 		final UIEntity selectBlockEntity = GuiElements.createEnumElement(tool, input -> {
 			currentSelectedBlock = tool.getObjFromID(input);
 			final ExtendedBlockState bsc = (ExtendedBlockState) currentSelectedBlock.getBlockState();
@@ -82,7 +85,6 @@ public class GuiPlacementtool extends GuiBase {
 			applyModelChanges();
 			this.entity.update();
 		});
-		
 		final UIEntity leftSide = new UIEntity();
 		leftSide.setInheritHeight(true);
 		leftSide.setInheritWidth(true);
@@ -107,11 +109,32 @@ public class GuiPlacementtool extends GuiBase {
 		blockRenderEntity.add(new UIScale(20, -20, 20));
 		blockRenderEntity.add(blockRender);
 		
-		this.entity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 5));
+		lowerEntity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 5));
 		
-		this.entity.add(leftSide);
-		this.entity.add(blockRenderEntity);
+		lowerEntity.add(leftSide);
+		lowerEntity.add(blockRenderEntity);
+		lowerEntity.setInheritHeight(true);
+		lowerEntity.setInheritWidth(true);
 		
+		final UILabel titlelabel = new UILabel(I18n.format("property.signal.name"));
+		titlelabel.setCenterX(false);
+		
+		final UIEntity titel = new UIEntity();
+		titel.add(new UIScale(1.2f, 1.2f, 1));
+		titel.add(titlelabel);
+		titel.setInheritHeight(true);
+		titel.setInheritWidth(true);
+		
+		final UIEntity topPart = new UIEntity();
+		topPart.setInheritWidth(true);
+		topPart.setHeight(20);
+		topPart.add(new UIBox(UIBox.HBoxMode.INSTANCE, 5));
+		topPart.add(GuiElements.createSpacerH(10));
+		topPart.add(titel);
+		this.entity.add(topPart);
+
+		this.entity.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
+		this.entity.add(lowerEntity);
 		this.entity.read(compound);
 	}
 	

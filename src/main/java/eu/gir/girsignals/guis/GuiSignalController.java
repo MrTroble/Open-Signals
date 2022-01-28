@@ -1,30 +1,33 @@
 package eu.gir.girsignals.guis;
 
 import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Map.Entry;
 
 import eu.gir.girsignals.EnumSignals.EnumMode;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import eu.gir.girsignals.guis.guilib.DrawUtil.EnumIntegerable;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.entitys.UIBlockRender;
 import eu.gir.girsignals.guis.guilib.entitys.UIBox;
+import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
 import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
+import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
 import eu.gir.girsignals.guis.guilib.entitys.UIIndependentTranslate;
 import eu.gir.girsignals.guis.guilib.entitys.UILabel;
 import eu.gir.girsignals.guis.guilib.entitys.UIRotate;
 import eu.gir.girsignals.guis.guilib.entitys.UIScale;
 import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
+import eu.gir.girsignals.guis.guilib.entitys.UIToolTip;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -32,31 +35,22 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class GuiSignalController extends GuiBase {
 	
 	private final BlockPos pos;
-	private final SignalControllerTileEntity tile;
-	private final UIBlockRender blockRender = new UIBlockRender();
-	private final AtomicReference<HashMap<SEProperty<?>, Object>> reference = new AtomicReference<>();
-	private final AtomicReference<IBlockState> referenceBlockState = new AtomicReference<>();
-	
-	private UIEntity list;
-	private String name;
-	
+	private final ContainerSignalController controller;
+	private final UIEntity lowerEntity = new UIEntity();
+	private boolean previewMode = false;
+
 	public GuiSignalController(final SignalControllerTileEntity tile) {
-		super("TestTitle");
 		this.pos = tile.getPos();
+		this.controller = new ContainerSignalController(tile, this::init);
+		Minecraft.getMinecraft().player.openContainer = this.controller;
 		this.compound = tile.getTag();
-		this.tile = tile;
-		tile.loadChunkAndGetTile((t, c) -> {
-			reference.set(t.getProperties());
-			final IBlockState state = c.getBlockState(t.getPos()).withProperty(Signal.ANGEL, SignalAngel.ANGEL0);
-			referenceBlockState.set(state.getBlock().getExtendedState(state, c.getWorld(), t.getPos()));
-		});
 		init();
 	}
 	
 	private void initMode(EnumMode mode, Signal signal) {
 		switch (mode) {
 		case MANUELL:
-			addManuellMode(signal);
+			addManuellMode();
 			break;
 		case SINGLE:
 			break;
@@ -68,46 +62,82 @@ public class GuiSignalController extends GuiBase {
 	}
 	
 	private void init() {
-		final IBlockState currentState = referenceBlockState.get();
-		final int typeId = this.tile.getSignalTypeImpl();
-		if (typeId < 0 || currentState == null) {
+		this.entity.clear();
+		
+		final Signal signal = this.controller.getSignal();
+		if (signal == null) {
 			this.entity.add(new UILabel("Not connected"));
 			return;
 		}
+		lowerEntity.setInheritHeight(true);
+		lowerEntity.setInheritWidth(true);
 		
-		final Signal signal = Signal.SIGNALLIST.get(typeId);
-		this.name = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name") + (this.tile.hasCustomName() ? " - " + this.tile.getName() : "");
+		final String name = I18n.format("tile." + signal.getRegistryName().getResourcePath() + ".name");
 		
-		this.list = new UIEntity();
-		this.list.setInheritHeight(true);
-		this.list.setInheritWidth(true);
+		final UILabel titlelabel = new UILabel(name);
+		titlelabel.setCenterX(false);
 		
-		final UIBox vbox = new UIBox(UIBox.VBoxMode.INSTANCE, 1);
-		this.list.add(vbox);
+		final UIEntity titel = new UIEntity();
+		titel.add(new UIScale(1.2f, 1.2f, 1));
+		titel.add(titlelabel);
+		titel.setInheritHeight(true);
+		titel.setInheritWidth(true);
 		
+		final UIEntity header = new UIEntity();
+		header.setInheritWidth(true);
+		header.setHeight(45);
+		header.add(new UIBox(UIBox.VBoxMode.INSTANCE, 1));
+		header.add(titel);
 		final EnumIntegerable<EnumMode> enumMode = new EnumIntegerable<EnumMode>(EnumMode.class);
 		final UIEntity rsMode = GuiElements.createEnumElement(enumMode, in -> {
-			list.clearChildren();
+			lowerEntity.clearChildren();
 			initMode(enumMode.getObjFromID(in), signal);
-			this.list.read(compound);
 		});
+		header.add(rsMode);
+		
+		final UIEntity middlePart = new UIEntity();
+		middlePart.setInheritHeight(true);
+		middlePart.setInheritWidth(true);
+		middlePart.add(new UIBox(UIBox.VBoxMode.INSTANCE, 1));
+		middlePart.add(header);
+		middlePart.add(lowerEntity);
+		
+		this.entity.add(GuiElements.createSpacerH(10));
+		this.entity.add(middlePart);
+		this.entity.add(GuiElements.createSpacerH(10));
+		this.entity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 1));
+		
+		this.entity.read(compound);
+	}
+	
+	private void addManuellMode() {
+		final UIEntity list = new UIEntity();
+		list.setInheritHeight(true);
+		list.setInheritWidth(true);
+		final UIBox vbox = new UIBox(UIBox.VBoxMode.INSTANCE, 1);
+		list.add(vbox);
+		
 		final UIEntity leftSide = new UIEntity();
 		leftSide.setInheritHeight(true);
 		leftSide.setInheritWidth(true);
-		leftSide.add(rsMode);
 		leftSide.add(list);
 		leftSide.add(GuiElements.createPageSelect(vbox));
 		leftSide.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
-		this.entity.add(leftSide);
-				
+		lowerEntity.add(leftSide);
+		
+		final UIBlockRender blockRender = new UIBlockRender();
+
 		final UIEntity rightSide = new UIEntity();
 		rightSide.setWidth(60);
 		rightSide.setInheritHeight(true);
 		final UIRotate rotation = new UIRotate();
 		rotation.setRotateY(180);
+		rightSide.add(new UIClickable(e -> {
+			previewMode = !previewMode;
+			applyModelChange(blockRender);
+		}, 1));
 		rightSide.add(new UIDrag((x, y) -> rotation.setRotateY(rotation.getRotateY() + x)));
-		
-		blockRender.setBlockState(currentState);
+		rightSide.add(new UIToolTip(I18n.format("controller.preview", previewMode)));
 		
 		rightSide.add(new UIScissor());
 		rightSide.add(new UIIndependentTranslate(35, 150, 40));
@@ -116,34 +146,41 @@ public class GuiSignalController extends GuiBase {
 		rightSide.add(new UIScale(20, -20, 20));
 		rightSide.add(blockRender);
 		
-		this.entity.add(rightSide);
-		
-		this.entity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 1));
-		this.entity.read(compound);
-	}
-	
-	private void addManuellMode(final Signal signal) {
-		final HashMap<SEProperty<?>, Object> map = reference.get();
-		if(map == null)
+		lowerEntity.add(rightSide);
+		lowerEntity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 1));
+
+		final HashMap<SEProperty<?>, Object> map = this.controller.getReference();
+		if (map == null)
 			return;
 		for (SEProperty<?> entry : map.keySet()) {
 			if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE) || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) && entry.test(map.entrySet())) {
-				final UIEntity guiEnum = GuiElements.createEnumElement(entry, e -> {
-				});
-				list.add(guiEnum);
+				list.add(GuiElements.createEnumElement(entry, e -> applyModelChange(blockRender)));
 			}
 		}
+		applyModelChange(blockRender);
 	}
-		
-	@Override
-	public void onGuiClosed() {
-		entity.write(compound);
-		GuiSyncNetwork.sendToPosServer(compound, pos);
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	private void applyModelChange(final UIBlockRender blockRender) {
+		IExtendedBlockState currentState = (IExtendedBlockState) this.controller.getSignal().getDefaultState();
+		for(Entry<SEProperty<?>, Object> e : controller.getReference().entrySet()) {
+			currentState = currentState.withProperty((SEProperty)e.getKey(), e.getValue());
+		}
+
+		if (!previewMode) {
+			for(UIEnumerable property : lowerEntity.findRecursive(UIEnumerable.class)) {
+				final SEProperty sep = SEProperty.cst(controller.lookup.get(property.getId()));
+				if(sep != null)
+					currentState = currentState.withProperty(sep, sep.getObjFromID(property.getIndex()));
+			}
+		}
+		blockRender.setBlockState(currentState);
 	}
 	
 	@Override
-	public String getTitle() {
-		return this.name;
+	public void onGuiClosed() {
+		this.entity.write(compound);
+		GuiSyncNetwork.sendToPosServer(compound, pos);
 	}
 	
 }
