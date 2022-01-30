@@ -1,19 +1,23 @@
 package eu.gir.girsignals.guis;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import eu.gir.girsignals.EnumSignals.EnumMode;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.guis.guilib.DrawUtil.BoolIntegerables;
 import eu.gir.girsignals.guis.guilib.DrawUtil.EnumIntegerable;
+import eu.gir.girsignals.guis.guilib.DrawUtil.SizeIntegerables;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.entitys.UIBlockRender;
 import eu.gir.girsignals.guis.guilib.entitys.UIBox;
 import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
+import eu.gir.girsignals.guis.guilib.entitys.UIColor;
 import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
@@ -22,10 +26,15 @@ import eu.gir.girsignals.guis.guilib.entitys.UILabel;
 import eu.gir.girsignals.guis.guilib.entitys.UIRotate;
 import eu.gir.girsignals.guis.guilib.entitys.UIScale;
 import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
+import eu.gir.girsignals.guis.guilib.entitys.UITexture;
 import eu.gir.girsignals.guis.guilib.entitys.UIToolTip;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
@@ -48,17 +57,66 @@ public class GuiSignalController extends GuiBase {
 	}
 	
 	private void initMode(EnumMode mode, Signal signal) {
+		lowerEntity.clear();
 		switch (mode) {
 		case MANUELL:
 			addManuellMode();
 			break;
 		case SINGLE:
+			addSingleRSMode();
 			break;
 		case MUX:
 			break;
 		default:
 			break;
 		}
+	}
+	
+	private void addSingleRSMode() {
+		this.lowerEntity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 2));
+		
+		final UIEntity leftSide = new UIEntity();
+		leftSide.setInheritHeight(true);
+		leftSide.setInheritWidth(true);
+		this.lowerEntity.add(leftSide);
+		
+		final UIEntity rightSide = new UIEntity();
+		rightSide.setInheritHeight(true);
+		rightSide.setWidth(30);
+		rightSide.add(new UIBox(UIBox.VBoxMode.INSTANCE, 4));
+		
+		final IBlockState state = Minecraft.getMinecraft().player.world.getBlockState(pos);
+		final IBakedModel model = Minecraft.getMinecraft().getBlockRendererDispatcher().getModelForState(state);
+		final UIEnumerable toggle = new UIEnumerable(EnumFacing.VALUES.length, "singleModeFace");
+		toggle.setOnChange(e -> {
+			final EnumFacing faceing = EnumFacing.VALUES[e];
+			
+			final List<UIColor> colors = rightSide.findRecursive(UIColor.class);
+			colors.forEach(c -> c.setColor(0x70000000));
+			colors.get(e).setColor(0x70FF0000);
+			leftSide.write(compound);
+			leftSide.clearChildren();
+			leftSide.add(GuiElements.createBoolElement(BoolIntegerables.of("eP"), null));
+			leftSide.read(compound);
+		});
+		rightSide.add(toggle);
+
+		for(EnumFacing face : EnumFacing.VALUES) {
+			final List<BakedQuad> quad = model.getQuads(state, face, 0);
+			final UIEntity faceEntity = new UIEntity();
+			faceEntity.setWidth(20);
+			faceEntity.setHeight(20);
+			faceEntity.add(new UITexture(quad.get(0).getSprite()));
+			final UIColor color = new UIColor(0x70000000);
+			faceEntity.add(color);
+			faceEntity.add(new UIClickable(e -> toggle.setIndex(face.ordinal())));
+			final UILabel label = new UILabel(face.getName().substring(0, 1).toUpperCase());
+			label.setTextColor(0xFFFFFFFF);
+			faceEntity.add(label);
+			rightSide.add(faceEntity);
+		}
+		
+		this.lowerEntity.add(rightSide);
 	}
 	
 	private void init() {
@@ -90,15 +148,17 @@ public class GuiSignalController extends GuiBase {
 		header.add(titel);
 		final EnumIntegerable<EnumMode> enumMode = new EnumIntegerable<EnumMode>(EnumMode.class);
 		final UIEntity rsMode = GuiElements.createEnumElement(enumMode, in -> {
+			lowerEntity.write(compound);
 			lowerEntity.clearChildren();
 			initMode(enumMode.getObjFromID(in), signal);
+			this.lowerEntity.read(compound);
 		});
 		header.add(rsMode);
 		
 		final UIEntity middlePart = new UIEntity();
 		middlePart.setInheritHeight(true);
 		middlePart.setInheritWidth(true);
-		middlePart.add(new UIBox(UIBox.VBoxMode.INSTANCE, 1));
+		middlePart.add(new UIBox(UIBox.VBoxMode.INSTANCE, 4));
 		middlePart.add(header);
 		middlePart.add(lowerEntity);
 		
