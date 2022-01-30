@@ -310,7 +310,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	
 	@Override
 	public void updateTag(NBTTagCompound compound) {
-		if (compound == null)
+		if (compound == null || tableOfSupportedSignalTypes == null)
 			return;
 		compound.getKeySet().forEach(str -> {
 			if (tableOfSupportedSignalTypes.containsKey(str)) {
