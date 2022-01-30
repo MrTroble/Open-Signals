@@ -1,5 +1,9 @@
 # Changelog
 
+## [Fix] 01.30.2022 - 1
+
+* Fixed client sync 
+
 ## [Update/Fixes] 01.28.2022 - 1
 
 * Updated UI system
