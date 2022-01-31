@@ -48,8 +48,6 @@ public class SignalControllerTileEntity extends TileEntity
     private NBTTagCompound compound = new NBTTagCompound();
     private final HashMap<EnumFacing, Map<EnumState, String>> statesEnabled = new HashMap<EnumFacing, Map<EnumState, String>>();
 
-    public static final String UPDATE_FLAG = "updateflag";
-
     private static final String ID_X = "xLinkedPos";
     private static final String ID_Y = "yLinkedPos";
     private static final String ID_Z = "zLinkedPos";
@@ -341,7 +339,7 @@ public class SignalControllerTileEntity extends TileEntity
 
     @Override
     public void updateTag(NBTTagCompound compound) {
-        if (compound == null)
+        if (compound == null || tableOfSupportedSignalTypes == null)
             return;
         this.compound = compound;
 
@@ -372,19 +370,19 @@ public class SignalControllerTileEntity extends TileEntity
     }
 
     public void redstoneUpdate() {
-        if(compound == null || tableOfSupportedSignalTypes == null)
+        if (compound == null || tableOfSupportedSignalTypes == null)
             return;
         for (EnumFacing face : EnumFacing.VALUES) {
             final EnumState currenState = this.world.isSidePowered(pos, face) ? EnumState.ONSTATE
                     : EnumState.OFFSTATE;
-            if(!this.statesEnabled.containsKey(face))
+            if (!this.statesEnabled.containsKey(face))
                 continue;
             final String profile = this.statesEnabled.get(face).get(currenState);
-            if(profile == null)
+            if (profile == null)
                 continue;
             compound.getKeySet().stream().filter(key -> key.endsWith(profile)).forEach(e -> {
                 final int value = compound.getInteger(e);
-                if(value == 0)
+                if (value == 0)
                     return;
                 final String name = e.split("\\.")[0];
                 if (tableOfSupportedSignalTypes.containsKey(name)) {

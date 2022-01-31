@@ -66,13 +66,15 @@ public class ContainerSignalController extends Container implements UIClientSync
 		hVExtendedBlockState.getUnlistedProperties().forEach(p -> lookup.put(p.getName(), (SEProperty<?>) p));
 		
 		final NBTTagCompound comp = (NBTTagCompound) compound.getTag("list");
-		final HashMap<SEProperty<?>, Object> map = new HashMap<>();
-		comp.getKeySet().forEach(str -> {
-			@SuppressWarnings("rawtypes")
-			final SEProperty property = lookup.get(str);
-			map.put(property, property.getObjFromID(comp.getInteger(str)));
-		});
-		reference.set(map);
+		if (comp != null) {
+			final HashMap<SEProperty<?>, Object> map = new HashMap<>();
+			comp.getKeySet().forEach(str -> {
+				@SuppressWarnings("rawtypes")
+				final SEProperty property = lookup.get(str);
+				map.put(property, property.getObjFromID(comp.getInteger(str)));
+			});
+			reference.set(map);
+		}
 		this.onUpdate.run();
 	}
 	
