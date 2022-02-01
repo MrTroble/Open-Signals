@@ -369,7 +369,6 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 			if (!this.statesEnabled.containsKey(face))
 				continue;
 			final boolean state = this.world.isSidePowered(pos.offset(face), face);
-			System.out.println(face.getName() + " - " + state);
 			final boolean old = this.currentStates[face.ordinal()];
 			if(state == old)
 				continue;
@@ -378,13 +377,11 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 			final String profile = this.statesEnabled.get(face).get(currenState);
 			if (profile == null)
 				continue;
-			System.out.println(profile + " - " + face + " - " + currenState);
 			compound.getKeySet().stream().filter(key -> key.endsWith(profile)).forEach(e -> {
 				final int value = compound.getInteger(e);
 				if (value < 0)
 					return;
 				final String name = e.split("\\.")[0];
-				System.out.println(name);
 				if (tableOfSupportedSignalTypes.containsKey(name)) {
 					int id = tableOfSupportedSignalTypes.get(name);
 					changeSignalImpl(id, value);
