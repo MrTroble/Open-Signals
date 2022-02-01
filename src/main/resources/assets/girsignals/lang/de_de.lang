@@ -178,6 +178,11 @@ property.value.MUX=Redstone MUX
 property.value.MUX_CONTROL=Signalteil
 property.value.SIGNAL_CONTROL=Signalbild
 property.value.None=Nichts
+property.profile.name=Profil
+property.enumstate.name=Redstone Zustand
+property.value.DISABLED=Deaktiviert
+property.value.OFFSTATE=Aus
+property.value.ONSTATE=An
 
 #Signalcontroller Description
 property.enummode.desc=Hier kannst du zwischen Manuellen Modus und Redstone Einzel- bzw. MUX-Modus umschalten. im Manuellen Modus kannst du das Signal über die GUI ändern, im Redstone Modus kannst du an den Controller Redstone anschließen und darüber das Signal steuern. Zusätzlich kann ein Signal auch immer über einen Computer von OpenComputers angesteuert werden.
@@ -186,6 +191,8 @@ property.enummuxmode.desc=Wechselt den MUX Eingang zwischen Signalteil und Signa
 property.enumfacing.desc=Hier kannst du die Seite, die angesteuert wird, des Controllers ändern.
 property.sigtype.desc=Hier kannst du den Signalteil ändern.
 controller.preview=Mit Rechtsklick um Preview zu ändern. Preview-Modus: %b
+property.profile.desc=Hier kannst du verschiedene Profile einstellen, die entsprechend der Seite des Controllers und ob Redstone Signal aktiv oder nicht ist, aktiviert werden.
+property.enumstate.desc=Gibt an, ob das Profil deaktiviert ist, bei aktiven Redstone Signal oder ausgeschalteten Redstone Signal geladen wird. 
 
 #Directions
 property.value.up=Oben
