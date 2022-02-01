@@ -333,6 +333,8 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 			});
 		}
 		updateRSProfiles();
+		final IBlockState state = world.getBlockState(pos);
+		this.world.notifyBlockUpdate(pos, state, state, 3);
 	}
 	
 	private void changeProfile(String onProfile, EnumFacing face, EnumState state) {
