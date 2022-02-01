@@ -8,6 +8,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 
+import com.google.common.collect.Maps;
+
+import eu.gir.girsignals.EnumSignals.EnumMode;
+import eu.gir.girsignals.EnumSignals.EnumState;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
@@ -25,6 +29,7 @@ import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.chunk.Chunk;
@@ -40,8 +45,8 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	private Map<String, Integer> tableOfSupportedSignalTypes;
 	private int signalTypeCache = -1;
 	private NBTTagCompound compound = new NBTTagCompound();
-	
-	public static final String UPDATE_FLAG = "updateflag";
+	private final HashMap<EnumFacing, Map<EnumState, String>> statesEnabled = new HashMap<EnumFacing, Map<EnumState, String>>();
+	private final boolean[] currentStates = new boolean[EnumFacing.values().length];
 	
 	private static final String ID_X = "xLinkedPos";
 	private static final String ID_Y = "yLinkedPos";
@@ -72,6 +77,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 		linkedSignalPosition = readBlockPosFromNBT(compound);
 		this.compound = compound.getCompoundTag(ID_COMP);
 		super.readFromNBT(compound);
+		this.updateRSProfiles();
 		if (world != null && world.isRemote && linkedSignalPosition != null)
 			onLink();
 	}
@@ -308,18 +314,80 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 		return true;
 	}
 	
+	private boolean inMode(EnumMode mode) {
+		return this.compound.getInteger(EnumMode.class.getSimpleName().toLowerCase()) == mode.ordinal();
+	}
+	
 	@Override
 	public void updateTag(NBTTagCompound compound) {
 		if (compound == null || tableOfSupportedSignalTypes == null)
 			return;
-		compound.getKeySet().forEach(str -> {
-			if (tableOfSupportedSignalTypes.containsKey(str)) {
-				int type = compound.getInteger(str);
-				int id = tableOfSupportedSignalTypes.get(str);
-				changeSignalImpl(id, type);
-			}
-		});
 		this.compound = compound;
+		
+		if (inMode(EnumMode.MANUELL)) {
+			compound.getKeySet().forEach(str -> {
+				if (tableOfSupportedSignalTypes.containsKey(str)) {
+					int type = compound.getInteger(str);
+					int id = tableOfSupportedSignalTypes.get(str);
+					changeSignalImpl(id, type);
+				}
+			});
+		}
+		updateRSProfiles();
+		final IBlockState state = world.getBlockState(pos);
+		this.world.notifyBlockUpdate(pos, state, state, 3);
+	}
+	
+	private void changeProfile(String onProfile, EnumFacing face, EnumState state) {
+		if (compound.hasKey(onProfile)) {
+			if (!this.statesEnabled.containsKey(face))
+				this.statesEnabled.put(face, Maps.newHashMap());
+			final int value = compound.getInteger(onProfile);
+			final Map<EnumState, String> faceMap = this.statesEnabled.get(face);
+			if (value < 0) {
+				faceMap.remove(state);
+			} else {
+				faceMap.put(state, "p" + value);
+			}
+		}
+	}
+	
+	private void updateRSProfiles() {
+		this.statesEnabled.clear();
+		for (EnumFacing face : EnumFacing.VALUES) {
+			final String offProfile = "profileOff." + face.getName();
+			final String onProfile = "profileOn." + face.getName();
+			changeProfile(onProfile, face, EnumState.ONSTATE);
+			changeProfile(offProfile, face, EnumState.OFFSTATE);
+		}
+	}
+	
+	public void redstoneUpdate() {
+		if (compound == null || tableOfSupportedSignalTypes == null)
+			return;
+		for (EnumFacing face : EnumFacing.VALUES) {
+			if (!this.statesEnabled.containsKey(face))
+				continue;
+			final boolean state = this.world.isSidePowered(pos.offset(face), face);
+			final boolean old = this.currentStates[face.ordinal()];
+			if(state == old)
+				continue;
+			this.currentStates[face.ordinal()] = state;
+			final EnumState currenState = state ? EnumState.ONSTATE : EnumState.OFFSTATE;
+			final String profile = this.statesEnabled.get(face).get(currenState);
+			if (profile == null)
+				continue;
+			compound.getKeySet().stream().filter(key -> key.endsWith(profile)).forEach(e -> {
+				final int value = compound.getInteger(e);
+				if (value < 0)
+					return;
+				final String name = e.split("\\.")[0];
+				if (tableOfSupportedSignalTypes.containsKey(name)) {
+					int id = tableOfSupportedSignalTypes.get(name);
+					changeSignalImpl(id, value);
+				}
+			});
+		}
 	}
 	
 	@Override

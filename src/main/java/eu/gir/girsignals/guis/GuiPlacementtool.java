@@ -61,7 +61,7 @@ public class GuiPlacementtool extends GuiBase {
 			final SEProperty<?> prop = SEProperty.cst(property);
 			of(prop, inp -> applyModelChanges());
 		}
-		if(currentSelectedBlock.canHaveCustomname(new HashMap<>()))
+		if (currentSelectedBlock.canHaveCustomname(new HashMap<>()))
 			list.add(GuiElements.createInputElement(Signal.CUSTOMNAME, in -> applyModelChanges()));
 		this.list.read(compound);
 	}
@@ -172,7 +172,7 @@ public class GuiPlacementtool extends GuiBase {
 		
 		final List<UIEnumerable> enumerables = this.list.findRecursive(UIEnumerable.class);
 		for (UIEnumerable enumerable : enumerables) {
-			SEProperty sep = (SEProperty) lookup.get(enumerable.getId());
+			SEProperty sep = (SEProperty) lookup.get(enumerable.getID());
 			if (sep == null)
 				return;
 			ebs = (IExtendedBlockState) ebs.withProperty(sep, sep.getObjFromID(enumerable.getIndex()));
@@ -180,7 +180,7 @@ public class GuiPlacementtool extends GuiBase {
 		
 		final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
 		for (UICheckBox checkb : checkbox) {
-			final SEProperty sep = (SEProperty) lookup.get(checkb.getId());
+			final SEProperty sep = (SEProperty) lookup.get(checkb.getID());
 			if (sep == null)
 				return;
 			if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
@@ -196,7 +196,7 @@ public class GuiPlacementtool extends GuiBase {
 				ebs = ebs.withProperty(property, property.getDefault());
 			}
 		}
-				
+		
 		blockRender.setBlockState(ebs);
 	}
 }

@@ -452,6 +452,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 			cm.register("trafficlight/trafficlight_car", with(SignalTram.CARSIGNAL, CAR.YELLOW::equals).and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.CAR::equals)), 0, "yellownorth", "girsignals:blocks/lamps/lamp_yellow");
 			// Car green
 			cm.register("trafficlight/trafficlight_car", with(SignalTram.CARSIGNAL, CAR.GREEN::equals).and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.CAR::equals)), 0, "greennorth", "girsignals:blocks/lamps/lamp_green");
+			// Car red-yellow
+			cm.register("trafficlight/trafficlight_car", with(SignalTram.CARSIGNAL, CAR.RED_YELLOW::equals).and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.CAR::equals)), 0, "rednorth", "girsignals:blocks/lamps/lamp_red", "yellownorth", "girsignals:blocks/lamps/lamp_yellow");
 			// Pedestrian Signal
 			cm.register("trafficlight/trafficlight_ped", with(SignalTram.PEDSIGNAL, PED.OFF::equals).and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.PEDESTRIAN::equals)), 0);
 			cm.register("trafficlight/trafficlight_ped", with(SignalTram.PEDSIGNAL, PED.RED::equals).and(withN(SignalTram.TRAMSIGNAL_TYPE, TRAMTYPE.PEDESTRIAN::equals)), 0, "rednorth", "girsignals:blocks/lamps/lamp_red");

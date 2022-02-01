@@ -36,4 +36,11 @@ public class SignalController extends Block implements ITileEntityProvider {
 		return new SignalControllerTileEntity();
 	}
 	
+	@Override
+	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
+		final TileEntity tile = world.getTileEntity(pos);
+		if (tile instanceof SignalControllerTileEntity) {
+			((SignalControllerTileEntity) tile).redstoneUpdate();
+		}
+	}
 }

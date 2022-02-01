@@ -1,5 +1,11 @@
 # Changelog
 
+## [Update] 02.01.2022 - 1
+
+* Readded new redstone mode interface
+* Updated readme
+* Added yellow-red traffic light state
+
 ## [Fix] 01.30.2022 - 1
 
 * Fixed client sync 
