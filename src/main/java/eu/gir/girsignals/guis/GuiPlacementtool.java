@@ -61,7 +61,7 @@ public class GuiPlacementtool extends GuiBase {
 			final SEProperty<?> prop = SEProperty.cst(property);
 			of(prop, inp -> applyModelChanges());
 		}
-		if(currentSelectedBlock.canHaveCustomname(new HashMap<>()))
+		if (currentSelectedBlock.canHaveCustomname(new HashMap<>()))
 			list.add(GuiElements.createInputElement(Signal.CUSTOMNAME, in -> applyModelChanges()));
 		this.list.read(compound);
 	}
@@ -196,7 +196,7 @@ public class GuiPlacementtool extends GuiBase {
 				ebs = ebs.withProperty(property, property.getDefault());
 			}
 		}
-				
+		
 		blockRender.setBlockState(ebs);
 	}
 }
