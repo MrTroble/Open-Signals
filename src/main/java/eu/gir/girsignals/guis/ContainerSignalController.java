@@ -28,11 +28,12 @@ public class ContainerSignalController extends Container implements UIClientSync
 	public final HashMap<String, SEProperty<?>> lookup = new HashMap<String, SEProperty<?>>();
 	
 	public ContainerSignalController(SignalControllerTileEntity tile) {
-		tile.loadChunkAndGetTile((t, c) -> {
+		if (!tile.loadChunkAndGetTile((t, c) -> {
 			reference.set(t.getProperties());
 			final IBlockState state = c.getBlockState(t.getPos());
 			referenceBlock.set((Signal) state.getBlock());
-		});
+		}))
+			referenceBlock.set(null);
 	}
 	
 	public ContainerSignalController(Runnable onUpdate) {
@@ -61,18 +62,24 @@ public class ContainerSignalController extends Container implements UIClientSync
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
+		if (!compound.hasKey("state")) {
+			this.referenceBlock.set(null);
+			return;
+		}
 		referenceBlock.set(Signal.SIGNALLIST.get(compound.getInteger("state")));
 		final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) referenceBlock.get().getBlockState();
 		hVExtendedBlockState.getUnlistedProperties().forEach(p -> lookup.put(p.getName(), (SEProperty<?>) p));
 		
 		final NBTTagCompound comp = (NBTTagCompound) compound.getTag("list");
-		final HashMap<SEProperty<?>, Object> map = new HashMap<>();
-		comp.getKeySet().forEach(str -> {
-			@SuppressWarnings("rawtypes")
-			final SEProperty property = lookup.get(str);
-			map.put(property, property.getObjFromID(comp.getInteger(str)));
-		});
-		reference.set(map);
+		if (comp != null) {
+			final HashMap<SEProperty<?>, Object> map = new HashMap<>();
+			comp.getKeySet().forEach(str -> {
+				@SuppressWarnings("rawtypes")
+				final SEProperty property = lookup.get(str);
+				map.put(property, property.getObjFromID(comp.getInteger(str)));
+			});
+			reference.set(map);
+		}
 		this.onUpdate.run();
 	}
 	

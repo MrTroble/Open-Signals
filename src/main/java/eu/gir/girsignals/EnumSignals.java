@@ -250,7 +250,8 @@ public class EnumSignals {
 		OFF,
 		RED,
 		YELLOW,
-		GREEN;
+		GREEN,
+		RED_YELLOW;
 	}
 	
 	public enum PED implements Offable<PED> {
@@ -463,6 +464,12 @@ public class EnumSignals {
 		MANUELL,
 		SINGLE,
 		MUX
+	}
+	
+	public static enum EnumState {
+		DISABLED,
+		OFFSTATE,
+		ONSTATE
 	}
 	
 }
