@@ -363,7 +363,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 		if (compound == null || tableOfSupportedSignalTypes == null)
 			return;
 		for (EnumFacing face : EnumFacing.VALUES) {
-			final EnumState currenState = this.world.isSidePowered(pos, face) ? EnumState.ONSTATE : EnumState.OFFSTATE;
+			final EnumState currenState = this.world.isBlockPowered(pos.offset(face)) ? EnumState.ONSTATE : EnumState.OFFSTATE;
 			if (!this.statesEnabled.containsKey(face))
 				continue;
 			final String profile = this.statesEnabled.get(face).get(currenState);
