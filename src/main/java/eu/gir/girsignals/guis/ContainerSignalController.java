@@ -28,11 +28,12 @@ public class ContainerSignalController extends Container implements UIClientSync
 	public final HashMap<String, SEProperty<?>> lookup = new HashMap<String, SEProperty<?>>();
 	
 	public ContainerSignalController(SignalControllerTileEntity tile) {
-		tile.loadChunkAndGetTile((t, c) -> {
+		if (!tile.loadChunkAndGetTile((t, c) -> {
 			reference.set(t.getProperties());
 			final IBlockState state = c.getBlockState(t.getPos());
 			referenceBlock.set((Signal) state.getBlock());
-		});
+		}))
+			referenceBlock.set(null);
 	}
 	
 	public ContainerSignalController(Runnable onUpdate) {
@@ -61,6 +62,10 @@ public class ContainerSignalController extends Container implements UIClientSync
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
+		if (!compound.hasKey("state")) {
+			this.referenceBlock.set(null);
+			return;
+		}
 		referenceBlock.set(Signal.SIGNALLIST.get(compound.getInteger("state")));
 		final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) referenceBlock.get().getBlockState();
 		hVExtendedBlockState.getUnlistedProperties().forEach(p -> lookup.put(p.getName(), (SEProperty<?>) p));
