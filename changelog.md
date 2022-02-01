@@ -1,5 +1,9 @@
 # Changelog
 
+## [Update] 02.01.2022 - 1
+
+* Readded new redstone mode interface
+
 ## [Fix] 01.30.2022 - 1
 
 * Fixed client sync 
