@@ -192,7 +192,7 @@ property.profileOn.south.name=Süden An
 property.profileOff.west.name=Westen Aus
 property.profileOn.west.name=Westen An
 property.profileOff.east.name=Osten Aus
-vproperty.profileOn.east.name=Osten An
+property.profileOn.east.name=Osten An
 
 #Signalcontroller Description
 property.enummode.desc=Hier kannst du zwischen Manuellen Modus und Redstone Einzel- bzw. MUX-Modus umschalten. im Manuellen Modus kannst du das Signal über die GUI ändern, im Redstone Modus kannst du an den Controller Redstone anschließen und darüber das Signal steuern. Zusätzlich kann ein Signal auch immer über einen Computer von OpenComputers angesteuert werden.
@@ -214,7 +214,7 @@ property.profileOn.south.desc=Redstone An
 property.profileOff.west.desc=Redstone Aus
 property.profileOn.west.desc=Redstone An
 property.profileOff.east.desc=Redstone Aus
-vproperty.profileOn.east.desc=Redstone An
+property.profileOn.east.desc=Redstone An
 
 
 #Directions
