@@ -110,7 +110,7 @@ public class EnumSignals {
     }
 
     public enum CAR implements Offable<CAR> {
-        OFF, RED, YELLOW, GREEN;
+        OFF, RED, YELLOW, GREEN, RED_YELLOW;
     }
 
     public enum PED implements Offable<PED> {
@@ -203,5 +203,4 @@ public class EnumSignals {
     public static enum EnumState {
         DISABLED, OFFSTATE, ONSTATE
     }
-
 }
