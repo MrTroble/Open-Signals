@@ -214,7 +214,7 @@ property.profileOn.south.desc=Redstone An
 property.profileOff.west.desc=Redstone Aus
 property.profileOn.west.desc=Redstone An
 property.profileOff.east.desc=Redstone Aus
-vproperty.profileOn.east.desc=Redstone An
+property.profileOn.east.desc=Redstone An
 
 
 #Directions
