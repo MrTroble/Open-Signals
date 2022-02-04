@@ -28,7 +28,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 	public final HashMap<String, SEProperty<?>> lookup = new HashMap<String, SEProperty<?>>();
 	
 	public ContainerSignalController(SignalControllerTileEntity tile) {
-		if (!tile.loadChunkAndGetTile((t, c) -> {
+		if (!tile.loadChunkAndGetTile(tile.getWorld(), tile.getLinkedPosition(), (t, c) -> {
 			reference.set(t.getProperties());
 			final IBlockState state = c.getBlockState(t.getPos());
 			referenceBlock.set((Signal) state.getBlock());

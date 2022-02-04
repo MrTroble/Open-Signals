@@ -22,14 +22,13 @@ import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldNameable;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class SignalControllerTileEntity extends TileEntity implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile, IChunkloadable<SignalTileEnity> {
+public class SignalControllerTileEntity extends SyncableTileEntity implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile, IChunkloadable<SignalTileEnity> {
 	
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
@@ -80,10 +79,10 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 		compound.setTag(ID_COMP, this.compound);
 		return compound;
 	}
-		
+	
 	public void onLink() {
 		new Thread(() -> {
-			loadChunkAndGetTile((sigtile, ch) -> {
+			loadChunkAndGetTile(world, linkedSignalPosition, (sigtile, ch) -> {
 				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
 				
 				HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
@@ -142,7 +141,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 		if (!find(getSupportedSignalTypesImpl(), type))
 			return false;
 		final AtomicBoolean rtc = new AtomicBoolean(true);
-		loadChunkAndGetTile((tile, chunk) -> {
+		loadChunkAndGetTile(world, linkedSignalPosition, (tile, chunk) -> {
 			IBlockState state = chunk.getBlockState(linkedSignalPosition);
 			Signal block = (Signal) state.getBlock();
 			SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
@@ -177,7 +176,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 		if (!find(getSupportedSignalTypesImpl(), type))
 			return -1;
 		final AtomicReference<SignalTileEnity> entity = new AtomicReference<SignalTileEnity>();
-		loadChunkAndGetTile((sig, ch) -> entity.set(sig));
+		loadChunkAndGetTile(world, linkedSignalPosition, (sig, ch) -> entity.set(sig));
 		final SignalTileEnity tile = entity.get();
 		if (tile == null)
 			return -1;
@@ -212,7 +211,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	public boolean hasLink() {
 		if (linkedSignalPosition == null)
 			return false;
-		if (loadChunkAndGetTile((x, y) -> {
+		if (loadChunkAndGetTile(world, linkedSignalPosition, (x, y) -> {
 		}))
 			return true;
 		if (!world.isRemote)
@@ -294,7 +293,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 				continue;
 			final boolean state = this.world.isSidePowered(pos.offset(face), face);
 			final boolean old = this.currentStates[face.ordinal()];
-			if(state == old)
+			if (state == old)
 				continue;
 			this.currentStates[face.ordinal()] = state;
 			final EnumState currenState = state ? EnumState.ONSTATE : EnumState.OFFSTATE;
@@ -318,5 +317,5 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	public NBTTagCompound getTag() {
 		return this.compound;
 	}
-
+	
 }

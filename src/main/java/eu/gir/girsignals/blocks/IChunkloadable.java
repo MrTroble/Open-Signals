@@ -14,15 +14,7 @@ import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
 import net.minecraft.world.gen.ChunkProviderServer;
 
 public interface IChunkloadable<T> {
-	
-	BlockPos getPos();
-	
-	World getWorld();
-	
-	default boolean loadChunkAndGetTile(BiConsumer<T, Chunk> consumer) {
-		return loadChunkAndGetTile(getWorld(), getPos(), consumer);
-	}
-	
+			
 	default boolean loadChunkAndGetTile(World w, BlockPos pos, BiConsumer<T, Chunk> consumer) {
 		if (pos == null)
 			return false;
@@ -44,7 +36,7 @@ public interface IChunkloadable<T> {
 				if (ch == null)
 					return false;
 				entity = ch.getTileEntity(pos, EnumCreateEntityType.IMMEDIATE);
-				boolean flag2 = entity != null;
+				final boolean flag2 = entity != null;
 				if (flag2) {
 					consumer.accept((T) entity, ch);
 				}
@@ -60,7 +52,7 @@ public interface IChunkloadable<T> {
 				}
 				return flag2;
 			};
-			MinecraftServer mcserver = w.getMinecraftServer();
+			final MinecraftServer mcserver = w.getMinecraftServer();
 			if (mcserver == null)
 				return Minecraft.getMinecraft().addScheduledTask(call).get();
 			return mcserver.callFromMainThread(call).get();

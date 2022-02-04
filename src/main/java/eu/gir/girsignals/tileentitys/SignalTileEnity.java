@@ -11,9 +11,6 @@ import eu.gir.girsignals.blocks.Signal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IWorldNameable;
@@ -23,7 +20,7 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SignalTileEnity extends TileEntity implements IWorldNameable {
+public class SignalTileEnity extends SyncableTileEntity implements IWorldNameable {
 	
 	private HashMap<SEProperty<?>, Object> map = new HashMap<>();
 	
@@ -82,23 +79,7 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 			__tmp = null;
 		}
 	}
-	
-	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
-	}
-	
-	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-		this.readFromNBT(pkt.getNbtCompound());
-		world.markBlockRangeForRenderUpdate(pos, pos);
-	}
-	
-	@Override
-	public NBTTagCompound getUpdateTag() {
-		return writeToNBT(new NBTTagCompound());
-	}
-	
+		
 	public <T extends Comparable<T>> void setProperty(SEProperty<T> prop, T opt) {
 		map.put(prop, opt);
 		this.markDirty();
@@ -173,4 +154,5 @@ public class SignalTileEnity extends TileEntity implements IWorldNameable {
 	public int getBlockID() {
 		return blockID;
 	}
+
 }
