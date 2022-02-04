@@ -2,6 +2,7 @@ package eu.gir.girsignals.proxy;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.blocks.SignalBox;
 import eu.gir.girsignals.guis.ContainerSignalController;
 import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.guis.guilib.UIInit;
@@ -20,7 +21,8 @@ public class CommonProxy {
 		UIInit.initCommon(GirsignalsMain.MODID);
 		GuiHandler.addServer(Placementtool.class, (p, w, bp) -> null);
 		GuiHandler.addServer(Signal.class, (p, w, bp) -> new ContainerSignalController((SignalControllerTileEntity) w.getTileEntity(bp)));
-		
+		GuiHandler.addServer(SignalBox.class, (p, w, bp) -> null);
+
 		GIRItems.init();
 		GIRBlocks.init();
 		

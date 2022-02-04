@@ -3,10 +3,8 @@ package eu.gir.girsignals.tileentitys;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 
 import com.google.common.collect.Maps;
 
@@ -14,6 +12,7 @@ import eu.gir.girsignals.EnumSignals.EnumMode;
 import eu.gir.girsignals.EnumSignals.EnumState;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.ISyncable;
 import eu.gir.girsignals.linkableApi.ILinkableTile;
@@ -22,23 +21,15 @@ import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldNameable;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
-import net.minecraft.world.gen.ChunkProviderServer;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class SignalControllerTileEntity extends TileEntity implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile {
+public class SignalControllerTileEntity extends TileEntity implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile, IChunkloadable<SignalTileEnity> {
 	
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
@@ -89,24 +80,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 		compound.setTag(ID_COMP, this.compound);
 		return compound;
 	}
-	
-	@Override
-	public SPacketUpdateTileEntity getUpdatePacket() {
-		return new SPacketUpdateTileEntity(pos, 0, getUpdateTag());
-	}
-	
-	@Override
-	public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-		this.readFromNBT(pkt.getNbtCompound());
-		if (hasLink())
-			onLink();
-	}
-	
-	@Override
-	public NBTTagCompound getUpdateTag() {
-		return writeToNBT(new NBTTagCompound());
-	}
-	
+		
 	public void onLink() {
 		new Thread(() -> {
 			loadChunkAndGetTile((sigtile, ch) -> {
@@ -124,9 +98,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
 				tableOfSupportedSignalTypes = supportedSignaleStates;
 				signalTypeCache = ((Signal) ch.getBlockState(linkedSignalPosition).getBlock()).getID();
-				IBlockState nstate = this.world.getBlockState(pos);
-				this.markDirty();
-				this.world.notifyBlockUpdate(pos, nstate, nstate, 3);
+				syncClient();
 			});
 		}).start();
 	}
@@ -135,8 +107,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	public void onLoad() {
 		if (linkedSignalPosition != null) {
 			onLink();
-			IBlockState state = world.getBlockState(pos);
-			this.world.notifyBlockUpdate(pos, state, state, 3);
+			syncClient();
 		}
 	}
 	
@@ -144,52 +115,6 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	@Optional.Method(modid = "opencomputers")
 	public Object[] hasLink(Context context, Arguments args) {
 		return new Object[] { hasLink() };
-	}
-	
-	public boolean loadChunkAndGetTile(BiConsumer<SignalTileEnity, Chunk> consumer) {
-		if (linkedSignalPosition == null)
-			return false;
-		try {
-			Callable<Boolean> call = () -> {
-				TileEntity entity = null;
-				Chunk ch = world.getChunkFromBlockCoords(linkedSignalPosition);
-				boolean flag = !ch.isLoaded();
-				if (flag) {
-					if (world.isRemote) {
-						ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
-						ch = client.loadChunk(ch.x, ch.z);
-					} else {
-						ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
-						ch = server.loadChunk(ch.x, ch.z);
-					}
-				}
-				if (ch == null)
-					return false;
-				entity = ch.getTileEntity(linkedSignalPosition, EnumCreateEntityType.IMMEDIATE);
-				boolean flag2 = entity instanceof SignalTileEnity && ((SignalTileEnity) entity).getBlockID() != -1;
-				if (flag2) {
-					consumer.accept((SignalTileEnity) entity, ch);
-				}
-				
-				if (flag) {
-					if (world.isRemote) {
-						ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
-						client.unloadChunk(ch.x, ch.z);
-					} else {
-						ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
-						server.queueUnload(ch);
-					}
-				}
-				return flag2;
-			};
-			MinecraftServer mcserver = world.getMinecraftServer();
-			if (mcserver == null)
-				return Minecraft.getMinecraft().addScheduledTask(call).get();
-			return mcserver.callFromMainThread(call).get();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return false;
 	}
 	
 	@Callback
@@ -334,8 +259,7 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 			});
 		}
 		updateRSProfiles();
-		final IBlockState state = world.getBlockState(pos);
-		this.world.notifyBlockUpdate(pos, state, state, 3);
+		syncClient();
 	}
 	
 	private void changeProfile(String onProfile, EnumFacing face, EnumState state) {
@@ -394,4 +318,5 @@ public class SignalControllerTileEntity extends TileEntity implements ISyncable,
 	public NBTTagCompound getTag() {
 		return this.compound;
 	}
+
 }

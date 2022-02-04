@@ -1,12 +1,15 @@
 package eu.gir.girsignals.proxy;
 
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.blocks.SignalBox;
 import eu.gir.girsignals.guis.GuiPlacementtool;
+import eu.gir.girsignals.guis.GuiSignalBox;
 import eu.gir.girsignals.guis.GuiSignalController;
 import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.init.GIRModels;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.models.GIRCustomModelLoader;
+import eu.gir.girsignals.tileentitys.SignalBoxTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalSpecialRenderer;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
@@ -25,9 +28,15 @@ public class ClientProxy extends CommonProxy {
 		GuiHandler.addGui(Placementtool.class, (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
 		GuiHandler.addGui(Signal.class, (p, w, bp) -> {
 			final TileEntity entity = w.getTileEntity(bp);
-			if (entity == null || !(entity instanceof SignalControllerTileEntity))
+			if (!(entity instanceof SignalControllerTileEntity))
 				return null;
 			return new GuiSignalController((SignalControllerTileEntity) entity);
+		});
+		GuiHandler.addGui(SignalBox.class,  (p, w, bp) -> {
+			final TileEntity entity = w.getTileEntity(bp);
+			if (!(entity instanceof SignalBoxTileEntity))
+				return null;
+			return new GuiSignalBox((SignalBoxTileEntity) entity);
 		});
 		
 		MinecraftForge.EVENT_BUS.register(GIRModels.class);
