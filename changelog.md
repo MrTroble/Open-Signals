@@ -1,5 +1,9 @@
 # Changelog
 
+## [Update] 02.04.2022 - 1
+
+* Imgbot optimizations
+
 ## [Update] 02.01.2022 - 1
 
 * Readded new redstone mode interface
