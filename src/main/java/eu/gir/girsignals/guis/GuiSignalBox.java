@@ -2,6 +2,7 @@ package eu.gir.girsignals.guis;
 
 import java.util.function.Consumer;
 
+import eu.gir.girsignals.guis.UISignalBoxTile.EnumMode;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
@@ -11,7 +12,6 @@ import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
 import eu.gir.girsignals.guis.guilib.entitys.UIColor;
 import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
-import eu.gir.girsignals.guis.guilib.entitys.UIIndependentTranslate;
 import eu.gir.girsignals.guis.guilib.entitys.UILabel;
 import eu.gir.girsignals.guis.guilib.entitys.UIScale;
 import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
@@ -54,41 +54,57 @@ public class GuiSignalBox extends GuiBase {
 		updateButton(entity);
 	}
 	
+	private void editTile(UIEntity tile, UIMenu menu) {
+		tile.setHeight(10);
+		tile.setWidth(10);
+		tile.add(new UIBorder(0xFF7F7F7F, 2));
+		final UISignalBoxTile sbt = new UISignalBoxTile();
+		tile.add(sbt);
+		tile.add(new UIClickable(e -> {
+			sbt.toggle(EnumMode.values()[menu.getSelection()]);
+		}));
+	}
+	
 	private void initEdit(UIEntity entity) {
-		lowerEntity.clear();
 		updateButton(entity);
+		final UIMenu menu = new UIMenu();
+		initMain(e -> this.editTile(e, menu));
+		lowerEntity.add(menu);
 	}
 
 	private void initTile(UIEntity tile) {
 		tile.setHeight(10);
 		tile.setWidth(10);
 		tile.add(new UIBorder(0xFF7F7F7F, 2));
-		tile.add(new UISignalBoxTile());
+		final UISignalBoxTile sbt = new UISignalBoxTile();
+		tile.add(sbt);
 	}
 	
 	private void initMain() {
+		initMain(this::initTile);
+	}
+
+	private void initMain(Consumer<UIEntity> consumer) {
 		lowerEntity.clear();
 		lowerEntity.add(new UIColor(0xFF8B8B8B));
 		lowerEntity.add(new UIStack());
-
+		lowerEntity.add(new UIScissor());
+		
 		final UIEntity plane = new UIEntity();
 		plane.setInheritWidth(true);
 		plane.setInheritHeight(true);
-		plane.add(new UIScissor());
-		final UIIndependentTranslate translate = new UIIndependentTranslate();
-		plane.add(translate);
-		final UIScale scale = new UIScale();
-		plane.add(scale);
-		plane.add(new UIScroll(s -> {
-			final float newScale = scale.getScaleX() + s * 0.001f;
+		lowerEntity.add(new UIScroll(s -> {
+			final float newScale = plane.getScaleX() + s * 0.001f;
 			if(newScale <= 0)
 				return;
-			scale.setScaleX(newScale);
-			scale.setScaleY(newScale);
+			plane.setScaleX(newScale);
+			plane.setScaleY(newScale);
+			plane.update();
 		}));
-		plane.add(new UIDrag((x, y) -> {
-			translate.setX(translate.getX() + x);
-			translate.setY(translate.getY() + y);
+		lowerEntity.add(new UIDrag((x, y) -> {
+			plane.setX(plane.getX() + x);
+			plane.setY(plane.getY() + y);
+			plane.update();
 		}, 2));
 		final UIBox vbox = new UIBox(UIBox.VBOX, 0);
 		vbox.setPageable(false);
@@ -102,7 +118,7 @@ public class GuiSignalBox extends GuiBase {
 			row.setWidth(10);
 			for (int y = 0; y < 50; y++) {
 				final UIEntity tile = new UIEntity();
-				initTile(tile);
+				consumer.accept(tile);
 				row.add(tile);
 			}
 			plane.add(row);
