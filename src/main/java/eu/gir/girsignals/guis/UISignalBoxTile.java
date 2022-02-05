@@ -13,6 +13,8 @@ import eu.gir.girsignals.guis.guilib.UIAutoSync;
 import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -23,7 +25,7 @@ import net.minecraft.util.Rotation;
 
 public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 	
-	private static ResourceLocation ICON = new ResourceLocation(GirsignalsMain.MODID, "");
+	private static ResourceLocation ICON = new ResourceLocation(GirsignalsMain.MODID, "gui/textures/symbols.png");
 	
 	private HashMap<Entry<EnumMode, Rotation>, Integer> signalBox = new HashMap<>();
 	private String id = "unknown";
@@ -67,14 +69,22 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 		BUE((parent, color) -> {
 			final int part = parent.getHeight() / 3;
 			drawLines(0, parent.getWidth(), part, part, color);
-			drawLines(0, parent.getWidth(), part*2, part*2, color);
-		});
+			drawLines(0, parent.getWidth(), part * 2, part * 2, color);
+		}),
+		HP(0),
+		VP(1),
+		RS(2),
+		RA10(3);
 		
 		/**
-		 * HP, VP, RS, RA10, BUE, Naming
+		 * Naming
 		 */
 		
 		public final BiConsumer<UIEntity, Integer> consumer;
+		
+		private EnumMode(int id) {
+			this.consumer = (parent, color) -> drawTextured(parent, id);
+		}
 		
 		private EnumMode(double x1, double y1, double x2, double y2) {
 			this.consumer = (parent, color) -> drawLines((int) (x1 * parent.getWidth()), (int) (x2 * parent.getWidth()), (int) (y1 * parent.getHeight()), (int) (y2 * parent.getHeight()), color);
@@ -112,25 +122,28 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		GlStateManager.color(f, f1, f2, f3);
-        bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos((double)left, (double)bottom, 0.0D).endVertex();
-        bufferbuilder.pos((double)right, (double)bottom, 0.0D).endVertex();
-        bufferbuilder.pos((double)right, (double)top, 0.0D).endVertex();
-        bufferbuilder.pos((double)left, (double)top, 0.0D).endVertex();
+		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+		bufferbuilder.pos((double) left, (double) bottom, 0.0D).endVertex();
+		bufferbuilder.pos((double) right, (double) bottom, 0.0D).endVertex();
+		bufferbuilder.pos((double) right, (double) top, 0.0D).endVertex();
+		bufferbuilder.pos((double) left, (double) top, 0.0D).endVertex();
 		tessellator.draw();
 	}
 	
-	private static void drawTextured(int left, int top, int right, int bottom, int textureID) {
+	private static void drawTextured(UIEntity entity, int textureID) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
-        bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-        bufferbuilder.pos((double)left, (double)bottom, 0.0D).tex(0, 0).endVertex();
-        bufferbuilder.pos((double)right, (double)bottom, 0.0D).tex(0.25 * textureID, 0).endVertex();
-        bufferbuilder.pos((double)right, (double)top, 0.0D).tex(0.25 * textureID, 1).endVertex();
-        bufferbuilder.pos((double)left, (double)top, 0.0D).tex(0, 1).endVertex();
-		tessellator.draw();
+		GlStateManager.color(1, 1, 1, 1);
+		GlStateManager.enableTexture2D();
+		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		final double offset = 0.25 * textureID;
+		bufferbuilder.pos((double) 0, (double) entity.getHeight(), 0.0D).tex(offset, 1).endVertex();
+		bufferbuilder.pos((double) entity.getWidth(), (double) entity.getHeight(), 0.0D).tex(offset + 0.25, 1).endVertex();
+		bufferbuilder.pos((double) entity.getWidth(), (double) 0, 0.0D).tex(offset + 0.25, 0).endVertex();
+		bufferbuilder.pos((double) 0, (double) 0, 0.0D).tex(offset, 0).endVertex();
+		tessellator.draw();		
+		GlStateManager.disableTexture2D();
 	}
-
 	
 	private static void drawLines(int x1, int x2, int y1, int y2, int color) {
 		float f3 = (float) (color >> 24 & 255) / 255.0F;
