@@ -1,5 +1,6 @@
 package eu.gir.girsignals.guis;
 
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import eu.gir.girsignals.guis.UISignalBoxTile.EnumMode;
@@ -23,6 +24,7 @@ import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.util.Rotation;
 
 public class GuiSignalBox extends GuiBase {
 	
@@ -32,6 +34,9 @@ public class GuiSignalBox extends GuiBase {
 	public GuiSignalBox(SignalBoxTileEntity box) {
 		this.box = box;
 		init();
+		if(this.box.getTag() != null)
+			this.compound = this.box.getTag();
+		this.entity.read(this.compound);
 	}
 	
 	private void updateButton(UIEntity button) {
@@ -49,42 +54,38 @@ public class GuiSignalBox extends GuiBase {
 	private void initSettings(UIEntity entity) {
 		lowerEntity.clear();
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
-		box.forEach(p -> lowerEntity.add(GuiElements.createButton(p.toString(), e -> {})));
+		box.forEach(p -> lowerEntity.add(GuiElements.createButton(p.toString(), e -> {
+		})));
 		lowerEntity.update();
 		updateButton(entity);
 	}
 	
-	private void editTile(UIEntity tile, UIMenu menu) {
-		tile.setHeight(10);
-		tile.setWidth(10);
-		tile.add(new UIBorder(0xFF7F7F7F, 2));
-		final UISignalBoxTile sbt = new UISignalBoxTile();
+	private void editTile(UIEntity tile, UIMenu menu, String name) {
+		final UISignalBoxTile sbt = new UISignalBoxTile(name);
 		tile.add(sbt);
 		tile.add(new UIClickable(e -> {
-			sbt.toggle(EnumMode.values()[menu.getSelection()]);
+			sbt.toggle(EnumMode.values()[menu.getSelection()], Rotation.values()[menu.getRotation()]);
 		}));
 	}
 	
 	private void initEdit(UIEntity entity) {
-		updateButton(entity);
 		final UIMenu menu = new UIMenu();
-		initMain(e -> this.editTile(e, menu));
+		initMain((e, name) -> this.editTile(e, menu, name));
+		updateButton(entity);
 		lowerEntity.add(menu);
 	}
-
-	private void initTile(UIEntity tile) {
-		tile.setHeight(10);
-		tile.setWidth(10);
-		tile.add(new UIBorder(0xFF7F7F7F, 2));
-		final UISignalBoxTile sbt = new UISignalBoxTile();
+	
+	private void initTile(UIEntity tile, String name) {
+		final UISignalBoxTile sbt = new UISignalBoxTile(name);
 		tile.add(sbt);
 	}
 	
 	private void initMain() {
 		initMain(this::initTile);
 	}
-
-	private void initMain(Consumer<UIEntity> consumer) {
+	
+	private void initMain(BiConsumer<UIEntity, String> consumer) {
+		this.entity.write(compound);
 		lowerEntity.clear();
 		lowerEntity.add(new UIColor(0xFF8B8B8B));
 		lowerEntity.add(new UIStack());
@@ -95,7 +96,7 @@ public class GuiSignalBox extends GuiBase {
 		plane.setInheritHeight(true);
 		lowerEntity.add(new UIScroll(s -> {
 			final float newScale = plane.getScaleX() + s * 0.001f;
-			if(newScale <= 0)
+			if (newScale <= 0)
 				return;
 			plane.setScaleX(newScale);
 			plane.setScaleY(newScale);
@@ -118,7 +119,11 @@ public class GuiSignalBox extends GuiBase {
 			row.setWidth(10);
 			for (int y = 0; y < 50; y++) {
 				final UIEntity tile = new UIEntity();
-				consumer.accept(tile);
+				tile.setHeight(10);
+				tile.setWidth(10);
+				tile.add(new UIBorder(0xFF7F7F7F, 2));
+				final String name = x + "." + y;
+				consumer.accept(tile, name);
 				row.add(tile);
 			}
 			plane.add(row);
@@ -130,6 +135,7 @@ public class GuiSignalBox extends GuiBase {
 		frame.setInheritWidth(true);
 		frame.add(new UIBorder(0xFF000000, 6));
 		lowerEntity.add(frame);
+		this.entity.read(compound);
 	}
 	
 	private void init() {
@@ -149,7 +155,7 @@ public class GuiSignalBox extends GuiBase {
 		header.setHeight(20);
 		header.add(new UIBox(UIBox.HBOX, 4));
 		header.add(titel);
-		header.add(GuiElements.createSpacerH(80));		
+		header.add(GuiElements.createSpacerH(80));
 		header.add(GuiElements.createButton(I18n.format("btn.settings"), e -> initSettings(e)));
 		header.add(GuiElements.createButton(I18n.format("btn.edit"), e -> initEdit(e)));
 		
@@ -163,7 +169,7 @@ public class GuiSignalBox extends GuiBase {
 		lowerEntity.setInheritHeight(true);
 		lowerEntity.setInheritWidth(true);
 		initMain();
-
+		
 		this.entity.add(GuiElements.createSpacerH(10));
 		this.entity.add(middlePart);
 		this.entity.add(GuiElements.createSpacerH(10));

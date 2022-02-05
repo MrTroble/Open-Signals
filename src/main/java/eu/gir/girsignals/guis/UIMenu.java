@@ -6,11 +6,14 @@ import eu.gir.girsignals.guis.guilib.entitys.UIBox;
 import eu.gir.girsignals.guis.guilib.entitys.UIColor;
 import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
+import eu.gir.girsignals.guis.guilib.entitys.UIEntity.KeyEvent;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity.MouseEvent;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.Rotation;
 
 public class UIMenu extends UIComponent {
 	
-	private int mX, mY, selection = 0;
+	private int mX, mY, selection = 0, rotation = 0;
 	
 	@Override
 	public void draw(int mouseX, int mouseY) {
@@ -23,6 +26,8 @@ public class UIMenu extends UIComponent {
 	@Override
 	public void postDraw(int mouseX, int mouseY) {
 		if (this.isVisible()) {
+			GlStateManager.pushMatrix();
+			GlStateManager.translate(0, 0, 3);
 			final UIEntity selection = new UIEntity();
 			selection.setX(mX);
 			selection.setY(mY);
@@ -32,7 +37,9 @@ public class UIMenu extends UIComponent {
 			for (EnumMode mode : EnumMode.values()) {
 				final UIEntity preview = new UIEntity();
 				preview.add(new UIColor(0xFFAFAFAF));
-				preview.add(new UISignalBoxTile(mode));
+				final UISignalBoxTile sbt = new UISignalBoxTile();
+				sbt.toggle(mode, Rotation.values()[this.rotation]);
+				preview.add(sbt);
 				preview.setInheritHeight(true);
 				preview.setInheritWidth(true);
 				if (mode.ordinal() == this.selection)
@@ -41,6 +48,7 @@ public class UIMenu extends UIComponent {
 			}
 			selection.updateEvent(parent.getLastUpdateEvent());
 			selection.draw(mouseX, mouseY);
+			GlStateManager.popMatrix();
 		}
 	}
 	
@@ -67,5 +75,20 @@ public class UIMenu extends UIComponent {
 		default:
 			break;
 		}
+	}
+	
+	@Override
+	public void keyEvent(KeyEvent event) {
+		super.keyEvent(event);
+		if(event.typed == 'r') {
+			this.rotation++;
+			if(this.rotation >= Rotation.values().length)
+				this.rotation = 0;
+		}
+	}
+	
+
+	public int getRotation() {
+		return rotation;
 	}
 }

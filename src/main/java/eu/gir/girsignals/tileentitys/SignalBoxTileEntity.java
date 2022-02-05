@@ -14,15 +14,17 @@ import net.minecraft.util.math.BlockPos;
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos> {
 	
 	private static final String LINKED_POS_LIST = "linkedPos";
-	
+	private static final String GUI_TAG = "guiTag";
+
 	private ArrayList<BlockPos> linkedBlocks = new ArrayList<>();
-	private NBTTagCompound guiTag;
+	private NBTTagCompound guiTag = new NBTTagCompound();
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		final NBTTagList list = new NBTTagList();
 		linkedBlocks.forEach(p -> list.appendTag(NBTUtil.createPosTag(p)));
 		compound.setTag(LINKED_POS_LIST, list);
+		compound.setTag(GUI_TAG, guiTag);
 		return super.writeToNBT(compound);
 	}
 	
@@ -33,11 +35,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			linkedBlocks.clear();
 			list.forEach(pos -> linkedBlocks.add(NBTUtil.getPosFromTag((NBTTagCompound) pos)));
 		}
+		this.guiTag = compound.getCompoundTag(GUI_TAG);
 		super.readFromNBT(compound);
 	}
 	
 	@Override
 	public void updateTag(NBTTagCompound compound) {
+		if(compound == null)
+			return;
 		this.guiTag = compound;
 		this.syncClient();
 	}
