@@ -8,12 +8,15 @@ import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.entitys.UIBorder;
 import eu.gir.girsignals.guis.guilib.entitys.UIBox;
 import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
+import eu.gir.girsignals.guis.guilib.entitys.UIColor;
 import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import eu.gir.girsignals.guis.guilib.entitys.UIIndependentTranslate;
 import eu.gir.girsignals.guis.guilib.entitys.UILabel;
 import eu.gir.girsignals.guis.guilib.entitys.UIScale;
 import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
+import eu.gir.girsignals.guis.guilib.entitys.UIScroll;
+import eu.gir.girsignals.guis.guilib.entitys.UIStack;
 import eu.gir.girsignals.tileentitys.SignalBoxTileEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -33,7 +36,7 @@ public class GuiSignalBox extends GuiBase {
 	
 	private void updateButton(UIEntity button) {
 		final SoundHandler handler = Minecraft.getMinecraft().getSoundHandler();
-		entity.findRecursive(UIClickable.class).forEach(c -> {
+		button.findRecursive(UIClickable.class).forEach(c -> {
 			final Consumer<UIEntity> old = c.getCallback();
 			c.setCallback(e -> {
 				initMain();
@@ -45,7 +48,7 @@ public class GuiSignalBox extends GuiBase {
 	
 	private void initSettings(UIEntity entity) {
 		lowerEntity.clear();
-		lowerEntity.add(new UIBox(UIBox.VBoxMode.INSTANCE, 2));
+		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
 		box.forEach(p -> lowerEntity.add(GuiElements.createButton(p.toString(), e -> {})));
 		lowerEntity.update();
 		updateButton(entity);
@@ -56,35 +59,61 @@ public class GuiSignalBox extends GuiBase {
 		updateButton(entity);
 	}
 
+	private void initTile(UIEntity tile) {
+		tile.setHeight(10);
+		tile.setWidth(10);
+		tile.add(new UIBorder(0xFF7F7F7F, 2));
+		tile.add(new UISignalBoxTile());
+	}
+	
 	private void initMain() {
 		lowerEntity.clear();
-		lowerEntity.add(new UIBorder(0xFF000000));
-		lowerEntity.add(new UIScissor());
+		lowerEntity.add(new UIColor(0xFF8B8B8B));
+		lowerEntity.add(new UIStack());
+
+		final UIEntity plane = new UIEntity();
+		plane.setInheritWidth(true);
+		plane.setInheritHeight(true);
+		plane.add(new UIScissor());
 		final UIIndependentTranslate translate = new UIIndependentTranslate();
-		lowerEntity.add(translate);
-		lowerEntity.add(new UIDrag((x, y) -> {
+		plane.add(translate);
+		final UIScale scale = new UIScale();
+		plane.add(scale);
+		plane.add(new UIScroll(s -> {
+			final float newScale = scale.getScaleX() + s * 0.001f;
+			if(newScale <= 0)
+				return;
+			scale.setScaleX(newScale);
+			scale.setScaleY(newScale);
+		}));
+		plane.add(new UIDrag((x, y) -> {
 			translate.setX(translate.getX() + x);
 			translate.setY(translate.getY() + y);
-		}, 0));
-		final UIBox vbox = new UIBox(UIBox.VBoxMode.INSTANCE, 2);
+		}, 2));
+		final UIBox vbox = new UIBox(UIBox.VBOX, 0);
 		vbox.setPageable(false);
-		lowerEntity.add(vbox);
+		plane.add(vbox);
 		for (int x = 0; x < 50; x++) {
 			final UIEntity row = new UIEntity();
-			final UIBox hbox = new UIBox(UIBox.HBoxMode.INSTANCE, 2);
+			final UIBox hbox = new UIBox(UIBox.HBOX, 0);
 			hbox.setPageable(false);
 			row.add(hbox);
 			row.setHeight(10);
 			row.setWidth(10);
 			for (int y = 0; y < 50; y++) {
 				final UIEntity tile = new UIEntity();
-				tile.setHeight(10);
-				tile.setWidth(10);
-				tile.add(new UIBorder(0xFF0000FF));
+				initTile(tile);
 				row.add(tile);
 			}
-			lowerEntity.add(row);
+			plane.add(row);
 		}
+		lowerEntity.add(plane);
+		
+		final UIEntity frame = new UIEntity();
+		frame.setInheritHeight(true);
+		frame.setInheritWidth(true);
+		frame.add(new UIBorder(0xFF000000, 6));
+		lowerEntity.add(frame);
 	}
 	
 	private void init() {
@@ -102,7 +131,7 @@ public class GuiSignalBox extends GuiBase {
 		final UIEntity header = new UIEntity();
 		header.setInheritWidth(true);
 		header.setHeight(20);
-		header.add(new UIBox(UIBox.HBoxMode.INSTANCE, 4));
+		header.add(new UIBox(UIBox.HBOX, 4));
 		header.add(titel);
 		header.add(GuiElements.createSpacerH(80));		
 		header.add(GuiElements.createButton(I18n.format("btn.settings"), e -> initSettings(e)));
@@ -111,7 +140,7 @@ public class GuiSignalBox extends GuiBase {
 		final UIEntity middlePart = new UIEntity();
 		middlePart.setInheritHeight(true);
 		middlePart.setInheritWidth(true);
-		middlePart.add(new UIBox(UIBox.VBoxMode.INSTANCE, 4));
+		middlePart.add(new UIBox(UIBox.VBOX, 4));
 		middlePart.add(header);
 		middlePart.add(lowerEntity);
 		
@@ -122,7 +151,7 @@ public class GuiSignalBox extends GuiBase {
 		this.entity.add(GuiElements.createSpacerH(10));
 		this.entity.add(middlePart);
 		this.entity.add(GuiElements.createSpacerH(10));
-		this.entity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 1));
+		this.entity.add(new UIBox(UIBox.HBOX, 1));
 		
 		this.entity.read(compound);
 	}
