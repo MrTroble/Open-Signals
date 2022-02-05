@@ -2,6 +2,7 @@ package eu.gir.girsignals.blocks;
 
 import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.tileentitys.SignalBoxTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -18,6 +19,7 @@ public class SignalBox extends Block implements ITileEntityProvider {
 
 	public SignalBox() {
 		super(Material.ROCK);
+		setCreativeTab(GIRTabs.tab);
 	}
 
 	@Override
