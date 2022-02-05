@@ -11,6 +11,7 @@ item.signplacementtool.name=Signaltafel-Platzierer
 
 #Blocks
 tile.hvsignalcontroller.name=Signal Steuerer
+tile.signalbox.name=Stellwerk
 tile.post.name=Pfosten
 tile.hvsignal.name=HV Signal
 tile.kssignal.name=Ks Signal
@@ -269,3 +270,7 @@ property.value.UP=Gerade
 property.value.HM=Hektometer
 property.value.OB=Ortstellbereich
 property.value.CROSS=Ungültigkeitskreuz
+
+#Signalbox
+btn.settings=Einstellungen
+btn.edit=Editor

@@ -11,6 +11,7 @@ item.signplacementtool.name=Signalplate-Placer
 
 #Blocks
 tile.hvsignalcontroller.name=Signal-Controller
+tile.signalbox.name=Signalbox
 tile.post.name=Post Block
 tile.hvsignal.name=HV Signal
 tile.kssignal.name=Ks Signal
@@ -270,3 +271,7 @@ property.value.UP=Straight
 property.value.HM=Hektometer
 property.value.OB=Local control area
 property.value.CROSS=Invalidation cross
+
+#Signalbox
+btn.settings=Settings
+btn.edit=Editor
