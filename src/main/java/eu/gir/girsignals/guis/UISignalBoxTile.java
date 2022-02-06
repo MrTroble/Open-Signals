@@ -5,6 +5,7 @@ import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.util.Point;
 
 import com.google.common.collect.Maps;
 
@@ -13,8 +14,6 @@ import eu.gir.girsignals.guis.guilib.UIAutoSync;
 import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
@@ -28,9 +27,9 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 	private static ResourceLocation ICON = new ResourceLocation(GirsignalsMain.MODID, "gui/textures/symbols.png");
 	
 	private HashMap<Entry<EnumMode, Rotation>, Integer> signalBox = new HashMap<>();
-	private String id = "unknown";
+	private Point id = null;
 	
-	public UISignalBoxTile(String name) {
+	public UISignalBoxTile(Point name) {
 		this.id = name;
 	}
 	
@@ -189,12 +188,15 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 	
 	@Override
 	public String getID() {
-		return this.id;
+		return this.id.getX() + "." + this.id.getY();
 	}
-	
+		
+	public Point getPoint() {
+		return id;
+	}
+
 	@Override
 	public void setID(String id) {
-		this.id = id;
 	}
 	
 }

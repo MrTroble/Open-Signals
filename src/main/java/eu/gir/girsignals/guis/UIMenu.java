@@ -27,23 +27,23 @@ public class UIMenu extends UIComponent {
 	public void postDraw(int mouseX, int mouseY) {
 		if (this.isVisible()) {
 			GlStateManager.pushMatrix();
-			GlStateManager.translate(0, 0, 3);
+			GlStateManager.translate(0, 0, 5);
 			final UIEntity selection = new UIEntity();
 			selection.setX(mX);
 			selection.setY(mY);
 			selection.setHeight(20);
-			selection.setWidth(20 * EnumMode.values().length);
-			selection.add(new UIBox(UIBox.HBOX, 1));
+			selection.setWidth(22 * EnumMode.values().length);
+			selection.add(new UIBox(UIBox.HBOX, 2));
 			for (EnumMode mode : EnumMode.values()) {
 				final UIEntity preview = new UIEntity();
 				preview.add(new UIColor(0xFFAFAFAF));
 				final UISignalBoxTile sbt = new UISignalBoxTile();
 				sbt.toggle(mode, Rotation.values()[this.rotation]);
 				preview.add(sbt);
-				preview.setInheritHeight(true);
-				preview.setInheritWidth(true);
+				preview.setHeight(20);
+				preview.setWidth(20);
 				if (mode.ordinal() == this.selection)
-					preview.add(new UIBorder(0xFF000000, 2));
+					preview.add(new UIBorder(0xFF00FF00, 4));
 				selection.add(preview);
 			}
 			selection.updateEvent(parent.getLastUpdateEvent());
@@ -66,7 +66,7 @@ public class UIMenu extends UIComponent {
 				this.mX = event.x;
 				this.mY = event.y;
 			}
-			this.selection = Math.max(0, Math.min(EnumMode.values().length - 1, (int) ((event.x - this.mX) / 20.0f)));
+			this.selection = Math.max(0, Math.min(EnumMode.values().length - 1, (int) ((event.x - this.mX) / 22.0f)));
 			this.setVisible(true);
 			break;
 		case RELEASE:
