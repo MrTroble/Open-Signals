@@ -4,7 +4,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.Point;
 
 import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
-import eu.gir.girsignals.tileentitys.SignalNode;
+import eu.gir.girsignals.signalbox.SignalNode;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;

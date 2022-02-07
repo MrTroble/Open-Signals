@@ -9,7 +9,7 @@ import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.init.GIRModels;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.models.GIRCustomModelLoader;
-import eu.gir.girsignals.tileentitys.SignalBoxTileEntity;
+import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalSpecialRenderer;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;

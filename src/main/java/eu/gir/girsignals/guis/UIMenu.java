@@ -1,6 +1,5 @@
 package eu.gir.girsignals.guis;
 
-import eu.gir.girsignals.guis.UISignalBoxTile.EnumMode;
 import eu.gir.girsignals.guis.guilib.entitys.UIBorder;
 import eu.gir.girsignals.guis.guilib.entitys.UIBox;
 import eu.gir.girsignals.guis.guilib.entitys.UIColor;
@@ -8,6 +7,7 @@ import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity.KeyEvent;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity.MouseEvent;
+import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.Rotation;
 
@@ -32,9 +32,9 @@ public class UIMenu extends UIComponent {
 			selection.setX(mX);
 			selection.setY(mY);
 			selection.setHeight(20);
-			selection.setWidth(22 * EnumMode.values().length);
+			selection.setWidth(22 * EnumGUIMode.values().length);
 			selection.add(new UIBox(UIBox.HBOX, 2));
-			for (EnumMode mode : EnumMode.values()) {
+			for (EnumGUIMode mode : EnumGUIMode.values()) {
 				final UIEntity preview = new UIEntity();
 				preview.add(new UIColor(0xFFAFAFAF));
 				final UISignalBoxTile sbt = new UISignalBoxTile();
@@ -66,7 +66,7 @@ public class UIMenu extends UIComponent {
 				this.mX = event.x;
 				this.mY = event.y;
 			}
-			this.selection = Math.max(0, Math.min(EnumMode.values().length - 1, (int) ((event.x - this.mX) / 22.0f)));
+			this.selection = Math.max(0, Math.min(EnumGUIMode.values().length - 1, (int) ((event.x - this.mX) / 22.0f)));
 			this.setVisible(true);
 			break;
 		case RELEASE:

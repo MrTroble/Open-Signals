@@ -3,7 +3,7 @@ package eu.gir.girsignals.blocks;
 import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.init.GIRTabs;
-import eu.gir.girsignals.tileentitys.SignalBoxTileEntity;
+import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;

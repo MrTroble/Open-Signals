@@ -1,11 +1,15 @@
 package eu.gir.girsignals.guis;
 
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.FREE_COLOR;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT1;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
+
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import org.lwjgl.util.Point;
 
-import eu.gir.girsignals.guis.UISignalBoxTile.EnumMode;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
@@ -20,7 +24,8 @@ import eu.gir.girsignals.guis.guilib.entitys.UIScale;
 import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
 import eu.gir.girsignals.guis.guilib.entitys.UIScroll;
 import eu.gir.girsignals.guis.guilib.entitys.UIStack;
-import eu.gir.girsignals.tileentitys.SignalBoxTileEntity;
+import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
+import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
@@ -30,14 +35,15 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Rotation;
 
 public class GuiSignalBox extends GuiBase {
-	
+		
 	private final UIEntity lowerEntity = new UIEntity();
 	private final SignalBoxTileEntity box;
 	private final ContainerSignalBox container;
-	
+	private UISignalBoxTile lastTile = null;
+
 	public GuiSignalBox(SignalBoxTileEntity box) {
 		this.box = box;
-		this.container = new ContainerSignalBox(this::debugUpdate);
+		this.container = new ContainerSignalBox(this::update);
 		Minecraft.getMinecraft().player.openContainer = this.container;
 		init();
 		if(this.box.getTag() != null)
@@ -45,11 +51,13 @@ public class GuiSignalBox extends GuiBase {
 		this.entity.read(this.compound);
 	}
 	
-	private void debugUpdate() {
+
+	private void update() {
 		this.entity.findRecursive(UISignalBoxTile.class).forEach(sbt -> {
-			final Point p = sbt.getPoint();
-			this.container.nodeList.stream().filter(node -> node.getPoint().equals(p) && !node.connections().isEmpty()).forEach(n -> {
-				sbt.getParent().add(new UIBorder(0xFF00FF00));
+			container.nodeList.forEach(signal -> {
+				if(sbt.getPoint().equals(signal.getPoint())) {
+					signal.forEach((e, o) -> sbt.put(e.getKey(), e.getValue(), o.getPathUsage().getColor()));
+				}
 			});
 		});
 	}
@@ -79,7 +87,7 @@ public class GuiSignalBox extends GuiBase {
 		final UISignalBoxTile sbt = new UISignalBoxTile(name);
 		tile.add(sbt);
 		tile.add(new UIClickable(e -> {
-			sbt.toggle(EnumMode.values()[menu.getSelection()], Rotation.values()[menu.getRotation()]);
+			sbt.toggle(EnumGUIMode.values()[menu.getSelection()], Rotation.values()[menu.getRotation()]);
 		}));
 	}
 	
@@ -89,25 +97,22 @@ public class GuiSignalBox extends GuiBase {
 		updateButton(entity);
 		lowerEntity.add(menu);
 	}
-	
-	private UISignalBoxTile cSbt = null;
-	
+		
 	private void initTile(UIEntity tile, Point name) {
-		final UISignalBoxTile sbt = new UISignalBoxTile(name);
-		tile.add(sbt);
+		final UISignalBoxTile currentTile = new UISignalBoxTile(name);
+		tile.add(currentTile);
 		tile.add(new UIClickable(c -> {
-			if(cSbt == null) {
-				cSbt = sbt;
+			c.add(new UIColor(FREE_COLOR));
+			if(lastTile == null) {
+				lastTile = currentTile;
 			} else {
 				final NBTTagCompound comp = new NBTTagCompound();
 				final NBTTagCompound way = new NBTTagCompound();
-				way.setInteger("xP1", cSbt.getPoint().getX());
-				way.setInteger("yP1", cSbt.getPoint().getY());
-				way.setInteger("xP2", sbt.getPoint().getX());
-				way.setInteger("yP2", sbt.getPoint().getY());
+				toNBT(way, POINT1, lastTile.getPoint());
+				toNBT(way, POINT2, currentTile.getPoint());
 				comp.setTag("requestWay", way);
 				GuiSyncNetwork.sendToPosServer(comp, box.getPos());
-				cSbt = null;
+				lastTile = null;
 			}
 		}));
 	}

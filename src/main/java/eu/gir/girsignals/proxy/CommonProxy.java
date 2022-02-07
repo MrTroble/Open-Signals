@@ -10,7 +10,7 @@ import eu.gir.girsignals.guis.guilib.UIInit;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.items.Placementtool;
-import eu.gir.girsignals.tileentitys.SignalBoxTileEntity;
+import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;

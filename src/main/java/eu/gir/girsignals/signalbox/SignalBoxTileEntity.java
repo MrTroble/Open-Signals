@@ -1,20 +1,28 @@
-package eu.gir.girsignals.tileentitys;
+package eu.gir.girsignals.signalbox;
+
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT1;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.REQUEST_WAY;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.fromNBT;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.requestWay;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import org.lwjgl.util.Point;
 
 import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.blocks.IChunkloadable;
+import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.ISyncable;
 import eu.gir.girsignals.linkableApi.ILinkableTile;
+import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
+import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
+import eu.gir.girsignals.tileentitys.SignalTileEnity;
+import eu.gir.girsignals.tileentitys.SyncableTileEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -23,14 +31,13 @@ import net.minecraft.util.math.BlockPos;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos> {
 	
+	public static final String SIGNALS = "signallist";
 	private static final String LINKED_POS_LIST = "linkedPos";
 	private static final String GUI_TAG = "guiTag";
 	
 	private ArrayList<BlockPos> linkedBlocks = new ArrayList<>();
 	private NBTTagCompound guiTag = new NBTTagCompound();
 	private HashMap<Point, SignalNode> modeGrid = new HashMap<>(100);
-	private ArrayList<ArrayList<SignalNode>> ways = new ArrayList<ArrayList<SignalNode>>();
-	private boolean updated = false;
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
@@ -52,21 +59,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		this.updateGrid();
 		super.readFromNBT(compound);
 	}
-	
-	public static enum EnumGUIMode {
-		STRAIGHT,
-		CORNER,
-		END,
-		PLATFORM,
-		BUE,
-		HP,
-		VP,
-		RS,
-		RA10;
-	}
-	
+		
 	private void updateGrid() {
-		updated = false;
 		modeGrid.clear();
 		this.guiTag.getKeySet().forEach(key -> {
 			final String[] names = key.split("\\.");
@@ -83,74 +77,32 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			node.post();
 			modeGrid.put(node.getPoint(), node);
 		});
-		updated = true;
 	}
 	
-	private double calculateHeuristic(Point p1, Point p2) {
-		final int dX = p2.getX() - p1.getX();
-		final int dY = p2.getY() - p1.getY();
-		return Math.hypot(dX, dY);
-	}
-	
-	@SuppressWarnings("unchecked")
-	private void requestWay(final Point p1, final Point p2) {
-		if(!this.modeGrid.containsKey(p1) || !this.modeGrid.containsKey(p2))
-			return;
-		final HashMap<Point, Point> closedList = new HashMap<>();
-		final Set<Point> openList = new HashSet<Point>();
-		final HashMap<Point, Double> fscores = new HashMap<>();
-		final HashMap<Point, Double> gscores = new HashMap<>();
-
-		openList.add(p1);
-		gscores.put(p1, 0.0);
-		fscores.put(p1, calculateHeuristic(p1, p2));
-		while (!openList.isEmpty()) {
-			final Point cnode = openList.stream().min((n1, n2) -> {
-				return Double.compare(fscores.getOrDefault(n1, Double.MAX_VALUE), fscores.getOrDefault(n2, Double.MAX_VALUE));
-			}).get();
-			if(cnode.equals(p2)) {
-				final ArrayList<SignalNode> nodes = new ArrayList<>();
-				for(Point p = cnode; p != null; p = closedList.get(p)) {
-					nodes.add(this.modeGrid.get(p));
-				}
-				this.ways.add(nodes);
-				return;
-			}
-			openList.remove(cnode);
-			final SignalNode cSNode = this.modeGrid.get(cnode);
-			if(cSNode == null)
-				continue;
-			for(Entry<Point, Point> e : cSNode.connections()) {
-				for(Entry<Point, Point> pE : new Entry[] {e, Maps.immutableEntry(e.getValue(), e.getKey())}) {
-					if(pE.getKey() == null || pE.getValue() == null)
-						continue;
-					final Point neighbor = pE.getValue();
-					if(closedList.containsKey(pE.getKey()) || p1.equals(pE.getKey()) || closedList.isEmpty()) {
-						final double tScore = gscores.getOrDefault(cnode, Double.MAX_VALUE - 1) + 1;
-						if(tScore < gscores.getOrDefault(neighbor, Double.MAX_VALUE)) {
-							closedList.put(neighbor, cnode);
-							gscores.put(neighbor, tScore);
-							fscores.put(neighbor, tScore + calculateHeuristic(neighbor, p2));
-							if(!openList.contains(neighbor)) {
-								openList.add(neighbor);
-							}
-						}
-					}
-				}
-			}
+	public void onWayAdd(final ArrayList<SignalNode> nodes) {
+		for (int i = 1; i < nodes.size() - 1; i++) {
+			final Point oldPos = nodes.get(i - 1).getPoint();
+			final Point newPos = nodes.get(i + 1).getPoint();
+			final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
+			final SignalNode current = nodes.get(i);
+			current.apply(entry, option -> option.setPathUsage(EnumPathUsage.SELECTED));
 		}
-		return;
+		final NBTTagList list = new NBTTagList();
+		modeGrid.values().forEach(signal -> list.appendTag(signal.writeNBT()));
+		final NBTTagCompound update = new NBTTagCompound();
+		update.setTag(SIGNALS, list);
+		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(update, ui.getPlayer()));
 	}
 	
 	@Override
 	public void updateTag(NBTTagCompound compound) {
 		if (compound == null)
 			return;
-		if (compound.hasKey("requestWay")) {
-			final NBTTagCompound comp = (NBTTagCompound) compound.getTag("requestWay");
-			final Point p1 = new Point(comp.getInteger("xP1"), comp.getInteger("yP1"));
-			final Point p2 = new Point(comp.getInteger("xP2"), comp.getInteger("yP2"));
-			requestWay(p1, p2);
+		if (compound.hasKey(REQUEST_WAY)) {
+			final NBTTagCompound request = (NBTTagCompound) compound.getTag(REQUEST_WAY);
+			final Point p1 = fromNBT(request, POINT1);
+			final Point p2 = fromNBT(request, POINT2);
+			requestWay(modeGrid, p1, p2).ifPresent(this::onWayAdd);
 			return;
 		}
 		this.guiTag = compound;
@@ -187,18 +139,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	@Override
 	public Iterator<BlockPos> iterator() {
 		return linkedBlocks.iterator();
-	}
-	
-	public Collection<SignalNode> nodes() {
-		return this.modeGrid.values();
-	}
-	
-	public boolean isUpdated() {
-		return updated;
-	}
-	
-	public ArrayList<ArrayList<SignalNode>> getWays() {
-		return ways;
 	}
 	
 }

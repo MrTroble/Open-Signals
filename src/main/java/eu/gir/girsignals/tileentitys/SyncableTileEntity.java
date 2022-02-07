@@ -1,5 +1,8 @@
 package eu.gir.girsignals.tileentitys;
 
+import java.util.ArrayList;
+
+import eu.gir.girsignals.guis.guilib.UIClientSync;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -10,6 +13,8 @@ import net.minecraft.world.World;
 
 public class SyncableTileEntity extends TileEntity {
 	
+	protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();
+
 	public SPacketUpdateTileEntity getUpdatePacket() {
 		return new SPacketUpdateTileEntity(getPos(), 0, getUpdateTag());
 	}
@@ -31,6 +36,14 @@ public class SyncableTileEntity extends TileEntity {
 	public void syncClient(World world, BlockPos pos) {
 		final IBlockState state = world.getBlockState(pos);
 		world.notifyBlockUpdate(pos, state, state, 3);
+	}
+	
+	public boolean add(UIClientSync sync) {
+		return this.clientSyncs.add(sync);
+	}
+	
+	public boolean remove(UIClientSync sync) {
+		return this.clientSyncs.remove(sync);
 	}
 
 }
