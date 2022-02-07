@@ -270,6 +270,7 @@ property.value.UP=Gerade
 property.value.HM=Hektometer
 property.value.OB=Ortstellbereich
 property.value.CROSS=Ungültigkeitskreuz
+property.value.RED_YELLOW=Rot-Gelb
 
 #Signalbox
 btn.settings=Einstellungen
