@@ -271,6 +271,7 @@ property.value.UP=Straight
 property.value.HM=Hektometer
 property.value.OB=Local control area
 property.value.CROSS=Invalidation cross
+property.value.RED_YELLOW=Rot-Gelb
 
 #Signalbox
 btn.settings=Settings
