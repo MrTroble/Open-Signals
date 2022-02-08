@@ -1,29 +1,26 @@
 package eu.gir.girsignals.guis;
 
-import java.util.ArrayList;
+import java.util.function.Consumer;
 
 import eu.gir.girsignals.guis.guilib.UIClientSync;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
-import eu.gir.girsignals.signalbox.SignalNode;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
 
 public class ContainerSignalBox extends Container implements UIClientSync {
 	
 	private EntityPlayerMP player;
 	private SignalBoxTileEntity tile;
-	private Runnable run;
-	public final ArrayList<SignalNode> nodeList = new ArrayList<>();
+	private Consumer<NBTTagCompound> run;
 	
 	public ContainerSignalBox(SignalBoxTileEntity tile) {
 		this.tile = tile;
 		this.tile.add(this);
 	}
 	
-	public ContainerSignalBox(Runnable run) {
+	public ContainerSignalBox(Consumer<NBTTagCompound> run) {
 		this.run = run;
 	}
 	
@@ -38,12 +35,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 	
 	@Override
 	public void readFromNBT(NBTTagCompound compound) {
-		this.nodeList.clear();
-		final NBTTagList list = (NBTTagList) compound.getTag(SignalBoxTileEntity.SIGNALS);
-		if (list != null) {
-			list.forEach(comp -> nodeList.add(new SignalNode((NBTTagCompound) comp)));
-		}
-		this.run.run();
+		this.run.accept(compound);
 	}
 	
 	@Override

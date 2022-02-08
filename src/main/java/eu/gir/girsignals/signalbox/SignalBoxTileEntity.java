@@ -20,18 +20,15 @@ import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.ISyncable;
 import eu.gir.girsignals.linkableApi.ILinkableTile;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
-import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos> {
 	
-	public static final String SIGNALS = "signallist";
 	private static final String LINKED_POS_LIST = "linkedPos";
 	private static final String GUI_TAG = "guiTag";
 	
@@ -66,14 +63,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			final String[] names = key.split("\\.");
 			final int x = Integer.parseInt(names[0]);
 			final int y = Integer.parseInt(names[1]);
-			final NBTTagCompound tag = (NBTTagCompound) this.guiTag.getTag(key);
 			final SignalNode node = new SignalNode(new Point(x, y));
-			tag.getKeySet().forEach(modes -> {
-				final String[] mNames = modes.split("\\.");
-				final EnumGUIMode mode = EnumGUIMode.valueOf(mNames[0]);
-				final Rotation rotate = Rotation.valueOf(mNames[1]);
-				node.add(mode, rotate);
-			});
+			node.read(this.guiTag);
 			node.post();
 			modeGrid.put(node.getPoint(), node);
 		});
@@ -87,10 +78,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			final SignalNode current = nodes.get(i);
 			current.apply(entry, option -> option.setPathUsage(EnumPathUsage.SELECTED));
 		}
-		final NBTTagList list = new NBTTagList();
-		modeGrid.values().forEach(signal -> list.appendTag(signal.writeNBT()));
 		final NBTTagCompound update = new NBTTagCompound();
-		update.setTag(SIGNALS, list);
+		modeGrid.values().forEach(signal -> signal.write(update));
 		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(update, ui.getPlayer()));
 	}
 	

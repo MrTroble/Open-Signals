@@ -7,6 +7,7 @@ import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity.KeyEvent;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity.MouseEvent;
+import eu.gir.girsignals.signalbox.SignalNode;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.Rotation;
@@ -37,8 +38,9 @@ public class UIMenu extends UIComponent {
 			for (EnumGUIMode mode : EnumGUIMode.values()) {
 				final UIEntity preview = new UIEntity();
 				preview.add(new UIColor(0xFFAFAFAF));
-				final UISignalBoxTile sbt = new UISignalBoxTile();
-				sbt.toggle(mode, Rotation.values()[this.rotation]);
+				final SignalNode node = new SignalNode(null);
+				node.add(mode, Rotation.values()[this.rotation]);
+				final UISignalBoxTile sbt = new UISignalBoxTile(node);
 				preview.add(sbt);
 				preview.setHeight(20);
 				preview.setWidth(20);

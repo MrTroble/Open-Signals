@@ -1,9 +1,5 @@
 package eu.gir.girsignals.signalbox;
 
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT0;
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.fromNBT;
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
-
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -14,14 +10,14 @@ import org.lwjgl.util.Point;
 
 import com.google.common.collect.Maps;
 
+import eu.gir.girsignals.guis.guilib.UIAutoSync;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Rotation;
 
-public class SignalNode {
+public class SignalNode implements UIAutoSync {
 	
-	private final String POINT_LIST = "pointList";
 	private final String MODE = "mode";
 	private final String ROTATION = "rotation";
 	private final String OPTION = "option";
@@ -34,37 +30,18 @@ public class SignalNode {
 		this.point = point;
 	}
 	
-	public SignalNode(NBTTagCompound comp) {
-		this.point = fromNBT(comp, POINT0);
-		final NBTTagList pointList = (NBTTagList) comp.getTag(POINT_LIST);
-		pointList.forEach(e -> {
-			final NBTTagCompound entry = (NBTTagCompound) e;
-			final EnumGUIMode mode = EnumGUIMode.valueOf(entry.getString(MODE));
-			final Rotation rotation = Rotation.valueOf(entry.getString(ROTATION));
-			final Entry<EnumGUIMode, Rotation> modeRotation = Maps.immutableEntry(mode, rotation);
-			possibleModes.put(modeRotation, new PathOption(entry.getCompoundTag(OPTION)));
-		});
-	}
-		
 	public void add(EnumGUIMode mode, Rotation rot) {
 		possibleModes.put(Maps.immutableEntry(mode, rot), new PathOption());
 	}
 	
-	public NBTTagCompound writeNBT() {
-		final NBTTagCompound comp = new NBTTagCompound();
-		toNBT(comp, POINT0, this.point);
-		final NBTTagList pointList = new NBTTagList();
-		possibleModes.forEach((mode, option) -> {
-			final NBTTagCompound entry = new NBTTagCompound();
-			entry.setString(MODE, mode.getKey().name());
-			entry.setString(ROTATION, mode.getValue().name());
-			entry.setTag(OPTION, option.writeNBT());
-			pointList.appendTag(entry);
-		});
-		comp.setTag(POINT_LIST, pointList);
-		return comp;
+	public boolean has(EnumGUIMode mode, Rotation rot) {
+		return possibleModes.containsKey(Maps.immutableEntry(mode, rot));
 	}
 	
+	public void remove(EnumGUIMode mode, Rotation rot) {
+		possibleModes.remove(Maps.immutableEntry(mode, rot));
+	}
+		
 	public void post() {
 		possibleModes.forEach((e, i) -> {
 			final Point p1 = new Point(this.point);
@@ -124,7 +101,7 @@ public class SignalNode {
 	}
 	
 	public void applyNormal(Entry<EnumGUIMode, Rotation> guimode, Consumer<PathOption> applier) {
-		if(guimode != null && this.possibleModes.containsKey(guimode))
+		if (guimode != null && this.possibleModes.containsKey(guimode))
 			applier.accept(this.possibleModes.get(guimode));
 	}
 	
@@ -140,8 +117,58 @@ public class SignalNode {
 		}
 		applyNormal(guimode, applier);
 	}
-
+	
 	public void forEach(BiConsumer<Entry<EnumGUIMode, Rotation>, PathOption> applier) {
 		possibleModes.forEach(applier);
+	}
+	
+	public boolean isEmpty() {
+		return possibleModes.isEmpty();
+	}
+	
+	@Override
+	public void write(NBTTagCompound compound) {
+		if(possibleModes.isEmpty())
+			return;
+		final NBTTagList pointList = new NBTTagList();
+		possibleModes.forEach((mode, option) -> {
+			final NBTTagCompound entry = new NBTTagCompound();
+			entry.setString(MODE, mode.getKey().name());
+			entry.setString(ROTATION, mode.getValue().name());
+			entry.setTag(OPTION, option.writeNBT());
+			pointList.appendTag(entry);
+		});
+		compound.setTag(this.getID(), pointList);
+	}
+	
+	@Override
+	public void read(NBTTagCompound compound) {
+		if(!compound.hasKey(getID()))
+			return;
+		final NBTTagList pointList = (NBTTagList) compound.getTag(getID());
+		pointList.forEach(e -> {
+			final NBTTagCompound entry = (NBTTagCompound) e;
+			final EnumGUIMode mode = EnumGUIMode.valueOf(entry.getString(MODE));
+			final Rotation rotation = Rotation.valueOf(entry.getString(ROTATION));
+			final Entry<EnumGUIMode, Rotation> modeRotation = Maps.immutableEntry(mode, rotation);
+			possibleModes.put(modeRotation, new PathOption(entry.getCompoundTag(OPTION)));
+		});
+	}
+	
+	@Override
+	public String getID() {
+		return point.getX() + "." + point.getY();
+	}
+	
+	@Override
+	public void setID(String id) {
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof SignalNode) {
+			this.point.equals(((SignalNode) obj).getPoint());
+		}
+		return super.equals(obj);
 	}
 }
