@@ -69,7 +69,7 @@ public class GuiSignalBox extends GuiBase {
 	
 	private void modeInit(UIEntity parent, EnumGUIMode mode, Rotation rotation, PathOption option) {
 		final String modeName = I18n.format("property." + mode.name());
-		final String rotationName = I18n.format("property." + rotation.name());
+		final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
 		final UIEntity entity = new UIEntity();
 		entity.setScaleX(1.1f);
 		entity.setScaleY(1.1f);
