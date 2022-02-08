@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 
 import org.lwjgl.util.Point;
 
+import eu.gir.girsignals.guis.guilib.DrawUtil.DisableIntegerable;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
@@ -18,11 +19,13 @@ import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
 import eu.gir.girsignals.guis.guilib.entitys.UIColor;
 import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
 import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
+import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
 import eu.gir.girsignals.guis.guilib.entitys.UILabel;
 import eu.gir.girsignals.guis.guilib.entitys.UIScale;
 import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
 import eu.gir.girsignals.guis.guilib.entitys.UIScroll;
 import eu.gir.girsignals.guis.guilib.entitys.UIStack;
+import eu.gir.girsignals.signalbox.PathOption;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
@@ -34,6 +37,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 
 public class GuiSignalBox extends GuiBase {
 	
@@ -60,10 +64,55 @@ public class GuiSignalBox extends GuiBase {
 	}
 	
 	private void resetSelection() {
-		final UIColor[] array = (UIColor[]) this.entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == SELECTION_COLOR).toArray(UIColor[]::new);
-		for (final UIColor color : array) {
-			color.getParent().remove(color);
+		this.entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == SELECTION_COLOR).forEach(color -> color.getParent().remove(color));
+	}
+	
+	private void modeInit(UIEntity parent, EnumGUIMode mode, Rotation rotation, PathOption option) {
+		final String modeName = I18n.format("property." + mode.name());
+		final String rotationName = I18n.format("property." + rotation.name());
+		final UIEntity entity = new UIEntity();
+		entity.setScaleX(1.1f);
+		entity.setScaleY(1.1f);
+		entity.setInheritWidth(true);
+		entity.setHeight(20);
+		final UILabel modeLabel = new UILabel(modeName + " - " + rotationName);
+		modeLabel.setCenterX(false);
+		entity.add(modeLabel);
+		parent.add(entity);
+		
+		if (mode.equals(EnumGUIMode.CORNER) || mode.equals(EnumGUIMode.STRAIGHT)) {
+			final UIEntity stateEntity = new UIEntity();
+			stateEntity.setInheritWidth(true);
+			stateEntity.setHeight(15);
+			final String pathUsageName = I18n.format("property.status") + ": ";
+			final String pathUsage = I18n.format("property." + option.getPathUsage());
+			stateEntity.add(new UILabel(pathUsageName + pathUsage));
+			parent.add(stateEntity);
 		}
+		
+		if (mode.ordinal() >= EnumGUIMode.HP.ordinal() || mode.equals(EnumGUIMode.CORNER)) {
+			final DisableIntegerable<BlockPos> integerable = new DisableIntegerable<BlockPos>(this.box);
+			final UIEntity selection = GuiElements.createEnumElement(integerable, e -> {
+			});
+			selection.findRecursive(UIEnumerable.class).forEach(en -> en.setMin(-1));
+			parent.add(selection);
+		}
+	}
+	
+	public void initTileConfig(final SignalNode node) {
+		if (node.isEmpty())
+			return;
+		this.reset();
+		final UIEntity list = new UIEntity();
+		list.setInheritHeight(true);
+		list.setInheritWidth(true);
+		final UIBox box = new UIBox(UIBox.VBOX, 1);
+		list.add(box);
+		lowerEntity.add(new UIBox(UIBox.VBOX, 3));
+		lowerEntity.add(new UIClickable(e -> initMain(this::initTile), 2));
+		lowerEntity.add(list);
+		node.forEach((e, opt) -> modeInit(list, e.getKey(), e.getValue(), opt));
+		lowerEntity.add(GuiElements.createPageSelect(box));
 	}
 	
 	private void updateButton(UIEntity button) {
@@ -71,7 +120,7 @@ public class GuiSignalBox extends GuiBase {
 		button.findRecursive(UIClickable.class).forEach(c -> {
 			final Consumer<UIEntity> old = c.getCallback();
 			c.setCallback(e -> {
-				initMain();
+				initMain(this::initTile);
 				c.setCallback(old);
 				handler.playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 			});
@@ -79,7 +128,7 @@ public class GuiSignalBox extends GuiBase {
 	}
 	
 	private void initSettings(UIEntity entity) {
-		lowerEntity.clear();
+		this.reset();
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
 		box.forEach(p -> lowerEntity.add(GuiElements.createButton(p.toString(), e -> {
 		})));
@@ -127,15 +176,17 @@ public class GuiSignalBox extends GuiBase {
 				lastTile = null;
 			}
 		}));
+		tile.add(new UIClickable(e -> initTileConfig(currentTile.getNode()), 1));
 	}
 	
-	private void initMain() {
-		initMain(this::initTile);
+	private void reset() {
+		this.entity.write(compound);
+		GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+		lowerEntity.clear();
 	}
 	
 	private void initMain(BiConsumer<UIEntity, UISignalBoxTile> consumer) {
-		this.entity.write(compound);
-		lowerEntity.clear();
+		reset();
 		lowerEntity.add(new UIColor(0xFF8B8B8B));
 		lowerEntity.add(new UIStack());
 		lowerEntity.add(new UIScissor());
@@ -220,7 +271,7 @@ public class GuiSignalBox extends GuiBase {
 		
 		lowerEntity.setInheritHeight(true);
 		lowerEntity.setInheritWidth(true);
-		initMain();
+		initMain(this::initTile);
 		
 		this.entity.add(GuiElements.createSpacerH(10));
 		this.entity.add(middlePart);

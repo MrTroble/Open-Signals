@@ -17,6 +17,7 @@ import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
+import eu.gir.girsignals.guis.guilib.IIntegerable;
 import eu.gir.girsignals.guis.guilib.ISyncable;
 import eu.gir.girsignals.linkableApi.ILinkableTile;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
@@ -27,7 +28,7 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 
-public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos> {
+public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos>, IIntegerable<BlockPos> {
 	
 	private static final String LINKED_POS_LIST = "linkedPos";
 	private static final String GUI_TAG = "guiTag";
@@ -56,11 +57,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		this.updateGrid();
 		super.readFromNBT(compound);
 	}
-		
+	
 	private void updateGrid() {
 		modeGrid.clear();
 		this.guiTag.getKeySet().forEach(key -> {
 			final String[] names = key.split("\\.");
+			if (names.length < 2)
+				return;
 			final int x = Integer.parseInt(names[0]);
 			final int y = Integer.parseInt(names[1]);
 			final SignalNode node = new SignalNode(new Point(x, y));
@@ -128,6 +131,27 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	@Override
 	public Iterator<BlockPos> iterator() {
 		return linkedBlocks.iterator();
+	}
+	
+	@Override
+	public BlockPos getObjFromID(int obj) {
+		return this.linkedBlocks.get(obj);
+	}
+	
+	@Override
+	public int count() {
+		return this.linkedBlocks.size();
+	}
+	
+	@Override
+	public String getName() {
+		return "signalposition";
+	}
+	
+	@Override
+	public String getNamedObj(int obj) {
+		final BlockPos pos = getObjFromID(obj);
+		return getLocalizedName() + ": x=" + pos.getX() + ", y=" + pos.getY() + ", z=" + pos.getZ();
 	}
 	
 }
