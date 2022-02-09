@@ -9,12 +9,14 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.requestWay;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.lwjgl.util.Point;
 
 import com.google.common.collect.Maps;
 
+import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.IIntegerable;
@@ -33,10 +35,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	private static final String LINKED_POS_LIST = "linkedPos";
 	private static final String GUI_TAG = "guiTag";
 	
-	private ArrayList<BlockPos> linkedBlocks = new ArrayList<>();
+	private final ArrayList<BlockPos> linkedBlocks = new ArrayList<>();
+	private final HashMap<Point, SignalNode> modeGrid = new HashMap<>(10);
+	private final Map<BlockPos, Map<SEProperty<?>, Object>> signalStates = new HashMap<>();
 	private NBTTagCompound guiTag = new NBTTagCompound();
-	private HashMap<Point, SignalNode> modeGrid = new HashMap<>(100);
-	
+
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		final NBTTagList list = new NBTTagList();
@@ -56,6 +59,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		this.guiTag = compound.getCompoundTag(GUI_TAG);
 		this.updateGrid();
 		super.readFromNBT(compound);
+		if(world != null)
+			onLoad();
 	}
 	
 	private void updateGrid() {
@@ -116,9 +121,21 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	public boolean link(BlockPos pos) {
 		if (linkedBlocks.contains(pos))
 			return false;
+		loadChunkAndGetTile(world, pos, (signaltile, _u) -> {
+			signalStates.put(pos, signaltile.getProperties());
+			syncClient();
+		});
 		linkedBlocks.add(pos);
-		syncClient();
 		return true;
+	}
+	
+	@Override
+	public void onLoad() {
+		signalStates.clear();
+		linkedBlocks.forEach(pos -> loadChunkAndGetTile(world, pos, (signaltile, _u) -> { 
+			signalStates.put(pos, signaltile.getProperties());
+			syncClient();
+		}));
 	}
 	
 	@Override
@@ -153,5 +170,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final BlockPos pos = getObjFromID(obj);
 		return getLocalizedName() + ": x=" + pos.getX() + ", y=" + pos.getY() + ", z=" + pos.getZ();
 	}
-	
+		
+	public Map<SEProperty<?>, Object> getProperties(final BlockPos pos) {
+		return this.signalStates.get(pos);
+	}
 }

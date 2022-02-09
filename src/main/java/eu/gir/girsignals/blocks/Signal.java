@@ -5,6 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -342,7 +343,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 			GhostBlock.destroyUpperBlock(worldIn, pos);
 	}
 	
-	public int getHeight(final HashMap<SEProperty<?>, Object> map) {
+	public int getHeight(final Map<SEProperty<?>, Object> map) {
 		return this.prop.height;
 	}
 	

@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.EnumSignals.EnumMode;
@@ -80,23 +82,26 @@ public class SignalControllerTileEntity extends SyncableTileEntity implements IS
 		return compound;
 	}
 	
+	public static Map<String, Integer> getSupportedSignalStates(final SignalTileEnity signaltile) {
+		final Signal signalBlock = Signal.SIGNALLIST.get(signaltile.getBlockID());
+		final Builder<String, Integer> supportedSignale = ImmutableMap.builder();
+		signaltile.accumulate((_u, property, value) -> {
+			if (property instanceof SEProperty && value != null) {
+				SEProperty<?> seProperty = ((SEProperty<?>) property);
+				if (seProperty.isChangabelAtStage(ChangeableStage.APISTAGE) || seProperty.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+					supportedSignale.put(property.getName(), signalBlock.getIDFromProperty(property));
+			}
+			return null;
+		}, null);
+		return supportedSignale.build();
+	}
+	
 	public void onLink() {
 		new Thread(() -> {
-			loadChunkAndGetTile(world, linkedSignalPosition, (sigtile, ch) -> {
-				Signal b = Signal.SIGNALLIST.get(sigtile.getBlockID());
-				
-				HashMap<String, Integer> supportedSignaleStates = new HashMap<>();
-				sigtile.accumulate((bs, prop, obj) -> {
-					if (prop instanceof SEProperty && obj != null) {
-						SEProperty<?> p = ((SEProperty<?>) prop);
-						if (p.isChangabelAtStage(ChangeableStage.APISTAGE) || p.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-							supportedSignaleStates.put(prop.getName(), b.getIDFromProperty(prop));
-					}
-					return null;
-				}, null);
-				listOfSupportedIndicies = supportedSignaleStates.values().stream().mapToInt(Integer::intValue).toArray();
-				tableOfSupportedSignalTypes = supportedSignaleStates;
-				signalTypeCache = ((Signal) ch.getBlockState(linkedSignalPosition).getBlock()).getID();
+			loadChunkAndGetTile(world, linkedSignalPosition, (signaltile, _u) -> {
+				signalTypeCache = signaltile.getBlockID();
+				tableOfSupportedSignalTypes = getSupportedSignalStates(signaltile);
+				listOfSupportedIndicies = tableOfSupportedSignalTypes.values().stream().mapToInt(Integer::intValue).toArray();
 				syncClient();
 			});
 		}).start();

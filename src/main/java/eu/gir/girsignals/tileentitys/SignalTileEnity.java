@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 
 import eu.gir.girsignals.SEProperty;
@@ -85,8 +86,8 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 		this.markDirty();
 	}
 	
-	public HashMap<SEProperty<?>, Object> getProperties() {
-		return map;
+	public Map<SEProperty<?>, Object> getProperties() {
+		return ImmutableMap.copyOf(map);
 	}
 	
 	public interface BiAccumulater<T, U, V> {

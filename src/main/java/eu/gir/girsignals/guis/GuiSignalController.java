@@ -1,7 +1,7 @@
 package eu.gir.girsignals.guis;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import eu.gir.girsignals.EnumSignals.EnumMode;
@@ -98,7 +98,7 @@ public class GuiSignalController extends GuiBase {
 		final UIBox boxMode = new UIBox(UIBox.VBOX, 1);
 		middlePart.add(boxMode);
 		
-		final HashMap<SEProperty<?>, Object> map = this.controller.getReference();
+		final Map<SEProperty<?>, Object> map = this.controller.getReference();
 		if (map == null)
 			return;
 		for (SEProperty<?> entry : map.keySet()) {
@@ -273,7 +273,7 @@ public class GuiSignalController extends GuiBase {
 		lowerEntity.add(createPreview(blockRender));
 		lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 		
-		final HashMap<SEProperty<?>, Object> map = this.controller.getReference();
+		final Map<SEProperty<?>, Object> map = this.controller.getReference();
 		if (map == null)
 			return;
 		for (SEProperty<?> entry : map.keySet()) {

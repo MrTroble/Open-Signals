@@ -26,6 +26,7 @@ import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
 import eu.gir.girsignals.guis.guilib.entitys.UIScroll;
 import eu.gir.girsignals.guis.guilib.entitys.UIStack;
 import eu.gir.girsignals.signalbox.PathOption;
+import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
@@ -42,6 +43,7 @@ import net.minecraft.util.math.BlockPos;
 public class GuiSignalBox extends GuiBase {
 	
 	private static final int SELECTION_COLOR = 0x2900FF00;
+	private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
 	
 	private final UIEntity lowerEntity = new UIEntity();
 	private final SignalBoxTileEntity box;
@@ -71,23 +73,27 @@ public class GuiSignalBox extends GuiBase {
 		final String modeName = I18n.format("property." + mode.name());
 		final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
 		final UIEntity entity = new UIEntity();
-		entity.setScaleX(1.1f);
-		entity.setScaleY(1.1f);
 		entity.setInheritWidth(true);
 		entity.setHeight(20);
+		entity.add(new UIColor(BACKGROUND_COLOR));
+		entity.add(new UIScale(1.1f, 1.1f, 1));
 		final UILabel modeLabel = new UILabel(modeName + " - " + rotationName);
 		modeLabel.setCenterX(false);
 		entity.add(modeLabel);
 		parent.add(entity);
 		
 		if (mode.equals(EnumGUIMode.CORNER) || mode.equals(EnumGUIMode.STRAIGHT)) {
+			final EnumPathUsage path = option.getPathUsage();
 			final UIEntity stateEntity = new UIEntity();
 			stateEntity.setInheritWidth(true);
 			stateEntity.setHeight(15);
 			final String pathUsageName = I18n.format("property.status") + ": ";
-			final String pathUsage = I18n.format("property." + option.getPathUsage());
+			final String pathUsage = I18n.format("property." + path);
 			stateEntity.add(new UILabel(pathUsageName + pathUsage));
 			parent.add(stateEntity);
+			if(path.equals(EnumPathUsage.SELECTED) && path.equals(EnumPathUsage.USED)) {
+				parent.add(GuiElements.createButton("Reset", e -> option.setPathUsage(EnumPathUsage.FREE)));
+			}
 		}
 		
 		if (mode.ordinal() >= EnumGUIMode.HP.ordinal() || mode.equals(EnumGUIMode.CORNER)) {
@@ -187,7 +193,7 @@ public class GuiSignalBox extends GuiBase {
 	
 	private void initMain(BiConsumer<UIEntity, UISignalBoxTile> consumer) {
 		reset();
-		lowerEntity.add(new UIColor(0xFF8B8B8B));
+		lowerEntity.add(new UIColor(BACKGROUND_COLOR));
 		lowerEntity.add(new UIStack());
 		lowerEntity.add(new UIScissor());
 		

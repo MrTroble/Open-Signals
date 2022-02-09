@@ -15,44 +15,44 @@ import net.minecraft.world.gen.ChunkProviderServer;
 
 public interface IChunkloadable<T> {
 			
-	default boolean loadChunkAndGetTile(World w, BlockPos pos, BiConsumer<T, Chunk> consumer) {
+	default boolean loadChunkAndGetTile(World world, BlockPos pos, BiConsumer<T, Chunk> consumer) {
 		if (pos == null)
 			return false;
 		try {
 			@SuppressWarnings("unchecked")
-			Callable<Boolean> call = () -> {
+			final Callable<Boolean> call = () -> {
 				TileEntity entity = null;
-				Chunk ch = w.getChunkFromBlockCoords(pos);
-				boolean flag = !ch.isLoaded();
+				Chunk chunk = world.getChunkFromBlockCoords(pos);
+				final boolean flag = !chunk.isLoaded();
 				if (flag) {
-					if (w.isRemote) {
-						ChunkProviderClient client = (ChunkProviderClient) w.getChunkProvider();
-						ch = client.loadChunk(ch.x, ch.z);
+					if (world.isRemote) {
+						ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
+						chunk = client.loadChunk(chunk.x, chunk.z);
 					} else {
-						ChunkProviderServer server = (ChunkProviderServer) w.getChunkProvider();
-						ch = server.loadChunk(ch.x, ch.z);
+						ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
+						chunk = server.loadChunk(chunk.x, chunk.z);
 					}
 				}
-				if (ch == null)
+				if (chunk == null)
 					return false;
-				entity = ch.getTileEntity(pos, EnumCreateEntityType.IMMEDIATE);
+				entity = chunk.getTileEntity(pos, EnumCreateEntityType.IMMEDIATE);
 				final boolean flag2 = entity != null;
 				if (flag2) {
-					consumer.accept((T) entity, ch);
+					consumer.accept((T) entity, chunk);
 				}
 				
 				if (flag) {
-					if (w.isRemote) {
-						ChunkProviderClient client = (ChunkProviderClient) w.getChunkProvider();
-						client.unloadChunk(ch.x, ch.z);
+					if (world.isRemote) {
+						ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
+						client.unloadChunk(chunk.x, chunk.z);
 					} else {
-						ChunkProviderServer server = (ChunkProviderServer) w.getChunkProvider();
-						server.queueUnload(ch);
+						ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
+						server.queueUnload(chunk);
 					}
 				}
 				return flag2;
 			};
-			final MinecraftServer mcserver = w.getMinecraftServer();
+			final MinecraftServer mcserver = world.getMinecraftServer();
 			if (mcserver == null)
 				return Minecraft.getMinecraft().addScheduledTask(call).get();
 			return mcserver.callFromMainThread(call).get();

@@ -1,6 +1,7 @@
 package eu.gir.girsignals.guis;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import eu.gir.girsignals.SEProperty;
@@ -19,7 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ContainerSignalController extends Container implements UIClientSync {
 	
-	private final AtomicReference<HashMap<SEProperty<?>, Object>> reference = new AtomicReference<>();
+	private final AtomicReference<Map<SEProperty<?>, Object>> reference = new AtomicReference<>();
 	private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
 	private boolean send = false;
 	private EntityPlayerMP player;
@@ -83,7 +84,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 		this.onUpdate.run();
 	}
 	
-	public HashMap<SEProperty<?>, Object> getReference() {
+	public Map<SEProperty<?>, Object> getReference() {
 		return reference.get();
 	}
 	
