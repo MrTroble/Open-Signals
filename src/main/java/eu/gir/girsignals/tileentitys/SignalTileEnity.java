@@ -5,7 +5,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
@@ -16,8 +15,6 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IWorldNameable;
 import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -59,7 +56,6 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 	}
 	
 	private void read(NBTTagCompound comp) {
-		ImmutableSet.of().parallelStream();
 		((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState()).getUnlistedProperties().stream().forEach(prop -> {
 			SEProperty<?> sep = SEProperty.cst(prop);
 			sep.readFromNBT(comp).ifPresent(obj -> map.put(sep, obj));
@@ -80,7 +76,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 			__tmp = null;
 		}
 	}
-		
+	
 	public <T extends Comparable<T>> void setProperty(SEProperty<T> prop, T opt) {
 		map.put(prop, opt);
 		this.markDirty();
@@ -89,21 +85,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 	public Map<SEProperty<?>, Object> getProperties() {
 		return ImmutableMap.copyOf(map);
 	}
-	
-	public interface BiAccumulater<T, U, V> {
 		
-		T accept(T t, U u, V v);
-		
-	}
-	
-	@SuppressWarnings("rawtypes")
-	public IExtendedBlockState accumulate(BiAccumulater<IExtendedBlockState, IUnlistedProperty, Object> bic, IExtendedBlockState bs) {
-		for (Map.Entry<SEProperty<?>, Object> entry : map.entrySet()) {
-			bs = bic.accept(bs, entry.getKey(), entry.getValue());
-		}
-		return bs;
-	}
-	
 	public Optional<?> getProperty(SEProperty<?> prop) {
 		if (map.containsKey(prop))
 			return Optional.of(map.get(prop));
@@ -155,5 +137,5 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 	public int getBlockID() {
 		return blockID;
 	}
-
+	
 }

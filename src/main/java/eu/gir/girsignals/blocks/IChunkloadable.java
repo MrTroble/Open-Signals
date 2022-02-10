@@ -36,6 +36,7 @@ public interface IChunkloadable<T> {
 				if (chunk == null)
 					return false;
 				entity = chunk.getTileEntity(pos, EnumCreateEntityType.IMMEDIATE);
+
 				final boolean flag2 = entity != null;
 				if (flag2) {
 					consumer.accept((T) entity, chunk);

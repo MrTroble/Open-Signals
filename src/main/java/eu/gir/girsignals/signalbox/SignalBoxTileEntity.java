@@ -124,7 +124,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	public boolean link(BlockPos linkedPos) {
 		if (linkedBlocks.contains(linkedPos))
 			return false;
-		if(!world.isRemote)
+		if (!world.isRemote)
 			loadChunkAndGetTile(world, linkedPos, this::updateSingle);
 		linkedBlocks.add(linkedPos);
 		return true;
@@ -139,11 +139,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	@Override
 	public void onLoad() {
-		if(world.isRemote)
+		if (world.isRemote)
 			return;
 		signalStates.clear();
 		signals.clear();
-		linkedBlocks.forEach(linkedPos -> loadChunkAndGetTile(world, linkedPos, this::updateSingle));
+		new Thread(() -> {
+			linkedBlocks.forEach(linkedPos -> loadChunkAndGetTile(world, linkedPos, this::updateSingle));
+		}).start();
 	}
 	
 	@Override

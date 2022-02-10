@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -250,14 +251,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 		return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-		IExtendedBlockState ebs = (IExtendedBlockState) super.getExtendedState(state, world, pos);
-		SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
+		final AtomicReference<IExtendedBlockState> blockState = new AtomicReference<>((IExtendedBlockState) super.getExtendedState(state, world, pos));
+		final SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
 		if (entity != null)
-			return entity.accumulate((b, p, o) -> b.withProperty(p, o), ebs);
-		return ebs;
+			entity.getProperties().forEach((property, value) -> blockState.getAndUpdate(oldState -> oldState.withProperty((SEProperty) (property), value)));
+		return blockState.get();
 	}
 	
 	@Override

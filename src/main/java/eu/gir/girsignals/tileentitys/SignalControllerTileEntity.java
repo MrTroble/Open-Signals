@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Maps;
 
@@ -84,16 +83,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity implements IS
 	
 	public static Map<String, Integer> getSupportedSignalStates(final SignalTileEnity signaltile) {
 		final Signal signalBlock = Signal.SIGNALLIST.get(signaltile.getBlockID());
-		final Builder<String, Integer> supportedSignale = ImmutableMap.builder();
-		signaltile.accumulate((_u, property, value) -> {
-			if (property instanceof SEProperty && value != null) {
-				SEProperty<?> seProperty = ((SEProperty<?>) property);
-				if (seProperty.isChangabelAtStage(ChangeableStage.APISTAGE) || seProperty.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-					supportedSignale.put(property.getName(), signalBlock.getIDFromProperty(property));
-			}
-			return null;
-		}, null);
-		return supportedSignale.build();
+		final Map<SEProperty<?>, Object> properties = signaltile.getProperties();
+		final Builder<String, Integer> nameToIDBuilder = new Builder<>();
+		properties.keySet().stream().filter((property) -> property.test(properties.entrySet()) && (property.isChangabelAtStage(ChangeableStage.APISTAGE) || property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))).forEach(property -> nameToIDBuilder.put(property.getName(), signalBlock.getIDFromProperty(property)));
+		return nameToIDBuilder.build();
 	}
 	
 	public void onLink() {
