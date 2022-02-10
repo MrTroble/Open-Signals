@@ -18,6 +18,7 @@ import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.IChunkloadable;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.IIntegerable;
 import eu.gir.girsignals.guis.guilib.ISyncable;
@@ -29,6 +30,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.Chunk;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos>, IIntegerable<BlockPos> {
 	
@@ -38,8 +40,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	private final ArrayList<BlockPos> linkedBlocks = new ArrayList<>();
 	private final HashMap<Point, SignalNode> modeGrid = new HashMap<>(10);
 	private final Map<BlockPos, Map<SEProperty<?>, Object>> signalStates = new HashMap<>();
+	private final Map<BlockPos, Signal> signals = new HashMap<>();
 	private NBTTagCompound guiTag = new NBTTagCompound();
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		final NBTTagList list = new NBTTagList();
@@ -59,7 +62,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		this.guiTag = compound.getCompoundTag(GUI_TAG);
 		this.updateGrid();
 		super.readFromNBT(compound);
-		if(world != null)
+		if (world != null)
 			onLoad();
 	}
 	
@@ -118,29 +121,36 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	@Override
-	public boolean link(BlockPos pos) {
-		if (linkedBlocks.contains(pos))
+	public boolean link(BlockPos linkedPos) {
+		if (linkedBlocks.contains(linkedPos))
 			return false;
-		loadChunkAndGetTile(world, pos, (signaltile, _u) -> {
-			signalStates.put(pos, signaltile.getProperties());
-			syncClient();
-		});
-		linkedBlocks.add(pos);
+		if(!world.isRemote)
+			loadChunkAndGetTile(world, linkedPos, this::updateSingle);
+		linkedBlocks.add(linkedPos);
 		return true;
+	}
+	
+	private void updateSingle(final SignalTileEnity signaltile, final Chunk _u) {
+		final BlockPos signalPos = signaltile.getPos();
+		signalStates.put(signalPos, signaltile.getProperties());
+		signals.put(signalPos, signaltile.getSignal());
+		syncClient();
 	}
 	
 	@Override
 	public void onLoad() {
+		if(world.isRemote)
+			return;
 		signalStates.clear();
-		linkedBlocks.forEach(pos -> loadChunkAndGetTile(world, pos, (signaltile, _u) -> { 
-			signalStates.put(pos, signaltile.getProperties());
-			syncClient();
-		}));
+		signals.clear();
+		linkedBlocks.forEach(linkedPos -> loadChunkAndGetTile(world, linkedPos, this::updateSingle));
 	}
 	
 	@Override
 	public boolean unlink() {
 		linkedBlocks.clear();
+		signals.clear();
+		signalStates.clear();
 		syncClient();
 		return true;
 	}
@@ -170,8 +180,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final BlockPos pos = getObjFromID(obj);
 		return getLocalizedName() + ": x=" + pos.getX() + ", y=" + pos.getY() + ", z=" + pos.getZ();
 	}
-		
+	
 	public Map<SEProperty<?>, Object> getProperties(final BlockPos pos) {
 		return this.signalStates.get(pos);
+	}
+	
+	public Signal getSignal(final BlockPos pos) {
+		return this.signals.get(pos);
 	}
 }
