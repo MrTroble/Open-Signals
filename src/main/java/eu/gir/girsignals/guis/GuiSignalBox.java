@@ -4,17 +4,15 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT1;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
 
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 
 import org.lwjgl.util.Point;
 
+import com.google.common.collect.ImmutableList;
+
 import eu.gir.girsignals.guis.guilib.DrawUtil.DisableIntegerable;
-import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.guis.guilib.DrawUtil.SizeIntegerables;
 import eu.gir.girsignals.guis.guilib.GuiBase;
 import eu.gir.girsignals.guis.guilib.GuiElements;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
@@ -74,7 +72,7 @@ public class GuiSignalBox extends GuiBase {
 		this.entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == SELECTION_COLOR).forEach(color -> color.getParent().remove(color));
 	}
 	
-	private void modeInit(UIEntity parent, EnumGUIMode mode, Rotation rotation, PathOption option) {
+	private void modeInit(UIEntity parent, EnumGUIMode mode, Rotation rotation, SignalNode node, PathOption option) {
 		final String modeName = I18n.format("property." + mode.name());
 		final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
 		final UIEntity entity = new UIEntity();
@@ -96,51 +94,29 @@ public class GuiSignalBox extends GuiBase {
 			final String pathUsage = I18n.format("property." + path);
 			stateEntity.add(new UILabel(pathUsageName + pathUsage));
 			parent.add(stateEntity);
-			if (path.equals(EnumPathUsage.SELECTED) && path.equals(EnumPathUsage.USED)) {
-				parent.add(GuiElements.createButton("Reset", e -> option.setPathUsage(EnumPathUsage.FREE)));
+			if (path.equals(EnumPathUsage.SELECTED) || path.equals(EnumPathUsage.USED)) {
+				parent.add(GuiElements.createButton("Reset", e -> {
+					option.setPathUsage(EnumPathUsage.FREE);
+					node.write(compound);
+				}));
 			}
 		}
 		
 		if (mode.ordinal() >= EnumGUIMode.HP.ordinal() || mode.equals(EnumGUIMode.CORNER)) {
-			final DisableIntegerable<BlockPos> integerable = new DisableIntegerable<BlockPos>(this.box);
-			
-			IntConsumer consumer = e -> {
-			};
-			Optional<UIEntity> listOfPropertiesOptional = Optional.empty();
-			if (mode.equals(EnumGUIMode.HP) || mode.equals(EnumGUIMode.VP) || mode.equals(EnumGUIMode.RS)) {
-				final UIEntity listOfProperties = new UIEntity();
-				listOfProperties.setInheritWidth(true);
-				listOfProperties.setInheritHeight(true);
-				listOfProperties.setMinHeight(100);
-				listOfProperties.add(new UIBox(UIBox.VBOX, 2));
-				consumer = e -> {
-					listOfProperties.write(compound);
-					listOfProperties.clearChildren();
-					final BlockPos pos = integerable.getObjFromID(e);
-					final Map<BlockPos, Map<SEProperty<?>, Object>> properties = this.container.getProperties();
-					if (pos == null || properties == null)
-						return;
-					final Map<SEProperty<?>, Object> map = properties.get(pos);
-					map.forEach((seproperty, value) -> {
-						if (!seproperty.test(map.entrySet()))
-							return;
-						if (!seproperty.isChangabelAtStage(ChangeableStage.APISTAGE) && !seproperty.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-							return;
-						final UIEntity element = GuiElements.createEnumElement(seproperty, _u -> {
-						});
-						element.findRecursive(UIEnumerable.class).forEach(enumerable -> {
-							enumerable.setID(seproperty.getName() + "-" + pos.getX() + "-" + pos.getY() + "-" + pos.getZ());
-						});
-						listOfProperties.add(element);
-					});
-					listOfProperties.read(compound);
-				};
-				listOfPropertiesOptional = Optional.of(listOfProperties);
+			final ImmutableList<BlockPos> positions = box.getPositions();
+			if (!positions.isEmpty()) {
+				final DisableIntegerable<BlockPos> blockPos = new DisableIntegerable<BlockPos>(SizeIntegerables.of("signal", positions.size(), positions::get));
+				final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
+					option.setLinkedPosition(id >= 0 ? positions.get(id) : null);
+					node.write(compound);
+				});
+				blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
+					e.setIndex(positions.indexOf(option.getLinkedPosition()));
+					e.setMin(-1);
+					e.setID(null);
+				});
+				parent.add(blockSelect);
 			}
-			final UIEntity selection = GuiElements.createEnumElement(integerable, consumer);
-			selection.findRecursive(UIEnumerable.class).forEach(en -> en.setMin(-1));
-			parent.add(selection);
-			listOfPropertiesOptional.ifPresent(parent::add);
 		}
 		
 	}
@@ -157,7 +133,7 @@ public class GuiSignalBox extends GuiBase {
 		lowerEntity.add(new UIBox(UIBox.VBOX, 3));
 		lowerEntity.add(new UIClickable(e -> initMain(this::initTile), 2));
 		lowerEntity.add(list);
-		node.forEach((e, opt) -> modeInit(list, e.getKey(), e.getValue(), opt));
+		node.forEach((e, opt) -> modeInit(list, e.getKey(), e.getValue(), node, opt));
 		lowerEntity.add(GuiElements.createPageSelect(box));
 		this.entity.read(compound);
 	}

@@ -14,13 +14,12 @@ import java.util.Map.Entry;
 
 import org.lwjgl.util.Point;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
-import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
-import eu.gir.girsignals.guis.guilib.IIntegerable;
 import eu.gir.girsignals.guis.guilib.ISyncable;
 import eu.gir.girsignals.linkableApi.ILinkableTile;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
@@ -32,14 +31,13 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
-public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos>, IIntegerable<BlockPos> {
+public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos> {
 	
 	private static final String LINKED_POS_LIST = "linkedPos";
 	private static final String GUI_TAG = "guiTag";
 	
 	private final ArrayList<BlockPos> linkedBlocks = new ArrayList<>();
 	private final HashMap<Point, SignalNode> modeGrid = new HashMap<>(10);
-	private final Map<BlockPos, Map<SEProperty<?>, Object>> signalStates = new HashMap<>();
 	private final Map<BlockPos, Signal> signals = new HashMap<>();
 	private NBTTagCompound guiTag = new NBTTagCompound();
 	
@@ -132,7 +130,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	private void updateSingle(final SignalTileEnity signaltile, final Chunk _u) {
 		final BlockPos signalPos = signaltile.getPos();
-		signalStates.put(signalPos, signaltile.getProperties());
 		signals.put(signalPos, signaltile.getSignal());
 		syncClient();
 	}
@@ -141,7 +138,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	public void onLoad() {
 		if (world.isRemote)
 			return;
-		signalStates.clear();
 		signals.clear();
 		new Thread(() -> {
 			linkedBlocks.forEach(linkedPos -> loadChunkAndGetTile(world, linkedPos, this::updateSingle));
@@ -152,7 +148,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	public boolean unlink() {
 		linkedBlocks.clear();
 		signals.clear();
-		signalStates.clear();
 		syncClient();
 		return true;
 	}
@@ -161,33 +156,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	public Iterator<BlockPos> iterator() {
 		return linkedBlocks.iterator();
 	}
-	
-	@Override
-	public BlockPos getObjFromID(int obj) {
-		return this.linkedBlocks.get(obj);
-	}
-	
-	@Override
-	public int count() {
-		return this.linkedBlocks.size();
-	}
-	
-	@Override
-	public String getName() {
-		return "signalposition";
-	}
-	
-	@Override
-	public String getNamedObj(int obj) {
-		final BlockPos pos = getObjFromID(obj);
-		return getLocalizedName() + ": x=" + pos.getX() + ", y=" + pos.getY() + ", z=" + pos.getZ();
-	}
-	
-	public Map<SEProperty<?>, Object> getProperties(final BlockPos pos) {
-		return this.signalStates.get(pos);
-	}
-	
+		
 	public Signal getSignal(final BlockPos pos) {
 		return this.signals.get(pos);
+	}
+	
+	public ImmutableList<BlockPos> getPositions() {
+		return ImmutableList.copyOf(this.linkedBlocks);
 	}
 }
