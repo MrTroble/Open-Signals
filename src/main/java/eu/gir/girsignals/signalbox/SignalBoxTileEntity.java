@@ -29,6 +29,7 @@ import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -110,6 +111,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 							if(config == null)
 								return;
 							config.change(atomic.get(), oldtile, newtile);
+							final IBlockState state = world.getBlockState(newposition);
+							world.markAndNotifyBlock(newposition, null, state, state, 3);
 						}));
 					}
 				});

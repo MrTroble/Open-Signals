@@ -57,7 +57,6 @@ public class PathOption {
 	
 	public void setPathUsage(EnumPathUsage pathUsage) {
 		this.pathUsage = pathUsage;
-		System.out.println(this.pathUsage);
 	}
 	
 	public BlockPos getLinkedPosition() {

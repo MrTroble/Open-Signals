@@ -1,15 +1,17 @@
 package eu.gir.girsignals.signalbox;
 
+import java.util.HashMap;
+
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.HP_BLOCK;
 import eu.gir.girsignals.EnumSignals.HP_HOME;
 import eu.gir.girsignals.EnumSignals.HP_TYPE;
 import eu.gir.girsignals.EnumSignals.VR;
+import eu.gir.girsignals.EnumSignals.ZS32;
+import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.ISignalAutoconifig;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.world.World;
 
 public final class HVSignalConfig implements ISignalAutoconifig {
 	
@@ -58,17 +60,25 @@ public final class HVSignalConfig implements ISignalAutoconifig {
 			return VR.OFF;
 		}
 	}
-
 	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
-		if (speed < 15) {
-			// TODO
+		final HashMap<SEProperty, Object> values = new HashMap<>();
+		if (speed < 16 && speed > 0) {
+			current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
+				final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
+				current.setProperty(SignalHV.ZS3, zs32);
+			});
+			values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
+			values.put(SignalHV.HPHOME, HP_HOME.HP2);
+			values.put(SignalHV.STOPSIGNAL, HP.HP2);
 		} else {
-			current.setProperty(SignalHV.HPBLOCK, HP_BLOCK.HP1);
-			current.setProperty(SignalHV.HPHOME, HP_HOME.HP1);
-			current.setProperty(SignalHV.STOPSIGNAL, HP.HP1);
+			values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
+			values.put(SignalHV.HPHOME, HP_HOME.HP1);
+			values.put(SignalHV.STOPSIGNAL, HP.HP1);
 		}
+		values.forEach((sep, value) -> current.getProperty(sep).ifPresent(_u -> current.setProperty(sep, (Comparable)value)));
 		current.getProperty(SignalHV.DISTANTSIGNAL).ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
 			VR vr = VR.VR0;
 			switch ((HP_TYPE) type) {
@@ -87,9 +97,10 @@ public final class HVSignalConfig implements ISignalAutoconifig {
 			}
 			current.setProperty(SignalHV.DISTANTSIGNAL, vr);
 		}));
-		final World world = current.getWorld();
-		final IBlockState state = world.getBlockState(current.getPos());
-		world.markAndNotifyBlock(current.getPos(), null, state, state, 3);
+		current.getProperty(SignalHV.ZS3V).ifPresent(_u -> {
+			current.setProperty(SignalHV.ZS3V, ZS32.OFF);
+			next.getProperty(SignalHV.ZS3).ifPresent(prevzs3 -> current.setProperty(SignalHV.ZS3V, (ZS32) prevzs3));
+		});
 	}
 	
 	@Override

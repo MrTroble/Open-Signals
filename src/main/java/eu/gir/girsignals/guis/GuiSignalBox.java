@@ -102,6 +102,19 @@ public class GuiSignalBox extends GuiBase {
 			}
 		}
 		
+		if (mode.equals(EnumGUIMode.STRAIGHT) || mode.equals(EnumGUIMode.CORNER)) {
+			final SizeIntegerables<Integer> size = new SizeIntegerables<>("Speed", 15, i -> i);
+			final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
+				option.setSpeed(id > 0 ? id:Integer.MAX_VALUE);
+				node.write(compound);
+			});
+			speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
+				e.setIndex(option.getSpeed() < 15 ? option.getSpeed():Integer.MAX_VALUE);
+				e.setID(null);
+			});
+			parent.add(speedSelection);
+		}
+		
 		if (mode.ordinal() >= EnumGUIMode.HP.ordinal() || mode.equals(EnumGUIMode.CORNER)) {
 			final ImmutableList<BlockPos> positions = box.getPositions();
 			if (!positions.isEmpty()) {

@@ -10,6 +10,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.signalbox.KSSignalConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -17,7 +18,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalKS extends Signal {
 	
 	public SignalKS() {
-		super(builder(GIRItems.PLACEMENT_TOOL, "KS").height(6).signHeight(4.95f).build());
+		super(builder(GIRItems.PLACEMENT_TOOL, "KS").height(6).signHeight(4.95f).config(KSSignalConfig.INSTANCE).build());
 	}
 	
 	public static final SEProperty<KS_TYPE> KSTYPE = SEProperty.of("kombitype", KS_TYPE.MAIN, ChangeableStage.GUISTAGE);
