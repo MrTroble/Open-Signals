@@ -51,6 +51,13 @@ public class SignalBoxUtil {
 	public static Optional<ArrayList<SignalNode>> requestWay(final HashMap<Point, SignalNode> modeGrid, final Point p1, final Point p2) {
 		if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
 			return Optional.empty();
+		final SignalNode lastNode = modeGrid.get(p2);
+		final boolean isRS = lastNode.has(EnumGUIMode.RS) || lastNode.has(EnumGUIMode.RA10);
+		if(isRS) {
+			final SignalNode firstNode = modeGrid.get(p1);
+			if(!(firstNode.has(EnumGUIMode.RS) || firstNode.has(EnumGUIMode.RA10)))
+					return Optional.empty();
+		}
 		final HashMap<Point, Point> closedList = new HashMap<>();
 		final Set<Point> openList = new HashSet<Point>();
 		final HashMap<Point, Double> fscores = new HashMap<>();
@@ -82,7 +89,8 @@ public class SignalBoxUtil {
 					if (entry.getKey() == null || entry.getValue() == null)
 						continue;
 					final Point neighbour = entry.getValue();
-					if (closedList.containsKey(entry.getKey()) || p1.equals(entry.getKey()) || closedList.isEmpty()) {
+					final Point previouse = closedList.get(currentNode);
+					if (previouse == null || previouse.equals(entry.getKey()) || p1.equals(entry.getKey())) {
 						final double tScore = gscores.getOrDefault(currentNode, Double.MAX_VALUE - 1) + 1;
 						if (tScore < gscores.getOrDefault(neighbour, Double.MAX_VALUE)) {
 							closedList.put(neighbour, currentNode);

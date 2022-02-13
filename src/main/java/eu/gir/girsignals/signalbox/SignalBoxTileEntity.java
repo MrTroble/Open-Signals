@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.lwjgl.util.Point;
 
@@ -18,11 +20,13 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.blocks.IChunkloadable;
+import eu.gir.girsignals.blocks.ISignalAutoconifig;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.ISyncable;
 import eu.gir.girsignals.linkableApi.ILinkableTile;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
+import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
 import net.minecraft.nbt.NBTTagCompound;
@@ -80,12 +84,36 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	public void onWayAdd(final ArrayList<SignalNode> nodes) {
+		final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
 		for (int i = 1; i < nodes.size() - 1; i++) {
 			final Point oldPos = nodes.get(i - 1).getPoint();
 			final Point newPos = nodes.get(i + 1).getPoint();
 			final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
 			final SignalNode current = nodes.get(i);
-			current.apply(entry, option -> option.setPathUsage(EnumPathUsage.SELECTED));
+			current.apply(entry, option -> { 
+				option.setPathUsage(EnumPathUsage.SELECTED);
+				atomic.getAndUpdate(oldspeed -> Math.min(oldspeed, option.getSpeed()));
+			});
+		}
+		final AtomicReference<SignalNode> lastNode = new AtomicReference<>();
+		for (final SignalNode node : nodes) {
+			if (node.has(EnumGUIMode.HP)) {
+				node.getOption(EnumGUIMode.HP).ifPresent(option -> {
+					final SignalNode old = lastNode.getAndSet(node);
+					if (old != null) {
+						final PathOption oldpath = old.getOption(EnumGUIMode.HP).get();
+						final BlockPos oldposition = oldpath.getLinkedPosition();
+						final BlockPos newposition = option.getLinkedPosition();
+						loadChunkAndGetTile(world, oldposition, (oldtile, _u) -> loadChunkAndGetTile(world, newposition, (newtile, _u2) -> {
+							final Signal current = newtile.getSignal();
+							final ISignalAutoconifig config = current.getConfig();
+							if(config == null)
+								return;
+							config.change(atomic.get(), oldtile, newtile);
+						}));
+					}
+				});
+			}
 		}
 		final NBTTagCompound update = new NBTTagCompound();
 		modeGrid.values().forEach(signal -> signal.write(update));
@@ -156,7 +184,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	public Iterator<BlockPos> iterator() {
 		return linkedBlocks.iterator();
 	}
-		
+	
 	public Signal getSignal(final BlockPos pos) {
 		return this.signals.get(pos);
 	}

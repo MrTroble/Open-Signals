@@ -2,6 +2,7 @@ package eu.gir.girsignals.signalbox;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -170,5 +171,18 @@ public class SignalNode implements UIAutoSync {
 			this.point.equals(((SignalNode) obj).getPoint());
 		}
 		return super.equals(obj);
+	}
+
+	public Optional<PathOption> getOption(final EnumGUIMode mode) {
+		final Optional<Entry<Entry<EnumGUIMode, Rotation>, PathOption>> opt = this.possibleModes.entrySet().stream().filter(e -> e.getKey().getKey().equals(mode)).findFirst();
+		if(opt.isPresent()) {
+			return Optional.of(opt.get().getValue());
+		} else {
+			return Optional.empty();
+		}
+	}
+	
+	public boolean has(EnumGUIMode mode) {
+		return this.possibleModes.keySet().stream().anyMatch(e -> e.getKey().equals(mode));
 	}
 }

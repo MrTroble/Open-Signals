@@ -33,7 +33,6 @@ public class PathOption {
 		}
 		if(compound.hasKey(SPEED))
 			this.speed = compound.getInteger(SPEED);
-		System.out.println(this.pathUsage);
 	}
 	
 	public NBTTagCompound writeNBT() {
