@@ -103,14 +103,14 @@ public class GuiSignalBox extends GuiBase {
 		}
 		
 		if (mode.equals(EnumGUIMode.STRAIGHT) || mode.equals(EnumGUIMode.CORNER)) {
-			final SizeIntegerables<Integer> size = new SizeIntegerables<>("Speed", 15, i -> i);
+			final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
 			final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
 				option.setSpeed(id > 0 ? id:Integer.MAX_VALUE);
 				node.write(compound);
 			});
 			speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
-				e.setIndex(option.getSpeed() < 15 ? option.getSpeed():Integer.MAX_VALUE);
 				e.setID(null);
+				e.setIndex(option.getSpeed() < 16 ? option.getSpeed():Integer.MAX_VALUE);
 			});
 			parent.add(speedSelection);
 		}
@@ -148,7 +148,6 @@ public class GuiSignalBox extends GuiBase {
 		lowerEntity.add(list);
 		node.forEach((e, opt) -> modeInit(list, e.getKey(), e.getValue(), node, opt));
 		lowerEntity.add(GuiElements.createPageSelect(box));
-		this.entity.read(compound);
 	}
 	
 	private void updateButton(UIEntity button) {
