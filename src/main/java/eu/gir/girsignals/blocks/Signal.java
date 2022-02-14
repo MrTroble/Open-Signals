@@ -92,9 +92,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 		public final float offsetY;
 		public final float signScale;
 		public final boolean canLink;
-		public final ISignalAutoconifig config;
+		public final ISignalAutoconfig config;
 		
-		public SignalProperties(final Placementtool placementtool, final String signalTypeName, final float customNameRenderHeight, final int height, final float signWidth, final float offsetX, final float offsetY, final float signScale, final boolean canLink, ISignalAutoconifig config) {
+		public SignalProperties(final Placementtool placementtool, final String signalTypeName, final float customNameRenderHeight, final int height, final float signWidth, final float offsetX, final float offsetY, final float signScale, final boolean canLink, ISignalAutoconfig config) {
 			this.placementtool = placementtool;
 			this.signalTypeName = signalTypeName;
 			this.customNameRenderHeight = customNameRenderHeight;
@@ -119,7 +119,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 		private float offsetY = 0;
 		private float signScale = 1;
 		private boolean canLink = true;
-		private ISignalAutoconifig config = null;
+		private ISignalAutoconfig config = null;
 		
 		public SignalPropertiesBuilder(final Placementtool placementtool, final String signalTypeName) {
 			this.placementtool = placementtool;
@@ -165,7 +165,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 			return this;
 		}
 		
-		public SignalPropertiesBuilder config(ISignalAutoconifig config) {
+		public SignalPropertiesBuilder config(ISignalAutoconfig config) {
 			this.config = config;
 			return this;
 		}
@@ -425,7 +425,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 		return t -> t.stream().noneMatch(e -> e.getKey().equals(property)) || t.stream().anyMatch((e -> e.getKey().equals(property) && e.getValue().equals(type)));
 	}
 	
-	public ISignalAutoconifig getConfig() {
+	public ISignalAutoconfig getConfig() {
 		return this.prop.config;
 	}
 	

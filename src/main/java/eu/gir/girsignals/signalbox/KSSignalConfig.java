@@ -8,11 +8,11 @@ import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KS_DISTANT;
 import eu.gir.girsignals.EnumSignals.KS_MAIN;
 import eu.gir.girsignals.EnumSignals.ZS32;
-import eu.gir.girsignals.blocks.ISignalAutoconifig;
+import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
-public final class KSSignalConfig implements ISignalAutoconifig {
+public final class KSSignalConfig implements ISignalAutoconfig {
 	
 	public static final KSSignalConfig INSTANCE = new KSSignalConfig();
 	
@@ -27,7 +27,7 @@ public final class KSSignalConfig implements ISignalAutoconifig {
 			final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
 			current.getProperty(SignalKS.ZS3).ifPresent(_u -> current.setProperty(SignalKS.ZS3, zs32));
 		}
-		final boolean changes = next.getProperty(SignalKS.ZS3).filter(e -> ((ZS32) e).ordinal() > ZS32.Z.ordinal() && (((ZS32) e).ordinal() - ZS32.Z.ordinal())  < speed).isPresent();
+		final boolean changes = next.getProperty(SignalKS.ZS3).filter(e -> ((ZS32) e).ordinal() > ZS32.Z.ordinal() && (((ZS32) e).ordinal() - ZS32.Z.ordinal()) < speed).isPresent();
 		final HashMap<SEProperty, Object> values = new HashMap<>();
 		values.put(SignalKS.MAINSIGNAL, KS_MAIN.KS1);
 		final Optional opt = next.getProperty(SignalKS.STOPSIGNAL);
@@ -42,6 +42,7 @@ public final class KSSignalConfig implements ISignalAutoconifig {
 			values.put(SignalKS.STOPSIGNAL, KS.KS1);
 			values.put(SignalKS.DISTANTSIGNAL, KS_DISTANT.KS1);
 		}
+		System.out.println(values);
 		values.forEach((prop, value) -> current.getProperty(prop).ifPresent(_u -> current.setProperty(prop, (Comparable) value)));
 	}
 	

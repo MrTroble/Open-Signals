@@ -48,7 +48,10 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 			this.tile.forEach(pos -> {
 				final NBTTagCompound entry = new NBTTagCompound();
 				entry.setTag(POS_ID, NBTUtil.createPosTag(pos));
-				entry.setInteger(SIGNAL_ID, tile.getSignal(pos).getID());
+				final Signal signal = tile.getSignal(pos);
+				if(signal == null)
+					return;
+				entry.setInteger(SIGNAL_ID, signal.getID());
 				typeList.appendTag(entry);
 			});
 			compound.setTag(UPDATE_SET, typeList);

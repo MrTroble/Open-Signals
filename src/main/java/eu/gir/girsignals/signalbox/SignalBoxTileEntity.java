@@ -20,7 +20,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.blocks.IChunkloadable;
-import eu.gir.girsignals.blocks.ISignalAutoconifig;
+import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.ISyncable;
@@ -107,10 +107,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 						final BlockPos newposition = option.getLinkedPosition();
 						loadChunkAndGetTile(world, oldposition, (oldtile, _u) -> loadChunkAndGetTile(world, newposition, (newtile, _u2) -> {
 							final Signal current = newtile.getSignal();
-							final ISignalAutoconifig config = current.getConfig();
+							final ISignalAutoconfig config = current.getConfig();
 							if(config == null)
 								return;
-							config.change(atomic.get(), oldtile, newtile);
+							config.change(atomic.get(), newtile, oldtile);
 							final IBlockState state = world.getBlockState(newposition);
 							world.markAndNotifyBlock(newposition, null, state, state, 3);
 						}));

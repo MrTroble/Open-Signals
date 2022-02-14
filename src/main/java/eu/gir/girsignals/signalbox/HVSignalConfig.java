@@ -9,11 +9,11 @@ import eu.gir.girsignals.EnumSignals.HP_TYPE;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.ISignalAutoconifig;
+import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
-public final class HVSignalConfig implements ISignalAutoconifig {
+public final class HVSignalConfig implements ISignalAutoconfig {
 	
 	public static final HVSignalConfig INSTANCE = new HVSignalConfig();
 	
