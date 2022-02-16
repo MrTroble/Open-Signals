@@ -295,3 +295,6 @@ property.SELECTED=Ausgewählt
 property.FREE=Frei
 property.USED=Besetzt
 property.NONE=Nichts
+property.speed.name=Geschwindigkeitsbeschränkung
+property.speed.desc=Wähle für z.B. Weichen eine Geschwindigkeitsbeschränkung aus. Liegt dieses Element im Fahrweg, wird das Signalbild entsprechend angepasst. Standardwert: 0
+property.signal.desc=Hier wählst du das zugehörige Signal aus. Alle verbundenen Signale findest du unter "Einstellungen".

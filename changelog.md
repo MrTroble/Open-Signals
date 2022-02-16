@@ -1,5 +1,11 @@
 # Changelog
 
+## [Alpha update] 02.16.2022 - 1
+
+* Added signal box
+
+  **This update is an alpha version and does not contain fully functional signal boxes. We ask you to test the system and give us feedback on functionality, bugs and features.**
+
 ## [Update] 02.04.2022 - 1
 
 * Imgbot optimizations
