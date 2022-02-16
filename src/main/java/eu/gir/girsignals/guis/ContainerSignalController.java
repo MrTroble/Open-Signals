@@ -1,6 +1,7 @@
 package eu.gir.girsignals.guis;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import eu.gir.girsignals.SEProperty;
@@ -19,7 +20,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ContainerSignalController extends Container implements UIClientSync {
 	
-	private final AtomicReference<HashMap<SEProperty<?>, Object>> reference = new AtomicReference<>();
+	private final AtomicReference<Map<SEProperty<?>, Object>> reference = new AtomicReference<>();
 	private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
 	private boolean send = false;
 	private EntityPlayerMP player;
@@ -28,7 +29,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 	public final HashMap<String, SEProperty<?>> lookup = new HashMap<String, SEProperty<?>>();
 	
 	public ContainerSignalController(SignalControllerTileEntity tile) {
-		if (!tile.loadChunkAndGetTile((t, c) -> {
+		if (!tile.loadChunkAndGetTile(tile.getWorld(), tile.getLinkedPosition(), (t, c) -> {
 			reference.set(t.getProperties());
 			final IBlockState state = c.getBlockState(t.getPos());
 			referenceBlock.set((Signal) state.getBlock());
@@ -83,7 +84,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 		this.onUpdate.run();
 	}
 	
-	public HashMap<SEProperty<?>, Object> getReference() {
+	public Map<SEProperty<?>, Object> getReference() {
 		return reference.get();
 	}
 	
@@ -98,5 +99,11 @@ public class ContainerSignalController extends Container implements UIClientSync
 			return true;
 		}
 		return false;
+	}
+
+	
+	@Override
+	public EntityPlayerMP getPlayer() {
+		return player;
 	}
 }

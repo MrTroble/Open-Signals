@@ -1,7 +1,7 @@
 package eu.gir.girsignals.guis;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import eu.gir.girsignals.EnumSignals.EnumMode;
@@ -17,7 +17,6 @@ import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
 import eu.gir.girsignals.guis.guilib.IIntegerable;
 import eu.gir.girsignals.guis.guilib.entitys.UIBlockRender;
 import eu.gir.girsignals.guis.guilib.entitys.UIBox;
-import eu.gir.girsignals.guis.guilib.entitys.UIBox.VBoxMode;
 import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
 import eu.gir.girsignals.guis.guilib.entitys.UIColor;
 import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
@@ -96,10 +95,10 @@ public class GuiSignalController extends GuiBase {
 		
 		middlePart.setInheritHeight(true);
 		middlePart.setInheritWidth(true);
-		final UIBox boxMode = new UIBox(VBoxMode.INSTANCE, 1);
+		final UIBox boxMode = new UIBox(UIBox.VBOX, 1);
 		middlePart.add(boxMode);
 		
-		final HashMap<SEProperty<?>, Object> map = this.controller.getReference();
+		final Map<SEProperty<?>, Object> map = this.controller.getReference();
 		if (map == null)
 			return;
 		for (SEProperty<?> entry : map.keySet()) {
@@ -128,12 +127,12 @@ public class GuiSignalController extends GuiBase {
 	}
 	
 	private void addSingleRSMode() {
-		this.lowerEntity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 2));
+		this.lowerEntity.add(new UIBox(UIBox.HBOX, 2));
 		
 		final UIEntity leftSide = new UIEntity();
 		leftSide.setInheritHeight(true);
 		leftSide.setInheritWidth(true);
-		leftSide.add(new UIBox(UIBox.VBoxMode.INSTANCE, 2));
+		leftSide.add(new UIBox(UIBox.VBOX, 2));
 		this.lowerEntity.add(leftSide);
 		
 		final UIBlockRender bRender = new UIBlockRender();
@@ -142,7 +141,7 @@ public class GuiSignalController extends GuiBase {
 		final UIEntity rightSide = new UIEntity();
 		rightSide.setInheritHeight(true);
 		rightSide.setWidth(30);
-		rightSide.add(new UIBox(UIBox.VBoxMode.INSTANCE, 4));
+		rightSide.add(new UIBox(UIBox.VBOX, 4));
 		
 		final Minecraft mc = Minecraft.getMinecraft();
 		final IBlockState state = mc.player.world.getBlockState(pos);
@@ -204,7 +203,7 @@ public class GuiSignalController extends GuiBase {
 		final UIEntity header = new UIEntity();
 		header.setInheritWidth(true);
 		header.setHeight(45);
-		header.add(new UIBox(UIBox.VBoxMode.INSTANCE, 1));
+		header.add(new UIBox(UIBox.VBOX, 1));
 		header.add(titel);
 		final EnumIntegerable<EnumMode> enumMode = new EnumIntegerable<EnumMode>(EnumMode.class);
 		final UIEntity rsMode = GuiElements.createEnumElement(enumMode, in -> {
@@ -218,14 +217,14 @@ public class GuiSignalController extends GuiBase {
 		final UIEntity middlePart = new UIEntity();
 		middlePart.setInheritHeight(true);
 		middlePart.setInheritWidth(true);
-		middlePart.add(new UIBox(UIBox.VBoxMode.INSTANCE, 4));
+		middlePart.add(new UIBox(UIBox.VBOX, 4));
 		middlePart.add(header);
 		middlePart.add(lowerEntity);
 		
 		this.entity.add(GuiElements.createSpacerH(10));
 		this.entity.add(middlePart);
 		this.entity.add(GuiElements.createSpacerH(10));
-		this.entity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 1));
+		this.entity.add(new UIBox(UIBox.HBOX, 1));
 		
 		this.entity.read(compound);
 	}
@@ -259,7 +258,7 @@ public class GuiSignalController extends GuiBase {
 		final UIEntity list = new UIEntity();
 		list.setInheritHeight(true);
 		list.setInheritWidth(true);
-		final UIBox vbox = new UIBox(UIBox.VBoxMode.INSTANCE, 1);
+		final UIBox vbox = new UIBox(UIBox.VBOX, 1);
 		list.add(vbox);
 		
 		final UIEntity leftSide = new UIEntity();
@@ -267,14 +266,14 @@ public class GuiSignalController extends GuiBase {
 		leftSide.setInheritWidth(true);
 		leftSide.add(list);
 		leftSide.add(GuiElements.createPageSelect(vbox));
-		leftSide.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
+		leftSide.add(new UIBox(UIBox.VBOX, 5));
 		lowerEntity.add(leftSide);
 		
 		final UIBlockRender blockRender = new UIBlockRender();
 		lowerEntity.add(createPreview(blockRender));
-		lowerEntity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 1));
+		lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 		
-		final HashMap<SEProperty<?>, Object> map = this.controller.getReference();
+		final Map<SEProperty<?>, Object> map = this.controller.getReference();
 		if (map == null)
 			return;
 		for (SEProperty<?> entry : map.keySet()) {

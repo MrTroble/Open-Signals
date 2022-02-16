@@ -11,6 +11,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.signalbox.HVSignalConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -18,7 +19,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalHV extends Signal {
 	
 	public SignalHV() {
-		super(builder(GIRItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f).build());
+		super(builder(GIRItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f).config(HVSignalConfig.INSTANCE).build());
 	}
 	
 	public static final SEProperty<HP_TYPE> HPTYPE = SEProperty.of("hptype", HP_TYPE.STOPSIGNAL, ChangeableStage.GUISTAGE);

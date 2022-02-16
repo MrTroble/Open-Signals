@@ -1,8 +1,1 @@
-{
-	"variants": { 
-		"normal": { 
-			"model": "girsignals:hvsignalcontroller"
-			}
-		}
-	
-	}
+{"variants": {"normal": {"model": "girsignals:hvsignalcontroller"}}}

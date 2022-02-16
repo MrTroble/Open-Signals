@@ -1,6 +1,6 @@
 package eu.gir.girsignals.blocks.signals;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
 import eu.gir.girsignals.SEProperty;
@@ -20,7 +20,7 @@ public class SignalSHLight extends Signal {
 	public static final SEProperty<Boolean> SH_HIGH = SEProperty.of("sh_high", false, ChangeableStage.GUISTAGE);
 	
 	@Override
-	public int getHeight(final HashMap<SEProperty<?>, Object> map) {
+	public int getHeight(final Map<SEProperty<?>, Object> map) {
 		if ((Boolean) map.getOrDefault(SH_HIGH, false)) {
 			return 2;
 		}

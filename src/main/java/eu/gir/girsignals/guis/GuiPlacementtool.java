@@ -68,7 +68,7 @@ public class GuiPlacementtool extends GuiBase {
 	
 	private void init() {
 		initList();
-		final UIBox vbox = new UIBox(UIBox.VBoxMode.INSTANCE, 5);
+		final UIBox vbox = new UIBox(UIBox.VBOX, 5);
 		this.list.add(vbox);
 		this.list.setInheritHeight(true);
 		this.list.setInheritWidth(true);
@@ -89,7 +89,7 @@ public class GuiPlacementtool extends GuiBase {
 		final UIEntity leftSide = new UIEntity();
 		leftSide.setInheritHeight(true);
 		leftSide.setInheritWidth(true);
-		leftSide.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
+		leftSide.add(new UIBox(UIBox.VBOX, 5));
 		
 		leftSide.add(selectBlockEntity);
 		leftSide.add(list);
@@ -110,7 +110,7 @@ public class GuiPlacementtool extends GuiBase {
 		blockRenderEntity.add(new UIScale(20, -20, 20));
 		blockRenderEntity.add(blockRender);
 		
-		lowerEntity.add(new UIBox(UIBox.HBoxMode.INSTANCE, 5));
+		lowerEntity.add(new UIBox(UIBox.HBOX, 5));
 		
 		lowerEntity.add(leftSide);
 		lowerEntity.add(blockRenderEntity);
@@ -129,12 +129,12 @@ public class GuiPlacementtool extends GuiBase {
 		final UIEntity topPart = new UIEntity();
 		topPart.setInheritWidth(true);
 		topPart.setHeight(20);
-		topPart.add(new UIBox(UIBox.HBoxMode.INSTANCE, 5));
+		topPart.add(new UIBox(UIBox.HBOX, 5));
 		topPart.add(GuiElements.createSpacerH(10));
 		topPart.add(titel);
 		this.entity.add(topPart);
 		
-		this.entity.add(new UIBox(UIBox.VBoxMode.INSTANCE, 5));
+		this.entity.add(new UIBox(UIBox.VBOX, 5));
 		this.entity.add(lowerEntity);
 		this.entity.read(compound);
 	}

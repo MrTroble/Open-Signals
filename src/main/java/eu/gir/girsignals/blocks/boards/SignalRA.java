@@ -1,6 +1,6 @@
 package eu.gir.girsignals.blocks.boards;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.RA_LIGHT;
@@ -20,7 +20,7 @@ public class SignalRA extends Signal {
 	public static final SEProperty<RA_LIGHT> RALIGHTSIGNAL = SEProperty.of("ralightsignal", RA_LIGHT.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(RATYPE, RA.RA6_9));
 	
 	@Override
-	public int getHeight(final HashMap<SEProperty<?>, Object> map) {
+	public int getHeight(final Map<SEProperty<?>, Object> map) {
 		final RA ra = (RA) map.get(RATYPE);
 		if (ra == null)
 			return super.getHeight(map);

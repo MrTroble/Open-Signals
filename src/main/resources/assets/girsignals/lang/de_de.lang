@@ -11,6 +11,7 @@ item.signplacementtool.name=Signaltafel-Platzierer
 
 #Blocks
 tile.hvsignalcontroller.name=Signal Steuerer
+tile.signalbox.name=Stellwerk
 tile.post.name=Pfosten
 tile.hvsignal.name=HV Signal
 tile.kssignal.name=Ks Signal
@@ -269,3 +270,31 @@ property.value.UP=Gerade
 property.value.HM=Hektometer
 property.value.OB=Ortstellbereich
 property.value.CROSS=Ungültigkeitskreuz
+property.value.RED_YELLOW=Rot-Gelb
+
+#Signalbox
+btn.settings=Einstellungen
+btn.edit=Editor
+property.signalposition.name=Signalposition
+property.signalposition.desc=Wähle hier die Welt-Koordinaten des verbundenen Signals aus.
+property.status=Status
+property.STRAIGHT=Gerade
+property.CORNER=Weiche
+property.END=Prellbock
+property.PLATFORM=Bahnsteig
+property.BUE=Bahnübergang
+property.NONE.rotation=0 Grad
+property.CLOCKWISE_90.rotation=90 Grad
+property.CLOCKWISE_180.rotation=180 Grad
+property.COUNTERCLOCKWISE_90.rotation=270 Grad
+property.HP=Hauptsignal
+property.VP=Vorsignal
+property.RS=Rangiersignal
+property.RA10=Ra10
+property.SELECTED=Ausgewählt
+property.FREE=Frei
+property.USED=Besetzt
+property.NONE=Nichts
+property.speed.name=Geschwindigkeitsbeschränkung
+property.speed.desc=Wähle für z.B. Weichen eine Geschwindigkeitsbeschränkung aus. Liegt dieses Element im Fahrweg, wird das Signalbild entsprechend angepasst. Standardwert: 0
+property.signal.desc=Hier wählst du das zugehörige Signal aus. Alle verbundenen Signale findest du unter "Einstellungen".

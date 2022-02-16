@@ -11,6 +11,7 @@ item.signplacementtool.name=Signalplate-Placer
 
 #Blocks
 tile.hvsignalcontroller.name=Signal-Controller
+tile.signalbox.name=Signalbox
 tile.post.name=Post Block
 tile.hvsignal.name=HV Signal
 tile.kssignal.name=Ks Signal
@@ -270,3 +271,31 @@ property.value.UP=Straight
 property.value.HM=Hektometer
 property.value.OB=Local control area
 property.value.CROSS=Invalidation cross
+property.value.RED_YELLOW=Rot-Gelb
+
+#Signalbox
+btn.settings=Settings
+btn.edit=Editor
+property.signalposition.name=Signalposition
+property.signalposition.desc=Select here the world coordinates of the connected signal.
+property.status=Status
+property.STRAIGHT=Straight
+property.CORNER=Switch
+property.END=Buffer
+property.PLATFORM=Platform
+property.BUE=Railroad crossing
+property.NONE.rotation=0 Degree
+property.CLOCKWISE_90.rotation=90 Degree
+property.CLOCKWISE_180.rotation=180 Degree
+property.COUNTERCLOCKWISE_90.rotation=270 Dregee
+property.HP=Mainsignal
+property.VP=Distant signal
+property.RS=Shunting signal
+property.RA10=Ra10
+property.SELECTED=Selected
+property.FREE=Free
+property.USED=Occupied
+property.NONE=None
+property.speed.name=Speed restriction
+property.speed.desc=Select a speed restriction for e.g. switches. If this element is in the drive path, the signal aspect is adjusted accordingly. Default value: 0
+property.signal.desc=Here you select the associated signal. All connected signals can be found under 'Settings'.

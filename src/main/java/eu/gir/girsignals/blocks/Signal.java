@@ -5,7 +5,9 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -90,8 +92,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 		public final float offsetY;
 		public final float signScale;
 		public final boolean canLink;
+		public final ISignalAutoconfig config;
 		
-		public SignalProperties(final Placementtool placementtool, final String signalTypeName, final float customNameRenderHeight, final int height, final float signWidth, final float offsetX, final float offsetY, final float signScale, final boolean canLink) {
+		public SignalProperties(final Placementtool placementtool, final String signalTypeName, final float customNameRenderHeight, final int height, final float signWidth, final float offsetX, final float offsetY, final float signScale, final boolean canLink, ISignalAutoconfig config) {
 			this.placementtool = placementtool;
 			this.signalTypeName = signalTypeName;
 			this.customNameRenderHeight = customNameRenderHeight;
@@ -101,6 +104,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 			this.offsetY = offsetY;
 			this.signScale = signScale;
 			this.canLink = canLink;
+			this.config = config;
 		}
 	}
 	
@@ -115,6 +119,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 		private float offsetY = 0;
 		private float signScale = 1;
 		private boolean canLink = true;
+		private ISignalAutoconfig config = null;
 		
 		public SignalPropertiesBuilder(final Placementtool placementtool, final String signalTypeName) {
 			this.placementtool = placementtool;
@@ -122,7 +127,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 		}
 		
 		public SignalProperties build() {
-			return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight, height, signWidth, offsetX, offsetY, signScale, canLink);
+			return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight, height, signWidth, offsetX, offsetY, signScale, canLink, config);
 		}
 		
 		public SignalPropertiesBuilder signWidth(float signWidth) {
@@ -160,6 +165,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 			return this;
 		}
 		
+		public SignalPropertiesBuilder config(ISignalAutoconfig config) {
+			this.config = config;
+			return this;
+		}
 	}
 	
 	public static final SignalPropertiesBuilder builder(final Placementtool placementtool, final String signalTypeName) {
@@ -249,14 +258,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 		return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
 	}
 	
-	@SuppressWarnings("unchecked")
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
-		IExtendedBlockState ebs = (IExtendedBlockState) super.getExtendedState(state, world, pos);
-		SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
+		final AtomicReference<IExtendedBlockState> blockState = new AtomicReference<>((IExtendedBlockState) super.getExtendedState(state, world, pos));
+		final SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
 		if (entity != null)
-			return entity.accumulate((b, p, o) -> b.withProperty(p, o), ebs);
-		return ebs;
+			entity.getProperties().forEach((property, value) -> blockState.getAndUpdate(oldState -> oldState.withProperty((SEProperty) (property), value)));
+		return blockState.get();
 	}
 	
 	@Override
@@ -342,7 +351,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 			GhostBlock.destroyUpperBlock(worldIn, pos);
 	}
 	
-	public int getHeight(final HashMap<SEProperty<?>, Object> map) {
+	public int getHeight(final Map<SEProperty<?>, Object> map) {
 		return this.prop.height;
 	}
 	
@@ -414,6 +423,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 	
 	public static <T extends Comparable<T>> Predicate<Set<Entry<SEProperty<?>, Object>>> check(SEProperty<T> property, T type) {
 		return t -> t.stream().noneMatch(e -> e.getKey().equals(property)) || t.stream().anyMatch((e -> e.getKey().equals(property) && e.getValue().equals(type)));
+	}
+	
+	public ISignalAutoconfig getConfig() {
+		return this.prop.config;
 	}
 	
 }

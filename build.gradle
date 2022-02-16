@@ -32,7 +32,7 @@ curseforge {
   project {
     id = '440990'
     changelog = file('changelog.md')
-    releaseType = 'release'
+    releaseType = 'alpha'
     changelogType = 'markdown'
     mainArtifact(jar) {
       relations {
