@@ -23,7 +23,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
 	@Override
 	public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
 		current.getProperty(SignalKS.ZS3V).ifPresent(_u -> next.getProperty(SignalKS.ZS3).ifPresent(value -> current.setProperty(SignalKS.ZS3V, (ZS32) value)));
-		if (speed < 16 && speed > 0) {
+		if (speed <= 16 && speed > 0) {
 			final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
 			current.getProperty(SignalKS.ZS3).ifPresent(_u -> current.setProperty(SignalKS.ZS3, zs32));
 		}
