@@ -5,7 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import eu.gir.guilib.ecs.IIntegerable;
+import eu.gir.guilib.ecs.interfaces.IIntegerable;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;

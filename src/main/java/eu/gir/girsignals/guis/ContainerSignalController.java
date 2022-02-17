@@ -8,7 +8,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.guilib.ecs.GuiSyncNetwork;
-import eu.gir.guilib.ecs.UIClientSync;
+import eu.gir.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;

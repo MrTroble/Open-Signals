@@ -2,13 +2,13 @@ package eu.gir.girsignals.guis;
 
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.signalbox.SignalNode;
-import eu.gir.guilib.ecs.entitys.UIBorder;
 import eu.gir.guilib.ecs.entitys.UIBox;
-import eu.gir.guilib.ecs.entitys.UIColor;
 import eu.gir.guilib.ecs.entitys.UIComponent;
 import eu.gir.guilib.ecs.entitys.UIEntity;
 import eu.gir.guilib.ecs.entitys.UIEntity.KeyEvent;
 import eu.gir.guilib.ecs.entitys.UIEntity.MouseEvent;
+import eu.gir.guilib.ecs.entitys.render.UIBorder;
+import eu.gir.guilib.ecs.entitys.render.UIColor;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.Rotation;
 

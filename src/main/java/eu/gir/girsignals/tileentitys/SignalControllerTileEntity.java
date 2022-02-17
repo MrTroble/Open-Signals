@@ -15,7 +15,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.guilib.ecs.ISyncable;
+import eu.gir.guilib.ecs.interfaces.ISyncable;
 import eu.gir.linkableapi.ILinkableTile;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;

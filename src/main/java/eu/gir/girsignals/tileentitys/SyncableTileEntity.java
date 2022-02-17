@@ -2,7 +2,7 @@ package eu.gir.girsignals.tileentitys;
 
 import java.util.ArrayList;
 
-import eu.gir.guilib.ecs.UIClientSync;
+import eu.gir.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;

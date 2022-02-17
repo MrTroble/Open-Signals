@@ -9,7 +9,7 @@ import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.guilib.ecs.GuiHandler;
-import eu.gir.guilib.ecs.IIntegerable;
+import eu.gir.guilib.ecs.interfaces.IIntegerable;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;

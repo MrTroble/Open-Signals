@@ -12,7 +12,7 @@ import org.lwjgl.util.Point;
 import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
-import eu.gir.guilib.ecs.UIAutoSync;
+import eu.gir.guilib.ecs.interfaces.UIAutoSync;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Rotation;
