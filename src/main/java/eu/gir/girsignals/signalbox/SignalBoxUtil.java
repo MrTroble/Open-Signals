@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.BiConsumer;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.BiConsumer;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.Point;
@@ -15,7 +15,7 @@ import org.lwjgl.util.Point;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
+import eu.gir.guilib.ecs.entitys.UIEntity;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;

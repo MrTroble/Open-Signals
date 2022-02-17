@@ -1,6 +1,8 @@
 package eu.gir.girsignals.signalbox;
 
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.*;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.FREE_COLOR;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.SELECTED_COLOR;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.USED_COLOR;
 
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;

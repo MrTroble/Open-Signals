@@ -1,9 +1,5 @@
 package eu.gir.girsignals.guis;
 
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT1;
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
-
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -11,29 +7,29 @@ import org.lwjgl.util.Point;
 
 import com.google.common.collect.ImmutableList;
 
-import eu.gir.girsignals.guis.guilib.DrawUtil.DisableIntegerable;
-import eu.gir.girsignals.guis.guilib.DrawUtil.SizeIntegerables;
-import eu.gir.girsignals.guis.guilib.GuiBase;
-import eu.gir.girsignals.guis.guilib.GuiElements;
-import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
-import eu.gir.girsignals.guis.guilib.entitys.UIBorder;
-import eu.gir.girsignals.guis.guilib.entitys.UIBox;
-import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
-import eu.gir.girsignals.guis.guilib.entitys.UIColor;
-import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
-import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
-import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
-import eu.gir.girsignals.guis.guilib.entitys.UILabel;
-import eu.gir.girsignals.guis.guilib.entitys.UIScale;
-import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
-import eu.gir.girsignals.guis.guilib.entitys.UIScroll;
-import eu.gir.girsignals.guis.guilib.entitys.UIStack;
 import eu.gir.girsignals.signalbox.PathOption;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.signalbox.SignalNode;
+import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
+import eu.gir.guilib.ecs.DrawUtil.SizeIntegerables;
+import eu.gir.guilib.ecs.GuiBase;
+import eu.gir.guilib.ecs.GuiElements;
+import eu.gir.guilib.ecs.GuiSyncNetwork;
+import eu.gir.guilib.ecs.entitys.UIBorder;
+import eu.gir.guilib.ecs.entitys.UIBox;
+import eu.gir.guilib.ecs.entitys.UIClickable;
+import eu.gir.guilib.ecs.entitys.UIColor;
+import eu.gir.guilib.ecs.entitys.UIDrag;
+import eu.gir.guilib.ecs.entitys.UIEntity;
+import eu.gir.guilib.ecs.entitys.UIEnumerable;
+import eu.gir.guilib.ecs.entitys.UILabel;
+import eu.gir.guilib.ecs.entitys.UIScale;
+import eu.gir.guilib.ecs.entitys.UIScissor;
+import eu.gir.guilib.ecs.entitys.UIScroll;
+import eu.gir.guilib.ecs.entitys.UIStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
@@ -42,6 +38,8 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.*;
 
 public class GuiSignalBox extends GuiBase {
 	

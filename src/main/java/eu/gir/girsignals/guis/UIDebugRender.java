@@ -3,8 +3,8 @@ package eu.gir.girsignals.guis;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.util.Point;
 
-import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
 import eu.gir.girsignals.signalbox.SignalNode;
+import eu.gir.guilib.ecs.entitys.UIComponent;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;

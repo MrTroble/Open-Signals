@@ -7,9 +7,9 @@ import java.util.function.Consumer;
 import com.google.common.collect.ImmutableMap.Builder;
 
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
-import eu.gir.girsignals.guis.guilib.UIClientSync;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
+import eu.gir.guilib.ecs.GuiSyncNetwork;
+import eu.gir.guilib.ecs.UIClientSync;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;

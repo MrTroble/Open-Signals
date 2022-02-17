@@ -3,10 +3,10 @@ package eu.gir.girsignals.guis;
 import org.lwjgl.util.Point;
 
 import eu.gir.girsignals.GirsignalsMain;
-import eu.gir.girsignals.guis.guilib.UIAutoSync;
-import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.signalbox.SignalNode;
+import eu.gir.guilib.ecs.UIAutoSync;
+import eu.gir.guilib.ecs.entitys.UIComponent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;

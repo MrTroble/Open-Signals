@@ -6,9 +6,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
-import eu.gir.girsignals.guis.guilib.UIClientSync;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
+import eu.gir.guilib.ecs.GuiSyncNetwork;
+import eu.gir.guilib.ecs.UIClientSync;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
