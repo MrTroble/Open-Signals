@@ -21,6 +21,7 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Rotation;
 
 public class SignalBoxUtil {
 	
@@ -48,15 +49,55 @@ public class SignalBoxUtil {
 		return Math.hypot(dX, dY);
 	}
 	
+	private static boolean isRS(final SignalNode node, final SignalNode other) {
+		return (node.has(EnumGUIMode.RS) || node.has(EnumGUIMode.RA10)) && (other.has(EnumGUIMode.RS) || other.has(EnumGUIMode.RA10));
+	}
+	
+	private static boolean isHP(final SignalNode node, final SignalNode other) {
+		return node.has(EnumGUIMode.HP) && other.has(EnumGUIMode.HP);
+	}
+	
+	private static Rotation getRotationFromDelta(final Point delta) {
+		if (delta.getX() > 0) {
+			return Rotation.CLOCKWISE_180;
+		} else if (delta.getX() < 0) {
+			return Rotation.NONE;
+		} else if (delta.getY() > 0) {
+			return Rotation.COUNTERCLOCKWISE_90;
+		} else {
+			return Rotation.CLOCKWISE_90;
+		}
+	}
+	
+	private static boolean checkApplicable(final SignalNode neighbour, final SignalNode previouse, final boolean isRS) {
+		return checkApplicable(neighbour, previouse, isRS, Rotation.NONE);
+	}
+	
+	private static boolean checkApplicable(final SignalNode neighbour, final SignalNode previouse, final boolean isRS, final Rotation apply) {
+		if (previouse == null)
+			return false;
+		final Point prev = previouse.getPoint();
+		final Point next = neighbour.getPoint();
+		final Point delta = new Point(prev.getX() - next.getX(), prev.getY() - next.getY());
+		final ArrayList<Rotation> list = new ArrayList<>();
+		final Rotation rot = getRotationFromDelta(delta).add(apply);
+		if (isRS) {
+			list.addAll(neighbour.getRotations(EnumGUIMode.RS));
+			list.addAll(neighbour.getRotations(EnumGUIMode.RA10));
+		} else {
+			list.addAll(neighbour.getRotations(EnumGUIMode.HP));
+		}
+		return list.contains(rot);
+	}
+	
 	public static Optional<ArrayList<SignalNode>> requestWay(final HashMap<Point, SignalNode> modeGrid, final Point p1, final Point p2) {
 		if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
 			return Optional.empty();
 		final SignalNode lastNode = modeGrid.get(p2);
-		final boolean isRS = lastNode.has(EnumGUIMode.RS) || lastNode.has(EnumGUIMode.RA10);
-		if(isRS) {
-			final SignalNode firstNode = modeGrid.get(p1);
-			if(!(firstNode.has(EnumGUIMode.RS) || firstNode.has(EnumGUIMode.RA10)))
-					return Optional.empty();
+		final SignalNode firstNode = modeGrid.get(p1);
+		final boolean isrs = isRS(lastNode, firstNode);
+		if (!(isrs || isHP(lastNode, firstNode))) {
+			return Optional.empty();
 		}
 		final HashMap<Point, Point> closedList = new HashMap<>();
 		final Set<Point> openList = new HashSet<Point>();
@@ -71,26 +112,33 @@ public class SignalBoxUtil {
 			final Point currentNode = openList.stream().min((n1, n2) -> {
 				return Double.compare(fscores.getOrDefault(n1, Double.MAX_VALUE), fscores.getOrDefault(n2, Double.MAX_VALUE));
 			}).get();
+			openList.remove(currentNode);
+			final SignalNode cSNode = modeGrid.get(currentNode);
 			if (currentNode.equals(p2)) {
+				if (!checkApplicable(cSNode, modeGrid.get(closedList.get(currentNode)), isrs))
+					return Optional.empty();
 				final ArrayList<SignalNode> nodes = new ArrayList<>();
 				for (Point point = currentNode; point != null; point = closedList.get(point)) {
 					nodes.add(modeGrid.get(point));
 				}
 				return Optional.of(nodes);
 			}
-			openList.remove(currentNode);
-			final SignalNode cSNode = modeGrid.get(currentNode);
 			if (cSNode == null)
 				continue;
 			for (final Entry<Point, Point> e : cSNode.connections()) {
 				entryImpl.set(0, e);
 				entryImpl.set(1, Maps.immutableEntry(e.getValue(), e.getKey()));
-				for (Entry<Point, Point> entry : entryImpl) {
+				for (final Entry<Point, Point> entry : entryImpl) {
 					if (entry.getKey() == null || entry.getValue() == null)
 						continue;
 					final Point neighbour = entry.getValue();
 					final Point previouse = closedList.get(currentNode);
-					if (previouse == null || previouse.equals(entry.getKey()) || p1.equals(entry.getKey())) {
+					final SignalNode next = modeGrid.get(neighbour);
+					if(next == null)
+						continue;
+					if (currentNode.equals(p1) && checkApplicable(cSNode, next, isrs))
+						continue;
+					if (!checkApplicable(next, cSNode, isrs) || previouse.equals(entry.getKey())) {
 						final double tScore = gscores.getOrDefault(currentNode, Double.MAX_VALUE - 1) + 1;
 						if (tScore < gscores.getOrDefault(neighbour, Double.MAX_VALUE)) {
 							closedList.put(neighbour, currentNode);
