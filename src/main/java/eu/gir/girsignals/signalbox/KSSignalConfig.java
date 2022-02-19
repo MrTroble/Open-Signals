@@ -42,14 +42,21 @@ public final class KSSignalConfig implements ISignalAutoconfig {
 			values.put(SignalKS.STOPSIGNAL, KS.KS1);
 			values.put(SignalKS.DISTANTSIGNAL, KS_DISTANT.KS1);
 		}
-		System.out.println(values);
-		values.forEach((prop, value) -> current.getProperty(prop).ifPresent(_u -> current.setProperty(prop, (Comparable) value)));
+		this.changeIfPresent(values, current);
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void reset(SignalTileEnity current, SignalTileEnity prev) {
-		// TODO Auto-generated method stub
-		
+		final HashMap<SEProperty, Object> values = new HashMap<>();
+		values.put(SignalKS.DISTANTSIGNAL, KS_DISTANT.KS2);
+		values.put(SignalKS.STOPSIGNAL, KS.HP0);
+		values.put(SignalKS.MAINSIGNAL, KS_MAIN.HP0);
+		values.put(SignalKS.ZS2, ZS32.OFF);
+		values.put(SignalKS.ZS3, ZS32.OFF);
+		values.put(SignalKS.ZS2V, ZS32.OFF);
+		values.put(SignalKS.ZS3V, ZS32.OFF);
+		this.changeIfPresent(values, current);
 	}
 	
 }

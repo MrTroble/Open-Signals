@@ -19,7 +19,7 @@ public class PathOption {
 	private int speed = Integer.MAX_VALUE;
 	
 	public PathOption() {
-		this.pathUsage = EnumPathUsage.NONE;
+		this.pathUsage = EnumPathUsage.FREE;
 	}
 	
 	public PathOption(EnumPathUsage pathUsage) {
@@ -81,8 +81,7 @@ public class PathOption {
 		
 		FREE(FREE_COLOR),
 		SELECTED(SELECTED_COLOR),
-		USED(USED_COLOR),
-		NONE(FREE_COLOR);
+		USED(USED_COLOR);
 		
 		private final int color;
 		

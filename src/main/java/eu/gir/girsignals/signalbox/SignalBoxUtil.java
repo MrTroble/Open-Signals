@@ -134,7 +134,7 @@ public class SignalBoxUtil {
 					final Point neighbour = entry.getValue();
 					final Point previouse = closedList.get(currentNode);
 					final SignalNode next = modeGrid.get(neighbour);
-					if(next == null)
+					if(next == null || next.isUsed())
 						continue;
 					if (currentNode.equals(p1) && checkApplicable(cSNode, next, isrs))
 						continue;

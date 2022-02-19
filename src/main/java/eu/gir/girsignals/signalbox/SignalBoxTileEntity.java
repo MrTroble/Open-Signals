@@ -11,8 +11,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import org.lwjgl.util.Point;
 
@@ -37,6 +37,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos> {
+	
+	public static final String ERROR_STRING = "error";
 	
 	private static final String LINKED_POS_LIST = "linkedPos";
 	private static final String GUI_TAG = "guiTag";
@@ -84,6 +86,18 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		});
 	}
 	
+	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos newposition) {
+		loadChunkAndGetTile(world, lastPosition, (oldtile, _u) -> loadChunkAndGetTile(world, newposition, (newtile, _u2) -> {
+			final Signal current = newtile.getSignal();
+			final ISignalAutoconfig config = current.getConfig();
+			if (config == null)
+				return;
+			config.change(speed, newtile, oldtile);
+			final IBlockState state = world.getBlockState(newposition);
+			world.markAndNotifyBlock(newposition, null, state, state, 3);
+		}));
+	}
+	
 	public void onWayAdd(final ArrayList<SignalNode> nodes) {
 		final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
 		for (int i = 1; i < nodes.size() - 1; i++) {
@@ -91,32 +105,20 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			final Point newPos = nodes.get(i + 1).getPoint();
 			final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
 			final SignalNode current = nodes.get(i);
-			current.apply(entry, option -> { 
+			current.apply(entry, option -> {
 				option.setPathUsage(EnumPathUsage.SELECTED);
 				atomic.getAndUpdate(oldspeed -> Math.min(oldspeed, option.getSpeed()));
 			});
 		}
-		final AtomicReference<SignalNode> lastNode = new AtomicReference<>();
+		final SignalNode firstNode = nodes.get(nodes.size() - 1);
+		final SignalNode lastNode = nodes.get(0);
+		final BlockPos lastPosition = lastNode.getOption(EnumGUIMode.HP).get().getLinkedPosition();
+		final BlockPos firstPosition = firstNode.getOption(EnumGUIMode.HP).get().getLinkedPosition();
+		if (lastPosition == null || firstPosition == null)
+			return;
+		loadAndConfig(atomic.get(), lastPosition, firstPosition);
 		for (final SignalNode node : nodes) {
-			if (node.has(EnumGUIMode.HP)) {
-				node.getOption(EnumGUIMode.HP).ifPresent(option -> {
-					final SignalNode old = lastNode.getAndSet(node);
-					if (old != null) {
-						final PathOption oldpath = old.getOption(EnumGUIMode.HP).get();
-						final BlockPos oldposition = oldpath.getLinkedPosition();
-						final BlockPos newposition = option.getLinkedPosition();
-						loadChunkAndGetTile(world, oldposition, (oldtile, _u) -> loadChunkAndGetTile(world, newposition, (newtile, _u2) -> {
-							final Signal current = newtile.getSignal();
-							final ISignalAutoconfig config = current.getConfig();
-							if(config == null)
-								return;
-							config.change(atomic.get(), newtile, oldtile);
-							final IBlockState state = world.getBlockState(newposition);
-							world.markAndNotifyBlock(newposition, null, state, state, 3);
-						}));
-					}
-				});
-			}
+			node.getOption(EnumGUIMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition()));
 		}
 		final NBTTagCompound update = new NBTTagCompound();
 		modeGrid.values().forEach(signal -> signal.write(update));
@@ -131,7 +133,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			final NBTTagCompound request = (NBTTagCompound) compound.getTag(REQUEST_WAY);
 			final Point p1 = fromNBT(request, POINT1);
 			final Point p2 = fromNBT(request, POINT2);
-			requestWay(modeGrid, p1, p2).ifPresent(this::onWayAdd);
+			final Optional<ArrayList<SignalNode>> ways = requestWay(modeGrid, p1, p2);
+			if (ways.isPresent()) {
+				this.onWayAdd(ways.get());
+			} else {
+				final NBTTagCompound update = new NBTTagCompound();
+				update.setString(ERROR_STRING, "error.nopathfound");
+				this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(update, ui.getPlayer()));
+			}
 			return;
 		}
 		this.guiTag = compound;

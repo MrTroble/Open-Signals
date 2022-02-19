@@ -29,6 +29,7 @@ import eu.gir.guilib.ecs.entitys.render.UIBorder;
 import eu.gir.guilib.ecs.entitys.render.UIColor;
 import eu.gir.guilib.ecs.entitys.render.UILabel;
 import eu.gir.guilib.ecs.entitys.render.UIScissor;
+import eu.gir.guilib.ecs.entitys.render.UIToolTip;
 import eu.gir.guilib.ecs.entitys.transform.UIScale;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
@@ -62,8 +63,22 @@ public class GuiSignalBox extends GuiBase {
 	}
 	
 	private void update(NBTTagCompound compound) {
-		this.entity.read(compound);
 		this.resetSelection();
+		if(compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
+			final String error = I18n.format(compound.getString(SignalBoxTileEntity.ERROR_STRING));
+			final UIToolTip tooltip = new UIToolTip(error);
+			entity.add(tooltip);
+			new Thread(() -> {
+				try {
+					Thread.sleep(4000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				entity.remove(tooltip);
+			}).start();
+			return;
+		}
+		this.entity.read(compound);
 	}
 	
 	private void resetSelection() {
@@ -191,6 +206,9 @@ public class GuiSignalBox extends GuiBase {
 	
 	private void initTile(UIEntity tile, final UISignalBoxTile currentTile) {
 		tile.add(new UIClickable(c -> {
+			final SignalNode currentNode = currentTile.getNode();
+			if(!(currentNode.has(EnumGUIMode.RS) || currentNode.has(EnumGUIMode.HP) || currentNode.has(EnumGUIMode.RA10)))
+				return;
 			c.add(new UIColor(SELECTION_COLOR));
 			if (lastTile == null) {
 				lastTile = currentTile;
@@ -203,7 +221,7 @@ public class GuiSignalBox extends GuiBase {
 				final NBTTagCompound comp = new NBTTagCompound();
 				final NBTTagCompound way = new NBTTagCompound();
 				toNBT(way, POINT1, lastTile.getNode().getPoint());
-				toNBT(way, POINT2, currentTile.getNode().getPoint());
+				toNBT(way, POINT2, currentNode.getPoint());
 				comp.setTag(SignalBoxUtil.REQUEST_WAY, way);
 				GuiSyncNetwork.sendToPosServer(comp, box.getPos());
 				lastTile = null;

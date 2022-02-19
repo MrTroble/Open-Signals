@@ -13,6 +13,7 @@ import org.lwjgl.util.Point;
 
 import com.google.common.collect.Maps;
 
+import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.guilib.ecs.interfaces.UIAutoSync;
 import net.minecraft.nbt.NBTTagCompound;
@@ -186,6 +187,10 @@ public class SignalNode implements UIAutoSync {
 	
 	public List<Rotation> getRotations(final EnumGUIMode mode) {
 		return this.possibleModes.keySet().stream().filter(entry -> entry.getKey().equals(mode)).map(entry -> entry.getValue()).collect(Collectors.toList());
+	}
+	
+	public boolean isUsed() {
+		return !this.possibleModes.values().stream().allMatch(option -> option.getPathUsage().equals(EnumPathUsage.FREE));
 	}
 	
 	public boolean has(EnumGUIMode mode) {

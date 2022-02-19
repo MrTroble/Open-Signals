@@ -61,7 +61,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
 		}
 	}
 	
-	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
 		final HashMap<SEProperty, Object> values = new HashMap<>();
@@ -90,7 +90,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
 			values.put(SignalHV.HPHOME, HP_HOME.HP1);
 			values.put(SignalHV.STOPSIGNAL, HP.HP1);
 		}
-		values.forEach((sep, value) -> current.getProperty(sep).ifPresent(_u -> current.setProperty(sep, (Comparable)value)));
+		this.changeIfPresent(values, current);
 		current.getProperty(SignalHV.DISTANTSIGNAL).ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
 			VR vr = VR.VR0;
 			switch ((HP_TYPE) type) {
@@ -115,9 +115,19 @@ public final class HVSignalConfig implements ISignalAutoconfig {
 		});
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
 	@Override
 	public void reset(SignalTileEnity current, SignalTileEnity prev) {
-		
+		final HashMap<SEProperty, Object> values = new HashMap<>();
+		values.put(SignalHV.HPBLOCK, HP_BLOCK.HP0);
+		values.put(SignalHV.HPHOME, HP_HOME.HP0);
+		values.put(SignalHV.STOPSIGNAL, HP.HP0);
+		values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
+		values.put(SignalHV.ZS3, ZS32.OFF);
+		values.put(SignalHV.ZS3V, ZS32.OFF);
+		values.put(SignalHV.ZS1, false);
+		values.put(SignalHV.ZS7, false);
+		this.changeIfPresent(values, current);
 	}
 	
 }
