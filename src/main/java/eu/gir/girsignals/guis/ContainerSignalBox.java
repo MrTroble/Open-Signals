@@ -49,13 +49,13 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 				final NBTTagCompound entry = new NBTTagCompound();
 				entry.setTag(POS_ID, NBTUtil.createPosTag(pos));
 				final Signal signal = tile.getSignal(pos);
-				if(signal == null)
+				if (signal == null)
 					return;
 				entry.setInteger(SIGNAL_ID, signal.getID());
 				typeList.appendTag(entry);
 			});
 			compound.setTag(UPDATE_SET, typeList);
-			GuiSyncNetwork.sendToClient(compound, getPlayer());			
+			GuiSyncNetwork.sendToClient(compound, getPlayer());
 		}
 	}
 	

@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 public class SyncableTileEntity extends TileEntity {
 	
 	protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();
-
+	
 	public SPacketUpdateTileEntity getUpdatePacket() {
 		return new SPacketUpdateTileEntity(getPos(), 0, getUpdateTag());
 	}
@@ -45,5 +45,5 @@ public class SyncableTileEntity extends TileEntity {
 	public boolean remove(UIClientSync sync) {
 		return this.clientSyncs.remove(sync);
 	}
-
+	
 }

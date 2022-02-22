@@ -57,7 +57,7 @@ public class UIMenu extends UIComponent {
 	public int getSelection() {
 		return selection;
 	}
-
+	
 	@Override
 	public void mouseEvent(MouseEvent event) {
 		switch (event.state) {
@@ -82,14 +82,13 @@ public class UIMenu extends UIComponent {
 	@Override
 	public void keyEvent(KeyEvent event) {
 		super.keyEvent(event);
-		if(event.typed == 'r') {
+		if (event.typed == 'r') {
 			this.rotation++;
-			if(this.rotation >= Rotation.values().length)
+			if (this.rotation >= Rotation.values().length)
 				this.rotation = 0;
 		}
 	}
 	
-
 	public int getRotation() {
 		return rotation;
 	}

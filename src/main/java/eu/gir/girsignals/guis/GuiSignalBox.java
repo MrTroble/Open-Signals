@@ -3,12 +3,11 @@ package eu.gir.girsignals.guis;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.lwjgl.util.Point;
-
 import com.google.common.collect.ImmutableList;
 
 import eu.gir.girsignals.signalbox.PathOption;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
+import eu.gir.girsignals.signalbox.Point;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;

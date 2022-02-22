@@ -1,7 +1,5 @@
 package eu.gir.girsignals.guis;
 
-import org.lwjgl.util.Point;
-
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.signalbox.SignalNode;
@@ -24,7 +22,7 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 	}
 	
 	public UISignalBoxTile(EnumGUIMode enumMode) {
-		this.node = new SignalNode((Point) null);
+		this.node = new SignalNode(null);
 		this.node.add(enumMode, Rotation.NONE);
 	}
 	
@@ -60,22 +58,22 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 	public void setNode(SignalNode node) {
 		this.node = node;
 	}
-
+	
 	@Override
 	public void write(NBTTagCompound compound) {
 		this.node.write(compound);
 	}
-
+	
 	@Override
 	public void read(NBTTagCompound compound) {
 		this.node.read(compound);
 	}
-
+	
 	@Override
 	public String getID() {
 		return this.node.getID();
 	}
-
+	
 	@Override
 	public void setID(String id) {
 		this.node.setID(id);

@@ -13,7 +13,7 @@ public class PathOption {
 	private static final String PATH_USAGE = "pathUsage";
 	private static final String POSITION = "position";
 	private static final String SPEED = "speed";
-
+	
 	private EnumPathUsage pathUsage;
 	private BlockPos linkedPosition;
 	private int speed = Integer.MAX_VALUE;
@@ -28,24 +28,24 @@ public class PathOption {
 	
 	public PathOption(NBTTagCompound compound) {
 		this.pathUsage = EnumPathUsage.valueOf(compound.getString(PATH_USAGE));
-		if(compound.hasKey(POSITION)) {
+		if (compound.hasKey(POSITION)) {
 			this.linkedPosition = NBTUtil.getPosFromTag(compound.getCompoundTag(POSITION));
 		} else {
 			this.linkedPosition = null;
 		}
-		if(compound.hasKey(SPEED))
+		if (compound.hasKey(SPEED))
 			this.speed = compound.getInteger(SPEED);
 	}
 	
 	public NBTTagCompound writeNBT() {
 		final NBTTagCompound compound = new NBTTagCompound();
 		compound.setString(PATH_USAGE, this.pathUsage.name());
-		if(linkedPosition != null) {
+		if (linkedPosition != null) {
 			compound.setTag(POSITION, NBTUtil.createPosTag(linkedPosition));
 		} else {
 			compound.removeTag(POSITION);
 		}
-		if(speed != Integer.MAX_VALUE) {
+		if (speed != Integer.MAX_VALUE) {
 			compound.setInteger(SPEED, speed);
 		} else {
 			compound.removeTag(SPEED);
@@ -64,19 +64,19 @@ public class PathOption {
 	public BlockPos getLinkedPosition() {
 		return linkedPosition;
 	}
-
+	
 	public void setLinkedPosition(BlockPos linkedPosition) {
 		this.linkedPosition = linkedPosition;
 	}
-
+	
 	public int getSpeed() {
 		return speed;
 	}
-
+	
 	public void setSpeed(int speed) {
 		this.speed = speed;
 	}
-
+	
 	public static enum EnumPathUsage {
 		
 		FREE(FREE_COLOR),

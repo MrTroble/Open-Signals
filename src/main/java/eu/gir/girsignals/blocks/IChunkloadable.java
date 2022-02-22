@@ -14,7 +14,7 @@ import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
 import net.minecraft.world.gen.ChunkProviderServer;
 
 public interface IChunkloadable<T> {
-			
+	
 	default boolean loadChunkAndGetTile(World world, BlockPos pos, BiConsumer<T, Chunk> consumer) {
 		if (pos == null)
 			return false;
@@ -36,7 +36,7 @@ public interface IChunkloadable<T> {
 				if (chunk == null)
 					return false;
 				entity = chunk.getTileEntity(pos, EnumCreateEntityType.IMMEDIATE);
-
+				
 				final boolean flag2 = entity != null;
 				if (flag2) {
 					consumer.accept((T) entity, chunk);

@@ -77,7 +77,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
 			values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
 			values.put(SignalHV.HPHOME, HP_HOME.HP2);
 			values.put(SignalHV.STOPSIGNAL, HP.HP2);
-		} else if (speed >= 7 && speed <= 16 ) {
+		} else if (speed >= 7 && speed <= 16) {
 			current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
 				final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
 				current.setProperty(SignalHV.ZS3, zs32);

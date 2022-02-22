@@ -85,7 +85,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 	public Map<SEProperty<?>, Object> getProperties() {
 		return ImmutableMap.copyOf(map);
 	}
-		
+	
 	public Optional<?> getProperty(SEProperty<?> prop) {
 		if (map.containsKey(prop))
 			return Optional.of(map.get(prop));

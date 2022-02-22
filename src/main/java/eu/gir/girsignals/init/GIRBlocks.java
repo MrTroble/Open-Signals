@@ -61,7 +61,7 @@ public class GIRBlocks {
 	public static final SignalWN WN_SIGNAL = new SignalWN();
 	public static final SignalStationName STATION_NAME = new SignalStationName();
 	public static final SignalBox SIGNAL_BOX = new SignalBox();
-
+	
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 	
 	public static void init() {

@@ -10,7 +10,6 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.Point;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;

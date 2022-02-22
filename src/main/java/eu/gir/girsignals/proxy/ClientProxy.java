@@ -32,7 +32,7 @@ public class ClientProxy extends CommonProxy {
 				return null;
 			return new GuiSignalController((SignalControllerTileEntity) entity);
 		});
-		GuiHandler.addGui(SignalBox.class,  (p, w, bp) -> {
+		GuiHandler.addGui(SignalBox.class, (p, w, bp) -> {
 			final TileEntity entity = w.getTileEntity(bp);
 			if (!(entity instanceof SignalBoxTileEntity))
 				return null;

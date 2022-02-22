@@ -15,8 +15,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.lwjgl.util.Point;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 
@@ -114,11 +112,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		currentNode.getRotations(EnumGUIMode.HP).forEach(rotation -> {
 			currentNode.applyNormal(Maps.immutableEntry(EnumGUIMode.HP, rotation), option -> {
 				final BlockPos position = option.getLinkedPosition();
-				if(position == null)
+				if (position == null)
 					return;
 				loadChunkAndGetTile(world, position, (signaltile, chunk) -> {
 					final ISignalAutoconfig config = signaltile.getSignal().getConfig();
-					if(config == null)
+					if (config == null)
 						return;
 					config.reset(signaltile);
 					updateWorld(position, chunk);

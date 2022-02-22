@@ -9,8 +9,6 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.lwjgl.util.Point;
-
 import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
@@ -30,8 +28,8 @@ public class SignalNode implements UIAutoSync {
 	private HashMap<Entry<Point, Point>, Entry<EnumGUIMode, Rotation>> possibleConnections = new HashMap<>();
 	private HashMap<Entry<EnumGUIMode, Rotation>, PathOption> possibleModes = new HashMap<>();
 	
-	public SignalNode(Point point) {
-		this.point = point;
+	public SignalNode(final Point point2) {
+		this.point = point2;
 	}
 	
 	public void add(EnumGUIMode mode, Rotation rot) {
@@ -45,7 +43,7 @@ public class SignalNode implements UIAutoSync {
 	public void remove(EnumGUIMode mode, Rotation rot) {
 		possibleModes.remove(Maps.immutableEntry(mode, rot));
 	}
-		
+	
 	public void post() {
 		possibleModes.forEach((e, i) -> {
 			final Point p1 = new Point(this.point);
@@ -132,7 +130,7 @@ public class SignalNode implements UIAutoSync {
 	
 	@Override
 	public void write(NBTTagCompound compound) {
-		if(possibleModes.isEmpty())
+		if (possibleModes.isEmpty())
 			return;
 		final NBTTagList pointList = new NBTTagList();
 		possibleModes.forEach((mode, option) -> {
@@ -147,7 +145,7 @@ public class SignalNode implements UIAutoSync {
 	
 	@Override
 	public void read(NBTTagCompound compound) {
-		if(!compound.hasKey(getID()))
+		if (!compound.hasKey(getID()))
 			return;
 		final NBTTagList pointList = (NBTTagList) compound.getTag(getID());
 		pointList.forEach(e -> {
@@ -170,15 +168,15 @@ public class SignalNode implements UIAutoSync {
 	
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof SignalNode) {
+		if (obj instanceof SignalNode) {
 			this.point.equals(((SignalNode) obj).getPoint());
 		}
 		return super.equals(obj);
 	}
-
+	
 	public Optional<PathOption> getOption(final EnumGUIMode mode) {
 		final Optional<Entry<Entry<EnumGUIMode, Rotation>, PathOption>> opt = this.possibleModes.entrySet().stream().filter(e -> e.getKey().getKey().equals(mode)).findFirst();
-		if(opt.isPresent()) {
+		if (opt.isPresent()) {
 			return Optional.of(opt.get().getValue());
 		} else {
 			return Optional.empty();

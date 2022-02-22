@@ -100,7 +100,6 @@ public class ContainerSignalController extends Container implements UIClientSync
 		}
 		return false;
 	}
-
 	
 	@Override
 	public EntityPlayerMP getPlayer() {
