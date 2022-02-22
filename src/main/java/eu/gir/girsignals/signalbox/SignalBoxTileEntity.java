@@ -2,13 +2,14 @@ package eu.gir.girsignals.signalbox;
 
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT1;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.REQUEST_WAY;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.*;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.fromNBT;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.requestWay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
@@ -86,16 +87,66 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		});
 	}
 	
+	private void updateWorld(final BlockPos newposition, final Chunk chunk) {
+		final IBlockState state = world.getBlockState(newposition);
+		world.markAndNotifyBlock(newposition, chunk, state, state, 3);
+	}
+	
 	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos newposition) {
-		loadChunkAndGetTile(world, lastPosition, (oldtile, _u) -> loadChunkAndGetTile(world, newposition, (newtile, _u2) -> {
+		loadChunkAndGetTile(world, lastPosition, (oldtile, chunk) -> loadChunkAndGetTile(world, newposition, (newtile, _u2) -> {
 			final Signal current = newtile.getSignal();
 			final ISignalAutoconfig config = current.getConfig();
 			if (config == null)
 				return;
 			config.change(speed, newtile, oldtile);
-			final IBlockState state = world.getBlockState(newposition);
-			world.markAndNotifyBlock(newposition, null, state, state, 3);
+			updateWorld(newposition, chunk);
 		}));
+	}
+	
+	private void resend() {
+		final NBTTagCompound update = new NBTTagCompound();
+		modeGrid.values().forEach(signal -> signal.write(update));
+		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(update, ui.getPlayer()));
+	}
+	
+	private void resetWay(final Point resetPoint) {
+		final SignalNode currentNode = modeGrid.get(resetPoint);
+		currentNode.getRotations(EnumGUIMode.HP).forEach(rotation -> {
+			currentNode.applyNormal(Maps.immutableEntry(EnumGUIMode.HP, rotation), option -> {
+				final BlockPos position = option.getLinkedPosition();
+				if(position == null)
+					return;
+				loadChunkAndGetTile(world, position, (signaltile, chunk) -> {
+					final ISignalAutoconfig config = signaltile.getSignal().getConfig();
+					if(config == null)
+						return;
+					config.reset(signaltile);
+					updateWorld(position, chunk);
+				});
+			});
+			final List<Point> list = new ArrayList<>();
+			final List<Point> visited = new ArrayList<>();
+			list.add(SignalBoxUtil.getOffset(rotation, resetPoint));
+			visited.add(resetPoint);
+			while (!list.isEmpty()) {
+				final Point current = list.get(0);
+				final SignalNode nextPoint = modeGrid.get(current);
+				if (nextPoint == null)
+					return;
+				visited.add(current);
+				nextPoint.connections().forEach(entry -> nextPoint.apply(entry, path -> {
+					if (path.getPathUsage().equals(EnumPathUsage.FREE))
+						return;
+					path.setPathUsage(EnumPathUsage.FREE);
+					if (!visited.contains(entry.getValue()))
+						list.add(entry.getValue());
+					if (!visited.contains(entry.getKey()))
+						list.add(entry.getKey());
+				}));
+				list.remove(current);
+			}
+		});
+		resend();
 	}
 	
 	public void onWayAdd(final ArrayList<SignalNode> nodes) {
@@ -114,21 +165,25 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final SignalNode lastNode = nodes.get(0);
 		final BlockPos lastPosition = lastNode.getOption(EnumGUIMode.HP).get().getLinkedPosition();
 		final BlockPos firstPosition = firstNode.getOption(EnumGUIMode.HP).get().getLinkedPosition();
-		if (lastPosition == null || firstPosition == null)
-			return;
-		loadAndConfig(atomic.get(), lastPosition, firstPosition);
-		for (final SignalNode node : nodes) {
-			node.getOption(EnumGUIMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition()));
+		if (lastPosition != null && firstPosition != null) {
+			loadAndConfig(atomic.get(), lastPosition, firstPosition);
+			for (final SignalNode node : nodes) {
+				node.getOption(EnumGUIMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition()));
+			}
 		}
-		final NBTTagCompound update = new NBTTagCompound();
-		modeGrid.values().forEach(signal -> signal.write(update));
-		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(update, ui.getPlayer()));
+		resend();
 	}
 	
 	@Override
 	public void updateTag(NBTTagCompound compound) {
 		if (compound == null)
 			return;
+		if (compound.hasKey(RESET_WAY)) {
+			final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
+			final Point p1 = fromNBT(request, POINT1);
+			resetWay(p1);
+			return;
+		}
 		if (compound.hasKey(REQUEST_WAY)) {
 			final NBTTagCompound request = (NBTTagCompound) compound.getTag(REQUEST_WAY);
 			final Point p1 = fromNBT(request, POINT1);

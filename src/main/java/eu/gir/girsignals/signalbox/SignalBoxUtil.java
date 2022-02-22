@@ -30,6 +30,7 @@ public class SignalBoxUtil {
 	public static final int USED_COLOR = 0xFFFF0000;
 	
 	public static final String REQUEST_WAY = "requestWay";
+	public static final String RESET_WAY = "resetWay";
 	public static final String POINT0 = "P";
 	public static final String POINT1 = "P1";
 	public static final String POINT2 = "P2";
@@ -57,7 +58,7 @@ public class SignalBoxUtil {
 		return node.has(EnumGUIMode.HP) && other.has(EnumGUIMode.HP);
 	}
 	
-	private static Rotation getRotationFromDelta(final Point delta) {
+	public static Rotation getRotationFromDelta(final Point delta) {
 		if (delta.getX() > 0) {
 			return Rotation.CLOCKWISE_180;
 		} else if (delta.getX() < 0) {
@@ -69,11 +70,17 @@ public class SignalBoxUtil {
 		}
 	}
 	
-	private static boolean checkApplicable(final SignalNode neighbour, final SignalNode previouse, final boolean isRS) {
+	public static Point getOffset(final Rotation rotation, final Point point) {
+		final int x = Rotation.CLOCKWISE_180.equals(rotation) ? -1 : (Rotation.NONE.equals(rotation) ? 1 : 0);
+		final int y = Rotation.COUNTERCLOCKWISE_90.equals(rotation) ? -1 : (Rotation.CLOCKWISE_90.equals(rotation) ? 1 : 0);
+		return new Point(x + point.getX(), y + point.getY());
+	}
+	
+	public static boolean checkApplicable(final SignalNode neighbour, final SignalNode previouse, final boolean isRS) {
 		return checkApplicable(neighbour, previouse, isRS, Rotation.NONE);
 	}
 	
-	private static boolean checkApplicable(final SignalNode neighbour, final SignalNode previouse, final boolean isRS, final Rotation apply) {
+	public static boolean checkApplicable(final SignalNode neighbour, final SignalNode previouse, final boolean isRS, final Rotation apply) {
 		if (previouse == null)
 			return false;
 		final Point prev = previouse.getPoint();
@@ -134,7 +141,7 @@ public class SignalBoxUtil {
 					final Point neighbour = entry.getValue();
 					final Point previouse = closedList.get(currentNode);
 					final SignalNode next = modeGrid.get(neighbour);
-					if(next == null || next.isUsed())
+					if (next == null || next.isUsed())
 						continue;
 					if (currentNode.equals(p1) && checkApplicable(cSNode, next, isrs))
 						continue;

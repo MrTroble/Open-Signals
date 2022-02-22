@@ -47,7 +47,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
 	
 	@SuppressWarnings({ "rawtypes" })
 	@Override
-	public void reset(SignalTileEnity current, SignalTileEnity prev) {
+	public void reset(SignalTileEnity current) {
 		final HashMap<SEProperty, Object> values = new HashMap<>();
 		values.put(SignalKS.DISTANTSIGNAL, KS_DISTANT.KS2);
 		values.put(SignalKS.STOPSIGNAL, KS.HP0);

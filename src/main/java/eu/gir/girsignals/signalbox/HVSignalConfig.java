@@ -117,7 +117,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
 	
 	@SuppressWarnings({ "rawtypes" })
 	@Override
-	public void reset(SignalTileEnity current, SignalTileEnity prev) {
+	public void reset(SignalTileEnity current) {
 		final HashMap<SEProperty, Object> values = new HashMap<>();
 		values.put(SignalHV.HPBLOCK, HP_BLOCK.HP0);
 		values.put(SignalHV.HPHOME, HP_HOME.HP0);

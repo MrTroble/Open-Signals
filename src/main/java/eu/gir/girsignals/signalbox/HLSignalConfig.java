@@ -75,7 +75,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 	
 	@SuppressWarnings("rawtypes")
 	@Override
-	public void reset(SignalTileEnity current, SignalTileEnity prev) {
+	public void reset(SignalTileEnity current) {
 		final HashMap<SEProperty, Object> values = new HashMap<>();
 		values.put(SignalHL.LIGHTBAR, HL_LIGHTBAR.OFF);
 		values.put(SignalHL.DISTANTSIGNAL, HL_DISTANT.HL10);

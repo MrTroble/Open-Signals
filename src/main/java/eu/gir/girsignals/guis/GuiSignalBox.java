@@ -64,7 +64,7 @@ public class GuiSignalBox extends GuiBase {
 	
 	private void update(NBTTagCompound compound) {
 		this.resetSelection();
-		if(compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
+		if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
 			final String error = I18n.format(compound.getString(SignalBoxTileEntity.ERROR_STRING));
 			final UIToolTip tooltip = new UIToolTip(error);
 			entity.add(tooltip);
@@ -108,7 +108,7 @@ public class GuiSignalBox extends GuiBase {
 			stateEntity.add(new UILabel(pathUsageName + pathUsage));
 			parent.add(stateEntity);
 			if (path.equals(EnumPathUsage.SELECTED) || path.equals(EnumPathUsage.USED)) {
-				parent.add(GuiElements.createButton("Reset", e -> {
+				parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
 					option.setPathUsage(EnumPathUsage.FREE);
 					node.write(compound);
 				}));
@@ -118,12 +118,12 @@ public class GuiSignalBox extends GuiBase {
 		if (mode.equals(EnumGUIMode.STRAIGHT) || mode.equals(EnumGUIMode.CORNER)) {
 			final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
 			final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
-				option.setSpeed(id > 0 ? id:Integer.MAX_VALUE);
+				option.setSpeed(id > 0 ? id : Integer.MAX_VALUE);
 				node.write(compound);
 			});
 			speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
 				e.setID(null);
-				e.setIndex(option.getSpeed() < 16 ? option.getSpeed():Integer.MAX_VALUE);
+				e.setIndex(option.getSpeed() < 16 ? option.getSpeed() : Integer.MAX_VALUE);
 			});
 			parent.add(speedSelection);
 		}
@@ -145,22 +145,37 @@ public class GuiSignalBox extends GuiBase {
 			}
 		}
 		
+		if (mode.equals(EnumGUIMode.HP)) {
+			parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
+				this.lowerEntity.clear();
+				mainPage(this::normalTile);
+				final NBTTagCompound compound = new NBTTagCompound();
+				final NBTTagCompound wayComp = new NBTTagCompound();
+				toNBT(wayComp, POINT1, node.getPoint());
+				compound.setTag(RESET_WAY, wayComp);
+				GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+			}));
+		}
+		
 	}
 	
 	public void initTileConfig(final SignalNode node) {
 		if (node.isEmpty())
 			return;
-		this.reset();
+		reset();
 		final UIEntity list = new UIEntity();
 		list.setInheritHeight(true);
 		list.setInheritWidth(true);
 		final UIBox box = new UIBox(UIBox.VBOX, 1);
 		list.add(box);
 		lowerEntity.add(new UIBox(UIBox.VBOX, 3));
-		lowerEntity.add(new UIClickable(e -> initMain(this::initTile), 2));
 		lowerEntity.add(list);
 		node.forEach((e, opt) -> modeInit(list, e.getKey(), e.getValue(), node, opt));
 		lowerEntity.add(GuiElements.createPageSelect(box));
+		lowerEntity.add(new UIClickable(e -> {
+			reset();
+			mainPage(this::normalTile);
+		}, 1));
 	}
 	
 	private void updateButton(UIEntity button) {
@@ -168,15 +183,16 @@ public class GuiSignalBox extends GuiBase {
 		button.findRecursive(UIClickable.class).forEach(c -> {
 			final Consumer<UIEntity> old = c.getCallback();
 			c.setCallback(e -> {
-				initMain(this::initTile);
+				reset();
+				mainPage(this::normalTile);
 				c.setCallback(old);
 				handler.playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 			});
 		});
 	}
 	
-	private void initSettings(UIEntity entity) {
-		this.reset();
+	private void settingsPage(UIEntity entity) {
+		reset();
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
 		box.forEach(p -> lowerEntity.add(GuiElements.createButton(p.toString(), e -> {
 		})));
@@ -197,17 +213,18 @@ public class GuiSignalBox extends GuiBase {
 		}));
 	}
 	
-	private void initEdit(UIEntity entity) {
+	private void editPage(UIEntity entity) {
+		reset();
 		final UIMenu menu = new UIMenu();
-		initMain((e, name) -> this.editTile(e, menu, name));
+		mainPage((e, name) -> this.editTile(e, menu, name));
 		updateButton(entity);
 		lowerEntity.add(menu);
 	}
 	
-	private void initTile(UIEntity tile, final UISignalBoxTile currentTile) {
+	private void normalTile(UIEntity tile, final UISignalBoxTile currentTile) {
 		tile.add(new UIClickable(c -> {
 			final SignalNode currentNode = currentTile.getNode();
-			if(!(currentNode.has(EnumGUIMode.RS) || currentNode.has(EnumGUIMode.HP) || currentNode.has(EnumGUIMode.RA10)))
+			if (!(currentNode.has(EnumGUIMode.RS) || currentNode.has(EnumGUIMode.HP) || currentNode.has(EnumGUIMode.RA10)))
 				return;
 			c.add(new UIColor(SELECTION_COLOR));
 			if (lastTile == null) {
@@ -230,14 +247,7 @@ public class GuiSignalBox extends GuiBase {
 		tile.add(new UIClickable(e -> initTileConfig(currentTile.getNode()), 1));
 	}
 	
-	private void reset() {
-		this.entity.write(compound);
-		GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
-		lowerEntity.clear();
-	}
-	
-	private void initMain(BiConsumer<UIEntity, UISignalBoxTile> consumer) {
-		reset();
+	private void mainPage(BiConsumer<UIEntity, UISignalBoxTile> consumer) {
 		lowerEntity.add(new UIColor(BACKGROUND_COLOR));
 		lowerEntity.add(new UIStack());
 		lowerEntity.add(new UIScissor());
@@ -310,8 +320,8 @@ public class GuiSignalBox extends GuiBase {
 		header.add(new UIBox(UIBox.HBOX, 4));
 		header.add(titel);
 		header.add(GuiElements.createSpacerH(80));
-		header.add(GuiElements.createButton(I18n.format("btn.settings"), e -> initSettings(e)));
-		header.add(GuiElements.createButton(I18n.format("btn.edit"), e -> initEdit(e)));
+		header.add(GuiElements.createButton(I18n.format("btn.settings"), this::settingsPage));
+		header.add(GuiElements.createButton(I18n.format("btn.edit"), this::editPage));
 		
 		final UIEntity middlePart = new UIEntity();
 		middlePart.setInheritHeight(true);
@@ -322,7 +332,7 @@ public class GuiSignalBox extends GuiBase {
 		
 		lowerEntity.setInheritHeight(true);
 		lowerEntity.setInheritWidth(true);
-		initMain(this::initTile);
+		mainPage(this::normalTile);
 		
 		this.entity.add(GuiElements.createSpacerH(10));
 		this.entity.add(middlePart);
@@ -336,5 +346,11 @@ public class GuiSignalBox extends GuiBase {
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+	}
+	
+	private void reset() {
+		this.entity.write(compound);
+		GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+		lowerEntity.clear();
 	}
 }

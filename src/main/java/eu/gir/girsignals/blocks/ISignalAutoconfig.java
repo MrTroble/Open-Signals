@@ -9,7 +9,7 @@ public interface ISignalAutoconfig {
 	
 	void change(final int speed, final SignalTileEnity current, final SignalTileEnity next);
 	
-	void reset(final SignalTileEnity current, final SignalTileEnity prev);
+	void reset(final SignalTileEnity current);
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	default void changeIfPresent(final HashMap<SEProperty, Object> values, final SignalTileEnity current) {
