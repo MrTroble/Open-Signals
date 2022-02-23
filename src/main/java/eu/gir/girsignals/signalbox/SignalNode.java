@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
-import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.guilib.ecs.interfaces.UIAutoSync;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -25,22 +24,22 @@ public class SignalNode implements UIAutoSync {
 	private final String OPTION = "option";
 	
 	private final Point point;
-	private HashMap<Entry<Point, Point>, Entry<EnumGUIMode, Rotation>> possibleConnections = new HashMap<>();
-	private HashMap<Entry<EnumGUIMode, Rotation>, PathOption> possibleModes = new HashMap<>();
+	private HashMap<Entry<Point, Point>, Entry<EnumGuiMode, Rotation>> possibleConnections = new HashMap<>();
+	private HashMap<Entry<EnumGuiMode, Rotation>, PathOption> possibleModes = new HashMap<>();
 	
 	public SignalNode(final Point point2) {
 		this.point = point2;
 	}
 	
-	public void add(EnumGUIMode mode, Rotation rot) {
+	public void add(EnumGuiMode mode, Rotation rot) {
 		possibleModes.put(Maps.immutableEntry(mode, rot), new PathOption());
 	}
 	
-	public boolean has(EnumGUIMode mode, Rotation rot) {
+	public boolean has(EnumGuiMode mode, Rotation rot) {
 		return possibleModes.containsKey(Maps.immutableEntry(mode, rot));
 	}
 	
-	public void remove(EnumGUIMode mode, Rotation rot) {
+	public void remove(EnumGuiMode mode, Rotation rot) {
 		possibleModes.remove(Maps.immutableEntry(mode, rot));
 	}
 	
@@ -102,13 +101,13 @@ public class SignalNode implements UIAutoSync {
 		return this.possibleConnections.keySet();
 	}
 	
-	public void applyNormal(Entry<EnumGUIMode, Rotation> guimode, Consumer<PathOption> applier) {
+	public void applyNormal(Entry<EnumGuiMode, Rotation> guimode, Consumer<PathOption> applier) {
 		if (guimode != null && this.possibleModes.containsKey(guimode))
 			applier.accept(this.possibleModes.get(guimode));
 	}
 	
 	public void apply(Entry<Point, Point> entry, Consumer<PathOption> applier) {
-		Entry<EnumGUIMode, Rotation> guimode = null;
+		Entry<EnumGuiMode, Rotation> guimode = null;
 		if (this.possibleConnections.containsKey(entry)) {
 			guimode = this.possibleConnections.get(entry);
 		} else {
@@ -120,7 +119,7 @@ public class SignalNode implements UIAutoSync {
 		applyNormal(guimode, applier);
 	}
 	
-	public void forEach(BiConsumer<Entry<EnumGUIMode, Rotation>, PathOption> applier) {
+	public void forEach(BiConsumer<Entry<EnumGuiMode, Rotation>, PathOption> applier) {
 		possibleModes.forEach(applier);
 	}
 	
@@ -150,9 +149,9 @@ public class SignalNode implements UIAutoSync {
 		final NBTTagList pointList = (NBTTagList) compound.getTag(getID());
 		pointList.forEach(e -> {
 			final NBTTagCompound entry = (NBTTagCompound) e;
-			final EnumGUIMode mode = EnumGUIMode.valueOf(entry.getString(MODE));
+			final EnumGuiMode mode = EnumGuiMode.valueOf(entry.getString(MODE));
 			final Rotation rotation = Rotation.valueOf(entry.getString(ROTATION));
-			final Entry<EnumGUIMode, Rotation> modeRotation = Maps.immutableEntry(mode, rotation);
+			final Entry<EnumGuiMode, Rotation> modeRotation = Maps.immutableEntry(mode, rotation);
 			possibleModes.put(modeRotation, new PathOption(entry.getCompoundTag(OPTION)));
 		});
 	}
@@ -174,8 +173,8 @@ public class SignalNode implements UIAutoSync {
 		return super.equals(obj);
 	}
 	
-	public Optional<PathOption> getOption(final EnumGUIMode mode) {
-		final Optional<Entry<Entry<EnumGUIMode, Rotation>, PathOption>> opt = this.possibleModes.entrySet().stream().filter(e -> e.getKey().getKey().equals(mode)).findFirst();
+	public Optional<PathOption> getOption(final EnumGuiMode mode) {
+		final Optional<Entry<Entry<EnumGuiMode, Rotation>, PathOption>> opt = this.possibleModes.entrySet().stream().filter(e -> e.getKey().getKey().equals(mode)).findFirst();
 		if (opt.isPresent()) {
 			return Optional.of(opt.get().getValue());
 		} else {
@@ -183,7 +182,7 @@ public class SignalNode implements UIAutoSync {
 		}
 	}
 	
-	public List<Rotation> getRotations(final EnumGUIMode mode) {
+	public List<Rotation> getRotations(final EnumGuiMode mode) {
 		return this.possibleModes.keySet().stream().filter(entry -> entry.getKey().equals(mode)).map(entry -> entry.getValue()).collect(Collectors.toList());
 	}
 	
@@ -191,7 +190,7 @@ public class SignalNode implements UIAutoSync {
 		return !this.possibleModes.values().stream().allMatch(option -> option.getPathUsage().equals(EnumPathUsage.FREE));
 	}
 	
-	public boolean has(EnumGUIMode mode) {
+	public boolean has(EnumGuiMode mode) {
 		return this.possibleModes.keySet().stream().anyMatch(e -> e.getKey().equals(mode));
 	}
 }

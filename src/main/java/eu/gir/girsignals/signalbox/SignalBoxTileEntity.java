@@ -2,7 +2,8 @@ package eu.gir.girsignals.signalbox;
 
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT1;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.*;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.REQUEST_WAY;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.fromNBT;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.requestWay;
 
@@ -22,7 +23,6 @@ import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
-import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
 import eu.gir.guilib.ecs.GuiSyncNetwork;
@@ -109,8 +109,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	private void resetWay(final Point resetPoint) {
 		final SignalNode currentNode = modeGrid.get(resetPoint);
-		currentNode.getRotations(EnumGUIMode.HP).forEach(rotation -> {
-			currentNode.applyNormal(Maps.immutableEntry(EnumGUIMode.HP, rotation), option -> {
+		currentNode.getRotations(EnumGuiMode.HP).forEach(rotation -> {
+			currentNode.applyNormal(Maps.immutableEntry(EnumGuiMode.HP, rotation), option -> {
 				final BlockPos position = option.getLinkedPosition();
 				if (position == null)
 					return;
@@ -161,12 +161,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		}
 		final SignalNode firstNode = nodes.get(nodes.size() - 1);
 		final SignalNode lastNode = nodes.get(0);
-		final BlockPos lastPosition = lastNode.getOption(EnumGUIMode.HP).get().getLinkedPosition();
-		final BlockPos firstPosition = firstNode.getOption(EnumGUIMode.HP).get().getLinkedPosition();
+		final BlockPos lastPosition = lastNode.getOption(EnumGuiMode.HP).get().getLinkedPosition();
+		final BlockPos firstPosition = firstNode.getOption(EnumGuiMode.HP).get().getLinkedPosition();
 		if (lastPosition != null && firstPosition != null) {
 			loadAndConfig(atomic.get(), lastPosition, firstPosition);
 			for (final SignalNode node : nodes) {
-				node.getOption(EnumGUIMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition()));
+				node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition()));
 			}
 		}
 		resend();

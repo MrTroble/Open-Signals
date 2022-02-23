@@ -1,16 +1,21 @@
 package eu.gir.girsignals.guis;
 
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT1;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
+
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
 
+import eu.gir.girsignals.signalbox.EnumGuiMode;
 import eu.gir.girsignals.signalbox.PathOption;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.Point;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
-import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.signalbox.SignalNode;
 import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
 import eu.gir.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -38,8 +43,6 @@ import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.*;
 
 public class GuiSignalBox extends GuiBase {
 	
@@ -84,7 +87,7 @@ public class GuiSignalBox extends GuiBase {
 		this.entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == SELECTION_COLOR).forEach(color -> color.getParent().remove(color));
 	}
 	
-	private void modeInit(UIEntity parent, EnumGUIMode mode, Rotation rotation, SignalNode node, PathOption option) {
+	private void modeInit(UIEntity parent, EnumGuiMode mode, Rotation rotation, SignalNode node, PathOption option) {
 		final String modeName = I18n.format("property." + mode.name());
 		final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
 		final UIEntity entity = new UIEntity();
@@ -97,7 +100,7 @@ public class GuiSignalBox extends GuiBase {
 		entity.add(modeLabel);
 		parent.add(entity);
 		
-		if (mode.equals(EnumGUIMode.CORNER) || mode.equals(EnumGUIMode.STRAIGHT)) {
+		if (mode.equals(EnumGuiMode.CORNER) || mode.equals(EnumGuiMode.STRAIGHT)) {
 			final EnumPathUsage path = option.getPathUsage();
 			final UIEntity stateEntity = new UIEntity();
 			stateEntity.setInheritWidth(true);
@@ -114,7 +117,7 @@ public class GuiSignalBox extends GuiBase {
 			}
 		}
 		
-		if (mode.equals(EnumGUIMode.STRAIGHT) || mode.equals(EnumGUIMode.CORNER)) {
+		if (mode.equals(EnumGuiMode.STRAIGHT) || mode.equals(EnumGuiMode.CORNER)) {
 			final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
 			final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
 				option.setSpeed(id > 0 ? id : Integer.MAX_VALUE);
@@ -127,7 +130,7 @@ public class GuiSignalBox extends GuiBase {
 			parent.add(speedSelection);
 		}
 		
-		if (mode.ordinal() >= EnumGUIMode.HP.ordinal() || mode.equals(EnumGUIMode.CORNER)) {
+		if (mode.ordinal() >= EnumGuiMode.HP.ordinal() || mode.equals(EnumGuiMode.CORNER)) {
 			final ImmutableList<BlockPos> positions = box.getPositions();
 			if (!positions.isEmpty()) {
 				final DisableIntegerable<BlockPos> blockPos = new DisableIntegerable<BlockPos>(SizeIntegerables.of("signal", positions.size(), positions::get));
@@ -144,7 +147,7 @@ public class GuiSignalBox extends GuiBase {
 			}
 		}
 		
-		if (mode.equals(EnumGUIMode.HP)) {
+		if (mode.equals(EnumGuiMode.HP)) {
 			parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
 				this.lowerEntity.clear();
 				mainPage(this::normalTile);
@@ -202,7 +205,7 @@ public class GuiSignalBox extends GuiBase {
 	private void editTile(UIEntity tile, UIMenu menu, final UISignalBoxTile sbt) {
 		tile.add(new UIClickable(e -> {
 			final SignalNode node = sbt.getNode();
-			final EnumGUIMode mode = EnumGUIMode.values()[menu.getSelection()];
+			final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
 			final Rotation rotation = Rotation.values()[menu.getRotation()];
 			if (node.has(mode, rotation)) {
 				node.remove(mode, rotation);
@@ -223,7 +226,7 @@ public class GuiSignalBox extends GuiBase {
 	private void normalTile(UIEntity tile, final UISignalBoxTile currentTile) {
 		tile.add(new UIClickable(c -> {
 			final SignalNode currentNode = currentTile.getNode();
-			if (!(currentNode.has(EnumGUIMode.RS) || currentNode.has(EnumGUIMode.HP) || currentNode.has(EnumGUIMode.RA10)))
+			if (!(currentNode.has(EnumGuiMode.RS) || currentNode.has(EnumGuiMode.HP) || currentNode.has(EnumGuiMode.RA10)))
 				return;
 			c.add(new UIColor(SELECTION_COLOR));
 			if (lastTile == null) {

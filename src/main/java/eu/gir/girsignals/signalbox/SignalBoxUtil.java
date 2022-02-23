@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.BiConsumer;
 
 import org.lwjgl.opengl.GL11;
 
@@ -50,11 +49,11 @@ public class SignalBoxUtil {
 	}
 	
 	private static boolean isRS(final SignalNode node, final SignalNode other) {
-		return (node.has(EnumGUIMode.RS) || node.has(EnumGUIMode.RA10)) && (other.has(EnumGUIMode.RS) || other.has(EnumGUIMode.RA10));
+		return (node.has(EnumGuiMode.RS) || node.has(EnumGuiMode.RA10)) && (other.has(EnumGuiMode.RS) || other.has(EnumGuiMode.RA10));
 	}
 	
 	private static boolean isHP(final SignalNode node, final SignalNode other) {
-		return node.has(EnumGUIMode.HP) && other.has(EnumGUIMode.HP);
+		return node.has(EnumGuiMode.HP) && other.has(EnumGuiMode.HP);
 	}
 	
 	public static Rotation getRotationFromDelta(final Point delta) {
@@ -88,10 +87,10 @@ public class SignalBoxUtil {
 		final ArrayList<Rotation> list = new ArrayList<>();
 		final Rotation rot = getRotationFromDelta(delta).add(apply);
 		if (isRS) {
-			list.addAll(neighbour.getRotations(EnumGUIMode.RS));
-			list.addAll(neighbour.getRotations(EnumGUIMode.RA10));
+			list.addAll(neighbour.getRotations(EnumGuiMode.RS));
+			list.addAll(neighbour.getRotations(EnumGuiMode.RA10));
 		} else {
-			list.addAll(neighbour.getRotations(EnumGUIMode.HP));
+			list.addAll(neighbour.getRotations(EnumGuiMode.HP));
 		}
 		return list.contains(rot);
 	}
@@ -161,43 +160,7 @@ public class SignalBoxUtil {
 		return Optional.empty();
 	}
 	
-	public static enum EnumGUIMode {
-		
-		STRAIGHT(0, 0.5, 1, 0.5),
-		CORNER(0, 0.5, 0.5, 1),
-		END(1, 0.30, 1, 0.70),
-		PLATFORM((parent, color) -> drawRect(0, 0, parent.getWidth(), parent.getHeight() / 3, color)),
-		BUE((parent, color) -> {
-			final int part = parent.getHeight() / 3;
-			drawLines(0, parent.getWidth(), part, part, color);
-			drawLines(0, parent.getWidth(), part * 2, part * 2, color);
-		}),
-		HP(0),
-		VP(1),
-		RS(2),
-		RA10(3);
-		
-		/**
-		 * Naming
-		 */
-		
-		public final BiConsumer<UIEntity, Integer> consumer;
-		
-		private EnumGUIMode(int id) {
-			this.consumer = (parent, color) -> drawTextured(parent, id);
-		}
-		
-		private EnumGUIMode(double x1, double y1, double x2, double y2) {
-			this.consumer = (parent, color) -> drawLines((int) (x1 * parent.getWidth()), (int) (x2 * parent.getWidth()), (int) (y1 * parent.getHeight()), (int) (y2 * parent.getHeight()), color);
-		}
-		
-		private EnumGUIMode(final BiConsumer<UIEntity, Integer> consumer) {
-			this.consumer = consumer;
-		}
-		
-	}
-	
-	private static void drawRect(int left, int top, int right, int bottom, int color) {
+	static void drawRect(int left, int top, int right, int bottom, int color) {
 		float f3 = (float) (color >> 24 & 255) / 255.0F;
 		float f = (float) (color >> 16 & 255) / 255.0F;
 		float f1 = (float) (color >> 8 & 255) / 255.0F;
@@ -213,7 +176,7 @@ public class SignalBoxUtil {
 		tessellator.draw();
 	}
 	
-	private static void drawTextured(UIEntity entity, int textureID) {
+	static void drawTextured(UIEntity entity, int textureID) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		GlStateManager.color(1, 1, 1, 1);
@@ -228,7 +191,7 @@ public class SignalBoxUtil {
 		GlStateManager.disableTexture2D();
 	}
 	
-	private static void drawLines(int x1, int x2, int y1, int y2, int color) {
+	static void drawLines(int x1, int x2, int y1, int y2, int color) {
 		float f3 = (float) (color >> 24 & 255) / 255.0F;
 		float f = (float) (color >> 16 & 255) / 255.0F;
 		float f1 = (float) (color >> 8 & 255) / 255.0F;

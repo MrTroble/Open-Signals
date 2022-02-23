@@ -1,6 +1,6 @@
 package eu.gir.girsignals.guis;
 
-import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
+import eu.gir.girsignals.signalbox.EnumGuiMode;
 import eu.gir.girsignals.signalbox.SignalNode;
 import eu.gir.guilib.ecs.entitys.UIBox;
 import eu.gir.guilib.ecs.entitys.UIComponent;
@@ -33,9 +33,9 @@ public class UIMenu extends UIComponent {
 			selection.setX(mX);
 			selection.setY(mY);
 			selection.setHeight(20);
-			selection.setWidth(22 * EnumGUIMode.values().length);
+			selection.setWidth(22 * EnumGuiMode.values().length);
 			selection.add(new UIBox(UIBox.HBOX, 2));
-			for (EnumGUIMode mode : EnumGUIMode.values()) {
+			for (final EnumGuiMode mode : EnumGuiMode.values()) {
 				final UIEntity preview = new UIEntity();
 				preview.add(new UIColor(0xFFAFAFAF));
 				final SignalNode node = new SignalNode(null);
@@ -68,7 +68,7 @@ public class UIMenu extends UIComponent {
 				this.mX = event.x;
 				this.mY = event.y;
 			}
-			this.selection = Math.max(0, Math.min(EnumGUIMode.values().length - 1, (int) ((event.x - this.mX) / 22.0f)));
+			this.selection = Math.max(0, Math.min(EnumGuiMode.values().length - 1, (int) ((event.x - this.mX) / 22.0f)));
 			this.setVisible(true);
 			break;
 		case RELEASE:

@@ -1,7 +1,7 @@
 package eu.gir.girsignals.guis;
 
 import eu.gir.girsignals.GirsignalsMain;
-import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
+import eu.gir.girsignals.signalbox.EnumGuiMode;
 import eu.gir.girsignals.signalbox.SignalNode;
 import eu.gir.guilib.ecs.entitys.UIComponent;
 import eu.gir.guilib.ecs.interfaces.UIAutoSync;
@@ -21,7 +21,7 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 		this.node = node;
 	}
 	
-	public UISignalBoxTile(EnumGUIMode enumMode) {
+	public UISignalBoxTile(EnumGuiMode enumMode) {
 		this.node = new SignalNode(null);
 		this.node.add(enumMode, Rotation.NONE);
 	}
