@@ -193,4 +193,9 @@ public class SignalNode implements UIAutoSync {
 	public boolean has(EnumGuiMode mode) {
 		return this.possibleModes.keySet().stream().anyMatch(e -> e.getKey().equals(mode));
 	}
+
+	@Override
+	public String toString() {
+		return "Node[point=" + this.point + "]";
+	}
 }

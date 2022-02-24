@@ -86,6 +86,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 	
 	@Override
 	public void onContainerClosed(EntityPlayer playerIn) {
+		playerIn.openContainer = null;
 		this.tile.remove(this);
 	}
 	
