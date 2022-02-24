@@ -139,8 +139,8 @@ public class GuiSignalBox extends GuiBase {
 					node.write(compound);
 				});
 				blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
-					e.setIndex(positions.indexOf(option.getLinkedPosition()));
 					e.setMin(-1);
+					e.setIndex(positions.indexOf(option.getLinkedPosition()));
 					e.setID(null);
 				});
 				parent.add(blockSelect);

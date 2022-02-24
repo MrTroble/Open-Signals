@@ -5,6 +5,10 @@
 * Fixed correct signal aspect for hp signals
 * Train routes now only applied between neighbor signals in the right direction
 * Train routes can now be reset manually
+* Fixed backend issues
+* Fixed issue with container closed
+* Fixed sync issue
+* Added Blocks for in and output
 
   **This update is an alpha version and does not contain fully functional signal boxes. We ask you to test the system and give us feedback on functionality, bugs and features.**
 
