@@ -8,11 +8,11 @@ import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 
-public class RedstoneOut extends Block {
+public class RedstoneIO extends Block {
 	
 	public static final PropertyBool POWER = PropertyBool.create("power");
 
-	public RedstoneOut() {
+	public RedstoneIO() {
 		super(Material.ROCK);
 		setCreativeTab(GIRTabs.tab);
 		this.setDefaultState(getDefaultState().withProperty(POWER, false));
