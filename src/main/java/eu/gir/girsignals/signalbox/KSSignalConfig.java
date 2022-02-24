@@ -3,11 +3,11 @@ package eu.gir.girsignals.signalbox;
 import java.util.HashMap;
 import java.util.Optional;
 
-import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KS_DISTANT;
 import eu.gir.girsignals.EnumSignals.KS_MAIN;
 import eu.gir.girsignals.EnumSignals.ZS32;
+import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
@@ -23,7 +23,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
 	@Override
 	public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
 		current.getProperty(SignalKS.ZS3V).ifPresent(_u -> next.getProperty(SignalKS.ZS3).ifPresent(value -> current.setProperty(SignalKS.ZS3V, (ZS32) value)));
-		if (speed < 16 && speed > 0) {
+		if (speed <= 16 && speed > 0) {
 			final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
 			current.getProperty(SignalKS.ZS3).ifPresent(_u -> current.setProperty(SignalKS.ZS3, zs32));
 		}
@@ -42,14 +42,21 @@ public final class KSSignalConfig implements ISignalAutoconfig {
 			values.put(SignalKS.STOPSIGNAL, KS.KS1);
 			values.put(SignalKS.DISTANTSIGNAL, KS_DISTANT.KS1);
 		}
-		System.out.println(values);
-		values.forEach((prop, value) -> current.getProperty(prop).ifPresent(_u -> current.setProperty(prop, (Comparable) value)));
+		this.changeIfPresent(values, current);
 	}
 	
+	@SuppressWarnings({ "rawtypes" })
 	@Override
-	public void reset(SignalTileEnity current, SignalTileEnity prev) {
-		// TODO Auto-generated method stub
-		
+	public void reset(SignalTileEnity current) {
+		final HashMap<SEProperty, Object> values = new HashMap<>();
+		values.put(SignalKS.DISTANTSIGNAL, KS_DISTANT.KS2);
+		values.put(SignalKS.STOPSIGNAL, KS.HP0);
+		values.put(SignalKS.MAINSIGNAL, KS_MAIN.HP0);
+		values.put(SignalKS.ZS2, ZS32.OFF);
+		values.put(SignalKS.ZS3, ZS32.OFF);
+		values.put(SignalKS.ZS2V, ZS32.OFF);
+		values.put(SignalKS.ZS3V, ZS32.OFF);
+		this.changeIfPresent(values, current);
 	}
 	
 }

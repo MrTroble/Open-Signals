@@ -2,38 +2,39 @@ package eu.gir.girsignals.guis;
 
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT1;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
+import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.lwjgl.util.Point;
-
 import com.google.common.collect.ImmutableList;
 
-import eu.gir.girsignals.guis.guilib.DrawUtil.DisableIntegerable;
-import eu.gir.girsignals.guis.guilib.DrawUtil.SizeIntegerables;
-import eu.gir.girsignals.guis.guilib.GuiBase;
-import eu.gir.girsignals.guis.guilib.GuiElements;
-import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
-import eu.gir.girsignals.guis.guilib.entitys.UIBorder;
-import eu.gir.girsignals.guis.guilib.entitys.UIBox;
-import eu.gir.girsignals.guis.guilib.entitys.UIClickable;
-import eu.gir.girsignals.guis.guilib.entitys.UIColor;
-import eu.gir.girsignals.guis.guilib.entitys.UIDrag;
-import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
-import eu.gir.girsignals.guis.guilib.entitys.UIEnumerable;
-import eu.gir.girsignals.guis.guilib.entitys.UILabel;
-import eu.gir.girsignals.guis.guilib.entitys.UIScale;
-import eu.gir.girsignals.guis.guilib.entitys.UIScissor;
-import eu.gir.girsignals.guis.guilib.entitys.UIScroll;
-import eu.gir.girsignals.guis.guilib.entitys.UIStack;
+import eu.gir.girsignals.signalbox.EnumGuiMode;
 import eu.gir.girsignals.signalbox.PathOption;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
+import eu.gir.girsignals.signalbox.Point;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
-import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
 import eu.gir.girsignals.signalbox.SignalNode;
+import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
+import eu.gir.guilib.ecs.DrawUtil.SizeIntegerables;
+import eu.gir.guilib.ecs.GuiBase;
+import eu.gir.guilib.ecs.GuiElements;
+import eu.gir.guilib.ecs.GuiSyncNetwork;
+import eu.gir.guilib.ecs.entitys.UIBox;
+import eu.gir.guilib.ecs.entitys.UIEntity;
+import eu.gir.guilib.ecs.entitys.UIEnumerable;
+import eu.gir.guilib.ecs.entitys.UIStack;
+import eu.gir.guilib.ecs.entitys.input.UIClickable;
+import eu.gir.guilib.ecs.entitys.input.UIDrag;
+import eu.gir.guilib.ecs.entitys.input.UIScroll;
+import eu.gir.guilib.ecs.entitys.render.UIBorder;
+import eu.gir.guilib.ecs.entitys.render.UIColor;
+import eu.gir.guilib.ecs.entitys.render.UILabel;
+import eu.gir.guilib.ecs.entitys.render.UIScissor;
+import eu.gir.guilib.ecs.entitys.render.UIToolTip;
+import eu.gir.guilib.ecs.entitys.transform.UIScale;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.PositionedSoundRecord;
 import net.minecraft.client.audio.SoundHandler;
@@ -64,15 +65,29 @@ public class GuiSignalBox extends GuiBase {
 	}
 	
 	private void update(NBTTagCompound compound) {
-		this.entity.read(compound);
 		this.resetSelection();
+		if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
+			final String error = I18n.format(compound.getString(SignalBoxTileEntity.ERROR_STRING));
+			final UIToolTip tooltip = new UIToolTip(error);
+			entity.add(tooltip);
+			new Thread(() -> {
+				try {
+					Thread.sleep(4000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+				entity.remove(tooltip);
+			}).start();
+			return;
+		}
+		this.entity.read(compound);
 	}
 	
 	private void resetSelection() {
 		this.entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == SELECTION_COLOR).forEach(color -> color.getParent().remove(color));
 	}
 	
-	private void modeInit(UIEntity parent, EnumGUIMode mode, Rotation rotation, SignalNode node, PathOption option) {
+	private void modeInit(UIEntity parent, EnumGuiMode mode, Rotation rotation, SignalNode node, PathOption option) {
 		final String modeName = I18n.format("property." + mode.name());
 		final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
 		final UIEntity entity = new UIEntity();
@@ -85,7 +100,7 @@ public class GuiSignalBox extends GuiBase {
 		entity.add(modeLabel);
 		parent.add(entity);
 		
-		if (mode.equals(EnumGUIMode.CORNER) || mode.equals(EnumGUIMode.STRAIGHT)) {
+		if (mode.equals(EnumGuiMode.CORNER) || mode.equals(EnumGuiMode.STRAIGHT)) {
 			final EnumPathUsage path = option.getPathUsage();
 			final UIEntity stateEntity = new UIEntity();
 			stateEntity.setInheritWidth(true);
@@ -95,27 +110,27 @@ public class GuiSignalBox extends GuiBase {
 			stateEntity.add(new UILabel(pathUsageName + pathUsage));
 			parent.add(stateEntity);
 			if (path.equals(EnumPathUsage.SELECTED) || path.equals(EnumPathUsage.USED)) {
-				parent.add(GuiElements.createButton("Reset", e -> {
+				parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
 					option.setPathUsage(EnumPathUsage.FREE);
 					node.write(compound);
 				}));
 			}
 		}
 		
-		if (mode.equals(EnumGUIMode.STRAIGHT) || mode.equals(EnumGUIMode.CORNER)) {
+		if (mode.equals(EnumGuiMode.STRAIGHT) || mode.equals(EnumGuiMode.CORNER)) {
 			final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
 			final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
-				option.setSpeed(id > 0 ? id:Integer.MAX_VALUE);
+				option.setSpeed(id > 0 ? id : Integer.MAX_VALUE);
 				node.write(compound);
 			});
 			speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
 				e.setID(null);
-				e.setIndex(option.getSpeed() < 16 ? option.getSpeed():Integer.MAX_VALUE);
+				e.setIndex(option.getSpeed() < 16 ? option.getSpeed() : Integer.MAX_VALUE);
 			});
 			parent.add(speedSelection);
 		}
 		
-		if (mode.ordinal() >= EnumGUIMode.HP.ordinal() || mode.equals(EnumGUIMode.CORNER)) {
+		if (mode.ordinal() >= EnumGuiMode.HP.ordinal() || mode.equals(EnumGuiMode.CORNER)) {
 			final ImmutableList<BlockPos> positions = box.getPositions();
 			if (!positions.isEmpty()) {
 				final DisableIntegerable<BlockPos> blockPos = new DisableIntegerable<BlockPos>(SizeIntegerables.of("signal", positions.size(), positions::get));
@@ -124,12 +139,25 @@ public class GuiSignalBox extends GuiBase {
 					node.write(compound);
 				});
 				blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
-					e.setIndex(positions.indexOf(option.getLinkedPosition()));
 					e.setMin(-1);
+					e.setIndex(positions.indexOf(option.getLinkedPosition()));
 					e.setID(null);
 				});
 				parent.add(blockSelect);
 			}
+		}
+		
+		if (mode.equals(EnumGuiMode.HP)) {
+			parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
+				this.lowerEntity.clear();
+				GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+				mainPage(this::normalTile);
+				final NBTTagCompound compound = new NBTTagCompound();
+				final NBTTagCompound wayComp = new NBTTagCompound();
+				toNBT(wayComp, POINT1, node.getPoint());
+				compound.setTag(RESET_WAY, wayComp);
+				GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+			}));
 		}
 		
 	}
@@ -137,17 +165,20 @@ public class GuiSignalBox extends GuiBase {
 	public void initTileConfig(final SignalNode node) {
 		if (node.isEmpty())
 			return;
-		this.reset();
+		reset();
 		final UIEntity list = new UIEntity();
 		list.setInheritHeight(true);
 		list.setInheritWidth(true);
 		final UIBox box = new UIBox(UIBox.VBOX, 1);
 		list.add(box);
 		lowerEntity.add(new UIBox(UIBox.VBOX, 3));
-		lowerEntity.add(new UIClickable(e -> initMain(this::initTile), 2));
 		lowerEntity.add(list);
 		node.forEach((e, opt) -> modeInit(list, e.getKey(), e.getValue(), node, opt));
 		lowerEntity.add(GuiElements.createPageSelect(box));
+		lowerEntity.add(new UIClickable(e -> {
+			reset();
+			mainPage(this::normalTile);
+		}, 1));
 	}
 	
 	private void updateButton(UIEntity button) {
@@ -155,15 +186,16 @@ public class GuiSignalBox extends GuiBase {
 		button.findRecursive(UIClickable.class).forEach(c -> {
 			final Consumer<UIEntity> old = c.getCallback();
 			c.setCallback(e -> {
-				initMain(this::initTile);
+				reset();
+				mainPage(this::normalTile);
 				c.setCallback(old);
 				handler.playSound(PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0F));
 			});
 		});
 	}
 	
-	private void initSettings(UIEntity entity) {
-		this.reset();
+	private void settingsPage(UIEntity entity) {
+		reset();
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
 		box.forEach(p -> lowerEntity.add(GuiElements.createButton(p.toString(), e -> {
 		})));
@@ -174,7 +206,7 @@ public class GuiSignalBox extends GuiBase {
 	private void editTile(UIEntity tile, UIMenu menu, final UISignalBoxTile sbt) {
 		tile.add(new UIClickable(e -> {
 			final SignalNode node = sbt.getNode();
-			final EnumGUIMode mode = EnumGUIMode.values()[menu.getSelection()];
+			final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
 			final Rotation rotation = Rotation.values()[menu.getRotation()];
 			if (node.has(mode, rotation)) {
 				node.remove(mode, rotation);
@@ -184,15 +216,19 @@ public class GuiSignalBox extends GuiBase {
 		}));
 	}
 	
-	private void initEdit(UIEntity entity) {
+	private void editPage(UIEntity entity) {
+		reset();
 		final UIMenu menu = new UIMenu();
-		initMain((e, name) -> this.editTile(e, menu, name));
+		mainPage((e, name) -> this.editTile(e, menu, name));
 		updateButton(entity);
 		lowerEntity.add(menu);
 	}
 	
-	private void initTile(UIEntity tile, final UISignalBoxTile currentTile) {
+	private void normalTile(UIEntity tile, final UISignalBoxTile currentTile) {
 		tile.add(new UIClickable(c -> {
+			final SignalNode currentNode = currentTile.getNode();
+			if (!(currentNode.has(EnumGuiMode.RS) || currentNode.has(EnumGuiMode.HP) || currentNode.has(EnumGuiMode.RA10)))
+				return;
 			c.add(new UIColor(SELECTION_COLOR));
 			if (lastTile == null) {
 				lastTile = currentTile;
@@ -205,7 +241,7 @@ public class GuiSignalBox extends GuiBase {
 				final NBTTagCompound comp = new NBTTagCompound();
 				final NBTTagCompound way = new NBTTagCompound();
 				toNBT(way, POINT1, lastTile.getNode().getPoint());
-				toNBT(way, POINT2, currentTile.getNode().getPoint());
+				toNBT(way, POINT2, currentNode.getPoint());
 				comp.setTag(SignalBoxUtil.REQUEST_WAY, way);
 				GuiSyncNetwork.sendToPosServer(comp, box.getPos());
 				lastTile = null;
@@ -214,14 +250,7 @@ public class GuiSignalBox extends GuiBase {
 		tile.add(new UIClickable(e -> initTileConfig(currentTile.getNode()), 1));
 	}
 	
-	private void reset() {
-		this.entity.write(compound);
-		GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
-		lowerEntity.clear();
-	}
-	
-	private void initMain(BiConsumer<UIEntity, UISignalBoxTile> consumer) {
-		reset();
+	private void mainPage(BiConsumer<UIEntity, UISignalBoxTile> consumer) {
 		lowerEntity.add(new UIColor(BACKGROUND_COLOR));
 		lowerEntity.add(new UIStack());
 		lowerEntity.add(new UIScissor());
@@ -294,8 +323,8 @@ public class GuiSignalBox extends GuiBase {
 		header.add(new UIBox(UIBox.HBOX, 4));
 		header.add(titel);
 		header.add(GuiElements.createSpacerH(80));
-		header.add(GuiElements.createButton(I18n.format("btn.settings"), e -> initSettings(e)));
-		header.add(GuiElements.createButton(I18n.format("btn.edit"), e -> initEdit(e)));
+		header.add(GuiElements.createButton(I18n.format("btn.settings"), this::settingsPage));
+		header.add(GuiElements.createButton(I18n.format("btn.edit"), this::editPage));
 		
 		final UIEntity middlePart = new UIEntity();
 		middlePart.setInheritHeight(true);
@@ -306,7 +335,7 @@ public class GuiSignalBox extends GuiBase {
 		
 		lowerEntity.setInheritHeight(true);
 		lowerEntity.setInheritWidth(true);
-		initMain(this::initTile);
+		mainPage(this::normalTile);
 		
 		this.entity.add(GuiElements.createSpacerH(10));
 		this.entity.add(middlePart);
@@ -320,5 +349,11 @@ public class GuiSignalBox extends GuiBase {
 	public void onGuiClosed() {
 		super.onGuiClosed();
 		GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+	}
+	
+	private void reset() {
+		this.entity.write(compound);
+		GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+		lowerEntity.clear();
 	}
 }

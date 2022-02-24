@@ -1,14 +1,14 @@
 package eu.gir.girsignals.guis;
 
-import eu.gir.girsignals.guis.guilib.entitys.UIBorder;
-import eu.gir.girsignals.guis.guilib.entitys.UIBox;
-import eu.gir.girsignals.guis.guilib.entitys.UIColor;
-import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
-import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
-import eu.gir.girsignals.guis.guilib.entitys.UIEntity.KeyEvent;
-import eu.gir.girsignals.guis.guilib.entitys.UIEntity.MouseEvent;
+import eu.gir.girsignals.signalbox.EnumGuiMode;
 import eu.gir.girsignals.signalbox.SignalNode;
-import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
+import eu.gir.guilib.ecs.entitys.UIBox;
+import eu.gir.guilib.ecs.entitys.UIComponent;
+import eu.gir.guilib.ecs.entitys.UIEntity;
+import eu.gir.guilib.ecs.entitys.UIEntity.KeyEvent;
+import eu.gir.guilib.ecs.entitys.UIEntity.MouseEvent;
+import eu.gir.guilib.ecs.entitys.render.UIBorder;
+import eu.gir.guilib.ecs.entitys.render.UIColor;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.Rotation;
 
@@ -33,9 +33,9 @@ public class UIMenu extends UIComponent {
 			selection.setX(mX);
 			selection.setY(mY);
 			selection.setHeight(20);
-			selection.setWidth(22 * EnumGUIMode.values().length);
+			selection.setWidth(22 * EnumGuiMode.values().length);
 			selection.add(new UIBox(UIBox.HBOX, 2));
-			for (EnumGUIMode mode : EnumGUIMode.values()) {
+			for (final EnumGuiMode mode : EnumGuiMode.values()) {
 				final UIEntity preview = new UIEntity();
 				preview.add(new UIColor(0xFFAFAFAF));
 				final SignalNode node = new SignalNode(null);
@@ -57,7 +57,7 @@ public class UIMenu extends UIComponent {
 	public int getSelection() {
 		return selection;
 	}
-
+	
 	@Override
 	public void mouseEvent(MouseEvent event) {
 		switch (event.state) {
@@ -68,7 +68,7 @@ public class UIMenu extends UIComponent {
 				this.mX = event.x;
 				this.mY = event.y;
 			}
-			this.selection = Math.max(0, Math.min(EnumGUIMode.values().length - 1, (int) ((event.x - this.mX) / 22.0f)));
+			this.selection = Math.max(0, Math.min(EnumGuiMode.values().length - 1, (int) ((event.x - this.mX) / 22.0f)));
 			this.setVisible(true);
 			break;
 		case RELEASE:
@@ -82,14 +82,13 @@ public class UIMenu extends UIComponent {
 	@Override
 	public void keyEvent(KeyEvent event) {
 		super.keyEvent(event);
-		if(event.typed == 'r') {
+		if (event.typed == 'r') {
 			this.rotation++;
-			if(this.rotation >= Rotation.values().length)
+			if (this.rotation >= Rotation.values().length)
 				this.rotation = 0;
 		}
 	}
 	
-
 	public int getRotation() {
 		return rotation;
 	}

@@ -29,6 +29,8 @@ tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Bahnsteignummern
 tile.wnsignal.name=Wn Signal
 tile.stationname.name=Bahnhofsname
+tile.redstonein.name=Redstone Input
+tile.redstoneout.name=Redstone Output
 
 #Linktool
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r
@@ -298,3 +300,5 @@ property.NONE=Nichts
 property.speed.name=Geschwindigkeitsbeschränkung
 property.speed.desc=Wähle für z.B. Weichen eine Geschwindigkeitsbeschränkung aus. Liegt dieses Element im Fahrweg, wird das Signalbild entsprechend angepasst. Standardwert: 0
 property.signal.desc=Hier wählst du das zugehörige Signal aus. Alle verbundenen Signale findest du unter "Einstellungen".
+error.nopathfound=Keine verfügbare Zugfahrstraße!
+button.reset=Fahrstraße zurücksetzen

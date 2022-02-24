@@ -1,5 +1,18 @@
 # Changelog
 
+## [Alpha update] 02.22.2022 - 1
+
+* Fixed correct signal aspect for hp signals
+* Train routes now only applied between neighbor signals in the right direction :TM:
+* Train routes can now be reset manually
+* Fixed backend issues
+* Fixed issue with container closed
+* Fixed sync issue
+* Added redstone io blocks for the signal box
+* Improvements and fixes
+
+  **This update is an alpha version and does not contain fully functional signal boxes. We ask you to test the system and give us feedback on functionality, bugs and features.**
+
 ## [Alpha update] 02.16.2022 - 1
 
 * Added signal box

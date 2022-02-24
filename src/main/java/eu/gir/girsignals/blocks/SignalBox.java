@@ -1,9 +1,9 @@
 package eu.gir.girsignals.blocks;
 
-import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
+import eu.gir.guilib.ecs.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -16,12 +16,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SignalBox extends Block implements ITileEntityProvider {
-
+	
 	public SignalBox() {
 		super(Material.ROCK);
 		setCreativeTab(GIRTabs.tab);
 	}
-
+	
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {

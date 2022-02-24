@@ -9,6 +9,7 @@ import com.google.common.collect.Lists;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HL_DISTANT;
 import eu.gir.girsignals.EnumSignals.HL_LIGHTBAR;
+import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.signals.SignalHL;
@@ -72,8 +73,15 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 		values.forEach((property, signal) -> current.getProperty(property).ifPresent(_u -> current.setProperty(property, (Comparable) signal)));
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
-	public void reset(SignalTileEnity current, SignalTileEnity prev) {
+	public void reset(SignalTileEnity current) {
+		final HashMap<SEProperty, Object> values = new HashMap<>();
+		values.put(SignalHL.LIGHTBAR, HL_LIGHTBAR.OFF);
+		values.put(SignalHL.DISTANTSIGNAL, HL_DISTANT.HL10);
+		values.put(SignalHL.STOPSIGNAL, HL.HP0);
+		values.put(SignalHL.ZS2, ZS32.OFF);
+		this.changeIfPresent(values, current);
 	}
 	
 }

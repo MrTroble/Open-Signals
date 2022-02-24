@@ -1,12 +1,10 @@
 package eu.gir.girsignals.guis;
 
-import org.lwjgl.util.Point;
-
 import eu.gir.girsignals.GirsignalsMain;
-import eu.gir.girsignals.guis.guilib.UIAutoSync;
-import eu.gir.girsignals.guis.guilib.entitys.UIComponent;
-import eu.gir.girsignals.signalbox.SignalBoxUtil.EnumGUIMode;
+import eu.gir.girsignals.signalbox.EnumGuiMode;
 import eu.gir.girsignals.signalbox.SignalNode;
+import eu.gir.guilib.ecs.entitys.UIComponent;
+import eu.gir.guilib.ecs.interfaces.UIAutoSync;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;
@@ -23,8 +21,8 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 		this.node = node;
 	}
 	
-	public UISignalBoxTile(EnumGUIMode enumMode) {
-		this.node = new SignalNode((Point) null);
+	public UISignalBoxTile(EnumGuiMode enumMode) {
+		this.node = new SignalNode(null);
 		this.node.add(enumMode, Rotation.NONE);
 	}
 	
@@ -60,22 +58,22 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 	public void setNode(SignalNode node) {
 		this.node = node;
 	}
-
+	
 	@Override
 	public void write(NBTTagCompound compound) {
 		this.node.write(compound);
 	}
-
+	
 	@Override
 	public void read(NBTTagCompound compound) {
 		this.node.read(compound);
 	}
-
+	
 	@Override
 	public String getID() {
 		return this.node.getID();
 	}
-
+	
 	@Override
 	public void setID(String id) {
 		this.node.setID(id);

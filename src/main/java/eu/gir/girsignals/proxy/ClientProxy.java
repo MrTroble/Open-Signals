@@ -5,7 +5,6 @@ import eu.gir.girsignals.blocks.SignalBox;
 import eu.gir.girsignals.guis.GuiPlacementtool;
 import eu.gir.girsignals.guis.GuiSignalBox;
 import eu.gir.girsignals.guis.GuiSignalController;
-import eu.gir.girsignals.guis.guilib.GuiHandler;
 import eu.gir.girsignals.init.GIRModels;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.models.GIRCustomModelLoader;
@@ -13,6 +12,7 @@ import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.girsignals.tileentitys.SignalSpecialRenderer;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
+import eu.gir.guilib.ecs.GuiHandler;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
@@ -32,7 +32,7 @@ public class ClientProxy extends CommonProxy {
 				return null;
 			return new GuiSignalController((SignalControllerTileEntity) entity);
 		});
-		GuiHandler.addGui(SignalBox.class,  (p, w, bp) -> {
+		GuiHandler.addGui(SignalBox.class, (p, w, bp) -> {
 			final TileEntity entity = w.getTileEntity(bp);
 			if (!(entity instanceof SignalBoxTileEntity))
 				return null;

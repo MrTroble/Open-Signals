@@ -8,6 +8,8 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
 import eu.gir.girsignals.blocks.IConfigUpdatable;
 import eu.gir.girsignals.blocks.Post;
+import eu.gir.girsignals.blocks.RedstoneIO;
+import eu.gir.girsignals.blocks.RedstoneInput;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalBox;
 import eu.gir.girsignals.blocks.SignalController;
@@ -61,7 +63,9 @@ public class GIRBlocks {
 	public static final SignalWN WN_SIGNAL = new SignalWN();
 	public static final SignalStationName STATION_NAME = new SignalStationName();
 	public static final SignalBox SIGNAL_BOX = new SignalBox();
-
+	public static final RedstoneIO REDSTONE_IN = new RedstoneInput();
+	public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
+	
 	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 	
 	public static void init() {

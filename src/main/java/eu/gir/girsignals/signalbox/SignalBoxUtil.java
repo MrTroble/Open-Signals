@@ -5,22 +5,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.util.function.BiConsumer;
 import java.util.Optional;
 import java.util.Set;
 
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.util.Point;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
-import eu.gir.girsignals.guis.guilib.entitys.UIEntity;
+import eu.gir.guilib.ecs.entitys.UIEntity;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Rotation;
 
 public class SignalBoxUtil {
 	
@@ -29,6 +28,7 @@ public class SignalBoxUtil {
 	public static final int USED_COLOR = 0xFFFF0000;
 	
 	public static final String REQUEST_WAY = "requestWay";
+	public static final String RESET_WAY = "resetWay";
 	public static final String POINT0 = "P";
 	public static final String POINT1 = "P1";
 	public static final String POINT2 = "P2";
@@ -48,15 +48,61 @@ public class SignalBoxUtil {
 		return Math.hypot(dX, dY);
 	}
 	
+	private static boolean isRS(final SignalNode node, final SignalNode other) {
+		return (node.has(EnumGuiMode.RS) || node.has(EnumGuiMode.RA10)) && (other.has(EnumGuiMode.RS) || other.has(EnumGuiMode.RA10));
+	}
+	
+	private static boolean isHP(final SignalNode node, final SignalNode other) {
+		return node.has(EnumGuiMode.HP) && other.has(EnumGuiMode.HP);
+	}
+	
+	public static Rotation getRotationFromDelta(final Point delta) {
+		if (delta.getX() > 0) {
+			return Rotation.CLOCKWISE_180;
+		} else if (delta.getX() < 0) {
+			return Rotation.NONE;
+		} else if (delta.getY() > 0) {
+			return Rotation.COUNTERCLOCKWISE_90;
+		} else {
+			return Rotation.CLOCKWISE_90;
+		}
+	}
+	
+	public static Point getOffset(final Rotation rotation, final Point point) {
+		final int x = Rotation.CLOCKWISE_180.equals(rotation) ? -1 : (Rotation.NONE.equals(rotation) ? 1 : 0);
+		final int y = Rotation.COUNTERCLOCKWISE_90.equals(rotation) ? -1 : (Rotation.CLOCKWISE_90.equals(rotation) ? 1 : 0);
+		return new Point(x + point.getX(), y + point.getY());
+	}
+	
+	public static boolean checkApplicable(final SignalNode neighbour, final SignalNode previouse, final boolean isRS) {
+		return checkApplicable(neighbour, previouse, isRS, Rotation.NONE);
+	}
+	
+	public static boolean checkApplicable(final SignalNode neighbour, final SignalNode previouse, final boolean isRS, final Rotation apply) {
+		if (previouse == null)
+			return false;
+		final Point prev = previouse.getPoint();
+		final Point next = neighbour.getPoint();
+		final Point delta = new Point(prev.getX() - next.getX(), prev.getY() - next.getY());
+		final ArrayList<Rotation> list = new ArrayList<>();
+		final Rotation rot = getRotationFromDelta(delta).add(apply);
+		if (isRS) {
+			list.addAll(neighbour.getRotations(EnumGuiMode.RS));
+			list.addAll(neighbour.getRotations(EnumGuiMode.RA10));
+		} else {
+			list.addAll(neighbour.getRotations(EnumGuiMode.HP));
+		}
+		return list.contains(rot);
+	}
+	
 	public static Optional<ArrayList<SignalNode>> requestWay(final HashMap<Point, SignalNode> modeGrid, final Point p1, final Point p2) {
 		if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
 			return Optional.empty();
 		final SignalNode lastNode = modeGrid.get(p2);
-		final boolean isRS = lastNode.has(EnumGUIMode.RS) || lastNode.has(EnumGUIMode.RA10);
-		if(isRS) {
-			final SignalNode firstNode = modeGrid.get(p1);
-			if(!(firstNode.has(EnumGUIMode.RS) || firstNode.has(EnumGUIMode.RA10)))
-					return Optional.empty();
+		final SignalNode firstNode = modeGrid.get(p1);
+		final boolean isrs = isRS(lastNode, firstNode);
+		if (!(isrs || isHP(lastNode, firstNode))) {
+			return Optional.empty();
 		}
 		final HashMap<Point, Point> closedList = new HashMap<>();
 		final Set<Point> openList = new HashSet<Point>();
@@ -71,26 +117,33 @@ public class SignalBoxUtil {
 			final Point currentNode = openList.stream().min((n1, n2) -> {
 				return Double.compare(fscores.getOrDefault(n1, Double.MAX_VALUE), fscores.getOrDefault(n2, Double.MAX_VALUE));
 			}).get();
+			openList.remove(currentNode);
+			final SignalNode cSNode = modeGrid.get(currentNode);
 			if (currentNode.equals(p2)) {
+				if (!checkApplicable(cSNode, modeGrid.get(closedList.get(currentNode)), isrs))
+					return Optional.empty();
 				final ArrayList<SignalNode> nodes = new ArrayList<>();
 				for (Point point = currentNode; point != null; point = closedList.get(point)) {
 					nodes.add(modeGrid.get(point));
 				}
 				return Optional.of(nodes);
 			}
-			openList.remove(currentNode);
-			final SignalNode cSNode = modeGrid.get(currentNode);
 			if (cSNode == null)
 				continue;
 			for (final Entry<Point, Point> e : cSNode.connections()) {
 				entryImpl.set(0, e);
 				entryImpl.set(1, Maps.immutableEntry(e.getValue(), e.getKey()));
-				for (Entry<Point, Point> entry : entryImpl) {
+				for (final Entry<Point, Point> entry : entryImpl) {
 					if (entry.getKey() == null || entry.getValue() == null)
 						continue;
 					final Point neighbour = entry.getValue();
 					final Point previouse = closedList.get(currentNode);
-					if (previouse == null || previouse.equals(entry.getKey()) || p1.equals(entry.getKey())) {
+					final SignalNode next = modeGrid.get(neighbour);
+					if (next == null || next.isUsed())
+						continue;
+					if (currentNode.equals(p1) && checkApplicable(cSNode, next, isrs))
+						continue;
+					if (!checkApplicable(next, cSNode, isrs) || previouse.equals(entry.getKey())) {
 						final double tScore = gscores.getOrDefault(currentNode, Double.MAX_VALUE - 1) + 1;
 						if (tScore < gscores.getOrDefault(neighbour, Double.MAX_VALUE)) {
 							closedList.put(neighbour, currentNode);
@@ -107,43 +160,7 @@ public class SignalBoxUtil {
 		return Optional.empty();
 	}
 	
-	public static enum EnumGUIMode {
-		
-		STRAIGHT(0, 0.5, 1, 0.5),
-		CORNER(0, 0.5, 0.5, 1),
-		END(1, 0.30, 1, 0.70),
-		PLATFORM((parent, color) -> drawRect(0, 0, parent.getWidth(), parent.getHeight() / 3, color)),
-		BUE((parent, color) -> {
-			final int part = parent.getHeight() / 3;
-			drawLines(0, parent.getWidth(), part, part, color);
-			drawLines(0, parent.getWidth(), part * 2, part * 2, color);
-		}),
-		HP(0),
-		VP(1),
-		RS(2),
-		RA10(3);
-		
-		/**
-		 * Naming
-		 */
-		
-		public final BiConsumer<UIEntity, Integer> consumer;
-		
-		private EnumGUIMode(int id) {
-			this.consumer = (parent, color) -> drawTextured(parent, id);
-		}
-		
-		private EnumGUIMode(double x1, double y1, double x2, double y2) {
-			this.consumer = (parent, color) -> drawLines((int) (x1 * parent.getWidth()), (int) (x2 * parent.getWidth()), (int) (y1 * parent.getHeight()), (int) (y2 * parent.getHeight()), color);
-		}
-		
-		private EnumGUIMode(final BiConsumer<UIEntity, Integer> consumer) {
-			this.consumer = consumer;
-		}
-		
-	}
-	
-	private static void drawRect(int left, int top, int right, int bottom, int color) {
+	static void drawRect(int left, int top, int right, int bottom, int color) {
 		float f3 = (float) (color >> 24 & 255) / 255.0F;
 		float f = (float) (color >> 16 & 255) / 255.0F;
 		float f1 = (float) (color >> 8 & 255) / 255.0F;
@@ -159,7 +176,7 @@ public class SignalBoxUtil {
 		tessellator.draw();
 	}
 	
-	private static void drawTextured(UIEntity entity, int textureID) {
+	static void drawTextured(UIEntity entity, int textureID) {
 		Tessellator tessellator = Tessellator.getInstance();
 		BufferBuilder bufferbuilder = tessellator.getBuffer();
 		GlStateManager.color(1, 1, 1, 1);
@@ -174,7 +191,7 @@ public class SignalBoxUtil {
 		GlStateManager.disableTexture2D();
 	}
 	
-	private static void drawLines(int x1, int x2, int y1, int y2, int color) {
+	static void drawLines(int x1, int x2, int y1, int y2, int color) {
 		float f3 = (float) (color >> 24 & 255) / 255.0F;
 		float f = (float) (color >> 16 & 255) / 255.0F;
 		float f1 = (float) (color >> 8 & 255) / 255.0F;

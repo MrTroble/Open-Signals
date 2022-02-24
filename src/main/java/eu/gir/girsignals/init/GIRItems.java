@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.items.Placementtool;
-import eu.gir.girsignals.linkableApi.Linkingtool;
+import eu.gir.linkableapi.Linkingtool;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;

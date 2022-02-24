@@ -7,9 +7,9 @@ import java.util.function.Consumer;
 import com.google.common.collect.ImmutableMap.Builder;
 
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.guis.guilib.GuiSyncNetwork;
-import eu.gir.girsignals.guis.guilib.UIClientSync;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
+import eu.gir.guilib.ecs.GuiSyncNetwork;
+import eu.gir.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;
@@ -49,13 +49,13 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 				final NBTTagCompound entry = new NBTTagCompound();
 				entry.setTag(POS_ID, NBTUtil.createPosTag(pos));
 				final Signal signal = tile.getSignal(pos);
-				if(signal == null)
+				if (signal == null)
 					return;
 				entry.setInteger(SIGNAL_ID, signal.getID());
 				typeList.appendTag(entry);
 			});
 			compound.setTag(UPDATE_SET, typeList);
-			GuiSyncNetwork.sendToClient(compound, getPlayer());			
+			GuiSyncNetwork.sendToClient(compound, getPlayer());
 		}
 	}
 	
@@ -86,6 +86,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 	
 	@Override
 	public void onContainerClosed(EntityPlayer playerIn) {
+		playerIn.openContainer = null;
 		this.tile.remove(this);
 	}
 	
