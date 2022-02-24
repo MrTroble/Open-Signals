@@ -29,6 +29,8 @@ tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Bahnsteignummern
 tile.wnsignal.name=Wn Signal
 tile.stationname.name=Bahnhofsname
+tile.redstonein.name=Redstone Input
+tile.redstoneout.name=Redstone Output
 
 #Linktool
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r

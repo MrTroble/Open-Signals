@@ -1,1 +1,1 @@
-{"variants": {"normal": {"model": "girsignals:redstonein"}}}
+{"variants": {"power=false": {"model": "girsignals:redstonein_off"}, "power=true": {"model": "gircredstone:redstonein_on"}}}

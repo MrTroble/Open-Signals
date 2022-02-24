@@ -29,6 +29,8 @@ tile.nesignal.name=Ne Signal
 tile.stationnumberplate.name=Platform Number
 tile.wnsignal.name=Wn Signal
 tile.stationname.name=Stationname
+tile.redstonein.name=Redstone Input
+tile.redstoneout.name=Redstone Output
 
 #Linktool
 lt.linkedpos=§2Linked to: {%d, %d, %d§2}§r
