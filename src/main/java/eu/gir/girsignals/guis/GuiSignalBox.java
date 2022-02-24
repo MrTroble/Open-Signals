@@ -150,6 +150,7 @@ public class GuiSignalBox extends GuiBase {
 		if (mode.equals(EnumGuiMode.HP)) {
 			parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
 				this.lowerEntity.clear();
+				GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
 				mainPage(this::normalTile);
 				final NBTTagCompound compound = new NBTTagCompound();
 				final NBTTagCompound wayComp = new NBTTagCompound();
