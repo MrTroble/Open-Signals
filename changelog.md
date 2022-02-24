@@ -9,6 +9,7 @@
 * Fixed issue with container closed
 * Fixed sync issue
 * Added Blocks for in and output
+* Added redstone io blocks for the signal box
 
   **This update is an alpha version and does not contain fully functional signal boxes. We ask you to test the system and give us feedback on functionality, bugs and features.**
 
