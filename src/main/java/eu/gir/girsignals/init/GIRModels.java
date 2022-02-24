@@ -17,6 +17,8 @@ public class GIRModels {
 		registerModel(Item.getItemFromBlock(GIRBlocks.HV_SIGNAL_CONTROLLER));
 		registerModel(Item.getItemFromBlock(GIRBlocks.POST));
 		registerModel(Item.getItemFromBlock(GIRBlocks.SIGNAL_BOX));
+		registerModel(Item.getItemFromBlock(GIRBlocks.REDSTONE_IN));
+		registerModel(Item.getItemFromBlock(GIRBlocks.REDSTONE_OUT));
 	}
 	
 	@SubscribeEvent
