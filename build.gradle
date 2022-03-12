@@ -81,7 +81,7 @@ def ocVersion = "MC1.12.2-1.7.5.192"
 def copyName = ""
 
 dependencies {   
-    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2854'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.1.1'
     compile "li.cil.oc:OpenComputers:$ocVersion:api"
     compile "li.cil.oc:OpenComputers:$ocVersion"
 }
