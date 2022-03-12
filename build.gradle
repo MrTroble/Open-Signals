@@ -77,7 +77,7 @@ minecraft {
     }
 }
 
-def ocVersion = "MC1.12.2-1.7.5.192"
+def ocVersion = "MC1.12.2-1.7.5.218"
 def copyName = ""
 
 dependencies {   
