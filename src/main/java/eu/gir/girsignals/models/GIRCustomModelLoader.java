@@ -89,40 +89,23 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 		return ebs -> ebs.getValue(property) == null;
 	}
 	
-	@SuppressWarnings("rawtypes")
-	private static class ModelPred<T extends Offable> implements Predicate<IExtendedBlockState> {
-		
-		private final IUnlistedProperty<T> property;
-		private final Predicate<T> t;
-		private final Predicate<T> offPred;
-		
-		public ModelPred(IUnlistedProperty<T> property, Predicate<T> t, boolean negate) {
-			this.property = property;
-			if (negate) {
-				this.t = t.negate();
-				this.offPred = test -> test.getOffState() == test;
-			} else {
-				this.t = t;
-				this.offPred = test -> false;
-			}
-		}
-		
-		@Override
-		public boolean test(IExtendedBlockState bs) {
-			T test = bs.getValue(this.property);
-			return test != null && t.or(offPred).test(test);
-		}
-		
+	private static <T extends Offable<?>> Predicate<IExtendedBlockState> modelPredicate(IUnlistedProperty<T> property, Predicate<T> t, boolean negate) {
+		final Predicate<T> offPredNew = negate ? test -> test.getOffState() == test : test -> false;
+		final Predicate<T> tNew = negate ? t.negate() : t;
+		return bs -> {
+			T test = bs.getValue(property);
+			return test != null && tNew.or(offPredNew).test(test);
+		};
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unused" })
 	private static <T extends Offable> Predicate<IExtendedBlockState> withNot(IUnlistedProperty<T> property, Predicate<T> t) {
-		return new ModelPred<T>(property, t, true);
+		return modelPredicate(property, t, true);
 	}
 	
 	@SuppressWarnings("rawtypes")
 	private static <T extends Offable> Predicate<IExtendedBlockState> with(IUnlistedProperty<T> property, Predicate<T> t) {
-		return new ModelPred<T>(property, t, false);
+		return modelPredicate(property, t, false);
 	}
 	
 	@SuppressWarnings("rawtypes")

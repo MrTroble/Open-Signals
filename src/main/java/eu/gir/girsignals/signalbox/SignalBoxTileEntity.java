@@ -46,6 +46,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	private final HashMap<Point, SignalNode> modeGrid = new HashMap<>(10);
 	private final Map<BlockPos, Signal> signals = new HashMap<>();
 	private NBTTagCompound guiTag = new NBTTagCompound();
+	private final HashMap<BlockPos, Entry<BlockPos, Integer>> pathWayEnd = new HashMap<>(10);
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
@@ -101,6 +102,15 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		}));
 	}
 	
+	private void lateUpdate(final BlockPos first) {
+		BlockPos earlier = first;
+		Entry<BlockPos, Integer> next;
+		while ((next = pathWayEnd.get(earlier)) != null) {
+			loadAndConfig(next.getValue(), earlier, next.getKey());
+			earlier = next.getKey();
+		}
+	}
+	
 	private void resend() {
 		final NBTTagCompound update = new NBTTagCompound();
 		modeGrid.values().forEach(signal -> signal.write(update));
@@ -121,7 +131,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 					config.reset(signaltile);
 					updateWorld(position, chunk);
 				});
+				lateUpdate(position);
+				pathWayEnd.remove(position);
 			});
+
 			final List<Point> list = new ArrayList<>();
 			final List<Point> visited = new ArrayList<>();
 			list.add(SignalBoxUtil.getOffset(rotation, resetPoint));
@@ -169,6 +182,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 				node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition()));
 			}
 		}
+		pathWayEnd.put(lastPosition, Maps.immutableEntry(firstPosition, atomic.get()));
+		lateUpdate(firstPosition);
 		resend();
 	}
 	

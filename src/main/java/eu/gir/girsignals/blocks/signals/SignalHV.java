@@ -11,7 +11,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
-import eu.gir.girsignals.signalbox.HVSignalConfig;
+import eu.gir.girsignals.signalbox.config.HVSignalConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
