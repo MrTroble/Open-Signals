@@ -7,14 +7,18 @@ import net.minecraft.world.World;
 
 public class RedstoneInput extends RedstoneIO {
 	
-	
-	public RedstoneInput() {}
+	public RedstoneInput() {
+	}
 	
 	@Override
 	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-		if(worldIn.isBlockPowered(pos)) {
+		if (worldIn.isBlockPowered(pos)) {
 			worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, true));
 		}
 	}
 	
+	@Override
+	public boolean canProvidePower(IBlockState state) {
+		return false;
+	}
 }

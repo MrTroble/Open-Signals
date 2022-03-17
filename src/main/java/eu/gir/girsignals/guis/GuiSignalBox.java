@@ -5,10 +5,10 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
 
+import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-
-import com.google.common.collect.ImmutableList;
+import java.util.stream.Collectors;
 
 import eu.gir.girsignals.signalbox.EnumGuiMode;
 import eu.gir.girsignals.signalbox.PathOption;
@@ -131,7 +131,7 @@ public class GuiSignalBox extends GuiBase {
 		}
 		
 		if (mode.ordinal() >= EnumGuiMode.HP.ordinal() || mode.equals(EnumGuiMode.CORNER)) {
-			final ImmutableList<BlockPos> positions = box.getPositions();
+			final List<BlockPos> positions = box.getPositions().keySet().stream().collect(Collectors.toList());
 			if (!positions.isEmpty()) {
 				final DisableIntegerable<BlockPos> blockPos = new DisableIntegerable<BlockPos>(SizeIntegerables.of("signal", positions.size(), positions::get));
 				final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
@@ -197,8 +197,11 @@ public class GuiSignalBox extends GuiBase {
 	private void settingsPage(UIEntity entity) {
 		reset();
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
-		box.forEach(p -> lowerEntity.add(GuiElements.createButton(p.toString(), e -> {
-		})));
+		box.getPositions().forEach((p, t) -> {
+			final String name = String.format("%s: x=%d, y=%d. z=%d", I18n.format("type." + t.name()), p.getX(), p.getY(), p.getZ());
+			lowerEntity.add(GuiElements.createButton(name, e -> {
+			}));
+		});
 		lowerEntity.update();
 		updateButton(entity);
 	}

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -95,7 +96,7 @@ public class SignalBoxUtil {
 		return list.contains(rot);
 	}
 	
-	public static Optional<ArrayList<SignalNode>> requestWay(final HashMap<Point, SignalNode> modeGrid, final Point p1, final Point p2) {
+	public static Optional<ArrayList<SignalNode>> requestWay(final Map<Point, SignalNode> modeGrid, final Point p1, final Point p2) {
 		if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
 			return Optional.empty();
 		final SignalNode lastNode = modeGrid.get(p2);
