@@ -20,7 +20,6 @@ import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.blocks.ISignalAutoconfig;
-import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
@@ -123,6 +122,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	private void lateUpdate(final BlockPos first) {
+		if (first == null)
+			return;
 		BlockPos earlier = first;
 		Entry<BlockPos, Integer> next;
 		while ((next = pathWayEnd.get(earlier)) != null) {
@@ -141,13 +142,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final SignalNode currentNode = modeGrid.get(resetPoint);
 		currentNode.getRotations(EnumGuiMode.HP).forEach(rotation -> {
 			currentNode.applyNormal(Maps.immutableEntry(EnumGuiMode.HP, rotation), option -> {
-				final BlockPos position = option.getLinkedPosition();
+				final BlockPos position = option.getLinkedPosition(LinkType.SIGNAL);
 				if (position == null)
 					return;
 				final Entry<BlockPos, Integer> next = pathWayEnd.get(position);
 				loadAndReset(position);
 				lateUpdate(position);
-				if(next != null)
+				if (next != null)
 					pathWayEnd.remove(next.getKey());
 			});
 			final List<Point> list = new ArrayList<>();
@@ -189,15 +190,15 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		}
 		final SignalNode firstNode = nodes.get(nodes.size() - 1);
 		final SignalNode lastNode = nodes.get(0);
-		final BlockPos lastPosition = lastNode.getOption(EnumGuiMode.HP).get().getLinkedPosition();
-		final BlockPos firstPosition = firstNode.getOption(EnumGuiMode.HP).get().getLinkedPosition();
+		final BlockPos lastPosition = lastNode.getOption(EnumGuiMode.HP).get().getLinkedPosition(LinkType.SIGNAL);
+		final BlockPos firstPosition = firstNode.getOption(EnumGuiMode.HP).get().getLinkedPosition(LinkType.SIGNAL);
 		if (lastPosition != null && firstPosition != null) {
 			loadAndConfig(atomic.get(), lastPosition, firstPosition);
 			for (final SignalNode node : nodes) {
-				node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition()));
+				node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition(LinkType.SIGNAL)));
 			}
+			pathWayEnd.put(lastPosition, Maps.immutableEntry(firstPosition, atomic.get()));
 		}
-		pathWayEnd.put(lastPosition, Maps.immutableEntry(firstPosition, atomic.get()));
 		lateUpdate(firstPosition);
 		resend();
 	}
@@ -256,11 +257,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		if (!world.isRemote) {
 			if (type.equals(LinkType.SIGNAL)) {
 				loadChunkAndGetTile(world, linkedPos, this::updateSingle);
-				loadAndReset(linkedPos);
-			} else {
-				if(world.isBlockLoaded(linkedPos)) {
-					world.setBlockState(linkedPos, state.withProperty(RedstoneIO.POWER, false));
-				} // TODO might check for unloaded
 			}
 		}
 		linkedBlocks.put(linkedPos, type);
@@ -290,7 +286,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		syncClient();
 		return true;
 	}
-		
+	
 	public Signal getSignal(final BlockPos pos) {
 		return this.signals.get(pos);
 	}

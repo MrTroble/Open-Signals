@@ -6,11 +6,15 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
 
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableSet;
+
 import eu.gir.girsignals.signalbox.EnumGuiMode;
+import eu.gir.girsignals.signalbox.LinkType;
 import eu.gir.girsignals.signalbox.PathOption;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.Point;
@@ -115,9 +119,7 @@ public class GuiSignalBox extends GuiBase {
 					node.write(compound);
 				}));
 			}
-		}
-		
-		if (mode.equals(EnumGuiMode.STRAIGHT) || mode.equals(EnumGuiMode.CORNER)) {
+			
 			final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
 			final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
 				option.setSpeed(id > 0 ? id : Integer.MAX_VALUE);
@@ -130,20 +132,26 @@ public class GuiSignalBox extends GuiBase {
 			parent.add(speedSelection);
 		}
 		
-		if (mode.ordinal() >= EnumGuiMode.HP.ordinal() || mode.equals(EnumGuiMode.CORNER)) {
-			final List<BlockPos> positions = box.getPositions().keySet().stream().collect(Collectors.toList());
-			if (!positions.isEmpty()) {
-				final DisableIntegerable<BlockPos> blockPos = new DisableIntegerable<BlockPos>(SizeIntegerables.of("signal", positions.size(), positions::get));
-				final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
-					option.setLinkedPosition(id >= 0 ? positions.get(id) : null);
-					node.write(compound);
-				});
-				blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
-					e.setMin(-1);
-					e.setIndex(positions.indexOf(option.getLinkedPosition()));
-					e.setID(null);
-				});
-				parent.add(blockSelect);
+		if (mode.ordinal() >= EnumGuiMode.HP.ordinal()) {
+			final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
+			for (final LinkType type : new LinkType[] { LinkType.SIGNAL, LinkType.INPUT }) {
+				final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(LinkType.SIGNAL)).map(e -> e.getKey()).collect(Collectors.toList());
+				if (!positions.isEmpty()) {
+					final DisableIntegerable<String> blockPos = new DisableIntegerable<String>(SizeIntegerables.of("prop." + type.name(), positions.size(), id -> {
+						final BlockPos pos = positions.get(id);
+						return String.format("x=%d,y=%d,z=%d", pos.getX(), pos.getY(), pos.getZ());
+					}));
+					final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
+						option.setLinkedPosition(type, id >= 0 ? positions.get(id) : null);
+						node.write(compound);
+					});
+					blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
+						e.setMin(-1);
+						e.setIndex(positions.indexOf(option.getLinkedPosition(type)));
+						e.setID(null);
+					});
+					parent.add(blockSelect);
+				}
 			}
 		}
 		
