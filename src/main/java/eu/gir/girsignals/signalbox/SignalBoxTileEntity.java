@@ -20,6 +20,7 @@ import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.blocks.ISignalAutoconfig;
+import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
@@ -129,6 +130,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		while ((next = pathWayEnd.get(earlier)) != null) {
 			loadAndConfig(next.getValue(), earlier, next.getKey());
 			earlier = next.getKey();
+			if (earlier == null)
+				return;
 		}
 	}
 	
@@ -162,6 +165,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 					return;
 				visited.add(current);
 				nextPoint.connections().forEach(entry -> nextPoint.apply(entry, path -> {
+					setPower(path.getLinkedPosition(LinkType.OUTPUT), false);
 					if (path.getPathUsage().equals(EnumPathUsage.FREE))
 						return;
 					path.setPathUsage(EnumPathUsage.FREE);
@@ -176,6 +180,18 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		resend();
 	}
 	
+	private void setPower(final BlockPos position, final boolean power) {
+		if (position == null)
+			return;
+		loadChunkAndGetBlock(world, position, (state, chunk) -> {
+			if(!(state.getBlock() instanceof RedstoneIO))
+				return;
+			final IBlockState ibstate = state.withProperty(RedstoneIO.POWER, power);
+			chunk.setBlockState(position, ibstate);
+			world.markAndNotifyBlock(position, chunk, state, ibstate, 3);
+		});
+	}
+	
 	public void onWayAdd(final ArrayList<SignalNode> nodes) {
 		final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
 		for (int i = 1; i < nodes.size() - 1; i++) {
@@ -184,6 +200,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
 			final SignalNode current = nodes.get(i);
 			current.apply(entry, option -> {
+				setPower(option.getLinkedPosition(LinkType.OUTPUT), true);
 				option.setPathUsage(EnumPathUsage.SELECTED);
 				atomic.getAndUpdate(oldspeed -> Math.min(oldspeed, option.getSpeed()));
 			});

@@ -37,7 +37,7 @@ public class RedstoneIO extends Block {
 
 	@Override
 	public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess, net.minecraft.util.math.BlockPos pos, EnumFacing side) {
-		return getStrongPower(blockState, blockAccess, pos, side);
+		return getWeakPower(blockState, blockAccess, pos, side);
 	}
 	
 	@Override
