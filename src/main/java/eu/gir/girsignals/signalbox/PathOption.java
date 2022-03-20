@@ -28,8 +28,10 @@ public class PathOption {
 	public PathOption(NBTTagCompound compound) {
 		this.pathUsage = EnumPathUsage.valueOf(compound.getString(PATH_USAGE));
 		for (final LinkType type : LinkType.values()) {
-			final NBTTagCompound item = compound.getCompoundTag(type.name());
-			linkedPositions[type.ordinal()] = NBTUtil.getPosFromTag(item);
+			if (compound.hasKey(type.name())) {
+				final NBTTagCompound item = compound.getCompoundTag(type.name());
+				linkedPositions[type.ordinal()] = NBTUtil.getPosFromTag(item);
+			}
 		}
 		if (compound.hasKey(SPEED))
 			this.speed = compound.getInteger(SPEED);
@@ -40,7 +42,7 @@ public class PathOption {
 		compound.setString(PATH_USAGE, this.pathUsage.name());
 		for (final LinkType type : LinkType.values()) {
 			final BlockPos position = linkedPositions[type.ordinal()];
-			if(position != null)
+			if (position != null)
 				compound.setTag(type.name(), NBTUtil.createPosTag(position));
 		}
 		if (speed != Integer.MAX_VALUE) {

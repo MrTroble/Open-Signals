@@ -71,7 +71,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			linkedBlocks.clear();
 			list.forEach(pos -> {
 				final NBTTagCompound item = (NBTTagCompound) pos;
-				linkedBlocks.put(NBTUtil.getPosFromTag(item), !item.hasKey(LINK_TYPE) ? LinkType.SIGNAL : LinkType.valueOf(item.getString(LINK_TYPE)));
+				if(item.hasKey(LINK_TYPE))
+					linkedBlocks.put(NBTUtil.getPosFromTag(item), LinkType.valueOf(item.getString(LINK_TYPE)));
 			});
 		}
 		this.guiTag = compound.getCompoundTag(GUI_TAG);
@@ -127,11 +128,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			return;
 		BlockPos earlier = first;
 		Entry<BlockPos, Integer> next;
+		int debugX = 0;
 		while ((next = pathWayEnd.get(earlier)) != null) {
 			loadAndConfig(next.getValue(), earlier, next.getKey());
 			earlier = next.getKey();
 			if (earlier == null)
 				return;
+			if(debugX++ > 100)
+				throw new RuntimeException("Too many iterations, this is a bug in debug!");
 		}
 	}
 	
@@ -209,7 +213,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final SignalNode lastNode = nodes.get(0);
 		final BlockPos lastPosition = lastNode.getOption(EnumGuiMode.HP).get().getLinkedPosition(LinkType.SIGNAL);
 		final BlockPos firstPosition = firstNode.getOption(EnumGuiMode.HP).get().getLinkedPosition(LinkType.SIGNAL);
-		if (lastPosition != null && firstPosition != null) {
+		if (lastPosition != null && firstPosition != null && !lastPosition.equals(firstPosition)) {
 			loadAndConfig(atomic.get(), lastPosition, firstPosition);
 			for (final SignalNode node : nodes) {
 				node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition(LinkType.SIGNAL)));
