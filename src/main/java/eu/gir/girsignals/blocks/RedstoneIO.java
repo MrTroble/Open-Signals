@@ -7,6 +7,8 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.IBlockAccess;
 
 public class RedstoneIO extends Block {
 	
@@ -31,6 +33,21 @@ public class RedstoneIO extends Block {
 	@Override
 	protected BlockStateContainer createBlockState() {
 		return new BlockStateContainer(this, new IProperty[] { POWER });
+	}
+
+	@Override
+	public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess, net.minecraft.util.math.BlockPos pos, EnumFacing side) {
+		return getWeakPower(blockState, blockAccess, pos, side);
+	}
+	
+	@Override
+	public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, net.minecraft.util.math.BlockPos pos, EnumFacing side) {
+		return blockState.getValue(POWER) ? 15:0;
+	}
+	
+	@Override
+	public boolean canProvidePower(IBlockState state) {
+		return true;
 	}
 
 }

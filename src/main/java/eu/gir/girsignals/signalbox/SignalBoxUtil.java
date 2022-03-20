@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
@@ -95,7 +96,19 @@ public class SignalBoxUtil {
 		return list.contains(rot);
 	}
 	
-	public static Optional<ArrayList<SignalNode>> requestWay(final HashMap<Point, SignalNode> modeGrid, final Point p1, final Point p2) {
+	private static boolean connectionCheck(final Point p1, final Point p2, final SignalNode cSNode, final Point currentNode, final Point neighbour, final SignalNode next, final Point previouse, final Map<Point, Point> closedList, final Entry<Point, Point> entry, final boolean isRS) {
+		if (next == null || next.isUsed())
+			return false;
+		if (currentNode.equals(p1) && checkApplicable(cSNode, next, isRS))
+			return false;
+		if (neighbour.equals(p2))
+			return true;
+		if (checkApplicable(next, cSNode, isRS))
+			return false;
+		return previouse == null || previouse.equals(entry.getKey()) && !closedList.containsKey(entry.getValue());
+	}
+	
+	public static Optional<ArrayList<SignalNode>> requestWay(final Map<Point, SignalNode> modeGrid, final Point p1, final Point p2) {
 		if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
 			return Optional.empty();
 		final SignalNode lastNode = modeGrid.get(p2);
@@ -139,11 +152,7 @@ public class SignalBoxUtil {
 					final Point neighbour = entry.getValue();
 					final Point previouse = closedList.get(currentNode);
 					final SignalNode next = modeGrid.get(neighbour);
-					if (next == null || next.isUsed())
-						continue;
-					if (currentNode.equals(p1) && checkApplicable(cSNode, next, isrs))
-						continue;
-					if (!checkApplicable(next, cSNode, isrs) || previouse.equals(entry.getKey())) {
+					if (connectionCheck(p1, p2, cSNode, currentNode, neighbour, next, previouse, closedList, entry, isrs)) {
 						final double tScore = gscores.getOrDefault(currentNode, Double.MAX_VALUE - 1) + 1;
 						if (tScore < gscores.getOrDefault(neighbour, Double.MAX_VALUE)) {
 							closedList.put(neighbour, currentNode);

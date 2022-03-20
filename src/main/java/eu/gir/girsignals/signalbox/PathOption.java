@@ -11,11 +11,10 @@ import net.minecraft.util.math.BlockPos;
 public class PathOption {
 	
 	private static final String PATH_USAGE = "pathUsage";
-	private static final String POSITION = "position";
 	private static final String SPEED = "speed";
 	
 	private EnumPathUsage pathUsage;
-	private BlockPos linkedPosition;
+	private final BlockPos[] linkedPositions = new BlockPos[LinkType.values().length];
 	private int speed = Integer.MAX_VALUE;
 	
 	public PathOption() {
@@ -28,10 +27,11 @@ public class PathOption {
 	
 	public PathOption(NBTTagCompound compound) {
 		this.pathUsage = EnumPathUsage.valueOf(compound.getString(PATH_USAGE));
-		if (compound.hasKey(POSITION)) {
-			this.linkedPosition = NBTUtil.getPosFromTag(compound.getCompoundTag(POSITION));
-		} else {
-			this.linkedPosition = null;
+		for (final LinkType type : LinkType.values()) {
+			if (compound.hasKey(type.name())) {
+				final NBTTagCompound item = compound.getCompoundTag(type.name());
+				linkedPositions[type.ordinal()] = NBTUtil.getPosFromTag(item);
+			}
 		}
 		if (compound.hasKey(SPEED))
 			this.speed = compound.getInteger(SPEED);
@@ -40,10 +40,10 @@ public class PathOption {
 	public NBTTagCompound writeNBT() {
 		final NBTTagCompound compound = new NBTTagCompound();
 		compound.setString(PATH_USAGE, this.pathUsage.name());
-		if (linkedPosition != null) {
-			compound.setTag(POSITION, NBTUtil.createPosTag(linkedPosition));
-		} else {
-			compound.removeTag(POSITION);
+		for (final LinkType type : LinkType.values()) {
+			final BlockPos position = linkedPositions[type.ordinal()];
+			if (position != null)
+				compound.setTag(type.name(), NBTUtil.createPosTag(position));
 		}
 		if (speed != Integer.MAX_VALUE) {
 			compound.setInteger(SPEED, speed);
@@ -61,12 +61,12 @@ public class PathOption {
 		this.pathUsage = pathUsage;
 	}
 	
-	public BlockPos getLinkedPosition() {
-		return linkedPosition;
+	public BlockPos getLinkedPosition(LinkType type) {
+		return linkedPositions[type.ordinal()];
 	}
 	
-	public void setLinkedPosition(BlockPos linkedPosition) {
-		this.linkedPosition = linkedPosition;
+	public void setLinkedPosition(LinkType type, BlockPos linkedPosition) {
+		this.linkedPositions[type.ordinal()] = linkedPosition;
 	}
 	
 	public int getSpeed() {

@@ -45,7 +45,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 			send = false;
 			final NBTTagCompound compound = new NBTTagCompound();
 			final NBTTagList typeList = new NBTTagList();
-			this.tile.forEach(pos -> {
+			this.tile.getPositions().keySet().forEach(pos -> {
 				final NBTTagCompound entry = new NBTTagCompound();
 				entry.setTag(POS_ID, NBTUtil.createPosTag(pos));
 				final Signal signal = tile.getSignal(pos);

@@ -5,12 +5,16 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
 
+import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import eu.gir.girsignals.signalbox.EnumGuiMode;
+import eu.gir.girsignals.signalbox.LinkType;
 import eu.gir.girsignals.signalbox.PathOption;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.Point;
@@ -100,6 +104,8 @@ public class GuiSignalBox extends GuiBase {
 		entity.add(modeLabel);
 		parent.add(entity);
 		
+		final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
+
 		if (mode.equals(EnumGuiMode.CORNER) || mode.equals(EnumGuiMode.STRAIGHT)) {
 			final EnumPathUsage path = option.getPathUsage();
 			final UIEntity stateEntity = new UIEntity();
@@ -115,9 +121,7 @@ public class GuiSignalBox extends GuiBase {
 					node.write(compound);
 				}));
 			}
-		}
-		
-		if (mode.equals(EnumGuiMode.STRAIGHT) || mode.equals(EnumGuiMode.CORNER)) {
+			
 			final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
 			final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
 				option.setSpeed(id > 0 ? id : Integer.MAX_VALUE);
@@ -128,22 +132,13 @@ public class GuiSignalBox extends GuiBase {
 				e.setIndex(option.getSpeed() < 16 ? option.getSpeed() : Integer.MAX_VALUE);
 			});
 			parent.add(speedSelection);
+			
+			selectLink(parent, node, option, entrySet, LinkType.OUTPUT);
 		}
 		
-		if (mode.ordinal() >= EnumGuiMode.HP.ordinal() || mode.equals(EnumGuiMode.CORNER)) {
-			final ImmutableList<BlockPos> positions = box.getPositions();
-			if (!positions.isEmpty()) {
-				final DisableIntegerable<BlockPos> blockPos = new DisableIntegerable<BlockPos>(SizeIntegerables.of("signal", positions.size(), positions::get));
-				final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
-					option.setLinkedPosition(id >= 0 ? positions.get(id) : null);
-					node.write(compound);
-				});
-				blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
-					e.setMin(-1);
-					e.setIndex(positions.indexOf(option.getLinkedPosition()));
-					e.setID(null);
-				});
-				parent.add(blockSelect);
+		if (mode.ordinal() >= EnumGuiMode.HP.ordinal()) {
+			for (final LinkType type : new LinkType[] { LinkType.SIGNAL, LinkType.INPUT }) {
+				selectLink(parent, node, option, entrySet, type);
 			}
 		}
 		
@@ -160,6 +155,26 @@ public class GuiSignalBox extends GuiBase {
 			}));
 		}
 		
+	}
+
+	private void selectLink(final UIEntity parent, final SignalNode node, PathOption option, final ImmutableSet<Entry<BlockPos, LinkType>> entrySet, final LinkType type) {
+		final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type)).map(e -> e.getKey()).collect(Collectors.toList());
+		if (!positions.isEmpty()) {
+			final DisableIntegerable<String> blockPos = new DisableIntegerable<String>(SizeIntegerables.of("prop." + type.name(), positions.size(), id -> {
+				final BlockPos pos = positions.get(id);
+				return String.format("x=%d,y=%d,z=%d", pos.getX(), pos.getY(), pos.getZ());
+			}));
+			final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
+				option.setLinkedPosition(type, id >= 0 ? positions.get(id) : null);
+				node.write(compound);
+			});
+			blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
+				e.setMin(-1);
+				e.setIndex(positions.indexOf(option.getLinkedPosition(type)));
+				e.setID(null);
+			});
+			parent.add(blockSelect);
+		}
 	}
 	
 	public void initTileConfig(final SignalNode node) {
@@ -197,8 +212,11 @@ public class GuiSignalBox extends GuiBase {
 	private void settingsPage(UIEntity entity) {
 		reset();
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
-		box.forEach(p -> lowerEntity.add(GuiElements.createButton(p.toString(), e -> {
-		})));
+		box.getPositions().forEach((p, t) -> {
+			final String name = String.format("%s: x=%d, y=%d. z=%d", I18n.format("type." + t.name()), p.getX(), p.getY(), p.getZ());
+			lowerEntity.add(GuiElements.createButton(name, e -> {
+			}));
+		});
 		lowerEntity.update();
 		updateButton(entity);
 	}

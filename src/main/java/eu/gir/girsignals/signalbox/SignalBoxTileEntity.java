@@ -9,25 +9,27 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.requestWay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.blocks.ISignalAutoconfig;
+import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
 import eu.gir.guilib.ecs.GuiSyncNetwork;
 import eu.gir.guilib.ecs.interfaces.ISyncable;
 import eu.gir.linkableapi.ILinkableTile;
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -35,22 +37,28 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
-public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile, Iterable<BlockPos> {
+public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile {
 	
 	public static final String ERROR_STRING = "error";
 	
 	private static final String LINKED_POS_LIST = "linkedPos";
 	private static final String GUI_TAG = "guiTag";
+	private static final String LINK_TYPE = "linkType";
 	
-	private final ArrayList<BlockPos> linkedBlocks = new ArrayList<>();
-	private final HashMap<Point, SignalNode> modeGrid = new HashMap<>(10);
-	private final Map<BlockPos, Signal> signals = new HashMap<>();
+	private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>(10);
+	private final Map<Point, SignalNode> modeGrid = new HashMap<>(10);
+	private final Map<BlockPos, Signal> signals = new HashMap<>(10);
 	private NBTTagCompound guiTag = new NBTTagCompound();
+	private final HashMap<BlockPos, Entry<BlockPos, Integer>> pathWayEnd = new HashMap<>();
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		final NBTTagList list = new NBTTagList();
-		linkedBlocks.forEach(p -> list.appendTag(NBTUtil.createPosTag(p)));
+		linkedBlocks.forEach((p, t) -> {
+			final NBTTagCompound item = NBTUtil.createPosTag(p);
+			item.setString(LINK_TYPE, t.name());
+			list.appendTag(item);
+		});
 		compound.setTag(LINKED_POS_LIST, list);
 		compound.setTag(GUI_TAG, guiTag);
 		return super.writeToNBT(compound);
@@ -61,7 +69,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final NBTTagList list = (NBTTagList) compound.getTag(LINKED_POS_LIST);
 		if (list != null) {
 			linkedBlocks.clear();
-			list.forEach(pos -> linkedBlocks.add(NBTUtil.getPosFromTag((NBTTagCompound) pos)));
+			list.forEach(pos -> {
+				final NBTTagCompound item = (NBTTagCompound) pos;
+				if(item.hasKey(LINK_TYPE))
+					linkedBlocks.put(NBTUtil.getPosFromTag(item), LinkType.valueOf(item.getString(LINK_TYPE)));
+			});
 		}
 		this.guiTag = compound.getCompoundTag(GUI_TAG);
 		this.updateGrid();
@@ -101,6 +113,32 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		}));
 	}
 	
+	private void loadAndReset(final BlockPos position) {
+		loadChunkAndGetTile(world, position, (signaltile, chunk) -> {
+			final ISignalAutoconfig config = signaltile.getSignal().getConfig();
+			if (config == null)
+				return;
+			config.reset(signaltile);
+			updateWorld(position, chunk);
+		});
+	}
+	
+	private void lateUpdate(final BlockPos first) {
+		if (first == null)
+			return;
+		BlockPos earlier = first;
+		Entry<BlockPos, Integer> next;
+		int debugX = 0;
+		while ((next = pathWayEnd.get(earlier)) != null) {
+			loadAndConfig(next.getValue(), earlier, next.getKey());
+			earlier = next.getKey();
+			if (earlier == null)
+				return;
+			if(debugX++ > 100)
+				throw new RuntimeException("Too many iterations, this is a bug in debug!");
+		}
+	}
+	
 	private void resend() {
 		final NBTTagCompound update = new NBTTagCompound();
 		modeGrid.values().forEach(signal -> signal.write(update));
@@ -111,16 +149,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final SignalNode currentNode = modeGrid.get(resetPoint);
 		currentNode.getRotations(EnumGuiMode.HP).forEach(rotation -> {
 			currentNode.applyNormal(Maps.immutableEntry(EnumGuiMode.HP, rotation), option -> {
-				final BlockPos position = option.getLinkedPosition();
+				final BlockPos position = option.getLinkedPosition(LinkType.SIGNAL);
 				if (position == null)
 					return;
-				loadChunkAndGetTile(world, position, (signaltile, chunk) -> {
-					final ISignalAutoconfig config = signaltile.getSignal().getConfig();
-					if (config == null)
-						return;
-					config.reset(signaltile);
-					updateWorld(position, chunk);
-				});
+				final Entry<BlockPos, Integer> next = pathWayEnd.get(position);
+				loadAndReset(position);
+				lateUpdate(position);
+				if (next != null)
+					pathWayEnd.remove(next.getKey());
 			});
 			final List<Point> list = new ArrayList<>();
 			final List<Point> visited = new ArrayList<>();
@@ -133,6 +169,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 					return;
 				visited.add(current);
 				nextPoint.connections().forEach(entry -> nextPoint.apply(entry, path -> {
+					setPower(path.getLinkedPosition(LinkType.OUTPUT), false);
 					if (path.getPathUsage().equals(EnumPathUsage.FREE))
 						return;
 					path.setPathUsage(EnumPathUsage.FREE);
@@ -147,6 +184,18 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		resend();
 	}
 	
+	private void setPower(final BlockPos position, final boolean power) {
+		if (position == null)
+			return;
+		loadChunkAndGetBlock(world, position, (state, chunk) -> {
+			if(!(state.getBlock() instanceof RedstoneIO))
+				return;
+			final IBlockState ibstate = state.withProperty(RedstoneIO.POWER, power);
+			chunk.setBlockState(position, ibstate);
+			world.markAndNotifyBlock(position, chunk, state, ibstate, 3);
+		});
+	}
+	
 	public void onWayAdd(final ArrayList<SignalNode> nodes) {
 		final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
 		for (int i = 1; i < nodes.size() - 1; i++) {
@@ -155,20 +204,23 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
 			final SignalNode current = nodes.get(i);
 			current.apply(entry, option -> {
+				setPower(option.getLinkedPosition(LinkType.OUTPUT), true);
 				option.setPathUsage(EnumPathUsage.SELECTED);
 				atomic.getAndUpdate(oldspeed -> Math.min(oldspeed, option.getSpeed()));
 			});
 		}
 		final SignalNode firstNode = nodes.get(nodes.size() - 1);
 		final SignalNode lastNode = nodes.get(0);
-		final BlockPos lastPosition = lastNode.getOption(EnumGuiMode.HP).get().getLinkedPosition();
-		final BlockPos firstPosition = firstNode.getOption(EnumGuiMode.HP).get().getLinkedPosition();
-		if (lastPosition != null && firstPosition != null) {
+		final BlockPos lastPosition = lastNode.getOption(EnumGuiMode.HP).get().getLinkedPosition(LinkType.SIGNAL);
+		final BlockPos firstPosition = firstNode.getOption(EnumGuiMode.HP).get().getLinkedPosition(LinkType.SIGNAL);
+		if (lastPosition != null && firstPosition != null && !lastPosition.equals(firstPosition)) {
 			loadAndConfig(atomic.get(), lastPosition, firstPosition);
 			for (final SignalNode node : nodes) {
-				node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition()));
+				node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition(LinkType.SIGNAL)));
 			}
+			pathWayEnd.put(lastPosition, Maps.immutableEntry(firstPosition, atomic.get()));
 		}
+		lateUpdate(firstPosition);
 		resend();
 	}
 	
@@ -213,11 +265,22 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	@Override
 	public boolean link(BlockPos linkedPos) {
-		if (linkedBlocks.contains(linkedPos))
+		if (linkedBlocks.containsKey(linkedPos))
 			return false;
-		if (!world.isRemote)
-			loadChunkAndGetTile(world, linkedPos, this::updateSingle);
-		linkedBlocks.add(linkedPos);
+		final IBlockState state = world.getBlockState(linkedPos);
+		final Block block = state.getBlock();
+		LinkType type = LinkType.SIGNAL;
+		if (block == GIRBlocks.REDSTONE_IN) {
+			type = LinkType.INPUT;
+		} else if (block == GIRBlocks.REDSTONE_OUT) {
+			type = LinkType.OUTPUT;
+		}
+		if (!world.isRemote) {
+			if (type.equals(LinkType.SIGNAL)) {
+				loadChunkAndGetTile(world, linkedPos, this::updateSingle);
+			}
+		}
+		linkedBlocks.put(linkedPos, type);
 		return true;
 	}
 	
@@ -233,7 +296,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			return;
 		signals.clear();
 		new Thread(() -> {
-			linkedBlocks.forEach(linkedPos -> loadChunkAndGetTile(world, linkedPos, this::updateSingle));
+			linkedBlocks.forEach((linkedPos, _u) -> loadChunkAndGetTile(world, linkedPos, this::updateSingle));
 		}).start();
 	}
 	
@@ -245,16 +308,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		return true;
 	}
 	
-	@Override
-	public Iterator<BlockPos> iterator() {
-		return linkedBlocks.iterator();
-	}
-	
 	public Signal getSignal(final BlockPos pos) {
 		return this.signals.get(pos);
 	}
 	
-	public ImmutableList<BlockPos> getPositions() {
-		return ImmutableList.copyOf(this.linkedBlocks);
+	public ImmutableMap<BlockPos, LinkType> getPositions() {
+		return ImmutableMap.copyOf(this.linkedBlocks);
 	}
+	
 }

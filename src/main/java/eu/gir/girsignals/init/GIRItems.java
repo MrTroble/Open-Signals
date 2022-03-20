@@ -21,7 +21,7 @@ public class GIRItems {
 	public static final Linkingtool LINKING_TOOL = new Linkingtool(GIRTabs.tab, (world, pos) -> {
 		final IBlockState state = world.getBlockState(pos);
 		final Block block = state.getBlock();
-		return state.canProvidePower() || (block instanceof Signal && ((Signal) block).canBeLinked());
+		return block == GIRBlocks.REDSTONE_IN || block == GIRBlocks.REDSTONE_OUT || (block instanceof Signal && ((Signal) block).canBeLinked());
 	});
 	public static final Placementtool PLACEMENT_TOOL = new Placementtool();
 	public static final Placementtool SIGN_PLACEMENT_TOOL = new Placementtool();
