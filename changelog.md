@@ -1,5 +1,13 @@
 # Changelog
 
+## [Alpha Update] 03.20.2022
+
+* Added Redstone output (e.g. switch control)
+* Fixed several issues
+* Signal of previous path way updated accordingly
+
+  **This update is an alpha version and does not contain fully functional signal boxes. We ask you to test the system and give us feedback on functionality, bugs and features.**
+
 ## [Internal] 03.12.2022 - 2
 
 * Internal Open Computers update
