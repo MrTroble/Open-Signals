@@ -1,5 +1,13 @@
 # Changelog
 
+## [Internal] 03.12.2022 - 2
+
+* Internal Open Computers update
+
+## [Internal] 03.12.2022 - 1
+
+* Internal Forge version update
+
 ## [Alpha update] 02.22.2022 - 1
 
 * Fixed correct signal aspect for hp signals
