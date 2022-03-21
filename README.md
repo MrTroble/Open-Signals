@@ -29,12 +29,12 @@
 
 ### Setup Eclipse
 
-- ``./gradlew genEclipseRuns eclipse``
+- ``./gradlew genEclipseRuns eclipse update``
 - Import project as existing workspace
 
 ### Setup IntelliJ IDEA
 
-- ``./gradlew genIntellijRuns``
+- ``./gradlew genIntellijRuns update``
 - Import as gradle project
 
 ### Build
