@@ -115,7 +115,7 @@ jar.finalizedBy('reobfJar')
 tasks.getByName("eclipse").finalizedBy('update')
 task update(type: Copy) {
 	dependsOn "eclipse"
-	def username = System.getenv("HOMEPATH")
+	def username = System.getProperty("user.home")
     println("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     def fl = new File("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     if(fl.exists()) {

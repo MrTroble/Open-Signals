@@ -23,13 +23,17 @@
 
 ## How to build this mod
 
-**DON'T FORGET TO INTIALIZE THE SUBMODULES**
+**DON'T FORGET TO INTIALIZE THE SUBMODULES (install git)**
 
 - ``git submodule update --init``
 
+or use submodule clone command:
+
+- ``git clone --recurse-submodules https://github.com/German-Immersive-Railroading-Community/GIRSignals.git``
+
 ### Setup Eclipse
 
-- ``./gradlew genEclipseRuns eclipse``
+- ``./gradlew genEclipseRuns eclipse update``
 - Import project as existing workspace
 
 ### Setup IntelliJ IDEA

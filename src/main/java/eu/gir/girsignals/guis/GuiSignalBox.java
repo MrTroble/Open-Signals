@@ -136,13 +136,13 @@ public class GuiSignalBox extends GuiBase {
 			selectLink(parent, node, option, entrySet, LinkType.OUTPUT);
 		}
 		
-		if (mode.ordinal() >= EnumGuiMode.HP.ordinal()) {
-			for (final LinkType type : new LinkType[] { LinkType.SIGNAL, LinkType.INPUT }) {
-				selectLink(parent, node, option, entrySet, type);
-			}
+		if (mode.equals(EnumGuiMode.VP)) {
+			selectLink(parent, node, option, entrySet, LinkType.SIGNAL);
 		}
 		
-		if (mode.equals(EnumGuiMode.HP)) {
+		if (mode.equals(EnumGuiMode.HP) || mode.equals(EnumGuiMode.RS)) {
+			selectLink(parent, node, option, entrySet, LinkType.SIGNAL);
+			selectLink(parent, node, option, entrySet, LinkType.INPUT);
 			parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
 				this.lowerEntity.clear();
 				GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());

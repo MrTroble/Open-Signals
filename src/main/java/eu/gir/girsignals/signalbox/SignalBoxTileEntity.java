@@ -49,7 +49,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	private final Map<Point, SignalNode> modeGrid = new HashMap<>(10);
 	private final Map<BlockPos, Signal> signals = new HashMap<>(10);
 	private NBTTagCompound guiTag = new NBTTagCompound();
-	private final HashMap<BlockPos, Entry<BlockPos, Integer>> pathWayEnd = new HashMap<>();
+	private final HashMap<ArrayList<SignalNode>, Integer> pathWayEnd = new HashMap<>();
 	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
@@ -71,7 +71,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			linkedBlocks.clear();
 			list.forEach(pos -> {
 				final NBTTagCompound item = (NBTTagCompound) pos;
-				if(item.hasKey(LINK_TYPE))
+				if (item.hasKey(LINK_TYPE))
 					linkedBlocks.put(NBTUtil.getPosFromTag(item), LinkType.valueOf(item.getString(LINK_TYPE)));
 			});
 		}
@@ -123,22 +123,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		});
 	}
 	
-	private void lateUpdate(final BlockPos first) {
-		if (first == null)
-			return;
-		BlockPos earlier = first;
-		Entry<BlockPos, Integer> next;
-		int debugX = 0;
-		while ((next = pathWayEnd.get(earlier)) != null) {
-			loadAndConfig(next.getValue(), earlier, next.getKey());
-			earlier = next.getKey();
-			if (earlier == null)
-				return;
-			if(debugX++ > 100)
-				throw new RuntimeException("Too many iterations, this is a bug in debug!");
-		}
-	}
-	
 	private void resend() {
 		final NBTTagCompound update = new NBTTagCompound();
 		modeGrid.values().forEach(signal -> signal.write(update));
@@ -147,16 +131,22 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	private void resetWay(final Point resetPoint) {
 		final SignalNode currentNode = modeGrid.get(resetPoint);
-		currentNode.getRotations(EnumGuiMode.HP).forEach(rotation -> {
-			currentNode.applyNormal(Maps.immutableEntry(EnumGuiMode.HP, rotation), option -> {
+		resetSignal(resetPoint, currentNode, EnumGuiMode.HP);
+		resetSignal(resetPoint, currentNode, EnumGuiMode.RS);
+		resend();
+	}
+	
+	private void resetSignal(final Point resetPoint, final SignalNode currentNode, final EnumGuiMode guiMode) {
+		currentNode.getRotations(guiMode).forEach(rotation -> {
+			currentNode.applyNormal(Maps.immutableEntry(guiMode, rotation), option -> {
 				final BlockPos position = option.getLinkedPosition(LinkType.SIGNAL);
 				if (position == null)
 					return;
-				final Entry<BlockPos, Integer> next = pathWayEnd.get(position);
 				loadAndReset(position);
-				lateUpdate(position);
-				if (next != null)
-					pathWayEnd.remove(next.getKey());
+			});
+			pathWayEnd.keySet().stream().filter(list -> list.get(0).equals(currentNode)).findAny().ifPresent(list -> {
+				signalPathWay(list, pathWayEnd.get(list));
+				pathWayEnd.remove(list);
 			});
 			final List<Point> list = new ArrayList<>();
 			final List<Point> visited = new ArrayList<>();
@@ -181,14 +171,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 				list.remove(current);
 			}
 		});
-		resend();
 	}
 	
 	private void setPower(final BlockPos position, final boolean power) {
 		if (position == null)
 			return;
 		loadChunkAndGetBlock(world, position, (state, chunk) -> {
-			if(!(state.getBlock() instanceof RedstoneIO))
+			if (!(state.getBlock() instanceof RedstoneIO))
 				return;
 			final IBlockState ibstate = state.withProperty(RedstoneIO.POWER, power);
 			chunk.setBlockState(position, ibstate);
@@ -209,19 +198,27 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 				atomic.getAndUpdate(oldspeed -> Math.min(oldspeed, option.getSpeed()));
 			});
 		}
+		signalPathWay(nodes, atomic.get());
+		pathWayEnd.put(nodes, atomic.get());
+		resend();
+	}
+	
+	private void signalPathWay(final ArrayList<SignalNode> nodes, final int speed) {
 		final SignalNode firstNode = nodes.get(nodes.size() - 1);
 		final SignalNode lastNode = nodes.get(0);
-		final BlockPos lastPosition = lastNode.getOption(EnumGuiMode.HP).get().getLinkedPosition(LinkType.SIGNAL);
-		final BlockPos firstPosition = firstNode.getOption(EnumGuiMode.HP).get().getLinkedPosition(LinkType.SIGNAL);
-		if (lastPosition != null && firstPosition != null && !lastPosition.equals(firstPosition)) {
-			loadAndConfig(atomic.get(), lastPosition, firstPosition);
-			for (final SignalNode node : nodes) {
-				node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(atomic.get(), lastPosition, option.getLinkedPosition(LinkType.SIGNAL)));
+		final Optional<PathOption> lPO = lastNode.getOption(EnumGuiMode.HP);
+		final Optional<PathOption> fPO = firstNode.getOption(EnumGuiMode.HP);
+		if (lPO.isPresent() && fPO.isPresent()) {
+			final BlockPos lastPosition = lPO.get().getLinkedPosition(LinkType.SIGNAL);
+			final BlockPos firstPosition = fPO.get().getLinkedPosition(LinkType.SIGNAL);
+			if (lastPosition != null && firstPosition != null && !lastPosition.equals(firstPosition)) {
+				loadAndConfig(speed, lastPosition, firstPosition);
+				for (final SignalNode node : nodes) {
+					node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(speed, lastPosition, option.getLinkedPosition(LinkType.SIGNAL)));
+				}
 			}
-			pathWayEnd.put(lastPosition, Maps.immutableEntry(firstPosition, atomic.get()));
 		}
-		lateUpdate(firstPosition);
-		resend();
+		pathWayEnd.keySet().stream().filter(list -> list.get(0).equals(firstNode)).findAny().ifPresent(list -> signalPathWay(list, pathWayEnd.get(list)));
 	}
 	
 	@Override
