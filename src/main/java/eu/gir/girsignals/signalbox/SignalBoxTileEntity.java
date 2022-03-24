@@ -133,6 +133,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final SignalNode currentNode = modeGrid.get(resetPoint);
 		resetSignal(resetPoint, currentNode, EnumGuiMode.HP);
 		resetSignal(resetPoint, currentNode, EnumGuiMode.RS);
+		pathWayEnd.keySet().stream().filter(list -> list.get(list.size() - 1).equals(currentNode)).findAny().ifPresent(pathWayEnd::remove);
+		System.out.println(pathWayEnd.size());
 		resend();
 	}
 	
@@ -146,7 +148,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			});
 			pathWayEnd.keySet().stream().filter(list -> list.get(0).equals(currentNode)).findAny().ifPresent(list -> {
 				signalPathWay(list, pathWayEnd.get(list));
-				pathWayEnd.remove(list);
 			});
 			final List<Point> list = new ArrayList<>();
 			final List<Point> visited = new ArrayList<>();
@@ -200,6 +201,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		}
 		signalPathWay(nodes, atomic.get());
 		pathWayEnd.put(nodes, atomic.get());
+		System.out.println(pathWayEnd.size());
 		resend();
 	}
 	
@@ -218,7 +220,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 				}
 			}
 		}
-		pathWayEnd.keySet().stream().filter(list -> list.get(0).equals(firstNode)).findAny().ifPresent(list -> signalPathWay(list, pathWayEnd.get(list)));
+		pathWayEnd.keySet().stream().filter(list -> list != null && list.get(0).equals(firstNode)).findAny().ifPresent(list -> signalPathWay(list, pathWayEnd.get(list)));
 	}
 	
 	@Override

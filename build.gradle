@@ -136,3 +136,46 @@ task update(type: Copy) {
         }
     }
 }
+
+uploadArchives {
+
+	tasks.uploadArchives.dependsOn build
+
+	repositories {
+		mavenDeployer {
+			if (project.hasProperty("mavenpass")) {
+				repository(url: "https://maven.girc.eu") {
+					authentication(userName: "maven", password: project.getProperty("mavenpass"))
+				}
+			}
+			pom {
+				groupId = project.group
+				artifactId = project.archivesBaseName
+				version = project.version
+				project {
+					name project.archivesBaseName
+					packaging "jar"
+					description project.name
+					url "https://github.com/German-Immersive-Railroading-Community/GIRSignals"
+					issueManagement {
+						system "github"
+						url "https://github.com/German-Immersive-Railroading-Community/GIRSignals/issues"
+					}
+					licenses {
+						license {
+							name "Apache License 2.0"
+							url "https://github.com/German-Immersive-Railroading-Community/GIRSignals/blob/master/LICENSE"
+							distribution "repo"
+						}
+					}
+
+					developers {
+						developer {
+							name "MrTroble"
+						}
+					}
+				}
+			}
+		}
+	}
+}
