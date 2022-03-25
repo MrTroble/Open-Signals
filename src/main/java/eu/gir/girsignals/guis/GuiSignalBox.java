@@ -221,10 +221,12 @@ public class GuiSignalBox extends GuiBase {
 	private void connectionSettingsPage(UIEntity entity) {
 		reset();
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
+		lowerEntity.setInheritHeight(true);
+		lowerEntity.setInheritWidth(true);
 		final UIEntity list = new UIEntity();
 		final UIBox uibox = new UIBox(UIBox.VBOX, 2);
 		list.add(uibox);
-		list.setInheritHeight(false);
+		list.setInheritHeight(true);
 		list.setInheritWidth(true);
 		box.getPositions().forEach((p, t) -> {
 			final String name = getSignalInfo(p, t);
