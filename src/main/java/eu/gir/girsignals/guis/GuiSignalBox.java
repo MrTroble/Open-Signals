@@ -45,6 +45,7 @@ import net.minecraft.client.audio.SoundHandler;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
@@ -214,8 +215,18 @@ public class GuiSignalBox extends GuiBase {
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
 		box.getPositions().forEach((p, t) -> {
 			final String name = String.format("%s: x=%d, y=%d. z=%d", I18n.format("type." + t.name()), p.getX(), p.getY(), p.getZ());
-			lowerEntity.add(GuiElements.createButton(name, e -> {
+			final UIEntity layout = new UIEntity();
+			layout.setHeight(20);
+			layout.setInheritWidth(true);
+			layout.add(new UIBox(UIBox.HBOX, 2));
+			layout.add(GuiElements.createButton(name, e -> {}));
+			layout.add(GuiElements.createButton("x", 20, e -> {
+				final NBTTagCompound resetPos = new NBTTagCompound();
+				resetPos.setTag(SignalBoxTileEntity.REMOVE_SIGNAL, NBTUtil.createPosTag(p));
+				GuiSyncNetwork.sendToPosServer(resetPos, this.box.getPos());
+				lowerEntity.remove(layout);
 			}));
+			lowerEntity.add(layout);
 		});
 		lowerEntity.update();
 		updateButton(entity);

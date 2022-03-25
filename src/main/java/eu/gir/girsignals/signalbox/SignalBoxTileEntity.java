@@ -40,7 +40,8 @@ import net.minecraft.world.chunk.Chunk;
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile {
 	
 	public static final String ERROR_STRING = "error";
-	
+	public static final String REMOVE_SIGNAL = "removeSignal";
+
 	private static final String LINKED_POS_LIST = "linkedPos";
 	private static final String GUI_TAG = "guiTag";
 	private static final String LINK_TYPE = "linkType";
@@ -227,6 +228,15 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	public void updateTag(NBTTagCompound compound) {
 		if (compound == null)
 			return;
+		if (compound.hasKey(REMOVE_SIGNAL)) {
+			final NBTTagCompound request = (NBTTagCompound) compound.getTag(REMOVE_SIGNAL);
+			final BlockPos p1 = NBTUtil.getPosFromTag(request);
+			if(signals.containsKey(p1)) {
+				signals.remove(p1);
+				loadAndReset(p1);
+			}
+			linkedBlocks.remove(p1);
+		}
 		if (compound.hasKey(RESET_WAY)) {
 			final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
 			final Point p1 = fromNBT(request, POINT1);
