@@ -277,6 +277,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		if (!world.isRemote) {
 			if (type.equals(LinkType.SIGNAL)) {
 				loadChunkAndGetTile(world, linkedPos, this::updateSingle);
+				loadAndReset(linkedPos);
 			}
 		}
 		linkedBlocks.put(linkedPos, type);
