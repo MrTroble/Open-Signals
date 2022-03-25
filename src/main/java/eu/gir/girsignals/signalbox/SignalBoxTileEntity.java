@@ -299,9 +299,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			linkedBlocks.forEach((linkedPos, _u) -> loadChunkAndGetTile(world, linkedPos, this::updateSingle));
 		}).start();
 	}
-	
+		
 	@Override
 	public boolean unlink() {
+		signals.keySet().forEach(this::loadAndReset);
 		linkedBlocks.clear();
 		signals.clear();
 		syncClient();
