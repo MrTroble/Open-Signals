@@ -38,6 +38,7 @@ import eu.gir.guilib.ecs.entitys.render.UIBorder;
 import eu.gir.guilib.ecs.entitys.render.UIColor;
 import eu.gir.guilib.ecs.entitys.render.UILabel;
 import eu.gir.guilib.ecs.entitys.render.UIScissor;
+import eu.gir.guilib.ecs.entitys.render.UITexture;
 import eu.gir.guilib.ecs.entitys.render.UIToolTip;
 import eu.gir.guilib.ecs.entitys.transform.UIScale;
 import net.minecraft.client.Minecraft;
@@ -214,29 +215,44 @@ public class GuiSignalBox extends GuiBase {
 	private String getSignalInfo(BlockPos signalPos, LinkType type) {
 		final Map<BlockPos, String> names = this.container.getNames();
 		final String customName = names == null ? null : names.get(signalPos);
-		return String.format("%s %s (x=%d, y=%d. z=%d)", customName == null ? "" : customName, I18n.format("type." + type.name()), signalPos.getX(), signalPos.getY(), signalPos.getZ());
+		return String.format("%s (x=%d, y=%d. z=%d)", customName == null ? (type.equals(LinkType.SIGNAL) ? "":I18n.format("type." + type.name())) : customName, signalPos.getX(), signalPos.getY(), signalPos.getZ());
 	}
 	
-	private void settingsPage(UIEntity entity) {
+	private void connectionSettingsPage(UIEntity entity) {
 		reset();
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
+		final UIEntity list = new UIEntity();
+		final UIBox uibox = new UIBox(UIBox.VBOX, 2);
+		list.add(uibox);
+		list.setInheritHeight(false);
+		list.setInheritWidth(true);
 		box.getPositions().forEach((p, t) -> {
 			final String name = getSignalInfo(p, t);
 			final UIEntity layout = new UIEntity();
 			layout.setHeight(20);
 			layout.setInheritWidth(true);
 			layout.add(new UIBox(UIBox.HBOX, 2));
+			
+			final int id = t.ordinal();
+			final UIEntity icon = new UIEntity();
+			icon.add(new UITexture(UISignalBoxTile.ICON, 0.25 * id, 0.5, 0.25 * id + 0.25, 1));
+			icon.setHeight(20);
+			icon.setWidth(20);
+			icon.add(new UIToolTip(I18n.format("type." + t.name())));
+			layout.add(icon);
+			
 			layout.add(GuiElements.createButton(name, e -> {
 			}));
 			layout.add(GuiElements.createButton("x", 20, e -> {
 				final NBTTagCompound resetPos = new NBTTagCompound();
 				resetPos.setTag(SignalBoxTileEntity.REMOVE_SIGNAL, NBTUtil.createPosTag(p));
 				GuiSyncNetwork.sendToPosServer(resetPos, this.box.getPos());
-				lowerEntity.remove(layout);
+				list.remove(layout);
 			}));
-			lowerEntity.add(layout);
+			list.add(layout);
 		});
-		lowerEntity.update();
+		lowerEntity.add(list);
+		lowerEntity.add(GuiElements.createPageSelect(uibox));
 		updateButton(entity);
 	}
 	
@@ -360,7 +376,7 @@ public class GuiSignalBox extends GuiBase {
 		header.add(new UIBox(UIBox.HBOX, 4));
 		header.add(titel);
 		header.add(GuiElements.createSpacerH(80));
-		header.add(GuiElements.createButton(I18n.format("btn.settings"), this::settingsPage));
+		header.add(GuiElements.createButton(I18n.format("btn.settings"), this::connectionSettingsPage));
 		header.add(GuiElements.createButton(I18n.format("btn.edit"), this::editPage));
 		
 		final UIEntity middlePart = new UIEntity();

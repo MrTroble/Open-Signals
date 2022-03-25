@@ -192,8 +192,8 @@ public class SignalBoxUtil {
 		GlStateManager.enableTexture2D();
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 		final double offset = 0.25 * textureID;
-		bufferbuilder.pos((double) 0, (double) entity.getHeight(), textureID).tex(offset, 1).endVertex();
-		bufferbuilder.pos((double) entity.getWidth(), (double) entity.getHeight(), textureID).tex(offset + 0.25, 1).endVertex();
+		bufferbuilder.pos((double) 0, (double) entity.getHeight(), textureID).tex(offset, 0.5).endVertex();
+		bufferbuilder.pos((double) entity.getWidth(), (double) entity.getHeight(), textureID).tex(offset + 0.25, 0.5).endVertex();
 		bufferbuilder.pos((double) entity.getWidth(), (double) 0, textureID).tex(offset + 0.25, 0).endVertex();
 		bufferbuilder.pos((double) 0, (double) 0, textureID).tex(offset, 0).endVertex();
 		tessellator.draw();
