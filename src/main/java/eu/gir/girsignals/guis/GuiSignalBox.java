@@ -6,6 +6,7 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -106,7 +107,7 @@ public class GuiSignalBox extends GuiBase {
 		parent.add(entity);
 		
 		final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
-
+		
 		if (mode.equals(EnumGuiMode.CORNER) || mode.equals(EnumGuiMode.STRAIGHT)) {
 			final EnumPathUsage path = option.getPathUsage();
 			final UIEntity stateEntity = new UIEntity();
@@ -157,13 +158,13 @@ public class GuiSignalBox extends GuiBase {
 		}
 		
 	}
-
+	
 	private void selectLink(final UIEntity parent, final SignalNode node, PathOption option, final ImmutableSet<Entry<BlockPos, LinkType>> entrySet, final LinkType type) {
 		final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type)).map(e -> e.getKey()).collect(Collectors.toList());
 		if (!positions.isEmpty()) {
 			final DisableIntegerable<String> blockPos = new DisableIntegerable<String>(SizeIntegerables.of("prop." + type.name(), positions.size(), id -> {
 				final BlockPos pos = positions.get(id);
-				return String.format("x=%d,y=%d,z=%d", pos.getX(), pos.getY(), pos.getZ());
+				return getSignalInfo(pos, type);
 			}));
 			final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
 				option.setLinkedPosition(type, id >= 0 ? positions.get(id) : null);
@@ -210,16 +211,23 @@ public class GuiSignalBox extends GuiBase {
 		});
 	}
 	
+	private String getSignalInfo(BlockPos signalPos, LinkType type) {
+		final Map<BlockPos, String> names = this.container.getNames();
+		final String customName = names == null ? null : names.get(signalPos);
+		return String.format("%s %s (x=%d, y=%d. z=%d)", customName == null ? "" : customName, I18n.format("type." + type.name()), signalPos.getX(), signalPos.getY(), signalPos.getZ());
+	}
+	
 	private void settingsPage(UIEntity entity) {
 		reset();
 		lowerEntity.add(new UIBox(UIBox.VBOX, 2));
 		box.getPositions().forEach((p, t) -> {
-			final String name = String.format("%s: x=%d, y=%d. z=%d", I18n.format("type." + t.name()), p.getX(), p.getY(), p.getZ());
+			final String name = getSignalInfo(p, t);
 			final UIEntity layout = new UIEntity();
 			layout.setHeight(20);
 			layout.setInheritWidth(true);
 			layout.add(new UIBox(UIBox.HBOX, 2));
-			layout.add(GuiElements.createButton(name, e -> {}));
+			layout.add(GuiElements.createButton(name, e -> {
+			}));
 			layout.add(GuiElements.createButton("x", 20, e -> {
 				final NBTTagCompound resetPos = new NBTTagCompound();
 				resetPos.setTag(SignalBoxTileEntity.REMOVE_SIGNAL, NBTUtil.createPosTag(p));
