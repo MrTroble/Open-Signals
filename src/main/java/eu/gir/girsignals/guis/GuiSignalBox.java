@@ -264,7 +264,7 @@ public class GuiSignalBox extends GuiBase {
 	private void normalTile(UIEntity tile, final UISignalBoxTile currentTile) {
 		tile.add(new UIClickable(c -> {
 			final SignalNode currentNode = currentTile.getNode();
-			if (!(currentNode.has(EnumGuiMode.RS) || currentNode.has(EnumGuiMode.HP) || currentNode.has(EnumGuiMode.RA10)))
+			if (!(currentNode.has(EnumGuiMode.RS) || currentNode.has(EnumGuiMode.HP) || currentNode.has(EnumGuiMode.RA10) || currentNode.has(EnumGuiMode.END)))
 				return;
 			c.add(new UIColor(SELECTION_COLOR));
 			if (lastTile == null) {

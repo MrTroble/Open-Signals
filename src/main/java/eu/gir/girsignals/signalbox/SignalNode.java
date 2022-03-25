@@ -72,6 +72,7 @@ public class SignalNode implements UIAutoSync {
 				}
 				break;
 			case STRAIGHT:
+			case END:
 				switch (e.getValue()) {
 				case NONE:
 				case CLOCKWISE_180:
