@@ -1,5 +1,14 @@
 # Changelog
 
+## [Alpha Update] 03.25.2022
+
+* fix: Update issue with equals method
+* feat: Signals automatically reset on link
+* feat: Signals fall back to danger if signalbox is reset
+* feat: Signals can now be individually removed
+* feat: Signal names or type now show up while configuring
+* feat: Terminus symbols can now be used as pathway destinations
+
 ## [Alpha Update] 03.20.2022
 
 * Added Redstone output (e.g. switch control)
