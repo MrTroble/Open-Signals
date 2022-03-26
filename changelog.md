@@ -8,6 +8,11 @@
 * feat: Signals can now be individually removed
 * feat: Signal names or type now show up while configuring
 * feat: Terminus symbols can now be used as pathway destinations
+* feat: Added icons for better visibility in settings page
+* fix: Added paging in config
+* feat: Added button for better usage in signal box
+* feat: Selection of pages is now visible
+* fix: Fixed synchronization issue after removing a tiles content
 
 ## [Alpha Update] 03.20.2022
 
