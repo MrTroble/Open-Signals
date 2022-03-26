@@ -278,6 +278,11 @@ public class GuiSignalBox extends GuiBase {
 		lowerEntity.add(GuiElements.createPageSelect(uibox));
 	}
 	
+	private void initializeFieldUsage(UIEntity entity) {
+		reset();
+		initializeFieldTemplate(this::tileNormal);
+	}
+	
 	private void initializeFieldEdit(UIEntity entity) {
 		reset();
 		final UIMenu menu = new UIMenu();
@@ -360,7 +365,7 @@ public class GuiSignalBox extends GuiBase {
 		header.add(GuiElements.createSpacerH(80));
 		header.add(GuiElements.createButton(I18n.format("btn.settings"), this::initializePageSettings));
 		header.add(GuiElements.createButton(I18n.format("btn.edit"), this::initializeFieldEdit));
-		header.add(GuiElements.createButton(I18n.format("btn.main"), e -> initializeFieldTemplate(this::tileNormal)));
+		header.add(GuiElements.createButton(I18n.format("btn.main"), this::initializeFieldUsage));
 		
 		final UIEntity middlePart = new UIEntity();
 		middlePart.setInheritHeight(true);

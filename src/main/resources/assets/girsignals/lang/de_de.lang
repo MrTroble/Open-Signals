@@ -205,7 +205,7 @@ property.enumfacing.desc=Hier kannst du die Seite, die angesteuert wird, des Con
 property.sigtype.desc=Hier kannst du den Signalteil ändern.
 controller.preview=Mit Rechtsklick um Preview zu ändern. Preview-Modus: %b
 property.profile.desc=Hier kannst du verschiedene Profile einstellen, die entsprechend der Seite des Controllers und ob Redstone Signal aktiv oder nicht ist, aktiviert werden.
-property.enumstate.desc=Gibt an, ob das Profil deaktiviert ist, bei aktiven Redstone Signal oder ausgeschalteten Redstone Signal geladen wird. 
+property.enumstate.desc=Gibt an, ob das Profil deaktiviert ist, bei aktiven Redstone Signal oder ausgeschalteten Redstone Signal geladen wird.
 property.profileOff.down.desc=Redstone Aus
 property.profileOn.down.desc=Redstone An
 property.profileOff.up.desc=Redstone Aus
@@ -277,6 +277,7 @@ property.value.RED_YELLOW=Rot-Gelb
 #Signalbox
 btn.settings=Einstellungen
 btn.edit=Editor
+btn.main=Nutzung
 property.signalposition.name=Signalposition
 property.signalposition.desc=Wähle hier die Welt-Koordinaten des verbundenen Signals aus.
 property.status=Status
