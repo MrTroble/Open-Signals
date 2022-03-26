@@ -34,6 +34,7 @@ import eu.gir.guilib.ecs.entitys.input.UIClickable;
 import eu.gir.guilib.ecs.entitys.input.UIDrag;
 import eu.gir.guilib.ecs.entitys.input.UIScroll;
 import eu.gir.guilib.ecs.entitys.render.UIBorder;
+import eu.gir.guilib.ecs.entitys.render.UIButton;
 import eu.gir.guilib.ecs.entitys.render.UIColor;
 import eu.gir.guilib.ecs.entitys.render.UILabel;
 import eu.gir.guilib.ecs.entitys.render.UIScissor;
@@ -68,7 +69,7 @@ public class GuiSignalBox extends GuiBase {
 	}
 	
 	private void update(NBTTagCompound compound) {
-		this.resetSelection();
+		this.resetTileSelection();
 		if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
 			final String error = I18n.format(compound.getString(SignalBoxTileEntity.ERROR_STRING));
 			final UIToolTip tooltip = new UIToolTip(error);
@@ -86,7 +87,7 @@ public class GuiSignalBox extends GuiBase {
 		this.entity.read(compound);
 	}
 	
-	private void resetSelection() {
+	private void resetTileSelection() {
 		this.entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == SELECTION_COLOR).forEach(color -> color.getParent().remove(color));
 	}
 	
@@ -206,7 +207,7 @@ public class GuiSignalBox extends GuiBase {
 			} else {
 				if (lastTile == currentTile) {
 					lastTile = null;
-					this.resetSelection();
+					this.resetTileSelection();
 					return;
 				}
 				final NBTTagCompound comp = new NBTTagCompound();
@@ -219,6 +220,14 @@ public class GuiSignalBox extends GuiBase {
 			}
 		}));
 		tile.add(new UIClickable(e -> initializePageTileConfig(currentTile.getNode()), 1));
+	}
+	
+	private void resetSelection(UIEntity entity) {
+		final UIEntity parent = entity.getParent();
+		parent.findRecursive(UIClickable.class).forEach(click -> click.setVisible(true));
+		parent.findRecursive(UIButton.class).forEach(btn -> btn.setEnabled(true));
+		entity.findRecursive(UIButton.class).forEach(btn -> btn.setEnabled(false));
+		entity.findRecursive(UIClickable.class).forEach(click -> click.setVisible(false));
 	}
 	
 	private void initializePageTileConfig(final SignalNode node) {
@@ -276,11 +285,13 @@ public class GuiSignalBox extends GuiBase {
 		});
 		lowerEntity.add(list);
 		lowerEntity.add(GuiElements.createPageSelect(uibox));
+		resetSelection(entity);
 	}
 	
 	private void initializeFieldUsage(UIEntity entity) {
 		reset();
 		initializeFieldTemplate(this::tileNormal);
+		resetSelection(entity);
 	}
 	
 	private void initializeFieldEdit(UIEntity entity) {
@@ -288,6 +299,7 @@ public class GuiSignalBox extends GuiBase {
 		final UIMenu menu = new UIMenu();
 		initializeFieldTemplate((e, name) -> this.tileEdit(e, menu, name));
 		lowerEntity.add(menu);
+		resetSelection(entity);
 	}
 	
 	private void initializeFieldTemplate(BiConsumer<UIEntity, UISignalBoxTile> consumer) {
@@ -365,7 +377,9 @@ public class GuiSignalBox extends GuiBase {
 		header.add(GuiElements.createSpacerH(80));
 		header.add(GuiElements.createButton(I18n.format("btn.settings"), this::initializePageSettings));
 		header.add(GuiElements.createButton(I18n.format("btn.edit"), this::initializeFieldEdit));
-		header.add(GuiElements.createButton(I18n.format("btn.main"), this::initializeFieldUsage));
+		final UIEntity mainButton = GuiElements.createButton(I18n.format("btn.main"), this::initializeFieldUsage);
+		header.add(mainButton);
+		resetSelection(mainButton);
 		
 		final UIEntity middlePart = new UIEntity();
 		middlePart.setInheritHeight(true);
