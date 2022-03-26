@@ -132,7 +132,9 @@ public class GuiSignalBox extends GuiBase {
 		
 		final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
 		
-		if (mode.equals(EnumGuiMode.CORNER) || mode.equals(EnumGuiMode.STRAIGHT)) {
+		switch (mode) {
+		case CORNER:
+		case STRAIGHT: {
 			final EnumPathUsage path = option.getPathUsage();
 			final UIEntity stateEntity = new UIEntity();
 			stateEntity.setInheritWidth(true);
@@ -160,13 +162,14 @@ public class GuiSignalBox extends GuiBase {
 			parent.add(speedSelection);
 			
 			selectLink(parent, node, option, entrySet, LinkType.OUTPUT);
+			selectLink(parent, node, option, entrySet, LinkType.INPUT);
 		}
-		
-		if (mode.equals(EnumGuiMode.VP)) {
+			break;
+		case VP:
 			selectLink(parent, node, option, entrySet, LinkType.SIGNAL);
-		}
-		
-		if (mode.equals(EnumGuiMode.HP) || mode.equals(EnumGuiMode.RS)) {
+			break;
+		case HP:
+		case RS: {
 			selectLink(parent, node, option, entrySet, LinkType.SIGNAL);
 			selectLink(parent, node, option, entrySet, LinkType.INPUT);
 			parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
@@ -179,6 +182,10 @@ public class GuiSignalBox extends GuiBase {
 				compound.setTag(RESET_WAY, wayComp);
 				GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
 			}));
+		}
+			break;
+		default:
+			break;
 		}
 		
 	}
