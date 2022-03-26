@@ -13,6 +13,7 @@
 * feat: Added button for better usage in signal box
 * feat: Selection of pages is now visible
 * fix: Fixed synchronization issue after removing a tiles content
+* feat: Added shunting pathways (SH Signals) implementation
 
 ## [Alpha Update] 03.20.2022
 

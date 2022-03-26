@@ -11,7 +11,11 @@ import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
-public class RSSignalConfig implements ISignalAutoconfig {
+public final class RSSignalConfig implements ISignalAutoconfig {
+	
+	public static final RSSignalConfig RS_CONFIG = new RSSignalConfig();
+	
+	private RSSignalConfig() {}
 	
 	@Override
 	public void change(int speed, SignalTileEnity current, SignalTileEnity next) {

@@ -24,6 +24,7 @@ import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
+import eu.gir.girsignals.signalbox.config.RSSignalConfig;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
 import eu.gir.guilib.ecs.GuiSyncNetwork;
@@ -104,9 +105,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos newposition) {
+		loadAndConfig(speed, lastPosition, newposition, null);
+	}
+	
+	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos newposition, final ISignalAutoconfig override) {
 		loadChunkAndGetTile(world, lastPosition, (oldtile, chunk) -> loadChunkAndGetTile(world, newposition, (newtile, _u2) -> {
 			final Signal current = newtile.getSignal();
-			final ISignalAutoconfig config = current.getConfig();
+			final ISignalAutoconfig config = override == null ? current.getConfig():override;
 			if (config == null)
 				return;
 			config.change(speed, newtile, oldtile);
@@ -201,7 +206,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		}
 		setPathway(nodes, atomic.get());
 		pathWayEnd.put(nodes, atomic.get());
-		System.out.println(pathWayEnd.size());
 		resendSignalTilesToUI();
 	}
 	
@@ -219,6 +223,17 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 					node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(speed, lastPosition, option.getLinkedPosition(LinkType.SIGNAL)));
 				}
 			}
+		} else {
+			final Optional<PathOption> lRSPO = lastNode.getOption(EnumGuiMode.RS);
+			final Optional<PathOption> fRSPO = firstNode.getOption(EnumGuiMode.RS);
+			if (lRSPO.isPresent() && fRSPO.isPresent()) {
+				final BlockPos lastPosition = lRSPO.get().getLinkedPosition(LinkType.SIGNAL);
+				final BlockPos firstPosition = fRSPO.get().getLinkedPosition(LinkType.SIGNAL);
+				if (lastPosition != null && firstPosition != null && !lastPosition.equals(firstPosition)) {
+					loadAndConfig(speed, lastPosition, firstPosition, RSSignalConfig.RS_CONFIG);
+				}
+			}
+			return;
 		}
 		pathWayEnd.keySet().stream().filter(list -> list != null && list.get(0).equals(firstNode)).findAny().ifPresent(list -> setPathway(list, pathWayEnd.get(list)));
 	}
