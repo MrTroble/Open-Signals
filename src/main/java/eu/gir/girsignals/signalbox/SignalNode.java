@@ -131,8 +131,10 @@ public class SignalNode implements UIAutoSync {
 	
 	@Override
 	public void write(NBTTagCompound compound) {
-		if (possibleModes.isEmpty())
+		if (possibleModes.isEmpty()) {
+			compound.removeTag(this.getID());
 			return;
+		}
 		final NBTTagList pointList = new NBTTagList();
 		possibleModes.forEach((mode, option) -> {
 			final NBTTagCompound entry = new NBTTagCompound();
