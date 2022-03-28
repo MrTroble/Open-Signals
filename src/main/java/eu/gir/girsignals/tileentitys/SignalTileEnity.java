@@ -94,6 +94,8 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 	
 	@Override
 	public String getName() {
+		if(formatCustomName == null)
+			return getSignal().getSignalTypeName();
 		return formatCustomName;
 	}
 	

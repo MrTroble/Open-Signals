@@ -1,5 +1,20 @@
 # Changelog
 
+## [Beta Update] 03.28.2022
+
+* fix: Update issue with equals method
+* feat: Signals automatically reset on link
+* feat: Signals fall back to danger if signalbox is reset
+* feat: Signals can now be individually removed
+* feat: Signal names or type now show up while configuring
+* feat: Terminus symbols can now be used as pathway destinations
+* feat: Added icons for better visibility in settings page
+* fix: Added paging in config
+* feat: Added button for better usage in signal box
+* feat: Selection of pages is now visible
+* fix: Fixed synchronization issue after removing a tiles content
+* feat: Added shunting pathways (SH Signals) implementation
+
 ## [Alpha Update] 03.20.2022
 
 * Added Redstone output (e.g. switch control)

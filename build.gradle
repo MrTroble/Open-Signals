@@ -16,7 +16,7 @@ buildscript {
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
 
 apply plugin: "com.matthewprenger.cursegradle"
 
@@ -41,7 +41,7 @@ curseforge {
   project {
     id = '440990'
     changelog = file('changelog.md')
-    releaseType = 'alpha'
+    releaseType = 'beta'
     changelogType = 'markdown'
     mainArtifact(jar) {
       relations {
@@ -115,7 +115,7 @@ jar.finalizedBy('reobfJar')
 tasks.getByName("eclipse").finalizedBy('update')
 task update(type: Copy) {
 	dependsOn "eclipse"
-	def username = System.getenv("HOMEPATH")
+	def username = System.getProperty("user.home")
     println("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     def fl = new File("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
     if(fl.exists()) {
@@ -135,4 +135,47 @@ task update(type: Copy) {
     		}
         }
     }
+}
+
+uploadArchives {
+
+	tasks.uploadArchives.dependsOn build
+
+	repositories {
+		mavenDeployer {
+			if (project.hasProperty("mavenpass")) {
+				repository(url: "https://maven.girc.eu") {
+					authentication(userName: "maven", password: project.getProperty("mavenpass"))
+				}
+			}
+			pom {
+				groupId = project.group
+				artifactId = project.archivesBaseName
+				version = project.version
+				project {
+					name project.archivesBaseName
+					packaging "jar"
+					description project.name
+					url "https://github.com/German-Immersive-Railroading-Community/GIRSignals"
+					issueManagement {
+						system "github"
+						url "https://github.com/German-Immersive-Railroading-Community/GIRSignals/issues"
+					}
+					licenses {
+						license {
+							name "Apache License 2.0"
+							url "https://github.com/German-Immersive-Railroading-Community/GIRSignals/blob/master/LICENSE"
+							distribution "repo"
+						}
+					}
+
+					developers {
+						developer {
+							name "MrTroble"
+						}
+					}
+				}
+			}
+		}
+	}
 }

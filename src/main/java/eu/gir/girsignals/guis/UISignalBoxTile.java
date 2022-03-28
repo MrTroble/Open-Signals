@@ -13,7 +13,7 @@ import net.minecraft.util.Rotation;
 
 public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 	
-	private static ResourceLocation ICON = new ResourceLocation(GirsignalsMain.MODID, "gui/textures/symbols.png");
+	public static ResourceLocation ICON = new ResourceLocation(GirsignalsMain.MODID, "gui/textures/symbols.png");
 	
 	private SignalNode node;
 	

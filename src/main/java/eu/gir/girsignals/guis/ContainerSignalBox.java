@@ -23,8 +23,10 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 	public final static String UPDATE_SET = "update";
 	public final static String SIGNAL_ID = "signal";
 	public final static String POS_ID = "posid";
+	public final static String SIGNAL_NAME = "signalName";
 	
 	private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
+	private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
 	private EntityPlayerMP player;
 	private SignalBoxTileEntity tile;
 	private Consumer<NBTTagCompound> run;
@@ -52,6 +54,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 				if (signal == null)
 					return;
 				entry.setInteger(SIGNAL_ID, signal.getID());
+				tile.loadChunkAndGetTile(tile.getWorld(), pos, (sig, _u) -> entry.setString(SIGNAL_NAME, sig.getName()));
 				typeList.appendTag(entry);
 			});
 			compound.setTag(UPDATE_SET, typeList);
@@ -72,13 +75,16 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 		if (compound.hasKey(UPDATE_SET)) {
 			final NBTTagList update = (NBTTagList) compound.getTag(UPDATE_SET);
 			final Builder<BlockPos, Signal> immutableMap = new Builder<>();
+			final Builder<BlockPos, String> nameBuilder = new Builder<>();
 			update.forEach(nbt -> {
 				final Signal signal = Signal.SIGNALLIST.get(compound.getInteger(SIGNAL_ID));
 				final NBTTagCompound comp = (NBTTagCompound) nbt;
 				final BlockPos pos = NBTUtil.getPosFromTag(comp.getCompoundTag(POS_ID));
 				immutableMap.put(pos, signal);
+				nameBuilder.put(pos, comp.getString(SIGNAL_NAME));
 			});
 			properties.set(immutableMap.build());
+			names.set(nameBuilder.build());
 			return;
 		}
 		this.run.accept(compound);
@@ -99,4 +105,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 		return this.properties.get();
 	}
 	
+	public Map<BlockPos, String> getNames() {
+		return this.names.get();
+	}
 }

@@ -3,6 +3,7 @@ package eu.gir.girsignals.signalbox;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -19,9 +20,9 @@ import net.minecraft.util.Rotation;
 
 public class SignalNode implements UIAutoSync {
 	
-	private final String MODE = "mode";
-	private final String ROTATION = "rotation";
-	private final String OPTION = "option";
+	private static final String MODE = "mode";
+	private static final String ROTATION = "rotation";
+	private static final String OPTION = "option";
 	
 	private final Point point;
 	private HashMap<Entry<Point, Point>, Entry<EnumGuiMode, Rotation>> possibleConnections = new HashMap<>();
@@ -71,6 +72,7 @@ public class SignalNode implements UIAutoSync {
 				}
 				break;
 			case STRAIGHT:
+			case END:
 				switch (e.getValue()) {
 				case NONE:
 				case CLOCKWISE_180:
@@ -129,8 +131,10 @@ public class SignalNode implements UIAutoSync {
 	
 	@Override
 	public void write(NBTTagCompound compound) {
-		if (possibleModes.isEmpty())
+		if (possibleModes.isEmpty()) {
+			compound.removeTag(this.getID());
 			return;
+		}
 		final NBTTagList pointList = new NBTTagList();
 		possibleModes.forEach((mode, option) -> {
 			final NBTTagCompound entry = new NBTTagCompound();
@@ -165,14 +169,6 @@ public class SignalNode implements UIAutoSync {
 	public void setID(String id) {
 	}
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (obj instanceof SignalNode) {
-			this.point.equals(((SignalNode) obj).getPoint());
-		}
-		return super.equals(obj);
-	}
-	
 	public Optional<PathOption> getOption(final EnumGuiMode mode) {
 		final Optional<Entry<Entry<EnumGuiMode, Rotation>, PathOption>> opt = this.possibleModes.entrySet().stream().filter(e -> e.getKey().getKey().equals(mode)).findFirst();
 		if (opt.isPresent()) {
@@ -193,9 +189,27 @@ public class SignalNode implements UIAutoSync {
 	public boolean has(EnumGuiMode mode) {
 		return this.possibleModes.keySet().stream().anyMatch(e -> e.getKey().equals(mode));
 	}
-
+	
 	@Override
 	public String toString() {
 		return "Node[point=" + this.point + "]";
 	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(point);
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		final SignalNode other = (SignalNode) obj;
+		return Objects.equals(point, other.point);
+	}
+	
 }

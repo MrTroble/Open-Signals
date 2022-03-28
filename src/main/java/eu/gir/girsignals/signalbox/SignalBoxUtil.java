@@ -54,7 +54,7 @@ public class SignalBoxUtil {
 	}
 	
 	private static boolean isHP(final SignalNode node, final SignalNode other) {
-		return node.has(EnumGuiMode.HP) && other.has(EnumGuiMode.HP);
+		return node.has(EnumGuiMode.HP) && (other.has(EnumGuiMode.HP));
 	}
 	
 	public static Rotation getRotationFromDelta(final Point delta) {
@@ -114,7 +114,7 @@ public class SignalBoxUtil {
 		final SignalNode lastNode = modeGrid.get(p2);
 		final SignalNode firstNode = modeGrid.get(p1);
 		final boolean isrs = isRS(lastNode, firstNode);
-		if (!(isrs || isHP(lastNode, firstNode))) {
+		if (!(isrs || isHP(lastNode, firstNode)) && !lastNode.has(EnumGuiMode.END)) {
 			return Optional.empty();
 		}
 		final HashMap<Point, Point> closedList = new HashMap<>();
@@ -133,7 +133,7 @@ public class SignalBoxUtil {
 			openList.remove(currentNode);
 			final SignalNode cSNode = modeGrid.get(currentNode);
 			if (currentNode.equals(p2)) {
-				if (!checkApplicable(cSNode, modeGrid.get(closedList.get(currentNode)), isrs))
+				if (!checkApplicable(cSNode, modeGrid.get(closedList.get(currentNode)), isrs) && !lastNode.has(EnumGuiMode.END))
 					return Optional.empty();
 				final ArrayList<SignalNode> nodes = new ArrayList<>();
 				for (Point point = currentNode; point != null; point = closedList.get(point)) {
@@ -192,8 +192,8 @@ public class SignalBoxUtil {
 		GlStateManager.enableTexture2D();
 		bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 		final double offset = 0.25 * textureID;
-		bufferbuilder.pos((double) 0, (double) entity.getHeight(), textureID).tex(offset, 1).endVertex();
-		bufferbuilder.pos((double) entity.getWidth(), (double) entity.getHeight(), textureID).tex(offset + 0.25, 1).endVertex();
+		bufferbuilder.pos((double) 0, (double) entity.getHeight(), textureID).tex(offset, 0.5).endVertex();
+		bufferbuilder.pos((double) entity.getWidth(), (double) entity.getHeight(), textureID).tex(offset + 0.25, 0.5).endVertex();
 		bufferbuilder.pos((double) entity.getWidth(), (double) 0, textureID).tex(offset + 0.25, 0).endVertex();
 		bufferbuilder.pos((double) 0, (double) 0, textureID).tex(offset, 0).endVertex();
 		tessellator.draw();
