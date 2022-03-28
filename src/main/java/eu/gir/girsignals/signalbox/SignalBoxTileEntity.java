@@ -42,7 +42,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	public static final String ERROR_STRING = "error";
 	public static final String REMOVE_SIGNAL = "removeSignal";
-
+	
 	private static final String LINKED_POS_LIST = "linkedPos";
 	private static final String GUI_TAG = "guiTag";
 	private static final String LINK_TYPE = "linkType";
@@ -104,19 +104,27 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		world.markAndNotifyBlock(newposition, chunk, state, state, 3);
 	}
 	
-	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos newposition) {
-		loadAndConfig(speed, lastPosition, newposition, null);
+	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos nextPosition) {
+		loadAndConfig(speed, lastPosition, nextPosition, null);
+	}
+	
+	private void config(final int speed, SignalTileEnity lastTile, SignalTileEnity nextTile, final ISignalAutoconfig override) {
+		final Signal last = lastTile.getSignal();
+		final ISignalAutoconfig config = override == null ? last.getConfig() : override;
+		if (config == null)
+			return;
+		config.change(speed, lastTile, nextTile);
 	}
 	
 	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos nextPosition, final ISignalAutoconfig override) {
-		loadChunkAndGetTile(world, lastPosition, (lastTile, chunk) -> loadChunkAndGetTile(world, nextPosition, (nextTile, _u2) -> {
-			final Signal last = lastTile.getSignal();
-			final ISignalAutoconfig config = override == null ? last.getConfig():override;
-			if (config == null)
-				return;
-			config.change(speed, lastTile, nextTile);
-			notifyBlockChanges(nextPosition, chunk);
-		}));
+		loadChunkAndGetTile(world, lastPosition, (lastTile, chunk) -> {
+			if (nextPosition == null) {
+				config(speed, lastTile, null, override);
+			} else {
+				loadChunkAndGetTile(world, nextPosition, (nextTile, _u2) -> config(speed, lastTile, nextTile, override));
+			}
+			notifyBlockChanges(lastPosition, chunk);
+		});
 	}
 	
 	private void loadAndReset(final BlockPos position) {
@@ -210,13 +218,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	private void setPathway(final ArrayList<SignalNode> nodes, final int speed) {
-		final SignalNode lastNode = nodes.get(0);
-		final SignalNode nextNode = nodes.get(nodes.size() - 1);
+		final SignalNode lastNode = nodes.get(nodes.size() - 1);
+		final SignalNode nextNode = nodes.get(0);
 		final Optional<PathOption> lastOptional = lastNode.getOption(EnumGuiMode.HP);
 		final Optional<PathOption> nextOptional = nextNode.getOption(EnumGuiMode.HP);
 		if (lastOptional.isPresent()) {
 			final BlockPos lastPosition = lastOptional.get().getLinkedPosition(LinkType.SIGNAL);
-			final BlockPos nextPosition = lastOptional.isPresent() ? nextOptional.get().getLinkedPosition(LinkType.SIGNAL):null;
+			final BlockPos nextPosition = nextOptional.isPresent() ? nextOptional.get().getLinkedPosition(LinkType.SIGNAL) : null;
 			if (lastPosition != null && !lastPosition.equals(nextPosition)) {
 				loadAndConfig(speed, lastPosition, nextPosition);
 				for (final SignalNode node : nodes) {
@@ -233,7 +241,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			}
 			return;
 		}
-		pathWayEnd.keySet().stream().filter(list -> list != null && list.get(0).equals(nextNode)).findAny().ifPresent(list -> setPathway(list, pathWayEnd.get(list)));
+		pathWayEnd.keySet().stream().filter(list -> list != null && list.get(0).equals(lastNode)).findAny().ifPresent(list -> setPathway(list, pathWayEnd.get(list)));
 	}
 	
 	@Override
@@ -243,7 +251,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		if (compound.hasKey(REMOVE_SIGNAL)) {
 			final NBTTagCompound request = (NBTTagCompound) compound.getTag(REMOVE_SIGNAL);
 			final BlockPos p1 = NBTUtil.getPosFromTag(request);
-			if(signals.containsKey(p1)) {
+			if (signals.containsKey(p1)) {
 				signals.remove(p1);
 				loadAndReset(p1);
 			}
@@ -321,7 +329,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			linkedBlocks.forEach((linkedPos, _u) -> loadChunkAndGetTile(world, linkedPos, this::updateSingle));
 		}).start();
 	}
-		
+	
 	@Override
 	public boolean unlink() {
 		signals.keySet().forEach(this::loadAndReset);
