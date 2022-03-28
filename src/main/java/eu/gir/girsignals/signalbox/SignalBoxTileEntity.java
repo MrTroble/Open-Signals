@@ -109,12 +109,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos nextPosition, final ISignalAutoconfig override) {
-		loadChunkAndGetTile(world, lastPosition, (oldtile, chunk) -> loadChunkAndGetTile(world, nextPosition, (newtile, _u2) -> {
-			final Signal current = newtile.getSignal();
-			final ISignalAutoconfig config = override == null ? current.getConfig():override;
+		loadChunkAndGetTile(world, lastPosition, (lastTile, chunk) -> loadChunkAndGetTile(world, nextPosition, (nextTile, _u2) -> {
+			final Signal last = lastTile.getSignal();
+			final ISignalAutoconfig config = override == null ? last.getConfig():override;
 			if (config == null)
 				return;
-			config.change(speed, newtile, oldtile);
+			config.change(speed, lastTile, nextTile);
 			notifyBlockChanges(nextPosition, chunk);
 		}));
 	}
