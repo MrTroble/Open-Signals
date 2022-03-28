@@ -222,7 +222,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final SignalNode nextNode = nodes.get(0);
 		final Optional<PathOption> lastOptional = lastNode.getOption(EnumGuiMode.HP);
 		final Optional<PathOption> nextOptional = nextNode.getOption(EnumGuiMode.HP);
-		if (lastOptional.isPresent()) {
+		if (lastOptional.isPresent() && (nextOptional.isPresent() || !nextNode.has(EnumGuiMode.RS))) {
 			final BlockPos lastPosition = lastOptional.get().getLinkedPosition(LinkType.SIGNAL);
 			final BlockPos nextPosition = nextOptional.isPresent() ? nextOptional.get().getLinkedPosition(LinkType.SIGNAL) : null;
 			if (lastPosition != null && !lastPosition.equals(nextPosition)) {
