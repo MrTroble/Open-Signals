@@ -1,6 +1,6 @@
 # Changelog
 
-## [Alpha Update] 03.25.2022
+## [Beta Update] 03.28.2022
 
 * fix: Update issue with equals method
 * feat: Signals automatically reset on link
