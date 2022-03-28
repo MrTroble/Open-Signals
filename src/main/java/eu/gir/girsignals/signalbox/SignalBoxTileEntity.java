@@ -108,14 +108,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		loadAndConfig(speed, lastPosition, newposition, null);
 	}
 	
-	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos newposition, final ISignalAutoconfig override) {
-		loadChunkAndGetTile(world, lastPosition, (oldtile, chunk) -> loadChunkAndGetTile(world, newposition, (newtile, _u2) -> {
+	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos nextPosition, final ISignalAutoconfig override) {
+		loadChunkAndGetTile(world, lastPosition, (oldtile, chunk) -> loadChunkAndGetTile(world, nextPosition, (newtile, _u2) -> {
 			final Signal current = newtile.getSignal();
 			final ISignalAutoconfig config = override == null ? current.getConfig():override;
 			if (config == null)
 				return;
 			config.change(speed, newtile, oldtile);
-			notifyBlockChanges(newposition, chunk);
+			notifyBlockChanges(nextPosition, chunk);
 		}));
 	}
 	
@@ -210,31 +210,30 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	private void setPathway(final ArrayList<SignalNode> nodes, final int speed) {
-		final SignalNode firstNode = nodes.get(nodes.size() - 1);
 		final SignalNode lastNode = nodes.get(0);
-		final Optional<PathOption> lPO = lastNode.getOption(EnumGuiMode.HP);
-		final Optional<PathOption> fPO = firstNode.getOption(EnumGuiMode.HP);
-		if (fPO.isPresent()) {
-			final BlockPos lastPosition = lPO.isPresent() ? lPO.get().getLinkedPosition(LinkType.SIGNAL):null;
-			final BlockPos firstPosition = fPO.get().getLinkedPosition(LinkType.SIGNAL);
-			if (firstPosition != null && !lastPosition.equals(firstPosition)) {
-				loadAndConfig(speed, lastPosition, firstPosition);
+		final SignalNode nextNode = nodes.get(nodes.size() - 1);
+		final Optional<PathOption> lastOptional = lastNode.getOption(EnumGuiMode.HP);
+		final Optional<PathOption> nextOptional = nextNode.getOption(EnumGuiMode.HP);
+		if (lastOptional.isPresent()) {
+			final BlockPos lastPosition = lastOptional.get().getLinkedPosition(LinkType.SIGNAL);
+			final BlockPos nextPosition = lastOptional.isPresent() ? nextOptional.get().getLinkedPosition(LinkType.SIGNAL):null;
+			if (lastPosition != null && !lastPosition.equals(nextPosition)) {
+				loadAndConfig(speed, lastPosition, nextPosition);
 				for (final SignalNode node : nodes) {
 					node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(speed, lastPosition, option.getLinkedPosition(LinkType.SIGNAL)));
 				}
 			}
 		} else {
-			final Optional<PathOption> lRSPO = lastNode.getOption(EnumGuiMode.RS);
-			final Optional<PathOption> fRSPO = firstNode.getOption(EnumGuiMode.RS);
-			if (fRSPO.isPresent()) {
-				final BlockPos lastPosition = lRSPO.get().getLinkedPosition(LinkType.SIGNAL);
+			final Optional<PathOption> lastRSOptional = lastNode.getOption(EnumGuiMode.RS);
+			if (lastRSOptional.isPresent()) {
+				final BlockPos lastPosition = lastRSOptional.get().getLinkedPosition(LinkType.SIGNAL);
 				if (lastPosition != null) {
 					loadAndConfig(speed, lastPosition, null, RSSignalConfig.RS_CONFIG);
 				}
 			}
 			return;
 		}
-		pathWayEnd.keySet().stream().filter(list -> list != null && list.get(0).equals(firstNode)).findAny().ifPresent(list -> setPathway(list, pathWayEnd.get(list)));
+		pathWayEnd.keySet().stream().filter(list -> list != null && list.get(0).equals(nextNode)).findAny().ifPresent(list -> setPathway(list, pathWayEnd.get(list)));
 	}
 	
 	@Override
