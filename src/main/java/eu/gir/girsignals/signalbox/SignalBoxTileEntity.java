@@ -191,7 +191,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		});
 	}
 	
-	public void onWayAdd(final ArrayList<SignalNode> nodes) {
+	private void onWayAdd(final ArrayList<SignalNode> nodes) {
 		final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
 		for (int i = 1; i < nodes.size() - 1; i++) {
 			final Point oldPos = nodes.get(i - 1).getPoint();
@@ -214,10 +214,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final SignalNode lastNode = nodes.get(0);
 		final Optional<PathOption> lPO = lastNode.getOption(EnumGuiMode.HP);
 		final Optional<PathOption> fPO = firstNode.getOption(EnumGuiMode.HP);
-		if (lPO.isPresent() && fPO.isPresent()) {
-			final BlockPos lastPosition = lPO.get().getLinkedPosition(LinkType.SIGNAL);
+		if (fPO.isPresent()) {
+			final BlockPos lastPosition = lPO.isPresent() ? lPO.get().getLinkedPosition(LinkType.SIGNAL):null;
 			final BlockPos firstPosition = fPO.get().getLinkedPosition(LinkType.SIGNAL);
-			if (lastPosition != null && firstPosition != null && !lastPosition.equals(firstPosition)) {
+			if (firstPosition != null && !lastPosition.equals(firstPosition)) {
 				loadAndConfig(speed, lastPosition, firstPosition);
 				for (final SignalNode node : nodes) {
 					node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(speed, lastPosition, option.getLinkedPosition(LinkType.SIGNAL)));
@@ -226,11 +226,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		} else {
 			final Optional<PathOption> lRSPO = lastNode.getOption(EnumGuiMode.RS);
 			final Optional<PathOption> fRSPO = firstNode.getOption(EnumGuiMode.RS);
-			if (lRSPO.isPresent() && fRSPO.isPresent()) {
+			if (fRSPO.isPresent()) {
 				final BlockPos lastPosition = lRSPO.get().getLinkedPosition(LinkType.SIGNAL);
-				final BlockPos firstPosition = fRSPO.get().getLinkedPosition(LinkType.SIGNAL);
-				if (lastPosition != null && firstPosition != null && !lastPosition.equals(firstPosition)) {
-					loadAndConfig(speed, lastPosition, firstPosition, RSSignalConfig.RS_CONFIG);
+				if (lastPosition != null) {
+					loadAndConfig(speed, lastPosition, null, RSSignalConfig.RS_CONFIG);
 				}
 			}
 			return;

@@ -65,54 +65,65 @@ public final class HVSignalConfig implements ISignalAutoconfig {
 	@Override
 	public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
 		final HashMap<SEProperty, Object> values = new HashMap<>();
-		if (speed < 7 && speed > 0 && speed != 4) {
-			current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
-				final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
-				current.setProperty(SignalHV.ZS3, zs32);
+		if (next != null) {
+			if (speed < 7 && speed > 0 && speed != 4) {
+				current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
+					final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
+					current.setProperty(SignalHV.ZS3, zs32);
+				});
+				values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
+				values.put(SignalHV.HPHOME, HP_HOME.HP2);
+				values.put(SignalHV.STOPSIGNAL, HP.HP2);
+			} else if (speed == 4) {
+				values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
+				values.put(SignalHV.HPHOME, HP_HOME.HP2);
+				values.put(SignalHV.STOPSIGNAL, HP.HP2);
+			} else if (speed >= 7 && speed <= 16) {
+				current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
+					final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
+					current.setProperty(SignalHV.ZS3, zs32);
+				});
+				values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
+				values.put(SignalHV.HPHOME, HP_HOME.HP1);
+				values.put(SignalHV.STOPSIGNAL, HP.HP1);
+			} else {
+				values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
+				values.put(SignalHV.HPHOME, HP_HOME.HP1);
+				values.put(SignalHV.STOPSIGNAL, HP.HP1);
+			}
+			current.getProperty(SignalHV.DISTANTSIGNAL).ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
+				VR vr = VR.VR0;
+				switch ((HP_TYPE) type) {
+				case HPBLOCK:
+					vr = next((HP_BLOCK) next.getProperty(SignalHV.HPBLOCK).get());
+					break;
+				case HPHOME:
+					vr = next((HP_HOME) next.getProperty(SignalHV.HPHOME).get());
+					break;
+				case STOPSIGNAL:
+					vr = next((HP) next.getProperty(SignalHV.STOPSIGNAL).get());
+					break;
+				case OFF:
+				default:
+					break;
+				}
+				current.setProperty(SignalHV.DISTANTSIGNAL, vr);
+			}));
+			current.getProperty(SignalHV.ZS3V).ifPresent(_u -> {
+				current.setProperty(SignalHV.ZS3V, ZS32.OFF);
+				next.getProperty(SignalHV.ZS3).ifPresent(prevzs3 -> current.setProperty(SignalHV.ZS3V, (ZS32) prevzs3));
 			});
-			values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
-			values.put(SignalHV.HPHOME, HP_HOME.HP2);
-			values.put(SignalHV.STOPSIGNAL, HP.HP2);
-		} else if (speed == 4) {
-			values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
-			values.put(SignalHV.HPHOME, HP_HOME.HP2);
-			values.put(SignalHV.STOPSIGNAL, HP.HP2);
-		} else if (speed >= 7 && speed <= 16) {
-			current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
-				final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
-				current.setProperty(SignalHV.ZS3, zs32);
-			});
-			values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
-			values.put(SignalHV.HPHOME, HP_HOME.HP1);
-			values.put(SignalHV.STOPSIGNAL, HP.HP1);
 		} else {
 			values.put(SignalHV.HPBLOCK, HP_BLOCK.HP1);
-			values.put(SignalHV.HPHOME, HP_HOME.HP1);
-			values.put(SignalHV.STOPSIGNAL, HP.HP1);
+			values.put(SignalHV.HPHOME, HP_HOME.HP2);
+			values.put(SignalHV.STOPSIGNAL, HP.HP2);
+			values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
+			values.put(SignalHV.ZS3, ZS32.Z3);
+			values.put(SignalHV.ZS3V, ZS32.OFF);
+			values.put(SignalHV.ZS1, false);
+			values.put(SignalHV.ZS7, false);
 		}
 		this.changeIfPresent(values, current);
-		current.getProperty(SignalHV.DISTANTSIGNAL).ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
-			VR vr = VR.VR0;
-			switch ((HP_TYPE) type) {
-			case HPBLOCK:
-				vr = next((HP_BLOCK) next.getProperty(SignalHV.HPBLOCK).get());
-				break;
-			case HPHOME:
-				vr = next((HP_HOME) next.getProperty(SignalHV.HPHOME).get());
-				break;
-			case STOPSIGNAL:
-				vr = next((HP) next.getProperty(SignalHV.STOPSIGNAL).get());
-				break;
-			case OFF:
-			default:
-				break;
-			}
-			current.setProperty(SignalHV.DISTANTSIGNAL, vr);
-		}));
-		current.getProperty(SignalHV.ZS3V).ifPresent(_u -> {
-			current.setProperty(SignalHV.ZS3V, ZS32.OFF);
-			next.getProperty(SignalHV.ZS3).ifPresent(prevzs3 -> current.setProperty(SignalHV.ZS3V, (ZS32) prevzs3));
-		});
 	}
 	
 	@SuppressWarnings({ "rawtypes" })

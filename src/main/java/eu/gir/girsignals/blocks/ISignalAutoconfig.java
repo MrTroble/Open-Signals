@@ -2,12 +2,14 @@ package eu.gir.girsignals.blocks;
 
 import java.util.HashMap;
 
+import javax.annotation.Nullable;
+
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public interface ISignalAutoconfig {
 	
-	void change(final int speed, final SignalTileEnity current, final SignalTileEnity next);
+	void change(final int speed, final SignalTileEnity current, @Nullable final SignalTileEnity next);
 	
 	void reset(final SignalTileEnity current);
 	
