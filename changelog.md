@@ -1,5 +1,9 @@
 # Changelog
 
+## [Update] 04.01.2022 - 1
+
+* feat: update lang and textures
+
 ## [Update] 02.04.2022 - 1
 
 * Imgbot optimizations
