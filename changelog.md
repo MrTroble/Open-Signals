@@ -1,5 +1,10 @@
 # Changelog
 
+## [Beta Update]
+
+* fix: Distant signals not updating
+* fix: Distant signals not reseting if pathway is reset
+
 ## [Beta Update] 03.28.2022
 
 * fix: Update issue with equals method
