@@ -147,7 +147,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		final SignalNode currentNode = modeGrid.get(resetPoint);
 		resetSignal(resetPoint, currentNode, EnumGuiMode.HP);
 		resetSignal(resetPoint, currentNode, EnumGuiMode.RS);
-		pathWayEnd.keySet().stream().filter(list -> list.get(list.size() - 1).equals(currentNode)).findAny().ifPresent(pathWayEnd::remove);
+		pathWayEnd.keySet().stream().filter(list -> list.get(list.size() - 1).equals(currentNode)).findAny().ifPresent(pathway -> {
+			pathway.stream().filter(signal -> signal.has(EnumGuiMode.VP)).forEach(signal -> loadAndReset(signal.getOption(EnumGuiMode.VP).get().getLinkedPosition(LinkType.SIGNAL)));
+			pathWayEnd.remove(pathway);
+		});
 		resendSignalTilesToUI();
 	}
 	
@@ -228,7 +231,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			if (lastPosition != null && !lastPosition.equals(nextPosition)) {
 				loadAndConfig(speed, lastPosition, nextPosition);
 				for (final SignalNode node : nodes) {
-					node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(speed, lastPosition, option.getLinkedPosition(LinkType.SIGNAL)));
+					if(node.equals(lastNode) || node.equals(nextNode))
+						continue;
+					node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(speed, option.getLinkedPosition(LinkType.SIGNAL), nextPosition));
 				}
 			}
 		} else {
