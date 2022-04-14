@@ -8,7 +8,6 @@ import com.google.common.collect.ImmutableMap.Builder;
 
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
-import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.guilib.ecs.GuiSyncNetwork;
 import eu.gir.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.entity.player.EntityPlayer;
@@ -18,6 +17,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IWorldNameable;
 
 public class ContainerSignalBox extends Container implements UIClientSync {
 	
@@ -51,11 +51,11 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 			this.tile.getPositions().keySet().forEach(pos -> {
 				final NBTTagCompound entry = new NBTTagCompound();
 				entry.setTag(POS_ID, NBTUtil.createPosTag(pos));
+				tile.loadChunkAndGetTile(IWorldNameable.class, tile.getWorld(), pos, (sig, _u) -> entry.setString(SIGNAL_NAME, sig.getName()));
 				final Signal signal = tile.getSignal(pos);
-				if (signal == null)
-					return;
-				entry.setInteger(SIGNAL_ID, signal.getID());
-				tile.loadChunkAndGetTile(SignalTileEnity.class, tile.getWorld(), pos, (sig, _u) -> entry.setString(SIGNAL_NAME, sig.getName()));
+				if (signal != null) {
+					entry.setInteger(SIGNAL_ID, signal.getID());
+				}
 				typeList.appendTag(entry);
 			});
 			compound.setTag(UPDATE_SET, typeList);
@@ -78,10 +78,12 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 			final Builder<BlockPos, Signal> immutableMap = new Builder<>();
 			final Builder<BlockPos, String> nameBuilder = new Builder<>();
 			update.forEach(nbt -> {
-				final Signal signal = Signal.SIGNALLIST.get(compound.getInteger(SIGNAL_ID));
 				final NBTTagCompound comp = (NBTTagCompound) nbt;
 				final BlockPos pos = NBTUtil.getPosFromTag(comp.getCompoundTag(POS_ID));
-				immutableMap.put(pos, signal);
+				if(compound.hasKey(SIGNAL_ID)) {
+					final Signal signal = Signal.SIGNALLIST.get(compound.getInteger(SIGNAL_ID));
+					immutableMap.put(pos, signal);
+				}
 				nameBuilder.put(pos, comp.getString(SIGNAL_NAME));
 			});
 			properties.set(immutableMap.build());

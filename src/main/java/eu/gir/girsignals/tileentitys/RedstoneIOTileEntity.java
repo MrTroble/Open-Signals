@@ -20,7 +20,7 @@ public class RedstoneIOTileEntity extends TileEntity implements IWorldNameable, 
 	public String getName() {
 		if(hasCustomName())
 			return name;
-		return this.blockType.getLocalizedName();
+		return this.getBlockType().getLocalizedName();
 	}
 
 	@Override
