@@ -2,6 +2,11 @@
 
 ## [Beta Update]
 
+* fix: Update UI Lib to fix packet crashing
+* opt: Reduced network load through compression
+
+## [Beta Update]
+
 * fix: Distant signals not updating
 * fix: Distant signals not reseting if pathway is reset
 
