@@ -6,10 +6,10 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldNameable;
 
-public class RedstoneIOTileEntity extends TileEntity implements IWorldNameable {
+public class RedstoneIOTileEntity extends TileEntity implements IWorldNameable, IChunkloadable {
 
 	private String name = null;
-	private ArrayList<BlockPos> linkedPositions;
+	private ArrayList<BlockPos> linkedPositions = new ArrayList<>();
 	
 	@Override
 	public String getName() {
@@ -23,4 +23,13 @@ public class RedstoneIOTileEntity extends TileEntity implements IWorldNameable {
 		return this.name != null;
 	}
 	
+	public void link(BlockPos pos) {
+		if(!linkedPositions.contains(pos))
+			linkedPositions.add(pos);
+	}
+	
+	public void unlink(BlockPos pos) {
+		if(linkedPositions.contains(pos))
+			linkedPositions.remove(pos);
+	}
 }

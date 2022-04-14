@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
+import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.guilib.ecs.GuiSyncNetwork;
 import eu.gir.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.entity.player.EntityPlayer;
@@ -54,7 +55,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 				if (signal == null)
 					return;
 				entry.setInteger(SIGNAL_ID, signal.getID());
-				tile.loadChunkAndGetTile(tile.getWorld(), pos, (sig, _u) -> entry.setString(SIGNAL_NAME, sig.getName()));
+				tile.loadChunkAndGetTile(SignalTileEnity.class, tile.getWorld(), pos, (sig, _u) -> entry.setString(SIGNAL_NAME, sig.getName()));
 				typeList.appendTag(entry);
 			});
 			compound.setTag(UPDATE_SET, typeList);
