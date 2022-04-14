@@ -25,6 +25,7 @@ import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
 import eu.gir.girsignals.signalbox.config.RSSignalConfig;
 import eu.gir.girsignals.tileentitys.IChunkloadable;
+import eu.gir.girsignals.tileentitys.RedstoneIOTileEntity;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
 import eu.gir.guilib.ecs.GuiSyncNetwork;
@@ -135,6 +136,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			config.reset(signaltile);
 			notifyBlockChanges(position, chunk);
 		});
+		
 	}
 	
 	private void resendSignalTilesToUI() {
@@ -231,7 +233,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			if (lastPosition != null && !lastPosition.equals(nextPosition)) {
 				loadAndConfig(speed, lastPosition, nextPosition);
 				for (final SignalNode node : nodes) {
-					if(node.equals(lastNode) || node.equals(nextNode))
+					if (node.equals(lastNode) || node.equals(nextNode))
 						continue;
 					node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(speed, option.getLinkedPosition(LinkType.SIGNAL), nextPosition));
 				}
@@ -313,6 +315,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			if (type.equals(LinkType.SIGNAL)) {
 				loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle);
 				loadAndReset(linkedPos);
+			} else {
+				loadChunkAndGetTile(RedstoneIOTileEntity.class, world, linkedPos, (tile, _u) -> tile.link(this.pos));
 			}
 		}
 		linkedBlocks.put(linkedPos, type);
@@ -338,6 +342,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	@Override
 	public boolean unlink() {
 		signals.keySet().forEach(this::loadAndReset);
+		linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue())).forEach(entry -> {
+			loadChunkAndGetTile(RedstoneIOTileEntity.class, world, entry.getKey(), (tile, _u) -> tile.unlink(pos));
+		});
 		linkedBlocks.clear();
 		signals.clear();
 		syncClient();
