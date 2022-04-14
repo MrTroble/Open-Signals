@@ -28,7 +28,7 @@ import net.minecraft.world.IWorldNameable;
 import net.minecraftforge.fml.common.Optional;
 
 @Optional.Interface(iface = "li.cil.oc.api.network.SimpleComponent", modid = "opencomputers")
-public class SignalControllerTileEntity extends SyncableTileEntity implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile, IChunkloadable<SignalTileEnity> {
+public class SignalControllerTileEntity extends SyncableTileEntity implements ISyncable, SimpleComponent, IWorldNameable, ILinkableTile, IChunkloadable {
 	
 	private BlockPos linkedSignalPosition = null;
 	private int[] listOfSupportedIndicies;
@@ -90,7 +90,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity implements IS
 	
 	public void onLink() {
 		new Thread(() -> {
-			loadChunkAndGetTile(world, linkedSignalPosition, (signaltile, _u) -> {
+			loadChunkAndGetTile(SignalTileEnity.class, world, linkedSignalPosition, (signaltile, _u) -> {
 				signalTypeCache = signaltile.getBlockID();
 				tableOfSupportedSignalTypes = getSupportedSignalStates(signaltile);
 				listOfSupportedIndicies = tableOfSupportedSignalTypes.values().stream().mapToInt(Integer::intValue).toArray();
@@ -138,7 +138,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity implements IS
 		if (!find(getSupportedSignalTypesImpl(), type))
 			return false;
 		final AtomicBoolean rtc = new AtomicBoolean(true);
-		loadChunkAndGetTile(world, linkedSignalPosition, (tile, chunk) -> {
+		loadChunkAndGetTile(SignalTileEnity.class, world, linkedSignalPosition, (tile, chunk) -> {
 			IBlockState state = chunk.getBlockState(linkedSignalPosition);
 			Signal block = (Signal) state.getBlock();
 			SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
@@ -173,7 +173,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity implements IS
 		if (!find(getSupportedSignalTypesImpl(), type))
 			return -1;
 		final AtomicReference<SignalTileEnity> entity = new AtomicReference<SignalTileEnity>();
-		loadChunkAndGetTile(world, linkedSignalPosition, (sig, ch) -> entity.set(sig));
+		loadChunkAndGetTile(SignalTileEnity.class, world, linkedSignalPosition, (sig, ch) -> entity.set(sig));
 		final SignalTileEnity tile = entity.get();
 		if (tile == null)
 			return -1;
@@ -208,7 +208,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity implements IS
 	public boolean hasLink() {
 		if (linkedSignalPosition == null)
 			return false;
-		if (loadChunkAndGetTile(world, linkedSignalPosition, (x, y) -> {
+		if (loadChunkAndGetTile(SignalTileEnity.class, world, linkedSignalPosition, (x, y) -> {
 		}))
 			return true;
 		if (!world.isRemote)

@@ -38,7 +38,7 @@ import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
-public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable<SignalTileEnity>, ILinkableTile {
+public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable, ILinkableTile {
 	
 	public static final String ERROR_STRING = "error";
 	public static final String REMOVE_SIGNAL = "removeSignal";
@@ -117,18 +117,18 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	private void loadAndConfig(final int speed, final BlockPos lastPosition, final BlockPos nextPosition, final ISignalAutoconfig override) {
-		loadChunkAndGetTile(world, lastPosition, (lastTile, chunk) -> {
+		loadChunkAndGetTile(SignalTileEnity.class, world, lastPosition, (lastTile, chunk) -> {
 			if (nextPosition == null) {
 				config(speed, lastTile, null, override);
 			} else {
-				loadChunkAndGetTile(world, nextPosition, (nextTile, _u2) -> config(speed, lastTile, nextTile, override));
+				loadChunkAndGetTile(SignalTileEnity.class, world, nextPosition, (nextTile, _u2) -> config(speed, lastTile, nextTile, override));
 			}
 			notifyBlockChanges(lastPosition, chunk);
 		});
 	}
 	
 	private void loadAndReset(final BlockPos position) {
-		loadChunkAndGetTile(world, position, (signaltile, chunk) -> {
+		loadChunkAndGetTile(SignalTileEnity.class, world, position, (signaltile, chunk) -> {
 			final ISignalAutoconfig config = signaltile.getSignal().getConfig();
 			if (config == null)
 				return;
@@ -311,7 +311,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		}
 		if (!world.isRemote) {
 			if (type.equals(LinkType.SIGNAL)) {
-				loadChunkAndGetTile(world, linkedPos, this::updateSingle);
+				loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle);
 				loadAndReset(linkedPos);
 			}
 		}
@@ -331,7 +331,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			return;
 		signals.clear();
 		new Thread(() -> {
-			linkedBlocks.forEach((linkedPos, _u) -> loadChunkAndGetTile(world, linkedPos, this::updateSingle));
+			linkedBlocks.forEach((linkedPos, _u) -> loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle));
 		}).start();
 	}
 	
