@@ -13,7 +13,6 @@ import eu.gir.girsignals.EnumSignals.EnumMode;
 import eu.gir.girsignals.EnumSignals.EnumState;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
-import eu.gir.girsignals.blocks.IChunkloadable;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.guilib.ecs.interfaces.ISyncable;
 import eu.gir.linkableapi.ILinkableTile;

@@ -1,4 +1,4 @@
-package eu.gir.girsignals.blocks;
+package eu.gir.girsignals.tileentitys;
 
 import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;

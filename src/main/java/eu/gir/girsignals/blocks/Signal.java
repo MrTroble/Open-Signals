@@ -15,6 +15,7 @@ import eu.gir.girsignals.GIRSignalsConfig;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.items.Placementtool;
+import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;

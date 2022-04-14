@@ -1,4 +1,4 @@
-package eu.gir.girsignals.blocks;
+package eu.gir.girsignals.signalbox.config;
 
 import java.util.HashMap;
 

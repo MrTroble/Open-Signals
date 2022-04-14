@@ -18,13 +18,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
-import eu.gir.girsignals.blocks.IChunkloadable;
-import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
+import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
 import eu.gir.girsignals.signalbox.config.RSSignalConfig;
+import eu.gir.girsignals.tileentitys.IChunkloadable;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
 import eu.gir.guilib.ecs.GuiSyncNetwork;

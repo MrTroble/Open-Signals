@@ -4,7 +4,6 @@ import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.SH_LIGHT;
-import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
