@@ -91,6 +91,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity implements IS
 	public void onLink() {
 		new Thread(() -> {
 			loadChunkAndGetTile(SignalTileEnity.class, world, linkedSignalPosition, (signaltile, _u) -> {
+				while(!world.isBlockLoaded(linkedSignalPosition))
+					continue;
 				signalTypeCache = signaltile.getBlockID();
 				tableOfSupportedSignalTypes = getSupportedSignalStates(signaltile);
 				listOfSupportedIndicies = tableOfSupportedSignalTypes.values().stream().mapToInt(Integer::intValue).toArray();

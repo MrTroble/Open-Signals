@@ -1,6 +1,7 @@
 package eu.gir.girsignals.signalbox;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Objects;
@@ -18,7 +19,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Rotation;
 
-public class SignalNode implements UIAutoSync {
+public class SignalNode implements UIAutoSync, Iterable<PathOption> {
 	
 	private static final String MODE = "mode";
 	private static final String ROTATION = "rotation";
@@ -211,5 +212,12 @@ public class SignalNode implements UIAutoSync {
 		final SignalNode other = (SignalNode) obj;
 		return Objects.equals(point, other.point);
 	}
+
+	
+	@Override
+	public Iterator<PathOption> iterator() {
+		return possibleModes.values().iterator();
+	}
+
 	
 }

@@ -2,6 +2,8 @@ package eu.gir.girsignals.tileentitys;
 
 import java.util.ArrayList;
 
+import eu.gir.girsignals.blocks.RedstoneIO;
+import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -10,7 +12,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldNameable;
 
 public class RedstoneIOTileEntity extends TileEntity implements IWorldNameable, IChunkloadable {
-
+	
+	public static final String STATUS = "status";
+	
 	private static final String LINKED_LIST = "linkedList";
 	
 	private String name = null;
@@ -18,11 +22,11 @@ public class RedstoneIOTileEntity extends TileEntity implements IWorldNameable, 
 	
 	@Override
 	public String getName() {
-		if(hasCustomName())
+		if (hasCustomName())
 			return name;
 		return this.getBlockType().getLocalizedName();
 	}
-
+	
 	@Override
 	public NBTTagCompound writeToNBT(NBTTagCompound compound) {
 		final NBTTagList list = new NBTTagList();
@@ -45,13 +49,23 @@ public class RedstoneIOTileEntity extends TileEntity implements IWorldNameable, 
 	}
 	
 	public void link(BlockPos pos) {
-		if(!linkedPositions.contains(pos))
+		if(world.isRemote)
+			return;
+		if (!linkedPositions.contains(pos))
 			linkedPositions.add(pos);
 	}
 	
 	public void unlink(BlockPos pos) {
-		if(linkedPositions.contains(pos))
+		if(world.isRemote)
+			return;
+		if (linkedPositions.contains(pos))
 			linkedPositions.remove(pos);
 	}
 	
+	public void sendToAll() {
+		if(world.isRemote)
+			return;
+		final boolean power = this.world.getBlockState(pos).getValue(RedstoneIO.POWER);
+		this.linkedPositions.forEach(position -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, position, (tile, _u) -> tile.updateRedstonInput(position, power)));
+	}
 }

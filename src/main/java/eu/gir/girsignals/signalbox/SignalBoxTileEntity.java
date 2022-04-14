@@ -308,6 +308,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		LinkType type = LinkType.SIGNAL;
 		if (block == GIRBlocks.REDSTONE_IN) {
 			type = LinkType.INPUT;
+			if(!world.isRemote)
+				loadChunkAndGetTile(RedstoneIOTileEntity.class, world, linkedPos, (tile, _u) -> tile.link(this.pos));
 		} else if (block == GIRBlocks.REDSTONE_OUT) {
 			type = LinkType.OUTPUT;
 		}
@@ -315,8 +317,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			if (type.equals(LinkType.SIGNAL)) {
 				loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle);
 				loadAndReset(linkedPos);
-			} else {
-				loadChunkAndGetTile(RedstoneIOTileEntity.class, world, linkedPos, (tile, _u) -> tile.link(this.pos));
 			}
 		}
 		linkedBlocks.put(linkedPos, type);
@@ -357,6 +357,28 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	public ImmutableMap<BlockPos, LinkType> getPositions() {
 		return ImmutableMap.copyOf(this.linkedBlocks);
+	}
+	
+	public void updateRedstonInput(BlockPos pos, boolean status) {
+		System.out.println(status);
+		next: for (final ArrayList<SignalNode> pathway : pathWayEnd.keySet()) {
+			for (final SignalNode signalNode : pathway) {
+				for (final PathOption option : signalNode) {
+					if (pos.equals(option.getLinkedPosition(LinkType.INPUT))) {
+						for (int i = 1; i < pathway.size() - 1; i++) {
+							final Point oldPos = pathway.get(i - 1).getPoint();
+							final Point newPos = pathway.get(i + 1).getPoint();
+							final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
+							final SignalNode current = pathway.get(i);
+							System.out.println(current);
+							current.apply(entry, pw -> pw.setPathUsage(EnumPathUsage.USED));
+							current.write(guiTag);
+						}
+						continue next;
+					}
+				}
+			}
+		}
 	}
 	
 }

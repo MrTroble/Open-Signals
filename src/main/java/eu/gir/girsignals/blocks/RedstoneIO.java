@@ -54,7 +54,6 @@ public class RedstoneIO extends Block implements ITileEntityProvider {
 		return true;
 	}
 
-	
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta) {
 		return new RedstoneIOTileEntity();
