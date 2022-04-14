@@ -53,4 +53,5 @@ public class RedstoneIOTileEntity extends TileEntity implements IWorldNameable, 
 		if(linkedPositions.contains(pos))
 			linkedPositions.remove(pos);
 	}
+	
 }
