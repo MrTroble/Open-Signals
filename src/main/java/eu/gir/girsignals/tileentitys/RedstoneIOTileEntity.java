@@ -1,9 +1,11 @@
 package eu.gir.girsignals.tileentitys;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
+import eu.gir.guilib.ecs.interfaces.ISyncable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -12,10 +14,10 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorldNameable;
 import net.minecraft.world.World;
 
-public class RedstoneIOTileEntity extends SyncableTileEntity implements IWorldNameable, IChunkloadable {
+public class RedstoneIOTileEntity extends SyncableTileEntity implements IWorldNameable, IChunkloadable, ISyncable, Iterable<BlockPos> {
 		
-	private static final String LINKED_LIST = "linkedList";
-	private static final String NAME_NBT = "name";
+	public static final String NAME_NBT = "name";
+	public static final String LINKED_LIST = "linkedList";
 
 	private String name = null;
 	private ArrayList<BlockPos> linkedPositions = new ArrayList<>();
@@ -78,5 +80,25 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements IWorldNa
 	@Override
 	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
 		return false;
+	}
+
+	
+	@Override
+	public void updateTag(NBTTagCompound compound) {
+		if(compound.hasKey(NAME_NBT)) {
+			this.name = compound.getString(NAME_NBT);
+			this.syncClient();
+		}
+	}
+	
+
+	@Override
+	public NBTTagCompound getTag() {
+		return writeToNBT(new NBTTagCompound());
+	}
+
+	@Override
+	public Iterator<BlockPos> iterator() {
+		return this.linkedPositions.iterator();
 	}
 }
