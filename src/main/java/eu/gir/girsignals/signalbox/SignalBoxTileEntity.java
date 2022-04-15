@@ -11,12 +11,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
@@ -177,7 +175,16 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 				if (nextPoint == null)
 					return;
 				visited.add(current);
-				nextPoint.connections().forEach(entry -> nextPoint.getOption(entry.getKey(), entry.getValue()));
+				nextPoint.connections().forEach(entry -> nextPoint.getOption(entry.getKey(), entry.getValue()).ifPresent(path -> {
+					setPower(path.getLinkedPosition(LinkType.OUTPUT), false);
+					if (path.getPathUsage().equals(EnumPathUsage.FREE))
+						return;
+					path.setPathUsage(EnumPathUsage.FREE);
+					if (!visited.contains(entry.getValue()))
+						list.add(entry.getValue());
+					if (!visited.contains(entry.getKey()))
+						list.add(entry.getKey());
+				}));
 				list.remove(current);
 			}
 		});
@@ -353,7 +360,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		for (int i = 1; i < pathway.size() - 1; i++) {
 			final Point oldPos = pathway.get(i - 1).getPoint();
 			final Point newPos = pathway.get(i + 1).getPoint();
-			final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
 			final SignalNode current = pathway.get(i);
 			current.getOption(oldPos, newPos).ifPresent(option -> option.setPathUsage(EnumPathUsage.USED));
 			current.write(guiTag);
