@@ -34,6 +34,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.chunk.Chunk;
 
@@ -369,6 +370,20 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	public void updateRedstonInput(BlockPos pos, boolean status) {
 		next: for (final ArrayList<SignalNode> pathway : pathWayEnd.keySet()) {
+			final SignalNode node = pathway.get(0);
+			final Point lastPoint = node.getPoint();
+			final Point delta = pathway.get(1).getPoint().delta(lastPoint);
+			final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta);
+			final PathOption end = node.getOption(EnumGuiMode.HP, rotation).orElse(node.getOption(EnumGuiMode.RS, rotation).orElse(null));
+			if(end != null) {
+				final BlockPos linked = end.getLinkedPosition(LinkType.INPUT);
+				if(linked != null && linked.equals(pos)) {
+					resetPathway(pathway.get(pathway.size() - 1).getPoint());
+					modeGrid.values().forEach(signal -> signal.write(guiTag));
+					this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
+					continue next;
+				}
+			}
 			for (int i = 1; i < pathway.size() - 1; i++) {
 				final Point oldPos = pathway.get(i - 1).getPoint();
 				final Point newPos = pathway.get(i + 1).getPoint();
