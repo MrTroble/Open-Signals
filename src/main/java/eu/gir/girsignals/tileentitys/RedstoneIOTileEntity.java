@@ -72,7 +72,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements IWorldNa
 		if(world.isRemote)
 			return;
 		final boolean power = this.world.getBlockState(pos).getValue(RedstoneIO.POWER);
-		this.linkedPositions.forEach(position -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, position, (tile, _u) -> tile.updateRedstonInput(position, power)));
+		this.linkedPositions.forEach(position -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, position, (tile, _u) -> tile.updateRedstonInput(this.pos, power)));
 	}
 		
 	@Override

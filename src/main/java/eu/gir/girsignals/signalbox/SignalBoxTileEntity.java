@@ -360,7 +360,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	public void updateRedstonInput(BlockPos pos, boolean status) {
-		System.out.println(status);
 		next: for (final ArrayList<SignalNode> pathway : pathWayEnd.keySet()) {
 			for (final SignalNode signalNode : pathway) {
 				for (final PathOption option : signalNode) {
@@ -370,7 +369,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 							final Point newPos = pathway.get(i + 1).getPoint();
 							final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
 							final SignalNode current = pathway.get(i);
-							System.out.println(current);
 							current.apply(entry, pw -> pw.setPathUsage(EnumPathUsage.USED));
 							current.write(guiTag);
 						}
