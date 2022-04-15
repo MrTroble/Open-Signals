@@ -19,11 +19,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements IWorldNa
 
 	private String name = null;
 	private ArrayList<BlockPos> linkedPositions = new ArrayList<>();
-	
-	public RedstoneIOTileEntity() {
-		System.out.println("Create " + this);
-	}
-	
+		
 	@Override
 	public String getName() {
 		if (hasCustomName())
@@ -62,7 +58,6 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements IWorldNa
 		if (!linkedPositions.contains(pos))
 			linkedPositions.add(pos);
 		this.syncClient();
-		System.out.println(this);
 	}
 	
 	public void unlink(BlockPos pos) {
@@ -76,16 +71,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements IWorldNa
 	public void sendToAll() {
 		if(world.isRemote)
 			return;
-		System.out.println(this.linkedPositions);
 		final boolean power = this.world.getBlockState(pos).getValue(RedstoneIO.POWER);
 		this.linkedPositions.forEach(position -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, position, (tile, _u) -> tile.updateRedstonInput(position, power)));
 	}
-	
-	@Override
-	protected void finalize() throws Throwable {
-		System.out.println("Destroyed " + this);
-	}
-	
+		
 	@Override
 	public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState, IBlockState newSate) {
 		return false;
