@@ -158,7 +158,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	private void resetSignal(final Point resetPoint, final SignalNode currentNode, final EnumGuiMode guiMode) {
 		currentNode.getRotations(guiMode).forEach(rotation -> {
-			currentNode.applyNormal(Maps.immutableEntry(guiMode, rotation), option -> {
+			currentNode.getOption(guiMode, rotation).ifPresent(option -> {
 				final BlockPos position = option.getLinkedPosition(LinkType.SIGNAL);
 				if (position == null)
 					return;
@@ -177,16 +177,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 				if (nextPoint == null)
 					return;
 				visited.add(current);
-				nextPoint.connections().forEach(entry -> nextPoint.apply(entry, path -> {
-					setPower(path.getLinkedPosition(LinkType.OUTPUT), false);
-					if (path.getPathUsage().equals(EnumPathUsage.FREE))
-						return;
-					path.setPathUsage(EnumPathUsage.FREE);
-					if (!visited.contains(entry.getValue()))
-						list.add(entry.getValue());
-					if (!visited.contains(entry.getKey()))
-						list.add(entry.getKey());
-				}));
+				nextPoint.connections().forEach(entry -> nextPoint.getOption(entry.getKey(), entry.getValue()));
 				list.remove(current);
 			}
 		});
@@ -209,9 +200,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		for (int i = 1; i < nodes.size() - 1; i++) {
 			final Point oldPos = nodes.get(i - 1).getPoint();
 			final Point newPos = nodes.get(i + 1).getPoint();
-			final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
 			final SignalNode current = nodes.get(i);
-			current.apply(entry, option -> {
+			current.getOption(oldPos, newPos).ifPresent(option -> {
 				setPower(option.getLinkedPosition(LinkType.OUTPUT), true);
 				option.setPathUsage(EnumPathUsage.SELECTED);
 				atomic.getAndUpdate(oldspeed -> Math.min(oldspeed, option.getSpeed()));
@@ -308,7 +298,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		LinkType type = LinkType.SIGNAL;
 		if (block == GIRBlocks.REDSTONE_IN) {
 			type = LinkType.INPUT;
-			if(!world.isRemote)
+			if (!world.isRemote)
 				loadChunkAndGetTile(RedstoneIOTileEntity.class, world, linkedPos, (tile, _u) -> tile.link(this.pos));
 		} else if (block == GIRBlocks.REDSTONE_OUT) {
 			type = LinkType.OUTPUT;
@@ -359,21 +349,28 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		return ImmutableMap.copyOf(this.linkedBlocks);
 	}
 	
+	private void lockPW(ArrayList<SignalNode> pathway) {
+		for (int i = 1; i < pathway.size() - 1; i++) {
+			final Point oldPos = pathway.get(i - 1).getPoint();
+			final Point newPos = pathway.get(i + 1).getPoint();
+			final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
+			final SignalNode current = pathway.get(i);
+			current.getOption(oldPos, newPos).ifPresent(option -> option.setPathUsage(EnumPathUsage.USED));
+			current.write(guiTag);
+		}
+		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
+	}
+	
 	public void updateRedstonInput(BlockPos pos, boolean status) {
 		next: for (final ArrayList<SignalNode> pathway : pathWayEnd.keySet()) {
-			for (final SignalNode signalNode : pathway) {
-				for (final PathOption option : signalNode) {
-					if (pos.equals(option.getLinkedPosition(LinkType.INPUT))) {
-						for (int i = 1; i < pathway.size() - 1; i++) {
-							final Point oldPos = pathway.get(i - 1).getPoint();
-							final Point newPos = pathway.get(i + 1).getPoint();
-							final Entry<Point, Point> entry = Maps.immutableEntry(oldPos, newPos);
-							final SignalNode current = pathway.get(i);
-							current.apply(entry, pw -> pw.setPathUsage(EnumPathUsage.USED));
-							current.write(guiTag);
-						}
-						continue next;
-					}
+			for (int i = 1; i < pathway.size() - 1; i++) {
+				final Point oldPos = pathway.get(i - 1).getPoint();
+				final Point newPos = pathway.get(i + 1).getPoint();
+				final SignalNode current = pathway.get(i);
+				final Optional<PathOption> optionOpt = current.getOption(oldPos, newPos);
+				if (optionOpt.isPresent() && pos.equals(optionOpt.get().getLinkedPosition(LinkType.INPUT))) {
+					lockPW(pathway);
+					continue next;
 				}
 			}
 		}

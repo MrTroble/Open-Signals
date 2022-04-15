@@ -103,25 +103,7 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
 	public Set<Entry<Point, Point>> connections() {
 		return this.possibleConnections.keySet();
 	}
-	
-	public void applyNormal(Entry<EnumGuiMode, Rotation> guimode, Consumer<PathOption> applier) {
-		if (guimode != null && this.possibleModes.containsKey(guimode))
-			applier.accept(this.possibleModes.get(guimode));
-	}
-	
-	public void apply(Entry<Point, Point> entry, Consumer<PathOption> applier) {
-		Entry<EnumGuiMode, Rotation> guimode = null;
-		if (this.possibleConnections.containsKey(entry)) {
-			guimode = this.possibleConnections.get(entry);
-		} else {
-			Entry<Point, Point> points = Maps.immutableEntry(entry.getValue(), entry.getKey());
-			if (this.possibleConnections.containsKey(points)) {
-				guimode = this.possibleConnections.get(points);
-			}
-		}
-		applyNormal(guimode, applier);
-	}
-	
+		
 	public void forEach(BiConsumer<Entry<EnumGuiMode, Rotation>, PathOption> applier) {
 		possibleModes.forEach(applier);
 	}
@@ -177,6 +159,29 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
 		} else {
 			return Optional.empty();
 		}
+	}
+	
+	public Optional<PathOption> getOption(final EnumGuiMode guimode, final Rotation rotation) {
+		final Entry<EnumGuiMode, Rotation> entry = Maps.immutableEntry(guimode, rotation);
+		return getOption(entry);
+	}
+	
+	public Optional<PathOption> getOption(final Entry<EnumGuiMode, Rotation> entry) {
+		if (entry == null || !this.possibleModes.containsKey(entry))
+			return Optional.empty();
+		return Optional.of(this.possibleModes.get(entry));
+	}
+	
+	public Optional<PathOption> getOption(final Point p1, final Point p2) {
+		final Entry<Point, Point> entry1 = Maps.immutableEntry(p1, p2);
+		if (this.possibleConnections.containsKey(entry1)) {
+			return getOption(this.possibleConnections.get(entry1));
+		}
+		final Entry<Point, Point> entry2 = Maps.immutableEntry(p2, p1);
+		if (this.possibleConnections.containsKey(entry2)) {
+			return getOption(this.possibleConnections.get(entry2));
+		}
+		return Optional.empty();
 	}
 	
 	public List<Rotation> getRotations(final EnumGuiMode mode) {
