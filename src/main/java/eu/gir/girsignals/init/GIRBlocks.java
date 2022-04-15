@@ -80,10 +80,11 @@ public class GIRBlocks {
 					block.setUnlocalizedName(name);
 					blocksToRegister.add(block);
 					if (block instanceof ITileEntityProvider) {
-						ITileEntityProvider provider = (ITileEntityProvider) block;
+						final ITileEntityProvider provider = (ITileEntityProvider) block;
 						try {
-							Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0).getClass();
-							TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
+							final Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0).getClass();
+							if(TileEntity.getKey(tileclass) == null)
+								TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
 						} catch (NullPointerException ex) {
 							GirsignalsMain.LOG.trace("All tileentity provide need to call back a default entity if the world is null!", ex);
 						}
