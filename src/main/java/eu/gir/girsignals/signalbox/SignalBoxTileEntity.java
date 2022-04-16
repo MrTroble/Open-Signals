@@ -142,6 +142,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	private void resendSignalTilesToUI() {
 		modeGrid.values().forEach(signal -> signal.write(guiTag));
 		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
+		this.syncClient();
 	}
 	
 	private void resetPathway(final Point resetPoint) {
@@ -358,6 +359,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	private void lockPW(ArrayList<SignalNode> pathway) {
+		final SignalNode node = pathway.get(pathway.size() - 1);
+		final Point lastPoint = node.getPoint();
+		final Point delta = lastPoint.delta(pathway.get(pathway.size() - 2).getPoint());
+		final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta);
+		final PathOption start = node.getOption(EnumGuiMode.HP, rotation).orElse(node.getOption(EnumGuiMode.RS, rotation).orElse(null));
+		loadAndReset(start.getLinkedPosition(LinkType.SIGNAL));
 		for (int i = 1; i < pathway.size() - 1; i++) {
 			final Point oldPos = pathway.get(i - 1).getPoint();
 			final Point newPos = pathway.get(i + 1).getPoint();
