@@ -372,7 +372,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			current.getOption(oldPos, newPos).ifPresent(option -> option.setPathUsage(EnumPathUsage.USED));
 			current.write(guiTag);
 		}
-		this.resendSignalTilesToUI();
+		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
 	}
 	
 	public void updateRedstonInput(BlockPos pos, boolean status) {
