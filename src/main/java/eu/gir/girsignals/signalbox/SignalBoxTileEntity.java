@@ -15,6 +15,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Lists;
 
 import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
@@ -139,9 +140,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	}
 	
 	private void resendSignalTilesToUI() {
-		final NBTTagCompound update = new NBTTagCompound();
-		modeGrid.values().forEach(signal -> signal.write(update));
-		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(update, ui.getPlayer()));
+		modeGrid.values().forEach(signal -> signal.write(guiTag));
+		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
 	}
 	
 	private void resetPathway(final Point resetPoint) {
@@ -365,19 +365,20 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			current.getOption(oldPos, newPos).ifPresent(option -> option.setPathUsage(EnumPathUsage.USED));
 			current.write(guiTag);
 		}
-		this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
+		this.resendSignalTilesToUI();
 	}
 	
 	public void updateRedstonInput(BlockPos pos, boolean status) {
-		next: for (final ArrayList<SignalNode> pathway : pathWayEnd.keySet()) {
+		final ArrayList<ArrayList<SignalNode>> listOfPathways = Lists.newArrayList(pathWayEnd.keySet());
+		next: for (final ArrayList<SignalNode> pathway : listOfPathways) {
 			final SignalNode node = pathway.get(0);
 			final Point lastPoint = node.getPoint();
 			final Point delta = pathway.get(1).getPoint().delta(lastPoint);
 			final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta);
 			final PathOption end = node.getOption(EnumGuiMode.HP, rotation).orElse(node.getOption(EnumGuiMode.RS, rotation).orElse(null));
-			if(end != null) {
+			if (end != null) {
 				final BlockPos linked = end.getLinkedPosition(LinkType.INPUT);
-				if(linked != null && linked.equals(pos)) {
+				if (linked != null && linked.equals(pos)) {
 					resetPathway(pathway.get(pathway.size() - 1).getPoint());
 					modeGrid.values().forEach(signal -> signal.write(guiTag));
 					this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
