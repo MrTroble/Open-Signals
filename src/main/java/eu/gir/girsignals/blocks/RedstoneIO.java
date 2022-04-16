@@ -67,7 +67,8 @@ public class RedstoneIO extends Block implements ITileEntityProvider {
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
-			GuiHandler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
+			if(worldIn.isRemote)
+				GuiHandler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
 			return true;
 		}
 		return false;
