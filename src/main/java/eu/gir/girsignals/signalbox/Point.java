@@ -42,6 +42,12 @@ public class Point implements Serializable {
 		this.y += y;
 	}
 	
+	public Point delta(Point other) {
+		final Point point = new Point(this);
+		point.translate(-other.getX(), -other.getY());
+		return point;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if(obj == null || !(obj instanceof Point))

@@ -2,6 +2,18 @@
 
 ## [Beta Update]
 
+* feat: Added UIs for the redstone io blocks and rename possibility
+* feat: Added automatic reset of pathways
+* feat: Signal Box blocks now show pathways currently in use in red
+
+### GUI Lib
+
+* fix: Issue with text not being shown correctly after layout calculation
+* fix: Potential issue with delayed send on an invalid player
+* fix: Removed debugging
+
+## [Beta Update]
+
 * fix: Update UI Lib to fix packet crashing
 * opt: Reduced network load through compression
 

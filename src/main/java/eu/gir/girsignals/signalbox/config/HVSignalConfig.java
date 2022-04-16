@@ -9,7 +9,6 @@ import eu.gir.girsignals.EnumSignals.HP_TYPE;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
@@ -65,7 +64,6 @@ public final class HVSignalConfig implements ISignalAutoconfig {
 	@Override
 	public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
 		final HashMap<SEProperty, Object> values = new HashMap<>();
-		System.out.println(current.getName());
 		if (next != null) {
 			if (speed < 7 && speed > 0 && speed != 4) {
 				current.getProperty(SignalHV.ZS3).ifPresent(_u -> {

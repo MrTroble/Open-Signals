@@ -11,7 +11,6 @@ import eu.gir.girsignals.EnumSignals.HL_DISTANT;
 import eu.gir.girsignals.EnumSignals.HL_LIGHTBAR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 

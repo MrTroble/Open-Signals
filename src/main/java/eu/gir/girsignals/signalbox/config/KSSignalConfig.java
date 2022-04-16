@@ -8,7 +8,6 @@ import eu.gir.girsignals.EnumSignals.KS_DISTANT;
 import eu.gir.girsignals.EnumSignals.KS_MAIN;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.ISignalAutoconfig;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 

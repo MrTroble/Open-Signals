@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
+import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.guilib.ecs.GuiSyncNetwork;
 import eu.gir.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.block.state.IBlockState;
@@ -29,7 +30,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 	public final HashMap<String, SEProperty<?>> lookup = new HashMap<String, SEProperty<?>>();
 	
 	public ContainerSignalController(SignalControllerTileEntity tile) {
-		if (!tile.loadChunkAndGetTile(tile.getWorld(), tile.getLinkedPosition(), (t, c) -> {
+		if (!tile.loadChunkAndGetTile(SignalTileEnity.class, tile.getWorld(), tile.getLinkedPosition(), (t, c) -> {
 			reference.set(t.getProperties());
 			final IBlockState state = c.getBlockState(t.getPos());
 			referenceBlock.set((Signal) state.getBlock());
