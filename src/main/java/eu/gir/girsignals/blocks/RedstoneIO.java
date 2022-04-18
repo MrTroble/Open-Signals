@@ -20,57 +20,63 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class RedstoneIO extends Block implements ITileEntityProvider {
-	
-	public static final PropertyBool POWER = PropertyBool.create("power");
 
-	public RedstoneIO() {
-		super(Material.ROCK);
-		setCreativeTab(GIRTabs.tab);
-		this.setDefaultState(getDefaultState().withProperty(POWER, false));
-	}
-	
-	@Override
-	public int getMetaFromState(IBlockState state) {
-		return state.getValue(POWER) ? 0:1;
-	}
-	
-	@Override
-	public IBlockState getStateFromMeta(int meta) {
-		return this.getDefaultState().withProperty(POWER, meta == 1);
-	}
-	
-	@Override
-	protected BlockStateContainer createBlockState() {
-		return new BlockStateContainer(this, new IProperty[] { POWER });
-	}
+    public static final PropertyBool POWER = PropertyBool.create("power");
 
-	@Override
-	public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess, net.minecraft.util.math.BlockPos pos, EnumFacing side) {
-		return getWeakPower(blockState, blockAccess, pos, side);
-	}
-	
-	@Override
-	public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, net.minecraft.util.math.BlockPos pos, EnumFacing side) {
-		return blockState.getValue(POWER) ? 15:0;
-	}
-	
-	@Override
-	public boolean canProvidePower(IBlockState state) {
-		return true;
-	}
+    public RedstoneIO() {
+        super(Material.ROCK);
+        setCreativeTab(GIRTabs.TAB);
+        this.setDefaultState(getDefaultState().withProperty(POWER, false));
+    }
 
-	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new RedstoneIOTileEntity();
-	}
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(POWER) ? 0 : 1;
+    }
 
-	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
-			if(worldIn.isRemote)
-				GuiHandler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
-			return true;
-		}
-		return false;
-	}
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(POWER, meta == 1);
+    }
+
+    @Override
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, new IProperty[] {
+                POWER
+        });
+    }
+
+    @Override
+    public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess,
+            net.minecraft.util.math.BlockPos pos, EnumFacing side) {
+        return getWeakPower(blockState, blockAccess, pos, side);
+    }
+
+    @Override
+    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess,
+            net.minecraft.util.math.BlockPos pos, EnumFacing side) {
+        return blockState.getValue(POWER) ? 15 : 0;
+    }
+
+    @Override
+    public boolean canProvidePower(IBlockState state) {
+        return true;
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
+        return new RedstoneIOTileEntity();
+    }
+
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state,
+            EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY,
+            float hitZ) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
+            if (worldIn.isRemote)
+                GuiHandler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
+            return true;
+        }
+        return false;
+    }
 }

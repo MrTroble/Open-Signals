@@ -18,7 +18,7 @@ import eu.gir.girsignals.blocks.boards.SignalBUELight;
 import eu.gir.girsignals.blocks.boards.SignalEL;
 import eu.gir.girsignals.blocks.boards.SignalLF;
 import eu.gir.girsignals.blocks.boards.SignalNE;
-import eu.gir.girsignals.blocks.boards.SignalOTHER;
+import eu.gir.girsignals.blocks.boards.SignalOther;
 import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalStationName;
 import eu.gir.girsignals.blocks.boards.SignalWN;
@@ -42,87 +42,94 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public class GIRBlocks {
-	
-	public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
-	public static final Post POST = new Post();
-	public static final SignalHV HV_SIGNAL = new SignalHV();
-	public static final GhostBlock GHOST_BLOCK = new GhostBlock();
-	public static final SignalKS KS_SIGNAL = new SignalKS();
-	public static final SignalHL HL_SIGNAL = new SignalHL();
-	public static final SignalSHLight SH_LIGHT = new SignalSHLight();
-	public static final SignalTram TRAM_SIGNAL = new SignalTram();
-	public static final SignalLF LF_SIGNAL = new SignalLF();
-	public static final SignalEL EL_SIGNAL = new SignalEL();
-	public static final Signal SH_SIGNAL = new Signal(Signal.builder(GIRItems.SIGN_PLACEMENT_TOOL, "shsignal").noLink().build());
-	public static final SignalRA RA_SIGNAL = new SignalRA();
-	public static final SignalBUE BUE_SIGNAL = new SignalBUE();
-	public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
-	public static final SignalOTHER OTHER_SIGNAL = new SignalOTHER();
-	public static final SignalNE NE_SIGNAL = new SignalNE();
-	public static final StationNumberPlate STATION_NUMBER_PLATE = new StationNumberPlate();
-	public static final SignalWN WN_SIGNAL = new SignalWN();
-	public static final SignalStationName STATION_NAME = new SignalStationName();
-	public static final SignalBox SIGNAL_BOX = new SignalBox();
-	public static final RedstoneIO REDSTONE_IN = new RedstoneInput();
-	public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
-	
-	public static ArrayList<Block> blocksToRegister = new ArrayList<>();
-	
-	public static void init() {
-		Field[] fields = GIRBlocks.class.getFields();
-		for (Field field : fields) {
-			int modifiers = field.getModifiers();
-			if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && Modifier.isPublic(modifiers)) {
-				String name = field.getName().toLowerCase().replace("_", "");
-				try {
-					Block block = (Block) field.get(null);
-					block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
-					block.setUnlocalizedName(name);
-					blocksToRegister.add(block);
-					if (block instanceof ITileEntityProvider) {
-						final ITileEntityProvider provider = (ITileEntityProvider) block;
-						try {
-							final Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0).getClass();
-							if(TileEntity.getKey(tileclass) == null)
-								TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
-						} catch (NullPointerException ex) {
-							GirsignalsMain.LOG.trace("All tileentity provide need to call back a default entity if the world is null!", ex);
-						}
-					}
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-	
-	@SubscribeEvent
-	public static void registerBlock(RegistryEvent.Register<Block> event) {
-		updateConfigs();
-		IForgeRegistry<Block> registry = event.getRegistry();
-		blocksToRegister.forEach(registry::register);
-	}
-	
-	@SubscribeEvent
-	public static void registerItem(RegistryEvent.Register<Item> event) {
-		IForgeRegistry<Item> registry = event.getRegistry();
-		blocksToRegister.forEach(block -> registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
-	}
-	
-	private static void updateConfigs() {
-		blocksToRegister.forEach(b -> {
-			if (b instanceof IConfigUpdatable) {
-				IConfigUpdatable configUpdate = (IConfigUpdatable) b;
-				configUpdate.updateConfigValues();
-			}
-		});
-	}
-	
-	@SubscribeEvent
-	public static void onConfigChangedEvent(OnConfigChangedEvent event) {
-		if (event.getModID().equals(GirsignalsMain.MODID)) {
-			ConfigManager.sync(GirsignalsMain.MODID, Type.INSTANCE);
-			updateConfigs();
-		}
-	}
+
+    public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
+    public static final Post POST = new Post();
+    public static final SignalHV HV_SIGNAL = new SignalHV();
+    public static final GhostBlock GHOST_BLOCK = new GhostBlock();
+    public static final SignalKS KS_SIGNAL = new SignalKS();
+    public static final SignalHL HL_SIGNAL = new SignalHL();
+    public static final SignalSHLight SH_LIGHT = new SignalSHLight();
+    public static final SignalTram TRAM_SIGNAL = new SignalTram();
+    public static final SignalLF LF_SIGNAL = new SignalLF();
+    public static final SignalEL EL_SIGNAL = new SignalEL();
+    public static final Signal SH_SIGNAL = new Signal(
+            Signal.builder(GIRItems.SIGN_PLACEMENT_TOOL, "shsignal").noLink().build());
+    public static final SignalRA RA_SIGNAL = new SignalRA();
+    public static final SignalBUE BUE_SIGNAL = new SignalBUE();
+    public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
+    public static final SignalOther OTHER_SIGNAL = new SignalOther();
+    public static final SignalNE NE_SIGNAL = new SignalNE();
+    public static final StationNumberPlate STATION_NUMBER_PLATE = new StationNumberPlate();
+    public static final SignalWN WN_SIGNAL = new SignalWN();
+    public static final SignalStationName STATION_NAME = new SignalStationName();
+    public static final SignalBox SIGNAL_BOX = new SignalBox();
+    public static final RedstoneIO REDSTONE_IN = new RedstoneInput();
+    public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
+
+    public static ArrayList<Block> blocksToRegister = new ArrayList<>();
+
+    public static void init() {
+        Field[] fields = GIRBlocks.class.getFields();
+        for (Field field : fields) {
+            int modifiers = field.getModifiers();
+            if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
+                    && Modifier.isPublic(modifiers)) {
+                String name = field.getName().toLowerCase().replace("_", "");
+                try {
+                    Block block = (Block) field.get(null);
+                    block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
+                    block.setUnlocalizedName(name);
+                    blocksToRegister.add(block);
+                    if (block instanceof ITileEntityProvider) {
+                        final ITileEntityProvider provider = (ITileEntityProvider) block;
+                        try {
+                            final Class<? extends TileEntity> tileclass = provider
+                                    .createNewTileEntity(null, 0).getClass();
+                            if (TileEntity.getKey(tileclass) == null)
+                                TileEntity.register(tileclass.getSimpleName().toLowerCase(),
+                                        tileclass);
+                        } catch (NullPointerException ex) {
+                            GirsignalsMain.log.trace(
+                                    "All tileentity provide need to call back a default entity if the world is null!",
+                                    ex);
+                        }
+                    }
+                } catch (IllegalArgumentException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void registerBlock(RegistryEvent.Register<Block> event) {
+        updateConfigs();
+        IForgeRegistry<Block> registry = event.getRegistry();
+        blocksToRegister.forEach(registry::register);
+    }
+
+    @SubscribeEvent
+    public static void registerItem(RegistryEvent.Register<Item> event) {
+        IForgeRegistry<Item> registry = event.getRegistry();
+        blocksToRegister.forEach(block -> registry
+                .register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
+    }
+
+    private static void updateConfigs() {
+        blocksToRegister.forEach(b -> {
+            if (b instanceof IConfigUpdatable) {
+                IConfigUpdatable configUpdate = (IConfigUpdatable) b;
+                configUpdate.updateConfigValues();
+            }
+        });
+    }
+
+    @SubscribeEvent
+    public static void onConfigChangedEvent(OnConfigChangedEvent event) {
+        if (event.getModID().equals(GirsignalsMain.MODID)) {
+            ConfigManager.sync(GirsignalsMain.MODID, Type.INSTANCE);
+            updateConfigs();
+        }
+    }
 }
