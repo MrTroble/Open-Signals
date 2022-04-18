@@ -312,3 +312,5 @@ property.prop.OUTPUT.name=Redstone Ausgabe
 property.prop.OUTPUT.desc=Hier kannst du die Redstone Ausgabe einstellen. Z.b. für Weichensteuerung
 property.prop.INPUT.name=Redstone Eingabe
 property.prop.INPUT.desc=Hier kannst du die Redstone Eingabe einstellen. Z.b. von Sensoren.
+btn.apply=Anwenden
+label.linkedto=Bezeichnung
