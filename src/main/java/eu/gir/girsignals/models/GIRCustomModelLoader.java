@@ -38,9 +38,9 @@ import eu.gir.girsignals.EnumSignals.RALight;
 import eu.gir.girsignals.EnumSignals.SHLight;
 import eu.gir.girsignals.EnumSignals.STNumber;
 import eu.gir.girsignals.EnumSignals.Tram;
+import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.EnumSignals.TramSwitch;
 import eu.gir.girsignals.EnumSignals.TramType;
-import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.WNCross;
 import eu.gir.girsignals.EnumSignals.WNNormal;
@@ -81,46 +81,48 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
     private static <T extends Enum<?>> Predicate<IExtendedBlockState> has(
-            IUnlistedProperty<T> property) {
+            final IUnlistedProperty<T> property) {
         return ebs -> ebs.getValue(property) != null;
     }
 
     private static <T extends Enum<?>> Predicate<IExtendedBlockState> hasNot(
-            IUnlistedProperty<T> property) {
+            final IUnlistedProperty<T> property) {
         return ebs -> ebs.getValue(property) == null;
     }
 
     private static <T extends DefaultName<?>> Predicate<IExtendedBlockState> with(
-            IUnlistedProperty<T> property, Predicate<T> t) {
+            final IUnlistedProperty<T> property, final Predicate<T> t) {
         return bs -> {
-            T test = bs.getValue(property);
+            final T test = bs.getValue(property);
             return test != null && t.test(test);
         };
     }
 
-    private static Predicate<IExtendedBlockState> hasAndIs(IUnlistedProperty<Boolean> property) {
+    private static Predicate<IExtendedBlockState> hasAndIs(
+            final IUnlistedProperty<Boolean> property) {
         return ebs -> {
-            Boolean bool = ebs.getValue(property);
+            final Boolean bool = ebs.getValue(property);
             return bool != null && bool.booleanValue();
         };
     }
 
-    private static Predicate<IExtendedBlockState> hasAndIsNot(IUnlistedProperty<Boolean> property) {
+    private static Predicate<IExtendedBlockState> hasAndIsNot(
+            final IUnlistedProperty<Boolean> property) {
         return ebs -> {
-            Boolean bool = ebs.getValue(property);
+            final Boolean bool = ebs.getValue(property);
             return bool != null && !bool.booleanValue();
         };
     }
 
     @Override
-    public void onResourceManagerReload(IResourceManager resourceManager) {
+    public void onResourceManagerReload(final IResourceManager resourceManager) {
         registeredModels.clear();
         registeredModels.put("hvsignal", cm -> {
             cm.register("hv/hv_base", ebs -> true, 0);
             cm.register("hv/hv_ne2", hasAndIs(SignalHV.NE2), 0);
             cm.register("hv/hv_mast1", ebs -> true, 1);
 
-            for (MastSignal sign : MastSignal.values())
+            for (final MastSignal sign : MastSignal.values())
                 if (!sign.equals(MastSignal.OFF))
                     cm.register("hv/hv_sign", with(SignalHV.MASTSIGN, ms -> ms.equals(sign)), 1,
                             "2", "girsignals:blocks/mast_sign/" + sign.getName());
@@ -181,14 +183,14 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             cm.register("hv/hv_identifier", hasAndIs(SignalHV.IDENTIFIER), 5.4f,
                     "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
             // Zs2, Zs2v, Zs3, Zs3v
-            for (ZS32 zs3 : ZS32.values()) {
+            for (final ZS32 zs3 : ZS32.values()) {
                 cm.register("hv/hv_zs3",
                         with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)),
                         6.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
                 cm.register("hv/hv_zs3v", with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)), 3f,
                         "overlay", "girsignals:blocks/zs3/" + zs3.name());
             }
-            for (ZS32 zs3 : ZS32.values()) {
+            for (final ZS32 zs3 : ZS32.values()) {
                 if (ZS32.OFF == zs3)
                     continue;
                 cm.register("zs/zs3",
@@ -269,7 +271,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
             cm.register("ks/ks_number", hasAndIs(Signal.CUSTOMNAME), 4);
 
-            for (MastSignal sign : MastSignal.values())
+            for (final MastSignal sign : MastSignal.values())
                 if (!sign.equals(MastSignal.OFF))
                     cm.register("ks/ks_sign", with(SignalKS.MASTSIGN, ms -> ms.equals(sign)), 2,
                             "13", "girsignals:blocks/mast_sign/" + sign.getName());
@@ -277,7 +279,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             cm.register("ks/ks_mast3", ebs -> true, 3);
             cm.register("ks/ks_mast4", ebs -> true, 4);
             // Zs2, Zs2v, Zs3, Zs3v
-            for (ZS32 zs3 : ZS32.values()) {
+            for (final ZS32 zs3 : ZS32.values()) {
                 cm.register("ks/ks_zs3", with(SignalKS.ZS3, pZs3 -> pZs3.equals(zs3)), 6, "overlay",
                         "girsignals:blocks/zs3/" + zs3.name());
                 cm.register("ks/ks_zs3v", with(SignalKS.ZS3V, pZs3 -> pZs3.equals(zs3)), 4,
@@ -287,7 +289,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                 cm.register("ks/ks_zs2v", with(SignalKS.ZS2V, pZs3 -> pZs3.equals(zs3)), 3,
                         "overlay", "girsignals:blocks/zs3/" + zs3.name());
             }
-            for (ZS32 zs3 : ZS32.values()) {
+            for (final ZS32 zs3 : ZS32.values()) {
                 if (ZS32.OFF == zs3)
                     continue;
                 cm.register("zs/zs3",
@@ -488,19 +490,19 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
             cm.register("hl/hl_number", hasAndIs(Signal.CUSTOMNAME), 0);
 
-            for (MastSignal sign : MastSignal.values())
+            for (final MastSignal sign : MastSignal.values())
                 if (!sign.equals(MastSignal.OFF))
                     cm.register("hl/hl_sign_main", with(SignalHL.MASTSIGN, ms -> ms.equals(sign)),
                             2, "9", "girsignals:blocks/mast_sign/" + sign.getName());
 
             cm.register("hl/hl_mast3", ebs -> true, 3);
-            for (ZS32 zs3 : ZS32.values()) {
+            for (final ZS32 zs3 : ZS32.values()) {
                 cm.register("hl/hl_zs2", with(SignalHL.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
                         "girsignals:blocks/zs3/" + zs3.name());
                 cm.register("hl/hl_zs2v", with(SignalHL.ZS2V, pZs3 -> pZs3.equals(zs3)), 3,
                         "overlay", "girsignals:blocks/zs3/" + zs3.name());
             }
-            for (ZS32 zs3 : ZS32.values()) {
+            for (final ZS32 zs3 : ZS32.values()) {
                 if (ZS32.OFF == zs3)
                     continue;
                 cm.register("zs/zs3",
@@ -859,8 +861,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             cm.register("mast_lamps",
                     with(SignalLF.LFTYPE, lamps -> lamps.equals(LFBachground.LF1)), 0);
             cm.register("mast", ebs -> true, 0);
-            for (LF lf1 : LF.values()) {
-                String[] rename = lf1.getOverlayRename();
+            for (final LF lf1 : LF.values()) {
+                final String[] rename = lf1.getOverlayRename();
                 cm.register("lf/lf1", with(SignalLF.LFTYPE, LFBachground.LF1::equals)
                         .and(with(SignalLF.INDICATOR, lf1::equals)), 1, rename);
                 cm.register("lf/lf1_2", with(SignalLF.LFTYPE, LFBachground.LF2::equals)
@@ -897,8 +899,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                     2);
             cm.register("el/el_arrow_r", with(SignalEL.ELARROW, ela -> ela.equals(ELArrow.RIGHT)),
                     2);
-            cm.register("el/el_arrow_up", with(SignalEL.ELARROW, ela -> ela.equals(ELArrow.UP)),
-                    2);
+            cm.register("el/el_arrow_up", with(SignalEL.ELARROW, ela -> ela.equals(ELArrow.UP)), 2);
         });
         registeredModels.put("shsignal", cm -> {
             cm.register("sh/sh2_mast", ebs -> true, 0);
@@ -1049,8 +1050,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                     Maps.immutableEntry(NE.NE2, 1.125f), Maps.immutableEntry(NE.NE1, 1.9375f),
                     Maps.immutableEntry(NE.NE4_small, 0.875f), Maps.immutableEntry(NE.NE6, 2.0f)
             };
-            for (Map.Entry<NE, Float> entry : entrys) {
-                for (Arrow arrow : Arrow.values()) {
+            for (final Map.Entry<NE, Float> entry : entrys) {
+                for (final Arrow arrow : Arrow.values()) {
                     if (arrow == Arrow.OFF)
                         continue;
                     cm.register("arrow",
@@ -1062,8 +1063,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             }
         });
         registeredModels.put("stationnumberplate", cm -> {
-            for (STNumber num : STNumber.values()) {
-                String[] rename = num.getOverlayRename();
+            for (final STNumber num : STNumber.values()) {
+                final String[] rename = num.getOverlayRename();
                 cm.register("other_signals/station_number",
                         (with(StationNumberPlate.STATIONNUMBER, num::equals)), 0, rename);
             }
@@ -1122,7 +1123,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
     }
 
     @Override
-    public boolean accepts(ResourceLocation modelLocation) {
+    public boolean accepts(final ResourceLocation modelLocation) {
         if (!modelLocation.getResourceDomain().equals(GirsignalsMain.MODID))
             return false;
         return registeredModels.containsKey(modelLocation.getResourcePath())
@@ -1130,12 +1131,12 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
     }
 
     @Override
-    public IModel loadModel(ResourceLocation modelLocation) throws Exception {
+    public IModel loadModel(final ResourceLocation modelLocation) throws Exception {
         if (modelLocation.getResourcePath().equals("ghostblock"))
             return (state, format, bak) -> new BuiltInModel(ItemCameraTransforms.DEFAULT,
                     ItemOverrideList.NONE);
-        ModelResourceLocation mrl = (ModelResourceLocation) modelLocation;
-        String[] strs = mrl.getVariant().split("=");
+        final ModelResourceLocation mrl = (ModelResourceLocation) modelLocation;
+        final String[] strs = mrl.getVariant().split("=");
         if (strs.length < 2)
             return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
                     SignalAngel.ANGEL0);

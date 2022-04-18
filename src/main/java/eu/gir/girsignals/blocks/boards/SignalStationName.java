@@ -19,22 +19,22 @@ public class SignalStationName extends Signal {
     }
 
     @Override
-    public boolean doesSideBlockRendering(IBlockState state, IBlockAccess world, BlockPos pos,
-            EnumFacing face) {
+    public boolean doesSideBlockRendering(final IBlockState state, final IBlockAccess world,
+            final BlockPos pos, final EnumFacing face) {
         return false;
     }
 
     @Override
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess,
-            BlockPos pos, EnumFacing side) {
+    public boolean shouldSideBeRendered(final IBlockState blockState,
+            final IBlockAccess blockAccess, final BlockPos pos, final EnumFacing side) {
         return true;
     }
 
     private static final float WIDTH_NORM = 56.0f;
 
     @Override
-    public void renderOverlay(double x, double y, double z, SignalTileEnity te, FontRenderer font,
-            final float renderHeight) {
+    public void renderOverlay(final double x, final double y, final double z,
+            final SignalTileEnity te, final FontRenderer font, final float renderHeight) {
         final World world = te.getWorld();
         final BlockPos pos = te.getPos();
         final IBlockState state = world.getBlockState(pos);

@@ -5,15 +5,15 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileEnity> {
 
     @Override
-    public void render(SignalTileEnity te, double x, double y, double z, float partialTicks,
-            int destroyStage, float alpha) {
+    public void render(final SignalTileEnity te, final double x, final double y, final double z,
+            final float partialTicks, final int destroyStage, final float alpha) {
         if (!te.hasCustomName())
             return;
         te.renderOverlay(x, y, z, getFontRenderer());
     }
 
     @Override
-    public boolean isGlobalRenderer(SignalTileEnity te) {
+    public boolean isGlobalRenderer(final SignalTileEnity te) {
         return te.hasCustomName();
     }
 }

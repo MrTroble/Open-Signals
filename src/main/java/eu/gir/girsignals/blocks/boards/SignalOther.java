@@ -26,7 +26,8 @@ public class SignalOther extends Signal {
     }
 
     @Override
-    public void renderOverlay(double x, double y, double z, SignalTileEnity te, FontRenderer font) {
+    public void renderOverlay(final double x, final double y, final double z,
+            final SignalTileEnity te, final FontRenderer font) {
         super.renderOverlay(x, y, z, te, font,
                 te.getProperty(OTHERTYPE).filter(OtherSignal.HM::equals).isPresent() ? 2.1f
                         : this.prop.customNameRenderHeight);

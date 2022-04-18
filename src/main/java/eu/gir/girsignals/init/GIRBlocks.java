@@ -70,14 +70,14 @@ public class GIRBlocks {
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
     public static void init() {
-        Field[] fields = GIRBlocks.class.getFields();
-        for (Field field : fields) {
-            int modifiers = field.getModifiers();
+        final Field[] fields = GIRBlocks.class.getFields();
+        for (final Field field : fields) {
+            final int modifiers = field.getModifiers();
             if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
                     && Modifier.isPublic(modifiers)) {
-                String name = field.getName().toLowerCase().replace("_", "");
+                final String name = field.getName().toLowerCase().replace("_", "");
                 try {
-                    Block block = (Block) field.get(null);
+                    final Block block = (Block) field.get(null);
                     block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
                     block.setUnlocalizedName(name);
                     blocksToRegister.add(block);
@@ -89,13 +89,13 @@ public class GIRBlocks {
                             if (TileEntity.getKey(tileclass) == null)
                                 TileEntity.register(tileclass.getSimpleName().toLowerCase(),
                                         tileclass);
-                        } catch (NullPointerException ex) {
+                        } catch (final NullPointerException ex) {
                             GirsignalsMain.log.trace(
                                     "All tileentity provide need to call back a default entity if the world is null!",
                                     ex);
                         }
                     }
-                } catch (IllegalArgumentException | IllegalAccessException e) {
+                } catch (final IllegalArgumentException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
@@ -103,15 +103,15 @@ public class GIRBlocks {
     }
 
     @SubscribeEvent
-    public static void registerBlock(RegistryEvent.Register<Block> event) {
+    public static void registerBlock(final RegistryEvent.Register<Block> event) {
         updateConfigs();
-        IForgeRegistry<Block> registry = event.getRegistry();
+        final IForgeRegistry<Block> registry = event.getRegistry();
         blocksToRegister.forEach(registry::register);
     }
 
     @SubscribeEvent
-    public static void registerItem(RegistryEvent.Register<Item> event) {
-        IForgeRegistry<Item> registry = event.getRegistry();
+    public static void registerItem(final RegistryEvent.Register<Item> event) {
+        final IForgeRegistry<Item> registry = event.getRegistry();
         blocksToRegister.forEach(block -> registry
                 .register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
     }
@@ -119,14 +119,14 @@ public class GIRBlocks {
     private static void updateConfigs() {
         blocksToRegister.forEach(b -> {
             if (b instanceof IConfigUpdatable) {
-                IConfigUpdatable configUpdate = (IConfigUpdatable) b;
+                final IConfigUpdatable configUpdate = (IConfigUpdatable) b;
                 configUpdate.updateConfigValues();
             }
         });
     }
 
     @SubscribeEvent
-    public static void onConfigChangedEvent(OnConfigChangedEvent event) {
+    public static void onConfigChangedEvent(final OnConfigChangedEvent event) {
         if (event.getModID().equals(GirsignalsMain.MODID)) {
             ConfigManager.sync(GirsignalsMain.MODID, Type.INSTANCE);
             updateConfigs();

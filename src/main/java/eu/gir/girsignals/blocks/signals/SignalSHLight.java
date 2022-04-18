@@ -32,7 +32,8 @@ public class SignalSHLight extends Signal {
     }
 
     @Override
-    public void renderOverlay(double x, double y, double z, SignalTileEnity te, FontRenderer font) {
+    public void renderOverlay(final double x, final double y, final double z,
+            final SignalTileEnity te, final FontRenderer font) {
         super.renderOverlay(x, y, z, te, font,
                 te.getProperty(SH_HIGH).filter(b -> (Boolean) b).isPresent() ? 2.35f
                         : this.prop.customNameRenderHeight);

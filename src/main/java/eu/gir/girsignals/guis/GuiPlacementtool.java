@@ -41,9 +41,9 @@ public class GuiPlacementtool extends GuiBase {
     private final UIBlockRender blockRender = new UIBlockRender();
     private final HashMap<String, IUnlistedProperty<?>> lookup = new HashMap<String, IUnlistedProperty<?>>();
     private Signal currentSelectedBlock;
-    private Placementtool tool;
+    private final Placementtool tool;
 
-    public GuiPlacementtool(ItemStack stack) {
+    public GuiPlacementtool(final ItemStack stack) {
         this.compound = stack.getTagCompound();
         if (this.compound == null)
             this.compound = new NBTTagCompound();
@@ -61,7 +61,7 @@ public class GuiPlacementtool extends GuiBase {
                 .getBlockState();
         final Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState
                 .getUnlistedProperties();
-        for (IUnlistedProperty<?> property : unlistedProperties) {
+        for (final IUnlistedProperty<?> property : unlistedProperties) {
             final SEProperty<?> prop = SEProperty.cst(property);
             of(prop, inp -> applyModelChanges());
         }
@@ -144,7 +144,7 @@ public class GuiPlacementtool extends GuiBase {
         this.entity.read(compound);
     }
 
-    public void of(SEProperty<?> property, IntConsumer consumer) {
+    public void of(final SEProperty<?> property, final IntConsumer consumer) {
         if (property == null)
             return;
         if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
@@ -178,27 +178,26 @@ public class GuiPlacementtool extends GuiBase {
         IExtendedBlockState ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
 
         final List<UIEnumerable> enumerables = this.list.findRecursive(UIEnumerable.class);
-        for (UIEnumerable enumerable : enumerables) {
-            SEProperty sep = (SEProperty) lookup.get(enumerable.getID());
+        for (final UIEnumerable enumerable : enumerables) {
+            final SEProperty sep = (SEProperty) lookup.get(enumerable.getID());
             if (sep == null)
                 return;
-            ebs = (IExtendedBlockState) ebs.withProperty(sep,
-                    sep.getObjFromID(enumerable.getIndex()));
+            ebs = ebs.withProperty(sep, sep.getObjFromID(enumerable.getIndex()));
         }
 
         final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
-        for (UICheckBox checkb : checkbox) {
+        for (final UICheckBox checkb : checkbox) {
             final SEProperty sep = (SEProperty) lookup.get(checkb.getID());
             if (sep == null)
                 return;
             if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-                ebs = (IExtendedBlockState) ebs.withProperty(sep, checkb.isChecked());
+                ebs = ebs.withProperty(sep, checkb.isChecked());
             } else if (checkb.isChecked()) {
-                ebs = (IExtendedBlockState) ebs.withProperty(sep, sep.getDefault());
+                ebs = ebs.withProperty(sep, sep.getDefault());
             }
         }
 
-        for (Entry<IUnlistedProperty<?>, Optional<?>> prop : ebs.getUnlistedProperties()
+        for (final Entry<IUnlistedProperty<?>, Optional<?>> prop : ebs.getUnlistedProperties()
                 .entrySet()) {
             final SEProperty property = SEProperty.cst(prop.getKey());
             if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {

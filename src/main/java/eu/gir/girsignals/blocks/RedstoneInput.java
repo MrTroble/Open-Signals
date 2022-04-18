@@ -12,8 +12,8 @@ import net.minecraft.world.World;
 public class RedstoneInput extends RedstoneIO {
 
     @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn,
-            BlockPos fromPos) {
+    public void neighborChanged(final IBlockState state, final World worldIn, final BlockPos pos,
+            final Block blockIn, final BlockPos fromPos) {
         if (worldIn.isRemote)
             return;
         if (worldIn.isBlockPowered(pos)) {
@@ -29,13 +29,13 @@ public class RedstoneInput extends RedstoneIO {
     }
 
     @Override
-    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,
-            EnumFacing side) {
+    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
         return 0;
     }
 
     @Override
-    public boolean canProvidePower(IBlockState state) {
+    public boolean canProvidePower(final IBlockState state) {
         return true;
     }
 }

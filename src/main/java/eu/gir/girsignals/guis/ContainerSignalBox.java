@@ -33,12 +33,12 @@ public class ContainerSignalBox extends Container implements UIClientSync {
     private Consumer<NBTTagCompound> run;
     private boolean send = true;
 
-    public ContainerSignalBox(SignalBoxTileEntity tile) {
+    public ContainerSignalBox(final SignalBoxTileEntity tile) {
         this.tile = tile;
         this.tile.add(this);
     }
 
-    public ContainerSignalBox(Consumer<NBTTagCompound> run) {
+    public ContainerSignalBox(final Consumer<NBTTagCompound> run) {
         this.run = run;
     }
 
@@ -65,7 +65,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer playerIn) {
+    public boolean canInteractWith(final EntityPlayer playerIn) {
         if (playerIn instanceof EntityPlayerMP && this.player == null) {
             this.player = (EntityPlayerMP) playerIn;
         }
@@ -73,7 +73,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(final NBTTagCompound compound) {
         if (compound.hasKey(UPDATE_SET)) {
             final NBTTagList update = (NBTTagList) compound.getTag(UPDATE_SET);
             final Builder<BlockPos, Signal> immutableMap = new Builder<>();
@@ -95,7 +95,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
     }
 
     @Override
-    public void onContainerClosed(EntityPlayer playerIn) {
+    public void onContainerClosed(final EntityPlayer playerIn) {
         playerIn.openContainer = null;
         this.tile.remove(this);
     }

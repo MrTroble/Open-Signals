@@ -56,7 +56,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     private final HashMap<ArrayList<SignalNode>, Integer> pathWayEnd = new HashMap<>();
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
         final NBTTagList list = new NBTTagList();
         linkedBlocks.forEach((p, t) -> {
             final NBTTagCompound item = NBTUtil.createPosTag(p);
@@ -69,7 +69,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(final NBTTagCompound compound) {
         final NBTTagList list = (NBTTagList) compound.getTag(LINKED_POS_LIST);
         if (list != null) {
             linkedBlocks.clear();
@@ -112,8 +112,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         loadAndConfig(speed, lastPosition, nextPosition, null);
     }
 
-    private void config(final int speed, SignalTileEnity lastTile, SignalTileEnity nextTile,
-            final ISignalAutoconfig override) {
+    private void config(final int speed, final SignalTileEnity lastTile,
+            final SignalTileEnity nextTile, final ISignalAutoconfig override) {
         final Signal last = lastTile.getSignal();
         final ISignalAutoconfig config = override == null ? last.getConfig() : override;
         if (config == null)
@@ -269,7 +269,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void updateTag(NBTTagCompound compound) {
+    public void updateTag(final NBTTagCompound compound) {
         if (compound == null)
             return;
         if (compound.hasKey(REMOVE_SIGNAL)) {
@@ -317,7 +317,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean link(BlockPos linkedPos) {
+    public boolean link(final BlockPos linkedPos) {
         if (linkedBlocks.containsKey(linkedPos))
             return false;
         final IBlockState state = world.getBlockState(linkedPos);
@@ -380,7 +380,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         return ImmutableMap.copyOf(this.linkedBlocks);
     }
 
-    private void lockPW(ArrayList<SignalNode> pathway) {
+    private void lockPW(final ArrayList<SignalNode> pathway) {
         final SignalNode node = pathway.get(pathway.size() - 1);
         final Point lastPoint = node.getPoint();
         final Point delta = lastPoint.delta(pathway.get(pathway.size() - 2).getPoint());
@@ -399,7 +399,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
     }
 
-    public void updateRedstonInput(BlockPos pos, boolean status) {
+    public void updateRedstonInput(final BlockPos pos, final boolean status) {
         final ArrayList<ArrayList<SignalNode>> listOfPathways = Lists
                 .newArrayList(pathWayEnd.keySet());
         next: for (final ArrayList<SignalNode> pathway : listOfPathways) {

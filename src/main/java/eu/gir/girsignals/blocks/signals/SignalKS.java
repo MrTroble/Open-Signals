@@ -52,8 +52,8 @@ public class SignalKS extends Signal {
     }
 
     @Override
-    public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos,
-            int tintIndex) {
+    public int colorMultiplier(final IBlockState state, final IBlockAccess worldIn,
+            final BlockPos pos, final int tintIndex) {
         return tintIndex == 1 ? 0xFFC200 : 0xFFFFFF;
     }
 

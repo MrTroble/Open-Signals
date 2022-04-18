@@ -16,8 +16,8 @@ import net.minecraft.world.gen.ChunkProviderServer;
 
 public interface IChunkloadable {
 
-    default <T> boolean loadChunkAndGetTile(Class<T> clazz, World world, BlockPos pos,
-            BiConsumer<T, Chunk> consumer) {
+    default <T> boolean loadChunkAndGetTile(final Class<T> clazz, final World world,
+            final BlockPos pos, final BiConsumer<T, Chunk> consumer) {
         if (pos == null)
             return false;
         try {
@@ -28,10 +28,12 @@ public interface IChunkloadable {
                 final boolean flag = !chunk.isLoaded();
                 if (flag) {
                     if (world.isRemote) {
-                        ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
+                        final ChunkProviderClient client = (ChunkProviderClient) world
+                                .getChunkProvider();
                         chunk = client.loadChunk(chunk.x, chunk.z);
                     } else {
-                        ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
+                        final ChunkProviderServer server = (ChunkProviderServer) world
+                                .getChunkProvider();
                         chunk = server.loadChunk(chunk.x, chunk.z);
                     }
                 }
@@ -46,10 +48,12 @@ public interface IChunkloadable {
 
                 if (flag) {
                     if (world.isRemote) {
-                        ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
+                        final ChunkProviderClient client = (ChunkProviderClient) world
+                                .getChunkProvider();
                         client.unloadChunk(chunk.x, chunk.z);
                     } else {
-                        ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
+                        final ChunkProviderServer server = (ChunkProviderServer) world
+                                .getChunkProvider();
                         server.queueUnload(chunk);
                     }
                 }
@@ -59,14 +63,14 @@ public interface IChunkloadable {
             if (mcserver == null)
                 return Minecraft.getMinecraft().addScheduledTask(call).get();
             return mcserver.callFromMainThread(call).get();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
         return false;
     }
 
-    default boolean loadChunkAndGetBlock(World world, BlockPos pos,
-            BiConsumer<IBlockState, Chunk> consumer) {
+    default boolean loadChunkAndGetBlock(final World world, final BlockPos pos,
+            final BiConsumer<IBlockState, Chunk> consumer) {
         if (pos == null)
             return false;
         try {
@@ -76,10 +80,12 @@ public interface IChunkloadable {
                 final boolean flag = !chunk.isLoaded();
                 if (flag) {
                     if (world.isRemote) {
-                        ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
+                        final ChunkProviderClient client = (ChunkProviderClient) world
+                                .getChunkProvider();
                         chunk = client.loadChunk(chunk.x, chunk.z);
                     } else {
-                        ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
+                        final ChunkProviderServer server = (ChunkProviderServer) world
+                                .getChunkProvider();
                         chunk = server.loadChunk(chunk.x, chunk.z);
                     }
                 }
@@ -94,10 +100,12 @@ public interface IChunkloadable {
 
                 if (flag) {
                     if (world.isRemote) {
-                        ChunkProviderClient client = (ChunkProviderClient) world.getChunkProvider();
+                        final ChunkProviderClient client = (ChunkProviderClient) world
+                                .getChunkProvider();
                         client.unloadChunk(chunk.x, chunk.z);
                     } else {
-                        ChunkProviderServer server = (ChunkProviderServer) world.getChunkProvider();
+                        final ChunkProviderServer server = (ChunkProviderServer) world
+                                .getChunkProvider();
                         server.queueUnload(chunk);
                     }
                 }
@@ -107,7 +115,7 @@ public interface IChunkloadable {
             if (mcserver == null)
                 return Minecraft.getMinecraft().addScheduledTask(call).get();
             return mcserver.callFromMainThread(call).get();
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
         return false;

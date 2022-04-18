@@ -25,22 +25,22 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
     private static final String OPTION = "option";
 
     private final Point point;
-    private HashMap<Entry<Point, Point>, Entry<EnumGuiMode, Rotation>> possibleConnections = new HashMap<>();
-    private HashMap<Entry<EnumGuiMode, Rotation>, PathOption> possibleModes = new HashMap<>();
+    private final HashMap<Entry<Point, Point>, Entry<EnumGuiMode, Rotation>> possibleConnections = new HashMap<>();
+    private final HashMap<Entry<EnumGuiMode, Rotation>, PathOption> possibleModes = new HashMap<>();
 
     public SignalNode(final Point point2) {
         this.point = point2;
     }
 
-    public void add(EnumGuiMode mode, Rotation rot) {
+    public void add(final EnumGuiMode mode, final Rotation rot) {
         possibleModes.put(Maps.immutableEntry(mode, rot), new PathOption());
     }
 
-    public boolean has(EnumGuiMode mode, Rotation rot) {
+    public boolean has(final EnumGuiMode mode, final Rotation rot) {
         return possibleModes.containsKey(Maps.immutableEntry(mode, rot));
     }
 
-    public void remove(EnumGuiMode mode, Rotation rot) {
+    public void remove(final EnumGuiMode mode, final Rotation rot) {
         possibleModes.remove(Maps.immutableEntry(mode, rot));
     }
 
@@ -103,7 +103,7 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
         return this.possibleConnections.keySet();
     }
 
-    public void forEach(BiConsumer<Entry<EnumGuiMode, Rotation>, PathOption> applier) {
+    public void forEach(final BiConsumer<Entry<EnumGuiMode, Rotation>, PathOption> applier) {
         possibleModes.forEach(applier);
     }
 
@@ -112,7 +112,7 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
     }
 
     @Override
-    public void write(NBTTagCompound compound) {
+    public void write(final NBTTagCompound compound) {
         if (possibleModes.isEmpty()) {
             compound.removeTag(this.getID());
             return;
@@ -129,7 +129,7 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
     }
 
     @Override
-    public void read(NBTTagCompound compound) {
+    public void read(final NBTTagCompound compound) {
         if (!compound.hasKey(getID()))
             return;
         final NBTTagList pointList = (NBTTagList) compound.getTag(getID());
@@ -148,7 +148,7 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
     }
 
     @Override
-    public void setID(String id) {
+    public void setID(final String id) {
     }
 
     public Optional<PathOption> getOption(final EnumGuiMode mode) {
@@ -194,7 +194,7 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
                 .allMatch(option -> option.getPathUsage().equals(EnumPathUsage.FREE));
     }
 
-    public boolean has(EnumGuiMode mode) {
+    public boolean has(final EnumGuiMode mode) {
         return this.possibleModes.keySet().stream().anyMatch(e -> e.getKey().equals(mode));
     }
 
@@ -209,7 +209,7 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)

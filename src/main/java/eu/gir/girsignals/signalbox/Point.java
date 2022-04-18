@@ -11,7 +11,7 @@ public class Point implements Serializable {
 
     private int x, y;
 
-    public Point(int x, int y) {
+    public Point(final int x, final int y) {
         this.x = x;
         this.y = y;
     }
@@ -25,7 +25,7 @@ public class Point implements Serializable {
         return x;
     }
 
-    public void setX(int x) {
+    public void setX(final int x) {
         this.x = x;
     }
 
@@ -33,23 +33,23 @@ public class Point implements Serializable {
         return y;
     }
 
-    public void setY(int y) {
+    public void setY(final int y) {
         this.y = y;
     }
 
-    public void translate(int x, int y) {
+    public void translate(final int x, final int y) {
         this.x += x;
         this.y += y;
     }
 
-    public Point delta(Point other) {
+    public Point delta(final Point other) {
         final Point point = new Point(this);
         point.translate(-other.getX(), -other.getY());
         return point;
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (obj == null || !(obj instanceof Point))
             return false;
         final Point other = (Point) obj;

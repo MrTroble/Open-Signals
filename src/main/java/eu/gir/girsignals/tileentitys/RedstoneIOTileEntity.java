@@ -21,7 +21,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     public static final String LINKED_LIST = "linkedList";
 
     private String name = null;
-    private ArrayList<BlockPos> linkedPositions = new ArrayList<>();
+    private final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
 
     @Override
     public String getName() {
@@ -31,7 +31,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
         final NBTTagList list = new NBTTagList();
         linkedPositions.forEach(pos -> list.appendTag(NBTUtil.createPosTag(pos)));
         compound.setTag(LINKED_LIST, list);
@@ -41,7 +41,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(final NBTTagCompound compound) {
         super.readFromNBT(compound);
         linkedPositions.clear();
         final NBTTagList list = (NBTTagList) compound.getTag(LINKED_LIST);
@@ -55,7 +55,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
         return this.name != null;
     }
 
-    public void link(BlockPos pos) {
+    public void link(final BlockPos pos) {
         if (world.isRemote)
             return;
         if (!linkedPositions.contains(pos))
@@ -63,7 +63,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
         this.syncClient();
     }
 
-    public void unlink(BlockPos pos) {
+    public void unlink(final BlockPos pos) {
         if (world.isRemote)
             return;
         if (linkedPositions.contains(pos))
@@ -80,13 +80,13 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState,
-            IBlockState newSate) {
+    public boolean shouldRefresh(final World world, final BlockPos pos, final IBlockState oldState,
+            final IBlockState newSate) {
         return false;
     }
 
     @Override
-    public void updateTag(NBTTagCompound compound) {
+    public void updateTag(final NBTTagCompound compound) {
         if (compound.hasKey(NAME_NBT)) {
             this.name = compound.getString(NAME_NBT);
             this.syncClient();

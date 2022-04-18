@@ -23,9 +23,9 @@ public class SignalController extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state,
-            EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY,
-            float hitZ) {
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
             GuiHandler.invokeGui(Signal.class, playerIn, worldIn, pos);
             return true;
@@ -34,13 +34,13 @@ public class SignalController extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
         return new SignalControllerTileEntity();
     }
 
     @Override
-    public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn,
-            BlockPos fromPos) {
+    public void neighborChanged(final IBlockState state, final World world, final BlockPos pos,
+            final Block blockIn, final BlockPos fromPos) {
         final TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof SignalControllerTileEntity) {
             ((SignalControllerTileEntity) tile).redstoneUpdate();

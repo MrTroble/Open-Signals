@@ -21,11 +21,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
     private HLSignalConfig() {
     }
 
-    @SuppressWarnings({
-            "rawtypes"
-    })
-    private void speedCheck(final int speed, final Map<SEProperty, Object> values, HL normal,
-            HL restricted) {
+    @SuppressWarnings("rawtypes")
+    private void speedCheck(final int speed, final Map<SEProperty, Object> values, final HL normal,
+            final HL restricted) {
         if (speed >= 1 && speed <= 10) {
             values.put(SignalHL.STOPSIGNAL, restricted);
             if (speed <= 5) {
@@ -42,7 +40,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
+    public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         if (next != null) {
             next.getProperty(SignalHL.STOPSIGNAL)
@@ -98,7 +96,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public void reset(SignalTileEnity current) {
+    public void reset(final SignalTileEnity current) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         values.put(SignalHL.LIGHTBAR, HLLightbar.OFF);
         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);

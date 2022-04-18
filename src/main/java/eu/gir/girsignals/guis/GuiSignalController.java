@@ -58,7 +58,7 @@ public class GuiSignalController extends GuiBase {
         init();
     }
 
-    private void initMode(EnumMode mode, Signal signal) {
+    private void initMode(final EnumMode mode, final Signal signal) {
         lowerEntity.clear();
         profileName = null;
         switch (mode) {
@@ -78,7 +78,8 @@ public class GuiSignalController extends GuiBase {
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    private void createPageForSide(EnumFacing face, UIEntity leftSide, UIBlockRender bRender) {
+    private void createPageForSide(final EnumFacing face, final UIEntity leftSide,
+            final UIBlockRender bRender) {
         final UIEntity middlePart = new UIEntity();
 
         final IIntegerable<String> profile = SizeIntegerables.of("profile", 32,
@@ -105,7 +106,7 @@ public class GuiSignalController extends GuiBase {
         final Map<SEProperty<?>, Object> map = this.controller.getReference();
         if (map == null)
             return;
-        for (SEProperty<?> entry : map.keySet()) {
+        for (final SEProperty<?> entry : map.keySet()) {
             if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
                     || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
                     && entry.test(map.entrySet())) {
@@ -169,7 +170,7 @@ public class GuiSignalController extends GuiBase {
         });
         rightSide.add(toggle);
 
-        for (EnumFacing face : EnumFacing.VALUES) {
+        for (final EnumFacing face : EnumFacing.VALUES) {
             final List<BakedQuad> quad = model.getQuads(state, face, 0);
             final UIEntity faceEntity = new UIEntity();
             faceEntity.setWidth(20);
@@ -286,7 +287,7 @@ public class GuiSignalController extends GuiBase {
         final Map<SEProperty<?>, Object> map = this.controller.getReference();
         if (map == null)
             return;
-        for (SEProperty<?> entry : map.keySet()) {
+        for (final SEProperty<?> entry : map.keySet()) {
             if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
                     || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
                     && entry.test(map.entrySet())) {
@@ -302,12 +303,12 @@ public class GuiSignalController extends GuiBase {
     private void applyModelChange(final UIBlockRender blockRender) {
         IExtendedBlockState currentState = (IExtendedBlockState) this.controller.getSignal()
                 .getDefaultState();
-        for (Entry<SEProperty<?>, Object> e : controller.getReference().entrySet()) {
+        for (final Entry<SEProperty<?>, Object> e : controller.getReference().entrySet()) {
             currentState = currentState.withProperty((SEProperty) e.getKey(), e.getValue());
         }
 
         if (!previewMode) {
-            for (UIEnumerable property : lowerEntity.findRecursive(UIEnumerable.class)) {
+            for (final UIEnumerable property : lowerEntity.findRecursive(UIEnumerable.class)) {
                 if (profileName == null || property.getID().endsWith(profileName)) {
                     final SEProperty sep = SEProperty.cst(
                             controller.lookup.get(property.getID().replace("." + profileName, "")));

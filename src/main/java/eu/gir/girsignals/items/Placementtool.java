@@ -43,8 +43,9 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
             "rawtypes", "unchecked"
     })
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos,
-            EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
+            final BlockPos pos, final EnumHand hand, final EnumFacing facing, final float hitX,
+            final float hitY, final float hitZ) {
         if (player.isSneaking()) {
             if (!worldIn.isRemote)
                 return EnumActionResult.SUCCESS;
@@ -57,7 +58,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
             if (!worldIn.isAirBlock(setPosition))
                 return EnumActionResult.FAIL;
 
-            NBTTagCompound compound = player.getHeldItemMainhand().getTagCompound();
+            final NBTTagCompound compound = player.getHeldItemMainhand().getTagCompound();
             if (compound == null || !compound.hasKey(BLOCK_TYPE_ID)) {
                 player.sendMessage(new TextComponentTranslation("pt.itemnotset"));
                 return EnumActionResult.FAIL;
@@ -71,7 +72,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
             final SignalTileEnity sig = (SignalTileEnity) worldIn.getTileEntity(setPosition);
             final ExtendedBlockState ebs = ((ExtendedBlockState) block.getBlockState());
             ebs.getUnlistedProperties().forEach(iup -> {
-                SEProperty sep = SEProperty.cst(iup);
+                final SEProperty sep = SEProperty.cst(iup);
                 if (sep.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
                     sig.setProperty(sep, sep.getDefault());
                     return;
@@ -86,7 +87,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
                 }
             });
 
-            int height = block.getHeight(sig.getProperties());
+            final int height = block.getHeight(sig.getProperties());
             for (int i = 0; i < height; i++)
                 if (!worldIn.isAirBlock(lastPos = lastPos.up())) {
                     worldIn.setBlockToAir(setPosition);
@@ -108,13 +109,13 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
 
     @SideOnly(Side.CLIENT)
     @Override
-    public String getNamedObj(int obj) {
+    public String getNamedObj(final int obj) {
         return I18n.format("property." + this.getName() + ".name") + ": "
                 + this.getObjFromID(obj).getLocalizedName();
     }
 
     @Override
-    public Signal getObjFromID(int obj) {
+    public Signal getObjFromID(final int obj) {
         return Signal.SIGNALLIST.get(signalids.get(obj));
     }
 

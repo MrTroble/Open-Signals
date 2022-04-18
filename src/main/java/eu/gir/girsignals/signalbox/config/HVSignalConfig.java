@@ -19,7 +19,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
     private HVSignalConfig() {
     }
 
-    private VR next(HP hp) {
+    private VR next(final HP hp) {
         switch (hp) {
             case HP0:
                 return VR.VR0;
@@ -33,7 +33,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
         }
     }
 
-    private VR next(HPHome hp) {
+    private VR next(final HPHome hp) {
         switch (hp) {
             case HP0:
             case HP0_ALTERNATE_RED:
@@ -48,7 +48,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
         }
     }
 
-    private VR next(HPBlock hp) {
+    private VR next(final HPBlock hp) {
         switch (hp) {
             case HP0:
                 return VR.VR0;
@@ -60,11 +60,9 @@ public final class HVSignalConfig implements ISignalAutoconfig {
         }
     }
 
-    @SuppressWarnings({
-            "rawtypes"
-    })
+    @SuppressWarnings("rawtypes")
     @Override
-    public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
+    public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         if (next != null) {
             if (speed < 7 && speed > 0 && speed != 4) {
@@ -129,11 +127,9 @@ public final class HVSignalConfig implements ISignalAutoconfig {
         this.changeIfPresent(values, current);
     }
 
-    @SuppressWarnings({
-            "rawtypes"
-    })
+    @SuppressWarnings("rawtypes")
     @Override
-    public void reset(SignalTileEnity current) {
+    public void reset(final SignalTileEnity current) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         values.put(SignalHV.HPBLOCK, HPBlock.HP0);
         values.put(SignalHV.HPHOME, HPHome.HP0);

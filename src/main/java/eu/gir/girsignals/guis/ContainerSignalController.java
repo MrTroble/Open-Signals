@@ -29,7 +29,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 
     public final HashMap<String, SEProperty<?>> lookup = new HashMap<String, SEProperty<?>>();
 
-    public ContainerSignalController(SignalControllerTileEntity tile) {
+    public ContainerSignalController(final SignalControllerTileEntity tile) {
         if (!tile.loadChunkAndGetTile(SignalTileEnity.class, tile.getWorld(),
                 tile.getLinkedPosition(), (t, c) -> {
                     reference.set(t.getProperties());
@@ -39,11 +39,11 @@ public class ContainerSignalController extends Container implements UIClientSync
             referenceBlock.set(null);
     }
 
-    public ContainerSignalController(Runnable onUpdate) {
+    public ContainerSignalController(final Runnable onUpdate) {
         this.onUpdate = onUpdate;
     }
 
-    private NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    private NBTTagCompound writeToNBT(final NBTTagCompound compound) {
         final Signal state = getSignal();
         if (state != null) {
             compound.setInteger("state", state.getID());
@@ -65,7 +65,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 
     @SideOnly(Side.CLIENT)
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(final NBTTagCompound compound) {
         if (!compound.hasKey("state")) {
             this.referenceBlock.set(null);
             return;
@@ -98,7 +98,7 @@ public class ContainerSignalController extends Container implements UIClientSync
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer playerIn) {
+    public boolean canInteractWith(final EntityPlayer playerIn) {
         if (playerIn instanceof EntityPlayerMP) {
             this.player = (EntityPlayerMP) playerIn;
             return true;

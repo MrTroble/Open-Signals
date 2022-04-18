@@ -18,17 +18,17 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 
     private SignalNode node;
 
-    public UISignalBoxTile(SignalNode node) {
+    public UISignalBoxTile(final SignalNode node) {
         this.node = node;
     }
 
-    public UISignalBoxTile(EnumGuiMode enumMode) {
+    public UISignalBoxTile(final EnumGuiMode enumMode) {
         this.node = new SignalNode(null);
         this.node.add(enumMode, Rotation.NONE);
     }
 
     @Override
-    public synchronized void draw(int mouseX, int mouseY) {
+    public synchronized void draw(final int mouseX, final int mouseY) {
         Minecraft.getMinecraft().getTextureManager().bindTexture(ICON);
         GlStateManager.enableBlend();
         GlStateManager.disableTexture2D();
@@ -58,17 +58,17 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
         return node;
     }
 
-    public void setNode(SignalNode node) {
+    public void setNode(final SignalNode node) {
         this.node = node;
     }
 
     @Override
-    public void write(NBTTagCompound compound) {
+    public void write(final NBTTagCompound compound) {
         this.node.write(compound);
     }
 
     @Override
-    public void read(NBTTagCompound compound) {
+    public void read(final NBTTagCompound compound) {
         this.node.read(compound);
     }
 
@@ -78,7 +78,7 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
     }
 
     @Override
-    public void setID(String id) {
+    public void setID(final String id) {
         this.node.setID(id);
     }
 

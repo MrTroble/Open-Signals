@@ -191,7 +191,8 @@ public class SEProperty<T extends Comparable<T>> implements IUnlistedProperty<T>
 
     public static class SEAutoNameProp<T extends Comparable<T>> extends SEProperty<T> {
 
-        public SEAutoNameProp(final IProperty<T> parent, final T defaultValue, final ChangeableStage stage,
+        public SEAutoNameProp(final IProperty<T> parent, final T defaultValue,
+                final ChangeableStage stage,
                 final Predicate<Set<Entry<SEProperty<?>, Object>>> deps) {
             super(parent, defaultValue, stage, deps);
         }

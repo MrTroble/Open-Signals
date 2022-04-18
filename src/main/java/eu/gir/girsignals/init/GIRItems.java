@@ -30,18 +30,18 @@ public class GIRItems {
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
     public static void init() {
-        Field[] fields = GIRItems.class.getFields();
-        for (Field field : fields) {
-            int modifiers = field.getModifiers();
+        final Field[] fields = GIRItems.class.getFields();
+        for (final Field field : fields) {
+            final int modifiers = field.getModifiers();
             if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
                     && Modifier.isPublic(modifiers)) {
-                String name = field.getName().toLowerCase().replace("_", "");
+                final String name = field.getName().toLowerCase().replace("_", "");
                 try {
-                    Item item = (Item) field.get(null);
+                    final Item item = (Item) field.get(null);
                     item.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
                     item.setUnlocalizedName(name);
                     registeredItems.add(item);
-                } catch (IllegalArgumentException | IllegalAccessException e) {
+                } catch (final IllegalArgumentException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
@@ -49,8 +49,8 @@ public class GIRItems {
     }
 
     @SubscribeEvent
-    public static void registerItem(RegistryEvent.Register<Item> event) {
-        IForgeRegistry<Item> registry = event.getRegistry();
+    public static void registerItem(final RegistryEvent.Register<Item> event) {
+        final IForgeRegistry<Item> registry = event.getRegistry();
         registeredItems.forEach(registry::register);
     }
 

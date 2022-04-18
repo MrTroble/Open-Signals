@@ -17,7 +17,7 @@ public class UIMenu extends UIComponent {
     private int mX, mY, selection = 0, rotation = 0;
 
     @Override
-    public void draw(int mouseX, int mouseY) {
+    public void draw(final int mouseX, final int mouseY) {
     }
 
     @Override
@@ -25,7 +25,7 @@ public class UIMenu extends UIComponent {
     }
 
     @Override
-    public void postDraw(int mouseX, int mouseY) {
+    public void postDraw(final int mouseX, final int mouseY) {
         if (this.isVisible()) {
             GlStateManager.pushMatrix();
             GlStateManager.translate(0, 0, 5);
@@ -59,7 +59,7 @@ public class UIMenu extends UIComponent {
     }
 
     @Override
-    public void mouseEvent(MouseEvent event) {
+    public void mouseEvent(final MouseEvent event) {
         switch (event.state) {
             case CLICKED:
                 if (event.key != 1)
@@ -81,7 +81,7 @@ public class UIMenu extends UIComponent {
     }
 
     @Override
-    public void keyEvent(KeyEvent event) {
+    public void keyEvent(final KeyEvent event) {
         super.keyEvent(event);
         if (event.typed == 'r') {
             this.rotation++;

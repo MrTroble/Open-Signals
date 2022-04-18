@@ -39,14 +39,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class SignalCustomModel implements IModel {
 
-    private ArrayList<ResourceLocation> textures = new ArrayList<>();
-    private HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
+    private final ArrayList<ResourceLocation> textures = new ArrayList<>();
+    private final HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
     private IBakedModel cachedModel = null;
     private SignalAngel angel = SignalAngel.ANGEL0;
 
     private static Field rotationField;
     static {
-        for (Field fdl : BlockPart.class.getFields()) {
+        for (final Field fdl : BlockPart.class.getFields()) {
             if (fdl.getType().equals(BlockPartRotation.class)) {
                 fdl.setAccessible(true);
                 rotationField = fdl;
@@ -54,14 +54,14 @@ public class SignalCustomModel implements IModel {
         }
     }
 
-    public SignalCustomModel(Consumer<SignalCustomModel> init, SignalAngel facing) {
+    public SignalCustomModel(final Consumer<SignalCustomModel> init, final SignalAngel facing) {
         init.accept(this);
         this.angel = facing;
     }
 
     @Override
-    public IBakedModel bake(IModelState state, VertexFormat format,
-            Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+    public IBakedModel bake(final IModelState state, final VertexFormat format,
+            final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
         if (cachedModel == null) {
             final MultipartBakedModel.Builder build = new MultipartBakedModel.Builder();
             modelCache.forEach((pr, m) -> {
@@ -81,7 +81,7 @@ public class SignalCustomModel implements IModel {
                                         angel.getAngel(), false);
                         try {
                             rotationField.set(bp, prt);
-                        } catch (IllegalArgumentException | IllegalAccessException e) {
+                        } catch (final IllegalArgumentException | IllegalAccessException e) {
                             e.printStackTrace();
                         }
                     });
@@ -109,23 +109,24 @@ public class SignalCustomModel implements IModel {
         return ImmutableList.copyOf(textures);
     }
 
-    protected void register(String name, Predicate<IExtendedBlockState> state, float yOffset) {
+    protected void register(final String name, final Predicate<IExtendedBlockState> state,
+            final float yOffset) {
         this.register(name, state, 0, yOffset, 0);
     }
 
-    protected void register(String name, Predicate<IExtendedBlockState> state, float yOffset,
-            String... strings) {
+    protected void register(final String name, final Predicate<IExtendedBlockState> state,
+            final float yOffset, final String... strings) {
         this.register(name, state, 0, yOffset, 0, strings);
     }
 
-    protected void register(String name, Predicate<IExtendedBlockState> state, float x, float y,
-            float z, @Nullable String... strings) {
+    protected void register(final String name, final Predicate<IExtendedBlockState> state,
+            final float x, final float y, final float z, @Nullable final String... strings) {
         IModel m = ModelLoaderRegistry.getModelOrLogError(
                 new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
                 "Couldn't find " + name);
         m = m.smoothLighting(false);
         if (strings != null && strings.length > 0) {
-            Builder<String, String> build = ImmutableMap.builder();
+            final Builder<String, String> build = ImmutableMap.builder();
             for (int i = 0; i < (int) Math.floor(strings.length / 2); i++)
                 build.put(strings[i * 2], strings[i * 2 + 1]);
             m = m.retexture(build.build());

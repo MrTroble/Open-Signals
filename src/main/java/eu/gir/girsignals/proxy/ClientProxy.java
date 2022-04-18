@@ -25,7 +25,8 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class ClientProxy extends CommonProxy {
 
-    public void preinit(FMLPreInitializationEvent event) {
+    @Override
+    public void preinit(final FMLPreInitializationEvent event) {
         super.preinit(event);
         GuiHandler.addGui(Placementtool.class,
                 (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
@@ -39,12 +40,14 @@ public class ClientProxy extends CommonProxy {
                 new SignalSpecialRenderer());
     }
 
-    public void init(FMLInitializationEvent event) {
+    @Override
+    public void init(final FMLInitializationEvent event) {
         super.init(event);
 
     }
 
-    public void postinit(FMLPostInitializationEvent event) {
+    @Override
+    public void postinit(final FMLPostInitializationEvent event) {
         super.postinit(event);
 
     }

@@ -22,7 +22,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
             "unchecked", "rawtypes"
     })
     @Override
-    public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
+    public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
 
         if (next != null) {
@@ -63,11 +63,9 @@ public final class KSSignalConfig implements ISignalAutoconfig {
         this.changeIfPresent(values, current);
     }
 
-    @SuppressWarnings({
-            "rawtypes"
-    })
+    @SuppressWarnings("rawtypes")
     @Override
-    public void reset(SignalTileEnity current) {
+    public void reset(final SignalTileEnity current) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
         values.put(SignalKS.STOPSIGNAL, KS.HP0);

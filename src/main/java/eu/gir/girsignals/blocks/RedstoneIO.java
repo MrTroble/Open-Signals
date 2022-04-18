@@ -30,12 +30,12 @@ public class RedstoneIO extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public int getMetaFromState(IBlockState state) {
+    public int getMetaFromState(final IBlockState state) {
         return state.getValue(POWER) ? 0 : 1;
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
+    public IBlockState getStateFromMeta(final int meta) {
         return this.getDefaultState().withProperty(POWER, meta == 1);
     }
 
@@ -47,31 +47,31 @@ public class RedstoneIO extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess,
-            net.minecraft.util.math.BlockPos pos, EnumFacing side) {
+    public int getStrongPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final net.minecraft.util.math.BlockPos pos, final EnumFacing side) {
         return getWeakPower(blockState, blockAccess, pos, side);
     }
 
     @Override
-    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess,
-            net.minecraft.util.math.BlockPos pos, EnumFacing side) {
+    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final net.minecraft.util.math.BlockPos pos, final EnumFacing side) {
         return blockState.getValue(POWER) ? 15 : 0;
     }
 
     @Override
-    public boolean canProvidePower(IBlockState state) {
+    public boolean canProvidePower(final IBlockState state) {
         return true;
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
         return new RedstoneIOTileEntity();
     }
 
     @Override
-    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state,
-            EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY,
-            float hitZ) {
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
                 GuiHandler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);

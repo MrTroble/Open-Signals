@@ -21,11 +21,11 @@ public enum EnumGuiMode {
 
     public final BiConsumer<Object, Integer> consumer;
 
-    private EnumGuiMode(int id) {
+    private EnumGuiMode(final int id) {
         this.consumer = (parent, color) -> SignalBoxUtil.drawTextured((UIEntity) parent, id);
     }
 
-    private EnumGuiMode(double x1, double y1, double x2, double y2) {
+    private EnumGuiMode(final double x1, final double y1, final double x2, final double y2) {
         this.consumer = (parent, color) -> SignalBoxUtil.drawLines(
                 (int) (x1 * ((UIEntity) parent).getWidth()),
                 (int) (x2 * ((UIEntity) parent).getWidth()),

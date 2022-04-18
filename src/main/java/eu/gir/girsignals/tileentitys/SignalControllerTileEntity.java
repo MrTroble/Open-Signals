@@ -36,7 +36,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private Map<String, Integer> tableOfSupportedSignalTypes;
     private int signalTypeCache = -1;
     private NBTTagCompound compound = new NBTTagCompound();
-    private final HashMap<EnumFacing, Map<EnumState, String>> statesEnabled = new HashMap<EnumFacing, Map<EnumState, String>>();
+    private final HashMap<EnumFacing, Map<EnumState, String>> statesEnabled //
+            = new HashMap<EnumFacing, Map<EnumState, String>>();
     private final boolean[] currentStates = new boolean[EnumFacing.values().length];
 
     private static final String ID_X = "xLinkedPos";
@@ -48,7 +49,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public SignalControllerTileEntity() {
     }
 
-    public static BlockPos readBlockPosFromNBT(NBTTagCompound compound) {
+    public static BlockPos readBlockPosFromNBT(final NBTTagCompound compound) {
         if (compound != null && compound.hasKey(ID_X) && compound.hasKey(ID_Y)
                 && compound.hasKey(ID_Z)) {
             return new BlockPos(compound.getInteger(ID_X), compound.getInteger(ID_Y),
@@ -57,7 +58,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return null;
     }
 
-    public static void writeBlockPosToNBT(BlockPos pos, NBTTagCompound compound) {
+    public static void writeBlockPosToNBT(final BlockPos pos, final NBTTagCompound compound) {
         if (pos != null && compound != null) {
             compound.setInteger(ID_X, pos.getX());
             compound.setInteger(ID_Y, pos.getY());
@@ -66,7 +67,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(final NBTTagCompound compound) {
         linkedSignalPosition = readBlockPosFromNBT(compound);
         this.compound = compound.getCompoundTag(ID_COMP);
         super.readFromNBT(compound);
@@ -76,7 +77,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
         writeBlockPosToNBT(linkedSignalPosition, compound);
         super.writeToNBT(compound);
         compound.setTag(ID_COMP, this.compound);
@@ -120,7 +121,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     @Callback
     @Optional.Method(modid = "opencomputers")
-    public Object[] hasLink(Context context, Arguments args) {
+    public Object[] hasLink(final Context context, final Arguments args) {
         return new Object[] {
                 hasLink()
         };
@@ -128,7 +129,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     @Callback
     @Optional.Method(modid = "opencomputers")
-    public Object[] getSupportedSignalTypes(Context context, Arguments args) {
+    public Object[] getSupportedSignalTypes(final Context context, final Arguments args) {
         return new Object[] {
                 tableOfSupportedSignalTypes
         };
@@ -138,13 +139,13 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return listOfSupportedIndicies;
     }
 
-    public static boolean find(int[] arr, int i) {
+    public static boolean find(final int[] arr, final int i) {
         return Arrays.stream(arr).anyMatch(x -> i == x);
     }
 
     @Callback
     @Optional.Method(modid = "opencomputers")
-    public Object[] changeSignal(Context context, Arguments args) {
+    public Object[] changeSignal(final Context context, final Arguments args) {
         return new Object[] {
                 changeSignalImpl(args.checkInteger(0), args.checkInteger(1))
         };
@@ -153,14 +154,14 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    public boolean changeSignalImpl(int type, int newSignal) {
+    public boolean changeSignalImpl(final int type, final int newSignal) {
         if (!find(getSupportedSignalTypesImpl(), type))
             return false;
         final AtomicBoolean rtc = new AtomicBoolean(true);
         loadChunkAndGetTile(SignalTileEnity.class, world, linkedSignalPosition, (tile, chunk) -> {
-            IBlockState state = chunk.getBlockState(linkedSignalPosition);
-            Signal block = (Signal) state.getBlock();
-            SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
+            final IBlockState state = chunk.getBlockState(linkedSignalPosition);
+            final Signal block = (Signal) state.getBlock();
+            final SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
             if (!prop.isValid(newSignal)) {
                 rtc.set(false);
                 return;
@@ -173,7 +174,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     @Callback
     @Optional.Method(modid = "opencomputers")
-    public Object[] getSignalType(Context context, Arguments args) {
+    public Object[] getSignalType(final Context context, final Arguments args) {
         return new Object[] {
                 Signal.SIGNALLIST.get(getSignalTypeImpl()).getSignalTypeName()
         };
@@ -185,14 +186,14 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     @Callback
     @Optional.Method(modid = "opencomputers")
-    public Object[] getSignalState(Context context, Arguments args) {
+    public Object[] getSignalState(final Context context, final Arguments args) {
         return new Object[] {
                 getSignalStateImpl(args.checkInteger(0))
         };
     }
 
     @SuppressWarnings("rawtypes")
-    public int getSignalStateImpl(int type) {
+    public int getSignalStateImpl(final int type) {
         if (!find(getSupportedSignalTypesImpl(), type))
             return -1;
         final AtomicReference<SignalTileEnity> entity = new AtomicReference<SignalTileEnity>();
@@ -201,9 +202,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         final SignalTileEnity tile = entity.get();
         if (tile == null)
             return -1;
-        Signal block = (Signal) Signal.SIGNALLIST.get(tile.getBlockID());
-        SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
-        java.util.Optional bool = tile.getProperty(prop);
+        final Signal block = Signal.SIGNALLIST.get(tile.getBlockID());
+        final SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
+        final java.util.Optional bool = tile.getProperty(prop);
         if (bool.isPresent())
             return SEProperty.getIDFromObj(bool.get());
         return -1;
@@ -259,13 +260,13 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return true;
     }
 
-    private boolean inMode(EnumMode mode) {
+    private boolean inMode(final EnumMode mode) {
         return this.compound.getInteger(EnumMode.class.getSimpleName().toLowerCase()) == mode
                 .ordinal();
     }
 
     @Override
-    public void updateTag(NBTTagCompound compound) {
+    public void updateTag(final NBTTagCompound compound) {
         if (compound == null || tableOfSupportedSignalTypes == null)
             return;
         this.compound = compound;
@@ -273,8 +274,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (inMode(EnumMode.MANUELL)) {
             compound.getKeySet().forEach(str -> {
                 if (tableOfSupportedSignalTypes.containsKey(str)) {
-                    int type = compound.getInteger(str);
-                    int id = tableOfSupportedSignalTypes.get(str);
+                    final int type = compound.getInteger(str);
+                    final int id = tableOfSupportedSignalTypes.get(str);
                     changeSignalImpl(id, type);
                 }
             });
@@ -283,7 +284,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         syncClient();
     }
 
-    private void changeProfile(String onProfile, EnumFacing face, EnumState state) {
+    private void changeProfile(final String onProfile, final EnumFacing face,
+            final EnumState state) {
         if (compound.hasKey(onProfile)) {
             if (!this.statesEnabled.containsKey(face))
                 this.statesEnabled.put(face, Maps.newHashMap());
@@ -299,7 +301,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     private void updateRSProfiles() {
         this.statesEnabled.clear();
-        for (EnumFacing face : EnumFacing.VALUES) {
+        for (final EnumFacing face : EnumFacing.VALUES) {
             final String offProfile = "profileOff." + face.getName();
             final String onProfile = "profileOn." + face.getName();
             changeProfile(onProfile, face, EnumState.ONSTATE);
@@ -310,7 +312,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public void redstoneUpdate() {
         if (compound == null || tableOfSupportedSignalTypes == null)
             return;
-        for (EnumFacing face : EnumFacing.VALUES) {
+        for (final EnumFacing face : EnumFacing.VALUES) {
             if (!this.statesEnabled.containsKey(face))
                 continue;
             final boolean state = this.world.isSidePowered(pos.offset(face), face);
@@ -328,7 +330,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
                     return;
                 final String name = e.split("\\.")[0];
                 if (tableOfSupportedSignalTypes.containsKey(name)) {
-                    int id = tableOfSupportedSignalTypes.get(name);
+                    final int id = tableOfSupportedSignalTypes.get(name);
                     changeSignalImpl(id, value);
                 }
             });

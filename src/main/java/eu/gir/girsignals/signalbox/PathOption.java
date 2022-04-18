@@ -21,11 +21,11 @@ public class PathOption {
         this.pathUsage = EnumPathUsage.FREE;
     }
 
-    public PathOption(EnumPathUsage pathUsage) {
+    public PathOption(final EnumPathUsage pathUsage) {
         this.pathUsage = pathUsage;
     }
 
-    public PathOption(NBTTagCompound compound) {
+    public PathOption(final NBTTagCompound compound) {
         this.pathUsage = EnumPathUsage.valueOf(compound.getString(PATH_USAGE));
         for (final LinkType type : LinkType.values()) {
             if (compound.hasKey(type.name())) {
@@ -57,15 +57,15 @@ public class PathOption {
         return pathUsage;
     }
 
-    public void setPathUsage(EnumPathUsage pathUsage) {
+    public void setPathUsage(final EnumPathUsage pathUsage) {
         this.pathUsage = pathUsage;
     }
 
-    public BlockPos getLinkedPosition(LinkType type) {
+    public BlockPos getLinkedPosition(final LinkType type) {
         return linkedPositions[type.ordinal()];
     }
 
-    public void setLinkedPosition(LinkType type, BlockPos linkedPosition) {
+    public void setLinkedPosition(final LinkType type, final BlockPos linkedPosition) {
         this.linkedPositions[type.ordinal()] = linkedPosition;
     }
 
@@ -73,7 +73,7 @@ public class PathOption {
         return speed;
     }
 
-    public void setSpeed(int speed) {
+    public void setSpeed(final int speed) {
         this.speed = speed;
     }
 
@@ -83,7 +83,7 @@ public class PathOption {
 
         private final int color;
 
-        private EnumPathUsage(int color) {
+        private EnumPathUsage(final int color) {
             this.color = color;
         }
 

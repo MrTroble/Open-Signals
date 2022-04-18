@@ -28,47 +28,47 @@ public class GhostBlock extends Block implements IConfigUpdatable {
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) {
+    public EnumBlockRenderType getRenderType(final IBlockState state) {
         return EnumBlockRenderType.INVISIBLE;
     }
 
     @SideOnly(Side.CLIENT)
     @Override
-    public float getAmbientOcclusionLightValue(IBlockState state) {
+    public float getAmbientOcclusionLightValue(final IBlockState state) {
         return 1.0F;
     }
 
     @Override
-    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state,
-            float chance, int fortune) {
+    public void dropBlockAsItemWithChance(final World worldIn, final BlockPos pos,
+            final IBlockState state, final float chance, final int fortune) {
     }
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world,
-            BlockPos pos, EntityPlayer player) {
-        BlockPos downPos = pos.down();
-        Block lowerBlock = world.getBlockState(downPos).getBlock();
+    public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target,
+            final World world, final BlockPos pos, final EntityPlayer player) {
+        final BlockPos downPos = pos.down();
+        final Block lowerBlock = world.getBlockState(downPos).getBlock();
         return lowerBlock.getPickBlock(state, target, world, downPos, player);
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state) {
+    public boolean isOpaqueCube(final IBlockState state) {
         return false;
     }
 
     @Override
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess,
-            BlockPos pos, EnumFacing side) {
+    public boolean shouldSideBeRendered(final IBlockState blockState,
+            final IBlockAccess blockAccess, final BlockPos pos, final EnumFacing side) {
         return false;
     }
 
     @Override
-    public boolean isFullCube(IBlockState state) {
+    public boolean isFullCube(final IBlockState state) {
         return false;
     }
 
     @Override
-    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+    public boolean canRenderInLayer(final IBlockState state, final BlockRenderLayer layer) {
         return layer == BlockRenderLayer.CUTOUT;
     }
 
@@ -81,15 +81,15 @@ public class GhostBlock extends Block implements IConfigUpdatable {
     }
 
     @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
 
         if (worldIn.isRemote)
             return;
         destroyUpperBlock(worldIn, pos);
 
-        BlockPos posdown = pos.down();
-        Block lowerBlock = worldIn.getBlockState(posdown).getBlock();
+        final BlockPos posdown = pos.down();
+        final Block lowerBlock = worldIn.getBlockState(posdown).getBlock();
         if (lowerBlock instanceof GhostBlock || lowerBlock instanceof Signal) {
             worldIn.destroyBlock(posdown, false);
         }

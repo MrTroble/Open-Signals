@@ -34,16 +34,16 @@ public class SignalBoxUtil {
     public static final String POINT1 = "P1";
     public static final String POINT2 = "P2";
 
-    public static Point fromNBT(NBTTagCompound comp, String name) {
+    public static Point fromNBT(final NBTTagCompound comp, final String name) {
         return new Point(comp.getInteger("x" + name), comp.getInteger("y" + name));
     }
 
-    public static void toNBT(NBTTagCompound comp, String name, Point point) {
+    public static void toNBT(final NBTTagCompound comp, final String name, final Point point) {
         comp.setInteger("x" + name, point.getX());
         comp.setInteger("y" + name, point.getY());
     }
 
-    private static double calculateHeuristic(Point p1, Point p2) {
+    private static double calculateHeuristic(final Point p1, final Point p2) {
         final int dX = p2.getX() - p1.getX();
         final int dY = p2.getY() - p1.getY();
         return Math.hypot(dX, dY);
@@ -183,47 +183,46 @@ public class SignalBoxUtil {
         return Optional.empty();
     }
 
-    static void drawRect(int left, int top, int right, int bottom, int color) {
-        float f3 = (float) (color >> 24 & 255) / 255.0F;
-        float f = (float) (color >> 16 & 255) / 255.0F;
-        float f1 = (float) (color >> 8 & 255) / 255.0F;
-        float f2 = (float) (color & 255) / 255.0F;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
+    static void drawRect(final int left, final int top, final int right, final int bottom,
+            final int color) {
+        final float f3 = (color >> 24 & 255) / 255.0F;
+        final float f = (color >> 16 & 255) / 255.0F;
+        final float f1 = (color >> 8 & 255) / 255.0F;
+        final float f2 = (color & 255) / 255.0F;
+        final Tessellator tessellator = Tessellator.getInstance();
+        final BufferBuilder bufferbuilder = tessellator.getBuffer();
         GlStateManager.color(f, f1, f2, f3);
         bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-        bufferbuilder.pos((double) left, (double) bottom, 0.0D).endVertex();
-        bufferbuilder.pos((double) right, (double) bottom, 0.0D).endVertex();
-        bufferbuilder.pos((double) right, (double) top, 0.0D).endVertex();
-        bufferbuilder.pos((double) left, (double) top, 0.0D).endVertex();
+        bufferbuilder.pos(left, bottom, 0.0D).endVertex();
+        bufferbuilder.pos(right, bottom, 0.0D).endVertex();
+        bufferbuilder.pos(right, top, 0.0D).endVertex();
+        bufferbuilder.pos(left, top, 0.0D).endVertex();
         tessellator.draw();
     }
 
-    static void drawTextured(UIEntity entity, int textureID) {
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
+    static void drawTextured(final UIEntity entity, final int textureID) {
+        final Tessellator tessellator = Tessellator.getInstance();
+        final BufferBuilder bufferbuilder = tessellator.getBuffer();
         GlStateManager.color(1, 1, 1, 1);
         GlStateManager.enableTexture2D();
         bufferbuilder.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         final double offset = 0.25 * textureID;
-        bufferbuilder.pos((double) 0, (double) entity.getHeight(), textureID).tex(offset, 0.5)
+        bufferbuilder.pos(0, entity.getHeight(), textureID).tex(offset, 0.5).endVertex();
+        bufferbuilder.pos(entity.getWidth(), entity.getHeight(), textureID).tex(offset + 0.25, 0.5)
                 .endVertex();
-        bufferbuilder.pos((double) entity.getWidth(), (double) entity.getHeight(), textureID)
-                .tex(offset + 0.25, 0.5).endVertex();
-        bufferbuilder.pos((double) entity.getWidth(), (double) 0, textureID).tex(offset + 0.25, 0)
-                .endVertex();
-        bufferbuilder.pos((double) 0, (double) 0, textureID).tex(offset, 0).endVertex();
+        bufferbuilder.pos(entity.getWidth(), 0, textureID).tex(offset + 0.25, 0).endVertex();
+        bufferbuilder.pos(0, 0, textureID).tex(offset, 0).endVertex();
         tessellator.draw();
         GlStateManager.disableTexture2D();
     }
 
-    static void drawLines(int x1, int x2, int y1, int y2, int color) {
-        float f3 = (float) (color >> 24 & 255) / 255.0F;
-        float f = (float) (color >> 16 & 255) / 255.0F;
-        float f1 = (float) (color >> 8 & 255) / 255.0F;
-        float f2 = (float) (color & 255) / 255.0F;
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder bufferbuilder = tessellator.getBuffer();
+    static void drawLines(final int x1, final int x2, final int y1, final int y2, final int color) {
+        final float f3 = (color >> 24 & 255) / 255.0F;
+        final float f = (color >> 16 & 255) / 255.0F;
+        final float f1 = (color >> 8 & 255) / 255.0F;
+        final float f2 = (color & 255) / 255.0F;
+        final Tessellator tessellator = Tessellator.getInstance();
+        final BufferBuilder bufferbuilder = tessellator.getBuffer();
         GL11.glLineWidth(5);
         GlStateManager.color(f, f1, f2, f3);
         bufferbuilder.begin(GL11.GL_LINES, DefaultVertexFormats.POSITION);

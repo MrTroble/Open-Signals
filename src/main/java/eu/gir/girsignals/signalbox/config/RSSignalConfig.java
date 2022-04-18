@@ -18,7 +18,7 @@ public final class RSSignalConfig implements ISignalAutoconfig {
     }
 
     @Override
-    public void change(int speed, SignalTileEnity current, SignalTileEnity next) {
+    public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
         current.getProperty(SignalSHLight.SHLIGHT_0)
                 .ifPresent(_u -> current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH1));
         current.getProperty(SignalHV.STOPSIGNAL)
@@ -30,7 +30,7 @@ public final class RSSignalConfig implements ISignalAutoconfig {
     }
 
     @Override
-    public void reset(SignalTileEnity current) {
+    public void reset(final SignalTileEnity current) {
         current.getProperty(SignalSHLight.SHLIGHT_0)
                 .ifPresent(_u -> current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH0));
     }

@@ -58,7 +58,7 @@ public class GuiSignalBox extends GuiBase {
     private final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
 
-    public GuiSignalBox(SignalBoxTileEntity box) {
+    public GuiSignalBox(final SignalBoxTileEntity box) {
         this.box = box;
         this.container = new ContainerSignalBox(this::update);
         Minecraft.getMinecraft().player.openContainer = this.container;
@@ -68,7 +68,7 @@ public class GuiSignalBox extends GuiBase {
         this.entity.read(this.compound);
     }
 
-    private void update(NBTTagCompound compound) {
+    private void update(final NBTTagCompound compound) {
         this.resetTileSelection();
         if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
             final String error = I18n.format(compound.getString(SignalBoxTileEntity.ERROR_STRING));
@@ -77,7 +77,7 @@ public class GuiSignalBox extends GuiBase {
             new Thread(() -> {
                 try {
                     Thread.sleep(4000);
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                     e.printStackTrace();
                 }
                 entity.remove(tooltip);
@@ -93,7 +93,7 @@ public class GuiSignalBox extends GuiBase {
                 .forEach(color -> color.getParent().remove(color));
     }
 
-    private void selectLink(final UIEntity parent, final SignalNode node, PathOption option,
+    private void selectLink(final UIEntity parent, final SignalNode node, final PathOption option,
             final ImmutableSet<Entry<BlockPos, LinkType>> entrySet, final LinkType type) {
         final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList());
@@ -116,7 +116,7 @@ public class GuiSignalBox extends GuiBase {
         }
     }
 
-    private String getSignalInfo(BlockPos signalPos, LinkType type) {
+    private String getSignalInfo(final BlockPos signalPos, final LinkType type) {
         final Map<BlockPos, String> names = this.container.getNames();
         final String customName = names == null ? null : names.get(signalPos);
         return String.format("%s (x=%d, y=%d. z=%d)",
@@ -126,8 +126,8 @@ public class GuiSignalBox extends GuiBase {
                 signalPos.getX(), signalPos.getY(), signalPos.getZ());
     }
 
-    private void setupModeSettings(UIEntity parent, EnumGuiMode mode, Rotation rotation,
-            SignalNode node, PathOption option) {
+    private void setupModeSettings(final UIEntity parent, final EnumGuiMode mode,
+            final Rotation rotation, final SignalNode node, final PathOption option) {
         final String modeName = I18n.format("property." + mode.name());
         final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
         final UIEntity entity = new UIEntity();
@@ -200,7 +200,7 @@ public class GuiSignalBox extends GuiBase {
 
     }
 
-    private void tileEdit(UIEntity tile, UIMenu menu, final UISignalBoxTile sbt) {
+    private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
         tile.add(new UIClickable(e -> {
             final SignalNode node = sbt.getNode();
             final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
@@ -213,7 +213,7 @@ public class GuiSignalBox extends GuiBase {
         }));
     }
 
-    private void tileNormal(UIEntity tile, final UISignalBoxTile currentTile) {
+    private void tileNormal(final UIEntity tile, final UISignalBoxTile currentTile) {
         tile.add(new UIClickable(c -> {
             final SignalNode currentNode = currentTile.getNode();
             if (!(currentNode.has(EnumGuiMode.RS) || currentNode.has(EnumGuiMode.HP)
@@ -240,7 +240,7 @@ public class GuiSignalBox extends GuiBase {
         tile.add(new UIClickable(e -> initializePageTileConfig(currentTile.getNode()), 1));
     }
 
-    private void resetSelection(UIEntity entity) {
+    private void resetSelection(final UIEntity entity) {
         final UIEntity parent = entity.getParent();
         parent.findRecursive(UIClickable.class).forEach(click -> click.setVisible(true));
         parent.findRecursive(UIButton.class).forEach(btn -> btn.setEnabled(true));
@@ -267,7 +267,7 @@ public class GuiSignalBox extends GuiBase {
         }, 1));
     }
 
-    private void initializePageSettings(UIEntity entity) {
+    private void initializePageSettings(final UIEntity entity) {
         reset();
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
@@ -306,13 +306,13 @@ public class GuiSignalBox extends GuiBase {
         resetSelection(entity);
     }
 
-    private void initializeFieldUsage(UIEntity entity) {
+    private void initializeFieldUsage(final UIEntity entity) {
         reset();
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
     }
 
-    private void initializeFieldEdit(UIEntity entity) {
+    private void initializeFieldEdit(final UIEntity entity) {
         reset();
         final UIMenu menu = new UIMenu();
         initializeFieldTemplate((e, name) -> this.tileEdit(e, menu, name));
@@ -320,7 +320,7 @@ public class GuiSignalBox extends GuiBase {
         resetSelection(entity);
     }
 
-    private void initializeFieldTemplate(BiConsumer<UIEntity, UISignalBoxTile> consumer) {
+    private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
         lowerEntity.add(new UIColor(BACKGROUND_COLOR));
         lowerEntity.add(new UIStack());
         lowerEntity.add(new UIScissor());

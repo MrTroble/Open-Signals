@@ -84,7 +84,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public SignalProperties(final Placementtool placementtool, final String signalTypeName,
                 final float customNameRenderHeight, final int height, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
-                final boolean canLink, ISignalAutoconfig config) {
+                final boolean canLink, final ISignalAutoconfig config) {
             this.placementtool = placementtool;
             this.signalTypeName = signalTypeName;
             this.customNameRenderHeight = customNameRenderHeight;
@@ -122,32 +122,32 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                     height, signWidth, offsetX, offsetY, signScale, canLink, config);
         }
 
-        public SignalPropertiesBuilder signWidth(float signWidth) {
+        public SignalPropertiesBuilder signWidth(final float signWidth) {
             this.signWidth = signWidth;
             return this;
         }
 
-        public SignalPropertiesBuilder offsetX(float offsetX) {
+        public SignalPropertiesBuilder offsetX(final float offsetX) {
             this.offsetX = offsetX;
             return this;
         }
 
-        public SignalPropertiesBuilder offsetY(float offsetY) {
+        public SignalPropertiesBuilder offsetY(final float offsetY) {
             this.offsetY = offsetY;
             return this;
         }
 
-        public SignalPropertiesBuilder signScale(float signScale) {
+        public SignalPropertiesBuilder signScale(final float signScale) {
             this.signScale = signScale;
             return this;
         }
 
-        public SignalPropertiesBuilder height(int height) {
+        public SignalPropertiesBuilder height(final int height) {
             this.height = height;
             return this;
         }
 
-        public SignalPropertiesBuilder signHeight(float customNameRenderHeight) {
+        public SignalPropertiesBuilder signHeight(final float customNameRenderHeight) {
             this.customNameRenderHeight = customNameRenderHeight;
             return this;
         }
@@ -157,7 +157,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return this;
         }
 
-        public SignalPropertiesBuilder config(ISignalAutoconfig config) {
+        public SignalPropertiesBuilder config(final ISignalAutoconfig config) {
             this.config = config;
             return this;
         }
@@ -188,12 +188,13 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public void dropBlockAsItemWithChance(World worldIn, BlockPos pos, IBlockState state,
-            float chance, int fortune) {
+    public void dropBlockAsItemWithChance(final World worldIn, final BlockPos pos,
+            final IBlockState state, final float chance, final int fortune) {
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
+            final BlockPos pos) {
         final SignalTileEnity te = (SignalTileEnity) source.getTileEntity(pos);
         if (te == null)
             return FULL_BLOCK_AABB;
@@ -201,12 +202,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn,
-            BlockPos pos) {
+    public AxisAlignedBB getCollisionBoundingBox(final IBlockState blockState,
+            final IBlockAccess worldIn, final BlockPos pos) {
         return getBoundingBox(blockState, worldIn, pos);
     }
 
-    public static ItemStack pickBlock(EntityPlayer player, Item item) {
+    public static ItemStack pickBlock(final EntityPlayer player, final Item item) {
         // Compatibility issues with other mods ...
         if (!Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown())
             return new ItemStack(item);
@@ -220,42 +221,42 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world,
-            BlockPos pos, EntityPlayer player) {
+    public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target,
+            final World world, final BlockPos pos, final EntityPlayer player) {
         return pickBlock(player, prop.placementtool);
     }
 
     @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
-            float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+    public IBlockState getStateForPlacement(final World world, final BlockPos pos,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ,
+            final int meta, final EntityLivingBase placer, final EnumHand hand) {
         final int index = 15
-                - (MathHelper.floor((double) (placer.getRotationYawHead() * 16.0F / 360.0F) - 0.5D)
-                        & 15);
+                - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
         return getDefaultState().withProperty(ANGEL, SignalAngel.values()[index]);
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
+    public IBlockState getStateFromMeta(final int meta) {
         return getDefaultState().withProperty(ANGEL, SignalAngel.values()[meta]);
     }
 
     @Override
-    public int getMetaFromState(IBlockState state) {
+    public int getMetaFromState(final IBlockState state) {
         return state.getValue(ANGEL).ordinal();
     }
 
     @Override
-    public IBlockState withRotation(IBlockState state, Rotation rot) {
+    public IBlockState withRotation(final IBlockState state, final Rotation rot) {
         return state.withRotation(rot);
     }
 
     @Override
-    public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
+    public IBlockState withMirror(final IBlockState state, final Mirror mirrorIn) {
         return state.withMirror(mirrorIn);
     }
 
     @Override
-    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+    public boolean canRenderInLayer(final IBlockState state, final BlockRenderLayer layer) {
         return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
     }
 
@@ -263,7 +264,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             "unchecked", "rawtypes"
     })
     @Override
-    public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos) {
+    public IBlockState getExtendedState(final IBlockState state, final IBlockAccess world,
+            final BlockPos pos) {
         final AtomicReference<IExtendedBlockState> blockState = new AtomicReference<>(
                 (IExtendedBlockState) super.getExtendedState(state, world, pos));
         final SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
@@ -274,17 +276,17 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public boolean isTranslucent(IBlockState state) {
+    public boolean isTranslucent(final IBlockState state) {
         return true;
     }
 
     @Override
-    public boolean isOpaqueCube(IBlockState state) {
+    public boolean isOpaqueCube(final IBlockState state) {
         return false;
     }
 
     @Override
-    public boolean isFullCube(IBlockState state) {
+    public boolean isFullCube(final IBlockState state) {
         return false;
     }
 
@@ -292,8 +294,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     private void buildCacheIfNull() {
         if (propcache == null) {
-            Collection<IUnlistedProperty<?>> props = ((ExtendedBlockState) this.getBlockState())
-                    .getUnlistedProperties();
+            final Collection<IUnlistedProperty<?>> props = ((ExtendedBlockState) this
+                    .getBlockState()).getUnlistedProperties();
             propcache = props.toArray(new IUnlistedProperty[props.size()]);
         }
     }
@@ -306,7 +308,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return -1;
     }
 
-    public IUnlistedProperty<?> getPropertyFromID(int id) {
+    public IUnlistedProperty<?> getPropertyFromID(final int id) {
         buildCacheIfNull();
         return propcache[id];
     }
@@ -314,14 +316,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     @SuppressWarnings("rawtypes")
     @Override
     protected BlockStateContainer createBlockState() {
-        ArrayList<IUnlistedProperty> prop = new ArrayList<>();
+        final ArrayList<IUnlistedProperty> prop = new ArrayList<>();
         if (!this.getClass().equals(Signal.class)) {
-            for (Field f : this.getClass().getDeclaredFields()) {
-                int mods = f.getModifiers();
+            for (final Field f : this.getClass().getDeclaredFields()) {
+                final int mods = f.getModifiers();
                 if (Modifier.isFinal(mods) && Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
                     try {
                         prop.add((IUnlistedProperty) f.get(null));
-                    } catch (IllegalArgumentException | IllegalAccessException e) {
+                    } catch (final IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
@@ -334,13 +336,13 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public boolean eventReceived(IBlockState state, World worldIn, BlockPos pos, int id,
-            int param) {
+    public boolean eventReceived(final IBlockState state, final World worldIn, final BlockPos pos,
+            final int id, final int param) {
         return true;
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
         return new SignalTileEnity();
     }
 
@@ -353,7 +355,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
 
         if (!worldIn.isRemote)
@@ -378,8 +380,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @SideOnly(Side.CLIENT)
-    public int colorMultiplier(IBlockState state, IBlockAccess worldIn, BlockPos pos,
-            int tintIndex) {
+    public int colorMultiplier(final IBlockState state, final IBlockAccess worldIn,
+            final BlockPos pos, final int tintIndex) {
         return 0;
     }
 
@@ -434,7 +436,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     public static <T extends Comparable<T>> Predicate<Set<Entry<SEProperty<?>, Object>>> check(
-            SEProperty<T> property, T type) {
+            final SEProperty<T> property, final T type) {
         return t -> t.stream().noneMatch(e -> e.getKey().equals(property)) || t.stream()
                 .anyMatch((e -> e.getKey().equals(property) && e.getValue().equals(type)));
     }

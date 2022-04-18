@@ -12,7 +12,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 public class GIRModels {
 
     @SubscribeEvent
-    public static void register(ModelRegistryEvent event) {
+    public static void register(final ModelRegistryEvent event) {
         GIRItems.registeredItems.forEach(GIRModels::registerModel);
         registerModel(Item.getItemFromBlock(GIRBlocks.HV_SIGNAL_CONTROLLER));
         registerModel(Item.getItemFromBlock(GIRBlocks.POST));
@@ -22,18 +22,18 @@ public class GIRModels {
     }
 
     @SubscribeEvent
-    public static void addColor(ColorHandlerEvent.Block event) {
-        BlockColors colors = event.getBlockColors();
+    public static void addColor(final ColorHandlerEvent.Block event) {
+        final BlockColors colors = event.getBlockColors();
         GIRBlocks.blocksToRegister.forEach(block -> {
             if (block instanceof Signal) {
-                Signal sb = (Signal) block;
+                final Signal sb = (Signal) block;
                 if (sb.hasCostumColor())
                     colors.registerBlockColorHandler(sb::colorMultiplier, block);
             }
         });
     }
 
-    private static void registerModel(Item item) {
+    private static void registerModel(final Item item) {
         ModelLoader.setCustomModelResourceLocation(item, 0,
                 new ModelResourceLocation(item.getRegistryName(), "inventory"));
     }
