@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<fileset-config file-format-version="1.2.0" simple-config="false" sync-formatter="false">
+  <local-check-config name="GIRCCheckStyle" location="internal_config_1650277802821.xml" type="internal" description=""/>
+  <fileset name="all" enabled="true" check-config-name="GIRCCheckStyle" local="true">
+    <file-match-pattern match-pattern="^(src|guilib|linkableapi).+\.java" include-pattern="true"/>
+  </fileset>
+</fileset-config>

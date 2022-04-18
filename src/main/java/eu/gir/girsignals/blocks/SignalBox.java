@@ -16,24 +16,26 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SignalBox extends Block implements ITileEntityProvider {
-	
-	public SignalBox() {
-		super(Material.ROCK);
-		setCreativeTab(GIRTabs.tab);
-	}
-	
-	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
-			GuiHandler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new SignalBoxTileEntity();
-	}
-	
+
+    public SignalBox() {
+        super(Material.ROCK);
+        setCreativeTab(GIRTabs.TAB);
+    }
+
+    @Override
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
+            GuiHandler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
+        return new SignalBoxTileEntity();
+    }
+
 }

@@ -2,6 +2,12 @@
 
 ## [Beta Update]
 
+* fix: Missing language keys
+* ref: Internal refactoring
+* ci: Code checks
+
+## [Beta Update]
+
 * feat: Added UIs for the redstone io blocks and rename possibility
 * feat: Added automatic reset of pathways
 * feat: Signal Box blocks now show pathways currently in use in red

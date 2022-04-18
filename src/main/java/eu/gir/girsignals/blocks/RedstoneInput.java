@@ -10,30 +10,32 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class RedstoneInput extends RedstoneIO {
-		
-	@Override
-	public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
-		if(worldIn.isRemote)
-			return;
-		if (worldIn.isBlockPowered(pos)) {
-			if(state.getValue(RedstoneIO.POWER) != true) {
-				worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, true));
-				final TileEntity entity = worldIn.getTileEntity(pos);
-				if(entity instanceof RedstoneIOTileEntity)
-					((RedstoneIOTileEntity) entity).sendToAll();
-			}
-		} else {
-			worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, false));
-		}
-	}
-	
-	@Override
-	public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos, EnumFacing side) {
-		return 0;
-	}
-	
-	@Override
-	public boolean canProvidePower(IBlockState state) {
-		return true;
-	}
+
+    @Override
+    public void neighborChanged(final IBlockState state, final World worldIn, final BlockPos pos,
+            final Block blockIn, final BlockPos fromPos) {
+        if (worldIn.isRemote)
+            return;
+        if (worldIn.isBlockPowered(pos)) {
+            if (state.getValue(RedstoneIO.POWER) != true) {
+                worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, true));
+                final TileEntity entity = worldIn.getTileEntity(pos);
+                if (entity instanceof RedstoneIOTileEntity)
+                    ((RedstoneIOTileEntity) entity).sendToAll();
+            }
+        } else {
+            worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, false));
+        }
+    }
+
+    @Override
+    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
+        return 0;
+    }
+
+    @Override
+    public boolean canProvidePower(final IBlockState state) {
+        return true;
+    }
 }
