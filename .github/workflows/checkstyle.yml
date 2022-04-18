@@ -15,3 +15,4 @@ jobs:
           reporter: "github-pr-review"
           tool_name: "Checkstyle"
           level: "error"
+          fail_on_error: true
