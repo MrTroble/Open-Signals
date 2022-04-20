@@ -15,7 +15,7 @@ public class SignalSHLight extends Signal {
 
     public SignalSHLight() {
         super(builder(GIRItems.PLACEMENT_TOOL, "SHLight").height(0).offsetX(-7.5f).offsetY(-6.3f)
-                .signHeight(0.35f).config(RSSignalConfig.RS_CONFIG).build());
+                .signHeight(0.373f).config(RSSignalConfig.RS_CONFIG).build());
     }
 
     public static final SEProperty<SHLight> SHLIGHT_0 = SEProperty.of("sh_light_bottom",
@@ -35,7 +35,7 @@ public class SignalSHLight extends Signal {
     public void renderOverlay(final double x, final double y, final double z,
             final SignalTileEnity te, final FontRenderer font) {
         super.renderOverlay(x, y, z, te, font,
-                te.getProperty(SH_HIGH).filter(b -> (Boolean) b).isPresent() ? 2.35f
+                te.getProperty(SH_HIGH).filter(b -> (Boolean) b).isPresent() ? 2.373f
                         : this.prop.customNameRenderHeight);
     }
 
