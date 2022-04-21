@@ -397,6 +397,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             current.write(guiTag);
         }
         this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
+        this.syncClient();
     }
 
     public void updateRedstonInput(final BlockPos pos, final boolean status) {
