@@ -73,7 +73,7 @@ public class EnumSignals {
     }
 
     public enum HLType implements Offable<HLType> {
-        OFF, MAIN, DISTANT;
+        OFF, MAIN, DISTANT, EXIT;
     }
 
     public enum HL implements Offable<HL> {
@@ -85,6 +85,10 @@ public class EnumSignals {
         OFF, HL1, HL4, HL7, HL10, HL_STATUS_LIGHT;
     }
 
+    public enum HLExit implements Offable<HLExit> {
+    	OFF, HL1, HL2_3, HL_SHUNTING, HL_STATUS_LIGHT;
+    }
+    
     public enum HLLightbar implements Offable<HLLightbar> {
         OFF, GREEN, YELLOW;
     }
