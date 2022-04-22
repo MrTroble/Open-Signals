@@ -8,6 +8,7 @@ import com.google.common.collect.Lists;
 
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLDistant;
+import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
@@ -51,7 +52,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                         } else if (hl.equals(HL.HL4)) {
                             current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
                         } else if (hl.equals(HL.HL2_3) || hl.equals(HL.HL5_6) || hl.equals(HL.HL7)
-                                || hl.equals(HL.HL8_9) || hl.equals(HL.HL11_12)) {
+                                || hl.equals(HL.HL8_9) || hl.equals(HL.HL11_12) || hl.equals(HLExit.HL2_3)) {
                             current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
                         } else {
                             current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
@@ -91,6 +92,11 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             values.put(SignalHL.STOPSIGNAL, HL.HL10);
             values.put(SignalHL.ZS2, ZS32.ZS13);
         }
+        if(speed <= 10) {
+        	current.setProperty(SignalHL.EXITSIGNAL, HLExit.HL2_3);
+        } else {
+        	values.put(SignalHL.EXITSIGNAL, HLExit.HL1);
+        }
         this.changeIfPresent(values, current);
     }
 
@@ -101,6 +107,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
         values.put(SignalHL.LIGHTBAR, HLLightbar.OFF);
         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
         values.put(SignalHL.STOPSIGNAL, HL.HP0);
+        values.put(SignalHL.EXITSIGNAL, HLExit.HP0);
         values.put(SignalHL.ZS2, ZS32.OFF);
         this.changeIfPresent(values, current);
     }
