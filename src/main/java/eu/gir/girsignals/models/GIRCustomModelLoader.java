@@ -16,6 +16,7 @@ import eu.gir.girsignals.EnumSignals.EL;
 import eu.gir.girsignals.EnumSignals.ELArrow;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLDistant;
+import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.HLType;
 import eu.gir.girsignals.EnumSignals.HP;
@@ -480,8 +481,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         registeredModels.put("hlsignal", cm -> {
             cm.register("hl/hl_base", ebs -> true, 0);
             cm.register("hl/hl_ne2", hasAndIs(SignalHL.NE2).and(has(SignalHL.DISTANTSIGNAL)), 0);
-            cm.register("hl/hl_ne2_4", hasAndIs(SignalHL.NE2_4).and(has(SignalHL.DISTANTSIGNAL)),
-                    1);
+            cm.register("hl/hl_ne2_4", hasAndIs(SignalHL.NE2_4).and(has(SignalHL.DISTANTSIGNAL)), 1);
+            cm.register("hl/hl_sh1", hasAndIs(SignalHL.SHUNTINGLIGHT), 5);
             cm.register("hl/hl_mast1", ebs -> true, 1);
             cm.register("hl/hl_ne2_2", hasAndIs(SignalHL.NE2).and(hasAndIs(SignalHL.NE2_2))
                     .and(has(SignalHL.DISTANTSIGNAL)), 1);
@@ -617,7 +618,63 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                             .and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.MAIN))
                                     .or(hasNot(SignalHL.HLTYPE))),
                     5, "lamp_white_sh_2north", "girsignals:blocks/lamps/lamp_white");
-
+            
+            // HL Exit Off
+            cm.register("hl/hl_main", 
+            		with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.OFF))
+            				.and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT)))
+            					.or(hasNot(SignalHL.HLTYPE)), 5);
+            
+            // HL Exit red
+            cm.register("hl/hl_main", 
+            		with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HP0))
+            			.and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
+            					.or(hasNot(SignalHL.HLTYPE))), 5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red");
+           
+            // HL Exit ALternate red
+            cm.register("hl/hl_main", 
+            		with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HP0_ALTERNATE_RED))
+            			.and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
+            					.or(hasNot(SignalHL.HLTYPE))), 5, "lamp_red2north", "girsignals:blocks/lamps/lamp_red");
+            
+            // HL Exit HL 1
+            cm.register("hl/hl_main",
+            		with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HL1))
+                     	.and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
+                     			.or(hasNot(SignalHL.HLTYPE))), 5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
+            
+            //HL Exit HL 2_3
+            cm.register("hl/hl_main",
+                    with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HL2_3))
+                            .and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
+                                    .or(hasNot(SignalHL.HLTYPE))),
+                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green", "lamp_yellow2north",
+                    "girsignals:blocks/lamps/lamp_yellow");
+            
+            //HL Exit Zs1
+            cm.register("hl/hl_main",
+                    with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HL_ZS1))
+                            .and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
+                                    .or(hasNot(SignalHL.HLTYPE))),
+                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_2north",
+                    "girsignals:blocks/lamps/lamp_white_blink");
+            
+            // HL Exit HL RS
+            cm.register("hl/hl_main",
+                    with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HL_SHUNTING))
+                            .and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
+                                    .or(hasNot(SignalHL.HLTYPE))),
+                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_1north",
+                    "girsignals:blocks/lamps/lamp_white", "lamp_white_sh_2north",
+                    "girsignals:blocks/lamps/lamp_white");
+            
+            //HL Exit Status Light
+            cm.register("hl/hl_main",
+                    with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HL_STATUS_LIGHT))
+                            .and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
+                                    .or(hasNot(SignalHL.HLTYPE))),
+                    5, "lamp_white_sh_2north", "girsignals:blocks/lamps/lamp_white");
+            
             // HL off Distant
             cm.register("hl/hl_shield_dist",
                     with(SignalHL.DISTANTSIGNAL, hl -> hl.equals(HLDistant.OFF))

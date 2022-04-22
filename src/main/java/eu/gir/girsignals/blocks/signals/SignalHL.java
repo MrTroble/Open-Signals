@@ -36,6 +36,8 @@ public class SignalHL extends Signal {
             HLLightbar.OFF);
     public static final SEProperty<MastSignal> MASTSIGN = SEProperty.of("mastsign", MastSignal.OFF,
             ChangeableStage.GUISTAGE);
+    public static final SEProperty<Boolean> SHUNTINGLIGHT = SEProperty.of("hl_sh1", false, 
+    		ChangeableStage.GUISTAGE);
     public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant",
             false, ChangeableStage.GUISTAGE);
     public static final SEProperty<Boolean> NE2 = SEProperty.of("ne2", false,
