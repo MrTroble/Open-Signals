@@ -664,10 +664,18 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                     with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HL_SHUNTING))
                             .and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
                                     .or(hasNot(SignalHL.HLTYPE))),
-                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_1north",
-                    "girsignals:blocks/lamps/lamp_white", "lamp_white_sh_2north",
+                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_2north",
                     "girsignals:blocks/lamps/lamp_white");
-            
+            cm.register("hl/hl_sh1",
+                    with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HL_SHUNTING)).and(hasAndIs(SignalHL.SHUNTINGLIGHT))
+                            .and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
+                                    .or(hasNot(SignalHL.HLTYPE))),
+                    5, "lamp_white_sh_1north", "girsignals:blocks/lamps/lamp_white");
+            cm.register("hl/hl_main",
+                    with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HL_SHUNTING)).and(hasAndIsNot(SignalHL.SHUNTINGLIGHT))
+                            .and(with(SignalHL.HLTYPE, hlt -> hlt.equals(HLType.EXIT))
+                                    .or(hasNot(SignalHL.HLTYPE))),
+                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red");
             //HL Exit Status Light
             cm.register("hl/hl_main",
                     with(SignalHL.EXITSIGNAL, hl -> hl.equals(HLExit.HL_STATUS_LIGHT))
