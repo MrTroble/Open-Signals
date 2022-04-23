@@ -29,7 +29,7 @@ public final class RSSignalConfig implements ISignalAutoconfig {
         current.getProperty(SignalHL.STOPSIGNAL)
                 .ifPresent(_u -> current.setProperty(SignalHL.STOPSIGNAL, HL.HL_SHUNTING));
         current.getProperty(SignalHL.EXITSIGNAL)
-        		.ifPresent(_u -> current.setProperty(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING));
+                .ifPresent(_u -> current.setProperty(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING));
     }
 
     @Override
