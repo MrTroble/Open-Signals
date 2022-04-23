@@ -53,7 +53,7 @@ public class EnumSignals {
     public enum MastSignal implements Offable<MastSignal> {
         OFF, WRW, WYWYW, WBWBW;
     }
-    
+
     public enum KSType implements Offable<KSType> {
         OFF, STOPSIGNAL, MAIN, DISTANT;
     }
@@ -86,9 +86,9 @@ public class EnumSignals {
     }
 
     public enum HLExit implements Offable<HLExit> {
-    	OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2_3, HL_ZS1, HL_SHUNTING, HL_STATUS_LIGHT;
+        OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2_3, HL_ZS1, HL_SHUNTING, HL_STATUS_LIGHT;
     }
-    
+
     public enum HLLightbar implements Offable<HLLightbar> {
         OFF, GREEN, YELLOW;
     }
