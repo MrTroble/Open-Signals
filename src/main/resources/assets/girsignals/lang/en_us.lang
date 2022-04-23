@@ -318,4 +318,4 @@ property.prop.OUTPUT.desc=Here you can set the Redstone output. E.g. for switch 
 property.prop.INPUT.name=Redstone input
 property.prop.INPUT.desc=Here you can set the Redstone input. E.g. from sensors.
 btn.apply=Apply
-label.linkedto=Label
+label.linkedto=Linked to
