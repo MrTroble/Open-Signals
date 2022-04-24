@@ -65,17 +65,20 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final ArrayList<HL> stopCheck = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
                     HL.HL_ZS1, HL.HL_SHUNTING);
             final ArrayList<HL> unchanged = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7, HL.HL10);
-            final boolean stop = next.getProperty(SignalHL.STOPSIGNAL)
-                    .filter(o -> stopCheck.contains(o) || (unchanged.contains(o) && optionalLightBar
-                            .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
+
+            final Optional<HL> hlStop = (Optional<HL>) next.getProperty(SignalHL.STOPSIGNAL);
+
+            final boolean stop = hlStop.filter(o -> stopCheck.contains(o) || (unchanged.contains(o)
+                    && optionalLightBar.filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
                     .isPresent();
+
             final ArrayList<HL> nextChangedSpeed = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
                     HL.HL11_12);
-            final boolean changed100 = next.getProperty(SignalHL.STOPSIGNAL)
-                    .filter(nextChangedSpeed::contains).isPresent()
+
+            final boolean changed100 = hlStop.filter(nextChangedSpeed::contains).isPresent()
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
-            final boolean normalSpeed = next.getProperty(SignalHL.STOPSIGNAL)
-                    .filter(unchanged::contains).isPresent()
+
+            final boolean normalSpeed = hlStop.filter(unchanged::contains).isPresent()
                     && (!optionalLightBar.isPresent()
                             || optionalLightBar.filter(HLLightbar.OFF::equals).isPresent());
 
