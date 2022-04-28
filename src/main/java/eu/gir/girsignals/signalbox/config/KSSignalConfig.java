@@ -96,8 +96,8 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                         values.put(SignalKS.STOPSIGNAL, KS.KS2);
                         values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
                     } else {
-                        values.put(SignalKS.STOPSIGNAL, KS.KS2);
-                        values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
+                        values.put(SignalKS.STOPSIGNAL, KS.KS1);
+                        values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
                     }
                 }
             }
