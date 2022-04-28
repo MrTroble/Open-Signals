@@ -53,10 +53,10 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final ArrayList<HL> unchanged = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7, HL.HL10);
             final Optional<HLExit> hlexit = (Optional<HLExit>) next
                     .getProperty(SignalHL.EXITSIGNAL);
-            
+
             final ArrayList<KS> goks = Lists.newArrayList(KS.KS1, KS.KS1_BLINK, KS.KS1_BLINK_LIGHT,
                     KS.KS2, KS.KS2_LIGHT);
-            
+
             final boolean stop = next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(o -> stopCheck.contains(o) || (unchanged.contains(o)
                             || hlexit.filter(HLExit.HP0::equals).isPresent())
@@ -65,12 +65,12 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     .isPresent();
             final ArrayList<HL> nextChangedSpeed = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
                     HL.HL11_12);
-            
+
             final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> goks.contains(a))
                     .isPresent();
             final boolean ksgomain = next.getProperty(SignalKS.MAINSIGNAL)
                     .filter(KSMain.KS1::equals).isPresent();
-            
+
             final boolean changed100 = (next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(nextChangedSpeed::contains).isPresent()
                     || hlexit.filter(HLExit.HL2_3::equals).isPresent())
@@ -103,7 +103,8 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             } else {
                 values.put(SignalHL.EXITSIGNAL, HLExit.HL1);
             }
-            if (next.getProperty(SignalKS.STOPSIGNAL).isPresent() || next.getProperty(SignalKS.MAINSIGNAL).isPresent()) {
+            if (next.getProperty(SignalKS.STOPSIGNAL).isPresent()
+                    || next.getProperty(SignalKS.MAINSIGNAL).isPresent()) {
                 if (ksgo || ksgomain) {
                     speedCheck(speed, values, HL.HL1, HL.HL2_3);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
