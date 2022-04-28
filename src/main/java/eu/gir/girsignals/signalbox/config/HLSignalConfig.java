@@ -11,9 +11,12 @@ import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLDistant;
 import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
+import eu.gir.girsignals.EnumSignals.KS;
+import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.signals.SignalHL;
+import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public final class HLSignalConfig implements ISignalAutoconfig {
@@ -49,6 +52,12 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     HL.HL_ZS1, HL.HL_SHUNTING);
             final ArrayList<HL> unchanged = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7, HL.HL10);
             final Optional<HLExit> hlexit = (Optional<HLExit>) next.getProperty(SignalHL.EXITSIGNAL);
+            final ArrayList<KS> goks = Lists.newArrayList(KS.KS1, KS.KS1_BLINK, KS.KS1_BLINK_LIGHT, KS.KS2,
+                    KS.KS2_LIGHT);
+            final ArrayList<KS> stopks = Lists.newArrayList(KS.HP0, KS.KS_ZS1, KS.KS_ZS7, KS.KS_SHUNTING,
+                    KS.OFF);
+            final ArrayList<KSMain> ksmain = Lists.newArrayList(KSMain.HP0, KSMain.KS_SHUNTING, KSMain.KS_ZS1,
+                    KSMain.KS_ZS7, KSMain.KS1, KSMain.OFF);
             final boolean stop = next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(o -> stopCheck.contains(o)
                             || (unchanged.contains(o) 
@@ -58,6 +67,13 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     .isPresent();
             final ArrayList<HL> nextChangedSpeed = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
                     HL.HL11_12);
+            final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> goks.contains(a))
+                    .isPresent();
+            final boolean ksgomain = next.getProperty(SignalKS.MAINSIGNAL).filter(KSMain.KS1::equals).isPresent();
+            final boolean nextks = next.getProperty(SignalKS.STOPSIGNAL).filter(c -> goks.contains(c)
+                    || stopks.contains(c)).isPresent();
+            final boolean nextksmain = next.getProperty(SignalKS.MAINSIGNAL).filter(e -> ksmain.contains(e))
+                    .isPresent();
             final boolean changed100 = (next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(nextChangedSpeed::contains).isPresent()
                     || hlexit.filter(HLExit.HL2_3::equals).isPresent())
@@ -68,6 +84,8 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     || hlexit.filter(HLExit.HL1::equals).isPresent()) &&
                     next.getProperty(SignalHL.LIGHTBAR).filter(HLLightbar.OFF::equals)
                             .isPresent();
+            
+            final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);           
 
             if (stop) {
                 speedCheck(speed, values, HL.HL10, HL.HL11_12);
@@ -82,17 +100,46 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                 speedCheck(speed, values, HL.HL7, HL.HL8_9);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
             }
+            
             if (speed <= 10) {
                 values.put(SignalHL.EXITSIGNAL, HLExit.HL2_3);
             } else {
                 values.put(SignalHL.EXITSIGNAL, HLExit.HL1);
             }
+            if (nextks || nextksmain) {
+                if (ksgo || ksgomain) {
+                    speedCheck(speed, values, HL.HL1, HL.HL2_3);
+                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
+                    if (speedKS.isPresent()) {
+                        final ZS32 speednext = speedKS.get();
+                        final int zs32 = speednext.ordinal();
+                            if (zs32 > 26 && zs32 <= 35) { 
+                                speedCheck(speed, values, HL.HL7, HL.HL8_9);
+                                values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
+                            } else if (zs32 >= 36 && zs32 < 42) {
+                                speedCheck(speed, values, HL.HL4, HL.HL5_6);
+                                values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
+                            } else {
+                                speedCheck(speed, values, HL.HL1, HL.HL2_3);
+                                values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
+                            } 
+                    }
+                } else {
+                    speedCheck(speed, values, HL.HL10, HL.HL11_12);
+                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
+                }
+            }
         } else {
-            values.put(SignalHL.LIGHTBAR, HLLightbar.OFF);
-            values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
-            values.put(SignalHL.STOPSIGNAL, HL.HL10);
-            values.put(SignalHL.ZS2, ZS32.ZS13);
-            values.put(SignalHL.EXITSIGNAL, HLExit.HP0);
+            if (speed <= 10) {
+                values.put(SignalHL.EXITSIGNAL, HL.HL2_3);
+            } else {
+                values.put(SignalHL.EXITSIGNAL, HLExit.HL1);
+            }
+            speedCheck(speed, values, HL.HL10, HL.HL11_12);
+            values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
+            values.put(SignalHL.ZS2, ZS32.OFF);
+            
+   
         }
         this.changeIfPresent(values, current);
     }
