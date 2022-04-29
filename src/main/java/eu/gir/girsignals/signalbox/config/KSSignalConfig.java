@@ -74,6 +74,10 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                 values.put(SignalKS.STOPSIGNAL, KS.KS1);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
             }
+            if (!hlmain40 && next.getProperty(SignalHL.STOPSIGNAL).isPresent()
+                    || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
+                values.put(SignalKS.ZS3V, ZS32.OFF);
+            }
             if (current.getProperty(SignalKS.ZS3V).isPresent()) {
                 if (next.getProperty(SignalHL.STOPSIGNAL).isPresent()
                         || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {

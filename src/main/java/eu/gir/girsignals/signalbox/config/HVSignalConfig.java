@@ -1,15 +1,25 @@
 package eu.gir.girsignals.signalbox.config;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
+import com.google.common.collect.Lists;
+
+import eu.gir.girsignals.EnumSignals.HL;
+import eu.gir.girsignals.EnumSignals.HLExit;
+import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.HPBlock;
 import eu.gir.girsignals.EnumSignals.HPHome;
 import eu.gir.girsignals.EnumSignals.HPType;
+import eu.gir.girsignals.EnumSignals.KS;
+import eu.gir.girsignals.EnumSignals.KSDistant;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
+import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public final class HVSignalConfig implements ISignalAutoconfig {
@@ -70,6 +80,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
                     current.setProperty(SignalHV.ZS3, zs32);
                 });
+
                 values.put(SignalHV.HPBLOCK, HPBlock.HP1);
                 values.put(SignalHV.HPHOME, HPHome.HP2);
                 values.put(SignalHV.STOPSIGNAL, HP.HP2);
@@ -90,6 +101,22 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 values.put(SignalHV.HPHOME, HPHome.HP1);
                 values.put(SignalHV.STOPSIGNAL, HP.HP1);
             }
+
+            final ArrayList<HL> stophlmain = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
+                    HL.HL_SHUNTING, HL.HL_ZS1);
+            final ArrayList<HLExit> stophlexit = Lists.newArrayList(HLExit.HP0,
+                    HLExit.HP0_ALTERNATE_RED, HLExit.HL_SHUNTING, HLExit.HL_ZS1);
+            final ArrayList<HL> hl40main = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
+                    HL.HL11_12);
+            final boolean hlstop = next.getProperty(SignalHL.STOPSIGNAL)
+                    .filter(a -> stophlmain.contains(a)).isPresent()
+                    || next.getProperty(SignalHL.EXITSIGNAL).filter(d -> stophlexit.contains(d))
+                            .isPresent();
+            final boolean hlmain40 = next.getProperty(SignalHL.STOPSIGNAL)
+                    .filter(c -> hl40main.contains(c)).isPresent()
+                    || next.getProperty(SignalHL.EXITSIGNAL).filter(HLExit.HL2_3::equals)
+                            .isPresent();
+
             current.getProperty(SignalHV.DISTANTSIGNAL)
                     .ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
                         VR vr = VR.VR0;
@@ -114,12 +141,68 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 next.getProperty(SignalHV.ZS3)
                         .ifPresent(prevzs3 -> current.setProperty(SignalHV.ZS3V, (ZS32) prevzs3));
             });
+
+            if (next.getProperty(SignalHL.STOPSIGNAL).isPresent()
+                    || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
+                if (current.getProperty(SignalHV.DISTANTSIGNAL).isPresent()) {
+                    if (hlstop) {
+                        current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR0);
+                    } else if (current.getProperty(SignalHV.ZS3V).isPresent()) {
+                        if (next.getProperty(SignalHL.STOPSIGNAL).isPresent()
+                                || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
+                            if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
+                                    .filter(HLLightbar.OFF::equals).isPresent()) {
+                                values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
+                            } else if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
+                                    .filter(HLLightbar.YELLOW::equals).isPresent()) {
+                                values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
+                                values.put(SignalHV.ZS3V, ZS32.Z6);
+                            } else if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
+                                    .filter(HLLightbar.GREEN::equals).isPresent()) {
+                                values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                                values.put(SignalHV.ZS3V, ZS32.Z10);
+                            } else if (hlstop) {
+                                values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
+                            } else {
+                                current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR1);
+                            }
+                        }
+                    } else if (hlmain40) {
+                        current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR2);
+                    } else {
+                        current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR1);
+                    }
+
+                }
+
+                if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR).filter(HLLightbar.OFF::equals)
+                        .isPresent()) {
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
+                    values.put(SignalKS.ZS3V, ZS32.Z4);
+                } else if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
+                        .filter(HLLightbar.YELLOW::equals).isPresent()) {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
+                    values.put(SignalKS.ZS3V, ZS32.Z6);
+                } else if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
+                        .filter(HLLightbar.GREEN::equals).isPresent()) {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
+                    values.put(SignalKS.ZS3V, ZS32.Z10);
+                } else if (hlstop) {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS2);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
+                } else {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
+                }
+            }
         } else {
             values.put(SignalHV.HPBLOCK, HPBlock.HP1);
             values.put(SignalHV.HPHOME, HPHome.HP2);
             values.put(SignalHV.STOPSIGNAL, HP.HP2);
             values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
-            values.put(SignalHV.ZS3, ZS32.Z3);
+            values.put(SignalHV.ZS3, ZS32.OFF);
             values.put(SignalHV.ZS3V, ZS32.OFF);
             values.put(SignalHV.ZS1, false);
             values.put(SignalHV.ZS7, false);

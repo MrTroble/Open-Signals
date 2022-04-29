@@ -67,8 +67,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     HL.HL11_12);
 
             final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> goks.contains(a))
-                    .isPresent();
-            final boolean ksgomain = next.getProperty(SignalKS.MAINSIGNAL)
+                    .isPresent() || next.getProperty(SignalKS.MAINSIGNAL)
                     .filter(KSMain.KS1::equals).isPresent();
 
             final boolean changed100 = (next.getProperty(SignalHL.STOPSIGNAL)
@@ -105,7 +104,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             }
             if (next.getProperty(SignalKS.STOPSIGNAL).isPresent()
                     || next.getProperty(SignalKS.MAINSIGNAL).isPresent()) {
-                if (ksgo || ksgomain) {
+                if (ksgo) {
                     speedCheck(speed, values, HL.HL1, HL.HL2_3);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
                     if (speedKS.isPresent()) {
