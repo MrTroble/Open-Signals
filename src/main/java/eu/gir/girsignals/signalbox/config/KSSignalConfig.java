@@ -140,7 +140,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     values.put(SignalHV.STOPSIGNAL, KS.KS1_BLINK);
                     values.put(SignalKS.ZS3V, ZS32.Z4);
                 }
-                if (speedHV.isPresent()) {
+                if (speedHV.isPresent() && current.getProperty(SignalKS.ZS3V).isPresent()) {
                     final ZS32 speednext = speedHV.get();
                     final int zs32 = speednext.ordinal();
                     if (zs32 > 26 && zs32 <= 42 && zs32 != 30) {

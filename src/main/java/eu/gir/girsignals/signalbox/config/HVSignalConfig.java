@@ -188,7 +188,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             if (current.getProperty(SignalHV.DISTANTSIGNAL).isPresent()) {
                 if (!ksstop || !ksstopmain) {
                     values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
-                    if (current.getProperty(SignalHV.ZS3V).isPresent()) {
+                    if (current.getProperty(SignalHV.ZS3V).isPresent() && speedKS.isPresent()) {
                         final ZS32 speednext = speedKS.get();
                         final int zs32 = speednext.ordinal();
                         if (zs32 > 26 && zs32 <= 42) {
