@@ -9,12 +9,16 @@ import com.google.common.collect.Lists;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
+import eu.gir.girsignals.EnumSignals.HP;
+import eu.gir.girsignals.EnumSignals.HPBlock;
+import eu.gir.girsignals.EnumSignals.HPHome;
 import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KSDistant;
 import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.signals.SignalHL;
+import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
@@ -64,6 +68,29 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     || next.getProperty(SignalHL.EXITSIGNAL).filter(HLExit.HL2_3::equals)
                             .isPresent();
 
+            final boolean hvstopgo = next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP1::equals)
+                    .isPresent()
+                    || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
+            final boolean hvhomego = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP1::equals)
+                    .isPresent()
+                    || next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals).isPresent();
+            final boolean hvblockgo = next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP1::equals)
+                    .isPresent();
+            final boolean hv40 = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
+                    .isPresent()
+                    || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
+            final boolean hvstop = next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP0::equals)
+                    .isPresent()
+                    || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.SHUNTING::equals)
+                            .isPresent();
+            final boolean hvblockstop = next.getProperty(SignalHV.HPBLOCK)
+                    .filter(HPBlock.HP0::equals).isPresent();
+            final boolean hvhomestop = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP0::equals)
+                    .isPresent()
+                    || next.getProperty(SignalHV.HPHOME).filter(HPHome.HP0_ALTERNATE_RED::equals)
+                            .isPresent();
+            final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
+
             if (stop || hlstop) {
                 values.put(SignalKS.STOPSIGNAL, KS.KS2);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
@@ -74,8 +101,9 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                 values.put(SignalKS.STOPSIGNAL, KS.KS1);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
             }
-            if (!hlmain40 && next.getProperty(SignalHL.STOPSIGNAL).isPresent()
-                    || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
+            if ((!hlmain40 && next.getProperty(SignalHL.STOPSIGNAL).isPresent()
+                    || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) || hvblockstop || hvstop
+                    || hvhomestop) {
                 values.put(SignalKS.ZS3V, ZS32.OFF);
             }
             if (current.getProperty(SignalKS.ZS3V).isPresent()) {
@@ -104,6 +132,25 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                         values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
                     }
                 }
+            }
+            if (hvblockgo || hvhomego || hvstopgo) {
+                values.put(SignalKS.STOPSIGNAL, KS.KS1);
+                values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
+                if (hv40) {
+                    values.put(SignalHV.STOPSIGNAL, KS.KS1_BLINK);
+                    values.put(SignalKS.ZS3V, ZS32.Z4);
+                }
+                if (speedHV.isPresent()) {
+                    final ZS32 speednext = speedHV.get();
+                    final int zs32 = speednext.ordinal();
+                    if (zs32 > 26 && zs32 <= 42 && zs32 != 30) {
+                        values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                        values.put(SignalKS.ZS3V, speednext);
+                    }
+                }
+            } else if (hvblockstop || hvhomestop || hvstop) {
+                values.put(SignalKS.STOPSIGNAL, KS.KS2);
+                values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
             }
         } else {
             values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);

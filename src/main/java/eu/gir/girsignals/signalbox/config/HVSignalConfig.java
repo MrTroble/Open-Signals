@@ -2,6 +2,7 @@ package eu.gir.girsignals.signalbox.config;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Optional;
 
 import com.google.common.collect.Lists;
 
@@ -13,7 +14,7 @@ import eu.gir.girsignals.EnumSignals.HPBlock;
 import eu.gir.girsignals.EnumSignals.HPHome;
 import eu.gir.girsignals.EnumSignals.HPType;
 import eu.gir.girsignals.EnumSignals.KS;
-import eu.gir.girsignals.EnumSignals.KSDistant;
+import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
@@ -116,6 +117,16 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     .filter(c -> hl40main.contains(c)).isPresent()
                     || next.getProperty(SignalHL.EXITSIGNAL).filter(HLExit.HL2_3::equals)
                             .isPresent();
+            final ArrayList<KS> stopks = Lists.newArrayList(KS.HP0, KS.KS_SHUNTING, KS.KS_ZS1,
+                    KS.KS_ZS7);
+            final ArrayList<KSMain> stopksmain = Lists.newArrayList(KSMain.HP0, KSMain.KS_SHUNTING,
+                    KSMain.KS_ZS1, KSMain.KS_ZS7);
+            final boolean ksstop = next.getProperty(SignalKS.STOPSIGNAL)
+                    .filter(a -> stopks.contains(a)).isPresent();
+            final boolean ksstopmain = next.getProperty(SignalKS.MAINSIGNAL)
+                    .filter(b -> stopksmain.contains(b)).isPresent();
+
+            final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
 
             current.getProperty(SignalHV.DISTANTSIGNAL)
                     .ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
@@ -172,29 +183,24 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     } else {
                         current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR1);
                     }
-
                 }
-
-                if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR).filter(HLLightbar.OFF::equals)
-                        .isPresent()) {
-                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
-                    values.put(SignalKS.ZS3V, ZS32.Z4);
-                } else if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
-                        .filter(HLLightbar.YELLOW::equals).isPresent()) {
-                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
-                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
-                    values.put(SignalKS.ZS3V, ZS32.Z6);
-                } else if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
-                        .filter(HLLightbar.GREEN::equals).isPresent()) {
-                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
-                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
-                    values.put(SignalKS.ZS3V, ZS32.Z10);
-                } else if (hlstop) {
-                    values.put(SignalKS.STOPSIGNAL, KS.KS2);
-                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
-                } else {
-                    values.put(SignalKS.STOPSIGNAL, KS.KS1);
-                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
+            }
+            if (current.getProperty(SignalHV.DISTANTSIGNAL).isPresent()) {
+                if (!ksstop || !ksstopmain) {
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                    if (current.getProperty(SignalHV.ZS3V).isPresent()) {
+                        final ZS32 speednext = speedKS.get();
+                        final int zs32 = speednext.ordinal();
+                        if (zs32 > 26 && zs32 <= 42) {
+                            values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
+                            values.put(SignalHV.ZS3V, speednext);
+                            if (zs32 > 33) {
+                                values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                            }
+                        }
+                    }
+                } else if (ksstop || ksstopmain) {
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
                 }
             }
         } else {
