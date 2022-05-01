@@ -84,6 +84,13 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
     compile "li.cil.oc:OpenComputers:$ocVersion:api"
     compile "li.cil.oc:OpenComputers:$ocVersion"
+    testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
+}
+
+test {
+    useJUnitPlatform {
+    	includeEngines("junit-jupiter")
+    }
 }
 
 jar {
