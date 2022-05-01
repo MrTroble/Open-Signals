@@ -35,7 +35,8 @@ public class GIRConfigTest {
         assertEquals(signalBase, signalDummy);
 
         final DummySignal signalHP0Next = DummyBuilder.start(STOPSIGNAL, HP.HP1)
-                .of(DISTANTSIGNAL, VR.VR0).of(HPHOME, HPHome.HP2).of(null, null).build();
+                .of(DISTANTSIGNAL, VR.VR0).of(ZS1, false).of(ZS7, false).of(HPHOME, HPHome.HP2)
+                .of(ZS3, ZS32.OFF).of(ZS3V, ZS32.OFF).of(HPBLOCK, HPBlock.HP1).build();
         config.change(0, signalBase, signalDummy);
         assertEquals(signalBase, signalHP0Next);
     }
