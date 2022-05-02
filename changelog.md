@@ -5,6 +5,9 @@
 * fix: Missing language keys
 * ref: Internal refactoring
 * ci: Code checks
+* fix: signal config for signalbox
+* fix: desync issues
+* fix: serveral issues
 
 ## [Beta Update]
 
