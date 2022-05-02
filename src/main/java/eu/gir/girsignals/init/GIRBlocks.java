@@ -41,7 +41,10 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEve
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class GIRBlocks {
+public final class GIRBlocks {
+
+    private GIRBlocks() {
+    }
 
     public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
     public static final Post POST = new Post();

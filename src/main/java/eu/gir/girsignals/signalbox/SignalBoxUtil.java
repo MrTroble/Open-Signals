@@ -22,7 +22,10 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Rotation;
 
-public class SignalBoxUtil {
+public final class SignalBoxUtil {
+
+    private SignalBoxUtil() {
+    }
 
     public static final int FREE_COLOR = 0xFF000000;
     public static final int SELECTED_COLOR = 0xFF00FF00;

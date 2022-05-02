@@ -2,10 +2,13 @@ package eu.gir.girsignals;
 
 import net.minecraft.util.IStringSerializable;
 
-public class EnumSignals {
+public final class EnumSignals {
 
     public static final int GUI_PLACEMENTTOOL = 0;
     public static final int GUI_SIGNAL_CONTROLLER = 1;
+
+    private EnumSignals() {
+    }
 
     public interface DefaultName<T extends Enum<T>> extends IStringSerializable, Comparable<T> {
 
@@ -19,7 +22,7 @@ public class EnumSignals {
 
         @SuppressWarnings("unchecked")
         public default T getOffState() {
-            return (T) Enum.valueOf((Class<T>) this.getClass(), "OFF");
+            return Enum.valueOf((Class<T>) this.getClass(), "OFF");
         }
 
     }

@@ -9,7 +9,10 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public class GIRModels {
+public final class GIRModels {
+
+    private GIRModels() {
+    }
 
     @SubscribeEvent
     public static void register(final ModelRegistryEvent event) {

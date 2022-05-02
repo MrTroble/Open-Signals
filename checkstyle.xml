@@ -9,7 +9,7 @@
     Description: none
 -->
 <module name="Checker">
-  <property name="severity" value="error"/>
+  <property name="severity" value="warning"/>
   <property name="fileExtensions" value="java"/>
   <module name="TreeWalker">
     <module name="ConstantName"/>
@@ -42,15 +42,16 @@
     <module name="AnnotationUseStyle"/>
     <module name="AnnotationLocation"/>
     <module name="FinalParameters">
-      <property name="severity" value="error"/>
+      <property name="severity" value="warning"/>
       <property name="tokens" value="METHOD_DEF,CTOR_DEF,LITERAL_CATCH,FOR_EACH_CLAUSE"/>
     </module>
     <module name="MissingOverride"/>
+    <module name="BooleanExpressionComplexity"/>
+    <module name="FinalClass"/>
+    <module name="HideUtilityClassConstructor"/>
   </module>
   <module name="LineLength">
     <property name="max" value="120"/>
-     <property name="severity" value="error"/>
-
   </module>
   <module name="FileTabCharacter">
     <property name="fileExtensions" value="java"/>

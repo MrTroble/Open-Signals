@@ -46,6 +46,8 @@ public final class HLSignalConfig implements ISignalAutoconfig {
     public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         if (next != null) {
+            final ArrayList<HL> nextChangedSpeed = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
+                    HL.HL11_12);
             next.getProperty(SignalHL.STOPSIGNAL)
                     .ifPresent(hl -> current.getProperty(SignalHL.DISTANTSIGNAL).ifPresent(_u -> {
                         final boolean stop = hl.equals(HL.HP0) || hl.equals(HL.HP0_ALTERNATE_RED);
@@ -53,8 +55,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                             current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                         } else if (hl.equals(HL.HL4)) {
                             current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
-                        } else if (hl.equals(HL.HL2_3) || hl.equals(HL.HL5_6) || hl.equals(HL.HL7)
-                                || hl.equals(HL.HL8_9) || hl.equals(HL.HL11_12)) {
+                        } else if (nextChangedSpeed.contains(hl) || hl.equals(HL.HL7)) {
                             current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
                         } else {
                             current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
@@ -71,9 +72,6 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final boolean stop = hlStop.filter(o -> stopCheck.contains(o) || (unchanged.contains(o)
                     && optionalLightBar.filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
                     .isPresent();
-
-            final ArrayList<HL> nextChangedSpeed = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
-                    HL.HL11_12);
 
             final boolean changed100 = hlStop.filter(nextChangedSpeed::contains).isPresent()
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
