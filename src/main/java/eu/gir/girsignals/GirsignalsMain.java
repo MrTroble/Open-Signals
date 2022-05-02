@@ -13,32 +13,32 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(modid = GirsignalsMain.MODID, dependencies = "after:opencomputers", acceptedMinecraftVersions = "[1.12.2]")
 public class GirsignalsMain {
-	
-	@Instance
-	private static GirsignalsMain instance;
-	public static final String MODID = "girsignals";
-	
-	public static GirsignalsMain getInstance() {
-		return instance;
-	}
-	
-	@SidedProxy(serverSide = "eu.gir.girsignals.proxy.CommonProxy", clientSide = "eu.gir.girsignals.proxy.ClientProxy")
-	public static CommonProxy PROXY;
-	public static Logger LOG;
-	
-	@EventHandler
-	public void preinit(FMLPreInitializationEvent event) {
-		LOG = event.getModLog();
-		PROXY.preinit(event);
-	}
-	
-	@EventHandler
-	public void init(FMLInitializationEvent event) {
-		PROXY.init(event);
-	}
-	
-	@EventHandler
-	public void postinit(FMLPostInitializationEvent event) {
-		PROXY.postinit(event);
-	}
+
+    @Instance
+    private static GirsignalsMain instance;
+    public static final String MODID = "girsignals";
+
+    public static GirsignalsMain getInstance() {
+        return instance;
+    }
+
+    @SidedProxy(serverSide = "eu.gir.girsignals.proxy.CommonProxy", clientSide = "eu.gir.girsignals.proxy.ClientProxy")
+    public static CommonProxy proxy;
+    public static Logger log;
+
+    @EventHandler
+    public void preinit(final FMLPreInitializationEvent event) {
+        log = event.getModLog();
+        proxy.preinit(event);
+    }
+
+    @EventHandler
+    public void init(final FMLInitializationEvent event) {
+        proxy.init(event);
+    }
+
+    @EventHandler
+    public void postinit(final FMLPostInitializationEvent event) {
+        proxy.postinit(event);
+    }
 }

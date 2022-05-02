@@ -16,31 +16,34 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SignalController extends Block implements ITileEntityProvider {
-	
-	public SignalController() {
-		super(Material.ROCK);
-		setCreativeTab(GIRTabs.tab);
-	}
-	
-	@Override
-	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
-			GuiHandler.invokeGui(Signal.class, playerIn, worldIn, pos);
-			return true;
-		}
-		return false;
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(World worldIn, int meta) {
-		return new SignalControllerTileEntity();
-	}
-	
-	@Override
-	public void neighborChanged(IBlockState state, World world, BlockPos pos, Block blockIn, BlockPos fromPos) {
-		final TileEntity tile = world.getTileEntity(pos);
-		if (tile instanceof SignalControllerTileEntity) {
-			((SignalControllerTileEntity) tile).redstoneUpdate();
-		}
-	}
+
+    public SignalController() {
+        super(Material.ROCK);
+        setCreativeTab(GIRTabs.TAB);
+    }
+
+    @Override
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
+            GuiHandler.invokeGui(Signal.class, playerIn, worldIn, pos);
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
+        return new SignalControllerTileEntity();
+    }
+
+    @Override
+    public void neighborChanged(final IBlockState state, final World world, final BlockPos pos,
+            final Block blockIn, final BlockPos fromPos) {
+        final TileEntity tile = world.getTileEntity(pos);
+        if (tile instanceof SignalControllerTileEntity) {
+            ((SignalControllerTileEntity) tile).redstoneUpdate();
+        }
+    }
 }

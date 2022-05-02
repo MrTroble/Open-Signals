@@ -16,40 +16,45 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class GIRItems {
-	
-	public static final Linkingtool LINKING_TOOL = new Linkingtool(GIRTabs.tab, (world, pos) -> {
-		final IBlockState state = world.getBlockState(pos);
-		final Block block = state.getBlock();
-		return block == GIRBlocks.REDSTONE_IN || block == GIRBlocks.REDSTONE_OUT || (block instanceof Signal && ((Signal) block).canBeLinked());
-	});
-	public static final Placementtool PLACEMENT_TOOL = new Placementtool();
-	public static final Placementtool SIGN_PLACEMENT_TOOL = new Placementtool();
-	
-	public static ArrayList<Item> registeredItems = new ArrayList<>();
-	
-	public static void init() {
-		Field[] fields = GIRItems.class.getFields();
-		for (Field field : fields) {
-			int modifiers = field.getModifiers();
-			if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers) && Modifier.isPublic(modifiers)) {
-				String name = field.getName().toLowerCase().replace("_", "");
-				try {
-					Item item = (Item) field.get(null);
-					item.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
-					item.setUnlocalizedName(name);
-					registeredItems.add(item);
-				} catch (IllegalArgumentException | IllegalAccessException e) {
-					e.printStackTrace();
-				}
-			}
-		}
-	}
-	
-	@SubscribeEvent
-	public static void registerItem(RegistryEvent.Register<Item> event) {
-		IForgeRegistry<Item> registry = event.getRegistry();
-		registeredItems.forEach(registry::register);
-	}
-	
+public final class GIRItems {
+
+    private GIRItems() {
+    }
+
+    public static final Linkingtool LINKING_TOOL = new Linkingtool(GIRTabs.TAB, (world, pos) -> {
+        final IBlockState state = world.getBlockState(pos);
+        final Block block = state.getBlock();
+        return block == GIRBlocks.REDSTONE_IN || block == GIRBlocks.REDSTONE_OUT
+                || (block instanceof Signal && ((Signal) block).canBeLinked());
+    });
+    public static final Placementtool PLACEMENT_TOOL = new Placementtool();
+    public static final Placementtool SIGN_PLACEMENT_TOOL = new Placementtool();
+
+    public static ArrayList<Item> registeredItems = new ArrayList<>();
+
+    public static void init() {
+        final Field[] fields = GIRItems.class.getFields();
+        for (final Field field : fields) {
+            final int modifiers = field.getModifiers();
+            if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
+                    && Modifier.isPublic(modifiers)) {
+                final String name = field.getName().toLowerCase().replace("_", "");
+                try {
+                    final Item item = (Item) field.get(null);
+                    item.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
+                    item.setUnlocalizedName(name);
+                    registeredItems.add(item);
+                } catch (final IllegalArgumentException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void registerItem(final RegistryEvent.Register<Item> event) {
+        final IForgeRegistry<Item> registry = event.getRegistry();
+        registeredItems.forEach(registry::register);
+    }
+
 }
