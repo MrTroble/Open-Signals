@@ -73,8 +73,6 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     .getProperty(SignalHL.LIGHTBAR);
             final ArrayList<HL> stopCheck = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
                     HL.HL_ZS1, HL.HL_SHUNTING);
-            final Optional<HLLightbar> optionalLightBar = (Optional<HLLightbar>) next
-                    .getProperty(SignalHL.LIGHTBAR);
 
             final ArrayList<HL> unchanged = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7, HL.HL10);
 
