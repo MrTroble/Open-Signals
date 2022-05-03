@@ -109,7 +109,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                             .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
                     .isPresent()
                     || hlexit
-                            .filter(o -> hlexitstop.contains(o) && optionalLightBar
+                            .filter(a -> hlexitstop.contains(a) && optionalLightBar
                                     .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
                             .isPresent();
             final boolean changed100 = hlStop.filter(nextChangedSpeed::contains).isPresent()
