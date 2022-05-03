@@ -3,7 +3,10 @@ package eu.gir.girsignals.init;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
-public class GIRTabs {
+public final class GIRTabs {
+
+    private GIRTabs() {
+    }
 
     public static final CreativeTabs TAB = new CreativeTabs("GIRSignals") {
 

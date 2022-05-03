@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.ImmutableMap;
@@ -54,6 +56,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     private final Map<BlockPos, Signal> signals = new HashMap<>(10);
     private NBTTagCompound guiTag = new NBTTagCompound();
     private final HashMap<ArrayList<SignalNode>, Integer> pathWayEnd = new HashMap<>();
+
+    private static final ExecutorService SERVICE = Executors.newCachedThreadPool();
 
     @Override
     public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
@@ -397,40 +401,45 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             current.write(guiTag);
         }
         this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
+        this.syncClient();
     }
 
     public void updateRedstonInput(final BlockPos pos, final boolean status) {
-        final ArrayList<ArrayList<SignalNode>> listOfPathways = Lists
-                .newArrayList(pathWayEnd.keySet());
-        next: for (final ArrayList<SignalNode> pathway : listOfPathways) {
-            final SignalNode node = pathway.get(0);
-            final Point lastPoint = node.getPoint();
-            final Point delta = pathway.get(1).getPoint().delta(lastPoint);
-            final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta);
-            final PathOption end = node.getOption(EnumGuiMode.HP, rotation)
-                    .orElse(node.getOption(EnumGuiMode.RS, rotation).orElse(null));
-            if (end != null) {
-                final BlockPos linked = end.getLinkedPosition(LinkType.INPUT);
-                if (linked != null && linked.equals(pos)) {
-                    resetPathway(pathway.get(pathway.size() - 1).getPoint());
-                    modeGrid.values().forEach(signal -> signal.write(guiTag));
-                    this.clientSyncs
-                            .forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
-                    continue next;
+        SERVICE.submit(() -> {
+            final ArrayList<ArrayList<SignalNode>> listOfPathways = Lists
+                    .newArrayList(pathWayEnd.keySet());
+            next: for (final ArrayList<SignalNode> pathway : listOfPathways) {
+                final SignalNode node = pathway.get(0);
+                final Point lastPoint = node.getPoint();
+                final Point delta = pathway.get(1).getPoint().delta(lastPoint);
+                final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta);
+                final PathOption end = node.getOption(EnumGuiMode.HP, rotation)
+                        .orElse(node.getOption(EnumGuiMode.RS, rotation).orElse(null));
+                if (end != null) {
+                    final BlockPos linked = end.getLinkedPosition(LinkType.INPUT);
+                    if (linked != null && linked.equals(pos)) {
+                        this.world.getMinecraftServer().addScheduledTask(() -> {
+                            resetPathway(pathway.get(pathway.size() - 1).getPoint());
+                            modeGrid.values().forEach(signal -> signal.write(guiTag));
+                            this.clientSyncs.forEach(
+                                    ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
+                        });
+                        continue next;
+                    }
+                }
+                for (int i = 1; i < pathway.size() - 1; i++) {
+                    final Point oldPos = pathway.get(i - 1).getPoint();
+                    final Point newPos = pathway.get(i + 1).getPoint();
+                    final SignalNode current = pathway.get(i);
+                    final Optional<PathOption> optionOpt = current.getOption(oldPos, newPos);
+                    if (optionOpt.isPresent()
+                            && pos.equals(optionOpt.get().getLinkedPosition(LinkType.INPUT))) {
+                        this.world.getMinecraftServer().addScheduledTask(() -> lockPW(pathway));
+                        continue next;
+                    }
                 }
             }
-            for (int i = 1; i < pathway.size() - 1; i++) {
-                final Point oldPos = pathway.get(i - 1).getPoint();
-                final Point newPos = pathway.get(i + 1).getPoint();
-                final SignalNode current = pathway.get(i);
-                final Optional<PathOption> optionOpt = current.getOption(oldPos, newPos);
-                if (optionOpt.isPresent()
-                        && pos.equals(optionOpt.get().getLinkedPosition(LinkType.INPUT))) {
-                    lockPW(pathway);
-                    continue next;
-                }
-            }
-        }
+        });
     }
 
 }

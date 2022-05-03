@@ -16,7 +16,10 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public class GIRItems {
+public final class GIRItems {
+
+    private GIRItems() {
+    }
 
     public static final Linkingtool LINKING_TOOL = new Linkingtool(GIRTabs.TAB, (world, pos) -> {
         final IBlockState state = world.getBlockState(pos);
