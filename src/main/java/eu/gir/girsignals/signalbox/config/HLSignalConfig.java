@@ -84,12 +84,14 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final ArrayList<KS> goks = Lists.newArrayList(KS.KS1, KS.KS1_BLINK, KS.KS1_BLINK_LIGHT,
                     KS.KS2, KS.KS2_LIGHT);
 
-            final boolean stop = hlStop.filter(o -> stopCheck.contains(o) || (unchanged.contains(o)
-                    && optionalLightBar.filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
-                    .isPresent();
-            final boolean stophlexit = hlexit.filter(a -> hlexitstop.contains(a)
-                    && optionalLightBar.filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
-                    .isPresent();
+            final boolean stop = hlStop
+                    .filter(o -> stopCheck.contains(o) || (unchanged.contains(o) && optionalLightBar
+                            .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
+                    .isPresent()
+                    || hlexit
+                            .filter(a -> hlexitstop.contains(a) && optionalLightBar
+                                    .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
+                            .isPresent();
             final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> goks.contains(a))
                     .isPresent()
                     || next.getProperty(SignalKS.MAINSIGNAL).filter(KSMain.KS1::equals).isPresent();
@@ -104,7 +106,6 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final boolean hv40 = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
                     .isPresent()
                     || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
-
             final boolean changed100 = hlStop.filter(nextChangedSpeed::contains).isPresent()
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
             final boolean normalSpeed = hlStop.filter(unchanged::contains).isPresent()
@@ -114,7 +115,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
             final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
 
-            if (stop || stophlexit) {
+            if (stop) {
                 speedCheck(speed, values, HL.HL10, HL.HL11_12);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
             } else if (changed100) {
