@@ -1,6 +1,6 @@
 # Changelog
 
-## [Beta Update] 04.23.2022
+## [Beta Update] 05.03.2022
 
 * fix: Missing language keys
 * ref: Internal refactoring
