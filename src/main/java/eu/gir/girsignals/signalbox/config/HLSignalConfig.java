@@ -116,7 +116,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 
             final boolean changed100 = hlStop.filter(nextChangedSpeed::contains).isPresent()
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
-            
+
             final boolean normalSpeed = hlStop.filter(unchanged::contains).isPresent()
                     && (!optionalLightBar.isPresent()
                             || optionalLightBar.filter(HLLightbar.OFF::equals).isPresent());

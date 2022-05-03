@@ -8,6 +8,14 @@
 * feat: Added HL without distant signal
 
 ## [Beta Update]
+* fix: Missing language keys
+* ref: Internal refactoring
+* ci: Code checks
+* fix: signal config for signalbox
+* fix: desync issues
+* fix: serveral issues
+
+## [Beat Update]
 
 * feat: Added UIs for the redstone io blocks and rename possibility
 * feat: Added automatic reset of pathways
