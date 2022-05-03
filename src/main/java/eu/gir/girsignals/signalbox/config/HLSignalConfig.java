@@ -105,7 +105,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     .isPresent()
                     || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
 
-            final boolean stop = hlStop
+            final boolean hlstop = hlStop
                     .filter(o -> stopCheck.contains(o) || (unchanged.contains(o) && optionalLightBar
                             .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
                     .isPresent()
@@ -123,7 +123,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
             final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
 
-            if (stop) {
+            if (hlstop) {
                 speedCheck(speed, values, HL.HL10, HL.HL11_12);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
             } else if (changed100) {
