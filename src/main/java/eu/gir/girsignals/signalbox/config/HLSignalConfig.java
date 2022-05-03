@@ -92,22 +92,28 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                             .filter(a -> hlexitstop.contains(a) && optionalLightBar
                                     .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
                             .isPresent();
+            
             final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> goks.contains(a))
                     .isPresent()
                     || next.getProperty(SignalKS.MAINSIGNAL).filter(KSMain.KS1::equals).isPresent();
+            
             final boolean hvstopgo = next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP1::equals)
                     .isPresent()
                     || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
             final boolean hvhomego = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP1::equals)
                     .isPresent()
                     || next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals).isPresent();
+            
             final boolean hvblockgo = next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP1::equals)
                     .isPresent();
+            
             final boolean hv40 = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
                     .isPresent()
                     || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
+            
             final boolean changed100 = hlStop.filter(nextChangedSpeed::contains).isPresent()
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
+            
             final boolean normalSpeed = hlStop.filter(unchanged::contains).isPresent()
                     && (!optionalLightBar.isPresent()
                             || optionalLightBar.filter(HLLightbar.OFF::equals).isPresent());
