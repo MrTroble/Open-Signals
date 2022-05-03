@@ -77,7 +77,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final ArrayList<HL> unchanged = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7, HL.HL10);
 
             final Optional<HL> hlStop = (Optional<HL>) next.getProperty(SignalHL.STOPSIGNAL);
-            /*
+            
             final Optional<HLExit> hlexit = (Optional<HLExit>) next
                     .getProperty(SignalHL.EXITSIGNAL);
 
@@ -104,10 +104,14 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final boolean hv40 = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
                     .isPresent()
                     || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
-            */
-            final boolean stop = hlStop.filter(o -> stopCheck.contains(o) || (unchanged.contains(o)
-                    && optionalLightBar.filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
-                    .isPresent();
+            final boolean stop = hlStop
+                    .filter(o -> stopCheck.contains(o) || (unchanged.contains(o) && optionalLightBar
+                            .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
+                    .isPresent()
+                    || hlexit
+                            .filter(o -> hlexitstop.contains(o) && optionalLightBar
+                                    .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
+                            .isPresent();
             final boolean changed100 = hlStop.filter(nextChangedSpeed::contains).isPresent()
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
 
