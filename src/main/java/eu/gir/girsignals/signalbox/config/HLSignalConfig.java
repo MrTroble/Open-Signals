@@ -87,6 +87,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final ArrayList<KS> goks = Lists.newArrayList(KS.KS1, KS.KS1_BLINK, KS.KS1_BLINK_LIGHT,
                     KS.KS2, KS.KS2_LIGHT);
 
+            final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
+            final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
+            
             final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> goks.contains(a))
                     .isPresent()
                     || next.getProperty(SignalKS.MAINSIGNAL).filter(KSMain.KS1::equals).isPresent();
@@ -119,9 +122,6 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final boolean normalSpeed = hlStop.filter(unchanged::contains).isPresent()
                     && (!optionalLightBar.isPresent()
                             || optionalLightBar.filter(HLLightbar.OFF::equals).isPresent());
-
-            final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
-            final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
 
             if (stop) {
                 speedCheck(speed, values, HL.HL10, HL.HL11_12);
