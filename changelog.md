@@ -1,12 +1,5 @@
 # Changelog
 
-## [Beta Update] 05.03.2022
-
-* fix: Missing language keys
-* ref: Internal refactoring
-* ci: Code checks
-* feat: Added HL without distant signal
-
 ## [Beta Update]
 * fix: Missing language keys
 * ref: Internal refactoring

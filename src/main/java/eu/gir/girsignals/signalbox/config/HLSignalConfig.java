@@ -92,7 +92,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                             .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
                     .isPresent()
                     || hlexit
-                            .filter(a -> hlexitstop.contains(a) && optionalLightBar
+                            .filter(o -> hlexitstop.contains(o) && optionalLightBar
                                     .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
                             .isPresent();
 
