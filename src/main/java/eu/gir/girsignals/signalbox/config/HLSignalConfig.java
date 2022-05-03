@@ -110,10 +110,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 
             final boolean stop = hlStop.filter(o -> stopCheck.contains(o) || (unchanged.contains(o) && optionalLightBar
                             .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
-                    .isPresent()
-                    || hlexit.filter(o -> hlexitstop.contains(o) && optionalLightBar
-                                    .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
-                            .isPresent();
+                    .isPresent();
+            final boolean hlstopexit = hlexit.filter(o -> hlexitstop.contains(o) && optionalLightBar
+                    .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()).isPresent();
             final boolean changed100 = hlStop.filter(nextChangedSpeed::contains).isPresent()
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
 
@@ -121,7 +120,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     && (!optionalLightBar.isPresent()
                             || optionalLightBar.filter(HLLightbar.OFF::equals).isPresent());
 
-            if (stop) {
+            if (stop || hlstopexit) {
                 speedCheck(speed, values, HL.HL10, HL.HL11_12);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
             } else if (changed100) {
