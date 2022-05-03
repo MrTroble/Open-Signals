@@ -71,7 +71,9 @@ public final class HVSignalConfig implements ISignalAutoconfig {
         }
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({
+            "rawtypes", "unchecked"
+    })
     @Override
     public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
@@ -127,7 +129,10 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     .filter(b -> stopksmain.contains(b)).isPresent();
 
             final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
-
+            final Optional<?> getlightbar = next.getProperty(SignalHL.LIGHTBAR);
+            final Optional<?> distantpresent = current.getProperty(SignalHV.DISTANTSIGNAL);
+            final Optional<?> stoppresent = next.getProperty(SignalHL.STOPSIGNAL);
+            
             current.getProperty(SignalHV.DISTANTSIGNAL)
                     .ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
                         VR vr = VR.VR0;
@@ -153,40 +158,40 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                         .ifPresent(prevzs3 -> current.setProperty(SignalHV.ZS3V, (ZS32) prevzs3));
             });
 
-            if (next.getProperty(SignalHL.STOPSIGNAL).isPresent()
+            if (stoppresent.isPresent()
                     || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
-                if (current.getProperty(SignalHV.DISTANTSIGNAL).isPresent()) {
+                if (distantpresent.isPresent()) {
                     if (hlstop) {
                         current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR0);
                     } else if (current.getProperty(SignalHV.ZS3V).isPresent()) {
                         if (next.getProperty(SignalHL.STOPSIGNAL).isPresent()
                                 || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
-                            if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
-                                    .filter(HLLightbar.OFF::equals).isPresent()) {
+                            if (hlmain40
+                                    && getlightbar.filter(HLLightbar.OFF::equals).isPresent()) {
                                 values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
-                            } else if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
-                                    .filter(HLLightbar.YELLOW::equals).isPresent()) {
+                            } else if (hlmain40
+                                    && getlightbar.filter(HLLightbar.YELLOW::equals).isPresent()) {
                                 values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
                                 values.put(SignalHV.ZS3V, ZS32.Z6);
-                            } else if (hlmain40 && next.getProperty(SignalHL.LIGHTBAR)
-                                    .filter(HLLightbar.GREEN::equals).isPresent()) {
+                            } else if (hlmain40
+                                    && getlightbar.filter(HLLightbar.GREEN::equals).isPresent()) {
                                 values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                                 values.put(SignalHV.ZS3V, ZS32.Z10);
                             } else if (hlstop) {
                                 values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
                             } else {
-                                current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR1);
+                                values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                             }
                         }
                     } else if (hlmain40) {
-                        current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR2);
+                       values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
                     } else {
-                        current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR1);
+                        values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                     }
                 }
             }
             if (current.getProperty(SignalHV.DISTANTSIGNAL).isPresent()) {
-                if (!ksstop || !ksstopmain) {
+                if ((!ksstop || !ksstopmain) && next.getProperty(SignalKS.STOPSIGNAL).isPresent()) {
                     values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                     if (current.getProperty(SignalHV.ZS3V).isPresent() && speedKS.isPresent()) {
                         final ZS32 speednext = speedKS.get();

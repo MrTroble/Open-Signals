@@ -47,7 +47,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
         }
     }
 
-    @SuppressWarnings("rawtypes")
+    @SuppressWarnings({
+            "rawtypes", "unchecked"
+    })
     @Override
     public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
