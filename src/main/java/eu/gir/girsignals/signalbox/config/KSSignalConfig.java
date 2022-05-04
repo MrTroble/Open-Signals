@@ -83,9 +83,10 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     .isPresent()
                     || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.SHUNTING::equals).isPresent()
                     || next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP0::equals).isPresent();
-            final boolean hvstop2 =  next.getProperty(SignalHV.HPHOME).filter(HPHome.HP0::equals).isPresent()
+            final boolean hvstop2 = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP0::equals)
+                    .isPresent()
                     || next.getProperty(SignalHV.HPHOME).filter(HPHome.HP0_ALTERNATE_RED::equals)
-                    .isPresent();
+                            .isPresent();
             final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
             final boolean nexthl = next.getProperty(SignalHL.STOPSIGNAL).isPresent()
                     || next.getProperty(SignalHL.EXITSIGNAL).isPresent();
