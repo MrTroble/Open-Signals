@@ -25,11 +25,11 @@ import eu.gir.girsignals.tileentitys.SignalTileEnity;
 public final class KSSignalConfig implements ISignalAutoconfig {
 
     public static final KSSignalConfig INSTANCE = new KSSignalConfig();
-    static final ArrayList<HL> stophlmain = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
+    private static final ArrayList<HL> STOP_HL = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
             HL.HL_SHUNTING, HL.HL_ZS1);
-    static final ArrayList<HLExit> stophlexit = Lists.newArrayList(HLExit.HP0,
+    private static final ArrayList<HLExit> STOP_HL_EXIT = Lists.newArrayList(HLExit.HP0,
             HLExit.HP0_ALTERNATE_RED, HLExit.HL_SHUNTING, HLExit.HL_ZS1);
-    static final ArrayList<HL> hl40main = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
+    private static final ArrayList<HL> HL_40_MAIN = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
             HL.HL11_12);
 
     private KSSignalConfig() {
@@ -60,11 +60,11 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     .isPresent() || opt.filter(KS.HP0::equals).isPresent();
 
             final boolean hlstop = next.getProperty(SignalHL.STOPSIGNAL)
-                    .filter(a -> stophlmain.contains(a)).isPresent()
-                    || next.getProperty(SignalHL.EXITSIGNAL).filter(d -> stophlexit.contains(d))
+                    .filter(a -> STOP_HL.contains(a)).isPresent()
+                    || next.getProperty(SignalHL.EXITSIGNAL).filter(d -> STOP_HL_EXIT.contains(d))
                             .isPresent();
             final boolean hlmain40 = next.getProperty(SignalHL.STOPSIGNAL)
-                    .filter(c -> hl40main.contains(c)).isPresent()
+                    .filter(c -> HL_40_MAIN.contains(c)).isPresent()
                     || next.getProperty(SignalHL.EXITSIGNAL).filter(HLExit.HL2_3::equals)
                             .isPresent();
 

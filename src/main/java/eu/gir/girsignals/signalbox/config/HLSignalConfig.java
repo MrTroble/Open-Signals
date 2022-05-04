@@ -27,13 +27,14 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 
     public static final HLSignalConfig INSTANCE = new HLSignalConfig();
 
-    static final ArrayList<HL> stopCheck = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
+    private static final ArrayList<HL> STOP_CHECK = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
             HL.HL_ZS1, HL.HL_SHUNTING);
-    static final ArrayList<HL> unchanged = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7, HL.HL10);
-    static final ArrayList<HLExit> hlexitstop = Lists.newArrayList(HLExit.HP0,
+    private static final ArrayList<HL> UNCHANGED = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7,
+            HL.HL10);
+    private static final ArrayList<HLExit> hlexitstop = Lists.newArrayList(HLExit.HP0,
             HLExit.HP0_ALTERNATE_RED, HLExit.HL_ZS1, HLExit.HL_SHUNTING);
-    static final ArrayList<KS> goks = Lists.newArrayList(KS.KS1, KS.KS1_BLINK, KS.KS1_BLINK_LIGHT,
-            KS.KS2, KS.KS2_LIGHT);
+    private static final ArrayList<KS> GOKS = Lists.newArrayList(KS.KS1, KS.KS1_BLINK,
+            KS.KS1_BLINK_LIGHT, KS.KS2, KS.KS2_LIGHT);
 
     private HLSignalConfig() {
     }
@@ -96,7 +97,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
             final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
 
-            final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> goks.contains(a))
+            final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> GOKS.contains(a))
                     .isPresent()
                     || next.getProperty(SignalKS.MAINSIGNAL).filter(KSMain.KS1::equals).isPresent();
             final boolean hvstopgo = next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP1::equals)
@@ -111,8 +112,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     .isPresent()
                     || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
             final boolean stop = hlStop
-                    .filter(o -> stopCheck.contains(o) || (unchanged.contains(o) && optionalLightBar
-                            .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
+                    .filter(o -> STOP_CHECK.contains(o)
+                            || (UNCHANGED.contains(o) && optionalLightBar
+                                    .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
                     .isPresent()
                     || hlexit
                             .filter(a -> hlexitstop.contains(a) && optionalLightBar
@@ -122,7 +124,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final boolean changed100 = hlStop.filter(nextChangedSpeed::contains).isPresent()
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
 
-            final boolean normalSpeed = hlStop.filter(unchanged::contains).isPresent()
+            final boolean normalSpeed = hlStop.filter(UNCHANGED::contains).isPresent()
                     && (!optionalLightBar.isPresent()
                             || optionalLightBar.filter(HLLightbar.OFF::equals).isPresent());
 
