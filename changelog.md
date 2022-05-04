@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Beta Update]
+* feat: new HL-Signal "HL Exit"
+* feat: Signalinteroperability between all Signalsystems
+
+## [Beta Update]
 * fix: Missing language keys
 * ref: Internal refactoring
 * ci: Code checks
@@ -8,7 +12,7 @@
 * fix: desync issues
 * fix: serveral issues
 
-## [Beat Update]
+## [Beta Update]
 
 * feat: Added UIs for the redstone io blocks and rename possibility
 * feat: Added automatic reset of pathways
