@@ -27,6 +27,14 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 
     public static final HLSignalConfig INSTANCE = new HLSignalConfig();
 
+    static final ArrayList<HL> stopCheck = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
+            HL.HL_ZS1, HL.HL_SHUNTING);
+    static final ArrayList<HL> unchanged = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7, HL.HL10);
+    static final ArrayList<HLExit> hlexitstop = Lists.newArrayList(HLExit.HP0,
+            HLExit.HP0_ALTERNATE_RED, HLExit.HL_ZS1, HLExit.HL_SHUNTING);
+    static final ArrayList<KS> goks = Lists.newArrayList(KS.KS1, KS.KS1_BLINK, KS.KS1_BLINK_LIGHT,
+            KS.KS2, KS.KS2_LIGHT);
+
     private HLSignalConfig() {
     }
 
@@ -46,11 +54,11 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             values.put(SignalHL.STOPSIGNAL, normal);
         }
     }
-    
+
     @SuppressWarnings("rawtypes")
-    private void speedCheckExit(final int speed, final Map<SEProperty, Object> values, final HLExit normal,
-            final HLExit restricted) {
-        if (speed >= 1 && speed <= 10 ) {
+    private void speedCheckExit(final int speed, final Map<SEProperty, Object> values,
+            final HLExit normal, final HLExit restricted) {
+        if (speed >= 1 && speed <= 10) {
             values.put(SignalHL.EXITSIGNAL, restricted);
         } else {
             values.put(SignalHL.EXITSIGNAL, normal);
@@ -81,22 +89,10 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     }));
             final Optional<HLLightbar> optionalLightBar = (Optional<HLLightbar>) next
                     .getProperty(SignalHL.LIGHTBAR);
-            final ArrayList<HL> stopCheck = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
-                    HL.HL_ZS1, HL.HL_SHUNTING);
-
-            final ArrayList<HL> unchanged = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7, HL.HL10);
-
             final Optional<HL> hlStop = (Optional<HL>) next.getProperty(SignalHL.STOPSIGNAL);
-            
+
             final Optional<HLExit> hlexit = (Optional<HLExit>) next
                     .getProperty(SignalHL.EXITSIGNAL);
-
-            final ArrayList<HLExit> hlexitstop = Lists.newArrayList(HLExit.HP0,
-                    HLExit.HP0_ALTERNATE_RED, HLExit.HL_ZS1, HLExit.HL_SHUNTING);
-
-            final ArrayList<KS> goks = Lists.newArrayList(KS.KS1, KS.KS1_BLINK, KS.KS1_BLINK_LIGHT,
-                    KS.KS2, KS.KS2_LIGHT);
-
             final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
             final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
 

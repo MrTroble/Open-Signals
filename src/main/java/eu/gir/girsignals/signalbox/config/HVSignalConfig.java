@@ -26,6 +26,16 @@ import eu.gir.girsignals.tileentitys.SignalTileEnity;
 public final class HVSignalConfig implements ISignalAutoconfig {
 
     public static final HVSignalConfig INSTANCE = new HVSignalConfig();
+    static final ArrayList<KS> stopks = Lists.newArrayList(KS.HP0, KS.KS_SHUNTING, KS.KS_ZS1,
+            KS.KS_ZS7);
+    static final ArrayList<KSMain> stopksmain = Lists.newArrayList(KSMain.HP0, KSMain.KS_SHUNTING,
+            KSMain.KS_ZS1, KSMain.KS_ZS7);
+    static final ArrayList<HL> stophlmain = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
+            HL.HL_SHUNTING, HL.HL_ZS1);
+    static final ArrayList<HLExit> stophlexit = Lists.newArrayList(HLExit.HP0,
+            HLExit.HP0_ALTERNATE_RED, HLExit.HL_SHUNTING, HLExit.HL_ZS1);
+    static final ArrayList<HL> hl40main = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
+            HL.HL11_12);
 
     private HVSignalConfig() {
     }
@@ -105,12 +115,6 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 values.put(SignalHV.STOPSIGNAL, HP.HP1);
             }
 
-            final ArrayList<HL> stophlmain = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
-                    HL.HL_SHUNTING, HL.HL_ZS1);
-            final ArrayList<HLExit> stophlexit = Lists.newArrayList(HLExit.HP0,
-                    HLExit.HP0_ALTERNATE_RED, HLExit.HL_SHUNTING, HLExit.HL_ZS1);
-            final ArrayList<HL> hl40main = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
-                    HL.HL11_12);
             final boolean hlstop = next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(a -> stophlmain.contains(a)).isPresent()
                     || next.getProperty(SignalHL.EXITSIGNAL).filter(d -> stophlexit.contains(d))
@@ -119,10 +123,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     .filter(c -> hl40main.contains(c)).isPresent()
                     || next.getProperty(SignalHL.EXITSIGNAL).filter(HLExit.HL2_3::equals)
                             .isPresent();
-            final ArrayList<KS> stopks = Lists.newArrayList(KS.HP0, KS.KS_SHUNTING, KS.KS_ZS1,
-                    KS.KS_ZS7);
-            final ArrayList<KSMain> stopksmain = Lists.newArrayList(KSMain.HP0, KSMain.KS_SHUNTING,
-                    KSMain.KS_ZS1, KSMain.KS_ZS7);
+
             final boolean ksstop = next.getProperty(SignalKS.STOPSIGNAL)
                     .filter(a -> stopks.contains(a)).isPresent();
             final boolean ksstopmain = next.getProperty(SignalKS.MAINSIGNAL)
