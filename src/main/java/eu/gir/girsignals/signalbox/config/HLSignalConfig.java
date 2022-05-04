@@ -31,7 +31,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             HL.HL_ZS1, HL.HL_SHUNTING);
     private static final ArrayList<HL> UNCHANGED = Lists.newArrayList(HL.HL1, HL.HL4, HL.HL7,
             HL.HL10);
-    private static final ArrayList<HLExit> hlexitstop = Lists.newArrayList(HLExit.HP0,
+    private static final ArrayList<HLExit> HL_EXIT_STOP = Lists.newArrayList(HLExit.HP0,
             HLExit.HP0_ALTERNATE_RED, HLExit.HL_ZS1, HLExit.HL_SHUNTING);
     private static final ArrayList<KS> GOKS = Lists.newArrayList(KS.KS1, KS.KS1_BLINK,
             KS.KS1_BLINK_LIGHT, KS.KS2, KS.KS2_LIGHT);
@@ -117,7 +117,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                                     .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent()))
                     .isPresent()
                     || hlexit
-                            .filter(a -> hlexitstop.contains(a) && optionalLightBar
+                            .filter(a -> HL_EXIT_STOP.contains(a) && optionalLightBar
                                     .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
                             .isPresent();
 
