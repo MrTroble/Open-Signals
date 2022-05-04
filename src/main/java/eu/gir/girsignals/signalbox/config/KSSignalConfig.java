@@ -81,12 +81,9 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
             final boolean hvstop = next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP0::equals)
                     .isPresent()
-                    || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.SHUNTING::equals)
-                            .isPresent();
-            final boolean hvblockstop = next.getProperty(SignalHV.HPBLOCK)
-                    .filter(HPBlock.HP0::equals).isPresent();
-            final boolean hvhomestop = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP0::equals)
-                    .isPresent()
+                    || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.SHUNTING::equals).isPresent()
+                    || next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP0::equals).isPresent()
+                    || next.getProperty(SignalHV.HPHOME).filter(HPHome.HP0::equals).isPresent()
                     || next.getProperty(SignalHV.HPHOME).filter(HPHome.HP0_ALTERNATE_RED::equals)
                             .isPresent();
             final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
@@ -94,7 +91,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     || next.getProperty(SignalHL.EXITSIGNAL).isPresent();
             final Optional<HLLightbar> nextlighbar = (Optional<HLLightbar>) next
                     .getProperty(SignalHL.LIGHTBAR);
-            final Optional<ZS32> current_zs3v = (Optional<ZS32>) current.getProperty(SignalKS.ZS3V);
+            final Optional<ZS32> currentzs3v = (Optional<ZS32>) current.getProperty(SignalKS.ZS3V);
 
             if (stop || hlstop) {
                 values.put(SignalKS.STOPSIGNAL, KS.KS2);
@@ -106,10 +103,10 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                 values.put(SignalKS.STOPSIGNAL, KS.KS1);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
             }
-            if ((!hlmain40 && nexthl) || hvblockstop || hvstop || hvhomestop) {
+            if ((!hlmain40 && nexthl) || hvstop) {
                 values.put(SignalKS.ZS3V, ZS32.OFF);
             }
-            if (current_zs3v.isPresent()) {
+            if (currentzs3v.isPresent()) {
                 if (nexthl) {
                     if (hlmain40 && nextlighbar.filter(HLLightbar.OFF::equals).isPresent()) {
                         values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
@@ -141,7 +138,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     values.put(SignalHV.STOPSIGNAL, KS.KS1_BLINK);
                     values.put(SignalKS.ZS3V, ZS32.Z4);
                 }
-                if (speedHV.isPresent() && current_zs3v.isPresent()) {
+                if (speedHV.isPresent() && currentzs3v.isPresent()) {
                     final ZS32 speednext = speedHV.get();
                     final int zs32 = speednext.ordinal();
                     if (zs32 > 26 && zs32 <= 42 && zs32 != 30) {
@@ -149,7 +146,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                         values.put(SignalKS.ZS3V, speednext);
                     }
                 }
-            } else if (hvblockstop || hvhomestop || hvstop) {
+            } else if (hvstop) {
                 values.put(SignalKS.STOPSIGNAL, KS.KS2);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
             }
