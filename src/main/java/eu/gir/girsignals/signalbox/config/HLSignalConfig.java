@@ -46,6 +46,16 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             values.put(SignalHL.STOPSIGNAL, normal);
         }
     }
+    
+    @SuppressWarnings("rawtypes")
+    private void speedCheckExit(final int speed, final Map<SEProperty, Object> values, final HLExit normal,
+            final HLExit restricted) {
+        if (speed >= 1 && speed <= 10 ) {
+            values.put(SignalHL.EXITSIGNAL, restricted);
+        } else {
+            values.put(SignalHL.EXITSIGNAL, normal);
+        }
+    }
 
     @SuppressWarnings({
             "rawtypes", "unchecked"
@@ -133,12 +143,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                 speedCheck(speed, values, HL.HL7, HL.HL8_9);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
             }
-
-            if (speed <= 10) {
-                values.put(SignalHL.EXITSIGNAL, HLExit.HL2_3);
-            } else {
-                values.put(SignalHL.EXITSIGNAL, HLExit.HL1);
-            }
+            speedCheckExit(speed, values, HLExit.HL1, HLExit.HL2_3);
             if (next.getProperty(SignalKS.STOPSIGNAL).isPresent()
                     || next.getProperty(SignalKS.MAINSIGNAL).isPresent()) {
                 if (ksgo) {
@@ -193,15 +198,10 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                 }
             }
         } else {
-            if (speed <= 10) {
-                values.put(SignalHL.EXITSIGNAL, HL.HL2_3);
-            } else {
-                values.put(SignalHL.EXITSIGNAL, HLExit.HL1);
-            }
+            speedCheckExit(speed, values, HLExit.HL1, HLExit.HL2_3);
             speedCheck(speed, values, HL.HL10, HL.HL11_12);
             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
             values.put(SignalHL.ZS2, ZS32.OFF);
-
         }
         this.changeIfPresent(values, current);
     }

@@ -129,10 +129,12 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     .filter(b -> stopksmain.contains(b)).isPresent();
 
             final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
-            final Optional<?> getlightbar = next.getProperty(SignalHL.LIGHTBAR);
-            final Optional<?> distantpresent = current.getProperty(SignalHV.DISTANTSIGNAL);
-            final Optional<?> stoppresent = next.getProperty(SignalHL.STOPSIGNAL);
-            
+            final Optional<HLLightbar> getlightbar = (Optional<HLLightbar>) next
+                    .getProperty(SignalHL.LIGHTBAR);
+            final Optional<VR> distantpresent = (Optional<VR>) current
+                    .getProperty(SignalHV.DISTANTSIGNAL);
+            final Optional<HP> stoppresent = (Optional<HP>) next.getProperty(SignalHL.STOPSIGNAL);
+
             current.getProperty(SignalHV.DISTANTSIGNAL)
                     .ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
                         VR vr = VR.VR0;
@@ -158,8 +160,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                         .ifPresent(prevzs3 -> current.setProperty(SignalHV.ZS3V, (ZS32) prevzs3));
             });
 
-            if (stoppresent.isPresent()
-                    || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
+            if (stoppresent.isPresent() || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
                 if (distantpresent.isPresent()) {
                     if (hlstop) {
                         current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR0);
@@ -184,7 +185,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                             }
                         }
                     } else if (hlmain40) {
-                       values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
+                        values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
                     } else {
                         values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                     }
