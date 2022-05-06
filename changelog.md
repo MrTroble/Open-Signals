@@ -1,8 +1,9 @@
 # Changelog
 
-## [Beta Update]
+## [Beta Update] 05.06.2022
 * feat: new HL-Signal "HL Exit"
-* feat: Signalinteroperability between all Signalsystems
+* feat: Signalinteroperability between all signalsystems
+* fix: several issues
 
 ## [Beta Update]
 * fix: Missing language keys
