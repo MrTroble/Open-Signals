@@ -148,6 +148,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     }
                     if (zs32 == 30) {
                         values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                        values.put(SignalKS.ZS3V, ZS32.Z4);
                     }
                 }
             } else if (hvstop || hvstop2) {
