@@ -164,7 +164,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             if (stoppresent.isPresent() || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
                 if (distantpresent.isPresent()) {
                     if (hlstop) {
-                        current.setProperty(SignalHV.DISTANTSIGNAL, VR.VR0);
+                        values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
                     } else if (current.getProperty(SignalHV.ZS3V).isPresent()) {
                         if (next.getProperty(SignalHL.STOPSIGNAL).isPresent()
                                 || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
