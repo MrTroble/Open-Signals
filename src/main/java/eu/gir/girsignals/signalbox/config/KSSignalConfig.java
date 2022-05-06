@@ -136,7 +136,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                 values.put(SignalKS.STOPSIGNAL, KS.KS1);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
                 if (hv40 && currentzs3v.isPresent()) {
-                    values.put(SignalHV.STOPSIGNAL, KS.KS1_BLINK);
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
                     values.put(SignalKS.ZS3V, ZS32.Z4);
                 }
                 if (speedHV.isPresent() && currentzs3v.isPresent()) {
