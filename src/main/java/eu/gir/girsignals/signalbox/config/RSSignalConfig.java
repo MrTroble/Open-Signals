@@ -1,6 +1,7 @@
 package eu.gir.girsignals.signalbox.config;
 
 import eu.gir.girsignals.EnumSignals.HL;
+import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.SHLight;
@@ -27,6 +28,8 @@ public final class RSSignalConfig implements ISignalAutoconfig {
                 .ifPresent(_u -> current.setProperty(SignalKS.STOPSIGNAL, KS.KS_SHUNTING));
         current.getProperty(SignalHL.STOPSIGNAL)
                 .ifPresent(_u -> current.setProperty(SignalHL.STOPSIGNAL, HL.HL_SHUNTING));
+        current.getProperty(SignalHL.EXITSIGNAL)
+                .ifPresent(_u -> current.setProperty(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING));
     }
 
     @Override

@@ -2,6 +2,7 @@ package eu.gir.girsignals.blocks.signals;
 
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLDistant;
+import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.HLType;
 import eu.gir.girsignals.EnumSignals.MastSignal;
@@ -29,9 +30,13 @@ public class SignalHL extends Signal {
     public static final SEProperty<HLDistant> DISTANTSIGNAL = SEProperty.of(
             "mainlightsignal_distant", HLDistant.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true,
             check(HLTYPE, HLType.DISTANT));
+    public static final SEProperty<HLExit> EXITSIGNAL = SEProperty.of("exitsignal", HLExit.OFF,
+            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(HLTYPE, HLType.EXIT));
     public static final SEProperty<HLLightbar> LIGHTBAR = SEProperty.of("mainlightsignallightbar",
             HLLightbar.OFF);
     public static final SEProperty<MastSignal> MASTSIGN = SEProperty.of("mastsign", MastSignal.OFF,
+            ChangeableStage.GUISTAGE);
+    public static final SEProperty<Boolean> SHUNTINGLIGHT = SEProperty.of("hl_sh1", false,
             ChangeableStage.GUISTAGE);
     public static final SEProperty<Boolean> MASTSIGNDISTANT = SEProperty.of("mastsigndistant",
             false, ChangeableStage.GUISTAGE);
