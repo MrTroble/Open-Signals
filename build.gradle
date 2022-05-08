@@ -2,21 +2,20 @@ buildscript {
     repositories {
         maven { url = 'https://maven.minecraftforge.net/' }
 		maven {
-      		url "https://plugins.gradle.org/m2/"
+      		url = "https://plugins.gradle.org/m2/"
     	}
-    	maven { url = "http://maven.cil.li/" }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:3.+'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:5.1+'
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 apply plugin: "com.matthewprenger.cursegradle"
 
@@ -58,7 +57,7 @@ archivesBaseName = 'GIRSignals'
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 repositories {
-    maven { url = "http://maven.cil.li/" }
+    maven{ url="https://maven.cil.li/" }
 }
 
 minecraft {
@@ -82,8 +81,8 @@ def copyName = ""
 
 dependencies {   
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
-    compile "li.cil.oc:OpenComputers:$ocVersion:api"
-    compile "li.cil.oc:OpenComputers:$ocVersion"
+    compileOnly "li.cil.oc:OpenComputers:$ocVersion:api"
+    runtimeOnly "li.cil.oc:OpenComputers:$ocVersion"
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.2")
 }
 
@@ -142,47 +141,4 @@ task update(type: Copy) {
     		}
         }
     }
-}
-
-uploadArchives {
-
-	tasks.uploadArchives.dependsOn build
-
-	repositories {
-		mavenDeployer {
-			if (project.hasProperty("mavenpass")) {
-				repository(url: "https://maven.girc.eu") {
-					authentication(userName: "maven", password: project.getProperty("mavenpass"))
-				}
-			}
-			pom {
-				groupId = project.group
-				artifactId = project.archivesBaseName
-				version = project.version
-				project {
-					name project.archivesBaseName
-					packaging "jar"
-					description project.name
-					url "https://github.com/German-Immersive-Railroading-Community/GIRSignals"
-					issueManagement {
-						system "github"
-						url "https://github.com/German-Immersive-Railroading-Community/GIRSignals/issues"
-					}
-					licenses {
-						license {
-							name "Apache License 2.0"
-							url "https://github.com/German-Immersive-Railroading-Community/GIRSignals/blob/master/LICENSE"
-							distribution "repo"
-						}
-					}
-
-					developers {
-						developer {
-							name "MrTroble"
-						}
-					}
-				}
-			}
-		}
-	}
 }
