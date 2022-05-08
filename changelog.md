@@ -1,5 +1,9 @@
 # Changelog
 
+## [Internal Update]
+
+* deps: Updatet gradle wrapper and forge gradle
+
 ## [Beta Update] 05.06.2022
 * feat: new HL-Signal "HL Exit"
 * feat: Signalinteroperability between all signalsystems
