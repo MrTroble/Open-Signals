@@ -95,7 +95,10 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final Optional<HLExit> hlexit = (Optional<HLExit>) next
                     .getProperty(SignalHL.EXITSIGNAL);
             final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
+            final Optional<ZS32> speedKSplate = (Optional<ZS32>) next
+                    .getProperty(SignalKS.ZS3_PLATE);
             final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
+            final Optional<ZS32> speedHVplate = (Optional<ZS32>) next.getProperty(SignalHV.ZS3V);
 
             final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> GOKS.contains(a))
                     .isPresent()
@@ -149,8 +152,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                 if (ksgo) {
                     speedCheck(speed, values, HL.HL1, HL.HL2_3);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
-                    if (speedKS.isPresent()) {
-                        final ZS32 speednext = speedKS.get();
+                    if (speedKS.isPresent() || speedKSplate.isPresent()) {
+                        final ZS32 speednext = speedKS.isPresent() ? speedKS.get()
+                                : speedKSplate.get();
                         final int zs32 = speednext.ordinal();
                         if (zs32 > 26 && zs32 <= 35) {
                             speedCheck(speed, values, HL.HL7, HL.HL8_9);
@@ -178,8 +182,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                         speedCheck(speed, values, HL.HL1, HL.HL2_3);
                         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
                     }
-                    if (speedHV.isPresent()) {
-                        final ZS32 speednext = speedHV.get();
+                    if (speedHV.isPresent() || speedHVplate.isPresent()) {
+                        final ZS32 speednext = speedHV.isPresent() ? speedHV.get()
+                                : speedHVplate.get();
                         final int zs32 = speednext.ordinal();
                         if (zs32 > 26 && zs32 <= 35) {
                             speedCheck(speed, values, HL.HL7, HL.HL8_9);
@@ -200,7 +205,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
         } else {
             speedCheckExit(speed, values, HLExit.HL1, HLExit.HL2_3);
             speedCheck(speed, values, HL.HL10, HL.HL11_12);
-            values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
+            values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
             values.put(SignalHL.ZS2, ZS32.OFF);
         }
         this.changeIfPresent(values, current);

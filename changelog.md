@@ -1,5 +1,9 @@
 # Changelog
 
+## [Beta Update] 08.05.2022
+* feat: ZS3_PLATE intigrated to Interoperability
+* bug fixes
+
 ## [Internal Update]
 
 * deps: Updatet gradle wrapper and forge gradle

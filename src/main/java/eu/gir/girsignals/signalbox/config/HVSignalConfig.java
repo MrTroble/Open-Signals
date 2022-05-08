@@ -130,6 +130,8 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     .filter(b -> STOP_KS_MAIN.contains(b)).isPresent();
 
             final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
+            final Optional<ZS32> speedKSplate = (Optional<ZS32>) next
+                    .getProperty(SignalKS.ZS3_PLATE);
             final Optional<HLLightbar> getlightbar = (Optional<HLLightbar>) next
                     .getProperty(SignalHL.LIGHTBAR);
             final Optional<VR> distantpresent = (Optional<VR>) current
@@ -195,8 +197,10 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             if (current.getProperty(SignalHV.DISTANTSIGNAL).isPresent()) {
                 if ((!ksstop || !ksstopmain) && next.getProperty(SignalKS.STOPSIGNAL).isPresent()) {
                     values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
-                    if (current.getProperty(SignalHV.ZS3V).isPresent() && speedKS.isPresent()) {
-                        final ZS32 speednext = speedKS.get();
+                    if (current.getProperty(SignalHV.ZS3V).isPresent()
+                            && (speedKS.isPresent() || speedKSplate.isPresent())) {
+                        final ZS32 speednext = speedKS.isPresent() ? speedKS.get()
+                                : speedKSplate.get();
                         final int zs32 = speednext.ordinal();
                         if (zs32 > 26 && zs32 <= 42) {
                             values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
