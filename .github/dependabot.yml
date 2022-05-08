@@ -8,6 +8,5 @@ updates:
     assignees:
       - "MrTroble"
     ignore:
-      - dependency-name: "net.minecraftforge.gradle:ForgeGradle"
       - dependency-name: "net.minecraftforge:forge"
         versions: ["[1.13,]"]
