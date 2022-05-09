@@ -2,7 +2,8 @@
 
 ## [Beta Update] 08.05.2022
 * feat: ZS3_PLATE intigrated to Interoperability
-* bug fixes
+* fix: various fixes
+* fix: Missing KS on shunting path
 
 ## [Internal Update]
 
