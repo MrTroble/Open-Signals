@@ -132,8 +132,8 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             final Optional<HP> nextHP = (Optional<HP>) next.getProperty(SignalHV.STOPSIGNAL);
             final boolean stop = next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP0::equals)
                     .isPresent() || nextHPHOME.filter(HPHome.HP0::equals).isPresent()
-                    || nextHPHOME.filter(HPHome.HP0_ALTERNATE_RED::equals).isPresent()
-                    || nextHP.filter(HP.HP0::equals).isPresent()
+                    || nextHPHOME.filter(HPHome.HP0_ALTERNATE_RED::equals).isPresent();
+            final boolean stop2 = nextHP.filter(HP.HP0::equals).isPresent()
                     || nextHP.filter(HP.SHUNTING::equals).isPresent();
             final boolean ksstopmain = next.getProperty(SignalKS.MAINSIGNAL)
                     .filter(b -> STOP_KS_MAIN.contains(b)).isPresent();
@@ -147,9 +147,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             final Optional<HP> stoppresent = (Optional<HP>) next.getProperty(SignalHL.STOPSIGNAL);
             final Optional<ZS32> speedHVZS3plate = (Optional<ZS32>) next
                     .getProperty(SignalHV.ZS3_PLATE);
-            final Optional<VR> currentVR = (Optional<VR>) current
-                    .getProperty(SignalHV.DISTANTSIGNAL);
-
+            
             current.getProperty(SignalHV.DISTANTSIGNAL)
                     .ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
                         VR vr = VR.VR0;
@@ -230,7 +228,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
                 }
             }
-            if (speedHVZS3plate.isPresent() && !stop) {
+            if (speedHVZS3plate.isPresent() && (!stop || !stop2)) {
                 final ZS32 speedcurrent = speedHVZS3plate.get();
                 final int zs32 = speedcurrent.ordinal();
                 values.put(SignalHV.ZS3V, speedcurrent);
