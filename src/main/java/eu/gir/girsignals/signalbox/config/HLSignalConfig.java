@@ -98,7 +98,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final Optional<ZS32> speedKSplate = (Optional<ZS32>) next
                     .getProperty(SignalKS.ZS3_PLATE);
             final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
-            final Optional<ZS32> speedHVplate = (Optional<ZS32>) next.getProperty(SignalHV.ZS3V);
+            final Optional<ZS32> speedHVplate = (Optional<ZS32>) next.getProperty(SignalHV.ZS3_PLATE);
 
             final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> GOKS.contains(a))
                     .isPresent()
