@@ -1,5 +1,13 @@
 # Changelog
 
+## [Beta Update] 08.05.2022
+* feat: ZS3_PLATE intigrated to Interoperability
+* fix: various fixes
+* fix: Missing KS on shunting path
+* fix: KS distant with HV
+* fix: Hl distant with HV
+* fix: Vr with KS
+
 ## [Internal Update]
 
 * deps: Updatet gradle wrapper and forge gradle

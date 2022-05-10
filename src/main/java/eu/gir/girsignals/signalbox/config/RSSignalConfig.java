@@ -4,6 +4,7 @@ import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.KS;
+import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.SHLight;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
@@ -26,6 +27,8 @@ public final class RSSignalConfig implements ISignalAutoconfig {
                 .ifPresent(_u -> current.setProperty(SignalHV.STOPSIGNAL, HP.SHUNTING));
         current.getProperty(SignalKS.STOPSIGNAL)
                 .ifPresent(_u -> current.setProperty(SignalKS.STOPSIGNAL, KS.KS_SHUNTING));
+        current.getProperty(SignalKS.MAINSIGNAL)
+                .ifPresent(_u -> current.setProperty(SignalKS.MAINSIGNAL, KSMain.KS_SHUNTING));
         current.getProperty(SignalHL.STOPSIGNAL)
                 .ifPresent(_u -> current.setProperty(SignalHL.STOPSIGNAL, HL.HL_SHUNTING));
         current.getProperty(SignalHL.EXITSIGNAL)
