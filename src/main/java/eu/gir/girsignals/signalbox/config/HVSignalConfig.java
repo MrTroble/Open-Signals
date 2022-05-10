@@ -208,8 +208,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 if ((!ksstop || !ksstopmain) && (next.getProperty(SignalKS.STOPSIGNAL).isPresent()
                         || next.getProperty(SignalKS.MAINSIGNAL).isPresent())) {
                     values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
-                    if (current.getProperty(SignalHV.ZS3V).isPresent()
-                            && (speedKS.isPresent() || speedKSplate.isPresent())) {
+                    if (speedKS.isPresent() || speedKSplate.isPresent()) {
                         final ZS32 speednext = speedKS.isPresent() ? speedKS.get()
                                 : speedKSplate.get();
                         final int zs32 = speednext.ordinal();
