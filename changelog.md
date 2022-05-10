@@ -4,6 +4,9 @@
 * feat: ZS3_PLATE intigrated to Interoperability
 * fix: various fixes
 * fix: Missing KS on shunting path
+* fix: KS distant with HV
+* fix: Hl distant with HV
+* fix: Vr with KS
 
 ## [Internal Update]
 
