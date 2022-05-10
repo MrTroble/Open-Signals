@@ -149,6 +149,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
                 if (hv40 && currentzs3v.isPresent()) {
                     values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
                     values.put(SignalKS.ZS3V, ZS32.Z4);
                 }
                 if ((speedHV.isPresent() || speedHVplate.isPresent()) && currentzs3v.isPresent()) {
@@ -156,15 +157,18 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     final int zs32 = speednext.ordinal();
                     if (zs32 > 26 && zs32 <= 42 && zs32 != 30) {
                         values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                        values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
                         values.put(SignalKS.ZS3V, speednext);
                     }
                     if (zs32 == 30) {
                         values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                        values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
                         values.put(SignalKS.ZS3V, ZS32.Z4);
                     }
                 }
             } else if (hvstop || hvstop2) {
                 values.put(SignalKS.STOPSIGNAL, KS.KS2);
+                values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
             }
         } else {
