@@ -178,6 +178,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                 if (hvblockgo || hvhomego || hvstopgo) {
                     if (hv40) {
                         speedCheck(speed, values, HL.HL7, HL.HL8_9);
+                        values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
                     } else {
                         speedCheck(speed, values, HL.HL1, HL.HL2_3);
                         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
