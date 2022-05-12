@@ -98,11 +98,14 @@ public final class KSSignalConfig implements ISignalAutoconfig {
             final Optional<ZS32> speedKSZS3plate = (Optional<ZS32>) next
                     .getProperty(SignalKS.ZS3_PLATE);
             final Optional<KS> currentks = (Optional<KS>) current.getProperty(SignalKS.STOPSIGNAL);
+            final Optional<ZS32> nextZS3 = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
             if (speedKSZS3plate.isPresent() && currentks.isPresent()
                     && !currentks.filter(KS.HP0::equals).isPresent()) {
-                final ZS32 speednext = speedKSZS3plate.get();
-                values.put(SignalKS.ZS3V, speednext);
-                values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                if (!nextZS3.isPresent()) {
+                    final ZS32 speednext = speedKSZS3plate.get();
+                    values.put(SignalKS.ZS3V, speednext);
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                }
             }
 
             if (stop || hlstop) {

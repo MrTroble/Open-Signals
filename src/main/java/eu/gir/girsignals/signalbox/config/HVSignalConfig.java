@@ -147,7 +147,8 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             final Optional<HP> stoppresent = (Optional<HP>) next.getProperty(SignalHL.STOPSIGNAL);
             final Optional<ZS32> speedHVZS3plate = (Optional<ZS32>) next
                     .getProperty(SignalHV.ZS3_PLATE);
-            
+            final Optional<ZS32> hvZS3 = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
+
             current.getProperty(SignalHV.DISTANTSIGNAL)
                     .ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
                         VR vr = VR.VR0;
@@ -228,17 +229,19 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 }
             }
             if (speedHVZS3plate.isPresent() && (!stop || !stop2)) {
-                final ZS32 speedcurrent = speedHVZS3plate.get();
-                final int zs32 = speedcurrent.ordinal();
-                values.put(SignalHV.ZS3V, speedcurrent);
-                if (zs32 > 26 && zs32 <= 42) {
-                    values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
-                    if (zs32 == 30) {
-                        values.put(SignalHV.ZS3V, VR.VR2);
-                        values.put(SignalHV.ZS3V, ZS32.OFF);
-                    }
-                    if (zs32 > 32) {
-                        values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                if (!hvZS3.isPresent()) {
+                    final ZS32 speedcurrent = speedHVZS3plate.get();
+                    final int zs32 = speedcurrent.ordinal();
+                    values.put(SignalHV.ZS3V, speedcurrent);
+                    if (zs32 > 26 && zs32 <= 42) {
+                        values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
+                        if (zs32 == 30) {
+                            values.put(SignalHV.ZS3V, VR.VR2);
+                            values.put(SignalHV.ZS3V, ZS32.OFF);
+                        }
+                        if (zs32 > 32) {
+                            values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                        }
                     }
                 }
             }
