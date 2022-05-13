@@ -2,15 +2,26 @@ package eu.gir.girsignals.signalbox.config;
 
 import java.util.HashMap;
 
-import javax.annotation.Nullable;
-
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public interface ISignalAutoconfig {
 
-    void change(final int speed, final SignalTileEnity current,
-            @Nullable final SignalTileEnity next);
+    public static class ConfigInfo {
+        public final SignalTileEnity current;
+        public final SignalTileEnity next;
+        public final int speed;
+
+        public ConfigInfo(final SignalTileEnity current, final SignalTileEnity next,
+                final int speed) {
+            this.current = current;
+            this.next = next;
+            this.speed = speed;
+        }
+
+    }
+
+    void change(final ConfigInfo info);
 
     void reset(final SignalTileEnity current);
 

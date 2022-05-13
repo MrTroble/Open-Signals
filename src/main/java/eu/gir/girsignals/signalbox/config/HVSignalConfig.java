@@ -85,26 +85,26 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             "rawtypes", "unchecked"
     })
     @Override
-    public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
+    public void change(final ConfigInfo info) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
-        if (next != null) {
-            if (speed < 7 && speed > 0 && speed != 4) {
-                current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
-                    final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
-                    current.setProperty(SignalHV.ZS3, zs32);
+        if (info.next != null) {
+            if (info.speed < 7 && info.speed > 0 && info.speed != 4) {
+                info.current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
+                    final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
+                    info.current.setProperty(SignalHV.ZS3, zs32);
                 });
 
                 values.put(SignalHV.HPBLOCK, HPBlock.HP1);
                 values.put(SignalHV.HPHOME, HPHome.HP2);
                 values.put(SignalHV.STOPSIGNAL, HP.HP2);
-            } else if (speed == 4) {
+            } else if (info.speed == 4) {
                 values.put(SignalHV.HPBLOCK, HPBlock.HP1);
                 values.put(SignalHV.HPHOME, HPHome.HP2);
                 values.put(SignalHV.STOPSIGNAL, HP.HP2);
-            } else if (speed >= 7 && speed <= 16) {
-                current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
-                    final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + speed];
-                    current.setProperty(SignalHV.ZS3, zs32);
+            } else if (info.speed >= 7 && info.speed <= 16) {
+                info.current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
+                    final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
+                    info.current.setProperty(SignalHV.ZS3, zs32);
                 });
                 values.put(SignalHV.HPBLOCK, HPBlock.HP1);
                 values.put(SignalHV.HPHOME, HPHome.HP1);
@@ -115,72 +115,71 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 values.put(SignalHV.STOPSIGNAL, HP.HP1);
             }
 
-            final boolean hlstop = next.getProperty(SignalHL.STOPSIGNAL)
+            final boolean hlstop = info.next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(a -> STOP_HL_MAIN.contains(a)).isPresent()
-                    || next.getProperty(SignalHL.EXITSIGNAL).filter(d -> STOP_HL_EXIT.contains(d))
-                            .isPresent();
-            final boolean hlmain40 = next.getProperty(SignalHL.STOPSIGNAL)
+                    || info.next.getProperty(SignalHL.EXITSIGNAL)
+                            .filter(d -> STOP_HL_EXIT.contains(d)).isPresent();
+            final boolean hlmain40 = info.next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(c -> HL_40_MAIN.contains(c)).isPresent()
-                    || next.getProperty(SignalHL.EXITSIGNAL).filter(HLExit.HL2_3::equals)
+                    || info.next.getProperty(SignalHL.EXITSIGNAL).filter(HLExit.HL2_3::equals)
                             .isPresent();
 
-            final boolean ksstop = next.getProperty(SignalKS.STOPSIGNAL)
+            final boolean ksstop = info.next.getProperty(SignalKS.STOPSIGNAL)
                     .filter(a -> STOP_KS.contains(a)).isPresent();
 
-            final Optional<HPHome> nextHPHOME = (Optional<HPHome>) next
+            final Optional<HPHome> nextHPHOME = (Optional<HPHome>) info.next
                     .getProperty(SignalHV.HPHOME);
-            final Optional<HP> nextHP = (Optional<HP>) next.getProperty(SignalHV.STOPSIGNAL);
-            final boolean stop = next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP0::equals)
+            final Optional<HP> nextHP = (Optional<HP>) info.next.getProperty(SignalHV.STOPSIGNAL);
+            final boolean stop = info.next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP0::equals)
                     .isPresent() || nextHPHOME.filter(HPHome.HP0::equals).isPresent()
                     || nextHPHOME.filter(HPHome.HP0_ALTERNATE_RED::equals).isPresent();
             final boolean stop2 = nextHP.filter(HP.HP0::equals).isPresent()
                     || nextHP.filter(HP.SHUNTING::equals).isPresent();
-            final boolean ksstopmain = next.getProperty(SignalKS.MAINSIGNAL)
+            final boolean ksstopmain = info.next.getProperty(SignalKS.MAINSIGNAL)
                     .filter(b -> STOP_KS_MAIN.contains(b)).isPresent();
-            final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
-            final Optional<ZS32> speedKSplate = (Optional<ZS32>) next
+            final Optional<ZS32> speedKS = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);
+            final Optional<ZS32> speedKSplate = (Optional<ZS32>) info.next
                     .getProperty(SignalKS.ZS3_PLATE);
-            final Optional<HLLightbar> getlightbar = (Optional<HLLightbar>) next
+            final Optional<HLLightbar> getlightbar = (Optional<HLLightbar>) info.next
                     .getProperty(SignalHL.LIGHTBAR);
-            final Optional<VR> distantpresent = (Optional<VR>) current
+            final Optional<VR> distantpresent = (Optional<VR>) info.current
                     .getProperty(SignalHV.DISTANTSIGNAL);
-            final Optional<HP> stoppresent = (Optional<HP>) next.getProperty(SignalHL.STOPSIGNAL);
-            final Optional<ZS32> speedHVZS3plate = (Optional<ZS32>) next
+            final Optional<HP> stoppresent = (Optional<HP>) info.next
+                    .getProperty(SignalHL.STOPSIGNAL);
+            final Optional<ZS32> speedHVZS3plate = (Optional<ZS32>) info.next
                     .getProperty(SignalHV.ZS3_PLATE);
-            final Optional<ZS32> hvZS3 = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
+            final Optional<ZS32> hvZS3 = (Optional<ZS32>) info.next.getProperty(SignalHV.ZS3);
 
-            current.getProperty(SignalHV.DISTANTSIGNAL)
-                    .ifPresent(_u -> next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
+            info.current.getProperty(SignalHV.DISTANTSIGNAL)
+                    .ifPresent(_u -> info.next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
                         VR vr = VR.VR0;
                         switch ((HPType) type) {
                             case HPBLOCK:
-                                vr = next((HPBlock) next.getProperty(SignalHV.HPBLOCK).get());
+                                vr = next((HPBlock) info.next.getProperty(SignalHV.HPBLOCK).get());
                                 break;
                             case HPHOME:
-                                vr = next((HPHome) next.getProperty(SignalHV.HPHOME).get());
+                                vr = next((HPHome) info.next.getProperty(SignalHV.HPHOME).get());
                                 break;
                             case STOPSIGNAL:
-                                vr = next((HP) next.getProperty(SignalHV.STOPSIGNAL).get());
+                                vr = next((HP) info.next.getProperty(SignalHV.STOPSIGNAL).get());
                                 break;
                             case OFF:
                             default:
                                 break;
                         }
-                        current.setProperty(SignalHV.DISTANTSIGNAL, vr);
+                        values.put(SignalHV.DISTANTSIGNAL, vr);
                     }));
-            current.getProperty(SignalHV.ZS3V).ifPresent(_u -> {
-                current.setProperty(SignalHV.ZS3V, ZS32.OFF);
-                next.getProperty(SignalHV.ZS3)
-                        .ifPresent(prevzs3 -> current.setProperty(SignalHV.ZS3V, (ZS32) prevzs3));
-            });
+            values.put(SignalHV.ZS3V, ZS32.OFF);
+            info.next.getProperty(SignalHV.ZS3)
+                    .ifPresent(prevzs3 -> values.put(SignalHV.ZS3V, prevzs3));
 
-            if (stoppresent.isPresent() || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
+            if (stoppresent.isPresent() || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
                 if (distantpresent.isPresent()) {
                     if (hlstop) {
                         values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
-                    } else if (current.getProperty(SignalHV.ZS3V).isPresent()) {
-                        if (next.getProperty(SignalHL.STOPSIGNAL).isPresent()
-                                || next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
+                    } else if (info.current.getProperty(SignalHV.ZS3V).isPresent()) {
+                        if (info.next.getProperty(SignalHL.STOPSIGNAL).isPresent()
+                                || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
                             if (hlmain40
                                     && getlightbar.filter(HLLightbar.OFF::equals).isPresent()) {
                                 values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
@@ -205,9 +204,10 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     }
                 }
             }
-            if (current.getProperty(SignalHV.DISTANTSIGNAL).isPresent()) {
-                if ((!ksstop || !ksstopmain) && (next.getProperty(SignalKS.STOPSIGNAL).isPresent()
-                        || next.getProperty(SignalKS.MAINSIGNAL).isPresent())) {
+            if (info.current.getProperty(SignalHV.DISTANTSIGNAL).isPresent()) {
+                if ((!ksstop || !ksstopmain)
+                        && (info.next.getProperty(SignalKS.STOPSIGNAL).isPresent()
+                                || info.next.getProperty(SignalKS.MAINSIGNAL).isPresent())) {
                     values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                     if (speedKS.isPresent() || speedKSplate.isPresent()) {
                         final ZS32 speednext = speedKS.isPresent() ? speedKS.get()
@@ -255,7 +255,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             values.put(SignalHV.ZS1, false);
             values.put(SignalHV.ZS7, false);
         }
-        this.changeIfPresent(values, current);
+        this.changeIfPresent(values, info.current);
     }
 
     @SuppressWarnings("rawtypes")

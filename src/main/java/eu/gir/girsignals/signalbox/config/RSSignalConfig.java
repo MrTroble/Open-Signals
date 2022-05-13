@@ -20,19 +20,19 @@ public final class RSSignalConfig implements ISignalAutoconfig {
     }
 
     @Override
-    public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
-        current.getProperty(SignalSHLight.SHLIGHT_0)
-                .ifPresent(_u -> current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH1));
-        current.getProperty(SignalHV.STOPSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalHV.STOPSIGNAL, HP.SHUNTING));
-        current.getProperty(SignalKS.STOPSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalKS.STOPSIGNAL, KS.KS_SHUNTING));
-        current.getProperty(SignalKS.MAINSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalKS.MAINSIGNAL, KSMain.KS_SHUNTING));
-        current.getProperty(SignalHL.STOPSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalHL.STOPSIGNAL, HL.HL_SHUNTING));
-        current.getProperty(SignalHL.EXITSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING));
+    public void change(final ConfigInfo info) {
+        info.current.getProperty(SignalSHLight.SHLIGHT_0)
+                .ifPresent(_u -> info.current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH1));
+        info.current.getProperty(SignalHV.STOPSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalHV.STOPSIGNAL, HP.SHUNTING));
+        info.current.getProperty(SignalKS.STOPSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalKS.STOPSIGNAL, KS.KS_SHUNTING));
+        info.current.getProperty(SignalKS.MAINSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalKS.MAINSIGNAL, KSMain.KS_SHUNTING));
+        info.current.getProperty(SignalHL.STOPSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalHL.STOPSIGNAL, HL.HL_SHUNTING));
+        info.current.getProperty(SignalHL.EXITSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING));
     }
 
     @Override
