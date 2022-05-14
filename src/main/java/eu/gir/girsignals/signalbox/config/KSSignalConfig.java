@@ -44,16 +44,14 @@ public final class KSSignalConfig implements ISignalAutoconfig {
         if (info.speed <= 16 && info.speed > 0) {
             final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
             values.put(SignalKS.ZS3, zs32);
-
         }
-
         if (info.next != null) {
             info.current.getProperty(SignalKS.ZS3V)
                     .ifPresent(_u -> info.next.getProperty(SignalKS.ZS3).ifPresent(
                             value -> info.current.setProperty(SignalKS.ZS3V, (ZS32) value)));
             final boolean changes = info.next.getProperty(SignalKS.ZS3)
                     .filter(e -> ((ZS32) e).ordinal() > ZS32.Z.ordinal()
-                            && (((ZS32) e).ordinal() - ZS32.Z.ordinal()) < info.speed)
+                            && (((ZS32) e).ordinal() - ZS32.Z.ordinal()) != info.speed)
                     .isPresent();
             values.put(SignalKS.MAINSIGNAL, KSMain.KS1);
             final Optional opt = info.next.getProperty(SignalKS.STOPSIGNAL);
@@ -108,14 +106,6 @@ public final class KSSignalConfig implements ISignalAutoconfig {
             final Optional<KS> currentks = (Optional<KS>) info.current
                     .getProperty(SignalKS.STOPSIGNAL);
             final Optional<ZS32> nextZS3 = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);
-            if (speedKSZS3plate.isPresent() && currentks.isPresent()
-                    && !currentks.filter(KS.HP0::equals).isPresent()) {
-                if (!nextZS3.isPresent()) {
-                    final ZS32 speednext = speedKSZS3plate.get();
-                    values.put(SignalKS.ZS3V, speednext);
-                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
-                }
-            }
 
             if (stop || hlstop) {
                 values.put(SignalKS.STOPSIGNAL, KS.KS2);
@@ -124,9 +114,18 @@ public final class KSSignalConfig implements ISignalAutoconfig {
             } else if (changes) {
                 values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
-            } else if (!speedKSZS3plate.isPresent()) {
+            } else {
                 values.put(SignalKS.STOPSIGNAL, KS.KS1);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
+                values.put(SignalKS.ZS3V, ZS32.OFF);
+            }
+            if (speedKSZS3plate.isPresent() && currentks.isPresent()
+                    && !currentks.filter(KS.HP0::equals).isPresent()) {
+                if (!nextZS3.isPresent() && currentzs3v.isPresent()) {
+                    final ZS32 speednext = speedKSZS3plate.get();
+                    values.put(SignalKS.ZS3V, speednext);
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                }
             }
             if ((!hlmain40 && nexthl) || hvstop || hvstop2) {
                 values.put(SignalKS.ZS3V, ZS32.OFF);
