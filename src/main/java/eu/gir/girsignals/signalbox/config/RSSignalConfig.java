@@ -6,6 +6,7 @@ import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.SHLight;
+import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
@@ -33,12 +34,16 @@ public final class RSSignalConfig implements ISignalAutoconfig {
                 .ifPresent(_u -> info.current.setProperty(SignalHL.STOPSIGNAL, HL.HL_SHUNTING));
         info.current.getProperty(SignalHL.EXITSIGNAL)
                 .ifPresent(_u -> info.current.setProperty(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING));
+        info.current.getProperty(SignalRA.RALIGHT)
+                .ifPresent(_u -> info.current.setProperty(SignalRA.RALIGHT, true));
     }
 
     @Override
     public void reset(final SignalTileEnity current) {
         current.getProperty(SignalSHLight.SHLIGHT_0)
                 .ifPresent(_u -> current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH0));
+        current.getProperty(SignalRA.RALIGHT)
+                .ifPresent(_u -> current.setProperty(SignalRA.RALIGHT, false));
     }
 
 }
