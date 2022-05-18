@@ -121,7 +121,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
             }
             if (speedKSZS3plate.isPresent() && currentks.isPresent()
                     && !currentks.filter(KS.HP0::equals).isPresent()) {
-                if (!nextZS3.isPresent() && currentzs3v.isPresent()) {
+                if (!nextZS3.isPresent() && currentzs3v.isPresent() && !stop) {
                     final ZS32 speednext = speedKSZS3plate.get();
                     values.put(SignalKS.ZS3V, speednext);
                     values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
@@ -179,7 +179,6 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                 }
             } else if (hvstop || hvstop2) {
                 values.put(SignalKS.STOPSIGNAL, KS.KS2);
-                values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
             }
         } else {

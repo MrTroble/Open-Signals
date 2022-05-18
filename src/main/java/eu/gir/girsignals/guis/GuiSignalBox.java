@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 
+import eu.gir.girsignals.EnumSignals;
+import eu.gir.girsignals.EnumSignals.SortOptions;
 import eu.gir.girsignals.signalbox.EnumGuiMode;
 import eu.gir.girsignals.signalbox.LinkType;
 import eu.gir.girsignals.signalbox.PathOption;
@@ -22,6 +24,7 @@ import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
 import eu.gir.girsignals.signalbox.SignalNode;
 import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
+import eu.gir.guilib.ecs.DrawUtil.EnumIntegerable;
 import eu.gir.guilib.ecs.DrawUtil.SizeIntegerables;
 import eu.gir.guilib.ecs.GuiBase;
 import eu.gir.guilib.ecs.GuiElements;
@@ -41,6 +44,7 @@ import eu.gir.guilib.ecs.entitys.render.UIScissor;
 import eu.gir.guilib.ecs.entitys.render.UITexture;
 import eu.gir.guilib.ecs.entitys.render.UIToolTip;
 import eu.gir.guilib.ecs.entitys.transform.UIScale;
+import eu.gir.guilib.ecs.interfaces.IIntegerable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
@@ -266,7 +270,19 @@ public class GuiSignalBox extends GuiBase {
             initializeFieldTemplate(this::tileNormal);
         }, 1));
     }
-
+    /*
+    private void sort(final SortOptions sort) {
+        String E = new String();
+        switch (sort) {
+            case DISABLED:
+                break;
+            case NAME_ASSENDING:
+                final ArrayList<String> sorted = Lists.newArrayList(E);
+            default:
+                break;
+        }
+    }
+    */
     private void initializePageSettings(final UIEntity entity) {
         reset();
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
@@ -274,6 +290,13 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.setInheritWidth(true);
         final UIEntity list = new UIEntity();
         final UIBox uibox = new UIBox(UIBox.VBOX, 2);
+        @SuppressWarnings({
+                "rawtypes", "unchecked"
+        })
+        IIntegerable<SortOptions> SortOptions = new EnumIntegerable(EnumSignals.SortOptions.class);
+        list.add(GuiElements.createEnumElement(SortOptions, id -> {
+            SortOptions.getObjFromID(id);
+        }));
         list.add(uibox);
         list.setInheritHeight(true);
         list.setInheritWidth(true);
