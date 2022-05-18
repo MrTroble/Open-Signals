@@ -270,19 +270,7 @@ public class GuiSignalBox extends GuiBase {
             initializeFieldTemplate(this::tileNormal);
         }, 1));
     }
-    /*
-    private void sort(final SortOptions sort) {
-        String E = new String();
-        switch (sort) {
-            case DISABLED:
-                break;
-            case NAME_ASSENDING:
-                final ArrayList<String> sorted = Lists.newArrayList(E);
-            default:
-                break;
-        }
-    }
-    */
+
     private void initializePageSettings(final UIEntity entity) {
         reset();
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
