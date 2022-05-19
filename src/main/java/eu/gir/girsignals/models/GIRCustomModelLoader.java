@@ -38,6 +38,7 @@ import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.RALight;
 import eu.gir.girsignals.EnumSignals.SHLight;
 import eu.gir.girsignals.EnumSignals.STNumber;
+import eu.gir.girsignals.EnumSignals.TSType;
 import eu.gir.girsignals.EnumSignals.Tram;
 import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.EnumSignals.TramSwitch;
@@ -56,6 +57,7 @@ import eu.gir.girsignals.blocks.boards.SignalLF;
 import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalOther;
 import eu.gir.girsignals.blocks.boards.SignalRA;
+import eu.gir.girsignals.blocks.boards.SignalTS;
 import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
@@ -956,6 +958,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                         .and(with(SignalLF.INDICATOR, lf1::equals)), 1, rename);
                 cm.register("lf/lf7", with(SignalLF.LFTYPE, LFBachground.LF7::equals)
                         .and(with(SignalLF.INDICATOR, lf1::equals)), 1, rename);
+                cm.register("lf/lf3_5", with(SignalLF.LFTYPE, LFBachground.LF5::equals), 1, "2",
+                        "girsignals:blocks/lf/lf5");
             }
         });
         registeredModels.put("elsignal", cm -> {
@@ -981,6 +985,14 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             cm.register("el/el_arrow_r", with(SignalEL.ELARROW, ela -> ela.equals(ELArrow.RIGHT)),
                     2);
             cm.register("el/el_arrow_up", with(SignalEL.ELARROW, ela -> ela.equals(ELArrow.UP)), 2);
+        });
+        registeredModels.put("tssignal", cm -> {
+            cm.register("ne/ne2", with(SignalTS.TSTYPE, TSType.TS1::equals), 1, "2",
+                    "girsignals:blocks/ts/ts1");
+            cm.register("el/el", with(SignalTS.TSTYPE, TSType.TS2::equals), 1, "2",
+                    "girsignals:blocks/ts/ts2");
+            cm.register("el/el", with(SignalTS.TSTYPE, TSType.TS3::equals), 1, "2",
+                    "girsignals:blocks/ts/ts3");
         });
         registeredModels.put("shsignal", cm -> {
             cm.register("sh/sh2_mast", ebs -> true, 0);
@@ -1122,6 +1134,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                     with(SignalNE.NEADDITION, nea -> nea.equals(NEAddition.PRE2)).and(
                             with(SignalNE.NETYPE, ne -> ne.equals(NE.NE2) || ne.equals(NE.NE2_1))),
                     1);
+            cm.register("ne/so106", with(SignalNE.NETYPE, NE.So106::equals), 1, "2",
+                    "girsignals:blocks/ne/so106");
             @SuppressWarnings("unchecked")
             final Map.Entry<NE, Float>[] entrys = new Map.Entry[] {
                     Maps.immutableEntry(NE.NE5, 1.875f), Maps.immutableEntry(NE.NE3_1, 3.0f),

@@ -138,7 +138,7 @@ public final class EnumSignals {
     }
 
     public enum LFBachground implements DefaultName<LFBachground> {
-        LF1, LF2, LF3_5, LF4, LF6, LF7;
+        LF1, LF2, LF3_5, LF4, LF5, LF6, LF7;
     }
 
     public enum EL implements DefaultName<EL> {
@@ -188,7 +188,7 @@ public final class EnumSignals {
     }
 
     public enum NE implements DefaultName<NE> {
-        NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_small, NE5, NE6;
+        NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_small, NE5, NE6, So106;
     }
 
     public enum NEAddition implements Offable<NEAddition> {
@@ -209,6 +209,10 @@ public final class EnumSignals {
 
     public static enum EnumState {
         DISABLED, OFFSTATE, ONSTATE
+    }
+
+    public enum TSType implements Offable<TSType> {
+        TS1, TS2, TS3;
     }
 
 }
