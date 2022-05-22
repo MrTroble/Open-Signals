@@ -2,7 +2,6 @@ package eu.gir.girsignals.blocks.signals;
 
 import java.util.Map;
 
-import eu.gir.girsignals.EnumSignals.MastsignalSHLight;
 import eu.gir.girsignals.EnumSignals.SHLight;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
