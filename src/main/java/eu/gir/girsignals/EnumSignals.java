@@ -203,16 +203,16 @@ public final class EnumSignals {
         OFF, WN3, WN4, WN5, WN6, BLINK;
     }
 
+    public enum TS implements Offable<TS> {
+        TS1, TS2, TS3;
+    }
+
     public static enum EnumMode {
         MANUELL, SINGLE, MUX
     }
 
     public static enum EnumState {
         DISABLED, OFFSTATE, ONSTATE
-    }
-
-    public enum TSType implements Offable<TSType> {
-        TS1, TS2, TS3;
     }
 
 }

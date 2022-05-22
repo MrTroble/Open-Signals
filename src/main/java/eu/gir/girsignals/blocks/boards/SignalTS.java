@@ -1,6 +1,6 @@
 package eu.gir.girsignals.blocks.boards;
 
-import eu.gir.girsignals.EnumSignals.TSType;
+import eu.gir.girsignals.EnumSignals.TS;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
@@ -11,7 +11,7 @@ public class SignalTS extends Signal {
         super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "tssignal").noLink().build());
     }
 
-    public static final SEProperty<TSType> TSTYPE = SEProperty.of("tssignal", TSType.TS1,
+    public static final SEProperty<TS> TSTYPE = SEProperty.of("tssignal", TS.TS1,
             ChangeableStage.GUISTAGE);
 
     @Override

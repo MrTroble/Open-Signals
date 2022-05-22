@@ -38,7 +38,7 @@ import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.RALight;
 import eu.gir.girsignals.EnumSignals.SHLight;
 import eu.gir.girsignals.EnumSignals.STNumber;
-import eu.gir.girsignals.EnumSignals.TSType;
+import eu.gir.girsignals.EnumSignals.TS;
 import eu.gir.girsignals.EnumSignals.Tram;
 import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.EnumSignals.TramSwitch;
@@ -944,6 +944,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             cm.register("mast_lamps",
                     with(SignalLF.LFTYPE, lamps -> lamps.equals(LFBachground.LF1)), 0);
             cm.register("mast", ebs -> true, 0);
+            cm.register("lf/lf3_5", with(SignalLF.LFTYPE, LFBachground.LF5::equals), 1, "2",
+                    "girsignals:blocks/lf/lf5");
             for (final LF lf1 : LF.values()) {
                 final String[] rename = lf1.getOverlayRename();
                 cm.register("lf/lf1", with(SignalLF.LFTYPE, LFBachground.LF1::equals)
@@ -958,8 +960,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                         .and(with(SignalLF.INDICATOR, lf1::equals)), 1, rename);
                 cm.register("lf/lf7", with(SignalLF.LFTYPE, LFBachground.LF7::equals)
                         .and(with(SignalLF.INDICATOR, lf1::equals)), 1, rename);
-                cm.register("lf/lf3_5", with(SignalLF.LFTYPE, LFBachground.LF5::equals), 1, "2",
-                        "girsignals:blocks/lf/lf5");
             }
         });
         registeredModels.put("elsignal", cm -> {
@@ -987,11 +987,12 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             cm.register("el/el_arrow_up", with(SignalEL.ELARROW, ela -> ela.equals(ELArrow.UP)), 2);
         });
         registeredModels.put("tssignal", cm -> {
-            cm.register("ne/ne2", with(SignalTS.TSTYPE, TSType.TS1::equals), 1, "2",
+            cm.register("mast", ebs -> true, 0);
+            cm.register("ne/ne2", with(SignalTS.TSTYPE, TS.TS1::equals), 1, "2",
                     "girsignals:blocks/ts/ts1");
-            cm.register("el/el", with(SignalTS.TSTYPE, TSType.TS2::equals), 1, "2",
+            cm.register("el/el", with(SignalTS.TSTYPE, TS.TS2::equals), 1, "2",
                     "girsignals:blocks/ts/ts2");
-            cm.register("el/el", with(SignalTS.TSTYPE, TSType.TS3::equals), 1, "2",
+            cm.register("el/el", with(SignalTS.TSTYPE, TS.TS3::equals), 1, "2",
                     "girsignals:blocks/ts/ts3");
         });
         registeredModels.put("shsignal", cm -> {

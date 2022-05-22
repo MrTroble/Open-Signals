@@ -21,6 +21,7 @@ import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalOther;
 import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalStationName;
+import eu.gir.girsignals.blocks.boards.SignalTS;
 import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
@@ -63,6 +64,7 @@ public final class GIRBlocks {
     public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
     public static final SignalOther OTHER_SIGNAL = new SignalOther();
     public static final SignalNE NE_SIGNAL = new SignalNE();
+    public static final SignalTS TS_SIGNAL = new SignalTS();
     public static final StationNumberPlate STATION_NUMBER_PLATE = new StationNumberPlate();
     public static final SignalWN WN_SIGNAL = new SignalWN();
     public static final SignalStationName STATION_NAME = new SignalStationName();
