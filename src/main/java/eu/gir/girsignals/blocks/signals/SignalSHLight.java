@@ -22,7 +22,7 @@ public class SignalSHLight extends Signal {
             SHLight.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
     public static final SEProperty<Boolean> SH_HIGH = SEProperty.of("sh_high", false,
             ChangeableStage.GUISTAGE);
-    public static final SEProperty<Boolean> BLACK_DOTS = SEProperty.of("", false,
+    public static final SEProperty<Boolean> BLACK_DOTS = SEProperty.of("blackdots", false,
             ChangeableStage.GUISTAGE);
 
     @Override
