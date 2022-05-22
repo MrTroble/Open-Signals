@@ -1021,7 +1021,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                         .and(with(SignalLF.INDICATOR, lf1::equals)), 1, rename);
                 cm.register("lf/lf7", with(SignalLF.LFTYPE, LFBachground.LF7::equals)
                         .and(with(SignalLF.INDICATOR, lf1::equals)), 1, rename);
-                cm.register("lf/lf3_5", with(SignalLF.LFTYPE, LFBachground.LF5::equals), 1);
+                cm.register("lf/lf5", with(SignalLF.LFTYPE, LFBachground.LF5::equals), 1);
             }
         });
         registeredModels.put("elsignal", cm -> {
