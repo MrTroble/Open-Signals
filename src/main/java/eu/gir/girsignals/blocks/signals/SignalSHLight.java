@@ -2,6 +2,7 @@ package eu.gir.girsignals.blocks.signals;
 
 import java.util.Map;
 
+import eu.gir.girsignals.EnumSignals.MastsignalSHLight;
 import eu.gir.girsignals.EnumSignals.SHLight;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -21,6 +22,8 @@ public class SignalSHLight extends Signal {
     public static final SEProperty<SHLight> SHLIGHT_0 = SEProperty.of("sh_light_bottom",
             SHLight.OFF, ChangeableStage.APISTAGE_NONE_CONFIG);
     public static final SEProperty<Boolean> SH_HIGH = SEProperty.of("sh_high", false,
+            ChangeableStage.GUISTAGE);
+    public static final SEProperty<Boolean> BLACK_DOTS = SEProperty.of("", false,
             ChangeableStage.GUISTAGE);
 
     @Override
