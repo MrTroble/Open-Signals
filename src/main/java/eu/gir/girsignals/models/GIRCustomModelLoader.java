@@ -30,7 +30,6 @@ import eu.gir.girsignals.EnumSignals.KSType;
 import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBachground;
 import eu.gir.girsignals.EnumSignals.MastSignal;
-import eu.gir.girsignals.EnumSignals.MastsignalSHLight;
 import eu.gir.girsignals.EnumSignals.NE;
 import eu.gir.girsignals.EnumSignals.NEAddition;
 import eu.gir.girsignals.EnumSignals.OtherSignal;
