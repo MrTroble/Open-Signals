@@ -3,6 +3,7 @@ package eu.gir.girsignals.proxy;
 import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalBox;
+import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.guis.GuiPlacementtool;
 import eu.gir.girsignals.guis.GuiRedstoneIO;
 import eu.gir.girsignals.guis.GuiSignal;
@@ -31,7 +32,7 @@ public class ClientProxy extends CommonProxy {
         super.preinit(event);
         GuiHandler.addGui(Placementtool.class,
                 (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
-        GuiHandler.addGui(Signal.class, SignalControllerTileEntity.class, GuiSignalController::new);
+        GuiHandler.addGui(SignalController.class, SignalControllerTileEntity.class, GuiSignalController::new);
         GuiHandler.addGui(SignalBox.class, SignalBoxTileEntity.class, GuiSignalBox::new);
         GuiHandler.addGui(RedstoneIO.class, RedstoneIOTileEntity.class, GuiRedstoneIO::new);
         GuiHandler.addGui(Signal.class, SignalTileEnity.class, GuiSignal::new);

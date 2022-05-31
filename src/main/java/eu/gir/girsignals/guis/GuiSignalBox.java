@@ -290,8 +290,8 @@ public class GuiSignalBox extends GuiBase {
                         o2.getValue().ordinal()));
                 break;
             case TYPE_DESCENDING:
-                //Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
-                //        o2.getValue().ordinal()));
+                Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
+                        o2.getValue().ordinal()));
                 break;
             case DISTANCE_ASSANDING:
                 break;

@@ -44,7 +44,7 @@ public class GuiSignal extends GuiBase {
         final UIEntity hbox = new UIEntity();
         hbox.add(new UIBox(UIBox.HBOX, 2));
         hbox.setHeight(25);
-        hbox.setInheritHeight(true);
+        hbox.setInheritWidth(true);
 
         final UIEntity textfield = new UIEntity();
         textfield.setHeight(20);
@@ -53,11 +53,12 @@ public class GuiSignal extends GuiBase {
         final UITextInput input = new UITextInput(SignalTileEnity.CUSTOMNAME);
         input.setText(tile.getName());
         textfield.add(input);
+        
         hbox.add(textfield);
         final UIEntity apply = GuiElements.createButton(I18n.format("btn.apply"),
                 _u -> this.updateText(input.getText()));
-        apply.setInheritHeight(false);
-        apply.setWidth(80);
+        apply.setInheritWidth(false);
+        apply.setWidth(60);
         hbox.add(apply);
 
         inner.add(hbox);
@@ -68,6 +69,7 @@ public class GuiSignal extends GuiBase {
         this.entity.write(compound);
         GuiSyncNetwork.sendToPosServer(compound, tile.getPos());
         labelComp.setText(input);
+        tile.setCustomName(input);
     }
 
 }
