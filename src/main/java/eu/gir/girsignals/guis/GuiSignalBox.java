@@ -5,6 +5,7 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -269,6 +270,36 @@ public class GuiSignalBox extends GuiBase {
             reset();
             initializeFieldTemplate(this::tileNormal);
         }, 1));
+    }
+
+    @SuppressWarnings({
+            "rawtypes", "unchecked", "unused"
+    })
+    private void sort(final SortOptions sort) {
+        final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
+        final ArrayList<Entry<BlockPos, LinkType>> Settingslist = new ArrayList(entrySet);
+        switch (sort) {
+            case DISABLED:
+                break;
+            case NAME_ASSENDING:
+                break;
+            case NAME_DESCENIDNG:
+                break;
+            case TYPE_ASSANDING:
+                Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
+                        o2.getValue().ordinal()));
+                break;
+            case TYPE_DESCENDING:
+                //Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
+                //        o2.getValue().ordinal()));
+                break;
+            case DISTANCE_ASSANDING:
+                break;
+            case DISTANCE_DSECENDING:
+                break;
+            default:
+                break;
+        }
     }
 
     private void initializePageSettings(final UIEntity entity) {
