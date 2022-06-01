@@ -13,23 +13,25 @@ import java.util.stream.Collectors;
 import com.google.common.collect.Maps;
 
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
-import eu.gir.guilib.ecs.interfaces.UIAutoSync;
+import eu.gir.girsignals.signalbox.entrys.ISaveable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.Rotation;
 
-public class SignalNode implements UIAutoSync, Iterable<PathOption> {
+public class SignalBoxNode implements ISaveable, Iterable<PathOption> {
 
     private static final String MODE = "mode";
     private static final String ROTATION = "rotation";
     private static final String OPTION = "option";
 
     private final Point point;
+    private final String identifier;
     private final HashMap<Entry<Point, Point>, Entry<EnumGuiMode, Rotation>> possibleConnections = new HashMap<>();
     private final HashMap<Entry<EnumGuiMode, Rotation>, PathOption> possibleModes = new HashMap<>();
 
-    public SignalNode(final Point point2) {
+    public SignalBoxNode(final Point point2) {
         this.point = point2;
+        this.identifier = point.getX() + "." + point.getY();
     }
 
     public void add(final EnumGuiMode mode, final Rotation rot) {
@@ -114,7 +116,7 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
     @Override
     public void write(final NBTTagCompound compound) {
         if (possibleModes.isEmpty()) {
-            compound.removeTag(this.getID());
+            compound.removeTag(this.identifier);
             return;
         }
         final NBTTagList pointList = new NBTTagList();
@@ -125,14 +127,14 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
             entry.setTag(OPTION, option.writeNBT());
             pointList.appendTag(entry);
         });
-        compound.setTag(this.getID(), pointList);
+        compound.setTag(this.identifier, pointList);
     }
 
     @Override
     public void read(final NBTTagCompound compound) {
-        if (!compound.hasKey(getID()))
+        if (!compound.hasKey(this.identifier))
             return;
-        final NBTTagList pointList = (NBTTagList) compound.getTag(getID());
+        final NBTTagList pointList = (NBTTagList) compound.getTag(this.identifier);
         pointList.forEach(e -> {
             final NBTTagCompound entry = (NBTTagCompound) e;
             final EnumGuiMode mode = EnumGuiMode.valueOf(entry.getString(MODE));
@@ -140,15 +142,6 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
             final Entry<EnumGuiMode, Rotation> modeRotation = Maps.immutableEntry(mode, rotation);
             possibleModes.put(modeRotation, new PathOption(entry.getCompoundTag(OPTION)));
         });
-    }
-
-    @Override
-    public String getID() {
-        return point.getX() + "." + point.getY();
-    }
-
-    @Override
-    public void setID(final String id) {
     }
 
     public Optional<PathOption> getOption(final EnumGuiMode mode) {
@@ -216,7 +209,7 @@ public class SignalNode implements UIAutoSync, Iterable<PathOption> {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final SignalNode other = (SignalNode) obj;
+        final SignalBoxNode other = (SignalBoxNode) obj;
         return Objects.equals(point, other.point);
     }
 

@@ -1,0 +1,382 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="15.0.0">
+  <zoom_level>9</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>459</x>
+      <y>297</y>
+      <w>333</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>PathOptionEntry
+--
+-pathEntrys[]: Map&lt;PathEntryType, IPathEntry&gt;
+--
++getEntry(type: PathEntryType): Optional&lt;IPathEntry&gt;
++setEntry(type: PathEntryType, IPathEntry)
+
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>459</x>
+      <y>432</y>
+      <w>333</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>/&lt;&lt;abstract&gt;&gt; IPathEntry&lt;T&gt;/
+--
+#isDirty: boolean
+--
++getValue(): T
++setValue(value: t)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>459</x>
+      <y>0</y>
+      <w>333</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enumaration&gt;&gt; PathStatus
+--
+FREE
+SET
+BLOCKED</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>864</x>
+      <y>450</y>
+      <w>504</w>
+      <h>252</h>
+    </coordinates>
+    <panel_attributes>SignalBoxNode
+--
+-point: Point
+-identifier: String
+-pathToMode: Map&lt;Path,ModeSet&gt;
+-pathOptionEntry: Map&lt;ModeSet, PathOptionEntry&gt;
+--
++SignalBoxNode(point: Point)
++update()
++getMode(path: Path): Optional&lt;ModeSet&gt;
++getPathOptionEntry(modeSet: ModeSet): Optional&lt;PathOptionEntry&gt;
++getPathOptionEntry(modeSet: Optional&lt;ModeSet&gt;): Optional&lt;PathOptionEntry&gt;
++addMode(modeSet: ModeSet)
++removeMode(modeSet: ModeSet)
++getPoint(): Point
++getPathStatus(): PathStatus
++setPathStatus(path: Path, status: PathStatus)
++canMakePath(Path)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>459</x>
+      <y>198</y>
+      <w>333</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>ModeSet
+--
++nodeMode: NodeMode &lt;&lt;final&gt;&gt;
++rotation: Rotation &lt;&lt;final&gt;&gt;
+--
++ModeSet(nodeMode: NodeMode, rotation: Rotation)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>459</x>
+      <y>99</y>
+      <w>333</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>Path
+--
++point1: Point &lt;&lt;final&gt;&gt;
++point2: Point &lt;&lt;final&gt;&gt;
+--
++Path(point1: Point, point2: Point)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>972</x>
+      <y>297</y>
+      <w>333</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt; ISaveable
+--
++write(nbt: NBTTag)
++read(nbt: NBTTag)</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>783</x>
+      <y>333</y>
+      <w>207</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>210.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>783</x>
+      <y>351</y>
+      <w>207</w>
+      <h>153</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>210.0;10.0;10.0;150.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1125</x>
+      <y>369</y>
+      <w>27</w>
+      <h>99</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>783</x>
+      <y>234</y>
+      <w>207</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>210.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>144</y>
+      <w>333</w>
+      <h>180</h>
+    </coordinates>
+    <panel_attributes>PathEntryType&lt;T&gt;
+--
+__SIGNAL__
+__RESET__
+__BLOCK__
+__OUTPUT__
+__SPEED__
+__PATHUSAGE__
+--
+-PathEntryType()
++of(option: PathOptionEntry): Optional&lt;T&gt;</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>810</x>
+      <y>0</y>
+      <w>252</w>
+      <h>207</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;enumaration&gt;&gt; NodeMode
+--
+STRAIGHT
+CORNER
+END
+PLATFORM
+BUE
+HP
+VP
+RS
+RA10
+NAMING
+OUTGOING</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1377</x>
+      <y>252</y>
+      <w>450</w>
+      <h>207</h>
+    </coordinates>
+    <panel_attributes>SignalBoxPathway
+--
+-listOfNodes: ImmutableList&lt;SignalBoxNode&gt;
+-configInfo: ConfigInfo
+-mapOfResetPositions: Map&lt;BlockPos, Path&gt;
+-mapOfBlockingPosition: Map&lt;BlockPos, Path&gt;
+--
++SignalBoxPathway(listOfNodes: List&lt;SignalBoxNode&gt;)
++setPathStatus(pathStatus: PathStatus)
++setPathStatus(pathStatus: PathStatus, path: Path)
++getOptionEntry(type: PathEntryType, value: T): Optional&lt;PathOptionEntry&gt;
++updatePathwaySignals()
++resetPathway()
++tryReset(BlockPos: position): boolean
++tryBlocking(BlockPos: position): boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>342</y>
+      <w>333</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>BlockPosEntry
+--
+-position: BlockPos
+--
++getValue(): BlockPos
++setValue(value: BlockPos)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>324</x>
+      <y>378</y>
+      <w>153</w>
+      <h>90</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>150.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>432</y>
+      <w>333</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>SpeedEntry
+--
+-speed: int
+--
++getValue(): Integer
++setValue(value: Integer)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>324</x>
+      <y>468</y>
+      <w>153</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>150.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>0</x>
+      <y>522</y>
+      <w>333</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>EnumEntry&lt;T extends Enum&gt;
+--
+-value: T
+--
++getValue(): T
++setValue(value: T)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>324</x>
+      <y>504</y>
+      <w>153</w>
+      <h>81</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>150.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>1296</x>
+      <y>333</y>
+      <w>99</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>459</x>
+      <y>558</y>
+      <w>333</w>
+      <h>108</h>
+    </coordinates>
+    <panel_attributes>BoolEntry
+--
+-status: boolean
+--
++getValue(): Boolean
++setValue(value: Boolean)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>612</x>
+      <y>531</y>
+      <w>27</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1377</x>
+      <y>117</y>
+      <w>450</w>
+      <h>117</h>
+    </coordinates>
+    <panel_attributes>TileEntitySignalBox
+--
+-listOfPathways: List&lt;SignalBoxPathway&gt;
+-previousPathways: Map&lt;SignalBoxPathway, SignalBoxPathway&gt;
+--
++addPathway(pathway: SignalBoxPathway)
++removePathway(point: Point)
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+</diagram>

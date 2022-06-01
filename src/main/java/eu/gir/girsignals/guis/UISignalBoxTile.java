@@ -2,7 +2,7 @@ package eu.gir.girsignals.guis;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.signalbox.EnumGuiMode;
-import eu.gir.girsignals.signalbox.SignalNode;
+import eu.gir.girsignals.signalbox.SignalBoxNode;
 import eu.gir.guilib.ecs.entitys.UIComponent;
 import eu.gir.guilib.ecs.interfaces.UIAutoSync;
 import net.minecraft.client.Minecraft;
@@ -16,14 +16,14 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
     public static final ResourceLocation ICON = new ResourceLocation(GirsignalsMain.MODID,
             "gui/textures/symbols.png");
 
-    private SignalNode node;
+    private SignalBoxNode node;
 
-    public UISignalBoxTile(final SignalNode node) {
+    public UISignalBoxTile(final SignalBoxNode node) {
         this.node = node;
     }
 
     public UISignalBoxTile(final EnumGuiMode enumMode) {
-        this.node = new SignalNode(null);
+        this.node = new SignalBoxNode(null);
         this.node.add(enumMode, Rotation.NONE);
     }
 
@@ -54,11 +54,11 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
     public void update() {
     }
 
-    public SignalNode getNode() {
+    public SignalBoxNode getNode() {
         return node;
     }
 
-    public void setNode(final SignalNode node) {
+    public void setNode(final SignalBoxNode node) {
         this.node = node;
     }
 

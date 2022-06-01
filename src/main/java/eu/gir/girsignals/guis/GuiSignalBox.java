@@ -20,7 +20,7 @@ import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.Point;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
-import eu.gir.girsignals.signalbox.SignalNode;
+import eu.gir.girsignals.signalbox.SignalBoxNode;
 import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
 import eu.gir.guilib.ecs.DrawUtil.SizeIntegerables;
 import eu.gir.guilib.ecs.GuiBase;
@@ -93,7 +93,7 @@ public class GuiSignalBox extends GuiBase {
                 .forEach(color -> color.getParent().remove(color));
     }
 
-    private void selectLink(final UIEntity parent, final SignalNode node, final PathOption option,
+    private void selectLink(final UIEntity parent, final SignalBoxNode node, final PathOption option,
             final ImmutableSet<Entry<BlockPos, LinkType>> entrySet, final LinkType type) {
         final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList());
@@ -127,7 +127,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void setupModeSettings(final UIEntity parent, final EnumGuiMode mode,
-            final Rotation rotation, final SignalNode node, final PathOption option) {
+            final Rotation rotation, final SignalBoxNode node, final PathOption option) {
         final String modeName = I18n.format("property." + mode.name());
         final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
         final UIEntity entity = new UIEntity();
@@ -202,7 +202,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
         tile.add(new UIClickable(e -> {
-            final SignalNode node = sbt.getNode();
+            final SignalBoxNode node = sbt.getNode();
             final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
             final Rotation rotation = Rotation.values()[menu.getRotation()];
             if (node.has(mode, rotation)) {
@@ -215,7 +215,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void tileNormal(final UIEntity tile, final UISignalBoxTile currentTile) {
         tile.add(new UIClickable(c -> {
-            final SignalNode currentNode = currentTile.getNode();
+            final SignalBoxNode currentNode = currentTile.getNode();
             if (!(currentNode.has(EnumGuiMode.RS) || currentNode.has(EnumGuiMode.HP)
                     || currentNode.has(EnumGuiMode.RA10) || currentNode.has(EnumGuiMode.END)))
                 return;
@@ -248,7 +248,7 @@ public class GuiSignalBox extends GuiBase {
         entity.findRecursive(UIClickable.class).forEach(click -> click.setVisible(false));
     }
 
-    private void initializePageTileConfig(final SignalNode node) {
+    private void initializePageTileConfig(final SignalBoxNode node) {
         if (node.isEmpty())
             return;
         reset();
@@ -357,7 +357,7 @@ public class GuiSignalBox extends GuiBase {
                 tile.setWidth(10);
                 tile.add(new UIBorder(0xFF7F7F7F, 2));
                 final Point name = new Point(y, x);
-                final SignalNode node = new SignalNode(name);
+                final SignalBoxNode node = new SignalBoxNode(name);
                 final UISignalBoxTile sbt = new UISignalBoxTile(node);
                 tile.add(sbt);
                 consumer.accept(tile, sbt);
