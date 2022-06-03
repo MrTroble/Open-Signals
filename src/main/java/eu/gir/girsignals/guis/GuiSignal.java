@@ -50,10 +50,10 @@ public class GuiSignal extends GuiBase {
         textfield.setHeight(20);
         textfield.setInheritWidth(true);
 
-        final UITextInput input = new UITextInput(SignalTileEnity.CUSTOMNAME);
+        final UITextInput input = new UITextInput(tile.getName());
         input.setText(tile.getName());
         textfield.add(input);
-        
+
         hbox.add(textfield);
         final UIEntity apply = GuiElements.createButton(I18n.format("btn.apply"),
                 _u -> this.updateText(input.getText()));
@@ -69,7 +69,6 @@ public class GuiSignal extends GuiBase {
         this.entity.write(compound);
         GuiSyncNetwork.sendToPosServer(compound, tile.getPos());
         labelComp.setText(input);
-        tile.setCustomName(input);
     }
 
 }
