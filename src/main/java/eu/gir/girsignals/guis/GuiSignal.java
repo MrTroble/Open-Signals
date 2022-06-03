@@ -69,6 +69,7 @@ public class GuiSignal extends GuiBase {
         this.entity.write(compound);
         GuiSyncNetwork.sendToPosServer(compound, tile.getPos());
         labelComp.setText(input);
+        tile.setCustomName(input);
     }
 
 }
