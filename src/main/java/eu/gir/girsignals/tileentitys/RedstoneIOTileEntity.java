@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import eu.gir.girsignals.blocks.RedstoneIO;
-import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.guilib.ecs.interfaces.ISyncable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -75,8 +74,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
         if (world.isRemote)
             return;
         final boolean power = this.world.getBlockState(pos).getValue(RedstoneIO.POWER);
-        this.linkedPositions.forEach(position -> loadChunkAndGetTile(SignalBoxTileEntity.class,
-                world, position, (tile, _u) -> tile.updateRedstonInput(this.pos, power)));
+//     TODO   this.linkedPositions.forEach(position -> loadChunkAndGetTile(SignalBoxTileEntity.class,
+//                world, position, (tile, _u) -> tile.updateRedstonInput(this.pos, power)));
     }
 
     @Override

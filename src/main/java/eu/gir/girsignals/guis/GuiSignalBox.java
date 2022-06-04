@@ -16,14 +16,16 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.gir.girsignals.EnumSignals;
 import eu.gir.girsignals.EnumSignals.SortOptions;
-import eu.gir.girsignals.signalbox.EnumGuiMode;
-import eu.gir.girsignals.signalbox.LinkType;
+import eu.gir.girsignals.enums.EnumGuiMode;
+import eu.gir.girsignals.enums.LinkType;
+import eu.gir.girsignals.signalbox.ModeSet;
 import eu.gir.girsignals.signalbox.PathOption;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.Point;
+import eu.gir.girsignals.signalbox.SignalBoxNode;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
-import eu.gir.girsignals.signalbox.SignalBoxNode;
+import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
 import eu.gir.guilib.ecs.DrawUtil.EnumIntegerable;
 import eu.gir.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -98,8 +100,9 @@ public class GuiSignalBox extends GuiBase {
                 .forEach(color -> color.getParent().remove(color));
     }
 
-    private void selectLink(final UIEntity parent, final SignalBoxNode node, final PathOption option,
-            final ImmutableSet<Entry<BlockPos, LinkType>> entrySet, final LinkType type) {
+    private void selectLink(final UIEntity parent, final SignalBoxNode node,
+            final PathOption option, final ImmutableSet<Entry<BlockPos, LinkType>> entrySet,
+            final LinkType type) {
         final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList());
         if (!positions.isEmpty()) {
@@ -132,7 +135,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void setupModeSettings(final UIEntity parent, final EnumGuiMode mode,
-            final Rotation rotation, final SignalBoxNode node, final PathOption option) {
+            final Rotation rotation, final SignalBoxNode node, final PathOptionEntry option) {
         final String modeName = I18n.format("property." + mode.name());
         final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
         final UIEntity entity = new UIEntity();
@@ -210,10 +213,11 @@ public class GuiSignalBox extends GuiBase {
             final SignalBoxNode node = sbt.getNode();
             final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
             final Rotation rotation = Rotation.values()[menu.getRotation()];
-            if (node.has(mode, rotation)) {
-                node.remove(mode, rotation);
+            final ModeSet modeSet = new ModeSet(mode, rotation);
+            if (node.has(modeSet)) {
+                node.remove(modeSet);
             } else {
-                node.add(mode, rotation);
+                node.add(modeSet);
             }
         }));
     }
@@ -312,7 +316,8 @@ public class GuiSignalBox extends GuiBase {
         @SuppressWarnings({
                 "rawtypes", "unchecked"
         })
-        IIntegerable<SortOptions> SortOptions = new EnumIntegerable(EnumSignals.SortOptions.class);
+        final IIntegerable<SortOptions> SortOptions = new EnumIntegerable(
+                EnumSignals.SortOptions.class);
         list.add(GuiElements.createEnumElement(SortOptions, id -> {
             SortOptions.getObjFromID(id);
         }));

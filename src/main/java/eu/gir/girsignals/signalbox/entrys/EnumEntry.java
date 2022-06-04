@@ -2,7 +2,7 @@ package eu.gir.girsignals.signalbox.entrys;
 
 import net.minecraft.nbt.NBTTagCompound;
 
-public final class EnumEntry<T extends Enum<T>> extends IPathEntry<T> {
+public class EnumEntry<T extends Enum<T>> extends IPathEntry<T> {
 
     private T enumValue;
     private final Class<T> enumClass;

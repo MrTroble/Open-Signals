@@ -3,7 +3,13 @@ package eu.gir.girsignals.signalbox;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableSet;
+
+import eu.gir.girsignals.enums.EnumGuiMode;
+import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.signalbox.entrys.ISaveable;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.nbt.NBTTagCompound;
@@ -110,6 +116,10 @@ public class SignalBoxNode implements ISaveable {
         });
     }
 
+    public Optional<PathOptionEntry> getOption(final Path path) {
+        return getOption(Optional.ofNullable(possibleConnections.get(path)));
+    }
+
     public Optional<PathOptionEntry> getOption(final ModeSet mode) {
         return Optional.ofNullable(possibleModes.get(mode));
     }
@@ -120,14 +130,42 @@ public class SignalBoxNode implements ISaveable {
         return Optional.empty();
     }
 
-    @Override
-    public String toString() {
-        return "Node[point=" + this.point + "]";
+    /**
+     * Get's the identifier of the given node
+     * 
+     * @return the identifier
+     */
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public PathType getPathType(final SignalBoxNode other) {
+        final Set<PathType> pathTypes = other.possibleModes.keySet().stream()
+                .map(mode -> PathType.of(mode.mode)).collect(Collectors.toSet());
+        return this.possibleModes.keySet().stream().map(mode -> PathType.of(mode.mode))
+                .filter(pathTypes::contains)
+                .min((t1, t2) -> Integer.min(t1.ordinal(), t2.ordinal())).orElse(PathType.NONE);
+    }
+
+    public boolean canMakePath(final Path path, final PathType type) {
+        final ModeSet modeSet = this.possibleConnections.get(path);
+        if (modeSet == null)
+            return false;
+        for (final EnumGuiMode mode : type.getModes()) {
+            final ModeSet possibleOverStepping = new ModeSet(mode, modeSet.rotation);
+            if (this.possibleModes.containsKey(possibleOverStepping))
+                return false; // Found another signal on the path that is not the target
+        }
+        return true;
+    }
+
+    public boolean isEmpty() {
+        return this.possibleModes.isEmpty();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(point);
+        return Objects.hash(point, possibleModes);
     }
 
     @Override
@@ -139,16 +177,18 @@ public class SignalBoxNode implements ISaveable {
         if (getClass() != obj.getClass())
             return false;
         final SignalBoxNode other = (SignalBoxNode) obj;
-        return Objects.equals(point, other.point);
+        return Objects.equals(point, other.point)
+                && Objects.equals(possibleModes, other.possibleModes);
     }
 
-    /**
-     * Get's the identifier of the given node
-     * 
-     * @return the identifier
-     */
-    public String getIdentifier() {
-        return identifier;
+    @Override
+    public String toString() {
+        return "SignalBoxNode [point=" + point + ", possibleConnections=" + possibleConnections
+                + ", possibleModes=" + possibleModes + "]";
+    }
+
+    public Set<Path> connections() {
+        return ImmutableSet.copyOf(this.possibleConnections.keySet());
     }
 
 }

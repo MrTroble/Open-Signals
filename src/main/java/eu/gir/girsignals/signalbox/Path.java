@@ -7,8 +7,8 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class Path implements ISaveable {
 
-    public static final String POINT_1 = "point1";
-    public static final String POINT_2 = "point2";
+    private static final String POINT_1 = "point1";
+    private static final String POINT_2 = "point2";
 
     public final Point point1;
     public final Point point2;

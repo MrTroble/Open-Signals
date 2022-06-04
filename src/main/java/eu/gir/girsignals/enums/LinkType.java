@@ -1,4 +1,4 @@
-package eu.gir.girsignals.signalbox;
+package eu.gir.girsignals.enums;
 
 public enum LinkType {
     SIGNAL, INPUT, OUTPUT;

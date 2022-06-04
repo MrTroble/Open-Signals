@@ -12,18 +12,21 @@ public class PathOptionEntry implements ISaveable {
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
 
     @SuppressWarnings("unchecked")
-    public <T extends IPathEntry<?>> Optional<T> getEntry(final PathEntryType<T> type) {
-        if (pathEntrys.containsKey(type))
+    public <T> Optional<T> getEntry(final PathEntryType<T> type) {
+        if (!pathEntrys.containsKey(type))
             return Optional.empty();
         return Optional.of((T) pathEntrys.get(type));
     }
 
-    public <T extends IPathEntry<?>> void setEntry(final PathEntryType<T> type, final T value) {
+    @SuppressWarnings("unchecked")
+    public <T> void setEntry(final PathEntryType<T> type, final T value) {
         if (value == null) {
             pathEntrys.remove(type);
             return;
         }
-        pathEntrys.put(type, value);
+        final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
+                pType -> pType.newValue());
+        pathEntry.setValue(value);
     }
 
     @Override

@@ -4,6 +4,7 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.FREE_COLOR;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.SELECTED_COLOR;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.USED_COLOR;
 
+import eu.gir.girsignals.enums.LinkType;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTUtil;
 import net.minecraft.util.math.BlockPos;

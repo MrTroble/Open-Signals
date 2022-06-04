@@ -1,7 +1,7 @@
 package eu.gir.girsignals.guis;
 
 import eu.gir.girsignals.GirsignalsMain;
-import eu.gir.girsignals.signalbox.EnumGuiMode;
+import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.signalbox.SignalBoxNode;
 import eu.gir.guilib.ecs.entitys.UIComponent;
 import eu.gir.guilib.ecs.interfaces.UIAutoSync;
