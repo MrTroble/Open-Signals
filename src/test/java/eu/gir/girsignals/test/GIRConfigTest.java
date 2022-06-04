@@ -18,6 +18,7 @@ import eu.gir.girsignals.EnumSignals.HPHome;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.signalbox.config.HVSignalConfig;
+import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
 import eu.gir.girsignals.test.DummySignal.DummyBuilder;
 
 public class GIRConfigTest {
@@ -37,8 +38,32 @@ public class GIRConfigTest {
         final DummySignal signalHP0Next = DummyBuilder.start(STOPSIGNAL, HP.HP1)
                 .of(DISTANTSIGNAL, VR.VR0).of(ZS1, false).of(ZS7, false).of(HPHOME, HPHome.HP1)
                 .of(ZS3, ZS32.OFF).of(ZS3V, ZS32.OFF).of(HPBLOCK, HPBlock.HP1).build();
-        config.change(0, signalBase, signalDummy);
+        config.change(new ConfigInfo(signalBase, signalDummy, 0));
         assertEquals(signalHP0Next, signalBase);
+
+        final DummySignal signalHP1next = DummyBuilder.start(STOPSIGNAL, HP.HP1)
+                .of(DISTANTSIGNAL, VR.VR1).of(ZS1, false).of(ZS7, false).of(HPHOME, HPHome.HP1)
+                .of(ZS3, ZS32.OFF).of(ZS3V, ZS32.OFF).of(HPBLOCK, HPBlock.HP1).build();
+        config.change(new ConfigInfo(signalBase, signalDummy, 0));
+        assertEquals(signalHP1next, signalBase);
+
+        final DummySignal signalHP1ZS3_6next = DummyBuilder.start(STOPSIGNAL, HP.HP1)
+                .of(DISTANTSIGNAL, VR.VR0).of(ZS1, false).of(ZS7, false).of(HPHOME, HPHome.HP1)
+                .of(ZS3, ZS32.Z6).of(ZS3V, ZS32.OFF).of(HPBLOCK, HPBlock.HP1).build();
+        config.change(new ConfigInfo(signalBase, signalDummy, 0));
+        assertEquals(signalHP1ZS3_6next, signalBase);
+
+        final DummySignal signalHP2next = DummyBuilder.start(STOPSIGNAL, HP.HP1)
+                .of(DISTANTSIGNAL, VR.VR2).of(ZS1, false).of(ZS7, false).of(HPHOME, HPHome.HP1)
+                .of(ZS3, ZS32.OFF).of(ZS3V, ZS32.OFF).of(HPBLOCK, HPBlock.HP1).build();
+        config.change(new ConfigInfo(signalBase, signalDummy, 0));
+        assertEquals(signalHP2next, signalBase);
+
+        final DummySignal signalZS3_6next = DummyBuilder.start(STOPSIGNAL, HP.HP1)
+                .of(DISTANTSIGNAL, VR.VR2).of(ZS1, false).of(ZS7, false).of(HPHOME, HPHome.HP1)
+                .of(ZS3, ZS32.Z6).of(ZS3V, ZS32.OFF).of(HPBLOCK, HPBlock.HP1).build();
+        config.change(new ConfigInfo(signalBase, signalDummy, 0));
+        assertEquals(signalZS3_6next, signalBase);
     }
 
 }

@@ -70,50 +70,54 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             "rawtypes", "unchecked"
     })
     @Override
-    public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
+    public void change(final ConfigInfo info) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
-        if (next != null) {
+        if (info.next != null) {
             final ArrayList<HL> nextChangedSpeed = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
                     HL.HL11_12);
-            next.getProperty(SignalHL.STOPSIGNAL)
-                    .ifPresent(hl -> current.getProperty(SignalHL.DISTANTSIGNAL).ifPresent(_u -> {
-                        final boolean stop = hl.equals(HL.HP0) || hl.equals(HL.HP0_ALTERNATE_RED);
-                        if (stop) {
-                            current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
-                        } else if (hl.equals(HL.HL4)) {
-                            current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
-                        } else if (nextChangedSpeed.contains(hl) || hl.equals(HL.HL7)) {
-                            current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
-                        } else {
-                            current.setProperty(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
-                        }
-                    }));
-            final Optional<HLLightbar> optionalLightBar = (Optional<HLLightbar>) next
+            info.next.getProperty(SignalHL.STOPSIGNAL).ifPresent(hl -> {
+                final boolean stop = hl.equals(HL.HP0) || hl.equals(HL.HP0_ALTERNATE_RED);
+                if (stop) {
+                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
+                } else if (hl.equals(HL.HL4)) {
+                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
+                } else if (nextChangedSpeed.contains(hl) || hl.equals(HL.HL7)) {
+                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
+                } else {
+                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
+                }
+            });
+            final Optional<HLLightbar> optionalLightBar = (Optional<HLLightbar>) info.next
                     .getProperty(SignalHL.LIGHTBAR);
-            final Optional<HL> hlStop = (Optional<HL>) next.getProperty(SignalHL.STOPSIGNAL);
+            final Optional<HL> hlStop = (Optional<HL>) info.next.getProperty(SignalHL.STOPSIGNAL);
 
-            final Optional<HLExit> hlexit = (Optional<HLExit>) next
+            final Optional<HLExit> hlexit = (Optional<HLExit>) info.next
                     .getProperty(SignalHL.EXITSIGNAL);
-            final Optional<ZS32> speedKS = (Optional<ZS32>) next.getProperty(SignalKS.ZS3);
-            final Optional<ZS32> speedKSplate = (Optional<ZS32>) next
+            final Optional<ZS32> speedKS = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);
+            final Optional<ZS32> speedKSplate = (Optional<ZS32>) info.next
                     .getProperty(SignalKS.ZS3_PLATE);
-            final Optional<ZS32> speedHV = (Optional<ZS32>) next.getProperty(SignalHV.ZS3);
-            final Optional<ZS32> speedHVplate = (Optional<ZS32>) next.getProperty(SignalHV.ZS3_PLATE);
+            final Optional<ZS32> speedHV = (Optional<ZS32>) info.next.getProperty(SignalHV.ZS3);
+            final Optional<ZS32> speedHVplate = (Optional<ZS32>) info.next
+                    .getProperty(SignalHV.ZS3_PLATE);
 
-            final boolean ksgo = next.getProperty(SignalKS.STOPSIGNAL).filter(a -> GOKS.contains(a))
+            final boolean ksgo = info.next.getProperty(SignalKS.STOPSIGNAL)
+                    .filter(a -> GOKS.contains(a)).isPresent()
+                    || info.next.getProperty(SignalKS.MAINSIGNAL).filter(KSMain.KS1::equals)
+                            .isPresent();
+            final boolean hvstopgo = info.next.getProperty(SignalHV.STOPSIGNAL)
+                    .filter(HP.HP1::equals).isPresent()
+                    || info.next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals)
+                            .isPresent();
+            final boolean hvhomego = info.next.getProperty(SignalHV.HPHOME)
+                    .filter(HPHome.HP1::equals).isPresent()
+                    || info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
+                            .isPresent();
+            final boolean hvblockgo = info.next.getProperty(SignalHV.HPBLOCK)
+                    .filter(HPBlock.HP1::equals).isPresent();
+            final boolean hv40 = info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
                     .isPresent()
-                    || next.getProperty(SignalKS.MAINSIGNAL).filter(KSMain.KS1::equals).isPresent();
-            final boolean hvstopgo = next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP1::equals)
-                    .isPresent()
-                    || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
-            final boolean hvhomego = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP1::equals)
-                    .isPresent()
-                    || next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals).isPresent();
-            final boolean hvblockgo = next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP1::equals)
-                    .isPresent();
-            final boolean hv40 = next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
-                    .isPresent()
-                    || next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent();
+                    || info.next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals)
+                            .isPresent();
             final boolean stop = hlStop
                     .filter(o -> STOP_CHECK.contains(o)
                             || (UNCHANGED.contains(o) && optionalLightBar
@@ -134,53 +138,53 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                             || optionalLightBar.filter(HLLightbar.OFF::equals).isPresent());
 
             if (stop) {
-                speedCheck(speed, values, HL.HL10, HL.HL11_12);
+                speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
             } else if (changed100) {
-                speedCheck(speed, values, HL.HL4, HL.HL5_6);
+                speedCheck(info.speed, values, HL.HL4, HL.HL5_6);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
             } else if (normalSpeed) {
-                speedCheck(speed, values, HL.HL1, HL.HL2_3);
+                speedCheck(info.speed, values, HL.HL1, HL.HL2_3);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
             } else {
-                speedCheck(speed, values, HL.HL7, HL.HL8_9);
+                speedCheck(info.speed, values, HL.HL7, HL.HL8_9);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
             }
-            speedCheckExit(speed, values, HLExit.HL1, HLExit.HL2_3);
-            if (next.getProperty(SignalKS.STOPSIGNAL).isPresent()
-                    || next.getProperty(SignalKS.MAINSIGNAL).isPresent()) {
+            speedCheckExit(info.speed, values, HLExit.HL1, HLExit.HL2_3);
+            if (info.next.getProperty(SignalKS.STOPSIGNAL).isPresent()
+                    || info.next.getProperty(SignalKS.MAINSIGNAL).isPresent()) {
                 if (ksgo) {
-                    speedCheck(speed, values, HL.HL1, HL.HL2_3);
+                    speedCheck(info.speed, values, HL.HL1, HL.HL2_3);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
                     if (speedKS.isPresent() || speedKSplate.isPresent()) {
                         final ZS32 speednext = speedKS.isPresent() ? speedKS.get()
                                 : speedKSplate.get();
                         final int zs32 = speednext.ordinal();
                         if (zs32 > 26 && zs32 <= 35) {
-                            speedCheck(speed, values, HL.HL7, HL.HL8_9);
+                            speedCheck(info.speed, values, HL.HL7, HL.HL8_9);
                             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
                         } else if (zs32 >= 36 && zs32 < 42) {
-                            speedCheck(speed, values, HL.HL4, HL.HL5_6);
+                            speedCheck(info.speed, values, HL.HL4, HL.HL5_6);
                             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
                         } else {
-                            speedCheck(speed, values, HL.HL1, HL.HL2_3);
+                            speedCheck(info.speed, values, HL.HL1, HL.HL2_3);
                             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
                         }
                     }
                 } else {
-                    speedCheck(speed, values, HL.HL10, HL.HL11_12);
+                    speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                 }
             }
-            if (next.getProperty(SignalHV.HPHOME).isPresent()
-                    || next.getProperty(SignalHV.HPBLOCK).isPresent()
-                    || next.getProperty(SignalHV.STOPSIGNAL).isPresent()) {
+            if (info.next.getProperty(SignalHV.HPHOME).isPresent()
+                    || info.next.getProperty(SignalHV.HPBLOCK).isPresent()
+                    || info.next.getProperty(SignalHV.STOPSIGNAL).isPresent()) {
                 if (hvblockgo || hvhomego || hvstopgo) {
                     if (hv40) {
-                        speedCheck(speed, values, HL.HL7, HL.HL8_9);
+                        speedCheck(info.speed, values, HL.HL7, HL.HL8_9);
                         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
                     } else {
-                        speedCheck(speed, values, HL.HL1, HL.HL2_3);
+                        speedCheck(info.speed, values, HL.HL1, HL.HL2_3);
                         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
                     }
                     if (speedHV.isPresent() || speedHVplate.isPresent()) {
@@ -188,28 +192,28 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                                 : speedHVplate.get();
                         final int zs32 = speednext.ordinal();
                         if (zs32 > 26 && zs32 <= 35) {
-                            speedCheck(speed, values, HL.HL7, HL.HL8_9);
+                            speedCheck(info.speed, values, HL.HL7, HL.HL8_9);
                             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
                         } else if (zs32 >= 36 && zs32 < 42) {
-                            speedCheck(speed, values, HL.HL4, HL.HL5_6);
+                            speedCheck(info.speed, values, HL.HL4, HL.HL5_6);
                             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
                         } else {
-                            speedCheck(speed, values, HL.HL1, HL.HL2_3);
+                            speedCheck(info.speed, values, HL.HL1, HL.HL2_3);
                             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
                         }
                     }
                 } else {
-                    speedCheck(speed, values, HL.HL10, HL.HL11_12);
+                    speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                 }
             }
         } else {
-            speedCheckExit(speed, values, HLExit.HL1, HLExit.HL2_3);
-            speedCheck(speed, values, HL.HL10, HL.HL11_12);
+            speedCheckExit(info.speed, values, HLExit.HL1, HLExit.HL2_3);
+            speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
             values.put(SignalHL.ZS2, ZS32.OFF);
         }
-        this.changeIfPresent(values, current);
+        this.changeIfPresent(values, info.current);
     }
 
     @SuppressWarnings("rawtypes")

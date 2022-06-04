@@ -5,6 +5,7 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,6 +14,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 
+import eu.gir.girsignals.EnumSignals;
+import eu.gir.girsignals.EnumSignals.SortOptions;
 import eu.gir.girsignals.signalbox.EnumGuiMode;
 import eu.gir.girsignals.signalbox.LinkType;
 import eu.gir.girsignals.signalbox.PathOption;
@@ -22,6 +25,7 @@ import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
 import eu.gir.girsignals.signalbox.SignalBoxNode;
 import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
+import eu.gir.guilib.ecs.DrawUtil.EnumIntegerable;
 import eu.gir.guilib.ecs.DrawUtil.SizeIntegerables;
 import eu.gir.guilib.ecs.GuiBase;
 import eu.gir.guilib.ecs.GuiElements;
@@ -41,6 +45,7 @@ import eu.gir.guilib.ecs.entitys.render.UIScissor;
 import eu.gir.guilib.ecs.entitys.render.UITexture;
 import eu.gir.guilib.ecs.entitys.render.UIToolTip;
 import eu.gir.guilib.ecs.entitys.transform.UIScale;
+import eu.gir.guilib.ecs.interfaces.IIntegerable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
@@ -267,6 +272,36 @@ public class GuiSignalBox extends GuiBase {
         }, 1));
     }
 
+    @SuppressWarnings({
+            "rawtypes", "unchecked", "unused"
+    })
+    private void sort(final SortOptions sort) {
+        final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
+        final ArrayList<Entry<BlockPos, LinkType>> Settingslist = new ArrayList(entrySet);
+        switch (sort) {
+            case DISABLED:
+                break;
+            case NAME_ASSENDING:
+                break;
+            case NAME_DESCENIDNG:
+                break;
+            case TYPE_ASSANDING:
+                Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
+                        o2.getValue().ordinal()));
+                break;
+            case TYPE_DESCENDING:
+                Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
+                        o2.getValue().ordinal()));
+                break;
+            case DISTANCE_ASSANDING:
+                break;
+            case DISTANCE_DSECENDING:
+                break;
+            default:
+                break;
+        }
+    }
+
     private void initializePageSettings(final UIEntity entity) {
         reset();
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
@@ -274,6 +309,13 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.setInheritWidth(true);
         final UIEntity list = new UIEntity();
         final UIBox uibox = new UIBox(UIBox.VBOX, 2);
+        @SuppressWarnings({
+                "rawtypes", "unchecked"
+        })
+        IIntegerable<SortOptions> SortOptions = new EnumIntegerable(EnumSignals.SortOptions.class);
+        list.add(GuiElements.createEnumElement(SortOptions, id -> {
+            SortOptions.getObjFromID(id);
+        }));
         list.add(uibox);
         list.setInheritHeight(true);
         list.setInheritWidth(true);

@@ -211,4 +211,8 @@ public final class EnumSignals {
         DISABLED, OFFSTATE, ONSTATE
     }
 
+    public enum SortOptions implements Offable<SortOptions> {
+        DISABLED, NAME_ASSENDING, NAME_DESCENIDNG, TYPE_ASSANDING, TYPE_DESCENDING,
+        DISTANCE_ASSANDING, DISTANCE_DSECENDING;
+    }
 }

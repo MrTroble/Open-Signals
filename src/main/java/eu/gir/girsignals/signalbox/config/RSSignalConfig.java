@@ -6,6 +6,7 @@ import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.SHLight;
+import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
@@ -20,25 +21,29 @@ public final class RSSignalConfig implements ISignalAutoconfig {
     }
 
     @Override
-    public void change(final int speed, final SignalTileEnity current, final SignalTileEnity next) {
-        current.getProperty(SignalSHLight.SHLIGHT_0)
-                .ifPresent(_u -> current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH1));
-        current.getProperty(SignalHV.STOPSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalHV.STOPSIGNAL, HP.SHUNTING));
-        current.getProperty(SignalKS.STOPSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalKS.STOPSIGNAL, KS.KS_SHUNTING));
-        current.getProperty(SignalKS.MAINSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalKS.MAINSIGNAL, KSMain.KS_SHUNTING));
-        current.getProperty(SignalHL.STOPSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalHL.STOPSIGNAL, HL.HL_SHUNTING));
-        current.getProperty(SignalHL.EXITSIGNAL)
-                .ifPresent(_u -> current.setProperty(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING));
+    public void change(final ConfigInfo info) {
+        info.current.getProperty(SignalSHLight.SHLIGHT_0)
+                .ifPresent(_u -> info.current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH1));
+        info.current.getProperty(SignalHV.STOPSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalHV.STOPSIGNAL, HP.SHUNTING));
+        info.current.getProperty(SignalKS.STOPSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalKS.STOPSIGNAL, KS.KS_SHUNTING));
+        info.current.getProperty(SignalKS.MAINSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalKS.MAINSIGNAL, KSMain.KS_SHUNTING));
+        info.current.getProperty(SignalHL.STOPSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalHL.STOPSIGNAL, HL.HL_SHUNTING));
+        info.current.getProperty(SignalHL.EXITSIGNAL)
+                .ifPresent(_u -> info.current.setProperty(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING));
+        info.current.getProperty(SignalRA.RALIGHT)
+                .ifPresent(_u -> info.current.setProperty(SignalRA.RALIGHT, true));
     }
 
     @Override
     public void reset(final SignalTileEnity current) {
         current.getProperty(SignalSHLight.SHLIGHT_0)
                 .ifPresent(_u -> current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH0));
+        current.getProperty(SignalRA.RALIGHT)
+                .ifPresent(_u -> current.setProperty(SignalRA.RALIGHT, false));
     }
 
 }
