@@ -1,13 +1,37 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="15.0.0">
-  <zoom_level>9</zoom_level>
+  <help_text>entry// Uncomment the following line to change the fontsize and font:
+// fontsize=14
+// fontfamily=SansSerif //possible: SansSerif,Serif,Monospaced
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+// Welcome to UMLet!
+//
+// Double-click on elements to add them to the diagram, or to copy them
+// Edit elements by modifying the text in this panel
+// Hold Ctrl to select multiple elements
+// Use Ctrl+mouse to select via lasso
+//
+// Use +/- or Ctrl+mouse wheel to zoom
+// Drag a whole relation at its central square icon
+//
+// Press Ctrl+C to copy the whole diagram to the system clipboard (then just paste it to, eg, Word)
+// Edit the files in the "palettes" directory to create your own element palettes
+//
+// Select "Custom Elements &gt; New..." to create new element types
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+// This text will be stored with each diagram;  use it for notes.</help_text>
+  <zoom_level>11</zoom_level>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>459</x>
-      <y>297</y>
-      <w>333</w>
-      <h>108</h>
+      <x>561</x>
+      <y>363</y>
+      <w>407</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>PathOptionEntry
 --
@@ -22,10 +46,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>459</x>
-      <y>432</y>
-      <w>333</w>
-      <h>108</h>
+      <x>561</x>
+      <y>528</y>
+      <w>407</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>/&lt;&lt;abstract&gt;&gt; IPathEntry&lt;T&gt;/
 --
@@ -39,10 +63,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>459</x>
+      <x>561</x>
       <y>0</y>
-      <w>333</w>
-      <h>90</h>
+      <w>407</w>
+      <h>110</h>
     </coordinates>
     <panel_attributes>&lt;&lt;enumaration&gt;&gt; PathStatus
 --
@@ -54,10 +78,10 @@ BLOCKED</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>864</x>
-      <y>450</y>
-      <w>504</w>
-      <h>252</h>
+      <x>1056</x>
+      <y>550</y>
+      <w>616</w>
+      <h>308</h>
     </coordinates>
     <panel_attributes>SignalBoxNode
 --
@@ -82,10 +106,10 @@ BLOCKED</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>459</x>
-      <y>198</y>
-      <w>333</w>
-      <h>90</h>
+      <x>561</x>
+      <y>242</y>
+      <w>407</w>
+      <h>110</h>
     </coordinates>
     <panel_attributes>ModeSet
 --
@@ -98,10 +122,10 @@ BLOCKED</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>459</x>
-      <y>99</y>
-      <w>333</w>
-      <h>81</h>
+      <x>561</x>
+      <y>121</y>
+      <w>407</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>Path
 --
@@ -114,10 +138,10 @@ BLOCKED</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>972</x>
-      <y>297</y>
-      <w>333</w>
-      <h>81</h>
+      <x>1188</x>
+      <y>363</y>
+      <w>407</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>&lt;&lt;interface&gt;&gt; ISaveable
 --
@@ -128,10 +152,10 @@ BLOCKED</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>783</x>
-      <y>333</y>
-      <w>207</w>
-      <h>27</h>
+      <x>957</x>
+      <y>407</y>
+      <w>253</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>210.0;10.0;10.0;10.0</additional_attributes>
@@ -139,10 +163,10 @@ BLOCKED</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>783</x>
-      <y>351</y>
-      <w>207</w>
-      <h>153</h>
+      <x>957</x>
+      <y>429</y>
+      <w>253</w>
+      <h>187</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>210.0;10.0;10.0;150.0</additional_attributes>
@@ -150,10 +174,10 @@ BLOCKED</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1125</x>
-      <y>369</y>
-      <w>27</w>
-      <h>99</h>
+      <x>1375</x>
+      <y>451</y>
+      <w>33</w>
+      <h>121</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;90.0</additional_attributes>
@@ -161,10 +185,10 @@ BLOCKED</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>783</x>
-      <y>234</y>
-      <w>207</w>
-      <h>108</h>
+      <x>957</x>
+      <y>286</y>
+      <w>253</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>210.0;100.0;10.0;10.0</additional_attributes>
@@ -173,9 +197,9 @@ BLOCKED</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>0</x>
-      <y>144</y>
-      <w>333</w>
-      <h>180</h>
+      <y>176</y>
+      <w>407</w>
+      <h>220</h>
     </coordinates>
     <panel_attributes>PathEntryType&lt;T&gt;
 --
@@ -193,10 +217,10 @@ __PATHUSAGE__
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>810</x>
+      <x>990</x>
       <y>0</y>
-      <w>252</w>
-      <h>207</h>
+      <w>308</w>
+      <h>253</h>
     </coordinates>
     <panel_attributes>&lt;&lt;enumaration&gt;&gt; NodeMode
 --
@@ -216,10 +240,10 @@ OUTGOING</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1377</x>
-      <y>252</y>
-      <w>450</w>
-      <h>207</h>
+      <x>1683</x>
+      <y>308</y>
+      <w>550</w>
+      <h>253</h>
     </coordinates>
     <panel_attributes>SignalBoxPathway
 --
@@ -242,9 +266,9 @@ OUTGOING</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>0</x>
-      <y>342</y>
-      <w>333</w>
-      <h>81</h>
+      <y>418</y>
+      <w>407</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>BlockPosEntry
 --
@@ -258,10 +282,10 @@ OUTGOING</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>324</x>
-      <y>378</y>
-      <w>153</w>
-      <h>90</h>
+      <x>396</x>
+      <y>462</y>
+      <w>187</w>
+      <h>110</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>150.0;80.0;10.0;10.0</additional_attributes>
@@ -270,9 +294,9 @@ OUTGOING</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>0</x>
-      <y>432</y>
-      <w>333</w>
-      <h>81</h>
+      <y>528</y>
+      <w>407</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>SpeedEntry
 --
@@ -286,10 +310,10 @@ OUTGOING</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>324</x>
-      <y>468</y>
-      <w>153</w>
-      <h>27</h>
+      <x>396</x>
+      <y>572</y>
+      <w>187</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>150.0;10.0;10.0;10.0</additional_attributes>
@@ -298,9 +322,9 @@ OUTGOING</panel_attributes>
     <id>UMLClass</id>
     <coordinates>
       <x>0</x>
-      <y>522</y>
-      <w>333</w>
-      <h>81</h>
+      <y>638</y>
+      <w>407</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>EnumEntry&lt;T extends Enum&gt;
 --
@@ -314,10 +338,10 @@ OUTGOING</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>324</x>
-      <y>504</y>
-      <w>153</w>
-      <h>81</h>
+      <x>396</x>
+      <y>616</y>
+      <w>187</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>150.0;10.0;10.0;70.0</additional_attributes>
@@ -325,10 +349,10 @@ OUTGOING</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1296</x>
-      <y>333</y>
-      <w>99</w>
-      <h>27</h>
+      <x>1584</x>
+      <y>407</y>
+      <w>121</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;90.0;10.0</additional_attributes>
@@ -336,10 +360,10 @@ OUTGOING</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>459</x>
-      <y>558</y>
-      <w>333</w>
-      <h>108</h>
+      <x>561</x>
+      <y>682</y>
+      <w>407</w>
+      <h>132</h>
     </coordinates>
     <panel_attributes>BoolEntry
 --
@@ -353,10 +377,10 @@ OUTGOING</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>612</x>
-      <y>531</y>
-      <w>27</w>
-      <h>45</h>
+      <x>748</x>
+      <y>649</y>
+      <w>33</w>
+      <h>55</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;30.0</additional_attributes>
@@ -364,10 +388,10 @@ OUTGOING</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1377</x>
-      <y>117</y>
-      <w>450</w>
-      <h>117</h>
+      <x>1683</x>
+      <y>143</y>
+      <w>550</w>
+      <h>143</h>
     </coordinates>
     <panel_attributes>TileEntitySignalBox
 --

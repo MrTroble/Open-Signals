@@ -1,58 +1,45 @@
 package eu.gir.girsignals.signalbox;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
-import com.google.common.collect.Maps;
-
-import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.entrys.ISaveable;
+import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.Rotation;
 
-public class SignalBoxNode implements ISaveable, Iterable<PathOption> {
-
-    private static final String MODE = "mode";
-    private static final String ROTATION = "rotation";
-    private static final String OPTION = "option";
+public class SignalBoxNode implements ISaveable {
 
     private final Point point;
     private final String identifier;
-    private final HashMap<Entry<Point, Point>, Entry<EnumGuiMode, Rotation>> possibleConnections = new HashMap<>();
-    private final HashMap<Entry<EnumGuiMode, Rotation>, PathOption> possibleModes = new HashMap<>();
+    private final HashMap<Path, ModeSet> possibleConnections = new HashMap<>();
+    private final HashMap<ModeSet, PathOptionEntry> possibleModes = new HashMap<>();
 
-    public SignalBoxNode(final Point point2) {
-        this.point = point2;
+    public SignalBoxNode(final Point point) {
+        this.point = Objects.requireNonNull(point);
         this.identifier = point.getX() + "." + point.getY();
     }
 
-    public void add(final EnumGuiMode mode, final Rotation rot) {
-        possibleModes.put(Maps.immutableEntry(mode, rot), new PathOption());
+    public void add(final ModeSet modeSet) {
+        possibleModes.put(modeSet, new PathOptionEntry());
     }
 
-    public boolean has(final EnumGuiMode mode, final Rotation rot) {
-        return possibleModes.containsKey(Maps.immutableEntry(mode, rot));
+    public boolean has(final ModeSet modeSet) {
+        return possibleModes.containsKey(modeSet);
     }
 
-    public void remove(final EnumGuiMode mode, final Rotation rot) {
-        possibleModes.remove(Maps.immutableEntry(mode, rot));
+    public void remove(final ModeSet modeSet) {
+        possibleModes.remove(modeSet);
     }
 
     public void post() {
         possibleModes.forEach((e, i) -> {
             final Point p1 = new Point(this.point);
             final Point p2 = new Point(this.point);
-            switch (e.getKey()) {
+            switch (e.mode) {
                 case CORNER:
-                    switch (e.getValue()) {
+                    switch (e.rotation) {
                         case NONE:
                             p1.translate(0, 1);
                             p2.translate(-1, 0);
@@ -75,7 +62,7 @@ public class SignalBoxNode implements ISaveable, Iterable<PathOption> {
                     break;
                 case STRAIGHT:
                 case END:
-                    switch (e.getValue()) {
+                    switch (e.rotation) {
                         case NONE:
                         case CLOCKWISE_180:
                             p1.translate(1, 0);
@@ -93,24 +80,12 @@ public class SignalBoxNode implements ISaveable, Iterable<PathOption> {
                 default:
                     return;
             }
-            possibleConnections.put(Maps.immutableEntry(p1, p2), e);
+            possibleConnections.put(new Path(p1, p2), e);
         });
     }
 
     public Point getPoint() {
         return point;
-    }
-
-    public Set<Entry<Point, Point>> connections() {
-        return this.possibleConnections.keySet();
-    }
-
-    public void forEach(final BiConsumer<Entry<EnumGuiMode, Rotation>, PathOption> applier) {
-        possibleModes.forEach(applier);
-    }
-
-    public boolean isEmpty() {
-        return possibleModes.isEmpty();
     }
 
     @Override
@@ -120,13 +95,7 @@ public class SignalBoxNode implements ISaveable, Iterable<PathOption> {
             return;
         }
         final NBTTagList pointList = new NBTTagList();
-        possibleModes.forEach((mode, option) -> {
-            final NBTTagCompound entry = new NBTTagCompound();
-            entry.setString(MODE, mode.getKey().name());
-            entry.setString(ROTATION, mode.getValue().name());
-            entry.setTag(OPTION, option.writeNBT());
-            pointList.appendTag(entry);
-        });
+        possibleModes.forEach((mode, option) -> pointList.appendTag(mode.writeToNBT(option)));
         compound.setTag(this.identifier, pointList);
     }
 
@@ -136,59 +105,19 @@ public class SignalBoxNode implements ISaveable, Iterable<PathOption> {
             return;
         final NBTTagList pointList = (NBTTagList) compound.getTag(this.identifier);
         pointList.forEach(e -> {
-            final NBTTagCompound entry = (NBTTagCompound) e;
-            final EnumGuiMode mode = EnumGuiMode.valueOf(entry.getString(MODE));
-            final Rotation rotation = Rotation.valueOf(entry.getString(ROTATION));
-            final Entry<EnumGuiMode, Rotation> modeRotation = Maps.immutableEntry(mode, rotation);
-            possibleModes.put(modeRotation, new PathOption(entry.getCompoundTag(OPTION)));
+            final PathOptionEntry entry = new PathOptionEntry();
+            possibleModes.put(ModeSet.readFromNBT(entry, compound), entry);
         });
     }
 
-    public Optional<PathOption> getOption(final EnumGuiMode mode) {
-        final Optional<Entry<Entry<EnumGuiMode, Rotation>, PathOption>> opt = this.possibleModes
-                .entrySet().stream().filter(e -> e.getKey().getKey().equals(mode)).findFirst();
-        if (opt.isPresent()) {
-            return Optional.of(opt.get().getValue());
-        } else {
-            return Optional.empty();
-        }
+    public Optional<PathOptionEntry> getOption(final ModeSet mode) {
+        return Optional.ofNullable(possibleModes.get(mode));
     }
 
-    public Optional<PathOption> getOption(final EnumGuiMode guimode, final Rotation rotation) {
-        final Entry<EnumGuiMode, Rotation> entry = Maps.immutableEntry(guimode, rotation);
-        return getOption(entry);
-    }
-
-    public Optional<PathOption> getOption(final Entry<EnumGuiMode, Rotation> entry) {
-        if (entry == null || !this.possibleModes.containsKey(entry))
-            return Optional.empty();
-        return Optional.of(this.possibleModes.get(entry));
-    }
-
-    public Optional<PathOption> getOption(final Point p1, final Point p2) {
-        final Entry<Point, Point> entry1 = Maps.immutableEntry(p1, p2);
-        if (this.possibleConnections.containsKey(entry1)) {
-            return getOption(this.possibleConnections.get(entry1));
-        }
-        final Entry<Point, Point> entry2 = Maps.immutableEntry(p2, p1);
-        if (this.possibleConnections.containsKey(entry2)) {
-            return getOption(this.possibleConnections.get(entry2));
-        }
+    public Optional<PathOptionEntry> getOption(final Optional<ModeSet> mode) {
+        if (mode.isPresent())
+            return getOption(mode.get());
         return Optional.empty();
-    }
-
-    public List<Rotation> getRotations(final EnumGuiMode mode) {
-        return this.possibleModes.keySet().stream().filter(entry -> entry.getKey().equals(mode))
-                .map(entry -> entry.getValue()).collect(Collectors.toList());
-    }
-
-    public boolean isUsed() {
-        return !this.possibleModes.values().stream()
-                .allMatch(option -> option.getPathUsage().equals(EnumPathUsage.FREE));
-    }
-
-    public boolean has(final EnumGuiMode mode) {
-        return this.possibleModes.keySet().stream().anyMatch(e -> e.getKey().equals(mode));
     }
 
     @Override
@@ -213,9 +142,13 @@ public class SignalBoxNode implements ISaveable, Iterable<PathOption> {
         return Objects.equals(point, other.point);
     }
 
-    @Override
-    public Iterator<PathOption> iterator() {
-        return possibleModes.values().iterator();
+    /**
+     * Get's the identifier of the given node
+     * 
+     * @return the identifier
+     */
+    public String getIdentifier() {
+        return identifier;
     }
 
 }

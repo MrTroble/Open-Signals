@@ -5,14 +5,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 
 import eu.gir.guilib.ecs.entitys.UIEntity;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -81,13 +79,13 @@ public final class SignalBoxUtil {
         return new Point(x + point.getX(), y + point.getY());
     }
 
-    public static boolean checkApplicable(final SignalBoxNode neighbour, final SignalBoxNode previouse,
-            final boolean isRS) {
+    public static boolean checkApplicable(final SignalBoxNode neighbour,
+            final SignalBoxNode previouse, final boolean isRS) {
         return checkApplicable(neighbour, previouse, isRS, Rotation.NONE);
     }
 
-    public static boolean checkApplicable(final SignalBoxNode neighbour, final SignalBoxNode previouse,
-            final boolean isRS, final Rotation apply) {
+    public static boolean checkApplicable(final SignalBoxNode neighbour,
+            final SignalBoxNode previouse, final boolean isRS, final Rotation apply) {
         if (previouse == null)
             return false;
         final Point prev = previouse.getPoint();
@@ -104,10 +102,10 @@ public final class SignalBoxUtil {
         return list.contains(rot);
     }
 
-    private static boolean connectionCheck(final Point p1, final Point p2, final SignalBoxNode cSNode,
-            final Point currentNode, final Point neighbour, final SignalBoxNode next,
-            final Point previouse, final Map<Point, Point> closedList,
-            final Entry<Point, Point> entry, final boolean isRS) {
+    private static boolean connectionCheck(final Point p1, final Point p2,
+            final SignalBoxNode cSNode, final Point currentNode, final Point neighbour,
+            final SignalBoxNode next, final Point previouse, final Map<Point, Point> closedList,
+            final Path entry, final boolean isRS) {
         if (next == null || next.isUsed())
             return false;
         if (currentNode.equals(p1) && checkApplicable(cSNode, next, isRS))
@@ -117,11 +115,11 @@ public final class SignalBoxUtil {
         if (checkApplicable(next, cSNode, isRS))
             return false;
         return previouse == null
-                || previouse.equals(entry.getKey()) && !closedList.containsKey(entry.getValue());
+                || previouse.equals(entry.point1) && !closedList.containsKey(entry.point2);
     }
 
-    public static Optional<ArrayList<SignalBoxNode>> requestWay(final Map<Point, SignalBoxNode> modeGrid,
-            final Point p1, final Point p2) {
+    public static Optional<ArrayList<SignalBoxNode>> requestWay(
+            final Map<Point, SignalBoxNode> modeGrid, final Point p1, final Point p2) {
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
             return Optional.empty();
         final SignalBoxNode lastNode = modeGrid.get(p2);
@@ -134,7 +132,7 @@ public final class SignalBoxUtil {
         final Set<Point> openList = new HashSet<Point>();
         final HashMap<Point, Double> fscores = new HashMap<>();
         final HashMap<Point, Double> gscores = new HashMap<>();
-        final List<Entry<Point, Point>> entryImpl = Lists.newArrayList(null, null);
+        final List<Path> entryImpl = Lists.newArrayList(null, null);
 
         openList.add(p1);
         gscores.put(p1, 0.0);
@@ -158,13 +156,11 @@ public final class SignalBoxUtil {
             }
             if (cSNode == null)
                 continue;
-            for (final Entry<Point, Point> e : cSNode.connections()) {
+            for (final Path e : cSNode.connections()) {
                 entryImpl.set(0, e);
-                entryImpl.set(1, Maps.immutableEntry(e.getValue(), e.getKey()));
-                for (final Entry<Point, Point> entry : entryImpl) {
-                    if (entry.getKey() == null || entry.getValue() == null)
-                        continue;
-                    final Point neighbour = entry.getValue();
+                entryImpl.set(1, e.getInverse());
+                for (final Path entry : entryImpl) {
+                    final Point neighbour = entry.point2;
                     final Point previouse = closedList.get(currentNode);
                     final SignalBoxNode next = modeGrid.get(neighbour);
                     if (connectionCheck(p1, p2, cSNode, currentNode, neighbour, next, previouse,

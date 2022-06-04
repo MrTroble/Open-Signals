@@ -1,5 +1,7 @@
 package eu.gir.girsignals.signalbox.entrys;
 
+import java.util.Objects;
+
 import net.minecraft.nbt.NBTTagCompound;
 
 public abstract class IPathEntry<T> implements ISaveable {
@@ -36,10 +38,40 @@ public abstract class IPathEntry<T> implements ISaveable {
      */
     public abstract void setValue(T value);
 
+    /**
+     * Write the values from this entry to the given network tag if and only if the
+     * value did change since the last write
+     * 
+     * @param tag the network tag to write to
+     */
     public void writeEntryNetwork(final NBTTagCompound tag) {
         if (this.isDirty) {
             this.write(tag);
+            this.isDirty = true;
         }
-        this.isDirty = true;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, this.getValue());
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final IPathEntry<?> other = (IPathEntry<?>) obj;
+        return Objects.equals(name, other.name) && Objects.equals(getValue(), other.getValue());
+    }
+
+    @Override
+    public String toString() {
+        return "IPathEntry [isDirty=" + isDirty + ", name=" + name + ", value=" + this.getValue()
+                + "]";
+    }
+
 }

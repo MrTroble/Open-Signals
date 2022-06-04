@@ -74,12 +74,11 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 
     @Override
     public String getID() {
-        return this.node.getID();
+        return this.node.getIdentifier();
     }
 
     @Override
     public void setID(final String id) {
-        this.node.setID(id);
     }
 
 }

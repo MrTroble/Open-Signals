@@ -1,13 +1,26 @@
 package eu.gir.girsignals.signalbox;
 
-public class Path {
+import java.util.Objects;
+
+import eu.gir.girsignals.signalbox.entrys.ISaveable;
+import net.minecraft.nbt.NBTTagCompound;
+
+public class Path implements ISaveable {
+
+    public static final String POINT_1 = "point1";
+    public static final String POINT_2 = "point2";
 
     public final Point point1;
     public final Point point2;
 
+    public Path() {
+        this.point1 = new Point();
+        this.point2 = new Point();
+    }
+
     public Path(final Point point1, final Point point2) {
-        this.point1 = point1;
-        this.point2 = point2;
+        this.point1 = Objects.requireNonNull(point1);
+        this.point2 = Objects.requireNonNull(point2);
     }
 
     /**
@@ -24,4 +37,24 @@ public class Path {
         return point2;
     }
 
+    public Path getInverse() {
+        return new Path(this.point2, this.point1);
+    }
+
+    @Override
+    public void write(final NBTTagCompound tag) {
+        final NBTTagCompound compound1 = new NBTTagCompound();
+        this.point1.write(compound1);
+        tag.setTag(POINT_1, compound1);
+
+        final NBTTagCompound compound2 = new NBTTagCompound();
+        this.point2.write(compound2);
+        tag.setTag(POINT_2, compound2);
+    }
+
+    @Override
+    public void read(final NBTTagCompound tag) {
+        this.point1.read(tag.getCompoundTag(POINT_1));
+        this.point2.read(tag.getCompoundTag(POINT_2));
+    }
 }
