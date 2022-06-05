@@ -1,8 +1,12 @@
 package eu.gir.girsignals.signalbox.entrys;
 
+import java.util.function.IntConsumer;
+
+import eu.gir.guilib.ecs.interfaces.IIntegerable;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class EnumEntry<T extends Enum<T>> extends IPathEntry<T> {
+public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
+        implements IIntegerable<T>, IntConsumer {
 
     private T enumValue;
     private final Class<T> enumClass;
@@ -42,6 +46,21 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T> {
     public void setValue(final T value) {
         this.enumValue = value;
         this.isDirty = true;
+    }
+
+    @Override
+    public T getObjFromID(final int obj) {
+        return enumClass.getEnumConstants()[obj];
+    }
+
+    @Override
+    public int count() {
+        return enumClass.getEnumConstants().length;
+    }
+
+    @Override
+    public void accept(final int value) {
+        setValue(getObjFromID(value));
     }
 
 }

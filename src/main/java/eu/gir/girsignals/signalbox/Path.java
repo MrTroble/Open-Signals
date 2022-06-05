@@ -57,4 +57,27 @@ public class Path implements ISaveable {
         this.point1.read(tag.getCompoundTag(POINT_1));
         this.point2.read(tag.getCompoundTag(POINT_2));
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(point1, point2);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final Path other = (Path) obj;
+        return Objects.equals(point1, other.point1) && Objects.equals(point2, other.point2);
+    }
+
+    @Override
+    public String toString() {
+        return "Path [point1=" + point1 + ", point2=" + point2 + "]";
+    }
+
 }

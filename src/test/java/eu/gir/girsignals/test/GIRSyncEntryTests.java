@@ -2,16 +2,21 @@ package eu.gir.girsignals.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 
 import org.junit.jupiter.api.Test;
 
+import eu.gir.girsignals.enums.EnumGuiMode;
+import eu.gir.girsignals.enums.EnumPathUsage;
+import eu.gir.girsignals.signalbox.ModeSet;
 import eu.gir.girsignals.signalbox.Path;
-import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.Point;
 import eu.gir.girsignals.signalbox.entrys.IPathEntry;
 import eu.gir.girsignals.signalbox.entrys.ISaveable;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
+import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import scala.util.Random;
 
@@ -65,6 +70,27 @@ public class GIRSyncEntryTests {
 
         final Point point2 = new Point(RANDOM.nextInt(), RANDOM.nextInt());
         testISavable(new Path(point1, point2), new Path(new Point(0, 0), new Point(0, 0)));
+
+        final ModeSet testSet = new ModeSet(randomEnum(EnumGuiMode.class),
+                randomEnum(Rotation.class));
+        testISavable(testSet, new ModeSet(EnumGuiMode.BUE, Rotation.NONE));
+
+        final PathOptionEntry entry = new PathOptionEntry();
+        entry.setEntry(PathEntryType.SPEED, RANDOM.nextInt());
+        final EnumPathUsage oldUsage = randomEnum(EnumPathUsage.class);
+        entry.setEntry(PathEntryType.PATHUSAGE, oldUsage);
+
+        final PathOptionEntry copyEntry = new PathOptionEntry();
+        testISavable(entry, copyEntry);
+
+        final PathOptionEntry newEntry = new PathOptionEntry();
+        newEntry.setEntry(PathEntryType.PATHUSAGE, oldUsage);
+        entry.setEntry(PathEntryType.SPEED, null);
+        assertEquals(newEntry, entry);
+
+        assertThrowsExactly(NullPointerException.class, () -> new ModeSet(null, null));
+        assertThrowsExactly(NullPointerException.class, () -> new ModeSet(null));
+        assertThrowsExactly(NullPointerException.class, () -> new Path(null, null));
     }
 
 }

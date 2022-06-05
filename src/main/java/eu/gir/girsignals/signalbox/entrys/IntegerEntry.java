@@ -1,8 +1,10 @@
 package eu.gir.girsignals.signalbox.entrys;
 
+import java.util.function.IntConsumer;
+
 import net.minecraft.nbt.NBTTagCompound;
 
-public class IntegerEntry extends IPathEntry<Integer> {
+public class IntegerEntry extends IPathEntry<Integer> implements IntConsumer {
 
     private int value = -1;
 
@@ -25,6 +27,11 @@ public class IntegerEntry extends IPathEntry<Integer> {
     public void setValue(final Integer value) {
         this.value = value;
         this.isDirty = true;
+    }
+
+    @Override
+    public void accept(final int value) {
+        this.setValue(value);
     }
 
 }

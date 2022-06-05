@@ -3,36 +3,25 @@ package eu.gir.girsignals.signalbox;
 import java.util.Objects;
 
 import eu.gir.girsignals.enums.EnumGuiMode;
-import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
+import eu.gir.girsignals.signalbox.entrys.ISaveable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Rotation;
 
-public class ModeSet {
+public class ModeSet implements ISaveable {
 
     private static final String MODE = "mode";
     private static final String ROTATION = "rotation";
 
-    public final EnumGuiMode mode;
-    public final Rotation rotation;
+    public EnumGuiMode mode;
+    public Rotation rotation;
+
+    public ModeSet(final NBTTagCompound compound) {
+        this.read(Objects.requireNonNull(compound));
+    }
 
     public ModeSet(final EnumGuiMode mode, final Rotation rotation) {
         this.mode = Objects.requireNonNull(mode);
         this.rotation = Objects.requireNonNull(rotation);
-    }
-
-    public NBTTagCompound writeToNBT(final PathOptionEntry pEntry) {
-        final NBTTagCompound entry = new NBTTagCompound();
-        entry.setString(MODE, this.mode.name());
-        entry.setString(ROTATION, this.rotation.name());
-        pEntry.write(entry);
-        return entry;
-    }
-
-    public static ModeSet readFromNBT(final PathOptionEntry pEntry, final NBTTagCompound tag) {
-        final ModeSet mode = new ModeSet(EnumGuiMode.valueOf(tag.getString(MODE)),
-                Rotation.valueOf(tag.getString(ROTATION)));
-        pEntry.read(tag);
-        return mode;
     }
 
     @Override
@@ -55,6 +44,18 @@ public class ModeSet {
     @Override
     public String toString() {
         return "ModeSet [mode=" + mode + ", rotation=" + rotation + "]";
+    }
+
+    @Override
+    public void write(final NBTTagCompound tag) {
+        tag.setString(MODE, this.mode.name());
+        tag.setString(ROTATION, this.rotation.name());
+    }
+
+    @Override
+    public void read(final NBTTagCompound tag) {
+        this.mode = EnumGuiMode.valueOf(tag.getString(MODE));
+        this.rotation = Rotation.valueOf(tag.getString(ROTATION));
     }
 
 }

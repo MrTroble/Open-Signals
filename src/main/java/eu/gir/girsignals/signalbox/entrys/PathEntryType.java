@@ -7,7 +7,7 @@ import java.util.Objects;
 
 import com.google.common.collect.ImmutableList;
 
-import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
+import eu.gir.girsignals.enums.EnumPathUsage;
 import net.minecraft.util.math.BlockPos;
 
 public final class PathEntryType<T> {
@@ -25,8 +25,6 @@ public final class PathEntryType<T> {
 
     public static final PathEntryType<BlockPos> SIGNAL = new PathEntryType<>(BlockposEntry.class,
             "signal");
-    public static final PathEntryType<BlockPos> SHUNTING = new PathEntryType<>(BlockposEntry.class,
-            "shunting");
     public static final PathEntryType<BlockPos> BLOCKING = new PathEntryType<>(BlockposEntry.class,
             "blocking");
     public static final PathEntryType<BlockPos> RESETING = new PathEntryType<>(BlockposEntry.class,

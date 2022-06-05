@@ -1,6 +1,7 @@
 package eu.gir.girsignals.guis;
 
 import eu.gir.girsignals.enums.EnumGuiMode;
+import eu.gir.girsignals.signalbox.ModeSet;
 import eu.gir.girsignals.signalbox.SignalBoxNode;
 import eu.gir.guilib.ecs.entitys.UIBox;
 import eu.gir.guilib.ecs.entitys.UIComponent;
@@ -39,7 +40,7 @@ public class UIMenu extends UIComponent {
                 final UIEntity preview = new UIEntity();
                 preview.add(new UIColor(0xFFAFAFAF));
                 final SignalBoxNode node = new SignalBoxNode(null);
-                node.add(mode, Rotation.values()[this.rotation]);
+                node.add(new ModeSet(mode, Rotation.values()[this.rotation]));
                 final UISignalBoxTile sbt = new UISignalBoxTile(node);
                 preview.add(sbt);
                 preview.setHeight(20);

@@ -21,10 +21,10 @@ import com.google.common.collect.ImmutableMap;
 import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.EnumGuiMode;
+import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.LinkType;
 import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.init.GIRBlocks;
-import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
@@ -321,7 +321,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             final Point newPos = pathway.get(i + 1).getPoint();
             final SignalBoxNode current = pathway.get(i);
             current.getOption(new Path(oldPos, newPos)).ifPresent(
-                    option -> option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.USED));
+                    option -> option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.BLOCKED));
             current.write(guiTag);
         }
         this.sendGuiTag();

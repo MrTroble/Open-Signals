@@ -2,7 +2,10 @@ package eu.gir.girsignals.guis;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.enums.EnumGuiMode;
+import eu.gir.girsignals.enums.EnumPathUsage;
+import eu.gir.girsignals.signalbox.ModeSet;
 import eu.gir.girsignals.signalbox.SignalBoxNode;
+import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.guilib.ecs.entitys.UIComponent;
 import eu.gir.guilib.ecs.interfaces.UIAutoSync;
 import net.minecraft.client.Minecraft;
@@ -24,7 +27,7 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 
     public UISignalBoxTile(final EnumGuiMode enumMode) {
         this.node = new SignalBoxNode(null);
-        this.node.add(enumMode, Rotation.NONE);
+        this.node.add(new ModeSet(enumMode, Rotation.NONE));
     }
 
     @Override
@@ -36,14 +39,17 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
         GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
                 GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
                 GlStateManager.DestFactor.ZERO);
-        node.forEach((mode, opt) -> {
+        node.forEach((modeSet) -> {
+            final EnumPathUsage usage = node.getOption(modeSet).map(
+                    entry -> entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE))
+                    .orElse(EnumPathUsage.FREE);
             GlStateManager.pushMatrix();
             final int offsetX = parent.getWidth() / 2;
             final int offsetY = parent.getHeight() / 2;
             GlStateManager.translate(offsetX, offsetY, 0);
-            GlStateManager.rotate(mode.getValue().ordinal() * 90, 0, 0, 1);
+            GlStateManager.rotate(modeSet.rotation.ordinal() * 90, 0, 0, 1);
             GlStateManager.translate(-offsetX, -offsetY, 0);
-            mode.getKey().consumer.accept(parent, opt.getPathUsage().getColor());
+            modeSet.mode.consumer.accept(parent, usage.getColor());
             GlStateManager.popMatrix();
         });
         GlStateManager.enableTexture2D();

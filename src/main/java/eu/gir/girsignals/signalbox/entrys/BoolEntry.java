@@ -1,8 +1,11 @@
 package eu.gir.girsignals.signalbox.entrys;
 
+import java.util.function.IntConsumer;
+
+import eu.gir.guilib.ecs.interfaces.IIntegerable;
 import net.minecraft.nbt.NBTTagCompound;
 
-public class BoolEntry extends IPathEntry<Boolean> {
+public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boolean>, IntConsumer {
 
     private boolean value = false;
 
@@ -37,6 +40,21 @@ public class BoolEntry extends IPathEntry<Boolean> {
     public void setValue(final Boolean value) {
         this.value = value.booleanValue();
         this.isDirty = true;
+    }
+
+    @Override
+    public Boolean getObjFromID(final int obj) {
+        return obj == 0 ? false : true;
+    }
+
+    @Override
+    public int count() {
+        return 2;
+    }
+
+    @Override
+    public void accept(final int value) {
+        this.setValue(getObjFromID(value));
     }
 
 }

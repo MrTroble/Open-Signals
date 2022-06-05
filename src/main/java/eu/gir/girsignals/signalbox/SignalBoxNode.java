@@ -1,6 +1,7 @@
 package eu.gir.girsignals.signalbox;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -15,7 +16,10 @@ import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 
-public class SignalBoxNode implements ISaveable {
+public class SignalBoxNode implements ISaveable, Iterable<ModeSet> {
+
+    private static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
+            EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
 
     private final Point point;
     private final String identifier;
@@ -101,7 +105,12 @@ public class SignalBoxNode implements ISaveable {
             return;
         }
         final NBTTagList pointList = new NBTTagList();
-        possibleModes.forEach((mode, option) -> pointList.appendTag(mode.writeToNBT(option)));
+        possibleModes.forEach((mode, option) -> {
+            final NBTTagCompound entry = new NBTTagCompound();
+            mode.write(entry);
+            option.write(entry);
+            pointList.appendTag(entry);
+        });
         compound.setTag(this.identifier, pointList);
     }
 
@@ -111,8 +120,10 @@ public class SignalBoxNode implements ISaveable {
             return;
         final NBTTagList pointList = (NBTTagList) compound.getTag(this.identifier);
         pointList.forEach(e -> {
+            final NBTTagCompound tag = (NBTTagCompound) e;
             final PathOptionEntry entry = new PathOptionEntry();
-            possibleModes.put(ModeSet.readFromNBT(entry, compound), entry);
+            entry.read(tag);
+            possibleModes.put(new ModeSet(tag), entry);
         });
     }
 
@@ -187,8 +198,18 @@ public class SignalBoxNode implements ISaveable {
                 + ", possibleModes=" + possibleModes + "]";
     }
 
+    public boolean isValidStart() {
+        return this.possibleModes.keySet().stream()
+                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode));
+    }
+
     public Set<Path> connections() {
         return ImmutableSet.copyOf(this.possibleConnections.keySet());
+    }
+
+    @Override
+    public Iterator<ModeSet> iterator() {
+        return this.possibleModes.keySet().iterator();
     }
 
 }

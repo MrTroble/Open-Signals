@@ -17,14 +17,14 @@ import com.google.common.collect.ImmutableSet;
 import eu.gir.girsignals.EnumSignals;
 import eu.gir.girsignals.EnumSignals.SortOptions;
 import eu.gir.girsignals.enums.EnumGuiMode;
+import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.LinkType;
 import eu.gir.girsignals.signalbox.ModeSet;
-import eu.gir.girsignals.signalbox.PathOption;
-import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.Point;
 import eu.gir.girsignals.signalbox.SignalBoxNode;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
+import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
 import eu.gir.guilib.ecs.DrawUtil.EnumIntegerable;
@@ -101,8 +101,8 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void selectLink(final UIEntity parent, final SignalBoxNode node,
-            final PathOption option, final ImmutableSet<Entry<BlockPos, LinkType>> entrySet,
-            final LinkType type) {
+            final PathOptionEntry option, final ImmutableSet<Entry<BlockPos, LinkType>> entrySet,
+            final LinkType type, final PathEntryType<BlockPos> entryType) {
         final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList());
         if (!positions.isEmpty()) {
@@ -112,12 +112,14 @@ public class GuiSignalBox extends GuiBase {
                         return getSignalInfo(pos, type);
                     }));
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
-                option.setLinkedPosition(type, id >= 0 ? positions.get(id) : null);
+                option.setEntry(entryType, id >= 0 ? positions.get(id) : null);
                 node.write(compound);
             });
             blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
                 e.setMin(-1);
-                e.setIndex(positions.indexOf(option.getLinkedPosition(type)));
+                final int index = option.getEntry(entryType).map(entry -> positions.indexOf(entry))
+                        .orElse(-1);
+                e.setIndex(index);
                 e.setID(null);
             });
             parent.add(blockSelect);
@@ -153,7 +155,8 @@ public class GuiSignalBox extends GuiBase {
         switch (mode) {
             case CORNER:
             case STRAIGHT: {
-                final EnumPathUsage path = option.getPathUsage();
+                final EnumPathUsage path = option.getEntry(PathEntryType.PATHUSAGE)
+                        .orElse(EnumPathUsage.FREE);
                 final UIEntity stateEntity = new UIEntity();
                 stateEntity.setInheritWidth(true);
                 stateEntity.setHeight(15);
@@ -161,35 +164,33 @@ public class GuiSignalBox extends GuiBase {
                 final String pathUsage = I18n.format("property." + path);
                 stateEntity.add(new UILabel(pathUsageName + pathUsage));
                 parent.add(stateEntity);
-                if (path.equals(EnumPathUsage.SELECTED) || path.equals(EnumPathUsage.USED)) {
-                    parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
-                        option.setPathUsage(EnumPathUsage.FREE);
-                        node.write(compound);
-                    }));
-                }
 
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
-                    option.setSpeed(id > 0 ? id : Integer.MAX_VALUE);
+                    option.setEntry(PathEntryType.SPEED, id > 0 ? id : Integer.MAX_VALUE);
                     node.write(compound);
                 });
+                final int speed = option.getEntry(PathEntryType.SPEED).filter(n -> n < 16)
+                        .orElse(Integer.MAX_VALUE);
                 speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
                     e.setID(null);
-                    e.setIndex(option.getSpeed() < 16 ? option.getSpeed() : Integer.MAX_VALUE);
+                    e.setIndex(speed);
+                    option.tryHook(PathEntryType.SPEED, e::setOnChange);
                 });
                 parent.add(speedSelection);
 
-                selectLink(parent, node, option, entrySet, LinkType.OUTPUT);
-                selectLink(parent, node, option, entrySet, LinkType.INPUT);
+                selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT);
+                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING);
+                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING);
             }
                 break;
             case VP:
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL);
+                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
                 break;
             case HP:
             case RS: {
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL);
-                selectLink(parent, node, option, entrySet, LinkType.INPUT);
+                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
+                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING);
                 parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
                     this.lowerEntity.clear();
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
@@ -225,8 +226,7 @@ public class GuiSignalBox extends GuiBase {
     private void tileNormal(final UIEntity tile, final UISignalBoxTile currentTile) {
         tile.add(new UIClickable(c -> {
             final SignalBoxNode currentNode = currentTile.getNode();
-            if (!(currentNode.has(EnumGuiMode.RS) || currentNode.has(EnumGuiMode.HP)
-                    || currentNode.has(EnumGuiMode.RA10) || currentNode.has(EnumGuiMode.END)))
+            if (!currentNode.isValidStart())
                 return;
             c.add(new UIColor(SELECTION_COLOR));
             if (lastTile == null) {
@@ -268,7 +268,8 @@ public class GuiSignalBox extends GuiBase {
         list.add(box);
         lowerEntity.add(new UIBox(UIBox.VBOX, 3));
         lowerEntity.add(list);
-        node.forEach((e, opt) -> setupModeSettings(list, e.getKey(), e.getValue(), node, opt));
+        node.forEach(modeSet -> setupModeSettings(list, modeSet.mode, modeSet.rotation, node,
+                node.getOption(modeSet).get()));
         lowerEntity.add(GuiElements.createPageSelect(box));
         lowerEntity.add(new UIClickable(e -> {
             reset();

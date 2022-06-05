@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 public enum PathType {
 
     NORMAL(PathEntryType.SIGNAL, EnumGuiMode.HP),
-    SHUNTING(PathEntryType.SHUNTING, EnumGuiMode.RS, EnumGuiMode.RA10), NONE(PathEntryType.SIGNAL);
+    SHUNTING(PathEntryType.SIGNAL, EnumGuiMode.RS, EnumGuiMode.RA10), NONE(PathEntryType.SIGNAL);
 
     private final EnumGuiMode[] modes;
     private final PathEntryType<BlockPos> type;
@@ -27,13 +27,6 @@ public enum PathType {
      */
     public EnumGuiMode[] getModes() {
         return modes;
-    }
-
-    /**
-     * @return the type
-     */
-    public PathEntryType<BlockPos> getType() {
-        return type;
     }
 
     public static final PathType of(final EnumGuiMode mode) {
