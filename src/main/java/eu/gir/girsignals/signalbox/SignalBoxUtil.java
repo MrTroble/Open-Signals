@@ -84,8 +84,8 @@ public final class SignalBoxUtil {
                 || previouse.equals(entry.point1) && !closedList.containsKey(entry.point2);
     }
 
-    public static Optional<ArrayList<SignalBoxNode>> requestWay(
-            final Map<Point, SignalBoxNode> modeGrid, final Point p1, final Point p2) {
+    public static Optional<SignalBoxPathway> requestWay(final Map<Point, SignalBoxNode> modeGrid,
+            final Point p1, final Point p2) {
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
             return Optional.empty();
         final SignalBoxNode lastNode = modeGrid.get(p2);
@@ -113,10 +113,13 @@ public final class SignalBoxUtil {
             final SignalBoxNode cSNode = modeGrid.get(currentNode);
             if (currentNode.equals(p2)) {
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
+
                 for (Point point = currentNode; point != null; point = closedList.get(point)) {
-                    nodes.add(modeGrid.get(point));
+                    final SignalBoxNode boxNode = modeGrid.get(point);
+                    nodes.add(boxNode);
                 }
-                return Optional.of(nodes);
+
+                return Optional.of(new SignalBoxPathway(nodes, pathType));
             }
             if (cSNode == null)
                 continue;

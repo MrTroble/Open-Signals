@@ -159,11 +159,16 @@ public class GIRSyncEntryTests {
 
         final Point p1 = SignalBoxUtil.getOffset(rotation, point2);
         final Point p2 = SignalBoxUtil.getOffset(rotation.add(Rotation.CLOCKWISE_180), point2);
-        assertTrue(signalBoxNode.getOption(new Path(p1, p2)).isPresent());
+        final Path path = new Path(p1, p2);
+        assertTrue(signalBoxNode.getOption(path).isPresent());
         assertTrue(finalNode.getOption(new Path(p1, p2)).isPresent());
+        assertTrue(signalBoxNode.connections().contains(path));
+        assertTrue(signalBoxNode.connections().contains(path.getInverse()));
 
         assertFalse(finalNode.getOption(new Path(p1.delta(new Point(21212, RANDOM.nextInt())), p2))
                 .isPresent());
+        assertFalse(signalBoxNode.connections()
+                .contains(new Path(p1.delta(new Point(21212, RANDOM.nextInt())), p2)));
 
         final SignalBoxNode currentNode = new SignalBoxNode(point2);
         final SignalBoxNode nextNode = new SignalBoxNode(point1);
