@@ -1,5 +1,6 @@
 package eu.gir.girsignals.signalbox;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Objects;
@@ -90,7 +91,9 @@ public class SignalBoxNode implements ISaveable, Iterable<ModeSet> {
                 default:
                     return;
             }
-            possibleConnections.put(new Path(p1, p2), e);
+            final Path path = new Path(p1, p2);
+            possibleConnections.put(path, e);
+            possibleConnections.put(path.getInverse(), e);
         });
     }
 
@@ -152,11 +155,22 @@ public class SignalBoxNode implements ISaveable, Iterable<ModeSet> {
     }
 
     public PathType getPathType(final SignalBoxNode other) {
-        final Set<PathType> pathTypes = other.possibleModes.keySet().stream()
-                .map(mode -> PathType.of(mode.mode)).collect(Collectors.toSet());
-        return this.possibleModes.keySet().stream().map(mode -> PathType.of(mode.mode))
-                .filter(pathTypes::contains)
-                .min((t1, t2) -> Integer.min(t1.ordinal(), t2.ordinal())).orElse(PathType.NONE);
+        if (other == null || other.getPoint().equals(this.getPoint()))
+            return PathType.NONE;
+        final Set<EnumGuiMode> thisMode = this.possibleModes.keySet().stream()
+                .map(mode -> mode.mode).collect(Collectors.toSet());
+
+        final Set<EnumGuiMode> otherMode = other.possibleModes.keySet().stream()
+                .map(mode -> mode.mode).collect(Collectors.toSet());
+        for (final PathType type : PathType.values()) {
+            final boolean thisContains = Arrays.stream(type.getModes())
+                    .anyMatch(thisMode::contains);
+            final boolean otherContains = Arrays.stream(type.getModes())
+                    .anyMatch(otherMode::contains);
+            if (thisContains && otherContains)
+                return type;
+        }
+        return PathType.NONE;
     }
 
     public boolean canMakePath(final Path path, final PathType type) {
