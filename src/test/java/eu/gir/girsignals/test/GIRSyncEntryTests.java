@@ -1,8 +1,10 @@
 package eu.gir.girsignals.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -11,6 +13,8 @@ import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.signalbox.ModeSet;
 import eu.gir.girsignals.signalbox.Path;
 import eu.gir.girsignals.signalbox.Point;
+import eu.gir.girsignals.signalbox.SignalBoxNode;
+import eu.gir.girsignals.signalbox.SignalBoxUtil;
 import eu.gir.girsignals.signalbox.entrys.IPathEntry;
 import eu.gir.girsignals.signalbox.entrys.ISaveable;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
@@ -88,9 +92,35 @@ public class GIRSyncEntryTests {
         entry.setEntry(PathEntryType.SPEED, null);
         assertEquals(newEntry, entry);
 
+        final SignalBoxNode signalBoxNode = new SignalBoxNode(point2);
+        assertFalse(signalBoxNode.has(testSet));
+        signalBoxNode.add(testSet);
+        assertTrue(signalBoxNode.has(testSet));
+        signalBoxNode.remove(testSet);
+        assertFalse(signalBoxNode.has(testSet));
+        signalBoxNode.add(testSet);
+        testISavable(signalBoxNode, new SignalBoxNode(point2));
+
+        final Rotation rotation = randomEnum(Rotation.class);
+        signalBoxNode.add(new ModeSet(EnumGuiMode.STRAIGHT, rotation));
+        signalBoxNode.post();
+
+        final SignalBoxNode finalNode = new SignalBoxNode(point2);
+        testISavable(signalBoxNode, finalNode);
+
+        final Point p1 = SignalBoxUtil.getOffset(rotation, point2);
+        final Point p2 = SignalBoxUtil.getOffset(rotation.add(Rotation.CLOCKWISE_180), point2);
+        assertTrue(signalBoxNode.getOption(new Path(p1, p2)).isPresent());
+        assertTrue(finalNode.getOption(new Path(p1, p2)).isPresent());
+
+        assertFalse(finalNode.getOption(new Path(p1.delta(new Point(21212, RANDOM.nextInt())), p2))
+                .isPresent());
+
         assertThrowsExactly(NullPointerException.class, () -> new ModeSet(null, null));
         assertThrowsExactly(NullPointerException.class, () -> new ModeSet(null));
         assertThrowsExactly(NullPointerException.class, () -> new Path(null, null));
+        assertThrowsExactly(NullPointerException.class, () -> new SignalBoxNode(null));
+
     }
 
 }

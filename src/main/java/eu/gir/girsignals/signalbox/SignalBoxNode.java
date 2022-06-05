@@ -125,6 +125,7 @@ public class SignalBoxNode implements ISaveable, Iterable<ModeSet> {
             entry.read(tag);
             possibleModes.put(new ModeSet(tag), entry);
         });
+        this.post();
     }
 
     public Optional<PathOptionEntry> getOption(final Path path) {
