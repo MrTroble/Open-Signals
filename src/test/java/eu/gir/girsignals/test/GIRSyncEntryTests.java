@@ -105,6 +105,22 @@ public class GIRSyncEntryTests {
         assertThrowsExactly(NullPointerException.class, () -> new SignalBoxNode(null));
     }
 
+    private static void testValidStartNot(final SignalBoxNode validStartCheck, final ModeSet set) {
+        assertFalse(validStartCheck.isValidStart());
+        validStartCheck.add(set);
+        assertFalse(validStartCheck.isValidStart());
+        validStartCheck.remove(set);
+        assertFalse(validStartCheck.isValidStart());
+    }
+
+    private static void testValidStart(final SignalBoxNode validStartCheck, final ModeSet set) {
+        assertFalse(validStartCheck.isValidStart());
+        validStartCheck.add(set);
+        assertTrue(validStartCheck.isValidStart());
+        validStartCheck.remove(set);
+        assertFalse(validStartCheck.isValidStart());
+    }
+
     @Test
     public void testSignalNode() {
         final ModeSet testSet = new ModeSet(randomEnum(EnumGuiMode.class),
@@ -113,10 +129,13 @@ public class GIRSyncEntryTests {
         final Point point1 = new Point(RANDOM.nextInt(), RANDOM.nextInt());
 
         final SignalBoxNode signalBoxNode = new SignalBoxNode(point2);
+        assertTrue(signalBoxNode.isEmpty());
         assertFalse(signalBoxNode.has(testSet));
         signalBoxNode.add(testSet);
+        assertFalse(signalBoxNode.isEmpty());
         assertTrue(signalBoxNode.has(testSet));
         signalBoxNode.remove(testSet);
+        assertTrue(signalBoxNode.isEmpty());
         assertFalse(signalBoxNode.has(testSet));
         signalBoxNode.add(testSet);
         testISavable(signalBoxNode, () -> new SignalBoxNode(point2));
@@ -176,5 +195,15 @@ public class GIRSyncEntryTests {
 
         currentNode.remove(cRSNode);
         assertEquals(PathType.NONE, currentNode.getPathType(nextNode));
+
+        final SignalBoxNode validStartCheck = new SignalBoxNode(point1);
+        for (final EnumGuiMode mode : EnumGuiMode.values()) {
+            if (mode.equals(EnumGuiMode.RA10) || mode.equals(EnumGuiMode.RS)
+                    || mode.equals(EnumGuiMode.HP) || mode.equals(EnumGuiMode.END)) {
+                testValidStart(validStartCheck, new ModeSet(mode, randomEnum(Rotation.class)));
+                continue;
+            }
+            testValidStartNot(validStartCheck, new ModeSet(mode, randomEnum(Rotation.class)));
+        }
     }
 }
