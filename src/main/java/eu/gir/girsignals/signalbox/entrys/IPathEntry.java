@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import net.minecraft.nbt.NBTTagCompound;
 
-public abstract class IPathEntry<T> implements ISaveable {
+public abstract class IPathEntry<T> implements INetworkSavable {
 
     protected boolean isDirty = false;
 
@@ -38,12 +38,7 @@ public abstract class IPathEntry<T> implements ISaveable {
      */
     public abstract void setValue(T value);
 
-    /**
-     * Write the values from this entry to the given network tag if and only if the
-     * value did change since the last write
-     * 
-     * @param tag the network tag to write to
-     */
+    @Override
     public void writeEntryNetwork(final NBTTagCompound tag) {
         if (this.isDirty) {
             this.write(tag);

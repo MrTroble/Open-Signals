@@ -18,7 +18,7 @@ import com.google.common.collect.Maps;
 import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.PathType;
-import eu.gir.girsignals.signalbox.entrys.ISaveable;
+import eu.gir.girsignals.signalbox.entrys.INetworkSavable;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.nbt.NBTTagCompound;
@@ -26,17 +26,16 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SignalBoxPathway implements ISaveable {
+public class SignalBoxPathway implements INetworkSavable {
 
     private final ImmutableList<SignalBoxNode> listOfNodes;
     private final PathType type;
-    private final int speed;
-    private final Optional<Entry<BlockPos, BlockPos>> signalPositions;
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
     private final Map<BlockPos, SignalBoxNode> mapOfBlockingPositions = new HashMap<>();
-    private final Point firstPoint;
-    private final Point lastPoint;
-
+    private Point firstPoint;
+    private Point lastPoint;
+    private int speed;
+    private Optional<Entry<BlockPos, BlockPos>> signalPositions;
     private WorldLoadOperations loadOps = new WorldLoadOperations(null);
 
     /**
@@ -51,6 +50,10 @@ public class SignalBoxPathway implements ISaveable {
             throw new IndexOutOfBoundsException();
         if (this.type.equals(PathType.NONE))
             throw new IllegalArgumentException();
+        initalize();
+    }
+
+    private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         foreachEntry((optionEntry, node) -> {
             optionEntry.getEntry(PathEntryType.SPEED)
@@ -60,13 +63,13 @@ public class SignalBoxPathway implements ISaveable {
             optionEntry.getEntry(PathEntryType.RESETING)
                     .ifPresent(position -> mapOfResetPositions.put(position, node));
         });
-        final SignalBoxNode firstNode = pNodes.get(pNodes.size() - 1);
+        final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
         this.firstPoint = firstNode.getPoint();
-        final BlockPos firstPos = makeFromNext(type, firstNode, pNodes.get(pNodes.size() - 2),
-                Rotation.NONE);
-        final SignalBoxNode lastNode = pNodes.get(0);
+        final BlockPos firstPos = makeFromNext(type, firstNode,
+                this.listOfNodes.get(this.listOfNodes.size() - 2), Rotation.NONE);
+        final SignalBoxNode lastNode = this.listOfNodes.get(0);
         this.lastPoint = lastNode.getPoint();
-        final BlockPos lastPos = makeFromNext(type, lastNode, pNodes.get(1),
+        final BlockPos lastPos = makeFromNext(type, lastNode, this.listOfNodes.get(1),
                 Rotation.CLOCKWISE_180);
         if (firstPos != null && lastPos != null) {
             this.signalPositions = Optional.of(Maps.immutableEntry(firstPos, lastPos));
@@ -217,6 +220,12 @@ public class SignalBoxPathway implements ISaveable {
                 + signalPositions + ", mapOfResetPositions=" + mapOfResetPositions
                 + ", mapOfBlockingPositions=" + mapOfBlockingPositions + ", firstPoint="
                 + firstPoint + ", lastPoint=" + lastPoint + "]";
+    }
+
+    @Override
+    public void writeEntryNetwork(final NBTTagCompound tag) {
+        // TODO Auto-generated method stub
+
     }
 
 }
