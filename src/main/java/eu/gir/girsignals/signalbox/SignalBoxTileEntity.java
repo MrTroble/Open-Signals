@@ -7,19 +7,17 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.fromNBT;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.requestWay;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
 
+import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.LinkType;
 import eu.gir.girsignals.init.GIRBlocks;
-import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.girsignals.tileentitys.IChunkloadable;
 import eu.gir.girsignals.tileentitys.RedstoneIOTileEntity;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
@@ -32,7 +30,6 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -127,8 +124,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             previousPathways.put(next, pathway);
         final SignalBoxPathway previous = endsToPath.get(pathway.getFirstPoint());
         if (previous != null)
-            previousPathways.put(previous, pathway);
+            previousPathways.put(pathway, previous);
         pathway.setPathStatus(EnumPathUsage.SELECTED);
+        pathway.updatePathwaySignals();
+        SignalBoxPathway previousPath = pathway;
+        while ((previousPath = previousPathways.get(previousPath)) != null) {
+            previousPath.updatePathwaySignals();
+        }
         resendSignalTilesToUI();
     }
 
@@ -148,7 +150,18 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         if (compound.hasKey(RESET_WAY)) {
             final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
             final Point p1 = fromNBT(request, POINT1);
-            // TODO Reset
+            final SignalBoxPathway pathway = startsToPath.get(p1);
+            if (pathway == null) {
+                GirsignalsMain.log.atWarn()
+                        .log("Signalboxpath is null, this should not be the case!");
+                return;
+            }
+            pathway.resetPathway();
+            resendSignalTilesToUI();
+            this.startsToPath.remove(pathway.getFirstPoint());
+            this.endsToPath.remove(pathway.getLastPoint());
+            this.previousPathways.remove(pathway);
+            this.previousPathways.entrySet().removeIf(entry -> entry.getValue().equals(pathway));
             return;
         }
         if (compound.hasKey(REQUEST_WAY)) {
@@ -249,24 +262,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         return this.modeGrid.isEmpty();
     }
 
-    private void lockPathway(final ArrayList<SignalBoxNode> pathway) {
-        final SignalBoxNode node = pathway.get(pathway.size() - 1);
-        final Point lastPoint = node.getPoint();
-        final Point delta = lastPoint.delta(pathway.get(pathway.size() - 2).getPoint());
-        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta);
-        node.getOption(new ModeSet(EnumGuiMode.HP, rotation)).ifPresent(optionEntry -> optionEntry
-                .getEntry(PathEntryType.SIGNAL).ifPresent(worldLoadOps::loadAndReset));
-        for (int i = 1; i < pathway.size() - 1; i++) {
-            final Point oldPos = pathway.get(i - 1).getPoint();
-            final Point newPos = pathway.get(i + 1).getPoint();
-            final SignalBoxNode current = pathway.get(i);
-            current.getOption(new Path(oldPos, newPos)).ifPresent(
-                    option -> option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.BLOCKED));
-            current.write(guiTag);
+    public void updateRedstonInput(final BlockPos pos, final boolean power) {
+        if (power) {
+            startsToPath.values().forEach(pathways -> pathways.tryBlock(pos));
+            startsToPath.values().forEach(pathways -> pathways.tryReset(pos));
+            resendSignalTilesToUI();
         }
-        this.sendGuiTag();
     }
-
-    // TODO Redstone input
 
 }

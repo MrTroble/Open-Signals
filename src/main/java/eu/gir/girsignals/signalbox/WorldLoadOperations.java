@@ -36,7 +36,7 @@ public class WorldLoadOperations implements IChunkloadable {
                 loadChunkAndGetTile(SignalTileEnity.class, world, nextPosition,
                         (nextTile, _u2) -> config(speed, lastTile, nextTile, override));
             }
-            syncClient(nextPosition);
+            syncClient(lastPosition);
         });
     }
 

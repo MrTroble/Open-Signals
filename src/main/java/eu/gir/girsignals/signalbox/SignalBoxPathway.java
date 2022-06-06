@@ -21,13 +21,12 @@ import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.signalbox.entrys.ISaveable;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
-import eu.gir.girsignals.tileentitys.IChunkloadable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SignalBoxPathway implements ISaveable, IChunkloadable {
+public class SignalBoxPathway implements ISaveable {
 
     private final ImmutableList<SignalBoxNode> listOfNodes;
     private final PathType type;
@@ -64,10 +63,11 @@ public class SignalBoxPathway implements ISaveable, IChunkloadable {
         final SignalBoxNode firstNode = pNodes.get(pNodes.size() - 1);
         this.firstPoint = firstNode.getPoint();
         final BlockPos firstPos = makeFromNext(type, firstNode, pNodes.get(pNodes.size() - 2),
-                Rotation.CLOCKWISE_180);
+                Rotation.NONE);
         final SignalBoxNode lastNode = pNodes.get(0);
         this.lastPoint = lastNode.getPoint();
-        final BlockPos lastPos = makeFromNext(type, lastNode, pNodes.get(1), Rotation.NONE);
+        final BlockPos lastPos = makeFromNext(type, lastNode, pNodes.get(1),
+                Rotation.CLOCKWISE_180);
         if (firstPos != null && lastPos != null) {
             this.signalPositions = Optional.of(Maps.immutableEntry(firstPos, lastPos));
         } else {
@@ -187,4 +187,36 @@ public class SignalBoxPathway implements ISaveable, IChunkloadable {
     public Point getLastPoint() {
         return lastPoint;
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(firstPoint, lastPoint, listOfNodes, mapOfBlockingPositions,
+                mapOfResetPositions, speed, type);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final SignalBoxPathway other = (SignalBoxPathway) obj;
+        return Objects.equals(firstPoint, other.firstPoint)
+                && Objects.equals(lastPoint, other.lastPoint)
+                && Objects.equals(listOfNodes, other.listOfNodes)
+                && Objects.equals(mapOfBlockingPositions, other.mapOfBlockingPositions)
+                && Objects.equals(mapOfResetPositions, other.mapOfResetPositions)
+                && speed == other.speed && type == other.type;
+    }
+
+    @Override
+    public String toString() {
+        return "SignalBoxPathway [type=" + type + ", speed=" + speed + ", signalPositions="
+                + signalPositions + ", mapOfResetPositions=" + mapOfResetPositions
+                + ", mapOfBlockingPositions=" + mapOfBlockingPositions + ", firstPoint="
+                + firstPoint + ", lastPoint=" + lastPoint + "]";
+    }
+
 }
