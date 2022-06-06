@@ -9,7 +9,6 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.requestWay;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -53,10 +52,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     private final Map<BlockPos, Signal> signals = new HashMap<>();
     private NBTTagCompound guiTag = new NBTTagCompound();
 
-    private final List<SignalBoxPathway> pathWayEnd = new ArrayList<>(32);
-    private final Map<SignalBoxNode, SignalBoxPathway> startsToPath = new HashMap<>();
+    private final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
+    private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
     private final Map<SignalBoxPathway, SignalBoxPathway> previousPathways = new HashMap<>(32);
-    private WorldLoadOperations worldLoadOps;
+    private WorldLoadOperations worldLoadOps = new WorldLoadOperations(null);
 
     @Override
     public void setWorld(final World worldIn) {
@@ -115,12 +114,21 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     private void resendSignalTilesToUI() {
-        modeGrid.values().forEach(signal -> signal.write(guiTag));
+        startsToPath.values().forEach(signal -> signal.write(guiTag));
         sendGuiTag();
     }
 
     private void onWayAdd(final SignalBoxPathway pathway) {
-        pathWayEnd.add(pathway);
+        pathway.setWorld(world);
+        startsToPath.put(pathway.getFirstPoint(), pathway);
+        endsToPath.put(pathway.getLastPoint(), pathway);
+        final SignalBoxPathway next = startsToPath.get(pathway.getLastPoint());
+        if (next != null)
+            previousPathways.put(next, pathway);
+        final SignalBoxPathway previous = endsToPath.get(pathway.getFirstPoint());
+        if (previous != null)
+            previousPathways.put(previous, pathway);
+        pathway.setPathStatus(EnumPathUsage.SELECTED);
         resendSignalTilesToUI();
     }
 

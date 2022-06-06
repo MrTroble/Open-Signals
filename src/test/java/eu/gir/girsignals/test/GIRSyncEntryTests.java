@@ -121,6 +121,20 @@ public class GIRSyncEntryTests {
         assertFalse(validStartCheck.isValidStart());
     }
 
+    private static void testMakePath(final SignalBoxNode pathStart) {
+        final Point p1 = new Point(pathStart.getPoint());
+        final Point p2 = new Point(pathStart.getPoint());
+        final Path p = new Path(p1, p2);
+        p1.translate(0, -1);
+        p2.translate(0, 1);
+        assertTrue(pathStart.canMakePath(p, PathType.SHUNTING));
+        assertTrue(pathStart.canMakePath(p, PathType.NORMAL));
+        p1.translate(0, -1);
+        p2.translate(0, 1);
+        assertFalse(pathStart.canMakePath(p, PathType.SHUNTING));
+        assertFalse(pathStart.canMakePath(p, PathType.NORMAL));
+    }
+
     @Test
     public void testSignalNode() {
         final ModeSet testSet = new ModeSet(randomEnum(EnumGuiMode.class),
@@ -210,5 +224,18 @@ public class GIRSyncEntryTests {
             }
             testValidStartNot(validStartCheck, new ModeSet(mode, randomEnum(Rotation.class)));
         }
+
+        final SignalBoxNode pathStart = new SignalBoxNode(new Point(0, 0));
+        pathStart.add(new ModeSet(EnumGuiMode.STRAIGHT, Rotation.CLOCKWISE_90));
+        pathStart.post();
+        final SignalBoxNode pathMiddle = new SignalBoxNode(new Point(0, 1));
+        pathMiddle.add(new ModeSet(EnumGuiMode.STRAIGHT, Rotation.COUNTERCLOCKWISE_90));
+        pathMiddle.post();
+        final SignalBoxNode pathEnd = new SignalBoxNode(new Point(0, 2));
+        pathEnd.add(new ModeSet(EnumGuiMode.STRAIGHT, Rotation.CLOCKWISE_90));
+        pathEnd.post();
+        testMakePath(pathStart);
+        testMakePath(pathMiddle);
+        testMakePath(pathEnd);
     }
 }

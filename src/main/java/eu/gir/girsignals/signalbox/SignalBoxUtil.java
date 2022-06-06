@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.PriorityQueue;
 
 import org.lwjgl.opengl.GL11;
 
@@ -70,18 +69,23 @@ public final class SignalBoxUtil {
         return new Point(x + point.getX(), y + point.getY());
     }
 
-    private static boolean connectionCheck(final Point p1, final Point p2,
-            final SignalBoxNode cSNode, final Point currentNode, final Point neighbour,
-            final SignalBoxNode next, final Point previouse, final Map<Point, Point> closedList,
-            final Path entry, final PathType type) {
-        if (next == null || !next.canMakePath(entry, type))
-            return false;
-        if (currentNode.equals(p1))
-            return false;
-        if (neighbour.equals(p2))
-            return true;
-        return previouse == null
-                || previouse.equals(entry.point1) && !closedList.containsKey(entry.point2);
+    private static class ConnectionChecker {
+        public Path path;
+        public SignalBoxNode nextNode;
+        public PathType type;
+        public Map<Point, Point> closedList;
+        public SignalBoxNode lastNode;
+        public Point previous;
+
+        public boolean check() {
+            if (path == null || previous == null)
+                return true;
+            if (nextNode == null || !nextNode.canMakePath(path, type))
+                return false;
+            if (nextNode.equals(lastNode))
+                return true;
+            return previous.equals(path.point1) && !closedList.containsKey(path.point2);
+        }
     }
 
     public static Optional<SignalBoxPathway> requestWay(final Map<Point, SignalBoxNode> modeGrid,
@@ -94,44 +98,50 @@ public final class SignalBoxUtil {
         if (pathType.equals(PathType.NONE))
             return Optional.empty();
 
-        final HashMap<Point, Point> closedList = new HashMap<>();
-        final HashMap<Point, Double> fscores = new HashMap<>();
-        final HashMap<Point, Double> gscores = new HashMap<>();
-        // Priority queue might be a bad choice because of updating scores
-        final PriorityQueue<Point> openList = new PriorityQueue<Point>((n1, n2) -> {
-            return Double.compare(fscores.getOrDefault(n1, Double.MAX_VALUE),
-                    fscores.getOrDefault(n2, Double.MAX_VALUE));
-        });
+        final Map<Point, Point> closedList = new HashMap<>();
+        final Map<Point, Double> fscores = new HashMap<>();
+        final Map<Point, Double> gscores = new HashMap<>();
+
+        final List<Point> openList = new ArrayList<Point>();
         final List<Path> entryImpl = Lists.newArrayList(null, null);
 
         openList.add(p1);
         gscores.put(p1, 0.0);
         fscores.put(p1, calculateHeuristic(p1, p2));
+
+        final ConnectionChecker checker = new ConnectionChecker();
+        checker.closedList = closedList;
+        checker.lastNode = lastNode;
+        checker.type = pathType;
+
         while (!openList.isEmpty()) {
-            final Point currentNode = openList.poll();
+            final Point currentNode = openList.stream().min((n1, n2) -> {
+                return Double.compare(fscores.getOrDefault(n1, Double.MAX_VALUE),
+                        fscores.getOrDefault(n2, Double.MAX_VALUE));
+            }).get();
+            System.out.println(openList);
             openList.remove(currentNode);
             final SignalBoxNode cSNode = modeGrid.get(currentNode);
             if (currentNode.equals(p2)) {
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
-
                 for (Point point = currentNode; point != null; point = closedList.get(point)) {
                     final SignalBoxNode boxNode = modeGrid.get(point);
                     nodes.add(boxNode);
                 }
-
                 return Optional.of(new SignalBoxPathway(nodes, pathType));
             }
             if (cSNode == null)
                 continue;
+            checker.nextNode = cSNode;
             for (final Path e : cSNode.connections()) {
                 entryImpl.set(0, e);
                 entryImpl.set(1, e.getInverse());
                 for (final Path entry : entryImpl) {
                     final Point neighbour = entry.point2;
-                    final Point previouse = closedList.get(currentNode);
-                    final SignalBoxNode next = modeGrid.get(neighbour);
-                    if (connectionCheck(p1, p2, cSNode, currentNode, neighbour, next, previouse,
-                            closedList, entry, pathType)) {
+                    checker.previous = closedList.get(currentNode);
+                    checker.path = checker.previous == null || neighbour == null ? null
+                            : new Path(checker.previous, neighbour);
+                    if (checker.check()) {
                         final double tScore = gscores.getOrDefault(currentNode,
                                 Double.MAX_VALUE - 1) + 1;
                         if (tScore < gscores.getOrDefault(neighbour, Double.MAX_VALUE)) {

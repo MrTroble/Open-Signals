@@ -18,7 +18,7 @@ public class PathOptionEntry implements ISaveable {
     public <T> Optional<T> getEntry(final PathEntryType<T> type) {
         if (!pathEntrys.containsKey(type))
             return Optional.empty();
-        return Optional.of((T) pathEntrys.get(type));
+        return Optional.of((T) pathEntrys.get(type).getValue());
     }
 
     @SuppressWarnings("unchecked")
