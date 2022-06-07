@@ -8,7 +8,6 @@ import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.HPBlock;
 import eu.gir.girsignals.EnumSignals.HPHome;
-import eu.gir.girsignals.EnumSignals.HPType;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
@@ -22,47 +21,6 @@ public final class HVSignalConfig implements ISignalAutoconfig {
     public static final HVSignalConfig INSTANCE = new HVSignalConfig();
 
     private HVSignalConfig() {
-    }
-
-    private VR next(final HP hp) {
-        switch (hp) {
-            case HP0:
-                return VR.VR0;
-            case HP1:
-                return VR.VR1;
-            case HP2:
-                return VR.VR2;
-            case OFF:
-            default:
-                return VR.OFF;
-        }
-    }
-
-    private VR next(final HPHome hp) {
-        switch (hp) {
-            case HP0:
-            case HP0_ALTERNATE_RED:
-                return VR.VR0;
-            case HP1:
-                return VR.VR1;
-            case HP2:
-                return VR.VR2;
-            case OFF:
-            default:
-                return VR.OFF;
-        }
-    }
-
-    private VR next(final HPBlock hp) {
-        switch (hp) {
-            case HP0:
-                return VR.VR0;
-            case HP1:
-                return VR.VR1;
-            case OFF:
-            default:
-                return VR.OFF;
-        }
     }
 
     @SuppressWarnings({
@@ -128,36 +86,25 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     .getProperty(SignalHL.LIGHTBAR);
             final Optional<VR> distantpresent = (Optional<VR>) info.current
                     .getProperty(SignalHV.DISTANTSIGNAL);
-            final Optional<HP> stoppresent = (Optional<HP>) info.next
-                    .getProperty(SignalHL.STOPSIGNAL);
             final Optional<ZS32> speedHVZS3plate = (Optional<ZS32>) info.next
                     .getProperty(SignalHV.ZS3_PLATE);
             final Optional<ZS32> hvZS3 = (Optional<ZS32>) info.next.getProperty(SignalHV.ZS3);
 
-            info.current.getProperty(SignalHV.DISTANTSIGNAL)
-                    .ifPresent(_u -> info.next.getProperty(SignalHV.HPTYPE).ifPresent(type -> {
-                        VR vr = VR.VR0;
-                        switch ((HPType) type) {
-                            case HPBLOCK:
-                                vr = next((HPBlock) info.next.getProperty(SignalHV.HPBLOCK).get());
-                                break;
-                            case HPHOME:
-                                vr = next((HPHome) info.next.getProperty(SignalHV.HPHOME).get());
-                                break;
-                            case STOPSIGNAL:
-                                vr = next((HP) info.next.getProperty(SignalHV.STOPSIGNAL).get());
-                                break;
-                            case OFF:
-                            default:
-                                break;
-                        }
-                        values.put(SignalHV.DISTANTSIGNAL, vr);
-                    }));
+            if (info.current.getProperty(SignalHV.DISTANTSIGNAL).isPresent()) {
+                if (stop || stop2) {
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
+                } else if (nextHP.filter(HP.HP2::equals).isPresent()
+                        || nextHPHOME.filter(HPHome.HP2::equals).isPresent()) {
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
+                } else {
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                }
+            }
             values.put(SignalHV.ZS3V, ZS32.OFF);
             info.next.getProperty(SignalHV.ZS3)
                     .ifPresent(prevzs3 -> values.put(SignalHV.ZS3V, prevzs3));
 
-            if (stoppresent.isPresent() || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
+            if (nextHP.isPresent() || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
                 if (distantpresent.isPresent()) {
                     if (hlstop) {
                         values.put(SignalHV.DISTANTSIGNAL, VR.VR0);

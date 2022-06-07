@@ -40,6 +40,10 @@ public class GIRConfigtestHV {
                 HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 0);
         configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, HP.HP0,
                 HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 0);
+        configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.Z6, HP.HP2, HPHome.HP2,
+                HPBlock.HP1, VR.VR0, ZS32.Z6, ZS32.OFF, 0);
+        configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, HP.HP1,
+                HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 0);
 
         // HV -> HL
         configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, HL.HP0,

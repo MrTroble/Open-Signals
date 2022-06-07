@@ -49,6 +49,20 @@ public class GIRConfigtestHL {
         configtestHL_KS(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, KS.HP0, KSMain.HP0,
                 KSDistant.KS2, ZS32.OFF, ZS32.OFF, 0);
 
+        configtestHL_KS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.OFF, KS.HP0,
+                KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 4);
+        configtestHL_KS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.YELLOW, KS.HP0,
+                KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 6);
+        configtestHL_KS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.GREEN, KS.HP0,
+                KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 10);
+        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, KS.KS2, KSMain.KS1,
+                KSDistant.KS2, ZS32.OFF, ZS32.OFF, 4);
+        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, KS.KS2,
+                KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, 6);
+        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, KS.KS2_LIGHT,
+                KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, 10);
+        configtestHL_KS(HL.HL1, HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+                KSDistant.KS1, ZS32.OFF, ZS32.OFF, 0);
         // HL -> HV
         configtestHL_HV(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, HP.HP0, HPHome.HP0,
                 HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 0);
