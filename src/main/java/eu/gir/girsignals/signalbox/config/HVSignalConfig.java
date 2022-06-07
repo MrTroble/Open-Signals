@@ -1,20 +1,14 @@
 package eu.gir.girsignals.signalbox.config;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
-import com.google.common.collect.Lists;
-
-import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.HPBlock;
 import eu.gir.girsignals.EnumSignals.HPHome;
 import eu.gir.girsignals.EnumSignals.HPType;
-import eu.gir.girsignals.EnumSignals.KS;
-import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
@@ -26,16 +20,6 @@ import eu.gir.girsignals.tileentitys.SignalTileEnity;
 public final class HVSignalConfig implements ISignalAutoconfig {
 
     public static final HVSignalConfig INSTANCE = new HVSignalConfig();
-    private static final ArrayList<KS> STOP_KS = Lists.newArrayList(KS.HP0, KS.KS_SHUNTING,
-            KS.KS_ZS1, KS.KS_ZS7);
-    private static final ArrayList<KSMain> STOP_KS_MAIN = Lists.newArrayList(KSMain.HP0,
-            KSMain.KS_SHUNTING, KSMain.KS_ZS1, KSMain.KS_ZS7);
-    private static final ArrayList<HL> STOP_HL_MAIN = Lists.newArrayList(HL.HP0,
-            HL.HP0_ALTERNATE_RED, HL.HL_SHUNTING, HL.HL_ZS1);
-    private static final ArrayList<HLExit> STOP_HL_EXIT = Lists.newArrayList(HLExit.HP0,
-            HLExit.HP0_ALTERNATE_RED, HLExit.HL_SHUNTING, HLExit.HL_ZS1);
-    private static final ArrayList<HL> HL_40_MAIN = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
-            HL.HL11_12);
 
     private HVSignalConfig() {
     }
@@ -116,16 +100,16 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             }
 
             final boolean hlstop = info.next.getProperty(SignalHL.STOPSIGNAL)
-                    .filter(a -> STOP_HL_MAIN.contains(a)).isPresent()
+                    .filter(a -> Signallists.HL_STOP.contains(a)).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL)
-                            .filter(d -> STOP_HL_EXIT.contains(d)).isPresent();
+                            .filter(d -> Signallists.HLEXIT_STOP.contains(d)).isPresent();
             final boolean hlmain40 = info.next.getProperty(SignalHL.STOPSIGNAL)
-                    .filter(c -> HL_40_MAIN.contains(c)).isPresent()
+                    .filter(c -> Signallists.HL_40_MAIN.contains(c)).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL).filter(HLExit.HL2_3::equals)
                             .isPresent();
 
             final boolean ksstop = info.next.getProperty(SignalKS.STOPSIGNAL)
-                    .filter(a -> STOP_KS.contains(a)).isPresent();
+                    .filter(a -> Signallists.STOP_KS.contains(a)).isPresent();
 
             final Optional<HPHome> nextHPHOME = (Optional<HPHome>) info.next
                     .getProperty(SignalHV.HPHOME);
@@ -136,7 +120,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             final boolean stop2 = nextHP.filter(HP.HP0::equals).isPresent()
                     || nextHP.filter(HP.SHUNTING::equals).isPresent();
             final boolean ksstopmain = info.next.getProperty(SignalKS.MAINSIGNAL)
-                    .filter(b -> STOP_KS_MAIN.contains(b)).isPresent();
+                    .filter(b -> Signallists.STOP_KS_MAIN.contains(b)).isPresent();
             final Optional<ZS32> speedKS = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);
             final Optional<ZS32> speedKSplate = (Optional<ZS32>) info.next
                     .getProperty(SignalKS.ZS3_PLATE);

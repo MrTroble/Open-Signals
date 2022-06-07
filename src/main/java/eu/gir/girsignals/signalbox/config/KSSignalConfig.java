@@ -1,12 +1,8 @@
 package eu.gir.girsignals.signalbox.config;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Optional;
 
-import com.google.common.collect.Lists;
-
-import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.HP;
@@ -25,12 +21,6 @@ import eu.gir.girsignals.tileentitys.SignalTileEnity;
 public final class KSSignalConfig implements ISignalAutoconfig {
 
     public static final KSSignalConfig INSTANCE = new KSSignalConfig();
-    private static final ArrayList<HL> STOP_HL = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED,
-            HL.HL_SHUNTING, HL.HL_ZS1);
-    private static final ArrayList<HLExit> STOP_HL_EXIT = Lists.newArrayList(HLExit.HP0,
-            HLExit.HP0_ALTERNATE_RED, HLExit.HL_SHUNTING, HLExit.HL_ZS1);
-    private static final ArrayList<HL> HL_40_MAIN = Lists.newArrayList(HL.HL2_3, HL.HL5_6, HL.HL8_9,
-            HL.HL11_12);
 
     private KSSignalConfig() {
     }
@@ -59,11 +49,11 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     .filter(KSMain.HP0::equals).isPresent()
                     || opt.filter(KS.HP0::equals).isPresent();
             final boolean hlstop = info.next.getProperty(SignalHL.STOPSIGNAL)
-                    .filter(a -> STOP_HL.contains(a)).isPresent()
+                    .filter(a -> Signallists.HL_STOP.contains(a)).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL)
-                            .filter(d -> STOP_HL_EXIT.contains(d)).isPresent();
+                            .filter(d -> Signallists.HLEXIT_STOP.contains(d)).isPresent();
             final boolean hlmain40 = info.next.getProperty(SignalHL.STOPSIGNAL)
-                    .filter(c -> HL_40_MAIN.contains(c)).isPresent()
+                    .filter(c -> Signallists.HL_40_MAIN.contains(c)).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL).filter(HLExit.HL2_3::equals)
                             .isPresent();
 
