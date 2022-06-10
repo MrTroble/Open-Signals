@@ -31,7 +31,7 @@ public class GIRConfigKS {
         final DummySignal signalDummy = signalBase.copy();
         ksconfig.reset(signalBase);
         assertEquals(signalDummy, signalBase);
-        
+
         final DummySignal signalHP0next = DummyBuilder.start(STOPSIGNAL, KS.KS2)
                 .of(MAINSIGNAL, KSMain.HP0).of(ZS3, ZS32.OFF).of(ZS3V, ZS32.OFF)
                 .of(DISTANTSIGNAL, KSDistant.KS2).of(ZS2, ZS32.OFF).of(ZS2V, ZS32.OFF).build();
