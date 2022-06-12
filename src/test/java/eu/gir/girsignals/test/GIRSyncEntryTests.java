@@ -2,6 +2,7 @@ package eu.gir.girsignals.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.junit.jupiter.api.Assertions.assertTimeout;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -57,7 +58,7 @@ public class GIRSyncEntryTests {
         final NBTTagCompound compound = new NBTTagCompound();
         toSave.write(compound);
         final AtomicReference<ISaveable> fresh = new AtomicReference<>();
-        assertTimeout(Duration.ofMinutes(1), () -> {
+        assertTimeout(Duration.ofSeconds(1), () -> {
             do {
                 fresh.set(getter.get());
             } while (toSave.equals(fresh.get()));
@@ -75,6 +76,8 @@ public class GIRSyncEntryTests {
         final IPathEntry<Object> pathEntry2 = (IPathEntry<Object>) entry.newValue();
         pathEntry2.read(compound);
         assertEquals(pathEntry2, pathEntry);
+        assertNotEquals(pathEntry2.getName(), "defaultEntry");
+        assertNotEquals(pathEntry.getName(), "defaultEntry");
     }
 
     @Test
@@ -313,7 +316,7 @@ public class GIRSyncEntryTests {
                 entry -> entry.setValue(randomEnum(EnumGuiMode.class)));
 
         final BoolEntry bentry = new BoolEntry();
-        bentry.setValue(RANDOM.nextBoolean());
+        bentry.setValue(true);
         testINetworkSavable(bentry, () -> new BoolEntry(),
                 entry -> entry.setValue(RANDOM.nextBoolean()));
 
