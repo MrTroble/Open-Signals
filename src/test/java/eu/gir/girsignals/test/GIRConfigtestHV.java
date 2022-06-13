@@ -44,14 +44,69 @@ public class GIRConfigtestHV {
                 HPBlock.HP1, VR.VR0, ZS32.Z6, ZS32.OFF, 0);
         configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, HP.HP1,
                 HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 0);
+        for (ZS32 zs32 : ZS32.values()) {
+            if (zs32.ordinal() > 26 && zs32.ordinal() < 33 && zs32.ordinal() != 30) {
+                configtestHV(HP.HP2, HPHome.HP2, HPBlock.HP1, VR.VR2, zs32, zs32, HP.HP2,
+                        HPHome.HP2, HPBlock.HP1, VR.VR0, zs32, ZS32.OFF, zs32.ordinal() - 26);
+            } else if (zs32.ordinal() == 30) {
+                configtestHV(HP.HP2, HPHome.HP2, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, HP.HP1,
+                        HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, 4);
+            } else if (zs32.ordinal() > 32 && zs32.ordinal() < 43) {
+                configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, zs32, zs32, HP.HP1,
+                        HPHome.HP1, HPBlock.HP1, VR.VR1, zs32, zs32, zs32.ordinal() - 26);
+            }
+        }
 
         // HV -> HL
         configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, HL.HP0,
                 HLExit.HP0, HLDistant.HL10, HLLightbar.OFF, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, HL.HL10,
+                HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, HL.HL1,
+                HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.OFF, HL.HL2_3,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.Z6, HL.HL2_3,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.Z10, HL.HL2_3,
+                HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.OFF, HL.HL5_6,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.Z6, HL.HL5_6,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.Z10, HL.HL5_6,
+                HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.OFF, HL.HL8_9,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.Z6, HL.HL8_9,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.Z10, HL.HL8_9,
+                HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.OFF, HL.HL11_12,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.Z6, HL.HL11_12,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, 0);
+        configtestHV_HL(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.Z10, HL.HL11_12,
+                HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, 0);
 
         // HV -> KS
         configtestHV_KS(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, KS.HP0,
                 KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 0);
+        for (ZS32 zs32 : ZS32.values()) {
+            if (zs32.ordinal() > 26 && zs32.ordinal() < 33 && zs32.ordinal() != 30) {
+                configtestHV_KS(HP.HP2, HPHome.HP2, HPBlock.HP1, VR.VR2, zs32, zs32, KS.KS1,
+                        KSMain.KS1, KSDistant.KS1, zs32, ZS32.OFF, zs32.ordinal() - 26);
+            } else if (zs32.ordinal() == 30) {
+                configtestHV_KS(HP.HP2, HPHome.HP2, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.OFF, KS.KS1,
+                        KSMain.KS1, KSDistant.KS1, ZS32.Z4, ZS32.OFF, 4);
+            } else if (zs32.ordinal() > 32 && zs32.ordinal() < 43) {
+                configtestHV_KS(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, zs32, zs32, KS.KS1,
+                        KSMain.KS1, KSDistant.KS1, zs32, ZS32.OFF, zs32.ordinal() - 26);
+            }
+        }
+        configtestHV_KS(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, KS.HP0,
+                KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 0);
+
     }
 
     private void configtestHV(final HP hpcurrent, final HPHome hphomecurrent,
