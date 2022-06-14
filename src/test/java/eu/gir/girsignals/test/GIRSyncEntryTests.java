@@ -285,6 +285,7 @@ public class GIRSyncEntryTests {
         final NBTTagCompound network1 = new NBTTagCompound();
         savable.writeEntryNetwork(network1);
         final T test = atomic.get();
+        assertEquals(savable, test);
         test.readEntryNetwork(network1);
         assertEquals(savable, test);
         assertTimeout(Duration.ofSeconds(1), () -> {
@@ -326,10 +327,35 @@ public class GIRSyncEntryTests {
                 e -> e.setEntry(PathEntryType.PATHUSAGE, randomEnum(EnumPathUsage.class)));
 
         final SignalBoxNode node = new SignalBoxNode(new Point(RANDOM.nextInt(), RANDOM.nextInt()));
+        ModeSet testModeImpl = null;
+        for (int i = 0; i < 10; i++) {
+            final ModeSet mode = new ModeSet(randomEnum(EnumGuiMode.class),
+                    randomEnum(Rotation.class));
+            testModeImpl = mode;
+            node.add(mode);
+            final PathOptionEntry consumer = node.getOption(mode).get();
+            consumer.setEntry(PathEntryType.SPEED, RANDOM.nextInt());
+            consumer.setEntry(PathEntryType.PATHUSAGE, randomEnum(EnumPathUsage.class));
+            consumer.setEntry(PathEntryType.SIGNAL,
+                    new BlockPos(RANDOM.nextInt(), RANDOM.nextInt(), RANDOM.nextInt()));
+        }
+        final ModeSet testMode = testModeImpl;
         testINetworkSavable(node, () -> new SignalBoxNode(), n -> {
             for (int i = 0; i < 20; i++) {
-                n.add(new ModeSet(randomEnum(EnumGuiMode.class), randomEnum(Rotation.class)));
+                final ModeSet mode = new ModeSet(randomEnum(EnumGuiMode.class),
+                        randomEnum(Rotation.class));
+                n.add(mode);
+                final PathOptionEntry consumer = n.getOption(mode).get();
+                consumer.setEntry(PathEntryType.SPEED, RANDOM.nextInt());
+                consumer.setEntry(PathEntryType.PATHUSAGE, randomEnum(EnumPathUsage.class));
+                consumer.setEntry(PathEntryType.SIGNAL,
+                        new BlockPos(RANDOM.nextInt(), RANDOM.nextInt(), RANDOM.nextInt()));
             }
+            final PathOptionEntry consumer = n.getOption(testMode).get();
+            consumer.setEntry(PathEntryType.SPEED, RANDOM.nextInt());
+            consumer.setEntry(PathEntryType.PATHUSAGE, randomEnum(EnumPathUsage.class));
+            consumer.setEntry(PathEntryType.SIGNAL,
+                    new BlockPos(RANDOM.nextInt(), RANDOM.nextInt(), RANDOM.nextInt()));
             n.post();
         });
     }
@@ -350,11 +376,20 @@ public class GIRSyncEntryTests {
         assertTrue(opt.isPresent());
 
         final SignalBoxPathway pathway = opt.get();
-        assertTrue(pathway.getFirstPoint().equals(p1));
-        assertTrue(pathway.getLastPoint().equals(p2));
+        assertEquals(pathway.getFirstPoint(), p1);
+        assertEquals(pathway.getLastPoint(), p2);
 
         final SignalBoxPathway pathwayCopy = new SignalBoxPathway();
         testISavable(pathway, () -> pathwayCopy);
+        final NBTTagCompound testCompound = new NBTTagCompound();
+        pathwayCopy.writeEntryNetwork(testCompound);
+        assertEquals(pathway, pathwayCopy);
+        pathwayCopy.readEntryNetwork(testCompound);
+        assertEquals(pathway.getListOfNodes().size(), pathwayCopy.getListOfNodes().size());
+        for (int i = 0; i < pathway.getListOfNodes().size(); i++) {
+            assertEquals(pathway.getListOfNodes().get(i), pathway.getListOfNodes().get(i));
+        }
+        assertEquals(pathway, pathwayCopy);
 
         testINetworkSavable(pathway, () -> new SignalBoxPathway(), pw -> {
             pw.setPathStatus(EnumPathUsage.BLOCKED);
