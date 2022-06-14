@@ -21,7 +21,9 @@ public final class BlockposEntry extends IPathEntry<BlockPos> {
      */
     @Override
     public void read(final NBTTagCompound tag) {
-        this.position = NBTUtil.getPosFromTag((NBTTagCompound) tag.getTag(getName()));
+        final NBTTagCompound compound = (NBTTagCompound) tag.getTag(getName());
+        if (compound != null)
+            this.position = NBTUtil.getPosFromTag(compound);
     }
 
     /**

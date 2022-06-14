@@ -253,4 +253,11 @@ public class SignalBoxPathway implements INetworkSavable {
         listOfNodes.forEach(node -> node.readEntryNetwork(tag));
     }
 
+    /**
+     * @return the listOfNodes
+     */
+    public ImmutableList<SignalBoxNode> getListOfNodes() {
+        return listOfNodes;
+    }
+
 }
