@@ -1,5 +1,10 @@
 # Changelog
 
+## [Beta Update] 
+*feat: Ra11 added to signalbox
+*feat: rename signal via right click
+*serveral fixes with ZS3 and ZS3_PlATE
+
 ## [Beta Update] 08.05.2022
 * feat: ZS3_PLATE intigrated to Interoperability
 * fix: various fixes

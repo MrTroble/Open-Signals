@@ -144,7 +144,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     }
 
     @Override
-    public void updateTag(NBTTagCompound compound) {
+    public void updateTag(final NBTTagCompound compound) {
         if (compound.hasKey(CUSTOMNAME))
             setCustomName(compound.getString(CUSTOMNAME));
         syncClient();

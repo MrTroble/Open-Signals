@@ -24,7 +24,6 @@ import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.signalbox.config.HLSignalConfig;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
-import eu.gir.girsignals.signalbox.config.Signallists;
 import eu.gir.girsignals.test.DummySignal.DummyBuilder;
 
 public class GIRConfigtestHL {
@@ -66,81 +65,79 @@ public class GIRConfigtestHL {
                 HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, 10);
 
         // HL -> KS
-        for (KS ks : Signallists.STOP_KS) {
-            configtestHL_KS(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, ks, KSMain.HP0,
-                    KSDistant.KS2, ZS32.OFF, ZS32.OFF, 0);
-        }
-        configtestHL_KS(HL.HL1, HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+        configtestHLKS(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, KS.HP0, KSMain.HP0,
+                KSDistant.KS2, ZS32.OFF, ZS32.OFF, 0);
+        configtestHLKS(HL.HL1, HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, KS.KS1, KSMain.KS1,
                 KSDistant.KS1, ZS32.OFF, ZS32.OFF, 0);
 
-        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, KS.KS2, KSMain.KS1,
+        configtestHLKS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, KS.KS2, KSMain.KS1,
                 KSDistant.KS2, ZS32.OFF, ZS32.OFF, 4);
-        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, KS.KS2,
+        configtestHLKS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, KS.KS2,
                 KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, 6);
-        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, KS.KS2_LIGHT,
+        configtestHLKS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, KS.KS2_LIGHT,
                 KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, 10);
 
-        configtestHL_KS(HL.HL4, HLExit.HL1, HLDistant.HL4, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+        configtestHLKS(HL.HL4, HLExit.HL1, HLDistant.HL4, HLLightbar.OFF, KS.KS1, KSMain.KS1,
                 KSDistant.KS1, ZS32.Z10, ZS32.OFF, 0);
-        configtestHL_KS(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+        configtestHLKS(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.OFF, KS.KS1, KSMain.KS1,
                 KSDistant.KS1, ZS32.Z10, ZS32.OFF, 4);
-        configtestHL_KS(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.YELLOW, KS.KS1,
+        configtestHLKS(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.YELLOW, KS.KS1,
                 KSMain.KS1, KSDistant.KS1, ZS32.Z10, ZS32.OFF, 6);
-        configtestHL_KS(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, KS.KS1, KSMain.KS1,
+        configtestHLKS(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, KS.KS1, KSMain.KS1,
                 KSDistant.KS1, ZS32.Z10, ZS32.OFF, 10);
 
-        configtestHL_KS(HL.HL7, HLExit.HL1, HLDistant.HL7, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+        configtestHLKS(HL.HL7, HLExit.HL1, HLDistant.HL7, HLLightbar.OFF, KS.KS1, KSMain.KS1,
                 KSDistant.KS1, ZS32.Z4, ZS32.OFF, 0);
-        configtestHL_KS(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+        configtestHLKS(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, KS.KS1, KSMain.KS1,
                 KSDistant.KS1, ZS32.Z4, ZS32.OFF, 4);
-        configtestHL_KS(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, KS.KS1,
+        configtestHLKS(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, KS.KS1,
                 KSMain.KS1, KSDistant.KS1, ZS32.Z4, ZS32.OFF, 6);
-        configtestHL_KS(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.GREEN, KS.KS1, KSMain.KS1,
+        configtestHLKS(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.GREEN, KS.KS1, KSMain.KS1,
                 KSDistant.KS1, ZS32.Z4, ZS32.OFF, 10);
 
-        configtestHL_KS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.OFF, KS.HP0,
+        configtestHLKS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.OFF, KS.HP0,
                 KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 4);
-        configtestHL_KS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.YELLOW, KS.HP0,
+        configtestHLKS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.YELLOW, KS.HP0,
                 KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 6);
-        configtestHL_KS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.GREEN, KS.HP0,
+        configtestHLKS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.GREEN, KS.HP0,
                 KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 10);
 
         // HL -> HV
-        configtestHL_HV(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, HP.HP0, HPHome.HP0,
+        configtestHLHV(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, HP.HP0, HPHome.HP0,
                 HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 0);
-        configtestHL_HV(HL.HL1, HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, HP.HP1, HPHome.HP1,
+        configtestHLHV(HL.HL1, HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, HP.HP1, HPHome.HP1,
                 HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 0);
 
-        configtestHL_HV(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, HP.HP1, HPHome.HP1,
+        configtestHLHV(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, HP.HP1, HPHome.HP1,
                 HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 4);
-        configtestHL_HV(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, HP.HP1,
+        configtestHLHV(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, HP.HP1,
                 HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 6);
-        configtestHL_HV(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, HP.HP1, HPHome.HP1,
+        configtestHLHV(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, HP.HP1, HPHome.HP1,
                 HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 10);
 
-        configtestHL_HV(HL.HL4, HLExit.HL1, HLDistant.HL4, HLLightbar.OFF, HP.HP1, HPHome.HP1,
+        configtestHLHV(HL.HL4, HLExit.HL1, HLDistant.HL4, HLLightbar.OFF, HP.HP1, HPHome.HP1,
                 HPBlock.HP1, VR.VR1, ZS32.Z10, ZS32.OFF, 0);
-        configtestHL_HV(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.OFF, HP.HP1, HPHome.HP1,
+        configtestHLHV(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.OFF, HP.HP1, HPHome.HP1,
                 HPBlock.HP1, VR.VR0, ZS32.Z10, ZS32.OFF, 4);
-        configtestHL_HV(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.YELLOW, HP.HP1,
+        configtestHLHV(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.YELLOW, HP.HP1,
                 HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.Z10, ZS32.OFF, 6);
-        configtestHL_HV(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, HP.HP1, HPHome.HP1,
+        configtestHLHV(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, HP.HP1, HPHome.HP1,
                 HPBlock.HP1, VR.VR0, ZS32.Z10, ZS32.OFF, 10);
 
-        configtestHL_HV(HL.HL7, HLExit.HL1, HLDistant.HL7, HLLightbar.OFF, HP.HP2, HPHome.HP2,
+        configtestHLHV(HL.HL7, HLExit.HL1, HLDistant.HL7, HLLightbar.OFF, HP.HP2, HPHome.HP2,
                 HPBlock.HP1, VR.VR1, ZS32.Z4, ZS32.OFF, 0);
-        configtestHL_HV(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, HP.HP2, HPHome.HP2,
+        configtestHLHV(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, HP.HP2, HPHome.HP2,
                 HPBlock.HP1, VR.VR1, ZS32.Z4, ZS32.OFF, 4);
-        configtestHL_HV(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, HP.HP2,
+        configtestHLHV(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, HP.HP2,
                 HPHome.HP2, HPBlock.HP1, VR.VR1, ZS32.Z4, ZS32.OFF, 6);
-        configtestHL_HV(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.GREEN, HP.HP2, HPHome.HP2,
+        configtestHLHV(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.GREEN, HP.HP2, HPHome.HP2,
                 HPBlock.HP1, VR.VR1, ZS32.Z4, ZS32.OFF, 10);
 
-        configtestHL_HV(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.OFF, HP.HP0,
+        configtestHLHV(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.OFF, HP.HP0,
                 HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 4);
-        configtestHL_HV(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.YELLOW, HP.HP0,
+        configtestHLHV(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.YELLOW, HP.HP0,
                 HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 6);
-        configtestHL_HV(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.GREEN, HP.HP0,
+        configtestHLHV(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.GREEN, HP.HP0,
                 HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 10);
     }
 
@@ -152,8 +149,8 @@ public class GIRConfigtestHL {
         final DummySignal signalBase = DummyBuilder.start(STOPSIGNAL, HL.HP0)
                 .of(EXITSIGNAL, HLExit.HP0).of(DISTANTSIGNAL, HLDistant.HL10)
                 .of(LIGHTBAR, HLLightbar.OFF).build();
-        final DummySignal DummySignal = signalBase.copy();
-        config.reset(DummySignal);
+        final DummySignal dummySignal = signalBase.copy();
+        config.reset(dummySignal);
 
         final DummySignal signalDummy = DummyBuilder.start(STOPSIGNAL, hlcurrent)
                 .of(EXITSIGNAL, exitcurrent).of(DISTANTSIGNAL, distantcurrent)
@@ -162,11 +159,11 @@ public class GIRConfigtestHL {
         final DummySignal signalnext = DummyBuilder.start(STOPSIGNAL, hlnext)
                 .of(EXITSIGNAL, exitnext).of(DISTANTSIGNAL, distantnext).of(LIGHTBAR, lightnext)
                 .build();
-        config.change(new ConfigInfo(DummySignal, signalnext, speed));
-        assertEquals(signalDummy, DummySignal);
+        config.change(new ConfigInfo(dummySignal, signalnext, speed));
+        assertEquals(signalDummy, dummySignal);
     }
 
-    private void configtestHL_KS(final HL hlcurrent, final HLExit exitcurrent,
+    private void configtestHLKS(final HL hlcurrent, final HLExit exitcurrent,
             final HLDistant distantcurrent, final HLLightbar lightcurrent, final KS ksnext,
             final KSMain ksmainnext, final KSDistant distantnext, final ZS32 zs3next,
             final ZS32 zs3vnext, final int speed) {
@@ -174,8 +171,8 @@ public class GIRConfigtestHL {
         final DummySignal signalBase = DummyBuilder.start(STOPSIGNAL, HL.HP0)
                 .of(EXITSIGNAL, HLExit.HP0).of(DISTANTSIGNAL, HLDistant.HL10)
                 .of(LIGHTBAR, HLLightbar.OFF).build();
-        final DummySignal DummySignal = signalBase.copy();
-        config.reset(DummySignal);
+        final DummySignal dummySignal = signalBase.copy();
+        config.reset(dummySignal);
 
         final DummySignal signalDummy = DummyBuilder.start(STOPSIGNAL, hlcurrent)
                 .of(EXITSIGNAL, exitcurrent).of(DISTANTSIGNAL, distantcurrent)
@@ -184,11 +181,11 @@ public class GIRConfigtestHL {
         final DummySignal signalnext = DummyBuilder.start(SignalKS.STOPSIGNAL, ksnext)
                 .of(SignalKS.MAINSIGNAL, ksmainnext).of(SignalKS.DISTANTSIGNAL, distantnext)
                 .of(SignalKS.ZS3, zs3next).of(SignalKS.ZS3V, zs3vnext).build();
-        config.change(new ConfigInfo(DummySignal, signalnext, speed));
-        assertEquals(signalDummy, DummySignal);
+        config.change(new ConfigInfo(dummySignal, signalnext, speed));
+        assertEquals(signalDummy, dummySignal);
     }
 
-    private void configtestHL_HV(final HL hlcurrent, final HLExit exitcurrent,
+    private void configtestHLHV(final HL hlcurrent, final HLExit exitcurrent,
             final HLDistant distantcurrent, final HLLightbar lightcurrent, final HP hpnext,
             final HPHome hphomenext, final HPBlock hpblocknext, final VR vrnext, final ZS32 zs3next,
             final ZS32 zs3vnext, final int speed) {
@@ -196,8 +193,8 @@ public class GIRConfigtestHL {
         final DummySignal signalBase = DummyBuilder.start(STOPSIGNAL, HL.HP0)
                 .of(EXITSIGNAL, HLExit.HP0).of(DISTANTSIGNAL, HLDistant.HL10)
                 .of(LIGHTBAR, HLLightbar.OFF).build();
-        final DummySignal DummySignal = signalBase.copy();
-        config.reset(DummySignal);
+        final DummySignal dummySignal = signalBase.copy();
+        config.reset(dummySignal);
 
         final DummySignal signalDummy = DummyBuilder.start(STOPSIGNAL, hlcurrent)
                 .of(EXITSIGNAL, exitcurrent).of(DISTANTSIGNAL, distantcurrent)
@@ -207,7 +204,7 @@ public class GIRConfigtestHL {
                 .of(SignalHV.HPHOME, hphomenext).of(SignalHV.HPBLOCK, hpblocknext)
                 .of(SignalHV.DISTANTSIGNAL, vrnext).of(SignalHV.ZS3, zs3next)
                 .of(SignalHV.ZS3V, zs3vnext).build();
-        config.change(new ConfigInfo(DummySignal, signalnext, speed));
-        assertEquals(signalDummy, DummySignal);
+        config.change(new ConfigInfo(dummySignal, signalnext, speed));
+        assertEquals(signalDummy, dummySignal);
     }
 }

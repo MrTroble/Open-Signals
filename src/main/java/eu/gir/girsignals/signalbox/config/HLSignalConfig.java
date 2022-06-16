@@ -107,8 +107,10 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final boolean hvgo = info.next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP1::equals)
                     .isPresent()
                     || info.next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent()
-                    || info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP1::equals).isPresent()
-                    || info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals).isPresent()
+                    || info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP1::equals)
+                            .isPresent();
+            final boolean hvgo2 = info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
+                    .isPresent()
                     || info.next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP1::equals)
                             .isPresent();
             final boolean hv40 = info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
@@ -129,8 +131,8 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     || hlexit.filter(HLExit.HL2_3::equals).isPresent())
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
 
-            final boolean normalSpeed = (hlStop.filter(Signallists.HL_UNCHANGED::contains).isPresent()
-                    || hlexit.filter(HLExit.HL1::equals).isPresent())
+            final boolean normalSpeed = (hlStop.filter(Signallists.HL_UNCHANGED::contains)
+                    .isPresent() || hlexit.filter(HLExit.HL1::equals).isPresent())
                     && (!optionalLightBar.isPresent()
                             || optionalLightBar.filter(HLLightbar.OFF::equals).isPresent());
 
@@ -156,7 +158,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             }
             speedCheckExit(info.speed, values, HLExit.HL1, HLExit.HL2_3);
             if (nextks || nexthv) {
-                if (ksgo || hvgo) {
+                if (ksgo || hvgo || hvgo2) {
                     if (hv40) {
                         speedCheck(info.speed, values, HL.HL7, HL.HL8_9);
                         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);

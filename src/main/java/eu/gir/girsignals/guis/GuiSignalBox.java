@@ -277,7 +277,7 @@ public class GuiSignalBox extends GuiBase {
     })
     private void sort(final SortOptions sort) {
         final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
-        final ArrayList<Entry<BlockPos, LinkType>> Settingslist = new ArrayList(entrySet);
+        final ArrayList<Entry<BlockPos, LinkType>> settingslist = new ArrayList(entrySet);
         switch (sort) {
             case DISABLED:
                 break;
@@ -286,11 +286,11 @@ public class GuiSignalBox extends GuiBase {
             case NAME_DESCENIDNG:
                 break;
             case TYPE_ASSANDING:
-                Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
+                settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
                         o2.getValue().ordinal()));
                 break;
             case TYPE_DESCENDING:
-                Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
+                settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
                         o2.getValue().ordinal()));
                 break;
             case DISTANCE_ASSANDING:
@@ -312,9 +312,9 @@ public class GuiSignalBox extends GuiBase {
         @SuppressWarnings({
                 "rawtypes", "unchecked"
         })
-        IIntegerable<SortOptions> SortOptions = new EnumIntegerable(EnumSignals.SortOptions.class);
-        list.add(GuiElements.createEnumElement(SortOptions, id -> {
-            SortOptions.getObjFromID(id);
+        IIntegerable<SortOptions> sortOptions = new EnumIntegerable(EnumSignals.SortOptions.class);
+        list.add(GuiElements.createEnumElement(sortOptions, id -> {
+            sortOptions.getObjFromID(id);
         }));
         list.add(uibox);
         list.setInheritHeight(true);
