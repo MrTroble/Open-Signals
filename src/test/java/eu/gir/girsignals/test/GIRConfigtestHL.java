@@ -24,6 +24,7 @@ import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.signalbox.config.HLSignalConfig;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
+import eu.gir.girsignals.signalbox.config.Signallists;
 import eu.gir.girsignals.test.DummySignal.DummyBuilder;
 
 public class GIRConfigtestHL {
@@ -38,6 +39,9 @@ public class GIRConfigtestHL {
                 HLDistant.HL10, HLLightbar.OFF, 0);
         configtestHL(HL.HL1, HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, HL.HL10, HLExit.HL1,
                 HLDistant.HL1, HLLightbar.OFF, 0);
+        configtestHL(HL.HL4, HLExit.HL1, HLDistant.HL4, HLLightbar.OFF, HL.HL2_3, HLExit.HL2_3,
+                HLDistant.HL1, HLLightbar.GREEN, 0);
+
         configtestHL(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.OFF, HL.HP0, HLExit.HP0,
                 HLDistant.HL10, HLLightbar.OFF, 4);
         configtestHL(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.YELLOW, HL.HP0,
@@ -45,9 +49,54 @@ public class GIRConfigtestHL {
         configtestHL(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.GREEN, HL.HP0, HLExit.HP0,
                 HLDistant.HL10, HLLightbar.OFF, 10);
 
+        configtestHL(HL.HL7, HLExit.HL1, HLDistant.HL7, HLLightbar.OFF, HL.HL11_12, HLExit.HL2_3,
+                HLDistant.HL7, HLLightbar.OFF, 0);
+        configtestHL(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, HL.HL11_12,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, 4);
+        configtestHL(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, HL.HL11_12,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, 6);
+        configtestHL(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.GREEN, HL.HL11_12,
+                HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, 10);
+
+        configtestHL(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, HL.HL2_3, HLExit.HL2_3,
+                HLDistant.HL1, HLLightbar.OFF, 4);
+        configtestHL(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, HL.HL2_3,
+                HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, 6);
+        configtestHL(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, HL.HL2_3,
+                HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, 10);
+
         // HL -> KS
-        configtestHL_KS(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, KS.HP0, KSMain.HP0,
-                KSDistant.KS2, ZS32.OFF, ZS32.OFF, 0);
+        for (KS ks : Signallists.STOP_KS) {
+            configtestHL_KS(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, ks, KSMain.HP0,
+                    KSDistant.KS2, ZS32.OFF, ZS32.OFF, 0);
+        }
+        configtestHL_KS(HL.HL1, HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+                KSDistant.KS1, ZS32.OFF, ZS32.OFF, 0);
+
+        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, KS.KS2, KSMain.KS1,
+                KSDistant.KS2, ZS32.OFF, ZS32.OFF, 4);
+        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, KS.KS2,
+                KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, 6);
+        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, KS.KS2_LIGHT,
+                KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, 10);
+
+        configtestHL_KS(HL.HL4, HLExit.HL1, HLDistant.HL4, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+                KSDistant.KS1, ZS32.Z10, ZS32.OFF, 0);
+        configtestHL_KS(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+                KSDistant.KS1, ZS32.Z10, ZS32.OFF, 4);
+        configtestHL_KS(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.YELLOW, KS.KS1,
+                KSMain.KS1, KSDistant.KS1, ZS32.Z10, ZS32.OFF, 6);
+        configtestHL_KS(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, KS.KS1, KSMain.KS1,
+                KSDistant.KS1, ZS32.Z10, ZS32.OFF, 10);
+
+        configtestHL_KS(HL.HL7, HLExit.HL1, HLDistant.HL7, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+                KSDistant.KS1, ZS32.Z4, ZS32.OFF, 0);
+        configtestHL_KS(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, KS.KS1, KSMain.KS1,
+                KSDistant.KS1, ZS32.Z4, ZS32.OFF, 4);
+        configtestHL_KS(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, KS.KS1,
+                KSMain.KS1, KSDistant.KS1, ZS32.Z4, ZS32.OFF, 6);
+        configtestHL_KS(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.GREEN, KS.KS1, KSMain.KS1,
+                KSDistant.KS1, ZS32.Z4, ZS32.OFF, 10);
 
         configtestHL_KS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.OFF, KS.HP0,
                 KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 4);
@@ -55,17 +104,44 @@ public class GIRConfigtestHL {
                 KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 6);
         configtestHL_KS(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.GREEN, KS.HP0,
                 KSMain.HP0, KSDistant.KS2, ZS32.OFF, ZS32.OFF, 10);
-        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, KS.KS2, KSMain.KS1,
-                KSDistant.KS2, ZS32.OFF, ZS32.OFF, 4);
-        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, KS.KS2,
-                KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, 6);
-        configtestHL_KS(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, KS.KS2_LIGHT,
-                KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, 10);
-        configtestHL_KS(HL.HL1, HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, KS.KS1, KSMain.KS1,
-                KSDistant.KS1, ZS32.OFF, ZS32.OFF, 0);
+
         // HL -> HV
         configtestHL_HV(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, HP.HP0, HPHome.HP0,
                 HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 0);
+        configtestHL_HV(HL.HL1, HLExit.HL1, HLDistant.HL1, HLLightbar.OFF, HP.HP1, HPHome.HP1,
+                HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 0);
+
+        configtestHL_HV(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, HP.HP1, HPHome.HP1,
+                HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 4);
+        configtestHL_HV(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, HP.HP1,
+                HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 6);
+        configtestHL_HV(HL.HL2_3, HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, HP.HP1, HPHome.HP1,
+                HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 10);
+
+        configtestHL_HV(HL.HL4, HLExit.HL1, HLDistant.HL4, HLLightbar.OFF, HP.HP1, HPHome.HP1,
+                HPBlock.HP1, VR.VR1, ZS32.Z10, ZS32.OFF, 0);
+        configtestHL_HV(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.OFF, HP.HP1, HPHome.HP1,
+                HPBlock.HP1, VR.VR0, ZS32.Z10, ZS32.OFF, 4);
+        configtestHL_HV(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.YELLOW, HP.HP1,
+                HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.Z10, ZS32.OFF, 6);
+        configtestHL_HV(HL.HL5_6, HLExit.HL2_3, HLDistant.HL4, HLLightbar.GREEN, HP.HP1, HPHome.HP1,
+                HPBlock.HP1, VR.VR0, ZS32.Z10, ZS32.OFF, 10);
+
+        configtestHL_HV(HL.HL7, HLExit.HL1, HLDistant.HL7, HLLightbar.OFF, HP.HP2, HPHome.HP2,
+                HPBlock.HP1, VR.VR1, ZS32.Z4, ZS32.OFF, 0);
+        configtestHL_HV(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.OFF, HP.HP2, HPHome.HP2,
+                HPBlock.HP1, VR.VR1, ZS32.Z4, ZS32.OFF, 4);
+        configtestHL_HV(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.YELLOW, HP.HP2,
+                HPHome.HP2, HPBlock.HP1, VR.VR1, ZS32.Z4, ZS32.OFF, 6);
+        configtestHL_HV(HL.HL8_9, HLExit.HL2_3, HLDistant.HL7, HLLightbar.GREEN, HP.HP2, HPHome.HP2,
+                HPBlock.HP1, VR.VR1, ZS32.Z4, ZS32.OFF, 10);
+
+        configtestHL_HV(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.OFF, HP.HP0,
+                HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 4);
+        configtestHL_HV(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.YELLOW, HP.HP0,
+                HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 6);
+        configtestHL_HV(HL.HL11_12, HLExit.HL2_3, HLDistant.HL10, HLLightbar.GREEN, HP.HP0,
+                HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 10);
     }
 
     private void configtestHL(final HL hlcurrent, final HLExit exitcurrent,
