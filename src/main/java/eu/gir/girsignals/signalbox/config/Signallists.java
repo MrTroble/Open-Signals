@@ -10,6 +10,9 @@ import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KSMain;
 
 public final class Signallists {
+    
+    private Signallists() {
+    }
 
     static final ArrayList<HL> HL_STOP = Lists.newArrayList(HL.HP0, HL.HP0_ALTERNATE_RED, HL.HL_ZS1,
             HL.HL_SHUNTING);
