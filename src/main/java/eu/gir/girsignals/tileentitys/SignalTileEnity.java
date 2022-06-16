@@ -19,7 +19,7 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SignalTileEnity extends SyncableTileEntity implements IWorldNameable,ISyncable{
+public class SignalTileEnity extends SyncableTileEntity implements IWorldNameable, ISyncable {
 
     private final HashMap<SEProperty<?>, Object> map = new HashMap<>();
 
@@ -121,8 +121,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
             map.put(Signal.CUSTOMNAME, true);
         }
         this.markDirty();
-        world.markBlockRangeForRenderUpdate(pos, pos);
-
+        this.syncClient();
     }
 
     @SideOnly(Side.CLIENT)
@@ -147,7 +146,6 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     public void updateTag(final NBTTagCompound compound) {
         if (compound.hasKey(CUSTOMNAME))
             setCustomName(compound.getString(CUSTOMNAME));
-        syncClient();
     }
 
     @Override
