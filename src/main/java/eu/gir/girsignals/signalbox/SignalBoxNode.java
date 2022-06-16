@@ -123,6 +123,8 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     @Override
     public void read(final NBTTagCompound compound) {
         final NBTTagList pointList = (NBTTagList) compound.getTag(POINT_LIST);
+        if (pointList == null)
+            return;
         pointList.forEach(e -> {
             final NBTTagCompound tag = (NBTTagCompound) e;
             final PathOptionEntry entry = new PathOptionEntry();
