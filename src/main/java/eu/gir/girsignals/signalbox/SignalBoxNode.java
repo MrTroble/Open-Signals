@@ -2,6 +2,7 @@ package eu.gir.girsignals.signalbox;
 
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
@@ -150,15 +151,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return Optional.empty();
     }
 
-    /**
-     * Get's the identifier of the given node
-     * 
-     * @return the identifier
-     */
-    public String getIdentifier() {
-        return identifier;
-    }
-
     public PathType getPathType(final SignalBoxNode other) {
         if (other == null || other.getPoint().equals(this.getPoint()))
             return PathType.NONE;
@@ -250,13 +242,21 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final NBTTagList points = (NBTTagList) tag.getTag(this.identifier);
         if (points == null)
             return;
+        if (points.hasNoTags()) {
+            this.possibleModes.clear();
+            return;
+        }
+        final Set<ModeSet> modeSets = new HashSet<>();
         points.forEach(nbt -> {
             final NBTTagCompound compound = (NBTTagCompound) nbt;
             final ModeSet set = new ModeSet(compound);
+            modeSets.add(set);
             final PathOptionEntry entry = this.possibleModes.computeIfAbsent(set,
                     _u -> new PathOptionEntry());
             entry.readEntryNetwork(compound);
         });
+        this.possibleModes.keySet().removeIf(mode -> !modeSets.contains(mode));
+        this.post();
     }
 
 }

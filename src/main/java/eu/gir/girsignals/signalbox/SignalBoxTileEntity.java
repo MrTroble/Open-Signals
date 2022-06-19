@@ -5,17 +5,13 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.REQUEST_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.fromNBT;
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.requestWay;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
 
-import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.LinkType;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.tileentitys.IChunkloadable;
@@ -37,7 +33,6 @@ import net.minecraft.world.chunk.Chunk;
 public class SignalBoxTileEntity extends SyncableTileEntity
         implements ISyncable, IChunkloadable, ILinkableTile {
 
-    public static final String ERROR_STRING = "error";
     public static final String REMOVE_SIGNAL = "removeSignal";
 
     private static final String LINKED_POS_LIST = "linkedPos";
@@ -45,13 +40,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     private static final String LINK_TYPE = "linkType";
 
     private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
-    private final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     private final Map<BlockPos, Signal> signals = new HashMap<>();
+    private final SignalBoxGrid grid = new SignalBoxGrid();
     private NBTTagCompound guiTag = new NBTTagCompound();
 
-    private final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
-    private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
-    private final Map<SignalBoxPathway, SignalBoxPathway> previousPathways = new HashMap<>(32);
     private WorldLoadOperations worldLoadOps = new WorldLoadOperations(null);
 
     @Override
@@ -86,52 +78,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             });
         }
         this.guiTag = compound.getCompoundTag(GUI_TAG);
-        this.updateModeGridFromUI();
         super.readFromNBT(compound);
         if (world != null)
             onLoad();
     }
 
-    private void updateModeGridFromUI() {
-        modeGrid.clear();
-        this.guiTag.getKeySet().forEach(key -> {
-            final String[] names = key.split("\\.");
-            if (names.length < 2)
-                return;
-            final int x = Integer.parseInt(names[0]);
-            final int y = Integer.parseInt(names[1]);
-            final SignalBoxNode node = new SignalBoxNode(new Point(x, y));
-            node.read(this.guiTag);
-            modeGrid.put(node.getPoint(), node);
-        });
-    }
-
-    private void sendGuiTag() {
-        this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
-    }
-
-    private void resendSignalTilesToUI() {
-        startsToPath.values().forEach(signal -> signal.write(guiTag));
-        sendGuiTag();
-    }
-
-    private void onWayAdd(final SignalBoxPathway pathway) {
-        pathway.setWorld(world);
-        startsToPath.put(pathway.getFirstPoint(), pathway);
-        endsToPath.put(pathway.getLastPoint(), pathway);
-        final SignalBoxPathway next = startsToPath.get(pathway.getLastPoint());
-        if (next != null)
-            previousPathways.put(next, pathway);
-        final SignalBoxPathway previous = endsToPath.get(pathway.getFirstPoint());
-        if (previous != null)
-            previousPathways.put(pathway, previous);
-        pathway.setPathStatus(EnumPathUsage.SELECTED);
-        pathway.updatePathwaySignals();
-        SignalBoxPathway previousPath = pathway;
-        while ((previousPath = previousPathways.get(previousPath)) != null) {
-            previousPath.updatePathwaySignals();
-        }
-        resendSignalTilesToUI();
+    private void sendTag(final NBTTagCompound tag) {
+        this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(tag, ui.getPlayer()));
     }
 
     @Override
@@ -150,37 +103,18 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         if (compound.hasKey(RESET_WAY)) {
             final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
             final Point p1 = fromNBT(request, POINT1);
-            final SignalBoxPathway pathway = startsToPath.get(p1);
-            if (pathway == null) {
-                GirsignalsMain.log.atWarn()
-                        .log("Signalboxpath is null, this should not be the case!");
-                return;
-            }
-            pathway.resetPathway();
-            resendSignalTilesToUI();
-            this.startsToPath.remove(pathway.getFirstPoint());
-            this.endsToPath.remove(pathway.getLastPoint());
-            this.previousPathways.remove(pathway);
-            this.previousPathways.entrySet().removeIf(entry -> entry.getValue().equals(pathway));
+            grid.resetPathway(compound, p1);
             return;
         }
         if (compound.hasKey(REQUEST_WAY)) {
             final NBTTagCompound request = (NBTTagCompound) compound.getTag(REQUEST_WAY);
             final Point p1 = fromNBT(request, POINT1);
             final Point p2 = fromNBT(request, POINT2);
-            final Optional<SignalBoxPathway> ways = requestWay(modeGrid, p1, p2);
-            if (ways.isPresent()) {
-                this.onWayAdd(ways.get());
-            } else {
-                final NBTTagCompound update = new NBTTagCompound();
-                update.setString(ERROR_STRING, "error.nopathfound");
-                this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(update, ui.getPlayer()));
-            }
+            grid.requestWay(world, p1, p2);
             return;
         }
-        this.guiTag = compound;
+        this.grid.updateModeGridFromUI(compound);
         this.syncClient();
-        updateModeGridFromUI();
     }
 
     @Override
@@ -258,15 +192,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         return ImmutableMap.copyOf(this.linkedBlocks);
     }
 
-    public boolean isEmpty() {
-        return this.modeGrid.isEmpty();
-    }
-
     public void updateRedstonInput(final BlockPos pos, final boolean power) {
         if (power) {
-            startsToPath.values().forEach(pathways -> pathways.tryBlock(pos));
-            startsToPath.values().forEach(pathways -> pathways.tryReset(pos));
-            resendSignalTilesToUI();
+            grid.setPowered(pos);
         }
     }
 

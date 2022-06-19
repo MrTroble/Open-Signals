@@ -120,9 +120,8 @@ public final class SignalBoxUtil {
                 return Double.compare(fscores.getOrDefault(n1, Double.MAX_VALUE),
                         fscores.getOrDefault(n2, Double.MAX_VALUE));
             }).get();
-            System.out.println(openList);
             openList.remove(currentNode);
-            final SignalBoxNode cSNode = modeGrid.get(currentNode);
+            final SignalBoxNode nextSignalnode = modeGrid.get(currentNode);
             if (currentNode.equals(p2)) {
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
                 for (Point point = currentNode; point != null; point = closedList.get(point)) {
@@ -131,10 +130,10 @@ public final class SignalBoxUtil {
                 }
                 return Optional.of(new SignalBoxPathway(nodes, pathType));
             }
-            if (cSNode == null)
+            if (nextSignalnode == null)
                 continue;
-            checker.nextNode = cSNode;
-            for (final Path entry : cSNode.connections()) {
+            checker.nextNode = nextSignalnode;
+            for (final Path entry : nextSignalnode.connections()) {
                 final Point neighbour = entry.point2;
                 checker.previous = closedList.get(currentNode);
                 checker.path = checker.previous == null || neighbour == null ? null
