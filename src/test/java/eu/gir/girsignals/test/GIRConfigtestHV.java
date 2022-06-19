@@ -38,13 +38,11 @@ public class GIRConfigtestHV {
         // HV -> HV
         configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, HP.HP0,
                 HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 0);
-        configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, HP.HP0,
-                HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 0);
         configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.Z6, HP.HP2, HPHome.HP2,
                 HPBlock.HP1, VR.VR0, ZS32.Z6, ZS32.OFF, 0);
         configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, HP.HP1,
                 HPHome.HP1, HPBlock.HP1, VR.VR1, ZS32.OFF, ZS32.OFF, 0);
-        for ( final ZS32 zs32 : ZS32.values()) {
+        for (final ZS32 zs32 : ZS32.values()) {
             if (zs32.ordinal() > 26 && zs32.ordinal() < 33 && zs32.ordinal() != 30) {
                 configtestHV(HP.HP2, HPHome.HP2, HPBlock.HP1, VR.VR2, zs32, zs32, HP.HP2,
                         HPHome.HP2, HPBlock.HP1, VR.VR0, zs32, ZS32.OFF, zs32.ordinal() - 26);
