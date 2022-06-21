@@ -29,7 +29,7 @@ import eu.gir.girsignals.test.DummySignal.DummyBuilder;
 
 public class GIRConfigtestKS {
 
-    final KSSignalConfig config = KSSignalConfig.INSTANCE;
+    private final KSSignalConfig config = KSSignalConfig.INSTANCE;
 
     @Test
     public void testKSConfig() {
@@ -52,16 +52,15 @@ public class GIRConfigtestKS {
         // KS -> HV
         configtestKSHV(KS.KS2, KSMain.KS1, KSDistant.KS2, ZS32.OFF, ZS32.OFF, HP.HP0, HPHome.HP0,
                 HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, 0);
-        
+
         for (final ZS32 zs32 : ZS32.values()) {
             if (zs32.ordinal() > 26 && zs32.ordinal() < 43) {
                 configtestKSHV(KS.KS1_BLINK, KSMain.KS1, KSDistant.KS1_BLINK, ZS32.OFF, zs32,
                         HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, zs32, ZS32.OFF, 0);
                 configtestKSHV(KS.KS1_BLINK, KSMain.KS1, KSDistant.KS1_BLINK, zs32, zs32, HP.HP1,
                         HPHome.HP1, HPBlock.HP1, VR.VR1, zs32, ZS32.OFF, zs32.ordinal() - 26);
-                configtestKSHV(KS.KS2, KSMain.KS1, KSDistant.KS2, zs32, ZS32.OFF,
-                        HP.HP0, HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF,
-                        zs32.ordinal() - 26);
+                configtestKSHV(KS.KS2, KSMain.KS1, KSDistant.KS2, zs32, ZS32.OFF, HP.HP0,
+                        HPHome.HP0, HPBlock.HP0, VR.VR0, ZS32.OFF, ZS32.OFF, zs32.ordinal() - 26);
             }
         }
         configtestKSHV(KS.KS1, KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, HP.HP1, HPHome.HP1,
@@ -137,10 +136,10 @@ public class GIRConfigtestKS {
 
         configtestKSHL(KS.KS1, KSMain.KS1, KSDistant.KS1, ZS32.OFF, ZS32.OFF, HL.HL7, HLExit.HL1,
                 HLDistant.HL1, HLLightbar.OFF, 0);
-        configtestKSHL(KS.KS1_BLINK, KSMain.KS1, KSDistant.KS1_BLINK, ZS32.OFF, ZS32.Z4,
-                HL.HL11_12, HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, 0);
-        configtestKSHL(KS.KS1_BLINK, KSMain.KS1, KSDistant.KS1_BLINK, ZS32.OFF, ZS32.Z6,
-                HL.HL11_12, HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, 0);
+        configtestKSHL(KS.KS1_BLINK, KSMain.KS1, KSDistant.KS1_BLINK, ZS32.OFF, ZS32.Z4, HL.HL11_12,
+                HLExit.HL2_3, HLDistant.HL1, HLLightbar.OFF, 0);
+        configtestKSHL(KS.KS1_BLINK, KSMain.KS1, KSDistant.KS1_BLINK, ZS32.OFF, ZS32.Z6, HL.HL11_12,
+                HLExit.HL2_3, HLDistant.HL1, HLLightbar.YELLOW, 0);
         configtestKSHL(KS.KS1_BLINK, KSMain.KS1, KSDistant.KS1_BLINK, ZS32.OFF, ZS32.Z10,
                 HL.HL11_12, HLExit.HL2_3, HLDistant.HL1, HLLightbar.GREEN, 0);
 
@@ -156,8 +155,7 @@ public class GIRConfigtestKS {
         final DummySignal signalBase = DummyBuilder.start(STOPSIGNAL, KS.HP0)
                 .of(MAINSIGNAL, KSMain.HP0).of(DISTANTSIGNAL, KSDistant.KS2).of(ZS3, ZS32.OFF)
                 .of(ZS3V, ZS32.OFF).build();
-        final DummySignal dummySignal = signalBase.copy();
-        config.reset(dummySignal);
+        config.reset(signalBase);
 
         final DummySignal signalDummy = DummyBuilder.start(STOPSIGNAL, kscurrent)
                 .of(MAINSIGNAL, ksmaincurrent).of(DISTANTSIGNAL, distantcurrent).of(ZS3, zs3current)
@@ -166,8 +164,8 @@ public class GIRConfigtestKS {
         final DummySignal signalnext = DummyBuilder.start(STOPSIGNAL, ksnext)
                 .of(MAINSIGNAL, ksmainnext).of(DISTANTSIGNAL, distantnext).of(ZS3, zs3next)
                 .of(ZS3V, zs3vnext).build();
-        config.change(new ConfigInfo(dummySignal, signalnext, speed));
-        assertEquals(signalDummy, dummySignal);
+        config.change(new ConfigInfo(signalBase, signalnext, speed));
+        assertEquals(signalDummy, signalBase);
     }
 
     private void configtestKSHV(final KS kscurrent, final KSMain ksmaincurrent,
@@ -178,8 +176,7 @@ public class GIRConfigtestKS {
         final DummySignal signalBase = DummyBuilder.start(STOPSIGNAL, KS.HP0)
                 .of(MAINSIGNAL, KSMain.HP0).of(DISTANTSIGNAL, KSDistant.KS2).of(ZS3, ZS32.OFF)
                 .of(ZS3V, ZS32.OFF).build();
-        final DummySignal dummySignal = signalBase.copy();
-        config.reset(dummySignal);
+        config.reset(signalBase);
 
         final DummySignal signalDummy = DummyBuilder.start(STOPSIGNAL, kscurrent)
                 .of(MAINSIGNAL, ksmaincurrent).of(DISTANTSIGNAL, distantcurrent).of(ZS3, zs3current)
@@ -189,8 +186,8 @@ public class GIRConfigtestKS {
                 .of(SignalHV.HPHOME, hphomenext).of(SignalHV.HPBLOCK, hpblocknext)
                 .of(SignalHV.DISTANTSIGNAL, vrnext).of(SignalHV.ZS3, zs3next)
                 .of(SignalHV.ZS3V, zs3vnext).build();
-        config.change(new ConfigInfo(dummySignal, signalnext, speed));
-        assertEquals(signalDummy, dummySignal);
+        config.change(new ConfigInfo(signalBase, signalnext, speed));
+        assertEquals(signalDummy, signalBase);
     }
 
     private void configtestKSHL(final KS kscurrent, final KSMain ksmaincurrent,
@@ -201,8 +198,7 @@ public class GIRConfigtestKS {
         final DummySignal signalBase = DummyBuilder.start(STOPSIGNAL, KS.HP0)
                 .of(MAINSIGNAL, KSMain.HP0).of(DISTANTSIGNAL, KSDistant.KS2).of(ZS3, ZS32.OFF)
                 .of(ZS3V, ZS32.OFF).build();
-        final DummySignal dummySignal = signalBase.copy();
-        config.reset(dummySignal);
+        config.reset(signalBase);
 
         final DummySignal signalDummy = DummyBuilder.start(STOPSIGNAL, kscurrent)
                 .of(MAINSIGNAL, ksmaincurrent).of(DISTANTSIGNAL, distantcurrent).of(ZS3, zs3current)
@@ -211,7 +207,7 @@ public class GIRConfigtestKS {
         final DummySignal signalnext = DummyBuilder.start(SignalHL.STOPSIGNAL, hlnext)
                 .of(SignalHL.EXITSIGNAL, exitnext).of(SignalHL.DISTANTSIGNAL, distantnext)
                 .of(SignalHL.LIGHTBAR, lightnext).build();
-        config.change(new ConfigInfo(dummySignal, signalnext, speed));
-        assertEquals(signalDummy, dummySignal);
+        config.change(new ConfigInfo(signalBase, signalnext, speed));
+        assertEquals(signalDummy, signalBase);
     }
 }
