@@ -8,6 +8,7 @@ import com.google.common.collect.ImmutableMap;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.guilib.ecs.interfaces.ISyncable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -18,7 +19,7 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SignalTileEnity extends SyncableTileEntity implements IWorldNameable {
+public class SignalTileEnity extends SyncableTileEntity implements IWorldNameable, ISyncable {
 
     private final HashMap<SEProperty<?>, Object> map = new HashMap<>();
 
@@ -120,8 +121,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
             map.put(Signal.CUSTOMNAME, true);
         }
         this.markDirty();
-        world.markBlockRangeForRenderUpdate(pos, pos);
-
+        this.syncClient();
     }
 
     @SideOnly(Side.CLIENT)
@@ -140,6 +140,17 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 
     public int getBlockID() {
         return blockID;
+    }
+
+    @Override
+    public void updateTag(final NBTTagCompound compound) {
+        if (compound.hasKey(CUSTOMNAME))
+            setCustomName(compound.getString(CUSTOMNAME));
+    }
+
+    @Override
+    public NBTTagCompound getTag() {
+        return null;
     }
 
 }

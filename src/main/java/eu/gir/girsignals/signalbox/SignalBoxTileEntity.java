@@ -24,6 +24,7 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
+import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
 import eu.gir.girsignals.signalbox.config.RSSignalConfig;
 import eu.gir.girsignals.tileentitys.IChunkloadable;
 import eu.gir.girsignals.tileentitys.RedstoneIOTileEntity;
@@ -122,7 +123,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         final ISignalAutoconfig config = override == null ? last.getConfig() : override;
         if (config == null)
             return;
-        config.change(speed, lastTile, nextTile);
+        final ConfigInfo info = new ConfigInfo(lastTile, nextTile, speed);
+        config.change(info);
     }
 
     private void loadAndConfig(final int speed, final BlockPos lastPosition,

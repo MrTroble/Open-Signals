@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -14,9 +13,11 @@ import java.util.function.Predicate;
 import eu.gir.girsignals.GIRSignalsConfig;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
+import eu.gir.guilib.ecs.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -366,7 +367,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return this.prop.height;
     }
 
-    public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
+    public boolean canHaveCustomname(final Map<SEProperty<?>, Object> map) {
         return this.prop.customNameRenderHeight != -1;
     }
 
@@ -445,4 +446,21 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return this.prop.config;
     }
 
+    @Override
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        final TileEntity tile = worldIn.getTileEntity(pos);
+        boolean customname = false;
+        if (tile instanceof SignalTileEnity) {
+            final SignalTileEnity signaltile = (SignalTileEnity) tile;
+            customname = canHaveCustomname(signaltile.getProperties());
+        }
+        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)
+                && (canBeLinked() || customname)) {
+            GuiHandler.invokeGui(Signal.class, playerIn, worldIn, pos);
+            return true;
+        }
+        return false;
+    }
 }

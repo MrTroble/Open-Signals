@@ -1,6 +1,6 @@
 package eu.gir.girsignals.blocks.boards;
 
-import java.util.HashMap;
+import java.util.Map;
 
 import eu.gir.girsignals.EnumSignals.OtherSignal;
 import eu.gir.girsignals.SEProperty;
@@ -21,7 +21,7 @@ public class SignalOther extends Signal {
             OtherSignal.HM, ChangeableStage.GUISTAGE, false);
 
     @Override
-    public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
+    public boolean canHaveCustomname(final Map<SEProperty<?>, Object> map) {
         return true;
     }
 
