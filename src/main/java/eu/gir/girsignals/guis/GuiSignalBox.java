@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 
-import eu.gir.girsignals.EnumSignals;
 import eu.gir.girsignals.EnumSignals.SortOptions;
 import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.EnumPathUsage;
@@ -28,7 +27,6 @@ import eu.gir.girsignals.signalbox.SignalBoxUtil;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
-import eu.gir.guilib.ecs.DrawUtil.EnumIntegerable;
 import eu.gir.guilib.ecs.DrawUtil.SizeIntegerables;
 import eu.gir.guilib.ecs.GuiBase;
 import eu.gir.guilib.ecs.GuiElements;
@@ -48,7 +46,6 @@ import eu.gir.guilib.ecs.entitys.render.UIScissor;
 import eu.gir.guilib.ecs.entitys.render.UITexture;
 import eu.gir.guilib.ecs.entitys.render.UIToolTip;
 import eu.gir.guilib.ecs.entitys.transform.UIScale;
-import eu.gir.guilib.ecs.interfaces.IIntegerable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
@@ -283,7 +280,7 @@ public class GuiSignalBox extends GuiBase {
     })
     private void sort(final SortOptions sort) {
         final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
-        final ArrayList<Entry<BlockPos, LinkType>> Settingslist = new ArrayList(entrySet);
+        final ArrayList<Entry<BlockPos, LinkType>> settingslist = new ArrayList(entrySet);
         switch (sort) {
             case DISABLED:
                 break;
@@ -292,11 +289,11 @@ public class GuiSignalBox extends GuiBase {
             case NAME_DESCENIDNG:
                 break;
             case TYPE_ASSANDING:
-                Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
+                settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
                         o2.getValue().ordinal()));
                 break;
             case TYPE_DESCENDING:
-                Settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
+                settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
                         o2.getValue().ordinal()));
                 break;
             case DISTANCE_ASSANDING:
@@ -315,15 +312,6 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.setInheritWidth(true);
         final UIEntity list = new UIEntity();
         final UIBox uibox = new UIBox(UIBox.VBOX, 2);
-        @SuppressWarnings({
-                "rawtypes", "unchecked"
-        })
-        final IIntegerable<SortOptions> SortOptions = new EnumIntegerable(
-                EnumSignals.SortOptions.class);
-        list.add(GuiElements.createEnumElement(SortOptions, id -> {
-            SortOptions.getObjFromID(id);
-        }));
-        list.add(uibox);
         list.setInheritHeight(true);
         list.setInheritWidth(true);
         box.getPositions().forEach((p, t) -> {

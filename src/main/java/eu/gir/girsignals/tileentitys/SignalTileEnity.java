@@ -121,8 +121,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
             map.put(Signal.CUSTOMNAME, true);
         }
         this.markDirty();
-        world.markBlockRangeForRenderUpdate(pos, pos);
-
+        this.syncClient();
     }
 
     @SideOnly(Side.CLIENT)
@@ -147,7 +146,6 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     public void updateTag(final NBTTagCompound compound) {
         if (compound.hasKey(CUSTOMNAME))
             setCustomName(compound.getString(CUSTOMNAME));
-        syncClient();
     }
 
     @Override
