@@ -8,13 +8,18 @@ import javax.annotation.Nullable;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.enums.EnumPathUsage;
+import eu.gir.girsignals.signalbox.entrys.ISaveable;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SignalBoxGrid {
+public class SignalBoxGrid implements ISaveable {
 
     public static final String ERROR_STRING = "error";
+
+    private static final String NODE_LIST = "nodeList";
+    private static final String PATHWAY_LIST = "pathwayList";
 
     private final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
     private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
@@ -74,6 +79,48 @@ public class SignalBoxGrid {
     public void setPowered(final BlockPos pos) {
         startsToPath.values().forEach(pathway -> pathway.tryBlock(pos));
         startsToPath.values().forEach(pathway -> pathway.tryReset(pos));
+    }
+
+    @Override
+    public void write(final NBTTagCompound tag) {
+        final NBTTagList list = new NBTTagList();
+        modeGrid.values().forEach(node -> {
+            final NBTTagCompound nodeTag = new NBTTagCompound();
+            node.write(nodeTag);
+            list.appendTag(nodeTag);
+        });
+        tag.setTag(NODE_LIST, list);
+        final NBTTagList pathList = new NBTTagList();
+        startsToPath.values().forEach(pathway -> {
+            final NBTTagCompound path = new NBTTagCompound();
+            pathway.write(path);
+            pathList.appendTag(path);
+        });
+        tag.setTag(PATHWAY_LIST, pathList);
+    }
+
+    private void clearPaths() {
+        previousPathways.clear();
+        startsToPath.clear();
+        endsToPath.clear();
+    }
+
+    @Override
+    public void read(final NBTTagCompound tag) {
+        clearPaths();
+        modeGrid.clear();
+        final NBTTagList nodes = (NBTTagList) tag.getTag(NODE_LIST);
+        nodes.forEach(comp -> {
+            final SignalBoxNode node = new SignalBoxNode();
+            node.read(tag);
+            modeGrid.put(node.getPoint(), node);
+        });
+        final NBTTagList list = (NBTTagList) tag.getTag(PATHWAY_LIST);
+        list.forEach(comp -> {
+            final SignalBoxPathway pathway = new SignalBoxPathway(this.modeGrid);
+            pathway.read(tag);
+            onWayAdd(null, pathway);
+        });
     }
 
 }

@@ -259,4 +259,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         this.post();
     }
 
+    /**
+     * @return the identifier
+     */
+    public String getIdentifier() {
+        return identifier;
+    }
+
 }

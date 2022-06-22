@@ -128,7 +128,7 @@ public final class SignalBoxUtil {
                     final SignalBoxNode boxNode = modeGrid.get(point);
                     nodes.add(boxNode);
                 }
-                return Optional.of(new SignalBoxPathway(nodes, pathType));
+                return Optional.of(new SignalBoxPathway(modeGrid, nodes, pathType));
             }
             if (nextSignalnode == null)
                 continue;

@@ -21,6 +21,7 @@ import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.LinkType;
 import eu.gir.girsignals.signalbox.ModeSet;
 import eu.gir.girsignals.signalbox.Point;
+import eu.gir.girsignals.signalbox.SignalBoxGrid;
 import eu.gir.girsignals.signalbox.SignalBoxNode;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
@@ -77,8 +78,8 @@ public class GuiSignalBox extends GuiBase {
 
     private void update(final NBTTagCompound compound) {
         this.resetTileSelection();
-        if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
-            final String error = I18n.format(compound.getString(SignalBoxTileEntity.ERROR_STRING));
+        if (compound.hasKey(SignalBoxGrid.ERROR_STRING)) {
+            final String error = I18n.format(compound.getString(SignalBoxGrid.ERROR_STRING));
             final UIToolTip tooltip = new UIToolTip(error);
             entity.add(tooltip);
             new Thread(() -> {

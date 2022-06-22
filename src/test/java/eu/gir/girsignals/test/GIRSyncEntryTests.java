@@ -379,7 +379,7 @@ public class GIRSyncEntryTests {
         assertEquals(pathway.getFirstPoint(), p1);
         assertEquals(pathway.getLastPoint(), p2);
 
-        final SignalBoxPathway pathwayCopy = new SignalBoxPathway();
+        final SignalBoxPathway pathwayCopy = new SignalBoxPathway(map);
         testISavable(pathway, () -> pathwayCopy);
         final NBTTagCompound testCompound = new NBTTagCompound();
         pathwayCopy.writeEntryNetwork(testCompound);
@@ -391,8 +391,19 @@ public class GIRSyncEntryTests {
         }
         assertEquals(pathway, pathwayCopy);
 
-        testINetworkSavable(pathway, () -> new SignalBoxPathway(), pw -> {
-            pw.setPathStatus(EnumPathUsage.BLOCKED);
+        pathway.setPathStatus(EnumPathUsage.BLOCKED);
+        assertEquals(pathway, pathwayCopy);
+
+        final Map<Point, SignalBoxNode> map2 = new HashMap<>();
+        map.forEach((p, n) -> {
+            final SignalBoxNode node = new SignalBoxNode(new Point(p));
+            final NBTTagCompound comp = new NBTTagCompound();
+            n.write(comp);
+            node.read(comp);
+            map2.put(node.getPoint(), node);
+        });
+        testINetworkSavable(pathway, () -> new SignalBoxPathway(map2), pw -> {
+            pw.setPathStatus(EnumPathUsage.FREE);
         });
     }
 }

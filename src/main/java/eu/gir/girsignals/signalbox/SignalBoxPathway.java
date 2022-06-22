@@ -39,16 +39,15 @@ public class SignalBoxPathway implements INetworkSavable {
     private int speed = -1;
     private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
     private WorldLoadOperations loadOps = new WorldLoadOperations(null);
+    private Map<Point, SignalBoxNode> modeGrid = null;
 
-    public SignalBoxPathway() {
+    public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
+        this.modeGrid = modeGrid;
     }
 
-    /**
-     * Creates a new pathway
-     * 
-     * @param pNodes the nodes that are contained in this pathway
-     */
-    public SignalBoxPathway(final List<SignalBoxNode> pNodes, final PathType type) {
+    public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid,
+            final List<SignalBoxNode> pNodes, final PathType type) {
+        this(modeGrid);
         this.listOfNodes = ImmutableList.copyOf(pNodes);
         this.type = Objects.requireNonNull(type);
         if (listOfNodes.size() < 2)
@@ -94,6 +93,7 @@ public class SignalBoxPathway implements INetworkSavable {
             if (possiblePosition != null)
                 return possiblePosition;
         }
+
         return null;
     }
 
@@ -105,7 +105,7 @@ public class SignalBoxPathway implements INetworkSavable {
         final NBTTagList nodesNBT = new NBTTagList();
         listOfNodes.forEach(node -> {
             final NBTTagCompound entry = new NBTTagCompound();
-            node.write(entry);
+            node.getPoint().write(entry);
             nodesNBT.appendTag(entry);
         });
         tag.setTag(LIST_OF_NODES, nodesNBT);
@@ -118,9 +118,9 @@ public class SignalBoxPathway implements INetworkSavable {
         final Builder<SignalBoxNode> nodeBuilder = ImmutableList.builder();
         nodesNBT.forEach(c -> {
             final NBTTagCompound nodeNBT = (NBTTagCompound) c;
-            final SignalBoxNode node = new SignalBoxNode();
-            node.read(nodeNBT);
-            nodeBuilder.add(node);
+            final Point point = new Point();
+            point.read(nodeNBT);
+            nodeBuilder.add(modeGrid.get(point));
         });
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));

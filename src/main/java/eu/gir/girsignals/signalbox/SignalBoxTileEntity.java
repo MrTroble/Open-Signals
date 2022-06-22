@@ -18,7 +18,6 @@ import eu.gir.girsignals.tileentitys.IChunkloadable;
 import eu.gir.girsignals.tileentitys.RedstoneIOTileEntity;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
-import eu.gir.guilib.ecs.GuiSyncNetwork;
 import eu.gir.guilib.ecs.interfaces.ISyncable;
 import eu.gir.linkableapi.ILinkableTile;
 import net.minecraft.block.Block;
@@ -81,10 +80,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         super.readFromNBT(compound);
         if (world != null)
             onLoad();
-    }
-
-    private void sendTag(final NBTTagCompound tag) {
-        this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(tag, ui.getPlayer()));
     }
 
     @Override
