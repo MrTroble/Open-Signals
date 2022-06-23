@@ -2,6 +2,7 @@ package eu.gir.girsignals.signalbox;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.annotation.Nullable;
@@ -123,4 +124,32 @@ public class SignalBoxGrid implements ISaveable {
         });
     }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(endsToPath, modeGrid, previousPathways, startsToPath);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final SignalBoxGrid other = (SignalBoxGrid) obj;
+        return Objects.equals(endsToPath, other.endsToPath)
+                && Objects.equals(modeGrid, other.modeGrid)
+                && Objects.equals(previousPathways, other.previousPathways)
+                && Objects.equals(startsToPath, other.startsToPath);
+    }
+
+    @Override
+    public String toString() {
+        return "SignalBoxGrid [modeGrid=" + modeGrid + "]";
+    }
+
+    public boolean isEmpty() {
+        return this.modeGrid.isEmpty();
+    }
 }

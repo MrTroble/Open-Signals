@@ -23,6 +23,7 @@ import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.signalbox.ModeSet;
 import eu.gir.girsignals.signalbox.Path;
 import eu.gir.girsignals.signalbox.Point;
+import eu.gir.girsignals.signalbox.SignalBoxGrid;
 import eu.gir.girsignals.signalbox.SignalBoxNode;
 import eu.gir.girsignals.signalbox.SignalBoxPathway;
 import eu.gir.girsignals.signalbox.SignalBoxUtil;
@@ -405,5 +406,19 @@ public class GIRSyncEntryTests {
         testINetworkSavable(pathway, () -> new SignalBoxPathway(map2), pw -> {
             pw.setPathStatus(EnumPathUsage.FREE);
         });
+    }
+
+    private SignalBoxGrid makeGrid() {
+        final SignalBoxGrid grid = new SignalBoxGrid();
+        final Map<Point, SignalBoxNode> map = generateMap(50, 50);
+        final NBTTagCompound compound = new NBTTagCompound();
+        map.values().forEach(node -> node.writeEntryNetwork(compound));
+        grid.updateModeGridFromUI(compound);
+        return grid;
+    }
+
+    @Test
+    public void testSignalBoxGrid() {
+        final SignalBoxGrid grid = new SignalBoxGrid();
     }
 }
