@@ -20,8 +20,6 @@ import net.minecraft.world.World;
 
 public class SignalBoxGrid implements ISaveable {
 	
-	public static final String ERROR_STRING = "error";
-	
 	private static final String NODE_LIST = "nodeList";
 	private static final String PATHWAY_LIST = "pathwayList";
 	
@@ -63,14 +61,13 @@ public class SignalBoxGrid implements ISaveable {
 		this.previousPathways.entrySet().removeIf(entry -> entry.getValue().equals(pathway));
 	}
 	
-	public void requestWay(final @Nullable World world, final Point p1, final Point p2) {
+	public boolean requestWay(final @Nullable World world, final Point p1, final Point p2) {
 		final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
 		if (ways.isPresent()) {
 			this.onWayAdd(world, ways.get());
-		} else {
-			final NBTTagCompound update = new NBTTagCompound();
-			update.setString(ERROR_STRING, "error.nopathfound");
+			return true;
 		}
+		return false;
 	}
 	
 	private void onWayAdd(final @Nullable World world, final SignalBoxPathway pathway) {

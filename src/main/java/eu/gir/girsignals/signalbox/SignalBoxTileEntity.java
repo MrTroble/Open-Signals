@@ -29,168 +29,167 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
-public class SignalBoxTileEntity extends SyncableTileEntity
-        implements ISyncable, IChunkloadable, ILinkableTile {
-
-    public static final String REMOVE_SIGNAL = "removeSignal";
-
-    private static final String LINKED_POS_LIST = "linkedPos";
-    private static final String GUI_TAG = "guiTag";
-    private static final String LINK_TYPE = "linkType";
-
-    private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
-    private final Map<BlockPos, Signal> signals = new HashMap<>();
-    private final SignalBoxGrid grid = new SignalBoxGrid();
-    private NBTTagCompound guiTag = new NBTTagCompound();
-
-    private WorldLoadOperations worldLoadOps = new WorldLoadOperations(null);
-
-    @Override
-    public void setWorld(final World worldIn) {
-        super.setWorld(worldIn);
-        worldLoadOps = new WorldLoadOperations(world);
-    }
-
-    @Override
-    public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
-        final NBTTagList list = new NBTTagList();
-        linkedBlocks.forEach((p, t) -> {
-            final NBTTagCompound item = NBTUtil.createPosTag(p);
-            item.setString(LINK_TYPE, t.name());
-            list.appendTag(item);
-        });
-        compound.setTag(LINKED_POS_LIST, list);
-        compound.setTag(GUI_TAG, guiTag);
-        return super.writeToNBT(compound);
-    }
-
-    @Override
-    public void readFromNBT(final NBTTagCompound compound) {
-        final NBTTagList list = (NBTTagList) compound.getTag(LINKED_POS_LIST);
-        if (list != null) {
-            linkedBlocks.clear();
-            list.forEach(pos -> {
-                final NBTTagCompound item = (NBTTagCompound) pos;
-                if (item.hasKey(LINK_TYPE))
-                    linkedBlocks.put(NBTUtil.getPosFromTag(item),
-                            LinkType.valueOf(item.getString(LINK_TYPE)));
-            });
-        }
-        this.guiTag = compound.getCompoundTag(GUI_TAG);
-        super.readFromNBT(compound);
-        if (world != null)
-            onLoad();
-    }
-
-    @Override
-    public void updateTag(final NBTTagCompound compound) {
-        if (compound == null)
-            return;
-        if (compound.hasKey(REMOVE_SIGNAL)) {
-            final NBTTagCompound request = (NBTTagCompound) compound.getTag(REMOVE_SIGNAL);
-            final BlockPos p1 = NBTUtil.getPosFromTag(request);
-            if (signals.containsKey(p1)) {
-                signals.remove(p1);
-                worldLoadOps.loadAndReset(p1);
-            }
-            linkedBlocks.remove(p1);
-        }
-        if (compound.hasKey(RESET_WAY)) {
-            final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
-            final Point p1 = fromNBT(request, POINT1);
-            grid.resetPathway(compound, p1);
-            return;
-        }
-        if (compound.hasKey(REQUEST_WAY)) {
-            final NBTTagCompound request = (NBTTagCompound) compound.getTag(REQUEST_WAY);
-            final Point p1 = fromNBT(request, POINT1);
-            final Point p2 = fromNBT(request, POINT2);
-            grid.requestWay(world, p1, p2);
-            return;
-        }
-        this.grid.updateModeGridFromUI(compound);
-        this.syncClient();
-    }
-
-    @Override
-    public NBTTagCompound getTag() {
-        return this.guiTag;
-    }
-
-    @Override
-    public boolean hasLink() {
-        return !linkedBlocks.isEmpty();
-    }
-
-    @Override
-    public boolean link(final BlockPos linkedPos) {
-        if (linkedBlocks.containsKey(linkedPos))
-            return false;
-        final IBlockState state = world.getBlockState(linkedPos);
-        final Block block = state.getBlock();
-        LinkType type = LinkType.SIGNAL;
-        if (block == GIRBlocks.REDSTONE_IN) {
-            type = LinkType.INPUT;
-            if (!world.isRemote)
-                loadChunkAndGetTile(RedstoneIOTileEntity.class, world, linkedPos,
-                        (tile, _u) -> tile.link(this.pos));
-        } else if (block == GIRBlocks.REDSTONE_OUT) {
-            type = LinkType.OUTPUT;
-        }
-        if (!world.isRemote) {
-            if (type.equals(LinkType.SIGNAL)) {
-                loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle);
-                new WorldLoadOperations(world).loadAndReset(linkedPos);
-            }
-        }
-        linkedBlocks.put(linkedPos, type);
-        this.syncClient();
-        return true;
-    }
-
-    private void updateSingle(final SignalTileEnity signaltile, final Chunk unused) {
-        final BlockPos signalPos = signaltile.getPos();
-        signals.put(signalPos, signaltile.getSignal());
-        syncClient();
-    }
-
-    @Override
-    public void onLoad() {
-        if (world.isRemote)
-            return;
-        signals.clear();
-        new Thread(() -> {
-            linkedBlocks.forEach((linkedPos, _u) -> loadChunkAndGetTile(SignalTileEnity.class,
-                    world, linkedPos, this::updateSingle));
-        }).start();
-    }
-
-    @Override
-    public boolean unlink() {
-        signals.keySet().forEach(worldLoadOps::loadAndReset);
-        linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue()))
-                .forEach(entry -> {
-                    loadChunkAndGetTile(RedstoneIOTileEntity.class, world, entry.getKey(),
-                            (tile, _u) -> tile.unlink(pos));
-                });
-        linkedBlocks.clear();
-        signals.clear();
-        syncClient();
-        return true;
-    }
-
-    public Signal getSignal(final BlockPos pos) {
-        return this.signals.get(pos);
-    }
-
-    public ImmutableMap<BlockPos, LinkType> getPositions() {
-        return ImmutableMap.copyOf(this.linkedBlocks);
-    }
-
-    public void updateRedstonInput(final BlockPos pos, final boolean power) {
-        if (power) {
-            grid.setPowered(pos);
-        }
-    }
-
+public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable, ILinkableTile {
+	
+	public static final String ERROR_STRING = "error";
+	public static final String REMOVE_SIGNAL = "removeSignal";
+	
+	private static final String LINKED_POS_LIST = "linkedPos";
+	private static final String GUI_TAG = "guiTag";
+	private static final String LINK_TYPE = "linkType";
+	
+	private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
+	private final Map<BlockPos, Signal> signals = new HashMap<>();
+	private final SignalBoxGrid grid = new SignalBoxGrid();
+	private NBTTagCompound guiTag = new NBTTagCompound();
+	
+	private WorldLoadOperations worldLoadOps = new WorldLoadOperations(null);
+	
+	@Override
+	public void setWorld(final World worldIn) {
+		super.setWorld(worldIn);
+		worldLoadOps = new WorldLoadOperations(world);
+	}
+	
+	@Override
+	public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
+		final NBTTagList list = new NBTTagList();
+		linkedBlocks.forEach((p, t) -> {
+			final NBTTagCompound item = NBTUtil.createPosTag(p);
+			item.setString(LINK_TYPE, t.name());
+			list.appendTag(item);
+		});
+		compound.setTag(LINKED_POS_LIST, list);
+		compound.setTag(GUI_TAG, guiTag);
+		return super.writeToNBT(compound);
+	}
+	
+	@Override
+	public void readFromNBT(final NBTTagCompound compound) {
+		final NBTTagList list = (NBTTagList) compound.getTag(LINKED_POS_LIST);
+		if (list != null) {
+			linkedBlocks.clear();
+			list.forEach(pos -> {
+				final NBTTagCompound item = (NBTTagCompound) pos;
+				if (item.hasKey(LINK_TYPE))
+					linkedBlocks.put(NBTUtil.getPosFromTag(item), LinkType.valueOf(item.getString(LINK_TYPE)));
+			});
+		}
+		this.guiTag = compound.getCompoundTag(GUI_TAG);
+		super.readFromNBT(compound);
+		if (world != null)
+			onLoad();
+	}
+	
+	@Override
+	public void updateTag(final NBTTagCompound compound) {
+		if (compound == null)
+			return;
+		if (compound.hasKey(REMOVE_SIGNAL)) {
+			final NBTTagCompound request = (NBTTagCompound) compound.getTag(REMOVE_SIGNAL);
+			final BlockPos p1 = NBTUtil.getPosFromTag(request);
+			if (signals.containsKey(p1)) {
+				signals.remove(p1);
+				worldLoadOps.loadAndReset(p1);
+			}
+			linkedBlocks.remove(p1);
+		}
+		if (compound.hasKey(RESET_WAY)) {
+			final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
+			final Point p1 = fromNBT(request, POINT1);
+			grid.resetPathway(compound, p1);
+			return;
+		}
+		if (compound.hasKey(REQUEST_WAY)) {
+			final NBTTagCompound request = (NBTTagCompound) compound.getTag(REQUEST_WAY);
+			final Point p1 = fromNBT(request, POINT1);
+			final Point p2 = fromNBT(request, POINT2);
+			if (!grid.requestWay(world, p1, p2)) {
+				final NBTTagCompound error = new NBTTagCompound();
+				error.setString(ERROR_STRING, "error.nopathfound");
+				sendToAll(error);
+			}
+			return;
+		}
+		this.grid.updateModeGridFromUI(compound);
+		this.syncClient();
+	}
+	
+	@Override
+	public NBTTagCompound getTag() {
+		return this.guiTag;
+	}
+	
+	@Override
+	public boolean hasLink() {
+		return !linkedBlocks.isEmpty();
+	}
+	
+	@Override
+	public boolean link(final BlockPos linkedPos) {
+		if (linkedBlocks.containsKey(linkedPos))
+			return false;
+		final IBlockState state = world.getBlockState(linkedPos);
+		final Block block = state.getBlock();
+		LinkType type = LinkType.SIGNAL;
+		if (block == GIRBlocks.REDSTONE_IN) {
+			type = LinkType.INPUT;
+			if (!world.isRemote)
+				loadChunkAndGetTile(RedstoneIOTileEntity.class, world, linkedPos, (tile, _u) -> tile.link(this.pos));
+		} else if (block == GIRBlocks.REDSTONE_OUT) {
+			type = LinkType.OUTPUT;
+		}
+		if (!world.isRemote) {
+			if (type.equals(LinkType.SIGNAL)) {
+				loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle);
+				new WorldLoadOperations(world).loadAndReset(linkedPos);
+			}
+		}
+		linkedBlocks.put(linkedPos, type);
+		this.syncClient();
+		return true;
+	}
+	
+	private void updateSingle(final SignalTileEnity signaltile, final Chunk unused) {
+		final BlockPos signalPos = signaltile.getPos();
+		signals.put(signalPos, signaltile.getSignal());
+		syncClient();
+	}
+	
+	@Override
+	public void onLoad() {
+		if (world.isRemote)
+			return;
+		signals.clear();
+		new Thread(() -> {
+			linkedBlocks.forEach((linkedPos, _u) -> loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle));
+		}).start();
+	}
+	
+	@Override
+	public boolean unlink() {
+		signals.keySet().forEach(worldLoadOps::loadAndReset);
+		linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue())).forEach(entry -> {
+			loadChunkAndGetTile(RedstoneIOTileEntity.class, world, entry.getKey(), (tile, _u) -> tile.unlink(pos));
+		});
+		linkedBlocks.clear();
+		signals.clear();
+		syncClient();
+		return true;
+	}
+	
+	public Signal getSignal(final BlockPos pos) {
+		return this.signals.get(pos);
+	}
+	
+	public ImmutableMap<BlockPos, LinkType> getPositions() {
+		return ImmutableMap.copyOf(this.linkedBlocks);
+	}
+	
+	public void updateRedstonInput(final BlockPos pos, final boolean power) {
+		if (power) {
+			grid.setPowered(pos);
+		}
+	}
+	
 }

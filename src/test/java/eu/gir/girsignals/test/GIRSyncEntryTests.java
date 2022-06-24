@@ -341,9 +341,7 @@ public class GIRSyncEntryTests {
 		});
 	}
 	
-	@Test
-	public void testSignalBoxUtil() {
-		final Map<Point, SignalBoxNode> map = generateMap(10, 10);
+	private Path makeWaypoints(final Map<Point, SignalBoxNode> map) {
 		final Point p1 = new Point(RANDOM.nextInt(8) + 1, RANDOM.nextInt(8) + 1);
 		Point p2;
 		do {
@@ -352,6 +350,15 @@ public class GIRSyncEntryTests {
 		
 		map.get(p2).add(new ModeSet(EnumGuiMode.HP, randomEnum(Rotation.class)));
 		map.get(p1).add(new ModeSet(EnumGuiMode.HP, randomEnum(Rotation.class)));
+		return new Path(p1, p2);
+	}
+	
+	@Test
+	public void testSignalBoxUtil() {
+		final Map<Point, SignalBoxNode> map = generateMap(10, 10);
+		final Path testPath = makeWaypoints(map);
+		final Point p1 = testPath.point1;
+		final Point p2 = testPath.point2;
 		
 		final Optional<SignalBoxPathway> opt = SignalBoxUtil.requestWay(map, p1, p2);
 		assertTrue(opt.isPresent());
@@ -388,9 +395,10 @@ public class GIRSyncEntryTests {
 		});
 	}
 	
-	private SignalBoxGrid makeGrid() {
+	private SignalBoxGrid makeGrid(final Consumer<Map<Point, SignalBoxNode>> consumer) {
 		final SignalBoxGrid grid = new SignalBoxGrid();
 		final Map<Point, SignalBoxNode> map = generateMap(50, 50);
+		consumer.accept(map);
 		final NBTTagCompound compound = new NBTTagCompound();
 		map.values().forEach(node -> node.writeEntryNetwork(compound));
 		grid.updateModeGridFromUI(compound);
@@ -400,7 +408,8 @@ public class GIRSyncEntryTests {
 	
 	@Test
 	public void testSignalBoxGrid() {
-		final SignalBoxGrid grid = makeGrid();
+		final SignalBoxGrid grid = makeGrid(_u -> {
+		});
 		final NBTTagCompound compound = new NBTTagCompound();
 		grid.write(compound);
 		final SignalBoxGrid gridCopy = new SignalBoxGrid();
@@ -414,5 +423,15 @@ public class GIRSyncEntryTests {
 			assertEquals(node, nodeCopy);
 		}
 		testISavable(gridCopy, () -> new SignalBoxGrid());
+		
+		final AtomicReference<Path> pathRef = new AtomicReference<>();
+		
+		final SignalBoxGrid wayTestGrid = makeGrid(map -> {
+			pathRef.set(makeWaypoints(map));
+		});
+		final Point p1 = pathRef.get().point1;
+		final Point p2 = pathRef.get().point2;
+		assertTrue(wayTestGrid.requestWay(null, p1, p2));
+		testISavable(wayTestGrid, () -> new SignalBoxGrid());
 	}
 }
