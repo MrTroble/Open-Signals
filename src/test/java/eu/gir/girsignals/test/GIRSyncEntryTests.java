@@ -396,7 +396,8 @@ public class GIRSyncEntryTests {
 	}
 	
 	private SignalBoxGrid makeGrid(final Consumer<Map<Point, SignalBoxNode>> consumer) {
-		final SignalBoxGrid grid = new SignalBoxGrid();
+		final SignalBoxGrid grid = new SignalBoxGrid(_u -> {
+		});
 		final Map<Point, SignalBoxNode> map = generateMap(50, 50);
 		consumer.accept(map);
 		final NBTTagCompound compound = new NBTTagCompound();
@@ -412,7 +413,8 @@ public class GIRSyncEntryTests {
 		});
 		final NBTTagCompound compound = new NBTTagCompound();
 		grid.write(compound);
-		final SignalBoxGrid gridCopy = new SignalBoxGrid();
+		final SignalBoxGrid gridCopy = new SignalBoxGrid(_u -> {
+		});
 		gridCopy.read(compound);
 		assertFalse(gridCopy.isEmpty());
 		final List<SignalBoxNode> nodes = grid.getNodes();
@@ -422,7 +424,8 @@ public class GIRSyncEntryTests {
 			final SignalBoxNode nodeCopy = nodesCopy.get(i);
 			assertEquals(node, nodeCopy);
 		}
-		testISavable(gridCopy, () -> new SignalBoxGrid());
+		testISavable(gridCopy, () -> new SignalBoxGrid(_u -> {
+		}));
 		
 		final AtomicReference<Path> pathRef = new AtomicReference<>();
 		
@@ -432,6 +435,7 @@ public class GIRSyncEntryTests {
 		final Point p1 = pathRef.get().point1;
 		final Point p2 = pathRef.get().point2;
 		assertTrue(wayTestGrid.requestWay(null, p1, p2));
-		testISavable(wayTestGrid, () -> new SignalBoxGrid());
+		testISavable(wayTestGrid, () -> new SignalBoxGrid(_u -> {
+		}));
 	}
 }

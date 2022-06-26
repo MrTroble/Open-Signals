@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
@@ -27,6 +28,11 @@ public class SignalBoxGrid implements ISaveable {
 	private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
 	private final Map<SignalBoxPathway, SignalBoxPathway> previousPathways = new HashMap<>(32);
 	private final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
+	private final Consumer<NBTTagCompound> sendToAll;
+	
+	public SignalBoxGrid(final Consumer<NBTTagCompound> sendToAll) {
+		this.sendToAll = sendToAll;
+	}
 	
 	private Optional<Point> saveRead(final String id) {
 		try {
@@ -59,6 +65,7 @@ public class SignalBoxGrid implements ISaveable {
 		this.endsToPath.remove(pathway.getLastPoint());
 		this.previousPathways.remove(pathway);
 		this.previousPathways.entrySet().removeIf(entry -> entry.getValue().equals(pathway));
+		updateToNet(pathway);
 	}
 	
 	public boolean requestWay(final @Nullable World world, final Point p1, final Point p2) {
@@ -86,11 +93,24 @@ public class SignalBoxGrid implements ISaveable {
 		while ((previousPath = previousPathways.get(previousPath)) != null) {
 			previousPath.updatePathwaySignals();
 		}
+		updateToNet(pathway);
+	}
+	
+	private void updateToNet(final SignalBoxPathway pathway) {
+		final NBTTagCompound update = new NBTTagCompound();
+		pathway.writeEntryNetwork(update);
+		this.sendToAll.accept(update);
 	}
 	
 	public void setPowered(final BlockPos pos) {
-		startsToPath.values().forEach(pathway -> pathway.tryBlock(pos));
-		startsToPath.values().forEach(pathway -> pathway.tryReset(pos));
+		startsToPath.values().forEach(pathway -> {
+			if (pathway.tryBlock(pos))
+				updateToNet(pathway);
+		});
+		startsToPath.values().forEach(pathway -> {
+			if (pathway.tryReset(pos))
+				updateToNet(pathway);
+		});
 	}
 	
 	@Override

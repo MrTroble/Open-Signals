@@ -40,7 +40,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
 	private final Map<BlockPos, Signal> signals = new HashMap<>();
-	private final SignalBoxGrid grid = new SignalBoxGrid();
+	private final SignalBoxGrid grid = new SignalBoxGrid(this::sendToAll);
 	private NBTTagCompound guiTag = new NBTTagCompound();
 	
 	private WorldLoadOperations worldLoadOps = new WorldLoadOperations(null);
