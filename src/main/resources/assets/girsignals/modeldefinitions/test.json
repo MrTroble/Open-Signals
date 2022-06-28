@@ -1,0 +1,24 @@
+{
+	"textures": {
+		"lamp_green": "girsignals:blocks/lamps/lamp_green",
+		"lamp_white": "girsignals:blocks/lamps/lamp_white"
+	},
+	"models": {
+		"hv/hv1": {
+			"texture": {
+				"lampgreennorth": {
+					"lamp_green": {
+						"has": "HP1",
+						"hasnot": "HP0",
+						"with": "VR1",
+						"hasandis": "HP1",
+						"hasandisnot": "Sh1"
+					}
+				}
+			},
+			"x": 0,
+			"y": 0,
+			"z": 0
+		}
+	}
+}
