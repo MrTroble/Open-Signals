@@ -9,17 +9,20 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import eu.gir.girsignals.init.GIRBlocks;
+import scala.util.parsing.json.JSONObject;
 
 public class ModelStateBuilder {
 
@@ -36,8 +39,6 @@ public class ModelStateBuilder {
     private Integer x;
     private Integer y;
     private Integer z;
-
-    final Gson gson = new Gson();
 
     public ModelStateBuilder(final String name, final String model, final String texture,
             final String has, final String hasnot, final String with, final String hasandis,
@@ -58,17 +59,28 @@ public class ModelStateBuilder {
         this.z = z;
     }
 
-    public static Map<String, String> readfromFile(final String location) {
-        final Optional<Path> pathloc = getRessourceLocation(location);
+    public static Map<String, JsonObject> fromJson(final String directory) {
+        final Gson gson = new Gson();
+        final Set<Entry<String, String>> entrySet = readallFilesfromDierectory(directory)
+                .entrySet();
+        entrySet.forEach(map -> {
+            final String content = map.getValue();
+
+        });
+        return null;
+    }
+
+    public static Map<String, String> readallFilesfromDierectory(final String directory) {
+        final Optional<Path> pathloc = getRessourceLocation(directory);
         if (pathloc.isPresent()) {
             final Path pathlocation = pathloc.get();
             try {
                 final Stream<Path> inputs = Files.list(pathlocation);
-                final Map<String, String> files = new HashMap<String, String>();
+                final Map<String, String> files = new HashMap<>();
                 inputs.forEach(file -> {
                     try {
                         final List<String> text = Files.readAllLines(file);
-                        final String output = text.toString();
+                        final String output = toString(text);
                         final String name = file.getFileName().toString();
                         files.put(name, output);
                     } catch (IOException e) {
@@ -82,6 +94,15 @@ public class ModelStateBuilder {
             }
         }
         return null;
+    }
+
+    private static String toString(final List<String> text) {
+        final StringBuilder stringbuilder = new StringBuilder();
+        text.forEach(string -> {
+            stringbuilder.append(string);
+            stringbuilder.append("\n");
+        });
+        return stringbuilder.toString();
     }
 
     private static Optional<Path> getRessourceLocation(final String location) {
