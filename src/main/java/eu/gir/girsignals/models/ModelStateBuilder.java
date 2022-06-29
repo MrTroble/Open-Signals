@@ -19,10 +19,10 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 import eu.gir.girsignals.init.GIRBlocks;
-import scala.util.parsing.json.JSONObject;
 
 public class ModelStateBuilder {
 
@@ -60,14 +60,17 @@ public class ModelStateBuilder {
     }
 
     public static Map<String, JsonObject> fromJson(final String directory) {
-        final Gson gson = new Gson();
+        final Gson gson = new GsonBuilder().create();
         final Set<Entry<String, String>> entrySet = readallFilesfromDierectory(directory)
                 .entrySet();
+        final Map<String, JsonObject> content = new HashMap<>();
         entrySet.forEach(map -> {
-            final String content = map.getValue();
-
+            final String substance = map.getValue();
+            final String title = map.getKey();
+            final JsonObject json = gson.fromJson(substance, JsonObject.class);
+            content.put(title, json);
         });
-        return null;
+        return content;
     }
 
     public static Map<String, String> readallFilesfromDierectory(final String directory) {

@@ -6,6 +6,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import eu.gir.girsignals.models.ModelStateBuilder;
 
@@ -15,8 +16,11 @@ public class ModelStateBuilderTest {
     
     @Test
      public void modelStateBuilderTest() {
-        Map<String, String> testmap = new HashMap<String, String>();
-        testmap = ModelStateBuilder.readallFilesfromDierectory("/assets/girsignals/modeldefinitions");
+        Map<String, JsonObject> testmap = new HashMap<>();
+        Map<String, String> testmap2 = new HashMap<>();
+        testmap = ModelStateBuilder.fromJson("/assets/girsignals/modeldefinitions");
+        testmap2 = ModelStateBuilder.readallFilesfromDierectory("/assets/girsignals/modeldefinitions");
         System.out.println(testmap);
+        System.out.println(testmap2);
     }
 }
