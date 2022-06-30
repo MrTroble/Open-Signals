@@ -71,7 +71,7 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 
     @Override
     public void write(final NBTTagCompound compound) {
-        this.node.writeEntryNetwork(compound);
+        this.node.writeEntryNetwork(compound, true);
     }
 
     @Override

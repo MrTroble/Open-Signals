@@ -98,10 +98,10 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     @Override
-    public void writeEntryNetwork(final NBTTagCompound tag) {
+    public void writeEntryNetwork(final NBTTagCompound tag, final boolean writeAll) {
         pathEntrys.forEach((type, option) -> {
             final NBTTagCompound entry = new NBTTagCompound();
-            option.writeEntryNetwork(entry);
+            option.writeEntryNetwork(entry, writeAll);
             if (entry.getSize() > 0)
                 tag.setTag(type.getName(), entry);
         });

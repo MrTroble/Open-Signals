@@ -39,8 +39,8 @@ public abstract class IPathEntry<T> implements INetworkSavable {
     public abstract void setValue(T value);
 
     @Override
-    public void writeEntryNetwork(final NBTTagCompound tag) {
-        if (this.isDirty) {
+    public void writeEntryNetwork(final NBTTagCompound tag, final boolean writeAll) {
+        if (this.isDirty || writeAll) {
             this.write(tag);
             this.isDirty = true;
         }

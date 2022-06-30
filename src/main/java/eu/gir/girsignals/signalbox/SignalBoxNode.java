@@ -225,11 +225,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     @Override
-    public void writeEntryNetwork(final NBTTagCompound tag) {
+    public void writeEntryNetwork(final NBTTagCompound tag, final boolean writeAll) {
         final NBTTagList pointList = new NBTTagList();
         this.possibleModes.forEach((modeset, option) -> {
             final NBTTagCompound compound = new NBTTagCompound();
-            option.writeEntryNetwork(compound);
+            option.writeEntryNetwork(compound, writeAll);
             modeset.write(compound);
             pointList.appendTag(compound);
         });
