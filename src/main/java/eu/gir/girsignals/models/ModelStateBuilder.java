@@ -19,6 +19,7 @@ import java.util.Set;
 import java.util.stream.Stream;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import eu.gir.girsignals.init.GIRBlocks;
 
@@ -57,30 +58,18 @@ public class ModelStateBuilder {
         this.z = z;
     }
 
-    @SuppressWarnings("unchecked")
-    public static void fromJson(final String directory) {
+    public static Map<String, JsonObject> fromJson(final String directory) {
         final Gson gson = new Gson();
         final Set<Entry<String, String>> entrySet = readallFilesfromDierectory(directory)
                 .entrySet();
+        final Map<String, JsonObject> content = new HashMap<>();
         entrySet.forEach(file -> {
             final String substance = file.getValue();
-            final Set<Entry<?, ?>> content = gson.fromJson(substance, Map.class).entrySet();
-            content.forEach(value -> {
-                final Object key = value.getKey();
-                final Object val = value.getValue();
-//                if(val instanceof Map)
-//                    recursive(val);
-
-            });
+            final String title = file.getKey();
+            final JsonObject json = gson.fromJson(substance, JsonObject.class);
+            content.put(title, json);
         });
-    }
-
-    private static String recursive(final Map<?, ?> map) {
-        /*
-         * map.forEach(<?> value -> {
-         * 
-         * });
-         */ return null;
+        return content;
     }
 
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
