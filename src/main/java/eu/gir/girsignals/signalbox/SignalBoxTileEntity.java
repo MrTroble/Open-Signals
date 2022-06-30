@@ -41,7 +41,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
 	private final Map<BlockPos, Signal> signals = new HashMap<>();
 	private final SignalBoxGrid grid = new SignalBoxGrid(this::sendToAll);
-	private NBTTagCompound guiTag = new NBTTagCompound();
 	
 	private WorldLoadOperations worldLoadOps = new WorldLoadOperations(null);
 	
@@ -60,7 +59,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 			list.appendTag(item);
 		});
 		compound.setTag(LINKED_POS_LIST, list);
-		compound.setTag(GUI_TAG, guiTag);
+		compound.setTag(GUI_TAG, getTag());
 		return super.writeToNBT(compound);
 	}
 	
@@ -75,7 +74,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 					linkedBlocks.put(NBTUtil.getPosFromTag(item), LinkType.valueOf(item.getString(LINK_TYPE)));
 			});
 		}
-		this.guiTag = compound.getCompoundTag(GUI_TAG);
+		final NBTTagCompound gridComp = compound.getCompoundTag(GUI_TAG);
+		grid.read(gridComp);
 		super.readFromNBT(compound);
 		if (world != null)
 			onLoad();
@@ -117,7 +117,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 	
 	@Override
 	public NBTTagCompound getTag() {
-		return this.guiTag;
+		final NBTTagCompound gridComp = new NBTTagCompound();
+		this.grid.write(gridComp);
+		return gridComp;
 	}
 	
 	@Override
