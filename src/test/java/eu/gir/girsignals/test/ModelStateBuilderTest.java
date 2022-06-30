@@ -18,7 +18,7 @@ public class ModelStateBuilderTest {
      public void modelStateBuilderTest() {
         Map<String, JsonObject> testmap = new HashMap<>();
         Map<String, String> testmap2 = new HashMap<>();
-        testmap = ModelStateBuilder.fromJson("/assets/girsignals/modeldefinitions");
+        //testmap = ModelStateBuilder.fromJson("/assets/girsignals/modeldefinitions");
         testmap2 = ModelStateBuilder.readallFilesfromDierectory("/assets/girsignals/modeldefinitions");
         System.out.println(testmap);
         System.out.println(testmap2);
