@@ -423,7 +423,7 @@ public class GIRSyncEntryTests {
         consumer.accept(map);
         final NBTTagCompound compound = new NBTTagCompound();
         map.values().forEach(node -> node.writeEntryNetwork(compound, false));
-        grid.writeEntryNetwork(compound, false);
+        grid.readEntryNetwork(compound);
         assertFalse(grid.isEmpty());
         return grid;
     }
@@ -456,9 +456,15 @@ public class GIRSyncEntryTests {
         final Point p1 = pathRef.get().point1;
         final Point p2 = pathRef.get().point2;
         assertTrue(wayTestGrid.requestWay(null, p1, p2));
-        testINetworkSavable(wayTestGrid, () -> new SignalBoxGrid(_u -> {
-        }), g -> {
+        testISavable(wayTestGrid, () -> new SignalBoxGrid(_u -> {
+        }));
 
+        final SignalBoxGrid netTestGrid = makeGrid(map -> {
+            pathRef.set(makeWaypoints(map));
         });
+        testINetworkSavable(netTestGrid, () -> new SignalBoxGrid(_u -> {
+        }), g -> g.getNodes()
+                .forEach(node -> node.connections().forEach(path -> node.getOption(path).ifPresent(
+                        entry -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.BLOCKED)))));
     }
 }
