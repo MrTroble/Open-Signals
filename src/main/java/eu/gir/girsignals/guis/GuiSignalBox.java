@@ -311,6 +311,7 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.setInheritWidth(true);
         final UIEntity list = new UIEntity();
         final UIBox uibox = new UIBox(UIBox.VBOX, 2);
+        list.add(uibox);
         list.setInheritHeight(true);
         list.setInheritWidth(true);
         box.getPositions().forEach((p, t) -> {

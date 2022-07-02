@@ -60,7 +60,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             list.appendTag(item);
         });
         compound.setTag(LINKED_POS_LIST, list);
-        compound.setTag(GUI_TAG, getTag());
+        final NBTTagCompound gridTag = new NBTTagCompound();
+        this.grid.write(gridTag);
+        compound.setTag(GUI_TAG, gridTag);
         return super.writeToNBT(compound);
     }
 
@@ -113,14 +115,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             }
             return;
         }
-        this.grid.writeEntryNetwork(compound, false);
+        this.grid.readEntryNetwork(compound);
         this.syncClient();
     }
 
     @Override
     public NBTTagCompound getTag() {
         final NBTTagCompound gridComp = new NBTTagCompound();
-        this.grid.write(gridComp);
+        this.grid.writeEntryNetwork(gridComp, true);
         return gridComp;
     }
 
