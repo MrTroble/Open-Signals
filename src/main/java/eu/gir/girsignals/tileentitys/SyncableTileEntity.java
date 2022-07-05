@@ -2,6 +2,7 @@ package eu.gir.girsignals.tileentitys;
 
 import java.util.ArrayList;
 
+import eu.gir.guilib.ecs.GuiSyncNetwork;
 import eu.gir.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -50,7 +51,7 @@ public class SyncableTileEntity extends TileEntity {
     }
 
     public void sendToAll(final NBTTagCompound compound) {
-        this.clientSyncs.forEach(sync -> sync.readFromNBT(compound));
+        this.clientSyncs.forEach(sync -> GuiSyncNetwork.sendToClient(compound, sync.getPlayer()));
     }
 
 }

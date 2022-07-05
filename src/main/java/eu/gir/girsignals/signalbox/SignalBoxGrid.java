@@ -132,18 +132,20 @@ public class SignalBoxGrid implements INetworkSavable {
         clearPaths();
         modeGrid.clear();
         final NBTTagList nodes = (NBTTagList) tag.getTag(NODE_LIST);
-        nodes.forEach(comp -> {
-            final SignalBoxNode node = new SignalBoxNode();
-            node.read((NBTTagCompound) comp);
-            node.post();
-            modeGrid.put(node.getPoint(), node);
-        });
+        if (nodes != null)
+            nodes.forEach(comp -> {
+                final SignalBoxNode node = new SignalBoxNode();
+                node.read((NBTTagCompound) comp);
+                node.post();
+                modeGrid.put(node.getPoint(), node);
+            });
         final NBTTagList list = (NBTTagList) tag.getTag(PATHWAY_LIST);
-        list.forEach(comp -> {
-            final SignalBoxPathway pathway = new SignalBoxPathway(this.modeGrid);
-            pathway.read((NBTTagCompound) comp);
-            onWayAdd(null, pathway);
-        });
+        if (list != null)
+            list.forEach(comp -> {
+                final SignalBoxPathway pathway = new SignalBoxPathway(this.modeGrid);
+                pathway.read((NBTTagCompound) comp);
+                onWayAdd(null, pathway);
+            });
     }
 
     @Override

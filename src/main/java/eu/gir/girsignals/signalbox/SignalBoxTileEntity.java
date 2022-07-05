@@ -149,7 +149,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         if (!world.isRemote) {
             if (type.equals(LinkType.SIGNAL)) {
                 loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle);
-                new WorldLoadOperations(world).loadAndReset(linkedPos);
+                worldLoadOps.loadAndReset(linkedPos);
             }
         }
         linkedBlocks.put(linkedPos, type);
