@@ -474,14 +474,12 @@ public class GIRSyncEntryTests {
             pathRef.set(makeWaypoints(map));
         });
         testINetworkSavable(removeTestGrid, () -> new SignalBoxGrid(_u -> {
-        }), g -> {
-            g.getNodes().stream().findAny().ifPresent(node -> {
-                final ArrayList<ModeSet> setRemove = Lists.newArrayList(node);
-                setRemove.forEach(set -> node.remove(set));
-                final NBTTagCompound network = new NBTTagCompound();
-                g.writeEntryNetwork(network, false);
-                g.readEntryNetwork(network);
-            });
-        });
+        }), g -> g.getNodes().stream().findAny().ifPresent(node -> {
+            final ArrayList<ModeSet> setRemove = Lists.newArrayList(node);
+            setRemove.forEach(set -> node.remove(set));
+            final NBTTagCompound network = new NBTTagCompound();
+            g.writeEntryNetwork(network, false);
+            assertFalse(g.getNodes().contains(node));
+        }));
     }
 }

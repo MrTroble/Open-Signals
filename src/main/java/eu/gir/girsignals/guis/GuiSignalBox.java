@@ -464,6 +464,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void reset() {
+        compound = new NBTTagCompound();
         this.entity.write(compound);
         GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
         lowerEntity.clear();

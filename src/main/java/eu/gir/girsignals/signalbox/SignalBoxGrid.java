@@ -62,11 +62,8 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public boolean requestWay(final @Nullable World world, final Point p1, final Point p2) {
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
-        if (ways.isPresent()) {
-            this.onWayAdd(world, ways.get());
-            return true;
-        }
-        return false;
+        ways.ifPresent(way -> this.onWayAdd(world, way));
+        return ways.isPresent();
     }
 
     private void onWayAdd(final @Nullable World world, final SignalBoxPathway pathway) {
@@ -186,7 +183,13 @@ public class SignalBoxGrid implements INetworkSavable {
 
     @Override
     public void writeEntryNetwork(final NBTTagCompound tag, final boolean writeAll) {
-        this.modeGrid.values().forEach(node -> node.writeEntryNetwork(tag, writeAll));
+        this.modeGrid.entrySet().removeIf(entry -> {
+            final SignalBoxNode node = entry.getValue();
+            if (node.isEmpty())
+                return true;
+            node.writeEntryNetwork(tag, writeAll);
+            return false;
+        });
     }
 
     @Override
