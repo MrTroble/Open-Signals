@@ -93,7 +93,6 @@ public class SignalBoxPathway implements INetworkSavable {
             if (possiblePosition != null)
                 return possiblePosition;
         }
-
         return null;
     }
 

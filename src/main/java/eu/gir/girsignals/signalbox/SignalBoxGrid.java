@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -170,7 +172,8 @@ public class SignalBoxGrid implements INetworkSavable {
 
     @Override
     public String toString() {
-        return "SignalBoxGrid [modeGrid=" + modeGrid + "]";
+        return "SignalBoxGrid [modeGrid=" + modeGrid.entrySet().stream()
+                .map(entry -> entry.toString()).collect(Collectors.joining("\n")) + "]";
     }
 
     public boolean isEmpty() {
@@ -188,11 +191,13 @@ public class SignalBoxGrid implements INetworkSavable {
 
     @Override
     public void readEntryNetwork(final NBTTagCompound tag) {
-        tag.getKeySet().forEach(identifier -> saveRead(identifier).ifPresent(point -> {
-            final SignalBoxNode node = modeGrid.computeIfAbsent(point,
-                    key -> new SignalBoxNode(key));
+        final Set<String> keys = tag.getKeySet();
+        keys.forEach(identifier -> saveRead(identifier).ifPresent(
+                point -> modeGrid.computeIfAbsent(point, key -> new SignalBoxNode(key))));
+        this.modeGrid.entrySet().removeIf(entry -> {
+            final SignalBoxNode node = entry.getValue();
             node.readEntryNetwork(tag);
-        }));
-        this.modeGrid.entrySet().removeIf(entry -> entry.getValue().isEmpty());
+            return !keys.contains(node.getIdentifier()) || node.isEmpty();
+        });
     }
 }

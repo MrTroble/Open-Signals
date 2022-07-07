@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +18,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.junit.jupiter.api.Test;
+
+import com.google.common.collect.Lists;
 
 import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.EnumPathUsage;
@@ -466,5 +469,19 @@ public class GIRSyncEntryTests {
         }), g -> g.getNodes()
                 .forEach(node -> node.connections().forEach(path -> node.getOption(path).ifPresent(
                         entry -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.BLOCKED)))));
+
+        final SignalBoxGrid removeTestGrid = makeGrid(map -> {
+            pathRef.set(makeWaypoints(map));
+        });
+        testINetworkSavable(removeTestGrid, () -> new SignalBoxGrid(_u -> {
+        }), g -> {
+            g.getNodes().stream().findAny().ifPresent(node -> {
+                final ArrayList<ModeSet> setRemove = Lists.newArrayList(node);
+                setRemove.forEach(set -> node.remove(set));
+                final NBTTagCompound network = new NBTTagCompound();
+                g.writeEntryNetwork(network, false);
+                g.readEntryNetwork(network);
+            });
+        });
     }
 }

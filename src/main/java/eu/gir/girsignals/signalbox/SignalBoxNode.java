@@ -146,9 +146,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public Optional<PathOptionEntry> getOption(final Optional<ModeSet> mode) {
-        if (mode.isPresent())
-            return getOption(mode.get());
-        return Optional.empty();
+        return mode.flatMap(this::getOption);
     }
 
     public PathType getPathType(final SignalBoxNode other) {
