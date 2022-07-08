@@ -1,5 +1,14 @@
 # Changelog
 
+## [Beta Update]
+
+* fix: several synchronization fixes
+* feat: partly pathway resetting
+* perf: reduced network load
+* feat: auto recover from bad pathways
+* perf: reduced redstone performance
+* perf: only send needed data 
+
 ## [Beta Update] 
 * feat: Ra11 added to signalbox
 * feat: rename signal via right click
