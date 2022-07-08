@@ -16,6 +16,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 
+import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.PathType;
@@ -40,6 +41,7 @@ public class SignalBoxPathway implements INetworkSavable {
     private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
     private WorldLoadOperations loadOps = new WorldLoadOperations(null);
     private Map<Point, SignalBoxNode> modeGrid = null;
+    private boolean emptyOrBroken = false;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
@@ -119,7 +121,14 @@ public class SignalBoxPathway implements INetworkSavable {
             final NBTTagCompound nodeNBT = (NBTTagCompound) c;
             final Point point = new Point();
             point.read(nodeNBT);
-            nodeBuilder.add(modeGrid.get(point));
+            final SignalBoxNode node = modeGrid.get(point);
+            if (node == null) {
+                GirsignalsMain.log.atError().log("Detecting broken pathway at {}!",
+                        point.toString());
+                this.emptyOrBroken = true;
+                return;
+            }
+            nodeBuilder.add(node);
         });
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
@@ -147,10 +156,10 @@ public class SignalBoxPathway implements INetworkSavable {
             final Point oldPos = listOfNodes.get(i - 1).getPoint();
             final Point newPos = listOfNodes.get(i + 1).getPoint();
             final SignalBoxNode current = listOfNodes.get(i);
-            if (current.getPoint().equals(point))
-                break;
             current.getOption(new Path(oldPos, newPos))
                     .ifPresent(entry -> consumer.accept(entry, current));
+            if (current.getPoint().equals(point))
+                break;
         }
     }
 
@@ -257,6 +266,13 @@ public class SignalBoxPathway implements INetworkSavable {
      */
     public ImmutableList<SignalBoxNode> getListOfNodes() {
         return listOfNodes;
+    }
+
+    /**
+     * @return the emptyOrBroken
+     */
+    public boolean isEmptyOrBroken() {
+        return emptyOrBroken;
     }
 
 }

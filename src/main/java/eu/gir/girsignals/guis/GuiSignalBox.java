@@ -61,6 +61,7 @@ public class GuiSignalBox extends GuiBase {
     private final SignalBoxTileEntity box;
     private final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
+    private Page page = Page.USAGE;
 
     public GuiSignalBox(final SignalBoxTileEntity box) {
         this.box = box;
@@ -88,6 +89,7 @@ public class GuiSignalBox extends GuiBase {
             }).start();
             return;
         }
+        this.compound = compound;
         this.entity.read(compound);
     }
 
@@ -110,7 +112,7 @@ public class GuiSignalBox extends GuiBase {
                     }));
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
                 option.setEntry(entryType, id >= 0 ? positions.get(id) : null);
-                node.write(compound);
+                node.writeEntryNetwork(compound, false);
             });
             blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
                 e.setMin(-1);
@@ -165,14 +167,13 @@ public class GuiSignalBox extends GuiBase {
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
                     option.setEntry(PathEntryType.SPEED, id > 0 ? id : Integer.MAX_VALUE);
-                    node.write(compound);
+                    node.writeEntryNetwork(compound, false);
                 });
                 final int speed = option.getEntry(PathEntryType.SPEED).filter(n -> n < 16)
                         .orElse(Integer.MAX_VALUE);
                 speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
                     e.setID(null);
                     e.setIndex(speed);
-                    option.tryHook(PathEntryType.SPEED, e::setOnChange);
                 });
                 parent.add(speedSelection);
 
@@ -341,12 +342,14 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(list);
         lowerEntity.add(GuiElements.createPageSelect(uibox));
         resetSelection(entity);
+        this.page = Page.SETTINGS;
     }
 
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
+        this.page = Page.USAGE;
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -355,6 +358,7 @@ public class GuiSignalBox extends GuiBase {
         initializeFieldTemplate((e, name) -> this.tileEdit(e, menu, name));
         lowerEntity.add(menu);
         resetSelection(entity);
+        this.page = Page.EDIT;
     }
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
@@ -464,9 +468,18 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void reset() {
-        compound = new NBTTagCompound();
-        this.entity.write(compound);
-        GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+        if (page == Page.EDIT) {
+            compound = new NBTTagCompound();
+        }
+        if (page != Page.SETTINGS) {
+            this.entity.write(compound);
+            GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+        }
         lowerEntity.clear();
     }
+
+    private static enum Page {
+        USAGE, EDIT, SETTINGS
+    }
+
 }

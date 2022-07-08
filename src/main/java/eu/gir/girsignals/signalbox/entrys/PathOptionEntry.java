@@ -4,15 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.IntConsumer;
 
 import net.minecraft.nbt.NBTTagCompound;
 
 public class PathOptionEntry implements INetworkSavable {
 
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
-    private final Map<PathEntryType<?>, Consumer<?>> visitors = new HashMap<>();
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getEntry(final PathEntryType<T> type) {
@@ -25,33 +22,11 @@ public class PathOptionEntry implements INetworkSavable {
     public <T> void setEntry(final PathEntryType<T> type, final T value) {
         if (value == null) {
             pathEntrys.remove(type);
-            visitors.remove(type);
             return;
         }
         final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
                 pType -> pType.newValue());
         pathEntry.setValue(value);
-        final Consumer<T> consumer = (Consumer<T>) visitors.get(type);
-        if (consumer != null)
-            consumer.accept(value);
-    }
-
-    public <T> void setVisitor(final PathEntryType<T> type, final Consumer<T> value) {
-        if (value == null) {
-            visitors.remove(type);
-            return;
-        }
-        this.visitors.put(type, value);
-    }
-
-    @SuppressWarnings("unchecked")
-    public <T> void tryHook(final PathEntryType<T> type, final Consumer<IntConsumer> hooker) {
-        final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.get(type);
-        if (pathEntry == null)
-            return;
-        if (pathEntry instanceof IntConsumer) {
-            hooker.accept((IntConsumer) pathEntry);
-        }
     }
 
     @Override

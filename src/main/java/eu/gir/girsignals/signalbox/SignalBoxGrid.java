@@ -79,8 +79,15 @@ public class SignalBoxGrid implements INetworkSavable {
         pathway.setPathStatus(EnumPathUsage.SELECTED);
         pathway.updatePathwaySignals();
         SignalBoxPathway previousPath = pathway;
+        int count = 0;
         while ((previousPath = previousPathways.get(previousPath)) != null) {
+            if (count > previousPathways.size()) {
+                GirsignalsMain.log.atError().log("Detected signalpath cycle, aborting!");
+                this.clearPaths();
+                break;
+            }
             previousPath.updatePathwaySignals();
+            count++;
         }
         updateToNet(pathway);
     }
@@ -143,6 +150,11 @@ public class SignalBoxGrid implements INetworkSavable {
             list.forEach(comp -> {
                 final SignalBoxPathway pathway = new SignalBoxPathway(this.modeGrid);
                 pathway.read((NBTTagCompound) comp);
+                if (pathway.isEmptyOrBroken()) {
+                    GirsignalsMain.log.atError()
+                            .log("Remove empty or broken pathway, try to recover!");
+                    return;
+                }
                 onWayAdd(null, pathway);
             });
     }
