@@ -39,6 +39,7 @@ public class SignalBoxPathway implements INetworkSavable {
     private Point lastPoint = new Point();
     private int speed = -1;
     private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
+    private ImmutableList<BlockPos> distantSignalPositions = ImmutableList.of();
     private WorldLoadOperations loadOps = new WorldLoadOperations(null);
     private Map<Point, SignalBoxNode> modeGrid = null;
     private boolean emptyOrBroken = false;
@@ -61,6 +62,7 @@ public class SignalBoxPathway implements INetworkSavable {
 
     private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
+        final Builder<BlockPos> distantPosBuilder = ImmutableList.builder();
         foreachEntry((optionEntry, node) -> {
             optionEntry.getEntry(PathEntryType.SPEED)
                     .ifPresent(value -> atomic.updateAndGet(in -> Math.min(in, value)));
@@ -68,7 +70,10 @@ public class SignalBoxPathway implements INetworkSavable {
                     .ifPresent(position -> mapOfBlockingPositions.put(position, node));
             optionEntry.getEntry(PathEntryType.RESETING)
                     .ifPresent(position -> mapOfResetPositions.put(position, node));
+            optionEntry.getEntry(PathEntryType.SIGNAL)
+                    .ifPresent(position -> distantPosBuilder.add(position));
         });
+        this.distantSignalPositions = distantPosBuilder.build();
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
         this.firstPoint = firstNode.getPoint();
         final BlockPos firstPos = makeFromNext(type, firstNode,
@@ -176,8 +181,11 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     public void updatePathwaySignals() {
-        this.signalPositions
-                .ifPresent(entry -> loadOps.loadAndConfig(speed, entry.getKey(), entry.getValue()));
+        this.signalPositions.ifPresent(entry -> {
+            loadOps.loadAndConfig(speed, entry.getKey(), entry.getValue());
+            distantSignalPositions
+                    .forEach(position -> loadOps.loadAndConfig(speed, position, entry.getValue()));
+        });
     }
 
     public void resetPathway() {
@@ -187,6 +195,10 @@ public class SignalBoxPathway implements INetworkSavable {
     public void resetPathway(final @Nullable Point point) {
         this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
         this.setPathStatus(EnumPathUsage.FREE, point);
+        if (point == null || point.equals(this.getLastPoint())
+                || point.equals(this.listOfNodes.get(this.listOfNodes.size() - 2).getPoint())) {
+            this.emptyOrBroken = true;
+        }
     }
 
     public boolean tryReset(final BlockPos position) {
@@ -222,8 +234,9 @@ public class SignalBoxPathway implements INetworkSavable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstPoint, lastPoint, listOfNodes, mapOfBlockingPositions,
-                mapOfResetPositions, speed, type);
+        return Objects.hash(distantSignalPositions, emptyOrBroken, firstPoint, lastPoint,
+                listOfNodes, mapOfBlockingPositions, mapOfResetPositions, modeGrid, signalPositions,
+                speed, type);
     }
 
     @Override
@@ -235,12 +248,16 @@ public class SignalBoxPathway implements INetworkSavable {
         if (getClass() != obj.getClass())
             return false;
         final SignalBoxPathway other = (SignalBoxPathway) obj;
-        return Objects.equals(firstPoint, other.firstPoint)
+        return Objects.equals(distantSignalPositions, other.distantSignalPositions)
+                && emptyOrBroken == other.emptyOrBroken
+                && Objects.equals(firstPoint, other.firstPoint)
                 && Objects.equals(lastPoint, other.lastPoint)
                 && Objects.equals(listOfNodes, other.listOfNodes)
                 && Objects.equals(mapOfBlockingPositions, other.mapOfBlockingPositions)
                 && Objects.equals(mapOfResetPositions, other.mapOfResetPositions)
-                && speed == other.speed && type == other.type;
+                && Objects.equals(modeGrid, other.modeGrid)
+                && Objects.equals(signalPositions, other.signalPositions) && speed == other.speed
+                && type == other.type;
     }
 
     @Override

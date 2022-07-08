@@ -101,7 +101,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         if (compound.hasKey(RESET_WAY)) {
             final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
             final Point p1 = fromNBT(request, POINT1);
-            grid.resetPathway(compound, p1);
+            grid.resetPathway(p1);
             return;
         }
         if (compound.hasKey(REQUEST_WAY)) {

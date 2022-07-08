@@ -45,19 +45,22 @@ public class SignalBoxGrid implements INetworkSavable {
         return Optional.empty();
     }
 
-    public void resetPathway(final NBTTagCompound compound, final Point p1) {
+    public void resetPathway(final Point p1) {
         final SignalBoxPathway pathway = startsToPath.get(p1);
         if (pathway == null) {
             GirsignalsMain.log.atWarn().log("Signalboxpath is null, this should not be the case!");
             return;
         }
+        resetPathway(pathway);
+        updateToNet(pathway);
+    }
+
+    private void resetPathway(final SignalBoxPathway pathway) {
         pathway.resetPathway();
-        pathway.writeEntryNetwork(compound, false);
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
         this.previousPathways.remove(pathway);
         this.previousPathways.entrySet().removeIf(entry -> entry.getValue().equals(pathway));
-        updateToNet(pathway);
     }
 
     public boolean requestWay(final @Nullable World world, final Point p1, final Point p2) {
@@ -105,8 +108,12 @@ public class SignalBoxGrid implements INetworkSavable {
                 updateToNet(pathway);
         });
         startsToPath.values().forEach(pathway -> {
-            if (pathway.tryReset(pos))
+            if (pathway.tryReset(pos)) {
+                if (pathway.isEmptyOrBroken()) {
+                    resetPathway(pathway);
+                }
                 updateToNet(pathway);
+            }
         });
     }
 
@@ -121,6 +128,8 @@ public class SignalBoxGrid implements INetworkSavable {
         tag.setTag(NODE_LIST, list);
         final NBTTagList pathList = new NBTTagList();
         startsToPath.values().forEach(pathway -> {
+            if (pathway.isEmptyOrBroken())
+                return;
             final NBTTagCompound path = new NBTTagCompound();
             pathway.write(path);
             pathList.appendTag(path);
@@ -139,25 +148,26 @@ public class SignalBoxGrid implements INetworkSavable {
         clearPaths();
         modeGrid.clear();
         final NBTTagList nodes = (NBTTagList) tag.getTag(NODE_LIST);
-        if (nodes != null)
-            nodes.forEach(comp -> {
-                final SignalBoxNode node = new SignalBoxNode();
-                node.read((NBTTagCompound) comp);
-                node.post();
-                modeGrid.put(node.getPoint(), node);
-            });
+        if (nodes == null)
+            return;
+        nodes.forEach(comp -> {
+            final SignalBoxNode node = new SignalBoxNode();
+            node.read((NBTTagCompound) comp);
+            node.post();
+            modeGrid.put(node.getPoint(), node);
+        });
         final NBTTagList list = (NBTTagList) tag.getTag(PATHWAY_LIST);
-        if (list != null)
-            list.forEach(comp -> {
-                final SignalBoxPathway pathway = new SignalBoxPathway(this.modeGrid);
-                pathway.read((NBTTagCompound) comp);
-                if (pathway.isEmptyOrBroken()) {
-                    GirsignalsMain.log.atError()
-                            .log("Remove empty or broken pathway, try to recover!");
-                    return;
-                }
-                onWayAdd(null, pathway);
-            });
+        if (list == null)
+            return;
+        list.forEach(comp -> {
+            final SignalBoxPathway pathway = new SignalBoxPathway(this.modeGrid);
+            pathway.read((NBTTagCompound) comp);
+            if (pathway.isEmptyOrBroken()) {
+                GirsignalsMain.log.atError().log("Remove empty or broken pathway, try to recover!");
+                return;
+            }
+            onWayAdd(null, pathway);
+        });
     }
 
     @Override
