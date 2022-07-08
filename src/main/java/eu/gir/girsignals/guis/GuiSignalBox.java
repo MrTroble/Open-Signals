@@ -102,11 +102,17 @@ public class GuiSignalBox extends GuiBase {
     private void selectLink(final UIEntity parent, final SignalBoxNode node,
             final PathOptionEntry option, final ImmutableSet<Entry<BlockPos, LinkType>> entrySet,
             final LinkType type, final PathEntryType<BlockPos> entryType) {
+        this.selectLink(parent, node, option, entrySet, type, entryType, "");
+    }
+
+    private void selectLink(final UIEntity parent, final SignalBoxNode node,
+            final PathOptionEntry option, final ImmutableSet<Entry<BlockPos, LinkType>> entrySet,
+            final LinkType type, final PathEntryType<BlockPos> entryType, final String suffix) {
         final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList());
         if (!positions.isEmpty()) {
             final DisableIntegerable<String> blockPos = new DisableIntegerable<String>(
-                    SizeIntegerables.of("prop." + type.name(), positions.size(), id -> {
+                    SizeIntegerables.of("prop." + type.name() + suffix, positions.size(), id -> {
                         final BlockPos pos = positions.get(id);
                         return getSignalInfo(pos, type);
                     }));
@@ -178,8 +184,10 @@ public class GuiSignalBox extends GuiBase {
                 parent.add(speedSelection);
 
                 selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT);
-                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING);
-                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING);
+                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
+                        ".blocking");
+                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
+                        ".resetting");
             }
                 break;
             case VP:

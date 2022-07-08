@@ -83,6 +83,7 @@ public class SignalBoxGrid implements INetworkSavable {
         while ((previousPath = previousPathways.get(previousPath)) != null) {
             if (count > previousPathways.size()) {
                 GirsignalsMain.log.atError().log("Detected signalpath cycle, aborting!");
+                startsToPath.values().forEach(path -> path.resetPathway());
                 this.clearPaths();
                 break;
             }
