@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.enums.EnumPathUsage;
@@ -213,6 +214,8 @@ public class SignalBoxGrid implements INetworkSavable {
             node.writeEntryNetwork(tag, writeAll);
             return false;
         });
+        Lists.newArrayList(this.startsToPath.values()).stream()
+                .filter(pathway -> pathway.isEmptyOrBroken()).forEach(this::resetPathway);
     }
 
     @Override
@@ -225,5 +228,7 @@ public class SignalBoxGrid implements INetworkSavable {
             node.readEntryNetwork(tag);
             return !keys.contains(node.getIdentifier()) || node.isEmpty();
         });
+        Lists.newArrayList(this.startsToPath.values()).stream()
+                .filter(pathway -> pathway.isEmptyOrBroken()).forEach(this::resetPathway);
     }
 }

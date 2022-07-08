@@ -199,6 +199,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     public void updateRedstonInput(final BlockPos pos, final boolean power) {
         if (power) {
             grid.setPowered(pos);
+            syncClient();
         }
     }
 

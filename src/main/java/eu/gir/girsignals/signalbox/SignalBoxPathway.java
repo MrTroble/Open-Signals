@@ -157,7 +157,7 @@ public class SignalBoxPathway implements INetworkSavable {
 
     private void foreachEntry(final BiConsumer<PathOptionEntry, SignalBoxNode> consumer,
             final @Nullable Point point) {
-        for (int i = 1; i < listOfNodes.size() - 1; i++) {
+        for (int i = listOfNodes.size() - 2; i > 0; i--) {
             final Point oldPos = listOfNodes.get(i - 1).getPoint();
             final Point newPos = listOfNodes.get(i + 1).getPoint();
             final SignalBoxNode current = listOfNodes.get(i);
@@ -196,7 +196,7 @@ public class SignalBoxPathway implements INetworkSavable {
         this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
         this.setPathStatus(EnumPathUsage.FREE, point);
         if (point == null || point.equals(this.getLastPoint())
-                || point.equals(this.listOfNodes.get(this.listOfNodes.size() - 2).getPoint())) {
+                || point.equals(this.listOfNodes.get(1).getPoint())) {
             this.emptyOrBroken = true;
         }
     }
