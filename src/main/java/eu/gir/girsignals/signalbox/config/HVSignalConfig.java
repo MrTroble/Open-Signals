@@ -186,7 +186,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             values.put(SignalHV.HPHOME, HPHome.HP2);
             values.put(SignalHV.STOPSIGNAL, HP.HP2);
             values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
-            values.put(SignalHV.ZS3, ZS32.OFF);
+            values.put(SignalHV.ZS3, ZS32.Z3);
             values.put(SignalHV.ZS3V, ZS32.OFF);
             values.put(SignalHV.ZS1, false);
             values.put(SignalHV.ZS7, false);
