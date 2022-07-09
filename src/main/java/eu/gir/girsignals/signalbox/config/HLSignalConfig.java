@@ -191,7 +191,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             speedCheckExit(info.speed, values, HLExit.HL1, HLExit.HL2_3);
             speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
-            values.put(SignalHL.ZS2, ZS32.OFF);
+            values.put(SignalHL.ZS2, ZS32.ZS13);
         }
         this.changeIfPresent(values, info.current);
     }
