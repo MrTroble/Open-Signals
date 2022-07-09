@@ -82,7 +82,7 @@ public class SignalBoxPathway implements INetworkSavable {
         this.lastPoint = lastNode.getPoint();
         final BlockPos lastPos = makeFromNext(type, lastNode, this.listOfNodes.get(1),
                 Rotation.CLOCKWISE_180);
-        if (firstPos != null && lastPos != null) {
+        if (firstPos != null) {
             this.signalPositions = Optional.of(Maps.immutableEntry(firstPos, lastPos));
         } else {
             this.signalPositions = Optional.empty();
@@ -128,8 +128,7 @@ public class SignalBoxPathway implements INetworkSavable {
             point.read(nodeNBT);
             final SignalBoxNode node = modeGrid.get(point);
             if (node == null) {
-                GirsignalsMain.log.error("Detecting broken pathway at {}!",
-                        point.toString());
+                GirsignalsMain.log.error("Detecting broken pathway at {}!", point.toString());
                 this.emptyOrBroken = true;
                 return;
             }

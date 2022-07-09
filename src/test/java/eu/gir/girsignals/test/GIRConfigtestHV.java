@@ -7,6 +7,7 @@ import static eu.gir.girsignals.blocks.signals.SignalHV.STOPSIGNAL;
 import static eu.gir.girsignals.blocks.signals.SignalHV.ZS3;
 import static eu.gir.girsignals.blocks.signals.SignalHV.ZS3V;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -28,19 +29,34 @@ import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.signalbox.config.HVSignalConfig;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
 import eu.gir.girsignals.test.DummySignal.DummyBuilder;
+import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public class GIRConfigtestHV {
 
     private final HVSignalConfig config = HVSignalConfig.INSTANCE;
 
+    private void assertChange(final SignalTileEnity current, final SignalTileEnity next,
+            final DummySignal expected) {
+        this.assertChange(current, next, expected, 0);
+    }
+
+    private void assertChange(final SignalTileEnity current, final SignalTileEnity next,
+            final DummySignal expected, final int speed) {
+        assertNotEquals(current, expected);
+        final ConfigInfo info = new ConfigInfo(current, next, speed);
+        config.change(info);
+        assertEquals(expected, current);
+    }
+
     @Test
     public void testHVConfig() {
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP2).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR2).build());
 
-        final ConfigInfo info = new ConfigInfo(
-                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
-                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP0).build(), 0);
-        config.change(info);
-        assertEquals(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(), info.current);
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP0).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build());
 
         // HV -> HV
         configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, HP.HP0,
