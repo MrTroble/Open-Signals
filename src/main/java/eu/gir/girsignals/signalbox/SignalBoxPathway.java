@@ -20,6 +20,7 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.PathType;
+import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
 import eu.gir.girsignals.signalbox.entrys.INetworkSavable;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
@@ -179,11 +180,15 @@ public class SignalBoxPathway implements INetworkSavable {
         setPathStatus(status, null);
     }
 
+    private void configUpdate(final ConfigInfo info) {
+        info.type = this.type;
+    }
+
     public void updatePathwaySignals() {
         this.signalPositions.ifPresent(entry -> {
-            loadOps.loadAndConfig(speed, entry.getKey(), entry.getValue());
-            distantSignalPositions
-                    .forEach(position -> loadOps.loadAndConfig(speed, position, entry.getValue()));
+            loadOps.loadAndConfig(speed, entry.getKey(), entry.getValue(), this::configUpdate);
+            distantSignalPositions.forEach(position -> loadOps.loadAndConfig(speed, position,
+                    entry.getValue(), this::configUpdate));
         });
     }
 

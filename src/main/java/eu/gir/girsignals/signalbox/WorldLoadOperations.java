@@ -1,5 +1,7 @@
 package eu.gir.girsignals.signalbox;
 
+import java.util.function.Consumer;
+
 import javax.annotation.Nullable;
 
 import eu.gir.girsignals.blocks.RedstoneIO;
@@ -20,35 +22,33 @@ public class WorldLoadOperations implements IChunkloadable {
         this.world = world;
     }
 
-    public void loadAndConfig(final int speed, final BlockPos lastPosition,
-            final BlockPos nextPosition) {
-        loadAndConfig(speed, lastPosition, nextPosition, null);
-    }
-
-    public void loadAndConfig(final int speed, final BlockPos lastPosition,
-            final BlockPos nextPosition, final ISignalAutoconfig override) {
+    public void loadAndConfig(final int speed, final BlockPos currentPosition,
+            final BlockPos nextPosition, final Consumer<ConfigInfo> infoChange) {
         if (world == null)
             return;
-        loadChunkAndGetTile(SignalTileEnity.class, world, lastPosition, (lastTile, chunk) -> {
+        loadChunkAndGetTile(SignalTileEnity.class, world, currentPosition, (currentTile, chunk) -> {
             if (nextPosition == null) {
-                config(speed, lastTile, null, override);
+                final ConfigInfo info = new ConfigInfo(currentTile, null, speed);
+                infoChange.accept(info);
+                config(info);
             } else {
-                loadChunkAndGetTile(SignalTileEnity.class, world, nextPosition,
-                        (nextTile, _u2) -> config(speed, lastTile, nextTile, override));
+                loadChunkAndGetTile(SignalTileEnity.class, world, nextPosition, (nextTile, _u2) -> {
+                    final ConfigInfo info = new ConfigInfo(currentTile, nextTile, speed);
+                    infoChange.accept(info);
+                    config(info);
+                });
             }
-            syncClient(lastPosition);
+            syncClient(currentPosition);
         });
     }
 
-    public void config(final int speed, final SignalTileEnity lastTile,
-            final SignalTileEnity nextTile, final ISignalAutoconfig override) {
+    public void config(final ConfigInfo info) {
         if (world == null)
             return;
-        final Signal last = lastTile.getSignal();
-        final ISignalAutoconfig config = override == null ? last.getConfig() : override;
+        final Signal current = info.current.getSignal();
+        final ISignalAutoconfig config = current.getConfig();
         if (config == null)
             return;
-        final ConfigInfo info = new ConfigInfo(lastTile, nextTile, speed);
         config.change(info);
     }
 

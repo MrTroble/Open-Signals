@@ -17,6 +17,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
+import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public final class HLSignalConfig implements ISignalAutoconfig {
@@ -73,6 +74,10 @@ public final class HLSignalConfig implements ISignalAutoconfig {
     })
     @Override
     public void change(final ConfigInfo info) {
+        if (info.type.equals(PathType.SHUNTING)) {
+            RSSignalConfig.RS_CONFIG.change(info);
+            return;
+        }
         final HashMap<SEProperty, Object> values = new HashMap<>();
         if (info.next != null) {
             info.next.getProperty(SignalHL.STOPSIGNAL).ifPresent(hl -> {

@@ -16,6 +16,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
+import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public final class KSSignalConfig implements ISignalAutoconfig {
@@ -30,6 +31,10 @@ public final class KSSignalConfig implements ISignalAutoconfig {
     })
     @Override
     public void change(final ConfigInfo info) {
+        if (info.type.equals(PathType.SHUNTING)) {
+            RSSignalConfig.RS_CONFIG.change(info);
+            return;
+        }
         final HashMap<SEProperty, Object> values = new HashMap<>();
         if (info.speed <= 16 && info.speed > 0) {
             final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
