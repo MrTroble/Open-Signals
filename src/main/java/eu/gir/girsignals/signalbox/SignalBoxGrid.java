@@ -49,7 +49,7 @@ public class SignalBoxGrid implements INetworkSavable {
     public void resetPathway(final Point p1) {
         final SignalBoxPathway pathway = startsToPath.get(p1);
         if (pathway == null) {
-            GirsignalsMain.log.atWarn().log("Signalboxpath is null, this should not be the case!");
+            GirsignalsMain.log.warn("Signalboxpath is null, this should not be the case!");
             return;
         }
         resetPathway(pathway);
@@ -86,7 +86,7 @@ public class SignalBoxGrid implements INetworkSavable {
         int count = 0;
         while ((previousPath = previousPathways.get(previousPath)) != null) {
             if (count > previousPathways.size()) {
-                GirsignalsMain.log.atError().log("Detected signalpath cycle, aborting!");
+                GirsignalsMain.log.error("Detected signalpath cycle, aborting!");
                 startsToPath.values().forEach(path -> path.resetPathway());
                 this.clearPaths();
                 break;
@@ -164,7 +164,7 @@ public class SignalBoxGrid implements INetworkSavable {
             final SignalBoxPathway pathway = new SignalBoxPathway(this.modeGrid);
             pathway.read((NBTTagCompound) comp);
             if (pathway.isEmptyOrBroken()) {
-                GirsignalsMain.log.atError().log("Remove empty or broken pathway, try to recover!");
+                GirsignalsMain.log.error("Remove empty or broken pathway, try to recover!");
                 return;
             }
             onWayAdd(null, pathway);

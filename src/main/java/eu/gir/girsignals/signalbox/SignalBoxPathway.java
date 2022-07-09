@@ -128,7 +128,7 @@ public class SignalBoxPathway implements INetworkSavable {
             point.read(nodeNBT);
             final SignalBoxNode node = modeGrid.get(point);
             if (node == null) {
-                GirsignalsMain.log.atError().log("Detecting broken pathway at {}!",
+                GirsignalsMain.log.error("Detecting broken pathway at {}!",
                         point.toString());
                 this.emptyOrBroken = true;
                 return;
