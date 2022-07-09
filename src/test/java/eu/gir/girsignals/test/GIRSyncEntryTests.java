@@ -293,7 +293,7 @@ public class GIRSyncEntryTests {
         assertEquals(savable, test);
         test.readEntryNetwork(network1);
         assertEquals(savable, test);
-        assertTimeoutPreemptively(Duration.ofSeconds(1), () -> {
+        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
             do {
                 consumer.accept(savable);
             } while (savable.equals(test));

@@ -49,6 +49,11 @@ public class GIRConfigtestHV {
 
     @Test
     public void testHVConfig() {
+//        // Issue 2
+//        assertChange(DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.OFF).build(),
+//                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1).build(),
+//                DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.KS1).build());
+//
 //        // Issue 3
 //        assertChange(DummyBuilder.start(SignalKS.ZS3V, ZS32.Z2).build(),
 //                DummyBuilder.start(SignalKS.ZS3, ZS32.Z5).build(),
