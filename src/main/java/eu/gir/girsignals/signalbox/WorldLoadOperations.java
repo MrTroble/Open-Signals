@@ -78,8 +78,7 @@ public class WorldLoadOperations implements IChunkloadable {
             if (!(state.getBlock() instanceof RedstoneIO))
                 return;
             final IBlockState ibstate = state.withProperty(RedstoneIO.POWER, power);
-            chunk.setBlockState(position, ibstate);
-            syncClient(position);
+            world.setBlockState(position, ibstate, 3);
         });
     }
 
