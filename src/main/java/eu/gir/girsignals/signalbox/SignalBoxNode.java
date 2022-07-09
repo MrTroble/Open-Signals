@@ -17,10 +17,11 @@ import eu.gir.girsignals.signalbox.entrys.INetworkSavable;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.Rotation;
 
 public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
-    private static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
+    public static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
             EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
 
     private final HashMap<Path, ModeSet> possibleConnections = new HashMap<>();
@@ -173,8 +174,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final ModeSet modeSet = this.possibleConnections.get(path);
         if (modeSet == null)
             return false;
+        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(path.point1.delta(this.point));
         for (final EnumGuiMode mode : type.getModes()) {
-            final ModeSet possibleOverStepping = new ModeSet(mode, modeSet.rotation);
+            final ModeSet possibleOverStepping = new ModeSet(mode, rotation);
             if (this.possibleModes.containsKey(possibleOverStepping))
                 return false; // Found another signal on the path that is not the target
         }

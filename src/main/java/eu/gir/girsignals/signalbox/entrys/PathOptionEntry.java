@@ -1,9 +1,11 @@
 package eu.gir.girsignals.signalbox.entrys;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -63,18 +65,20 @@ public class PathOptionEntry implements INetworkSavable {
 
     @Override
     public void read(final NBTTagCompound tag) {
-        tag.getKeySet().forEach(name -> {
-            final PathEntryType<?> entry = PathEntryType.getType(name);
+        final List<PathEntryType<?>> tagSet = tag.getKeySet().stream().map(PathEntryType::getType)
+                .collect(Collectors.toList());
+        tagSet.forEach(entry -> {
             if (entry != null) {
-                if (tag.hasKey(name, 10)) {
+                if (tag.hasKey(entry.getName(), 10)) {
                     final IPathEntry<?> path = entry.newValue();
-                    path.read(tag.getCompoundTag(name));
+                    path.read(tag.getCompoundTag(entry.getName()));
                     pathEntrys.put(entry, path);
                 } else {
                     pathEntrys.remove(entry);
                 }
             }
         });
+        pathEntrys.keySet().retainAll(tagSet);
     }
 
     @Override

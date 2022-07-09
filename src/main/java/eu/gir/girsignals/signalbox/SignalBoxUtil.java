@@ -81,8 +81,6 @@ public final class SignalBoxUtil {
         public Set<Path> visited;
 
         public boolean check() {
-            if (path == null || previous == null)
-                return true;
             if (nextNode == null || !nextNode.canMakePath(path, type))
                 return false;
             if (!nextNode.getOption(path).map(entry -> entry.getEntry(PathEntryType.PATHUSAGE)
@@ -141,9 +139,9 @@ public final class SignalBoxUtil {
             for (final Path entry : nextSignalnode.connections()) {
                 final Point neighbour = entry.point2;
                 checker.previous = closedList.get(currentNode);
-                checker.path = checker.previous == null || neighbour == null ? null
-                        : new Path(checker.previous, neighbour);
-                if (checker.check()) {
+                if (checker.previous != null)
+                    checker.path = new Path(checker.previous, neighbour);
+                if (currentNode.equals(p1) || checker.check()) {
                     final double tScore = gscores.getOrDefault(currentNode, Double.MAX_VALUE - 1)
                             + 1;
                     if (tScore < gscores.getOrDefault(neighbour, Double.MAX_VALUE)) {

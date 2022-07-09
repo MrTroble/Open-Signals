@@ -182,7 +182,8 @@ public final class KSSignalConfig implements ISignalAutoconfig {
             values.put(SignalKS.MAINSIGNAL, KSMain.KS1);
             values.put(SignalKS.ZS2, ZS32.OFF);
             values.put(SignalKS.ZS2V, ZS32.OFF);
-            values.put(SignalKS.ZS3V, ZS32.Z3);
+            values.put(SignalKS.ZS3V, ZS32.OFF);
+            values.put(SignalKS.ZS3, ZS32.Z3);
         }
 
         this.changeIfPresent(values, info.current);
