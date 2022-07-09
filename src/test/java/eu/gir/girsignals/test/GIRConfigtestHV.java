@@ -23,6 +23,7 @@ import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.blocks.signals.SignalHL;
+import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.signalbox.config.HVSignalConfig;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
@@ -34,6 +35,12 @@ public class GIRConfigtestHV {
 
     @Test
     public void testHVConfig() {
+
+        final ConfigInfo info = new ConfigInfo(
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP0).build(), 0);
+        config.change(info);
+        assertEquals(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(), info.current);
 
         // HV -> HV
         configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, HP.HP0,
@@ -127,6 +134,7 @@ public class GIRConfigtestHV {
                 .of(ZS3V, zs3vnext).build();
         config.change(new ConfigInfo(signalBase, signalnext, speed));
         assertEquals(signalDummy, signalBase);
+
     }
 
     private void configtestHVHL(final HP hpcurrent, final HPHome hphomecurrent,
