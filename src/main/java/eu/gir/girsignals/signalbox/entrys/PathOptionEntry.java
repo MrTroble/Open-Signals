@@ -10,6 +10,7 @@ import net.minecraft.nbt.NBTTagCompound;
 public class PathOptionEntry implements INetworkSavable {
 
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
+    private final Map<PathEntryType<?>, IPathEntry<?>> removedEntrys = new HashMap<>(2);
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getEntry(final PathEntryType<T> type) {
@@ -21,7 +22,7 @@ public class PathOptionEntry implements INetworkSavable {
     @SuppressWarnings("unchecked")
     public <T> void setEntry(final PathEntryType<T> type, final T value) {
         if (value == null) {
-            pathEntrys.remove(type);
+            removedEntrys.put(type, pathEntrys.remove(type));
             return;
         }
         final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
@@ -65,9 +66,13 @@ public class PathOptionEntry implements INetworkSavable {
         tag.getKeySet().forEach(name -> {
             final PathEntryType<?> entry = PathEntryType.getType(name);
             if (entry != null) {
-                final IPathEntry<?> path = entry.newValue();
-                path.read(tag.getCompoundTag(name));
-                pathEntrys.put(entry, path);
+                if (tag.hasKey(name, 10)) {
+                    final IPathEntry<?> path = entry.newValue();
+                    path.read(tag.getCompoundTag(name));
+                    pathEntrys.put(entry, path);
+                } else {
+                    pathEntrys.remove(entry);
+                }
             }
         });
     }
@@ -79,6 +84,10 @@ public class PathOptionEntry implements INetworkSavable {
             option.writeEntryNetwork(entry, writeAll);
             if (entry.getSize() > 0)
                 tag.setTag(type.getName(), entry);
+        });
+        removedEntrys.keySet().removeIf(type -> {
+            tag.setBoolean(type.getName(), false);
+            return true;
         });
     }
 

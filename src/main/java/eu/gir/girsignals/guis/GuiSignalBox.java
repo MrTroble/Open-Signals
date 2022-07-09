@@ -266,6 +266,7 @@ public class GuiSignalBox extends GuiBase {
     private void initializePageTileConfig(final SignalBoxNode node) {
         if (node.isEmpty())
             return;
+        this.page = Page.TILE_CONFIG;
         reset();
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
@@ -476,10 +477,10 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void reset() {
-        if (page == Page.EDIT) {
+        if (page.equals(Page.EDIT)) {
             compound = new NBTTagCompound();
         }
-        if (page != Page.SETTINGS) {
+        if (!page.equals(Page.SETTINGS)) {
             this.entity.write(compound);
             GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
         }
@@ -487,7 +488,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private static enum Page {
-        USAGE, EDIT, SETTINGS
+        USAGE, EDIT, SETTINGS, TILE_CONFIG;
     }
 
 }
