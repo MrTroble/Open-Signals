@@ -198,7 +198,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     public void updateRedstonInput(final BlockPos pos, final boolean power) {
-        if (power) {
+        if (power && !this.world.isRemote) {
             grid.setPowered(pos);
             syncClient();
         }

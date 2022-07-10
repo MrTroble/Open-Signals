@@ -57,6 +57,7 @@ public class WorldLoadOperations implements IChunkloadable {
             return;
         final IBlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);
+        world.markBlockRangeForRenderUpdate(pos, pos);
     }
 
     public void loadAndReset(final BlockPos position) {

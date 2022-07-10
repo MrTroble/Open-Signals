@@ -207,11 +207,20 @@ public class SignalBoxPathway implements INetworkSavable {
         resetPathway(null);
     }
 
+    private void resetFirstSignal() {
+        this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
+    }
+
+    private void resetSignals() {
+        resetFirstSignal();
+        distantSignalPositions.forEach(position -> loadOps.loadAndReset(position));
+    }
+
     public void resetPathway(final @Nullable Point point) {
         this.setPathStatus(EnumPathUsage.FREE, point);
-        this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
         if (point == null || point.equals(this.getLastPoint())
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
+            resetSignals();
             this.emptyOrBroken = true;
         }
     }
@@ -227,8 +236,8 @@ public class SignalBoxPathway implements INetworkSavable {
     public boolean tryBlock(final BlockPos position) {
         if (!this.mapOfBlockingPositions.containsKey(position))
             return false;
+        resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
-        this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
         return true;
     }
 
