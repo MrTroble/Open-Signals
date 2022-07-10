@@ -57,6 +57,7 @@ public class SignalBoxGrid implements INetworkSavable {
 
     private void resetPathway(final SignalBoxPathway pathway) {
         pathway.resetPathway();
+        updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
         this.previousPathways.remove(pathway);
@@ -115,9 +116,8 @@ public class SignalBoxGrid implements INetworkSavable {
                 updateToNet(pathway);
             }
         });
-        startsToPath.values().forEach(pathway -> {
+        ImmutableList.copyOf(startsToPath.values()).forEach(pathway -> {
             if (pathway.tryReset(pos)) {
-                updatePrevious(pathway);
                 if (pathway.isEmptyOrBroken()) {
                     resetPathway(pathway);
                 }

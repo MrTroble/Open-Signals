@@ -71,9 +71,14 @@ public class SignalBoxPathway implements INetworkSavable {
                     .ifPresent(position -> mapOfBlockingPositions.put(position, node));
             optionEntry.getEntry(PathEntryType.RESETING)
                     .ifPresent(position -> mapOfResetPositions.put(position, node));
-            optionEntry.getEntry(PathEntryType.SIGNAL)
-                    .ifPresent(position -> distantPosBuilder.add(position));
         });
+        foreachPath((path, node) -> {
+            final Rotation rotation = SignalBoxUtil
+                    .getRotationFromDelta(node.getPoint().delta(path.point1));
+            node.getOption(new ModeSet(EnumGuiMode.VP, rotation))
+                    .ifPresent(option -> option.getEntry(PathEntryType.SIGNAL)
+                            .ifPresent(position -> distantPosBuilder.add(position)));
+        }, null);
         this.distantSignalPositions = distantPosBuilder.build();
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
         this.firstPoint = firstNode.getPoint();
@@ -155,17 +160,23 @@ public class SignalBoxPathway implements INetworkSavable {
         foreachEntry(consumer, null);
     }
 
-    private void foreachEntry(final BiConsumer<PathOptionEntry, SignalBoxNode> consumer,
+    private void foreachPath(final BiConsumer<Path, SignalBoxNode> consumer,
             final @Nullable Point point) {
         for (int i = listOfNodes.size() - 2; i > 0; i--) {
             final Point oldPos = listOfNodes.get(i - 1).getPoint();
             final Point newPos = listOfNodes.get(i + 1).getPoint();
             final SignalBoxNode current = listOfNodes.get(i);
-            current.getOption(new Path(oldPos, newPos))
-                    .ifPresent(entry -> consumer.accept(entry, current));
+            consumer.accept(new Path(oldPos, newPos), current);
             if (current.getPoint().equals(point))
                 break;
         }
+
+    }
+
+    private void foreachEntry(final BiConsumer<PathOptionEntry, SignalBoxNode> consumer,
+            final @Nullable Point point) {
+        foreachPath((path, current) -> current.getOption(path)
+                .ifPresent(entry -> consumer.accept(entry, current)), point);
     }
 
     public void setPathStatus(final EnumPathUsage status, final @Nullable Point point) {
@@ -197,8 +208,8 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     public void resetPathway(final @Nullable Point point) {
-        this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
         this.setPathStatus(EnumPathUsage.FREE, point);
+        this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
         if (point == null || point.equals(this.getLastPoint())
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
             this.emptyOrBroken = true;
