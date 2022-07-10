@@ -106,7 +106,6 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 }
             }
 
-            values.put(SignalHV.ZS3, ZS32.OFF);
             info.next.getProperty(SignalHV.ZS3)
                     .ifPresent(prevzs3 -> values.put(SignalHV.ZS3V, prevzs3));
 
