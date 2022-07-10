@@ -217,6 +217,7 @@ public class SignalBoxPathway implements INetworkSavable {
         if (!this.mapOfBlockingPositions.containsKey(position))
             return false;
         this.setPathStatus(EnumPathUsage.BLOCKED);
+        this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
         return true;
     }
 

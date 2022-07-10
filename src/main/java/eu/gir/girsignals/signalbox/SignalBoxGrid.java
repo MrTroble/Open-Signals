@@ -65,22 +65,14 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public boolean requestWay(final Point p1, final Point p2) {
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
-        ways.ifPresent(way -> this.onWayAdd(way));
+        ways.ifPresent(way -> {
+            way.setPathStatus(EnumPathUsage.SELECTED);
+            this.onWayAdd(way);
+        });
         return ways.isPresent();
     }
 
-    private void onWayAdd(final SignalBoxPathway pathway) {
-        pathway.setWorld(world);
-        startsToPath.put(pathway.getFirstPoint(), pathway);
-        endsToPath.put(pathway.getLastPoint(), pathway);
-        final SignalBoxPathway next = startsToPath.get(pathway.getLastPoint());
-        if (next != null)
-            previousPathways.put(next, pathway);
-        final SignalBoxPathway previous = endsToPath.get(pathway.getFirstPoint());
-        if (previous != null)
-            previousPathways.put(pathway, previous);
-        pathway.setPathStatus(EnumPathUsage.SELECTED);
-        pathway.updatePathwaySignals();
+    private void updatePrevious(final SignalBoxPathway pathway) {
         SignalBoxPathway previousPath = pathway;
         int count = 0;
         while ((previousPath = previousPathways.get(previousPath)) != null) {
@@ -93,6 +85,20 @@ public class SignalBoxGrid implements INetworkSavable {
             previousPath.updatePathwaySignals();
             count++;
         }
+    }
+
+    private void onWayAdd(final SignalBoxPathway pathway) {
+        pathway.setWorld(world);
+        startsToPath.put(pathway.getFirstPoint(), pathway);
+        endsToPath.put(pathway.getLastPoint(), pathway);
+        final SignalBoxPathway next = startsToPath.get(pathway.getLastPoint());
+        if (next != null)
+            previousPathways.put(next, pathway);
+        final SignalBoxPathway previous = endsToPath.get(pathway.getFirstPoint());
+        if (previous != null)
+            previousPathways.put(pathway, previous);
+        pathway.updatePathwaySignals();
+        updatePrevious(pathway);
         updateToNet(pathway);
     }
 
@@ -104,11 +110,14 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public void setPowered(final BlockPos pos) {
         startsToPath.values().forEach(pathway -> {
-            if (pathway.tryBlock(pos))
+            if (pathway.tryBlock(pos)) {
+                updatePrevious(pathway);
                 updateToNet(pathway);
+            }
         });
         startsToPath.values().forEach(pathway -> {
             if (pathway.tryReset(pos)) {
+                updatePrevious(pathway);
                 if (pathway.isEmptyOrBroken()) {
                     resetPathway(pathway);
                 }
