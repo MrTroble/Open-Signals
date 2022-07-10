@@ -78,7 +78,6 @@ public class PathOptionEntry implements INetworkSavable {
                 }
             }
         });
-        pathEntrys.keySet().retainAll(tagSet);
     }
 
     @Override
