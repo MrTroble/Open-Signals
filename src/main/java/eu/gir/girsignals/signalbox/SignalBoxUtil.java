@@ -13,7 +13,6 @@ import org.lwjgl.opengl.GL11;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
-import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import eu.gir.guilib.ecs.entitys.UIEntity;
 import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
@@ -84,9 +83,9 @@ public final class SignalBoxUtil {
         public boolean check() {
             if (nextNode == null || !nextNode.canMakePath(path, type))
                 return false;
-            final Optional<PathOptionEntry> optional = nextNode.getOption(path);
-            if (!optional.flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE)
-                    .filter(EnumPathUsage.FREE::equals)).isPresent())
+            final Optional<EnumPathUsage> optional = nextNode.getOption(path)
+                    .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
+            if (optional.isPresent() && !optional.get().equals(EnumPathUsage.FREE))
                 return false;
             if (nextNode.equals(lastNode))
                 return true;
