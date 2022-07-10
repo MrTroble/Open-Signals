@@ -29,6 +29,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
     })
     @Override
     public void change(final ConfigInfo info) {
+
         final Optional<ZS32> speedKS = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);
         final Optional<ZS32> speedKSplate = (Optional<ZS32>) info.next
                 .getProperty(SignalKS.ZS3_PLATE);
@@ -69,19 +70,22 @@ public final class HVSignalConfig implements ISignalAutoconfig {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         if (info.next != null) {
             if (info.speed < 7 && info.speed > 0 && info.speed != 4) {
-                final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
-                values.put(SignalHV.ZS3, zs32);
-            }
-            values.put(SignalHV.HPBLOCK, HPBlock.HP1);
-            values.put(SignalHV.HPHOME, HPHome.HP2);
-            values.put(SignalHV.STOPSIGNAL, HP.HP2);
-            if (info.speed == 4) {
+                info.current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
+                    final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
+                    info.current.setProperty(SignalHV.ZS3, zs32);
+                });
+                values.put(SignalHV.HPBLOCK, HPBlock.HP1);
+                values.put(SignalHV.HPHOME, HPHome.HP2);
+                values.put(SignalHV.STOPSIGNAL, HP.HP2);
+            } else if (info.speed == 4) {
                 values.put(SignalHV.HPBLOCK, HPBlock.HP1);
                 values.put(SignalHV.HPHOME, HPHome.HP2);
                 values.put(SignalHV.STOPSIGNAL, HP.HP2);
             } else if (info.speed >= 7 && info.speed <= 16) {
-                final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
-                values.put(SignalHV.ZS3, zs32);
+                info.current.getProperty(SignalHV.ZS3).ifPresent(_u -> {
+                    final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
+                    info.current.setProperty(SignalHV.ZS3, zs32);
+                });
                 values.put(SignalHV.HPBLOCK, HPBlock.HP1);
                 values.put(SignalHV.HPHOME, HPHome.HP1);
                 values.put(SignalHV.STOPSIGNAL, HP.HP1);
@@ -102,7 +106,9 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 }
             }
 
-            values.put(SignalHV.ZS3V, info.next.getProperty(SignalHV.ZS3).get());
+            values.put(SignalHV.ZS3, ZS32.OFF);
+            info.next.getProperty(SignalHV.ZS3)
+                    .ifPresent(prevzs3 -> values.put(SignalHV.ZS3V, prevzs3));
 
             if (info.next.getProperty(SignalHL.STOPSIGNAL).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
@@ -155,7 +161,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                                 values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                             }
                         } else if (zs32 < 26) {
-                            values.put(SignalKS.ZS2V, speedKS.get());
+                            values.put(SignalKS.ZS2V, speednext);
                         }
                     }
                 } else if (ksstop || ksstopmain) {
