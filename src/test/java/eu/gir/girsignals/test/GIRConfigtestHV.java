@@ -56,13 +56,13 @@ public class GIRConfigtestHV {
                 DummyBuilder.start(SignalHV.ZS3V, ZS32.Z5).build());
 
         // Issue 1
-        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
-                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP2).build(),
-                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR2).build());
-
-        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
-                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP0).build(),
-                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build());
+//        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+//                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP2).build(),
+//                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR2).build());
+//
+//        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+//                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP0).build(),
+//                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build());
 
         // HV -> HV
         configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, HP.HP0,
