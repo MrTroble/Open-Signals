@@ -4,7 +4,7 @@
 		"lamp_white": "girsignals:blocks/lamps/lamp_white"
 	},
 	"models": {
-		"hv/hv1": {
+		"modelname": {
 			"texture": {
 				"lampgreennorth": {
 					"lamp_green": {

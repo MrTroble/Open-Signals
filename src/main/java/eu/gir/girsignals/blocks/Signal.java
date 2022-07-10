@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
+import com.google.common.collect.ImmutableList;
+
 import eu.gir.girsignals.GIRSignalsConfig;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -163,6 +165,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return this;
         }
     }
+    
+    @SuppressWarnings("rawtypes")
+    private final ArrayList<IUnlistedProperty> properties = new ArrayList<>();
 
     public static final SignalPropertiesBuilder builder(final Placementtool placementtool,
             final String signalTypeName) {
@@ -317,23 +322,28 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     @SuppressWarnings("rawtypes")
     @Override
     protected BlockStateContainer createBlockState() {
-        final ArrayList<IUnlistedProperty> prop = new ArrayList<>();
+        properties.clear();
         if (!this.getClass().equals(Signal.class)) {
             for (final Field f : this.getClass().getDeclaredFields()) {
                 final int mods = f.getModifiers();
                 if (Modifier.isFinal(mods) && Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
                     try {
-                        prop.add((IUnlistedProperty) f.get(null));
+                        properties.add((IUnlistedProperty) f.get(null));
                     } catch (final IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
             }
         }
-        prop.add(CUSTOMNAME);
+        properties.add(CUSTOMNAME);
         return new ExtendedBlockState(this, new IProperty<?>[] {
                 ANGEL
-        }, prop.toArray(new IUnlistedProperty[prop.size()]));
+        }, properties.toArray(new IUnlistedProperty[properties.size()]));
+    }
+    
+    @SuppressWarnings("rawtypes")
+    public ImmutableList<IUnlistedProperty> getProperties() {
+        return ImmutableList.copyOf(this.properties);
     }
 
     @Override

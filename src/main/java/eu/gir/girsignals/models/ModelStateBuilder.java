@@ -9,66 +9,60 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Stream;
 
+import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRBlocks;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class ModelStateBuilder {
 
-    private String name;
-    private String model;
-    private String texture;
-    private String has;
-    private String hasnot;
-    private String with;
-    private String hasandis;
-    private String hasandisnot;
-    private String lamp;
-    private String retexture;
-    private Integer x;
-    private Integer y;
-    private Integer z;
+    private final Signal sig;
 
-    public ModelStateBuilder(final String name, final String model, final String texture,
-            final String has, final String hasnot, final String with, final String hasandis,
-            final String hasandisnot, final String lamp, final String retexture, final int x,
-            final int y, final int z) {
-        this.name = name;
-        this.model = model;
-        this.texture = texture;
-        this.has = has;
-        this.hasnot = hasnot;
-        this.with = with;
-        this.hasandis = hasandis;
-        this.hasandisnot = hasandisnot;
-        this.lamp = lamp;
-        this.retexture = retexture;
-        this.x = x;
-        this.y = y;
-        this.z = z;
+    public ModelStateBuilder(final Signal sig) {
+        this.sig = sig;
     }
 
-    public static Map<String, JsonObject> fromJson(final String directory) {
+    public static void getfromJson(final String directory) {
+        final Map<String, JsonObject> entrySet = getasJsonObject(directory);
+        // final Map<String, JsonElement> map1 = new HashMap<>();
+        if (entrySet != null) {
+            entrySet.forEach((signaltype, file) -> {
+                // @SuppressWarnings("rawtypes")
+                // final ImmutableList<IUnlistedProperty> map = sig.getProperties();
+                final String models = file.get("models").toString().replace("{", "").replace("}",
+                        "");
+                final JsonElement modelname = file.get("modelname");
+                System.out.println(models);
+                System.out.println(modelname);
+                // map1.put(signaltype, models);
+            });
+        }
+        // return map1;
+    }
+
+    public static Map<String, JsonObject> getasJsonObject(final String directory) {
         final Gson gson = new Gson();
-        final Set<Entry<String, String>> entrySet = readallFilesfromDierectory(directory)
-                .entrySet();
+        final Map<String, String> entrySet = readallFilesfromDierectory(directory);
         final Map<String, JsonObject> content = new HashMap<>();
-        entrySet.forEach(file -> {
-            final String substance = file.getValue();
-            final String title = file.getKey();
-            final JsonObject json = gson.fromJson(substance, JsonObject.class);
-            content.put(title, json);
-        });
+        if (entrySet != null) {
+            entrySet.forEach((filename, file) -> {
+                final JsonObject json = gson.fromJson(file, JsonObject.class);
+                content.put(filename, json);
+            });
+        }
         return content;
     }
 
@@ -82,9 +76,9 @@ public class ModelStateBuilder {
                 inputs.forEach(file -> {
                     try {
                         final List<String> text = Files.readAllLines(file);
-                        final String output = toString(text);
+                        final String content = toString(text);
                         final String name = file.getFileName().toString();
-                        files.put(name, output);
+                        files.put(name, content);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -131,109 +125,5 @@ public class ModelStateBuilder {
             e.printStackTrace();
         }
         return Optional.empty();
-    }
-
-    public String getHasandis() {
-        return hasandis;
-    }
-
-    public void setHasandis(String hasandis) {
-        this.hasandis = hasandis;
-    }
-
-    public String getHasandisnot() {
-        return hasandisnot;
-    }
-
-    public void setHasandisnot(String hasandisnot) {
-        this.hasandisnot = hasandisnot;
-    }
-
-    public String getHas() {
-        return has;
-    }
-
-    public void setHas(String has) {
-        this.has = has;
-    }
-
-    public String getHasnot() {
-        return hasnot;
-    }
-
-    public void setHasnot(String hasnot) {
-        this.hasnot = hasnot;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
-
-    public int getX() {
-        return x;
-    }
-
-    public void setX(int x) {
-        this.x = x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public void setY(int y) {
-        this.y = y;
-    }
-
-    public int getZ() {
-        return z;
-    }
-
-    public void setZ(int z) {
-        this.z = z;
-    }
-
-    public String getLamp() {
-        return lamp;
-    }
-
-    public void setLamp(String lamp) {
-        this.lamp = lamp;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRetexture() {
-        return retexture;
-    }
-
-    public void setRetexture(String retexture) {
-        this.retexture = retexture;
-    }
-
-    public String getTexture() {
-        return texture;
-    }
-
-    public void setTexture(String texture) {
-        this.texture = texture;
-    }
-
-    public String getWith() {
-        return with;
-    }
-
-    public void setWith(String with) {
-        this.with = with;
     }
 }
