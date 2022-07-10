@@ -49,6 +49,10 @@ public class GIRConfigtestKS {
 
     @Test
     public void testKSConfig() {
+        final ConfigInfo info = new ConfigInfo(new DummySignal(), null, 0);
+        config.change(info);
+        assertEquals(new DummySignal(), info.current);
+
         assertChange(DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.OFF).build(),
                 DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1_BLINK).build(),
                 DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.KS1).build());
