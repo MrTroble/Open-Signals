@@ -458,7 +458,7 @@ public class GIRSyncEntryTests {
         });
         final Point p1 = pathRef.get().point1;
         final Point p2 = pathRef.get().point2;
-        assertTrue(wayTestGrid.requestWay(null, p1, p2));
+        assertTrue(wayTestGrid.requestWay(p1, p2));
         testISavable(wayTestGrid, () -> new SignalBoxGrid(_u -> {
         }));
 

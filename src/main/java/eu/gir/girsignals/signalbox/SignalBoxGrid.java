@@ -9,8 +9,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javax.annotation.Nullable;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 
@@ -32,6 +30,7 @@ public class SignalBoxGrid implements INetworkSavable {
     private final Map<SignalBoxPathway, SignalBoxPathway> previousPathways = new HashMap<>(32);
     private final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     private final Consumer<NBTTagCompound> sendToAll;
+    private World world = null;
 
     public SignalBoxGrid(final Consumer<NBTTagCompound> sendToAll) {
         this.sendToAll = sendToAll;
@@ -64,13 +63,13 @@ public class SignalBoxGrid implements INetworkSavable {
         this.previousPathways.entrySet().removeIf(entry -> entry.getValue().equals(pathway));
     }
 
-    public boolean requestWay(final @Nullable World world, final Point p1, final Point p2) {
+    public boolean requestWay(final Point p1, final Point p2) {
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
-        ways.ifPresent(way -> this.onWayAdd(world, way));
+        ways.ifPresent(way -> this.onWayAdd(way));
         return ways.isPresent();
     }
 
-    private void onWayAdd(final @Nullable World world, final SignalBoxPathway pathway) {
+    private void onWayAdd(final SignalBoxPathway pathway) {
         pathway.setWorld(world);
         startsToPath.put(pathway.getFirstPoint(), pathway);
         endsToPath.put(pathway.getLastPoint(), pathway);
@@ -167,8 +166,15 @@ public class SignalBoxGrid implements INetworkSavable {
                 GirsignalsMain.log.error("Remove empty or broken pathway, try to recover!");
                 return;
             }
-            onWayAdd(null, pathway);
+            onWayAdd(pathway);
         });
+    }
+
+    /**
+     * @param world the world to set
+     */
+    public void setWorld(final World world) {
+        this.world = world;
     }
 
     @Override

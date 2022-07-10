@@ -238,9 +238,7 @@ public class SignalBoxPathway implements INetworkSavable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(distantSignalPositions, emptyOrBroken, firstPoint, lastPoint,
-                listOfNodes, mapOfBlockingPositions, mapOfResetPositions, modeGrid, signalPositions,
-                speed, type);
+        return Objects.hash(emptyOrBroken, firstPoint, lastPoint, listOfNodes, modeGrid, type);
     }
 
     @Override
@@ -252,24 +250,15 @@ public class SignalBoxPathway implements INetworkSavable {
         if (getClass() != obj.getClass())
             return false;
         final SignalBoxPathway other = (SignalBoxPathway) obj;
-        return Objects.equals(distantSignalPositions, other.distantSignalPositions)
-                && emptyOrBroken == other.emptyOrBroken
-                && Objects.equals(firstPoint, other.firstPoint)
+        return emptyOrBroken == other.emptyOrBroken && Objects.equals(firstPoint, other.firstPoint)
                 && Objects.equals(lastPoint, other.lastPoint)
                 && Objects.equals(listOfNodes, other.listOfNodes)
-                && Objects.equals(mapOfBlockingPositions, other.mapOfBlockingPositions)
-                && Objects.equals(mapOfResetPositions, other.mapOfResetPositions)
-                && Objects.equals(modeGrid, other.modeGrid)
-                && Objects.equals(signalPositions, other.signalPositions) && speed == other.speed
-                && type == other.type;
+                && Objects.equals(modeGrid, other.modeGrid) && type == other.type;
     }
 
     @Override
     public String toString() {
-        return "SignalBoxPathway [type=" + type + ", speed=" + speed + ", signalPositions="
-                + signalPositions + ", mapOfResetPositions=" + mapOfResetPositions
-                + ", mapOfBlockingPositions=" + mapOfBlockingPositions + ", firstPoint="
-                + firstPoint + ", lastPoint=" + lastPoint + ", list=" + listOfNodes + "]";
+        return "SignalBoxPathway [start=" + firstPoint + ", end=" + lastPoint + "]";
     }
 
     @Override

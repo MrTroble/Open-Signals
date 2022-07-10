@@ -48,7 +48,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     @Override
     public void setWorld(final World worldIn) {
         super.setWorld(worldIn);
-        worldLoadOps = new WorldLoadOperations(world);
+        worldLoadOps = new WorldLoadOperations(worldIn);
+        grid.setWorld(worldIn);
     }
 
     @Override
@@ -108,7 +109,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             final NBTTagCompound request = (NBTTagCompound) compound.getTag(REQUEST_WAY);
             final Point p1 = fromNBT(request, POINT1);
             final Point p2 = fromNBT(request, POINT2);
-            if (!grid.requestWay(world, p1, p2)) {
+            if (!grid.requestWay(p1, p2)) {
                 final NBTTagCompound error = new NBTTagCompound();
                 error.setString(ERROR_STRING, "error.nopathfound");
                 sendToAll(error);
