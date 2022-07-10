@@ -39,11 +39,11 @@ public final class KSSignalConfig implements ISignalAutoconfig {
 
         final HashMap<SEProperty, Object> values = new HashMap<>();
 
-        if (info.speed <= 16 && info.speed > 0) {
-            final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
-            values.put(SignalKS.ZS3, zs32);
-        }
         if (info.next != null) {
+            if (info.speed <= 16 && info.speed > 0) {
+                final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
+                values.put(SignalKS.ZS3, zs32);
+            }
             final Optional<ZS32> speedHV = (Optional<ZS32>) info.next.getProperty(SignalHV.ZS3);
             final Optional<ZS32> speedHVplate = (Optional<ZS32>) info.next
                     .getProperty(SignalHV.ZS3_PLATE);
@@ -120,8 +120,14 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     && !currentks.filter(KS.HP0::equals).isPresent()) {
                 if (!nextZS3.isPresent() && currentzs3v.isPresent() && !stop) {
                     final ZS32 speednext = speedKSZS3plate.get();
-                    values.put(SignalKS.ZS3V, speednext);
-                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                    final int speed = speednext.ordinal();
+                    if (speed < 26 && speed < 42) {
+                        values.put(SignalKS.ZS3V, speednext);
+                        values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                    } else if (speednext.ordinal() > 26) {
+                        values.put(SignalKS.ZS2V, speednext);
+                        values.put(SignalKS.STOPSIGNAL, KS.KS1);
+                    }
                 }
             }
             if ((!hlmain40 && nexthl) || hvstop || hvstop2) {
