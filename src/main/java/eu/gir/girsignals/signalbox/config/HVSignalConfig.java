@@ -102,7 +102,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 }
             }
 
-            values.put(SignalHV.ZS3V, info.next.getProperty(SignalHV.ZS3));
+            values.put(SignalHV.ZS3V, info.next.getProperty(SignalHV.ZS3).get());
 
             if (info.next.getProperty(SignalHL.STOPSIGNAL).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {

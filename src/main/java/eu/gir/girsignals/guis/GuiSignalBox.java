@@ -196,7 +196,6 @@ public class GuiSignalBox extends GuiBase {
             case HP:
             case RS: {
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
-                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING);
                 parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
                     this.lowerEntity.clear();
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());

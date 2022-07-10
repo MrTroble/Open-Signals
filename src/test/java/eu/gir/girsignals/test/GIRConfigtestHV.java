@@ -50,6 +50,11 @@ public class GIRConfigtestHV {
 
     @Test
     public void testHVConfig() {
+        assertChange(
+                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP2).of(SignalHV.ZS3V, ZS32.Z15).build(),
+                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP1).build(), DummyBuilder
+                        .start(SignalHV.STOPSIGNAL, HP.HP1).of(SignalHV.ZS3V, ZS32.Z15).build());
+
         // Works at HV
         assertChange(DummyBuilder.start(SignalHV.ZS3V, ZS32.Z2).build(),
                 DummyBuilder.start(SignalHV.ZS3, ZS32.Z5).build(),
