@@ -57,6 +57,7 @@ public class SignalBoxGrid implements INetworkSavable {
 
     private void resetPathway(final SignalBoxPathway pathway) {
         pathway.resetPathway();
+        updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
         this.previousPathways.remove(pathway);
@@ -66,7 +67,9 @@ public class SignalBoxGrid implements INetworkSavable {
     public boolean requestWay(final Point p1, final Point p2) {
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
+            way.setWorld(world);
             way.setPathStatus(EnumPathUsage.SELECTED);
+            way.updatePathwaySignals();
             this.onWayAdd(way);
         });
         return ways.isPresent();
@@ -97,7 +100,6 @@ public class SignalBoxGrid implements INetworkSavable {
         final SignalBoxPathway previous = endsToPath.get(pathway.getFirstPoint());
         if (previous != null)
             previousPathways.put(pathway, previous);
-        pathway.updatePathwaySignals();
         updatePrevious(pathway);
         updateToNet(pathway);
     }
@@ -109,15 +111,15 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void setPowered(final BlockPos pos) {
-        startsToPath.values().forEach(pathway -> {
+        final List<SignalBoxPathway> nodeCopy = ImmutableList.copyOf(startsToPath.values());
+        nodeCopy.forEach(pathway -> {
             if (pathway.tryBlock(pos)) {
-                updatePrevious(pathway);
                 updateToNet(pathway);
+                updatePrevious(pathway);
             }
         });
-        startsToPath.values().forEach(pathway -> {
+        nodeCopy.forEach(pathway -> {
             if (pathway.tryReset(pos)) {
-                updatePrevious(pathway);
                 if (pathway.isEmptyOrBroken()) {
                     resetPathway(pathway);
                 }

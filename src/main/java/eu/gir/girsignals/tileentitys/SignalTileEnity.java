@@ -2,6 +2,7 @@ package eu.gir.girsignals.tileentitys;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
@@ -151,6 +152,24 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     @Override
     public NBTTagCompound getTag() {
         return null;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(formatCustomName, map);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final SignalTileEnity other = (SignalTileEnity) obj;
+        return Objects.equals(formatCustomName, other.formatCustomName)
+                && Objects.equals(map, other.map);
     }
 
 }

@@ -50,6 +50,10 @@ public class GIRConfigtestHV {
 
     @Test
     public void testHVConfig() {
+        final ConfigInfo info = new ConfigInfo(new DummySignal(), null, 0);
+        config.change(info);
+        assertEquals(new DummySignal(), info.current);
+
         assertChange(
                 DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP2).of(SignalHV.ZS3V, ZS32.Z15).build(),
                 DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP1).build(), DummyBuilder
