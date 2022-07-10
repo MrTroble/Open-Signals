@@ -124,7 +124,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     if (speed < 26 && speed < 42) {
                         values.put(SignalKS.ZS3V, speednext);
                         values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
-                    } else if (speednext.ordinal() > 26) {
+                    } else if (speednext.ordinal() < 26) {
                         values.put(SignalKS.ZS2V, speednext);
                         values.put(SignalKS.STOPSIGNAL, KS.KS1);
                     }
