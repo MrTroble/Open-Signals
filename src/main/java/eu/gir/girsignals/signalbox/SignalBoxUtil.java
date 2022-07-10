@@ -85,7 +85,7 @@ public final class SignalBoxUtil {
             if (nextNode == null || !nextNode.canMakePath(path, type))
                 return false;
             final Optional<PathOptionEntry> optional = nextNode.getOption(path);
-            if (!optional.map(entry -> entry.getEntry(PathEntryType.PATHUSAGE)
+            if (!optional.flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE)
                     .filter(EnumPathUsage.FREE::equals)).isPresent())
                 return false;
             if (nextNode.equals(lastNode))

@@ -50,10 +50,6 @@ public class GIRConfigtestHV {
 
     @Test
     public void testHVConfig() {
-        final ConfigInfo info = new ConfigInfo(new DummySignal(), null, 0);
-        config.change(info);
-        assertEquals(new DummySignal(), info.current);
-
         assertChange(
                 DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP2).of(SignalHV.ZS3V, ZS32.Z15).build(),
                 DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP1).build(), DummyBuilder
@@ -65,13 +61,17 @@ public class GIRConfigtestHV {
                 DummyBuilder.start(SignalHV.ZS3V, ZS32.Z5).build());
 
         // Issue 1
-//        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
-//                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP2).build(),
-//                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR2).build());
-//
-//        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
-//                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP0).build(),
-//                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build());
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP2).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR2).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP0).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build());
+
+        final ConfigInfo info = new ConfigInfo(new DummySignal(), null, 0);
+        config.change(info);
+        assertEquals(new DummySignal(), info.current);
 
         // HV -> HV
         configtestHV(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, HP.HP0,
