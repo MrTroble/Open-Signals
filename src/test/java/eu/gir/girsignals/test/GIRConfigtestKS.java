@@ -51,11 +51,25 @@ public class GIRConfigtestKS {
     public void testKSConfig() {
         assertChange(DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.OFF).build(),
                 DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1_BLINK).build(),
-                DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK).build());
+                DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.KS1).build());
 
-        assertChange(DummyBuilder.start(SignalKS.ZS3V, ZS32.Z2).build(),
-                DummyBuilder.start(SignalKS.ZS3, ZS32.Z5).build(),
-                DummyBuilder.start(SignalKS.ZS3V, ZS32.Z5).build());
+        assertChange(DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.OFF).build(),
+                DummyBuilder.start(SignalKS.MAINSIGNAL, KSMain.KS1).build(),
+                DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.KS1).build());
+
+        assertChange(DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1).build(),
+                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.HP0).build(),
+                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS2).build());
+
+        assertChange(DummyBuilder.start(SignalKS.ZS3V, ZS32.Z5).build(),
+                DummyBuilder.start(SignalKS.ZS3, ZS32.Z2).build(),
+                DummyBuilder.start(SignalKS.ZS3V, ZS32.Z2).build());
+
+        assertChange(
+                DummyBuilder.start(SignalKS.ZS3V, ZS32.Z5).of(SignalKS.STOPSIGNAL, KS.KS1).build(),
+                DummyBuilder.start(SignalKS.ZS3, ZS32.Z2).of(SignalKS.STOPSIGNAL, KS.KS1).build(),
+                DummyBuilder.start(SignalKS.ZS3V, ZS32.Z2).of(SignalKS.STOPSIGNAL, KS.KS1_BLINK)
+                        .build());
 
         // KS -> KS
         for (final ZS32 zs32 : ZS32.values()) {
