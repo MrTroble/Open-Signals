@@ -45,12 +45,11 @@ public final class HLSignalConfig implements ISignalAutoconfig {
     }
 
     @SuppressWarnings("rawtypes")
-    private void speedCheckExit(final int speed, final Map<SEProperty, Object> values,
-            final HLExit normal, final HLExit restricted) {
+    private void speedCheckExit(final int speed, final Map<SEProperty, Object> values) {
         if (speed >= 1 && speed <= 10) {
-            values.put(SignalHL.EXITSIGNAL, restricted);
+            values.put(SignalHL.EXITSIGNAL, HLExit.HL2_3);
         } else {
-            values.put(SignalHL.EXITSIGNAL, normal);
+            values.put(SignalHL.EXITSIGNAL, HLExit.HL1);
         }
     }
 
@@ -78,20 +77,10 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             RSSignalConfig.RS_CONFIG.change(info);
             return;
         }
+
         final HashMap<SEProperty, Object> values = new HashMap<>();
+
         if (info.next != null) {
-            info.next.getProperty(SignalHL.STOPSIGNAL).ifPresent(hl -> {
-                final boolean stop = hl.equals(HL.HP0) || hl.equals(HL.HP0_ALTERNATE_RED);
-                if (stop) {
-                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
-                } else if (hl.equals(HL.HL4)) {
-                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
-                } else if (Signallists.HL_40_MAIN.contains(hl) || hl.equals(HL.HL7)) {
-                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
-                } else {
-                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
-                }
-            });
             final Optional<HLLightbar> optionalLightBar = (Optional<HLLightbar>) info.next
                     .getProperty(SignalHL.LIGHTBAR);
             final Optional<HL> hlStop = (Optional<HL>) info.next.getProperty(SignalHL.STOPSIGNAL);
@@ -161,22 +150,17 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                 speedCheck(info.speed, values, HL.HL7, HL.HL8_9);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
             }
-            speedCheckExit(info.speed, values, HLExit.HL1, HLExit.HL2_3);
-            if (nextks || nexthv) {
-                if (ksgo || hvgo || hvgo2) {
+            speedCheckExit(info.speed, values);
+            if (nexthv) {
+                if (hvgo || hvgo2) {
                     if (hv40) {
                         speedCheck(info.speed, values, HL.HL7, HL.HL8_9);
                         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
-                    } else if (!hv40) {
+                    } else {
                         speedCheck(info.speed, values, HL.HL1, HL.HL2_3);
                         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
                     }
-                    if (speedKS.isPresent() || speedKSplate.isPresent()) {
-                        final ZS32 speednext = speedKS.isPresent() ? speedKS.get()
-                                : speedKSplate.get();
-                        final int zs32 = speednext.ordinal();
-                        speedChecknext(info.speed, zs32, values);
-                    } else if (speedHV.isPresent() || speedHVplate.isPresent()) {
+                    if (speedHV.isPresent() || speedHVplate.isPresent()) {
                         final ZS32 speednext = speedHV.isPresent() ? speedHV.get()
                                 : speedHVplate.get();
                         final int zs32 = speednext.ordinal();
@@ -186,9 +170,21 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                 }
+            } else if (nextks) {
+                if (ksgo) {
+                    if (speedKS.isPresent() || speedKSplate.isPresent()) {
+                        final ZS32 speednext = speedKS.isPresent() ? speedKS.get()
+                                : speedKSplate.get();
+                        final int zs32 = speednext.ordinal();
+                        speedChecknext(info.speed, zs32, values);
+                    }
+                } else {
+                    speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
+                    values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
+                }
             }
         } else {
-            speedCheckExit(info.speed, values, HLExit.HL1, HLExit.HL2_3);
+            speedCheckExit(info.speed, values);
             speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
             values.put(SignalHL.ZS2, ZS32.ZS13);
