@@ -259,7 +259,7 @@ public class SignalBoxPathway implements INetworkSavable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(emptyOrBroken, firstPoint, lastPoint, listOfNodes, modeGrid, type);
+        return Objects.hash(firstPoint, lastPoint, listOfNodes, modeGrid, type);
     }
 
     @Override
@@ -271,7 +271,7 @@ public class SignalBoxPathway implements INetworkSavable {
         if (getClass() != obj.getClass())
             return false;
         final SignalBoxPathway other = (SignalBoxPathway) obj;
-        return emptyOrBroken == other.emptyOrBroken && Objects.equals(firstPoint, other.firstPoint)
+        return Objects.equals(firstPoint, other.firstPoint)
                 && Objects.equals(lastPoint, other.lastPoint)
                 && Objects.equals(listOfNodes, other.listOfNodes)
                 && Objects.equals(modeGrid, other.modeGrid) && type == other.type;

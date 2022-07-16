@@ -65,6 +65,8 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
+        if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
+            return false;
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
             way.setWorld(world);
