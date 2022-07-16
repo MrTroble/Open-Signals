@@ -181,8 +181,9 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                         if (zs32 > 32) {
                             values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                         }
-                    } else if (zs32 < 26) {
-                        values.put(SignalHV.ZS3V, speedcurrent);
+                    } else if (zs32 <= 26) {
+                        values.put(SignalHV.ZS2V, speedcurrent);
+                        values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                     }
                 }
             }
