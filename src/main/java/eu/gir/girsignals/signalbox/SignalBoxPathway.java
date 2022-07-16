@@ -40,6 +40,7 @@ public class SignalBoxPathway implements INetworkSavable {
     private Point lastPoint = new Point();
     private int speed = -1;
     private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
+    private Optional<BlockPos> lastSignal = Optional.empty();
     private ImmutableList<BlockPos> distantSignalPositions = ImmutableList.of();
     private WorldLoadOperations loadOps = new WorldLoadOperations(null);
     private Map<Point, SignalBoxNode> modeGrid = null;
@@ -89,6 +90,9 @@ public class SignalBoxPathway implements INetworkSavable {
         final BlockPos lastPos = makeFromNext(type, lastNode, this.listOfNodes.get(1),
                 Rotation.CLOCKWISE_180);
         if (firstPos != null) {
+            if (lastPos != null) {
+                lastSignal = Optional.of(lastPos);
+            }
             this.signalPositions = Optional.of(Maps.immutableEntry(firstPos, lastPos));
         } else {
             this.signalPositions = Optional.empty();
@@ -142,8 +146,11 @@ public class SignalBoxPathway implements INetworkSavable {
         });
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
-        if (this.listOfNodes.size() < 2)
+        if (this.listOfNodes.size() < 2) {
+            GirsignalsMain.log.error("Detecting pathway with only 2 elements!");
+            this.emptyOrBroken = true;
             return;
+        }
         this.initalize();
     }
 
@@ -198,8 +205,10 @@ public class SignalBoxPathway implements INetworkSavable {
     public void updatePathwaySignals() {
         this.signalPositions.ifPresent(entry -> {
             loadOps.loadAndConfig(speed, entry.getKey(), entry.getValue(), this::configUpdate);
-            distantSignalPositions.forEach(position -> loadOps.loadAndConfig(speed, position,
-                    entry.getValue(), this::configUpdate));
+        });
+        lastSignal.ifPresent(posIn -> {
+            distantSignalPositions.forEach(
+                    position -> loadOps.loadAndConfig(speed, position, posIn, this::configUpdate));
         });
     }
 
