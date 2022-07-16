@@ -160,7 +160,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                                 values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                             }
                         } else if (zs32 < 26) {
-                            values.put(SignalKS.ZS2V, speednext);
+                            values.put(SignalKS.ZS3V, speednext);
                         }
                     }
                 } else if (ksstop || ksstopmain) {
