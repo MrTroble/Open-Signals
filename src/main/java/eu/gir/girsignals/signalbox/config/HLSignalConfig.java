@@ -94,6 +94,8 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final Optional<ZS32> speedHV = (Optional<ZS32>) info.next.getProperty(SignalHV.ZS3);
             final Optional<ZS32> speedHVplate = (Optional<ZS32>) info.next
                     .getProperty(SignalHV.ZS3_PLATE);
+            final Optional<ZS32> nextHLPLATE = (Optional<ZS32>) info.next
+                    .getProperty(SignalHL.ZS3_PLATE);
 
             final boolean ksgo = info.next.getProperty(SignalKS.STOPSIGNAL)
                     .filter(a -> Signallists.KS_GO.contains(a)).isPresent()
@@ -166,7 +168,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                                 : speedHVplate.get();
                         final int zs32 = speednext.ordinal();
                         speedChecknext(info.speed, zs32, values);
-                        if (zs32 < 26) {
+                        if (zs32 <= 26) {
                             values.put(SignalHL.ZS2V, speednext);
                         }
                     }
@@ -181,13 +183,20 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                                 : speedKSplate.get();
                         final int zs32 = speednext.ordinal();
                         speedChecknext(info.speed, zs32, values);
-                        if (zs32 < 26) {
+                        if (zs32 <= 26) {
                             values.put(SignalHL.ZS2V, speednext);
                         }
                     }
                 } else {
                     speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
+                }
+            }
+            if (nextHLPLATE.isPresent()) {
+                final ZS32 zs3next = nextHLPLATE.get();
+                final int zs3 = zs3next.ordinal();
+                if (zs3 <= 26) {
+                    values.put(SignalHL.ZS2V, zs3next);
                 }
             }
         } else {
