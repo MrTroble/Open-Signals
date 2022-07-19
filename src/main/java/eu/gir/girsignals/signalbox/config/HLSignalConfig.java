@@ -217,6 +217,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
         values.put(SignalHL.STOPSIGNAL, HL.HP0);
         values.put(SignalHL.EXITSIGNAL, HLExit.HP0);
         values.put(SignalHL.ZS2, ZS32.OFF);
+        values.put(SignalHL.ZS2V, ZS32.OFF);
         this.changeIfPresent(values, current);
     }
 
