@@ -113,7 +113,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     }
 
     public void setCustomName(final String str) {
-        if (!getSignal().canHaveCustomname(this.map))
+        if (!getSignal().canHaveCustomname(this.map) || !getSignal().canBeLinked())
             return;
         this.formatCustomName = str;
         if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
