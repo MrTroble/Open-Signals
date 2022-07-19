@@ -62,6 +62,7 @@ public class GuiSignalBox extends GuiBase {
     private final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
     private Page page = Page.USAGE;
+    private SignalBoxNode node = null;
 
     public GuiSignalBox(final SignalBoxTileEntity box) {
         this.box = box;
@@ -118,7 +119,6 @@ public class GuiSignalBox extends GuiBase {
                     }));
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
                 option.setEntry(entryType, id >= 0 ? positions.get(id) : null);
-                node.writeEntryNetwork(compound, false);
             });
             blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
                 e.setMin(-1);
@@ -154,7 +154,7 @@ public class GuiSignalBox extends GuiBase {
         modeLabel.setCenterX(false);
         entity.add(modeLabel);
         parent.add(entity);
-
+        this.node = node;
         final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
 
         switch (mode) {
@@ -173,7 +173,6 @@ public class GuiSignalBox extends GuiBase {
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
                     option.setEntry(PathEntryType.SPEED, id > 0 ? id : Integer.MAX_VALUE);
-                    node.writeEntryNetwork(compound, false);
                 });
                 final int speed = option.getEntry(PathEntryType.SPEED).filter(n -> n < 16)
                         .orElse(Integer.MAX_VALUE);
@@ -265,8 +264,8 @@ public class GuiSignalBox extends GuiBase {
     private void initializePageTileConfig(final SignalBoxNode node) {
         if (node.isEmpty())
             return;
-        this.page = Page.TILE_CONFIG;
         reset();
+        this.page = Page.TILE_CONFIG;
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
         list.setInheritWidth(true);
@@ -315,6 +314,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializePageSettings(final UIEntity entity) {
         reset();
+        this.page = Page.SETTINGS;
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
@@ -350,23 +350,22 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(list);
         lowerEntity.add(GuiElements.createPageSelect(uibox));
         resetSelection(entity);
-        this.page = Page.SETTINGS;
     }
 
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
+        this.page = Page.USAGE;
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
-        this.page = Page.USAGE;
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
         reset();
+        this.page = Page.EDIT;
         final UIMenu menu = new UIMenu();
         initializeFieldTemplate((e, name) -> this.tileEdit(e, menu, name));
         lowerEntity.add(menu);
         resetSelection(entity);
-        this.page = Page.EDIT;
     }
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
@@ -471,8 +470,7 @@ public class GuiSignalBox extends GuiBase {
 
     @Override
     public void onGuiClosed() {
-        super.onGuiClosed();
-        GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+        this.reset();
     }
 
     private void reset() {
@@ -481,6 +479,9 @@ public class GuiSignalBox extends GuiBase {
         }
         if (!page.equals(Page.SETTINGS)) {
             this.entity.write(compound);
+            if (page.equals(Page.TILE_CONFIG) && node != null) {
+                node.writeEntryNetwork(compound, false);
+            }
             GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
         }
         lowerEntity.clear();
