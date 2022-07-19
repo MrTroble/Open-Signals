@@ -89,10 +89,10 @@ public class SignalBoxPathway implements INetworkSavable {
         this.lastPoint = lastNode.getPoint();
         final BlockPos lastPos = makeFromNext(type, lastNode, this.listOfNodes.get(1),
                 Rotation.CLOCKWISE_180);
+        if (lastPos != null) {
+            lastSignal = Optional.of(lastPos);
+        }
         if (firstPos != null) {
-            if (lastPos != null) {
-                lastSignal = Optional.of(lastPos);
-            }
             this.signalPositions = Optional.of(Maps.immutableEntry(firstPos, lastPos));
         } else {
             this.signalPositions = Optional.empty();
