@@ -156,7 +156,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     values.put(SignalKS.STOPSIGNAL, KS.KS1);
                     values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
                 }
-                if (nexthlZS3PLATE.isPresent()) {
+                if (nexthlZS3PLATE.isPresent() && !hlstop) {
                     final ZS32 zs2next = nexthlZS3PLATE.get();
                     final int zs2 = zs2next.ordinal();
                     if (zs2 <= 26 || zs2 == 47 || zs2 == 49) {

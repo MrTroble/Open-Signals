@@ -139,7 +139,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                         values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                     }
                 }
-                if (nexthlZS3PLATE.isPresent()) {
+                if (nexthlZS3PLATE.isPresent() && !hlstop) {
                     final ZS32 zs2next = nexthlZS3PLATE.get();
                     final int zs2 = zs2next.ordinal();
                     if (zs2 <= 26 || zs2 == 47 || zs2 == 49) {
