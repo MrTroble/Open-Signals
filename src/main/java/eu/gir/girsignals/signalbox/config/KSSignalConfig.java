@@ -163,6 +163,10 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                         values.put(SignalKS.ZS2V, zs2next);
                     }
                 }
+                if (!currentzs3v.isPresent() && !hlstop) {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
+                }
             }
 
             if (hvblockgo || hvhomego || hvstopgo) {
