@@ -55,6 +55,8 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         } else {
             read(comp);
         }
+        if (comp.hasKey(CUSTOMNAME))
+            setCustomName(comp.getString(CUSTOMNAME));
     }
 
     private void read(final NBTTagCompound comp) {
@@ -63,9 +65,9 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
                     final SEProperty<?> sep = SEProperty.cst(prop);
                     sep.readFromNBT(comp).ifPresent(obj -> map.put(sep, obj));
                 });
+        setBlockID();
         if (comp.hasKey(CUSTOMNAME))
             setCustomName(comp.getString(CUSTOMNAME));
-        setBlockID();
     }
 
     @Override
@@ -113,16 +115,12 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     }
 
     public void setCustomName(final String str) {
-        if (!(getSignal().canHaveCustomname(this.map) || getSignal().canBeLinked()))
-            return;
         this.formatCustomName = str;
         if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
             map.remove(Signal.CUSTOMNAME);
         } else if (str != null) {
             map.put(Signal.CUSTOMNAME, true);
         }
-        this.markDirty();
-        this.syncClient();
     }
 
     @SideOnly(Side.CLIENT)
@@ -132,7 +130,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     }
 
     public void setBlockID() {
-        blockID = ((Signal) world.getBlockState(pos).getBlock()).getID();
+        blockID = getSignal().getID();
     }
 
     public Signal getSignal() {
