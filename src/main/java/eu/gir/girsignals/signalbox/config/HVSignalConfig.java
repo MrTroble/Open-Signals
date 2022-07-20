@@ -76,6 +76,8 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             final Optional<HPHome> nextHPHOME = (Optional<HPHome>) info.next
                     .getProperty(SignalHV.HPHOME);
             final Optional<HP> nextHP = (Optional<HP>) info.next.getProperty(SignalHV.STOPSIGNAL);
+            final Optional<ZS32> nexthlZS3PLATE = (Optional<ZS32>) info.next
+                    .getProperty(SignalHL.ZS3_PLATE);
 
             final boolean hlstop = info.next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(a -> Signallists.HL_STOP.contains(a)).isPresent()
@@ -115,29 +117,33 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     if (hlstop) {
                         values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
                     } else if (info.current.getProperty(SignalHV.ZS3V).isPresent()) {
-                        if (info.next.getProperty(SignalHL.STOPSIGNAL).isPresent()
-                                || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
-                            if (hlmain40
-                                    && getlightbar.filter(HLLightbar.OFF::equals).isPresent()) {
-                                values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
-                            } else if (hlmain40
-                                    && getlightbar.filter(HLLightbar.YELLOW::equals).isPresent()) {
-                                values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
-                                values.put(SignalHV.ZS3V, ZS32.Z6);
-                            } else if (hlmain40
-                                    && getlightbar.filter(HLLightbar.GREEN::equals).isPresent()) {
-                                values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
-                                values.put(SignalHV.ZS3V, ZS32.Z10);
-                            } else if (hlstop) {
-                                values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
-                            } else {
-                                values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
-                            }
+                        if (hlmain40 && getlightbar.filter(HLLightbar.OFF::equals).isPresent()) {
+                            values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
+                        } else if (hlmain40
+                                && getlightbar.filter(HLLightbar.YELLOW::equals).isPresent()) {
+                            values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
+                            values.put(SignalHV.ZS3V, ZS32.Z6);
+                        } else if (hlmain40
+                                && getlightbar.filter(HLLightbar.GREEN::equals).isPresent()) {
+                            values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                            values.put(SignalHV.ZS3V, ZS32.Z10);
+                        } else if (hlstop) {
+                            values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
+                        } else {
+                            values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                         }
+
                     } else if (hlmain40) {
                         values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
                     } else {
                         values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                    }
+                }
+                if (nexthlZS3PLATE.isPresent()) {
+                    final ZS32 zs2next = nexthlZS3PLATE.get();
+                    final int zs2 = zs2next.ordinal();
+                    if (zs2 <= 26 || zs2 == 47 || zs2 == 49) {
+                        values.put(SignalKS.ZS2V, zs2next);
                     }
                 }
             }
@@ -159,7 +165,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                             if (zs32 > 32) {
                                 values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                             }
-                        } else if (zs32 <= 26) {
+                        } else if (zs32 <= 26 || zs32 == 47 || zs32 == 49) {
                             values.put(SignalKS.ZS3V, speednext);
                         }
                     }
@@ -181,7 +187,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                         if (zs32 > 32) {
                             values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                         }
-                    } else if (zs32 <= 26) {
+                    } else if (zs32 <= 26 || zs32 == 47 || zs32 == 49) {
                         values.put(SignalHV.ZS3V, speedcurrent);
                         values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                     }

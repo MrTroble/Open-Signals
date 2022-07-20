@@ -168,7 +168,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                                 : speedHVplate.get();
                         final int zs32 = speednext.ordinal();
                         speedChecknext(info.speed, zs32, values);
-                        if (zs32 <= 26) {
+                        if (zs32 <= 26 || zs32 == 47 || zs32 == 49) {
                             values.put(SignalHL.ZS2V, speednext);
                         }
                     }
@@ -183,7 +183,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                                 : speedKSplate.get();
                         final int zs32 = speednext.ordinal();
                         speedChecknext(info.speed, zs32, values);
-                        if (zs32 <= 26) {
+                        if (zs32 <= 26 || zs32 == 47 || zs32 == 49) {
                             values.put(SignalHL.ZS2V, speednext);
                         }
                     }
@@ -195,7 +195,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             if (nextHLPLATE.isPresent()) {
                 final ZS32 zs3next = nextHLPLATE.get();
                 final int zs3 = zs3next.ordinal();
-                if (zs3 <= 26) {
+                if (zs3 <= 26 || zs3 == 47 || zs3 == 49) {
                     values.put(SignalHL.ZS2V, zs3next);
                 }
             }

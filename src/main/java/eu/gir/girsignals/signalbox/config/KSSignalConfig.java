@@ -59,6 +59,8 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     .getProperty(SignalKS.STOPSIGNAL);
             final Optional<ZS32> nextZS3 = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);
             final Optional opt = info.next.getProperty(SignalKS.STOPSIGNAL);
+            final Optional<ZS32> nexthlZS3PLATE = (Optional<ZS32>) info.next
+                    .getProperty(SignalHL.ZS3_PLATE);
 
             final boolean stop = info.next.getProperty(SignalKS.MAINSIGNAL)
                     .filter(KSMain.HP0::equals).isPresent()
@@ -125,7 +127,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                         values.put(SignalKS.ZS3V, speednext);
                         values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
                         values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
-                    } else if (speednext.ordinal() <= 26) {
+                    } else if (speed <= 26 || speed == 47 || speed == 49) {
                         values.put(SignalKS.ZS2V, speednext);
                         values.put(SignalKS.STOPSIGNAL, KS.KS1);
                     }
@@ -157,6 +159,13 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                         values.put(SignalKS.STOPSIGNAL, KS.KS1);
                         values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
                     }
+                    if (nexthlZS3PLATE.isPresent()) {
+                        final ZS32 zs2next = nexthlZS3PLATE.get();
+                        final int zs2 = zs2next.ordinal();
+                        if (zs2 <= 26 || zs2 == 47 || zs2 == 49) {
+                            values.put(SignalKS.ZS2V, zs2next);
+                        }
+                    }
                 }
             }
             if (hvblockgo || hvhomego || hvstopgo) {
@@ -167,7 +176,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
                     values.put(SignalKS.ZS3V, ZS32.Z4);
                 }
-                if ((speedHV.isPresent() || speedHVplate.isPresent()) && currentzs3v.isPresent()) {
+                if ((speedHV.isPresent() || speedHVplate.isPresent())) {
                     final ZS32 speednext = speedHV.isPresent() ? speedHV.get() : speedHVplate.get();
                     final int zs32 = speednext.ordinal();
                     if (zs32 > 26 && zs32 <= 42 && zs32 != 30) {
@@ -178,7 +187,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                         values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
                         values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
                         values.put(SignalKS.ZS3V, ZS32.Z4);
-                    } else if (zs32 <= 26) {
+                    } else if (zs32 <= 26 || zs32 == 47 || zs32 == 49) {
                         values.put(SignalKS.ZS2V, speednext);
                     }
                 }
