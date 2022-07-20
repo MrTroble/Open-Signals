@@ -136,38 +136,35 @@ public final class KSSignalConfig implements ISignalAutoconfig {
             if ((!hlmain40 && nexthl) || hvstop || hvstop2) {
                 values.put(SignalKS.ZS3V, ZS32.OFF);
             }
-            if (currentzs3v.isPresent()) {
-                if (nexthl) {
-                    if (hlmain40 && nextlighbar.filter(HLLightbar.OFF::equals).isPresent()) {
-                        values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
-                        values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
-                        values.put(SignalKS.ZS3V, ZS32.Z4);
-                    } else if (hlmain40
-                            && nextlighbar.filter(HLLightbar.YELLOW::equals).isPresent()) {
-                        values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
-                        values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
-                        values.put(SignalKS.ZS3V, ZS32.Z6);
-                    } else if (hlmain40
-                            && nextlighbar.filter(HLLightbar.GREEN::equals).isPresent()) {
-                        values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
-                        values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
-                        values.put(SignalKS.ZS3V, ZS32.Z10);
-                    } else if (hlstop) {
-                        values.put(SignalKS.STOPSIGNAL, KS.KS2);
-                        values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
-                    } else {
-                        values.put(SignalKS.STOPSIGNAL, KS.KS1);
-                        values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
-                    }
-                    if (nexthlZS3PLATE.isPresent()) {
-                        final ZS32 zs2next = nexthlZS3PLATE.get();
-                        final int zs2 = zs2next.ordinal();
-                        if (zs2 <= 26 || zs2 == 47 || zs2 == 49) {
-                            values.put(SignalKS.ZS2V, zs2next);
-                        }
+            if (nexthl) {
+                if (hlmain40 && nextlighbar.filter(HLLightbar.OFF::equals).isPresent()) {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
+                    values.put(SignalKS.ZS3V, ZS32.Z4);
+                } else if (hlmain40 && nextlighbar.filter(HLLightbar.YELLOW::equals).isPresent()) {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
+                    values.put(SignalKS.ZS3V, ZS32.Z6);
+                } else if (hlmain40 && nextlighbar.filter(HLLightbar.GREEN::equals).isPresent()) {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1_BLINK);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1_BLINK);
+                    values.put(SignalKS.ZS3V, ZS32.Z10);
+                } else if (hlstop) {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS2);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
+                } else {
+                    values.put(SignalKS.STOPSIGNAL, KS.KS1);
+                    values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
+                }
+                if (nexthlZS3PLATE.isPresent()) {
+                    final ZS32 zs2next = nexthlZS3PLATE.get();
+                    final int zs2 = zs2next.ordinal();
+                    if (zs2 <= 26 || zs2 == 47 || zs2 == 49) {
+                        values.put(SignalKS.ZS2V, zs2next);
                     }
                 }
             }
+
             if (hvblockgo || hvhomego || hvstopgo) {
                 values.put(SignalKS.STOPSIGNAL, KS.KS1);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);

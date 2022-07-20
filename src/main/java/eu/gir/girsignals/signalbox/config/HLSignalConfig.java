@@ -192,7 +192,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                 }
             }
-            if (nextHLPLATE.isPresent()) {
+            if (nextHLPLATE.isPresent() && !stop) {
                 final ZS32 zs3next = nextHLPLATE.get();
                 final int zs3 = zs3next.ordinal();
                 if (zs3 <= 26 || zs3 == 47 || zs3 == 49) {
