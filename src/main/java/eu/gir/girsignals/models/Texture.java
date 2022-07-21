@@ -13,7 +13,7 @@ public class Texture extends Models {
 
     private List<String> has;
     private List<String> hasnot;
-    private Map<String, String> wtih;
+    private Map<String, String> with;
     private List<String> hasandis;
     private List<String> hasandisnot;
 
@@ -26,7 +26,7 @@ public class Texture extends Models {
     }
 
     public Map<String, String> getWtih() {
-        return wtih;
+        return with;
     }
 
     public List<String> getHasandis() {
