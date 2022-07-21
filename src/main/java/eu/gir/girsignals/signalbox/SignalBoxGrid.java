@@ -27,7 +27,6 @@ public class SignalBoxGrid implements INetworkSavable {
 
     private final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
     private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
-    private final Map<SignalBoxPathway, SignalBoxPathway> previousPathways = new HashMap<>(32);
     private final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     private final Consumer<NBTTagCompound> sendToAll;
     private World world = null;
@@ -60,8 +59,6 @@ public class SignalBoxGrid implements INetworkSavable {
         updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
-        this.previousPathways.remove(pathway);
-        this.previousPathways.entrySet().removeIf(entry -> entry.getValue().equals(pathway));
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
@@ -80,8 +77,8 @@ public class SignalBoxGrid implements INetworkSavable {
     private void updatePrevious(final SignalBoxPathway pathway) {
         SignalBoxPathway previousPath = pathway;
         int count = 0;
-        while ((previousPath = previousPathways.get(previousPath)) != null) {
-            if (count > previousPathways.size()) {
+        while ((previousPath = endsToPath.get(previousPath.getFirstPoint())) != null) {
+            if (count > endsToPath.size()) {
                 GirsignalsMain.log.error("Detected signalpath cycle, aborting!");
                 startsToPath.values().forEach(path -> path.resetPathway());
                 this.clearPaths();
@@ -90,18 +87,15 @@ public class SignalBoxGrid implements INetworkSavable {
             previousPath.updatePathwaySignals();
             count++;
         }
+        if (count == 0) {
+            GirsignalsMain.log.warn("Could not find previous! " + pathway);
+        }
     }
 
     private void onWayAdd(final SignalBoxPathway pathway) {
         pathway.setWorld(world);
         startsToPath.put(pathway.getFirstPoint(), pathway);
         endsToPath.put(pathway.getLastPoint(), pathway);
-        final SignalBoxPathway next = startsToPath.get(pathway.getLastPoint());
-        if (next != null)
-            previousPathways.put(next, pathway);
-        final SignalBoxPathway previous = endsToPath.get(pathway.getFirstPoint());
-        if (previous != null)
-            previousPathways.put(pathway, previous);
         updatePrevious(pathway);
         updateToNet(pathway);
     }
@@ -151,7 +145,6 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     private void clearPaths() {
-        previousPathways.clear();
         startsToPath.clear();
         endsToPath.clear();
     }
@@ -192,7 +185,7 @@ public class SignalBoxGrid implements INetworkSavable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(endsToPath, modeGrid, previousPathways, startsToPath);
+        return Objects.hash(endsToPath, modeGrid, startsToPath);
     }
 
     @Override
@@ -206,7 +199,6 @@ public class SignalBoxGrid implements INetworkSavable {
         final SignalBoxGrid other = (SignalBoxGrid) obj;
         return Objects.equals(endsToPath, other.endsToPath)
                 && Objects.equals(modeGrid, other.modeGrid)
-                && Objects.equals(previousPathways, other.previousPathways)
                 && Objects.equals(startsToPath, other.startsToPath);
     }
 
