@@ -81,17 +81,17 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
-    private static <T extends Enum<?>> Predicate<IExtendedBlockState> has(
+    public static <T extends Enum<?>> Predicate<IExtendedBlockState> has(
             final IUnlistedProperty<T> property) {
         return ebs -> ebs.getValue(property) != null;
     }
 
-    private static <T extends Enum<?>> Predicate<IExtendedBlockState> hasNot(
+    public static <T extends Enum<?>> Predicate<IExtendedBlockState> hasNot(
             final IUnlistedProperty<T> property) {
         return ebs -> ebs.getValue(property) == null;
     }
 
-    private static <T extends DefaultName<?>> Predicate<IExtendedBlockState> with(
+    public static <T extends DefaultName<?>> Predicate<IExtendedBlockState> with(
             final IUnlistedProperty<T> property, final Predicate<T> t) {
         return bs -> {
             final T test = bs.getValue(property);
@@ -99,7 +99,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         };
     }
 
-    private static Predicate<IExtendedBlockState> hasAndIs(
+    public static Predicate<IExtendedBlockState> hasAndIs(
             final IUnlistedProperty<Boolean> property) {
         return ebs -> {
             final Boolean bool = ebs.getValue(property);
@@ -107,7 +107,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         };
     }
 
-    private static Predicate<IExtendedBlockState> hasAndIsNot(
+    public static Predicate<IExtendedBlockState> hasAndIsNot(
             final IUnlistedProperty<Boolean> property) {
         return ebs -> {
             final Boolean bool = ebs.getValue(property);

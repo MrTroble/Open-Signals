@@ -165,9 +165,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return this;
         }
     }
-    
-    @SuppressWarnings("rawtypes")
-    private final ArrayList<IUnlistedProperty> properties = new ArrayList<>();
 
     public static final SignalPropertiesBuilder builder(final Placementtool placementtool,
             final String signalTypeName) {
@@ -318,11 +315,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         buildCacheIfNull();
         return propcache[id];
     }
+    
+    @SuppressWarnings("rawtypes")
+    private ArrayList<IUnlistedProperty> properties = new ArrayList<>();
 
     @SuppressWarnings("rawtypes")
     @Override
     protected BlockStateContainer createBlockState() {
-        properties.clear();
+        this.properties.clear();
         if (!this.getClass().equals(Signal.class)) {
             for (final Field f : this.getClass().getDeclaredFields()) {
                 final int mods = f.getModifiers();
@@ -340,7 +340,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 ANGEL
         }, properties.toArray(new IUnlistedProperty[properties.size()]));
     }
-    
+
     @SuppressWarnings("rawtypes")
     public ImmutableList<IUnlistedProperty> getProperties() {
         return ImmutableList.copyOf(this.properties);

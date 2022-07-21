@@ -8,11 +8,21 @@
 			"texture": {
 				"lampgreennorth": {
 					"lamp_green": {
-						"has": "HP1",
-						"hasnot": "HP0",
-						"with": "VR1",
-						"hasandis": "HP1",
-						"hasandisnot": "Sh1"
+						"has": [
+							"Hp0"
+						],
+						"hasnot": [
+							
+						],
+						"with": {
+
+						},
+						"hasandis": [
+
+						],
+						"hasandisnot": [
+
+						]
 					}
 				}
 			},

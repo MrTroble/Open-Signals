@@ -9,7 +9,6 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -17,56 +16,26 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
-import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRBlocks;
-import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class ModelStateBuilder {
 
-    private final Signal sig;
-
-    public ModelStateBuilder(final Signal sig) {
-        this.sig = sig;
-    }
-
-    public static void getfromJson(final String directory) {
-        final Map<String, JsonObject> entrySet = getasJsonObject(directory);
-        // final Map<String, JsonElement> map1 = new HashMap<>();
-        if (entrySet != null) {
-            entrySet.forEach((signaltype, file) -> {
-                // @SuppressWarnings("rawtypes")
-                // final ImmutableList<IUnlistedProperty> map = sig.getProperties();
-                final String models = file.get("models").toString().replace("{", "").replace("}",
-                        "");
-                final JsonElement modelname = file.get("modelname");
-                System.out.println(models);
-                System.out.println(modelname);
-                // map1.put(signaltype, models);
-            });
-        }
-        // return map1;
-    }
-
-    public static Map<String, JsonObject> getasJsonObject(final String directory) {
+    public Map<String, ModelStats> getfromJson(final String directory) {
         final Gson gson = new Gson();
         final Map<String, String> entrySet = readallFilesfromDierectory(directory);
-        final Map<String, JsonObject> content = new HashMap<>();
+        final Map<String, ModelStats> content = new HashMap<>();
         if (entrySet != null) {
             entrySet.forEach((filename, file) -> {
-                final JsonObject json = gson.fromJson(file, JsonObject.class);
+                final ModelStats json = gson.fromJson(file, ModelStats.class);
                 content.put(filename, json);
             });
         }
         return content;
     }
 
-    public static Map<String, String> readallFilesfromDierectory(final String directory) {
+    private static Map<String, String> readallFilesfromDierectory(final String directory) {
         final Optional<Path> pathloc = getRessourceLocation(directory);
         if (pathloc.isPresent()) {
             final Path pathlocation = pathloc.get();
@@ -92,7 +61,7 @@ public class ModelStateBuilder {
         return null;
     }
 
-    private static String toString(final List<String> text) {
+    public static String toString(final List<String> text) {
         final StringBuilder stringbuilder = new StringBuilder();
         text.forEach(string -> {
             stringbuilder.append(string);
