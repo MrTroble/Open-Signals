@@ -35,7 +35,7 @@ public class ModelStateBuilder {
         return content;
     }
 
-    private static Map<String, String> readallFilesfromDierectory(final String directory) {
+    public static Map<String, String> readallFilesfromDierectory(final String directory) {
         final Optional<Path> pathloc = getRessourceLocation(directory);
         if (pathloc.isPresent()) {
             final Path pathlocation = pathloc.get();
@@ -61,7 +61,7 @@ public class ModelStateBuilder {
         return null;
     }
 
-    public static String toString(final List<String> text) {
+    private static String toString(final List<String> text) {
         final StringBuilder stringbuilder = new StringBuilder();
         text.forEach(string -> {
             stringbuilder.append(string);

@@ -81,17 +81,17 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
-    public static <T extends Enum<?>> Predicate<IExtendedBlockState> has(
+    private static <T extends Enum<?>> Predicate<IExtendedBlockState> has(
             final IUnlistedProperty<T> property) {
         return ebs -> ebs.getValue(property) != null;
     }
 
-    public static <T extends Enum<?>> Predicate<IExtendedBlockState> hasNot(
+    private static <T extends Enum<?>> Predicate<IExtendedBlockState> hasNot(
             final IUnlistedProperty<T> property) {
         return ebs -> ebs.getValue(property) == null;
     }
 
-    public static <T extends DefaultName<?>> Predicate<IExtendedBlockState> with(
+    private static <T extends DefaultName<?>> Predicate<IExtendedBlockState> with(
             final IUnlistedProperty<T> property, final Predicate<T> t) {
         return bs -> {
             final T test = bs.getValue(property);
@@ -99,7 +99,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         };
     }
 
-    public static Predicate<IExtendedBlockState> hasAndIs(
+    private static Predicate<IExtendedBlockState> hasAndIs(
             final IUnlistedProperty<Boolean> property) {
         return ebs -> {
             final Boolean bool = ebs.getValue(property);
@@ -107,7 +107,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         };
     }
 
-    public static Predicate<IExtendedBlockState> hasAndIsNot(
+    private static Predicate<IExtendedBlockState> hasAndIsNot(
             final IUnlistedProperty<Boolean> property) {
         return ebs -> {
             final Boolean bool = ebs.getValue(property);
@@ -117,10 +117,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
     @Override
     public void onResourceManagerReload(final IResourceManager resourceManager) {
+        final Texture texture = new Texture();
         registeredModels.clear();
         registeredModels.put("hvsignal", cm -> {
             cm.register("hv/hv_base", ebs -> true, 0);
-            cm.register("hv/hv_ne2", hasAndIs(SignalHV.NE2), 0);
+            cm.register("hv/hv_ne2", texture.getPredicates() , 0);
             cm.register("hv/hv_mast1", ebs -> true, 1);
 
             for (final MastSignal sign : MastSignal.values())

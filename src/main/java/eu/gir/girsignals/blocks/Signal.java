@@ -315,35 +315,36 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         buildCacheIfNull();
         return propcache[id];
     }
-    
+
     @SuppressWarnings("rawtypes")
-    private ArrayList<IUnlistedProperty> properties = new ArrayList<>();
+    private ArrayList<IUnlistedProperty> signalProperties;
 
     @SuppressWarnings("rawtypes")
     @Override
     protected BlockStateContainer createBlockState() {
-        this.properties.clear();
+        this.signalProperties = new ArrayList<>();
+        this.signalProperties.clear();
         if (!this.getClass().equals(Signal.class)) {
             for (final Field f : this.getClass().getDeclaredFields()) {
                 final int mods = f.getModifiers();
                 if (Modifier.isFinal(mods) && Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
                     try {
-                        properties.add((IUnlistedProperty) f.get(null));
+                        this.signalProperties.add((IUnlistedProperty) f.get(null));
                     } catch (final IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
             }
         }
-        properties.add(CUSTOMNAME);
+        this.signalProperties.add(CUSTOMNAME);
         return new ExtendedBlockState(this, new IProperty<?>[] {
                 ANGEL
-        }, properties.toArray(new IUnlistedProperty[properties.size()]));
+        }, this.signalProperties.toArray(new IUnlistedProperty[signalProperties.size()]));
     }
 
     @SuppressWarnings("rawtypes")
     public ImmutableList<IUnlistedProperty> getProperties() {
-        return ImmutableList.copyOf(this.properties);
+        return ImmutableList.copyOf(this.signalProperties);
     }
 
     @Override

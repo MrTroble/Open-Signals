@@ -1,23 +1,19 @@
 package eu.gir.girsignals.test;
 
+import java.util.function.Predicate;
+
 import org.junit.jupiter.api.Test;
 
 import eu.gir.girsignals.models.Texture;
+import net.minecraftforge.common.property.IExtendedBlockState;
 
 public class ModelStateBuilderTest {
 
-    private Texture texture = new Texture();
+    private final Texture texture = new Texture();
 
     @Test
     public void testModelstats() {
-        texture.getPredicates();
+        final Predicate<IExtendedBlockState> blockstate = texture.getPredicates();
+        System.out.println(blockstate);
     }
-
-    /*private void test() {
-        Map<String, String> map = state.getfromJson("/assets/girsignals/modeldefinitions");
-        System.out.println(map);
-        map.forEach((filename, classes) -> {
-            System.out.println(filename.equals(classes));
-        });
-    }*/
 }

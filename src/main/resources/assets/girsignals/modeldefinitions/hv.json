@@ -4,28 +4,19 @@
 		"lamp_white": "girsignals:blocks/lamps/lamp_white"
 	},
 	"models": {
-		"modelname": {
-			"texture": {
-				"lampgreennorth": {
-					"lamp_green": {
-						"has": [
-							"Hp0"
-						],
-						"hasnot": [
-							
-						],
-						"with": {
-
-						},
-						"hasandis": [
-
-						],
-						"hasandisnot": [
-
-						]
-					}
+		"hv/hv_ne2": {
+			"texture": [
+				{
+					"has": [],
+					"hasnot": [],
+					"with": {},
+					"hasandis": [
+						"NE2"
+					],
+					"hasandisnot": [],
+					"retexture": {}
 				}
-			},
+			],
 			"x": 0,
 			"y": 0,
 			"z": 0
