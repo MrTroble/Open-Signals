@@ -73,7 +73,6 @@ public final class HLSignalConfig implements ISignalAutoconfig {
     })
     @Override
     public void change(final ConfigInfo info) {
-
         if (info.type.equals(PathType.SHUNTING)) {
             RSSignalConfig.RS_CONFIG.change(info);
             return;

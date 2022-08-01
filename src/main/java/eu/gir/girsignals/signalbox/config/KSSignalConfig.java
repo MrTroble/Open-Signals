@@ -31,7 +31,6 @@ public final class KSSignalConfig implements ISignalAutoconfig {
     })
     @Override
     public void change(final ConfigInfo info) {
-
         if (info.type.equals(PathType.SHUNTING)) {
             RSSignalConfig.RS_CONFIG.change(info);
             return;
@@ -44,6 +43,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                 final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
                 values.put(SignalKS.ZS3, zs32);
             }
+
             final Optional<ZS32> speedHV = (Optional<ZS32>) info.next.getProperty(SignalHV.ZS3);
             final Optional<ZS32> speedHVplate = (Optional<ZS32>) info.next
                     .getProperty(SignalHV.ZS3_PLATE);
@@ -97,12 +97,11 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     .filter(HPHome.HP0::equals).isPresent()
                     || info.next.getProperty(SignalHV.HPHOME)
                             .filter(HPHome.HP0_ALTERNATE_RED::equals).isPresent();
-
-            info.current.getProperty(SignalKS.ZS3V).ifPresent(_u -> nextZS3
-                    .ifPresent(value -> info.current.setProperty(SignalKS.ZS3V, (ZS32) value)));
-
             final boolean changes = nextZS3.filter(e -> ((ZS32) e).ordinal() > ZS32.Z.ordinal()
                     && (((ZS32) e).ordinal() - ZS32.Z.ordinal()) != info.speed).isPresent();
+            
+            info.current.getProperty(SignalKS.ZS3V).ifPresent(_u -> nextZS3
+                    .ifPresent(value -> info.current.setProperty(SignalKS.ZS3V, (ZS32) value)));
 
             values.put(SignalKS.MAINSIGNAL, KSMain.KS1);
 
@@ -168,7 +167,6 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
                 }
             }
-
             if (hvblockgo || hvhomego || hvstopgo) {
                 values.put(SignalKS.STOPSIGNAL, KS.KS1);
                 values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS1);
@@ -222,5 +220,4 @@ public final class KSSignalConfig implements ISignalAutoconfig {
         values.put(SignalKS.ZS3V, ZS32.OFF);
         this.changeIfPresent(values, current);
     }
-
 }

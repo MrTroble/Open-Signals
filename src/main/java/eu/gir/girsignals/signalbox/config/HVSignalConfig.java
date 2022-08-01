@@ -29,13 +29,12 @@ public final class HVSignalConfig implements ISignalAutoconfig {
     })
     @Override
     public void change(final ConfigInfo info) {
-
-        final HashMap<SEProperty, Object> values = new HashMap<>();
-
         if (info.type.equals(PathType.SHUNTING)) {
             RSSignalConfig.RS_CONFIG.change(info);
             return;
         }
+
+        final HashMap<SEProperty, Object> values = new HashMap<>();
 
         if (info.next != null) {
             if (info.speed < 7 && info.speed > 0 && info.speed != 4) {
@@ -63,6 +62,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                 values.put(SignalHV.HPHOME, HPHome.HP1);
                 values.put(SignalHV.STOPSIGNAL, HP.HP1);
             }
+
             final Optional<ZS32> speedKS = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);
             final Optional<ZS32> speedKSplate = (Optional<ZS32>) info.next
                     .getProperty(SignalKS.ZS3_PLATE);
@@ -220,5 +220,4 @@ public final class HVSignalConfig implements ISignalAutoconfig {
         values.put(SignalHV.ZS7, false);
         this.changeIfPresent(values, current);
     }
-
 }
