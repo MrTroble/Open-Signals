@@ -77,67 +77,73 @@ public class Texture extends Models {
         };
     }
 
-    private List<Predicate<IExtendedBlockState>> hasBlockstates;
-
-    private List<Predicate<IExtendedBlockState>> hasandisBlockstates;
-
-    private Predicate<IExtendedBlockState> states;
+    private static List<Predicate<IExtendedBlockState>> hasBlockstates;
+    private static List<Predicate<IExtendedBlockState>> hasandisBlockstates;
+    private static List<Predicate<IExtendedBlockState>> hasnotBlockstates;
+    private static List<Predicate<IExtendedBlockState>> hasandisnotBlockstates;
+    private static List<Predicate<IExtendedBlockState>> withBLockstates;
+    private static Predicate<IExtendedBlockState> state;
 
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    public Predicate<IExtendedBlockState> getPredicates() {
-        this.hasBlockstates = new ArrayList<>();
-        final ModelStateBuilder state = new ModelStateBuilder();
-        final Map<String, ModelStats> content = state
-                .getfromJson("/assets/girsignals/modeldefinitions");
+    public static Predicate<IExtendedBlockState> getPredicates(final String filename,
+            final Texture texture) {
         final ArrayList<Signal> signals = new ArrayList<>(Signal.SIGNALLIST);
-        content.forEach((filename, values) -> {
-            final String name = filename.replace(".json", "");
-            signals.forEach(signal -> {
-                final String signalsystem = signal.getSignalTypeName();
-                if (name.equalsIgnoreCase(signalsystem)) {
-                    final List<IUnlistedProperty> properties = signal.getProperties();
-                    final Map<String, Models> models = values.getModels();
-                    models.forEach((modelname, model) -> {
-                        model.getTexture().forEach((test1) -> {
-                            properties.forEach(property -> {
-                                final String prop = property.toString();
-                                if (!test1.getHas().isEmpty()) {
-                                    final String has0 = test1.getHas().get(0);
-                                    if (prop.equalsIgnoreCase(has0)) {
-                                        this.hasBlockstates.add(has(property));
-                                    }
-                                }
-                                if (test1.getHas().size() >= 1) {
-                                    final String has1 = test1.getHas().get(1);
-                                    if (prop.equalsIgnoreCase(has1)) {
-                                        this.hasBlockstates.add(has(property));
-                                    }
-                                }
-                                if (test1.getHas().size() >= 2) {
-                                    final String has2 = test1.getHas().get(2);
-                                    if (prop.equalsIgnoreCase(has2)) {
-                                        this.hasBlockstates.add(has(property));
-                                    }
-                                }
-                                if (test1.getHasandis().size() >= 0) {
-                                    final String hasandis0 = test1.getHasandis().get(0);
-                                    if (prop.equalsIgnoreCase(hasandis0)) {
-                                        this.hasBlockstates.add(has(property));
-                                    }
-                                }
-                            });
-                        });
-                    });
-                }
-            });
+        signals.forEach(signal -> {
+            if (filename.equalsIgnoreCase(signal.getSignalTypeName())) {
+                final List<IUnlistedProperty> properties = signal.getProperties();
+                properties.forEach(property -> {
+                    final String prop = property.toString();
+                    for (int i = 0; i < texture.getHas().size(); i++) {
+                        if (texture.getHas().get(i).equalsIgnoreCase(prop)) {
+                            hasBlockstates.add(has(property));
+                        }
+                    }
+                    for (int i = 0; i < texture.getHasandis().size(); i++) {
+                        if (texture.getHasandis().get(i).equalsIgnoreCase(prop)) {
+                            hasandisBlockstates.add(hasAndIs(property));
+                        }
+                    }
+                    for (int i = 0; i < texture.getHasnot().size(); i++) {
+                        if (texture.getHasnot().get(i).equalsIgnoreCase(prop)) {
+                            hasnotBlockstates.add(hasNot(property));
+                        }
+                    }
+                    for (int i = 0; i < texture.getHasandisnot().size(); i++) {
+                        if (texture.getHasandisnot().get(i).equalsIgnoreCase(prop)) {
+                            hasandisnotBlockstates.add(hasAndIsNot(property));
+                        }
+                    }
+                });
+                state = statesNullChecker(state, blockStateBuilder(hasBlockstates));
+                state = statesNullChecker(state, blockStateBuilder(hasandisBlockstates));
+                state = statesNullChecker(state, blockStateBuilder(hasnotBlockstates));
+                state = statesNullChecker(state, blockStateBuilder(hasandisnotBlockstates));
+            }
         });
-        for (int i = 0; i < hasBlockstates.size(); i++) {
-            final Predicate<IExtendedBlockState> firststate = this.hasBlockstates.get(0);
-            final Predicate<IExtendedBlockState> blockstate = hasBlockstates.get(i);
-        }
-        return states;
+        return state;
     }
 
+    private static Predicate<IExtendedBlockState> blockstate;
+
+    private static Predicate<IExtendedBlockState> blockStateBuilder(
+            final List<Predicate<IExtendedBlockState>> statelist) {
+        if (statelist.size() >= 0) {
+            blockstate = statelist.get(0);
+            for (int i = 1; i < statelist.size(); i++) {
+                blockstate = blockstate.and(statelist.get(i));
+            }
+        }
+        return blockstate;
+    }
+
+    private static Predicate<IExtendedBlockState> statesNullChecker(
+            Predicate<IExtendedBlockState> state1, final Predicate<IExtendedBlockState> state2) {
+        if (state1 == null) {
+            return state1 = state2;
+        } else {
+            return state1 = state1.and(state2);
+        }
+    }
 }

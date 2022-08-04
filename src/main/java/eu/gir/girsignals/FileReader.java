@@ -1,4 +1,4 @@
-package eu.gir.girsignals.models;
+package eu.gir.girsignals;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,24 +16,9 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.google.gson.Gson;
-
 import eu.gir.girsignals.init.GIRBlocks;
 
-public class ModelStateBuilder {
-
-    public Map<String, ModelStats> getfromJson(final String directory) {
-        final Gson gson = new Gson();
-        final Map<String, String> entrySet = readallFilesfromDierectory(directory);
-        final Map<String, ModelStats> content = new HashMap<>();
-        if (entrySet != null) {
-            entrySet.forEach((filename, file) -> {
-                final ModelStats json = gson.fromJson(file, ModelStats.class);
-                content.put(filename, json);
-            });
-        }
-        return content;
-    }
+public class FileReader {
 
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
         final Optional<Path> pathloc = getRessourceLocation(directory);

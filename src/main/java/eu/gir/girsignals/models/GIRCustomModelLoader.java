@@ -117,11 +117,22 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
     @Override
     public void onResourceManagerReload(final IResourceManager resourceManager) {
-        final Texture texture = new Texture();
+        final Map<String, ModelStats> modelmap = ModelStats
+                .getfromJson("/assets/girsignals/modeldefinitions");
+        modelmap.forEach((filename, content) -> {
+            content.getModels().forEach((test1, test2) -> {
+                test2.getTexture().forEach(modelstate -> {
+                    registeredModels.put("models", cm -> {
+                        cm.register(test1, Texture.getPredicates(filename, modelstate),
+                                modelstate.getX(), modelstate.getY(), modelstate.getZ(), null);
+                    });
+                });
+            });
+        });
         registeredModels.clear();
         registeredModels.put("hvsignal", cm -> {
             cm.register("hv/hv_base", ebs -> true, 0);
-            cm.register("hv/hv_ne2", texture.getPredicates() , 0);
+            cm.register("hv/hv_ne2", null, 0);
             cm.register("hv/hv_mast1", ebs -> true, 1);
 
             for (final MastSignal sign : MastSignal.values())
