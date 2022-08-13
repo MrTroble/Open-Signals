@@ -155,6 +155,10 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     public void setWorld(final @Nullable World world) {
+        if (world == null) {
+            this.loadOps = new WorldOperations();
+            return;
+        }
         this.loadOps = new WorldLoadOperations(world);
     }
 

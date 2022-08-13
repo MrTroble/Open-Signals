@@ -79,7 +79,7 @@ public class SignalBoxGrid implements INetworkSavable {
         int count = 0;
         while ((previousPath = endsToPath.get(previousPath.getFirstPoint())) != null) {
             if (count > endsToPath.size()) {
-                GirsignalsMain.log.error("Detected signalpath cycle, aborting!");
+                GirsignalsMain.getLogger().error("Detected signalpath cycle, aborting!");
                 startsToPath.values().forEach(path -> path.resetPathway());
                 this.clearPaths();
                 break;
@@ -88,7 +88,7 @@ public class SignalBoxGrid implements INetworkSavable {
             count++;
         }
         if (count == 0) {
-            GirsignalsMain.log.warn("Could not find previous! " + pathway);
+            GirsignalsMain.getLogger().warn("Could not find previous! " + pathway);
         }
     }
 

@@ -1,5 +1,6 @@
 package eu.gir.girsignals;
 
+import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import eu.gir.girsignals.proxy.CommonProxy;
@@ -24,7 +25,7 @@ public class GirsignalsMain {
 
     @SidedProxy(serverSide = "eu.gir.girsignals.proxy.CommonProxy", clientSide = "eu.gir.girsignals.proxy.ClientProxy")
     public static CommonProxy proxy;
-    public static Logger log;
+    public static Logger log = null;
 
     @EventHandler
     public void preinit(final FMLPreInitializationEvent event) {
@@ -40,5 +41,11 @@ public class GirsignalsMain {
     @EventHandler
     public void postinit(final FMLPostInitializationEvent event) {
         proxy.postinit(event);
+    }
+
+    public static Logger getLogger() {
+        if (log == null)
+            log = LogManager.getLogger(MODID);
+        return log;
     }
 }
