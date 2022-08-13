@@ -43,7 +43,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     private final Map<BlockPos, Signal> signals = new HashMap<>();
     private final SignalBoxGrid grid = new SignalBoxGrid(this::sendToAll);
 
-    private WorldLoadOperations worldLoadOps = new WorldLoadOperations(null);
+    private WorldOperations worldLoadOps = new WorldOperations();
 
     @Override
     public void setWorld(final World worldIn) {

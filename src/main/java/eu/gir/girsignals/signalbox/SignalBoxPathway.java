@@ -42,7 +42,7 @@ public class SignalBoxPathway implements INetworkSavable {
     private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
     private Optional<BlockPos> lastSignal = Optional.empty();
     private ImmutableList<BlockPos> distantSignalPositions = ImmutableList.of();
-    private WorldLoadOperations loadOps = new WorldLoadOperations(null);
+    private WorldOperations loadOps = new WorldOperations();
     private Map<Point, SignalBoxNode> modeGrid = null;
     private boolean emptyOrBroken = false;
 

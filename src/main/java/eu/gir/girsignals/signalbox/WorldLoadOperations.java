@@ -1,32 +1,29 @@
 package eu.gir.girsignals.signalbox;
 
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-
-import javax.annotation.Nullable;
 
 import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
-import eu.gir.girsignals.tileentitys.IChunkloadable;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class WorldLoadOperations implements IChunkloadable {
+public class WorldLoadOperations extends WorldOperations {
 
     private final World world;
 
-    public WorldLoadOperations(final @Nullable World world) {
-        this.world = world;
+    public WorldLoadOperations(final World world) {
+        this.world = Objects.requireNonNull(world);
     }
 
+    @Override
     public void loadAndConfig(final int speed, final BlockPos currentPosition,
             final BlockPos nextPosition, final Consumer<ConfigInfo> infoChange) {
-        if (world == null)
-            return;
         loadChunkAndGetTile(SignalTileEnity.class, world, currentPosition, (currentTile, chunk) -> {
             if (nextPosition == null) {
                 final ConfigInfo info = new ConfigInfo(currentTile, null, speed);
@@ -43,6 +40,7 @@ public class WorldLoadOperations implements IChunkloadable {
         });
     }
 
+    @Override
     public void config(final ConfigInfo info) {
         if (world == null)
             return;
@@ -53,16 +51,14 @@ public class WorldLoadOperations implements IChunkloadable {
         config.change(info);
     }
 
+    @Override
     public void syncClient(final BlockPos pos) {
-        if (world == null)
-            return;
         final IBlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);
     }
 
+    @Override
     public void loadAndReset(final BlockPos position) {
-        if (world == null)
-            return;
         loadChunkAndGetTile(SignalTileEnity.class, world, position, (signaltile, chunk) -> {
             final ISignalAutoconfig config = signaltile.getSignal().getConfig();
             if (config == null)
@@ -72,8 +68,9 @@ public class WorldLoadOperations implements IChunkloadable {
         });
     }
 
+    @Override
     public void setPower(final BlockPos position, final boolean power) {
-        if (position == null || world == null)
+        if (position == null)
             return;
         loadChunkAndGetBlock(world, position, (state, chunk) -> {
             if (!(state.getBlock() instanceof RedstoneIO))
@@ -83,8 +80,9 @@ public class WorldLoadOperations implements IChunkloadable {
         });
     }
 
+    @Override
     public boolean isPowered(final BlockPos position) {
-        if (position == null || world == null)
+        if (position == null)
             return false;
         final AtomicBoolean atomic = new AtomicBoolean(false);
         loadChunkAndGetBlock(world, position, (state, chunk) -> {
