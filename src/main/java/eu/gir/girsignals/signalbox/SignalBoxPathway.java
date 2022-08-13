@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -242,11 +243,17 @@ public class SignalBoxPathway implements INetworkSavable {
         final SignalBoxNode node = this.mapOfResetPositions.get(position);
         if (node == null)
             return false;
-        for (final BlockPos pos : mapOfBlockingPositions.keySet()) {
-            if (loadOps.isPowered(pos))
-                return false;
-        }
-        this.resetPathway(node.getPoint());
+        final Point point = node.getPoint();
+        final AtomicBoolean atomic = new AtomicBoolean(false);
+        foreachEntry((option, cNode) -> {
+            option.getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
+                if (loadOps.isPowered(pos))
+                    atomic.set(true);
+            });
+        }, point);
+        if (atomic.get())
+            return false;
+        this.resetPathway(point);
         return true;
     }
 
