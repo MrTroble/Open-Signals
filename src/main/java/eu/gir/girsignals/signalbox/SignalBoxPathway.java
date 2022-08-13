@@ -238,6 +238,10 @@ public class SignalBoxPathway implements INetworkSavable {
         final SignalBoxNode node = this.mapOfResetPositions.get(position);
         if (node == null)
             return false;
+        for (final BlockPos pos : mapOfBlockingPositions.keySet()) {
+            if (loadOps.isPowered(pos))
+                return false;
+        }
         this.resetPathway(node.getPoint());
         return true;
     }

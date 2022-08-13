@@ -1,5 +1,6 @@
 package eu.gir.girsignals.signalbox;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -80,6 +81,19 @@ public class WorldLoadOperations implements IChunkloadable {
             final IBlockState ibstate = state.withProperty(RedstoneIO.POWER, power);
             world.setBlockState(position, ibstate, 3);
         });
+    }
+
+    public boolean isPowered(final BlockPos position) {
+        if (position == null || world == null)
+            return false;
+        final AtomicBoolean atomic = new AtomicBoolean(false);
+        loadChunkAndGetBlock(world, position, (state, chunk) -> {
+            if (!(state.getBlock() instanceof RedstoneIO))
+                return;
+            if (!atomic.get())
+                atomic.set(world.isBlockPowered(position));
+        });
+        return atomic.get();
     }
 
 }
