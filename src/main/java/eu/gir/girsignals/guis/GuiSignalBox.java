@@ -65,6 +65,7 @@ public class GuiSignalBox extends GuiBase {
     private SignalBoxNode node = null;
     private boolean dirty = false;
     private NBTTagCompound dirtyCompound = new NBTTagCompound();
+    private UIEntity mainButton;
 
     public GuiSignalBox(final SignalBoxTileEntity box) {
         this.box = box;
@@ -205,12 +206,12 @@ public class GuiSignalBox extends GuiBase {
                 parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
                     this.lowerEntity.clear();
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
-                    initializeFieldTemplate(this::tileNormal);
                     final NBTTagCompound compound = new NBTTagCompound();
                     final NBTTagCompound wayComp = new NBTTagCompound();
                     toNBT(wayComp, POINT1, node.getPoint());
                     compound.setTag(RESET_WAY, wayComp);
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+                    initializeFieldUsage(mainButton);
                 }));
             }
                 break;
@@ -459,8 +460,7 @@ public class GuiSignalBox extends GuiBase {
         header.add(GuiElements.createButton(I18n.format("btn.settings"),
                 this::initializePageSettings));
         header.add(GuiElements.createButton(I18n.format("btn.edit"), this::initializeFieldEdit));
-        final UIEntity mainButton = GuiElements.createButton(I18n.format("btn.main"),
-                this::initializeFieldUsage);
+        mainButton = GuiElements.createButton(I18n.format("btn.main"), this::initializeFieldUsage);
         header.add(mainButton);
         resetSelection(mainButton);
 
