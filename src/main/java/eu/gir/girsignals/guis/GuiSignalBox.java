@@ -63,6 +63,8 @@ public class GuiSignalBox extends GuiBase {
     private UISignalBoxTile lastTile = null;
     private Page page = Page.USAGE;
     private SignalBoxNode node = null;
+    private boolean dirty = false;
+    private NBTTagCompound dirtyCompound = new NBTTagCompound();
 
     public GuiSignalBox(final SignalBoxTileEntity box) {
         this.box = box;
@@ -91,7 +93,12 @@ public class GuiSignalBox extends GuiBase {
             return;
         }
         this.compound = compound;
-        this.entity.read(compound);
+        if (this.page.equals(Page.EDIT) || this.page.equals(Page.USAGE)) {
+            this.entity.read(compound);
+        } else {
+            this.dirtyCompound = compound;
+            this.dirty = true;
+        }
     }
 
     private void resetTileSelection() {
@@ -265,7 +272,6 @@ public class GuiSignalBox extends GuiBase {
         if (node.isEmpty())
             return;
         reset();
-        this.page = Page.TILE_CONFIG;
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
         list.setInheritWidth(true);
@@ -280,6 +286,7 @@ public class GuiSignalBox extends GuiBase {
             reset();
             initializeFieldTemplate(this::tileNormal);
         }, 1));
+        this.page = Page.TILE_CONFIG;
     }
 
     @SuppressWarnings({
@@ -312,9 +319,16 @@ public class GuiSignalBox extends GuiBase {
         }
     }
 
+    private void pageCheck(final Page page) {
+        this.page = page;
+        if (this.dirty && (this.page.equals(Page.EDIT) || this.page.equals(Page.USAGE))) {
+            this.entity.read(this.dirtyCompound);
+            this.dirty = false;
+        }
+    }
+
     private void initializePageSettings(final UIEntity entity) {
         reset();
-        this.page = Page.SETTINGS;
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
@@ -350,22 +364,23 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(list);
         lowerEntity.add(GuiElements.createPageSelect(uibox));
         resetSelection(entity);
+        this.pageCheck(Page.SETTINGS);
     }
 
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
-        this.page = Page.USAGE;
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
+        this.pageCheck(Page.USAGE);
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
         reset();
-        this.page = Page.EDIT;
         final UIMenu menu = new UIMenu();
         initializeFieldTemplate((e, name) -> this.tileEdit(e, menu, name));
         lowerEntity.add(menu);
         resetSelection(entity);
+        this.pageCheck(Page.EDIT);
     }
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
@@ -484,11 +499,12 @@ public class GuiSignalBox extends GuiBase {
             }
             GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
         }
+        this.page = Page.NONE;
         lowerEntity.clear();
     }
 
     private static enum Page {
-        USAGE, EDIT, SETTINGS, TILE_CONFIG;
+        USAGE, EDIT, SETTINGS, TILE_CONFIG, NONE;
     }
 
 }

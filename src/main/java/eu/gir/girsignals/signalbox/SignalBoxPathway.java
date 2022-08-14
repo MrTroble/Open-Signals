@@ -1,5 +1,6 @@
 package eu.gir.girsignals.signalbox;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,9 +78,11 @@ public class SignalBoxPathway implements INetworkSavable {
         foreachPath((path, node) -> {
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));
-            node.getOption(new ModeSet(EnumGuiMode.VP, rotation))
-                    .ifPresent(option -> option.getEntry(PathEntryType.SIGNAL)
-                            .ifPresent(position -> distantPosBuilder.add(position)));
+            for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
+                node.getOption(new ModeSet(mode, rotation))
+                        .ifPresent(option -> option.getEntry(PathEntryType.SIGNAL)
+                                .ifPresent(position -> distantPosBuilder.add(position)));
+            }
         }, null);
         this.distantSignalPositions = distantPosBuilder.build();
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
