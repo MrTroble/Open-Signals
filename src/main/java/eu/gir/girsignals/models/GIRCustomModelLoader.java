@@ -132,6 +132,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         registeredModels.clear();
         registeredModels.put("hvsignal", cm -> {
             cm.register("hv/hv_base", ebs -> true, 0);
+            cm.register("hv/hv_ne2", null, 0);
             cm.register("hv/hv_mast1", ebs -> true, 1);
 
             for (final MastSignal sign : MastSignal.values())
