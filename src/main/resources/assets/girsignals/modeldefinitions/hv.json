@@ -5,8 +5,8 @@
 	},
 	"models": {
 		"hv/hv_ne2": {
-			"texture": [
-				{
+			"texture": {
+				"overlay": {
 					"has": [],
 					"hasnot": [],
 					"with": {},
@@ -14,9 +14,9 @@
 						"NE2"
 					],
 					"hasandisnot": [],
-					"retexture": {}
+					"retexture": ""
 				}
-			],
+			},
 			"x": 0,
 			"y": 0,
 			"z": 0

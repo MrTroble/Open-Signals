@@ -1,27 +1,27 @@
 package eu.gir.girsignals.models;
 
-import java.util.List;
+import java.util.Map;
 
-public class Models extends ModelStats {
+public class Models {
 
-    private List<Texture> texture;
-    private int x;
-    private int y;
-    private int z;
+    private Map<String, Texture> textures;
+    private float x;
+    private float y;
+    private float z;
 
-    public int getX() {
+    public float getX() {
         return x;
     }
 
-    public int getY() {
+    public float getY() {
         return y;
     }
 
-    public int getZ() {
+    public float getZ() {
         return z;
     }
 
-    public List<Texture> getTexture() {
-        return texture;
+    public Map<String, Texture> getTexture() {
+        return textures;
     }
 }
