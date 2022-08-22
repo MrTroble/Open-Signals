@@ -8,7 +8,6 @@ public class ModelStateBuilderTest {
 
     @Test
     public void testModelstats() {
-        System.out.println(
-                GIRFileReader.readallFilesfromDierectory("assets/girsignals/modeldefinitions"));
+        System.out.println(GIRFileReader.readallFilesfromDierectory("/assets/girsignals/modeldefinitions"));
     }
 }
