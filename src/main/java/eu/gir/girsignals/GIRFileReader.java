@@ -65,19 +65,24 @@ public class GIRFileReader {
         try {
             if (url != null) {
                 final URI uri = url.toURI();
-                Path path;
                 if ("file".equals(uri.getScheme())) {
-                    path = Paths.get(GIRBlocks.class.getResource(location).toURI());
-                    return Optional.of(path);
+                    if (!location.startsWith("/"))
+                        location = "/" + location;
+
+                    final URL resource = GIRBlocks.class.getResource(location);
+
+                    if (resource == null)
+                        return Optional.empty();
+
+                    return Optional.of(Paths.get(resource.toURI()));
                 } else {
                     if (!"jar".equals(uri.getScheme())) {
                         return Optional.empty();
                     }
 
-                    final FileSystem filesystem = FileSystems.newFileSystem(uri,
-                            Collections.emptyMap());
-                    path = filesystem.getPath(location);
-                    return Optional.of(path);
+                    try (final FileSystem filesystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
+                        return Optional.of(filesystem.getPath(location));
+                    }
                 }
             }
         } catch (IOException | URISyntaxException e1) {
