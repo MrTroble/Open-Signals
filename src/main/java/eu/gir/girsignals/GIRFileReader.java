@@ -21,8 +21,9 @@ import eu.gir.girsignals.init.GIRBlocks;
 public class GIRFileReader {
 
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
-        if (getRessourceLocation(directory) != null) {
-            final Path pathlocation = getRessourceLocation(directory);
+        final Optional<Path> pathloc = getRessourceLocation(directory);
+        if (pathloc.isPresent()) {
+            final Path pathlocation = pathloc.get();
             System.out.println(pathlocation);
             try {
                 final Stream<Path> inputs = Files.list(pathlocation);
@@ -61,7 +62,7 @@ public class GIRFileReader {
         return stringbuilder.toString();
     }
 
-    public static Path getRessourceLocation(String location) {
+    public static Optional<Path> getRessourceLocation(String location) {
         final URL url = GIRBlocks.class.getResource("/assets/girsignals");
         // GirsignalsMain.log.info("Reading " + location + "...");
         try {
@@ -74,26 +75,22 @@ public class GIRFileReader {
                     final URL resource = GIRBlocks.class.getResource(location);
 
                     if (resource == null)
-                        return null;
+                        return Optional.empty();
 
-                    final Path returnpath = Paths.get(resource.toURI());
-                    if (returnpath != null)
-                        return returnpath;
+                    return Optional.of(Paths.get(resource.toURI()));
                 } else {
                     if (!"jar".equals(uri.getScheme())) {
-                        return null;
+                        return Optional.empty();
                     }
                     try (final FileSystem filesystem = FileSystems.newFileSystem(uri,
                             Collections.emptyMap())) {
-                        final Path returnpath = filesystem.getPath(location);
-                        if (returnpath != null)
-                            return returnpath;
+                        return Optional.of(filesystem.getPath(location));
                     }
                 }
             }
         } catch (IOException | URISyntaxException e1) {
             e1.printStackTrace();
         }
-        return null;
+        return Optional.empty();
     }
 }

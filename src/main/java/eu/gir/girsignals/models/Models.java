@@ -4,7 +4,7 @@ import java.util.Map;
 
 public class Models {
 
-    private Map<String, Texture> textures;
+    private Map<String, TextureStats> textures;
     private float x;
     private float y;
     private float z;
@@ -21,7 +21,7 @@ public class Models {
         return z;
     }
 
-    public Map<String, Texture> getTexture() {
+    public Map<String, TextureStats> getTexture() {
         return textures;
     }
 }

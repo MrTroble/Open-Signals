@@ -136,9 +136,10 @@ public class TextureStats {
                         final IUnlistedProperty prop = properties.get(i);
                         if (key.equalsIgnoreCase(properties.get(i).toString())) {
                             final SEProperty seprop = (SEProperty) prop;
-                            final Enum en = (Enum) seprop.getDefault();
-                            final Enum enu = Enum.valueOf(en.getDeclaringClass(), val);
-                            withBlockstates.add(with(prop, obj -> obj.equals(en)));
+                            final Enum defaultvalue = (Enum) seprop.getDefault();
+                            final Enum signalenum = Enum.valueOf(defaultvalue.getDeclaringClass(),
+                                    val);
+                            withBlockstates.add(with(prop, obj -> obj.equals(signalenum)));
                         }
                     }
                 }

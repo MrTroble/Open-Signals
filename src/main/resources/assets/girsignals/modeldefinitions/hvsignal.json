@@ -5,7 +5,7 @@
 	},
 	"models": {
 		"hv/hv_ne2": {
-			"texture": {
+			"textures": {
 				"overlay": {
 					"has": [],
 					"hasnot": [],
