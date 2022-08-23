@@ -1,5 +1,6 @@
 package eu.gir.girsignals.models;
 
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -46,6 +47,7 @@ import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.WNCross;
 import eu.gir.girsignals.EnumSignals.WNNormal;
 import eu.gir.girsignals.EnumSignals.ZS32;
+import eu.gir.girsignals.GIRFileReader;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalAngel;
@@ -115,13 +117,27 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         };
     }
 
+    private static final Map<String, ModelStats> modelmap = ModelStats
+            .getfromJson("/assets/girsignals/modeldefinitions");
+
+    public static Map<String, ModelStats> test() {
+        return modelmap;
+    }
+
     @Override
     public void onResourceManagerReload(final IResourceManager resourceManager) {
+
         registeredModels.clear();
-        final Map<String, ModelStats> modelmap = ModelStats
-                .getfromJson("assets/girsignals/modeldefinitions");
         modelmap.forEach((filename, content) -> {
-            registeredModels.put(filename.replace(".json", "signal"), cm -> {
+            Path path = null;
+            if (GIRFileReader.getRessourceLocation("/assets/girsignals/modeldefinitions") != null)
+                path = GIRFileReader.getRessourceLocation("/assets/girsignals/modeldefinitions");
+            String str;
+            if (path == null)
+                str = filename;
+            else
+                str = path.toString();
+            registeredModels.put(str, cm -> {
                 content.getModels().forEach((modelname, test2) -> {
                     test2.getTexture().forEach((test, modelstate) -> {
                         modelstate.getTextureStats().forEach((test1, texturestats) -> {

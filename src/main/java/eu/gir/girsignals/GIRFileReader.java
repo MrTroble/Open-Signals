@@ -21,30 +21,31 @@ import eu.gir.girsignals.init.GIRBlocks;
 public class GIRFileReader {
 
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
-        final Optional<Path> pathloc = getRessourceLocation(directory);
-        if (pathloc.isPresent()) {
-            final Path pathlocation = pathloc.get();
+        if (getRessourceLocation(directory) != null) {
+            final Path pathlocation = getRessourceLocation(directory);
+            System.out.println(pathlocation);
             try {
                 final Stream<Path> inputs = Files.list(pathlocation);
                 final Map<String, String> files = new HashMap<>();
                 inputs.forEach(file -> {
-                    GirsignalsMain.log.info("Reading " + file + " from " + pathlocation + " ...");
+                    // GirsignalsMain.log.info("Reading " + file + " from " + pathlocation + "
+                    // ...");
                     try {
                         final List<String> text = Files.readAllLines(file);
                         final String content = toString(text);
                         final String name = file.getFileName().toString();
                         files.put(name, content);
                     } catch (IOException e) {
-                        GirsignalsMain.log
-                                .error("There was a problem during loading " + file + "!");
+                        // GirsignalsMain.log
+                        // .error("There was a problem during loading " + file + "!");
                         e.printStackTrace();
                     }
                 });
                 inputs.close();
                 return files;
             } catch (IOException e) {
-                GirsignalsMain.log.error(
-                        "There was a problem during listing all files from" + pathlocation + "!");
+                // GirsignalsMain.log.error(
+                // "There was a problem during listing all files from" + pathlocation + "!");
                 e.printStackTrace();
             }
         }
@@ -60,8 +61,9 @@ public class GIRFileReader {
         return stringbuilder.toString();
     }
 
-    public static Optional<Path> getRessourceLocation(String location) {
+    public static Path getRessourceLocation(String location) {
         final URL url = GIRBlocks.class.getResource("/assets/girsignals");
+        // GirsignalsMain.log.info("Reading " + location + "...");
         try {
             if (url != null) {
                 final URI uri = url.toURI();
@@ -72,22 +74,26 @@ public class GIRFileReader {
                     final URL resource = GIRBlocks.class.getResource(location);
 
                     if (resource == null)
-                        return Optional.empty();
+                        return null;
 
-                    return Optional.of(Paths.get(resource.toURI()));
+                    final Path returnpath = Paths.get(resource.toURI());
+                    if (returnpath != null)
+                        return returnpath;
                 } else {
                     if (!"jar".equals(uri.getScheme())) {
-                        return Optional.empty();
+                        return null;
                     }
-
-                    try (final FileSystem filesystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
-                        return Optional.of(filesystem.getPath(location));
+                    try (final FileSystem filesystem = FileSystems.newFileSystem(uri,
+                            Collections.emptyMap())) {
+                        final Path returnpath = filesystem.getPath(location);
+                        if (returnpath != null)
+                            return returnpath;
                     }
                 }
             }
         } catch (IOException | URISyntaxException e1) {
             e1.printStackTrace();
         }
-        return Optional.empty();
+        return null;
     }
 }

@@ -94,7 +94,7 @@ public class TextureStats {
         final ArrayList<Signal> signals = new ArrayList<>(Signal.SIGNALLIST);
         signals.forEach(signal -> {
             if (filename.replace(".json", "")
-                    .equalsIgnoreCase(signal.getSignalTypeName().replace("Signal", ""))) {
+                    .equalsIgnoreCase(signal.getSignalTypeName().replace("signal", ""))) {
                 final List<IUnlistedProperty> properties = signal.getProperties();
                 for (int i = 0; i < texture.getHas().size(); i++) {
                     for (int j = 0; j < properties.size(); j++) {
@@ -110,6 +110,8 @@ public class TextureStats {
                             hasandisBlockstates.add(hasAndIs(properties.get(j)));
 
                     }
+                    if (texture.getHasandis().get(i).equalsIgnoreCase("CUSTOMNAME"))
+                        hasandisBlockstates.add(hasAndIs(Signal.CUSTOMNAME));
                 }
                 for (int i = 0; i < texture.getHasnot().size(); i++) {
                     for (int j = 0; j < properties.size(); j++) {
