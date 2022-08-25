@@ -1,12 +1,15 @@
 {
 	"textures": {
 		"lamp_green": "girsignals:blocks/lamps/lamp_green",
-		"lamp_white": "girsignals:blocks/lamps/lamp_white"
+		"lamp_white": "girsignals:blocks/lamps/lamp_white",
+		"lamp_red": "girsignals:blocks/lamps/lamp_red",
+		"lamp_yellow": "girsignals:blocks/lamps/lamp_yellow"
 	},
 	"models": {
 		"hv/hv_ne2": {
-			"textures": {
-				"overlay": {
+			"textures": [
+				{
+					"autoBlockstate": false,
 					"has": [],
 					"hasnot": [],
 					"with": {},
@@ -14,11 +17,131 @@
 						"NE2"
 					],
 					"hasandisnot": [],
-					"retexture": ""
+					"retexture": {}
 				}
-			},
+			],
 			"x": 0,
 			"y": 0,
+			"z": 0
+		},
+		"hv/hv_base": {
+			"textures": [
+				{
+					"autoBlockstate": true,
+					"has": [],
+					"hasnot": [],
+					"with": {},
+					"hasandis": [],
+					"hasandisnot": [],
+					"retexture": {}
+				}
+			],
+			"x": 0,
+			"y": 0,
+			"z": 0
+		},
+		"hv/hv_zs1": {
+			"textures": [
+				{
+					"autoBlockstate": false,
+					"has": [],
+					"hasnot": [],
+					"with": {},
+					"hasandis": [
+						"ZS1"
+					],
+					"hasandisnot": [],
+					"retexture": {
+						"lamp1north": "lamp_white"
+					}
+				},
+				{
+					"autoBlockstate": false,
+					"has": [],
+					"hasnot": [],
+					"with": {},
+					"hasandis": [],
+					"hasandisnot": [
+						"ZS1"
+					],
+					"retexture": {}
+				}
+			],
+			"x": 0,
+			"y": 4.4,
+			"z": 0
+		},
+		"hv/hv_zs7": {
+			"textures": [
+				{
+					"autoBlockstate": false,
+					"has": [],
+					"hasnot": [],
+					"with": {},
+					"hasandis": [
+						"ZS7"
+					],
+					"hasandisnot": [],
+					"retexture": {
+						"lamp1north": "lamp_yellow"
+					}
+				},
+				{
+					"autoBlockstate": false,
+					"has": [],
+					"hasnot": [],
+					"with": {},
+					"hasandis": [],
+					"hasandisnot": [
+						"ZS7"
+					],
+					"retexture": {}
+				}
+			],
+			"x": 0,
+			"y": 4.6,
+			"z": 0
+		},
+		"hv/hv_exit": {
+			"textures": [
+				{
+					"autoBlockstate": false,
+					"has": [],
+					"hasnot": [
+						"HPTYPE"
+					],
+					"with": {
+						"STOPSIGNAL": "HP0",
+						"HPTYPE": "STOPSIGNAL"
+					},
+					"hasandis": [],
+					"hasandisnot": [],
+					"retexture": {
+						"lamp_red_primarynorth": "lamp_red",
+						"lamp_red_secondarynorth": "lamp_red"
+					}
+				}
+			],
+			"x": 0,
+			"y": 5.4,
+			"z": 0
+		},
+		"hv/hv_number": {
+			"textures": [
+				{
+					"autoBlockstate": false,
+					"has": [],
+					"hasnot": [],
+					"with": {},
+					"hasandis": [
+						"CUSTOMNAME"
+					],
+					"hasandisnot": [],
+					"retexture": {}
+				}
+			],
+			"x": 0,
+			"y": 2,
 			"z": 0
 		}
 	}

@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -111,16 +112,19 @@ public class SignalCustomModel implements IModel {
 
     protected void register(final String name, final Predicate<IExtendedBlockState> state,
             final float yOffset) {
-        this.register(name, state, 0, yOffset, 0);
+        final Map<String, String> map = new HashMap<>();
+        this.register(name, state, 0, yOffset, 0, map);
     }
 
     protected void register(final String name, final Predicate<IExtendedBlockState> state,
             final float yOffset, final String... strings) {
-        this.register(name, state, 0, yOffset, 0, strings);
+        final Map<String, String> map = new HashMap<>();
+        this.register(name, state, 0, yOffset, 0, map, strings);
     }
 
     protected void register(final String name, final Predicate<IExtendedBlockState> state,
-            final float x, final float y, final float z, @Nullable final String... strings) {
+            final float x, final float y, final float z, @Nullable final Map<String, String> map,
+            @Nullable final String... strings) {
         IModel m = ModelLoaderRegistry.getModelOrLogError(
                 new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
                 "Couldn't find " + name);
@@ -129,6 +133,20 @@ public class SignalCustomModel implements IModel {
             final Builder<String, String> build = ImmutableMap.builder();
             for (int i = 0; i < (int) Math.floor(strings.length / 2); i++)
                 build.put(strings[i * 2], strings[i * 2 + 1]);
+            m = m.retexture(build.build());
+        }
+        // This strings just until the new RenderSystem is fully included!
+        String str = "";
+        if (map != null) {
+            Builder<String, String> build = ImmutableMap.builder();
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                final String key = entry.getKey();
+                final String val = entry.getValue();
+                str = key;
+                if (str.length() > 2) {
+                    build.put(key, val);
+                }
+            }
             m = m.retexture(build.build());
         }
         m.getTextures().stream().filter(rs -> !textures.contains(rs)).forEach(textures::add);

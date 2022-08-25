@@ -9,11 +9,11 @@ import eu.gir.girsignals.GIRFileReader;
 
 public class ModelStats {
 
-    private Map<String, String> texture;
+    private Map<String, String> textures;
     private Map<String, Models> models;
 
     public Map<String, String> getTextures() {
-        return texture;
+        return textures;
     }
 
     public Map<String, Models> getModels() {
@@ -33,19 +33,26 @@ public class ModelStats {
         return content;
     }
 
-    public static String createRetexture(final String lampname, final String lamppath,
-            final Map<String, String> map) {
-        if (getLampPath(lamppath, map) != null)
-            return lampname + " " + getLampPath(lamppath, map);
-        else
-            return null;
+    public static Map<String, String> createRetexture(final Map<String, String> retexture,
+            final Map<String, String> lamp) {
+        final Map<String, String> retexturemap = new HashMap<>();
+        if (retexture != null) {
+            for (Map.Entry<String, String> entry : retexture.entrySet()) {
+                final String key = entry.getKey();
+                final String val = entry.getValue();
+                retexturemap.put(key, getLampPath(val, lamp));
+            }
+        }
+        return retexturemap;
     }
 
     private static String getLampPath(final String lampname, final Map<String, String> map) {
-        for (Map.Entry<String, String> entry : map.entrySet()) {
-            if (entry.getKey().equalsIgnoreCase(lampname))
-                return entry.getValue();
+        if (map != null) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                if (entry.getKey().equalsIgnoreCase(lampname))
+                    return entry.getValue();
+            }
         }
-        return null;
+        return lampname;
     }
 }

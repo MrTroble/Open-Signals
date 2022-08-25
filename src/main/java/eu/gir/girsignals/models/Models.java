@@ -1,10 +1,10 @@
 package eu.gir.girsignals.models;
 
-import java.util.Map;
+import java.util.List;
 
 public class Models {
 
-    private Map<String, TextureStats> textures;
+    private List<TextureStats> textures;
     private float x;
     private float y;
     private float z;
@@ -21,7 +21,7 @@ public class Models {
         return z;
     }
 
-    public Map<String, TextureStats> getTexture() {
+    public List<TextureStats> getTexture() {
         return textures;
     }
 }
