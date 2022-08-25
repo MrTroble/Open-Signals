@@ -28,23 +28,24 @@ public class ModelStateBuilderTest {
             test2.getModels().forEach((test3, test4) -> {
                 System.out.println(test4.getX());
                 test4.getTexture().forEach(test5 -> {
-                    System.out.println(test5.isautoBlockstate());
-                    System.out.println(test5.getHasandis());
-                    System.out.println(TextureStats.getPredicates(test1, test5));
+                    System.out.println("This is model: " + test3);
+                    System.out.println("The Autoblockstate is: " + test5.isautoBlockstate());
+                    System.out.println("The Predicate<IExtendedBlockstate is: "
+                            + TextureStats.getPredicates(test1, test5));
                     final Map<String, String> map1 = ModelStats
                             .createRetexture(test5.getRetextures(), test2.getTextures());
                     map1.forEach((str1, str2) -> {
                         System.out.println("Der Key ist: " + str1);
                         System.out.println("Der Value ist: " + str2);
                     });
+                    System.out.println();
                 });
             });
         });
         final Field[] fields = SignalHV.class.getDeclaredFields();
         for (final Field field : fields) {
-            System.out.println(field);
+            // System.out.println(field);
         }
-        System.out.println("Jetzt komen die Properties:");
         ArrayList<IUnlistedProperty> signalProperties = new ArrayList<>();
         signalProperties.clear();
         if (!this.getClass().equals(Signal.class)) {
@@ -60,7 +61,7 @@ public class ModelStateBuilderTest {
             }
         }
         signalProperties.forEach(property -> {
-            System.out.println(property.toString());
+            // System.out.println(property.toString());
         });
     }
 }

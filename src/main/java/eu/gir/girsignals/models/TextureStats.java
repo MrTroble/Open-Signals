@@ -128,7 +128,6 @@ public class TextureStats {
                                 hasandisBlockstates.add(state);
                             }
                         }
-
                     }
                     if (texture.getHasandis().get(i).equalsIgnoreCase("CUSTOMNAME"))
                         hasandisBlockstates.add(hasAndIs(Signal.CUSTOMNAME));
