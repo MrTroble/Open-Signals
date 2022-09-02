@@ -1,0 +1,67 @@
+{
+    "textures": {},
+    "models": {
+        "OFF": {
+            "textures": [
+                {
+                    "autoBlockstate": false,
+                    "has": [],
+                    "hasnot": [],
+                    "with": {
+                        "ZS3": "OFF"
+                    },
+                    "hasandis": [],
+                    "hasandisnot": [],
+                    "retexture": {
+                        "overlay": "girsignals:blocks/zs3/OFF"
+                    }
+                }
+            ],
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "A": {
+            "textures": [
+                {
+                    "autoBlockstate": false,
+                    "has": [],
+                    "hasnot": [],
+                    "with": {
+                        "prop": "A"
+                    },
+                    "hasandis": [],
+                    "hasandisnot": [],
+                    "retexture": {
+                        "overlay": "girsignals:blocks/zs3/A"
+                    },
+                    "extentions": []
+                }
+            ],
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "B": {
+            "textures": [
+                {
+                    "autoBlockstate": false,
+                    "has": [],
+                    "hasnot": [],
+                    "with": {
+                        "prop": "B"
+                    },
+                    "hasandis": [],
+                    "hasandisnot": [],
+                    "retexture": {
+                        "overlay": "girsignals:blocks/zs3/B"
+                    },
+                    "extentions": []
+                }
+            ],
+            "x": 0,
+            "y": 0,
+            "z": 0
+        }
+    }
+}

@@ -11,12 +11,10 @@ import eu.gir.girsignals.GIRFileReader;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.models.ModelStats;
-import eu.gir.girsignals.models.TextureStats;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class ModelStateBuilderTest {
 
-    @SuppressWarnings("rawtypes")
     @Test
     public void testModelstats() {
         System.out.println(
@@ -31,7 +29,7 @@ public class ModelStateBuilderTest {
                     System.out.println("This is model: " + test3);
                     System.out.println("The Autoblockstate is: " + test5.isautoBlockstate());
                     System.out.println("The Predicate<IExtendedBlockstate is: "
-                            + TextureStats.getPredicates(test1, test5));
+                            + test5.getPredicates(test1, test5));
                     final Map<String, String> map1 = ModelStats
                             .createRetexture(test5.getRetextures(), test2.getTextures());
                     map1.forEach((str1, str2) -> {
@@ -43,9 +41,14 @@ public class ModelStateBuilderTest {
             });
         });
         final Field[] fields = SignalHV.class.getDeclaredFields();
-        for (final Field field : fields) {
+        for (@SuppressWarnings("unused")
+        final Field field : fields) {
             // System.out.println(field);
         }
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void testProperties() {
         ArrayList<IUnlistedProperty> signalProperties = new ArrayList<>();
         signalProperties.clear();
         if (!this.getClass().equals(Signal.class)) {
@@ -61,7 +64,7 @@ public class ModelStateBuilderTest {
             }
         }
         signalProperties.forEach(property -> {
-            // System.out.println(property.toString());
+            System.out.println(property.toString());
         });
     }
 }

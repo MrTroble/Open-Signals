@@ -21,36 +21,35 @@ import eu.gir.girsignals.init.GIRBlocks;
 public class GIRFileReader {
 
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
+        final Map<String, String> files = new HashMap<>();
         final Optional<Path> pathloc = getRessourceLocation(directory);
         if (pathloc.isPresent()) {
             final Path pathlocation = pathloc.get();
             System.out.println(pathlocation);
             try {
                 final Stream<Path> inputs = Files.list(pathlocation);
-                final Map<String, String> files = new HashMap<>();
+
                 inputs.forEach(file -> {
-                    // GirsignalsMain.log.info("Reading " + file + " from " + pathlocation + "
-                    // ...");
                     try {
                         final List<String> text = Files.readAllLines(file);
                         final String content = toString(text);
                         final String name = file.getFileName().toString();
                         files.put(name, content);
                     } catch (IOException e) {
-                        // GirsignalsMain.log
-                        // .error("There was a problem during loading " + file + "!");
+                        GirsignalsMain.log
+                                .warn("There was a problem during loading " + file + " !");
                         e.printStackTrace();
                     }
                 });
                 inputs.close();
                 return files;
             } catch (IOException e) {
-                // GirsignalsMain.log.error(
-                // "There was a problem during listing all files from" + pathlocation + "!");
+                GirsignalsMain.log.warn(
+                        "There was a problem during listing all files from " + pathlocation + " !");
                 e.printStackTrace();
             }
         }
-        return null;
+        return files;
     }
 
     private static String toString(final List<String> text) {
@@ -64,7 +63,6 @@ public class GIRFileReader {
 
     public static Optional<Path> getRessourceLocation(String location) {
         final URL url = GIRBlocks.class.getResource("/assets/girsignals");
-        // GirsignalsMain.log.info("Reading " + location + "...");
         try {
             if (url != null) {
                 final URI uri = url.toURI();

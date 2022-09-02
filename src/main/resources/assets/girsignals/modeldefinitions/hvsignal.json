@@ -11,13 +11,12 @@
 				{
 					"autoBlockstate": false,
 					"has": [],
-					"hasnot": [],
 					"with": {},
 					"hasandis": [
 						"NE2"
 					],
-					"hasandisnot": [],
-					"retexture": {}
+					"retexture": {},
+					"extentions": []
 				}
 			],
 			"x": 0,
@@ -29,11 +28,10 @@
 				{
 					"autoBlockstate": true,
 					"has": [],
-					"hasnot": [],
 					"with": {},
 					"hasandis": [],
-					"hasandisnot": [],
-					"retexture": {}
+					"retexture": {},
+					"extentions": []
 				}
 			],
 			"x": 0,
@@ -45,26 +43,24 @@
 				{
 					"autoBlockstate": false,
 					"has": [],
-					"hasnot": [],
 					"with": {},
 					"hasandis": [
 						"ZS1"
 					],
-					"hasandisnot": [],
 					"retexture": {
 						"lamp1north": "lamp_white"
-					}
+					},
+					"extentions": []
 				},
 				{
 					"autoBlockstate": false,
 					"has": [],
-					"hasnot": [],
 					"with": {},
-					"hasandis": [],
-					"hasandisnot": [
-						"ZS1"
+					"hasandis": [
+						"!ZS1"
 					],
-					"retexture": {}
+					"retexture": {},
+					"extentions": []
 				}
 			],
 			"x": 0,
@@ -76,26 +72,24 @@
 				{
 					"autoBlockstate": false,
 					"has": [],
-					"hasnot": [],
 					"with": {},
 					"hasandis": [
 						"ZS7"
 					],
-					"hasandisnot": [],
 					"retexture": {
 						"lamp1north": "lamp_yellow"
-					}
+					},
+					"extentions": []
 				},
 				{
 					"autoBlockstate": false,
 					"has": [],
-					"hasnot": [],
 					"with": {},
-					"hasandis": [],
-					"hasandisnot": [
-						"ZS7"
+					"hasandis": [
+						"!ZS7"
 					],
-					"retexture": {}
+					"retexture": {},
+					"extentions": []
 				}
 			],
 			"x": 0,
@@ -106,20 +100,19 @@
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"has": [],
-					"hasnot": [
-						"HPTYPE"
+					"has": [
+						"!HPTYPE"
 					],
 					"with": {
-						"STOPSIGNAL": "HP0",
-						"HPTYPE": "STOPSIGNAL"
+						"HPTYPE": "STOPSIGNAL",
+						"STOPSIGNAL": "HP0"
 					},
 					"hasandis": [],
-					"hasandisnot": [],
 					"retexture": {
 						"lamp_red_primarynorth": "lamp_red",
 						"lamp_red_secondarynorth": "lamp_red"
-					}
+					},
+					"extentions": []
 				}
 			],
 			"x": 0,
@@ -131,13 +124,12 @@
 				{
 					"autoBlockstate": false,
 					"has": [],
-					"hasnot": [],
 					"with": {},
 					"hasandis": [
 						"CUSTOMNAME"
 					],
-					"hasandisnot": [],
-					"retexture": {}
+					"retexture": {},
+					"extentions": []
 				}
 			],
 			"x": 0,
