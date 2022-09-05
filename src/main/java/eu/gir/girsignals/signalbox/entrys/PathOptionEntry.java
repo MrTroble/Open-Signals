@@ -26,6 +26,8 @@ public class PathOptionEntry implements INetworkSavable {
         if (value == null) {
             removedEntrys.put(type, pathEntrys.remove(type));
             return;
+        } else if (removedEntrys.containsKey(type)) {
+            removedEntrys.remove(type);
         }
         final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
                 pType -> pType.newValue());
