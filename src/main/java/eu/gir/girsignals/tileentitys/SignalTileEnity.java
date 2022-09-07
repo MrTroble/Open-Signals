@@ -55,8 +55,6 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         } else {
             read(comp);
         }
-        if (comp.hasKey(CUSTOMNAME))
-            setCustomName(comp.getString(CUSTOMNAME));
     }
 
     private void read(final NBTTagCompound comp) {
@@ -118,8 +116,10 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         this.formatCustomName = str;
         if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
             map.remove(Signal.CUSTOMNAME);
+            this.syncClient();
         } else if (str != null) {
             map.put(Signal.CUSTOMNAME, true);
+            this.syncClient();
         }
     }
 

@@ -5,7 +5,6 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.toNBT;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 
-import eu.gir.girsignals.EnumSignals.SortOptions;
 import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.LinkType;
@@ -78,6 +76,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void update(final NBTTagCompound compound) {
+        System.out.println(compound.getKeySet());
         this.resetTileSelection();
         if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
             final String error = I18n.format(compound.getString(SignalBoxTileEntity.ERROR_STRING));
@@ -288,36 +287,6 @@ public class GuiSignalBox extends GuiBase {
             initializeFieldTemplate(this::tileNormal);
         }, 1));
         this.page = Page.TILE_CONFIG;
-    }
-
-    @SuppressWarnings({
-            "rawtypes", "unchecked", "unused"
-    })
-    private void sort(final SortOptions sort) {
-        final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
-        final ArrayList<Entry<BlockPos, LinkType>> settingslist = new ArrayList(entrySet);
-        switch (sort) {
-            case DISABLED:
-                break;
-            case NAME_ASSENDING:
-                break;
-            case NAME_DESCENIDNG:
-                break;
-            case TYPE_ASSANDING:
-                settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
-                        o2.getValue().ordinal()));
-                break;
-            case TYPE_DESCENDING:
-                settingslist.sort((o1, o2) -> Integer.compare(o1.getValue().ordinal(),
-                        o2.getValue().ordinal()));
-                break;
-            case DISTANCE_ASSANDING:
-                break;
-            case DISTANCE_DSECENDING:
-                break;
-            default:
-                break;
-        }
     }
 
     private void pageCheck(final Page page) {

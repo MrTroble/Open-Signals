@@ -115,9 +115,13 @@ public class SignalBoxGrid implements INetworkSavable {
             }
         });
         nodeCopy.forEach(pathway -> {
+            final Point first = pathway.getFirstPoint();
             if (pathway.tryReset(pos)) {
                 if (pathway.isEmptyOrBroken()) {
                     resetPathway(pathway);
+                } else {
+                    this.startsToPath.remove(first);
+                    this.startsToPath.put(pathway.getFirstPoint(), pathway);
                 }
                 updateToNet(pathway);
             }

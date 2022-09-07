@@ -40,6 +40,7 @@ public class SyncableTileEntity extends TileEntity {
     public void syncClient(final World world, final BlockPos pos) {
         final IBlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);
+        world.markBlockRangeForRenderUpdate(pos, pos);
     }
 
     public boolean add(final UIClientSync sync) {
