@@ -7,7 +7,9 @@
 * perf: reduced network load
 * feat: auto recover from bad pathways
 * perf: reduced redstone performance
-* perf: only send needed data 
+* perf: only send needed data
+
+// Known issues: Sometimes pathways are invisible
 
 ## [Beta Update] 
 * feat: Ra11 added to signalbox
