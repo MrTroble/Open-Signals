@@ -98,6 +98,7 @@ public class GuiSignalBox extends GuiBase {
         } else {
             this.dirtyCompound = compound;
             this.dirty = true;
+            System.out.println(this.page);
         }
     }
 

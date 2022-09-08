@@ -71,7 +71,7 @@ public final class SignalBoxUtil {
         return new Point(x + point.getX(), y + point.getY());
     }
 
-    private static class ConnectionChecker {
+    public static class ConnectionChecker {
 
         public Path path;
         public SignalBoxNode nextNode;
@@ -114,7 +114,8 @@ public final class SignalBoxUtil {
         gscores.put(p1, 0.0);
         fscores.put(p1, calculateHeuristic(p1, p2));
 
-        final ConnectionChecker checker = new ConnectionChecker();
+        final SignalBoxFactory factory = SignalBoxFactory.getFactory();
+        final ConnectionChecker checker = factory.getConnectionChecker();
         checker.visited = visitedPaths;
         checker.lastNode = lastNode;
         checker.type = pathType;
@@ -132,7 +133,7 @@ public final class SignalBoxUtil {
                     final SignalBoxNode boxNode = modeGrid.get(point);
                     nodes.add(boxNode);
                 }
-                return Optional.of(new SignalBoxPathway(modeGrid, nodes, pathType));
+                return Optional.of(factory.getPathway(modeGrid, nodes, pathType));
             }
             if (nextSignalnode == null)
                 continue;

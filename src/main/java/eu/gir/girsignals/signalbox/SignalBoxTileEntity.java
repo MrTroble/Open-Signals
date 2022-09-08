@@ -41,14 +41,18 @@ public class SignalBoxTileEntity extends SyncableTileEntity
 
     private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
     private final Map<BlockPos, Signal> signals = new HashMap<>();
-    private final SignalBoxGrid grid = new SignalBoxGrid(this::sendToAll);
+    private final SignalBoxGrid grid;
+
+    public SignalBoxTileEntity() {
+        grid = SignalBoxFactory.getFactory().getGrid(this::sendToAll);
+    }
 
     private WorldOperations worldLoadOps = new WorldOperations();
 
     @Override
     public void setWorld(final World worldIn) {
         super.setWorld(worldIn);
-        worldLoadOps = new WorldLoadOperations(worldIn);
+        worldLoadOps = SignalBoxFactory.getFactory().getWorldOperations(worldIn);
         grid.setWorld(worldIn);
     }
 

@@ -29,10 +29,12 @@ public class SignalBoxGrid implements INetworkSavable {
     private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
     private final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     private final Consumer<NBTTagCompound> sendToAll;
+    private final SignalBoxFactory factory;
     private World world = null;
 
     public SignalBoxGrid(final Consumer<NBTTagCompound> sendToAll) {
         this.sendToAll = sendToAll;
+        this.factory = SignalBoxFactory.getFactory();
     }
 
     private Optional<Point> saveRead(final String id) {
@@ -88,7 +90,7 @@ public class SignalBoxGrid implements INetworkSavable {
             count++;
         }
         if (count == 0) {
-            GirsignalsMain.getLogger().warn("Could not find previous! " + pathway);
+            GirsignalsMain.getLogger().debug("Could not find previous! " + pathway);
         }
     }
 
@@ -170,7 +172,7 @@ public class SignalBoxGrid implements INetworkSavable {
         if (list == null)
             return;
         list.forEach(comp -> {
-            final SignalBoxPathway pathway = new SignalBoxPathway(this.modeGrid);
+            final SignalBoxPathway pathway = factory.getPathway(this.modeGrid);
             pathway.read((NBTTagCompound) comp);
             if (pathway.isEmptyOrBroken()) {
                 GirsignalsMain.log.error("Remove empty or broken pathway, try to recover!");
