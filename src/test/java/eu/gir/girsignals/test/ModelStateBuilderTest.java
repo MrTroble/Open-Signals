@@ -10,7 +10,9 @@ import org.junit.jupiter.api.Test;
 import eu.gir.girsignals.GIRFileReader;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.signals.SignalHV;
+import eu.gir.girsignals.models.GIRBlockstateParser;
 import eu.gir.girsignals.models.ModelStats;
+import eu.gir.girsignals.models.TextureStats;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class ModelStateBuilderTest {
@@ -24,26 +26,25 @@ public class ModelStateBuilderTest {
         map.forEach((test1, test2) -> {
             System.out.println(test1);
             test2.getModels().forEach((test3, test4) -> {
-                System.out.println(test4.getX());
-                test4.getTexture().forEach(test5 -> {
+                for (int i = 0; i < test4.getTexture().size(); i++) {
+
+                    final TextureStats test5 = test4.getTexture().get(i);
                     System.out.println("This is model: " + test3);
                     System.out.println("The Autoblockstate is: " + test5.isautoBlockstate());
-                    System.out.println("The Predicate<IExtendedBlockstate is: "
-                            + test5.getPredicates(test1, test5));
+                    System.out.println("The " + i + ". blockstate of " + test3 + " is: "
+                            + test5.getBlockstate());
                     final Map<String, String> map1 = ModelStats
                             .createRetexture(test5.getRetextures(), test2.getTextures());
                     map1.forEach((str1, str2) -> {
                         System.out.println("Der Key ist: " + str1);
                         System.out.println("Der Value ist: " + str2);
                     });
-                    System.out.println();
-                });
+                }
             });
         });
         final Field[] fields = SignalHV.class.getDeclaredFields();
-        for (@SuppressWarnings("unused")
-        final Field field : fields) {
-            // System.out.println(field);
+        for (final Field field : fields) {
+            //System.out.println(field);
         }
     }
 
@@ -66,5 +67,11 @@ public class ModelStateBuilderTest {
         signalProperties.forEach(property -> {
             System.out.println(property.toString());
         });
+    }
+
+    public void testBlockstateParser() {
+        final Object state = GIRBlockstateParser.getBlockstatefromString(
+                "with(STOPSIGNAL, HP0) && (with(HPTYPE, STOPSIGNAL) || !has(HPTYPE))", null, null);
+        System.out.println(state);
     }
 }

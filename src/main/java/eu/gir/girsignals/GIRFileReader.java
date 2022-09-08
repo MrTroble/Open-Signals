@@ -25,7 +25,6 @@ public class GIRFileReader {
         final Optional<Path> pathloc = getRessourceLocation(directory);
         if (pathloc.isPresent()) {
             final Path pathlocation = pathloc.get();
-            System.out.println(pathlocation);
             try {
                 final Stream<Path> inputs = Files.list(pathlocation);
 

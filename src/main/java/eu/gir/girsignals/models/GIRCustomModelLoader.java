@@ -130,81 +130,40 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         });
 
         for (Map.Entry<String, ModelStats> modelstatemap : modelmap.entrySet()) {
-            String filename = modelstatemap.getKey();
-            ModelStats content = modelstatemap.getValue();
+            final String filename = modelstatemap.getKey();
+            final ModelStats content = modelstatemap.getValue();
 
-            if (filename.equalsIgnoreCase("zs32.json")
-                    || filename.equalsIgnoreCase("mastsigns.json")) {
+            if (!filename.equalsIgnoreCase("zs32.json")
+                    || !filename.equalsIgnoreCase("mastsigns.json")) {
 
                 registeredModels.put(filename.replace(".json", ""), cm -> {
 
                     for (Map.Entry<String, Models> entry2 : content.getModels().entrySet()) {
+
                         final String modelname = entry2.getKey();
                         final Models modelstats = entry2.getValue();
 
-                        for (int i = 0; i < modelstats.getTexture().size(); i++) {
-                            final TextureStats modelstate = modelstats.getTexture().get(i);
-                            if (modelstats.getTexture().get(i).getExtentions().size() == 0) {
-                                final Predicate<IExtendedBlockState> state = modelstate
-                                        .getPredicates(filename, modelstate);
+                        modelstats.getTexture().forEach(texturestate -> {
 
-                                if (modelstate.isautoBlockstate()) {
-                                    cm.register(modelname, ebs -> true, modelstats.getX(),
-                                            modelstats.getY(), modelstats.getZ(),
-                                            ModelStats.createRetexture(modelstate.getRetextures(),
-                                                    content.getTextures()));
+                            final Predicate<IExtendedBlockState> state = GIRBlockstateParser
+                                    .getBlockstatefromString(texturestate.getBlockstate(), filename,
+                                            modelname);
 
-                                } else if (state != null && !modelstate.isautoBlockstate()) {
-                                    cm.register(modelname, state, modelstats.getX(),
-                                            modelstats.getY(), modelstats.getZ(),
-                                            ModelStats.createRetexture(modelstate.getRetextures(),
-                                                    content.getTextures()));
+                            if (texturestate.isautoBlockstate()) {
+                                cm.register(modelname, ebs -> true, modelstats.getX(),
+                                        modelstats.getY(), modelstats.getZ(),
+                                        ModelStats.createRetexture(texturestate.getRetextures(),
+                                                content.getTextures()));
 
-                                } else if (state == null && !modelstate.isautoBlockstate()) {
-                                    GirsignalsMain.log.warn("The Blockstate of " + modelname
-                                            + " is null! This shouldn´t be the case!");
-                                }
-                            } else {
+                            } else if (state != null && !texturestate.isautoBlockstate()) {
+                                cm.register(modelname, state, modelstats.getX(), modelstats.getY(),
+                                        modelstats.getZ(),
+                                        ModelStats.createRetexture(texturestate.getRetextures(),
+                                                content.getTextures()));
 
-                                for (int j = 0; j < modelstate.getExtentions().size(); j++) {
-                                    final String extention = modelstats.getTexture().get(i)
-                                            .getExtentions().get(j);
-
-                                    if (extention.equalsIgnoreCase("ZS32")) {
-                                        zs32states.forEach((name, state) -> {
-                                            state.getModels().forEach((zs3name, zs3state) -> {
-                                                zs3state.getTexture().forEach(textures -> {
-                                                    textures.getWith().forEach((key, val) -> {
-                                                        modelstate.getWith()
-                                                                .forEach((key1, val1) -> {
-                                                                    modelstate.getWith();
-                                                                });
-                                                    });
-
-                                                    modelstate
-                                                            .addRetexture(textures.getRetextures());
-                                                    final Predicate<IExtendedBlockState> blockstate = modelstate
-                                                            .getPredicates(filename, modelstate);
-
-                                                    if (blockstate == null) {
-                                                        GirsignalsMain.log.warn("The Blockstate of "
-                                                                + modelname + " in the extention "
-                                                                + name
-                                                                + " is null! This shouldn´t be the case!");
-                                                    } else {
-                                                        cm.register(modelname, blockstate,
-                                                                modelstats.getX(),
-                                                                modelstats.getY(),
-                                                                modelstats.getZ(),
-                                                                ModelStats.createRetexture(
-                                                                        modelstate.getRetextures(),
-                                                                        content.getTextures()));
-                                                    }
-                                                });
-                                            });
-                                        });
-                                    }
-                                }
+                            } else if (state == null && !texturestate.isautoBlockstate()) {
+                                GirsignalsMain.log.warn("The predicate of " + modelname + " in "
+                                        + filename + " is null! This shouldn´t be the case!");
                             }
 
                             cm.register("hv/hv_mast1", ebs -> true, 1);
@@ -234,13 +193,14 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                             // Zs7 off
                             // cm.register("hv/hv_zs7", hasAndIsNot(SignalHV.ZS7), 4.6f);
                             // HP 0
-                            // cm.register("hv/hv_exit",
-                            // with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP0))
-                            // .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.STOPSIGNAL))
-                            // .or(hasNot(SignalHV.HPTYPE))),
-                            // 5.4f, "lamp_red_primarynorth",
-                            // "girsignals:blocks/lamps/lamp_red",
-                            // "lamp_red_secondarynorth", "girsignals:blocks/lamps/lamp_red");
+                            cm.register("hv/hv_exit",
+                                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP0))
+                                            .and(with(SignalHV.HPTYPE,
+                                                    hpt -> hpt.equals(HPType.STOPSIGNAL))
+                                                            .or(hasNot(SignalHV.HPTYPE))),
+                                    5.4f, "lamp_red_primarynorth",
+                                    "girsignals:blocks/lamps/lamp_red", "lamp_red_secondarynorth",
+                                    "girsignals:blocks/lamps/lamp_red");
                             // HP 1
                             cm.register("hv/hv_exit",
                                     with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP1))
@@ -379,7 +339,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                             cm.register("hv/hv_vr_statuslight",
                                     hasAndIsNot(SignalHV.VR_LIGHT).and(has(SignalHV.DISTANTSIGNAL)),
                                     4);
-                        }
+                        });
                     }
                 });
             }

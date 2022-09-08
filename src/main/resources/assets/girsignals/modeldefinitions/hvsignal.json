@@ -10,11 +10,7 @@
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"has": [],
-					"with": {},
-					"hasandis": [
-						"NE2"
-					],
+					"blockstate": "hasandis(NE2)",
 					"retexture": {},
 					"extentions": []
 				}
@@ -27,9 +23,7 @@
 			"textures": [
 				{
 					"autoBlockstate": true,
-					"has": [],
-					"with": {},
-					"hasandis": [],
+					"blockstate": "",
 					"retexture": {},
 					"extentions": []
 				}
@@ -42,11 +36,7 @@
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"has": [],
-					"with": {},
-					"hasandis": [
-						"ZS1"
-					],
+					"blockstate": "hasandis(ZS1)",
 					"retexture": {
 						"lamp1north": "lamp_white"
 					},
@@ -54,11 +44,7 @@
 				},
 				{
 					"autoBlockstate": false,
-					"has": [],
-					"with": {},
-					"hasandis": [
-						"!ZS1"
-					],
+					"blockstate": "has(ZS1) && ",
 					"retexture": {},
 					"extentions": []
 				}
@@ -71,11 +57,7 @@
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"has": [],
-					"with": {},
-					"hasandis": [
-						"ZS7"
-					],
+					"blockstate": "hasandis(ZS7)",
 					"retexture": {
 						"lamp1north": "lamp_yellow"
 					},
@@ -83,11 +65,7 @@
 				},
 				{
 					"autoBlockstate": false,
-					"has": [],
-					"with": {},
-					"hasandis": [
-						"!ZS7"
-					],
+					"blockstate": "!hasandis(ZS7)",
 					"retexture": {},
 					"extentions": []
 				}
@@ -96,18 +74,24 @@
 			"y": 4.6,
 			"z": 0
 		},
+		"hv/hv_number": {
+			"textures": [
+				{
+					"autoBlockstate": false,
+					"blockstate": "hasandis(CUSTOMNAME)",
+					"retexture": {},
+					"extentions": []
+				}
+			],
+			"x": 0,
+			"y": 2,
+			"z": 0
+		},
 		"hv/hv_exit": {
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"has": [
-						"!HPTYPE"
-					],
-					"with": {
-						"HPTYPE": "STOPSIGNAL",
-						"STOPSIGNAL": "HP0"
-					},
-					"hasandis": [],
+					"blockstate": "with(STOPSIGNAL, HP0) && (with(HPTYPE, STOPSIGNAL) || !has(HPTYPE))",
 					"retexture": {
 						"lamp_red_primarynorth": "lamp_red",
 						"lamp_red_secondarynorth": "lamp_red"
@@ -119,22 +103,5 @@
 			"y": 5.4,
 			"z": 0
 		},
-		"hv/hv_number": {
-			"textures": [
-				{
-					"autoBlockstate": false,
-					"has": [],
-					"with": {},
-					"hasandis": [
-						"CUSTOMNAME"
-					],
-					"retexture": {},
-					"extentions": []
-				}
-			],
-			"x": 0,
-			"y": 2,
-			"z": 0
-		}
 	}
 }

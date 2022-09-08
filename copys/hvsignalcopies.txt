@@ -1,0 +1,16 @@
+"hv/hv_exit": {
+			"textures": [
+				{
+					"autoBlockstate": false,
+					"blockstate": "with(STOPSIGNAL, HP0) && (with(HPTYPE, STOPSIGNAL) || !has(HPTYPE))",
+					"retexture": {
+						"lamp_red_primarynorth": "lamp_red",
+						"lamp_red_secondarynorth": "lamp_red"
+					},
+					"extentions": []
+				}
+			],
+			"x": 0,
+			"y": 5.4,
+			"z": 0
+		},
