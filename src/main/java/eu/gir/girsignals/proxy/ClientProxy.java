@@ -32,7 +32,8 @@ public class ClientProxy extends CommonProxy {
         super.preinit(event);
         GuiHandler.addGui(Placementtool.class,
                 (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
-        GuiHandler.addGui(SignalController.class, SignalControllerTileEntity.class, GuiSignalController::new);
+        GuiHandler.addGui(SignalController.class, SignalControllerTileEntity.class,
+                GuiSignalController::new);
         GuiHandler.addGui(SignalBox.class, SignalBoxTileEntity.class, GuiSignalBox::new);
         GuiHandler.addGui(RedstoneIO.class, RedstoneIOTileEntity.class, GuiRedstoneIO::new);
         GuiHandler.addGui(Signal.class, SignalTileEnity.class, GuiSignal::new);

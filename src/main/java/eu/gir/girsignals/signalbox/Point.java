@@ -1,15 +1,16 @@
 package eu.gir.girsignals.signalbox;
 
-import java.io.Serializable;
+import eu.gir.girsignals.signalbox.entrys.ISaveable;
+import net.minecraft.nbt.NBTTagCompound;
 
-public class Point implements Serializable {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -4441798278173012509L;
+public class Point implements ISaveable {
 
     private int x, y;
+
+    public Point() {
+        x = 0;
+        y = 0;
+    }
 
     public Point(final int x, final int y) {
         this.x = x;
@@ -65,5 +66,17 @@ public class Point implements Serializable {
     @Override
     public String toString() {
         return "Point[x=" + this.x + ",y=" + this.y + "]";
+    }
+
+    @Override
+    public void write(final NBTTagCompound tag) {
+        tag.setInteger("x", x);
+        tag.setInteger("y", y);
+    }
+
+    @Override
+    public void read(final NBTTagCompound tag) {
+        this.x = tag.getInteger("x");
+        this.y = tag.getInteger("y");
     }
 }

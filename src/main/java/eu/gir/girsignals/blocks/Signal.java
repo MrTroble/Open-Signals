@@ -432,6 +432,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         GlStateManager.rotate(angel, 0, 1, 0);
         GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         GlStateManager.scale(-1f, 1f, 1f);
+
         for (int i = 0; i < display.length; i++) {
             font.drawSplitString(display[i], 0, (int) (i * scale * 2.8f), (int) width, 0);
         }
