@@ -17,14 +17,16 @@ public class FunctionParsingInfo {
 
 	static {
 		paramaterParser.put(IUnlistedProperty.class, FunctionParsingInfo::getProperty);
-		paramaterParser.put(ValuePack.class, FunctionParsingInfo::getProperty);
+		paramaterParser.put(ValuePack.class, FunctionParsingInfo::getPredicate);
 	}
 
-	public String name;
-	public String[] arguments;
-	public ParameterInfo info;
+	public final ParameterInfo info;
+	
+	public FunctionParsingInfo(final Signal signalSystem) {
+		info = new ParameterInfo("", signalSystem);
+	}
 
-	public Object[] getParameter(final Class[] parameter, final String[] argument) {
+	public Object[] getParameter(final Class[] parameter, final String[] arguments) {
 		final Object[] parameters = new Object[arguments.length];
 		for (int i = 0; i < arguments.length; i++) {
 			info.argument = arguments[i];
