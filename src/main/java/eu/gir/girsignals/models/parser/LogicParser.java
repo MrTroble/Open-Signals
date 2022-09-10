@@ -3,6 +3,9 @@ package eu.gir.girsignals.models.parser;
 import java.util.HashMap;
 import java.util.function.Predicate;
 
+import eu.gir.girsignals.models.parser.interm.EvaluationLevel;
+import eu.gir.girsignals.models.parser.interm.IntermidiateNode;
+import eu.gir.girsignals.models.parser.interm.LogicalSymbols;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
@@ -37,6 +40,44 @@ public class LogicParser {
 			throw new LogicalParserException(String.format("Wrong argument count in function=%s, needed=%d, actual=%d",
 					name, length, arguments.length));
 		return method.blockState.apply(parser.getParameter(method.parameter, arguments));
+	}
+
+	public static IntermidiateLogic parse(final String input, final FunctionParsingInfo info) {
+		final char[] array = input.toCharArray();
+		final IntermidiateLogic logic = new IntermidiateLogic();
+		logic.push();
+		final StringBuilder builder = new StringBuilder();
+		String nextName = null;
+		for (final char current : array) {
+			if (current == '(') {
+				if (builder.isEmpty()) {
+					logic.push();
+				} else {
+					nextName = builder.toString();
+					builder.setLength(0);
+				}
+				continue;
+			}
+			if (current == ')') {
+				if (nextName == null) {
+					logic.pop();
+				} else {
+					logic.add(new IntermidiateNode(nDegreeFunctionParser(nextName, info, builder.toString().split(",")),
+							EvaluationLevel.PRELEVEL));
+					builder.setLength(0);
+				}
+				continue;
+			}
+			if (!Character.isWhitespace(current)) {
+				builder.append(current);
+				final LogicalSymbols symbol = LogicalSymbols.find(builder.toString());
+				if (symbol != null) {
+					logic.add(symbol.builder.get());
+					builder.setLength(0);
+				}
+			}
+		}
+		return logic;
 	}
 
 }
