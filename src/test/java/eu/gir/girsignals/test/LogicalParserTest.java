@@ -219,7 +219,10 @@ public class LogicalParserTest {
                 with(SignalHV.STOPSIGNAL, HP.HP1));
         check(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0).put(SignalHV.DISTANTSIGNAL, VR.OFF),
                 with(SignalHV.STOPSIGNAL, HP.HP0), and(), with(SignalHV.DISTANTSIGNAL, VR.OFF));
-
+        check(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0), with(SignalHV.STOPSIGNAL, HP.HP0),
+                or(), with(SignalHV.DISTANTSIGNAL, VR.VR0));
+        check(new DummyBlockState(SignalHV.DISTANTSIGNAL, VR.VR0),
+                with(SignalHV.STOPSIGNAL, HP.HP0), or(), with(SignalHV.DISTANTSIGNAL, VR.VR0));
     }
 
 }
