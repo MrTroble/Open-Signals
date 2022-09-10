@@ -475,4 +475,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
         return false;
     }
+    
+    
 }

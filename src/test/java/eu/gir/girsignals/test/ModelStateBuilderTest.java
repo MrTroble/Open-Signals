@@ -70,7 +70,7 @@ public class ModelStateBuilderTest {
     }
 
     public void testBlockstateParser() {
-        final Object state = GIRBlockstateParser.getBlockstatefromString(
+        final Object state = GIRBlockstateParser.getPredicateFromString(
                 "with(STOPSIGNAL, HP0) && (with(HPTYPE, STOPSIGNAL) || !has(HPTYPE))", null, null);
         System.out.println(state);
     }
