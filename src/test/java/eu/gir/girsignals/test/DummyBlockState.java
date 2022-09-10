@@ -1,7 +1,5 @@
 package eu.gir.girsignals.test;
 
-import static org.junit.Assert.assertNotNull;
-
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -32,341 +30,360 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-@SuppressWarnings({ "rawtypes", "unchecked" })
+@SuppressWarnings({
+        "rawtypes", "unchecked"
+})
 public class DummyBlockState implements IExtendedBlockState {
 
-	private final Map<IUnlistedProperty, Object> map = new HashMap<>();
+    private final Map<IUnlistedProperty, Object> map = new HashMap<>();
 
-	public DummyBlockState(final IUnlistedProperty property, final Object value) {
-		super();
-		map.put(property, value);
-	}
-	
-	public DummyBlockState(final Map<IUnlistedProperty, Object> in) {
-		this.map.putAll(in);
-	}
+    public DummyBlockState(final IUnlistedProperty property, final Object value) {
+        super();
+        map.put(property, value);
+    }
 
-	@Override
-	public Collection<IProperty<?>> getPropertyKeys() {
-		return null;
-	}
+    public DummyBlockState(final Map<IUnlistedProperty, Object> in) {
+        this.map.putAll(in);
+    }
 
-	@Override
-	public <T extends Comparable<T>> T getValue(final IProperty<T> property) {
-		return null;
-	}
+    public DummyBlockState put(final IUnlistedProperty prop, final Object obj) {
+        map.put(prop, obj);
+        return this;
+    }
 
-	@Override
-	public <T extends Comparable<T>, V extends T> IBlockState withProperty(final IProperty<T> property, final V value) {
-		return null;
-	}
+    @Override
+    public Collection<IProperty<?>> getPropertyKeys() {
+        return null;
+    }
 
-	@Override
-	public <T extends Comparable<T>> IBlockState cycleProperty(final IProperty<T> property) {
-		return null;
-	}
+    @Override
+    public <T extends Comparable<T>> T getValue(final IProperty<T> property) {
+        return null;
+    }
 
-	@Override
-	public ImmutableMap<IProperty<?>, Comparable<?>> getProperties() {
-		return null;
-	}
+    @Override
+    public <T extends Comparable<T>, V extends T> IBlockState withProperty(
+            final IProperty<T> property, final V value) {
+        return null;
+    }
 
-	@Override
-	public Block getBlock() {
-		return null;
-	}
+    @Override
+    public <T extends Comparable<T>> IBlockState cycleProperty(final IProperty<T> property) {
+        return null;
+    }
 
-	@Override
-	public boolean onBlockEventReceived(final World worldIn, final BlockPos pos, final int id, final int param) {
-		return false;
-	}
+    @Override
+    public ImmutableMap<IProperty<?>, Comparable<?>> getProperties() {
+        return null;
+    }
 
-	@Override
-	public void neighborChanged(final World worldIn, final BlockPos pos, final Block blockIn, final BlockPos fromPos) {
+    @Override
+    public Block getBlock() {
+        return null;
+    }
 
-	}
+    @Override
+    public boolean onBlockEventReceived(final World worldIn, final BlockPos pos, final int id,
+            final int param) {
+        return false;
+    }
 
-	@Override
-	public Material getMaterial() {
+    @Override
+    public void neighborChanged(final World worldIn, final BlockPos pos, final Block blockIn,
+            final BlockPos fromPos) {
 
-		return null;
-	}
+    }
 
-	@Override
-	public boolean isFullBlock() {
+    @Override
+    public Material getMaterial() {
 
-		return false;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean canEntitySpawn(final Entity entityIn) {
+    @Override
+    public boolean isFullBlock() {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public int getLightOpacity() {
+    @Override
+    public boolean canEntitySpawn(final Entity entityIn) {
 
-		return 0;
-	}
+        return false;
+    }
 
-	@Override
-	public int getLightOpacity(final IBlockAccess world, final BlockPos pos) {
+    @Override
+    public int getLightOpacity() {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public int getLightValue() {
+    @Override
+    public int getLightOpacity(final IBlockAccess world, final BlockPos pos) {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public int getLightValue(final IBlockAccess world, final BlockPos pos) {
+    @Override
+    public int getLightValue() {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public boolean isTranslucent() {
+    @Override
+    public int getLightValue(final IBlockAccess world, final BlockPos pos) {
 
-		return false;
-	}
+        return 0;
+    }
 
-	@Override
-	public boolean useNeighborBrightness() {
+    @Override
+    public boolean isTranslucent() {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public MapColor getMapColor(final IBlockAccess p_185909_1_, final BlockPos p_185909_2_) {
+    @Override
+    public boolean useNeighborBrightness() {
 
-		return null;
-	}
+        return false;
+    }
 
-	@Override
-	public IBlockState withRotation(final Rotation rot) {
+    @Override
+    public MapColor getMapColor(final IBlockAccess access, final BlockPos pos) {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public IBlockState withMirror(final Mirror mirrorIn) {
+    @Override
+    public IBlockState withRotation(final Rotation rot) {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean isFullCube() {
+    @Override
+    public IBlockState withMirror(final Mirror mirrorIn) {
 
-		return false;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean hasCustomBreakingProgress() {
+    @Override
+    public boolean isFullCube() {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public EnumBlockRenderType getRenderType() {
+    @Override
+    public boolean hasCustomBreakingProgress() {
 
-		return null;
-	}
+        return false;
+    }
 
-	@Override
-	public int getPackedLightmapCoords(final IBlockAccess source, final BlockPos pos) {
+    @Override
+    public EnumBlockRenderType getRenderType() {
 
-		return 0;
-	}
+        return null;
+    }
 
-	@Override
-	public float getAmbientOcclusionLightValue() {
+    @Override
+    public int getPackedLightmapCoords(final IBlockAccess source, final BlockPos pos) {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public boolean isBlockNormalCube() {
+    @Override
+    public float getAmbientOcclusionLightValue() {
 
-		return false;
-	}
+        return 0;
+    }
 
-	@Override
-	public boolean isNormalCube() {
+    @Override
+    public boolean isBlockNormalCube() {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean canProvidePower() {
+    @Override
+    public boolean isNormalCube() {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public int getWeakPower(final IBlockAccess blockAccess, final BlockPos pos, final EnumFacing side) {
+    @Override
+    public boolean canProvidePower() {
 
-		return 0;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean hasComparatorInputOverride() {
+    @Override
+    public int getWeakPower(final IBlockAccess blockAccess, final BlockPos pos,
+            final EnumFacing side) {
 
-		return false;
-	}
+        return 0;
+    }
 
-	@Override
-	public int getComparatorInputOverride(final World worldIn, final BlockPos pos) {
+    @Override
+    public boolean hasComparatorInputOverride() {
 
-		return 0;
-	}
+        return false;
+    }
 
-	@Override
-	public float getBlockHardness(final World worldIn, final BlockPos pos) {
+    @Override
+    public int getComparatorInputOverride(final World worldIn, final BlockPos pos) {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public float getPlayerRelativeBlockHardness(final EntityPlayer player, final World worldIn, final BlockPos pos) {
+    @Override
+    public float getBlockHardness(final World worldIn, final BlockPos pos) {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public int getStrongPower(final IBlockAccess blockAccess, final BlockPos pos, final EnumFacing side) {
+    @Override
+    public float getPlayerRelativeBlockHardness(final EntityPlayer player, final World worldIn,
+            final BlockPos pos) {
 
-		return 0;
-	}
+        return 0;
+    }
 
-	@Override
-	public EnumPushReaction getMobilityFlag() {
+    @Override
+    public int getStrongPower(final IBlockAccess blockAccess, final BlockPos pos,
+            final EnumFacing side) {
 
-		return null;
-	}
+        return 0;
+    }
 
-	@Override
-	public IBlockState getActualState(final IBlockAccess blockAccess, final BlockPos pos) {
+    @Override
+    public EnumPushReaction getMobilityFlag() {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public AxisAlignedBB getSelectedBoundingBox(final World worldIn, final BlockPos pos) {
+    @Override
+    public IBlockState getActualState(final IBlockAccess blockAccess, final BlockPos pos) {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean shouldSideBeRendered(final IBlockAccess blockAccess, final BlockPos pos, final EnumFacing facing) {
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(final World worldIn, final BlockPos pos) {
 
-		return false;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean isOpaqueCube() {
+    @Override
+    public boolean shouldSideBeRendered(final IBlockAccess blockAccess, final BlockPos pos,
+            final EnumFacing facing) {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public AxisAlignedBB getCollisionBoundingBox(final IBlockAccess worldIn, final BlockPos pos) {
+    @Override
+    public boolean isOpaqueCube() {
 
-		return null;
-	}
+        return false;
+    }
 
-	@Override
-	public void addCollisionBoxToList(final World worldIn, final BlockPos pos, final AxisAlignedBB entityBox,
-			final List<AxisAlignedBB> collidingBoxes, final Entity entityIn, final boolean p_185908_6_) {
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(final IBlockAccess worldIn, final BlockPos pos) {
 
-	}
+        return null;
+    }
 
-	@Override
-	public AxisAlignedBB getBoundingBox(final IBlockAccess blockAccess, final BlockPos pos) {
+    @Override
+    public void addCollisionBoxToList(final World worldIn, final BlockPos pos,
+            final AxisAlignedBB entityBox, final List<AxisAlignedBB> collidingBoxes,
+            final Entity entityIn, final boolean flag) {
 
-		return null;
-	}
+    }
 
-	@Override
-	public RayTraceResult collisionRayTrace(final World worldIn, final BlockPos pos, final Vec3d start,
-			final Vec3d end) {
+    @Override
+    public AxisAlignedBB getBoundingBox(final IBlockAccess blockAccess, final BlockPos pos) {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean isTopSolid() {
+    @Override
+    public RayTraceResult collisionRayTrace(final World worldIn, final BlockPos pos,
+            final Vec3d start, final Vec3d end) {
 
-		return false;
-	}
+        return null;
+    }
 
-	@Override
-	public boolean doesSideBlockRendering(final IBlockAccess world, final BlockPos pos, final EnumFacing side) {
+    @Override
+    public boolean isTopSolid() {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean isSideSolid(final IBlockAccess world, final BlockPos pos, final EnumFacing side) {
+    @Override
+    public boolean doesSideBlockRendering(final IBlockAccess world, final BlockPos pos,
+            final EnumFacing side) {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean doesSideBlockChestOpening(final IBlockAccess world, final BlockPos pos, final EnumFacing side) {
+    @Override
+    public boolean isSideSolid(final IBlockAccess world, final BlockPos pos,
+            final EnumFacing side) {
 
-		return false;
-	}
+        return false;
+    }
 
-	@Override
-	public Vec3d getOffset(final IBlockAccess access, final BlockPos pos) {
+    @Override
+    public boolean doesSideBlockChestOpening(final IBlockAccess world, final BlockPos pos,
+            final EnumFacing side) {
 
-		return null;
-	}
+        return false;
+    }
 
-	@Override
-	public boolean causesSuffocation() {
+    @Override
+    public Vec3d getOffset(final IBlockAccess access, final BlockPos pos) {
 
-		return false;
-	}
+        return null;
+    }
 
-	@Override
-	public BlockFaceShape getBlockFaceShape(final IBlockAccess worldIn, final BlockPos pos, final EnumFacing facing) {
+    @Override
+    public boolean causesSuffocation() {
 
-		return null;
-	}
+        return false;
+    }
 
-	@Override
-	public Collection<IUnlistedProperty<?>> getUnlistedNames() {
+    @Override
+    public BlockFaceShape getBlockFaceShape(final IBlockAccess worldIn, final BlockPos pos,
+            final EnumFacing facing) {
 
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public <V> V getValue(final IUnlistedProperty<V> property) {
-		final Object value = map.get(property);
-		assertNotNull(value);
-		return (V) value;
-	}
+    @Override
+    public Collection<IUnlistedProperty<?>> getUnlistedNames() {
 
-	@Override
-	public <V> IExtendedBlockState withProperty(final IUnlistedProperty<V> property, final V value) {
-		return null;
-	}
+        return null;
+    }
 
-	@Override
-	public ImmutableMap<IUnlistedProperty<?>, Optional<?>> getUnlistedProperties() {
+    @Override
+    public <V> V getValue(final IUnlistedProperty<V> property) {
+        final Object value = map.get(property);
+        return (V) value;
+    }
 
-		return null;
-	}
+    @Override
+    public <V> IExtendedBlockState withProperty(final IUnlistedProperty<V> property,
+            final V value) {
+        return null;
+    }
 
-	@Override
-	public IBlockState getClean() {
+    @Override
+    public ImmutableMap<IUnlistedProperty<?>, Optional<?>> getUnlistedProperties() {
 
-		return null;
-	}
+        return null;
+    }
+
+    @Override
+    public IBlockState getClean() {
+
+        return null;
+    }
 
 }
