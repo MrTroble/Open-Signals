@@ -93,4 +93,8 @@ public final class LogicParser {
         return logic;
     }
 
+    public static Predicate<IExtendedBlockState> predicate(final String input,
+            final FunctionParsingInfo info) {
+        return parse(input, info).pop().getPredicate();
+    }
 }
