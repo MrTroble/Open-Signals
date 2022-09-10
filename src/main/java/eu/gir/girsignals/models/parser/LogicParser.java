@@ -45,7 +45,6 @@ public class LogicParser {
 	public static IntermidiateLogic parse(final String input, final FunctionParsingInfo info) {
 		final char[] array = input.toCharArray();
 		final IntermidiateLogic logic = new IntermidiateLogic();
-		logic.push();
 		final StringBuilder builder = new StringBuilder();
 		String nextName = null;
 		for (final char current : array) {

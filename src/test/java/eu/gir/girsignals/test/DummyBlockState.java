@@ -1,9 +1,11 @@
 package eu.gir.girsignals.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
@@ -33,13 +35,15 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 @SuppressWarnings({ "rawtypes", "unchecked" })
 public class DummyBlockState implements IExtendedBlockState {
 
-	private final IUnlistedProperty property;
-	private final Object value;
+	private final Map<IUnlistedProperty, Object> map = new HashMap<>();
 
 	public DummyBlockState(final IUnlistedProperty property, final Object value) {
 		super();
-		this.property = property;
-		this.value = value;
+		map.put(property, value);
+	}
+	
+	public DummyBlockState(final Map<IUnlistedProperty, Object> in) {
+		this.map.putAll(in);
 	}
 
 	@Override
@@ -343,8 +347,9 @@ public class DummyBlockState implements IExtendedBlockState {
 
 	@Override
 	public <V> V getValue(final IUnlistedProperty<V> property) {
-		assertEquals(this.property, property);
-		return (V) this.value;
+		final Object value = map.get(property);
+		assertNotNull(value);
+		return (V) value;
 	}
 
 	@Override

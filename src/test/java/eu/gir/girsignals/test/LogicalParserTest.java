@@ -18,10 +18,17 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
+import eu.gir.girsignals.models.parser.IntermidiateLogic;
 import eu.gir.girsignals.models.parser.LogicParser;
 import eu.gir.girsignals.models.parser.LogicalParserException;
 import eu.gir.girsignals.models.parser.ParameterInfo;
+import eu.gir.girsignals.models.parser.PredicateHolder;
 import eu.gir.girsignals.models.parser.ValuePack;
+import eu.gir.girsignals.models.parser.interm.EvaluationLevel;
+import eu.gir.girsignals.models.parser.interm.IntermidiateAnd;
+import eu.gir.girsignals.models.parser.interm.IntermidiateNegate;
+import eu.gir.girsignals.models.parser.interm.IntermidiateNode;
+import eu.gir.girsignals.models.parser.interm.IntermidiateOr;
 import net.minecraft.init.Bootstrap;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -125,6 +132,30 @@ public class LogicalParserTest {
 		assertThrows(LogicalParserException.class, () -> LogicParser.nDegreeFunctionParser("hasandis", parsingInfo, ""));
 		assertThrows(LogicalParserException.class, () -> LogicParser.nDegreeFunctionParser("hasandisnot", parsingInfo, "stopsignal", ""));
 		assertThrows(LogicalParserException.class, () -> LogicParser.nDegreeFunctionParser("hasandisnot", parsingInfo, ""));
+	}
+	
+
+	private static IntermidiateLogic buildInterm(final IntermidiateNode... nodes) {
+		final IntermidiateLogic logic = new IntermidiateLogic();
+		for(final IntermidiateNode node : nodes) {
+			logic.add(node);
+		}
+		return logic;
+	}
+	
+	private static IntermidiateNode with(final IUnlistedProperty prop, final Object obj) {
+		return new IntermidiateNode(PredicateHolder.with(prop, t -> t.equals(obj)), EvaluationLevel.PRELEVEL);
+	}
+	
+	@Test
+	public void testIntermidiate() {
+		assertThrows(LogicalParserException.class, () -> buildInterm(new IntermidiateAnd()).pop());
+		assertThrows(LogicalParserException.class, () -> buildInterm(new IntermidiateOr()).pop());
+		assertThrows(LogicalParserException.class, () -> buildInterm(new IntermidiateNegate()).pop());
+		assertThrows(LogicalParserException.class, () -> buildInterm(new IntermidiateNegate(), new IntermidiateAnd()).pop());
+		assertThrows(LogicalParserException.class, () -> buildInterm(new IntermidiateNegate(), new IntermidiateOr()).pop());
+		
+		
 	}
 
 }
