@@ -191,11 +191,15 @@ public class LogicalParserTest {
         return new IntermidiateAnd();
     }
 
+    private static void testNode(final IExtendedBlockState state, final IntermidiateNode node) {
+        assertTrue(node.getPredicate().test(state));
+        assertFalse(node.getPredicate().negate().test(state));
+    }
+
     private static void check(final IExtendedBlockState state,
             final IntermidiateNode... intermidiateNodes) {
         final IntermidiateNode node = buildInterm(intermidiateNodes).pop();
-        assertTrue(node.getPredicate().test(state));
-        assertFalse(node.getPredicate().negate().test(state));
+        testNode(state, node);
     }
 
     @Test
@@ -223,6 +227,30 @@ public class LogicalParserTest {
                 or(), with(SignalHV.DISTANTSIGNAL, VR.VR0));
         check(new DummyBlockState(SignalHV.DISTANTSIGNAL, VR.VR0),
                 with(SignalHV.STOPSIGNAL, HP.HP0), or(), with(SignalHV.DISTANTSIGNAL, VR.VR0));
+    }
+
+    @Test
+    public void testInput() {
+        final FunctionParsingInfo info = new FunctionParsingInfo(GIRBlocks.HV_SIGNAL);
+        testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0),
+                LogicParser.parse("has(stopsignal)", info).pop());
+        testNode(new DummyBlockState(SignalHV.DISTANTSIGNAL, VR.VR0),
+                LogicParser.parse("!has(stopsignal)", info).pop());
+        testNode(new DummyBlockState(SignalHV.DISTANTSIGNAL, VR.VR0),
+                LogicParser.parse("!has(stopsignal) && with(distantsignal.VR0)", info).pop());
+
+        assertThrows(LogicalParserException.class, () -> LogicParser.parse("!&&", info).pop());
+        assertThrows(LogicalParserException.class, () -> LogicParser.parse("!||", info).pop());
+        assertThrows(LogicalParserException.class, () -> LogicParser.parse("!|", info).pop());
+        assertThrows(LogicalParserException.class, () -> LogicParser.parse("!", info).pop());
+        assertThrows(LogicalParserException.class,
+                () -> LogicParser.parse("&&has(stopsignal)", info).pop());
+        assertThrows(LogicalParserException.class,
+                () -> LogicParser.parse("||has(stopsignal)", info).pop());
+        assertThrows(LogicalParserException.class,
+                () -> LogicParser.parse("has(stopsignal)&&", info).pop());
+        assertThrows(LogicalParserException.class,
+                () -> LogicParser.parse("has(stopsignal)||", info).pop());
     }
 
 }
