@@ -74,10 +74,15 @@ public final class LogicParser {
                 if (nextName == null) {
                     logic.pop();
                 } else {
-                    logic.add(new IntermidiateNode(
-                            nDegreeFunctionParser(nextName, info, builder.toString().split(",")),
-                            EvaluationLevel.PRELEVEL));
+                    final String arguments = builder.toString();
+                    logic.add(
+                            new IntermidiateNode(
+                                    nDegreeFunctionParser(nextName, info,
+                                            arguments.isEmpty() ? new String[0]
+                                                    : arguments.split(",")),
+                                    EvaluationLevel.PRELEVEL));
                     builder.setLength(0);
+                    nextName = null;
                 }
                 continue;
             }

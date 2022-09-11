@@ -21,7 +21,6 @@ import eu.gir.girsignals.models.parser.FunctionParsingInfo;
 import eu.gir.girsignals.models.parser.IntermidiateLogic;
 import eu.gir.girsignals.models.parser.LogicParser;
 import eu.gir.girsignals.models.parser.LogicalParserException;
-import eu.gir.girsignals.models.parser.ParameterInfo;
 import eu.gir.girsignals.models.parser.PredicateHolder;
 import eu.gir.girsignals.models.parser.ValuePack;
 import eu.gir.girsignals.models.parser.interm.EvaluationLevel;
@@ -43,25 +42,31 @@ public class LogicalParserTest {
         Bootstrap.register();
     }
 
+    public static FunctionParsingInfo function(final String name, final Signal signal) {
+        final FunctionParsingInfo parsing = new FunctionParsingInfo(signal);
+        parsing.info.argument = name;
+        return parsing;
+    }
+
     @Test
     public void testFunctionParser() throws Exception {
         for (final Signal signal : new Signal[] {
                 GIRBlocks.HV_SIGNAL, GIRBlocks.SH_SIGNAL, GIRBlocks.KS_SIGNAL, GIRBlocks.LF_SIGNAL
         }) {
-            final ParameterInfo info = new ParameterInfo("", signal);
-            for (final IUnlistedProperty property : info.properties) {
-                info.argument = property.getName();
-                final Object object = FunctionParsingInfo.getProperty(info);
+            final FunctionParsingInfo info = new FunctionParsingInfo(signal);
+            for (final IUnlistedProperty property : info.info.properties) {
+                info.info.argument = property.getName();
+                final Object object = info.getProperty();
                 assertEquals(property, object);
             }
         }
-        final ParameterInfo hvSignalInfo = new ParameterInfo("", GIRBlocks.HV_SIGNAL);
+        final FunctionParsingInfo hvSignalInfo = new FunctionParsingInfo(GIRBlocks.HV_SIGNAL);
         for (final SEProperty property : new SEProperty[] {
                 SignalHV.HPHOME, SignalHV.HPBLOCK, SignalHV.ZS3_PLATE
         }) {
             final Object def = property.getDefault();
-            hvSignalInfo.argument = property.getName() + "." + def;
-            final Object object = FunctionParsingInfo.getPredicate(hvSignalInfo);
+            hvSignalInfo.info.argument = property.getName() + "." + def;
+            final Object object = hvSignalInfo.getPredicate();
             assertTrue(object instanceof ValuePack);
             final ValuePack pack = (ValuePack) object;
             assertEquals(pack.property, property);
@@ -91,21 +96,21 @@ public class LogicalParserTest {
         assertEquals(SignalHV.STOPSIGNAL, property2);
 
         assertThrows(LogicalParserException.class,
-                () -> FunctionParsingInfo.getProperty(new ParameterInfo("", GIRBlocks.HV_SIGNAL)));
-        assertThrows(LogicalParserException.class, () -> FunctionParsingInfo
-                .getProperty(new ParameterInfo("asdansdkjnkls", GIRBlocks.HV_SIGNAL)));
-        assertThrows(LogicalParserException.class, () -> FunctionParsingInfo
-                .getProperty(new ParameterInfo("stopsignal.HP0", GIRBlocks.HV_SIGNAL)));
-        assertThrows(LogicalParserException.class, () -> FunctionParsingInfo
-                .getPredicate(new ParameterInfo("asdansdkjnkls", GIRBlocks.HV_SIGNAL)));
-        assertThrows(LogicalParserException.class, () -> FunctionParsingInfo
-                .getPredicate(new ParameterInfo("stopsignal", GIRBlocks.HV_SIGNAL)));
-        assertThrows(LogicalParserException.class, () -> FunctionParsingInfo
-                .getPredicate(new ParameterInfo("asdasdasd.asdasd", GIRBlocks.HV_SIGNAL)));
-        assertThrows(LogicalParserException.class, () -> FunctionParsingInfo
-                .getPredicate(new ParameterInfo("stopsignal.asdasds", GIRBlocks.HV_SIGNAL)));
-        assertThrows(LogicalParserException.class, () -> FunctionParsingInfo
-                .getPredicate(new ParameterInfo("hptype.HP0", GIRBlocks.HV_SIGNAL)));
+                () -> function("", GIRBlocks.HV_SIGNAL).getProperty());
+        assertThrows(LogicalParserException.class,
+                () -> function("asdansdkjnkls", GIRBlocks.HV_SIGNAL).getProperty());
+        assertThrows(LogicalParserException.class,
+                () -> function("stopsignal.HP0", GIRBlocks.HV_SIGNAL).getProperty());
+        assertThrows(LogicalParserException.class,
+                () -> function("asdansdkjnkls", GIRBlocks.HV_SIGNAL).getPredicate());
+        assertThrows(LogicalParserException.class,
+                () -> function("stopsignal", GIRBlocks.HV_SIGNAL).getPredicate());
+        assertThrows(LogicalParserException.class,
+                () -> function("asdasdasd.asdasd", GIRBlocks.HV_SIGNAL).getPredicate());
+        assertThrows(LogicalParserException.class,
+                () -> function("stopsignal.asdasds", GIRBlocks.HV_SIGNAL).getPredicate());
+        assertThrows(LogicalParserException.class,
+                () -> function("hptype.HP0", GIRBlocks.HV_SIGNAL).getPredicate());
     }
 
     public void assertFunction(final String name, final FunctionParsingInfo info,
@@ -251,6 +256,9 @@ public class LogicalParserTest {
                 () -> LogicParser.parse("has(stopsignal)&&", info).pop());
         assertThrows(LogicalParserException.class,
                 () -> LogicParser.parse("has(stopsignal)||", info).pop());
+
+        testNode(new DummyBlockState(SignalHV.DISTANTSIGNAL, VR.VR1),
+                LogicParser.parse("!(has(stopsignal) && (with(distantsignal.VR0)))", info).pop());
     }
 
 }

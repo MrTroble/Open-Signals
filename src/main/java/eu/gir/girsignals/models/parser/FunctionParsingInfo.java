@@ -2,7 +2,6 @@ package eu.gir.girsignals.models.parser;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
 
 import eu.gir.girsignals.blocks.Signal;
@@ -11,9 +10,10 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 @SuppressWarnings("rawtypes")
 public class FunctionParsingInfo {
 
-    private static final HashMap<Class, Function<ParameterInfo, Object>> PARAMETER_PARSER = new HashMap<>();
-    private static final HashMap<EntryPack, IUnlistedProperty> PROPERTY_CACHE = new HashMap<>();
-    private static final HashMap<EntryPack, ValuePack> PREDICATE_CACHE = new HashMap<>();
+    private static final HashMap<Class, Function<FunctionParsingInfo, Object>> PARAMETER_PARSER = new HashMap<>();
+
+    private final HashMap<String, IUnlistedProperty> propertyCache = new HashMap<>();
+    private final HashMap<String, ValuePack> predicateCache = new HashMap<>();
 
     static {
         PARAMETER_PARSER.put(IUnlistedProperty.class, FunctionParsingInfo::getProperty);
@@ -30,17 +30,17 @@ public class FunctionParsingInfo {
         final Object[] parameters = new Object[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
             info.argument = arguments[i];
-            parameters[i] = PARAMETER_PARSER.get(parameter[i]).apply(info);
+            parameters[i] = PARAMETER_PARSER.get(parameter[i]).apply(this);
         }
         return parameters;
     }
 
-    public static Object getProperty(final ParameterInfo info) {
-        final IUnlistedProperty property = PROPERTY_CACHE
-                .computeIfAbsent(new EntryPack(info.argument, info.system), _u -> {
+    public Object getProperty() {
+        final IUnlistedProperty property = propertyCache
+                .computeIfAbsent(info.argument.toLowerCase(), _u -> {
                     final List<IUnlistedProperty> properties = info.system.getProperties();
-                    return properties.stream()
-                            .filter(noneCache -> noneCache.getName().equals(info.argument))
+                    return properties.stream().filter(
+                            noneCache -> noneCache.getName().equalsIgnoreCase(info.argument))
                             .findAny().orElse(null);
                 });
         if (property == null)
@@ -51,21 +51,22 @@ public class FunctionParsingInfo {
     }
 
     @SuppressWarnings("unchecked")
-    public static Object getPredicate(final ParameterInfo info) {
-        final ValuePack predicate = PREDICATE_CACHE
-                .computeIfAbsent(new EntryPack(info.argument, info.system), _u -> {
+    public Object getPredicate() {
+        final ValuePack predicate = predicateCache.computeIfAbsent(info.argument.toLowerCase(),
+                _u -> {
                     final String[] parts = info.argument.split("\\.");
                     if (parts.length != 2)
                         throw new LogicalParserException(String.format(
                                 "Syntax error predicate need to have the form PROPERTY.NAME but was %s",
                                 info.argument));
-                    final IUnlistedProperty property = (IUnlistedProperty) getProperty(
-                            new ParameterInfo(parts[0], info));
+                    final String nextInfo = info.argument;
+                    info.argument = parts[0];
+                    final IUnlistedProperty property = (IUnlistedProperty) getProperty();
                     final Class clazz = property.getType();
                     if (!clazz.isEnum())
                         throw new LogicalParserException(
                                 String.format("Property=%s is not a enum property but must be",
-                                        info.argument, info.system.getSignalTypeName()));
+                                        nextInfo, info.system.getSignalTypeName()));
                     try {
                         final Object value = Enum.valueOf(clazz, parts[1]);
                         return new ValuePack(property, ext -> ext.equals(value));
@@ -78,34 +79,6 @@ public class FunctionParsingInfo {
                     String.format("Could not make predicate=%s with system=%S!", info.argument,
                             info.system.getSignalTypeName()));
         return predicate;
-    }
-
-    private static class EntryPack {
-        private final String name;
-        private final String signal;
-
-        public EntryPack(final String name, final Signal signal) {
-            this.name = name;
-            this.signal = signal.getSignalTypeName();
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(name, signal);
-        }
-
-        @Override
-        public boolean equals(final Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            final EntryPack other = (EntryPack) obj;
-            return Objects.equals(name, other.name) && Objects.equals(signal, other.signal);
-        }
-
     }
 
 }
