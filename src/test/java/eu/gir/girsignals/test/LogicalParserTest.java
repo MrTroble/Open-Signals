@@ -267,6 +267,9 @@ public class LogicalParserTest {
 
         testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0),
                 LogicParser.parse("has(StoPSigNal)", info).pop());
+
+        testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0),
+                LogicParser.parse("(((HAS(StoPSigNal))))", info).pop());
     }
 
 }
