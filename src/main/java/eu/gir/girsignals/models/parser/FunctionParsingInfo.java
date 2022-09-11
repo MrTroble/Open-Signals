@@ -68,7 +68,7 @@ public class FunctionParsingInfo {
                                 String.format("Property=%s is not a enum property but must be",
                                         nextInfo, info.system.getSignalTypeName()));
                     try {
-                        final Object value = Enum.valueOf(clazz, parts[1]);
+                        final Object value = Enum.valueOf(clazz, parts[1].toUpperCase());
                         return new ValuePack(property, ext -> ext.equals(value));
                     } catch (final IllegalArgumentException e) {
                         throw new LogicalParserException(e);

@@ -120,6 +120,11 @@ public class LogicalParserTest {
         final IExtendedBlockState state = new DummyBlockState(property, value);
         assertTrue(statePredicate.test(state));
         assertFalse(statePredicate.negate().test(state));
+
+        final Predicate<IExtendedBlockState> statePredicate2 = LogicParser
+                .nDegreeFunctionParser(name.toUpperCase(), info, parsing);
+        assertTrue(statePredicate2.test(state));
+        assertFalse(statePredicate2.negate().test(state));
     }
 
     @Test
@@ -259,6 +264,9 @@ public class LogicalParserTest {
 
         testNode(new DummyBlockState(SignalHV.DISTANTSIGNAL, VR.VR1),
                 LogicParser.parse("!(has(stopsignal) && (with(distantsignal.VR0)))", info).pop());
+
+        testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0),
+                LogicParser.parse("has(StoPSigNal)", info).pop());
     }
 
 }

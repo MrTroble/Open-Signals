@@ -42,7 +42,7 @@ public final class LogicParser {
     public static Predicate<IExtendedBlockState> nDegreeFunctionParser(final String name,
             final FunctionParsingInfo parser, final String... parameter) {
         final String[] arguments = parameter;
-        final MethodInfo method = TRANSLATION_TABLE.get(name);
+        final MethodInfo method = TRANSLATION_TABLE.get(name.toLowerCase());
         if (method == null)
             throw new LogicalParserException(
                     String.format("Syntax error function=%s does not exist permitted are:%n%s",
