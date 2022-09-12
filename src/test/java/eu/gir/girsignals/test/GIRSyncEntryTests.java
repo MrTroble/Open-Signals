@@ -414,7 +414,11 @@ public class GIRSyncEntryTests {
             node.read(comp);
             map2.put(node.getPoint(), node);
         });
-        testINetworkSavable(pathway, () -> new SignalBoxPathway(map2), pw -> {
+        testINetworkSavable(pathway, () -> {
+            final SignalBoxPathway pw = new SignalBoxPathway(map2);
+            pw.setPathStatus(EnumPathUsage.SELECTED);
+            return pw;
+        }, pw -> {
             pw.setPathStatus(EnumPathUsage.FREE);
         });
     }
