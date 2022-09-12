@@ -241,7 +241,7 @@ public class SignalBoxPathway implements INetworkSavable {
             this.emptyOrBroken = true;
         } else {
             this.listOfNodes = this.listOfNodes.subList(0,
-                    this.listOfNodes.indexOf(this.modeGrid.get(point)));
+                    this.listOfNodes.indexOf(this.modeGrid.get(point)) - 1);
             this.initalize();
         }
     }
