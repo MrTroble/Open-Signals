@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.LinkType;
 import eu.gir.girsignals.init.GIRBlocks;
+import eu.gir.girsignals.signalbox.debug.SignalBoxFactory;
 import eu.gir.girsignals.tileentitys.IChunkloadable;
 import eu.gir.girsignals.tileentitys.RedstoneIOTileEntity;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;

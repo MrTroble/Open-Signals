@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableSet;
 
 import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.PathType;
+import eu.gir.girsignals.signalbox.debug.SignalBoxFactory;
 import eu.gir.girsignals.signalbox.entrys.INetworkSavable;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.nbt.NBTTagCompound;
@@ -30,7 +31,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private String identifier;
 
     public SignalBoxNode() {
-        this.point = new Point();
+        this(new Point());
     }
 
     public SignalBoxNode(final Point point) {
@@ -39,7 +40,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public void add(final ModeSet modeSet) {
-        possibleModes.put(modeSet, new PathOptionEntry());
+        possibleModes.put(modeSet, SignalBoxFactory.getFactory().getEntry());
     }
 
     public boolean has(final ModeSet modeSet) {
@@ -128,9 +129,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final NBTTagList pointList = (NBTTagList) compound.getTag(POINT_LIST);
         if (pointList == null)
             return;
+        final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         pointList.forEach(e -> {
             final NBTTagCompound tag = (NBTTagCompound) e;
-            final PathOptionEntry entry = new PathOptionEntry();
+            final PathOptionEntry entry = factory.getEntry();
             entry.read(tag);
             possibleModes.put(new ModeSet(tag), entry);
         });
@@ -248,13 +250,14 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             this.possibleModes.clear();
             return;
         }
+        final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         final Set<ModeSet> modeSets = new HashSet<>();
         points.forEach(nbt -> {
             final NBTTagCompound compound = (NBTTagCompound) nbt;
             final ModeSet set = new ModeSet(compound);
             modeSets.add(set);
             final PathOptionEntry entry = this.possibleModes.computeIfAbsent(set,
-                    _u -> new PathOptionEntry());
+                    _u -> factory.getEntry());
             entry.readEntryNetwork(compound);
         });
         this.possibleModes.keySet().removeIf(mode -> !modeSets.contains(mode));
