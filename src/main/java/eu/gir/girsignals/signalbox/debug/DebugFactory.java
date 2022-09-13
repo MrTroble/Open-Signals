@@ -9,9 +9,9 @@ import net.minecraft.nbt.NBTTagCompound;
 
 public class DebugFactory extends SignalBoxFactory {
 
-    private final boolean enableConnectionChecker = true;
-    private final boolean enableDebugGrid = true;
-    private final boolean enableDebugPath = true;
+    private final boolean enableConnectionChecker = false;
+    private final boolean enableDebugGrid = false;
+    private final boolean enableDebugPath = false;
 
     @Override
     public ConnectionChecker getConnectionChecker() {

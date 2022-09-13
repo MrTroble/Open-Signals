@@ -282,8 +282,7 @@ public class GuiSignalBox extends GuiBase {
                 node.getOption(modeSet).get()));
         lowerEntity.add(GuiElements.createPageSelect(box));
         lowerEntity.add(new UIClickable(e -> {
-            reset();
-            initializeFieldTemplate(this::tileNormal);
+            initializeFieldUsage(mainButton);
         }, 1));
         this.page = Page.TILE_CONFIG;
     }
