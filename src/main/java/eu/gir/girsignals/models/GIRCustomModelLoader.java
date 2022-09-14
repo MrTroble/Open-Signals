@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -105,28 +106,18 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
     @Override
     public void onResourceManagerReload(final IResourceManager resourceManager) {
         registeredModels.clear();
-        final Map<String, ModelStats> zs32states = new HashMap<>();
 
-        final Map<String, ModelStats> mastsignsstates = new HashMap<>();
-
-        final Map<String, ModelStats> modelmap = ModelStats
+        final Map<String, Object> modelmap = ModelStats
                 .getfromJson("/assets/girsignals/modeldefinitions");
 
-        modelmap.forEach((filename, modelstate) -> {
+        for (Entry<String, Object> modelstatemap : modelmap.entrySet()) {
 
-            if (filename.equalsIgnoreCase("zs32.json"))
-                zs32states.put("zs32", modelstate);
-
-            if (filename.equalsIgnoreCase("mastsigns.json"))
-                mastsignsstates.put("mastsigns", modelstate);
-        });
-
-        for (Map.Entry<String, ModelStats> modelstatemap : modelmap.entrySet()) {
             final String filename = modelstatemap.getKey();
-            final ModelStats content = modelstatemap.getValue();
 
             if (!(filename.equalsIgnoreCase("zs32.json")
                     && filename.equalsIgnoreCase("mastsigns.json"))) {
+
+                final ModelStats content = (ModelStats) modelstatemap.getValue();
 
                 String file = "";
 

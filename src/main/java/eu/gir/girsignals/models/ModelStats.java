@@ -20,14 +20,24 @@ public class ModelStats {
         return models;
     }
 
-    public static Map<String, ModelStats> getfromJson(final String directory) {
+    public static Map<String, Object> getfromJson(final String directory) {
         final Gson gson = new Gson();
         final Map<String, String> entrySet = GIRFileReader.readallFilesfromDierectory(directory);
-        final Map<String, ModelStats> content = new HashMap<>();
+        final Map<String, Object> content = new HashMap<>();
         if (entrySet != null) {
             entrySet.forEach((filename, file) -> {
-                final ModelStats json = gson.fromJson(file, ModelStats.class);
-                content.put(filename, json);
+
+                if (!(filename.equalsIgnoreCase("zs32.json")
+                        || filename.equalsIgnoreCase("mastsigns.json"))) {
+
+                    final ModelStats json = gson.fromJson(file, ModelStats.class);
+                    content.put(filename, json);
+
+                } else {
+                    final ModelExtention json = gson.fromJson(file, ModelExtention.class);
+                    content.put(filename, json);
+
+                }
             });
         }
         return content;
