@@ -6,6 +6,7 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
+import net.minecraft.nbt.NBTTagCompound;
 
 public class DebugOptionEntry extends PathOptionEntry {
 
@@ -25,4 +26,15 @@ public class DebugOptionEntry extends PathOptionEntry {
         return entry;
     }
 
+    @Override
+    public void read(final NBTTagCompound tag) {
+        GirsignalsMain.log.debug("R:" + tag);
+        super.read(tag);
+    }
+
+    @Override
+    public void write(final NBTTagCompound tag) {
+        super.write(tag);
+        GirsignalsMain.log.debug("W:" + tag);
+    }
 }

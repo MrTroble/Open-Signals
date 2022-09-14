@@ -73,6 +73,7 @@ public class SignalBoxGrid implements INetworkSavable {
             way.setPathStatus(EnumPathUsage.SELECTED);
             way.updatePathwaySignals();
             this.onWayAdd(way);
+            updateToNet(way);
         });
         return ways.isPresent();
     }
@@ -100,7 +101,6 @@ public class SignalBoxGrid implements INetworkSavable {
         startsToPath.put(pathway.getFirstPoint(), pathway);
         endsToPath.put(pathway.getLastPoint(), pathway);
         updatePrevious(pathway);
-        updateToNet(pathway);
     }
 
     protected void updateToNet(final SignalBoxPathway pathway) {

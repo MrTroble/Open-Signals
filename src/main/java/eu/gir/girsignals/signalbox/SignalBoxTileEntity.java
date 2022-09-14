@@ -74,6 +74,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
 
     @Override
     public void readFromNBT(final NBTTagCompound compound) {
+        super.readFromNBT(compound);
         final NBTTagList list = (NBTTagList) compound.getTag(LINKED_POS_LIST);
         if (list != null) {
             linkedBlocks.clear();
@@ -86,13 +87,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         }
         final NBTTagCompound gridComp = compound.getCompoundTag(GUI_TAG);
         grid.read(gridComp);
-        super.readFromNBT(compound);
-        if (world != null)
+        if (world != null) {
             onLoad();
+        }
     }
 
     @Override
     public void updateTag(final NBTTagCompound compound) {
+        this.markDirty();
         if (compound == null)
             return;
         if (compound.hasKey(REMOVE_SIGNAL)) {
