@@ -5,6 +5,7 @@
 		"lamp_red": "girsignals:blocks/lamps/lamp_red",
 		"lamp_yellow": "girsignals:blocks/lamps/lamp_yellow"
 	},
+	
 	"models": {
 		"hv/hv_ne2": {
 			"textures": [
@@ -102,6 +103,6 @@
 			"x": 0,
 			"y": 5.4,
 			"z": 0
-		},
+		}
 	}
 }
