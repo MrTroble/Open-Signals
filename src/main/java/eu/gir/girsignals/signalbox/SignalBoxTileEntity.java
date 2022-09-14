@@ -211,4 +211,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         }
     }
 
+    public boolean isBlocked() {
+        return !this.clientSyncs.isEmpty();
+    }
 }
