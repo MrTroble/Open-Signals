@@ -6,7 +6,9 @@ import static eu.gir.girsignals.models.parser.PredicateHolder.hasAndIsNot;
 import static eu.gir.girsignals.models.parser.PredicateHolder.hasNot;
 import static eu.gir.girsignals.models.parser.PredicateHolder.with;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -68,6 +70,8 @@ import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalTram;
+import eu.gir.girsignals.models.parser.FunctionParsingInfo;
+import eu.gir.girsignals.models.parser.LogicParser;
 import net.minecraft.client.renderer.block.model.BuiltInModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
@@ -85,16 +89,34 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
+    private static final Map<String, Signal> TRANSLATION_TABLE = new HashMap<>();
+
+    private static final List<Signal> SIGNALS = new ArrayList<>(Signal.SIGNALLIST);
+
+    static {
+
+        SIGNALS.forEach(signal -> {
+
+            TRANSLATION_TABLE.put(signal.getSignalTypeName(), signal);
+        });
+
+    }
+
     @Override
     public void onResourceManagerReload(final IResourceManager resourceManager) {
         registeredModels.clear();
         final Map<String, ModelStats> zs32states = new HashMap<>();
+
         final Map<String, ModelStats> mastsignsstates = new HashMap<>();
+
         final Map<String, ModelStats> modelmap = ModelStats
                 .getfromJson("/assets/girsignals/modeldefinitions");
+
         modelmap.forEach((filename, modelstate) -> {
+
             if (filename.equalsIgnoreCase("zs32.json"))
                 zs32states.put("zs32", modelstate);
+
             if (filename.equalsIgnoreCase("mastsigns.json"))
                 mastsignsstates.put("mastsigns", modelstate);
         });
@@ -103,10 +125,16 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             final String filename = modelstatemap.getKey();
             final ModelStats content = modelstatemap.getValue();
 
-            if (!filename.equalsIgnoreCase("zs32.json")
-                    || !filename.equalsIgnoreCase("mastsigns.json")) {
+            if (!(filename.equalsIgnoreCase("zs32.json")
+                    && filename.equalsIgnoreCase("mastsigns.json"))) {
 
-                registeredModels.put(filename.replace(".json", ""), cm -> {
+                String file = "";
+
+                if (!filename.endsWith("signal.json")) {
+                    file = filename.toLowerCase() + "signal";
+                }
+
+                registeredModels.put(file.replace(".json", ""), cm -> {
 
                     for (Map.Entry<String, Models> entry2 : content.getModels().entrySet()) {
 
@@ -115,9 +143,32 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                         modelstats.getTexture().forEach(texturestate -> {
 
-                            final Predicate<IExtendedBlockState> state = GIRBlockstateParser
-                                    .getPredicateFromString(texturestate.getBlockstate(), filename,
-                                            modelname);
+                            Signal signaltype = null;
+
+                            boolean gotSignal = false;
+
+                            for (Map.Entry<String, Signal> entry : TRANSLATION_TABLE.entrySet()) {
+                                final String signalname = entry.getKey();
+                                final Signal signal = entry.getValue();
+
+                                if (filename.replace(".json", "").equalsIgnoreCase(signalname)) {
+
+                                    signaltype = signal;
+                                    gotSignal = true;
+                                }
+                            }
+
+                            Predicate<IExtendedBlockState> state = null;
+
+                            if (!gotSignal) {
+                                GirsignalsMain.log.warn("Please check the filename of " + filename
+                                        + "! It doesn't match the pattern!");
+
+                            } else {
+                                state = LogicParser.predicate(texturestate.getBlockstate(),
+                                        new FunctionParsingInfo(signaltype));
+
+                            }
 
                             if (texturestate.isautoBlockstate()) {
                                 cm.register(modelname, ebs -> true, modelstats.getX(),
