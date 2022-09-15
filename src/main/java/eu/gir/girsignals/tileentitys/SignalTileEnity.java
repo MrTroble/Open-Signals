@@ -12,6 +12,7 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.guilib.ecs.interfaces.ISyncable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -172,4 +173,8 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
                 && Objects.equals(map, other.map);
     }
 
+    @Override
+    public boolean isValid(final EntityPlayer player) {
+        return true;
+    }
 }

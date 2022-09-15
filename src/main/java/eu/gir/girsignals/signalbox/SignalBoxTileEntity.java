@@ -23,6 +23,7 @@ import eu.gir.guilib.ecs.interfaces.ISyncable;
 import eu.gir.linkableapi.ILinkableTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -213,5 +214,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity
 
     public boolean isBlocked() {
         return !this.clientSyncs.isEmpty();
+    }
+
+    @Override
+    public boolean isValid(final EntityPlayer player) {
+        if (clientSyncs.isEmpty())
+            return false;
+        return this.clientSyncs.get(0).getPlayer().equals(player);
     }
 }
