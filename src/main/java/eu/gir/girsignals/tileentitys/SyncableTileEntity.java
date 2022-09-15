@@ -53,7 +53,7 @@ public class SyncableTileEntity extends TileEntity {
     }
 
     public boolean remove(final UIClientSync sync) {
-        return this.clientSyncs.remove(sync);
+        return this.clientSyncs.removeIf(s -> s.getPlayer().equals(sync.getPlayer()));
     }
 
     public void sendToAll(final NBTTagCompound compound) {
