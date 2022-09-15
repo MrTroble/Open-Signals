@@ -14,4 +14,9 @@ public class IntermidiateAnd extends IntermidiateNode {
         this.predicate = first.predicate.and(next.predicate);
         return true;
     }
+
+    @Override
+    public String toString() {
+        return "IntermidiateAnd";
+    }
 }

@@ -34,4 +34,8 @@ public class IntermidiateNode {
         return predicate;
     }
 
+    @Override
+    public String toString() {
+        return "IntermidiateNode [predicate=" + predicate + ", level=" + level + "]";
+    }
 }

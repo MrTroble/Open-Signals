@@ -3,6 +3,7 @@ package eu.gir.girsignals.models.parser;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
+import java.util.stream.Collectors;
 
 import eu.gir.girsignals.models.parser.interm.EvaluationLevel;
 import eu.gir.girsignals.models.parser.interm.IntermidiateNode;
@@ -20,6 +21,8 @@ public class IntermidiateLogic {
     }
 
     public IntermidiateNode pop() {
+        if (stackNodes.isEmpty())
+            throw new LogicalParserException("Stack empty! Maybe too many ')' at the end?");
         List<IntermidiateNode> node = stackNodes.pop();
         for (final EvaluationLevel level : EvaluationLevel.values()) {
             if (level.equals(EvaluationLevel.PRELEVEL))
@@ -55,7 +58,10 @@ public class IntermidiateLogic {
             node = nextNode;
         }
         if (node.size() != 1)
-            throw new LogicalParserException("Could not merge all nodes!");
+            throw new LogicalParserException(
+                    String.format("Could not merge all nodes! Elements: %n%s",
+                            node.stream().map(n -> n.toString())
+                                    .collect(Collectors.joining(System.lineSeparator()))));
         if (!stackNodes.isEmpty())
             stackNodes.lastElement().add(node.get(0));
         return node.get(0);

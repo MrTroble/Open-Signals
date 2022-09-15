@@ -15,4 +15,8 @@ public class IntermidiateOr extends IntermidiateNode {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "IntermidiateOr";
+    }
 }

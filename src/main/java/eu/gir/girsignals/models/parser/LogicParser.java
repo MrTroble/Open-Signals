@@ -8,6 +8,7 @@ import eu.gir.girsignals.models.parser.interm.IntermidiateNode;
 import eu.gir.girsignals.models.parser.interm.LogicalSymbols;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import scala.actors.threadpool.Arrays;
 
 @SuppressWarnings({
         "rawtypes", "unchecked"
@@ -55,44 +56,66 @@ public final class LogicParser {
         return method.blockState.apply(parser.getParameter(method.parameter, arguments));
     }
 
+    private static final int ERROR_CLAMP = 20;
+
+    private static final String getSubstringError(final String input, final int index) {
+        if (input.isEmpty())
+            return input;
+        final int start = index - ERROR_CLAMP;
+        final int end = index + ERROR_CLAMP + Math.abs(Math.min(0, start));
+        final int eStart = Math.max(start, 0);
+        final String erroring = input.substring(eStart, Math.min(end, input.length()));
+        final char[] nextLine = new char[erroring.length()];
+        Arrays.fill(nextLine, ' ');
+        nextLine[index - eStart] = '^';
+        return erroring + System.lineSeparator() + new String(nextLine);
+    }
+
     public static IntermidiateLogic parse(final String input, final FunctionParsingInfo info) {
         final char[] array = input.toCharArray();
         final IntermidiateLogic logic = new IntermidiateLogic();
         final StringBuilder builder = new StringBuilder();
         String nextName = null;
+        int i = 0;
         for (final char current : array) {
-            if (current == '(') {
-                if (builder.length() <= 0) {
-                    logic.push();
-                } else {
-                    nextName = builder.toString();
-                    builder.setLength(0);
+            i++;
+            try {
+                if (current == '(') {
+                    if (builder.length() <= 0) {
+                        logic.push();
+                    } else {
+                        nextName = builder.toString();
+                        builder.setLength(0);
+                    }
+                    continue;
                 }
-                continue;
-            }
-            if (current == ')') {
-                if (nextName == null) {
-                    logic.pop();
-                } else {
-                    final String arguments = builder.toString();
-                    logic.add(
-                            new IntermidiateNode(
-                                    nDegreeFunctionParser(nextName, info,
-                                            arguments.isEmpty() ? new String[0]
-                                                    : arguments.split(",")),
-                                    EvaluationLevel.PRELEVEL));
-                    builder.setLength(0);
-                    nextName = null;
+                if (current == ')') {
+                    if (nextName == null) {
+                        logic.pop();
+                    } else {
+                        final String arguments = builder.toString();
+                        logic.add(
+                                new IntermidiateNode(
+                                        nDegreeFunctionParser(nextName, info,
+                                                arguments.isEmpty() ? new String[0]
+                                                        : arguments.split(",")),
+                                        EvaluationLevel.PRELEVEL));
+                        builder.setLength(0);
+                        nextName = null;
+                    }
+                    continue;
                 }
-                continue;
-            }
-            if (!Character.isWhitespace(current)) {
-                builder.append(current);
-                final LogicalSymbols symbol = LogicalSymbols.find(builder.toString());
-                if (symbol != null) {
-                    logic.add(symbol.builder.get());
-                    builder.setLength(0);
+                if (!Character.isWhitespace(current)) {
+                    builder.append(current);
+                    final LogicalSymbols symbol = LogicalSymbols.find(builder.toString());
+                    if (symbol != null) {
+                        logic.add(symbol.builder.get());
+                        builder.setLength(0);
+                    }
                 }
+            } catch (final Throwable e) {
+                throw new LogicalParserException(
+                        "Parserstate: " + System.lineSeparator() + getSubstringError(input, i), e);
             }
         }
         return logic;

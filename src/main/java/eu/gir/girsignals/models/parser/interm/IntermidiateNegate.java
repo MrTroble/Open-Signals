@@ -14,4 +14,9 @@ public class IntermidiateNegate extends IntermidiateNode {
         return true;
     }
 
+    @Override
+    public String toString() {
+        return "IntermidiateNegate";
+    }
+
 }

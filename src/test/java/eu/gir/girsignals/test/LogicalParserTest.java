@@ -270,6 +270,23 @@ public class LogicalParserTest {
 
         testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0),
                 LogicParser.parse("(((HAS(StoPSigNal))))", info).pop());
+
+        testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0), LogicParser
+                .parse("with(STOPSIGNAL.HP0) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))", info)
+                .pop());
+
+        testNode(
+                new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0).put(SignalHV.HPTYPE,
+                        HPType.STOPSIGNAL),
+                LogicParser
+                        .parse("with(STOPSIGNAL.HP0) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))",
+                                info)
+                        .pop());
+
+        assertThrows(LogicalParserException.class,
+                () -> LogicParser.parse(
+                        "with(STOPSIGNAL.HP0) && (with(HPTYPE.STOPSIGNAL) || hasnot(HPTYPE))", info)
+                        .pop());
     }
 
 }

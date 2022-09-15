@@ -12,4 +12,8 @@ public class LogicalParserException extends RuntimeException {
         super(th);
     }
 
+    public LogicalParserException(final String message, final Throwable th) {
+        super(message, th);
+    }
+
 }
