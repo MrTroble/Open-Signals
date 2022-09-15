@@ -2,7 +2,7 @@
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"blockstate": "with(STOPSIGNAL, HP0) && (with(HPTYPE, STOPSIGNAL) || !has(HPTYPE))",
+					"blockstate": "with(STOPSIGNAL.HP0) && (with(HPTYPE.STOPSIGNAL) || hasnot(HPTYPE))",
 					"retexture": {
 						"lamp_red_primarynorth": "lamp_red",
 						"lamp_red_secondarynorth": "lamp_red"

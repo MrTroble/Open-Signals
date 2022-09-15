@@ -5,13 +5,12 @@
 		"lamp_red": "girsignals:blocks/lamps/lamp_red",
 		"lamp_yellow": "girsignals:blocks/lamps/lamp_yellow"
 	},
-	
 	"models": {
 		"hv/hv_ne2": {
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"blockstate": "hasandis(NE2)",
+					"blockstate": "hasandis(ne2)",
 					"retexture": {},
 					"extentions": []
 				}
@@ -37,7 +36,7 @@
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"blockstate": "hasandis(ZS1)",
+					"blockstate": "hasandis(zs1)",
 					"retexture": {
 						"lamp1north": "lamp_white"
 					},
@@ -45,7 +44,7 @@
 				},
 				{
 					"autoBlockstate": false,
-					"blockstate": "has(ZS1) && ",
+					"blockstate": "hasandisnot(zs1)",
 					"retexture": {},
 					"extentions": []
 				}
@@ -58,7 +57,7 @@
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"blockstate": "hasandis(ZS7)",
+					"blockstate": "hasandis(zs7)",
 					"retexture": {
 						"lamp1north": "lamp_yellow"
 					},
@@ -66,7 +65,7 @@
 				},
 				{
 					"autoBlockstate": false,
-					"blockstate": "!hasandis(ZS7)",
+					"blockstate": "hasandisnot(zs7)",
 					"retexture": {},
 					"extentions": []
 				}
@@ -79,7 +78,7 @@
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"blockstate": "hasandis(CUSTOMNAME)",
+					"blockstate": "",
 					"retexture": {},
 					"extentions": []
 				}
@@ -92,7 +91,7 @@
 			"textures": [
 				{
 					"autoBlockstate": false,
-					"blockstate": "with(STOPSIGNAL, HP0) && (with(HPTYPE, STOPSIGNAL) || !has(HPTYPE))",
+					"blockstate": "with(stopsignal.HP0) && (with(hptype.STOPSIGNAL) || hasnot(hptype))",
 					"retexture": {
 						"lamp_red_primarynorth": "lamp_red",
 						"lamp_red_secondarynorth": "lamp_red"

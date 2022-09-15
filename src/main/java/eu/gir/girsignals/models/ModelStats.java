@@ -27,16 +27,15 @@ public class ModelStats {
         if (entrySet != null) {
             entrySet.forEach((filename, file) -> {
 
-                if (!(filename.equalsIgnoreCase("zs32.json")
-                        || filename.equalsIgnoreCase("mastsigns.json"))) {
+                if (!filename.endsWith("extention.json")) {
 
                     final ModelStats json = gson.fromJson(file, ModelStats.class);
                     content.put(filename, json);
 
                 } else {
+
                     final ModelExtention json = gson.fromJson(file, ModelExtention.class);
                     content.put(filename, json);
-
                 }
             });
         }
@@ -45,11 +44,15 @@ public class ModelStats {
 
     public static Map<String, String> createRetexture(final Map<String, String> retexture,
             final Map<String, String> lamp) {
+
         final Map<String, String> retexturemap = new HashMap<>();
+
         if (retexture != null) {
             for (Map.Entry<String, String> entry : retexture.entrySet()) {
+
                 final String key = entry.getKey();
                 final String val = entry.getValue();
+
                 retexturemap.put(key, getLampPath(val, lamp));
             }
         }

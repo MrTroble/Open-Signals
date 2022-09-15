@@ -114,8 +114,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
             final String filename = modelstatemap.getKey();
 
-            if (!(filename.equalsIgnoreCase("zs32.json")
-                    && filename.equalsIgnoreCase("mastsigns.json"))) {
+            if (!filename.endsWith("extention.json")) {
 
                 final ModelStats content = (ModelStats) modelstatemap.getValue();
 

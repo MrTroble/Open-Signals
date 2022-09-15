@@ -4,10 +4,9 @@ import java.util.Map;
 
 public class ModelExtention {
 
-    private Map<String, String> extention;
+    private Map<String, ModelExtentionRetexture> extention;
 
-    public Map<String, String> getExtention() {
+    public Map<String, ModelExtentionRetexture> getExtention() {
         return extention;
     }
-
 }
