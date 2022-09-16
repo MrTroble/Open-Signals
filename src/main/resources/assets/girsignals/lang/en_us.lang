@@ -130,7 +130,7 @@ property.signaltramadd.desc=Here you can select between A, T and A with T.
 property.signaltrama.desc=Drive request
 property.signaltramt.desc=Departure recommendation
 property.signaltramswitch.desc=Left, right, straight ahead with and without locked switch
-property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign.
+property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign. With '[n]' you get into the next line.
 
 #Sign Names
 property.indicator.name=Indicator
