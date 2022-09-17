@@ -1,0 +1,9 @@
+{
+    "extention": {
+        "OFF": "girsignals:blocks/zs3/OFF",
+        "A": "girsignals:blocks/zs3/A",
+        "B": "girsignals:blocks/zs3/B",
+        "C": "girsignals:blocks/zs3/C",
+        "D": "girsignals:blocks/zs3/D"
+    }
+}

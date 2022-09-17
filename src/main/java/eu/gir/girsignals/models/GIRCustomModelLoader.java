@@ -107,18 +107,29 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
     public void onResourceManagerReload(final IResourceManager resourceManager) {
         registeredModels.clear();
 
+        final Map<String, ModelExtention> extentions = new HashMap<>();
+
         final Map<String, Object> modelmap = ModelStats
                 .getfromJson("/assets/girsignals/modeldefinitions");
+
+        modelmap.forEach((filename, content) -> {
+
+            if (filename.endsWith(".extention.json")) {
+
+                final ModelExtention ext = (ModelExtention) content;
+                extentions.put(filename.replace(".extention", ""), ext);
+            }
+        });
 
         for (Entry<String, Object> modelstatemap : modelmap.entrySet()) {
 
             final String filename = modelstatemap.getKey();
 
-            if (!filename.endsWith("extention.json")) {
+            if (!filename.endsWith(".extention.json")) {
 
                 final ModelStats content = (ModelStats) modelstatemap.getValue();
 
-                String file = "";
+                String file = filename;
 
                 if (!filename.endsWith("signal.json")) {
                     file = filename.toLowerCase() + "signal";
@@ -133,11 +144,16 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                         modelstats.getTexture().forEach(texturestate -> {
 
+                            final String blockstate = texturestate.getBlockstate();
+
+                            final Map<String, String> retexture = texturestate.getRetextures();
+
                             Signal signaltype = null;
 
                             boolean gotSignal = false;
 
                             for (Map.Entry<String, Signal> entry : TRANSLATION_TABLE.entrySet()) {
+                                
                                 final String signalname = entry.getKey();
                                 final Signal signal = entry.getValue();
 
@@ -154,9 +170,73 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                 GirsignalsMain.log.warn("Please check the filename of " + filename
                                         + "! It doesn't match the pattern!");
 
-                            } else {
-                                state = LogicParser.predicate(texturestate.getBlockstate(),
-                                        new FunctionParsingInfo(signaltype));
+                            }
+
+                            if (!texturestate.isautoBlockstate()) {
+
+                                boolean extentionloaded = false;
+
+                                for (Map.Entry<String, ModelExtention> entry : extentions
+                                        .entrySet()) {
+
+                                    if (texturestate.getExtentions() != null) {
+
+                                        for (Map.Entry<String, Map<String, String>> entry1 : texturestate
+                                                .getExtentions().entrySet()) {
+
+                                            final String nametoextend = entry1.getKey();
+                                            final Map<String, String> ex = entry1.getValue();
+
+                                            if (nametoextend.equalsIgnoreCase(entry.getKey())) {
+
+                                                for (Map.Entry<String, String> entry3 : entry
+                                                        .getValue().getExtention().entrySet()) {
+
+                                                    final String enums = entry3.getKey();
+                                                    final String retextureval = entry3.getValue();
+
+                                                    for (Map.Entry<String, String> entry4 : ex
+                                                            .entrySet()) {
+
+                                                        final String seprop = entry4.getKey();
+                                                        final String retexturekey = entry4
+                                                                .getValue();
+
+                                                        texturestate.appendExtention(seprop, enums,
+                                                                retexturekey, retextureval);
+
+                                                        state = LogicParser.predicate(
+                                                                texturestate.getBlockstate(),
+                                                                new FunctionParsingInfo(
+                                                                        signaltype));
+
+                                                        cm.register(modelname, state,
+                                                                modelstats.getX(),
+                                                                modelstats.getY(),
+                                                                modelstats.getZ(),
+                                                                ModelStats.createRetexture(
+                                                                        texturestate
+                                                                                .getRetextures(),
+                                                                        content.getTextures()));
+
+                                                        texturestate.resetStates(blockstate,
+                                                                retexture);
+
+                                                        extentionloaded = true;
+                                                    }
+
+                                                }
+                                            }
+
+                                        }
+                                    }
+
+                                }
+                                if (!extentionloaded) {
+
+                                    state = LogicParser.predicate(blockstate,
+                                            new FunctionParsingInfo(signaltype));
+                                }
 
                             }
 
@@ -252,10 +332,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                     "girsignals:blocks/lamps/lamp_white");
                             // Zs2, Zs2v, Zs3, Zs3v
                             for (final ZS32 zs3 : ZS32.values()) {
-                                cm.register("hv/hv_zs3",
-                                        with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3))
-                                                .and(has(SignalHV.STOPSIGNAL)),
-                                        6.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
+                                /*
+                                 * cm.register("hv/hv_zs3", with(SignalHV.ZS3, pZs3 ->
+                                 * pZs3.equals(zs3)) .and(has(SignalHV.STOPSIGNAL)), 6.9f,
+                                 * "overlay", "girsignals:blocks/zs3/" + zs3.name());
+                                 */
                                 cm.register("hv/hv_zs3v",
                                         with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)), 3f,
                                         "overlay", "girsignals:blocks/zs3/" + zs3.name());
