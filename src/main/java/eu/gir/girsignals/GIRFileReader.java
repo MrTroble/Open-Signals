@@ -18,7 +18,7 @@ import java.util.stream.Stream;
 
 import eu.gir.girsignals.init.GIRBlocks;
 
-public class GIRFileReader {
+public final class GIRFileReader {
 
     private GIRFileReader() {
     }
