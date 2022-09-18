@@ -6,23 +6,43 @@
 		"lamp_yellow": "girsignals:blocks/lamps/lamp_yellow"
 	},
 	"models": {
+		"hv/hv_base": {
+			"textures": [
+				{}
+			],
+			"y": 0
+		},
 		"hv/hv_ne2": {
 			"textures": [
 				{
 					"blockstate": "hasandis(ne2)"
 				}
 			],
-			"x": 0,
-			"y": 0,
-			"z": 0
+			"y": 0
 		},
-		"hv/hv_base": {
+		"hv/hv_mast1": {
 			"textures": [
 				{}
 			],
-			"x": 0,
-			"y": 0,
-			"z": 0
+			"y": 1
+		},
+		"hv/hv_mast2": {
+			"textures": [
+				{}
+			],
+			"y": 2
+		},
+		"hv/hv_mast3": {
+			"textures": [
+				{}
+			],
+			"y": 3
+		},
+		"hv/hv_mast4": {
+			"textures": [
+				{}
+			],
+			"y": 4
 		},
 		"hv/hv_zs1": {
 			"textures": [
@@ -36,9 +56,7 @@
 					"blockstate": "hasandisnot(ZS1)"
 				}
 			],
-			"x": 0,
-			"y": 4.4,
-			"z": 0
+			"y": 4.4
 		},
 		"hv/hv_zs7": {
 			"textures": [
@@ -52,9 +70,7 @@
 					"blockstate": "hasandisnot(ZS7)"
 				}
 			],
-			"x": 0,
-			"y": 4.6,
-			"z": 0
+			"y": 4.6
 		},
 		"hv/hv_number": {
 			"textures": [
@@ -62,9 +78,7 @@
 					"blockstate": "hasandis(CUSTOMNAME)"
 				}
 			],
-			"x": 0,
-			"y": 2,
-			"z": 0
+			"y": 2
 		},
 		"hv/hv_exit": {
 			"textures": [
@@ -76,15 +90,12 @@
 					}
 				}
 			],
-			"x": 0,
-			"y": 5.4,
-			"z": 0
+			"y": 5.4
 		},
 		"hv/hv_zs3": {
 			"textures": [
 				{
-					"blockstate": "has(STOPSIGNAL)",
-					"retexture": {},
+					"blockstate": "with(prop.prop) && has(STOPSIGNAL)",
 					"extentions": {
 						"zs32.json": {
 							"zs3": "overlay"
@@ -92,9 +103,20 @@
 					}
 				}
 			],
-			"x": 0,
-			"y": 6.9,
-			"z": 0
+			"y": 6.9
+		},
+		"hv/hv_sign": {
+			"textures": [
+				{
+					"blockstate": "with(prop.prop)",
+					"extentions": {
+						"mastsigns.json": {
+							"mastsign": "2"
+						}
+					}
+				}
+			],
+			"y": 1
 		}
 	}
 }

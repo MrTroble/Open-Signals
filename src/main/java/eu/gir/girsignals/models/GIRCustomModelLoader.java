@@ -153,7 +153,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                             boolean gotSignal = false;
 
                             for (Map.Entry<String, Signal> entry : TRANSLATION_TABLE.entrySet()) {
-                                
+
                                 final String signalname = entry.getKey();
                                 final Signal signal = entry.getValue();
 
@@ -203,7 +203,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                                 .getValue();
 
                                                         texturestate.appendExtention(seprop, enums,
-                                                                retexturekey, retextureval);
+                                                                retexturekey, retextureval,
+                                                                modelname);
 
                                                         state = LogicParser.predicate(
                                                                 texturestate.getBlockstate(),
@@ -224,29 +225,28 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                                         extentionloaded = true;
                                                     }
-
                                                 }
                                             }
-
                                         }
                                     }
-
                                 }
+
                                 if (!extentionloaded) {
 
                                     state = LogicParser.predicate(blockstate,
                                             new FunctionParsingInfo(signaltype));
                                 }
-
                             }
 
                             if (texturestate.isautoBlockstate()) {
+
                                 cm.register(modelname, ebs -> true, modelstats.getX(),
                                         modelstats.getY(), modelstats.getZ(),
                                         ModelStats.createRetexture(texturestate.getRetextures(),
                                                 content.getTextures()));
 
                             } else if (state != null && !texturestate.isautoBlockstate()) {
+
                                 cm.register(modelname, state, modelstats.getX(), modelstats.getY(),
                                         modelstats.getZ(),
                                         ModelStats.createRetexture(texturestate.getRetextures(),
@@ -257,41 +257,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                         + filename + " is null! This shouldn´t be the case!");
                             }
 
-                            cm.register("hv/hv_mast1", ebs -> true, 1);
-
-                            for (final MastSignal sign : MastSignal.values())
-                                if (!sign.equals(MastSignal.OFF))
-                                    cm.register("hv/hv_sign",
-                                            with(SignalHV.MASTSIGN, ms -> ms.equals(sign)), 1, "2",
-                                            "girsignals:blocks/mast_sign/" + sign.getName());
-
-                            cm.register("hv/hv_mast2", ebs -> true, 2);
-                            cm.register("hv/hv_mast3", ebs -> true, 3);
-                            cm.register("hv/hv_mast4", ebs -> true, 4);
-
-                            // cm.register("hv/hv_number", hasAndIs(Signal.CUSTOMNAME), 2);
-
-                            // Zs1 on
-                            // cm.register("hv/hv_zs1", hasAndIs(SignalHV.ZS1), 4.4f,
-                            // "lamp1north",
-                            // "girsignals:blocks/lamps/lamp_white");
-                            // Zs1 off
-                            // cm.register("hv/hv_zs1", hasAndIsNot(SignalHV.ZS1), 4.4f);
-                            // Zs7 on
-                            // cm.register("hv/hv_zs7", hasAndIs(SignalHV.ZS7), 4.6f,
-                            // "lamp1north",
-                            // "girsignals:blocks/lamps/lamp_yellow");
-                            // Zs7 off
-                            // cm.register("hv/hv_zs7", hasAndIsNot(SignalHV.ZS7), 4.6f);
-                            // HP 0
-                            cm.register("hv/hv_exit",
-                                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP0))
-                                            .and(with(SignalHV.HPTYPE,
-                                                    hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                                            .or(hasNot(SignalHV.HPTYPE))),
-                                    5.4f, "lamp_red_primarynorth",
-                                    "girsignals:blocks/lamps/lamp_red", "lamp_red_secondarynorth",
-                                    "girsignals:blocks/lamps/lamp_red");
                             // HP 1
                             cm.register("hv/hv_exit",
                                     with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP1))

@@ -1,6 +1,9 @@
 package eu.gir.girsignals.models;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import eu.gir.girsignals.GirsignalsMain;
 
 public class TextureStats {
 
@@ -13,6 +16,7 @@ public class TextureStats {
     }
 
     public void resetStates(final String newblockstate, final Map<String, String> retexture) {
+        
         this.blockstate = newblockstate;
 
         this.retexture = retexture;
@@ -35,35 +39,23 @@ public class TextureStats {
     }
 
     public void appendExtention(final String seprop, final String enums, final String retexturekey,
-            final String retexureval) {
+            final String retexureval, final String modelname) {
+
+        if (retexture == null) {
+
+            retexture = new HashMap<>();
+
+        }
 
         retexture.put(retexturekey, retexureval);
 
-        if (blockstate.isEmpty() || blockstate == null) {
+        if (blockstate.contains("with(prop.prop)")) {
 
-            blockstate = "with(" + seprop + "." + enums + ")";
+            blockstate = blockstate.replace("prop.prop", seprop + "." + enums);
 
         } else {
-
-            blockstate += " && with(" + seprop + "." + enums + ")";
+            GirsignalsMain.log.warn("Unable to load an extention into " + modelname
+                    + "! Did you included 'with(prop.prop)' to your blockstate?");
         }
     }
-
-    /*
-     * private static void appendRetexture(final TextureStats states, final String
-     * retexturekey, final String retextureval) {
-     * 
-     * states.getRetextures().put(retexturekey, retextureval); }
-     * 
-     * private static void appendBlockstate(final TextureStats states, final String
-     * seprop, final String enums, final boolean empty) {
-     * 
-     * if (empty) {
-     * 
-     * states.resetAndSetNewBlockstate("with(" + seprop + "." + enums + ")");
-     * 
-     * } else {
-     * 
-     * states.appendBlockstate("&& with(" + seprop + "." + enums + ")"); } }
-     */
 }
