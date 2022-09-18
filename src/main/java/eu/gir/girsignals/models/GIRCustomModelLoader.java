@@ -260,68 +260,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                         + filename + " is null! This shouldn´t be the case!");
                             }
 
-                            // HP 1
-                            cm.register("hv/hv_exit",
-                                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP1))
-                                            .and(with(SignalHV.HPTYPE,
-                                                    hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                                            .or(hasNot(SignalHV.HPTYPE))),
-                                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-                            // HP 2
-                            cm.register("hv/hv_exit",
-                                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP2))
-                                            .and(with(SignalHV.HPTYPE,
-                                                    hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                                            .or(hasNot(SignalHV.HPTYPE))),
-                                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green",
-                                    "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
-                            // HP off
-                            cm.register("hv/hv_exit",
-                                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.OFF))
-                                            .and(with(SignalHV.HPTYPE,
-                                                    hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                                            .or(hasNot(SignalHV.HPTYPE))),
-                                    5.4f);
-                            // HP RS
-                            cm.register("hv/hv_exit",
-                                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.SHUNTING))
-                                            .and(with(SignalHV.HPTYPE,
-                                                    hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                                            .or(hasNot(SignalHV.HPTYPE))),
-                                    5.4f, "lamp_red_primarynorth",
-                                    "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_1north",
-                                    "girsignals:blocks/lamps/lamp_white", "lamp_white_sh_2north",
-                                    "girsignals:blocks/lamps/lamp_white");
-                            // HP Status light
-                            cm.register("hv/hv_identifier", hasAndIsNot(SignalHV.IDENTIFIER), 5.4f);
-                            // HP Status light
-                            cm.register("hv/hv_identifier", hasAndIs(SignalHV.IDENTIFIER), 5.4f,
-                                    "lamp_white_identifiernorth",
-                                    "girsignals:blocks/lamps/lamp_white");
-                            // Zs2, Zs2v, Zs3, Zs3v
-                            for (final ZS32 zs3 : ZS32.values()) {
-                                /*
-                                 * cm.register("hv/hv_zs3", with(SignalHV.ZS3, pZs3 ->
-                                 * pZs3.equals(zs3)) .and(has(SignalHV.STOPSIGNAL)), 6.9f,
-                                 * "overlay", "girsignals:blocks/zs3/" + zs3.name());
-                                 */
-                                cm.register("hv/hv_zs3v",
-                                        with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)), 3f,
-                                        "overlay", "girsignals:blocks/zs3/" + zs3.name());
-                            }
-                            for (final ZS32 zs3 : ZS32.values()) {
-                                if (ZS32.OFF == zs3)
-                                    continue;
-                                cm.register("zs/zs3",
-                                        with(SignalHV.ZS3_PLATE, pZs3 -> pZs3.equals(zs3))
-                                                .and(has(SignalHV.STOPSIGNAL)
-                                                        .and(has(SignalHV.ZS3).negate())),
-                                        6.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-                                cm.register("zs/zs3v",
-                                        with(SignalHV.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3))
-                                                .and(has(SignalHV.ZS3V).negate()),
-                                        2.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-                            }
                             // HV home
                             // HP 0
                             cm.register("hv/hv_home",

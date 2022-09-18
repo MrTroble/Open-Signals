@@ -83,6 +83,9 @@
 		"hv/hv_exit": {
 			"textures": [
 				{
+					"blockstate": "with(STOPSIGNAL.OFF) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))"
+				},
+				{
 					"blockstate": "with(STOPSIGNAL.HP0) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))",
 					"retexture": {
 						"lamp_red_primarynorth": "lamp_red",
@@ -92,8 +95,37 @@
 				{
 					"blockstate": "with(STOPSIGNAL.HP1) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))",
 					"retexture": {
-						"lamp_red_greennorth" : "lamp_green"
+						"lamp_red_greennorth": "lamp_green"
 					}
+				},
+				{
+					"blockstate": "with(STOPSIGNAL.HP2) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))",
+					"retexture": {
+						"lamp_greennorth": "lamp_green",
+						"lamp_yellownorth": "lamp_yellow"
+					}
+				},
+				{
+					"blockstate": "with(STOPSIGNAL.SHUNTING) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))",
+					"retexture": {
+						"lamp_red_primarynorth": "lamp_red",
+						"lamp_white_sh_1north": "lamp_white",
+						"lamp_white_sh_2north": "lamp_white"
+					}
+				}
+			],
+			"y": 5.4
+		},
+		"hv/hv_identifier": {
+			"textures": [
+				{
+					"blockstate": "hasandis(IDENTIFIER)",
+					"retexture": {
+						"lamp_white_identifiernorth": "lamp_white"
+					}
+				},
+				{
+					"blockstate": "hasandisnot(IDENTIFIER)"
 				}
 			],
 			"y": 5.4
@@ -105,6 +137,45 @@
 					"extentions": {
 						"zs32.json": {
 							"zs3": "overlay"
+						}
+					}
+				}
+			],
+			"y": 6.9
+		},
+		"hv/hv_zs3v": {
+			"textures": [
+				{
+					"blockstate": "with(prop.prop)",
+					"extentions": {
+						"zs32.json": {
+							"zs3v": "overlay"
+						}
+					}
+				}
+			],
+			"y": 3
+		},
+		"zs/zs3": {
+			"textures": [
+				{
+					"blockstate": "with(prop.prop) && (has(STOPSIGNAL) && !has(SignalHV.ZS3))",
+					"extentions": {
+						"zs32.json": {
+							"zs3_plate": "overlay"
+						}
+					}
+				}
+			],
+			"y": 6.9
+		},
+		"zs/zs3v": {
+			"textures": [
+				{
+					"blockstate": "with(prop.prop) && !has(SignalHV.ZS3V)",
+					"extentions": {
+						"zs32.json": {
+							"zs3v_plate": "overlay"
 						}
 					}
 				}
