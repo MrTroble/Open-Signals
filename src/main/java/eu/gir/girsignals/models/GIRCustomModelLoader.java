@@ -150,8 +150,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                             Signal signaltype = null;
 
-                            boolean gotSignal = false;
-
                             for (Map.Entry<String, Signal> entry : TRANSLATION_TABLE.entrySet()) {
 
                                 final String signalname = entry.getKey();
@@ -160,17 +158,21 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                 if (filename.replace(".json", "").equalsIgnoreCase(signalname)) {
 
                                     signaltype = signal;
-                                    gotSignal = true;
                                 }
                             }
 
                             Predicate<IExtendedBlockState> state = null;
 
-                            if (!gotSignal) {
-                                GirsignalsMain.log.warn("Please check the filename of " + filename
+                            if (signaltype == null) {
+
+                                GirsignalsMain.log.error("Please check the filename of " + filename
                                         + "! It doesn't match the pattern!");
+                                return;
 
                             }
+
+                            final FunctionParsingInfo parsinginfo = new FunctionParsingInfo(
+                                    signaltype);
 
                             if (!texturestate.isautoBlockstate()) {
 
@@ -208,8 +210,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                                         state = LogicParser.predicate(
                                                                 texturestate.getBlockstate(),
-                                                                new FunctionParsingInfo(
-                                                                        signaltype));
+                                                                parsinginfo);
 
                                                         cm.register(modelname, state,
                                                                 modelstats.getX(),
@@ -233,15 +234,17 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                 if (!extentionloaded) {
 
-                                    state = LogicParser.predicate(blockstate,
-                                            new FunctionParsingInfo(signaltype));
+                                    state = LogicParser.predicate(blockstate, parsinginfo);
                                 }
                             }
 
                             if (texturestate.isautoBlockstate()) {
 
-                                cm.register(modelname, ebs -> true, modelstats.getX(),
-                                        modelstats.getY(), modelstats.getZ(),
+                                System.out.println(modelname);
+                                System.out.println(modelstats.getY());
+
+                                cm.register(modelname, new ImplAutoBlockstatePredicate(),
+                                        modelstats.getX(), modelstats.getY(), modelstats.getZ(),
                                         ModelStats.createRetexture(texturestate.getRetextures(),
                                                 content.getTextures()));
 

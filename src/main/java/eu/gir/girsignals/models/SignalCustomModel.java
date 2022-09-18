@@ -137,7 +137,7 @@ public class SignalCustomModel implements IModel {
         }
         // This strings just until the new RenderSystem is fully included!
         String str = "";
-        if (map != null) {
+        if (map != null && !map.isEmpty()) {
             Builder<String, String> build = ImmutableMap.builder();
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 final String key = entry.getKey();
