@@ -20,6 +20,9 @@ import eu.gir.girsignals.init.GIRBlocks;
 
 public class GIRFileReader {
 
+    private GIRFileReader() {
+    }
+
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
         final Map<String, String> files = new HashMap<>();
         final Optional<Path> pathloc = getRessourceLocation(directory);
@@ -62,28 +65,37 @@ public class GIRFileReader {
         return stringbuilder.toString();
     }
 
-    public static Optional<Path> getRessourceLocation(String location) {
+    public static Optional<Path> getRessourceLocation(final String location) {
+
+        String loc = location;
+
         final URL url = GIRBlocks.class.getResource("/assets/girsignals");
         try {
             if (url != null) {
-                final URI uri = url.toURI();
-                if ("file".equals(uri.getScheme())) {
-                    if (!location.startsWith("/"))
-                        location = "/" + location;
 
-                    final URL resource = GIRBlocks.class.getResource(location);
+                final URI uri = url.toURI();
+
+                if ("file".equals(uri.getScheme())) {
+
+                    if (!location.startsWith("/"))
+                        loc = "/" + loc;
+
+                    final URL resource = GIRBlocks.class.getResource(loc);
 
                     if (resource == null)
                         return Optional.empty();
 
                     return Optional.of(Paths.get(resource.toURI()));
+
                 } else {
+
                     if (!"jar".equals(uri.getScheme())) {
                         return Optional.empty();
                     }
+
                     try (final FileSystem filesystem = FileSystems.newFileSystem(uri,
                             Collections.emptyMap())) {
-                        return Optional.of(filesystem.getPath(location));
+                        return Optional.of(filesystem.getPath(loc));
                     }
                 }
             }
