@@ -48,7 +48,7 @@ public class ModelStats {
         final Map<String, String> retexturemap = new HashMap<>();
 
         if (retexture != null) {
-            for (Map.Entry<String, String> entry : retexture.entrySet()) {
+            for (final Map.Entry<String, String> entry : retexture.entrySet()) {
 
                 final String key = entry.getKey();
                 final String val = entry.getValue();
@@ -61,7 +61,7 @@ public class ModelStats {
 
     private static String getLampPath(final String lampname, final Map<String, String> map) {
         if (map != null) {
-            for (Map.Entry<String, String> entry : map.entrySet()) {
+            for (final Map.Entry<String, String> entry : map.entrySet()) {
                 if (entry.getKey().equalsIgnoreCase(lampname))
                     return entry.getValue();
             }

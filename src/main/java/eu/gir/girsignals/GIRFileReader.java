@@ -26,6 +26,7 @@ public class GIRFileReader {
         if (pathloc.isPresent()) {
             final Path pathlocation = pathloc.get();
             try {
+
                 final Stream<Path> inputs = Files.list(pathlocation);
 
                 inputs.forEach(file -> {
@@ -33,8 +34,9 @@ public class GIRFileReader {
                         final List<String> text = Files.readAllLines(file);
                         final String content = toString(text);
                         final String name = file.getFileName().toString();
+
                         files.put(name, content);
-                    } catch (IOException e) {
+                    } catch (final IOException e) {
                         GirsignalsMain.log
                                 .warn("There was a problem during loading " + file + " !");
                         e.printStackTrace();
@@ -42,7 +44,7 @@ public class GIRFileReader {
                 });
                 inputs.close();
                 return files;
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 GirsignalsMain.log.warn(
                         "There was a problem during listing all files from " + pathlocation + " !");
                 e.printStackTrace();
@@ -85,8 +87,8 @@ public class GIRFileReader {
                     }
                 }
             }
-        } catch (IOException | URISyntaxException e1) {
-            e1.printStackTrace();
+        } catch (final IOException | URISyntaxException e) {
+            e.printStackTrace();
         }
         return Optional.empty();
     }

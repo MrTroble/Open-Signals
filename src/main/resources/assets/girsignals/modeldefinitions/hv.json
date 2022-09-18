@@ -88,6 +88,12 @@
 						"lamp_red_primarynorth": "lamp_red",
 						"lamp_red_secondarynorth": "lamp_red"
 					}
+				},
+				{
+					"blockstate": "with(STOPSIGNAL.HP1) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))",
+					"retexture": {
+						"lamp_red_greennorth" : "lamp_green"
+					}
 				}
 			],
 			"y": 5.4

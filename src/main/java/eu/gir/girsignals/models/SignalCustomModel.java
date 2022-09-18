@@ -139,7 +139,7 @@ public class SignalCustomModel implements IModel {
         String str = "";
         if (map != null && !map.isEmpty()) {
             Builder<String, String> build = ImmutableMap.builder();
-            for (Map.Entry<String, String> entry : map.entrySet()) {
+            for (final Map.Entry<String, String> entry : map.entrySet()) {
                 final String key = entry.getKey();
                 final String val = entry.getValue();
                 str = key;

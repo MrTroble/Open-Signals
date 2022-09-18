@@ -9,14 +9,14 @@ public class ImplAutoBlockstatePredicate implements Predicate<IExtendedBlockStat
 
     private final int id;
 
-    private static int COUNTER = 0;
+    private static int counter = 0;
 
     public ImplAutoBlockstatePredicate() {
-        this.id = COUNTER++;
+        this.id = counter++;
     }
 
     @Override
-    public boolean test(IExtendedBlockState t) {
+    public boolean test(final IExtendedBlockState t) {
         return true;
     }
 
@@ -26,7 +26,7 @@ public class ImplAutoBlockstatePredicate implements Predicate<IExtendedBlockStat
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)

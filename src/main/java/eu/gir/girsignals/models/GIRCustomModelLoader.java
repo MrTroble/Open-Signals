@@ -121,7 +121,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             }
         });
 
-        for (Entry<String, Object> modelstatemap : modelmap.entrySet()) {
+        for (final Entry<String, Object> modelstatemap : modelmap.entrySet()) {
 
             final String filename = modelstatemap.getKey();
 
@@ -137,7 +137,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                 registeredModels.put(file.replace(".json", ""), cm -> {
 
-                    for (Map.Entry<String, Models> entry2 : content.getModels().entrySet()) {
+                    for (final Map.Entry<String, Models> entry2 : content.getModels().entrySet()) {
 
                         final String modelname = entry2.getKey();
                         final Models modelstats = entry2.getValue();
@@ -150,7 +150,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                             Signal signaltype = null;
 
-                            for (Map.Entry<String, Signal> entry : TRANSLATION_TABLE.entrySet()) {
+                            for (final Map.Entry<String, Signal> entry : TRANSLATION_TABLE
+                                    .entrySet()) {
 
                                 final String signalname = entry.getKey();
                                 final Signal signal = entry.getValue();
@@ -168,7 +169,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                 GirsignalsMain.log.error("Please check the filename of " + filename
                                         + "! It doesn't match the pattern!");
                                 return;
-
                             }
 
                             final FunctionParsingInfo parsinginfo = new FunctionParsingInfo(
@@ -178,12 +178,12 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                 boolean extentionloaded = false;
 
-                                for (Map.Entry<String, ModelExtention> entry : extentions
+                                for (final Map.Entry<String, ModelExtention> entry : extentions
                                         .entrySet()) {
 
                                     if (texturestate.getExtentions() != null) {
 
-                                        for (Map.Entry<String, Map<String, String>> entry1 : texturestate
+                                        for (final Map.Entry<String, Map<String, String>> entry1 : texturestate
                                                 .getExtentions().entrySet()) {
 
                                             final String nametoextend = entry1.getKey();
@@ -191,13 +191,13 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                             if (nametoextend.equalsIgnoreCase(entry.getKey())) {
 
-                                                for (Map.Entry<String, String> entry3 : entry
+                                                for (final Map.Entry<String, String> entry3 : entry
                                                         .getValue().getExtention().entrySet()) {
 
                                                     final String enums = entry3.getKey();
                                                     final String retextureval = entry3.getValue();
 
-                                                    for (Map.Entry<String, String> entry4 : ex
+                                                    for (final Map.Entry<String, String> entry4 : ex
                                                             .entrySet()) {
 
                                                         final String seprop = entry4.getKey();
