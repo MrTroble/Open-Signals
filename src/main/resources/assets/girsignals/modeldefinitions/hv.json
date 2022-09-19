@@ -1,4 +1,5 @@
 {
+	"registryname": "hvsignal",
 	"textures": {
 		"lamp_green": "girsignals:blocks/lamps/lamp_green",
 		"lamp_white": "girsignals:blocks/lamps/lamp_white",
