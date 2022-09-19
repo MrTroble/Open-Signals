@@ -1,0 +1,98 @@
+{
+    "textures": {
+        "lamp_green": "girsignals:blocks/lamps/lamp_green",
+        "lamp_yellow": "girsignals:blocks/lamps/lamp_yellow"
+    },
+    "models:": {
+        "hl/hl_base": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "hl/hl_ne2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2) && has(MAINLIGHTSIGNAL_DISTANT)"
+                }
+            ],
+            "y": 0
+        },
+        "hl/hl_ne2_4": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2_4) && has(MAINLIGHTSIGNAL_DISTANT)"
+                }
+            ],
+            "y": 0
+        },
+        "hl/hl_mast1": {
+            "textures": [
+                {}
+            ],
+            "y": 1
+        },
+        "hl/hl_ne2_2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2) && hasandis(NE2_2) && has(MAINLIGHTSIGNAL_DISTANT)"
+                }
+            ],
+            "y": 1
+        },
+        "hl/hl_sign_distant": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(MASTSIGNDISTANT)"
+                }
+            ],
+            "y": 1
+        },
+        "hl/hl_mast2": {
+            "textures": [
+                {}
+            ],
+            "y": 2
+        },
+        "hl/hl_number": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(CUSTOMNAME)"
+                }
+            ],
+            "y": 0
+        },
+        "hl/hl_mast3": {
+            "textures": [
+                {}
+            ],
+            "y": 3
+        },
+        "hl/hl_mast4": {
+            "textures": [
+                {}
+            ],
+            "y": 4
+        },
+        "hl/hl_shield1": {
+            "textures": [
+                {
+                    "blockstate": "with(MAINLIGHTSIGNALLIGHTBAR.OFF)"
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNALLIGHTBAR.GREEN)",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNALLIGHTBAR.YELLOW)",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow"
+                    }
+                }
+            ],
+            "y": 4
+        }
+    }
+}
