@@ -67,7 +67,7 @@ public final class LogicParser {
         final String erroring = input.substring(eStart, Math.min(end, input.length()));
         final char[] nextLine = new char[erroring.length()];
         Arrays.fill(nextLine, ' ');
-        nextLine[index - eStart] = '^';
+        nextLine[index - eStart - 1] = '^';
         return erroring + System.lineSeparator() + new String(nextLine);
     }
 
