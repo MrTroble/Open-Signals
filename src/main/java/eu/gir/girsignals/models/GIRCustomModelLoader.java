@@ -27,10 +27,6 @@ import eu.gir.girsignals.EnumSignals.HLDistant;
 import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.HLType;
-import eu.gir.girsignals.EnumSignals.HP;
-import eu.gir.girsignals.EnumSignals.HPBlock;
-import eu.gir.girsignals.EnumSignals.HPHome;
-import eu.gir.girsignals.EnumSignals.HPType;
 import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KSDistant;
 import eu.gir.girsignals.EnumSignals.KSMain;
@@ -50,7 +46,6 @@ import eu.gir.girsignals.EnumSignals.Tram;
 import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.EnumSignals.TramSwitch;
 import eu.gir.girsignals.EnumSignals.TramType;
-import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.WNCross;
 import eu.gir.girsignals.EnumSignals.WNNormal;
 import eu.gir.girsignals.EnumSignals.ZS32;
@@ -67,7 +62,6 @@ import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
-import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalTram;
@@ -204,22 +198,25 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                         final String retexturekey = entry4
                                                                 .getValue();
 
-                                                        texturestate.appendExtention(seprop, enums,
-                                                                retexturekey, retextureval,
-                                                                modelname);
+                                                        final boolean load = texturestate
+                                                                .appendExtention(seprop, enums,
+                                                                        retexturekey, retextureval,
+                                                                        modelname);
+                                                        if (load) {
 
-                                                        state = LogicParser.predicate(
-                                                                texturestate.getBlockstate(),
-                                                                parsinginfo);
+                                                            state = LogicParser.predicate(
+                                                                    texturestate.getBlockstate(),
+                                                                    parsinginfo);
 
-                                                        cm.register(modelname, state,
-                                                                modelstats.getX(),
-                                                                modelstats.getY(),
-                                                                modelstats.getZ(),
-                                                                ModelStats.createRetexture(
-                                                                        texturestate
-                                                                                .getRetextures(),
-                                                                        content.getTextures()));
+                                                            cm.register(modelname, state,
+                                                                    modelstats.getX(),
+                                                                    modelstats.getY(),
+                                                                    modelstats.getZ(),
+                                                                    ModelStats.createRetexture(
+                                                                            texturestate
+                                                                                    .getRetextures(),
+                                                                            content.getTextures()));
+                                                        }
 
                                                         texturestate.resetStates(blockstate,
                                                                 retexture);
@@ -240,9 +237,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                             if (texturestate.isautoBlockstate()) {
 
-                                System.out.println(modelname);
-                                System.out.println(modelstats.getY());
-
                                 cm.register(modelname, new ImplAutoBlockstatePredicate(),
                                         modelstats.getX(), modelstats.getY(), modelstats.getZ(),
                                         ModelStats.createRetexture(texturestate.getRetextures(),
@@ -259,84 +253,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                 GirsignalsMain.log.warn("The predicate of " + modelname + " in "
                                         + filename + " is null! This shouldn´t be the case!");
                             }
-
-                            // HV home
-                            // HP 0
-                            cm.register("hv/hv_home",
-                                    with(SignalHV.HPHOME, hpvr -> hpvr.equals(HPHome.HP0)).and(with(
-                                            SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPHOME))),
-                                    5.4f, "lamp_red_primarynorth",
-                                    "girsignals:blocks/lamps/lamp_red");
-                            cm.register("hv/hv_home",
-                                    with(SignalHV.HPHOME,
-                                            hpvr -> hpvr.equals(HPHome.HP0_ALTERNATE_RED))
-                                                    .and(with(SignalHV.HPTYPE,
-                                                            hpt -> hpt.equals(HPType.HPHOME))),
-                                    5.4f, "lamp_red_secondarynorth",
-                                    "girsignals:blocks/lamps/lamp_red");
-                            // HP 1
-                            cm.register("hv/hv_home",
-                                    with(SignalHV.HPHOME, hpvr -> hpvr.equals(HPHome.HP1)).and(with(
-                                            SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPHOME))),
-                                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-                            // HP 2
-                            cm.register("hv/hv_home",
-                                    with(SignalHV.HPHOME, hpvr -> hpvr.equals(HPHome.HP2)).and(with(
-                                            SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPHOME))),
-                                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green",
-                                    "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
-                            // HP off
-                            cm.register("hv/hv_home",
-                                    with(SignalHV.HPHOME, hpvr -> hpvr.equals(HPHome.OFF)).and(with(
-                                            SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPHOME))),
-                                    5.4f);
-                            // HP Block
-                            cm.register("hv/hv_block",
-                                    with(SignalHV.HPBLOCK, hpvr -> hpvr.equals(HPBlock.HP0))
-                                            .and(with(SignalHV.HPTYPE,
-                                                    hpt -> hpt.equals(HPType.HPBLOCK))),
-                                    5.4f, "lamp_red_primarynorth",
-                                    "girsignals:blocks/lamps/lamp_red");
-                            // HP 1
-                            cm.register("hv/hv_block",
-                                    with(SignalHV.HPBLOCK, hpvr -> hpvr.equals(HPBlock.HP1))
-                                            .and(with(SignalHV.HPTYPE,
-                                                    hpt -> hpt.equals(HPType.HPBLOCK))),
-                                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-                            // HP off
-                            cm.register("hv/hv_block",
-                                    with(SignalHV.HPBLOCK, hpvr -> hpvr.equals(HPBlock.OFF))
-                                            .and(with(SignalHV.HPTYPE,
-                                                    hpt -> hpt.equals(HPType.HPBLOCK))),
-                                    5.4f);
-
-                            // VR0
-                            cm.register("hv/hv_vr",
-                                    with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR0)), 4,
-                                    "lamp_yellow_1north", "girsignals:blocks/lamps/lamp_yellow",
-                                    "lamp_yellow_2north", "girsignals:blocks/lamps/lamp_yellow");
-                            // VR1
-                            cm.register("hv/hv_vr",
-                                    with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR1)), 4,
-                                    "lamp_green_1north", "girsignals:blocks/lamps/lamp_green",
-                                    "lamp_green_2north", "girsignals:blocks/lamps/lamp_green");
-                            // VR2
-                            cm.register("hv/hv_vr",
-                                    with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR2)), 4,
-                                    "lamp_green_1north", "girsignals:blocks/lamps/lamp_green",
-                                    "lamp_yellow_2north", "girsignals:blocks/lamps/lamp_yellow");
-                            // VR off
-                            cm.register("hv/hv_vr",
-                                    with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.OFF)), 4);
-                            // VR Status light
-                            cm.register("hv/hv_vr_statuslight",
-                                    hasAndIs(SignalHV.VR_LIGHT).and(has(SignalHV.DISTANTSIGNAL)), 4,
-                                    "lamp_white_identifiernorth",
-                                    "girsignals:blocks/lamps/lamp_white");
-                            // VR Status light off
-                            cm.register("hv/hv_vr_statuslight",
-                                    hasAndIsNot(SignalHV.VR_LIGHT).and(has(SignalHV.DISTANTSIGNAL)),
-                                    4);
                         });
                     }
                 });

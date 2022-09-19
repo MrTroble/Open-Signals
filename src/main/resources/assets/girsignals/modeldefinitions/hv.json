@@ -95,7 +95,7 @@
 				{
 					"blockstate": "with(STOPSIGNAL.HP1) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))",
 					"retexture": {
-						"lamp_red_greennorth": "lamp_green"
+						"lamp_greennorth": "lamp_green"
 					}
 				},
 				{
@@ -115,6 +115,95 @@
 				}
 			],
 			"y": 5.4
+		},
+		"hv/hv_home": {
+			"textures": [
+				{
+					"blockstate": "with(HPHOME.OFF) && with(HPTYPE.HPHOME)"
+				},
+				{
+					"blockstate": "with(HPHOME.HP0) && with(HPTYPE.HPHOME)",
+					"retexture": {
+						"lamp_red_primarynorth": "lamp_red"
+					}
+				},
+				{
+					"blockstate": "with(HPHOME.HP0_ALTERNATE_RED) && with(HPTYPE.HPHOME)",
+					"retexture": {
+						"lamp_red_secondarynorth": "lamp_red"
+					}
+				},
+				{
+					"blockstate": "with(HPHOME.HP1) && with(HPTYPE.HPHOME)",
+					"retexture": {
+						"lamp_greennorth": "lamp_green"
+					}
+				},
+				{
+					"blockstate": "with(HPHOME.HP2) && with(HPTYPE.HPHOME)",
+					"retexture": {
+						"lamp_greennorth": "lamp_green",
+						"lamp_yellownorth": "lamp_yellow"
+					}
+				}
+			],
+			"y": 5.4
+		},
+		"hv/hv_block": {
+			"textures": [
+				{
+					"blockstate": "with(HPBLOCK.OFF) && with(HPTYPE.HPBLOCK)"
+				},
+				{
+					"blockstate": "with(HPBLOCK.HP0) && with(HPTYPE.HPBLOCK)",
+					"retexture": {
+						"lamp_red_primarynorth": "lamp_red"
+					}
+				},
+				{
+					"blockstate": "with(HPBLOCK.HP1) && with(HPTYPE.HPBLOCK)",
+					"retexture": {
+						"lamp_greennorth": "lamp_green"
+					}
+				}
+			],
+			"y": 5.4
+		},
+		"hv/hv_vr": {
+			"textures": [
+				{
+					"blockstate": "with(DISTANTSIGNAL.OFF)"
+				},
+				{
+					"blockstate": "with(DISTANTSIGNAL.VR1)",
+					"retexture": {
+						"lamp_green_1north": "lamp_green",
+						"lamp_green_2north": "lamp_green"
+					}
+				},
+				{
+					"blockstate": "with(DISTANTSIGNAL.VR2)",
+					"retexture": {
+						"lamp_green_1north": "lamp_green",
+						"lamp_yellow_2north": "lamp_yellow"
+					}
+				}
+			],
+			"y": 4
+		},
+		"hv/hv_vr_statuslight": {
+			"textures": [
+				{
+					"blockstate": "hasandisnot(VRLIGHT) && has(DISTANTSIGNAL)"
+				},
+				{
+					"blockstate": "hasandis(VRLIGHT) && has(DISTANTSIGNAL)",
+					"retexture": {
+						"lamp_white_identifiernorth": "lamp_white"
+					}
+				}
+			],
+			"y": 4
 		},
 		"hv/hv_identifier": {
 			"textures": [
@@ -159,10 +248,11 @@
 		"zs/zs3": {
 			"textures": [
 				{
-					"blockstate": "with(prop.prop) && (has(STOPSIGNAL) && !has(SignalHV.ZS3))",
+					"loadOFFstate": false,
+					"blockstate": "with(prop.prop) && (has(STOPSIGNAL) && !has(ZS3))",
 					"extentions": {
 						"zs32.json": {
-							"zs3_plate": "overlay"
+							"zs3plate": "overlay"
 						}
 					}
 				}
@@ -172,15 +262,16 @@
 		"zs/zs3v": {
 			"textures": [
 				{
-					"blockstate": "with(prop.prop) && !has(SignalHV.ZS3V)",
+					"loadOFFstate": false,
+					"blockstate": "with(prop.prop) && !has(ZS3V)",
 					"extentions": {
 						"zs32.json": {
-							"zs3v_plate": "overlay"
+							"zs3vplate": "overlay"
 						}
 					}
 				}
 			],
-			"y": 6.9
+			"y": 2.9
 		},
 		"hv/hv_sign": {
 			"textures": [

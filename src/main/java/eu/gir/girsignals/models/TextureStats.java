@@ -7,16 +7,21 @@ import eu.gir.girsignals.GirsignalsMain;
 
 public class TextureStats {
 
+    private boolean loadOFFstate = true;
     private String blockstate;
     private Map<String, String> retexture;
     private Map<String, Map<String, String>> extentions;
+
+    public boolean loadOFFstate() {
+        return loadOFFstate;
+    }
 
     public boolean isautoBlockstate() {
         return blockstate == null;
     }
 
     public void resetStates(final String newblockstate, final Map<String, String> retexture) {
-        
+
         this.blockstate = newblockstate;
 
         this.retexture = retexture;
@@ -38,8 +43,15 @@ public class TextureStats {
         return extentions;
     }
 
-    public void appendExtention(final String seprop, final String enums, final String retexturekey,
-            final String retexureval, final String modelname) {
+    /**
+     * @return boolean: if this model with these parameters should be loaded
+     */
+
+    public boolean appendExtention(final String seprop, final String enums,
+            final String retexturekey, final String retexureval, final String modelname) {
+
+        if (!loadOFFstate && enums.equalsIgnoreCase("OFF"))
+            return false;
 
         if (retexture == null) {
 
@@ -49,13 +61,15 @@ public class TextureStats {
 
         retexture.put(retexturekey, retexureval);
 
-        if (blockstate.contains("with(prop.prop)")) {
+        if (!blockstate.contains("with(prop.prop)")) {
 
-            blockstate = blockstate.replace("prop.prop", seprop + "." + enums);
-
-        } else {
-            GirsignalsMain.log.warn("Unable to load an extention into " + modelname
+            GirsignalsMain.log.error("Unable to load an extention into " + modelname
                     + "! Did you included 'with(prop.prop)' to your blockstate?");
+            return false;
         }
+
+        blockstate = blockstate.replace("prop.prop", seprop + "." + enums);
+        return true;
+
     }
 }
