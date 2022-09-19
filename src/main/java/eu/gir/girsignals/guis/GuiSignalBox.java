@@ -75,6 +75,12 @@ public class GuiSignalBox extends GuiBase {
         this.entity.read(this.compound);
     }
 
+    @Override
+    public void initGui() {
+        super.initGui();
+        this.mc.player.openContainer = this.container;
+    }
+
     private void update(final NBTTagCompound compound) {
         this.resetTileSelection();
         if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
@@ -453,6 +459,9 @@ public class GuiSignalBox extends GuiBase {
     @Override
     public void onGuiClosed() {
         this.reset();
+        if (this.mc.player != null) {
+            this.container.onContainerClosed(this.mc.player);
+        }
     }
 
     private void reset() {

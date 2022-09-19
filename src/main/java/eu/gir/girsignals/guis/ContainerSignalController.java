@@ -101,9 +101,8 @@ public class ContainerSignalController extends Container implements UIClientSync
     public boolean canInteractWith(final EntityPlayer playerIn) {
         if (playerIn instanceof EntityPlayerMP) {
             this.player = (EntityPlayerMP) playerIn;
-            return true;
         }
-        return false;
+        return true;
     }
 
     @Override
