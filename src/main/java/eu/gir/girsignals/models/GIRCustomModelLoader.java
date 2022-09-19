@@ -25,12 +25,7 @@ import eu.gir.girsignals.EnumSignals.ELArrow;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLDistant;
 import eu.gir.girsignals.EnumSignals.HLExit;
-import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.HLType;
-import eu.gir.girsignals.EnumSignals.KS;
-import eu.gir.girsignals.EnumSignals.KSDistant;
-import eu.gir.girsignals.EnumSignals.KSMain;
-import eu.gir.girsignals.EnumSignals.KSType;
 import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBachground;
 import eu.gir.girsignals.EnumSignals.MastSignal;
@@ -62,7 +57,6 @@ import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
-import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalTram;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
@@ -270,17 +264,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         }
 
         registeredModels.put("hlsignal", cm -> {
-            cm.register("hl/hl_base", ebs -> true, 0);
-            cm.register("hl/hl_ne2", hasAndIs(SignalHL.NE2).and(has(SignalHL.DISTANTSIGNAL)), 0);
-            cm.register("hl/hl_ne2_4", hasAndIs(SignalHL.NE2_4).and(has(SignalHL.DISTANTSIGNAL)),
-                    1);
-            cm.register("hl/hl_mast1", ebs -> true, 1);
-            cm.register("hl/hl_ne2_2", hasAndIs(SignalHL.NE2).and(hasAndIs(SignalHL.NE2_2))
-                    .and(has(SignalHL.DISTANTSIGNAL)), 1);
-            cm.register("hl/hl_sign_distant", hasAndIs(SignalHL.MASTSIGNDISTANT), 1);
-            cm.register("hl/hl_mast2", ebs -> true, 2);
-
-            cm.register("hl/hl_number", hasAndIs(Signal.CUSTOMNAME), 0);
 
             for (final MastSignal sign : MastSignal.values())
                 if (!sign.equals(MastSignal.OFF))
@@ -306,18 +289,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                 .and(has(SignalHL.ZS2).negate()),
                         3.6875f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
             }
-            cm.register("hl/hl_mast4", ebs -> true, 4);
-            // HL Lightbar off
-            cm.register("hl/hl_shield2",
-                    with(SignalHL.LIGHTBAR, hllb -> hllb.equals(HLLightbar.OFF)), 4);
-            // HL Lightbar green
-            cm.register("hl/hl_shield2",
-                    with(SignalHL.LIGHTBAR, hllb -> hllb.equals(HLLightbar.GREEN)), 4,
-                    "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-            // HL Lightbar yellow
-            cm.register("hl/hl_shield2",
-                    with(SignalHL.LIGHTBAR, hllb -> hllb.equals(HLLightbar.YELLOW)), 4,
-                    "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
             // HL off
             cm.register("hl/hl_shield1",
                     with(SignalHL.STOPSIGNAL, hl -> hl.equals(HL.OFF))
