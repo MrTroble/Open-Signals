@@ -1,7 +1,8 @@
-package eu.gir.girsignals.signalbox;
+package eu.gir.girsignals.enums;
 
 import java.util.function.BiConsumer;
 
+import eu.gir.girsignals.signalbox.SignalBoxUtil;
 import eu.gir.guilib.ecs.entitys.UIEntity;
 
 public enum EnumGuiMode {

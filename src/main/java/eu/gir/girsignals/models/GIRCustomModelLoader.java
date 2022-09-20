@@ -1,7 +1,16 @@
 package eu.gir.girsignals.models;
 
+import static eu.gir.girsignals.models.parser.PredicateHolder.has;
+import static eu.gir.girsignals.models.parser.PredicateHolder.hasAndIs;
+import static eu.gir.girsignals.models.parser.PredicateHolder.hasAndIsNot;
+import static eu.gir.girsignals.models.parser.PredicateHolder.hasNot;
+import static eu.gir.girsignals.models.parser.PredicateHolder.with;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
@@ -11,22 +20,12 @@ import eu.gir.girsignals.EnumSignals.Arrow;
 import eu.gir.girsignals.EnumSignals.BUE;
 import eu.gir.girsignals.EnumSignals.BUEAdd;
 import eu.gir.girsignals.EnumSignals.CAR;
-import eu.gir.girsignals.EnumSignals.DefaultName;
 import eu.gir.girsignals.EnumSignals.EL;
 import eu.gir.girsignals.EnumSignals.ELArrow;
 import eu.gir.girsignals.EnumSignals.HL;
 import eu.gir.girsignals.EnumSignals.HLDistant;
 import eu.gir.girsignals.EnumSignals.HLExit;
-import eu.gir.girsignals.EnumSignals.HLLightbar;
 import eu.gir.girsignals.EnumSignals.HLType;
-import eu.gir.girsignals.EnumSignals.HP;
-import eu.gir.girsignals.EnumSignals.HPBlock;
-import eu.gir.girsignals.EnumSignals.HPHome;
-import eu.gir.girsignals.EnumSignals.HPType;
-import eu.gir.girsignals.EnumSignals.KS;
-import eu.gir.girsignals.EnumSignals.KSDistant;
-import eu.gir.girsignals.EnumSignals.KSMain;
-import eu.gir.girsignals.EnumSignals.KSType;
 import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBachground;
 import eu.gir.girsignals.EnumSignals.MastSignal;
@@ -42,7 +41,6 @@ import eu.gir.girsignals.EnumSignals.Tram;
 import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.EnumSignals.TramSwitch;
 import eu.gir.girsignals.EnumSignals.TramType;
-import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.WNCross;
 import eu.gir.girsignals.EnumSignals.WNNormal;
 import eu.gir.girsignals.EnumSignals.ZS32;
@@ -59,10 +57,10 @@ import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
-import eu.gir.girsignals.blocks.signals.SignalHV;
-import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalTram;
+import eu.gir.girsignals.models.parser.FunctionParsingInfo;
+import eu.gir.girsignals.models.parser.LogicParser;
 import net.minecraft.client.renderer.block.model.BuiltInModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
@@ -72,7 +70,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -81,415 +78,193 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
-    private static <T extends Enum<?>> Predicate<IExtendedBlockState> has(
-            final IUnlistedProperty<T> property) {
-        return ebs -> ebs.getValue(property) != null;
-    }
+    private static final Map<String, Signal> TRANSLATION_TABLE = new HashMap<>();
 
-    private static <T extends Enum<?>> Predicate<IExtendedBlockState> hasNot(
-            final IUnlistedProperty<T> property) {
-        return ebs -> ebs.getValue(property) == null;
-    }
+    private static final List<Signal> SIGNALS = new ArrayList<>(Signal.SIGNALLIST);
 
-    private static <T extends DefaultName<?>> Predicate<IExtendedBlockState> with(
-            final IUnlistedProperty<T> property, final Predicate<T> t) {
-        return bs -> {
-            final T test = bs.getValue(property);
-            return test != null && t.test(test);
-        };
-    }
+    static {
 
-    private static Predicate<IExtendedBlockState> hasAndIs(
-            final IUnlistedProperty<Boolean> property) {
-        return ebs -> {
-            final Boolean bool = ebs.getValue(property);
-            return bool != null && bool.booleanValue();
-        };
-    }
+        SIGNALS.forEach(signal -> {
 
-    private static Predicate<IExtendedBlockState> hasAndIsNot(
-            final IUnlistedProperty<Boolean> property) {
-        return ebs -> {
-            final Boolean bool = ebs.getValue(property);
-            return bool != null && !bool.booleanValue();
-        };
+            TRANSLATION_TABLE.put(signal.getSignalTypeName(), signal);
+        });
     }
 
     @Override
     public void onResourceManagerReload(final IResourceManager resourceManager) {
+
         registeredModels.clear();
-        registeredModels.put("hvsignal", cm -> {
-            cm.register("hv/hv_base", ebs -> true, 0);
-            cm.register("hv/hv_ne2", hasAndIs(SignalHV.NE2), 0);
-            cm.register("hv/hv_mast1", ebs -> true, 1);
 
-            for (final MastSignal sign : MastSignal.values())
-                if (!sign.equals(MastSignal.OFF))
-                    cm.register("hv/hv_sign", with(SignalHV.MASTSIGN, ms -> ms.equals(sign)), 1,
-                            "2", "girsignals:blocks/mast_sign/" + sign.getName());
+        final Map<String, ModelExtention> extentions = new HashMap<>();
 
-            cm.register("hv/hv_mast2", ebs -> true, 2);
-            cm.register("hv/hv_mast3", ebs -> true, 3);
-            cm.register("hv/hv_mast4", ebs -> true, 4);
+        final Map<String, Object> modelmap = ModelStats
+                .getfromJson("/assets/girsignals/modeldefinitions");
 
-            cm.register("hv/hv_number", hasAndIs(Signal.CUSTOMNAME), 2);
+        modelmap.forEach((filename, content) -> {
 
-            // Zs1 on
-            cm.register("hv/hv_zs1", hasAndIs(SignalHV.ZS1), 4.4f, "lamp1north",
-                    "girsignals:blocks/lamps/lamp_white");
-            // Zs1 off
-            cm.register("hv/hv_zs1", hasAndIsNot(SignalHV.ZS1), 4.4f);
-            // Zs7 on
-            cm.register("hv/hv_zs7", hasAndIs(SignalHV.ZS7), 4.6f, "lamp1north",
-                    "girsignals:blocks/lamps/lamp_yellow");
-            // Zs7 off
-            cm.register("hv/hv_zs7", hasAndIsNot(SignalHV.ZS7), 4.6f);
-            // HP 0
-            cm.register("hv/hv_exit",
-                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP0))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                    .or(hasNot(SignalHV.HPTYPE))),
-                    5.4f, "lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red",
-                    "lamp_red_secondarynorth", "girsignals:blocks/lamps/lamp_red");
-            // HP 1
-            cm.register("hv/hv_exit",
-                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP1))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                    .or(hasNot(SignalHV.HPTYPE))),
-                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-            // HP 2
-            cm.register("hv/hv_exit",
-                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.HP2))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                    .or(hasNot(SignalHV.HPTYPE))),
-                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green",
-                    "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
-            // HP off
-            cm.register("hv/hv_exit",
-                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.OFF))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                    .or(hasNot(SignalHV.HPTYPE))),
-                    5.4f);
-            // HP RS
-            cm.register("hv/hv_exit",
-                    with(SignalHV.STOPSIGNAL, hpvr -> hpvr.equals(HP.SHUNTING))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.STOPSIGNAL))
-                                    .or(hasNot(SignalHV.HPTYPE))),
-                    5.4f, "lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red",
-                    "lamp_white_sh_1north", "girsignals:blocks/lamps/lamp_white",
-                    "lamp_white_sh_2north", "girsignals:blocks/lamps/lamp_white");
-            // HP Status light
-            cm.register("hv/hv_identifier", hasAndIsNot(SignalHV.IDENTIFIER), 5.4f);
-            // HP Status light
-            cm.register("hv/hv_identifier", hasAndIs(SignalHV.IDENTIFIER), 5.4f,
-                    "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
-            // Zs2, Zs2v, Zs3, Zs3v
-            for (final ZS32 zs3 : ZS32.values()) {
-                cm.register("hv/hv_zs3",
-                        with(SignalHV.ZS3, pZs3 -> pZs3.equals(zs3)).and(has(SignalHV.STOPSIGNAL)),
-                        6.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-                cm.register("hv/hv_zs3v", with(SignalHV.ZS3V, pZs3 -> pZs3.equals(zs3)), 3f,
-                        "overlay", "girsignals:blocks/zs3/" + zs3.name());
+            if (filename.endsWith(".extention.json")) {
+
+                final ModelExtention ext = (ModelExtention) content;
+                extentions.put(filename.replace(".extention", ""), ext);
             }
-            for (final ZS32 zs3 : ZS32.values()) {
-                if (ZS32.OFF == zs3)
-                    continue;
-                cm.register("zs/zs3",
-                        with(SignalHV.ZS3_PLATE, pZs3 -> pZs3.equals(zs3))
-                                .and(has(SignalHV.STOPSIGNAL).and(has(SignalHV.ZS3).negate())),
-                        6.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-                cm.register("zs/zs3v",
-                        with(SignalHV.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3))
-                                .and(has(SignalHV.ZS3V).negate()),
-                        2.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-            }
-            // HV home
-            // HP 0
-            cm.register("hv/hv_home",
-                    with(SignalHV.HPHOME, hpvr -> hpvr.equals(HPHome.HP0))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPHOME))),
-                    5.4f, "lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red");
-            cm.register("hv/hv_home",
-                    with(SignalHV.HPHOME, hpvr -> hpvr.equals(HPHome.HP0_ALTERNATE_RED))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPHOME))),
-                    5.4f, "lamp_red_secondarynorth", "girsignals:blocks/lamps/lamp_red");
-            // HP 1
-            cm.register("hv/hv_home",
-                    with(SignalHV.HPHOME, hpvr -> hpvr.equals(HPHome.HP1))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPHOME))),
-                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-            // HP 2
-            cm.register("hv/hv_home",
-                    with(SignalHV.HPHOME, hpvr -> hpvr.equals(HPHome.HP2))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPHOME))),
-                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green",
-                    "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
-            // HP off
-            cm.register("hv/hv_home", with(SignalHV.HPHOME, hpvr -> hpvr.equals(HPHome.OFF))
-                    .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPHOME))), 5.4f);
-            // HP Block
-            cm.register("hv/hv_block",
-                    with(SignalHV.HPBLOCK, hpvr -> hpvr.equals(HPBlock.HP0))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPBLOCK))),
-                    5.4f, "lamp_red_primarynorth", "girsignals:blocks/lamps/lamp_red");
-            // HP 1
-            cm.register("hv/hv_block",
-                    with(SignalHV.HPBLOCK, hpvr -> hpvr.equals(HPBlock.HP1))
-                            .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPBLOCK))),
-                    5.4f, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-            // HP off
-            cm.register("hv/hv_block", with(SignalHV.HPBLOCK, hpvr -> hpvr.equals(HPBlock.OFF))
-                    .and(with(SignalHV.HPTYPE, hpt -> hpt.equals(HPType.HPBLOCK))), 5.4f);
-
-            // VR0
-            cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR0)), 4,
-                    "lamp_yellow_1north", "girsignals:blocks/lamps/lamp_yellow",
-                    "lamp_yellow_2north", "girsignals:blocks/lamps/lamp_yellow");
-            // VR1
-            cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR1)), 4,
-                    "lamp_green_1north", "girsignals:blocks/lamps/lamp_green", "lamp_green_2north",
-                    "girsignals:blocks/lamps/lamp_green");
-            // VR2
-            cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.VR2)), 4,
-                    "lamp_green_1north", "girsignals:blocks/lamps/lamp_green", "lamp_yellow_2north",
-                    "girsignals:blocks/lamps/lamp_yellow");
-            // VR off
-            cm.register("hv/hv_vr", with(SignalHV.DISTANTSIGNAL, hpvr -> hpvr.equals(VR.OFF)), 4);
-            // VR Status light
-            cm.register("hv/hv_vr_statuslight",
-                    hasAndIs(SignalHV.VR_LIGHT).and(has(SignalHV.DISTANTSIGNAL)), 4,
-                    "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
-            // VR Status light off
-            cm.register("hv/hv_vr_statuslight",
-                    hasAndIsNot(SignalHV.VR_LIGHT).and(has(SignalHV.DISTANTSIGNAL)), 4);
         });
-        registeredModels.put("kssignal", cm -> {
-            cm.register("ks/ks_base", ebs -> true, 0);
-            cm.register("ks/ks_ne2", hasAndIs(SignalKS.NE2).and(has(SignalKS.DISTANTSIGNAL)), 0);
-            cm.register("ks/ks_mast1", ebs -> true, 1);
-            cm.register("ks/ks_sign_distant", hasAndIs(SignalKS.MASTSIGNDISTANT), 1);
-            cm.register("ks/ks_mast2", ebs -> true, 2);
 
-            cm.register("ks/ks_number", hasAndIs(Signal.CUSTOMNAME), 4);
+        for (final Entry<String, Object> modelstatemap : modelmap.entrySet()) {
 
-            for (final MastSignal sign : MastSignal.values())
-                if (!sign.equals(MastSignal.OFF))
-                    cm.register("ks/ks_sign", with(SignalKS.MASTSIGN, ms -> ms.equals(sign)), 2,
-                            "13", "girsignals:blocks/mast_sign/" + sign.getName());
+            final String filename = modelstatemap.getKey();
 
-            cm.register("ks/ks_mast3", ebs -> true, 3);
-            cm.register("ks/ks_mast4", ebs -> true, 4);
-            // Zs2, Zs2v, Zs3, Zs3v
-            for (final ZS32 zs3 : ZS32.values()) {
-                cm.register("ks/ks_zs3", with(SignalKS.ZS3, pZs3 -> pZs3.equals(zs3)), 6, "overlay",
-                        "girsignals:blocks/zs3/" + zs3.name());
-                cm.register("ks/ks_zs3v", with(SignalKS.ZS3V, pZs3 -> pZs3.equals(zs3)), 4,
-                        "overlay", "girsignals:blocks/zs3/" + zs3.name());
-                cm.register("ks/ks_zs2", with(SignalKS.ZS2, pZs3 -> pZs3.equals(zs3)), 3, "overlay",
-                        "girsignals:blocks/zs3/" + zs3.name());
-                cm.register("ks/ks_zs2v", with(SignalKS.ZS2V, pZs3 -> pZs3.equals(zs3)), 3,
-                        "overlay", "girsignals:blocks/zs3/" + zs3.name());
+            if (!filename.endsWith(".extention.json")) {
+
+                final ModelStats content = (ModelStats) modelstatemap.getValue();
+
+                Signal signaltype = null;
+
+                for (final Map.Entry<String, Signal> entry : TRANSLATION_TABLE.entrySet()) {
+
+                    final String signalname = entry.getKey();
+                    final Signal signal = entry.getValue();
+
+                    if (filename.replace(".json", "").equalsIgnoreCase(signalname)) {
+
+                        signaltype = signal;
+                    }
+                }
+
+                if (signaltype == null) {
+
+                    GirsignalsMain.log.error("There doesn't exists a signalsystem named "
+                            + filename.replace(".json", "") + "!");
+                    return;
+                }
+
+                final FunctionParsingInfo parsinginfo = new FunctionParsingInfo(signaltype);
+
+                registeredModels.put(
+                        signaltype.getRegistryName().toString().replace("girsignals:", ""), cm -> {
+
+                            for (final Map.Entry<String, Models> entry2 : content.getModels()
+                                    .entrySet()) {
+
+                                final String modelname = entry2.getKey();
+                                final Models modelstats = entry2.getValue();
+
+                                for (int i = 0; i < modelstats.getTexture().size(); i++) {
+
+                                    final TextureStats texturestate = modelstats.getTexture()
+                                            .get(i);
+
+                                    final String blockstate = texturestate.getBlockstate();
+
+                                    final Map<String, String> retexture = texturestate
+                                            .getRetextures();
+
+                                    Predicate<IExtendedBlockState> state = null;
+
+                                    if (!texturestate.isautoBlockstate()) {
+
+                                        boolean extentionloaded = false;
+
+                                        for (final Map.Entry<String, ModelExtention> entry : extentions
+                                                .entrySet()) {
+
+                                            if (texturestate.getExtentions() != null) {
+
+                                                for (final Map.Entry<String, Map<String, String>> entry1 : texturestate
+                                                        .getExtentions().entrySet()) {
+
+                                                    final String nametoextend = entry1.getKey();
+                                                    final Map<String, String> ex = entry1
+                                                            .getValue();
+
+                                                    if (nametoextend
+                                                            .equalsIgnoreCase(entry.getKey())) {
+
+                                                        for (final Map.Entry<String, String> entry3 : entry
+                                                                .getValue().getExtention()
+                                                                .entrySet()) {
+
+                                                            final String enums = entry3.getKey();
+                                                            final String retextureval = entry3
+                                                                    .getValue();
+
+                                                            for (final Map.Entry<String, String> entry4 : ex
+                                                                    .entrySet()) {
+
+                                                                final String seprop = entry4
+                                                                        .getKey();
+                                                                final String retexturekey = entry4
+                                                                        .getValue();
+
+                                                                final boolean load = texturestate
+                                                                        .appendExtention(seprop,
+                                                                                enums, retexturekey,
+                                                                                retextureval,
+                                                                                modelname);
+
+                                                                if (load) {
+
+                                                                    state = LogicParser.predicate(
+                                                                            texturestate
+                                                                                    .getBlockstate(),
+                                                                            parsinginfo);
+
+                                                                    cm.register(modelname, state,
+                                                                            modelstats.getX(),
+                                                                            modelstats.getY(),
+                                                                            modelstats.getZ(),
+                                                                            ModelStats
+                                                                                    .createRetexture(
+                                                                                            texturestate
+                                                                                                    .getRetextures(),
+                                                                                            content.getTextures()));
+                                                                }
+
+                                                                texturestate.resetStates(blockstate,
+                                                                        retexture);
+
+                                                                extentionloaded = true;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        if (!extentionloaded) {
+
+                                            state = LogicParser.predicate(blockstate, parsinginfo);
+                                        }
+                                    }
+
+                                    if (texturestate.isautoBlockstate()) {
+
+                                        cm.register(modelname, new ImplAutoBlockstatePredicate(),
+                                                modelstats.getX(), modelstats.getY(),
+                                                modelstats.getZ(),
+                                                ModelStats.createRetexture(
+                                                        texturestate.getRetextures(),
+                                                        content.getTextures()));
+
+                                    } else if (state != null && !texturestate.isautoBlockstate()) {
+
+                                        cm.register(modelname, state, modelstats.getX(),
+                                                modelstats.getY(), modelstats.getZ(),
+                                                ModelStats.createRetexture(
+                                                        texturestate.getRetextures(),
+                                                        content.getTextures()));
+
+                                    } else if (state == null && !texturestate.isautoBlockstate()) {
+                                        GirsignalsMain.log.warn(
+                                                "The predicate of " + modelname + " in " + filename
+                                                        + " is null! This shouldn´t be the case!");
+                                    }
+                                }
+                            }
+                        });
             }
-            for (final ZS32 zs3 : ZS32.values()) {
-                if (ZS32.OFF == zs3)
-                    continue;
-                cm.register("zs/zs3",
-                        with(SignalKS.ZS3_PLATE, pZs3 -> pZs3.equals(zs3))
-                                .and(has(SignalKS.ZS3).negate()),
-                        6.375f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-                cm.register("zs/zs3v",
-                        with(SignalKS.ZS3V_PLATE, pZs3 -> pZs3.equals(zs3))
-                                .and(has(SignalKS.ZS3V).negate()),
-                        3.9f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
-            }
-            // KS off
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.OFF))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5);
-            // HP 0
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.HP0))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red");
-            // KS 1
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS1))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-            // KS 1 Blink
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS1_BLINK))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green_blink");
-            // KS 1 Blink Light
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS1_BLINK_LIGHT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green_blink",
-                    "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
-            // KS 2
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS2))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
-            // KS 2 Light
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS2_LIGHT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow",
-                    "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
-            // KS Zs1
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS_ZS1))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_zsnorth",
-                    "girsignals:blocks/lamps/lamp_white_blink");
-            // KS Zs7
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS_ZS7))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_zs7north",
-                    "girsignals:blocks/lamps/lamp_yellow");
-            // KS RS
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS_SHUNTING))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_zsnorth",
-                    "girsignals:blocks/lamps/lamp_white", "lamp_white_shnorth",
-                    "girsignals:blocks/lamps/lamp_white");
-            // KS Status light
-            cm.register("ks/ks_signal",
-                    with(SignalKS.STOPSIGNAL, ks -> ks.equals(KS.KS_STATUS_LIGHT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.STOPSIGNAL))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
-            // KS MAIN
-            // KS off
-            cm.register("ks/ks_signal_main", with(SignalKS.MAINSIGNAL, ks -> ks.equals(KSMain.OFF))
-                    .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.MAIN))), 5);
-            // HP 0
-            cm.register("ks/ks_signal_main",
-                    with(SignalKS.MAINSIGNAL, ks -> ks.equals(KSMain.HP0))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.MAIN))),
-                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red");
-            // KS 1
-            cm.register("ks/ks_signal_main",
-                    with(SignalKS.MAINSIGNAL, ks -> ks.equals(KSMain.KS1))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.MAIN))),
-                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-            // KS Zs1
-            cm.register("ks/ks_signal_main",
-                    with(SignalKS.MAINSIGNAL, ks -> ks.equals(KSMain.KS_ZS1))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.MAIN))),
-                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_zsnorth",
-                    "girsignals:blocks/lamps/lamp_white_blink");
-            // KS Zs7
-            cm.register("ks/ks_signal_main",
-                    with(SignalKS.MAINSIGNAL, ks -> ks.equals(KSMain.KS_ZS7))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.MAIN))),
-                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_zs7north",
-                    "girsignals:blocks/lamps/lamp_yellow");
-            // KS RS
-            cm.register("ks/ks_signal_main",
-                    with(SignalKS.MAINSIGNAL, ks -> ks.equals(KSMain.KS_SHUNTING))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.MAIN))),
-                    5, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red", "lamp_white_sh_zsnorth",
-                    "girsignals:blocks/lamps/lamp_white", "lamp_white_shnorth",
-                    "girsignals:blocks/lamps/lamp_white");
-            // KS Status light
-            cm.register("ks/ks_signal_main",
-                    with(SignalKS.MAINSIGNAL, ks -> ks.equals(KSMain.KS_STATUS_LIGHT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.MAIN))),
-                    5, "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
+        }
 
-            // KS off Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.OFF))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))),
-                    5);
-            // KS 1 Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.KS1))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-            // KS 1 Repeat Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.KS1_REPEAT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green",
-                    "lamp_white_sh_zsnorth", "girsignals:blocks/lamps/lamp_white");
-            // KS 1 Blink Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.KS1_BLINK))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green_blink");
-            // KS 1 Blink Light Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.KS1_BLINK_LIGHT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green_blink",
-                    "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
-            // KS 1 Blink Repeat Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.KS1_BLINK_REPEAT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_greennorth", "girsignals:blocks/lamps/lamp_green_blink",
-                    "lamp_white_sh_zsnorth", "girsignals:blocks/lamps/lamp_white");
-            // KS 2 Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.KS2))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
-            // KS 2 Light Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.KS2_LIGHT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow",
-                    "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
-            // KS 2 Repeat Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.KS2_REPEAT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow",
-                    "lamp_white_sh_zsnorth", "girsignals:blocks/lamps/lamp_white");
-            // KS Status light Distant
-            cm.register("ks/ks_signal_dist",
-                    with(SignalKS.DISTANTSIGNAL, ks -> ks.equals(KSDistant.KS_STATUS_LIGHT))
-                            .and(with(SignalKS.KSTYPE, kst -> kst.equals(KSType.DISTANT))
-                                    .or(hasNot(SignalKS.KSTYPE))),
-                    5, "lamp_white_identifiernorth", "girsignals:blocks/lamps/lamp_white");
-        });
         registeredModels.put("hlsignal", cm -> {
-            cm.register("hl/hl_base", ebs -> true, 0);
-            cm.register("hl/hl_ne2", hasAndIs(SignalHL.NE2).and(has(SignalHL.DISTANTSIGNAL)), 0);
-            cm.register("hl/hl_ne2_4", hasAndIs(SignalHL.NE2_4).and(has(SignalHL.DISTANTSIGNAL)),
-                    1);
-            cm.register("hl/hl_mast1", ebs -> true, 1);
-            cm.register("hl/hl_ne2_2", hasAndIs(SignalHL.NE2).and(hasAndIs(SignalHL.NE2_2))
-                    .and(has(SignalHL.DISTANTSIGNAL)), 1);
-            cm.register("hl/hl_sign_distant", hasAndIs(SignalHL.MASTSIGNDISTANT), 1);
-            cm.register("hl/hl_mast2", ebs -> true, 2);
-
-            cm.register("hl/hl_number", hasAndIs(Signal.CUSTOMNAME), 0);
 
             for (final MastSignal sign : MastSignal.values())
                 if (!sign.equals(MastSignal.OFF))
@@ -515,18 +290,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                 .and(has(SignalHL.ZS2).negate()),
                         3.6875f, "overlay", "girsignals:blocks/zs3/" + zs3.name());
             }
-            cm.register("hl/hl_mast4", ebs -> true, 4);
-            // HL Lightbar off
-            cm.register("hl/hl_shield2",
-                    with(SignalHL.LIGHTBAR, hllb -> hllb.equals(HLLightbar.OFF)), 4);
-            // HL Lightbar green
-            cm.register("hl/hl_shield2",
-                    with(SignalHL.LIGHTBAR, hllb -> hllb.equals(HLLightbar.GREEN)), 4,
-                    "lamp_greennorth", "girsignals:blocks/lamps/lamp_green");
-            // HL Lightbar yellow
-            cm.register("hl/hl_shield2",
-                    with(SignalHL.LIGHTBAR, hllb -> hllb.equals(HLLightbar.YELLOW)), 4,
-                    "lamp_yellownorth", "girsignals:blocks/lamps/lamp_yellow");
             // HL off
             cm.register("hl/hl_shield1",
                     with(SignalHL.STOPSIGNAL, hl -> hl.equals(HL.OFF))
@@ -1224,5 +987,4 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
                 SignalAngel.valueOf(strs[1].toUpperCase()));
     }
-
 }

@@ -5,32 +5,19 @@ import static eu.gir.girsignals.signalbox.SignalBoxUtil.POINT2;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.REQUEST_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.RESET_WAY;
 import static eu.gir.girsignals.signalbox.SignalBoxUtil.fromNBT;
-import static eu.gir.girsignals.signalbox.SignalBoxUtil.requestWay;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 
-import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.enums.LinkType;
 import eu.gir.girsignals.init.GIRBlocks;
-import eu.gir.girsignals.signalbox.PathOption.EnumPathUsage;
-import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
-import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
-import eu.gir.girsignals.signalbox.config.RSSignalConfig;
 import eu.gir.girsignals.tileentitys.IChunkloadable;
 import eu.gir.girsignals.tileentitys.RedstoneIOTileEntity;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import eu.gir.girsignals.tileentitys.SyncableTileEntity;
-import eu.gir.guilib.ecs.GuiSyncNetwork;
 import eu.gir.guilib.ecs.interfaces.ISyncable;
 import eu.gir.linkableapi.ILinkableTile;
 import net.minecraft.block.Block;
@@ -38,8 +25,8 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 
 public class SignalBoxTileEntity extends SyncableTileEntity
@@ -52,13 +39,22 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     private static final String GUI_TAG = "guiTag";
     private static final String LINK_TYPE = "linkType";
 
-    private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>(10);
-    private final Map<Point, SignalNode> modeGrid = new HashMap<>(10);
-    private final Map<BlockPos, Signal> signals = new HashMap<>(10);
-    private NBTTagCompound guiTag = new NBTTagCompound();
-    private final HashMap<ArrayList<SignalNode>, Integer> pathWayEnd = new HashMap<>();
+    private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
+    private final Map<BlockPos, Signal> signals = new HashMap<>();
+    private final SignalBoxGrid grid;
 
-    private static final ExecutorService SERVICE = Executors.newCachedThreadPool();
+    public SignalBoxTileEntity() {
+        grid = SignalBoxFactory.getFactory().getGrid(this::sendToAll);
+    }
+
+    private WorldOperations worldLoadOps = new WorldOperations();
+
+    @Override
+    public void setWorld(final World worldIn) {
+        super.setWorld(worldIn);
+        worldLoadOps = SignalBoxFactory.getFactory().getWorldOperations(worldIn);
+        grid.setWorld(worldIn);
+    }
 
     @Override
     public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
@@ -69,7 +65,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             list.appendTag(item);
         });
         compound.setTag(LINKED_POS_LIST, list);
-        compound.setTag(GUI_TAG, guiTag);
+        final NBTTagCompound gridTag = new NBTTagCompound();
+        this.grid.write(gridTag);
+        compound.setTag(GUI_TAG, gridTag);
         return super.writeToNBT(compound);
     }
 
@@ -85,193 +83,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity
                             LinkType.valueOf(item.getString(LINK_TYPE)));
             });
         }
-        this.guiTag = compound.getCompoundTag(GUI_TAG);
-        this.updateModeGridFromUI();
+        final NBTTagCompound gridComp = compound.getCompoundTag(GUI_TAG);
+        grid.read(gridComp);
         super.readFromNBT(compound);
         if (world != null)
             onLoad();
-    }
-
-    private void updateModeGridFromUI() {
-        modeGrid.clear();
-        this.guiTag.getKeySet().forEach(key -> {
-            final String[] names = key.split("\\.");
-            if (names.length < 2)
-                return;
-            final int x = Integer.parseInt(names[0]);
-            final int y = Integer.parseInt(names[1]);
-            final SignalNode node = new SignalNode(new Point(x, y));
-            node.read(this.guiTag);
-            node.post();
-            modeGrid.put(node.getPoint(), node);
-        });
-    }
-
-    private void notifyBlockChanges(final BlockPos newposition, final Chunk chunk) {
-        final IBlockState state = world.getBlockState(newposition);
-        world.markAndNotifyBlock(newposition, chunk, state, state, 3);
-    }
-
-    private void loadAndConfig(final int speed, final BlockPos lastPosition,
-            final BlockPos nextPosition) {
-        loadAndConfig(speed, lastPosition, nextPosition, null);
-    }
-
-    private void config(final int speed, final SignalTileEnity lastTile,
-            final SignalTileEnity nextTile, final ISignalAutoconfig override) {
-        final Signal last = lastTile.getSignal();
-        final ISignalAutoconfig config = override == null ? last.getConfig() : override;
-        if (config == null)
-            return;
-        final ConfigInfo info = new ConfigInfo(lastTile, nextTile, speed);
-        config.change(info);
-    }
-
-    private void loadAndConfig(final int speed, final BlockPos lastPosition,
-            final BlockPos nextPosition, final ISignalAutoconfig override) {
-        loadChunkAndGetTile(SignalTileEnity.class, world, lastPosition, (lastTile, chunk) -> {
-            if (nextPosition == null) {
-                config(speed, lastTile, null, override);
-            } else {
-                loadChunkAndGetTile(SignalTileEnity.class, world, nextPosition,
-                        (nextTile, _u2) -> config(speed, lastTile, nextTile, override));
-            }
-            notifyBlockChanges(lastPosition, chunk);
-        });
-    }
-
-    private void loadAndReset(final BlockPos position) {
-        loadChunkAndGetTile(SignalTileEnity.class, world, position, (signaltile, chunk) -> {
-            final ISignalAutoconfig config = signaltile.getSignal().getConfig();
-            if (config == null)
-                return;
-            config.reset(signaltile);
-            notifyBlockChanges(position, chunk);
-        });
-
-    }
-
-    private void resendSignalTilesToUI() {
-        modeGrid.values().forEach(signal -> signal.write(guiTag));
-        this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
-        this.syncClient();
-    }
-
-    private void resetPathway(final Point resetPoint) {
-        final SignalNode currentNode = modeGrid.get(resetPoint);
-        resetSignal(resetPoint, currentNode, EnumGuiMode.HP);
-        resetSignal(resetPoint, currentNode, EnumGuiMode.RS);
-        pathWayEnd.keySet().stream().filter(list -> list.get(list.size() - 1).equals(currentNode))
-                .findAny().ifPresent(pathway -> {
-                    pathway.stream().filter(signal -> signal.has(EnumGuiMode.VP))
-                            .forEach(signal -> loadAndReset(signal.getOption(EnumGuiMode.VP).get()
-                                    .getLinkedPosition(LinkType.SIGNAL)));
-                    pathWayEnd.remove(pathway);
-                });
-        resendSignalTilesToUI();
-    }
-
-    private void resetSignal(final Point resetPoint, final SignalNode currentNode,
-            final EnumGuiMode guiMode) {
-        currentNode.getRotations(guiMode).forEach(rotation -> {
-            currentNode.getOption(guiMode, rotation).ifPresent(option -> {
-                final BlockPos position = option.getLinkedPosition(LinkType.SIGNAL);
-                if (position == null)
-                    return;
-                loadAndReset(position);
-            });
-            pathWayEnd.keySet().stream().filter(list -> list.get(0).equals(currentNode)).findAny()
-                    .ifPresent(list -> {
-                        setPathway(list, pathWayEnd.get(list));
-                    });
-            final List<Point> list = new ArrayList<>();
-            final List<Point> visited = new ArrayList<>();
-            list.add(SignalBoxUtil.getOffset(rotation, resetPoint));
-            visited.add(resetPoint);
-            while (!list.isEmpty()) {
-                final Point current = list.get(0);
-                final SignalNode nextPoint = modeGrid.get(current);
-                if (nextPoint == null)
-                    return;
-                visited.add(current);
-                nextPoint.connections().forEach(entry -> nextPoint
-                        .getOption(entry.getKey(), entry.getValue()).ifPresent(path -> {
-                            setPower(path.getLinkedPosition(LinkType.OUTPUT), false);
-                            if (path.getPathUsage().equals(EnumPathUsage.FREE))
-                                return;
-                            path.setPathUsage(EnumPathUsage.FREE);
-                            if (!visited.contains(entry.getValue()))
-                                list.add(entry.getValue());
-                            if (!visited.contains(entry.getKey()))
-                                list.add(entry.getKey());
-                        }));
-                list.remove(current);
-            }
-        });
-    }
-
-    private void setPower(final BlockPos position, final boolean power) {
-        if (position == null)
-            return;
-        loadChunkAndGetBlock(world, position, (state, chunk) -> {
-            if (!(state.getBlock() instanceof RedstoneIO))
-                return;
-            final IBlockState ibstate = state.withProperty(RedstoneIO.POWER, power);
-            chunk.setBlockState(position, ibstate);
-            world.markAndNotifyBlock(position, chunk, state, ibstate, 3);
-        });
-    }
-
-    private void onWayAdd(final ArrayList<SignalNode> nodes) {
-        final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
-        for (int i = 1; i < nodes.size() - 1; i++) {
-            final Point oldPos = nodes.get(i - 1).getPoint();
-            final Point newPos = nodes.get(i + 1).getPoint();
-            final SignalNode current = nodes.get(i);
-            current.getOption(oldPos, newPos).ifPresent(option -> {
-                setPower(option.getLinkedPosition(LinkType.OUTPUT), true);
-                option.setPathUsage(EnumPathUsage.SELECTED);
-                atomic.getAndUpdate(oldspeed -> Math.min(oldspeed, option.getSpeed()));
-            });
-        }
-        setPathway(nodes, atomic.get());
-        pathWayEnd.put(nodes, atomic.get());
-        resendSignalTilesToUI();
-    }
-
-    private void setPathway(final ArrayList<SignalNode> nodes, final int speed) {
-        final SignalNode lastNode = nodes.get(nodes.size() - 1);
-        final SignalNode nextNode = nodes.get(0);
-        final Optional<PathOption> lastOptional = lastNode.getOption(EnumGuiMode.HP);
-        final Optional<PathOption> nextOptional = nextNode.getOption(EnumGuiMode.HP);
-        if (lastOptional.isPresent()
-                && (nextOptional.isPresent() || !nextNode.has(EnumGuiMode.RS))) {
-            final BlockPos lastPosition = lastOptional.get().getLinkedPosition(LinkType.SIGNAL);
-            final BlockPos nextPosition = nextOptional.isPresent()
-                    ? nextOptional.get().getLinkedPosition(LinkType.SIGNAL)
-                    : null;
-            if (lastPosition != null && !lastPosition.equals(nextPosition)) {
-                loadAndConfig(speed, lastPosition, nextPosition);
-                for (final SignalNode node : nodes) {
-                    if (node.equals(lastNode) || node.equals(nextNode))
-                        continue;
-                    node.getOption(EnumGuiMode.VP).ifPresent(option -> loadAndConfig(speed,
-                            option.getLinkedPosition(LinkType.SIGNAL), nextPosition));
-                }
-            }
-        } else {
-            final Optional<PathOption> lastRSOptional = lastNode.getOption(EnumGuiMode.RS);
-            if (lastRSOptional.isPresent()) {
-                final BlockPos lastPosition = lastRSOptional.get()
-                        .getLinkedPosition(LinkType.SIGNAL);
-                if (lastPosition != null) {
-                    loadAndConfig(speed, lastPosition, null, RSSignalConfig.RS_CONFIG);
-                }
-            }
-            return;
-        }
-        pathWayEnd.keySet().stream().filter(list -> list != null && list.get(0).equals(lastNode))
-                .findAny().ifPresent(list -> setPathway(list, pathWayEnd.get(list)));
     }
 
     @Override
@@ -283,38 +99,36 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             final BlockPos p1 = NBTUtil.getPosFromTag(request);
             if (signals.containsKey(p1)) {
                 signals.remove(p1);
-                loadAndReset(p1);
+                worldLoadOps.loadAndReset(p1);
             }
             linkedBlocks.remove(p1);
         }
         if (compound.hasKey(RESET_WAY)) {
             final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
             final Point p1 = fromNBT(request, POINT1);
-            resetPathway(p1);
+            grid.resetPathway(p1);
             return;
         }
         if (compound.hasKey(REQUEST_WAY)) {
             final NBTTagCompound request = (NBTTagCompound) compound.getTag(REQUEST_WAY);
             final Point p1 = fromNBT(request, POINT1);
             final Point p2 = fromNBT(request, POINT2);
-            final Optional<ArrayList<SignalNode>> ways = requestWay(modeGrid, p1, p2);
-            if (ways.isPresent()) {
-                this.onWayAdd(ways.get());
-            } else {
-                final NBTTagCompound update = new NBTTagCompound();
-                update.setString(ERROR_STRING, "error.nopathfound");
-                this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(update, ui.getPlayer()));
+            if (!grid.requestWay(p1, p2)) {
+                final NBTTagCompound error = new NBTTagCompound();
+                error.setString(ERROR_STRING, "error.nopathfound");
+                sendToAll(error);
             }
             return;
         }
-        this.guiTag = compound;
+        this.grid.readEntryNetwork(compound);
         this.syncClient();
-        updateModeGridFromUI();
     }
 
     @Override
     public NBTTagCompound getTag() {
-        return this.guiTag;
+        final NBTTagCompound gridComp = new NBTTagCompound();
+        this.grid.writeEntryNetwork(gridComp, true);
+        return gridComp;
     }
 
     @Override
@@ -340,10 +154,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         if (!world.isRemote) {
             if (type.equals(LinkType.SIGNAL)) {
                 loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle);
-                loadAndReset(linkedPos);
+                worldLoadOps.loadAndReset(linkedPos);
             }
         }
         linkedBlocks.put(linkedPos, type);
+        this.syncClient();
         return true;
     }
 
@@ -366,7 +181,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
 
     @Override
     public boolean unlink() {
-        signals.keySet().forEach(this::loadAndReset);
+        signals.keySet().forEach(worldLoadOps::loadAndReset);
         linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue()))
                 .forEach(entry -> {
                     loadChunkAndGetTile(RedstoneIOTileEntity.class, world, entry.getKey(),
@@ -386,62 +201,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         return ImmutableMap.copyOf(this.linkedBlocks);
     }
 
-    private void lockPW(final ArrayList<SignalNode> pathway) {
-        final SignalNode node = pathway.get(pathway.size() - 1);
-        final Point lastPoint = node.getPoint();
-        final Point delta = lastPoint.delta(pathway.get(pathway.size() - 2).getPoint());
-        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta);
-        final PathOption start = node.getOption(EnumGuiMode.HP, rotation)
-                .orElse(node.getOption(EnumGuiMode.RS, rotation).orElse(null));
-        loadAndReset(start.getLinkedPosition(LinkType.SIGNAL));
-        for (int i = 1; i < pathway.size() - 1; i++) {
-            final Point oldPos = pathway.get(i - 1).getPoint();
-            final Point newPos = pathway.get(i + 1).getPoint();
-            final SignalNode current = pathway.get(i);
-            current.getOption(oldPos, newPos)
-                    .ifPresent(option -> option.setPathUsage(EnumPathUsage.USED));
-            current.write(guiTag);
+    public void updateRedstonInput(final BlockPos pos, final boolean power) {
+        if (power && !this.world.isRemote) {
+            grid.setPowered(pos);
+            syncClient();
         }
-        this.clientSyncs.forEach(ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
-        this.syncClient();
-    }
-
-    public void updateRedstonInput(final BlockPos pos, final boolean status) {
-        SERVICE.submit(() -> {
-            final ArrayList<ArrayList<SignalNode>> listOfPathways = Lists
-                    .newArrayList(pathWayEnd.keySet());
-            next: for (final ArrayList<SignalNode> pathway : listOfPathways) {
-                final SignalNode node = pathway.get(0);
-                final Point lastPoint = node.getPoint();
-                final Point delta = pathway.get(1).getPoint().delta(lastPoint);
-                final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta);
-                final PathOption end = node.getOption(EnumGuiMode.HP, rotation)
-                        .orElse(node.getOption(EnumGuiMode.RS, rotation).orElse(null));
-                if (end != null) {
-                    final BlockPos linked = end.getLinkedPosition(LinkType.INPUT);
-                    if (linked != null && linked.equals(pos)) {
-                        this.world.getMinecraftServer().addScheduledTask(() -> {
-                            resetPathway(pathway.get(pathway.size() - 1).getPoint());
-                            modeGrid.values().forEach(signal -> signal.write(guiTag));
-                            this.clientSyncs.forEach(
-                                    ui -> GuiSyncNetwork.sendToClient(guiTag, ui.getPlayer()));
-                        });
-                        continue next;
-                    }
-                }
-                for (int i = 1; i < pathway.size() - 1; i++) {
-                    final Point oldPos = pathway.get(i - 1).getPoint();
-                    final Point newPos = pathway.get(i + 1).getPoint();
-                    final SignalNode current = pathway.get(i);
-                    final Optional<PathOption> optionOpt = current.getOption(oldPos, newPos);
-                    if (optionOpt.isPresent()
-                            && pos.equals(optionOpt.get().getLinkedPosition(LinkType.INPUT))) {
-                        this.world.getMinecraftServer().addScheduledTask(() -> lockPW(pathway));
-                        continue next;
-                    }
-                }
-            }
-        });
     }
 
 }
