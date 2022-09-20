@@ -2,14 +2,13 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"texture_size": [32, 32],
 	"textures": {
-		"6": "girsignals:blocks/white"
+		"6": "girsignals:blocks/default/white"
 	},
 	"elements": [
 		{
 			"name": "number",
 			"from": [8, 3, 4.5],
 			"to": [14, 8, 5.5],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-2, 42, -3]},
 			"faces": {
 				"north": {"uv": [0, 0, 3, 2.5], "texture": "#6"},
 				"east": {"uv": [0, 0, 0.5, 2.5], "texture": "#6"},

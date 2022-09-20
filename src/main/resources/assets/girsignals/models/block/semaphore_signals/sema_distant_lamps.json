@@ -2,15 +2,14 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"texture_size": [32, 32],
 	"textures": {
-		"1": "girsignals:blocks/shield_black",
-		"18": "girsignals:blocks/semaphore_lamps3"
+		"1": "girsignals:blocks/default/shield_black",
+		"18": "girsignals:blocks/semaphore/semaphore_lamps3"
 	},
 	"elements": [
 		{
 			"name": "shield",
 			"from": [-0.5, 13, 6],
 			"to": [5.5, 23, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [4, 17, -3.5]},
 			"faces": {
 				"north": {"uv": [0, 0, 10, 6], "rotation": 270, "texture": "#18"},
 				"east": {"uv": [0, 0, 0.5, 5], "texture": "#1"},
@@ -24,7 +23,6 @@
 			"name": "shield",
 			"from": [10.5, 2, 6],
 			"to": [16.5, 12, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [15.5, 6, -3.5]},
 			"faces": {
 				"north": {"uv": [0, 0, 10, 6], "rotation": 90, "texture": "#18"},
 				"east": {"uv": [0, 0, 0.5, 5], "texture": "#1"},

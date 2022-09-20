@@ -2,15 +2,14 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"texture_size": [32, 32],
 	"textures": {
-		"1": "girsignals:blocks/shield_black",
-		"15": "girsignals:blocks/semaphore_distant"
+		"1": "girsignals:blocks/default/shield_black",
+		"15": "girsignals:blocks/semaphore/semaphore_distant"
 	},
 	"elements": [
 		{
 			"name": "sign",
 			"from": [5.5, -8, 6],
 			"to": [10.5, -7, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-2, -8, -2]},
 			"faces": {
 				"north": {"uv": [11, 7, 13.5, 7.5], "texture": "#15"},
 				"east": {"uv": [0, 0, 0.5, 0.5], "texture": "#15"},
@@ -23,7 +22,6 @@
 			"name": "sign",
 			"from": [3.5, -7, 6],
 			"to": [12.5, -6, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-4, -7, -2]},
 			"faces": {
 				"north": {"uv": [10, 6.5, 14.5, 7], "texture": "#15"},
 				"east": {"uv": [0, 0, 0.5, 0.5], "texture": "#15"},
@@ -36,7 +34,6 @@
 			"name": "sign",
 			"from": [2.5, -6, 6],
 			"to": [13.5, -5, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-5, -6, -2]},
 			"faces": {
 				"north": {"uv": [9.5, 6, 15, 6.5], "texture": "#15"},
 				"east": {"uv": [0, 0, 0.5, 0.5], "texture": "#15"},
@@ -49,7 +46,6 @@
 			"name": "sign",
 			"from": [1.5, -5, 6],
 			"to": [14.5, -3, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-6, -5, -2]},
 			"faces": {
 				"north": {"uv": [9, 5, 15.5, 6], "texture": "#15"},
 				"east": {"uv": [0, 0, 0.5, 1], "texture": "#15"},
@@ -62,7 +58,6 @@
 			"name": "sign",
 			"from": [0.5, -3, 6],
 			"to": [15.5, 2, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-7, -3, -2]},
 			"faces": {
 				"north": {"uv": [8.5, 2.5, 16, 5], "texture": "#15"},
 				"east": {"uv": [0, 0, 0.5, 2.5], "texture": "#15"},
@@ -76,7 +71,6 @@
 			"name": "sign",
 			"from": [1.5, 2, 6],
 			"to": [14.5, 4, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-6, 2, -2]},
 			"faces": {
 				"north": {"uv": [9, 1.5, 15.5, 2.5], "texture": "#15"},
 				"east": {"uv": [0, 0, 0.5, 1], "texture": "#15"},
@@ -89,7 +83,6 @@
 			"name": "sign",
 			"from": [2.5, 4, 6],
 			"to": [13.5, 5, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-5, 4, -2]},
 			"faces": {
 				"north": {"uv": [9.5, 1, 15, 1.5], "texture": "#15"},
 				"east": {"uv": [0, 0, 0.5, 0.5], "texture": "#15"},
@@ -102,7 +95,6 @@
 			"name": "sign",
 			"from": [3.5, 5, 6],
 			"to": [12.5, 6, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-4, 5, -2]},
 			"faces": {
 				"north": {"uv": [10, 0.5, 14.5, 1], "texture": "#15"},
 				"east": {"uv": [0, 0, 0.5, 0.5], "texture": "#15"},
@@ -115,7 +107,6 @@
 			"name": "sign",
 			"from": [5.5, 6, 6],
 			"to": [10.5, 7, 7],
-			"rotation": {"angle": 0, "axis": "y", "origin": [-2, 6, -2]},
 			"faces": {
 				"north": {"uv": [11, 0, 13.5, 0.5], "texture": "#15"},
 				"east": {"uv": [11, 0, 13.5, 0.5], "texture": "#15"},
@@ -128,7 +119,6 @@
 			"name": "coil_wire_wing5",
 			"from": [7.5, -2, 7],
 			"to": [8.5, -1, 9],
-			"rotation": {"angle": 0, "axis": "y", "origin": [0, -2, -2]},
 			"faces": {
 				"north": {"uv": [0, 0, 1.5, 0.5], "texture": "#1"},
 				"east": {"uv": [0, 0, 1.5, 0.5], "texture": "#1"},

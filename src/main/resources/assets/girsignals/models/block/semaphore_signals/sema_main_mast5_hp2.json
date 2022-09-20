@@ -2,16 +2,15 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "girsignals:blocks/mast",
-		"1": "girsignals:blocks/shield_black",
-		"2": "girsignals:blocks/shield_gray"
+		"0": "girsignals:blocks/default/mast",
+		"1": "girsignals:blocks/default/shield_black",
+		"2": "girsignals:blocks/default/shield_gray"
 	},
 	"elements": [
 		{
 			"name": "wire_wing2",
 			"from": [11, 0, 8.25],
 			"to": [11.5, 11, 8.75],
-			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, -1]},
 			"faces": {
 				"north": {"uv": [0, 0, 0.25, 5.5], "texture": "#2"},
 				"east": {"uv": [0, 0, 0.25, 5.5], "texture": "#2"},
@@ -23,7 +22,6 @@
 			"name": "mast",
 			"from": [10.5, 8, 6.5],
 			"to": [12, 9, 9],
-			"rotation": {"angle": 0, "axis": "y", "origin": [0, 10, -6]},
 			"faces": {
 				"north": {"uv": [0, 0, 0.75, 0.5], "texture": "#1"},
 				"east": {"uv": [0, 0, 1.25, 0.5], "texture": "#1"},
@@ -37,7 +35,6 @@
 			"name": "mast",
 			"from": [10.5, 8, 2.5],
 			"to": [11.5, 9, 5.5],
-			"rotation": {"angle": 0, "axis": "y", "origin": [0, 10, -6]},
 			"faces": {
 				"north": {"uv": [0, 0, 0.5, 0.5], "texture": "#0"},
 				"east": {"uv": [0, 0, 1.5, 0.5], "texture": "#0"},
@@ -51,7 +48,6 @@
 			"name": "lamp",
 			"from": [3.5, 3, 6.5],
 			"to": [8.5, 5, 8.5],
-			"rotation": {"angle": 0, "axis": "y", "origin": [5, 7, -1.5]},
 			"faces": {
 				"north": {"uv": [0, 0, 3, 5], "texture": "#1"},
 				"east": {"uv": [0, 0, 3, 5], "texture": "#1"},
@@ -65,7 +61,6 @@
 			"name": "lamp",
 			"from": [-0.5, 2, 5.5],
 			"to": [3.5, 6, 9.5],
-			"rotation": {"angle": 0, "axis": "y", "origin": [1, 6, -2.5]},
 			"faces": {
 				"north": {"uv": [0, 0, 2, 2], "texture": "#1"},
 				"east": {"uv": [0, 0, 2, 2], "texture": "#1"},
