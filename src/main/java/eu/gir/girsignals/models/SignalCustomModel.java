@@ -135,14 +135,15 @@ public class SignalCustomModel implements IModel {
             final Builder<String, String> build = ImmutableMap.builder();
             for (int i = 0; i < (int) Math.floor(strings.length / 2); i++)
                 build.put(strings[i * 2], strings[i * 2 + 1]);
+
             m = m.retexture(build.build());
         }
 
         if (!map.isEmpty() && map != null) {
-            Builder<String, String> build = ImmutableMap.builder();
-            for (final Map.Entry<String, String> entry : map.entrySet()) {
+            final Builder<String, String> build = ImmutableMap.builder();
+            for (final Map.Entry<String, String> entry : map.entrySet())
                 build.put(entry.getKey(), entry.getValue());
-            }
+
             m = m.retexture(build.build());
         }
 
