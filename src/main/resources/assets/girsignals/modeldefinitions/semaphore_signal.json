@@ -275,10 +275,18 @@
 			],
 			"y": 4
 		},
-		"semaphore_signals/sema_distant_lamps": {
+		"semaphore_signals/sema_distant_vr0": {
 			"textures": [
 				{
-					"blockstate": "hasandisnot(SEMATYPE)"
+					"blockstate": "hasandisnot(SEMATYPE) && has(VR2) && with(VR_WING.VR0)"
+				}
+			],
+			"y": 2
+		},
+		"semaphore_signals/sema_distant_vr1": {
+			"textures": [
+				{
+					"blockstate": "hasandisnot(SEMATYPE) && has(VR2) && with(VR_WING.VR1)"
 				}
 			],
 			"y": 2
@@ -286,15 +294,7 @@
 		"semaphore_signals/sema_distant_vr2": {
 			"textures": [
 				{
-					"blockstate": "hasandisnot(SEMATYPE) && has(VR2) && hasandisnot(VR_WING)"
-				}
-			],
-			"y": 2
-		},
-		"semaphore_signals/sema_distant_vr2_on": {
-			"textures": [
-				{
-					"blockstate": "hasandisnot(SEMATYPE) && has(VR2) && hasandis(VR_WING)"
+					"blockstate": "hasandisnot(SEMATYPE) && has(VR2) && with(VR_WING.VR2)"
 				}
 			],
 			"y": 2

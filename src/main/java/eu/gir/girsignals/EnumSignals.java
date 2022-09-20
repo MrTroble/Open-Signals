@@ -215,4 +215,8 @@ public final class EnumSignals {
         DISABLED, NAME_ASSENDING, NAME_DESCENIDNG, TYPE_ASSANDING, TYPE_DESCENDING,
         DISTANCE_ASSANDING, DISTANCE_DSECENDING;
     }
+    
+    public enum SemaDist implements DefaultName<SemaDist> {
+        VR0, VR1, VR2;
+    }
 }
