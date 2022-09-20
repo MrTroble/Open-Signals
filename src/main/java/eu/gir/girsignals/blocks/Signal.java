@@ -69,6 +69,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public float getAngel() {
             return this.ordinal() * 22.5f;
         }
+
+        public double getRadians() {
+            return (this.ordinal() / 16.0) * Math.PI * 2.0;
+        }
     }
 
     public static class SignalProperties {
@@ -475,6 +479,5 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
         return false;
     }
-    
-    
+
 }
