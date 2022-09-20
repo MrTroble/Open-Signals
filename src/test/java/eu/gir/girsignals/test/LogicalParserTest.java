@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.HPType;
+import eu.gir.girsignals.EnumSignals.MastSignal;
 import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
@@ -270,6 +271,9 @@ public class LogicalParserTest {
 
         testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0),
                 LogicParser.parse("(((HAS(StoPSigNal))))", info).pop());
+
+        testNode(new DummyBlockState(SignalHV.MASTSIGN, MastSignal.WYWYW),
+                LogicParser.parse("with(mastsign.WYWYW)", info).pop());
 
         testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0), LogicParser
                 .parse("with(STOPSIGNAL.HP0) && (with(HPTYPE.STOPSIGNAL) || !has(HPTYPE))", info)

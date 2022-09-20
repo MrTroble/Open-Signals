@@ -125,31 +125,24 @@ public class SignalCustomModel implements IModel {
     protected void register(final String name, final Predicate<IExtendedBlockState> state,
             final float x, final float y, final float z, @Nullable final Map<String, String> map,
             @Nullable final String... strings) {
+        
+        if (map.isEmpty())
+            return;
+
         IModel m = ModelLoaderRegistry.getModelOrLogError(
                 new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
                 "Couldn't find " + name);
         m = m.smoothLighting(false);
-        if (strings != null && strings.length > 0) {
-            final Builder<String, String> build = ImmutableMap.builder();
-            for (int i = 0; i < (int) Math.floor(strings.length / 2); i++)
-                build.put(strings[i * 2], strings[i * 2 + 1]);
-            m = m.retexture(build.build());
+
+        Builder<String, String> build = ImmutableMap.builder();
+        for (final Map.Entry<String, String> entry : map.entrySet()) {
+            build.put(entry.getKey(), entry.getValue());
         }
-        // This strings just until the new RenderSystem is fully included!
-        String str = "";
-        if (map != null && !map.isEmpty()) {
-            Builder<String, String> build = ImmutableMap.builder();
-            for (final Map.Entry<String, String> entry : map.entrySet()) {
-                final String key = entry.getKey();
-                final String val = entry.getValue();
-                str = key;
-                if (str.length() > 2) {
-                    build.put(key, val);
-                }
-            }
-            m = m.retexture(build.build());
-        }
+
+        m = m.retexture(build.build());
+
         m.getTextures().stream().filter(rs -> !textures.contains(rs)).forEach(textures::add);
         modelCache.put(state, Pair.of(m, new Vector3f(x, y, z)));
+        System.out.println();
     }
 }

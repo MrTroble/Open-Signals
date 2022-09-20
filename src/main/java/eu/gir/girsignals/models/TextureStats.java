@@ -44,7 +44,7 @@ public class TextureStats {
     }
 
     /**
-     * @return boolean: if this model with these parameters should be loaded
+     * @return true if this model with these parameters should be loaded
      */
 
     public boolean appendExtention(final String seprop, final String enums,
@@ -56,7 +56,6 @@ public class TextureStats {
         if (retexture == null) {
 
             retexture = new HashMap<>();
-
         }
 
         retexture.put(retexturekey, retexureval);
@@ -70,6 +69,5 @@ public class TextureStats {
 
         blockstate = blockstate.replace("prop.prop", seprop + "." + enums);
         return true;
-
     }
 }

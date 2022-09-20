@@ -200,6 +200,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                                                 enums, retexturekey,
                                                                                 retextureval,
                                                                                 modelname);
+
                                                                 if (load) {
 
                                                                     state = LogicParser.predicate(

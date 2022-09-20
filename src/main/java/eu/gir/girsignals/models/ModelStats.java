@@ -60,10 +60,12 @@ public class ModelStats {
     }
 
     private static String getLampPath(final String lampname, final Map<String, String> map) {
-        if (map != null) {
-            for (final Map.Entry<String, String> entry : map.entrySet()) {
-                if (entry.getKey().equalsIgnoreCase(lampname))
-                    return entry.getValue();
+        if (lampname.startsWith("lamp_")) {
+            if (map != null) {
+                for (final Map.Entry<String, String> entry : map.entrySet()) {
+                    if (entry.getKey().equalsIgnoreCase(lampname))
+                        return entry.getValue();
+                }
             }
         }
         return lampname;
