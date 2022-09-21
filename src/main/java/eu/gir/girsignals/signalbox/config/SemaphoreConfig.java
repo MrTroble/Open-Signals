@@ -19,9 +19,7 @@ import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public final class SemaphoreConfig implements ISignalAutoconfig {
 
-    @SuppressWarnings({
-            "rawtypes"
-    })
+    @SuppressWarnings("rawtypes")
     private static void checkSpeed(final Optional<ZS32> opt,
             final HashMap<SEProperty, Object> values) {
 
