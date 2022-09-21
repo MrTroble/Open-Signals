@@ -1,0 +1,7 @@
+{
+    "extention": {
+        "ARROW_LEFT": "girsignals:blocks/arrows/arrow_left",
+        "ARROW_RIGHT": "girsignals:blocks/arrows/arrow_right",
+        "ARROW_LEFT_RIGHT": "girsignals:blocks/arrows/arrow_left_right"
+    }
+}
