@@ -1,0 +1,85 @@
+{
+	"textures": {},
+	"models": {
+		"sh/sh_mast": {
+			"textures": [
+				{
+					"blockstate": "hasandis(SH_HIGH)"
+				}
+			],
+			"y": 0
+		},
+		"sh/sh_mast1": {
+			"textures": [
+				{
+					"blockstate": "hasandis(SH_HIGH)"
+				}
+			],
+			"y": 1
+		},
+		"sh/sh0_mech": {
+			"textures": [
+				{
+					"blockstate": "with(SH_MECH.SH0) && hasandisnot(SH_HIGH)"
+				}
+			],
+			"y": 0
+		},
+		"sh/sh1_mech": {
+			"textures": [
+				{
+					"blockstate": "with(SH_MECH.SH1) && hasandisnot(SH_HIGH)"
+				}
+			],
+			"y": 0
+		},
+		"sh/sh1_gsp2_mech": {
+			"textures": [
+				{
+					"blockstate": "with(SH_MECH.SH1_GSP2) && hasandisnot(SH_HIGH)"
+				}
+			],
+			"y": 0
+		},
+		"sh/sh0_mech1": {
+			"textures": [
+				{
+					"blockstate": "with(SH_MECH.SH0) && hasandis(SH_HIGH)"
+				}
+			],
+			"y": 2
+		},
+		"sh/sh1_mech1": {
+			"textures": [
+				{
+					"blockstate": "with(SH_MECH.SH1) && hasandis(SH_HIGH)"
+				}
+			],
+			"y": 2
+		},
+		"sh/sh1_gsp2_mech1": {
+			"textures": [
+				{
+					"blockstate": "with(SH_MECH.SH1_GSP2) && hasandis(SH_HIGH)"
+				}
+			],
+			"y": 2
+		},
+		"sh/sh_mech_number": {
+			"textures": [
+				{
+					"blockstate": "hasandis(CUSTOMNAME) && hasandisnot(SH_HIGH)"
+				}
+			],
+			"y": 0
+		},
+		"sh/sh_mech_number1": {
+			"textures": [
+				{
+					"blockstate": "hasandis(CUSTOMNAME) && hasandis(SH_HIGH)"
+				}
+			],
+			"y": 2
+		}
+	}
+}

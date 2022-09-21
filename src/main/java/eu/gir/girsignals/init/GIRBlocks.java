@@ -27,6 +27,7 @@ import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
+import eu.gir.girsignals.blocks.signals.SignalSHMech;
 import eu.gir.girsignals.blocks.signals.SignalSemaphore;
 import eu.gir.girsignals.blocks.signals.SignalTram;
 import net.minecraft.block.Block;
@@ -71,7 +72,8 @@ public final class GIRBlocks {
     public static final RedstoneIO REDSTONE_IN = new RedstoneInput();
     public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
     public static final SignalSemaphore SEMAPHORE_SIGNAL = new SignalSemaphore();
-
+    public static final SignalSHMech SH_MECH = new SignalSHMech(); 
+    
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
     public static void init() {

@@ -99,6 +99,10 @@ public final class EnumSignals {
     public enum SHLight implements Offable<SHLight> {
         OFF, SH0, SH1, STATUS_LIGHT;
     }
+    
+    public enum SHMech implements DefaultName<SHMech> {
+        SH0, SH1, SH1_GSP2;
+    }
 
     public enum TramType implements DefaultName<TramType> {
         TRAM, CAR, PEDESTRIAN, SWITCH;
