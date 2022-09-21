@@ -66,7 +66,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return this.name().toLowerCase();
         }
 
-        public float getAngel() {
+        public float getDegree() {
             return this.ordinal() * 22.5f;
         }
 
@@ -421,7 +421,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         final BlockPos pos = te.getPos();
         final IBlockState state = world.getBlockState(pos);
         final SignalAngel face = state.getValue(Signal.ANGEL);
-        final float angel = face.getAngel();
+        final float angel = face.getDegree();
 
         final String[] display = te.getDisplayName().getFormattedText().split("\\[n\\]");
         final float width = this.prop.signWidth;

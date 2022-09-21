@@ -1,0 +1,17 @@
+{
+    "textures": {},
+    "models": {
+        "other_signals/staion_number": {
+            "textures": [
+                {
+                    "blockstate": "with(prop.prop)",
+                    "extentions": {
+                        "stationnumber.json": {
+                            "STATIONNUMBER": "overlay"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

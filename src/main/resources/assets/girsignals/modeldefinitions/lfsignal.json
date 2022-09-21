@@ -1,0 +1,97 @@
+{
+    "textures": {},
+    "models": {
+        "mast_lamps": {
+            "textures": [
+                {
+                    "blockstate": "with(LFTYPE.LF1)"
+                }
+            ],
+            "y": 0
+        },
+        "mast": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "lf/lf1": {
+            "textures": [
+                {
+                    "blockstate": "with(LFTYPE.LF1) && with(prop.prop)",
+                    "extentions": {
+                        "lf.json": {
+                            "INDICATOR": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "lf/lf1_2": {
+            "textures": [
+                {
+                    "blockstate": "with(LFTYPE.LF2) && with(prop.prop)",
+                    "extentions": {
+                        "lf.json": {
+                            "INDICATOR": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "lf/lf3_5": {
+            "textures": [
+                {
+                    "blockstate": "with(LFTYPE.LF3_5) && with(prop.prop)",
+                    "extentions": {
+                        "lf.json": {
+                            "INDICATOR": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "lf/lf4": {
+            "textures": [
+                {
+                    "blockstate": "with(LFTYPE.LF4) && with(prop.prop)",
+                    "extentions": {
+                        "lf.json": {
+                            "INDICATOR": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "lf/lf6": {
+            "textures": [
+                {
+                    "blockstate": "with(LFTYPE.LF6) && with(prop.prop)",
+                    "extentions": {
+                        "lf.json": {
+                            "INDICATOR": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "lf/lf7": {
+            "textures": [
+                {
+                    "blockstate": "with(LFTYPE.LF7) && with(prop.prop)",
+                    "extentions": {
+                        "lf.json": {
+                            "INDICATOR": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 1
+        }
+    }
+}
