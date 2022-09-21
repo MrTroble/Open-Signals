@@ -1,0 +1,17 @@
+{
+    "textures": {},
+    "models": {
+        "sh/sh2_mast": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "sh/sh2": {
+            "textures": [
+                {}
+            ],
+            "y": 1
+        }
+    }
+}

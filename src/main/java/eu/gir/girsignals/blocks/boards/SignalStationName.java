@@ -39,7 +39,7 @@ public class SignalStationName extends Signal {
         final BlockPos pos = te.getPos();
         final IBlockState state = world.getBlockState(pos);
         final SignalAngel face = state.getValue(Signal.ANGEL);
-        final float angel = face.getAngel();
+        final float angel = face.getDegree();
 
         final String display = te.getDisplayName().getFormattedText();
         final float width = font.getStringWidth(display);
