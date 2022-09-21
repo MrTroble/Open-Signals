@@ -497,7 +497,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                     Maps.immutableEntry(NE.NE3_4, 3.0f), Maps.immutableEntry(NE.NE3_5, 3.0f),
                     Maps.immutableEntry(NE.NE4, 3.0f), Maps.immutableEntry(NE.NE2_1, 1.125f),
                     Maps.immutableEntry(NE.NE2, 1.125f), Maps.immutableEntry(NE.NE1, 1.9375f),
-                    Maps.immutableEntry(NE.NE4_small, 0.875f), Maps.immutableEntry(NE.NE6, 2.0f)
+                    Maps.immutableEntry(NE.NE4_SMALL, 0.875f), Maps.immutableEntry(NE.NE6, 2.0f)
             };
             for (final Map.Entry<NE, Float> entry : entrys) {
                 for (final Arrow arrow : Arrow.values()) {
