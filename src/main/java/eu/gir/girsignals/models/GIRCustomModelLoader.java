@@ -445,10 +445,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                     0, "rednorth", "girsignals:blocks/lamps/lamp_yellow_blink", "greennorth",
                     "girsignals:blocks/lamps/lamp_yellow_blink_i");
         });
-        registeredModels.put("shsignal", cm -> {
-            cm.register("sh/sh2_mast", ebs -> true, 0);
-            cm.register("sh/sh2", ebs -> true, 1);
-        });
         registeredModels.put("rasignal", cm -> {
             cm.register("mast", with(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate()
                     .and(with(SignalRA.RATYPE, mast -> mast.equals(RA.RA6_9)).negate()), 0);
