@@ -216,6 +216,10 @@ public final class EnumSignals {
         DISTANCE_ASSANDING, DISTANCE_DSECENDING;
     }
     
+    public enum SemaType implements DefaultName<SemaType> {
+        DIST, MAIN, MAIN_SMALL;
+    }
+    
     public enum SemaDist implements DefaultName<SemaDist> {
         VR0, VR1, VR2;
     }

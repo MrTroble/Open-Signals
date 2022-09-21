@@ -4,13 +4,14 @@
 	"textures": {
 		"1": "girsignals:blocks/default/shield_black",
 		"4": "girsignals:blocks/semaphore/semaphore",
-		"9": "girsignals:blocks/semaphore/semaphore_lamps2_dark"
+		"9": "girsignals:blocks/semaphore/semaphore_lamps2"
 	},
 	"elements": [
 		{
 			"name": "wing2",
 			"from": [9, 0, 3.5],
 			"to": [13, 32, 4.5],
+			"rotation": {"angle": 45, "axis": "z", "origin": [11, 8.5, 3]},
 			"faces": {
 				"north": {"uv": [0, 0.5, 16, 2.5], "rotation": 270, "texture": "#4"},
 				"east": {"uv": [0, 6, 16, 6.5], "rotation": 90, "texture": "#4"},
@@ -24,6 +25,7 @@
 			"name": "wing2",
 			"from": [13, 27, 3.5],
 			"to": [14, 31, 4.5],
+			"rotation": {"angle": 45, "axis": "z", "origin": [11, 8.5, 3]},
 			"faces": {
 				"north": {"uv": [13.5, 0, 15.5, 0.5], "rotation": 270, "texture": "#4"},
 				"east": {"uv": [12.5, 9.5, 14.5, 10], "rotation": 90, "texture": "#4"},
@@ -37,6 +39,7 @@
 			"name": "wing2",
 			"from": [8, 27, 3.5],
 			"to": [9, 31, 4.5],
+			"rotation": {"angle": 45, "axis": "z", "origin": [11, 8.5, 3]},
 			"faces": {
 				"north": {"uv": [13.5, 2.5, 15.5, 3], "rotation": 270, "texture": "#4"},
 				"east": {"uv": [0, 0, 0.5, 0.5], "rotation": 90, "texture": "#missing"},
@@ -48,8 +51,8 @@
 		},
 		{
 			"name": "shield",
-			"from": [-4.42893, 0.32233, 4.5],
-			"to": [5.57107, 6.32233, 5.5],
+			"from": [-8.42893, 0.32233, 4.5],
+			"to": [1.57107, 6.32233, 5.5],
 			"rotation": {"angle": -45, "axis": "z", "origin": [0, 0, 0]},
 			"faces": {
 				"north": {"uv": [0, 0, 10, 6], "texture": "#9"},

@@ -4,7 +4,7 @@
 	"textures": {
 		"1": "girsignals:blocks/default/shield_black",
 		"15": "girsignals:blocks/semaphore/semaphore_distant",
-		"18": "girsignals:blocks/semaphore/semaphore_lamps3",
+		"18": "girsignals:blocks/semaphore/semaphore_lamps3_yellow",
 		"particle": "girsignals:blocks/default/shield_black"
 	},
 	"elements": [

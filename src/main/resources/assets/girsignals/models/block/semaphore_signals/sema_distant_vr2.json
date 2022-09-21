@@ -3,8 +3,9 @@
 	"texture_size": [32, 32],
 	"textures": {
 		"1": "girsignals:blocks/default/shield_black",
+		"3": "girsignals:blocks/semaphore/semaphore_lamps3_yellow",
 		"15": "girsignals:blocks/semaphore/semaphore_distant",
-		"18": "girsignals:blocks/semaphore/semaphore_lamps3",
+		"18": "girsignals:blocks/semaphore/semaphore_lamps3_green",
 		"particle": "girsignals:blocks/default/shield_black"
 	},
 	"elements": [
@@ -66,7 +67,7 @@
 			"from": [10.5, 2, 6],
 			"to": [16.5, 12, 7],
 			"faces": {
-				"north": {"uv": [0, 0, 10, 6], "rotation": 90, "texture": "#18"},
+				"north": {"uv": [0, 0, 10, 6], "rotation": 90, "texture": "#3"},
 				"east": {"uv": [0, 0, 0.5, 5], "texture": "#1"},
 				"south": {"uv": [0, 0, 3, 5], "texture": "#1"},
 				"west": {"uv": [0, 0, 0.5, 5], "texture": "#1"},
