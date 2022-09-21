@@ -4,7 +4,7 @@
         "mast": {
             "textures": [
                 {
-                    "blockstate": "with(NETYPE.NE6) || !with(NETYPE.NE4_SMALL)"
+                    "blockstate": "with(NETYPE.NE6) || !with(NETYPE.NE4_small)"
                 }
             ],
             "y": 0
@@ -81,7 +81,7 @@
         "ne/ne_small": {
             "textures": [
                 {
-                    "blockstate": "with(NETYPE.NE4_SMALL)"
+                    "blockstate": "with(NETYPE.NE4_small)"
                 }
             ],
             "y": 0
@@ -122,6 +122,119 @@
                 }
             ],
             "y": 1
+        },
+        "arrow": {
+            "textures": [
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE5)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.875
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_2)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_4)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE4)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE2)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.125
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE4_small)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 0.875
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_1)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_3)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_5)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE2_1)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.125
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE1)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.9375
+                },
+                {
+                    "blockstate": "with(prop.prop) && with(NETPYE.NE6)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 2.0
+                }
+            ],
+            "y": 0
         }
     }
 }

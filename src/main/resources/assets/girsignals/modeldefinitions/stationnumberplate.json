@@ -1,7 +1,7 @@
 {
     "textures": {},
     "models": {
-        "other_signals/staion_number": {
+        "other_signals/station_number": {
             "textures": [
                 {
                     "blockstate": "with(prop.prop)",

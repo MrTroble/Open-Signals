@@ -9,13 +9,13 @@
             ],
             "y": 0
         },
-        "bue/bue_mast1": {
+        "bue/bue_mast_1": {
             "textures": [
                 {}
             ],
             "y": 1
         },
-        "bue/bue_mast2": {
+        "bue/bue_mast_2": {
             "textures": [
                 {}
             ],

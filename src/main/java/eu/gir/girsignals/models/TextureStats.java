@@ -20,15 +20,15 @@ public class TextureStats {
         return blockstate == null;
     }
 
-    public void resetStates(final String newblockstate, final Map<String, String> retexture) {
-
-        this.blockstate = newblockstate;
-
-        this.retexture = retexture;
-    }
-
     public String getBlockstate() {
         return blockstate;
+    }
+
+    public void resetStates(final String state, final Map<String, String> retexture) {
+
+        blockstate = state;
+
+        this.retexture = retexture;
     }
 
     public Map<String, String> getRetextures() {
@@ -63,11 +63,13 @@ public class TextureStats {
         if (!blockstate.contains("with(prop.prop)")) {
 
             GirsignalsMain.log.error("Unable to load an extention into " + modelname
-                    + "! Did you included 'with(prop.prop)' to your blockstate?");
+                    + "! Did you included 'with(prop.prop)' to your blockstate? The state was "
+                    + blockstate + ".");
             return false;
         }
 
         blockstate = blockstate.replace("prop.prop", seprop + "." + enums);
         return true;
+
     }
 }

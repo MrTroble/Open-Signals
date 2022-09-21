@@ -12,13 +12,9 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.google.common.collect.Maps;
-
-import eu.gir.girsignals.EnumSignals.Arrow;
 import eu.gir.girsignals.EnumSignals.BUE;
 import eu.gir.girsignals.EnumSignals.BUEAdd;
 import eu.gir.girsignals.EnumSignals.CAR;
-import eu.gir.girsignals.EnumSignals.NE;
 import eu.gir.girsignals.EnumSignals.PED;
 import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.RALight;
@@ -33,7 +29,6 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
-import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
@@ -180,12 +175,16 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                                                 retextureval,
                                                                                 modelname);
 
+                                                                final String blstate = texturestate
+                                                                        .getBlockstate();
+
+                                                                texturestate.resetStates(blockstate,
+                                                                        retexture);
+
                                                                 if (load) {
 
                                                                     state = LogicParser.predicate(
-                                                                            texturestate
-                                                                                    .getBlockstate(),
-                                                                            parsinginfo);
+                                                                            blstate, parsinginfo);
 
                                                                     cm.register(modelname, state,
                                                                             modelstats.getX(),
@@ -196,12 +195,9 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                                                             texturestate
                                                                                                     .getRetextures(),
                                                                                             content.getTextures()));
+                                                                    extentionloaded = true;
+
                                                                 }
-
-                                                                texturestate.resetStates(blockstate,
-                                                                        retexture);
-
-                                                                extentionloaded = true;
                                                             }
                                                         }
                                                     }
@@ -524,28 +520,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                             .and(with(SignalBUE.BUETYPE, bue -> bue.equals(BUE.BUE4))
                                     .or(with(SignalBUE.BUETYPE, bue -> bue.equals(BUE.BUE5)))),
                     2);
-        });
-        registeredModels.put("nesignal", cm -> {
-            @SuppressWarnings("unchecked")
-            final Map.Entry<NE, Float>[] entrys = new Map.Entry[] {
-                    Maps.immutableEntry(NE.NE5, 1.875f), Maps.immutableEntry(NE.NE3_1, 3.0f),
-                    Maps.immutableEntry(NE.NE3_2, 3.0f), Maps.immutableEntry(NE.NE3_3, 3.0f),
-                    Maps.immutableEntry(NE.NE3_4, 3.0f), Maps.immutableEntry(NE.NE3_5, 3.0f),
-                    Maps.immutableEntry(NE.NE4, 3.0f), Maps.immutableEntry(NE.NE2_1, 1.125f),
-                    Maps.immutableEntry(NE.NE2, 1.125f), Maps.immutableEntry(NE.NE1, 1.9375f),
-                    Maps.immutableEntry(NE.NE4_small, 0.875f), Maps.immutableEntry(NE.NE6, 2.0f)
-            };
-            for (final Map.Entry<NE, Float> entry : entrys) {
-                for (final Arrow arrow : Arrow.values()) {
-                    if (arrow == Arrow.OFF)
-                        continue;
-                    cm.register("arrow",
-                            with(SignalNE.ARROWPROP, arrow::equals)
-                                    .and(with(SignalNE.NETYPE, entry.getKey()::equals)),
-                            entry.getValue(), "1",
-                            "girsignals:blocks/arrows/" + arrow.name().toLowerCase());
-                }
-            }
         });
         registeredModels.put("wnsignal", cm -> {
             cm.register("wn/wn1_2", hasAndIsNot(SignalWN.WNTYPE)
