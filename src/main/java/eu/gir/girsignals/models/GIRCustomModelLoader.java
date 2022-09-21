@@ -207,9 +207,15 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                                             parsinginfo);
 
                                                                     cm.register(modelname, state,
-                                                                            modelstats.getX(),
-                                                                            modelstats.getY(),
-                                                                            modelstats.getZ(),
+                                                                            modelstats.getX(
+                                                                                    texturestate
+                                                                                            .getOffsetX()),
+                                                                            modelstats.getY(
+                                                                                    texturestate
+                                                                                            .getOffsetY()),
+                                                                            modelstats.getZ(
+                                                                                    texturestate
+                                                                                            .getOffsetZ()),
                                                                             ModelStats
                                                                                     .createRetexture(
                                                                                             texturestate
@@ -237,16 +243,19 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                     if (texturestate.isautoBlockstate()) {
 
                                         cm.register(modelname, new ImplAutoBlockstatePredicate(),
-                                                modelstats.getX(), modelstats.getY(),
-                                                modelstats.getZ(),
+                                                modelstats.getX(texturestate.getOffsetX()),
+                                                modelstats.getY(texturestate.getOffsetY()),
+                                                modelstats.getZ(texturestate.getOffsetZ()),
                                                 ModelStats.createRetexture(
                                                         texturestate.getRetextures(),
                                                         content.getTextures()));
 
                                     } else if (state != null && !texturestate.isautoBlockstate()) {
 
-                                        cm.register(modelname, state, modelstats.getX(),
-                                                modelstats.getY(), modelstats.getZ(),
+                                        cm.register(modelname, state,
+                                                modelstats.getX(texturestate.getOffsetX()),
+                                                modelstats.getY(texturestate.getOffsetY()),
+                                                modelstats.getZ(texturestate.getOffsetZ()),
                                                 ModelStats.createRetexture(
                                                         texturestate.getRetextures(),
                                                         content.getTextures()));
