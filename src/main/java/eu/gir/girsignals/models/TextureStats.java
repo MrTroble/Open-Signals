@@ -7,10 +7,26 @@ import eu.gir.girsignals.GirsignalsMain;
 
 public class TextureStats {
 
+    private float x = 0;
+    private float y = 0;
+    private float z = 0;
+
     private boolean loadOFFstate = true;
     private String blockstate;
     private Map<String, String> retexture;
     private Map<String, Map<String, String>> extentions;
+
+    public float getOffsetX() {
+        return x;
+    }
+
+    public float getOffsetY() {
+        return y;
+    }
+
+    public float getOffsetZ() {
+        return z;
+    }
 
     public boolean loadOFFstate() {
         return loadOFFstate;
