@@ -22,7 +22,6 @@ import eu.gir.girsignals.EnumSignals.NE;
 import eu.gir.girsignals.EnumSignals.PED;
 import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.RALight;
-import eu.gir.girsignals.EnumSignals.SHLight;
 import eu.gir.girsignals.EnumSignals.Tram;
 import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.EnumSignals.TramSwitch;
@@ -36,7 +35,6 @@ import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalWN;
-import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalTram;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
 import eu.gir.girsignals.models.parser.LogicParser;
@@ -188,9 +186,15 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                                             parsinginfo);
 
                                                                     cm.register(modelname, state,
-                                                                            modelstats.getX(),
-                                                                            modelstats.getY(),
-                                                                            modelstats.getZ(),
+                                                                            modelstats.getX(
+                                                                                    texturestate
+                                                                                            .getOffsetX()),
+                                                                            modelstats.getY(
+                                                                                    texturestate
+                                                                                            .getOffsetY()),
+                                                                            modelstats.getZ(
+                                                                                    texturestate
+                                                                                            .getOffsetZ()),
                                                                             ModelStats
                                                                                     .createRetexture(
                                                                                             texturestate
@@ -218,16 +222,19 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                     if (texturestate.isautoBlockstate()) {
 
                                         cm.register(modelname, new ImplAutoBlockstatePredicate(),
-                                                modelstats.getX(), modelstats.getY(),
-                                                modelstats.getZ(),
+                                                modelstats.getX(texturestate.getOffsetX()),
+                                                modelstats.getY(texturestate.getOffsetY()),
+                                                modelstats.getZ(texturestate.getOffsetZ()),
                                                 ModelStats.createRetexture(
                                                         texturestate.getRetextures(),
                                                         content.getTextures()));
 
                                     } else if (state != null && !texturestate.isautoBlockstate()) {
 
-                                        cm.register(modelname, state, modelstats.getX(),
-                                                modelstats.getY(), modelstats.getZ(),
+                                        cm.register(modelname, state,
+                                                modelstats.getX(texturestate.getOffsetX()),
+                                                modelstats.getY(texturestate.getOffsetY()),
+                                                modelstats.getZ(texturestate.getOffsetZ()),
                                                 ModelStats.createRetexture(
                                                         texturestate.getRetextures(),
                                                         content.getTextures()));
@@ -243,49 +250,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             }
         }
 
-        registeredModels.put("shlight", cm -> {
-            // SH ground off
-            cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SHLight.OFF))
-                    .and(hasAndIsNot(SignalSHLight.SH_HIGH)), 0);
-            // SH ground sh0
-            cm.register("sh/sh_light",
-                    with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SHLight.SH0))
-                            .and(hasAndIsNot(SignalSHLight.SH_HIGH)),
-                    0, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red");
-            // SH ground sh1
-            cm.register("sh/sh_light",
-                    with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SHLight.SH1))
-                            .and(hasAndIsNot(SignalSHLight.SH_HIGH)),
-                    0, "lamp_whitenorth", "girsignals:blocks/lamps/lamp_white", "lamp_white2north",
-                    "girsignals:blocks/lamps/lamp_white");
-            // SH ground statuslight
-            cm.register("sh/sh_light",
-                    with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SHLight.STATUS_LIGHT))
-                            .and(hasAndIsNot(SignalSHLight.SH_HIGH)),
-                    0, "lamp_whitenorth", "girsignals:blocks/lamps/lamp_white");
-            // Mast
-            cm.register("sh/sh_mast", hasAndIs(SignalSHLight.SH_HIGH), 0);
-            cm.register("sh/sh_mast", hasAndIs(SignalSHLight.SH_HIGH), 1);
-            // SH above off
-            cm.register("sh/sh_light", with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SHLight.OFF))
-                    .and(hasAndIs(SignalSHLight.SH_HIGH)), 2);
-            // SH above sh0
-            cm.register("sh/sh_light",
-                    with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SHLight.SH0))
-                            .and(hasAndIs(SignalSHLight.SH_HIGH)),
-                    2, "lamp_rednorth", "girsignals:blocks/lamps/lamp_red");
-            // SH above sh1
-            cm.register("sh/sh_light",
-                    with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SHLight.SH1))
-                            .and(hasAndIs(SignalSHLight.SH_HIGH)),
-                    2, "lamp_whitenorth", "girsignals:blocks/lamps/lamp_white", "lamp_white2north",
-                    "girsignals:blocks/lamps/lamp_white");
-            // SH above statuslight
-            cm.register("sh/sh_light",
-                    with(SignalSHLight.SHLIGHT_0, sh -> sh.equals(SHLight.STATUS_LIGHT))
-                            .and(hasAndIs(SignalSHLight.SH_HIGH)),
-                    2, "lamp_whitenorth", "girsignals:blocks/lamps/lamp_white");
-        });
         registeredModels.put("tramsignal", cm -> {
             // TRAM off
             cm.register("trafficlight/trafficlight_tram",

@@ -5,20 +5,20 @@ import java.util.List;
 public class Models {
 
     private List<TextureStats> textures;
-    private float x;
-    private float y;
-    private float z;
+    private float x = 0;
+    private float y = 0;
+    private float z = 0;
 
-    public float getX() {
-        return x;
+    public float getX(final float xOffset) {
+        return x + xOffset;
     }
 
-    public float getY() {
-        return y;
+    public float getY(final float yOffset) {
+        return y + yOffset;
     }
 
-    public float getZ() {
-        return z;
+    public float getZ(final float zOffset) {
+        return z + zOffset;
     }
 
     public List<TextureStats> getTexture() {
