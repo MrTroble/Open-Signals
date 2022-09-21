@@ -251,6 +251,15 @@
 							"zs3": "overlay"
 						}
 					}
+				},
+				{
+					"blockstate": "with(prop.prop) && with(SEMATYPE.MAIN_SMALL)",
+					"extentions": {
+						"zs32.json": {
+							"zs3": "overlay"
+						}
+					},
+					"y": -2
 				}
 			],
 			"y": 3
@@ -265,25 +274,7 @@
 							"zs3plate": "overlay"
 						}
 					}
-				}
-			],
-			"y": 3
-		},
-		"semaphore_signals/sema_mainsmall_zs3": {
-			"textures": [
-				{
-					"blockstate": "with(prop.prop) && with(SEMATYPE.MAIN_SMALL)",
-					"extentions": {
-						"zs32.json": {
-							"zs3": "overlay"
-						}
-					}
-				}
-			],
-			"y": 1
-		},
-		"semaphore_signals/sema_mainsmall_zs3_plate": {
-			"textures": [
+				},
 				{
 					"loadOFFstate": false,
 					"blockstate": "with(prop.prop) && with(SEMATYPE.MAIN_SMALL) && !has(ZS3)",
@@ -291,15 +282,20 @@
 						"zs32.json": {
 							"zs3plate": "overlay"
 						}
-					}
+					},
+					"y": -2
 				}
 			],
-			"y": 1
+			"y": 3
 		},
 		"semaphore_signals/sema_main_wing1": {
 			"textures": [
 				{
 					"blockstate": "with(SEMATYPE.MAIN) && hasandisnot(WING1)"
+				},
+				{
+					"blockstate": "with(SEMATYPE.MAIN_SMALL) && hasandisnot(WING1)",
+					"y": -3
 				}
 			],
 			"y": 7
@@ -308,6 +304,10 @@
 			"textures": [
 				{
 					"blockstate": "with(SEMATYPE.MAIN) && hasandis(WING1)"
+				},
+				{
+					"blockstate": "with(SEMATYPE.MAIN_SMALL) && hasandis(WING1)",
+					"y": -3
 				}
 			],
 			"y": 7
@@ -316,6 +316,10 @@
 			"textures": [
 				{
 					"blockstate": "with(SEMATYPE.MAIN) && hasandis(HP2) && hasandisnot(WING2)"
+				},
+				{
+					"blockstate": "with(SEMATYPE.MAIN_SMALL) && hasandis(HP2) && hasandisnot(WING2)",
+					"y": -3
 				}
 			],
 			"y": 5
@@ -324,41 +328,13 @@
 			"textures": [
 				{
 					"blockstate": "with(SEMATYPE.MAIN) && hasandis(HP2) && hasandis(WING2)"
+				},
+				{
+					"blockstate": "with(SEMATYPE.MAIN_SMALL) && hasandis(HP2) && hasandis(WING2)",
+					"y": -3
 				}
 			],
 			"y": 5
-		},
-		"semaphore_signals/sema_mainsmall_wing1": {
-			"textures": [
-				{
-					"blockstate": "with(SEMATYPE.MAIN_SMALL) && hasandisnot(WING1)"
-				}
-			],
-			"y": 4
-		},
-		"semaphore_signals/sema_mainsmall_wing1_on": {
-			"textures": [
-				{
-					"blockstate": "with(SEMATYPE.MAIN_SMALL) && hasandis(WING1)"
-				}
-			],
-			"y": 4
-		},
-		"semaphore_signals/sema_mainsmall_wing2": {
-			"textures": [
-				{
-					"blockstate": "with(SEMATYPE.MAIN_SMALL) && hasandis(HP2) && hasandisnot(WING2)"
-				}
-			],
-			"y": 2
-		},
-		"semaphore_signals/sema_mainsmall_wing2_on": {
-			"textures": [
-				{
-					"blockstate": "with(SEMATYPE.MAIN_SMALL) && hasandis(HP2) && hasandis(WING2)"
-				}
-			],
-			"y": 2
 		},
 		"semaphore_signals/sema_distant_base": {
 			"textures": [
