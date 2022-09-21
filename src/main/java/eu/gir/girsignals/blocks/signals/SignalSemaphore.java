@@ -9,6 +9,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.signalbox.config.SemaphoreConfig;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.client.gui.FontRenderer;
 
@@ -16,7 +17,7 @@ public class SignalSemaphore extends Signal {
 
     public SignalSemaphore() {
         super(builder(GIRItems.PLACEMENT_TOOL, "semaphore_signal").height(3).offsetX(10f)
-                .offsetY(-11f).signHeight(1.47f).build());
+                .offsetY(-11f).signHeight(1.47f).config(SemaphoreConfig.SEMAPHORE_CONFIG).build());
     }
 
     public static final SEProperty<SemaType> SEMATYPE = SEProperty.of("sematype", SemaType.DIST,
