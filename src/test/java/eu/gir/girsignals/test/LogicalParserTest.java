@@ -277,7 +277,7 @@ public class LogicalParserTest {
         testNode(new DummyBlockState(SignalHV.MASTSIGN, MastSignal.WYWYW),
                 LogicParser.parse("with(mastsign.WYWYW)", info).pop());
 
-        testNode(new DummyBlockState(SignalNE.NETYPE, NE.NE4_small), LogicParser
+        testNode(new DummyBlockState(SignalNE.NETYPE, NE.NE4_SMALL), LogicParser
                 .parse("with(NETYPE.NE4_small)", new FunctionParsingInfo(new SignalNE())).pop());
 
         testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0), LogicParser
