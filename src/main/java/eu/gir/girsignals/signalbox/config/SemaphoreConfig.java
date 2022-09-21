@@ -65,7 +65,7 @@ public final class SemaphoreConfig implements ISignalAutoconfig {
             "rawtypes", "unchecked"
     })
     @Override
-    public void change(ConfigInfo info) {
+    public void change(final ConfigInfo info) {
 
         if (info.type.equals(PathType.SHUNTING)) {
             RSSignalConfig.RS_CONFIG.change(info);
@@ -76,12 +76,12 @@ public final class SemaphoreConfig implements ISignalAutoconfig {
 
         values.put(SignalSemaphore.WING1, true);
 
-        if (info.speed <= 4) {
+        if (info.speed <= 7) {
 
             values.put(SignalSemaphore.WING2, true);
         }
 
-        if (info.speed != 4) {
+        if (info.speed != 4 && info.speed <= 16) {
 
             final ZS32 zs32 = ZS32.values()[ZS32.Z.ordinal() + info.speed];
             values.put(SignalSemaphore.ZS3, zs32);
@@ -160,7 +160,7 @@ public final class SemaphoreConfig implements ISignalAutoconfig {
     }
 
     @Override
-    public void reset(SignalTileEnity current) {
+    public void reset(final SignalTileEnity current) {
 
         @SuppressWarnings("rawtypes")
         final HashMap<SEProperty, Object> values = new HashMap<>();
