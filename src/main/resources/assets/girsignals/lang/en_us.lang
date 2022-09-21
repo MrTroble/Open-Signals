@@ -31,6 +31,8 @@ tile.wnsignal.name=Wn Signal
 tile.stationname.name=Stationname
 tile.redstonein.name=Redstone Input
 tile.redstoneout.name=Redstone Output
+tile.semaphoresignal.name=Semaphore Signal
+tile.shmech.name=Shunting Signal
 
 #Linktool
 lt.linkedpos=§2Linked to: {%d, %d, %d§2}§r
@@ -89,6 +91,14 @@ property.signalped.name=Pedestrian light
 property.signaltrama.name=A
 property.signaltramt.name=T
 property.signaltramswitch.name=Switch signals
+property.sematype.name=Signal Type
+property.hp2.name=Second Wing
+property.ra12.name=Shunting Signal
+property.ne2_3.name=Three-handle Semaphoresignal
+property.wing2.name=Second Wing
+property.wing1.name=Primary Wing
+property.semavr.name=Distant Signal
+property.sh_mech.name=Protection Signal
 
 #Signal Description
 property.signaltype.desc=Here you can toggle between the different signal types.
@@ -131,6 +141,14 @@ property.signaltrama.desc=Drive request
 property.signaltramt.desc=Departure recommendation
 property.signaltramswitch.desc=Left, right, straight ahead with and without locked switch
 property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign.
+property.sematype.desc=Changes the type of the shape signal: approach signal, main signal and small main signal
+property.hp2.desc=Adds the second wing to the main signal.
+property.ra12.desc=Allows shunting.
+property.ne2_3.desc=The sign indicates a location of a three-handle semaphore signal.
+property.wing2.desc=Wing for Hp0/1 and Hp2
+property.wing1.desc=Wing for Hp0 and Hp1
+property.semavr.desc=§lVr Distant signal§r - Distant signals indicate which signal aspect is to be expected at the associated main signal.%n§nVr0§r: Expect stop%n§nVr1§r: Expect run%n§nVr2§r: Expect run with speed restriction
+property.sh_mech.desc=§lSh Protection signal§r%n§nSh0§r: Stop for train and shunting movements%n§nSh1§r: Shunting permitted.%n§nWn7/Gsp2§r:The track lock is set aside.
 
 #Sign Names
 property.indicator.name=Indicator
@@ -252,6 +270,9 @@ property.value.signaltram=Tram signal
 property.value.switch=TRAM switch signal
 property.value.signalcar=Traffic light
 property.value.signalped=Pedestrian light
+property.value.VR0=VR0
+property.value.VR1=VR1
+property.value.VR2=VR2
 
 #Sign Values
 property.value.ralight=Sh1 light
