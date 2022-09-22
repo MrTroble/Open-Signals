@@ -53,7 +53,14 @@ public class ModelStats {
                 final String key = entry.getKey();
                 final String val = entry.getValue();
 
-                retexturemap.put(key, getLampPath(val, lamp));
+                if (!lamp.isEmpty()) {
+
+                    retexturemap.put(key, getLampPath(val, lamp));
+
+                } else {
+
+                    retexturemap.put(key, val);
+                }
             }
         }
         return retexturemap;

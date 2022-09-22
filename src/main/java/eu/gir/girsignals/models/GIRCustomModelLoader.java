@@ -12,8 +12,6 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import eu.gir.girsignals.EnumSignals.BUE;
-import eu.gir.girsignals.EnumSignals.BUEAdd;
 import eu.gir.girsignals.EnumSignals.CAR;
 import eu.gir.girsignals.EnumSignals.PED;
 import eu.gir.girsignals.EnumSignals.RA;
@@ -27,12 +25,12 @@ import eu.gir.girsignals.EnumSignals.WNNormal;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalAngel;
-import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.signals.SignalTram;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
 import eu.gir.girsignals.models.parser.LogicParser;
+import eu.gir.girsignals.models.parser.LogicalParserException;
 import net.minecraft.client.renderer.block.model.BuiltInModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.block.model.ItemOverrideList;
@@ -114,11 +112,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                 registeredModels.put(
                         signaltype.getRegistryName().toString().replace("girsignals:", ""), cm -> {
 
-                            for (final Map.Entry<String, Models> entry2 : content.getModels()
+                            for (final Map.Entry<String, Models> modelsmap : content.getModels()
                                     .entrySet()) {
 
-                                final String modelname = entry2.getKey();
-                                final Models modelstats = entry2.getValue();
+                                final String modelname = modelsmap.getKey();
+                                final Models modelstats = modelsmap.getValue();
 
                                 for (int i = 0; i < modelstats.getTexture().size(); i++) {
 
@@ -136,35 +134,37 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                         boolean extentionloaded = false;
 
-                                        for (final Map.Entry<String, ModelExtention> entry : extentions
+                                        for (final Map.Entry<String, ModelExtention> extention : extentions
                                                 .entrySet()) {
 
                                             if (texturestate.getExtentions() != null) {
 
-                                                for (final Map.Entry<String, Map<String, String>> entry1 : texturestate
+                                                for (final Map.Entry<String, Map<String, String>> extentionsInFile : texturestate
                                                         .getExtentions().entrySet()) {
 
-                                                    final String nametoextend = entry1.getKey();
-                                                    final Map<String, String> ex = entry1
+                                                    final String nametoextend = extentionsInFile
+                                                            .getKey();
+                                                    final Map<String, String> ex = extentionsInFile
                                                             .getValue();
 
                                                     if (nametoextend
-                                                            .equalsIgnoreCase(entry.getKey())) {
+                                                            .equalsIgnoreCase(extention.getKey())) {
 
-                                                        for (final Map.Entry<String, String> entry3 : entry
+                                                        for (final Map.Entry<String, String> extentionprops : extention
                                                                 .getValue().getExtention()
                                                                 .entrySet()) {
 
-                                                            final String enums = entry3.getKey();
-                                                            final String retextureval = entry3
+                                                            final String enums = extentionprops
+                                                                    .getKey();
+                                                            final String retextureval = extentionprops
                                                                     .getValue();
 
-                                                            for (final Map.Entry<String, String> entry4 : ex
+                                                            for (final Map.Entry<String, String> extentionvals : ex
                                                                     .entrySet()) {
 
-                                                                final String seprop = entry4
+                                                                final String seprop = extentionvals
                                                                         .getKey();
-                                                                final String retexturekey = entry4
+                                                                final String retexturekey = extentionvals
                                                                         .getValue();
 
                                                                 final boolean load = texturestate
@@ -181,8 +181,21 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                                                 if (load) {
 
-                                                                    state = LogicParser.predicate(
-                                                                            blstate, parsinginfo);
+                                                                    try {
+                                                                        state = LogicParser
+                                                                                .predicate(blstate,
+                                                                                        parsinginfo);
+
+                                                                    } catch (final LogicalParserException e) {
+
+                                                                        GirsignalsMain.log.error(
+                                                                                "There was an problem during loading "
+                                                                                        + modelname
+                                                                                        + " from "
+                                                                                        + filename
+                                                                                        + "!");
+                                                                        e.printStackTrace();
+                                                                    }
 
                                                                     cm.register(modelname, state,
                                                                             modelstats.getX(
@@ -211,7 +224,16 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                         if (!extentionloaded) {
 
-                                            state = LogicParser.predicate(blockstate, parsinginfo);
+                                            try {
+                                                state = LogicParser.predicate(blockstate,
+                                                        parsinginfo);
+                                            } catch (final LogicalParserException e) {
+                                                GirsignalsMain.log.error(
+                                                        "There was an problem during loading "
+                                                                + modelname + " from " + filename
+                                                                + "!");
+                                                e.printStackTrace();
+                                            }
                                         }
                                     }
 
@@ -464,27 +486,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                     "girsignals:blocks/lamps/lamp_white", "lamp_5",
                     "girsignals:blocks/lamps/lamp_white");
         });
-        registeredModels.put("buesignal", cm -> {
-            cm.register("mast", ebs -> true, 0);
-            cm.register("bue/bue2", with(SignalBUE.BUETYPE, BUE.BUE2_1::equals), 1, "2",
-                    "girsignals:blocks/bue/bue2_1");
-            cm.register("bue/bue2", with(SignalBUE.BUETYPE, BUE.BUE2_2::equals), 1, "2",
-                    "girsignals:blocks/bue/bue2_2");
-            cm.register("bue/bue2", with(SignalBUE.BUETYPE, BUE.BUE2_3::equals), 1, "2",
-                    "girsignals:blocks/bue/bue2_3");
-            cm.register("bue/bue2", with(SignalBUE.BUETYPE, BUE.BUE2_4::equals), 1, "2",
-                    "girsignals:blocks/bue/bue2_4");
-            cm.register("bue/bue3", with(SignalBUE.BUETYPE, BUE.BUE3::equals), 1);
-            cm.register("bue/bue4", with(SignalBUE.BUETYPE, BUE.BUE4::equals), 1);
-            cm.register("bue/bue4", with(SignalBUE.BUEADD, buea -> buea.equals(BUEAdd.BUE4))
-                    .and(with(SignalBUE.BUETYPE, bue -> bue.equals(BUE.BUE4))), 2);
-            cm.register("bue/bue5", with(SignalBUE.BUETYPE, BUE.BUE5::equals), 1);
-            cm.register("bue/bueadd",
-                    with(SignalBUE.BUEADD, buea -> buea.equals(BUEAdd.ADD))
-                            .and(with(SignalBUE.BUETYPE, bue -> bue.equals(BUE.BUE4))
-                                    .or(with(SignalBUE.BUETYPE, bue -> bue.equals(BUE.BUE5)))),
-                    2);
-        });
         registeredModels.put("wnsignal", cm -> {
             cm.register("wn/wn1_2", hasAndIsNot(SignalWN.WNTYPE)
                     .and(with(SignalWN.WNNORMAL, wn -> wn.equals(WNNormal.OFF))), 0);
@@ -532,9 +533,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                     hasAndIs(SignalWN.WNTYPE)
                             .and(with(SignalWN.WNCROSS, wn -> wn.equals(WNCross.BLINK))),
                     0, "lamp_1", "girsignals:blocks/lamps/lamp_white_blink");
-        });
-        registeredModels.put("stationname", cm -> {
-            cm.register("other_signals/station_name", t -> true, 0);
         });
     }
 

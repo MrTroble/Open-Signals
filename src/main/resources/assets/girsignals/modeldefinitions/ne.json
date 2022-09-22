@@ -78,7 +78,7 @@
             ],
             "y": 1
         },
-        "ne/ne_small": {
+        "ne/ne4_small": {
             "textures": [
                 {
                     "blockstate": "with(NETYPE.NE4_small)"
@@ -118,7 +118,7 @@
         "ne/ne2_2": {
             "textures": [
                 {
-                    "blockstate": "with(NEADITION.PRE2) && (with(NETYPE.NE2) || with(NETYPE.NE2_1)"
+                    "blockstate": "with(neaddition.PRE2) && (with(NETYPE.NE2) || with(NETYPE.NE2_1)"
                 }
             ],
             "y": 1
@@ -126,7 +126,7 @@
         "arrow": {
             "textures": [
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE5)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE5)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -135,7 +135,7 @@
                     "y": 1.875
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_2)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE3_2)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -144,7 +144,7 @@
                     "y": 3.0
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_4)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE3_4)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -153,7 +153,7 @@
                     "y": 3.0
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE4)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE4)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -162,7 +162,7 @@
                     "y": 3.0
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE2)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE2)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -171,7 +171,7 @@
                     "y": 1.125
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE4_small)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE4_small)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -180,7 +180,7 @@
                     "y": 0.875
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_1)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE3_1)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -189,7 +189,7 @@
                     "y": 3.0
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_3)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE3_3)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -198,7 +198,7 @@
                     "y": 3.0
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE3_5)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE3_5)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -207,7 +207,7 @@
                     "y": 3.0
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE2_1)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE2_1)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -216,7 +216,7 @@
                     "y": 1.125
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE1)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE1)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
@@ -225,7 +225,7 @@
                     "y": 1.9375
                 },
                 {
-                    "blockstate": "with(prop.prop) && with(NETPYE.NE6)",
+                    "blockstate": "with(prop.prop) && with(NETYPE.NE6)",
                     "extentions": {
                         "arrow.json": {
                             "ARROW": "1"
