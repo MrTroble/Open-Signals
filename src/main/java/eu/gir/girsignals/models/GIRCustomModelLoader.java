@@ -139,12 +139,11 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                             if (texturestate.getExtentions() != null) {
 
-                                                for (final Map.Entry<String, Map<String, String>> extentionsInFile : texturestate
+                                                for (final Map.Entry<String, Map<String, String>> filext : texturestate
                                                         .getExtentions().entrySet()) {
 
-                                                    final String nametoextend = extentionsInFile
-                                                            .getKey();
-                                                    final Map<String, String> ex = extentionsInFile
+                                                    final String nametoextend = filext.getKey();
+                                                    final Map<String, String> ex = filext
                                                             .getValue();
 
                                                     if (nametoextend
