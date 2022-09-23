@@ -53,7 +53,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     .getProperty(SignalKS.ZS3V);
             final Optional<ZS32> speedKSZS3plate = (Optional<ZS32>) info.next
                     .getProperty(SignalKS.ZS3_PLATE);
-            final Optional<ZS32> nextZS3 = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);         
+            final Optional<ZS32> nextZS3 = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);
             final Optional<ZS32> nexthlZS3PLATE = (Optional<ZS32>) info.next
                     .getProperty(SignalHL.ZS3_PLATE);
 
@@ -114,7 +114,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
 
             final boolean changes = nextZS3.filter(e -> ((ZS32) e).ordinal() > ZS32.Z.ordinal()
                     && (((ZS32) e).ordinal() - ZS32.Z.ordinal()) != info.speed).isPresent();
-            
+
             info.current.getProperty(SignalKS.ZS3V).ifPresent(_u -> nextZS3
                     .ifPresent(value -> info.current.setProperty(SignalKS.ZS3V, (ZS32) value)));
 
@@ -151,6 +151,7 @@ public final class KSSignalConfig implements ISignalAutoconfig {
 
             if ((!hlmain40 && nexthl) || hvstop || hvstop2) {
                 values.put(SignalKS.ZS3V, ZS32.OFF);
+                values.put(SignalKS.ZS2V, ZS32.OFF);
             }
 
             if (nexthl) {
