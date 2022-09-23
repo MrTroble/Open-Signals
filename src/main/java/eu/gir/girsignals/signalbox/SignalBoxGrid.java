@@ -188,6 +188,7 @@ public class SignalBoxGrid implements INetworkSavable {
      */
     public void setWorld(final World world) {
         this.world = world;
+        startsToPath.values().forEach(pw -> pw.setWorld(world));
     }
 
     @Override
