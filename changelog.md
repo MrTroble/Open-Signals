@@ -8,8 +8,13 @@
 * feat: auto recover from bad pathways
 * perf: reduced redstone performance
 * perf: only send needed data
+* fix: improved dijkstra path detection
+* feat: security patch for signal boxes (only one user at same time)
+* fix: sh light signal status light
+* feat: new sh light texture
+* ref: optimize models
 
-// Known issues: Sometimes pathways are invisible
+// Known issues: Sometimes pathways are invisible, Custom Names doesn't render sometimes
 
 ## [Beta Update] 
 * feat: Ra11 added to signalbox
