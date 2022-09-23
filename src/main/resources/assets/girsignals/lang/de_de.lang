@@ -318,3 +318,4 @@ property.prop.INPUT.name=Redstone Eingabe
 property.prop.INPUT.desc=Hier kannst du die Redstone Eingabe einstellen. Z.b. von Sensoren.
 btn.apply=Anwenden
 label.linkedto=Verlinkt mit
+msg.isblocked=Das Stellwerk wird bereits verwendet.
