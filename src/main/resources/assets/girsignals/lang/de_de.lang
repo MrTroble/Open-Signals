@@ -319,3 +319,7 @@ property.prop.INPUT.desc=Hier kannst du die Redstone Eingabe einstellen. Z.b. vo
 btn.apply=Anwenden
 label.linkedto=Verlinkt mit
 msg.isblocked=Das Stellwerk wird bereits verwendet.
+property.prop.INPUT.blocking.name=Blockieren
+property.prop.INPUT.blocking.desc=Blockiert eine Fahrstraße. Blockiert werden kann hinter einem Signal oder auf einem freien Feld (z.B. für Dauerblockierung)
+property.prop.INPUT.resetting.name=Zurücksetzen
+property.prop.INPUT.resetting.desc=Setzt eine Fahrstraße zurück. Fahrstraßen werden vor einem Signal zurückgesetzt oder auf einem freien Stück (z.B. für eine Teilfahrstraßenauflösung)
