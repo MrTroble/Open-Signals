@@ -106,11 +106,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity
                 worldLoadOps.loadAndReset(p1);
             }
             linkedBlocks.remove(p1);
+            this.syncClient();
+            return;
         }
         if (compound.hasKey(RESET_WAY)) {
             final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
             final Point p1 = fromNBT(request, POINT1);
             grid.resetPathway(p1);
+            this.syncClient();
             return;
         }
         if (compound.hasKey(REQUEST_WAY)) {
@@ -121,6 +124,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity
                 final NBTTagCompound error = new NBTTagCompound();
                 error.setString(ERROR_STRING, "error.nopathfound");
                 sendToAll(error);
+            } else {
+                this.syncClient();
             }
             return;
         }
