@@ -28,14 +28,16 @@ public class SignalBox extends Block implements ITileEntityProvider {
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
+            if (worldIn.isRemote)
+                return true;
             final TileEntity entity = worldIn.getTileEntity(pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {
                 GuiHandler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
-                return true;
             } else {
                 playerIn.sendStatusMessage(new TextComponentTranslation("msg.isblocked"), true);
             }
+            return true;
         }
         return false;
     }

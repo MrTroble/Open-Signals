@@ -78,7 +78,6 @@ public class GuiSignalBox extends GuiBase {
     @Override
     public void initGui() {
         super.initGui();
-        this.mc.player.openContainer = this.container;
     }
 
     private void update(final NBTTagCompound compound) {
