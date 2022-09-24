@@ -116,13 +116,13 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                     .filter(b -> Signallists.STOP_KS_MAIN.contains(b)).isPresent();
 
             if (currentdistant.isPresent()) {
-                if (stop || stop2) {
-                    values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
+                if (!(stop && stop2)) {
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                 } else if (nextHP.filter(HP.HP2::equals).isPresent()
                         || nextHPHOME.filter(HPHome.HP2::equals).isPresent()) {
                     values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
                 } else {
-                    values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
                 }
             }
 
@@ -186,7 +186,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
                                 values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                             }
                         } else if (zs32 <= 26 || zs32 == 47 || zs32 == 49) {
-                            values.put(SignalKS.ZS3V, speednext);
+                            values.put(SignalHV.ZS3V, speednext);
                         }
                     }
 
