@@ -115,14 +115,18 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             final boolean ksstopmain = info.next.getProperty(SignalKS.MAINSIGNAL)
                     .filter(b -> Signallists.STOP_KS_MAIN.contains(b)).isPresent();
 
+            final boolean hp2 = nextHP.filter(HP.HP2::equals).isPresent()
+                    || nextHPHOME.filter(HPHome.HP2::equals).isPresent();
+
+
+
             if (currentdistant.isPresent()) {
-                if (!(stop && stop2)) {
-                    values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
-                } else if (nextHP.filter(HP.HP2::equals).isPresent()
-                        || nextHPHOME.filter(HPHome.HP2::equals).isPresent()) {
+                if ((stop || stop2) && !hp2) {
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
+                } else if (hp2) {
                     values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
                 } else {
-                    values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
                 }
             }
 
