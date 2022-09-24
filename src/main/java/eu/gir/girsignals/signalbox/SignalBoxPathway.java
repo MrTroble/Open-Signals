@@ -214,10 +214,8 @@ public class SignalBoxPathway implements INetworkSavable {
         this.signalPositions.ifPresent(entry -> {
             loadOps.loadAndConfig(speed, entry.getKey(), entry.getValue(), this::configUpdate);
         });
-        lastSignal.ifPresent(posIn -> {
-            distantSignalPositions.forEach(
-                    position -> loadOps.loadAndConfig(speed, position, posIn, this::configUpdate));
-        });
+        distantSignalPositions.forEach(position -> loadOps.loadAndConfig(speed, position,
+                lastSignal.orElse(null), this::configUpdate));
     }
 
     public void resetPathway() {
