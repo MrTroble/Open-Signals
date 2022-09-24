@@ -89,6 +89,18 @@ public class GIRConfigtestHV {
                 DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1).of(SignalKS.ZS3, ZS32.Z8).build(),
                 DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build());
 
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+                DummyBuilder.start(SignalHV.HPHOME, HPHome.HP0).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(),
+                DummyBuilder.start(SignalHV.HPHOME, HPHome.HP1).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(),
+                DummyBuilder.start(SignalHV.HPHOME, HPHome.HP2).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR2).build());
+
         final ConfigInfo info = new ConfigInfo(new DummySignal(), null, 0);
         config.change(info);
         assertEquals(new DummySignal(), info.current);

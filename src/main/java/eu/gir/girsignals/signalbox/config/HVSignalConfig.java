@@ -126,22 +126,24 @@ public final class HVSignalConfig implements ISignalAutoconfig {
 
             final boolean hp2 = nextHP.filter(HP.HP2::equals).isPresent()
                     || nextHPHOME.filter(HPHome.HP2::equals).isPresent();
-
-            final boolean instop1 = stop || stop2 || ksstop;
-            final boolean instop2 = ksstopmain || hlstop;
-            final boolean anyStop = instop1 || instop2;
             final boolean hlSlowDown = (hlmain40
                     && !getlightbar.filter(HLLightbar.GREEN::equals).isPresent());
             final boolean ksSlowdown = ksStopsignal.filter(Signallists.KS_GO::contains).isPresent()
                     && ksZS3.filter(zs -> zs.compareTo(ZS32.Z8) < 0).isPresent();
             final boolean anySlowdown = hp2 || hlSlowDown || ksSlowdown;
 
-            if (anyStop && !anySlowdown) {
+            final boolean instop1 = stop || stop2 || ksstop;
+            final boolean instop2 = ksstopmain || hlstop;
+            final boolean anyStop = instop1 || instop2;
+
+            if (anyStop) {
                 values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
-            } else if (anySlowdown) {
-                values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
             } else {
-                values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                if (anySlowdown) {
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR2);
+                } else {
+                    values.put(SignalHV.DISTANTSIGNAL, VR.VR1);
+                }
             }
 
             info.next.getProperty(SignalHV.ZS3)
@@ -150,9 +152,7 @@ public final class HVSignalConfig implements ISignalAutoconfig {
             if (info.next.getProperty(SignalHL.STOPSIGNAL).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
                 if (currentdistant.isPresent()) {
-                    if (hlstop) {
-                        values.put(SignalHV.DISTANTSIGNAL, VR.VR0);
-                    } else if (info.current.getProperty(SignalHV.ZS3V).isPresent()) {
+                    if (info.current.getProperty(SignalHV.ZS3V).isPresent()) {
                         if (hlmain40 && getlightbar.filter(HLLightbar.YELLOW::equals).isPresent()) {
                             values.put(SignalHV.ZS3V, ZS32.Z6);
                         } else if (hlmain40
