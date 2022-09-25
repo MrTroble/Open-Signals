@@ -14,7 +14,9 @@
 * feat: new sh light texture
 * ref: optimize models
 
-// Known issues: Sometimes pathways are invisible, Custom Names doesn't render sometimes
+// Known issues:
+* Custom names are sometimes not rendered
+* Ra11 shows Ra12 with train drive path
 
 ## [Beta Update] 
 * feat: Ra11 added to signalbox
