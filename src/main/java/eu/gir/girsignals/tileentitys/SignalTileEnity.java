@@ -117,13 +117,11 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         this.formatCustomName = str;
         if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
             map.remove(Signal.CUSTOMNAME);
-            this.markDirty();
-            this.syncClient();
         } else if (str != null) {
             map.put(Signal.CUSTOMNAME, true);
-            this.markDirty();
-            this.syncClient();
         }
+        this.markDirty();
+        this.syncClient();
     }
 
     @SideOnly(Side.CLIENT)
