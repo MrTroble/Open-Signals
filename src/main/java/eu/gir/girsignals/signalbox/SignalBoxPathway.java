@@ -237,17 +237,19 @@ public class SignalBoxPathway implements INetworkSavable {
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
             resetSignals();
             this.emptyOrBroken = true;
-        } else {
-            this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
-                    this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
-            this.initalize();
         }
     }
 
-    public boolean tryReset(final BlockPos position) {
+    public void compact(final Point point) {
+        this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
+                this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
+        this.initalize();
+    }
+
+    public Optional<Point> tryReset(final BlockPos position) {
         final SignalBoxNode node = this.mapOfResetPositions.get(position);
         if (node == null)
-            return false;
+            return Optional.empty();
         final Point point = node.getPoint();
         final AtomicBoolean atomic = new AtomicBoolean(false);
         foreachEntry((option, cNode) -> {
@@ -257,9 +259,9 @@ public class SignalBoxPathway implements INetworkSavable {
             });
         }, point);
         if (atomic.get())
-            return false;
+            return Optional.empty();
         this.resetPathway(point);
-        return true;
+        return Optional.of(point);
     }
 
     public boolean tryBlock(final BlockPos position) {
