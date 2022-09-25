@@ -151,23 +151,24 @@ public final class HVSignalConfig implements ISignalAutoconfig {
 
             if (info.next.getProperty(SignalHL.STOPSIGNAL).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()) {
-                if (currentdistant.isPresent()) {
-                    if (info.current.getProperty(SignalHV.ZS3V).isPresent()) {
-                        if (hlmain40 && getlightbar.filter(HLLightbar.YELLOW::equals).isPresent()) {
-                            values.put(SignalHV.ZS3V, ZS32.Z6);
-                        } else if (hlmain40
-                                && getlightbar.filter(HLLightbar.GREEN::equals).isPresent()) {
-                            values.put(SignalHV.ZS3V, ZS32.Z10);
-                        }
-
+                if (currentdistant.isPresent()
+                        && info.current.getProperty(SignalHV.ZS3V).isPresent()) {
+                    if (hlmain40 && getlightbar.filter(HLLightbar.YELLOW::equals).isPresent()) {
+                        values.put(SignalHV.ZS3V, ZS32.Z6);
+                    } else if (hlmain40
+                            && getlightbar.filter(HLLightbar.GREEN::equals).isPresent()) {
+                        values.put(SignalHV.ZS3V, ZS32.Z10);
                     }
+
                 }
 
                 if (nexthlZS3PLATE.isPresent() && !hlstop) {
                     final ZS32 zs2next = nexthlZS3PLATE.get();
-                    final int zs2 = zs2next.ordinal();
-                    if (zs2 <= 26 || zs2 == 47 || zs2 == 49) {
-                        values.put(SignalHV.ZS3V, zs2next);
+                    if (!zs2next.equals(ZS32.OFF)) {
+                        final int zs2 = zs2next.ordinal();
+                        if (zs2 <= 26 || zs2 == 47 || zs2 == 49) {
+                            values.put(SignalHV.ZS3V, zs2next);
+                        }
                     }
                 }
             }
