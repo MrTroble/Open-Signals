@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class CommonProxy {
 
     public void preinit(final FMLPreInitializationEvent event) {
-        UIInit.initCommon(GirsignalsMain.MODID);
+        UIInit.initCommon(GirsignalsMain.MODID, GirsignalsMain.isDebug());
         GuiHandler.addServer(Placementtool.class, (p, w, bp) -> null);
         GuiHandler.addServer(SignalController.class, (p, w, bp) -> new ContainerSignalController(
                 (SignalControllerTileEntity) w.getTileEntity(bp)));

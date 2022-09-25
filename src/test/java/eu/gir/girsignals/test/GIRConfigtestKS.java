@@ -6,6 +6,7 @@ import static eu.gir.girsignals.blocks.signals.SignalKS.STOPSIGNAL;
 import static eu.gir.girsignals.blocks.signals.SignalKS.ZS3;
 import static eu.gir.girsignals.blocks.signals.SignalKS.ZS3V;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
@@ -23,16 +24,56 @@ import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
+import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig.ConfigInfo;
 import eu.gir.girsignals.signalbox.config.KSSignalConfig;
 import eu.gir.girsignals.test.DummySignal.DummyBuilder;
+import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public class GIRConfigtestKS {
 
     private final KSSignalConfig config = KSSignalConfig.INSTANCE;
 
+    private void assertChange(final SignalTileEnity current, final SignalTileEnity next,
+            final DummySignal expected) {
+        this.assertChange(current, next, expected, 0);
+    }
+
+    private void assertChange(final SignalTileEnity current, final SignalTileEnity next,
+            final DummySignal expected, final int speed) {
+        assertNotEquals(current, expected);
+        final ConfigInfo info = new ConfigInfo(current, next, speed);
+        config.change(info);
+        assertEquals(expected, current);
+    }
+
     @Test
     public void testKSConfig() {
+        final ConfigInfo info = new ConfigInfo(new DummySignal(), null, 0);
+        config.change(info);
+        assertEquals(new DummySignal(), info.current);
+
+        assertChange(DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.OFF).build(),
+                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1_BLINK).build(),
+                DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.KS1).build());
+
+        assertChange(DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.OFF).build(),
+                DummyBuilder.start(SignalKS.MAINSIGNAL, KSMain.KS1).build(),
+                DummyBuilder.start(SignalKS.DISTANTSIGNAL, KSDistant.KS1).build());
+
+        assertChange(DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1).build(),
+                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.HP0).build(),
+                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS2).build());
+
+        assertChange(DummyBuilder.start(SignalKS.ZS3V, ZS32.Z5).build(),
+                DummyBuilder.start(SignalKS.ZS3, ZS32.Z2).build(),
+                DummyBuilder.start(SignalKS.ZS3V, ZS32.Z2).build());
+
+        assertChange(
+                DummyBuilder.start(SignalKS.ZS3V, ZS32.Z5).of(SignalKS.STOPSIGNAL, KS.KS1).build(),
+                DummyBuilder.start(SignalKS.ZS3, ZS32.Z2).of(SignalKS.STOPSIGNAL, KS.KS1).build(),
+                DummyBuilder.start(SignalKS.ZS3V, ZS32.Z2).of(SignalKS.STOPSIGNAL, KS.KS1_BLINK)
+                        .build());
 
         // KS -> KS
         for (final ZS32 zs32 : ZS32.values()) {

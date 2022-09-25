@@ -1,5 +1,23 @@
 # Changelog
 
+## [Beta Update]
+
+* fix: several synchronization fixes
+* feat: partly pathway resetting
+* perf: reduced network load
+* feat: auto recover from bad pathways
+* perf: reduced redstone performance
+* perf: only send needed data
+* fix: improved dijkstra path detection
+* feat: security patch for signal boxes (only one user at same time)
+* fix: sh light signal status light
+* feat: new sh light texture
+* ref: optimize models
+
+// Known issues:
+* Custom names are sometimes not rendered
+* Ra11 shows Ra12 with train drive path
+
 ## [Beta Update] 
 * feat: Ra11 added to signalbox
 * feat: rename signal via right click

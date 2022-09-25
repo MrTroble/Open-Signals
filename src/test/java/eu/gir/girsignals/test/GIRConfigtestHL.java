@@ -32,6 +32,9 @@ public class GIRConfigtestHL {
 
     @Test
     public void testHLConfig() {
+        final ConfigInfo info = new ConfigInfo(new DummySignal(), null, 0);
+        config.change(info);
+        assertEquals(new DummySignal(), info.current);
 
         // HL -> HL
         configtestHL(HL.HL10, HLExit.HL1, HLDistant.HL10, HLLightbar.OFF, HL.HP0, HLExit.HP0,

@@ -130,7 +130,7 @@ property.signaltramadd.desc=Hier kannst du zwischen A, T und A sowie T wählen.
 property.signaltrama.desc=Fahrtanforderung
 property.signaltramt.desc=Abfertigungsempfehlung
 property.signaltramswitch.desc=Links, rechts, gerade aus mit und ohne verschlossener Weiche
-property.customname.desc=Hier kann der Signalname bzw. die Signalbeschriftung eingetragen werden, welche auf dem Schild angezeigt werden.
+property.customname.desc=Hier kann der Signalname bzw. die Signalbeschriftung eingetragen werden, welche auf dem Schild angezeigt werden. Mit '[n]' kommst du in die nächste Zeile.
 
 #Sign Names
 property.indicator.name=Aufschrift
@@ -318,3 +318,8 @@ property.prop.INPUT.name=Redstone Eingabe
 property.prop.INPUT.desc=Hier kannst du die Redstone Eingabe einstellen. Z.b. von Sensoren.
 btn.apply=Anwenden
 label.linkedto=Verlinkt mit
+msg.isblocked=Das Stellwerk wird bereits verwendet.
+property.prop.INPUT.blocking.name=Blockieren
+property.prop.INPUT.blocking.desc=Blockiert eine Fahrstraße. Blockiert werden kann hinter einem Signal oder auf einem freien Feld (z.B. für Dauerblockierung)
+property.prop.INPUT.resetting.name=Zurücksetzen
+property.prop.INPUT.resetting.desc=Setzt eine Fahrstraße zurück. Fahrstraßen werden vor einem Signal zurückgesetzt oder auf einem freien Stück (z.B. für eine Teilfahrstraßenauflösung)

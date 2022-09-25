@@ -21,6 +21,7 @@ import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
 import li.cil.oc.api.network.SimpleComponent;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -340,6 +341,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     @Override
     public NBTTagCompound getTag() {
         return this.compound;
+    }
+
+    @Override
+    public boolean isValid(final EntityPlayer player) {
+        return true;
     }
 
 }
