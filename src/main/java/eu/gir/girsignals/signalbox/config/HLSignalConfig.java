@@ -105,6 +105,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             final Optional<ZS32> nextHLPLATE = (Optional<ZS32>) info.next
                     .getProperty(SignalHL.ZS3_PLATE);
 
+            final Optional<HL> currentHl = (Optional<HL>) info.current
+                    .getProperty(SignalHL.STOPSIGNAL);
+
             final boolean ksgo = info.next.getProperty(SignalKS.STOPSIGNAL)
                     .filter(a -> Signallists.KS_GO.contains(a)).isPresent()
                     || info.next.getProperty(SignalKS.MAINSIGNAL).filter(KSMain.KS1::equals)
@@ -151,6 +154,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 
             final boolean nextks = info.next.getProperty(SignalKS.STOPSIGNAL).isPresent()
                     || info.next.getProperty(SignalKS.MAINSIGNAL).isPresent();
+
+            final boolean expectStop = currentHl.filter(HL.HL10::equals).isPresent()
+                    || currentHl.filter(HL.HL11_12::equals).isPresent();
 
             if (stop) {
                 speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
@@ -216,6 +222,10 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                 if (zs3 <= 26 || zs3 == 47 || zs3 == 49) {
                     values.put(SignalHL.ZS2V, zs3next);
                 }
+            }
+
+            if (expectStop) {
+                values.put(SignalHL.ZS2V, ZS32.OFF);
             }
 
         } else {
