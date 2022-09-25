@@ -198,14 +198,6 @@ public class GuiSignalBox extends GuiBase {
                         ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
                         ".resetting");
-            }
-                break;
-            case VP:
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
-                break;
-            case HP:
-            case RS: {
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
                 parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
                     this.lowerEntity.clear();
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
@@ -216,6 +208,14 @@ public class GuiSignalBox extends GuiBase {
                     compound.setTag(RESET_WAY, wayComp);
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
                 }));
+            }
+                break;
+            case VP:
+                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
+                break;
+            case HP:
+            case RS: {
+                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
             }
                 break;
             default:

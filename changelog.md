@@ -1,6 +1,13 @@
 # Changelog
 
-## [Beta Update]
+## [Fix]
+
+* fix: partial pathways cannot be reset
+* fix: partial pathways do not update correctly in UI
+
+## [Update]
+
+### BREAKING CHANGES!
 
 * fix: several synchronization fixes
 * feat: partly pathway resetting
@@ -15,8 +22,10 @@
 * ref: optimize models
 
 // Known issues:
+
 * Custom names are sometimes not rendered
 * Ra11 shows Ra12 with train drive path
+* Edit not saved on exit (Workaround: Go to the Use tab before exiting)
 
 ## [Beta Update] 
 * feat: Ra11 added to signalbox
