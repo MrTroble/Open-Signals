@@ -226,21 +226,22 @@ public class SignalBoxPathway implements INetworkSavable {
         this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
     }
 
-    private void resetSignals() {
-        resetFirstSignal();
+    private void resetOther() {
         distantSignalPositions.forEach(position -> loadOps.loadAndReset(position));
     }
 
     public void resetPathway(final @Nullable Point point) {
         this.setPathStatus(EnumPathUsage.FREE, point);
+        resetFirstSignal();
         if (point == null || point.equals(this.getLastPoint())
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
-            resetSignals();
             this.emptyOrBroken = true;
+            resetOther();
         }
     }
 
     public void compact(final Point point) {
+    	foreachEntry(entry -> entry.getEntry(PathEntryType.SIGNAL).ifPresent(loadOps::loadAndReset), point);
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
         this.initalize();
