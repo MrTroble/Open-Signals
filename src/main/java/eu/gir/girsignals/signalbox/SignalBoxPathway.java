@@ -241,7 +241,8 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     public void compact(final Point point) {
-    	foreachEntry(entry -> entry.getEntry(PathEntryType.SIGNAL).ifPresent(loadOps::loadAndReset), point);
+        foreachEntry(entry -> entry.getEntry(PathEntryType.SIGNAL).ifPresent(loadOps::loadAndReset),
+                point);
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
         this.initalize();

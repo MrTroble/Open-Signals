@@ -2,6 +2,10 @@
 
 ## [Fix]
 
+* fix: crash when signal is beeing destroyed
+
+## [Fix]
+
 * fix: partial pathways cannot be reset
 * fix: partial pathways do not update correctly in UI
 
