@@ -9,10 +9,12 @@ import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.SHLight;
 import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.signals.SignalHL;
 import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
+import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public final class RSSignalConfig implements ISignalAutoconfig {
@@ -35,6 +37,10 @@ public final class RSSignalConfig implements ISignalAutoconfig {
         values.put(SignalHL.STOPSIGNAL, HL.HL_SHUNTING);
         values.put(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING);
 
+        if (info.type.equals(PathType.SHUNTING)) {
+            values.put(SignalRA.RALIGHT, true);
+        }
+
         this.changeIfPresent(values, info.current);
     }
 
@@ -42,6 +48,8 @@ public final class RSSignalConfig implements ISignalAutoconfig {
     public void reset(final SignalTileEnity current) {
         current.getProperty(SignalSHLight.SHLIGHT_0)
                 .ifPresent(_u -> current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH0));
+        current.getProperty(SignalRA.RALIGHT)
+                .ifPresent(_u -> current.setProperty(SignalRA.RALIGHT, true));
     }
 
 }
