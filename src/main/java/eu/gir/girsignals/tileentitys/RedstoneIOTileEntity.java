@@ -46,6 +46,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
         super.readFromNBT(compound);
         linkedPositions.clear();
         final NBTTagList list = (NBTTagList) compound.getTag(LINKED_LIST);
+        if (list == null)
+            return;
         list.forEach(nbt -> linkedPositions.add(NBTUtil.getPosFromTag((NBTTagCompound) nbt)));
         if (compound.hasKey(NAME_NBT))
             this.name = compound.getString(NAME_NBT);
