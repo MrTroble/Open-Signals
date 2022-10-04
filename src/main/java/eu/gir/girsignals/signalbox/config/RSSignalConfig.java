@@ -49,7 +49,7 @@ public final class RSSignalConfig implements ISignalAutoconfig {
         current.getProperty(SignalSHLight.SHLIGHT_0)
                 .ifPresent(_u -> current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH0));
         current.getProperty(SignalRA.RALIGHT)
-                .ifPresent(_u -> current.setProperty(SignalRA.RALIGHT, true));
+                .ifPresent(_u -> current.setProperty(SignalRA.RALIGHT, false));
     }
 
 }
