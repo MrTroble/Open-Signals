@@ -3,6 +3,8 @@
 ## [Fix]
 
 * fix: crash when signal is beeing destroyed
+* fix: NPE with Redstone IO
+* fix: Ra11 light was acitivated with train pathway
 
 ## [Fix]
 
