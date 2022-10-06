@@ -161,7 +161,7 @@ public class SignalCustomModel implements IModel {
             m = m.retexture(build.build());
         }
 
-        if (!map.isEmpty() && map != null) {
+        if (map != null && !map.isEmpty()) {
             final Builder<String, String> build = ImmutableMap.builder();
             for (final Map.Entry<String, String> entry : map.entrySet())
                 build.put(entry.getKey(), entry.getValue());
@@ -174,16 +174,16 @@ public class SignalCustomModel implements IModel {
     }
 
     protected void loadExtention(final TextureStats texturestate,
-            Map<String, ModelExtention> extention, final String modelname, final ModelStats states,
+            final Map<String, ModelExtention> extention, final String modelname, final ModelStats states,
             final Models models, final FunctionParsingInfo signaltype) {
 
         final String originalblstate = texturestate.getBlockstate();
 
         final Map<String, String> originalretexmap = texturestate.getRetextures();
 
-        for (Map.Entry<String, ModelExtention> extentionmap : extention.entrySet()) {
+        for (final Map.Entry<String, ModelExtention> extentionmap : extention.entrySet()) {
 
-            for (Map.Entry<String, Map<String, String>> inFileExt : texturestate.getExtentions()
+            for (final Map.Entry<String, Map<String, String>> inFileExt : texturestate.getExtentions()
                     .entrySet()) {
 
                 final String extentionInFilename = inFileExt.getKey();
@@ -191,13 +191,13 @@ public class SignalCustomModel implements IModel {
 
                 if (extentionInFilename.equalsIgnoreCase(extentionmap.getKey())) {
 
-                    for (Map.Entry<String, String> entry : extentionmap.getValue().getExtention()
+                    for (final Map.Entry<String, String> entry : extentionmap.getValue().getExtention()
                             .entrySet()) {
 
-                        String enumval = entry.getKey();
-                        String retexutreval = entry.getValue();
+                        final String enumval = entry.getKey();
+                        final String retexutreval = entry.getValue();
 
-                        for (Map.Entry<String, String> extprops : extentionprops.entrySet()) {
+                        for (final Map.Entry<String, String> extprops : extentionprops.entrySet()) {
                             final String seprop = extprops.getKey();
                             final String retexturekey = extprops.getValue();
 

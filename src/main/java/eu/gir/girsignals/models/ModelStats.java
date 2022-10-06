@@ -27,7 +27,7 @@ public class ModelStats {
         final Map<String, String> entrySet = GIRFileReader.readallFilesfromDierectory(directory);
 
         final Map<String, Object> content = new HashMap<>();
-        
+
         if (entrySet != null) {
             entrySet.forEach((filename, file) -> {
 
@@ -49,6 +49,10 @@ public class ModelStats {
     public static Map<String, String> createRetexture(final Map<String, String> retexture,
             final Map<String, String> lamp) {
 
+        if (lamp.isEmpty()) {
+            return retexture;
+        }
+
         final Map<String, String> retexturemap = new HashMap<>();
 
         if (retexture != null) {
@@ -56,32 +60,15 @@ public class ModelStats {
 
                 final String key = entry.getKey();
                 final String val = entry.getValue();
+                final String lam = lamp.get(val);
 
-                if (!lamp.isEmpty()) {
-
-                    retexturemap.put(key, getLampPath(val, lamp));
-
-                } else {
-
+                if (lam == null) {
                     retexturemap.put(key, val);
+                } else {
+                    retexturemap.put(key, lam);
                 }
             }
         }
         return retexturemap;
-    }
-
-    private static String getLampPath(final String lampname, final Map<String, String> map) {
-        
-        if (lampname.startsWith("lamp_")) {
-            
-            if (map != null) {
-                
-                for (final Map.Entry<String, String> entry : map.entrySet()) {
-                    if (entry.getKey().equalsIgnoreCase(lampname))
-                        return entry.getValue();
-                }
-            }
-        }
-        return lampname;
     }
 }
