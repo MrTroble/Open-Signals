@@ -3,9 +3,9 @@ package eu.gir.girsignals.blocks.signals;
 import eu.gir.girsignals.EnumSignals.CAR;
 import eu.gir.girsignals.EnumSignals.PED;
 import eu.gir.girsignals.EnumSignals.Tram;
+import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.EnumSignals.TramSwitch;
 import eu.gir.girsignals.EnumSignals.TramType;
-import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
@@ -24,9 +24,9 @@ public class SignalTram extends Signal {
     public static final SEProperty<TramAdd> TRAMSIGNAL_ADD = SEProperty.of("signaltramadd",
             TramAdd.OFF, ChangeableStage.GUISTAGE, true, check(TRAMSIGNAL_TYPE, TramType.TRAM));
     public static final SEProperty<Boolean> TRAMSIGNAL_A = SEProperty.of("signaltrama", false,
-            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(TRAMSIGNAL_TYPE, TramType.TRAM));
+            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(TRAMSIGNAL_TYPE, TramType.TRAM).and(check(TRAMSIGNAL_ADD, TramAdd.A).or(check(TRAMSIGNAL_ADD, TramAdd.AT))));
     public static final SEProperty<Boolean> TRAMSIGNAL_T = SEProperty.of("signaltramt", false,
-            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(TRAMSIGNAL_TYPE, TramType.TRAM));
+            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(TRAMSIGNAL_TYPE, TramType.TRAM).and(check(TRAMSIGNAL_ADD, TramAdd.T).or(check(TRAMSIGNAL_ADD, TramAdd.AT))));
     public static final SEProperty<TramSwitch> TRAM_SWITCH = SEProperty.of("signaltramswitch",
             TramSwitch.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true,
             check(TRAMSIGNAL_TYPE, TramType.SWITCH));

@@ -12,14 +12,8 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import eu.gir.girsignals.EnumSignals.CAR;
-import eu.gir.girsignals.EnumSignals.PED;
 import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.RALight;
-import eu.gir.girsignals.EnumSignals.Tram;
-import eu.gir.girsignals.EnumSignals.TramAdd;
-import eu.gir.girsignals.EnumSignals.TramSwitch;
-import eu.gir.girsignals.EnumSignals.TramType;
 import eu.gir.girsignals.EnumSignals.WNCross;
 import eu.gir.girsignals.EnumSignals.WNNormal;
 import eu.gir.girsignals.GirsignalsMain;
@@ -27,7 +21,6 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import eu.gir.girsignals.blocks.boards.SignalRA;
 import eu.gir.girsignals.blocks.boards.SignalWN;
-import eu.gir.girsignals.blocks.signals.SignalTram;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
 import eu.gir.girsignals.models.parser.LogicParser;
 import eu.gir.girsignals.models.parser.LogicalParserException;
@@ -192,6 +185,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
             }
         }
 
+        /*
         registeredModels.put("tramsignal", cm -> {
             // TRAM off
             cm.register("trafficlight/trafficlight_tram",
@@ -351,6 +345,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                     0, "rednorth", "girsignals:blocks/lamps/lamp_yellow_blink", "greennorth",
                     "girsignals:blocks/lamps/lamp_yellow_blink_i");
         });
+        */
         registeredModels.put("rasignal", cm -> {
             cm.register("mast", with(SignalRA.RATYPE, mast -> mast.equals(RA.RA12)).negate()
                     .and(with(SignalRA.RATYPE, mast -> mast.equals(RA.RA6_9)).negate()), 0);
