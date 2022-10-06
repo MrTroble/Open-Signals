@@ -64,14 +64,14 @@ public class TextureStats {
     public boolean appendExtention(final String seprop, final String enums,
             final String retexturekey, final String retexureval) {
 
-        if (!loadOFFstate && enums.equalsIgnoreCase("OFF")) {
+        if (!loadOFFstate && enums.equalsIgnoreCase("OFF"))
             return false;
-        }
 
         if (this.retexture == null) {
 
             this.retexture = new HashMap<>();
         }
+        
         this.retexture.put(retexturekey, retexureval);
 
         if (this.blockstate.length() < 4) {
@@ -84,6 +84,5 @@ public class TextureStats {
         }
 
         return true;
-
     }
 }

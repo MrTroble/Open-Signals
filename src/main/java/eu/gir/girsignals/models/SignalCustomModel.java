@@ -221,7 +221,7 @@ public class SignalCustomModel implements IModel {
                                     GirsignalsMain.log.error(
                                             "There was an problem during loading an extention into "
                                                     + modelname + " with the blockstate '"
-                                                    + texturestate.getBlockstate() + " '!");
+                                                    + texturestate.getBlockstate() + "'!");
                                 }
 
                                 texturestate.resetStates(originalblstate, originalretexmap);
