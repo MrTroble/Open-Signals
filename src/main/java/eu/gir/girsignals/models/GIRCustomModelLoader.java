@@ -1,9 +1,5 @@
 package eu.gir.girsignals.models;
 
-import static eu.gir.girsignals.models.parser.PredicateHolder.hasAndIs;
-import static eu.gir.girsignals.models.parser.PredicateHolder.hasAndIsNot;
-import static eu.gir.girsignals.models.parser.PredicateHolder.with;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,12 +8,9 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import eu.gir.girsignals.EnumSignals.WNCross;
-import eu.gir.girsignals.EnumSignals.WNNormal;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalAngel;
-import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
 import eu.gir.girsignals.models.parser.LogicParser;
 import eu.gir.girsignals.models.parser.LogicalParserException;
@@ -181,55 +174,6 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                         });
             }
         }
-        
-        registeredModels.put("wnsignal", cm -> {
-            cm.register("wn/wn1_2", hasAndIsNot(SignalWN.WNTYPE)
-                    .and(with(SignalWN.WNNORMAL, wn -> wn.equals(WNNormal.OFF))), 0);
-            cm.register("wn/wn1_2",
-                    hasAndIsNot(SignalWN.WNTYPE)
-                            .and(with(SignalWN.WNNORMAL, wn -> wn.equals(WNNormal.WN1))),
-                    0, "lamp_1", "girsignals:blocks/lamps/lamp_white", "lamp_3",
-                    "girsignals:blocks/lamps/lamp_white");
-            cm.register("wn/wn1_2",
-                    hasAndIsNot(SignalWN.WNTYPE)
-                            .and(with(SignalWN.WNNORMAL, wn -> wn.equals(WNNormal.WN2))),
-                    0, "lamp_2", "girsignals:blocks/lamps/lamp_white", "lamp_3",
-                    "girsignals:blocks/lamps/lamp_white");
-            cm.register("wn/wn1_2",
-                    hasAndIsNot(SignalWN.WNTYPE)
-                            .and(with(SignalWN.WNNORMAL, wn -> wn.equals(WNNormal.BLINK))),
-                    0, "lamp_3", "girsignals:blocks/lamps/lamp_white_blink");
-            cm.register("wn/wn3_6", hasAndIs(SignalWN.WNTYPE)
-                    .and(with(SignalWN.WNCROSS, wn -> wn.equals(WNCross.OFF))), 0);
-            cm.register("wn/wn3_6",
-                    hasAndIs(SignalWN.WNTYPE)
-                            .and(with(SignalWN.WNCROSS, wn -> wn.equals(WNCross.WN3))),
-                    0, "lamp_1", "girsignals:blocks/lamps/lamp_white", "lamp_3",
-                    "girsignals:blocks/lamps/lamp_white", "lamp_5",
-                    "girsignals:blocks/lamps/lamp_white");
-            cm.register("wn/wn3_6",
-                    hasAndIs(SignalWN.WNTYPE)
-                            .and(with(SignalWN.WNCROSS, wn -> wn.equals(WNCross.WN4))),
-                    0, "lamp_1", "girsignals:blocks/lamps/lamp_white", "lamp_2",
-                    "girsignals:blocks/lamps/lamp_white", "lamp_4",
-                    "girsignals:blocks/lamps/lamp_white");
-            cm.register("wn/wn3_6",
-                    hasAndIs(SignalWN.WNTYPE)
-                            .and(with(SignalWN.WNCROSS, wn -> wn.equals(WNCross.WN5))),
-                    0, "lamp_1", "girsignals:blocks/lamps/lamp_white", "lamp_3",
-                    "girsignals:blocks/lamps/lamp_white", "lamp_4",
-                    "girsignals:blocks/lamps/lamp_white");
-            cm.register("wn/wn3_6",
-                    hasAndIs(SignalWN.WNTYPE)
-                            .and(with(SignalWN.WNCROSS, wn -> wn.equals(WNCross.WN6))),
-                    0, "lamp_1", "girsignals:blocks/lamps/lamp_white", "lamp_2",
-                    "girsignals:blocks/lamps/lamp_white", "lamp_5",
-                    "girsignals:blocks/lamps/lamp_white");
-            cm.register("wn/wn3_6",
-                    hasAndIs(SignalWN.WNTYPE)
-                            .and(with(SignalWN.WNCROSS, wn -> wn.equals(WNCross.BLINK))),
-                    0, "lamp_1", "girsignals:blocks/lamps/lamp_white_blink");
-        });
     }
 
     @Override
