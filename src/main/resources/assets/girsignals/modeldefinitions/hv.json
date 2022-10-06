@@ -222,7 +222,7 @@
 		"hv/hv_zs3": {
 			"textures": [
 				{
-					"blockstate": "with(prop.prop) && has(STOPSIGNAL)",
+					"blockstate": "has(STOPSIGNAL)",
 					"extentions": {
 						"zs32.json": {
 							"zs3": "overlay"
@@ -235,7 +235,7 @@
 		"hv/hv_zs3v": {
 			"textures": [
 				{
-					"blockstate": "with(prop.prop)",
+					"blockstate": "",
 					"extentions": {
 						"zs32.json": {
 							"zs3v": "overlay"
@@ -249,7 +249,7 @@
 			"textures": [
 				{
 					"loadOFFstate": false,
-					"blockstate": "with(prop.prop) && (has(STOPSIGNAL) && !has(ZS3))",
+					"blockstate": "(has(STOPSIGNAL) && !has(ZS3))",
 					"extentions": {
 						"zs32.json": {
 							"zs3plate": "overlay"
@@ -263,7 +263,7 @@
 			"textures": [
 				{
 					"loadOFFstate": false,
-					"blockstate": "with(prop.prop) && !has(ZS3V)",
+					"blockstate": "!has(ZS3V)",
 					"extentions": {
 						"zs32.json": {
 							"zs3vplate": "overlay"
@@ -276,7 +276,7 @@
 		"hv/hv_sign": {
 			"textures": [
 				{
-					"blockstate": "with(prop.prop)",
+					"blockstate": "",
 					"extentions": {
 						"mastsigns.json": {
 							"mastsign": "2"

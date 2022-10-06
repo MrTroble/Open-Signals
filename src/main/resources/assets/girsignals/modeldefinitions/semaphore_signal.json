@@ -245,7 +245,7 @@
 		"semaphore_signals/sema_main_zs3": {
 			"textures": [
 				{
-					"blockstate": "with(prop.prop) && with(SEMATYPE.MAIN)",
+					"blockstate": "with(SEMATYPE.MAIN)",
 					"extentions": {
 						"zs32.json": {
 							"zs3": "overlay"
@@ -253,7 +253,7 @@
 					}
 				},
 				{
-					"blockstate": "with(prop.prop) && with(SEMATYPE.MAIN_SMALL)",
+					"blockstate": "with(SEMATYPE.MAIN_SMALL)",
 					"extentions": {
 						"zs32.json": {
 							"zs3": "overlay"
@@ -268,7 +268,7 @@
 			"textures": [
 				{
 					"loadOFFstate": false,
-					"blockstate": "with(prop.prop) && with(SEMATYPE.MAIN) && !has(ZS3)",
+					"blockstate": "(with(SEMATYPE.MAIN) && !has(ZS3))",
 					"extentions": {
 						"zs32.json": {
 							"zs3plate": "overlay"
@@ -277,7 +277,7 @@
 				},
 				{
 					"loadOFFstate": false,
-					"blockstate": "with(prop.prop) && with(SEMATYPE.MAIN_SMALL) && !has(ZS3)",
+					"blockstate": "(with(SEMATYPE.MAIN_SMALL) && !has(ZS3))",
 					"extentions": {
 						"zs32.json": {
 							"zs3plate": "overlay"

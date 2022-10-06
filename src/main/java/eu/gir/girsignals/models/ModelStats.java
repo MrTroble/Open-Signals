@@ -21,8 +21,11 @@ public class ModelStats {
     }
 
     public static Map<String, Object> getfromJson(final String directory) {
+
         final Gson gson = new Gson();
+
         final Map<String, String> entrySet = GIRFileReader.readallFilesfromDierectory(directory);
+
         final Map<String, Object> content = new HashMap<>();
         if (entrySet != null) {
             entrySet.forEach((filename, file) -> {

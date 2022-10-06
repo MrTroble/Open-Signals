@@ -125,100 +125,21 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                                     final String blockstate = texturestate.getBlockstate();
 
-                                    final Map<String, String> retexture = texturestate
-                                            .getRetextures();
-
                                     Predicate<IExtendedBlockState> state = null;
+
+                                    boolean extentionloaded = false;
 
                                     if (!texturestate.isautoBlockstate()) {
 
-                                        boolean extentionloaded = false;
+                                        final Map<String, Map<String, String>> texturemap = texturestate
+                                                .getExtentions();
 
-                                        for (final Map.Entry<String, ModelExtention> extention : extentions
-                                                .entrySet()) {
+                                        if (texturemap != null && !texturemap.isEmpty()) {
 
-                                            if (texturestate.getExtentions() != null) {
+                                            cm.loadExtention(texturestate, extentions, modelname,
+                                                    content, modelstats, parsinginfo);
 
-                                                for (final Map.Entry<String, Map<String, String>> filext : texturestate
-                                                        .getExtentions().entrySet()) {
-
-                                                    final String nametoextend = filext.getKey();
-                                                    final Map<String, String> ex = filext
-                                                            .getValue();
-
-                                                    if (nametoextend
-                                                            .equalsIgnoreCase(extention.getKey())) {
-
-                                                        for (final Map.Entry<String, String> extentionprops : extention
-                                                                .getValue().getExtention()
-                                                                .entrySet()) {
-
-                                                            final String enums = extentionprops
-                                                                    .getKey();
-                                                            final String retextureval = extentionprops
-                                                                    .getValue();
-
-                                                            for (final Map.Entry<String, String> extentionvals : ex
-                                                                    .entrySet()) {
-
-                                                                final String seprop = extentionvals
-                                                                        .getKey();
-                                                                final String retexturekey = extentionvals
-                                                                        .getValue();
-
-                                                                final boolean load = texturestate
-                                                                        .appendExtention(seprop,
-                                                                                enums, retexturekey,
-                                                                                retextureval,
-                                                                                modelname);
-
-                                                                final String blstate = texturestate
-                                                                        .getBlockstate();
-
-                                                                texturestate.resetStates(blockstate,
-                                                                        retexture);
-
-                                                                if (load) {
-
-                                                                    try {
-                                                                        state = LogicParser
-                                                                                .predicate(blstate,
-                                                                                        parsinginfo);
-
-                                                                    } catch (final LogicalParserException e) {
-
-                                                                        GirsignalsMain.log.error(
-                                                                                "There was an problem during loading "
-                                                                                        + modelname
-                                                                                        + " from "
-                                                                                        + filename
-                                                                                        + "!");
-                                                                        e.printStackTrace();
-                                                                    }
-
-                                                                    cm.register(modelname, state,
-                                                                            modelstats.getX(
-                                                                                    texturestate
-                                                                                            .getOffsetX()),
-                                                                            modelstats.getY(
-                                                                                    texturestate
-                                                                                            .getOffsetY()),
-                                                                            modelstats.getZ(
-                                                                                    texturestate
-                                                                                            .getOffsetZ()),
-                                                                            ModelStats
-                                                                                    .createRetexture(
-                                                                                            texturestate
-                                                                                                    .getRetextures(),
-                                                                                            content.getTextures()));
-                                                                    extentionloaded = true;
-
-                                                                }
-                                                            }
-                                                        }
-                                                    }
-                                                }
-                                            }
+                                            extentionloaded = true;
                                         }
 
                                         if (!extentionloaded) {
@@ -229,8 +150,10 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                             } catch (final LogicalParserException e) {
                                                 GirsignalsMain.log.error(
                                                         "There was an problem during loading "
-                                                                + modelname + " from " + filename
-                                                                + "!");
+                                                                + modelname
+                                                                + " with the blockstate '"
+                                                                + texturestate.getBlockstate()
+                                                                + " '!");
                                                 e.printStackTrace();
                                             }
                                         }
@@ -246,7 +169,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                         texturestate.getRetextures(),
                                                         content.getTextures()));
 
-                                    } else if (state != null && !texturestate.isautoBlockstate()) {
+                                    } else if (state != null && !texturestate.isautoBlockstate()
+                                            && !extentionloaded) {
 
                                         cm.register(modelname, state,
                                                 modelstats.getX(texturestate.getOffsetX()),
@@ -256,7 +180,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                         texturestate.getRetextures(),
                                                         content.getTextures()));
 
-                                    } else if (state == null && !texturestate.isautoBlockstate()) {
+                                    } else if (state == null && !texturestate.isautoBlockstate()
+                                            && !extentionloaded) {
                                         GirsignalsMain.log.warn(
                                                 "The predicate of " + modelname + " in " + filename
                                                         + " is null! This shouldn´t be the case!");

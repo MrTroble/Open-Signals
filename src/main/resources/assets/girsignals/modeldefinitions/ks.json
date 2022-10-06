@@ -247,7 +247,7 @@
         "ks/ks_sign": {
             "textures": [
                 {
-                    "blockstate": "with(prop.prop)",
+                    "blockstate": "",
                     "extentions": {
                         "mastsigns.json": {
                             "MASTSIGN": "13"
@@ -260,7 +260,7 @@
         "ks/ks_zs3": {
             "textures": [
                 {
-                    "blockstate": "with(prop.prop)",
+                    "blockstate": "",
                     "extentions": {
                         "zs32.json": {
                             "ZS3": "overlay"
@@ -273,7 +273,7 @@
         "ks/ks_zs3v": {
             "textures": [
                 {
-                    "blockstate": "with(prop.prop)",
+                    "blockstate": "",
                     "extentions": {
                         "zs32.json": {
                             "ZS3V": "overlay"
@@ -286,7 +286,7 @@
         "ks/ks_zs2": {
             "textures": [
                 {
-                    "blockstate": "with(prop.prop)",
+                    "blockstate": "",
                     "extentions": {
                         "zs32.json": {
                             "ZS2": "overlay"
@@ -299,7 +299,7 @@
         "ks/ks_zs2v": {
             "textures": [
                 {
-                    "blockstate": "with(prop.prop)",
+                    "blockstate": "",
                     "extentions": {
                         "zs32.json": {
                             "ZS2V": "overlay"
@@ -313,7 +313,7 @@
             "textures": [
                 {
                     "loadOFFstate": false,
-                    "blockstate": "with(prop.prop)",
+                    "blockstate": "",
                     "extentions": {
                         "zs32.json": {
                             "ZS3PLATE": "overlay"
@@ -327,7 +327,7 @@
             "textures": [
                 {
                     "loadOFFstate": false,
-                    "blockstate": "with(prop.prop)",
+                    "blockstate": "",
                     "extentions": {
                         "zs32.json": {
                             "ZS3VPLATE": "overlay"

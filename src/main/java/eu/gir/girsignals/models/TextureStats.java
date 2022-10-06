@@ -3,8 +3,6 @@ package eu.gir.girsignals.models;
 import java.util.HashMap;
 import java.util.Map;
 
-import eu.gir.girsignals.GirsignalsMain;
-
 public class TextureStats {
 
     private float x = 0;
@@ -60,31 +58,31 @@ public class TextureStats {
     }
 
     /**
-     * @return true if this model with these parameters should be loaded
+     * @return true if this model with these parameters should/can be loaded
      */
 
     public boolean appendExtention(final String seprop, final String enums,
-            final String retexturekey, final String retexureval, final String modelname) {
+            final String retexturekey, final String retexureval) {
 
-        if (!loadOFFstate && enums.equalsIgnoreCase("OFF"))
-            return false;
-
-        if (retexture == null) {
-
-            retexture = new HashMap<>();
-        }
-
-        retexture.put(retexturekey, retexureval);
-
-        if (!blockstate.contains("with(prop.prop)")) {
-
-            GirsignalsMain.log.error("Unable to load an extention into " + modelname
-                    + "! Did you included 'with(prop.prop)' to your blockstate? The state was "
-                    + blockstate + ".");
+        if (!loadOFFstate && enums.equalsIgnoreCase("OFF")) {
             return false;
         }
 
-        blockstate = blockstate.replace("prop.prop", seprop + "." + enums);
+        if (this.retexture == null) {
+
+            this.retexture = new HashMap<>();
+        }
+        this.retexture.put(retexturekey, retexureval);
+
+        if (this.blockstate.length() < 4) {
+
+            this.blockstate = "with(" + seprop + "." + enums + ")";
+
+        } else {
+
+            this.blockstate += " && with(" + seprop + "." + enums + ")";
+        }
+
         return true;
 
     }

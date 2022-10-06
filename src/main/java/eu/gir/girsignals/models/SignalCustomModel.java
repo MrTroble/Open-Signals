@@ -21,6 +21,9 @@ import com.mojang.realmsclient.util.Pair;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal.SignalAngel;
+import eu.gir.girsignals.models.parser.FunctionParsingInfo;
+import eu.gir.girsignals.models.parser.LogicParser;
+import eu.gir.girsignals.models.parser.LogicalParserException;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
@@ -168,5 +171,65 @@ public class SignalCustomModel implements IModel {
 
         m.getTextures().stream().filter(rs -> !textures.contains(rs)).forEach(textures::add);
         modelCache.put(state, Pair.of(m, new Vector3f(x, y, z)));
+    }
+
+    protected void loadExtention(final TextureStats texturestate,
+            Map<String, ModelExtention> extention, final String modelname, final ModelStats states,
+            final Models models, final FunctionParsingInfo signaltype) {
+
+        final String originalblstate = texturestate.getBlockstate();
+
+        final Map<String, String> originalretexmap = texturestate.getRetextures();
+
+        for (Map.Entry<String, ModelExtention> extentionmap : extention.entrySet()) {
+
+            for (Map.Entry<String, Map<String, String>> inFileExt : texturestate.getExtentions()
+                    .entrySet()) {
+
+                final String extentionInFilename = inFileExt.getKey();
+                final Map<String, String> extentionprops = inFileExt.getValue();
+
+                if (extentionInFilename.equalsIgnoreCase(extentionmap.getKey())) {
+
+                    for (Map.Entry<String, String> entry : extentionmap.getValue().getExtention()
+                            .entrySet()) {
+
+                        String enumval = entry.getKey();
+                        String retexutreval = entry.getValue();
+
+                        for (Map.Entry<String, String> extprops : extentionprops.entrySet()) {
+                            final String seprop = extprops.getKey();
+                            final String retexturekey = extprops.getValue();
+
+                            final boolean load = texturestate.appendExtention(seprop, enumval,
+                                    retexturekey, retexutreval);
+
+                            if (load) {
+
+                                try {
+
+                                    this.register(modelname,
+                                            LogicParser.predicate(texturestate.getBlockstate(),
+                                                    signaltype),
+                                            models.getX(texturestate.getOffsetX()),
+                                            models.getY(texturestate.getOffsetY()),
+                                            models.getZ(texturestate.getOffsetZ()),
+                                            ModelStats.createRetexture(texturestate.getRetextures(),
+                                                    states.getTextures()));
+
+                                } catch (final LogicalParserException e) {
+                                    GirsignalsMain.log.error(
+                                            "There was an problem during loading an extention into "
+                                                    + modelname + " with the blockstate '"
+                                                    + texturestate.getBlockstate() + " '!");
+                                }
+
+                                texturestate.resetStates(originalblstate, originalretexmap);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
