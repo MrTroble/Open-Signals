@@ -7,6 +7,7 @@ import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.guilib.ecs.interfaces.ISyncable;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -45,6 +46,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
         super.readFromNBT(compound);
         linkedPositions.clear();
         final NBTTagList list = (NBTTagList) compound.getTag(LINKED_LIST);
+        if (list == null)
+            return;
         list.forEach(nbt -> linkedPositions.add(NBTUtil.getPosFromTag((NBTTagCompound) nbt)));
         if (compound.hasKey(NAME_NBT))
             this.name = compound.getString(NAME_NBT);
@@ -101,5 +104,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     @Override
     public Iterator<BlockPos> iterator() {
         return this.linkedPositions.iterator();
+    }
+
+    @Override
+    public boolean isValid(final EntityPlayer player) {
+        return true;
     }
 }

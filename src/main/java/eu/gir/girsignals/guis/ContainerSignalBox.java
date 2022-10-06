@@ -35,7 +35,6 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 
     public ContainerSignalBox(final SignalBoxTileEntity tile) {
         this.tile = tile;
-        this.tile.add(this);
     }
 
     public ContainerSignalBox(final Consumer<NBTTagCompound> run) {
@@ -66,8 +65,11 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 
     @Override
     public boolean canInteractWith(final EntityPlayer playerIn) {
+        if (tile.isBlocked() && !tile.isValid(playerIn))
+            return false;
         if (playerIn instanceof EntityPlayerMP && this.player == null) {
             this.player = (EntityPlayerMP) playerIn;
+            this.tile.add(this);
         }
         return true;
     }
@@ -96,8 +98,8 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 
     @Override
     public void onContainerClosed(final EntityPlayer playerIn) {
-        playerIn.openContainer = null;
-        this.tile.remove(this);
+        if (this.tile != null)
+            this.tile.remove(this);
     }
 
     @Override

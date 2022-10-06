@@ -12,6 +12,7 @@ import eu.gir.girsignals.blocks.Signal;
 import eu.gir.guilib.ecs.interfaces.ISyncable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -116,11 +117,11 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         this.formatCustomName = str;
         if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
             map.remove(Signal.CUSTOMNAME);
-            this.syncClient();
         } else if (str != null) {
             map.put(Signal.CUSTOMNAME, true);
-            this.syncClient();
         }
+        this.markDirty();
+        this.syncClient();
     }
 
     @SideOnly(Side.CLIENT)
@@ -172,4 +173,8 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
                 && Objects.equals(map, other.map);
     }
 
+    @Override
+    public boolean isValid(final EntityPlayer player) {
+        return true;
+    }
 }

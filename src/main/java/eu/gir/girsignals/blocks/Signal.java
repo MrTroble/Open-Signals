@@ -420,6 +420,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         final World world = te.getWorld();
         final BlockPos pos = te.getPos();
         final IBlockState state = world.getBlockState(pos);
+        if (!(state.getBlock() instanceof Signal)) {
+            return;
+        }
         final SignalAngel face = state.getValue(Signal.ANGEL);
         final float angel = face.getDegree();
 

@@ -69,6 +69,38 @@ public class GIRConfigtestHV {
                 DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP0).build(),
                 DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build());
 
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(),
+                DummyBuilder.start(SignalHV.STOPSIGNAL, HP.HP1).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.HP0).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(),
+                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(),
+                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1).of(SignalKS.ZS3, ZS32.Z7).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR2).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(),
+                DummyBuilder.start(SignalKS.STOPSIGNAL, KS.KS1).of(SignalKS.ZS3, ZS32.Z8).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build(),
+                DummyBuilder.start(SignalHV.HPHOME, HPHome.HP0).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(),
+                DummyBuilder.start(SignalHV.HPHOME, HPHome.HP1).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR1).build());
+
+        assertChange(DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR0).build(),
+                DummyBuilder.start(SignalHV.HPHOME, HPHome.HP2).build(),
+                DummyBuilder.start(SignalHV.DISTANTSIGNAL, VR.VR2).build());
+
         final ConfigInfo info = new ConfigInfo(new DummySignal(), null, 0);
         config.change(info);
         assertEquals(new DummySignal(), info.current);
@@ -135,9 +167,6 @@ public class GIRConfigtestHV {
             } else if (zs32.ordinal() == 30) {
                 configtestHVKS(HP.HP2, HPHome.HP2, HPBlock.HP1, VR.VR2, ZS32.OFF, ZS32.OFF, KS.KS1,
                         KSMain.KS1, KSDistant.KS1, ZS32.Z4, ZS32.OFF, 4);
-            } else if (zs32.ordinal() > 32 && zs32.ordinal() < 43) {
-                configtestHVKS(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR1, zs32, zs32, KS.KS1,
-                        KSMain.KS1, KSDistant.KS1, zs32, ZS32.OFF, zs32.ordinal() - 26);
             }
         }
         configtestHVKS(HP.HP1, HPHome.HP1, HPBlock.HP1, VR.VR0, ZS32.OFF, ZS32.OFF, KS.HP0,

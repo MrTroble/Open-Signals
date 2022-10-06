@@ -140,7 +140,7 @@ property.signaltramadd.desc=Here you can select between A, T and A with T.
 property.signaltrama.desc=Drive request
 property.signaltramt.desc=Departure recommendation
 property.signaltramswitch.desc=Left, right, straight ahead with and without locked switch
-property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign.
+property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign. With '[n]' you get into the next line.
 property.sematype.desc=Changes the type of the shape signal: approach signal, main signal and small main signal
 property.hp2.desc=Adds the second wing to the main signal.
 property.ra12.desc=Allows shunting.
@@ -149,6 +149,7 @@ property.wing2.desc=Wing for Hp0/1 and Hp2
 property.wing1.desc=Wing for Hp0 and Hp1
 property.semavr.desc=§lVr Distant signal§r - Distant signals indicate which signal aspect is to be expected at the associated main signal.%n§nVr0§r: Expect stop%n§nVr1§r: Expect run%n§nVr2§r: Expect run with speed restriction
 property.sh_mech.desc=§lSh Protection signal§r%n§nSh0§r: Stop for train and shunting movements%n§nSh1§r: Shunting permitted.%n§nWn7/Gsp2§r:The track lock is set aside.
+property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign. With '[n]' you get into the next line.
 
 #Sign Names
 property.indicator.name=Indicator
@@ -340,3 +341,8 @@ property.prop.INPUT.name=Redstone input
 property.prop.INPUT.desc=Here you can set the Redstone input. E.g. from sensors.
 btn.apply=Apply
 label.linkedto=Linked to
+msg.isblocked=The signal box is already in use.
+property.prop.INPUT.blocking.name=Blocking
+property.prop.INPUT.blocking.desc=Blocks a route. Blocking can be done behind a signal or on a free field (e.g. for permanent blocking).
+property.prop.INPUT.resetting.name=Resetting
+property.prop.INPUT.resetting.desc=Resets a route. Routes are reset before a signal or on a free section (e.g. for a partial route reset).

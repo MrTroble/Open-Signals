@@ -1,6 +1,19 @@
 # Changelog
 
-## [Beta Update]
+## [Fix]
+
+* fix: crash when signal is beeing destroyed
+* fix: NPE with Redstone IO
+* fix: Ra11 light was acitivated with train pathway
+
+## [Fix]
+
+* fix: partial pathways cannot be reset
+* fix: partial pathways do not update correctly in UI
+
+## [Update]
+
+### BREAKING CHANGES!
 
 * fix: several synchronization fixes
 * feat: partly pathway resetting
@@ -8,8 +21,17 @@
 * feat: auto recover from bad pathways
 * perf: reduced redstone performance
 * perf: only send needed data
+* fix: improved dijkstra path detection
+* feat: security patch for signal boxes (only one user at same time)
+* fix: sh light signal status light
+* feat: new sh light texture
+* ref: optimize models
 
-// Known issues: Sometimes pathways are invisible
+// Known issues:
+
+* Custom names are sometimes not rendered
+* Ra11 shows Ra12 with train drive path
+* Edit not saved on exit (Workaround: Go to the Use tab before exiting)
 
 ## [Beta Update] 
 * feat: Ra11 added to signalbox

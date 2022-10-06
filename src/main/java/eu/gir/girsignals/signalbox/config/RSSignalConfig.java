@@ -15,6 +15,7 @@ import eu.gir.girsignals.blocks.signals.SignalHV;
 import eu.gir.girsignals.blocks.signals.SignalKS;
 import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalSemaphore;
+import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public final class RSSignalConfig implements ISignalAutoconfig {
@@ -36,8 +37,11 @@ public final class RSSignalConfig implements ISignalAutoconfig {
         values.put(SignalKS.MAINSIGNAL, KSMain.KS_SHUNTING);
         values.put(SignalHL.STOPSIGNAL, HL.HL_SHUNTING);
         values.put(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING);
-        values.put(SignalRA.RALIGHT, true);
         values.put(SignalSemaphore.RA12, true);
+
+        if (info.type.equals(PathType.SHUNTING)) {
+            values.put(SignalRA.RALIGHT, true);
+        }
 
         this.changeIfPresent(values, info.current);
     }

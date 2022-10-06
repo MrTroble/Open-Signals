@@ -12,6 +12,7 @@ import org.lwjgl.opengl.GL11;
 
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.PathType;
+import eu.gir.girsignals.signalbox.debug.SignalBoxFactory;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.guilib.ecs.entitys.UIEntity;
 import net.minecraft.client.renderer.BufferBuilder;

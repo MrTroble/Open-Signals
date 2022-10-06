@@ -10,6 +10,7 @@ public class DebugChecker extends ConnectionChecker {
         final boolean flag = super.check();
         if (!flag) {
             GirsignalsMain.log.debug("Check failed for " + this.path);
+            GirsignalsMain.log.debug(nextNode);
         }
         return flag;
     }

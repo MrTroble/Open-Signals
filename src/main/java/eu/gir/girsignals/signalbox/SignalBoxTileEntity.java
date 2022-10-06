@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.LinkType;
 import eu.gir.girsignals.init.GIRBlocks;
+import eu.gir.girsignals.signalbox.debug.SignalBoxFactory;
 import eu.gir.girsignals.tileentitys.IChunkloadable;
 import eu.gir.girsignals.tileentitys.RedstoneIOTileEntity;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
@@ -22,6 +23,7 @@ import eu.gir.guilib.ecs.interfaces.ISyncable;
 import eu.gir.linkableapi.ILinkableTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.nbt.NBTUtil;
@@ -73,6 +75,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
 
     @Override
     public void readFromNBT(final NBTTagCompound compound) {
+        super.readFromNBT(compound);
         final NBTTagList list = (NBTTagList) compound.getTag(LINKED_POS_LIST);
         if (list != null) {
             linkedBlocks.clear();
@@ -85,13 +88,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         }
         final NBTTagCompound gridComp = compound.getCompoundTag(GUI_TAG);
         grid.read(gridComp);
-        super.readFromNBT(compound);
-        if (world != null)
+        if (world != null) {
             onLoad();
+        }
     }
 
     @Override
     public void updateTag(final NBTTagCompound compound) {
+        this.markDirty();
         if (compound == null)
             return;
         if (compound.hasKey(REMOVE_SIGNAL)) {
@@ -102,11 +106,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity
                 worldLoadOps.loadAndReset(p1);
             }
             linkedBlocks.remove(p1);
+            this.syncClient();
+            return;
         }
         if (compound.hasKey(RESET_WAY)) {
             final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
             final Point p1 = fromNBT(request, POINT1);
             grid.resetPathway(p1);
+            this.syncClient();
             return;
         }
         if (compound.hasKey(REQUEST_WAY)) {
@@ -117,6 +124,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity
                 final NBTTagCompound error = new NBTTagCompound();
                 error.setString(ERROR_STRING, "error.nopathfound");
                 sendToAll(error);
+            } else {
+                this.syncClient();
             }
             return;
         }
@@ -208,4 +217,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         }
     }
 
+    public boolean isBlocked() {
+        return !this.clientSyncs.isEmpty();
+    }
+
+    @Override
+    public boolean isValid(final EntityPlayer player) {
+        if (clientSyncs.isEmpty())
+            return false;
+        return this.clientSyncs.get(0).getPlayer().equals(player);
+    }
 }

@@ -1,4 +1,4 @@
-package eu.gir.girsignals.signalbox;
+package eu.gir.girsignals.signalbox.debug;
 
 import java.util.List;
 import java.util.Map;
@@ -8,8 +8,14 @@ import javax.annotation.Nullable;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.enums.PathType;
+import eu.gir.girsignals.signalbox.Point;
+import eu.gir.girsignals.signalbox.SignalBoxGrid;
+import eu.gir.girsignals.signalbox.SignalBoxNode;
+import eu.gir.girsignals.signalbox.SignalBoxPathway;
 import eu.gir.girsignals.signalbox.SignalBoxUtil.ConnectionChecker;
-import eu.gir.girsignals.signalbox.debug.DebugFactory;
+import eu.gir.girsignals.signalbox.WorldLoadOperations;
+import eu.gir.girsignals.signalbox.WorldOperations;
+import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.World;
 
@@ -48,5 +54,9 @@ public class SignalBoxFactory {
 
     public SignalBoxGrid getGrid(final Consumer<NBTTagCompound> sendToAll) {
         return new SignalBoxGrid(sendToAll);
+    }
+
+    public PathOptionEntry getEntry() {
+        return new PathOptionEntry();
     }
 }

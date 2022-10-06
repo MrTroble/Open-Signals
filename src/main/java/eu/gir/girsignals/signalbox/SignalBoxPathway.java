@@ -214,10 +214,8 @@ public class SignalBoxPathway implements INetworkSavable {
         this.signalPositions.ifPresent(entry -> {
             loadOps.loadAndConfig(speed, entry.getKey(), entry.getValue(), this::configUpdate);
         });
-        lastSignal.ifPresent(posIn -> {
-            distantSignalPositions.forEach(
-                    position -> loadOps.loadAndConfig(speed, position, posIn, this::configUpdate));
-        });
+        distantSignalPositions.forEach(position -> loadOps.loadAndConfig(speed, position,
+                lastSignal.orElse(null), this::configUpdate));
     }
 
     public void resetPathway() {
@@ -228,28 +226,32 @@ public class SignalBoxPathway implements INetworkSavable {
         this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
     }
 
-    private void resetSignals() {
-        resetFirstSignal();
+    private void resetOther() {
         distantSignalPositions.forEach(position -> loadOps.loadAndReset(position));
     }
 
     public void resetPathway(final @Nullable Point point) {
         this.setPathStatus(EnumPathUsage.FREE, point);
+        resetFirstSignal();
         if (point == null || point.equals(this.getLastPoint())
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
-            resetSignals();
             this.emptyOrBroken = true;
-        } else {
-            this.listOfNodes = this.listOfNodes.subList(0,
-                    this.listOfNodes.indexOf(this.modeGrid.get(point)));
-            this.initalize();
+            resetOther();
         }
     }
 
-    public boolean tryReset(final BlockPos position) {
+    public void compact(final Point point) {
+        foreachEntry(entry -> entry.getEntry(PathEntryType.SIGNAL).ifPresent(loadOps::loadAndReset),
+                point);
+        this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
+                this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
+        this.initalize();
+    }
+
+    public Optional<Point> tryReset(final BlockPos position) {
         final SignalBoxNode node = this.mapOfResetPositions.get(position);
         if (node == null)
-            return false;
+            return Optional.empty();
         final Point point = node.getPoint();
         final AtomicBoolean atomic = new AtomicBoolean(false);
         foreachEntry((option, cNode) -> {
@@ -259,9 +261,9 @@ public class SignalBoxPathway implements INetworkSavable {
             });
         }, point);
         if (atomic.get())
-            return false;
+            return Optional.empty();
         this.resetPathway(point);
-        return true;
+        return Optional.of(point);
     }
 
     public boolean tryBlock(final BlockPos position) {

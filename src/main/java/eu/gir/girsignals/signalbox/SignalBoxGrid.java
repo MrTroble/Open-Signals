@@ -14,6 +14,7 @@ import com.google.common.collect.Lists;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.enums.EnumPathUsage;
+import eu.gir.girsignals.signalbox.debug.SignalBoxFactory;
 import eu.gir.girsignals.signalbox.entrys.INetworkSavable;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
@@ -25,11 +26,11 @@ public class SignalBoxGrid implements INetworkSavable {
     private static final String NODE_LIST = "nodeList";
     private static final String PATHWAY_LIST = "pathwayList";
 
-    private final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
-    private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
-    private final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
-    private final Consumer<NBTTagCompound> sendToAll;
-    private final SignalBoxFactory factory;
+    protected final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
+    protected final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
+    protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
+    protected final Consumer<NBTTagCompound> sendToAll;
+    protected final SignalBoxFactory factory;
     private World world = null;
 
     public SignalBoxGrid(final Consumer<NBTTagCompound> sendToAll) {
@@ -56,7 +57,7 @@ public class SignalBoxGrid implements INetworkSavable {
         updateToNet(pathway);
     }
 
-    private void resetPathway(final SignalBoxPathway pathway) {
+    protected void resetPathway(final SignalBoxPathway pathway) {
         pathway.resetPathway();
         updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());
@@ -72,11 +73,12 @@ public class SignalBoxGrid implements INetworkSavable {
             way.setPathStatus(EnumPathUsage.SELECTED);
             way.updatePathwaySignals();
             this.onWayAdd(way);
+            updateToNet(way);
         });
         return ways.isPresent();
     }
 
-    private void updatePrevious(final SignalBoxPathway pathway) {
+    protected void updatePrevious(final SignalBoxPathway pathway) {
         SignalBoxPathway previousPath = pathway;
         int count = 0;
         while ((previousPath = endsToPath.get(previousPath.getFirstPoint())) != null) {
@@ -94,15 +96,14 @@ public class SignalBoxGrid implements INetworkSavable {
         }
     }
 
-    private void onWayAdd(final SignalBoxPathway pathway) {
+    protected void onWayAdd(final SignalBoxPathway pathway) {
         pathway.setWorld(world);
         startsToPath.put(pathway.getFirstPoint(), pathway);
         endsToPath.put(pathway.getLastPoint(), pathway);
         updatePrevious(pathway);
-        updateToNet(pathway);
     }
 
-    private void updateToNet(final SignalBoxPathway pathway) {
+    protected void updateToNet(final SignalBoxPathway pathway) {
         final NBTTagCompound update = new NBTTagCompound();
         pathway.writeEntryNetwork(update, false);
         this.sendToAll.accept(update);
@@ -118,14 +119,17 @@ public class SignalBoxGrid implements INetworkSavable {
         });
         nodeCopy.forEach(pathway -> {
             final Point first = pathway.getFirstPoint();
-            if (pathway.tryReset(pos)) {
+            final Optional<Point> optPoint = pathway.tryReset(pos);
+            if (optPoint.isPresent()) {
                 if (pathway.isEmptyOrBroken()) {
                     resetPathway(pathway);
+                    updateToNet(pathway);
                 } else {
+                    updateToNet(pathway);
+                    pathway.compact(optPoint.get());
                     this.startsToPath.remove(first);
                     this.startsToPath.put(pathway.getFirstPoint(), pathway);
                 }
-                updateToNet(pathway);
             }
         });
     }
@@ -150,7 +154,7 @@ public class SignalBoxGrid implements INetworkSavable {
         tag.setTag(PATHWAY_LIST, pathList);
     }
 
-    private void clearPaths() {
+    protected void clearPaths() {
         startsToPath.clear();
         endsToPath.clear();
     }
@@ -187,6 +191,7 @@ public class SignalBoxGrid implements INetworkSavable {
      */
     public void setWorld(final World world) {
         this.world = world;
+        startsToPath.values().forEach(pw -> pw.setWorld(world));
     }
 
     @Override

@@ -75,8 +75,12 @@ public class GuiSignalBox extends GuiBase {
         this.entity.read(this.compound);
     }
 
+    @Override
+    public void initGui() {
+        super.initGui();
+    }
+
     private void update(final NBTTagCompound compound) {
-        System.out.println(compound.getKeySet());
         this.resetTileSelection();
         if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
             final String error = I18n.format(compound.getString(SignalBoxTileEntity.ERROR_STRING));
@@ -98,7 +102,6 @@ public class GuiSignalBox extends GuiBase {
         } else {
             this.dirtyCompound = compound;
             this.dirty = true;
-            System.out.println(this.page);
         }
     }
 
@@ -195,6 +198,16 @@ public class GuiSignalBox extends GuiBase {
                         ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
                         ".resetting");
+                parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
+                    this.lowerEntity.clear();
+                    GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+                    initializeFieldUsage(mainButton);
+                    final NBTTagCompound compound = new NBTTagCompound();
+                    final NBTTagCompound wayComp = new NBTTagCompound();
+                    toNBT(wayComp, POINT1, node.getPoint());
+                    compound.setTag(RESET_WAY, wayComp);
+                    GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+                }));
             }
                 break;
             case VP:
@@ -203,16 +216,6 @@ public class GuiSignalBox extends GuiBase {
             case HP:
             case RS: {
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
-                parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
-                    this.lowerEntity.clear();
-                    GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
-                    final NBTTagCompound compound = new NBTTagCompound();
-                    final NBTTagCompound wayComp = new NBTTagCompound();
-                    toNBT(wayComp, POINT1, node.getPoint());
-                    compound.setTag(RESET_WAY, wayComp);
-                    GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
-                    initializeFieldUsage(mainButton);
-                }));
             }
                 break;
             default:
@@ -284,8 +287,7 @@ public class GuiSignalBox extends GuiBase {
                 node.getOption(modeSet).get()));
         lowerEntity.add(GuiElements.createPageSelect(box));
         lowerEntity.add(new UIClickable(e -> {
-            reset();
-            initializeFieldTemplate(this::tileNormal);
+            initializeFieldUsage(mainButton);
         }, 1));
         this.page = Page.TILE_CONFIG;
     }
@@ -456,6 +458,9 @@ public class GuiSignalBox extends GuiBase {
     @Override
     public void onGuiClosed() {
         this.reset();
+        if (this.mc.player != null) {
+            this.container.onContainerClosed(this.mc.player);
+        }
     }
 
     private void reset() {

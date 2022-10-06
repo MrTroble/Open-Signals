@@ -140,7 +140,7 @@ property.signaltramadd.desc=Hier kannst du zwischen A, T und A sowie T wählen.
 property.signaltrama.desc=Fahrtanforderung
 property.signaltramt.desc=Abfertigungsempfehlung
 property.signaltramswitch.desc=Links, rechts, gerade aus mit und ohne verschlossener Weiche
-property.customname.desc=Hier kann der Signalname bzw. die Signalbeschriftung eingetragen werden, welche auf dem Schild angezeigt werden.
+property.customname.desc=Hier kann der Signalname bzw. die Signalbeschriftung eingetragen werden, welche auf dem Schild angezeigt werden. Mit '[n]' kommst du in die nächste Zeile.
 property.sematype.desc=Ändert den Typ des Formsignals: Vorsignal, Hauptsignal und kleines Hauptsignal
 property.hp2.desc=Fügt den zweiten Flügel zum Hauptsignal hinzu.
 property.ra12.desc=Erlaubt Rangierfahrten.
@@ -149,6 +149,7 @@ property.wing2.desc=Flügel für Hp0/1 und Hp2
 property.wing1.desc=Flügel für Hp0 und Hp1
 property.semavr.desc=§lVr Vorsignal§r - Vorsignale zeigen an, welches Signalbild am zugehörigen Hauptsignal zu erwarten ist.%n§nVr0§r: Halt erwarten%n§nVr1§r: Fahrt erwarten%n§nVr2§r: Fahrt mit Geschwindigkeitsbeschränkung erwarten 
 property.sh_mech.desc=§lSh Schutzhaltsignal§r%n§nSh0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben%n§nWn7/Gsp2§r: Die Gleissperre ist abgelegt.
+
 
 #Sign Names
 property.indicator.name=Aufschrift
@@ -339,3 +340,8 @@ property.prop.INPUT.name=Redstone Eingabe
 property.prop.INPUT.desc=Hier kannst du die Redstone Eingabe einstellen. Z.b. von Sensoren.
 btn.apply=Anwenden
 label.linkedto=Verlinkt mit
+msg.isblocked=Das Stellwerk wird bereits verwendet.
+property.prop.INPUT.blocking.name=Blockieren
+property.prop.INPUT.blocking.desc=Blockiert eine Fahrstraße. Blockiert werden kann hinter einem Signal oder auf einem freien Feld (z.B. für Dauerblockierung)
+property.prop.INPUT.resetting.name=Zurücksetzen
+property.prop.INPUT.resetting.desc=Setzt eine Fahrstraße zurück. Fahrstraßen werden vor einem Signal zurückgesetzt oder auf einem freien Stück (z.B. für eine Teilfahrstraßenauflösung)

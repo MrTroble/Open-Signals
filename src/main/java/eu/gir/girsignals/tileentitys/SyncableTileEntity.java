@@ -23,7 +23,12 @@ public class SyncableTileEntity extends TileEntity {
 
     @Override
     public void onDataPacket(final NetworkManager net, final SPacketUpdateTileEntity pkt) {
-        this.readFromNBT(pkt.getNbtCompound());
+        this.handleUpdateTag(pkt.getNbtCompound());
+    }
+
+    @Override
+    public void handleUpdateTag(final NBTTagCompound tag) {
+        this.readFromNBT(tag);
         final BlockPos pos = getPos();
         getWorld().markBlockRangeForRenderUpdate(pos, pos);
     }
@@ -48,7 +53,7 @@ public class SyncableTileEntity extends TileEntity {
     }
 
     public boolean remove(final UIClientSync sync) {
-        return this.clientSyncs.remove(sync);
+        return this.clientSyncs.removeIf(s -> s.getPlayer().equals(sync.getPlayer()));
     }
 
     public void sendToAll(final NBTTagCompound compound) {
