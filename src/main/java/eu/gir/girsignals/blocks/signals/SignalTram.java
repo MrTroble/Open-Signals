@@ -24,9 +24,11 @@ public class SignalTram extends Signal {
     public static final SEProperty<TramAdd> TRAMSIGNAL_ADD = SEProperty.of("signaltramadd",
             TramAdd.OFF, ChangeableStage.GUISTAGE, true, check(TRAMSIGNAL_TYPE, TramType.TRAM));
     public static final SEProperty<Boolean> TRAMSIGNAL_A = SEProperty.of("signaltrama", false,
-            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(TRAMSIGNAL_TYPE, TramType.TRAM).and(check(TRAMSIGNAL_ADD, TramAdd.A).or(check(TRAMSIGNAL_ADD, TramAdd.AT))));
+            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(TRAMSIGNAL_TYPE, TramType.TRAM)
+                    .and(check(TRAMSIGNAL_ADD, TramAdd.A).or(check(TRAMSIGNAL_ADD, TramAdd.AT))));
     public static final SEProperty<Boolean> TRAMSIGNAL_T = SEProperty.of("signaltramt", false,
-            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(TRAMSIGNAL_TYPE, TramType.TRAM).and(check(TRAMSIGNAL_ADD, TramAdd.T).or(check(TRAMSIGNAL_ADD, TramAdd.AT))));
+            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(TRAMSIGNAL_TYPE, TramType.TRAM)
+                    .and(check(TRAMSIGNAL_ADD, TramAdd.T).or(check(TRAMSIGNAL_ADD, TramAdd.AT))));
     public static final SEProperty<TramSwitch> TRAM_SWITCH = SEProperty.of("signaltramswitch",
             TramSwitch.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true,
             check(TRAMSIGNAL_TYPE, TramType.SWITCH));
