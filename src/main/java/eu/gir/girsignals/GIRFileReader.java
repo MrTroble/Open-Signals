@@ -93,10 +93,9 @@ public final class GIRFileReader {
                         return Optional.empty();
                     }
 
-                    try (final FileSystem filesystem = FileSystems.newFileSystem(uri,
-                            Collections.emptyMap())) {
-                        return Optional.of(filesystem.getPath(loc));
-                    }
+                    final FileSystem filesystem = FileSystems.newFileSystem(uri,
+                            Collections.emptyMap());
+                    return Optional.of(filesystem.getPath(loc));
                 }
             }
         } catch (final IOException | URISyntaxException e) {
