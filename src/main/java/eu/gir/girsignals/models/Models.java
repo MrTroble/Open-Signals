@@ -2,6 +2,8 @@ package eu.gir.girsignals.models;
 
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
 public class Models {
 
     private List<TextureStats> textures;
@@ -21,7 +23,7 @@ public class Models {
         return z + zOffset;
     }
 
-    public List<TextureStats> getTexture() {
-        return textures;
+    public ImmutableList<TextureStats> getTexture() {
+        return ImmutableList.copyOf(textures);
     }
 }

@@ -1,5 +1,10 @@
 # Changelog
 
+##[Update]
+
+* feat: added new ModelRenderSystem
+* feat: added semaphore signals
+
 ## [Fix]
 
 * fix: crash when signal is beeing destroyed

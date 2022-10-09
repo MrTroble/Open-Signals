@@ -174,35 +174,36 @@ public class SignalCustomModel implements IModel {
     }
 
     protected void loadExtention(final TextureStats texturestate,
-            final Map<String, ModelExtention> extention, final String modelname, final ModelStats states,
-            final Models models, final FunctionParsingInfo signaltype) {
+            final Map<String, ModelExtention> extention, final String modelname,
+            final ModelStats states, final Models models, final FunctionParsingInfo signaltype) {
 
-        final String originalblstate = texturestate.getBlockstate();
+        final String blockstate = texturestate.getBlockstate();
 
-        final Map<String, String> originalretexmap = texturestate.getRetextures();
+        final Map<String, String> retexture = texturestate.getRetextures();
 
-        for (final Map.Entry<String, ModelExtention> extentionmap : extention.entrySet()) {
+        for (final Map.Entry<String, ModelExtention> extentionvalues : extention.entrySet()) {
 
-            for (final Map.Entry<String, Map<String, String>> inFileExt : texturestate.getExtentions()
-                    .entrySet()) {
+            for (final Map.Entry<String, Map<String, String>> modelExtentions : texturestate
+                    .getExtentions().entrySet()) {
 
-                final String extentionInFilename = inFileExt.getKey();
-                final Map<String, String> extentionprops = inFileExt.getValue();
+                final String extentionInFilename = modelExtentions.getKey();
+                final Map<String, String> extentionprops = modelExtentions.getValue();
 
-                if (extentionInFilename.equalsIgnoreCase(extentionmap.getKey())) {
+                if (extentionInFilename.equalsIgnoreCase(extentionvalues.getKey())) {
 
-                    for (final Map.Entry<String, String> entry : extentionmap.getValue().getExtention()
-                            .entrySet()) {
+                    for (final Map.Entry<String, String> entry : extentionvalues.getValue()
+                            .getExtention().entrySet()) {
 
-                        final String enumval = entry.getKey();
-                        final String retexutreval = entry.getValue();
+                        final String enumValue = entry.getKey();
+                        final String retextureValue = entry.getValue();
 
-                        for (final Map.Entry<String, String> extprops : extentionprops.entrySet()) {
-                            final String seprop = extprops.getKey();
-                            final String retexturekey = extprops.getValue();
+                        for (final Map.Entry<String, String> extentionProperties : extentionprops
+                                .entrySet()) {
+                            final String seProperty = extentionProperties.getKey();
+                            final String retexturekey = extentionProperties.getValue();
 
-                            final boolean load = texturestate.appendExtention(seprop, enumval,
-                                    retexturekey, retexutreval);
+                            final boolean load = texturestate.appendExtention(seProperty, enumValue,
+                                    retexturekey, retextureValue);
 
                             if (load) {
 
@@ -222,9 +223,10 @@ public class SignalCustomModel implements IModel {
                                             "There was an problem during loading an extention into "
                                                     + modelname + " with the blockstate '"
                                                     + texturestate.getBlockstate() + "'!");
+                                    e.printStackTrace();
                                 }
 
-                                texturestate.resetStates(originalblstate, originalretexmap);
+                                texturestate.resetStates(blockstate, retexture);
                             }
                         }
                     }

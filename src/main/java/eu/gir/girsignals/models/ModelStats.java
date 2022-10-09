@@ -3,6 +3,7 @@ package eu.gir.girsignals.models;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
 import eu.gir.girsignals.GIRFileReader;
@@ -12,12 +13,12 @@ public class ModelStats {
     private Map<String, String> textures;
     private Map<String, Models> models;
 
-    public Map<String, String> getTextures() {
-        return textures;
+    public ImmutableMap<String, String> getTextures() {
+        return ImmutableMap.copyOf(textures);
     }
 
-    public Map<String, Models> getModels() {
-        return models;
+    public ImmutableMap<String, Models> getModels() {
+        return ImmutableMap.copyOf(models);
     }
 
     public static Map<String, Object> getfromJson(final String directory) {
@@ -46,26 +47,26 @@ public class ModelStats {
         return content;
     }
 
-    public static Map<String, String> createRetexture(final Map<String, String> retexture,
-            final Map<String, String> lamp) {
+    public static Map<String, String> createRetexture(final Map<String, String> textureNames,
+            final Map<String, String> textureTranslationTable) {
 
-        if (lamp.isEmpty()) {
-            return retexture;
+        if (textureTranslationTable.isEmpty()) {
+            return textureNames;
         }
 
         final Map<String, String> retexturemap = new HashMap<>();
 
-        if (retexture != null) {
-            for (final Map.Entry<String, String> entry : retexture.entrySet()) {
+        if (textureNames != null) {
+            for (final Map.Entry<String, String> entry : textureNames.entrySet()) {
 
                 final String key = entry.getKey();
-                final String val = entry.getValue();
-                final String lam = lamp.get(val);
+                final String textureVariable = entry.getValue();
+                final String texture = textureTranslationTable.get(textureVariable);
 
-                if (lam == null) {
-                    retexturemap.put(key, val);
+                if (texture == null) {
+                    retexturemap.put(key, textureVariable);
                 } else {
-                    retexturemap.put(key, lam);
+                    retexturemap.put(key, texture);
                 }
             }
         }

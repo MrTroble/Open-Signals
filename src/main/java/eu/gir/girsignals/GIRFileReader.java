@@ -25,9 +25,9 @@ public final class GIRFileReader {
 
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
         final Map<String, String> files = new HashMap<>();
-        final Optional<Path> pathloc = getRessourceLocation(directory);
-        if (pathloc.isPresent()) {
-            final Path pathlocation = pathloc.get();
+        final Optional<Path> filepath = getRessourceLocation(directory);
+        if (filepath.isPresent()) {
+            final Path pathlocation = filepath.get();
             try {
 
                 final Stream<Path> inputs = Files.list(pathlocation);
@@ -67,7 +67,7 @@ public final class GIRFileReader {
 
     public static Optional<Path> getRessourceLocation(final String location) {
 
-        String loc = location;
+        String filelocation = location;
 
         final URL url = GIRBlocks.class.getResource("/assets/girsignals");
         try {
@@ -78,9 +78,9 @@ public final class GIRFileReader {
                 if ("file".equals(uri.getScheme())) {
 
                     if (!location.startsWith("/"))
-                        loc = "/" + loc;
+                        filelocation = "/" + filelocation;
 
-                    final URL resource = GIRBlocks.class.getResource(loc);
+                    final URL resource = GIRBlocks.class.getResource(filelocation);
 
                     if (resource == null)
                         return Optional.empty();
@@ -95,7 +95,7 @@ public final class GIRFileReader {
 
                     final FileSystem filesystem = FileSystems.newFileSystem(uri,
                             Collections.emptyMap());
-                    return Optional.of(filesystem.getPath(loc));
+                    return Optional.of(filesystem.getPath(filelocation));
                 }
             }
         } catch (final IOException | URISyntaxException e) {

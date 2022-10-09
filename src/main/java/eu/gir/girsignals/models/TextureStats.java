@@ -3,6 +3,8 @@ package eu.gir.girsignals.models;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
+
 public class TextureStats {
 
     private float x = 0;
@@ -45,16 +47,16 @@ public class TextureStats {
         this.retexture = retexture;
     }
 
-    public Map<String, String> getRetextures() {
-        return retexture;
+    public ImmutableMap<String, String> getRetextures() {
+        return ImmutableMap.copyOf(retexture);
     }
 
     /**
      * 1. String: Name of the file to get load 2. String: SEProperty 3. String: The
      * key of the retexture map
      */
-    public Map<String, Map<String, String>> getExtentions() {
-        return extentions;
+    public ImmutableMap<String, Map<String, String>> getExtentions() {
+        return ImmutableMap.copyOf(extentions);
     }
 
     /**
@@ -71,7 +73,7 @@ public class TextureStats {
 
             this.retexture = new HashMap<>();
         }
-        
+
         this.retexture.put(retexturekey, retexureval);
 
         if (this.blockstate.length() < 4) {
