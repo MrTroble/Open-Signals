@@ -175,6 +175,13 @@
 					"blockstate": "with(DISTANTSIGNAL.OFF)"
 				},
 				{
+					"blockstate": "with(DISTANTSIGNAL.VR0)",
+					"retexture": {
+						"lamp_yellow_1north": "lamp_yellow",
+						"lamp_yellow_2north": "lamp_yellow"
+					}
+				},
+				{
 					"blockstate": "with(DISTANTSIGNAL.VR1)",
 					"retexture": {
 						"lamp_green_1north": "lamp_green",

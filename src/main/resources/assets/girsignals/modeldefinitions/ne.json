@@ -94,7 +94,8 @@
                         "overlay": "girsignals:blocks/zs3/h"
                     }
                 }
-            ]
+            ],
+            "y": 1
         },
         "ne/ne6": {
             "textures": [
@@ -118,7 +119,21 @@
         "ne/ne2_2": {
             "textures": [
                 {
-                    "blockstate": "with(neaddition.PRE2) && (with(NETYPE.NE2) || with(NETYPE.NE2_1)"
+                    "blockstate": "with(NEADDITION.PRE1) && with(NETYPE.NE2)"
+                },
+                {
+                    "blockstate": "with(NEADDITION.PRE1) && with(NETYPE.NE2_1)"
+                }
+            ],
+            "y": 1
+        },
+        "ne/ne2_3": {
+            "textures": [
+                {
+                    "blockstate": "with(NEADDITION.PRE2) && with(NETYPE.NE2)"
+                },
+                {
+                    "blockstate": "with(NEADDITION.PRE2) && with(NETYPE.NE2_1)"
                 }
             ],
             "y": 1

@@ -141,9 +141,15 @@
                     "blockstate": "with(KOMBISIGNAL_MAIN.OFF) && with(KOMBITYPE.MAIN)"
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL_MAIN.KS1) && with(KOMBITYPE.MAIN)",
+                    "blockstate": "with(KOMBISIGNAL_MAIN.HP0) && with(KOMBITYPE.MAIN)",
                     "retexture": {
                         "lamp_rednorth": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(KOMBISIGNAL_MAIN.KS1) && with(KOMBITYPE.MAIN)",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green"
                     }
                 },
                 {
@@ -157,7 +163,7 @@
                     "blockstate": "with(KOMBISIGNAL_MAIN.KS_ZS7) && with(KOMBITYPE.MAIN)",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
-                        "lamp_white_zs7zsnorth": "lamp_yellow"
+                        "lamp_white_zs7north": "lamp_yellow"
                     }
                 },
                 {
