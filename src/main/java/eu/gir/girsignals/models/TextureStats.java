@@ -48,6 +48,10 @@ public class TextureStats {
     }
 
     public ImmutableMap<String, String> getRetextures() {
+
+        if (retexture == null) 
+            retexture = new HashMap<>();
+            
         return ImmutableMap.copyOf(retexture);
     }
 

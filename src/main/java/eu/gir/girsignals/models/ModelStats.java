@@ -14,10 +14,18 @@ public class ModelStats {
     private Map<String, Models> models;
 
     public ImmutableMap<String, String> getTextures() {
+        
+        if (textures == null)
+            textures = new HashMap<>();
+
         return ImmutableMap.copyOf(textures);
     }
 
     public ImmutableMap<String, Models> getModels() {
+
+        if (models == null)
+            models = new HashMap<>();
+
         return ImmutableMap.copyOf(models);
     }
 

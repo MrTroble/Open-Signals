@@ -1,6 +1,7 @@
 package eu.gir.girsignals.models;
 
 import java.util.List;
+import java.util.ArrayList;
 
 import com.google.common.collect.ImmutableList;
 
@@ -24,6 +25,10 @@ public class Models {
     }
 
     public ImmutableList<TextureStats> getTexture() {
+        
+        if (textures == null)
+            textures = new ArrayList<>();
+
         return ImmutableList.copyOf(textures);
     }
 }
