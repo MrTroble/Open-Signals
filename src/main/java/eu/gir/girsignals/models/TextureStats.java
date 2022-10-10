@@ -7,9 +7,9 @@ import com.google.common.collect.ImmutableMap;
 
 public class TextureStats {
 
-    private final float x = 0;
-    private final float y = 0;
-    private final float z = 0;
+    private float x = 0;
+    private float y = 0;
+    private float z = 0;
 
     private boolean loadOFFstate = true;
     private String blockstate;
