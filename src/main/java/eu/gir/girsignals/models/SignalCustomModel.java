@@ -9,7 +9,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import javax.annotation.Nullable;
 import javax.vecmath.AxisAngle4f;
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
@@ -133,33 +132,12 @@ public class SignalCustomModel implements IModel {
     }
 
     protected void register(final String name, final Predicate<IExtendedBlockState> state,
-            final float yOffset) {
-        final Map<String, String> map = new HashMap<>();
-        this.register(name, state, 0, yOffset, 0, map);
-    }
-
-    protected void register(final String name, final Predicate<IExtendedBlockState> state,
-            final float yOffset, final String... strings) {
-        final Map<String, String> map = new HashMap<>();
-        this.register(name, state, 0, yOffset, 0, map, strings);
-    }
-
-    protected void register(final String name, final Predicate<IExtendedBlockState> state,
-            final float x, final float y, final float z, @Nullable final Map<String, String> map,
-            @Nullable final String... strings) {
+            final float x, final float y, final float z, final Map<String, String> map) {
 
         IModel m = ModelLoaderRegistry.getModelOrLogError(
                 new ResourceLocation(GirsignalsMain.MODID, "block/" + name),
                 "Couldn't find " + name);
         m = m.smoothLighting(false);
-
-        if (strings != null && strings.length > 0) {
-            final Builder<String, String> build = ImmutableMap.builder();
-            for (int i = 0; i < (int) Math.floor(strings.length / 2); i++)
-                build.put(strings[i * 2], strings[i * 2 + 1]);
-
-            m = m.retexture(build.build());
-        }
 
         if (map != null && !map.isEmpty()) {
             final Builder<String, String> build = ImmutableMap.builder();
@@ -215,8 +193,7 @@ public class SignalCustomModel implements IModel {
                                             models.getX(texturestate.getOffsetX()),
                                             models.getY(texturestate.getOffsetY()),
                                             models.getZ(texturestate.getOffsetZ()),
-                                            ModelStats.createRetexture(texturestate.getRetextures(),
-                                                    states.getTextures()));
+                                            states.createRetexture(texturestate.getRetextures()));
 
                                 } catch (final LogicalParserException e) {
                                     GirsignalsMain.log.error(

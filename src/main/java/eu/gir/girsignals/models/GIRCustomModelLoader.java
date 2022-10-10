@@ -148,9 +148,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                 modelstats.getX(texturestate.getOffsetX()),
                                                 modelstats.getY(texturestate.getOffsetY()),
                                                 modelstats.getZ(texturestate.getOffsetZ()),
-                                                ModelStats.createRetexture(
-                                                        texturestate.getRetextures(),
-                                                        content.getTextures()));
+                                                content.createRetexture(
+                                                        texturestate.getRetextures()));
 
                                     } else if (state != null && !texturestate.isautoBlockstate()
                                             && !extentionloaded) {
@@ -159,9 +158,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
                                                 modelstats.getX(texturestate.getOffsetX()),
                                                 modelstats.getY(texturestate.getOffsetY()),
                                                 modelstats.getZ(texturestate.getOffsetZ()),
-                                                ModelStats.createRetexture(
-                                                        texturestate.getRetextures(),
-                                                        content.getTextures()));
+                                                content.createRetexture(
+                                                        texturestate.getRetextures()));
 
                                     } else if (state == null && !texturestate.isautoBlockstate()
                                             && !extentionloaded) {

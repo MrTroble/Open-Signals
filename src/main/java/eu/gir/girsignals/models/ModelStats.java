@@ -10,16 +10,8 @@ import eu.gir.girsignals.GIRFileReader;
 
 public class ModelStats {
 
-    private Map<String, String> textures;
+    private Map<String, String> textureTranslationTable;
     private Map<String, Models> models;
-
-    public ImmutableMap<String, String> getTextures() {
-        
-        if (textures == null)
-            textures = new HashMap<>();
-
-        return ImmutableMap.copyOf(textures);
-    }
 
     public ImmutableMap<String, Models> getModels() {
 
@@ -55,10 +47,9 @@ public class ModelStats {
         return content;
     }
 
-    public static Map<String, String> createRetexture(final Map<String, String> textureNames,
-            final Map<String, String> textureTranslationTable) {
+    public Map<String, String> createRetexture(final Map<String, String> textureNames) {
 
-        if (textureTranslationTable.isEmpty()) {
+        if (textureTranslationTable == null || textureTranslationTable.isEmpty()) {
             return textureNames;
         }
 
