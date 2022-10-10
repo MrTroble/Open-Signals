@@ -21,9 +21,6 @@
             "textures": [
                 {
                     "blockstate": "hasandis(AC_ELECTRICITY)"   
-                },
-                {
-                    "blockstate": "hasandisnot(AC_ELECTRICITY)"
                 }
             ],
             "y": 1
