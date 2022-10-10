@@ -43,7 +43,6 @@ public class TextureStats {
 	public void resetStates(final String state, final Map<String, String> retexture) {
 
 		blockstate = state;
-
 		this.retexture = retexture;
 	}
 
@@ -89,7 +88,6 @@ public class TextureStats {
 
 			this.blockstate += " && with(" + seprop + "." + enums + ")";
 		}
-
 		return true;
 	}
 }
