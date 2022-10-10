@@ -482,5 +482,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
         return false;
     }
+    
+    public void getUpdate(final World world, final BlockPos pos) {
+        
+    }
 
 }

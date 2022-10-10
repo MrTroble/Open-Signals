@@ -13,6 +13,7 @@ import eu.gir.girsignals.blocks.RedstoneInput;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalBox;
 import eu.gir.girsignals.blocks.SignalController;
+import eu.gir.girsignals.blocks.boards.RailroadBarrier;
 import eu.gir.girsignals.blocks.boards.SignalAndreasCross;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalBUELight;
@@ -75,6 +76,7 @@ public final class GIRBlocks {
     public static final SignalSemaphore SEMAPHORE_SIGNAL = new SignalSemaphore();
     public static final SignalSHMech SH_MECH = new SignalSHMech();
     public static final SignalAndreasCross ANDREAS_CROSS = new SignalAndreasCross();
+    public static final RailroadBarrier RAILROAD_BARRIER = new RailroadBarrier();
     
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 

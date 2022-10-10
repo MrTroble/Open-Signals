@@ -8,6 +8,7 @@ import eu.gir.girsignals.guis.ContainerSignalBox;
 import eu.gir.girsignals.guis.ContainerSignalController;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.init.GIRSounds;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
@@ -31,6 +32,7 @@ public class CommonProxy {
 
         GIRItems.init();
         GIRBlocks.init();
+        GIRSounds.init();
 
         MinecraftForge.EVENT_BUS.register(GIRItems.class);
         MinecraftForge.EVENT_BUS.register(GIRBlocks.class);

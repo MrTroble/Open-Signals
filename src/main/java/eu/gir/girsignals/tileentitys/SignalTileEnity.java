@@ -84,6 +84,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     public <T extends Comparable<T>> void setProperty(final SEProperty<T> prop, final T opt) {
         map.put(prop, opt);
         this.markDirty();
+        getSignal().getUpdate(world, pos);
     }
 
     public Map<SEProperty<?>, Object> getProperties() {
