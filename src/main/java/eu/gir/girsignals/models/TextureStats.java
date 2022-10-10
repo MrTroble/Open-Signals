@@ -7,9 +7,9 @@ import com.google.common.collect.ImmutableMap;
 
 public class TextureStats {
 
-    private float x = 0;
-    private float y = 0;
-    private float z = 0;
+    private final float x = 0;
+    private final float y = 0;
+    private final float z = 0;
 
     private boolean loadOFFstate = true;
     private String blockstate;
@@ -60,6 +60,10 @@ public class TextureStats {
      * key of the retexture map
      */
     public ImmutableMap<String, Map<String, String>> getExtentions() {
+        
+        if (extentions == null) {
+            extentions = new HashMap<>();
+        }
         return ImmutableMap.copyOf(extentions);
     }
 
@@ -70,6 +74,8 @@ public class TextureStats {
     public boolean appendExtention(final String seprop, final String enums,
             final String retexturekey, final String retexureval) {
 
+        retexture = new HashMap<>();
+        
         if (!loadOFFstate && enums.equalsIgnoreCase("OFF"))
             return false;
 
