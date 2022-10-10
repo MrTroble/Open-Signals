@@ -18,7 +18,8 @@
         "lamp_red": "girsignals:blocks/lamps/lamp_red",
         "lamp_yellow": "girsignals:blocks/lamps/lamp_yellow",
         "lamp_green": "girsignals:blocks/lamps/lamp_green",
-        "lamp_yellow_blink": "girsignals:blocks/lamps/lamp_yellow_blink"
+        "lamp_yellow_blink": "girsignals:blocks/lamps/lamp_yellow_blink",
+        "lamp_yellow_blink_i": "girsignals:blocks/lamps/lamp_yellow_blink_i"
     },
     "models": {
         "trafficlight/trafficlight_tram": {
@@ -207,7 +208,7 @@
                     "blockstate": "with(SIGNALPED.YELLOW) && with(SIGNALTRAMTYPE.PEDESTRIAN)",
                     "retexture": {
                         "rednorth": "lamp_yellow_blink",
-                        "greennorth": "lamp_yellow_blink"
+                        "greennorth": "lamp_yellow_blink_i"
                     }
                 }
             ],
