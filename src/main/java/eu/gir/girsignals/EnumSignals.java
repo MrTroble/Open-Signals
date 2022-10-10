@@ -227,4 +227,12 @@ public final class EnumSignals {
     public enum SemaDist implements DefaultName<SemaDist> {
         VR0, VR1, VR2;
     }
+    
+    public enum ACAddition implements Offable<ACAddition> {
+        OFF, BLINK1, BLINK2, TRAFFIC_LIGHT;
+    }
+    
+    public enum ACCar implements Offable<ACCar> {
+        OFF, RED, YELLOW;
+    }
 }
