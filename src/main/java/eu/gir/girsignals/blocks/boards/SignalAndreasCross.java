@@ -34,20 +34,16 @@ public class SignalAndreasCross extends Signal {
             check(AC_ADDITION, ACAddition.TRAFFIC_LIGHT));
     public static final SEProperty<Boolean> AC_SOUND = SEProperty.of("ac_sound", false,
             ChangeableStage.GUISTAGE);
-    
+
     public boolean checkDoesSound(final IBlockState state, final World world, final BlockPos pos) {
         final TileEntity tile = world.getTileEntity(pos);
         if (!(tile instanceof SignalTileEnity))
             return false;
         final SignalTileEnity tileEntity = (SignalTileEnity) tile;
-        System.out.println("Property AC_BLINK_LIGHT: " + tileEntity.getProperty(AC_BLINK_LIGHT));
-        System.out.println("Property AC_SOUND: " + tileEntity.getProperty(AC_SOUND));
-        System.out.println("Output AC_BLINK_LIGHT: " + tileEntity.getProperty(AC_BLINK_LIGHT).filter(tileEntity.getProperty(AC_BLINK_LIGHT)::equals).isPresent());
-        System.out.println("Output AC_SOUND: " + tileEntity.getProperty(AC_SOUND).filter(tileEntity.getProperty(AC_SOUND)::equals).isPresent());
         return tileEntity.getProperty(AC_BLINK_LIGHT).filter(AC_BLINK_LIGHT::equals).isPresent()
                 && tileEntity.getProperty(AC_SOUND).filter(AC_SOUND::equals).isPresent();
     }
-    
+
     @Override
     public void getUpdate(final World world, final BlockPos pos) {
         if (world.isUpdateScheduled(pos, this)) {

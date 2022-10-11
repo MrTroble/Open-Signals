@@ -9,6 +9,10 @@ import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 
 public final class GIRSounds {
+    
+    private GIRSounds() {
+    }
+    
     public static final List<SoundEvent> SOUNDS = new LinkedList<>();
     
     public static SoundEvent andreascross;
