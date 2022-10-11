@@ -1,5 +1,6 @@
 package eu.gir.girsignals.blocks.boards;
 
+import java.util.Map;
 import java.util.Random;
 
 import eu.gir.girsignals.EnumSignals.ACAddition;
@@ -19,7 +20,7 @@ import net.minecraft.world.World;
 public class SignalAndreasCross extends Signal {
 
     public SignalAndreasCross() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "andreas_cross").height(3).build());
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "andreas_cross").height(2).build());
     }
 
     public static final SEProperty<Boolean> ELECTRICITY = SEProperty.of("ac_electricity", false,
@@ -37,11 +38,24 @@ public class SignalAndreasCross extends Signal {
 
     public boolean checkDoesSound(final IBlockState state, final World world, final BlockPos pos) {
         final TileEntity tile = world.getTileEntity(pos);
+
         if (!(tile instanceof SignalTileEnity))
             return false;
-        final SignalTileEnity tileEntity = (SignalTileEnity) tile;
-        return tileEntity.getProperty(AC_BLINK_LIGHT).filter(AC_BLINK_LIGHT::equals).isPresent()
-                && tileEntity.getProperty(AC_SOUND).filter(AC_SOUND::equals).isPresent();
+
+        final SignalTileEnity signalTE = (SignalTileEnity) tile;
+
+        final Map<SEProperty<?>, Object> signalProperties = signalTE.getProperties();
+
+        boolean isCarAndOn = signalTE.getProperty(AC_CAR)
+                .filter(car -> ACCar.YELLOW.equals(car) || ACCar.RED.equals(car)).isPresent();
+
+        if (signalProperties.containsKey(AC_SOUND)
+                && signalProperties.containsKey(AC_BLINK_LIGHT)) {
+
+            return (Boolean) signalProperties.get(AC_SOUND)
+                    && ((Boolean) signalProperties.get(AC_BLINK_LIGHT) || isCarAndOn);
+        }
+        return false;
     }
 
     @Override
@@ -62,7 +76,7 @@ public class SignalAndreasCross extends Signal {
         }
         if (checkDoesSound(state, world, pos)) {
             world.playSound(null, pos, GIRSounds.andreascross, SoundCategory.BLOCKS, 1.0F, 1.0F);
-            world.scheduleUpdate(pos, this, 40);
+            world.scheduleUpdate(pos, this, 84);
         }
     }
 }
