@@ -1,0 +1,37 @@
+{
+    "textures": {},
+    "models": {
+        "mast": {
+            "textures": [
+                {
+                    "blockstate": "!with(OTHERTYPE.CROSS)"
+                }
+            ],
+            "y": 0
+        },
+        "other_signals/hm_sign": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.HM)"
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/ob_sign": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.OB)"
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/cross_sign": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.CROSS)"
+                }
+            ],
+            "y": 1
+        }
+    }
+}

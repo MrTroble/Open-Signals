@@ -16,7 +16,7 @@ tile.post.name=Pfosten
 tile.hvsignal.name=HV Signal
 tile.kssignal.name=Ks Signal
 tile.hlsignal.name=Hl Signal
-tile.shlight.name=Rangiersignal
+tile.shlight.name=Schutzhaltsignal
 tile.tramsignal.name=Straßenverkehr
 tile.lfsignal.name=Lf Signal
 tile.elsignal.name=El Signal
@@ -31,6 +31,9 @@ tile.wnsignal.name=Wn Signal
 tile.stationname.name=Bahnhofsname
 tile.redstonein.name=Redstone Input
 tile.redstoneout.name=Redstone Output
+tile.semaphoresignal.name=Formsignal
+tile.shmech.name=Schutzhaltsignal
+tile.andreascross.name=Andreaskreuz
 
 #Linktool
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r
@@ -89,6 +92,14 @@ property.signalped.name=Fußgängerampel
 property.signaltrama.name=A
 property.signaltramt.name=T
 property.signaltramswitch.name=Weichensignale
+property.sematype.name=Signaltyp
+property.hp2.name=Sekundärer Flügel
+property.ra12.name=Rangiersignal
+property.ne2_3.name=Dreibegriffiges Formsignal
+property.wing2.name=Sekundärer Flügel
+property.wing1.name=Primärer Flügel
+property.semavr.name=Vorsignal
+property.sh_mech.name=Schutzhaltsignal
 
 #Signal Description
 property.signaltype.desc=Hier kannst du zwischen den verschiedenen Signaltypen wechseln.
@@ -131,6 +142,15 @@ property.signaltrama.desc=Fahrtanforderung
 property.signaltramt.desc=Abfertigungsempfehlung
 property.signaltramswitch.desc=Links, rechts, gerade aus mit und ohne verschlossener Weiche
 property.customname.desc=Hier kann der Signalname bzw. die Signalbeschriftung eingetragen werden, welche auf dem Schild angezeigt werden. Mit '[n]' kommst du in die nächste Zeile.
+property.sematype.desc=Ändert den Typ des Formsignals: Vorsignal, Hauptsignal und kleines Hauptsignal
+property.hp2.desc=Fügt den zweiten Flügel zum Hauptsignal hinzu.
+property.ra12.desc=Erlaubt Rangierfahrten.
+property.ne2_3.desc=Das Zeichen kennzeichnet ein Standort eines dreibegriffigen Formsignals.
+property.wing2.desc=Flügel für Hp0/1 und Hp2
+property.wing1.desc=Flügel für Hp0 und Hp1
+property.semavr.desc=§lVr Vorsignal§r - Vorsignale zeigen an, welches Signalbild am zugehörigen Hauptsignal zu erwarten ist.%n§nVr0§r: Halt erwarten%n§nVr1§r: Fahrt erwarten%n§nVr2§r: Fahrt mit Geschwindigkeitsbeschränkung erwarten 
+property.sh_mech.desc=§lSh Schutzhaltsignal§r%n§nSh0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben%n§nWn7/Gsp2§r: Die Gleissperre ist abgelegt.
+
 
 #Sign Names
 property.indicator.name=Aufschrift
@@ -151,6 +171,11 @@ property.wntype.name=Wn Signalart umschalten
 property.wnnormal.name=Weichensignal
 property.wncross.name=Doppelweichensignal
 property.arrow.name=Zuordnungstafel
+property.ac_electricity.name=Oberleitungsblitz
+property.ac_addition.name=Zusätze
+property.ac_sound.name=Sound
+property.ac_blink_light.name=Blinklicht
+property.ac_car.name=Verkehrsampel für Autos und Fußgänger.
 
 #Sign Description
 property.indicator.desc=Aufschrift für Lf Signale.1 bis 20 für die Geschwindigkeit. A für Anfang und E für Ende
@@ -171,6 +196,11 @@ property.wntype.desc=Wechselt zwischen Wn Signalen für eine normale Weiche und 
 property.wnnormal.desc=§lWn Weichensignale§r - Weichensignale zeigen an, für welchen Fahrweg die Weiche gestellt ist.%n§nWn1§r: Die Weiche liegt zur Fahrt durch den geraden Strang.%n§nWn2§r: Die Weiche liegt zur Fahrt durch den gebogenen Strang.
 property.wncross.desc=§lWn Weichensignale§r - Weichensignale zeigen an, für welchen Fahrweg die Weiche gestellt ist.%n§nWn3§r: Der Fahrweg führt vom linken in den rechten Zweig.%n§nWn4§r: Der Fahrweg führt vom rechten in den linken Zweig.%n§nWn5§r: Der Fahrweg führt vom linken in den linken Zweig.%n§nWn6§r: Der Fahrweg führt vom rechten in den rechten Zweig.
 property.arrow.desc=Das dazugehörige Signale bezieht sich auf das Gleis auf der angezeigten Seite.
+property.ac_electricity.desc=Zeigt an, ob das Gleis über eine Oberleitung verfügt.
+property.ac_addition.desc=Ändert die Zusätze zwischen zwei Arten von blinkenden Lichtern und einer Ampel.
+property.ac_sound.desc=Wenn das Signal getriggert wird, wird ein Bing-Sound ausgegeben, um akustisch zu warnen.
+property.ac_blink_light.desc=Blinkt als Indikator für einen herannahenden Zug.
+property.ac_car.desc=Ampel
 
 #Signalcontroller Names
 property.enummode.name=Modus
@@ -251,6 +281,9 @@ property.value.signaltram=Tram Signal
 property.value.switch=Tram Weichensignal
 property.value.signalcar=Verkehrsampel
 property.value.signalped=Fußgängerampel
+property.value.VR0=VR0
+property.value.VR1=VR1
+property.value.VR2=VR2
 
 #Sign Values
 property.value.ralight=Sh1 Licht
@@ -300,7 +333,7 @@ property.RS=Rangiersignal
 property.RA10=Ra10
 property.SELECTED=Ausgewählt
 property.FREE=Frei
-property.USED=Besetzt
+property.BLOCKED=Besetzt
 property.NONE=Nichts
 property.speed.name=Geschwindigkeitsbeschränkung
 property.speed.desc=Wähle für z.B. Weichen eine Geschwindigkeitsbeschränkung aus. Liegt dieses Element im Fahrweg, wird das Signalbild entsprechend angepasst. Standardwert: 0

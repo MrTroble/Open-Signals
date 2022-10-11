@@ -1,0 +1,255 @@
+{
+    "textures": {},
+    "models": {
+        "mast": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE6) || !with(NETYPE.NE4_small)"
+                }
+            ],
+            "y": 0
+        },
+        "ne/ne1": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE1)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne1"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "ne/ne2": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE2)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne2"
+                    }
+                },
+                {
+                    "blockstate": "with(NETYPE.NE2_1)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne2_1"
+                    }
+                }
+            ],
+            "y": 0
+        },
+        "ne/ne3_4": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE3_1)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne3_1"
+                    }
+                },
+                {
+                    "blockstate": "with(NETYPE.NE3_2)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne3_2"
+                    }
+                },
+                {
+                    "blockstate": "with(NETYPE.NE3_3)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne3_3"
+                    }
+                },
+                {
+                    "blockstate": "with(NETYPE.NE3_4)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne3_4"
+                    }
+                },
+                {
+                    "blockstate": "with(NETYPE.NE3_5)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne3_5"
+                    }
+                },
+                {
+                    "blockstate": "with(NETYPE.NE4)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne4"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "ne/ne4_small": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE4_small)"
+                }
+            ],
+            "y": 0
+        },
+        "lf/lf3_5": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE5)",
+                    "retexture": {
+                        "overlay": "girsignals:blocks/zs3/h"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "ne/ne6": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE6)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/ne6"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "ne/ne6_mast": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE6)"
+                }
+            ],
+            "y": 0
+        },
+        "ne/ne2_2": {
+            "textures": [
+                {
+                    "blockstate": "with(NEADDITION.PRE1) && with(NETYPE.NE2)"
+                },
+                {
+                    "blockstate": "with(NEADDITION.PRE1) && with(NETYPE.NE2_1)"
+                }
+            ],
+            "y": 1
+        },
+        "ne/ne2_3": {
+            "textures": [
+                {
+                    "blockstate": "with(NEADDITION.PRE2) && with(NETYPE.NE2)"
+                },
+                {
+                    "blockstate": "with(NEADDITION.PRE2) && with(NETYPE.NE2_1)"
+                }
+            ],
+            "y": 1
+        },
+        "arrow": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE5)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.875
+                },
+                {
+                    "blockstate": "with(NETYPE.NE3_2)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(NETYPE.NE3_4)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(NETYPE.NE4)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(NETYPE.NE2)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.125
+                },
+                {
+                    "blockstate": "with(NETYPE.NE4_small)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 0.875
+                },
+                {
+                    "blockstate": "with(NETYPE.NE3_1)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(NETYPE.NE3_3)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(NETYPE.NE3_5)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 3.0
+                },
+                {
+                    "blockstate": "with(NETYPE.NE2_1)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.125
+                },
+                {
+                    "blockstate": "with(NETYPE.NE1)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.9375
+                },
+                {
+                    "blockstate": "with(NETYPE.NE6)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 2.0
+                }
+            ],
+            "y": 0
+        }
+    }
+}

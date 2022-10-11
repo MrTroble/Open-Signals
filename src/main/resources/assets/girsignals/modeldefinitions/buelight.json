@@ -1,0 +1,55 @@
+{
+    "textures": {
+        "lamp_white_blink": "girsignals:blocks/lamps/lamp_white_blink"
+    },
+    "models": {
+        "bue/bue_base": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "bue/bue_mast_1": {
+            "textures": [
+                {}
+            ],
+            "y": 1
+        },
+        "bue/bue_mast_2": {
+            "textures": [
+                {}
+            ],
+            "y": 2
+        },
+        "bue/bue_signal_head": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(BUELIGHT)"
+                },
+                {
+                    "blockstate": "hasandis(BUELIGHT)",
+                    "retexture": {
+                        "7": "lamp_white_blink"
+                    }
+                }
+            ],
+            "y": 3
+        },
+        "bue/bue_ne_2_2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2_2)"
+                }
+            ],
+            "y": 1
+        },
+        "bue/bue_ne_2_4": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2_4)"
+                }
+            ],
+            "y": 1
+        }
+    }
+}

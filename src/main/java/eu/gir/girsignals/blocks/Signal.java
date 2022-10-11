@@ -10,6 +10,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
+import com.google.common.collect.ImmutableList;
+
 import eu.gir.girsignals.GIRSignalsConfig;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -64,8 +66,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return this.name().toLowerCase();
         }
 
-        public float getAngel() {
+        public float getDegree() {
             return this.ordinal() * 22.5f;
+        }
+
+        public double getRadians() {
+            return (this.ordinal() / 16.0) * Math.PI * 2.0;
         }
     }
 
@@ -315,25 +321,34 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @SuppressWarnings("rawtypes")
+    private ArrayList<IUnlistedProperty> signalProperties;
+
+    @SuppressWarnings("rawtypes")
     @Override
     protected BlockStateContainer createBlockState() {
-        final ArrayList<IUnlistedProperty> prop = new ArrayList<>();
+        this.signalProperties = new ArrayList<>();
+        this.signalProperties.clear();
         if (!this.getClass().equals(Signal.class)) {
             for (final Field f : this.getClass().getDeclaredFields()) {
                 final int mods = f.getModifiers();
                 if (Modifier.isFinal(mods) && Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
                     try {
-                        prop.add((IUnlistedProperty) f.get(null));
+                        this.signalProperties.add((IUnlistedProperty) f.get(null));
                     } catch (final IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
             }
         }
-        prop.add(CUSTOMNAME);
+        this.signalProperties.add(CUSTOMNAME);
         return new ExtendedBlockState(this, new IProperty<?>[] {
                 ANGEL
-        }, prop.toArray(new IUnlistedProperty[prop.size()]));
+        }, this.signalProperties.toArray(new IUnlistedProperty[signalProperties.size()]));
+    }
+
+    @SuppressWarnings("rawtypes")
+    public ImmutableList<IUnlistedProperty> getProperties() {
+        return ImmutableList.copyOf(this.signalProperties);
     }
 
     @Override
@@ -409,7 +424,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return;
         }
         final SignalAngel face = state.getValue(Signal.ANGEL);
-        final float angel = face.getAngel();
+        final float angel = face.getDegree();
 
         final String[] display = te.getDisplayName().getFormattedText().split("\\[n\\]");
         final float width = this.prop.signWidth;
@@ -467,4 +482,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
         return false;
     }
+    
+    public void getUpdate(final World world, final BlockPos pos) {
+        
+    }
+
 }

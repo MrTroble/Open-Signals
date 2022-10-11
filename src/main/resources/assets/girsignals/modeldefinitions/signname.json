@@ -1,0 +1,11 @@
+{
+    "textures": {},
+    "models": {
+        "other_signals/station_name": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        }
+    }
+}

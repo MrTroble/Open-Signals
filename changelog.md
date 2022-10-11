@@ -1,5 +1,11 @@
 # Changelog
 
+##[Update]
+
+* feat: added new ModelRenderSystem
+* feat: added semaphore signals
+* feat: added andreas cross signals
+
 ## [Fix]
 
 * fix: crash when signal is beeing destroyed

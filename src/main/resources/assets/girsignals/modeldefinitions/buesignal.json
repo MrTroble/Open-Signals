@@ -1,0 +1,76 @@
+{
+    "textures": {},
+    "models": {
+        "mast": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "bue/bue2": {
+            "textures": [
+                {
+                    "blockstate": "with(BUETYPE.BUE2_1)",
+                    "retexture": {
+                        "2": "girsignals:blocks/bue/bue2_1"
+                    }
+                },
+                {
+                    "blockstate": "with(BUETYPE.BUE2_2)",
+                    "retexture": {
+                        "2": "girsignals:blocks/bue/bue2_2"
+                    }
+                },
+                {
+                    "blockstate": "with(BUETYPE.BUE2_3)",
+                    "retexture": {
+                        "2": "girsignals:blocks/bue/bue2_3"
+                    }
+                },
+                {
+                    "blockstate": "with(BUETYPE.BUE2_4)",
+                    "retexture": {
+                        "2": "girsignals:blocks/bue/bue2_4"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "bue/bue3": {
+            "textures": [
+                {
+                    "blockstate": "with(BUETYPE.BUE3)"
+                }
+            ],
+            "y": 1
+        },
+        "bue/bue4": {
+            "textures": [
+                {
+                    "blockstate": "with(BUETYPE.BUE4)"
+                },
+                {
+                    "blockstate": "with(BUEADD.BUE4) && with(BUETYPE.BUE4)",
+                    "y": 1
+                }
+            ],
+            "y": 1
+        },
+        "bue/bue5": {
+            "textures": [
+                {
+                    "blockstate": "with(BUETYPE.BUE5)"
+                }
+            ],
+            "y": 1
+        },
+        "bue/bueadd": {
+            "textures": [
+                {
+                    "blockstate": "with(BUEADD.ADD) && (with(BUETYPE.BUE4) || with(BUETYPE.BUE5))"
+                }
+            ],
+            "y": 2
+        }
+    }
+}
