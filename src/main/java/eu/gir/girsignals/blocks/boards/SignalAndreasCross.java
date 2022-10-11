@@ -16,6 +16,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 public class SignalAndreasCross extends Signal {
@@ -36,14 +37,6 @@ public class SignalAndreasCross extends Signal {
             check(AC_ADDITION, ACAddition.TRAFFIC_LIGHT));
     public static final SEProperty<Boolean> AC_SOUND = SEProperty.of("ac_sound", false,
             ChangeableStage.GUISTAGE);
-
-    @Override
-    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
-            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
-            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
-            worldIn.playSound(null, pos, GIRSounds.andreas_cross, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        return true;
-    }
     
     @Override
     public void updateTick(final World world, final BlockPos pos, final IBlockState state, final Random rand) {
@@ -57,7 +50,10 @@ public class SignalAndreasCross extends Signal {
     }
     
     public boolean checkDoesSound(final IBlockState state, final World world, final BlockPos pos) {
-        final SignalTileEnity tileEntity = (SignalTileEnity) world.getTileEntity(pos);
+        final TileEntity tile = world.getTileEntity(pos);
+        if (!(tile instanceof SignalTileEnity))
+            return;
+        final SignalTileEnity tileEntity = (SignalTileEnity) tile;
         return tileEntity.getProperty(AC_BLINK_LIGHT).isPresent() && tileEntity.getProperty(AC_SOUND).isPresent();
     }
     
