@@ -1,6 +1,5 @@
 package eu.gir.girsignals.blocks.boards;
 
-import java.util.Map;
 import java.util.Random;
 
 import eu.gir.girsignals.EnumSignals.ACAddition;
@@ -44,18 +43,13 @@ public class SignalAndreasCross extends Signal {
 
         final SignalTileEnity signalTE = (SignalTileEnity) tile;
 
-        final Map<SEProperty<?>, Object> signalProperties = signalTE.getProperties();
-
         boolean isCarAndOn = signalTE.getProperty(AC_CAR)
                 .filter(car -> ACCar.YELLOW.equals(car) || ACCar.RED.equals(car)).isPresent();
 
-        if (signalProperties.containsKey(AC_SOUND)
-                && signalProperties.containsKey(AC_BLINK_LIGHT)) {
+        return (signalTE.getProperty(AC_BLINK_LIGHT).filter(blink -> (Boolean) blink).isPresent()
+                || isCarAndOn)
+                && signalTE.getProperty(AC_SOUND).filter(sound -> (Boolean) sound).isPresent();
 
-            return (Boolean) signalProperties.get(AC_SOUND)
-                    && ((Boolean) signalProperties.get(AC_BLINK_LIGHT) || isCarAndOn);
-        }
-        return false;
     }
 
     @Override
