@@ -49,7 +49,6 @@ public class SignalAndreasCross extends Signal {
         return (signalTE.getProperty(AC_BLINK_LIGHT).filter(blink -> (Boolean) blink).isPresent()
                 || isCarAndOn)
                 && signalTE.getProperty(AC_SOUND).filter(sound -> (Boolean) sound).isPresent();
-
     }
 
     @Override
