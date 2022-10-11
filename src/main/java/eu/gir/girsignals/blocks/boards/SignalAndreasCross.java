@@ -52,7 +52,7 @@ public class SignalAndreasCross extends Signal {
     public boolean checkDoesSound(final IBlockState state, final World world, final BlockPos pos) {
         final TileEntity tile = world.getTileEntity(pos);
         if (!(tile instanceof SignalTileEnity))
-            return;
+            return false;
         final SignalTileEnity tileEntity = (SignalTileEnity) tile;
         return tileEntity.getProperty(AC_BLINK_LIGHT).isPresent() && tileEntity.getProperty(AC_SOUND).isPresent();
     }
