@@ -11,12 +11,9 @@ import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.init.GIRSounds;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.world.World;
 
 public class SignalAndreasCross extends Signal {
@@ -38,23 +35,17 @@ public class SignalAndreasCross extends Signal {
     public static final SEProperty<Boolean> AC_SOUND = SEProperty.of("ac_sound", false,
             ChangeableStage.GUISTAGE);
     
-    @Override
-    public void updateTick(final World world, final BlockPos pos, final IBlockState state, final Random rand) {
-        if (world.isRemote) {
-            return;
-        }
-        if (checkDoesSound(state, world, pos)) {
-            world.playSound(null, pos, GIRSounds.andreas_cross, SoundCategory.BLOCKS, 1.0F, 1.0F);
-            world.scheduleUpdate(pos, this, 40);
-        }
-    }
-    
     public boolean checkDoesSound(final IBlockState state, final World world, final BlockPos pos) {
         final TileEntity tile = world.getTileEntity(pos);
         if (!(tile instanceof SignalTileEnity))
             return false;
         final SignalTileEnity tileEntity = (SignalTileEnity) tile;
-        return tileEntity.getProperty(AC_BLINK_LIGHT).isPresent() && tileEntity.getProperty(AC_SOUND).isPresent();
+        System.out.println("Property AC_BLINK_LIGHT: " + tileEntity.getProperty(AC_BLINK_LIGHT));
+        System.out.println("Property AC_SOUND: " + tileEntity.getProperty(AC_SOUND));
+        System.out.println("Output AC_BLINK_LIGHT: " + tileEntity.getProperty(AC_BLINK_LIGHT).filter(tileEntity.getProperty(AC_BLINK_LIGHT)::equals).isPresent());
+        System.out.println("Output AC_SOUND: " + tileEntity.getProperty(AC_SOUND).filter(tileEntity.getProperty(AC_SOUND)::equals).isPresent());
+        return tileEntity.getProperty(AC_BLINK_LIGHT).filter(AC_BLINK_LIGHT::equals).isPresent()
+                && tileEntity.getProperty(AC_SOUND).filter(AC_SOUND::equals).isPresent();
     }
     
     @Override
@@ -64,6 +55,18 @@ public class SignalAndreasCross extends Signal {
         }
         if (checkDoesSound(world.getBlockState(pos), world, pos)) {
             world.scheduleUpdate(pos, this, 1);
+        }
+    }
+
+    @Override
+    public void updateTick(final World world, final BlockPos pos, final IBlockState state,
+            final Random rand) {
+        if (world.isRemote) {
+            return;
+        }
+        if (checkDoesSound(state, world, pos)) {
+            world.playSound(null, pos, GIRSounds.andreascross, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.scheduleUpdate(pos, this, 40);
         }
     }
 }
