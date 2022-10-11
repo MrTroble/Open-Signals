@@ -33,6 +33,7 @@ tile.redstonein.name=Redstone Input
 tile.redstoneout.name=Redstone Output
 tile.semaphoresignal.name=Semaphore Signal
 tile.shmech.name=Shunting Signal
+tile.andreascross.name=Andreascross
 
 #Linktool
 lt.linkedpos=§2Linked to: {%d, %d, %d§2}§r
@@ -151,6 +152,7 @@ property.semavr.desc=§lVr Distant signal§r - Distant signals indicate which si
 property.sh_mech.desc=§lSh Protection signal§r%n§nSh0§r: Stop for train and shunting movements%n§nSh1§r: Shunting permitted.%n§nWn7/Gsp2§r:The track lock is set aside.
 property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign. With '[n]' you get into the next line.
 
+
 #Sign Names
 property.indicator.name=Indicator
 property.lftype.name=Speed signal
@@ -170,6 +172,11 @@ property.wntype.name=Change Wn signal type
 property.wnnormal.name=Normal points
 property.wncross.name=Double slip points
 property.arrow.name=Assignment board
+property.ac_electricity.name=Electricity Arrow
+property.ac_addition.name=Additions
+property.ac_sound.name=Sound
+property.ac_blink_light.name=Blink Light
+property.ac_car.name=Traffic Light
 
 #Sign Description
 property.indicator.desc=Inscription for Lf signals.1 to 20 for speed. A for start and E for end
@@ -190,6 +197,11 @@ property.wntype.desc=Toggles between Wn signals for a normal point and a double-
 property.wnnormal.desc=§lWn Point signals§r - Point signals indicate for which track the switch is set.%n§nWn1§r: The switch is for driving through the straight track.%n§nWn2§r: The switch is for driving through the curved track.
 property.wncross.desc=§lWn Point signals§r - Point signals indicate for which route the switch is set.%n§nWn3§r: The track leads from the left track to the right track.%n§nWn4§r: The track leads from the right track to the left track.%n§nWn5§r: The track leads from the left track to the left track.%n§nWn6§r: The track leads from the right track to the right track.
 property.arrow.desc=Indicates which track a signal board is intended for.
+property.ac_electricity.desc=Indicates if the train track has a catenary.
+property.ac_addition.desc=Change the addition between two kind of blinking lights and a traffic light.
+property.ac_sound.desc=When the signal is triggered, a bing sound is emitted to provide an audible warning.
+property.ac_blink_light.desc=Flashes as an indicator of an approaching train. 
+property.ac_car.desc=Traffic light for cars and pedestrians.
 
 #Signalcontroller Names
 property.enummode.name=Mode
@@ -323,7 +335,7 @@ property.RS=Shunting signal
 property.RA10=Ra10
 property.SELECTED=Selected
 property.FREE=Free
-property.USED=Occupied
+property.BLOCKED=Occupied
 property.NONE=None
 property.speed.name=Speed restriction
 property.speed.desc=Select a speed restriction for e.g. switches. If this element is in the drive path, the signal aspect is adjusted accordingly. Default value: 0
