@@ -13,7 +13,7 @@ import net.minecraft.client.gui.FontRenderer;
 public class SignalOther extends Signal {
 
     public SignalOther() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "othersignal").signScale(3.5f).offsetX(-5)
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "othersignal").height(1).signScale(3.5f).offsetX(-5)
                 .offsetY(1.8f).noLink().build());
     }
 
@@ -31,5 +31,23 @@ public class SignalOther extends Signal {
         super.renderOverlay(x, y, z, te, font,
                 te.getProperty(OTHERTYPE).filter(OtherSignal.HM::equals).isPresent() ? 2.1f
                         : this.prop.customNameRenderHeight);
+        super.renderOverlay(x, y, z, te, font,
+                te.getProperty(OTHERTYPE).filter(OtherSignal.HM2::equals).isPresent() ? 2.1f
+                        : this.prop.customNameRenderHeight);
+    }
+    
+    @Override
+    public int getHeight(final Map<SEProperty<?>, Object> map) {
+        final OtherSignal other = (OtherSignal) map.get(OTHERTYPE);
+        if (other == null)
+            return super.getHeight(map);
+        switch (other) {
+            case CROSS:
+                return 0;
+            case ZS10:
+                return 2;
+            default:
+                return super.getHeight(map);
+        }
     }
 }

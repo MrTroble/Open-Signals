@@ -174,7 +174,7 @@ public final class EnumSignals {
     }
 
     public enum OtherSignal implements DefaultName<OtherSignal> {
-        HM, OB, CROSS;
+        HM, OB, CROSS, LZB, ZS10, HM2;
     }
 
     public enum STNumber implements DefaultName<STNumber> {
