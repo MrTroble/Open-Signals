@@ -1,6 +1,6 @@
 [submodule "guilib"]
 	path = guilib
-	url = https://github.com/German-Immersive-Railroading-Community/guilib
+	url = https://github.com/MrTroble/guilib
 [submodule "linkableapi"]
 	path = linkableapi
-	url = https://github.com/German-Immersive-Railroading-Community/linkableapi
+	url = https://github.com/MrTroble/linkableapi
