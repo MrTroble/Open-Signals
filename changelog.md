@@ -1,6 +1,10 @@
 # Changelog
 
-##[Update]
+## [Fix]
+
+* fix: crash on ressource pack loading
+
+## [Update]
 
 * feat: added new ModelRenderSystem
 * feat: added semaphore signals
