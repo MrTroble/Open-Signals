@@ -318,6 +318,19 @@
                 }
             ],
             "y": 0
+        },
+        "ne/ne5_addition": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE5)",
+                    "extentions": {
+                        "ne5_addition.json": {
+                            "NE5_ADDITION": "2"
+                        }
+                    }
+                }
+            ],
+            "y": 0
         }
     }
 }

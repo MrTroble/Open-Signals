@@ -2,6 +2,7 @@ package eu.gir.girsignals.blocks.boards;
 
 import eu.gir.girsignals.EnumSignals.Arrow;
 import eu.gir.girsignals.EnumSignals.NE;
+import eu.gir.girsignals.EnumSignals.NE5Addition;
 import eu.gir.girsignals.EnumSignals.NEAddition;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -20,6 +21,8 @@ public class SignalNE extends Signal {
             NEAddition.OFF, ChangeableStage.GUISTAGE);
     public static final SEProperty<Arrow> ARROWPROP = SEProperty.of("arrow", Arrow.OFF,
             ChangeableStage.GUISTAGE);
+    public static final SEProperty<NE5Addition> NE5_ADDITION = SEProperty.of("ne5_addition",
+            NE5Addition.OFF, ChangeableStage.GUISTAGE);
 
     @Override
     public boolean hasCostumColor() {
