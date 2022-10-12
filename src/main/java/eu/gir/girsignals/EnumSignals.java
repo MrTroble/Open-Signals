@@ -192,7 +192,7 @@ public final class EnumSignals {
     }
 
     public enum NE implements DefaultName<NE> {
-        NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_small, NE5, NE6, So106;
+        NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_SMALL, NE5, NE6, SO106;
     }
 
     public enum NEAddition implements Offable<NEAddition> {
