@@ -50,9 +50,32 @@
                     "retexture": {
                         "2": "girsignals:blocks/el/el6"
                     }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL7)",
+                    "retexture": {
+                        "2": "girsignals:blocks/el/el7"
+                    }
                 }
             ],
             "y" : 1
+        },
+        "ne/ne2": {
+            "textures": [
+                {
+                    "blockstate": "with(ELTYPE.EL8A)",
+                    "retexture": {
+                        "2": "girsignals:blocks/el/el8a"
+                    }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL8E)",
+                    "retexture": {
+                        "2": "girsignals:blocks/el/el8e"
+                    }
+                }
+            ],
+            "y": 1
         },
         "el/el_arrow_lr": {
             "textures": [
