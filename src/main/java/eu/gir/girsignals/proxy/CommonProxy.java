@@ -3,10 +3,12 @@ package eu.gir.girsignals.proxy;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalBox;
+import eu.gir.girsignals.blocks.SignalController;
 import eu.gir.girsignals.guis.ContainerSignalBox;
 import eu.gir.girsignals.guis.ContainerSignalController;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.init.GIRSounds;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
@@ -20,15 +22,17 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class CommonProxy {
 
     public void preinit(final FMLPreInitializationEvent event) {
-        UIInit.initCommon(GirsignalsMain.MODID);
+        UIInit.initCommon(GirsignalsMain.MODID, GirsignalsMain.isDebug());
         GuiHandler.addServer(Placementtool.class, (p, w, bp) -> null);
-        GuiHandler.addServer(Signal.class, (p, w, bp) -> new ContainerSignalController(
+        GuiHandler.addServer(SignalController.class, (p, w, bp) -> new ContainerSignalController(
                 (SignalControllerTileEntity) w.getTileEntity(bp)));
         GuiHandler.addServer(SignalBox.class,
                 (p, w, bp) -> new ContainerSignalBox((SignalBoxTileEntity) w.getTileEntity(bp)));
+        GuiHandler.addServer(Signal.class, (p, w, bp) -> null);
 
         GIRItems.init();
         GIRBlocks.init();
+        GIRSounds.init();
 
         MinecraftForge.EVENT_BUS.register(GIRItems.class);
         MinecraftForge.EVENT_BUS.register(GIRBlocks.class);

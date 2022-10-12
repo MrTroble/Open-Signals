@@ -11,7 +11,7 @@ public class SignalTS extends Signal {
         super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "tssignal").noLink().build());
     }
 
-    public static final SEProperty<TS> TSTYPE = SEProperty.of("tssignal", TS.TS1,
+    public static final SEProperty<TS> TSTYPE = SEProperty.of("tstype", TS.TS1,
             ChangeableStage.GUISTAGE);
 
     @Override

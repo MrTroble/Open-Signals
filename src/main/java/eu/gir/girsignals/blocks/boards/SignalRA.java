@@ -8,11 +8,13 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.signalbox.config.RSSignalConfig;
 
 public class SignalRA extends Signal {
 
     public SignalRA() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0).build());
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0)
+                .config(RSSignalConfig.RS_CONFIG).build());
     }
 
     public static final SEProperty<RA> RATYPE = SEProperty.of("ratype", RA.RA10,

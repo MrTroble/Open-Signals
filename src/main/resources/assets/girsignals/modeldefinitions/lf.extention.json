@@ -1,0 +1,26 @@
+{
+    "extention": {
+        "Z1": "girsignals:blocks/zs3/z1",
+        "Z2": "girsignals:blocks/zs3/z2",
+        "Z3": "girsignals:blocks/zs3/z3",
+        "Z4": "girsignals:blocks/zs3/z4",
+        "Z5": "girsignals:blocks/zs3/z5",
+        "Z6": "girsignals:blocks/zs3/z6",
+        "Z7": "girsignals:blocks/zs3/z7",
+        "Z8": "girsignals:blocks/zs3/z8",
+        "Z9": "girsignals:blocks/zs3/z9",
+        "Z10": "girsignals:blocks/zs3/z10",
+        "Z11": "girsignals:blocks/zs3/z11",
+        "Z12": "girsignals:blocks/zs3/z12",
+        "Z13": "girsignals:blocks/zs3/z13",
+        "Z14": "girsignals:blocks/zs3/z14",
+        "Z15": "girsignals:blocks/zs3/z15",
+        "Z16": "girsignals:blocks/zs3/z16",
+        "Z17": "girsignals:blocks/zs3/z17",
+        "Z18": "girsignals:blocks/zs3/z18",
+        "Z19": "girsignals:blocks/zs3/z19",
+        "Z20": "girsignals:blocks/zs3/z20",
+        "A": "girsignals:blocks/zs3/a",
+        "E": "girsignals:blocks/zs3/e"
+    }
+}

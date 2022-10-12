@@ -27,7 +27,9 @@ public class SignalController extends Block implements ITileEntityProvider {
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
-            GuiHandler.invokeGui(Signal.class, playerIn, worldIn, pos);
+            if (worldIn.isRemote)
+                return true;
+            GuiHandler.invokeGui(SignalController.class, playerIn, worldIn, pos);
             return true;
         }
         return false;

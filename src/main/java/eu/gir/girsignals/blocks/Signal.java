@@ -4,19 +4,22 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
+import com.google.common.collect.ImmutableList;
+
 import eu.gir.girsignals.GIRSignalsConfig;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
+import eu.gir.guilib.ecs.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -63,8 +66,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return this.name().toLowerCase();
         }
 
-        public float getAngel() {
+        public float getDegree() {
             return this.ordinal() * 22.5f;
+        }
+
+        public double getRadians() {
+            return (this.ordinal() / 16.0) * Math.PI * 2.0;
         }
     }
 
@@ -314,25 +321,34 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @SuppressWarnings("rawtypes")
+    private ArrayList<IUnlistedProperty> signalProperties;
+
+    @SuppressWarnings("rawtypes")
     @Override
     protected BlockStateContainer createBlockState() {
-        final ArrayList<IUnlistedProperty> prop = new ArrayList<>();
+        this.signalProperties = new ArrayList<>();
+        this.signalProperties.clear();
         if (!this.getClass().equals(Signal.class)) {
             for (final Field f : this.getClass().getDeclaredFields()) {
                 final int mods = f.getModifiers();
                 if (Modifier.isFinal(mods) && Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
                     try {
-                        prop.add((IUnlistedProperty) f.get(null));
+                        this.signalProperties.add((IUnlistedProperty) f.get(null));
                     } catch (final IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
                 }
             }
         }
-        prop.add(CUSTOMNAME);
+        this.signalProperties.add(CUSTOMNAME);
         return new ExtendedBlockState(this, new IProperty<?>[] {
                 ANGEL
-        }, prop.toArray(new IUnlistedProperty[prop.size()]));
+        }, this.signalProperties.toArray(new IUnlistedProperty[signalProperties.size()]));
+    }
+
+    @SuppressWarnings("rawtypes")
+    public ImmutableList<IUnlistedProperty> getProperties() {
+        return ImmutableList.copyOf(this.signalProperties);
     }
 
     @Override
@@ -366,7 +382,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return this.prop.height;
     }
 
-    public boolean canHaveCustomname(final HashMap<SEProperty<?>, Object> map) {
+    public boolean canHaveCustomname(final Map<SEProperty<?>, Object> map) {
         return this.prop.customNameRenderHeight != -1;
     }
 
@@ -404,8 +420,11 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         final World world = te.getWorld();
         final BlockPos pos = te.getPos();
         final IBlockState state = world.getBlockState(pos);
+        if (!(state.getBlock() instanceof Signal)) {
+            return;
+        }
         final SignalAngel face = state.getValue(Signal.ANGEL);
-        final float angel = face.getAngel();
+        final float angel = face.getDegree();
 
         final String[] display = te.getDisplayName().getFormattedText().split("\\[n\\]");
         final float width = this.prop.signWidth;
@@ -420,6 +439,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         GlStateManager.rotate(angel, 0, 1, 0);
         GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         GlStateManager.scale(-1f, 1f, 1f);
+
         for (int i = 0; i < display.length; i++) {
             font.drawSplitString(display[i], 0, (int) (i * scale * 2.8f), (int) width, 0);
         }
@@ -443,6 +463,28 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     public ISignalAutoconfig getConfig() {
         return this.prop.config;
+    }
+
+    @Override
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        final TileEntity tile = worldIn.getTileEntity(pos);
+        boolean customname = false;
+        if (tile instanceof SignalTileEnity) {
+            final SignalTileEnity signaltile = (SignalTileEnity) tile;
+            customname = canHaveCustomname(signaltile.getProperties());
+        }
+        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)
+                && (canBeLinked() || customname)) {
+            GuiHandler.invokeGui(Signal.class, playerIn, worldIn, pos);
+            return true;
+        }
+        return false;
+    }
+    
+    public void getUpdate(final World world, final BlockPos pos) {
+        
     }
 
 }

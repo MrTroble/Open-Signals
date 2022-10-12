@@ -1,5 +1,51 @@
 # Changelog
 
+##[Update]
+
+* feat: added new ModelRenderSystem
+* feat: added semaphore signals
+* feat: added andreas cross signals
+
+## [Fix]
+
+* fix: crash when signal is beeing destroyed
+* fix: NPE with Redstone IO
+* fix: Ra11 light was acitivated with train pathway
+
+## [Fix]
+
+* fix: partial pathways cannot be reset
+* fix: partial pathways do not update correctly in UI
+
+## [Update]
+
+### BREAKING CHANGES!
+
+* fix: several synchronization fixes
+* feat: partly pathway resetting
+* perf: reduced network load
+* feat: auto recover from bad pathways
+* perf: reduced redstone performance
+* perf: only send needed data
+* fix: improved dijkstra path detection
+* feat: security patch for signal boxes (only one user at same time)
+* fix: sh light signal status light
+* feat: new sh light texture
+* ref: optimize models
+
+// Known issues:
+
+* Custom names are sometimes not rendered
+* Ra11 shows Ra12 with train drive path
+* Edit not saved on exit (Workaround: Go to the Use tab before exiting)
+
+## [Beta Update] 
+* feat: Ra11 added to signalbox
+* feat: rename signal via right click
+* serveral fixes with ZS3 and ZS3_PlATE
+
+  **Warning: Contains a lot of known issues that will be fixed with coming versions.**
+
 ## [Beta Update] 08.05.2022
 * feat: ZS3_PLATE intigrated to Interoperability
 * fix: various fixes

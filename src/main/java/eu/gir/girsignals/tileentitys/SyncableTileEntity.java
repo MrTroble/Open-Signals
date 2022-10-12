@@ -2,6 +2,7 @@ package eu.gir.girsignals.tileentitys;
 
 import java.util.ArrayList;
 
+import eu.gir.guilib.ecs.GuiSyncNetwork;
 import eu.gir.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -22,7 +23,12 @@ public class SyncableTileEntity extends TileEntity {
 
     @Override
     public void onDataPacket(final NetworkManager net, final SPacketUpdateTileEntity pkt) {
-        this.readFromNBT(pkt.getNbtCompound());
+        this.handleUpdateTag(pkt.getNbtCompound());
+    }
+
+    @Override
+    public void handleUpdateTag(final NBTTagCompound tag) {
+        this.readFromNBT(tag);
         final BlockPos pos = getPos();
         getWorld().markBlockRangeForRenderUpdate(pos, pos);
     }
@@ -39,6 +45,7 @@ public class SyncableTileEntity extends TileEntity {
     public void syncClient(final World world, final BlockPos pos) {
         final IBlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);
+        world.markBlockRangeForRenderUpdate(pos, pos);
     }
 
     public boolean add(final UIClientSync sync) {
@@ -46,7 +53,11 @@ public class SyncableTileEntity extends TileEntity {
     }
 
     public boolean remove(final UIClientSync sync) {
-        return this.clientSyncs.remove(sync);
+        return this.clientSyncs.removeIf(s -> s.getPlayer().equals(sync.getPlayer()));
+    }
+
+    public void sendToAll(final NBTTagCompound compound) {
+        this.clientSyncs.forEach(sync -> GuiSyncNetwork.sendToClient(compound, sync.getPlayer()));
     }
 
 }

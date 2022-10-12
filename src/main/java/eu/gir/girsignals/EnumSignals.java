@@ -99,7 +99,7 @@ public final class EnumSignals {
     public enum SHLight implements Offable<SHLight> {
         OFF, SH0, SH1, STATUS_LIGHT;
     }
-
+    
     public enum SHMech implements DefaultName<SHMech> {
         SH0, SH1, SH1_GSP2;
     }
@@ -142,7 +142,7 @@ public final class EnumSignals {
     }
 
     public enum LFBachground implements DefaultName<LFBachground> {
-        LF1, LF2, LF3_5, LF4, LF5, LF6, LF7;
+        LF1, LF2, LF3_5, LF4, LF6, LF7, LF5;
     }
 
     public enum EL implements DefaultName<EL> {
@@ -223,7 +223,6 @@ public final class EnumSignals {
         DISABLED, NAME_ASSENDING, NAME_DESCENIDNG, TYPE_ASSANDING, TYPE_DESCENDING,
         DISTANCE_ASSANDING, DISTANCE_DSECENDING;
     }
-
     public enum SemaType implements DefaultName<SemaType> {
         DIST, MAIN, MAIN_SMALL;
     }

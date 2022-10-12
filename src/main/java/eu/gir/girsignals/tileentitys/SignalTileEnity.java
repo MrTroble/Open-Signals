@@ -2,14 +2,17 @@ package eu.gir.girsignals.tileentitys;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
 
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.guilib.ecs.interfaces.ISyncable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
@@ -18,7 +21,7 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SignalTileEnity extends SyncableTileEntity implements IWorldNameable {
+public class SignalTileEnity extends SyncableTileEntity implements IWorldNameable, ISyncable {
 
     private final HashMap<SEProperty<?>, Object> map = new HashMap<>();
 
@@ -61,9 +64,9 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
                     final SEProperty<?> sep = SEProperty.cst(prop);
                     sep.readFromNBT(comp).ifPresent(obj -> map.put(sep, obj));
                 });
+        setBlockID();
         if (comp.hasKey(CUSTOMNAME))
             setCustomName(comp.getString(CUSTOMNAME));
-        setBlockID();
     }
 
     @Override
@@ -81,6 +84,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     public <T extends Comparable<T>> void setProperty(final SEProperty<T> prop, final T opt) {
         map.put(prop, opt);
         this.markDirty();
+        getSignal().getUpdate(world, pos);
     }
 
     public Map<SEProperty<?>, Object> getProperties() {
@@ -111,8 +115,6 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     }
 
     public void setCustomName(final String str) {
-        if (!getSignal().canHaveCustomname(this.map))
-            return;
         this.formatCustomName = str;
         if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
             map.remove(Signal.CUSTOMNAME);
@@ -120,8 +122,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
             map.put(Signal.CUSTOMNAME, true);
         }
         this.markDirty();
-        world.markBlockRangeForRenderUpdate(pos, pos);
-
+        this.syncClient();
     }
 
     @SideOnly(Side.CLIENT)
@@ -131,7 +132,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     }
 
     public void setBlockID() {
-        blockID = ((Signal) world.getBlockState(pos).getBlock()).getID();
+        blockID = getSignal().getID();
     }
 
     public Signal getSignal() {
@@ -142,4 +143,39 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         return blockID;
     }
 
+    @Override
+    public void updateTag(final NBTTagCompound compound) {
+        if (compound.hasKey(CUSTOMNAME)) {
+            setCustomName(compound.getString(CUSTOMNAME));
+            this.syncClient();
+        }
+    }
+
+    @Override
+    public NBTTagCompound getTag() {
+        return null;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(formatCustomName, map);
+    }
+
+    @Override
+    public boolean equals(final Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final SignalTileEnity other = (SignalTileEnity) obj;
+        return Objects.equals(formatCustomName, other.formatCustomName)
+                && Objects.equals(map, other.map);
+    }
+
+    @Override
+    public boolean isValid(final EntityPlayer player) {
+        return true;
+    }
 }
