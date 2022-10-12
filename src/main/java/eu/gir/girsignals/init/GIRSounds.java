@@ -16,9 +16,11 @@ public final class GIRSounds {
     public static final List<SoundEvent> SOUNDS = new LinkedList<>();
     
     public static SoundEvent andreascross;
+    public static SoundEvent rottenwarn;
     
     public static void init() {
         andreascross = registerSound("andreas_cross");
+        rottenwarn = registerSound("rottenwarn");
     }
 
     private static SoundEvent registerSound(final String soundName) {

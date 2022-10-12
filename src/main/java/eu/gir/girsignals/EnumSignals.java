@@ -248,6 +248,10 @@ public final class EnumSignals {
     public enum ETCS implements DefaultName<ETCS> {
         NE14_LEFT, NE14_RIGHT, NE14_DOWN, BLOCK;
     }
+    
+    public enum RO implements DefaultName<RO> {
+        RO4, ATWS;
+    }
 
     public enum RailroadBarrierType implements DefaultName<RailroadBarrierType> {
         TYPE1;
