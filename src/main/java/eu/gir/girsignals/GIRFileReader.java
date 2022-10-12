@@ -20,6 +20,8 @@ import eu.gir.girsignals.init.GIRBlocks;
 
 public final class GIRFileReader {
 
+    private static FileSystem fileSystemCache = null;
+
     private GIRFileReader() {
     }
 
@@ -93,9 +95,10 @@ public final class GIRFileReader {
                         return Optional.empty();
                     }
 
-                    final FileSystem filesystem = FileSystems.newFileSystem(uri,
-                            Collections.emptyMap());
-                    return Optional.of(filesystem.getPath(filelocation));
+                    if (fileSystemCache == null) {
+                        fileSystemCache = FileSystems.newFileSystem(uri, Collections.emptyMap());
+                    }
+                    return Optional.of(fileSystemCache.getPath(filelocation));
                 }
             }
         } catch (final IOException | URISyntaxException e) {
