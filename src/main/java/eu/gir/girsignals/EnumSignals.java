@@ -199,7 +199,7 @@ public final class EnumSignals {
     public enum NEAddition implements Offable<NEAddition> {
         OFF, PRE1, PRE2;
     }
-    
+
     public enum NE5Addition implements Offable<NE5Addition> {
         OFF, M50, M70, M100, M120, M150, M200, M250, KURZ, LANG;
     }
@@ -243,6 +243,10 @@ public final class EnumSignals {
 
     public enum ACCar implements Offable<ACCar> {
         OFF, RED, YELLOW;
+    }
+
+    public enum ETCS implements DefaultName<ETCS> {
+        NE14_LEFT, NE14_RIGHT, NE14_DOWN, BLOCK;
     }
 
     public enum RailroadBarrierType implements DefaultName<RailroadBarrierType> {

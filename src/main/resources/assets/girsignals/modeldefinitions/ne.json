@@ -169,7 +169,7 @@
             "y": 2
         },
         "ne/so1": {
-            "texture": [
+            "textures": [
                 {
                     "blockstate": "with(NETYPE.SO1)"
                 }

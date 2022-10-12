@@ -17,6 +17,7 @@ import eu.gir.girsignals.blocks.boards.SignalAndreasCross;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalBUELight;
 import eu.gir.girsignals.blocks.boards.SignalEL;
+import eu.gir.girsignals.blocks.boards.SignalETCS;
 import eu.gir.girsignals.blocks.boards.SignalLF;
 import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalOther;
@@ -77,6 +78,7 @@ public final class GIRBlocks {
     public static final SignalSemaphore SEMAPHORE_SIGNAL = new SignalSemaphore();
     public static final SignalSHMech SH_MECH = new SignalSHMech();
     public static final SignalAndreasCross ANDREAS_CROSS = new SignalAndreasCross();
+    public static final SignalETCS ETCS_SIGNAL = new SignalETCS();
     
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
