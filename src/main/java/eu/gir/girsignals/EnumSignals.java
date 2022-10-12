@@ -99,7 +99,7 @@ public final class EnumSignals {
     public enum SHLight implements Offable<SHLight> {
         OFF, SH0, SH1, STATUS_LIGHT;
     }
-    
+
     public enum SHMech implements DefaultName<SHMech> {
         SH0, SH1, SH1_GSP2;
     }
@@ -192,7 +192,8 @@ public final class EnumSignals {
     }
 
     public enum NE implements DefaultName<NE> {
-        NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_SMALL, NE5, NE6, SO106;
+        NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_SMALL, NE5, NE6, NE7A, NE7B,
+        NE7A_EAST, NE7B_EAST, SO1, SO19_1, SO19_2, SO19_3, SO106;
     }
 
     public enum NEAddition implements Offable<NEAddition> {
@@ -223,6 +224,7 @@ public final class EnumSignals {
         DISABLED, NAME_ASSENDING, NAME_DESCENIDNG, TYPE_ASSANDING, TYPE_DESCENDING,
         DISTANCE_ASSANDING, DISTANCE_DSECENDING;
     }
+
     public enum SemaType implements DefaultName<SemaType> {
         DIST, MAIN, MAIN_SMALL;
     }

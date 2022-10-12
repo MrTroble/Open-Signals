@@ -1,10 +1,16 @@
 {
-    "textures": {},
+    "textures": {
+        "ne7_east": "girsignals:blocks/ne/ne7_yellow"
+    },
     "models": {
         "mast": {
             "textures": [
                 {
                     "blockstate": "with(NETYPE.NE6) || !with(NETYPE.NE4_small)"
+                },
+                {
+                    "blockstate":"with(NETYPE.NE7A) || with(NETYPE.NE7B) || with(NETYPE.NE7A_EAST) || with(NETYPE.NE7B_EAST)",
+                    "y": 1
                 }
             ],
             "y": 0
@@ -74,6 +80,24 @@
                     "retexture": {
                         "2": "girsignals:blocks/ne/ne4"
                     }
+                },
+                {
+                    "blockstate": "with(NETYPE.SO19_1)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/so19_1"
+                    }
+                },
+                {
+                    "blockstate": "with(NETYPE.SO19_2)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/so19_2"
+                    }
+                },
+                {
+                    "blockstate": "with(NETYPE.SO19_3)",
+                    "retexture": {
+                        "2": "girsignals:blocks/ne/so19_3"
+                    }
                 }
             ],
             "y": 1
@@ -115,6 +139,42 @@
                 }
             ],
             "y": 0
+        },
+        "ne/ne7a": {
+            "textures":[
+                {
+                    "blockstate": "with(NETYPE.NE7A)"
+                },
+                {
+                    "blockstate": "with(NETYPE.NE7A_EAST)",
+                    "retexture": {
+                        "3": "ne7_east"
+                    }
+                }
+            ],
+            "y": 2
+        },
+        "ne/ne7b": {
+            "textures": [
+                {
+                    "blockstate": "with(NETYPE.NE7B)"
+                },
+                {
+                    "blockstate": "with(NETYPE.NE7B_EAST)",
+                    "retexture": {
+                        "3": "ne7_east"
+                    }
+                }
+            ],
+            "y": 2
+        },
+        "ne/so1": {
+            "texture": [
+                {
+                    "blockstate": "with(NETYPE.SO1)"
+                }
+            ],
+            "y": 1
         },
         "ne/so106": {
             "textures": [
