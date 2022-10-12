@@ -71,6 +71,14 @@
                 }
             ],
             "y": 2
+        },
+        "ne/ne2_2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(BUESHORT) && (with(BUETYPE.BUE2_1) || with(BUETYPE.BUE2_2) || with(BUETYPE.BUE2_3) || with(BUETYPE.BUE2_4))"
+                }
+            ],
+            "y": 2.3125
         }
     }
 }
