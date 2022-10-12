@@ -59,7 +59,8 @@
                 {
                     "blockstate": "with(LFTYPE.LF5)"
                 }
-            ]
+            ],
+            "y": 1
         },
         "lf/lf4": {
             "textures": [
