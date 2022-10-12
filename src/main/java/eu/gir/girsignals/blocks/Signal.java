@@ -77,16 +77,16 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     public static class SignalProperties {
 
-        public final Placementtool placementtool;
-        public final String signalTypeName;
-        public final float customNameRenderHeight;
-        public final int height;
-        public final float signWidth;
-        public final float offsetX;
-        public final float offsetY;
-        public final float signScale;
-        public final boolean canLink;
-        public final ISignalAutoconfig config;
+        public transient Placementtool placementtool;
+        public String signalTypeName;
+        public float customNameRenderHeight;
+        public int height;
+        public float signWidth;
+        public float offsetX;
+        public float offsetY;
+        public float signScale;
+        public boolean canLink;
+        public transient ISignalAutoconfig config;
 
         public SignalProperties(final Placementtool placementtool, final String signalTypeName,
                 final float customNameRenderHeight, final int height, final float signWidth,
@@ -482,9 +482,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
         return false;
     }
-    
+
     public void getUpdate(final World world, final BlockPos pos) {
-        
+
     }
 
 }

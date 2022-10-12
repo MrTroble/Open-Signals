@@ -38,6 +38,9 @@ public final class LogicParser {
                 new MethodInfo("hasandisnot",
                         objects -> PredicateHolder.hasAndIsNot((IUnlistedProperty) objects[0]),
                         IUnlistedProperty.class));
+
+        TRANSLATION_TABLE.put("check", new MethodInfo("check",
+                objects -> PredicateHolder.check((ValuePack) objects[0]), ValuePack.class));
     }
 
     public static Predicate<IExtendedBlockState> nDegreeFunctionParser(final String name,

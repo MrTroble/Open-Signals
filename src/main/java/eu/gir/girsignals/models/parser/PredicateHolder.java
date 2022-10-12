@@ -1,7 +1,10 @@
 package eu.gir.girsignals.models.parser;
 
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 
+import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.DefaultName;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -48,6 +51,24 @@ public final class PredicateHolder {
             final Boolean bool = ebs.getValue(property);
             return bool != null && !bool.booleanValue();
         };
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Comparable<T>> Predicate<Set<Entry<SEProperty<?>, Object>>> check(
+            final ValuePack pack) {
+        return check(pack.property, pack.predicate);
+    }
+
+    public static <T extends Comparable<T>> Predicate<Set<Entry<SEProperty<?>, Object>>> check(
+            final IUnlistedProperty<T> property, final T type) {
+        return check(property, type::equals);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends Comparable<T>> Predicate<Set<Entry<SEProperty<?>, Object>>> check(
+            final IUnlistedProperty<T> property, final Predicate<T> type) {
+        return t -> t.stream().noneMatch(e -> e.getKey().equals(property)) || t.stream()
+                .anyMatch((e -> e.getKey().equals(property) && type.test((T) e.getValue())));
     }
 
 }
