@@ -158,7 +158,7 @@ public final class EnumSignals {
     }
 
     public enum RA implements DefaultName<RA> {
-        RA10, RA11A, RA11B, RA12, RA6_9;
+        RA10, RA11A, RA11B, RA12, RA6_9, RA11_DWARF;
     }
 
     public enum RALight implements Offable<RALight> {
@@ -248,7 +248,7 @@ public final class EnumSignals {
     public enum ETCS implements DefaultName<ETCS> {
         NE14_LEFT, NE14_RIGHT, NE14_DOWN, BLOCK;
     }
-    
+
     public enum RO implements DefaultName<RO> {
         RO4, ATWS;
     }
@@ -259,5 +259,9 @@ public final class EnumSignals {
 
     public enum RailroadBarrierLength implements DefaultName<RailroadBarrierLength> {
         L1, L2, L3, L4, L5, L6;
+    }
+    
+    public enum TramSigns implements DefaultName<TramSigns> {
+        SH1, SO1, SO2, SO5, SO5_1, SO5_2, SO6, ST1, ST2, ST7;
     }
 }

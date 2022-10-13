@@ -8,14 +8,14 @@
         "mast": {
             "textures": [
                 {
-                    "blockstate": "!with(RATYPE.RA12) && !with(RATYPE.RA6_9)"
+                    "blockstate": "!with(RATYPE.RA12) && !with(RATYPE.RA6_9) && !with(RATYPE.RA11_DWARF)"
                 },
                 {
-                    "blockstate": "!with(RATYPE.RA12) && !with(RATYPE.RA6_9) && !with(RATYPE.RA10)",
+                    "blockstate": "!with(RATYPE.RA12) && !with(RATYPE.RA6_9) && !with(RATYPE.RA10) && !with(RATYPE.RA11_DWARF)",
                     "y": 1
                 },
                 {
-                    "blockstate": "!with(RATYPE.RA12) && !with(RATYPE.RA6_9) && !with(RATYPE.RA10)",
+                    "blockstate": "!with(RATYPE.RA12) && !with(RATYPE.RA6_9) && !with(RATYPE.RA10) && !with(RATYPE.RA11_DWARF)",
                     "y": 2
                 }
             ],
@@ -45,6 +45,20 @@
                 }
             ],
             "y": 3
+        },
+        "ra/ra11_dwarf": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA11_DWARF) && hasandisnot(RALIGHT)"
+                },
+                {
+                    "blockstate": "with(RATYPE.RA11_DWARF) && hasandis(RALIGHT)",
+                    "retexture": {
+                        "lamp_whitenorth": "lamp_white"
+                    }
+                }
+            ],
+            "y": 0
         },
         "ra/ra12": {
             "textures": [
