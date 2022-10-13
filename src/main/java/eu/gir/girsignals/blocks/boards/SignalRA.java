@@ -32,7 +32,6 @@ public class SignalRA extends Signal {
             return super.getHeight(map);
         switch (ra) {
             case RA10:
-            case RA11_DWARF:
                 return 1;
             case RA11A:
             case RA11B:

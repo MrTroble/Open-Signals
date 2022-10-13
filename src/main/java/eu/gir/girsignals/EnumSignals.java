@@ -253,14 +253,10 @@ public final class EnumSignals {
         RO4, ATWS;
     }
 
-    public enum RailroadBarrierType implements DefaultName<RailroadBarrierType> {
-        TYPE1;
-    }
-
-    public enum RailroadBarrierLength implements DefaultName<RailroadBarrierLength> {
+    public enum RailroadGateLength implements DefaultName<RailroadGateLength> {
         L1, L2, L3, L4, L5, L6;
     }
-    
+
     public enum TramSigns implements DefaultName<TramSigns> {
         SH1, SO1, SO2, SO5, SO5_1, SO5_2, SO6, ST1, ST2, ST7;
     }
