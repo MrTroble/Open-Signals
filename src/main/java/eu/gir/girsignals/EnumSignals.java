@@ -193,7 +193,7 @@ public final class EnumSignals {
 
     public enum NE implements DefaultName<NE> {
         NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_SMALL, NE5, NE6, NE7A, NE7B,
-        NE7A_EAST, NE7B_EAST, SO1, SO19_1, SO19_2, SO19_3, SO106;
+        NE7A_EAST, NE7B_EAST, NE12, NE13, SO1, SO19_1, SO19_2, SO19_3, SO106;
     }
 
     public enum NEAddition implements Offable<NEAddition> {
@@ -259,5 +259,9 @@ public final class EnumSignals {
 
     public enum TramSigns implements DefaultName<TramSigns> {
         SH1, SO1, SO2, SO5, SO5_1, SO5_2, SO6, ST1, ST2, ST7;
+    }
+    
+    public enum ColorWeight implements DefaultName<ColorWeight> {
+        WHITE_BLACK, WHITE_BLACK_W, YELLOW, YELLOW_BLACK, RED_YELLOW;
     }
 }

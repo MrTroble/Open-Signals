@@ -12,7 +12,7 @@ import eu.gir.girsignals.init.GIRItems;
 public class SignalNE extends Signal {
 
     public SignalNE() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "ne").noLink().build());
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "ne").build());
     }
 
     public static final SEProperty<NE> NETYPE = SEProperty.of("netype", NE.NE1,
@@ -23,6 +23,8 @@ public class SignalNE extends Signal {
             ChangeableStage.GUISTAGE);
     public static final SEProperty<NE5Addition> NE5_ADDITION = SEProperty.of("ne5_addition",
             NE5Addition.OFF, ChangeableStage.GUISTAGE);
+    public static final SEProperty<Boolean> NE13 = SEProperty.of("ne13", false,
+            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(NETYPE, NE.NE13));
 
     @Override
     public boolean hasCostumColor() {
