@@ -7,6 +7,7 @@ import eu.gir.girsignals.GirsignalsMain;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 public final class GIRSounds {
     
@@ -30,6 +31,7 @@ public final class GIRSounds {
         return sound;
     }
     
+    @SubscribeEvent
     public static void soundRegistry(final RegistryEvent.Register<SoundEvent> event) {
         SOUNDS.forEach(sound -> event.getRegistry().register(sound));
     }
