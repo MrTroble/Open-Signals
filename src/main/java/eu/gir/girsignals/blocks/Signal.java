@@ -78,6 +78,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     public static class SignalProperties {
 
         public transient Placementtool placementtool;
+        public String placementToolName;
         public String signalTypeName;
         public float customNameRenderHeight;
         public int height;
