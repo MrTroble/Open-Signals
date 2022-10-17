@@ -1,5 +1,7 @@
 package eu.gir.girsignals.blocks.boards;
 
+import java.util.Map;
+
 import eu.gir.girsignals.EnumSignals.Arrow;
 import eu.gir.girsignals.EnumSignals.NE;
 import eu.gir.girsignals.EnumSignals.NE5Addition;
@@ -12,7 +14,7 @@ import eu.gir.girsignals.init.GIRItems;
 public class SignalNE extends Signal {
 
     public SignalNE() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "ne").build());
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "ne").height(2).build());
     }
 
     public static final SEProperty<NE> NETYPE = SEProperty.of("netype", NE.NE1,
@@ -29,6 +31,27 @@ public class SignalNE extends Signal {
     @Override
     public boolean hasCostumColor() {
         return true;
+    }
+    
+    @Override
+    public int getHeight(final Map<SEProperty<?>, Object> map) {
+        final NE other = (NE) map.get(NETYPE);
+        if (other == null)
+            return super.getHeight(map);
+        switch (other) {
+            case NE2:
+            case NE2_1:
+            case NE4_SMALL:
+                return 0;
+            case NE1:
+            case NE5:
+            case NE6:
+            case SO1:
+            case SO106:
+                return 1;
+            default:
+                return super.getHeight(map);
+        }
     }
 
 }
