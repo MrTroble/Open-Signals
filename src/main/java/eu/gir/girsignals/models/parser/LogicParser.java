@@ -6,7 +6,6 @@ import java.util.function.Predicate;
 import eu.gir.girsignals.models.parser.interm.EvaluationLevel;
 import eu.gir.girsignals.models.parser.interm.IntermidiateNode;
 import eu.gir.girsignals.models.parser.interm.LogicalSymbols;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import scala.actors.threadpool.Arrays;
 
@@ -43,7 +42,7 @@ public final class LogicParser {
                 objects -> PredicateHolder.check((ValuePack) objects[0]), ValuePack.class));
     }
 
-    public static Predicate<IExtendedBlockState> nDegreeFunctionParser(final String name,
+    public static Predicate nDegreeFunctionParser(final String name,
             final FunctionParsingInfo parser, final String... parameter) {
         final String[] arguments = parameter;
         final MethodInfo method = TRANSLATION_TABLE.get(name.toLowerCase());
@@ -124,8 +123,7 @@ public final class LogicParser {
         return logic;
     }
 
-    public static Predicate<IExtendedBlockState> predicate(final String input,
-            final FunctionParsingInfo info) {
+    public static Predicate predicate(final String input, final FunctionParsingInfo info) {
         return parse(input, info).pop().getPredicate();
     }
 }
