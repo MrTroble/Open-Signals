@@ -6,6 +6,7 @@ import java.util.Optional;
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.HPBlock;
 import eu.gir.girsignals.EnumSignals.HPHome;
+import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KSMain;
 import eu.gir.girsignals.EnumSignals.SemaDist;
 import eu.gir.girsignals.EnumSignals.ZS32;
@@ -36,20 +37,16 @@ public final class SemaphoreConfig implements ISignalAutoconfig {
         }
     }
 
-    /**
-     * @param if the bool is true, the next signal shows something that isn't red.
-     */
-
     @SuppressWarnings("rawtypes")
-    private static void checkStop(final boolean bool, final HashMap<SEProperty, Object> values) {
+    private static void checkStop(final boolean stop, final HashMap<SEProperty, Object> values) {
 
-        if (bool) {
+        if (stop) {
 
-            values.put(SignalSemaphore.SEMA_VR, SemaDist.VR1);
+            values.put(SignalSemaphore.SEMA_VR, SemaDist.VR0);
 
         } else {
 
-            values.put(SignalSemaphore.SEMA_VR, SemaDist.VR2);
+            values.put(SignalSemaphore.SEMA_VR, SemaDist.VR1);
         }
 
     }
@@ -100,32 +97,44 @@ public final class SemaphoreConfig implements ISignalAutoconfig {
             final Optional<ZS32> nexthlZS3PLATE = (Optional<ZS32>) info.next
                     .getProperty(SignalHL.ZS3_PLATE);
 
-            final boolean ksgo = info.next.getProperty(SignalKS.STOPSIGNAL)
-                    .filter(a -> Signallists.KS_GO.contains(a)).isPresent()
-                    || info.next.getProperty(SignalKS.MAINSIGNAL).filter(KSMain.KS1::equals)
+            final Optional<Boolean> wing1 = (Optional<Boolean>) info.next
+                    .getProperty(SignalSemaphore.WING1);
+
+            final Optional<Boolean> wing2 = (Optional<Boolean>) info.next
+                    .getProperty(SignalSemaphore.WING1);
+
+            final boolean ksStop = info.next.getProperty(SignalKS.MAINSIGNAL)
+                    .filter(KSMain.HP0::equals).isPresent()
+                    || info.next.getProperty(SignalKS.STOPSIGNAL).filter(KS.HP0::equals)
                             .isPresent();
 
-            final boolean hvgo = info.next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP1::equals)
-                    .isPresent()
-                    || info.next.getProperty(SignalHV.STOPSIGNAL).filter(HP.HP2::equals).isPresent()
-                    || info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP1::equals)
+            final boolean hvStop1 = info.next.getProperty(SignalHV.HPBLOCK)
+                    .filter(HPBlock.HP0::equals).isPresent()
+                    || info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP0::equals).isPresent()
+                    || info.next.getProperty(SignalHV.HPHOME)
+                            .filter(HPHome.HP0_ALTERNATE_RED::equals).isPresent();
+
+            final boolean hvStop2 = info.next.getProperty(SignalHV.STOPSIGNAL)
+                    .filter(HP.HP0::equals).isPresent()
+                    || info.next.getProperty(SignalHV.STOPSIGNAL).filter(HP.SHUNTING::equals)
                             .isPresent();
 
-            final boolean hvgo2 = info.next.getProperty(SignalHV.HPHOME).filter(HPHome.HP2::equals)
-                    .isPresent()
-                    || info.next.getProperty(SignalHV.HPBLOCK).filter(HPBlock.HP1::equals)
-                            .isPresent();
-
-            final boolean hlstop = info.next.getProperty(SignalHL.STOPSIGNAL)
+            final boolean hlStop = info.next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(a -> Signallists.HL_STOP.contains(a)).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL)
                             .filter(d -> Signallists.HLEXIT_STOP.contains(d)).isPresent();
 
-            checkStop(ksgo, values);
-            checkStop(!hlstop, values);
-            checkStop(hvgo2, values);
-            checkStop(hvgo, values);
-            checkStop(ksgo, values);
+            final boolean semaStop = !(wing2.filter(wing -> (Boolean) wing).isPresent())
+                    && !(wing1.filter(s -> (Boolean) s).isPresent());
+
+            final boolean semaHP2 = wing1.filter(wing -> (Boolean) wing).isPresent()
+                    && wing2.filter(wing -> (Boolean) wing).isPresent();
+
+            final boolean hvStop = hvStop1 || hvStop2;
+
+            checkStop(ksStop, values);
+            checkStop(hlStop, values);
+            checkStop(hvStop, values);
 
             checkSpeed(nexthlZS3PLATE, values);
             checkSpeed(hvZS3, values);
@@ -134,17 +143,17 @@ public final class SemaphoreConfig implements ISignalAutoconfig {
             checkSpeed(speedKSplate, values);
             checkSpeed(speedKS, values);
 
-            if (hlstop) {
+            values.put(SignalSemaphore.SEMA_VR, SemaDist.VR1);
+
+            if (semaHP2) {
+                values.put(SignalSemaphore.SEMA_VR, SemaDist.VR2);
+            }
+
+            final boolean anyStop = hlStop || semaStop || hvStop;
+
+            if (anyStop) {
 
                 values.put(SignalSemaphore.SEMA_VR, SemaDist.VR0);
-
-            } else if (!ksgo || !(hvgo || hvgo2)) {
-
-                values.put(SignalSemaphore.SEMA_VR, SemaDist.VR0);
-
-            } else {
-
-                values.put(SignalSemaphore.SEMA_VR, SemaDist.VR1);
             }
 
         } else {
