@@ -211,6 +211,10 @@ public final class EnumSignals {
     public enum NE5Addition implements Offable<NE5Addition> {
         OFF, M50, M70, M100, M120, M150, M200, M250, KURZ, LANG;
     }
+    
+    public enum WNMech implements DefaultName<WNMech> {
+        WN1, WN2;
+    }
 
     public enum WNNormal implements Offable<WNNormal> {
         OFF, WN1, WN2, BLINK;
