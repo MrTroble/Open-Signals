@@ -230,6 +230,7 @@ property.bueshort.desc=The signal is in the shortened braking distance.
 property.ne5_addition.desc=Ne5 Addition
 property.tstype.desc=Ts signals
 property.etcs_type.desc=ETCS signals
+property.rotype.desc=Ro signals
 property.tramsigns.desc=Tram signals
 property.barrier_length.desc=Railroad gates length
 property.manual.desc=Switch between mechanical Wn signals and switch handle.
