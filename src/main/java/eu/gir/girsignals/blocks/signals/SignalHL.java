@@ -1,6 +1,8 @@
 package eu.gir.girsignals.blocks.signals;
 
 import eu.gir.girsignals.EnumSignals.HL;
+import eu.gir.girsignals.EnumSignals.HLBlock;
+import eu.gir.girsignals.EnumSignals.HLBlockExit;
 import eu.gir.girsignals.EnumSignals.HLDistant;
 import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
@@ -52,6 +54,11 @@ public class SignalHL extends Signal {
             ChangeableStage.GUISTAGE);
     public static final SEProperty<ZS32> ZS3V_PLATE = SEProperty.of("zs3vplate", ZS32.OFF,
             ChangeableStage.GUISTAGE);
+    public static final SEProperty<HLBlock> BLOCKSIGNAL = SEProperty.of("blocksignal", HLBlock.OFF,
+            ChangeableStage.APISTAGE_NONE_CONFIG, true, check(HLTYPE, HLType.BLOCK));
+    public static final SEProperty<HLBlockExit> BLOCKEXITSIGNAL = SEProperty.of("blockexitsignal",
+            HLBlockExit.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true,
+            check(HLTYPE, HLType.BLOCK_EXIT));
 
     @Override
     public boolean hasCostumColor() {
