@@ -1,5 +1,25 @@
 # Changelog
 
+## [Update]
+
+* feat: added bue east signal
+* feat: added more el signals
+* feat: added more ne signals
+* feat: added more other signals
+* feat: added etcs signals
+* feat: added ro signals
+* feat: added ra11 dwarf signal
+* feat: added tram signs
+* feat: added railroad gates
+* feat: added spring-loaded switch signals
+* feat: added switch handles and mechanical wn signals
+* feat: added hl block signals
+* update: post block
+* update: bue signs
+* fix: no sounds on servers
+* fix: semaphore signals with control box
+* fix: ne signal heights
+
 ## [Fix]
 
 * fix: crash on ressource pack loading
