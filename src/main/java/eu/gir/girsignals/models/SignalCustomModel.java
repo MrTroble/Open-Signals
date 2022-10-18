@@ -151,6 +151,7 @@ public class SignalCustomModel implements IModel {
         modelCache.put(state, Pair.of(m, new Vector3f(x, y, z)));
     }
 
+    @SuppressWarnings("unchecked")
     protected void loadExtention(final TextureStats texturestate,
             final Map<String, ModelExtention> extention, final String modelname,
             final ModelStats states, final Models models, final FunctionParsingInfo signaltype) {

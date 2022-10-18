@@ -43,6 +43,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         });
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onResourceManagerReload(final IResourceManager resourceManager) {
 
@@ -92,8 +93,8 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
 
                 final FunctionParsingInfo parsinginfo = new FunctionParsingInfo(signaltype);
 
-                registeredModels.put(
-                        signaltype.getRegistryName().toString().replace("girsignals:", ""), cm -> {
+                registeredModels.put(signaltype.getRegistryName().toString()
+                        .replace(GirsignalsMain.MODID + ":", ""), cm -> {
 
                             for (final Map.Entry<String, Models> modelsmap : content.getModels()
                                     .entrySet()) {

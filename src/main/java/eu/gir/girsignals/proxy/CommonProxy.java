@@ -4,6 +4,7 @@ import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalBox;
 import eu.gir.girsignals.blocks.SignalController;
+import eu.gir.girsignals.blocks.SignalLoader;
 import eu.gir.girsignals.guis.ContainerSignalBox;
 import eu.gir.girsignals.guis.ContainerSignalController;
 import eu.gir.girsignals.init.GIRBlocks;
@@ -30,6 +31,7 @@ public class CommonProxy {
                 (p, w, bp) -> new ContainerSignalBox((SignalBoxTileEntity) w.getTileEntity(bp)));
         GuiHandler.addServer(Signal.class, (p, w, bp) -> null);
 
+        SignalLoader.loadInternSignals();
         GIRItems.init();
         GIRBlocks.init();
         GIRSounds.init();

@@ -54,7 +54,7 @@ public class LogicalParserTest {
     @Test
     public void testFunctionParser() throws Exception {
         for (final Signal signal : new Signal[] {
-                GIRBlocks.HV_SIGNAL, GIRBlocks.SH_SIGNAL, GIRBlocks.KS_SIGNAL, GIRBlocks.LF_SIGNAL
+                GIRBlocks.HV_SIGNAL, GIRBlocks.KS_SIGNAL, GIRBlocks.LF_SIGNAL
         }) {
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
             for (final IUnlistedProperty property : info.info.properties) {

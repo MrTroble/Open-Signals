@@ -3,6 +3,7 @@ package eu.gir.girsignals.init;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.List;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
@@ -31,6 +32,7 @@ import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalSHMech;
 import eu.gir.girsignals.blocks.signals.SignalSemaphore;
 import eu.gir.girsignals.blocks.signals.SignalTram;
+import eu.gir.girsignals.contentpacks.SignalSystemParser;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.item.Item;
@@ -59,8 +61,8 @@ public final class GIRBlocks {
     public static final SignalTram TRAM_SIGNAL = new SignalTram();
     public static final SignalLF LF_SIGNAL = new SignalLF();
     public static final SignalEL EL_SIGNAL = new SignalEL();
-    public static final Signal SH_SIGNAL = new Signal(
-            Signal.builder(GIRItems.SIGN_PLACEMENT_TOOL, "shsignal").noLink().build());
+//    public static final Signal SH_SIGNAL = new Signal(
+//            Signal.builder(GIRItems.SIGN_PLACEMENT_TOOL, "shsignal").noLink().build());
     public static final SignalRA RA_SIGNAL = new SignalRA();
     public static final SignalBUE BUE_SIGNAL = new SignalBUE();
     public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
@@ -75,7 +77,7 @@ public final class GIRBlocks {
     public static final SignalSemaphore SEMAPHORE_SIGNAL = new SignalSemaphore();
     public static final SignalSHMech SH_MECH = new SignalSHMech();
     public static final SignalAndreasCross ANDREAS_CROSS = new SignalAndreasCross();
-    
+
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
     public static void init() {
@@ -109,6 +111,32 @@ public final class GIRBlocks {
                 }
             }
         }
+
+        final List<Signal> signals = new ArrayList<>(SignalSystemParser.getSignalSystems());
+        signals.forEach(signal -> {
+            try {
+                final Block block = (Block) signal;
+                block.setRegistryName(
+                        new ResourceLocation(GirsignalsMain.MODID, signal.getSignalTypeName()));
+                block.setUnlocalizedName(signal.getSignalTypeName());
+                blocksToRegister.add(block);
+                if (block instanceof ITileEntityProvider) {
+                    final ITileEntityProvider provider = (ITileEntityProvider) block;
+                    try {
+                        final Class<? extends TileEntity> tileclass = provider
+                                .createNewTileEntity(null, 0).getClass();
+                        if (TileEntity.getKey(tileclass) == null)
+                            TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
+                    } catch (final NullPointerException ex) {
+                        GirsignalsMain.log.trace(
+                                "All tileentity provide need to call back a default entity if the world is null!",
+                                ex);
+                    }
+                }
+            } catch (final IllegalArgumentException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @SubscribeEvent

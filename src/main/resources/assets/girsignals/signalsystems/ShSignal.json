@@ -1,0 +1,11 @@
+{
+    "systemProperties": [
+        {
+            "placementToolName": "SIGN_PLACEMENT_TOOL",
+            "canLink": false
+        }
+    ],
+    "seProperties": [
+        {}
+    ]
+}
