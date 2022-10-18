@@ -79,15 +79,15 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     public static class SignalProperties {
 
         public transient Placementtool placementtool;
-        public String placementToolName = "";
-        public String signalTypeName = "";
-        public float customNameRenderHeight = -1;
-        public int height = 1;
-        public float signWidth = 22;
-        public float offsetX = 0;
-        public float offsetY = 0;
-        public float signScale = 1;
-        public boolean canLink = false;
+        public String placementToolName;
+        public String signalTypeName;
+        public float customNameRenderHeight;
+        public int height;
+        public float signWidth;
+        public float offsetX;
+        public float offsetY;
+        public float signScale;
+        public boolean canLink;
         public transient ISignalAutoconfig config;
 
         public SignalProperties(final Placementtool placementtool, final String signalTypeName,
