@@ -63,7 +63,7 @@ public class SignalSystemParser {
 
         if (signalProperty.canLink) {
             signalProperty = new SignalPropertiesBuilder(tool,
-                    fileName.replace(".json", "").toUpperCase().replace("_", ""))
+                    fileName.replace(".json", "").replace("_", "").toLowerCase())
                             .height(signalProperty.height).offsetX(signalProperty.offsetX)
                             .offsetY(signalProperty.offsetY)
                             .signHeight(signalProperty.customNameRenderHeight)
