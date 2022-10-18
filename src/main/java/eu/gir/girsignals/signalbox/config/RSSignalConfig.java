@@ -3,6 +3,7 @@ package eu.gir.girsignals.signalbox.config;
 import java.util.HashMap;
 
 import eu.gir.girsignals.EnumSignals.HL;
+import eu.gir.girsignals.EnumSignals.HLBlockExit;
 import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HP;
 import eu.gir.girsignals.EnumSignals.KS;
@@ -41,6 +42,7 @@ public final class RSSignalConfig implements ISignalAutoconfig {
         values.put(SignalHL.EXITSIGNAL, HLExit.HL_SHUNTING);
         values.put(SignalSemaphore.RA12, true);
         values.put(SignalSHMech.SH_MECH, SHMech.SH1);
+        values.put(SignalHL.BLOCKEXITSIGNAL, HLBlockExit.HL_SHUNTING);
 
         if (info.type.equals(PathType.SHUNTING)) {
             values.put(SignalRA.RALIGHT, true);

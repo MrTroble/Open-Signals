@@ -66,7 +66,9 @@ public final class KSSignalConfig implements ISignalAutoconfig {
                     .getProperty(SignalHL.LIGHTBAR);
 
             final boolean nexthl = info.next.getProperty(SignalHL.STOPSIGNAL).isPresent()
-                    || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent();
+                    || info.next.getProperty(SignalHL.EXITSIGNAL).isPresent()
+                    || info.next.getProperty(SignalHL.BLOCKSIGNAL).isPresent()
+                    || info.next.getProperty(SignalHL.BLOCKSIGNAL).isPresent();
 
             final boolean stop = info.next.getProperty(SignalKS.MAINSIGNAL)
                     .filter(KSMain.HP0::equals).isPresent()
@@ -75,7 +77,11 @@ public final class KSSignalConfig implements ISignalAutoconfig {
             final boolean hlstop = info.next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(a -> Signallists.HL_STOP.contains(a)).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL)
-                            .filter(d -> Signallists.HLEXIT_STOP.contains(d)).isPresent();
+                            .filter(d -> Signallists.HLEXIT_STOP.contains(d)).isPresent()
+                    || info.next.getProperty(SignalHL.EXITSIGNAL)
+                            .filter(b -> Signallists.HLBLOCK_STOP.contains(b)).isPresent()
+                    || info.next.getProperty(SignalHL.EXITSIGNAL)
+                            .filter(be -> Signallists.HLBLOCKEXIT_STOP.contains(be)).isPresent();
 
             final boolean hlmain40 = info.next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(c -> Signallists.HL_40_MAIN.contains(c)).isPresent()

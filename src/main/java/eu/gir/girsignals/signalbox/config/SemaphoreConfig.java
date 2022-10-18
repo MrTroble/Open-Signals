@@ -124,7 +124,11 @@ public final class SemaphoreConfig implements ISignalAutoconfig {
             final boolean hlStop = info.next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(a -> Signallists.HL_STOP.contains(a)).isPresent()
                     || info.next.getProperty(SignalHL.EXITSIGNAL)
-                            .filter(d -> Signallists.HLEXIT_STOP.contains(d)).isPresent();
+                            .filter(d -> Signallists.HLEXIT_STOP.contains(d)).isPresent()
+                    || info.next.getProperty(SignalHL.BLOCKSIGNAL)
+                            .filter(b -> Signallists.HLBLOCK_STOP.contains(b)).isPresent()
+                    || info.next.getProperty(SignalHL.BLOCKEXITSIGNAL)
+                            .filter(be -> Signallists.HLBLOCKEXIT_STOP.contains(be)).isPresent();
 
             final boolean hlmain40 = info.next.getProperty(SignalHL.STOPSIGNAL)
                     .filter(c -> Signallists.HL_40_MAIN.contains(c)).isPresent()

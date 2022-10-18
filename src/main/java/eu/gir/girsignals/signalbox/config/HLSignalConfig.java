@@ -5,6 +5,8 @@ import java.util.Map;
 import java.util.Optional;
 
 import eu.gir.girsignals.EnumSignals.HL;
+import eu.gir.girsignals.EnumSignals.HLBlock;
+import eu.gir.girsignals.EnumSignals.HLBlockExit;
 import eu.gir.girsignals.EnumSignals.HLDistant;
 import eu.gir.girsignals.EnumSignals.HLExit;
 import eu.gir.girsignals.EnumSignals.HLLightbar;
@@ -73,6 +75,16 @@ public final class HLSignalConfig implements ISignalAutoconfig {
         }
     }
 
+    @SuppressWarnings("rawtypes")
+    private void speedCheckBlock(final Map<SEProperty, Object> values) {
+        values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL1);
+    }
+
+    @SuppressWarnings("rawtypes")
+    private void speedCheckBlockExit(final Map<SEProperty, Object> values) {
+        values.put(SignalHL.BLOCKEXITSIGNAL, HLBlockExit.HL1);
+    }
+
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
@@ -95,6 +107,12 @@ public final class HLSignalConfig implements ISignalAutoconfig {
 
             final Optional<HLExit> hlexit = (Optional<HLExit>) info.next
                     .getProperty(SignalHL.EXITSIGNAL);
+
+            final Optional<HLBlock> hlBlock = (Optional<HLBlock>) info.next
+                    .getProperty(SignalHL.BLOCKSIGNAL);
+
+            final Optional<HLBlockExit> hlBlockExit = (Optional<HLBlockExit>) info.next
+                    .getProperty(SignalHL.BLOCKEXITSIGNAL);
 
             final Optional<ZS32> speedKS = (Optional<ZS32>) info.next.getProperty(SignalKS.ZS3);
 
@@ -139,14 +157,22 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     || hlexit
                             .filter(a -> Signallists.HLEXIT_STOP.contains(a) && optionalLightBar
                                     .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
+                            .isPresent()
+                    || hlBlock
+                            .filter(b -> Signallists.HLBLOCK_STOP.contains(b) && optionalLightBar
+                                    .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
                             .isPresent();
 
             final boolean changed100 = (hlStop.filter(Signallists.HL_40_MAIN::contains).isPresent()
-                    || hlexit.filter(HLExit.HL2_3::equals).isPresent())
+                    || hlexit.filter(HLExit.HL2_3::equals).isPresent()
+                    || hlBlock.filter(HLBlock.HL1::equals).isPresent()
+                    || hlBlockExit.filter(HLBlockExit.HL1::equals).isPresent())
                     && optionalLightBar.filter(HLLightbar.GREEN::equals).isPresent();
 
             final boolean normalSpeed = (hlStop.filter(Signallists.HL_UNCHANGED::contains)
-                    .isPresent() || hlexit.filter(HLExit.HL1::equals).isPresent())
+                    .isPresent() || hlexit.filter(HLExit.HL1::equals).isPresent()
+                    || hlBlock.filter(HLBlock.HL1::equals).isPresent()
+                    || hlBlockExit.filter(HLBlockExit.HL1::equals).isPresent())
                     && (!optionalLightBar.isPresent()
                             || optionalLightBar.filter(HLLightbar.OFF::equals).isPresent());
 
@@ -169,27 +195,34 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                 speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                 values.put(SignalHL.ZS2V, ZS32.OFF);
+                values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL10);
             } else if (changed100) {
                 speedCheck(info.speed, values, HL.HL4, HL.HL5_6);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL4);
+                values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL1);
             } else if (normalSpeed) {
                 speedCheck(info.speed, values, HL.HL1, HL.HL2_3);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
+                values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL1);
             } else {
                 speedCheck(info.speed, values, HL.HL7, HL.HL8_9);
                 values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
+                values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL1);
             }
 
             speedCheckExit(info.speed, values);
+            speedCheckBlockExit(values);
 
             if (nexthv) {
                 if (hvgo || hvgo2) {
                     if (hv40) {
                         speedCheck(info.speed, values, HL.HL7, HL.HL8_9);
                         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL7);
+                        values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL1);
                     } else {
                         speedCheck(info.speed, values, HL.HL1, HL.HL2_3);
                         values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL1);
+                        values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL1);
                     }
                     if (speedHV.isPresent() || speedHVplate.isPresent()) {
                         final ZS32 speednext = speedHV.isPresent() ? speedHV.get()
@@ -205,6 +238,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                     values.put(SignalHL.ZS2V, ZS32.OFF);
+                    values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL10);
                 }
 
             } else if (nextks) {
@@ -223,13 +257,16 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                     values.put(SignalHL.ZS2V, ZS32.OFF);
+                    values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL10);
                 }
             }
 
         } else {
             speedCheckExit(info.speed, values);
             speedCheck(info.speed, values, HL.HL10, HL.HL11_12);
+            values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL10);
             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
+            values.put(SignalHL.BLOCKEXITSIGNAL, HLBlockExit.HL1);
             values.put(SignalHL.ZS2, ZS32.ZS13);
         }
         this.changeIfPresent(values, info.current);
@@ -245,6 +282,8 @@ public final class HLSignalConfig implements ISignalAutoconfig {
         values.put(SignalHL.EXITSIGNAL, HLExit.HP0);
         values.put(SignalHL.ZS2, ZS32.OFF);
         values.put(SignalHL.ZS2V, ZS32.OFF);
+        values.put(SignalHL.BLOCKSIGNAL, HLBlock.HP0);
+        values.put(SignalHL.BLOCKEXITSIGNAL, HLBlockExit.HP0);
         this.changeIfPresent(values, current);
     }
 }
