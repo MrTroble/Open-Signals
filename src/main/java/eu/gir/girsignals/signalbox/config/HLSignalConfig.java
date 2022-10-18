@@ -75,16 +75,6 @@ public final class HLSignalConfig implements ISignalAutoconfig {
         }
     }
 
-    @SuppressWarnings("rawtypes")
-    private void speedCheckBlock(final Map<SEProperty, Object> values) {
-        values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL1);
-    }
-
-    @SuppressWarnings("rawtypes")
-    private void speedCheckBlockExit(final Map<SEProperty, Object> values) {
-        values.put(SignalHL.BLOCKEXITSIGNAL, HLBlockExit.HL1);
-    }
-
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
@@ -161,6 +151,10 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     || hlBlock
                             .filter(b -> Signallists.HLBLOCK_STOP.contains(b) && optionalLightBar
                                     .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
+                            .isPresent()
+                    || hlBlockExit.filter(
+                            be -> Signallists.HLBLOCKEXIT_STOP.contains(be) && optionalLightBar
+                                    .filter(lbar -> !lbar.equals(HLLightbar.OFF)).isPresent())
                             .isPresent();
 
             final boolean changed100 = (hlStop.filter(Signallists.HL_40_MAIN::contains).isPresent()
@@ -211,7 +205,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             }
 
             speedCheckExit(info.speed, values);
-            speedCheckBlockExit(values);
+            values.put(SignalHL.BLOCKEXITSIGNAL, HLBlockExit.HL1);
 
             if (nexthv) {
                 if (hvgo || hvgo2) {
@@ -239,6 +233,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                     values.put(SignalHL.ZS2V, ZS32.OFF);
                     values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL10);
+                    values.put(SignalHL.BLOCKEXITSIGNAL, HLBlockExit.HL1);
                 }
 
             } else if (nextks) {
@@ -258,6 +253,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
                     values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
                     values.put(SignalHL.ZS2V, ZS32.OFF);
                     values.put(SignalHL.BLOCKSIGNAL, HLBlock.HL10);
+                    values.put(SignalHL.BLOCKEXITSIGNAL, HLBlockExit.HL1);
                 }
             }
 
