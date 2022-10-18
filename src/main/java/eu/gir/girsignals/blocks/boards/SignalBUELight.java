@@ -17,4 +17,6 @@ public class SignalBUELight extends Signal {
             ChangeableStage.GUISTAGE);
     public static final SEProperty<Boolean> BUELIGHT = SEProperty.of("buelight", false,
             ChangeableStage.APISTAGE_NONE_CONFIG);
+    public static final SEProperty<Boolean> BUETYPE = SEProperty.of("buetype", false,
+            ChangeableStage.GUISTAGE);
 }

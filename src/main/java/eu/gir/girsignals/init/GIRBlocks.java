@@ -13,15 +13,21 @@ import eu.gir.girsignals.blocks.RedstoneInput;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalBox;
 import eu.gir.girsignals.blocks.SignalController;
+import eu.gir.girsignals.blocks.SwitchHandle;
+import eu.gir.girsignals.blocks.boards.RailroadGate;
 import eu.gir.girsignals.blocks.boards.SignalAndreasCross;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalBUELight;
 import eu.gir.girsignals.blocks.boards.SignalEL;
+import eu.gir.girsignals.blocks.boards.SignalETCS;
 import eu.gir.girsignals.blocks.boards.SignalLF;
 import eu.gir.girsignals.blocks.boards.SignalNE;
 import eu.gir.girsignals.blocks.boards.SignalOther;
 import eu.gir.girsignals.blocks.boards.SignalRA;
+import eu.gir.girsignals.blocks.boards.SignalRO;
 import eu.gir.girsignals.blocks.boards.SignalStationName;
+import eu.gir.girsignals.blocks.boards.SignalTS;
+import eu.gir.girsignals.blocks.boards.SignalTramSign;
 import eu.gir.girsignals.blocks.boards.SignalWN;
 import eu.gir.girsignals.blocks.boards.StationNumberPlate;
 import eu.gir.girsignals.blocks.signals.SignalHL;
@@ -66,6 +72,7 @@ public final class GIRBlocks {
     public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
     public static final SignalOther OTHER_SIGNAL = new SignalOther();
     public static final SignalNE NE_SIGNAL = new SignalNE();
+    public static final SignalTS TS_SIGNAL = new SignalTS();
     public static final StationNumberPlate STATION_NUMBER_PLATE = new StationNumberPlate();
     public static final SignalWN WN_SIGNAL = new SignalWN();
     public static final SignalStationName STATION_NAME = new SignalStationName();
@@ -75,6 +82,11 @@ public final class GIRBlocks {
     public static final SignalSemaphore SEMAPHORE_SIGNAL = new SignalSemaphore();
     public static final SignalSHMech SH_MECH = new SignalSHMech();
     public static final SignalAndreasCross ANDREAS_CROSS = new SignalAndreasCross();
+    public static final SignalETCS ETCS_SIGNAL = new SignalETCS();
+    public static final SignalRO RO_SIGNAL = new SignalRO();
+    public static final SignalTramSign TRAM_SIGN_SIGNAL = new SignalTramSign();
+    public static final RailroadGate RAILROAD_GATE = new RailroadGate();
+    public static final SwitchHandle SWITCH_HANDLE = new SwitchHandle();
     
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 

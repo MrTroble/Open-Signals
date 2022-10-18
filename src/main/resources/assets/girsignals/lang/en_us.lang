@@ -34,6 +34,12 @@ tile.redstoneout.name=Redstone Output
 tile.semaphoresignal.name=Semaphore Signal
 tile.shmech.name=Shunting Signal
 tile.andreascross.name=Andreascross
+tile.tssignal.name=Ts Signal
+tile.etcssignal.name=ETCS Signal
+tile.rosignal.name=Ro Signal
+tile.tramsignssignal.name=Tram Signal
+tile.railroadgate.name=Railroad Gates
+tile.switchhandle.name=Switch Handle/ Wn Signal
 
 #Linktool
 lt.linkedpos=§2Linked to: {%d, %d, %d§2}§r
@@ -152,7 +158,6 @@ property.semavr.desc=§lVr Distant signal§r - Distant signals indicate which si
 property.sh_mech.desc=§lSh Protection signal§r%n§nSh0§r: Stop for train and shunting movements%n§nSh1§r: Shunting permitted.%n§nWn7/Gsp2§r:The track lock is set aside.
 property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign. With '[n]' you get into the next line.
 
-
 #Sign Names
 property.indicator.name=Indicator
 property.lftype.name=Speed signal
@@ -177,6 +182,25 @@ property.ac_addition.name=Additions
 property.ac_sound.name=Sound
 property.ac_blink_light.name=Blink Light
 property.ac_car.name=Traffic Light
+property.bueshort.name=Shortened break distance
+property.ne5_addition.name=Ne5 addition
+property.tstype.name=Ts signals
+property.etcs_type.name=ETCS signals
+property.rotype.name=Ro signals
+property.tramsigns.name=Tram signals
+property.barrier_length.name=Railroad gates length
+property.manual.name=Wn Signals/Switch handle
+property.fallback_switch.name=Fallback switch
+property.weightcolor.name=Switch handle color
+property.switchside.name=Curved track side
+property.switchplaceside.name=Switch handle side
+property.blockexitsignal.name=Hl block exit signal
+property.blocksignal.name=Hl block signal
+property.ne13.name=Ne13a/b
+property.atws.name=Rotten warning system
+property.barrier_open.name=Barrier control
+property.powered.name=Switch handle control
+property.wn_mech.name=Wn signals
 
 #Sign Description
 property.indicator.desc=Inscription for Lf signals.1 to 20 for speed. A for start and E for end
@@ -202,6 +226,25 @@ property.ac_addition.desc=Change the addition between two kind of blinking light
 property.ac_sound.desc=When the signal is triggered, a bing sound is emitted to provide an audible warning.
 property.ac_blink_light.desc=Flashes as an indicator of an approaching train. 
 property.ac_car.desc=Traffic light for cars and pedestrians.
+property.bueshort.desc=The signal is in the shortened braking distance.
+property.ne5_addition.desc=Ne5 Addition
+property.tstype.desc=Ts signals
+property.etcs_type.desc=ETCS signals
+property.rotype.desc=Ro signals
+property.tramsigns.desc=Tram signals
+property.barrier_length.desc=Railroad gates length
+property.manual.desc=Switch between mechanical Wn signals and switch handle.
+property.fallback_switch.desc=Change here between normal and fallback switch.
+property.weightcolor.desc=Switch handle color
+property.switchside.desc=Indicates on which side the curved track of the switch is located.
+property.switchplaceside.desc=Indicates on which side the switch handle is located.
+property.blockexitsignal.desc=Hl block exit signal
+property.blocksignal.desc=Hl block signal
+property.ne13.desc=Ne13a - The fallback switch can be driven against the point. Ne13b - The fallback switch is not passable against the point, stop in front of the switch.
+property.atws.desc=Emits an audible warning tone to alert construction workers of an approaching train.
+property.barrier_open.desc=Barrier control
+property.powered.desc=Switch handle control
+property.wn_mech.desc=Wn signals
 
 #Signalcontroller Names
 property.enummode.name=Mode
@@ -232,7 +275,6 @@ property.profileOn.west.name=West on
 property.profileOff.east.name=East off
 property.profileOn.east.name=East on
 
-
 #Signalcontroller Description
 property.enummode.desc=Here you can toggle between Manual mode and Redstone single- respectively MUX-mode. In Manual mode you can change the signal via the GUI, in Redstone mode you can connect to the controller Redstone and control the signal via it. Additionally a signal can always be controlled by a computer from OpenComputers.
 property.enumredstonemode.desc=Here you can switch between single mode and MUX mode.%nSingle mode allows you to set On and Off state for one side and one signal part.%nMUX mode allows you to iterate the signal parts and the signal aspects.
@@ -254,7 +296,6 @@ property.profileOff.west.desc=Redstone off
 property.profileOn.west.desc=Redstone on
 property.profileOff.east.desc=Redstone off
 property.profileOn.east.desc=Redstone on
-
 
 #Directions
 property.value.up=Up
@@ -293,6 +334,9 @@ property.value.ralightsignal=Hump yard signal
 property.value.buelight=Supervision signal
 property.value.wnnormal=Normal points
 property.value.wncross=Double slip points
+property.value.LZB=LZB
+property.value.ZS10=Zs10
+property.value.HM2=Hectometer
 
 #Signal Aspects
 property.value.false=False

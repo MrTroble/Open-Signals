@@ -21,6 +21,12 @@
             "textures": [
                 {
                     "blockstate": "with(OTHERTYPE.OB)"
+                },
+                {
+                    "blockstate": "with(OTHERTYPE.LZB)",
+                    "retexture": {
+                        "2": "girsignals:blocks/other_signals/lzb"
+                    }
                 }
             ],
             "y": 1
@@ -29,6 +35,22 @@
             "textures": [
                 {
                     "blockstate": "with(OTHERTYPE.CROSS)"
+                }
+            ],
+            "y": 0
+        },
+        "other_signals/zs10": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.ZS10)"
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/hm_sign_double": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.HM2)"
                 }
             ],
             "y": 1

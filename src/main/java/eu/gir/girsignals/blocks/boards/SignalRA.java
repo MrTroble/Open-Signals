@@ -20,7 +20,8 @@ public class SignalRA extends Signal {
     public static final SEProperty<RA> RATYPE = SEProperty.of("ratype", RA.RA10,
             ChangeableStage.GUISTAGE);
     public static final SEProperty<Boolean> RALIGHT = SEProperty.of("ralight", false,
-            ChangeableStage.APISTAGE, true, check(RATYPE, RA.RA11A).or(check(RATYPE, RA.RA11B)));
+            ChangeableStage.APISTAGE, true,
+            check(RATYPE, RA.RA11A).or(check(RATYPE, RA.RA11B)).or(check(RATYPE, RA.RA11_DWARF)));
     public static final SEProperty<RALight> RALIGHTSIGNAL = SEProperty.of("ralightsignal",
             RALight.OFF, ChangeableStage.APISTAGE_NONE_CONFIG, true, check(RATYPE, RA.RA6_9));
 
