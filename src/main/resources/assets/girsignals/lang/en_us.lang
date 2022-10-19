@@ -37,7 +37,7 @@ tile.andreascross.name=Andreascross
 tile.tssignal.name=Ts Signal
 tile.etcssignal.name=ETCS Signal
 tile.rosignal.name=Ro Signal
-tile.tramsignssignal.name=Tram Signal
+tile.tramsignsignal.name=Tram Signal
 tile.railroadgate.name=Railroad Gates
 tile.switchhandle.name=Switch Handle/ Wn Signal
 
