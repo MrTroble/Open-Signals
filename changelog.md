@@ -1,5 +1,9 @@
 # Changelog
 
+## [Fix]
+* fix: missing language keys
+* fix: mechanical wn signal models
+
 ## [Update]
 
 * feat: added bue east signal

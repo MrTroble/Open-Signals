@@ -696,10 +696,24 @@
         "wn/wn2_mech": {
             "textures": [
                 {
-                    "blockstate": "hasandisnot(SWITCHSIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN2)"
+                    "blockstate": "hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN2)"
                 },
                 {
-                    "blockstate": "hasandis(SWITCHSIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN2)",
+                    "blockstate": "hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN2)",
+                    "retexture": {
+                        "5": "wn2_2"
+                    }
+                }
+            ],
+            "y": 0
+        },
+        "wn/wn2_mech_right": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN2)"
+                },
+                {
+                    "blockstate": "hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN2)",
                     "retexture": {
                         "5": "wn2_2"
                     }
@@ -710,10 +724,24 @@
         "wn/wn1_mech": {
             "textures": [
                 {
-                    "blockstate": "hasandisnot(SWITCHSIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN1)"
+                    "blockstate": "hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN1)"
                 },
                 {
-                    "blockstate": "hasandis(SWITCHSIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN1)",
+                    "blockstate": "hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN1)",
+                    "retexture": {
+                        "5": "wn2_2"
+                    }
+                }
+            ],
+            "y": 0
+        },
+        "wn/wn1_mech_right": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN1)"
+                },
+                {
+                    "blockstate": "hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandisnot(MANUAL) && with(WN_MECH.WN1)",
                     "retexture": {
                         "5": "wn2_2"
                     }
