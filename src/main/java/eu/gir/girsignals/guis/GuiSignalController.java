@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import eu.gir.girsignals.EnumSignals.EnumMode;
+import eu.gir.girsignals.ChangeableStage;
+import eu.gir.girsignals.EnumMode;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import eu.gir.guilib.ecs.DrawUtil.DisableIntegerable;
@@ -109,7 +109,7 @@ public class GuiSignalController extends GuiBase {
         for (final SEProperty<?> entry : map.keySet()) {
             if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
                     || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-                    && entry.test(map.entrySet())) {
+                    && entry.test(map)) {
                 final UIEntity entity = GuiElements.createEnumElement(
                         new DisableIntegerable<>(entry), e -> applyModelChange(bRender));
                 entity.findRecursive(UIEnumerable.class).forEach(e -> {
@@ -290,7 +290,7 @@ public class GuiSignalController extends GuiBase {
         for (final SEProperty<?> entry : map.keySet()) {
             if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
                     || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-                    && entry.test(map.entrySet())) {
+                    && entry.test(map)) {
                 list.add(GuiElements.createEnumElement(entry, e -> applyModelChange(blockRender)));
             }
         }

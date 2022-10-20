@@ -37,6 +37,8 @@ public class GirsignalsMain {
         return debug;
     }
 
+    public static final int GUI_SIGNAL_CONTROLLER = 1;
+
     @EventHandler
     public void preinit(final FMLPreInitializationEvent event) {
         debug = Files.isDirectory(event.getSourceFile().toPath());

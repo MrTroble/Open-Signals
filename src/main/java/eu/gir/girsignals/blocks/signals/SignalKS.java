@@ -1,5 +1,6 @@
 package eu.gir.girsignals.blocks.signals;
 
+import eu.gir.girsignals.ChangeableStage;
 import eu.gir.girsignals.EnumSignals.KS;
 import eu.gir.girsignals.EnumSignals.KSDistant;
 import eu.gir.girsignals.EnumSignals.KSMain;
@@ -7,7 +8,6 @@ import eu.gir.girsignals.EnumSignals.KSType;
 import eu.gir.girsignals.EnumSignals.MastSignal;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.signalbox.config.KSSignalConfig;

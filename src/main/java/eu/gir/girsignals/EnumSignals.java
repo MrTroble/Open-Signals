@@ -4,9 +4,6 @@ import net.minecraft.util.IStringSerializable;
 
 public final class EnumSignals {
 
-    public static final int GUI_PLACEMENTTOOL = 0;
-    public static final int GUI_SIGNAL_CONTROLLER = 1;
-
     private EnumSignals() {
     }
 
@@ -99,7 +96,7 @@ public final class EnumSignals {
     public enum SHLight implements Offable<SHLight> {
         OFF, SH0, SH1, STATUS_LIGHT;
     }
-    
+
     public enum SHMech implements DefaultName<SHMech> {
         SH0, SH1, SH1_GSP2;
     }
@@ -207,31 +204,18 @@ public final class EnumSignals {
         OFF, WN3, WN4, WN5, WN6, BLINK;
     }
 
-    public static enum EnumMode {
-        MANUELL, SINGLE, MUX
-    }
-
-    public static enum EnumState {
-        DISABLED, OFFSTATE, ONSTATE
-    }
-
-    public enum SortOptions implements Offable<SortOptions> {
-        DISABLED, NAME_ASSENDING, NAME_DESCENIDNG, TYPE_ASSANDING, TYPE_DESCENDING,
-        DISTANCE_ASSANDING, DISTANCE_DSECENDING;
-    }
-    
     public enum SemaType implements DefaultName<SemaType> {
         DIST, MAIN, MAIN_SMALL;
     }
-    
+
     public enum SemaDist implements DefaultName<SemaDist> {
         VR0, VR1, VR2;
     }
-    
+
     public enum ACAddition implements Offable<ACAddition> {
         OFF, BLINK1, BLINK2, TRAFFIC_LIGHT;
     }
-    
+
     public enum ACCar implements Offable<ACCar> {
         OFF, RED, YELLOW;
     }

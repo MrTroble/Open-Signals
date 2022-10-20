@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.IntConsumer;
 
+import eu.gir.girsignals.ChangeableStage;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.guilib.ecs.GuiBase;
@@ -42,6 +42,7 @@ public class GuiPlacementtool extends GuiBase {
     private final HashMap<String, IUnlistedProperty<?>> lookup = new HashMap<String, IUnlistedProperty<?>>();
     private Signal currentSelectedBlock;
     private final Placementtool tool;
+    public static final int GUI_PLACEMENTTOOL = 0;
 
     public GuiPlacementtool(final ItemStack stack) {
         this.compound = stack.getTagCompound();

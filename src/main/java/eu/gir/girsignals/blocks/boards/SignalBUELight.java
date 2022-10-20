@@ -1,7 +1,7 @@
 package eu.gir.girsignals.blocks.boards;
 
+import eu.gir.girsignals.ChangeableStage;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 

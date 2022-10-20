@@ -2,8 +2,8 @@ package eu.gir.girsignals.items;
 
 import java.util.ArrayList;
 
+import eu.gir.girsignals.ChangeableStage;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.init.GIRTabs;

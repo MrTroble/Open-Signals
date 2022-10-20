@@ -1,5 +1,6 @@
 package eu.gir.girsignals.blocks.signals;
 
+import eu.gir.girsignals.ChangeableStage;
 import eu.gir.girsignals.EnumSignals.CAR;
 import eu.gir.girsignals.EnumSignals.PED;
 import eu.gir.girsignals.EnumSignals.Tram;
@@ -7,7 +8,6 @@ import eu.gir.girsignals.EnumSignals.TramAdd;
 import eu.gir.girsignals.EnumSignals.TramSwitch;
 import eu.gir.girsignals.EnumSignals.TramType;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 

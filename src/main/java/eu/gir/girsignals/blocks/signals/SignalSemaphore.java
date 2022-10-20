@@ -2,11 +2,11 @@ package eu.gir.girsignals.blocks.signals;
 
 import java.util.Map;
 
+import eu.gir.girsignals.ChangeableStage;
 import eu.gir.girsignals.EnumSignals.SemaDist;
 import eu.gir.girsignals.EnumSignals.SemaType;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.signalbox.config.SemaphoreConfig;

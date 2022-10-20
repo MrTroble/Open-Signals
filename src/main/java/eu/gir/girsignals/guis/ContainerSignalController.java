@@ -48,8 +48,7 @@ public class ContainerSignalController extends Container implements UIClientSync
         if (state != null) {
             compound.setInteger("state", state.getID());
             final NBTTagCompound comp = new NBTTagCompound();
-            reference.get()
-                    .forEach((p, o) -> comp.setInteger(p.getName(), SEProperty.getIDFromObj(o)));
+            reference.get().forEach((p, o) -> p.writeToNBT(compound, state));
             compound.setTag("list", comp);
         }
         return compound;

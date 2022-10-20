@@ -2,10 +2,10 @@ package eu.gir.girsignals.blocks.boards;
 
 import java.util.Random;
 
+import eu.gir.girsignals.ChangeableStage;
 import eu.gir.girsignals.EnumSignals.ACAddition;
 import eu.gir.girsignals.EnumSignals.ACCar;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.init.GIRSounds;

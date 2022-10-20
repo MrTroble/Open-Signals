@@ -9,10 +9,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Maps;
 
-import eu.gir.girsignals.EnumSignals.EnumMode;
-import eu.gir.girsignals.EnumSignals.EnumState;
+import eu.gir.girsignals.ChangeableStage;
+import eu.gir.girsignals.EnumMode;
+import eu.gir.girsignals.EnumState;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.guilib.ecs.interfaces.ISyncable;
 import eu.gir.linkableapi.ILinkableTile;
@@ -89,7 +89,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         final Signal signalBlock = Signal.SIGNALLIST.get(signaltile.getBlockID());
         final Map<SEProperty<?>, Object> properties = signaltile.getProperties();
         final Builder<String, Integer> nameToIDBuilder = new Builder<>();
-        properties.keySet().stream().filter((property) -> property.test(properties.entrySet())
+        properties.keySet().stream().filter((property) -> property.test(properties)
                 && (property.isChangabelAtStage(ChangeableStage.APISTAGE)
                         || property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)))
                 .forEach(property -> nameToIDBuilder.put(property.getName(),
@@ -207,7 +207,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         final SEProperty prop = SEProperty.cst(block.getPropertyFromID(type));
         final java.util.Optional bool = tile.getProperty(prop);
         if (bool.isPresent())
-            return SEProperty.getIDFromObj(bool.get());
+            return (boolean) bool.get() ? 1 : 0;
         return -1;
     }
 

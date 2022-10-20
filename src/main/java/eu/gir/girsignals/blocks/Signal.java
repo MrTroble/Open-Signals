@@ -6,16 +6,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
 
+import eu.gir.girsignals.ChangeableStage;
 import eu.gir.girsignals.GIRSignalsConfig;
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.ChangeableStage;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.signalbox.config.ISignalAutoconfig;
@@ -466,10 +464,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         setLightLevel(GIRSignalsConfig.signalLightValue / 15.0f);
     }
 
-    public static <T extends Comparable<T>> Predicate<Set<Entry<SEProperty<?>, Object>>> check(
+    public static <T extends Comparable<T>> Predicate<Map<SEProperty<?>, Object>> check(
             final SEProperty<T> property, final T type) {
-        return t -> t.stream().noneMatch(e -> e.getKey().equals(property)) || t.stream()
-                .anyMatch((e -> e.getKey().equals(property) && e.getValue().equals(type)));
+        return map -> map.containsKey(property) ? map.get(property).equals(type) : true;
     }
 
     public ISignalAutoconfig getConfig() {

@@ -11,7 +11,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -36,8 +35,7 @@ public final class GIRFileReader {
 
                 inputs.forEach(file -> {
                     try {
-                        final List<String> text = Files.readAllLines(file);
-                        final String content = toString(text);
+                        final String content = new String(Files.readAllBytes(file));
                         final String name = file.getFileName().toString();
 
                         files.put(name, content);
@@ -56,15 +54,6 @@ public final class GIRFileReader {
             }
         }
         return files;
-    }
-
-    private static String toString(final List<String> text) {
-        final StringBuilder stringbuilder = new StringBuilder();
-        text.forEach(string -> {
-            stringbuilder.append(string);
-            stringbuilder.append("\n");
-        });
-        return stringbuilder.toString();
     }
 
     public static Optional<Path> getRessourceLocation(final String location) {
