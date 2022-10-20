@@ -1,6 +1,5 @@
 package eu.gir.girsignals.contentpacks;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,7 +11,7 @@ import eu.gir.girsignals.GIRFileReader;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalProperties;
-import eu.gir.girsignals.blocks.Signal.SignalPropertiesBuilder;
+import eu.gir.girsignals.blocks.SignalOrSign;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.items.Placementtool;
 
@@ -21,14 +20,14 @@ public class SignalSystemParser {
     private List<SignalProperties> systemProperties;
     private List<SEPropertyParser> seProperties;
 
-    private static transient List<Signal> systems;
+    private static transient List<Signal> SYSTEMS;
 
     public List<SEPropertyParser> getSEProperties() {
         return seProperties;
     }
 
     public static List<Signal> getSignalSystems() {
-        return ImmutableList.copyOf(systems);
+        return ImmutableList.copyOf(SYSTEMS);
     }
 
     public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {
@@ -50,8 +49,7 @@ public class SignalSystemParser {
         return properties;
     }
 
-    public void createNewSignalSystem(final String fileName) {
-        systems = new ArrayList<>();
+    public Signal createNewSignalSystem(final String fileName) {
 
         SignalProperties signalProperty = systemProperties.get(0);
 
@@ -62,24 +60,23 @@ public class SignalSystemParser {
             tool = GIRItems.SIGN_PLACEMENT_TOOL;
 
         if (signalProperty.canLink) {
-            signalProperty = new SignalPropertiesBuilder(tool,
-                    fileName.replace(".json", "").replace("_", "").toLowerCase())
-                            .height(signalProperty.height).offsetX(signalProperty.offsetX)
-                            .offsetY(signalProperty.offsetY)
-                            .signHeight(signalProperty.customNameRenderHeight)
-                            .signScale(signalProperty.signScale).signWidth(signalProperty.signWidth)
-                            .build();
+            signalProperty = Signal
+                    .builder(tool, fileName.replace(".json", "").replace("_", "").toLowerCase())
+                    .height(signalProperty.height).offsetX(signalProperty.offsetX)
+                    .offsetY(signalProperty.offsetY)
+                    .signHeight(signalProperty.customNameRenderHeight)
+                    .signScale(signalProperty.signScale).signWidth(signalProperty.signWidth)
+                    .build();
         } else {
-            signalProperty = new SignalPropertiesBuilder(tool,
-                    fileName.replace(".json", "").toUpperCase().replace("_", ""))
-                            .height(signalProperty.height).offsetX(signalProperty.offsetX)
-                            .offsetY(signalProperty.offsetY)
-                            .signHeight(signalProperty.customNameRenderHeight)
-                            .signScale(signalProperty.signScale).signWidth(signalProperty.signWidth)
-                            .noLink().build();
+            signalProperty = Signal
+                    .builder(tool, fileName.replace(".json", "").replace("_", "").toLowerCase())
+                    .height(signalProperty.height).offsetX(signalProperty.offsetX)
+                    .offsetY(signalProperty.offsetY)
+                    .signHeight(signalProperty.customNameRenderHeight)
+                    .signScale(signalProperty.signScale).signWidth(signalProperty.signWidth)
+                    .noLink().build();
         }
 
-        systems.add(new Signal(signalProperty));
+        return new SignalOrSign(signalProperty);
     }
-
 }

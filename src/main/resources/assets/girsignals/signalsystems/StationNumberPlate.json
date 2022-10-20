@@ -1,0 +1,16 @@
+{
+    "systemProperties": [
+        {
+            "placementToolName": "SIGN_PLACEMENT_TOOL",
+            "height": 0,
+            "canLink": false
+        }
+    ],
+    "seProperties": [
+        {
+            "name": "stationnumer",
+            "defaultValue": "STNumber.Z1",
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

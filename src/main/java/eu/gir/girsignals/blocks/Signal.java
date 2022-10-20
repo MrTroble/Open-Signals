@@ -88,6 +88,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public float offsetY;
         public float signScale;
         public boolean canLink;
+        public boolean hasCostumColor;
         public transient ISignalAutoconfig config;
 
         public SignalProperties(final Placementtool placementtool, final String signalTypeName,
@@ -342,9 +343,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 }
             }
         }
-        final List<SEProperty> systemProperties = SignalLoader.getSEProperties();
-        systemProperties.forEach(property -> {
-            this.signalProperties.add((IUnlistedProperty) property);
+
+        final Map<Signal, List<SEProperty>> systemProperties = SignalLoader.getSignals();
+        systemProperties.forEach((signal, props) -> {
+            if (signal.getSignalTypeName().equalsIgnoreCase(this.getSignalTypeName())) {
+                props.forEach(seprop -> this.signalProperties.add(seprop));
+            }
         });
 
         this.signalProperties.add(CUSTOMNAME);

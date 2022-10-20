@@ -14,7 +14,7 @@ import net.minecraft.util.IStringSerializable;
 public class SEPropertyParser {
 
     private String name = "";
-    private String defaultValue;
+    private String defaultValue = "";
     private String changeableStage = "";
     private boolean autoname = false;
     private String dependencies = "";
