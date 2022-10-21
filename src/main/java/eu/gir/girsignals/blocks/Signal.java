@@ -325,6 +325,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     private ArrayList<IUnlistedProperty> signalProperties;
 
     @SuppressWarnings("rawtypes")
+    private ArrayList<IUnlistedProperty> systemProperties;
+
+    @SuppressWarnings("rawtypes")
     @Override
     protected BlockStateContainer createBlockState() {
         this.signalProperties = new ArrayList<>();
@@ -341,13 +344,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 }
             }
         }
-
-        final Map<Signal, List<SEProperty>> systemProperties = SignalLoader.getSignals();
-        systemProperties.forEach((signal, props) -> {
-            if (signal.getSignalTypeName().equalsIgnoreCase(this.getSignalTypeName())) {
-                props.forEach(seprop -> this.signalProperties.add(seprop));
-            }
-        });
+        if (this.systemProperties != null)
+            this.systemProperties.forEach(property -> this.signalProperties.add(property));
 
         this.signalProperties.add(CUSTOMNAME);
         return new ExtendedBlockState(this, new IProperty<?>[] {
@@ -412,7 +410,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     @SideOnly(Side.CLIENT)
     public boolean hasCostumColor() {
-        return false;
+        return this.prop.hasCostumColor;
     }
 
     @SideOnly(Side.CLIENT)
@@ -493,6 +491,13 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     public void getUpdate(final World world, final BlockPos pos) {
 
+    }
+
+    @SuppressWarnings("rawtypes")
+    public void appendSEProperty(final List<SEProperty> propertyies) {
+        if (this.systemProperties == null)
+            this.systemProperties = new ArrayList<>();
+        propertyies.forEach(property -> this.signalProperties.add(property));
     }
 
 }

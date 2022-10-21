@@ -11,7 +11,6 @@ import eu.gir.girsignals.GIRFileReader;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalProperties;
-import eu.gir.girsignals.blocks.SignalOrSign;
 import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.items.Placementtool;
 
@@ -55,8 +54,7 @@ public class SignalSystemParser {
 
         Placementtool tool = GIRItems.PLACEMENT_TOOL;
 
-        if (signalProperty.placementToolName != null
-                && signalProperty.placementToolName.equalsIgnoreCase("SIGN_PLACEMENT_TOOL"))
+        if (signalProperty.placementToolName.equalsIgnoreCase("SIGN_PLACEMENT_TOOL"))
             tool = GIRItems.SIGN_PLACEMENT_TOOL;
 
         if (signalProperty.canLink) {
@@ -77,6 +75,6 @@ public class SignalSystemParser {
                     .noLink().build();
         }
 
-        return new SignalOrSign(signalProperty);
+        return new Signal(signalProperty);
     }
 }

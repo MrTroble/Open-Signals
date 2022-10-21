@@ -14,6 +14,7 @@ import eu.gir.girsignals.blocks.RedstoneInput;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalBox;
 import eu.gir.girsignals.blocks.SignalController;
+import eu.gir.girsignals.blocks.SignalLoader;
 import eu.gir.girsignals.blocks.boards.SignalAndreasCross;
 import eu.gir.girsignals.blocks.boards.SignalBUE;
 import eu.gir.girsignals.blocks.boards.SignalBUELight;
@@ -31,7 +32,6 @@ import eu.gir.girsignals.blocks.signals.SignalSHLight;
 import eu.gir.girsignals.blocks.signals.SignalSHMech;
 import eu.gir.girsignals.blocks.signals.SignalSemaphore;
 import eu.gir.girsignals.blocks.signals.SignalTram;
-import eu.gir.girsignals.contentpacks.SignalSystemParser;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.item.Item;
@@ -111,7 +111,7 @@ public final class GIRBlocks {
             }
         }
 
-        final List<Signal> signals = new ArrayList<>(SignalSystemParser.getSignalSystems());
+        final List<Signal> signals = new ArrayList<>(SignalLoader.getSignals());
         signals.forEach(signal -> {
             try {
                 final Block block = (Block) signal;
