@@ -5,10 +5,10 @@ import net.minecraftforge.common.config.Config.Comment;
 import net.minecraftforge.common.config.Config.RangeInt;
 import net.minecraftforge.common.config.Config.RequiresMcRestart;
 
-@Config(modid = GirsignalsMain.MODID)
-public final class GIRSignalsConfig {
+@Config(modid = SignalsMain.MODID)
+public final class SignalsConfig {
 
-    private GIRSignalsConfig() {
+    private SignalsConfig() {
     }
 
     @RangeInt(min = 0, max = 15)

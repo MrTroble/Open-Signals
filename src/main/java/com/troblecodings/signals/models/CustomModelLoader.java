@@ -8,7 +8,7 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.Signal.SignalAngel;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
@@ -87,7 +87,7 @@ public class CustomModelLoader implements ICustomModelLoader {
 
                 if (signaltype == null) {
 
-                    GirsignalsMain.log.error("There doesn't exists a signalsystem named "
+                    SignalsMain.log.error("There doesn't exists a signalsystem named "
                             + filename.replace(".json", "") + "!");
                     return;
                 }
@@ -95,7 +95,7 @@ public class CustomModelLoader implements ICustomModelLoader {
                 final FunctionParsingInfo parsinginfo = new FunctionParsingInfo(signaltype);
 
                 registeredModels.put(signaltype.getRegistryName().toString()
-                        .replace(GirsignalsMain.MODID + ":", ""), cm -> {
+                        .replace(SignalsMain.MODID + ":", ""), cm -> {
 
                             for (final Map.Entry<String, Models> modelsmap : content.getModels()
                                     .entrySet()) {
@@ -133,7 +133,7 @@ public class CustomModelLoader implements ICustomModelLoader {
                                                 state = LogicParser.predicate(blockstate,
                                                         parsinginfo);
                                             } catch (final LogicalParserException e) {
-                                                GirsignalsMain.log.error(
+                                                SignalsMain.log.error(
                                                         "There was an problem during loading "
                                                                 + modelname
                                                                 + " with the blockstate '"
@@ -165,7 +165,7 @@ public class CustomModelLoader implements ICustomModelLoader {
 
                                     } else if (state == null && !texturestate.isautoBlockstate()
                                             && !extentionloaded) {
-                                        GirsignalsMain.log.warn(
+                                        SignalsMain.log.warn(
                                                 "The predicate of " + modelname + " in " + filename
                                                         + " is null! This shouldn´t be the case!");
                                     }
@@ -178,7 +178,7 @@ public class CustomModelLoader implements ICustomModelLoader {
 
     @Override
     public boolean accepts(final ResourceLocation modelLocation) {
-        if (!modelLocation.getResourceDomain().equals(GirsignalsMain.MODID))
+        if (!modelLocation.getResourceDomain().equals(SignalsMain.MODID))
             return false;
         return registeredModels.containsKey(modelLocation.getResourcePath())
                 || modelLocation.getResourcePath().equals("ghostblock");

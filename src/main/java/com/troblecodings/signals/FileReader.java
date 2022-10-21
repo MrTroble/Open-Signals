@@ -40,7 +40,7 @@ public final class FileReader {
 
                         files.put(name, content);
                     } catch (final IOException e) {
-                        GirsignalsMain.log
+                        SignalsMain.log
                                 .warn("There was a problem during loading " + file + " !");
                         e.printStackTrace();
                     }
@@ -48,7 +48,7 @@ public final class FileReader {
                 inputs.close();
                 return files;
             } catch (final IOException e) {
-                GirsignalsMain.log.warn(
+                SignalsMain.log.warn(
                         "There was a problem during listing all files from " + pathlocation + " !");
                 e.printStackTrace();
             }

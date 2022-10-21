@@ -3,7 +3,7 @@ package com.troblecodings.signals.init;
 import java.util.LinkedList;
 import java.util.List;
 
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
@@ -23,7 +23,7 @@ public final class SignalSounds {
     }
 
     private static SoundEvent registerSound(final String soundName) {
-        final ResourceLocation resource = new ResourceLocation(GirsignalsMain.MODID, soundName);
+        final ResourceLocation resource = new ResourceLocation(SignalsMain.MODID, soundName);
         final SoundEvent sound = new SoundEvent(resource).setRegistryName(soundName);
         SOUNDS.add(sound);
         return sound;

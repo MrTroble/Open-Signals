@@ -7,7 +7,7 @@ import java.util.Map;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.troblecodings.signals.FileReader;
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.Signal.SignalProperties;
 import com.troblecodings.signals.init.SignaIItems;
@@ -37,7 +37,7 @@ public class SignalSystemParser {
         final Map<String, SignalSystemParser> properties = new HashMap<>();
 
         if (systems == null) {
-            GirsignalsMain.log.warn("Can't read out signalsystems from " + directory + "!");
+            SignalsMain.log.warn("Can't read out signalsystems from " + directory + "!");
             return properties;
         }
 

@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -29,7 +29,7 @@ public class SignalBoxFactory {
 
     public static final SignalBoxFactory getFactory() {
         if (factory == null) {
-            factory = GirsignalsMain.isDebug() ? new DebugFactory() : new SignalBoxFactory();
+            factory = SignalsMain.isDebug() ? new DebugFactory() : new SignalBoxFactory();
         }
         return factory;
     }

@@ -5,7 +5,7 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.GhostBlock;
 import com.troblecodings.signals.blocks.IConfigUpdatable;
 import com.troblecodings.signals.blocks.Post;
@@ -89,7 +89,7 @@ public final class SignalBlocks {
                 final String name = field.getName().toLowerCase().replace("_", "");
                 try {
                     final Block block = (Block) field.get(null);
-                    block.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
+                    block.setRegistryName(new ResourceLocation(SignalsMain.MODID, name));
                     block.setUnlocalizedName(name);
                     blocksToRegister.add(block);
                     if (block instanceof ITileEntityProvider) {
@@ -101,7 +101,7 @@ public final class SignalBlocks {
                                 TileEntity.register(tileclass.getSimpleName().toLowerCase(),
                                         tileclass);
                         } catch (final NullPointerException ex) {
-                            GirsignalsMain.log.trace(
+                            SignalsMain.log.trace(
                                     "All tileentity provide need to call back a default entity if the world is null!",
                                     ex);
                         }
@@ -117,7 +117,7 @@ public final class SignalBlocks {
             try {
                 final Block block = (Block) signal;
                 block.setRegistryName(
-                        new ResourceLocation(GirsignalsMain.MODID, signal.getSignalTypeName()));
+                        new ResourceLocation(SignalsMain.MODID, signal.getSignalTypeName()));
                 block.setUnlocalizedName(signal.getSignalTypeName());
                 blocksToRegister.add(block);
                 if (block instanceof ITileEntityProvider) {
@@ -128,7 +128,7 @@ public final class SignalBlocks {
                         if (TileEntity.getKey(tileclass) == null)
                             TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
                     } catch (final NullPointerException ex) {
-                        GirsignalsMain.log.trace(
+                        SignalsMain.log.trace(
                                 "All tileentity provide need to call back a default entity if the world is null!",
                                 ex);
                     }
@@ -164,8 +164,8 @@ public final class SignalBlocks {
 
     @SubscribeEvent
     public static void onConfigChangedEvent(final OnConfigChangedEvent event) {
-        if (event.getModID().equals(GirsignalsMain.MODID)) {
-            ConfigManager.sync(GirsignalsMain.MODID, Type.INSTANCE);
+        if (event.getModID().equals(SignalsMain.MODID)) {
+            ConfigManager.sync(SignalsMain.MODID, Type.INSTANCE);
             updateConfigs();
         }
     }

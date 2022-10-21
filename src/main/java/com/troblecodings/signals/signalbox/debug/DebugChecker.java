@@ -1,6 +1,6 @@
 package com.troblecodings.signals.signalbox.debug;
 
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 
 public class DebugChecker extends ConnectionChecker {
@@ -9,8 +9,8 @@ public class DebugChecker extends ConnectionChecker {
     public boolean check() {
         final boolean flag = super.check();
         if (!flag) {
-            GirsignalsMain.log.debug("Check failed for " + this.path);
-            GirsignalsMain.log.debug(nextNode);
+            SignalsMain.log.debug("Check failed for " + this.path);
+            SignalsMain.log.debug(nextNode);
         }
         return flag;
     }

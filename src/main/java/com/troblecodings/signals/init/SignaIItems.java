@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.Placementtool;
 
@@ -42,7 +42,7 @@ public final class SignaIItems {
                 final String name = field.getName().toLowerCase().replace("_", "");
                 try {
                     final Item item = (Item) field.get(null);
-                    item.setRegistryName(new ResourceLocation(GirsignalsMain.MODID, name));
+                    item.setRegistryName(new ResourceLocation(SignalsMain.MODID, name));
                     item.setUnlocalizedName(name);
                     registeredItems.add(item);
                 } catch (final IllegalArgumentException | IllegalAccessException e) {

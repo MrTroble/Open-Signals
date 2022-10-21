@@ -1,6 +1,6 @@
 package com.troblecodings.signals.proxy;
 
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
@@ -24,7 +24,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class CommonProxy {
 
     public void preinit(final FMLPreInitializationEvent event) {
-        UIInit.initCommon(GirsignalsMain.MODID, GirsignalsMain.isDebug());
+        UIInit.initCommon(SignalsMain.MODID, SignalsMain.isDebug());
         GuiHandler.addServer(Placementtool.class, (p, w, bp) -> null);
         GuiHandler.addServer(SignalController.class, (p, w, bp) -> new ContainerSignalController(
                 (SignalControllerTileEntity) w.getTileEntity(bp)));

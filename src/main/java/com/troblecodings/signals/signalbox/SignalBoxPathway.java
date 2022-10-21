@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -142,7 +142,7 @@ public class SignalBoxPathway implements INetworkSavable {
             point.read(nodeNBT);
             final SignalBoxNode node = modeGrid.get(point);
             if (node == null) {
-                GirsignalsMain.log.error("Detecting broken pathway at {}!", point.toString());
+                SignalsMain.log.error("Detecting broken pathway at {}!", point.toString());
                 this.emptyOrBroken = true;
                 return;
             }
@@ -151,7 +151,7 @@ public class SignalBoxPathway implements INetworkSavable {
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         if (this.listOfNodes.size() < 2) {
-            GirsignalsMain.log.error("Detecting pathway with only 2 elements!");
+            SignalsMain.log.error("Detecting pathway with only 2 elements!");
             this.emptyOrBroken = true;
             return;
         }

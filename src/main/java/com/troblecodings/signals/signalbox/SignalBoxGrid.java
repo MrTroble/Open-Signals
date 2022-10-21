@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
@@ -50,7 +50,7 @@ public class SignalBoxGrid implements INetworkSavable {
     public void resetPathway(final Point p1) {
         final SignalBoxPathway pathway = startsToPath.get(p1);
         if (pathway == null) {
-            GirsignalsMain.log.warn("Signalboxpath is null, this should not be the case!");
+            SignalsMain.log.warn("Signalboxpath is null, this should not be the case!");
             return;
         }
         resetPathway(pathway);
@@ -83,7 +83,7 @@ public class SignalBoxGrid implements INetworkSavable {
         int count = 0;
         while ((previousPath = endsToPath.get(previousPath.getFirstPoint())) != null) {
             if (count > endsToPath.size()) {
-                GirsignalsMain.getLogger().error("Detected signalpath cycle, aborting!");
+                SignalsMain.getLogger().error("Detected signalpath cycle, aborting!");
                 startsToPath.values().forEach(path -> path.resetPathway());
                 this.clearPaths();
                 break;
@@ -92,7 +92,7 @@ public class SignalBoxGrid implements INetworkSavable {
             count++;
         }
         if (count == 0) {
-            GirsignalsMain.getLogger().debug("Could not find previous! " + pathway);
+            SignalsMain.getLogger().debug("Could not find previous! " + pathway);
         }
     }
 
@@ -179,7 +179,7 @@ public class SignalBoxGrid implements INetworkSavable {
             final SignalBoxPathway pathway = factory.getPathway(this.modeGrid);
             pathway.read((NBTTagCompound) comp);
             if (pathway.isEmptyOrBroken()) {
-                GirsignalsMain.log.error("Remove empty or broken pathway, try to recover!");
+                SignalsMain.log.error("Remove empty or broken pathway, try to recover!");
                 return;
             }
             onWayAdd(pathway);

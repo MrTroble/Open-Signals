@@ -11,7 +11,7 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.ChangeableStage;
-import com.troblecodings.signals.GIRSignalsConfig;
+import com.troblecodings.signals.SignalsConfig;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.items.Placementtool;
@@ -459,7 +459,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     @Override
     public void updateConfigValues() {
-        setLightLevel(GIRSignalsConfig.signalLightValue / 15.0f);
+        setLightLevel(SignalsConfig.signalLightValue / 15.0f);
     }
 
     public static <T extends Comparable<T>> Predicate<Map<SEProperty<?>, Object>> check(

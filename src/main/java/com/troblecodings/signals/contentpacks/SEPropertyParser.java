@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.troblecodings.signals.ChangeableStage;
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.JsonSEProperty;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SEProperty.SEAutoNameProp;
@@ -27,12 +27,12 @@ public class SEPropertyParser {
 
         final JsonSEProperty json = JsonSEProperty.PROPERTIES.get(defaultEnum);
         if (json == null)
-            GirsignalsMain.log.error("The given defaultEnum '" + defaultEnum + "' doesn't exists!");
+            SignalsMain.log.error("The given defaultEnum '" + defaultEnum + "' doesn't exists!");
 
         try {
             Enum.valueOf(ChangeableStage.class, changeableStage);
         } catch (final IllegalArgumentException e) {
-            GirsignalsMain.log
+            SignalsMain.log
                     .error("The given Changeable Stage is not permitted! You can use 'APISTAGE, "
                             + "GUISTAGE, APISTAGE_NONE_CONFIG' or 'AUTOMATICSTAGE! Your stage was "
                             + changeableStage + ".");

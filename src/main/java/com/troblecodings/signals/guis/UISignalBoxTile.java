@@ -1,6 +1,6 @@
 package com.troblecodings.signals.guis;
 
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -18,7 +18,7 @@ import net.minecraft.util.Rotation;
 
 public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 
-    public static final ResourceLocation ICON = new ResourceLocation(GirsignalsMain.MODID,
+    public static final ResourceLocation ICON = new ResourceLocation(SignalsMain.MODID,
             "gui/textures/symbols.png");
 
     private SignalBoxNode node;

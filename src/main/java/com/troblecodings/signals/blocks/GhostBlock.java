@@ -1,6 +1,6 @@
 package com.troblecodings.signals.blocks;
 
-import com.troblecodings.signals.GIRSignalsConfig;
+import com.troblecodings.signals.SignalsConfig;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -98,6 +98,6 @@ public class GhostBlock extends Block implements IConfigUpdatable {
 
     @Override
     public void updateConfigValues() {
-        setLightLevel(GIRSignalsConfig.signalLightValue / 15.0f);
+        setLightLevel(SignalsConfig.signalLightValue / 15.0f);
     }
 }

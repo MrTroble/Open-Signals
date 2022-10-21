@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import com.troblecodings.signals.GirsignalsMain;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
@@ -24,12 +24,12 @@ public class DebugGrid extends SignalBoxGrid {
         if (pw == null)
             return;
         final List<SignalBoxNode> nodes = pw.getListOfNodes();
-        GirsignalsMain.log.debug("Pathway prereset, {}", pw);
-        GirsignalsMain.log.debug(nodes.stream().map(node -> node.toString())
+        SignalsMain.log.debug("Pathway prereset, {}", pw);
+        SignalsMain.log.debug(nodes.stream().map(node -> node.toString())
                 .collect(Collectors.joining(System.lineSeparator())));
         super.resetPathway(p1);
-        GirsignalsMain.log.debug("Pathway postreset, {}", this.startsToPath.get(p1));
-        GirsignalsMain.log.debug(nodes.stream().map(node -> node.toString())
+        SignalsMain.log.debug("Pathway postreset, {}", this.startsToPath.get(p1));
+        SignalsMain.log.debug(nodes.stream().map(node -> node.toString())
                 .collect(Collectors.joining(System.lineSeparator())));
     }
 }
