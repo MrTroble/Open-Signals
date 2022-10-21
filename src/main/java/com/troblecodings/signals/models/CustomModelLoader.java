@@ -28,7 +28,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class GIRCustomModelLoader implements ICustomModelLoader {
+public class CustomModelLoader implements ICustomModelLoader {
 
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
@@ -53,7 +53,7 @@ public class GIRCustomModelLoader implements ICustomModelLoader {
         final Map<String, ModelExtention> extentions = new HashMap<>();
 
         final Map<String, Object> modelmap = ModelStats
-                .getfromJson("/assets/girsignals/modeldefinitions");
+                .getfromJson("/assets/signals/modeldefinitions");
 
         modelmap.forEach((filename, content) -> {
 

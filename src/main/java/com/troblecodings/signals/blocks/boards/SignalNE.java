@@ -6,12 +6,12 @@ import com.troblecodings.signals.EnumSignals.Arrow;
 import com.troblecodings.signals.EnumSignals.NE;
 import com.troblecodings.signals.EnumSignals.NEAddition;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.GIRItems;
+import com.troblecodings.signals.init.SignaIItems;
 
 public class SignalNE extends Signal {
 
     public SignalNE() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "ne").noLink().build());
+        super(builder(SignaIItems.SIGN_PLACEMENT_TOOL, "ne").noLink().build());
     }
 
     public static final SEProperty<NE> NETYPE = SEProperty.of("netype", NE.NE1,

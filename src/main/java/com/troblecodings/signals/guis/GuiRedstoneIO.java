@@ -1,6 +1,6 @@
 package com.troblecodings.signals.guis;
 
-import com.troblecodings.signals.init.GIRBlocks;
+import com.troblecodings.signals.init.SignalBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import eu.gir.guilib.ecs.GuiBase;
@@ -72,7 +72,7 @@ public class GuiRedstoneIO extends GuiBase {
         final UIBox layout = new UIBox(UIBox.VBOX, 5);
         list.add(layout);
         this.tile.forEach(pos -> list.add(GuiElements.createLabel(
-                String.format("%s: x=%d, y=%d, z=%d", GIRBlocks.SIGNAL_BOX.getLocalizedName(),
+                String.format("%s: x=%d, y=%d, z=%d", SignalBlocks.SIGNAL_BOX.getLocalizedName(),
                         pos.getX(), pos.getY(), pos.getZ()))));
         inner.add(list);
         inner.add(GuiElements.createPageSelect(layout));

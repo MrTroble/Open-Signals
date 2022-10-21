@@ -1,7 +1,7 @@
 package com.troblecodings.signals.blocks;
 
-import com.troblecodings.signals.init.GIRItems;
-import com.troblecodings.signals.init.GIRTabs;
+import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalTabs;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import eu.gir.guilib.ecs.GuiHandler;
@@ -26,7 +26,7 @@ public class RedstoneIO extends Block implements ITileEntityProvider {
 
     public RedstoneIO() {
         super(Material.ROCK);
-        setCreativeTab(GIRTabs.TAB);
+        setCreativeTab(SignalTabs.TAB);
         this.setDefaultState(getDefaultState().withProperty(POWER, false));
     }
 
@@ -73,7 +73,7 @@ public class RedstoneIO extends Block implements ITileEntityProvider {
     public boolean onBlockActivated(final World worldIn, final BlockPos pos,
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
-        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(SignaIItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
                 GuiHandler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
             return true;

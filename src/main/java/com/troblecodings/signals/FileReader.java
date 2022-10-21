@@ -15,13 +15,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import com.troblecodings.signals.init.GIRBlocks;
+import com.troblecodings.signals.init.SignalBlocks;
 
-public final class GIRFileReader {
+public final class FileReader {
 
     private static FileSystem fileSystemCache = null;
 
-    private GIRFileReader() {
+    private FileReader() {
     }
 
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
@@ -60,7 +60,7 @@ public final class GIRFileReader {
 
         String filelocation = location;
 
-        final URL url = GIRBlocks.class.getResource("/assets/girsignals");
+        final URL url = SignalBlocks.class.getResource("/assets/girsignals");
         try {
             if (url != null) {
 
@@ -71,7 +71,7 @@ public final class GIRFileReader {
                     if (!location.startsWith("/"))
                         filelocation = "/" + filelocation;
 
-                    final URL resource = GIRBlocks.class.getResource(filelocation);
+                    final URL resource = SignalBlocks.class.getResource(filelocation);
 
                     if (resource == null)
                         return Optional.empty();

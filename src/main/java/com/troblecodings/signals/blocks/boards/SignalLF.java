@@ -5,12 +5,12 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.LF;
 import com.troblecodings.signals.EnumSignals.LFBachground;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.GIRItems;
+import com.troblecodings.signals.init.SignaIItems;
 
 public class SignalLF extends Signal {
 
     public SignalLF() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "lfsignal").noLink().build());
+        super(builder(SignaIItems.SIGN_PLACEMENT_TOOL, "lfsignal").noLink().build());
     }
 
     public static final SEProperty<LF> INDICATOR = SEProperty.of("indicator", LF.Z1,

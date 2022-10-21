@@ -9,12 +9,12 @@ import com.troblecodings.signals.EnumSignals.TramAdd;
 import com.troblecodings.signals.EnumSignals.TramSwitch;
 import com.troblecodings.signals.EnumSignals.TramType;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.GIRItems;
+import com.troblecodings.signals.init.SignaIItems;
 
 public class SignalTram extends Signal {
 
     public SignalTram() {
-        super(builder(GIRItems.PLACEMENT_TOOL, "TramSignal").height(0).build());
+        super(builder(SignaIItems.PLACEMENT_TOOL, "TramSignal").height(0).build());
     }
 
     public static final SEProperty<TramType> TRAMSIGNAL_TYPE = SEProperty.of("signaltramtype",

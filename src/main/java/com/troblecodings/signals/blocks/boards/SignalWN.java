@@ -5,12 +5,12 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.WNCross;
 import com.troblecodings.signals.EnumSignals.WNNormal;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.GIRItems;
+import com.troblecodings.signals.init.SignaIItems;
 
 public class SignalWN extends Signal {
 
     public SignalWN() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "wnsignal").height(0).build());
+        super(builder(SignaIItems.SIGN_PLACEMENT_TOOL, "wnsignal").height(0).build());
     }
 
     public static final SEProperty<Boolean> WNTYPE = SEProperty.of("wntype", false,

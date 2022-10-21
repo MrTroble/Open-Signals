@@ -6,11 +6,11 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
-import com.troblecodings.signals.GIRFileReader;
+import com.troblecodings.signals.FileReader;
 import com.troblecodings.signals.GirsignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.Signal.SignalProperties;
-import com.troblecodings.signals.init.GIRItems;
+import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.items.Placementtool;
 
 public class SignalSystemParser {
@@ -32,7 +32,7 @@ public class SignalSystemParser {
 
         final Gson gson = new Gson();
 
-        final Map<String, String> systems = GIRFileReader.readallFilesfromDierectory(directory);
+        final Map<String, String> systems = FileReader.readallFilesfromDierectory(directory);
 
         final Map<String, SignalSystemParser> properties = new HashMap<>();
 
@@ -51,10 +51,10 @@ public class SignalSystemParser {
 
         SignalProperties signalProperty = systemProperties.get(0);
 
-        Placementtool tool = GIRItems.PLACEMENT_TOOL;
+        Placementtool tool = SignaIItems.PLACEMENT_TOOL;
 
         if (signalProperty.placementToolName.equalsIgnoreCase("SIGN_PLACEMENT_TOOL"))
-            tool = GIRItems.SIGN_PLACEMENT_TOOL;
+            tool = SignaIItems.SIGN_PLACEMENT_TOOL;
 
         if (signalProperty.canLink) {
             signalProperty = Signal

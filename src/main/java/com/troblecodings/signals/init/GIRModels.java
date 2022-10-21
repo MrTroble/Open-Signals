@@ -17,18 +17,18 @@ public final class GIRModels {
 
     @SubscribeEvent
     public static void register(final ModelRegistryEvent event) {
-        GIRItems.registeredItems.forEach(GIRModels::registerModel);
-        registerModel(Item.getItemFromBlock(GIRBlocks.HV_SIGNAL_CONTROLLER));
-        registerModel(Item.getItemFromBlock(GIRBlocks.POST));
-        registerModel(Item.getItemFromBlock(GIRBlocks.SIGNAL_BOX));
-        registerModel(Item.getItemFromBlock(GIRBlocks.REDSTONE_IN));
-        registerModel(Item.getItemFromBlock(GIRBlocks.REDSTONE_OUT));
+        SignaIItems.registeredItems.forEach(GIRModels::registerModel);
+        registerModel(Item.getItemFromBlock(SignalBlocks.HV_SIGNAL_CONTROLLER));
+        registerModel(Item.getItemFromBlock(SignalBlocks.POST));
+        registerModel(Item.getItemFromBlock(SignalBlocks.SIGNAL_BOX));
+        registerModel(Item.getItemFromBlock(SignalBlocks.REDSTONE_IN));
+        registerModel(Item.getItemFromBlock(SignalBlocks.REDSTONE_OUT));
     }
 
     @SubscribeEvent
     public static void addColor(final ColorHandlerEvent.Block event) {
         final BlockColors colors = event.getBlockColors();
-        GIRBlocks.blocksToRegister.forEach(block -> {
+        SignalBlocks.blocksToRegister.forEach(block -> {
             if (block instanceof Signal) {
                 final Signal sb = (Signal) block;
                 if (sb.hasCostumColor())

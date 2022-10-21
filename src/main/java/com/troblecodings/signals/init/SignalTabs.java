@@ -3,16 +3,16 @@ package com.troblecodings.signals.init;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
-public final class GIRTabs {
+public final class SignalTabs {
 
-    private GIRTabs() {
+    private SignalTabs() {
     }
 
     public static final CreativeTabs TAB = new CreativeTabs("GIRSignals") {
 
         @Override
         public ItemStack getTabIconItem() {
-            return new ItemStack(GIRItems.PLACEMENT_TOOL);
+            return new ItemStack(SignaIItems.PLACEMENT_TOOL);
         }
     };
 

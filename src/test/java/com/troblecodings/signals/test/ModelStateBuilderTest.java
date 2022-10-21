@@ -2,7 +2,7 @@ package com.troblecodings.signals.test;
 
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.GIRFileReader;
+import com.troblecodings.signals.FileReader;
 
 public final class ModelStateBuilderTest {
 
@@ -13,6 +13,6 @@ public final class ModelStateBuilderTest {
     public static void testModelstats() {
 
         System.out.println(
-                GIRFileReader.readallFilesfromDierectory("/assets/girsignals/modeldefinitions"));
+                FileReader.readallFilesfromDierectory("/assets/signals/modeldefinitions"));
     }
 }

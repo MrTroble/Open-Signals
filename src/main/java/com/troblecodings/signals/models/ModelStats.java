@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import com.troblecodings.signals.GIRFileReader;
+import com.troblecodings.signals.FileReader;
 
 public class ModelStats {
 
@@ -24,7 +24,7 @@ public class ModelStats {
 
         final Gson gson = new Gson();
 
-        final Map<String, String> entrySet = GIRFileReader.readallFilesfromDierectory(directory);
+        final Map<String, String> entrySet = FileReader.readallFilesfromDierectory(directory);
 
         final Map<String, Object> content = new HashMap<>();
 

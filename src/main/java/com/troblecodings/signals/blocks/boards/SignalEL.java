@@ -5,12 +5,12 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.EL;
 import com.troblecodings.signals.EnumSignals.ELArrow;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.GIRItems;
+import com.troblecodings.signals.init.SignaIItems;
 
 public class SignalEL extends Signal {
 
     public SignalEL() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "elsignal").height(2).noLink().build());
+        super(builder(SignaIItems.SIGN_PLACEMENT_TOOL, "elsignal").height(2).noLink().build());
     }
 
     public static final SEProperty<EL> ELTYPE = SEProperty.of("eltype", EL.EL1V,

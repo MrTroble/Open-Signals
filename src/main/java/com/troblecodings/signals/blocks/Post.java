@@ -1,6 +1,6 @@
 package com.troblecodings.signals.blocks;
 
-import com.troblecodings.signals.init.GIRTabs;
+import com.troblecodings.signals.init.SignalTabs;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -10,7 +10,7 @@ public class Post extends Block {
 
     public Post() {
         super(Material.ROCK);
-        setCreativeTab(GIRTabs.TAB);
+        setCreativeTab(SignalTabs.TAB);
     }
 
     @Override

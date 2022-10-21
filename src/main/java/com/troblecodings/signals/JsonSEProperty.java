@@ -74,8 +74,8 @@ public class JsonSEProperty implements IUnlistedProperty<String>, IProperty<Stri
     @SuppressWarnings("unchecked")
     public static Map<String, JsonSEProperty> getProperties() {
         final HashMap<String, JsonSEProperty> returnmap = new HashMap<>();
-        final Map<String, String> files = GIRFileReader
-                .readallFilesfromDierectory("/assets/girsignals/enumdefinition");
+        final Map<String, String> files = FileReader
+                .readallFilesfromDierectory("/assets/signals/enumdefinition");
         files.forEach((_u, file) -> {
             final Map<String, List<String>> map = GSON.fromJson(file,
                     (Class<Map<String, List<String>>>) (Class<?>) Map.class);

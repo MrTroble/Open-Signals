@@ -10,7 +10,7 @@ import com.troblecodings.signals.EnumSignals.HLType;
 import com.troblecodings.signals.EnumSignals.MastSignal;
 import com.troblecodings.signals.EnumSignals.ZS32;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.GIRItems;
+import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.signalbox.config.HLSignalConfig;
 
 import net.minecraft.block.state.IBlockState;
@@ -20,7 +20,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalHL extends Signal {
 
     public SignalHL() {
-        super(builder(GIRItems.PLACEMENT_TOOL, "HL").height(6).signHeight(1.15f)
+        super(builder(SignaIItems.PLACEMENT_TOOL, "HL").height(6).signHeight(1.15f)
                 .config(HLSignalConfig.INSTANCE).build());
     }
 

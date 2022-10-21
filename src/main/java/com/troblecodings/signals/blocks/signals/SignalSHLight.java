@@ -6,7 +6,7 @@ import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.SHLight;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.GIRItems;
+import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.signalbox.config.RSSignalConfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
@@ -15,7 +15,7 @@ import net.minecraft.client.gui.FontRenderer;
 public class SignalSHLight extends Signal {
 
     public SignalSHLight() {
-        super(builder(GIRItems.PLACEMENT_TOOL, "SHLight").height(0).offsetX(-7.5f).offsetY(-6.3f)
+        super(builder(SignaIItems.PLACEMENT_TOOL, "SHLight").height(0).offsetX(-7.5f).offsetY(-6.3f)
                 .signHeight(0.373f).config(RSSignalConfig.RS_CONFIG).build());
     }
 

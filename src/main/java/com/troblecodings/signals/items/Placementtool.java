@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.GIRBlocks;
-import com.troblecodings.signals.init.GIRTabs;
+import com.troblecodings.signals.init.SignalBlocks;
+import com.troblecodings.signals.init.SignalTabs;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
 import eu.gir.guilib.ecs.GuiHandler;
@@ -33,7 +33,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
     public final ArrayList<Integer> signalids = new ArrayList<>();
 
     public Placementtool() {
-        setCreativeTab(GIRTabs.TAB);
+        setCreativeTab(SignalTabs.TAB);
     }
 
     public void addSignal(final Signal sig) {
@@ -97,7 +97,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
             lastPos = setPosition;
             for (int i = 0; i < height; i++)
                 worldIn.setBlockState(lastPos = lastPos.up(),
-                        GIRBlocks.GHOST_BLOCK.getDefaultState());
+                        SignalBlocks.GHOST_BLOCK.getDefaultState());
 
             final String str = compound.getString(SIGNAL_CUSTOMNAME);
             if (!str.isEmpty())

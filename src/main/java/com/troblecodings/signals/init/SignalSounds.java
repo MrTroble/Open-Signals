@@ -9,9 +9,9 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 
-public final class GIRSounds {
+public final class SignalSounds {
     
-    private GIRSounds() {
+    private SignalSounds() {
     }
     
     public static final List<SoundEvent> SOUNDS = new LinkedList<>();

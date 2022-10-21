@@ -18,7 +18,7 @@ public class SignalLoader {
     }
 
     public static void loadInternSignals() {
-        loadSignals(SignalSystemParser.getSignalSystems("/assets/girsignals/signalsystems"));
+        loadSignals(SignalSystemParser.getSignalSystems("/assets/signals/signalsystems"));
     }
 
     @SuppressWarnings("rawtypes")

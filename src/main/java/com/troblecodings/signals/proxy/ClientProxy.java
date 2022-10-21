@@ -11,7 +11,7 @@ import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.GuiSignalController;
 import com.troblecodings.signals.init.GIRModels;
 import com.troblecodings.signals.items.Placementtool;
-import com.troblecodings.signals.models.GIRCustomModelLoader;
+import com.troblecodings.signals.models.CustomModelLoader;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
@@ -40,7 +40,7 @@ public class ClientProxy extends CommonProxy {
         GuiHandler.addGui(Signal.class, SignalTileEnity.class, GuiSignal::new);
 
         MinecraftForge.EVENT_BUS.register(GIRModels.class);
-        ModelLoaderRegistry.registerLoader(new GIRCustomModelLoader());
+        ModelLoaderRegistry.registerLoader(new CustomModelLoader());
         ClientRegistry.bindTileEntitySpecialRenderer(SignalTileEnity.class,
                 new SignalSpecialRenderer());
     }

@@ -17,15 +17,15 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public final class GIRItems {
+public final class SignaIItems {
 
-    private GIRItems() {
+    private SignaIItems() {
     }
 
-    public static final Linkingtool LINKING_TOOL = new Linkingtool(GIRTabs.TAB, (world, pos) -> {
+    public static final Linkingtool LINKING_TOOL = new Linkingtool(SignalTabs.TAB, (world, pos) -> {
         final IBlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();
-        return block == GIRBlocks.REDSTONE_IN || block == GIRBlocks.REDSTONE_OUT
+        return block == SignalBlocks.REDSTONE_IN || block == SignalBlocks.REDSTONE_OUT
                 || (block instanceof Signal && ((Signal) block).canBeLinked());
     });
     public static final Placementtool PLACEMENT_TOOL = new Placementtool();
@@ -34,7 +34,7 @@ public final class GIRItems {
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
     public static void init() {
-        final Field[] fields = GIRItems.class.getFields();
+        final Field[] fields = SignaIItems.class.getFields();
         for (final Field field : fields) {
             final int modifiers = field.getModifiers();
             if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)

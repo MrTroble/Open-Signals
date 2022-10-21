@@ -1,7 +1,7 @@
 package com.troblecodings.signals.blocks;
 
-import com.troblecodings.signals.init.GIRItems;
-import com.troblecodings.signals.init.GIRTabs;
+import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalTabs;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import eu.gir.guilib.ecs.GuiHandler;
@@ -21,14 +21,14 @@ public class SignalBox extends Block implements ITileEntityProvider {
 
     public SignalBox() {
         super(Material.ROCK);
-        setCreativeTab(GIRTabs.TAB);
+        setCreativeTab(SignalTabs.TAB);
     }
 
     @Override
     public boolean onBlockActivated(final World worldIn, final BlockPos pos,
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
-        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(SignaIItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
                 return true;
             final TileEntity entity = worldIn.getTileEntity(pos);

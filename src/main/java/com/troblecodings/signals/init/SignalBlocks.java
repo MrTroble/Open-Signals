@@ -46,9 +46,9 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEve
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public final class GIRBlocks {
+public final class SignalBlocks {
 
-    private GIRBlocks() {
+    private SignalBlocks() {
     }
 
     public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
@@ -81,7 +81,7 @@ public final class GIRBlocks {
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
     public static void init() {
-        final Field[] fields = GIRBlocks.class.getFields();
+        final Field[] fields = SignalBlocks.class.getFields();
         for (final Field field : fields) {
             final int modifiers = field.getModifiers();
             if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)

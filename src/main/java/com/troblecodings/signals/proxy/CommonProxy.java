@@ -7,9 +7,9 @@ import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.blocks.SignalLoader;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
-import com.troblecodings.signals.init.GIRBlocks;
-import com.troblecodings.signals.init.GIRItems;
-import com.troblecodings.signals.init.GIRSounds;
+import com.troblecodings.signals.init.SignalBlocks;
+import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalSounds;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
@@ -33,12 +33,12 @@ public class CommonProxy {
         GuiHandler.addServer(Signal.class, (p, w, bp) -> null);
 
         SignalLoader.loadInternSignals();
-        GIRItems.init();
-        GIRBlocks.init();
-        GIRSounds.init();
+        SignaIItems.init();
+        SignalBlocks.init();
+        SignalSounds.init();
 
-        MinecraftForge.EVENT_BUS.register(GIRItems.class);
-        MinecraftForge.EVENT_BUS.register(GIRBlocks.class);
+        MinecraftForge.EVENT_BUS.register(SignaIItems.class);
+        MinecraftForge.EVENT_BUS.register(SignalBlocks.class);
     }
 
     public void init(final FMLInitializationEvent event) {

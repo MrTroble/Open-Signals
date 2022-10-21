@@ -12,7 +12,7 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.LinkType;
-import com.troblecodings.signals.init.GIRBlocks;
+import com.troblecodings.signals.init.SignalBlocks;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.IChunkloadable;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
@@ -152,12 +152,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         final IBlockState state = world.getBlockState(linkedPos);
         final Block block = state.getBlock();
         LinkType type = LinkType.SIGNAL;
-        if (block == GIRBlocks.REDSTONE_IN) {
+        if (block == SignalBlocks.REDSTONE_IN) {
             type = LinkType.INPUT;
             if (!world.isRemote)
                 loadChunkAndGetTile(RedstoneIOTileEntity.class, world, linkedPos,
                         (tile, _u) -> tile.link(this.pos));
-        } else if (block == GIRBlocks.REDSTONE_OUT) {
+        } else if (block == SignalBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
         if (!world.isRemote) {

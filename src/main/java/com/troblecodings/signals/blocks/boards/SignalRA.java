@@ -7,13 +7,13 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.RA;
 import com.troblecodings.signals.EnumSignals.RALight;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.GIRItems;
+import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.signalbox.config.RSSignalConfig;
 
 public class SignalRA extends Signal {
 
     public SignalRA() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0)
+        super(builder(SignaIItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0)
                 .config(RSSignalConfig.RS_CONFIG).build());
     }
 
