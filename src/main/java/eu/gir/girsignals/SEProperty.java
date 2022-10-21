@@ -21,14 +21,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class SEProperty<T extends Comparable<T>>
         implements IUnlistedProperty<T>, IIntegerable<T>, Predicate<Map<SEProperty<?>, Object>> {
 
+    private final String name;
     private final IProperty<T> parent;
     private final T defaultValue;
     private final ChangeableStage stage;
     private final Predicate<Map<SEProperty<?>, Object>> deps;
     private final List<T> allowedValues;
 
-    public SEProperty(final IProperty<T> parent, final T defaultValue, final ChangeableStage stage,
-            final Predicate<Map<SEProperty<?>, Object>> deps) {
+    public SEProperty(final String name, final IProperty<T> parent, final T defaultValue,
+            final ChangeableStage stage, final Predicate<Map<SEProperty<?>, Object>> deps) {
+        this.name = name;
         this.parent = parent;
         this.defaultValue = defaultValue;
         this.stage = stage;
@@ -38,7 +40,7 @@ public class SEProperty<T extends Comparable<T>>
 
     @Override
     public String getName() {
-        return parent.getName();
+        return name;
     }
 
     @Override
@@ -147,27 +149,28 @@ public class SEProperty<T extends Comparable<T>>
             final T defaultValue, final ChangeableStage stage, final boolean autoname,
             final Predicate<Map<SEProperty<?>, Object>> deps) {
         if (autoname)
-            return new SEAutoNameProp<T>(
+            return new SEAutoNameProp<T>(name,
                     PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue,
                     stage, deps);
-        return new SEProperty<T>(PropertyEnum.create(name, (Class<T>) defaultValue.getClass()),
-                defaultValue, stage, deps);
+        return new SEProperty<T>(name,
+                PropertyEnum.create(name, (Class<T>) defaultValue.getClass()), defaultValue, stage,
+                deps);
     }
 
     public static SEProperty<Boolean> of(final String name, final boolean defaultValue,
             final ChangeableStage stage, final boolean autoname,
             final Predicate<Map<SEProperty<?>, Object>> deps) {
         if (autoname)
-            return new SEAutoNameProp<Boolean>(PropertyBool.create(name), defaultValue, stage,
+            return new SEAutoNameProp<Boolean>(name, PropertyBool.create(name), defaultValue, stage,
                     deps);
-        return new SEProperty<Boolean>(PropertyBool.create(name), defaultValue, stage, deps);
+        return new SEProperty<Boolean>(name, PropertyBool.create(name), defaultValue, stage, deps);
     }
 
     public static class SEAutoNameProp<T extends Comparable<T>> extends SEProperty<T> {
 
-        public SEAutoNameProp(final IProperty<T> parent, final T defaultValue,
+        public SEAutoNameProp(final String name, final IProperty<T> parent, final T defaultValue,
                 final ChangeableStage stage, final Predicate<Map<SEProperty<?>, Object>> deps) {
-            super(parent, defaultValue, stage, deps);
+            super(name, parent, defaultValue, stage, deps);
         }
 
         @SideOnly(Side.CLIENT)

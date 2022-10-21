@@ -8,6 +8,7 @@
     ],
     "seProperties": [
         {
+            "name": "stationnumer",
             "defaultEnum": "STNumber",
             "defaultState": "Z1",
             "changeableStage": "GUISTAGE"

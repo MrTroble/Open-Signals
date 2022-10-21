@@ -7,7 +7,7 @@
                     "blockstate": "",
                     "extentions": {
                         "stationnumber.json": {
-                            "STNumber": "overlay"
+                            "STATIONNUMBER": "overlay"
                         }
                     }
                 }

@@ -13,6 +13,7 @@ import eu.gir.girsignals.models.parser.LogicParser;
 
 public class SEPropertyParser {
 
+    private String name;
     private String defaultEnum;
     private String defaultState;
     private String changeableStage;
@@ -45,11 +46,11 @@ public class SEPropertyParser {
         }
 
         if (autoname)
-            return new SEAutoNameProp(json, defaultState,
+            return new SEAutoNameProp(name, json, defaultState,
                     Enum.valueOf(ChangeableStage.class, changeableStage),
                     (Predicate<Map<SEProperty<?>, Object>>) predicate);
 
-        return new SEProperty(json, defaultState,
+        return new SEProperty(name, json, defaultState,
                 Enum.valueOf(ChangeableStage.class, changeableStage),
                 (Predicate<Map<SEProperty<?>, Object>>) predicate);
     }
