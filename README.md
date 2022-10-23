@@ -1,13 +1,13 @@
-# GIRSignals
+# Open Signals
 
 [
-![Curseforge](https://cf.way2muchnoise.eu/title/gir-signal-mod.svg?badge_style=for_the_badge)
-![Curseforge Downloads](https://cf.way2muchnoise.eu/short_gir-signal-mod.svg?badge_style=for_the_badge)
-![Curseforge Versions](http://cf.way2muchnoise.eu/versions/gir-signal-mod.svg?badge_style=for_the_badge)
-](https://www.curseforge.com/minecraft/mc-mods/gir-signal-mod)
+![Curseforge](https://cf.way2muchnoise.eu/title/440990.svg?badge_style=for_the_badge)
+![Curseforge Downloads](https://cf.way2muchnoise.eu/short_440990.svg?badge_style=for_the_badge)
+![Curseforge Versions](http://cf.way2muchnoise.eu/versions/440990.svg?badge_style=for_the_badge)
+](https://www.curseforge.com/minecraft/mc-mods/open-signals)
 [
-![Discord](https://img.shields.io/discord/690967067855421470?logo=discord&style=for-the-badge)
-](https://discord.gg/UdxeFgG)
+![Discord](https://img.shields.io/discord/166953995951276032?logo=discord&style=for-the-badge)
+](https://discord.gg/Um97SHnrYp)
 [
 ![Buid](https://img.shields.io/appveyor/build/MrTroble/girsignals/master?logo=appveyor&style=for-the-badge)
 ](https://ci.appveyor.com/project/MrTroble/girsignals)
@@ -17,8 +17,8 @@
 
 ## This mod adds a lot of commonly used german signal systems as controllable signals
 
-- Download on [curseforge](https://www.curseforge.com/minecraft/mc-mods/gir-signal-mod).  
-- Find more information on our [website](https://girc.eu/) or in our [wiki](https://github.com/German-Immersive-Railroading-Community/GIRSignals/wiki).
+- Download on [curseforge](https://www.curseforge.com/minecraft/mc-mods/open-signals).  
+- Find more information in our [wiki](https://github.com/MrTroble/Open-Signals/wiki).
 - Updates can be found in the [changelog](changelog.md).
 
 ## How to build this mod
@@ -29,7 +29,7 @@
 
 or use submodule clone command:
 
-- ``git clone --recurse-submodules https://github.com/German-Immersive-Railroading-Community/GIRSignals.git``
+- ``git clone --recurse-submodules https://github.com/MrTroble/Open-Signals.git``
 
 ### Setup Eclipse
 
