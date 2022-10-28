@@ -1,10 +1,6 @@
 name: Java CI with Gradle
 
-on:
-  push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+on: [push]
 
 permissions:
   contents: read
@@ -22,6 +18,6 @@ jobs:
         java-version: '8'
         distribution: 'adopt'
     - name: Build with Gradle
-      uses: gradle/gradle-build-action@67421db6bd0bf253fb4bd25b31ebb98943c375e1
+      uses: gradle/gradle-build-action@v2
       with:
         arguments: build
