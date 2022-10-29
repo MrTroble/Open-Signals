@@ -31,6 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       APPVEYOR_BUILD_VERSION: ${{ github.run_number }}
+      CURSETOKEN: ${{ secrets.CURSETOKEN }}
     steps:
     - uses: actions/checkout@v3
       with:
