@@ -4,7 +4,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -414,8 +413,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight);
     }
 
-    private static final HashMap<BlockPos, String> TEST = new HashMap<>();
-
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
             final SignalTileEnity te, final FontRenderer font, final float renderHeight) {
@@ -428,7 +425,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return;
         }
         final ITextComponent name = te.getDisplayName();
-        TEST.put(pos, name.getFormattedText());
         final SignalAngel face = state.getValue(Signal.ANGEL);
         final float angel = face.getDegree();
 
