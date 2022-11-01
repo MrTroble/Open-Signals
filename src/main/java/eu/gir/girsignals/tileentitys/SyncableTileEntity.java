@@ -23,12 +23,7 @@ public class SyncableTileEntity extends TileEntity {
 
     @Override
     public void onDataPacket(final NetworkManager net, final SPacketUpdateTileEntity pkt) {
-        this.handleUpdateTag(pkt.getNbtCompound());
-    }
-
-    @Override
-    public void handleUpdateTag(final NBTTagCompound tag) {
-        this.readFromNBT(tag);
+        this.readFromNBT(pkt.getNbtCompound());
         final BlockPos pos = getPos();
         getWorld().markBlockRangeForRenderUpdate(pos, pos);
     }
