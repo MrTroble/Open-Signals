@@ -2,9 +2,8 @@ package com.troblecodings.signals.enums;
 
 import java.util.function.BiConsumer;
 
+import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
-
-import eu.gir.guilib.ecs.entitys.UIEntity;
 
 public enum EnumGuiMode {
 

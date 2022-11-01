@@ -5,11 +5,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableMap.Builder;
+import com.troblecodings.guilib.ecs.GuiSyncNetwork;
+import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
-import eu.gir.guilib.ecs.GuiSyncNetwork;
-import eu.gir.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.Container;

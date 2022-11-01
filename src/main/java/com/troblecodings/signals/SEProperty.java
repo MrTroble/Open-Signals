@@ -6,8 +6,8 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 
-import eu.gir.guilib.ecs.interfaces.IIntegerable;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;

@@ -2,8 +2,9 @@ package com.troblecodings.signals.tileentitys;
 
 import java.util.ArrayList;
 
-import eu.gir.guilib.ecs.GuiSyncNetwork;
-import eu.gir.guilib.ecs.interfaces.UIClientSync;
+import com.troblecodings.guilib.ecs.GuiSyncNetwork;
+import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
+
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;

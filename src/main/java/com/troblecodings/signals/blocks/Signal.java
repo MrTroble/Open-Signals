@@ -11,14 +11,14 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.ChangeableStage;
-import com.troblecodings.signals.SignalsConfig;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.SignalsConfig;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.signalbox.config.ISignalAutoconfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-import eu.gir.guilib.ecs.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -483,7 +483,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
         if (!playerIn.getHeldItemMainhand().getItem().equals(SignaIItems.LINKING_TOOL)
                 && (canBeLinked() || customname)) {
-            GuiHandler.invokeGui(Signal.class, playerIn, worldIn, pos);
+            SignalsMain.handler.invokeGui(Signal.class, playerIn, worldIn, pos);
             return true;
         }
         return false;

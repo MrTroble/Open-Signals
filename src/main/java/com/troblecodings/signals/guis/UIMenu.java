@@ -1,17 +1,17 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.guilib.ecs.entitys.UIBox;
+import com.troblecodings.guilib.ecs.entitys.UIComponent;
+import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEntity.KeyEvent;
+import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
+import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
+import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 
-import eu.gir.guilib.ecs.entitys.UIBox;
-import eu.gir.guilib.ecs.entitys.UIComponent;
-import eu.gir.guilib.ecs.entitys.UIEntity;
-import eu.gir.guilib.ecs.entitys.UIEntity.KeyEvent;
-import eu.gir.guilib.ecs.entitys.UIEntity.MouseEvent;
-import eu.gir.guilib.ecs.entitys.render.UIBorder;
-import eu.gir.guilib.ecs.entitys.render.UIColor;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.Rotation;
 

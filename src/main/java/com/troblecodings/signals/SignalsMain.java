@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.proxy.CommonProxy;
 
 import net.minecraftforge.fml.common.Mod;
@@ -29,6 +30,7 @@ public class SignalsMain {
     @SidedProxy(serverSide = "eu.gir.girsignals.proxy.CommonProxy", clientSide = "eu.gir.girsignals.proxy.ClientProxy")
     public static CommonProxy proxy;
     public static Logger log = null;
+    public static GuiHandler handler = null;
     private static boolean debug;
 
     /**

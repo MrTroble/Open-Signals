@@ -2,15 +2,16 @@ package com.troblecodings.signals.items;
 
 import java.util.ArrayList;
 
+import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
+import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.init.SignalBlocks;
 import com.troblecodings.signals.init.SignalTabs;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-import eu.gir.guilib.ecs.GuiHandler;
-import eu.gir.guilib.ecs.interfaces.IIntegerable;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -25,7 +26,7 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class Placementtool extends Item implements IIntegerable<Signal> {
+public class Placementtool extends Item implements IIntegerable<Signal>, ITagableItem {
 
     public static final String BLOCK_TYPE_ID = "blocktypeid";
     public static final String SIGNAL_CUSTOMNAME = "customname";
@@ -50,7 +51,7 @@ public class Placementtool extends Item implements IIntegerable<Signal> {
         if (player.isSneaking()) {
             if (!worldIn.isRemote)
                 return EnumActionResult.SUCCESS;
-            GuiHandler.invokeGui(Placementtool.class, player, worldIn, pos);
+            SignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, pos);
             return EnumActionResult.SUCCESS;
         } else {
             if (worldIn.isRemote)

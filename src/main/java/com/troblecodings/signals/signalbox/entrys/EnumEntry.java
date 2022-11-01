@@ -2,7 +2,8 @@ package com.troblecodings.signals.signalbox.entrys;
 
 import java.util.function.IntConsumer;
 
-import eu.gir.guilib.ecs.interfaces.IIntegerable;
+import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
+
 import net.minecraft.nbt.NBTTagCompound;
 
 public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>

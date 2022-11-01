@@ -1,5 +1,7 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.guilib.ecs.entitys.UIComponent;
+import com.troblecodings.guilib.ecs.interfaces.UIAutoSync;
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -8,8 +10,6 @@ import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
-import eu.gir.guilib.ecs.entitys.UIComponent;
-import eu.gir.guilib.ecs.interfaces.UIAutoSync;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.nbt.NBTTagCompound;

@@ -1,14 +1,14 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.guilib.ecs.GuiBase;
+import com.troblecodings.guilib.ecs.GuiElements;
+import com.troblecodings.guilib.ecs.GuiSyncNetwork;
+import com.troblecodings.guilib.ecs.entitys.UIBox;
+import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UITextInput;
+import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-import eu.gir.guilib.ecs.GuiBase;
-import eu.gir.guilib.ecs.GuiElements;
-import eu.gir.guilib.ecs.GuiSyncNetwork;
-import eu.gir.guilib.ecs.entitys.UIBox;
-import eu.gir.guilib.ecs.entitys.UIEntity;
-import eu.gir.guilib.ecs.entitys.UITextInput;
-import eu.gir.guilib.ecs.entitys.render.UILabel;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 

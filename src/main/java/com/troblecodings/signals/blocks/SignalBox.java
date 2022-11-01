@@ -1,10 +1,10 @@
 package com.troblecodings.signals.blocks;
 
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.init.SignalTabs;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
-import eu.gir.guilib.ecs.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -34,7 +34,7 @@ public class SignalBox extends Block implements ITileEntityProvider {
             final TileEntity entity = worldIn.getTileEntity(pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {
-                GuiHandler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
+                SignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
             } else {
                 playerIn.sendStatusMessage(new TextComponentTranslation("msg.isblocked"), true);
             }

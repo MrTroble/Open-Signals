@@ -1,10 +1,10 @@
 package com.troblecodings.signals.blocks;
 
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.init.SignalTabs;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
-import eu.gir.guilib.ecs.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -30,7 +30,7 @@ public class SignalController extends Block implements ITileEntityProvider {
         if (!playerIn.getHeldItemMainhand().getItem().equals(SignaIItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
                 return true;
-            GuiHandler.invokeGui(SignalController.class, playerIn, worldIn, pos);
+            SignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos);
             return true;
         }
         return false;

@@ -1,10 +1,10 @@
 package com.troblecodings.signals.blocks;
 
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.init.SignalTabs;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import eu.gir.guilib.ecs.GuiHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
@@ -75,7 +75,7 @@ public class RedstoneIO extends Block implements ITileEntityProvider {
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         if (!playerIn.getHeldItemMainhand().getItem().equals(SignaIItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
-                GuiHandler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
+                SignalsMain.handler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
             return true;
         }
         return false;

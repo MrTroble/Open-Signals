@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.SignalBlocks;
@@ -19,7 +20,6 @@ import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
-import eu.gir.guilib.ecs.interfaces.ISyncable;
 import eu.gir.linkableapi.ILinkableTile;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;

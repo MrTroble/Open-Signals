@@ -3,10 +3,10 @@ package com.troblecodings.signals.tileentitys;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
-import eu.gir.guilib.ecs.interfaces.ISyncable;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
