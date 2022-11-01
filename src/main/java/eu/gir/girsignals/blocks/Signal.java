@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -46,6 +47,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -412,6 +414,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight);
     }
 
+    private static final HashMap<BlockPos, String> TEST = new HashMap<>();
+
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
             final SignalTileEnity te, final FontRenderer font, final float renderHeight) {
@@ -423,10 +427,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
+        final ITextComponent name = te.getDisplayName();
+        TEST.put(pos, name.getFormattedText());
         final SignalAngel face = state.getValue(Signal.ANGEL);
         final float angel = face.getDegree();
 
-        final String[] display = te.getDisplayName().getFormattedText().split("\\[n\\]");
+        final String[] display = name.getFormattedText().split("\\[n\\]");
         final float width = this.prop.signWidth;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
@@ -482,9 +488,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
         return false;
     }
-    
+
     public void getUpdate(final World world, final BlockPos pos) {
-        
+
     }
 
 }

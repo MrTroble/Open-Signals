@@ -151,7 +151,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 
     @Override
     public int hashCode() {
-        return Objects.hash(formatCustomName, map);
+        return Objects.hash(formatCustomName, map, pos, world);
     }
 
     @Override
@@ -164,7 +164,8 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
             return false;
         final SignalTileEnity other = (SignalTileEnity) obj;
         return Objects.equals(formatCustomName, other.formatCustomName)
-                && Objects.equals(map, other.map);
+                && Objects.equals(map, other.map) && Objects.equals(pos, other.pos)
+                && Objects.equals(world, other.world);
     }
 
     @Override
