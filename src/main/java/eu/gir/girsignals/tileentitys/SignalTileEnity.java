@@ -30,7 +30,6 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     public static final String BLOCKID = "blockid";
 
     private String formatCustomName = null;
-    private int blockID = -1;
 
     @Override
     public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
@@ -38,7 +37,6 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         map.forEach((prop, in) -> prop.writeToNBT(comp, in));
         if (formatCustomName != null)
             comp.setString(CUSTOMNAME, formatCustomName);
-        compound.setInteger(BLOCKID, blockID);
         compound.setTag(PROPERTIES, comp);
         super.writeToNBT(compound);
         return compound;
@@ -48,12 +46,12 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 
     @Override
     public void readFromNBT(final NBTTagCompound compound) {
-        final NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
         super.readFromNBT(compound);
-        blockID = comp.getInteger(BLOCKID);
+        final NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
         if (world == null) {
             temporary = comp.copy();
         } else {
+            temporary = null;
             read(comp);
         }
     }
@@ -64,7 +62,6 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
                     final SEProperty<?> sep = SEProperty.cst(prop);
                     sep.readFromNBT(comp).ifPresent(obj -> map.put(sep, obj));
                 });
-        setBlockID();
         if (comp.hasKey(CUSTOMNAME))
             setCustomName(comp.getString(CUSTOMNAME));
     }
@@ -131,16 +128,12 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         getSignal().renderOverlay(x, y, z, this, font);
     }
 
-    public void setBlockID() {
-        blockID = getSignal().getID();
-    }
-
     public Signal getSignal() {
         return (Signal) super.getBlockType();
     }
 
     public int getBlockID() {
-        return blockID;
+        return getSignal().getID();
     }
 
     @Override
@@ -158,7 +151,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
 
     @Override
     public int hashCode() {
-        return Objects.hash(formatCustomName, map);
+        return Objects.hash(formatCustomName, map, pos, world);
     }
 
     @Override
@@ -171,7 +164,8 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
             return false;
         final SignalTileEnity other = (SignalTileEnity) obj;
         return Objects.equals(formatCustomName, other.formatCustomName)
-                && Objects.equals(map, other.map);
+                && Objects.equals(map, other.map) && Objects.equals(pos, other.pos)
+                && Objects.equals(world, other.world);
     }
 
     @Override

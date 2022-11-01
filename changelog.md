@@ -1,6 +1,10 @@
 # Changelog
 
 ## [Fix]
+* fix: render overlay issue
+* potential fix: nbt desync (disappearing signals)
+
+## [Fix]
 * fix: missing language keys
 * fix: mechanical wn signal models
 
