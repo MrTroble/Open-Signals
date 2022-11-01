@@ -4,11 +4,11 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
+import com.troblecodings.linkableapi.Linkingtool;
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.Placementtool;
 
-import eu.gir.linkableapi.Linkingtool;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;

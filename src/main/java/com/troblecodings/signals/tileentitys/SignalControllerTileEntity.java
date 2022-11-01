@@ -8,6 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.collect.ImmutableMap.Builder;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
+import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.EnumMode;
 import com.troblecodings.signals.EnumState;
@@ -15,7 +16,6 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.google.common.collect.Maps;
 
-import eu.gir.linkableapi.ILinkableTile;
 import li.cil.oc.api.machine.Arguments;
 import li.cil.oc.api.machine.Callback;
 import li.cil.oc.api.machine.Context;
