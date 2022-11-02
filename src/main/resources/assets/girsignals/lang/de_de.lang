@@ -8,6 +8,12 @@ gui.keyprompt=Drücke [LSHIFT] für mehr Informationen!
 item.linkingtool.name=Verlinker
 item.placementtool.name=Signal-Platzierer
 item.signplacementtool.name=Signaltafel-Platzierer
+item.conductortrowelgreen.name=Handkelle Grün
+item.conductortrowelred.name=Handkelle Rot
+item.reflectivechestplate.name=Sicherheitsweste
+item.traindriverhead.name=Lokführer Mütze
+item.dispatcherhead.name=Fahrdienstleiter Mütze
+item.stationmanagerhead.name=Bahnhofsaufsicht Mütze
 
 #Blocks
 tile.hvsignalcontroller.name=Signal Steuerer

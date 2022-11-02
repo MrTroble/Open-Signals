@@ -8,6 +8,12 @@ gui.keyprompt=Press [LSHIFT] for more information!
 item.linkingtool.name=Linking Tool
 item.placementtool.name=Signal-Placer
 item.signplacementtool.name=Signalplate-Placer
+item.conductortrowelgreen.name=Conductor Trowel Green
+item.conductortrowelred.name=Conductor Trowel Red
+item.reflectivechestplate.name=Reflective Chestplate
+item.traindriverhead.name=Train Driver Cap
+item.dispatcherhead.name=Dispatcher Cap
+item.stationmanagerhead.name=Station Manager Cap
 
 #Blocks
 tile.hvsignalcontroller.name=Signal-Controller

@@ -6,10 +6,13 @@ import java.util.ArrayList;
 
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.items.ItemArmorTemplate;
+import eu.gir.girsignals.items.ItemConductorTrowel;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.linkableapi.Linkingtool;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -29,6 +32,16 @@ public final class GIRItems {
     });
     public static final Placementtool PLACEMENT_TOOL = new Placementtool();
     public static final Placementtool SIGN_PLACEMENT_TOOL = new Placementtool();
+    public static final ItemConductorTrowel CONDUCTOR_TROWEL_GREEN = new ItemConductorTrowel();
+    public static final ItemConductorTrowel CONDUCTOR_TROWEL_RED = new ItemConductorTrowel();
+    public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE = new ItemArmorTemplate(
+            ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.CHEST);
+    public static final ItemArmorTemplate DISPATCHER_HEAD = new ItemArmorTemplate(
+            ItemArmorTemplate.dispatcherArmorMaterial, 1, EntityEquipmentSlot.HEAD);
+    public static final ItemArmorTemplate STATION_MANAGER_HEAD = new ItemArmorTemplate(
+            ItemArmorTemplate.stationManagerArmorMaterial, 1, EntityEquipmentSlot.HEAD);
+    public static final ItemArmorTemplate TRAIN_DRIVER_HEAD = new ItemArmorTemplate(
+            ItemArmorTemplate.trainDriverArmorMaterial, 1, EntityEquipmentSlot.HEAD);
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
