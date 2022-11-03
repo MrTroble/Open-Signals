@@ -10,10 +10,14 @@ item.placementtool.name=Signal-Placer
 item.signplacementtool.name=Signalplate-Placer
 item.conductortrowelgreen.name=Conductor Trowel Green
 item.conductortrowelred.name=Conductor Trowel Red
+item.warningflag.name=Warning Flag
+item.kboard.name=K-Board
+item.lboard.name=L-Board
 item.reflectivechestplate.name=Reflective Chestplate
 item.traindriverhead.name=Train Driver Cap
 item.dispatcherhead.name=Dispatcher Cap
 item.stationmanagerhead.name=Station Manager Cap
+item.conductorchestplate.name=Conductor Suit
 
 #Blocks
 tile.hvsignalcontroller.name=Signal-Controller

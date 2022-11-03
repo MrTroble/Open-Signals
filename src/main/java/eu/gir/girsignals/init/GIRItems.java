@@ -34,6 +34,9 @@ public final class GIRItems {
     public static final Placementtool SIGN_PLACEMENT_TOOL = new Placementtool();
     public static final ItemConductorTrowel CONDUCTOR_TROWEL_GREEN = new ItemConductorTrowel();
     public static final ItemConductorTrowel CONDUCTOR_TROWEL_RED = new ItemConductorTrowel();
+    public static final ItemConductorTrowel WARNING_FLAG = new ItemConductorTrowel();
+    public static final ItemConductorTrowel K_BOARD = new ItemConductorTrowel();
+    public static final ItemConductorTrowel L_BOARD = new ItemConductorTrowel();
     public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE = new ItemArmorTemplate(
             ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate DISPATCHER_HEAD = new ItemArmorTemplate(
@@ -42,6 +45,8 @@ public final class GIRItems {
             ItemArmorTemplate.stationManagerArmorMaterial, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate TRAIN_DRIVER_HEAD = new ItemArmorTemplate(
             ItemArmorTemplate.trainDriverArmorMaterial, 1, EntityEquipmentSlot.HEAD);
+    public static final ItemArmorTemplate CONDUCTOR_CHESTPLATE = new ItemArmorTemplate(
+            ItemArmorTemplate.conductorArmorMaterial, 1, EntityEquipmentSlot.CHEST);
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 

@@ -34,4 +34,9 @@ public class ItemArmorTemplate extends ItemArmor{
             .addArmorMaterial("train_driver", GirsignalsMain.MODID + ":train_driver", 1000, new int[] {
                     1, 1, 1, 1
             }, 30, SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 0F);
+    
+    public static final ArmorMaterial conductorArmorMaterial = EnumHelper
+            .addArmorMaterial("conductor", GirsignalsMain.MODID + ":conductor", 1000, new int[] {
+                    1, 1, 1, 1
+            }, 30, SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 0F); 
 }

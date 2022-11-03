@@ -10,10 +10,14 @@ item.placementtool.name=Signal-Platzierer
 item.signplacementtool.name=Signaltafel-Platzierer
 item.conductortrowelgreen.name=Handkelle Grün
 item.conductortrowelred.name=Handkelle Rot
+item.warningflag.name=Warnflagge
+item.kboard.name=K-Tafel
+item.lboard.name=L-Tafel
 item.reflectivechestplate.name=Sicherheitsweste
 item.traindriverhead.name=Lokführer Mütze
 item.dispatcherhead.name=Fahrdienstleiter Mütze
 item.stationmanagerhead.name=Bahnhofsaufsicht Mütze
+item.conductorchestplate.name=Zugführer Anzug
 
 #Blocks
 tile.hvsignalcontroller.name=Signal Steuerer
