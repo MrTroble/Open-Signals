@@ -13,8 +13,8 @@ import net.minecraft.client.gui.FontRenderer;
 public class SignalOther extends Signal {
 
     public SignalOther() {
-        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "othersignal").height(1).signScale(3.5f).offsetX(-5)
-                .offsetY(1.8f).noLink().build());
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "othersignal").height(1).signScale(3.5f)
+                .offsetX(-5).offsetY(1.8f).noLink().build());
     }
 
     public static final SEProperty<OtherSignal> OTHERTYPE = SEProperty.of("othertype",
@@ -27,15 +27,17 @@ public class SignalOther extends Signal {
 
     @Override
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderer font) {
+            final SignalTileEnity te, final FontRenderer font, final boolean isDoubleSided) {
         super.renderOverlay(x, y, z, te, font,
                 te.getProperty(OTHERTYPE).filter(OtherSignal.HM::equals).isPresent() ? 2.1f
-                        : this.prop.customNameRenderHeight);
+                        : this.prop.customNameRenderHeight,
+                false);
         super.renderOverlay(x, y, z, te, font,
                 te.getProperty(OTHERTYPE).filter(OtherSignal.HM2::equals).isPresent() ? 2.1f
-                        : this.prop.customNameRenderHeight);
+                        : this.prop.customNameRenderHeight,
+                true);
     }
-    
+
     @Override
     public int getHeight(final Map<SEProperty<?>, Object> map) {
         final OtherSignal other = (OtherSignal) map.get(OTHERTYPE);

@@ -409,13 +409,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderer font) {
-        this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight);
+            final SignalTileEnity te, final FontRenderer font, final boolean isDoubleSided) {
+        this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight, isDoubleSided);
     }
 
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderer font, final float renderHeight) {
+            final SignalTileEnity te, final FontRenderer font, final float renderHeight,
+            final boolean isDoubleSided) {
         if (renderHeight == -1)
             return;
         final World world = te.getWorld();
@@ -446,6 +447,21 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             font.drawSplitString(display[i], 0, (int) (i * scale * 2.8f), (int) width, 0);
         }
         GlStateManager.popMatrix();
+
+        if (isDoubleSided) {
+            GlStateManager.enableAlpha();
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(x + 0.5f, y + renderHeight, z + 0.5f);
+            GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
+            GlStateManager.rotate(angel + 180, 0, 1, 0);
+            GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
+            GlStateManager.scale(-1f, 1f, 1f);
+
+            for (int i = 0; i < display.length; i++) {
+                font.drawSplitString(display[i], 0, (int) (i * scale * 2.8f), (int) width, 0);
+            }
+            GlStateManager.popMatrix();
+        }
     }
 
     public Placementtool getPlacementtool() {

@@ -61,10 +61,11 @@ public class SignalSemaphore extends Signal {
 
     @Override
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderer font) {
+            final SignalTileEnity te, final FontRenderer font, final boolean isDoubleSided) {
         super.renderOverlay(x, y, z, te, font,
                 te.getProperty(SEMATYPE).filter(st -> st.equals(SemaType.MAIN_SMALL)).isPresent()
                         ? 1.04f
-                        : this.prop.customNameRenderHeight);
+                        : this.prop.customNameRenderHeight,
+                false);
     }
 }
