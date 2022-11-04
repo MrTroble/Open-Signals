@@ -1,5 +1,7 @@
 package com.troblecodings.signals.models.parser;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.function.Function;
@@ -64,15 +66,17 @@ public class FunctionParsingInfo {
                     info.argument = parts[0];
                     final IUnlistedProperty property = (IUnlistedProperty) getProperty();
                     final Class clazz = property.getType();
-                    if (!clazz.isEnum())
-                        throw new LogicalParserException(
-                                String.format("Property=%s is not a enum property but must be",
-                                        nextInfo, info.system.getSignalTypeName()));
                     try {
-                        final Object value = Enum.valueOf(clazz, parts[1].toUpperCase());
+                        final Method method = clazz.getMethod("valueOf", String.class);
+                        final Object value = method.invoke(null, parts[1].toUpperCase());
                         return new ValuePack(property, ext -> ext.equals(value));
-                    } catch (final IllegalArgumentException e) {
-                        throw new LogicalParserException(e);
+                    } catch (final IllegalArgumentException | NoSuchMethodException
+                            | SecurityException | IllegalAccessException
+                            | InvocationTargetException e) {
+                        throw new LogicalParserException(
+                                String.format("Property=%s is not a valid property [System: %s]",
+                                        nextInfo, info.system.getSignalTypeName()),
+                                e);
                     }
                 });
         if (predicate == null)
