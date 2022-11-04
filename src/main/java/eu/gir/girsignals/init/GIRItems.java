@@ -39,6 +39,12 @@ public final class GIRItems {
     public static final ItemConductorTrowel L_BOARD = new ItemConductorTrowel();
     public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE = new ItemArmorTemplate(
             ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.CHEST);
+    public static final ItemArmorTemplate REFLECTIVE_PANTS = new ItemArmorTemplate(
+            ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.LEGS);
+    public static final ItemArmorTemplate REFLECTIVE_SHOES = new ItemArmorTemplate(
+            ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.FEET);
+    public static final ItemArmorTemplate REFLECTIVE_HEAD = new ItemArmorTemplate(
+            ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate DISPATCHER_HEAD = new ItemArmorTemplate(
             ItemArmorTemplate.dispatcherArmorMaterial, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate STATION_MANAGER_HEAD = new ItemArmorTemplate(
@@ -47,6 +53,10 @@ public final class GIRItems {
             ItemArmorTemplate.trainDriverArmorMaterial, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate CONDUCTOR_CHESTPLATE = new ItemArmorTemplate(
             ItemArmorTemplate.conductorArmorMaterial, 1, EntityEquipmentSlot.CHEST);
+    public static final ItemArmorTemplate CONDUCTOR_PANTS = new ItemArmorTemplate(
+            ItemArmorTemplate.conductorArmorMaterial, 1, EntityEquipmentSlot.LEGS);
+    public static final ItemArmorTemplate CONDUCTOR_SHOES = new ItemArmorTemplate(
+            ItemArmorTemplate.conductorArmorMaterial, 1, EntityEquipmentSlot.FEET);
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
