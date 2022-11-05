@@ -1,4 +1,4 @@
-package com.troblecodings.signals;
+package com.troblecodings.signals.utils;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.init.SignalBlocks;
 
 public final class FileReader {
@@ -60,7 +61,7 @@ public final class FileReader {
 
         String filelocation = location;
 
-        final URL url = SignalBlocks.class.getResource("/assets/girsignals");
+        final URL url = SignalBlocks.class.getResource("/assets/signals");
         try {
             if (url != null) {
 

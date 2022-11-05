@@ -2,10 +2,10 @@ package com.troblecodings.signals.blocks.signals;
 
 import java.util.Map;
 
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.SHMech;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.signalbox.config.RSSignalConfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;

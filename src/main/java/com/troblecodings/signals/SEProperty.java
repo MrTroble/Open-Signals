@@ -7,6 +7,7 @@ import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
+import com.troblecodings.signals.enums.ChangeableStage;
 
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;

@@ -21,9 +21,9 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.client.resources.I18n;

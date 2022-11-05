@@ -4,10 +4,10 @@ import java.util.ArrayList;
 
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignalBlocks;
 import com.troblecodings.signals.init.SignalTabs;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;

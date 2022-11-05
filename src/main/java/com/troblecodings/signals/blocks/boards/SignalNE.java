@@ -1,11 +1,11 @@
 package com.troblecodings.signals.blocks.boards;
 
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.Arrow;
 import com.troblecodings.signals.EnumSignals.NE;
 import com.troblecodings.signals.EnumSignals.NEAddition;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignaIItems;
 
 public class SignalNE extends Signal {

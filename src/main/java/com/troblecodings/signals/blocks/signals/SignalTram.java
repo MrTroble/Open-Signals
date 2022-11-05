@@ -1,6 +1,5 @@
 package com.troblecodings.signals.blocks.signals;
 
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.CAR;
 import com.troblecodings.signals.EnumSignals.PED;
@@ -9,6 +8,7 @@ import com.troblecodings.signals.EnumSignals.TramAdd;
 import com.troblecodings.signals.EnumSignals.TramSwitch;
 import com.troblecodings.signals.EnumSignals.TramType;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignaIItems;
 
 public class SignalTram extends Signal {

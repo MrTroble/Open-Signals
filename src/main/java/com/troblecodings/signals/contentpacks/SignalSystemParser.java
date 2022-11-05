@@ -6,12 +6,12 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
-import com.troblecodings.signals.FileReader;
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.Signal.SignalProperties;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.items.Placementtool;
+import com.troblecodings.signals.utils.FileReader;
 
 public class SignalSystemParser {
 

@@ -2,11 +2,11 @@ package com.troblecodings.signals.blocks.boards;
 
 import java.util.Random;
 
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.ACAddition;
 import com.troblecodings.signals.EnumSignals.ACCar;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.init.SignalSounds;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;

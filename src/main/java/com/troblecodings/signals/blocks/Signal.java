@@ -10,10 +10,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SignalsConfig;
 import com.troblecodings.signals.SignalsMain;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.signalbox.config.ISignalAutoconfig;

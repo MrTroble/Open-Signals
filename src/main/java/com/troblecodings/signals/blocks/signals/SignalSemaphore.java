@@ -2,12 +2,12 @@ package com.troblecodings.signals.blocks.signals;
 
 import java.util.Map;
 
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.SemaDist;
 import com.troblecodings.signals.EnumSignals.SemaType;
 import com.troblecodings.signals.EnumSignals.ZS32;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.signalbox.config.SemaphoreConfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;

@@ -25,10 +25,10 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
-import com.troblecodings.signals.ChangeableStage;
-import com.troblecodings.signals.EnumMode;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.block.state.IBlockState;

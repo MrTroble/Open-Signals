@@ -3,13 +3,13 @@ package com.troblecodings.signals.contentpacks;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SignalsMain;
-import com.troblecodings.signals.JsonSEProperty;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SEProperty.SEAutoNameProp;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.LogicParser;
+import com.troblecodings.signals.utils.JsonEnum;
 
 public class SEPropertyParser {
 
@@ -25,7 +25,7 @@ public class SEPropertyParser {
     })
     public SEProperty createSEProperty(final FunctionParsingInfo info) {
 
-        final JsonSEProperty json = JsonSEProperty.PROPERTIES.get(defaultEnum);
+        final JsonEnum json = JsonEnum.PROPERTIES.get(defaultEnum);
         if (json == null)
             SignalsMain.log.error("The given defaultEnum '" + defaultEnum + "' doesn't exists!");
 

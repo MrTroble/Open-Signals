@@ -2,11 +2,11 @@ package com.troblecodings.signals.blocks.boards;
 
 import java.util.Map;
 
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.RA;
 import com.troblecodings.signals.EnumSignals.RALight;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.signalbox.config.RSSignalConfig;
 

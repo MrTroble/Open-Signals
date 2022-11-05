@@ -1,4 +1,4 @@
-package com.troblecodings.signals;
+package com.troblecodings.signals.utils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,13 +14,13 @@ import com.google.gson.Gson;
 import net.minecraft.block.properties.IProperty;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class JsonSEProperty implements IUnlistedProperty<String>, IProperty<String> {
+public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
 
     private final String name;
     private final List<String> values;
     private final Set<String> valueSet;
 
-    public JsonSEProperty(final String name, final List<String> values) {
+    public JsonEnum(final String name, final List<String> values) {
         this.name = name;
         this.values = ImmutableList.copyOf(values);
         this.valueSet = ImmutableSet.copyOf(values);
@@ -69,11 +69,11 @@ public class JsonSEProperty implements IUnlistedProperty<String>, IProperty<Stri
     }
 
     private static final Gson GSON = new Gson();
-    public static final Map<String, JsonSEProperty> PROPERTIES = getProperties();
+    public static final Map<String, JsonEnum> PROPERTIES = getProperties();
 
     @SuppressWarnings("unchecked")
-    public static Map<String, JsonSEProperty> getProperties() {
-        final HashMap<String, JsonSEProperty> returnmap = new HashMap<>();
+    public static Map<String, JsonEnum> getProperties() {
+        final HashMap<String, JsonEnum> returnmap = new HashMap<>();
         final Map<String, String> files = FileReader
                 .readallFilesfromDierectory("/assets/signals/enumdefinition");
         files.forEach((_u, file) -> {
@@ -81,7 +81,7 @@ public class JsonSEProperty implements IUnlistedProperty<String>, IProperty<Stri
                     (Class<Map<String, List<String>>>) (Class<?>) Map.class);
             if (map == null)
                 throw new IllegalStateException("Could not parse " + file);
-            map.forEach((name, list) -> returnmap.put(name, new JsonSEProperty(name, list)));
+            map.forEach((name, list) -> returnmap.put(name, new JsonEnum(name, list)));
         });
         return returnmap;
     }

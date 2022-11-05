@@ -1,6 +1,5 @@
 package com.troblecodings.signals.blocks.signals;
 
-import com.troblecodings.signals.ChangeableStage;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.HP;
 import com.troblecodings.signals.EnumSignals.HPBlock;
@@ -10,6 +9,7 @@ import com.troblecodings.signals.EnumSignals.MastSignal;
 import com.troblecodings.signals.EnumSignals.VR;
 import com.troblecodings.signals.EnumSignals.ZS32;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignaIItems;
 import com.troblecodings.signals.signalbox.config.HVSignalConfig;
 
