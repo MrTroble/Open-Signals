@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
@@ -18,14 +17,8 @@ public class SignalSystemParser {
     private List<SignalProperties> systemProperties;
     private List<SEPropertyParser> seProperties;
 
-    private static transient List<Signal> SYSTEMS;
-
     public List<SEPropertyParser> getSEProperties() {
         return seProperties;
-    }
-
-    public static List<Signal> getSignalSystems() {
-        return ImmutableList.copyOf(SYSTEMS);
     }
 
     public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {

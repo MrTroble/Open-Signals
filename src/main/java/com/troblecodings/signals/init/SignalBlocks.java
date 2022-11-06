@@ -3,7 +3,6 @@ package com.troblecodings.signals.init;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.GhostBlock;
@@ -14,7 +13,6 @@ import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
-import com.troblecodings.signals.blocks.SignalLoader;
 import com.troblecodings.signals.blocks.boards.SignalAndreasCross;
 import com.troblecodings.signals.blocks.boards.SignalBUE;
 import com.troblecodings.signals.blocks.boards.SignalBUELight;
@@ -88,55 +86,39 @@ public final class SignalBlocks {
                     && Modifier.isPublic(modifiers)) {
                 final String name = field.getName().toLowerCase().replace("_", "");
                 try {
-                    final Block block = (Block) field.get(null);
-                    block.setRegistryName(new ResourceLocation(SignalsMain.MODID, name));
-                    block.setUnlocalizedName(name);
-                    blocksToRegister.add(block);
-                    if (block instanceof ITileEntityProvider) {
-                        final ITileEntityProvider provider = (ITileEntityProvider) block;
-                        try {
-                            final Class<? extends TileEntity> tileclass = provider
-                                    .createNewTileEntity(null, 0).getClass();
-                            if (TileEntity.getKey(tileclass) == null)
-                                TileEntity.register(tileclass.getSimpleName().toLowerCase(),
-                                        tileclass);
-                        } catch (final NullPointerException ex) {
-                            SignalsMain.log.trace(
-                                    "All tileentity provide need to call back a default entity if the world is null!",
-                                    ex);
-                        }
-                    }
+                    loadBlock((Block) field.get(null), name);
                 } catch (final IllegalArgumentException | IllegalAccessException e) {
                     e.printStackTrace();
                 }
             }
         }
 
-        final List<Signal> signals = new ArrayList<>(SignalLoader.getSignals());
-        signals.forEach(signal -> {
+        for (int i = 0; i < Signal.SIGNALLIST.size(); i++) {
+            final Signal signal = Signal.SIGNALLIST.get(i);
+            loadBlock(signal, signal.getSignalTypeName());
+        }
+    }
+
+    private static void loadBlock(final Block block, final String name) {
+        if (blocksToRegister.contains(block))
+            return;
+
+        block.setRegistryName(new ResourceLocation(SignalsMain.MODID, name));
+        block.setUnlocalizedName(name);
+        blocksToRegister.add(block);
+        if (block instanceof ITileEntityProvider) {
+            final ITileEntityProvider provider = (ITileEntityProvider) block;
             try {
-                final Block block = (Block) signal;
-                block.setRegistryName(
-                        new ResourceLocation(SignalsMain.MODID, signal.getSignalTypeName()));
-                block.setUnlocalizedName(signal.getSignalTypeName());
-                blocksToRegister.add(block);
-                if (block instanceof ITileEntityProvider) {
-                    final ITileEntityProvider provider = (ITileEntityProvider) block;
-                    try {
-                        final Class<? extends TileEntity> tileclass = provider
-                                .createNewTileEntity(null, 0).getClass();
-                        if (TileEntity.getKey(tileclass) == null)
-                            TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
-                    } catch (final NullPointerException ex) {
-                        SignalsMain.log.trace(
-                                "All tileentity provide need to call back a default entity if the world is null!",
-                                ex);
-                    }
-                }
-            } catch (final IllegalArgumentException e) {
-                e.printStackTrace();
+                final Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0)
+                        .getClass();
+                if (TileEntity.getKey(tileclass) == null)
+                    TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
+            } catch (final NullPointerException ex) {
+                SignalsMain.log.trace(
+                        "All tileentity provide need to call back a default entity if the world is null!",
+                        ex);
             }
-        });
+        }
     }
 
     @SubscribeEvent

@@ -61,7 +61,7 @@ public final class FileReader {
 
         String filelocation = location;
 
-        final URL url = SignalBlocks.class.getResource("/assets/signals");
+        final URL url = SignalBlocks.class.getResource("/assets/girsignals");
         try {
             if (url != null) {
 

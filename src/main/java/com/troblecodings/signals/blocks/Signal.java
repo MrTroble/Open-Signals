@@ -494,10 +494,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @SuppressWarnings("rawtypes")
-    public void appendSEProperty(final List<SEProperty> propertyies) {
+    public void appendSEProperty(final List<SEProperty> properties) {
         if (this.systemProperties == null)
             this.systemProperties = new ArrayList<>();
-        propertyies.forEach(property -> this.signalProperties.add(property));
+        systemProperties.addAll(properties);
     }
 
 }

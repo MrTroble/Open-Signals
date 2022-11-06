@@ -1,5 +1,6 @@
 package com.troblecodings.signals.utils;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -48,7 +49,10 @@ public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
 
     @Override
     public Collection<String> getAllowedValues() {
-        return values;
+        if (values != null) {
+            return values;
+        }
+        return new ArrayList<>();
     }
 
     @Override
@@ -75,7 +79,7 @@ public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
     public static Map<String, JsonEnum> getProperties() {
         final HashMap<String, JsonEnum> returnmap = new HashMap<>();
         final Map<String, String> files = FileReader
-                .readallFilesfromDierectory("/assets/signals/enumdefinition");
+                .readallFilesfromDierectory("/assets/girsignals/enumdefinition");
         files.forEach((_u, file) -> {
             final Map<String, List<String>> map = GSON.fromJson(file,
                     (Class<Map<String, List<String>>>) (Class<?>) Map.class);

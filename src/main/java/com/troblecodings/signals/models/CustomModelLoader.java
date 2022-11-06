@@ -140,6 +140,7 @@ public class CustomModelLoader implements ICustomModelLoader {
                                                                 + texturestate.getBlockstate()
                                                                 + " '!");
                                                 e.printStackTrace();
+                                                return;
                                             }
                                         }
                                     }
@@ -168,6 +169,7 @@ public class CustomModelLoader implements ICustomModelLoader {
                                         SignalsMain.log.warn(
                                                 "The predicate of " + modelname + " in " + filename
                                                         + " is null! This shouldn´t be the case!");
+                                        return;
                                     }
                                 }
                             }

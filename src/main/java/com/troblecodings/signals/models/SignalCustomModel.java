@@ -202,6 +202,7 @@ public class SignalCustomModel implements IModel {
                                                     + modelname + " with the blockstate '"
                                                     + texturestate.getBlockstate() + "'!");
                                     e.printStackTrace();
+                                    return;
                                 }
 
                                 texturestate.resetStates(blockstate, retexture);

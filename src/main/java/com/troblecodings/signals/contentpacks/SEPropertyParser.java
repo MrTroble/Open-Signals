@@ -3,38 +3,56 @@ package com.troblecodings.signals.contentpacks;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SEProperty.SEAutoNameProp;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.LogicParser;
 import com.troblecodings.signals.utils.JsonEnum;
 
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
+
 public class SEPropertyParser {
 
     private String name;
     private String defaultEnum;
-    private String defaultState;
+    private Object defaultState;
     private String changeableStage;
     private boolean autoname = false;
     private String dependencies;
+    private transient Object type;
+    private transient Object parent;
 
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
     public SEProperty createSEProperty(final FunctionParsingInfo info) {
 
-        final JsonEnum json = JsonEnum.PROPERTIES.get(defaultEnum);
-        if (json == null)
-            SignalsMain.log.error("The given defaultEnum '" + defaultEnum + "' doesn't exists!");
+        if (defaultState instanceof Boolean) {
+            type = (Boolean) type;
+            defaultState = (Boolean) defaultState;
+            parent = PropertyBool.create(name);
+        } else {
+            type = (String) type;
+            defaultState = (String) defaultState;
+            parent = (JsonEnum) parent;
+
+            if (defaultEnum != null && !defaultEnum.isEmpty()) {
+                parent = JsonEnum.PROPERTIES.get(defaultEnum);
+                if (parent == null)
+                    SignalsMain.getLogger()
+                            .error("The given defaultEnum '" + defaultEnum + "' doesn't exists!");
+            }
+        }
 
         try {
             Enum.valueOf(ChangeableStage.class, changeableStage);
         } catch (final IllegalArgumentException e) {
-            SignalsMain.log
+            SignalsMain.getLogger()
                     .error("The given Changeable Stage is not permitted! You can use 'APISTAGE, "
-                            + "GUISTAGE, APISTAGE_NONE_CONFIG' or 'AUTOMATICSTAGE! Your stage was "
+                            + "GUISTAGE, APISTAGE_NONE_CONFIG' or 'AUTOMATICSTAGE!' Your stage was "
                             + changeableStage + ".");
         }
 
@@ -46,12 +64,12 @@ public class SEPropertyParser {
         }
 
         if (autoname)
-            return new SEAutoNameProp(name, json, defaultState,
+            return new SEAutoNameProp(name, (IProperty) parent, (Comparable) defaultState,
                     Enum.valueOf(ChangeableStage.class, changeableStage),
-                    (Predicate<Map<SEProperty<?>, Object>>) predicate);
+                    (Predicate<Map<SEProperty<?>, Object>>) predicate, type);
 
-        return new SEProperty(name, json, defaultState,
+        return new SEProperty(name, (IProperty) parent, (Comparable) defaultState,
                 Enum.valueOf(ChangeableStage.class, changeableStage),
-                (Predicate<Map<SEProperty<?>, Object>>) predicate);
+                (Predicate<Map<SEProperty<?>, Object>>) predicate, type);
     }
 }
