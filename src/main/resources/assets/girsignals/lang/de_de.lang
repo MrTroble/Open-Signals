@@ -231,6 +231,7 @@ property.atws.name=Rottenwarnanlage
 property.barrier_open.name=Schrankensteuerung
 property.powered.name=Weichenhebelkontrolle
 property.wn_mech.name=Wn Signale
+property.railroadcrossing.name=Bahnübergangszusatz
 
 #Sign Description
 property.indicator.desc=Aufschrift für Lf Signale.1 bis 20 für die Geschwindigkeit. A für Anfang und E für Ende
@@ -275,6 +276,7 @@ property.atws.desc=Gibt einen akustischen Warnton aus, der Bauarbeitern einen na
 property.barrier_open.desc=Schrankensteuerung
 property.powered.desc=Weichenhebelkontrolle
 property.wn_mech.desc=Wn Signale
+property.railroadcrossing.desc=Bahnübergangszusatz
 
 #Signalcontroller Names
 property.enummode.name=Modus
@@ -367,6 +369,14 @@ property.value.wncross=Doppelweichensignal
 property.value.LZB=LZB
 property.value.ZS10=Zs10
 property.value.HM2=Hektometer
+property.value.FIRETORCH=Brandfackel
+property.value.KEEP_DISTANCE=Abstand Halten
+property.value.NO_PASS=Kein Durchgang
+property.value.NARROWING=Bahnsteigverengung
+property.value.NOTE_TRAIN_TRAFFIC=Beachte Zugverkehr
+property.value.RC1=Bahnübergang 1
+property.value.RC2=Bahnübergang 2
+property.value.RC3=Bahnübergang 3
 
 #Signal Aspects
 property.value.false=Aus

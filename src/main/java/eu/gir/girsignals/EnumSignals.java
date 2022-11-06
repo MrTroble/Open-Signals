@@ -91,11 +91,11 @@ public final class EnumSignals {
     public enum HLExit implements Offable<HLExit> {
         OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2_3, HL_ZS1, HL_SHUNTING, HL_STATUS_LIGHT;
     }
-    
+
     public enum HLBlock implements Offable<HLBlock> {
         OFF, HP0, HP0_ALTERNATE_RED, HL1, HL10, HL_ZS1, HL_STATUS_LIGHT;
     }
-    
+
     public enum HLBlockExit implements Offable<HLBlockExit> {
         OFF, HP0, HL1, HL_ZS1, HL_SHUNTING, HL_STATUS_LIGHT;
     }
@@ -182,7 +182,8 @@ public final class EnumSignals {
     }
 
     public enum OtherSignal implements DefaultName<OtherSignal> {
-        HM, OB, CROSS, LZB, ZS10, HM2;
+        HM, OB, CROSS, LZB, ZS10, HM2, FIRETORCH, KEEP_DISTANCE, NO_PASS, NARROWING,
+        NOTE_TRAIN_TRAFFIC, RC1, RC2, RC3;
     }
 
     public enum STNumber implements DefaultName<STNumber> {
@@ -211,7 +212,7 @@ public final class EnumSignals {
     public enum NE5Addition implements Offable<NE5Addition> {
         OFF, M50, M70, M100, M120, M150, M200, M250, KURZ, LANG;
     }
-    
+
     public enum WNMech implements DefaultName<WNMech> {
         WN1, WN2;
     }
@@ -272,7 +273,7 @@ public final class EnumSignals {
     public enum TramSigns implements DefaultName<TramSigns> {
         SH1, SO1, SO2, SO5, SO5_1, SO5_2, SO6, ST1, ST2, ST7;
     }
-    
+
     public enum ColorWeight implements DefaultName<ColorWeight> {
         WHITE_BLACK, WHITE_BLACK_W, YELLOW, YELLOW_BLACK, RED_YELLOW;
     }

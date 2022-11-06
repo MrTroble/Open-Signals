@@ -226,6 +226,7 @@ property.atws.name=Rotten warning system
 property.barrier_open.name=Barrier control
 property.powered.name=Switch handle control
 property.wn_mech.name=Wn signals
+property.railroadcrossing.name=Railroad Crossing Addition
 
 #Sign Description
 property.indicator.desc=Inscription for Lf signals.1 to 20 for speed. A for start and E for end
@@ -270,6 +271,7 @@ property.atws.desc=Emits an audible warning tone to alert construction workers o
 property.barrier_open.desc=Barrier control
 property.powered.desc=Switch handle control
 property.wn_mech.desc=Wn signals
+property.railroadcrossing.desc=Railroad Crossing Addition
 
 #Signalcontroller Names
 property.enummode.name=Mode
@@ -362,6 +364,14 @@ property.value.wncross=Double slip points
 property.value.LZB=LZB
 property.value.ZS10=Zs10
 property.value.HM2=Hectometer
+property.value.FIRETORCH=Firetorch
+property.value.KEEP_DISTANCE=Keep Distance
+property.value.NO_PASS=No Pass
+property.value.NARROWING=Platform Narrowing
+property.value.NOTE_TRAIN_TRAFFIC=Note Train Traffic
+property.value.RC1=Railroad Crossing 1
+property.value.RC2=Railroad Crossing 2
+property.value.RC3=Railroad Crossing 3
 
 #Signal Aspects
 property.value.false=False
