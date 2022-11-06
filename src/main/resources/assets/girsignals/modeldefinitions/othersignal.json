@@ -125,7 +125,22 @@
         "other_signals/railroadcrossing": {
             "textures": [
                 {
-                    "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && hasandis(RAILROADCROSSING)"
+                    "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && with(RAILROADCROSSING.MODERN)",
+                    "retexture": {
+                        "overlay": "girsignals:blocks/other_signals/rc_modern"
+                    }
+                },
+                {
+                    "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && with(RAILROADCROSSING.OLD)",
+                    "retexture": {
+                        "overlay": "girsignals:blocks/other_signals/rc_old"
+                    }
+                },
+                {
+                    "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && with(RAILROADCROSSING.FENCE)",
+                    "retexture": {
+                        "overlay": "girsignals:blocks/other_signals/rc_fence"
+                    }
                 }
             ],
             "y": 2

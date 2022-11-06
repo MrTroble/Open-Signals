@@ -2,6 +2,7 @@ package eu.gir.girsignals.blocks.boards;
 
 import java.util.Map;
 
+import eu.gir.girsignals.EnumSignals.CrossingSign;
 import eu.gir.girsignals.EnumSignals.OtherSignal;
 import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.SEProperty.ChangeableStage;
@@ -19,8 +20,8 @@ public class SignalOther extends Signal {
 
     public static final SEProperty<OtherSignal> OTHERTYPE = SEProperty.of("othertype",
             OtherSignal.HM, ChangeableStage.GUISTAGE, false);
-    public static final SEProperty<Boolean> RAILROADCROSSING = SEProperty.of("railroadcrossing",
-            false, ChangeableStage.GUISTAGE, true, check(OTHERTYPE, OtherSignal.RC1)
+    public static final SEProperty<CrossingSign> RAILROADCROSSING = SEProperty.of("railroadcrossing",
+            CrossingSign.OFF, ChangeableStage.GUISTAGE, true, check(OTHERTYPE, OtherSignal.RC1)
                     .or(check(OTHERTYPE, OtherSignal.RC1)).or(check(OTHERTYPE, OtherSignal.RC1)));
 
     @Override
@@ -44,9 +45,6 @@ public class SignalOther extends Signal {
     @Override
     public int getHeight(final Map<SEProperty<?>, Object> map) {
         final OtherSignal other = (OtherSignal) map.get(OTHERTYPE);
-        if ((Boolean) map.getOrDefault(RAILROADCROSSING, false)) {
-            return 2;
-        }
         if (other == null)
             return super.getHeight(map);
         switch (other) {
