@@ -8,7 +8,7 @@ import com.google.gson.Gson;
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.Signal.SignalProperties;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.utils.FileReader;
 
@@ -44,10 +44,10 @@ public class SignalSystemParser {
 
         SignalProperties signalProperty = systemProperties.get(0);
 
-        Placementtool tool = SignaIItems.PLACEMENT_TOOL;
+        Placementtool tool = SignalItems.PLACEMENT_TOOL;
 
         if (signalProperty.placementToolName.equalsIgnoreCase("SIGN_PLACEMENT_TOOL"))
-            tool = SignaIItems.SIGN_PLACEMENT_TOOL;
+            tool = SignalItems.SIGN_PLACEMENT_TOOL;
 
         if (signalProperty.canLink) {
             signalProperty = Signal

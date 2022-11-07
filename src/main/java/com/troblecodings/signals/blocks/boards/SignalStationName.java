@@ -1,7 +1,7 @@
 package com.troblecodings.signals.blocks.boards;
 
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
 import net.minecraft.block.state.IBlockState;
@@ -15,7 +15,7 @@ import net.minecraft.world.World;
 public class SignalStationName extends Signal {
 
     public SignalStationName() {
-        super(builder(SignaIItems.SIGN_PLACEMENT_TOOL, "signname").height(0).signHeight(0.5f)
+        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "signname").height(0).signHeight(0.5f)
                 .offsetY(2f).noLink().build());
     }
 

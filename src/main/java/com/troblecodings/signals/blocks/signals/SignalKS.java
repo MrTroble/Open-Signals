@@ -9,7 +9,7 @@ import com.troblecodings.signals.EnumSignals.MastSignal;
 import com.troblecodings.signals.EnumSignals.ZS32;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.signalbox.config.KSSignalConfig;
 
 import net.minecraft.block.state.IBlockState;
@@ -19,7 +19,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalKS extends Signal {
 
     public SignalKS() {
-        super(builder(SignaIItems.PLACEMENT_TOOL, "KS").height(6).signHeight(4.95f)
+        super(builder(SignalItems.PLACEMENT_TOOL, "KS").height(6).signHeight(4.95f)
                 .config(KSSignalConfig.INSTANCE).build());
     }
 

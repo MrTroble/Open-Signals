@@ -6,7 +6,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.SHMech;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.signalbox.config.RSSignalConfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
@@ -15,7 +15,7 @@ import net.minecraft.client.gui.FontRenderer;
 public class SignalSHMech extends Signal {
     
     public SignalSHMech() {
-        super(builder(SignaIItems.PLACEMENT_TOOL, "SHMech").height(0).offsetX(7.0f).offsetY(-9.8f)
+        super(builder(SignalItems.PLACEMENT_TOOL, "SHMech").height(0).offsetX(7.0f).offsetY(-9.8f)
                 .signHeight(1.04f).config(RSSignalConfig.RS_CONFIG).build());
     }
 

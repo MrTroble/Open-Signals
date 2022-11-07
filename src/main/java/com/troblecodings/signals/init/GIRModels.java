@@ -17,7 +17,7 @@ public final class GIRModels {
 
     @SubscribeEvent
     public static void register(final ModelRegistryEvent event) {
-        SignaIItems.registeredItems.forEach(GIRModels::registerModel);
+        SignalItems.registeredItems.forEach(GIRModels::registerModel);
         registerModel(Item.getItemFromBlock(SignalBlocks.HV_SIGNAL_CONTROLLER));
         registerModel(Item.getItemFromBlock(SignalBlocks.POST));
         registerModel(Item.getItemFromBlock(SignalBlocks.SIGNAL_BOX));

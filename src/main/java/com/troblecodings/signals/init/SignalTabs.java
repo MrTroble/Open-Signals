@@ -12,7 +12,7 @@ public final class SignalTabs {
 
         @Override
         public ItemStack getTabIconItem() {
-            return new ItemStack(SignaIItems.PLACEMENT_TOOL);
+            return new ItemStack(SignalItems.PLACEMENT_TOOL);
         }
     };
 

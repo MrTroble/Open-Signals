@@ -5,12 +5,12 @@ import com.troblecodings.signals.EnumSignals.BUE;
 import com.troblecodings.signals.EnumSignals.BUEAdd;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 
 public class SignalBUE extends Signal {
 
     public SignalBUE() {
-        super(builder(SignaIItems.SIGN_PLACEMENT_TOOL, "buesignal").height(2).noLink().build());
+        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "buesignal").height(2).noLink().build());
     }
 
     public static final SEProperty<BUE> BUETYPE = SEProperty.of("buetype", BUE.BUE4,

@@ -14,7 +14,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SignalsConfig;
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.signalbox.config.ISignalAutoconfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
@@ -481,7 +481,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             final SignalTileEnity signaltile = (SignalTileEnity) tile;
             customname = canHaveCustomname(signaltile.getProperties());
         }
-        if (!playerIn.getHeldItemMainhand().getItem().equals(SignaIItems.LINKING_TOOL)
+        if (!playerIn.getHeldItemMainhand().getItem().equals(SignalItems.LINKING_TOOL)
                 && (canBeLinked() || customname)) {
             SignalsMain.handler.invokeGui(Signal.class, playerIn, worldIn, pos);
             return true;

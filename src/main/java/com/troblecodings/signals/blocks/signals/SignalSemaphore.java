@@ -8,7 +8,7 @@ import com.troblecodings.signals.EnumSignals.SemaType;
 import com.troblecodings.signals.EnumSignals.ZS32;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.signalbox.config.SemaphoreConfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
@@ -17,7 +17,7 @@ import net.minecraft.client.gui.FontRenderer;
 public class SignalSemaphore extends Signal {
 
     public SignalSemaphore() {
-        super(builder(SignaIItems.PLACEMENT_TOOL, "semaphore_signal").height(3).offsetX(10f)
+        super(builder(SignalItems.PLACEMENT_TOOL, "semaphore_signal").height(3).offsetX(10f)
                 .offsetY(-11f).signHeight(1.47f).config(SemaphoreConfig.SEMAPHORE_CONFIG).build());
     }
 

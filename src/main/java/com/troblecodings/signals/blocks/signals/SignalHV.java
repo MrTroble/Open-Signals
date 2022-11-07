@@ -10,7 +10,7 @@ import com.troblecodings.signals.EnumSignals.VR;
 import com.troblecodings.signals.EnumSignals.ZS32;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.signalbox.config.HVSignalConfig;
 
 import net.minecraft.block.state.IBlockState;
@@ -20,7 +20,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalHV extends Signal {
 
     public SignalHV() {
-        super(builder(SignaIItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f)
+        super(builder(SignalItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f)
                 .config(HVSignalConfig.INSTANCE).build());
     }
 

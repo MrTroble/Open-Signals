@@ -17,9 +17,9 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public final class SignaIItems {
+public final class SignalItems {
 
-    private SignaIItems() {
+    private SignalItems() {
     }
 
     public static final Linkingtool LINKING_TOOL = new Linkingtool(SignalTabs.TAB, (world, pos) -> {
@@ -34,7 +34,7 @@ public final class SignaIItems {
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
     public static void init() {
-        final Field[] fields = SignaIItems.class.getFields();
+        final Field[] fields = SignalItems.class.getFields();
         for (final Field field : fields) {
             final int modifiers = field.getModifiers();
             if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)

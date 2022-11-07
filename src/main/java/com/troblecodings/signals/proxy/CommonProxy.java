@@ -7,7 +7,7 @@ import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.init.SignalBlocks;
 import com.troblecodings.signals.init.SignalSounds;
 import com.troblecodings.signals.items.Placementtool;
@@ -32,11 +32,11 @@ public class CommonProxy {
                 (p, w, bp) -> new ContainerSignalBox((SignalBoxTileEntity) w.getTileEntity(bp)));
         SignalsMain.handler.addServer(Signal.class, (p, w, bp) -> null);
 
-        SignaIItems.init();
+        SignalItems.init();
         SignalBlocks.init();
         SignalSounds.init();
 
-        MinecraftForge.EVENT_BUS.register(SignaIItems.class);
+        MinecraftForge.EVENT_BUS.register(SignalItems.class);
         MinecraftForge.EVENT_BUS.register(SignalBlocks.class);
     }
 

@@ -7,7 +7,7 @@ import com.troblecodings.signals.EnumSignals.ACAddition;
 import com.troblecodings.signals.EnumSignals.ACCar;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.init.SignalSounds;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 public class SignalAndreasCross extends Signal {
 
     public SignalAndreasCross() {
-        super(builder(SignaIItems.SIGN_PLACEMENT_TOOL, "andreas_cross").height(2).build());
+        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "andreas_cross").height(2).build());
     }
 
     public static final SEProperty<Boolean> ELECTRICITY = SEProperty.of("ac_electricity", false,

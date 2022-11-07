@@ -6,7 +6,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.OtherSignal;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.init.SignaIItems;
+import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
 import net.minecraft.client.gui.FontRenderer;
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.FontRenderer;
 public class SignalOther extends Signal {
 
     public SignalOther() {
-        super(builder(SignaIItems.SIGN_PLACEMENT_TOOL, "othersignal").signScale(3.5f).offsetX(-5)
+        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "othersignal").signScale(3.5f).offsetX(-5)
                 .offsetY(1.8f).noLink().build());
     }
 
