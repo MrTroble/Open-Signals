@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.contentpacks.ContentPackException;
 import com.troblecodings.signals.contentpacks.SignalSystemParser;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 
@@ -26,8 +27,13 @@ public class SignalLoader {
             final List<SEProperty> property = new ArrayList<>();
 
             if (properties.getSEProperties() != null && !properties.getSEProperties().isEmpty()) {
-                properties.getSEProperties().forEach(
-                        seproperty -> property.add(seproperty.createSEProperty(parsingInfo)));
+                properties.getSEProperties().forEach(seproperty -> {
+                    try {
+                        property.add(seproperty.createSEProperty(parsingInfo));
+                    } catch (final ContentPackException e) {
+                        e.printStackTrace();
+                    }
+                });
 
                 signal.appendSEProperty(property);
             }

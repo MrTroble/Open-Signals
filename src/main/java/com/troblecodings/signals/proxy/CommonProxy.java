@@ -5,7 +5,6 @@ import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
-import com.troblecodings.signals.blocks.SignalLoader;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.init.SignaIItems;
@@ -33,7 +32,6 @@ public class CommonProxy {
                 (p, w, bp) -> new ContainerSignalBox((SignalBoxTileEntity) w.getTileEntity(bp)));
         SignalsMain.handler.addServer(Signal.class, (p, w, bp) -> null);
 
-        SignalLoader.loadInternSignals();
         SignaIItems.init();
         SignalBlocks.init();
         SignalSounds.init();

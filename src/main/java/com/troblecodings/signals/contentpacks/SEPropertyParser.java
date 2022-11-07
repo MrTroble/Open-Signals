@@ -5,7 +5,6 @@ import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SEProperty.SEAutoNameProp;
-import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.LogicParser;
@@ -22,36 +21,33 @@ public class SEPropertyParser {
     private String changeableStage;
     private boolean autoname = false;
     private String dependencies;
-    private transient Object type;
     private transient Object parent;
 
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    public SEProperty createSEProperty(final FunctionParsingInfo info) {
+    public SEProperty createSEProperty(final FunctionParsingInfo info) throws ContentPackException {
 
         if (defaultState instanceof Boolean) {
-            type = (Boolean) type;
             defaultState = (Boolean) defaultState;
             parent = PropertyBool.create(name);
         } else {
-            type = (String) type;
             defaultState = (String) defaultState;
             parent = (JsonEnum) parent;
 
             if (defaultEnum != null && !defaultEnum.isEmpty()) {
                 parent = JsonEnum.PROPERTIES.get(defaultEnum);
                 if (parent == null)
-                    SignalsMain.getLogger()
-                            .error("The given defaultEnum '" + defaultEnum + "' doesn't exists!");
+                    throw new ContentPackException(
+                            "The given defaultEnum '" + defaultEnum + "' doesn't exists!");
             }
         }
 
         try {
             Enum.valueOf(ChangeableStage.class, changeableStage);
         } catch (final IllegalArgumentException e) {
-            SignalsMain.getLogger()
-                    .error("The given Changeable Stage is not permitted! You can use 'APISTAGE, "
+            throw new ContentPackException(
+                    "The given Changeable Stage is not permitted! You can use 'APISTAGE, "
                             + "GUISTAGE, APISTAGE_NONE_CONFIG' or 'AUTOMATICSTAGE!' Your stage was "
                             + changeableStage + ".");
         }
@@ -66,10 +62,10 @@ public class SEPropertyParser {
         if (autoname)
             return new SEAutoNameProp(name, (IProperty) parent, (Comparable) defaultState,
                     Enum.valueOf(ChangeableStage.class, changeableStage),
-                    (Predicate<Map<SEProperty<?>, Object>>) predicate, type);
+                    (Predicate<Map<SEProperty<?>, Object>>) predicate);
 
         return new SEProperty(name, (IProperty) parent, (Comparable) defaultState,
                 Enum.valueOf(ChangeableStage.class, changeableStage),
-                (Predicate<Map<SEProperty<?>, Object>>) predicate, type);
+                (Predicate<Map<SEProperty<?>, Object>>) predicate);
     }
 }

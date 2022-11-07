@@ -12,11 +12,12 @@ public class ContentPackMain {
 
         if (!assetsFolder.exists()) {
             assetsFolder.mkdirs();
-        }
+        } else {
 
         final File[] contentPacks = assetsFolder.listFiles((dir, name) -> name.endsWith(".zip"));
 
         if (contentPacks == null || contentPacks.length == 0)
             SignalsMain.log.info("No ContentPacks found!");
+        }
     }
 }

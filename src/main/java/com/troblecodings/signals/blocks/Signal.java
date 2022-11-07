@@ -344,8 +344,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 }
             }
         }
-        if (this.systemProperties != null)
-            this.systemProperties.forEach(property -> this.signalProperties.add(property));
+        if (this.systemProperties != null && !this.systemProperties.isEmpty())
+            this.signalProperties.addAll(this.systemProperties);
 
         this.signalProperties.add(CUSTOMNAME);
         return new ExtendedBlockState(this, new IProperty<?>[] {

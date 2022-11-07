@@ -13,6 +13,7 @@ import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
+import com.troblecodings.signals.blocks.SignalLoader;
 import com.troblecodings.signals.blocks.boards.SignalAndreasCross;
 import com.troblecodings.signals.blocks.boards.SignalBUE;
 import com.troblecodings.signals.blocks.boards.SignalBUELight;
@@ -92,6 +93,8 @@ public final class SignalBlocks {
                 }
             }
         }
+
+        SignalLoader.loadInternSignals();
 
         for (int i = 0; i < Signal.SIGNALLIST.size(); i++) {
             final Signal signal = Signal.SIGNALLIST.get(i);
