@@ -144,6 +144,14 @@
                 }
             ],
             "y": 2
+        },
+        "other_signals/stop_protecting": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.STOP_PROTECTING)"
+                }
+            ],
+            "y": 1
         }
     }
 }

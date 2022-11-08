@@ -174,7 +174,7 @@ public final class EnumSignals {
     }
 
     public enum BUE implements DefaultName<BUE> {
-        BUE2_1, BUE2_2, BUE2_3, BUE2_4, BUE3, BUE4, BUE5;
+        BUE2_1, BUE2_2, BUE2_3, BUE2_4, BUE3, BUE4, BUE5, HET, AUTO_HET;
     }
 
     public enum BUEAdd implements Offable<BUEAdd> {
@@ -183,7 +183,7 @@ public final class EnumSignals {
 
     public enum OtherSignal implements DefaultName<OtherSignal> {
         HM, OB, CROSS, LZB, ZS10, HM2, FIRETORCH, KEEP_DISTANCE, NO_PASS, NARROWING,
-        NOTE_TRAIN_TRAFFIC, RC1, RC2, RC3;
+        NOTE_TRAIN_TRAFFIC, RC1, RC2, RC3, STOP_PROTECTING;
     }
     
     public enum CrossingSign implements Offable<CrossingSign> {

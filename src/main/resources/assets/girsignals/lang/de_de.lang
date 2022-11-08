@@ -377,6 +377,7 @@ property.value.NOTE_TRAIN_TRAFFIC=Beachte Zugverkehr
 property.value.RC1=Bahnübergang 1
 property.value.RC2=Bahnübergang 2
 property.value.RC3=Bahnübergang 3
+property.value.STOP_PROTECTING=Halt! Sicherung
 
 #Signal Aspects
 property.value.false=Aus

@@ -372,6 +372,7 @@ property.value.NOTE_TRAIN_TRAFFIC=Note Train Traffic
 property.value.RC1=Railroad Crossing 1
 property.value.RC2=Railroad Crossing 2
 property.value.RC3=Railroad Crossing 3
+property.value.STOP_PROTECTING=Stop Protecting
 
 #Signal Aspects
 property.value.false=False
