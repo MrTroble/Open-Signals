@@ -83,7 +83,7 @@ public final class GIRItems {
     public static void init() {
         final Field[] fields = GIRItems.class.getFields();
         for (final Field field : fields) {
-            final int modifiers = field.getModifiers();
+            final int modifiers = field.getModifiers(); 
             if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
                     && Modifier.isPublic(modifiers)) {
                 final String name = field.getName().toLowerCase().replace("_", "");
