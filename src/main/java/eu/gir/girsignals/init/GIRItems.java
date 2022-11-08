@@ -38,45 +38,45 @@ public final class GIRItems {
     public static final ItemConductorTrowel K_BOARD = new ItemConductorTrowel();
     public static final ItemConductorTrowel L_BOARD = new ItemConductorTrowel();
     public static final ItemArmorTemplate REFLECTIVE_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.HEAD);
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.CHEST);
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate REFLECTIVE_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.LEGS);
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate REFLECTIVE_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.reflectiveArmorMaterial, 1, EntityEquipmentSlot.FEET);
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final ItemArmorTemplate DISPATCHER_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.dispatcherArmorMaterial, 1, EntityEquipmentSlot.HEAD);
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate DISPATCHER_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.dispatcherArmorMaterial, 1, EntityEquipmentSlot.CHEST);
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate DISPATCHER_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.dispatcherArmorMaterial, 1, EntityEquipmentSlot.LEGS);
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate DISPATCHER_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.dispatcherArmorMaterial, 1, EntityEquipmentSlot.FEET);
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final ItemArmorTemplate STATION_MANAGER_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.stationManagerArmorMaterial, 1, EntityEquipmentSlot.HEAD);
+            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate STATION_MANAGER_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.stationManagerArmorMaterial, 1, EntityEquipmentSlot.CHEST);
+            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate STATION_MANAGER_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.stationManagerArmorMaterial, 1, EntityEquipmentSlot.LEGS);
+            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate STATION_MANAGER_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.stationManagerArmorMaterial, 1, EntityEquipmentSlot.FEET);
+            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final ItemArmorTemplate TRAIN_DRIVER_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.trainDriverArmorMaterial, 1, EntityEquipmentSlot.HEAD);
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate TRAIN_DRIVER_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.trainDriverArmorMaterial, 1, EntityEquipmentSlot.CHEST);
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate TRAIN_DRIVER_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.trainDriverArmorMaterial, 1, EntityEquipmentSlot.LEGS);
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate TRAIN_DRIVER_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.trainDriverArmorMaterial, 1, EntityEquipmentSlot.FEET);
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final ItemArmorTemplate CONDUCTOR_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.conductorArmorMaterial, 1, EntityEquipmentSlot.HEAD);
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate CONDUCTOR_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.conductorArmorMaterial, 1, EntityEquipmentSlot.CHEST);
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate CONDUCTOR_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.conductorArmorMaterial, 1, EntityEquipmentSlot.LEGS);
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate CONDUCTOR_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.conductorArmorMaterial, 1, EntityEquipmentSlot.FEET);
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
