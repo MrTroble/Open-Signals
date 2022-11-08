@@ -36,6 +36,7 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -135,8 +136,7 @@ public class SignalCustomModel implements IModel {
             final float x, final float y, final float z, final Map<String, String> map) {
 
         IModel m = ModelLoaderRegistry.getModelOrLogError(
-                new ResourceLocation(SignalsMain.MODID, "block/" + name),
-                "Couldn't find " + name);
+                new ResourceLocation(SignalsMain.MODID, "block/" + name), "Couldn't find " + name);
         m = m.smoothLighting(false);
 
         if (map != null && !map.isEmpty()) {
@@ -202,6 +202,7 @@ public class SignalCustomModel implements IModel {
                                                     + modelname + " with the blockstate '"
                                                     + texturestate.getBlockstate() + "'!");
                                     e.printStackTrace();
+                                    FMLCommonHandler.instance().exitJava(-1, false);
                                     return;
                                 }
 

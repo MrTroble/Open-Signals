@@ -16,56 +16,37 @@ import net.minecraft.block.properties.PropertyBool;
 public class SEPropertyParser {
 
     private String name;
-    private String defaultEnum;
+    private String enumClass;
     private Object defaultState;
     private String changeableStage;
-    private boolean autoname = false;
+    private final boolean autoname = false;
     private String dependencies;
-    private transient Object parent;
+    private transient IProperty<?> parent;
 
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    public SEProperty createSEProperty(final FunctionParsingInfo info) throws ContentPackException {
-
+    public SEProperty createSEProperty() {
         if (defaultState instanceof Boolean) {
-            defaultState = (Boolean) defaultState;
             parent = PropertyBool.create(name);
         } else {
-            defaultState = (String) defaultState;
-            parent = (JsonEnum) parent;
-
-            if (defaultEnum != null && !defaultEnum.isEmpty()) {
-                parent = JsonEnum.PROPERTIES.get(defaultEnum);
-                if (parent == null)
-                    throw new ContentPackException(
-                            "The given defaultEnum '" + defaultEnum + "' doesn't exists!");
-            }
+            parent = JsonEnum.PROPERTIES.get(enumClass.toLowerCase());
         }
 
-        try {
-            Enum.valueOf(ChangeableStage.class, changeableStage);
-        } catch (final IllegalArgumentException e) {
-            throw new ContentPackException(
-                    "The given Changeable Stage is not permitted! You can use 'APISTAGE, "
-                            + "GUISTAGE, APISTAGE_NONE_CONFIG' or 'AUTOMATICSTAGE!' Your stage was "
-                            + changeableStage + ".");
-        }
+        if (parent == null)
+            throw new ContentPackException(String.format("Property[%s] not found!", name));
 
-        Predicate predicate;
-        if (dependencies == null || dependencies.isEmpty()) {
-            predicate = t -> true;
-        } else {
-            predicate = LogicParser.predicate(dependencies, info);
+        final ChangeableStage stage = Enum.valueOf(ChangeableStage.class, changeableStage);
+
+        Predicate predicate = t -> true;
+        if (dependencies != null && !dependencies.isEmpty()) {
+            predicate = LogicParser.predicate(dependencies, FunctionParsingInfo.DEFAULT_INFO);
         }
 
         if (autoname)
-            return new SEAutoNameProp(name, (IProperty) parent, (Comparable) defaultState,
-                    Enum.valueOf(ChangeableStage.class, changeableStage),
+            return new SEAutoNameProp(name, parent, (Comparable) defaultState, stage,
                     (Predicate<Map<SEProperty<?>, Object>>) predicate);
-
-        return new SEProperty(name, (IProperty) parent, (Comparable) defaultState,
-                Enum.valueOf(ChangeableStage.class, changeableStage),
+        return new SEProperty(name, parent, (Comparable) defaultState, stage,
                 (Predicate<Map<SEProperty<?>, Object>>) predicate);
     }
 }

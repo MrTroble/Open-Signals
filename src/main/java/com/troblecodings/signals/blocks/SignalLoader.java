@@ -1,42 +1,19 @@
 package com.troblecodings.signals.blocks;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import com.troblecodings.signals.SEProperty;
-import com.troblecodings.signals.contentpacks.ContentPackException;
 import com.troblecodings.signals.contentpacks.SignalSystemParser;
-import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 
-public class SignalLoader {
+public final class SignalLoader {
 
-    public static void loadInternSignals() {
-        loadSignals(SignalSystemParser.getSignalSystems("/assets/girsignals/signalsystems"));
+    private SignalLoader() {
     }
 
-    @SuppressWarnings("rawtypes")
-    public static void loadSignals(final Map<String, SignalSystemParser> signals) {
-
+    public static void loadInternSignals() {
+        final Map<String, SignalSystemParser> signals = SignalSystemParser
+                .getSignalSystems("/assets/girsignals/signalsystems");
         signals.forEach((filename, properties) -> {
-
-            final Signal signal = properties.createNewSignalSystem(filename);
-
-            final FunctionParsingInfo parsingInfo = new FunctionParsingInfo(signal);
-
-            final List<SEProperty> property = new ArrayList<>();
-
-            if (properties.getSEProperties() != null && !properties.getSEProperties().isEmpty()) {
-                properties.getSEProperties().forEach(seproperty -> {
-                    try {
-                        property.add(seproperty.createSEProperty(parsingInfo));
-                    } catch (final ContentPackException e) {
-                        e.printStackTrace();
-                    }
-                });
-
-                signal.appendSEProperty(property);
-            }
+            Signal.SIGNALLIST.add(properties.createNewSignalSystem(filename));
         });
     }
 }

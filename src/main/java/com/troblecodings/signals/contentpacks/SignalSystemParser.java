@@ -7,14 +7,12 @@ import java.util.Map;
 import com.google.gson.Gson;
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.blocks.Signal.SignalProperties;
-import com.troblecodings.signals.init.SignalItems;
-import com.troblecodings.signals.items.Placementtool;
+import com.troblecodings.signals.blocks.Signal.SignalPropertiesBuilder;
 import com.troblecodings.signals.utils.FileReader;
 
 public class SignalSystemParser {
 
-    private List<SignalProperties> systemProperties;
+    private SignalPropertiesBuilder systemProperties;
     private List<SEPropertyParser> seProperties;
 
     public List<SEPropertyParser> getSEProperties() {
@@ -41,32 +39,9 @@ public class SignalSystemParser {
     }
 
     public Signal createNewSignalSystem(final String fileName) {
-
-        SignalProperties signalProperty = systemProperties.get(0);
-
-        Placementtool tool = SignalItems.PLACEMENT_TOOL;
-
-        if (signalProperty.placementToolName.equalsIgnoreCase("SIGN_PLACEMENT_TOOL"))
-            tool = SignalItems.SIGN_PLACEMENT_TOOL;
-
-        if (signalProperty.canLink) {
-            signalProperty = Signal
-                    .builder(tool, fileName.replace(".json", "").replace("_", "").toLowerCase())
-                    .height(signalProperty.height).offsetX(signalProperty.offsetX)
-                    .offsetY(signalProperty.offsetY)
-                    .signHeight(signalProperty.customNameRenderHeight)
-                    .signScale(signalProperty.signScale).signWidth(signalProperty.signWidth)
-                    .build();
-        } else {
-            signalProperty = Signal
-                    .builder(tool, fileName.replace(".json", "").replace("_", "").toLowerCase())
-                    .height(signalProperty.height).offsetX(signalProperty.offsetX)
-                    .offsetY(signalProperty.offsetY)
-                    .signHeight(signalProperty.customNameRenderHeight)
-                    .signScale(signalProperty.signScale).signWidth(signalProperty.signWidth)
-                    .noLink().build();
-        }
-
-        return new Signal(signalProperty);
+        Signal.nextConsumer = list -> seProperties
+                .forEach(prop -> list.add(prop.createSEProperty()));
+        return new Signal(systemProperties
+                .typename(fileName.replace(".json", "").replace("_", "").toLowerCase()).build());
     }
 }

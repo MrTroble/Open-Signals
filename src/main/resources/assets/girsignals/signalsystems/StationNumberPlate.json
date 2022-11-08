@@ -1,17 +1,15 @@
 {
-    "systemProperties": [
-        {
-            "placementToolName": "SIGN_PLACEMENT_TOOL",
-            "height": 0,
-            "canLink": false
-        }
-    ],
-    "seProperties": [
-        {
-            "name": "stationnumer",
-            "defaultEnum": "STNumber",
-            "defaultState": "Z1",
-            "changeableStage": "GUISTAGE"
-        }
-    ]
+	"systemProperties": {
+		"placementToolName": "SIGN_PLACEMENT_TOOL",
+		"height": 0,
+		"canLink": false
+	},
+	"seProperties": [
+		{
+			"name": "stationnumber",
+			"enumClass": "STNumber",
+			"defaultState": "Z1",
+			"changeableStage": "GUISTAGE"
+		}
+	]
 }

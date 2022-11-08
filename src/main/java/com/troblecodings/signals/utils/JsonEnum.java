@@ -85,7 +85,8 @@ public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
                     (Class<Map<String, List<String>>>) (Class<?>) Map.class);
             if (map == null)
                 throw new IllegalStateException("Could not parse " + file);
-            map.forEach((name, list) -> returnmap.put(name, new JsonEnum(name, list)));
+            map.forEach(
+                    (name, list) -> returnmap.put(name.toLowerCase(), new JsonEnum(name, list)));
         });
         return returnmap;
     }

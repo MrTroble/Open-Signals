@@ -7,11 +7,14 @@ import java.util.List;
 import java.util.function.Function;
 
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.utils.JsonEnum;
 
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 @SuppressWarnings("rawtypes")
 public class FunctionParsingInfo {
+
+    public static final FunctionParsingInfo DEFAULT_INFO = new FunctionParsingInfo(null);
 
     private static final HashMap<Class, Function<FunctionParsingInfo, Object>> PARAMETER_PARSER = new HashMap<>();
 
@@ -39,17 +42,23 @@ public class FunctionParsingInfo {
     }
 
     public Object getProperty() {
-        final IUnlistedProperty property = propertyCache
-                .computeIfAbsent(info.argument.toLowerCase(), _u -> {
+        final String name = info.argument.toLowerCase();
+        final IUnlistedProperty property = info.system != null
+                ? propertyCache.computeIfAbsent(name, _u -> {
                     final List<IUnlistedProperty> properties = info.system.getProperties();
                     return properties.stream().filter(
                             noneCache -> noneCache.getName().equalsIgnoreCase(info.argument))
                             .findAny().orElse(null);
-                });
-        if (property == null)
+                })
+                : null;
+        if (property == null) {
+            final IUnlistedProperty backup = JsonEnum.PROPERTIES.get(name);
+            if (backup != null)
+                return backup;
             throw new LogicalParserException(
                     String.format("Could not find property=%s in system=%S!", info.argument,
                             info.system.getSignalTypeName()));
+        }
         return property;
     }
 
@@ -67,7 +76,9 @@ public class FunctionParsingInfo {
                     final IUnlistedProperty property = (IUnlistedProperty) getProperty();
                     final Class clazz = property.getType();
                     try {
-                        final Method method = clazz.getMethod("valueOf", String.class);
+                        final Method method = clazz.equals(String.class)
+                                ? clazz.getMethod("valueOf", Object.class)
+                                : clazz.getMethod("valueOf", String.class);
                         final Object value = method.invoke(null, parts[1].toUpperCase());
                         return new ValuePack(property, ext -> ext.equals(value));
                     } catch (final IllegalArgumentException | NoSuchMethodException

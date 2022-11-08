@@ -24,6 +24,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -53,7 +54,7 @@ public class CustomModelLoader implements ICustomModelLoader {
         final Map<String, ModelExtention> extentions = new HashMap<>();
 
         final Map<String, Object> modelmap = ModelStats
-                .getfromJson("/assets/signals/modeldefinitions");
+                .getfromJson("/assets/girsignals/modeldefinitions");
 
         modelmap.forEach((filename, content) -> {
 
@@ -89,6 +90,7 @@ public class CustomModelLoader implements ICustomModelLoader {
 
                     SignalsMain.log.error("There doesn't exists a signalsystem named "
                             + filename.replace(".json", "") + "!");
+                    FMLCommonHandler.instance().exitJava(-1, false);
                     return;
                 }
 
@@ -140,6 +142,7 @@ public class CustomModelLoader implements ICustomModelLoader {
                                                                 + texturestate.getBlockstate()
                                                                 + " '!");
                                                 e.printStackTrace();
+                                                FMLCommonHandler.instance().exitJava(-1, false);
                                                 return;
                                             }
                                         }
@@ -168,7 +171,8 @@ public class CustomModelLoader implements ICustomModelLoader {
                                             && !extentionloaded) {
                                         SignalsMain.log.warn(
                                                 "The predicate of " + modelname + " in " + filename
-                                                        + " is null! This shouldn´t be the case!");
+                                                        + " is null! This shouldn't be the case!");
+                                        FMLCommonHandler.instance().exitJava(-1, false);
                                         return;
                                     }
                                 }

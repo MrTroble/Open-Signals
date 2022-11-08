@@ -1,6 +1,6 @@
 package com.troblecodings.signals.contentpacks;
 
-public class ContentPackException extends Exception {
+public class ContentPackException extends RuntimeException {
 
     private static final long serialVersionUID = -3954830220162464371L;
 

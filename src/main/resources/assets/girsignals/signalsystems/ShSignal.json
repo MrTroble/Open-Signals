@@ -1,10 +1,8 @@
 {
-    "systemProperties": [
-        {
-            "placementToolName": "SIGN_PLACEMENT_TOOL",
-            "canLink": false,
-            "height": 1
-        }
-    ],
-    "seProperties": []
+	"systemProperties": {
+		"placementToolName": "SIGN_PLACEMENT_TOOL",
+		"canLink": false,
+		"height": 1
+	},
+	"seProperties": []
 }

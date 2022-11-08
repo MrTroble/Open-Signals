@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
@@ -76,23 +77,23 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     public static class SignalProperties {
 
-        public transient Placementtool placementtool;
-        public String placementToolName;
-        public String signalTypeName;
-        public float customNameRenderHeight;
-        public int height;
-        public float signWidth;
-        public float offsetX;
-        public float offsetY;
-        public float signScale;
-        public boolean canLink;
-        public boolean hasCostumColor;
-        public transient ISignalAutoconfig config;
+        public final Placementtool placementtool;
+        public final String signalTypeName;
+        public final float customNameRenderHeight;
+        public final int height;
+        public final float signWidth;
+        public final float offsetX;
+        public final float offsetY;
+        public final float signScale;
+        public final boolean canLink;
+        public final boolean hasCostumColor;
+        public final ISignalAutoconfig config;
 
         public SignalProperties(final Placementtool placementtool, final String signalTypeName,
                 final float customNameRenderHeight, final int height, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
-                final boolean canLink, final ISignalAutoconfig config) {
+                final boolean canLink, final boolean hasCostumColor,
+                final ISignalAutoconfig config) {
             this.placementtool = placementtool;
             this.signalTypeName = signalTypeName;
             this.customNameRenderHeight = customNameRenderHeight;
@@ -102,13 +103,16 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             this.offsetY = offsetY;
             this.signScale = signScale;
             this.canLink = canLink;
+            this.hasCostumColor = hasCostumColor;
             this.config = config;
         }
+
     }
 
     public static class SignalPropertiesBuilder {
 
-        private Placementtool placementtool = null;
+        private transient Placementtool placementtool = null;
+        private String placementToolName = null;
         private String signalTypeName = null;
         private int height = 1;
         private float customNameRenderHeight = -1;
@@ -117,7 +121,11 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private float offsetY = 0;
         private float signScale = 1;
         private boolean canLink = true;
-        private ISignalAutoconfig config = null;
+        private transient ISignalAutoconfig config = null;
+        private boolean hasCostumColor;
+
+        public SignalPropertiesBuilder() {
+        }
 
         public SignalPropertiesBuilder(final Placementtool placementtool,
                 final String signalTypeName) {
@@ -126,8 +134,21 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
 
         public SignalProperties build() {
+            if (placementToolName != null)
+                this.placementtool = SignalItems.PLACEMENT_TOOL;
             return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight,
-                    height, signWidth, offsetX, offsetY, signScale, canLink, config);
+                    height, signWidth, offsetX, offsetY, signScale, canLink, hasCostumColor,
+                    config);
+        }
+
+        public SignalPropertiesBuilder typename(final String signalTypeName) {
+            this.signalTypeName = signalTypeName;
+            return this;
+        }
+
+        public SignalPropertiesBuilder placementtoolname(final String placementToolName) {
+            this.placementToolName = placementToolName;
+            return this;
         }
 
         public SignalPropertiesBuilder signWidth(final float signWidth) {
@@ -185,6 +206,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     private final int id;
     protected final SignalProperties prop;
+
+    @SuppressWarnings("rawtypes")
+    public static Consumer<List<IUnlistedProperty>> nextConsumer = _u -> {
+    };
 
     public Signal(final SignalProperties prop) {
         super(Material.ROCK);
@@ -325,9 +350,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     private ArrayList<IUnlistedProperty> signalProperties;
 
     @SuppressWarnings("rawtypes")
-    private ArrayList<IUnlistedProperty> systemProperties;
-
-    @SuppressWarnings("rawtypes")
     @Override
     protected BlockStateContainer createBlockState() {
         this.signalProperties = new ArrayList<>();
@@ -344,9 +366,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 }
             }
         }
-        if (this.systemProperties != null && !this.systemProperties.isEmpty())
-            this.signalProperties.addAll(this.systemProperties);
 
+        nextConsumer.accept(signalProperties);
+        nextConsumer = _u -> {
+        };
         this.signalProperties.add(CUSTOMNAME);
         return new ExtendedBlockState(this, new IProperty<?>[] {
                 ANGEL
@@ -491,13 +514,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     public void getUpdate(final World world, final BlockPos pos) {
 
-    }
-
-    @SuppressWarnings("rawtypes")
-    public void appendSEProperty(final List<SEProperty> properties) {
-        if (this.systemProperties == null)
-            this.systemProperties = new ArrayList<>();
-        systemProperties.addAll(properties);
     }
 
 }
