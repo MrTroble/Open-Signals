@@ -1,8 +1,6 @@
 package com.troblecodings.signals.models;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
@@ -35,14 +33,9 @@ public class CustomModelLoader implements ICustomModelLoader {
 
     private static final Map<String, Signal> TRANSLATION_TABLE = new HashMap<>();
 
-    private static final List<Signal> SIGNALS = new ArrayList<>(Signal.SIGNALLIST);
-
     static {
-
-        SIGNALS.forEach(signal -> {
-
-            TRANSLATION_TABLE.put(signal.getSignalTypeName(), signal);
-        });
+        Signal.SIGNALLIST
+                .forEach(signal -> TRANSLATION_TABLE.put(signal.getSignalTypeName(), signal));
     }
 
     @SuppressWarnings("unchecked")
@@ -88,7 +81,7 @@ public class CustomModelLoader implements ICustomModelLoader {
 
                 if (signaltype == null) {
 
-                    SignalsMain.log.error("There doesn't exists a signalsystem named "
+                    SignalsMain.getLogger().error("There doesn't exists a signalsystem named "
                             + filename.replace(".json", "") + "!");
                     FMLCommonHandler.instance().exitJava(-1, false);
                     return;

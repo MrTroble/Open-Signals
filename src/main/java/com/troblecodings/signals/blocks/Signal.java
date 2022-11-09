@@ -122,7 +122,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private float signScale = 1;
         private boolean canLink = true;
         private transient ISignalAutoconfig config = null;
-        private boolean hasCostumColor;
+        private boolean hasCostumColor = false;
 
         public SignalPropertiesBuilder() {
         }
@@ -134,8 +134,20 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
 
         public SignalProperties build() {
-            if (placementToolName != null)
-                this.placementtool = SignalItems.PLACEMENT_TOOL;
+            if (placementToolName != null) {
+                SignalItems.registeredItems.forEach(item -> {
+                    if (item instanceof Placementtool) {
+                        if (item.getRegistryName().toString().replace(SignalsMain.MODID + ":", "")
+                                .equalsIgnoreCase(placementToolName)) {
+                            placementtool = (Placementtool) item;
+                        }
+                    }
+                });
+                if (placementtool == null)
+                    SignalsMain.getLogger()
+                            .error("There doesn't exists a placementtool with the name '"
+                                    + placementToolName + "'!");
+            }
             return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight,
                     height, signWidth, offsetX, offsetY, signScale, canLink, hasCostumColor,
                     config);

@@ -3,6 +3,7 @@ package com.troblecodings.signals.blocks;
 import java.util.Map;
 
 import com.troblecodings.signals.contentpacks.SignalSystemParser;
+import com.troblecodings.signals.init.SignalBlocks;
 
 public final class SignalLoader {
 
@@ -13,7 +14,7 @@ public final class SignalLoader {
         final Map<String, SignalSystemParser> signals = SignalSystemParser
                 .getSignalSystems("/assets/girsignals/signalsystems");
         signals.forEach((filename, properties) -> {
-            Signal.SIGNALLIST.add(properties.createNewSignalSystem(filename));
+            SignalBlocks.blocksToRegister.add(properties.createNewSignalSystem(filename));
         });
     }
 }

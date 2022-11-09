@@ -10,7 +10,6 @@ import com.troblecodings.signals.blocks.IConfigUpdatable;
 import com.troblecodings.signals.blocks.Post;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.RedstoneInput;
-import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.blocks.SignalLoader;
@@ -26,7 +25,6 @@ import com.troblecodings.signals.blocks.boards.SignalStationName;
 import com.troblecodings.signals.blocks.boards.SignalWN;
 import com.troblecodings.signals.blocks.signals.SignalHL;
 import com.troblecodings.signals.blocks.signals.SignalHV;
-import com.troblecodings.signals.blocks.signals.SignalKS;
 import com.troblecodings.signals.blocks.signals.SignalSHLight;
 import com.troblecodings.signals.blocks.signals.SignalSHMech;
 import com.troblecodings.signals.blocks.signals.SignalSemaphore;
@@ -54,7 +52,7 @@ public final class SignalBlocks {
     public static final Post POST = new Post();
     public static final SignalHV HV_SIGNAL = new SignalHV();
     public static final GhostBlock GHOST_BLOCK = new GhostBlock();
-    public static final SignalKS KS_SIGNAL = new SignalKS();
+//    public static final SignalKS KS_SIGNAL = new SignalKS();
     public static final SignalHL HL_SIGNAL = new SignalHL();
     public static final SignalSHLight SH_LIGHT = new SignalSHLight();
     public static final SignalTram TRAM_SIGNAL = new SignalTram();
@@ -95,11 +93,6 @@ public final class SignalBlocks {
         }
 
         SignalLoader.loadInternSignals();
-
-        for (int i = 0; i < Signal.SIGNALLIST.size(); i++) {
-            final Signal signal = Signal.SIGNALLIST.get(i);
-            loadBlock(signal, signal.getSignalTypeName());
-        }
     }
 
     private static void loadBlock(final Block block, final String name) {

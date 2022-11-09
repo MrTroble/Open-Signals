@@ -42,7 +42,9 @@ public class SignalSystemParser {
         Signal.nextConsumer = list -> seProperties
                 .forEach(prop -> list.add(prop.createSEProperty()));
 
-        return new Signal(systemProperties
-                .typename(fileName.replace(".json", "").replace("_", "").toLowerCase()).build());
+        final String name = fileName.replace(".json", "").replace("_", "").toLowerCase();
+
+        return (Signal) new Signal(systemProperties.typename(name).build())
+                .setRegistryName(SignalsMain.MODID, name).setUnlocalizedName(name);
     }
 }
