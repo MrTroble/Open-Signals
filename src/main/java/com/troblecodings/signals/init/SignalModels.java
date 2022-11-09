@@ -10,14 +10,14 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public final class GIRModels {
+public final class SignalModels {
 
-    private GIRModels() {
+    private SignalModels() {
     }
 
     @SubscribeEvent
     public static void register(final ModelRegistryEvent event) {
-        SignalItems.registeredItems.forEach(GIRModels::registerModel);
+        SignalItems.registeredItems.forEach(SignalModels::registerModel);
         registerModel(Item.getItemFromBlock(SignalBlocks.HV_SIGNAL_CONTROLLER));
         registerModel(Item.getItemFromBlock(SignalBlocks.POST));
         registerModel(Item.getItemFromBlock(SignalBlocks.SIGNAL_BOX));

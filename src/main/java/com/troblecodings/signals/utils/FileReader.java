@@ -41,8 +41,7 @@ public final class FileReader {
 
                         files.put(name, content);
                     } catch (final IOException e) {
-                        SignalsMain.log
-                                .warn("There was a problem during loading " + file + " !");
+                        SignalsMain.log.warn("There was a problem during loading " + file + " !");
                         e.printStackTrace();
                     }
                 });
@@ -54,6 +53,8 @@ public final class FileReader {
                 e.printStackTrace();
             }
         }
+        if (files.isEmpty())
+            SignalsMain.getLogger().warn("No files found at " + directory + "!");
         return files;
     }
 

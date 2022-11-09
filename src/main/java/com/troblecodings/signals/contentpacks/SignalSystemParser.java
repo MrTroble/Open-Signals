@@ -41,6 +41,7 @@ public class SignalSystemParser {
     public Signal createNewSignalSystem(final String fileName) {
         Signal.nextConsumer = list -> seProperties
                 .forEach(prop -> list.add(prop.createSEProperty()));
+
         return new Signal(systemProperties
                 .typename(fileName.replace(".json", "").replace("_", "").toLowerCase()).build());
     }
