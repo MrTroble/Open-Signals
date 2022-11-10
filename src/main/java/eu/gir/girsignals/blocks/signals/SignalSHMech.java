@@ -33,10 +33,9 @@ public class SignalSHMech extends Signal {
 
     @Override
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderer font, final boolean isDoubleSided) {
+            final SignalTileEnity te, final FontRenderer font) {
         super.renderOverlay(x, y, z, te, font,
                 te.getProperty(SH_HIGH).filter(b -> (Boolean) b).isPresent() ? 3.04f
-                        : this.prop.customNameRenderHeight,
-                false);
+                        : this.prop.customNameRenderHeight);
     }
 }

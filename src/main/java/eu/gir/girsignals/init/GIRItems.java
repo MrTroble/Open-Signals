@@ -7,11 +7,11 @@ import java.util.ArrayList;
 import eu.gir.girsignals.GirsignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.items.ItemArmorTemplate;
-import eu.gir.girsignals.items.ItemConductorTrowel;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.linkableapi.Linkingtool;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
@@ -32,11 +32,11 @@ public final class GIRItems {
     });
     public static final Placementtool PLACEMENT_TOOL = new Placementtool();
     public static final Placementtool SIGN_PLACEMENT_TOOL = new Placementtool();
-    public static final ItemConductorTrowel CONDUCTOR_TROWEL_GREEN = new ItemConductorTrowel();
-    public static final ItemConductorTrowel CONDUCTOR_TROWEL_RED = new ItemConductorTrowel();
-    public static final ItemConductorTrowel WARNING_FLAG = new ItemConductorTrowel();
-    public static final ItemConductorTrowel K_BOARD = new ItemConductorTrowel();
-    public static final ItemConductorTrowel L_BOARD = new ItemConductorTrowel();
+    public static final Item CONDUCTOR_TROWEL_GREEN = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item CONDUCTOR_TROWEL_RED = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item WARNING_FLAG = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item K_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item L_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final ItemArmorTemplate REFLECTIVE_HEAD = new ItemArmorTemplate(
             ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE = new ItemArmorTemplate(

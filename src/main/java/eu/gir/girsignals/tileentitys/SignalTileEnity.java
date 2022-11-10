@@ -125,7 +125,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
             final FontRenderer font) {
-        getSignal().renderOverlay(x, y, z, this, font, false);
+        getSignal().renderOverlay(x, y, z, this, font);
     }
 
     public Signal getSignal() {

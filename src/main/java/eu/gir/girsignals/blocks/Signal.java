@@ -409,14 +409,13 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderer font, final boolean isDoubleSided) {
-        this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight, isDoubleSided);
+            final SignalTileEnity te, final FontRenderer font) {
+        this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight);
     }
 
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderer font, final float renderHeight,
-            final boolean isDoubleSided) {
+            final SignalTileEnity te, final FontRenderer font, final float renderHeight) {
         if (renderHeight == -1)
             return;
         final World world = te.getWorld();
@@ -430,9 +429,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         final float angel = face.getDegree();
 
         final String[] display = name.getFormattedText().split("\\[n\\]");
-        final float width = this.prop.signWidth;
-        final float offsetX = this.prop.offsetX;
-        final float offsetZ = this.prop.offsetY;
+
         final float scale = this.prop.signScale;
 
         GlStateManager.enableAlpha();
@@ -440,28 +437,26 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         GlStateManager.translate(x + 0.5f, y + renderHeight, z + 0.5f);
         GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
         GlStateManager.rotate(angel, 0, 1, 0);
+
+        renderSingleOverlay(display, font, te);
+
+        GlStateManager.popMatrix();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void renderSingleOverlay(final String[] display, final FontRenderer font,
+            final SignalTileEnity te) {
+        final float width = this.prop.signWidth;
+        final float offsetX = this.prop.offsetX;
+        final float offsetZ = this.prop.offsetY;
+        final float scale = this.prop.signScale;
+        GlStateManager.pushMatrix();
         GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         GlStateManager.scale(-1f, 1f, 1f);
-
         for (int i = 0; i < display.length; i++) {
             font.drawSplitString(display[i], 0, (int) (i * scale * 2.8f), (int) width, 0);
         }
         GlStateManager.popMatrix();
-
-        if (isDoubleSided) {
-            GlStateManager.enableAlpha();
-            GlStateManager.pushMatrix();
-            GlStateManager.translate(x + 0.5f, y + renderHeight, z + 0.5f);
-            GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
-            GlStateManager.rotate(angel + 180, 0, 1, 0);
-            GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
-            GlStateManager.scale(-1f, 1f, 1f);
-
-            for (int i = 0; i < display.length; i++) {
-                font.drawSplitString(display[i], 0, (int) (i * scale * 2.8f), (int) width, 0);
-            }
-            GlStateManager.popMatrix();
-        }
     }
 
     public Placementtool getPlacementtool() {
