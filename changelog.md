@@ -1,5 +1,10 @@
 # Changelog
 
+## [Update]
+* feat: added staff uniforms and tools
+* feat: double-sided text for hectometer boards
+* feat: added several station and railroadcrossing signs
+
 ## [Fix]
 * fix: render overlay issue
 * potential fix: nbt desync (disappearing signals)

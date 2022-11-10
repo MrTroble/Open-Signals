@@ -8,6 +8,31 @@ gui.keyprompt=Press [LSHIFT] for more information!
 item.linkingtool.name=Linking Tool
 item.placementtool.name=Signal-Placer
 item.signplacementtool.name=Signalplate-Placer
+item.conductortrowelgreen.name=Conductor Trowel Green
+item.conductortrowelred.name=Conductor Trowel Red
+item.warningflag.name=Warning Flag
+item.kboard.name=K-Board
+item.lboard.name=L-Board
+item.reflectivehead.name=Shunter Helmet
+item.reflectivechestplate.name=Shunter Vest
+item.reflectivepants.name=Shunter Dungaree
+item.reflectiveshoes.name=Shunter Safety Shoes
+item.traindriverhead.name=Train Driver Cap
+item.traindriverchestplate.name=Train Jacket
+item.traindriverpants.name=Train Pants
+item.traindrivershoes.name=Train Shoes
+item.dispatcherhead.name=Dispatcher Cap
+item.dispatcherchestplate.name=Dispatcher Jacket
+item.dispatcherpants.name=Dispatcher Pants
+item.dispatchershoes.name=Dispatcher Shoes
+item.stationmanagerhead.name=Station Manager Cap
+item.stationmanagerchestplate.name=Station Manager Jacket
+item.stationmanagerpants.name=Station Manager Pants
+item.stationmanagershoes.name=Station Manager Shoes
+item.conductorhead.name=Conductor Cap
+item.conductorchestplate.name=Conductor Jacket
+item.conductorpants.name=Conductor Pants
+item.conductorshoes.name=Conductor Shoes
 
 #Blocks
 tile.hvsignalcontroller.name=Signal-Controller
@@ -201,6 +226,7 @@ property.atws.name=Rotten warning system
 property.barrier_open.name=Barrier control
 property.powered.name=Switch handle control
 property.wn_mech.name=Wn signals
+property.railroadcrossing.name=Railroad Crossing Addition
 
 #Sign Description
 property.indicator.desc=Inscription for Lf signals.1 to 20 for speed. A for start and E for end
@@ -245,6 +271,7 @@ property.atws.desc=Emits an audible warning tone to alert construction workers o
 property.barrier_open.desc=Barrier control
 property.powered.desc=Switch handle control
 property.wn_mech.desc=Wn signals
+property.railroadcrossing.desc=Railroad Crossing Addition
 
 #Signalcontroller Names
 property.enummode.name=Mode
@@ -337,6 +364,15 @@ property.value.wncross=Double slip points
 property.value.LZB=LZB
 property.value.ZS10=Zs10
 property.value.HM2=Hectometer
+property.value.FIRETORCH=Firetorch
+property.value.KEEP_DISTANCE=Keep Distance
+property.value.NO_PASS=No Pass
+property.value.NARROWING=Platform Narrowing
+property.value.NOTE_TRAIN_TRAFFIC=Note Train Traffic
+property.value.RC1=Railroad Crossing 1
+property.value.RC2=Railroad Crossing 2
+property.value.RC3=Railroad Crossing 3
+property.value.STOP_PROTECTING=Stop Protecting
 
 #Signal Aspects
 property.value.false=False

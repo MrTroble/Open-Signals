@@ -8,6 +8,37 @@ gui.keyprompt=Drücke [LSHIFT] für mehr Informationen!
 item.linkingtool.name=Verlinker
 item.placementtool.name=Signal-Platzierer
 item.signplacementtool.name=Signaltafel-Platzierer
+item.conductortrowelgreen.name=Handkelle Grün
+item.conductortrowelred.name=Handkelle Rot
+item.warningflag.name=Warnflagge
+item.kboard.name=K-Tafel
+item.lboard.name=L-Tafel
+item.reflectivehead.name=Rangierer Sicherheitshelm
+item.reflectivechestplate.name=Rangierer Weste
+item.reflectivepants.name=Rangierer Latzhose
+item.reflectiveshoes.name=Rangierer Sicherheitsschuhe
+item.traindriverhead.name=Lokführer Mütze
+item.traindriverchestplate.name=Lokführer Jacke
+item.traindriverpants.name=Lokführer Hose
+item.traindrivershoes.name=Lokführer Schuhe
+item.dispatcherhead.name=Fahrdienstleiter Mütze
+item.dispatcherchestplate.name=Fahrdienstleiter Jacke
+item.dispatcherpants.name=Fahrdienstleiter Hose
+item.dispatchershoes.name=Fahrdienstleiter Schuhe
+item.stationmanagerhead.name=Bahnhofsaufsicht Mütze
+item.stationmanagerchestplate.name=Bahnhofsaufsicht Jacke
+item.stationmanagerpants.name=Bahnhofsaufsicht Hose
+item.stationmanagershoes.name=Bahnhofsaufsicht Schuhe
+item.conductorhead.name=Zugführer Mütze
+item.conductorchestplate.name=Zugführer Jacke
+item.conductorpants.name=Zugführer Hose
+item.conductorshoes.name=Zugführer Schuhe
+
+item.reflectivechestplate.name=Sicherheitsweste
+item.traindriverhead.name=Lokführer Mütze
+item.dispatcherhead.name=Fahrdienstleiter Mütze
+item.stationmanagerhead.name=Bahnhofsaufsicht Mütze
+item.conductorchestplate.name=Zugführer Anzug
 
 #Blocks
 tile.hvsignalcontroller.name=Signal Steuerer
@@ -200,6 +231,7 @@ property.atws.name=Rottenwarnanlage
 property.barrier_open.name=Schrankensteuerung
 property.powered.name=Weichenhebelkontrolle
 property.wn_mech.name=Wn Signale
+property.railroadcrossing.name=Bahnübergangszusatz
 
 #Sign Description
 property.indicator.desc=Aufschrift für Lf Signale.1 bis 20 für die Geschwindigkeit. A für Anfang und E für Ende
@@ -244,6 +276,7 @@ property.atws.desc=Gibt einen akustischen Warnton aus, der Bauarbeitern einen na
 property.barrier_open.desc=Schrankensteuerung
 property.powered.desc=Weichenhebelkontrolle
 property.wn_mech.desc=Wn Signale
+property.railroadcrossing.desc=Bahnübergangszusatz
 
 #Signalcontroller Names
 property.enummode.name=Modus
@@ -336,6 +369,15 @@ property.value.wncross=Doppelweichensignal
 property.value.LZB=LZB
 property.value.ZS10=Zs10
 property.value.HM2=Hektometer
+property.value.FIRETORCH=Brandfackel
+property.value.KEEP_DISTANCE=Abstand Halten
+property.value.NO_PASS=Kein Durchgang
+property.value.NARROWING=Bahnsteigverengung
+property.value.NOTE_TRAIN_TRAFFIC=Beachte Zugverkehr
+property.value.RC1=Bahnübergang 1
+property.value.RC2=Bahnübergang 2
+property.value.RC3=Bahnübergang 3
+property.value.STOP_PROTECTING=Halt! Sicherung
 
 #Signal Aspects
 property.value.false=Aus

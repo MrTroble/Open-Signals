@@ -79,6 +79,23 @@
                 }
             ],
             "y": 2.3125
+        },
+        "bue/het": {
+            "textures": [
+                {
+                    "blockstate": "with(BUETYPE.HET)",
+                    "retexture": {
+                        "2": "girsignals:blocks/bue/het"
+                    }
+                },
+                {
+                    "blockstate": "with(BUETYPE.AUTO_HET)",
+                    "retexture": {
+                        "2": "girsignals:blocks/bue/auto_het"
+                    }
+                }
+            ],
+            "y": 1
         }
     }
 }
