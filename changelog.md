@@ -1,5 +1,9 @@
 # Changelog
 
+## [Opt]
+
+* optimized: image size
+
 ## [Update]
 * feat: added staff uniforms and tools
 * feat: double-sided text for hectometer boards
