@@ -1,5 +1,8 @@
 # Changelog
 
+## [Fix]
+fix: desync with ForgeEssentials
+
 ## [Update]
 * feat: added staff uniforms and tools
 * feat: double-sided text for hectometer boards
