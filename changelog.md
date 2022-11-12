@@ -1,5 +1,8 @@
 # Changelog
 
+## [Fix]
+fix: desync with ForgeEssentials
+
 ## [Opt]
 
 * optimized: image size
