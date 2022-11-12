@@ -3,6 +3,10 @@
 ## [Fix]
 fix: desync with ForgeEssentials
 
+## [Opt]
+
+* optimized: image size
+
 ## [Update]
 * feat: added staff uniforms and tools
 * feat: double-sided text for hectometer boards
