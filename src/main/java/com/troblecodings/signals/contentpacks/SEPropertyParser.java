@@ -19,7 +19,7 @@ public class SEPropertyParser {
     private String enumClass;
     private Object defaultState;
     private String changeableStage;
-    private boolean autoname = false;
+    private final boolean autoname = false;
     private String dependencies;
     private transient IProperty<?> parent;
 
@@ -41,15 +41,13 @@ public class SEPropertyParser {
             stage = Enum.valueOf(ChangeableStage.class, changeableStage);
         }
 
-        Predicate predicate = t -> true;
+        Predicate<Map<SEProperty<?>, Object>> predicate = t -> true;
         if (dependencies != null && !dependencies.isEmpty()) {
             predicate = LogicParser.predicate(dependencies, FunctionParsingInfo.DEFAULT_INFO);
         }
 
         if (autoname)
-            return new SEAutoNameProp(name, parent, (Comparable) defaultState, stage,
-                    (Predicate<Map<SEProperty<?>, Object>>) predicate);
-        return new SEProperty(name, parent, (Comparable) defaultState, stage,
-                (Predicate<Map<SEProperty<?>, Object>>) predicate);
+            return new SEAutoNameProp(name, parent, (Comparable) defaultState, stage, predicate);
+        return new SEProperty(name, parent, (Comparable) defaultState, stage, predicate);
     }
 }

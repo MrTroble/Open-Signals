@@ -28,8 +28,6 @@ public class ContainerSignalController extends Container implements UIClientSync
     private EntityPlayerMP player;
     private Runnable onUpdate;
 
-    public final HashMap<String, SEProperty<?>> lookup = new HashMap<String, SEProperty<?>>();
-
     public ContainerSignalController(final SignalControllerTileEntity tile) {
         if (!tile.loadChunkAndGetTile(SignalTileEnity.class, tile.getWorld(),
                 tile.getLinkedPosition(), (t, c) -> {
@@ -49,7 +47,7 @@ public class ContainerSignalController extends Container implements UIClientSync
         if (state != null) {
             compound.setInteger("state", state.getID());
             final NBTTagCompound comp = new NBTTagCompound();
-            reference.get().forEach((p, o) -> p.writeToNBT(compound, state));
+            reference.get().forEach((p, o) -> p.writeToNBT(comp, o));
             compound.setTag("list", comp);
         }
         return compound;
@@ -73,17 +71,12 @@ public class ContainerSignalController extends Container implements UIClientSync
         referenceBlock.set(Signal.SIGNALLIST.get(compound.getInteger("state")));
         final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) referenceBlock.get()
                 .getBlockState();
-        hVExtendedBlockState.getUnlistedProperties()
-                .forEach(p -> lookup.put(p.getName(), (SEProperty<?>) p));
 
         final NBTTagCompound comp = (NBTTagCompound) compound.getTag("list");
         if (comp != null) {
             final HashMap<SEProperty<?>, Object> map = new HashMap<>();
-            comp.getKeySet().forEach(str -> {
-                @SuppressWarnings("rawtypes")
-                final SEProperty property = lookup.get(str);
-                map.put(property, property.getObjFromID(comp.getInteger(str)));
-            });
+            hVExtendedBlockState.getUnlistedProperties().forEach(p -> ((SEProperty<?>) p)
+                    .readFromNBT(comp).ifPresent(obj -> map.put(((SEProperty<?>) p), obj)));
             reference.set(map);
         }
         this.onUpdate.run();

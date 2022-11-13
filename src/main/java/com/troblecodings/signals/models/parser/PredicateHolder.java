@@ -1,7 +1,6 @@
 package com.troblecodings.signals.models.parser;
 
-import java.util.Map.Entry;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
@@ -53,19 +52,23 @@ public final class PredicateHolder {
         };
     }
 
-    public static Predicate<Set<Entry<SEProperty<?>, Object>>> check(final ValuePack pack) {
+    public static Predicate<Map<SEProperty<?>, Object>> check(final ValuePack pack) {
         return check(pack.property, pack.predicate);
     }
 
-    public static Predicate<Set<Entry<SEProperty<?>, Object>>> check(
-            final IUnlistedProperty property, final Object type) {
+    public static Predicate<Map<SEProperty<?>, Object>> check(final IUnlistedProperty property,
+            final Object type) {
         return check(property, type::equals);
     }
 
-    public static Predicate<Set<Entry<SEProperty<?>, Object>>> check(
-            final IUnlistedProperty property, final Predicate type) {
-        return t -> t.stream().noneMatch(e -> e.getKey().equals(property)) || t.stream()
-                .anyMatch((e -> e.getKey().equals(property) && type.test(e.getValue())));
+    public static Predicate<Map<SEProperty<?>, Object>> check(final IUnlistedProperty property,
+            final Predicate type) {
+        return t -> {
+            final Object value = t.get(property);
+            if (value == null)
+                return true;
+            return type.test(value);
+        };
     }
 
 }

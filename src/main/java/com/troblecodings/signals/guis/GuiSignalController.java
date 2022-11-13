@@ -1,15 +1,16 @@
 package com.troblecodings.signals.guis;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import com.troblecodings.guilib.ecs.GuiBase;
-import com.troblecodings.guilib.ecs.GuiElements;
-import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
+import com.troblecodings.guilib.ecs.GuiBase;
+import com.troblecodings.guilib.ecs.GuiElements;
+import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -50,9 +51,12 @@ public class GuiSignalController extends GuiBase {
     private final UIEntity lowerEntity = new UIEntity();
     private boolean previewMode = false;
     private String profileName = null;
+    private BlockPos linkedPos = null;
+    private final List<UIPropertyEnumHolder> holders = new ArrayList<>();
 
     public GuiSignalController(final SignalControllerTileEntity tile) {
         this.pos = tile.getPos();
+        this.linkedPos = tile.getLinkedPosition();
         this.controller = new ContainerSignalController(this::init);
         Minecraft.getMinecraft().player.openContainer = this.controller;
         this.compound = tile.getTag();
@@ -285,6 +289,7 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.add(createPreview(blockRender));
         lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 
+        holders.clear();
         final Map<SEProperty<?>, Object> map = this.controller.getReference();
         if (map == null)
             return;
@@ -292,7 +297,10 @@ public class GuiSignalController extends GuiBase {
             if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
                     || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
                     && entry.test(map)) {
-                list.add(GuiElements.createEnumElement(entry, e -> applyModelChange(blockRender)));
+                final UIEnumerable enumarable = new UIEnumerable(entry.count(), entry.getName());
+                list.add(GuiElements.createEnumElement(enumarable, entry,
+                        e -> applyModelChange(blockRender)));
+                holders.add(new UIPropertyEnumHolder(entry, enumarable));
             }
         }
         applyModelChange(blockRender);
@@ -308,15 +316,9 @@ public class GuiSignalController extends GuiBase {
             currentState = currentState.withProperty((SEProperty) e.getKey(), e.getValue());
         }
 
-        if (!previewMode) {
-            for (final UIEnumerable property : lowerEntity.findRecursive(UIEnumerable.class)) {
-                if (profileName == null || property.getID().endsWith(profileName)) {
-                    final SEProperty sep = SEProperty.cst(
-                            controller.lookup.get(property.getID().replace("." + profileName, "")));
-                    if (sep != null)
-                        currentState = currentState.withProperty(sep,
-                                sep.getObjFromID(property.getIndex()));
-                }
+        if (!previewMode && linkedPos != null) {
+            for (final UIPropertyEnumHolder holder : holders) {
+                currentState = holder.apply(currentState);
             }
         }
         blockRender.setBlockState(currentState);
