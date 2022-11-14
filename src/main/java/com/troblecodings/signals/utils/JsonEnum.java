@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 
 import com.google.common.base.Optional;
@@ -53,6 +54,24 @@ public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
             return values;
         }
         return new ArrayList<>();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, valueSet, values);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final JsonEnum other = (JsonEnum) obj;
+        return Objects.equals(name, other.name) && Objects.equals(valueSet, other.valueSet)
+                && Objects.equals(values, other.values);
     }
 
     @Override

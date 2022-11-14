@@ -37,7 +37,7 @@ public class SEPropertyParser {
             throw new ContentPackException(String.format("Property[%s] not found!", name));
 
         ChangeableStage stage = ChangeableStage.APISTAGE;
-        if (changeableStage != null) {
+        if (changeableStage != null && !changeableStage.isEmpty()) {
             stage = Enum.valueOf(ChangeableStage.class, changeableStage);
         }
 
