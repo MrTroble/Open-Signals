@@ -26,7 +26,7 @@ public class SEPropertyParser {
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    public SEProperty createSEProperty() {
+    public SEProperty createSEProperty(final FunctionParsingInfo info) {
         if (defaultState instanceof Boolean) {
             parent = PropertyBool.create(name);
         } else {
@@ -43,7 +43,7 @@ public class SEPropertyParser {
 
         Predicate<Map<SEProperty<?>, Object>> predicate = t -> true;
         if (dependencies != null && !dependencies.isEmpty()) {
-            predicate = LogicParser.predicate(dependencies, FunctionParsingInfo.DEFAULT_INFO);
+            predicate = LogicParser.predicate(dependencies, info);
         }
 
         if (autoname)

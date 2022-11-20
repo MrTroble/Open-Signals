@@ -8,6 +8,7 @@ import com.google.gson.Gson;
 import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.Signal.SignalPropertiesBuilder;
+import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.utils.FileReader;
 
 public class SignalSystemParser {
@@ -39,11 +40,13 @@ public class SignalSystemParser {
     }
 
     public Signal createNewSignalSystem(final String fileName) {
-        Signal.nextConsumer = list -> seProperties
-                .forEach(prop -> list.add(prop.createSEProperty()));
-
+        
         final String name = fileName.replace(".json", "").replace("_", "").toLowerCase();
-
+        
+        Signal.nextConsumer = list -> {
+            final FunctionParsingInfo info = new FunctionParsingInfo(name, list);
+            seProperties.forEach(prop -> list.add(prop.createSEProperty(info)));
+        };
         return (Signal) new Signal(systemProperties.typename(name).build())
                 .setRegistryName(SignalsMain.MODID, name).setUnlocalizedName(name);
     }

@@ -86,14 +86,13 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public final float offsetY;
         public final float signScale;
         public final boolean canLink;
-        public final boolean hasCostumColor;
+        public final List<Integer> colors;
         public final ISignalAutoconfig config;
 
         public SignalProperties(final Placementtool placementtool, final String signalTypeName,
                 final float customNameRenderHeight, final int height, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
-                final boolean canLink, final boolean hasCostumColor,
-                final ISignalAutoconfig config) {
+                final boolean canLink, final ISignalAutoconfig config, final List<Integer> colors) {
             this.placementtool = placementtool;
             this.signalTypeName = signalTypeName;
             this.customNameRenderHeight = customNameRenderHeight;
@@ -103,7 +102,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             this.offsetY = offsetY;
             this.signScale = signScale;
             this.canLink = canLink;
-            this.hasCostumColor = hasCostumColor;
+            this.colors = colors;
             this.config = config;
         }
 
@@ -122,7 +121,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private float signScale = 1;
         private boolean canLink = true;
         private transient ISignalAutoconfig config = null;
-        private boolean hasCostumColor = false;
+        private List<Integer> colors = null;
 
         public SignalPropertiesBuilder() {
         }
@@ -148,9 +147,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                             .error("There doesn't exists a placementtool with the name '"
                                     + placementToolName + "'!");
             }
+            this.colors = this.colors == null ? new ArrayList<>() : this.colors;
             return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight,
-                    height, signWidth, offsetX, offsetY, signScale, canLink, hasCostumColor,
-                    config);
+                    height, signWidth, offsetX, offsetY, signScale, canLink, config, colors);
         }
 
         public SignalPropertiesBuilder typename(final String signalTypeName) {
@@ -440,12 +439,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     @SideOnly(Side.CLIENT)
     public int colorMultiplier(final IBlockState state, final IBlockAccess worldIn,
             final BlockPos pos, final int tintIndex) {
-        return 0;
+        return this.prop.colors.get(tintIndex);
     }
 
     @SideOnly(Side.CLIENT)
     public boolean hasCostumColor() {
-        return this.prop.hasCostumColor;
+        return !this.prop.colors.isEmpty();
     }
 
     @SideOnly(Side.CLIENT)

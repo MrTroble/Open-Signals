@@ -48,7 +48,7 @@ public class LogicalParserTest {
 
     public static FunctionParsingInfo function(final String name, final Signal signal) {
         final FunctionParsingInfo parsing = new FunctionParsingInfo(signal);
-        parsing.info.argument = name;
+        parsing.argument = name;
         return parsing;
     }
 
@@ -58,8 +58,8 @@ public class LogicalParserTest {
                 SignalBlocks.HV_SIGNAL, SignalBlocks.LF_SIGNAL
         }) {
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
-            for (final IUnlistedProperty property : info.info.properties) {
-                info.info.argument = property.getName();
+            for (final IUnlistedProperty property : info.properties) {
+                info.argument = property.getName();
                 final Object object = info.getProperty();
                 assertEquals(property, object);
             }
@@ -69,7 +69,7 @@ public class LogicalParserTest {
                 SignalHV.HPHOME, SignalHV.HPBLOCK, SignalHV.ZS3_PLATE
         }) {
             final Object def = property.getDefault();
-            hvSignalInfo.info.argument = property.getName() + "." + def;
+            hvSignalInfo.argument = property.getName() + "." + def;
             final Object object = hvSignalInfo.getPredicate();
             assertTrue(object instanceof ValuePack);
             final ValuePack pack = (ValuePack) object;

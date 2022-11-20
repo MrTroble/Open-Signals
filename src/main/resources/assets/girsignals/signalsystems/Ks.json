@@ -4,7 +4,9 @@
         "canLink": true,
         "height": 6,
         "signWidth": 4.95,
-        "hasCostumColor": true
+        "colors": [
+            16761344
+        ]
     },
     "seProperties": [
         {
@@ -19,7 +21,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(KSTYPE.STOPSIGNAL)"
+            "dependencies": "check(KOMBITYPE.STOPSIGNAL)"
         },
         {
             "name": "kombisignal_main",
@@ -27,7 +29,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(KSTYPE.MAIN)"
+            "dependencies": "check(KOMBITYPE.MAIN)"
         },
         {
             "name": "kombisignal_distant",
@@ -35,7 +37,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(KSTYPE.DISTANT)"
+            "dependencies": "check(KOMBITYPE.DISTANT)"
         },
         {
             "name": "mastsign",

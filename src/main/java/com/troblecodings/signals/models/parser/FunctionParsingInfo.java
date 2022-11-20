@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 import com.troblecodings.signals.blocks.Signal;
@@ -13,8 +14,6 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 @SuppressWarnings("rawtypes")
 public class FunctionParsingInfo {
-
-    public static final FunctionParsingInfo DEFAULT_INFO = new FunctionParsingInfo(null);
 
     private static final HashMap<Class, Function<FunctionParsingInfo, Object>> PARAMETER_PARSER = new HashMap<>();
 
@@ -26,74 +25,77 @@ public class FunctionParsingInfo {
         PARAMETER_PARSER.put(ValuePack.class, FunctionParsingInfo::getPredicate);
     }
 
-    public final ParameterInfo info;
+    public String argument;
+    public final String signalName;
+    public final List<IUnlistedProperty> properties;
 
     public FunctionParsingInfo(final Signal signalSystem) {
-        info = new ParameterInfo("", signalSystem);
+        this(Objects.requireNonNull(signalSystem).getSignalTypeName(),
+                signalSystem.getProperties());
+    }
+
+    public FunctionParsingInfo(final String signalSystem,
+            final List<IUnlistedProperty> properties) {
+        this.argument = "";
+        this.signalName = signalSystem;
+        this.properties = properties;
     }
 
     public Object[] getParameter(final Class[] parameter, final String[] arguments) {
         final Object[] parameters = new Object[arguments.length];
         for (int i = 0; i < arguments.length; i++) {
-            info.argument = arguments[i];
+            argument = arguments[i];
             parameters[i] = PARAMETER_PARSER.get(parameter[i]).apply(this);
         }
         return parameters;
     }
 
     public Object getProperty() {
-        final String name = info.argument.toLowerCase();
-        final IUnlistedProperty property = info.system != null
-                ? propertyCache.computeIfAbsent(name, _u -> {
-                    final List<IUnlistedProperty> properties = info.system.getProperties();
-                    return properties.stream().filter(
-                            noneCache -> noneCache.getName().equalsIgnoreCase(info.argument))
-                            .findAny().orElse(null);
-                })
-                : null;
+        final String name = argument.toLowerCase();
+        final IUnlistedProperty property = propertyCache.computeIfAbsent(name, _u -> {
+            return properties.stream()
+                    .filter(noneCache -> noneCache.getName().equalsIgnoreCase(argument)).findAny()
+                    .orElse(null);
+        });
         if (property == null) {
             final IUnlistedProperty backup = JsonEnum.PROPERTIES.get(name);
             if (backup != null)
                 return backup;
-            throw new LogicalParserException(
-                    String.format("Could not find property=%s in system=%S!", info.argument,
-                            info.system.getSignalTypeName()));
+            throw new LogicalParserException(String
+                    .format("Could not find property=%s in system=%S!", argument, signalName));
         }
         return property;
     }
 
     @SuppressWarnings("unchecked")
     public Object getPredicate() {
-        final ValuePack predicate = predicateCache.computeIfAbsent(info.argument.toLowerCase(),
-                _u -> {
-                    final String[] parts = info.argument.split("\\.");
-                    if (parts.length != 2)
-                        throw new LogicalParserException(String.format(
-                                "Syntax error predicate need to have the form PROPERTY.NAME but was %s",
-                                info.argument));
-                    final String nextInfo = info.argument;
-                    info.argument = parts[0];
-                    final IUnlistedProperty property = (IUnlistedProperty) getProperty();
-                    final Class clazz = property.getType();
-                    try {
-                        final Method method = clazz.equals(String.class)
-                                ? clazz.getMethod("valueOf", Object.class)
-                                : clazz.getMethod("valueOf", String.class);
-                        final Object value = method.invoke(null, parts[1].toUpperCase());
-                        return new ValuePack(property, ext -> ext.equals(value));
-                    } catch (final IllegalArgumentException | NoSuchMethodException
-                            | SecurityException | IllegalAccessException
-                            | InvocationTargetException e) {
-                        throw new LogicalParserException(
-                                String.format("Property=%s is not a valid property [System: %s]",
-                                        nextInfo, info.system.getSignalTypeName()),
-                                e);
-                    }
-                });
+        final ValuePack predicate = predicateCache.computeIfAbsent(argument.toLowerCase(), _u -> {
+            final String[] parts = argument.split("\\.");
+            if (parts.length != 2)
+                throw new LogicalParserException(String.format(
+                        "Syntax error predicate need to have the form PROPERTY.NAME but was %s",
+                        argument));
+            final String nextInfo = argument;
+            argument = parts[0];
+            final IUnlistedProperty property = (IUnlistedProperty) getProperty();
+            final Class clazz = property.getType();
+            try {
+                final Method method = clazz.equals(String.class)
+                        ? clazz.getMethod("valueOf", Object.class)
+                        : clazz.getMethod("valueOf", String.class);
+                final Object value = method.invoke(null, parts[1].toUpperCase());
+                return new ValuePack(property, ext -> ext.equals(value));
+            } catch (final IllegalArgumentException | NoSuchMethodException | SecurityException
+                    | IllegalAccessException | InvocationTargetException e) {
+                throw new LogicalParserException(
+                        String.format("Property=%s is not a valid property [System: %s]", nextInfo,
+                                signalName),
+                        e);
+            }
+        });
         if (predicate == null)
-            throw new LogicalParserException(
-                    String.format("Could not make predicate=%s with system=%S!", info.argument,
-                            info.system.getSignalTypeName()));
+            throw new LogicalParserException(String
+                    .format("Could not make predicate=%s with system=%S!", argument, signalName));
         return predicate;
     }
 
