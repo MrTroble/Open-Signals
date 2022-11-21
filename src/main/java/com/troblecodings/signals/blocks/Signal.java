@@ -455,9 +455,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         if (heightCache != null) {
             for (Map.Entry<SEProperty<?>, Map<Object, Integer>> entry : heightCache.entrySet()) {
                 final Object val = map.get(entry.getKey());
-                if (val == null)
-                    continue;
-                if (entry.getValue().get(val) == null)
+                if (val == null || entry.getValue().get(val) == null)
                     continue;
                 return entry.getValue().get(val);
 
