@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -80,7 +81,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public final Placementtool placementtool;
         public final String signalTypeName;
         public final float customNameRenderHeight;
-        public final int height;
+        public final int defaultHeight;
+        public final Map<String, Integer> signalHeights;
         public final float signWidth;
         public final float offsetX;
         public final float offsetY;
@@ -90,13 +92,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public final ISignalAutoconfig config;
 
         public SignalProperties(final Placementtool placementtool, final String signalTypeName,
-                final float customNameRenderHeight, final int height, final float signWidth,
+                final float customNameRenderHeight, final int height,
+                final Map<String, Integer> signalHeights, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
                 final boolean canLink, final ISignalAutoconfig config, final List<Integer> colors) {
             this.placementtool = placementtool;
             this.signalTypeName = signalTypeName;
             this.customNameRenderHeight = customNameRenderHeight;
-            this.height = height;
+            this.defaultHeight = height;
             this.signWidth = signWidth;
             this.offsetX = offsetX;
             this.offsetY = offsetY;
@@ -104,6 +107,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             this.canLink = canLink;
             this.colors = colors;
             this.config = config;
+            this.signalHeights = signalHeights;
         }
 
     }
@@ -113,7 +117,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private transient Placementtool placementtool = null;
         private String placementToolName = null;
         private String signalTypeName = null;
-        private int height = 1;
+        private int defaultHeight = 1;
+        private Map<String, Integer> signalHeights = null;
         private float customNameRenderHeight = -1;
         private float signWidth = 22;
         private float offsetX = 0;
@@ -149,7 +154,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             }
             this.colors = this.colors == null ? new ArrayList<>() : this.colors;
             return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight,
-                    height, signWidth, offsetX, offsetY, signScale, canLink, config, colors);
+                    defaultHeight, signalHeights, signWidth, offsetX, offsetY, signScale, canLink,
+                    config, colors);
         }
 
         public SignalPropertiesBuilder typename(final String signalTypeName) {
@@ -183,7 +189,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
 
         public SignalPropertiesBuilder height(final int height) {
-            this.height = height;
+            this.defaultHeight = height;
             return this;
         }
 
@@ -419,8 +425,45 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             GhostBlock.destroyUpperBlock(worldIn, pos);
     }
 
+    private Map<SEProperty<?>, Map<Object, Integer>> heightCache = null;
+
     public int getHeight(final Map<SEProperty<?>, Object> map) {
-        return this.prop.height;
+        if (heightCache == null) {
+            if (this.prop.signalHeights != null) {
+                for (Map.Entry<SEProperty<?>, Object> properties : map.entrySet()) {
+
+                    for (Map.Entry<String, Integer> valuesfromJson : this.prop.signalHeights
+                            .entrySet()) {
+
+                        final SEProperty<?> property = properties.getKey();
+                        final Object value = properties.getValue();
+
+                        final String[] str = valuesfromJson.getKey().split("\\.");
+
+                        if (str[0].equalsIgnoreCase(property.getName())) {
+                            if (str[1].equalsIgnoreCase(value.toString())) {
+                                heightCache = new HashMap<>();
+                                final Map<Object, Integer> values = new HashMap<>();
+                                values.put(value, valuesfromJson.getValue());
+                                heightCache.put(property, values);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if (heightCache != null) {
+            for (Map.Entry<SEProperty<?>, Map<Object, Integer>> entry : heightCache.entrySet()) {
+                final Object val = map.get(entry.getKey());
+                if (val == null)
+                    continue;
+                if (entry.getValue().get(val) == null)
+                    continue;
+                return entry.getValue().get(val);
+
+            }
+        }
+        return this.prop.defaultHeight;
     }
 
     public boolean canHaveCustomname(final Map<SEProperty<?>, Object> map) {

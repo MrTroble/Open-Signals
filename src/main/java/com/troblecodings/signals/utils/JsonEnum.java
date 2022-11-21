@@ -91,6 +91,11 @@ public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
         return value;
     }
 
+    @Override
+    public String toString() {
+        return name;
+    }
+
     private static final Gson GSON = new Gson();
     public static final Map<String, JsonEnum> PROPERTIES = getProperties();
 

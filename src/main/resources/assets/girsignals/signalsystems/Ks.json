@@ -2,7 +2,10 @@
     "systemProperties": {
         "placementToolName": "placementtool",
         "canLink": true,
-        "height": 6,
+        "defaultHeight": 6,
+        "signalHeights": {
+            "kombitype.MAIN": 2
+        },
         "signWidth": 4.95,
         "colors": [
             16761344
