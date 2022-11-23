@@ -1,5 +1,6 @@
 package com.troblecodings.signals.contentpacks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,6 +11,8 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.Signal.SignalPropertiesBuilder;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.utils.FileReader;
+
+import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class SignalSystemParser {
 
@@ -29,7 +32,7 @@ public class SignalSystemParser {
         final Map<String, SignalSystemParser> properties = new HashMap<>();
 
         if (systems == null) {
-            SignalsMain.log.warn("Can't read out signalsystems from " + directory + "!");
+            SignalsMain.log.error("Can't read out signalsystems from " + directory + "!");
             return properties;
         }
 
@@ -39,15 +42,20 @@ public class SignalSystemParser {
         return properties;
     }
 
+    @SuppressWarnings("rawtypes")
     public Signal createNewSignalSystem(final String fileName) {
-        
+
         final String name = fileName.replace(".json", "").replace("_", "").toLowerCase();
-        
+
+        final List<IUnlistedProperty> properties = new ArrayList<>();
+
+        final FunctionParsingInfo info = new FunctionParsingInfo(name, properties);
+        seProperties.forEach(prop -> properties.add(prop.createSEProperty(info)));
+
         Signal.nextConsumer = list -> {
-            final FunctionParsingInfo info = new FunctionParsingInfo(name, list);
-            seProperties.forEach(prop -> list.add(prop.createSEProperty(info)));
+            list.addAll(properties);
         };
-        return (Signal) new Signal(systemProperties.typename(name).build())
+        return (Signal) new Signal(systemProperties.typename(name).build(info))
                 .setRegistryName(SignalsMain.MODID, name).setUnlocalizedName(name);
     }
 }

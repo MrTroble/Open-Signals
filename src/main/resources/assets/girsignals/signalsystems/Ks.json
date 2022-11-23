@@ -3,11 +3,9 @@
         "placementToolName": "placementtool",
         "canLink": true,
         "defaultHeight": 6,
-        "signalHeights": {
-            "kombitype.MAIN": 2
-        },
         "signWidth": 4.95,
         "colors": [
+            16777215,
             16761344
         ]
     },

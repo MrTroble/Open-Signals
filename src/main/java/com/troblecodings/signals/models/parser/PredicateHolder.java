@@ -71,4 +71,12 @@ public final class PredicateHolder {
         };
     }
 
+    public static Predicate<Map<SEProperty<?>, Object>> config(final ValuePack pack) {
+        return t -> {
+            final Object value = t.get(pack.property);
+            if (value == null)
+                return false;
+            return pack.predicate.test(value);
+        };
+    }
 }

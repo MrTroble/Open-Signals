@@ -4,12 +4,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+
+import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.SEProperty;
@@ -18,6 +19,8 @@ import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.items.Placementtool;
+import com.troblecodings.signals.models.parser.FunctionParsingInfo;
+import com.troblecodings.signals.models.parser.LogicParser;
 import com.troblecodings.signals.signalbox.config.ISignalAutoconfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
@@ -82,7 +85,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public final String signalTypeName;
         public final float customNameRenderHeight;
         public final int defaultHeight;
-        public final Map<String, Integer> signalHeights;
+        public final List<HeightProperty> signalHeights;
         public final float signWidth;
         public final float offsetX;
         public final float offsetY;
@@ -93,7 +96,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
         public SignalProperties(final Placementtool placementtool, final String signalTypeName,
                 final float customNameRenderHeight, final int height,
-                final Map<String, Integer> signalHeights, final float signWidth,
+                final List<HeightProperty> signalHeights, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
                 final boolean canLink, final ISignalAutoconfig config, final List<Integer> colors) {
             this.placementtool = placementtool;
@@ -138,6 +141,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
 
         public SignalProperties build() {
+            return this.build(null);
+        }
+
+        public SignalProperties build(@Nullable FunctionParsingInfo info) {
             if (placementToolName != null) {
                 SignalItems.registeredItems.forEach(item -> {
                     if (item instanceof Placementtool) {
@@ -152,10 +159,20 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                             .error("There doesn't exists a placementtool with the name '"
                                     + placementToolName + "'!");
             }
+            final List<HeightProperty> heights = new ArrayList<>();
+            if (signalHeights != null) {
+                signalHeights.forEach((property, height) -> {
+                    if (info != null)
+                        heights.add(
+                                new HeightProperty(LogicParser.predicate(property, info), height));
+                });
+            }
+
             this.colors = this.colors == null ? new ArrayList<>() : this.colors;
+
             return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight,
-                    defaultHeight, signalHeights, signWidth, offsetX, offsetY, signScale, canLink,
-                    config, colors);
+                    defaultHeight, ImmutableList.copyOf(heights), signWidth, offsetX, offsetY,
+                    signScale, canLink, config, colors);
         }
 
         public SignalPropertiesBuilder typename(final String signalTypeName) {
@@ -425,41 +442,11 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             GhostBlock.destroyUpperBlock(worldIn, pos);
     }
 
-    private Map<SEProperty<?>, Map<Object, Integer>> heightCache = null;
-
+    @SuppressWarnings("unchecked")
     public int getHeight(final Map<SEProperty<?>, Object> map) {
-        if (heightCache == null) {
-            if (this.prop.signalHeights != null) {
-                for (Map.Entry<SEProperty<?>, Object> properties : map.entrySet()) {
-
-                    for (Map.Entry<String, Integer> valuesfromJson : this.prop.signalHeights
-                            .entrySet()) {
-
-                        final SEProperty<?> property = properties.getKey();
-                        final Object value = properties.getValue();
-
-                        final String[] str = valuesfromJson.getKey().split("\\.");
-
-                        if (str[0].equalsIgnoreCase(property.getName())) {
-                            if (str[1].equalsIgnoreCase(value.toString())) {
-                                heightCache = new HashMap<>();
-                                final Map<Object, Integer> values = new HashMap<>();
-                                values.put(value, valuesfromJson.getValue());
-                                heightCache.put(property, values);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        if (heightCache != null) {
-            for (Map.Entry<SEProperty<?>, Map<Object, Integer>> entry : heightCache.entrySet()) {
-                final Object val = map.get(entry.getKey());
-                if (val == null || entry.getValue().get(val) == null)
-                    continue;
-                return entry.getValue().get(val);
-
-            }
+        for (final HeightProperty property : this.prop.signalHeights) {
+            if (property.predicate.test(map))
+                return property.height;
         }
         return this.prop.defaultHeight;
     }

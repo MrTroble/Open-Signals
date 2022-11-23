@@ -41,6 +41,9 @@ public final class LogicParser {
 
         TRANSLATION_TABLE.put("check", new MethodInfo("check",
                 objects -> PredicateHolder.check((ValuePack) objects[0]), ValuePack.class));
+
+        TRANSLATION_TABLE.put("config", new MethodInfo("config",
+                objects -> PredicateHolder.config((ValuePack) objects[0]), ValuePack.class));
     }
 
     public static Predicate nDegreeFunctionParser(final String name,

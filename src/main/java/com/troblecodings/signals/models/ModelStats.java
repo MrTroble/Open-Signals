@@ -28,21 +28,17 @@ public class ModelStats {
 
         final Map<String, Object> content = new HashMap<>();
 
-        if (entrySet != null) {
-            entrySet.forEach((filename, file) -> {
+        entrySet.forEach((filename, file) -> {
+            if (!filename.endsWith("extention.json")) {
 
-                if (!filename.endsWith("extention.json")) {
+                final ModelStats json = gson.fromJson(file, ModelStats.class);
+                content.put(filename, json);
 
-                    final ModelStats json = gson.fromJson(file, ModelStats.class);
-                    content.put(filename, json);
-
-                } else {
-
-                    final ModelExtention json = gson.fromJson(file, ModelExtention.class);
-                    content.put(filename, json);
-                }
-            });
-        }
+            } else {
+                final ModelExtention json = gson.fromJson(file, ModelExtention.class);
+                content.put(filename, json);
+            }
+        });
         return content;
     }
 
