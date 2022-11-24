@@ -86,6 +86,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public final float customNameRenderHeight;
         public final int defaultHeight;
         public final List<HeightProperty> signalHeights;
+        public final List<FloatProperty> customRenderHeights;
         public final float signWidth;
         public final float offsetX;
         public final float offsetY;
@@ -98,7 +99,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 final float customNameRenderHeight, final int height,
                 final List<HeightProperty> signalHeights, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
-                final boolean canLink, final ISignalAutoconfig config, final List<Integer> colors) {
+                final boolean canLink, final ISignalAutoconfig config, final List<Integer> colors,
+                final List<FloatProperty> renderheights) {
             this.placementtool = placementtool;
             this.signalTypeName = signalTypeName;
             this.customNameRenderHeight = customNameRenderHeight;
@@ -111,6 +113,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             this.colors = colors;
             this.config = config;
             this.signalHeights = signalHeights;
+            this.customRenderHeights = renderheights;
         }
 
     }
@@ -123,6 +126,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private int defaultHeight = 1;
         private Map<String, Integer> signalHeights = null;
         private float customNameRenderHeight = -1;
+        private Map<String, Float> renderHeights = null;
         private float signWidth = 22;
         private float offsetX = 0;
         private float offsetY = 0;
@@ -144,7 +148,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return this.build(null);
         }
 
-        public SignalProperties build(@Nullable FunctionParsingInfo info) {
+        public SignalProperties build(final @Nullable FunctionParsingInfo info) {
             if (placementToolName != null) {
                 SignalItems.registeredItems.forEach(item -> {
                     if (item instanceof Placementtool) {
@@ -159,20 +163,29 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                             .error("There doesn't exists a placementtool with the name '"
                                     + placementToolName + "'!");
             }
-            final List<HeightProperty> heights = new ArrayList<>();
+            final List<HeightProperty> signalheights = new ArrayList<>();
             if (signalHeights != null) {
                 signalHeights.forEach((property, height) -> {
                     if (info != null)
-                        heights.add(
+                        signalheights.add(
                                 new HeightProperty(LogicParser.predicate(property, info), height));
+                });
+            }
+
+            final List<FloatProperty> renderheights = new ArrayList<>();
+            if (renderHeights != null) {
+                renderHeights.forEach((property, height) -> {
+                    if (info != null)
+                        renderheights.add(
+                                new FloatProperty(LogicParser.predicate(property, info), height));
                 });
             }
 
             this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
             return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight,
-                    defaultHeight, ImmutableList.copyOf(heights), signWidth, offsetX, offsetY,
-                    signScale, canLink, config, colors);
+                    defaultHeight, ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY,
+                    signScale, canLink, config, colors, ImmutableList.copyOf(renderheights));
         }
 
         public SignalPropertiesBuilder typename(final String signalTypeName) {
@@ -481,10 +494,17 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight);
     }
 
+    @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
             final SignalTileEnity te, final FontRenderer font, final float renderHeight) {
-        if (renderHeight == -1)
+        float customRenderHeight = renderHeight;
+        for (final FloatProperty property : this.prop.customRenderHeights) {
+            if (property.predicate.test(te.getProperties())) {
+                customRenderHeight = property.height;
+            }
+        }
+        if (customRenderHeight == -1)
             return;
         final World world = te.getWorld();
         final BlockPos pos = te.getPos();
@@ -503,7 +523,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
         GlStateManager.enableAlpha();
         GlStateManager.pushMatrix();
-        GlStateManager.translate(x + 0.5f, y + renderHeight, z + 0.5f);
+        GlStateManager.translate(x + 0.5f, y + customRenderHeight, z + 0.5f);
         GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
         GlStateManager.rotate(angel, 0, 1, 0);
         GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);

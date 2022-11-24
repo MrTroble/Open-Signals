@@ -3,7 +3,7 @@
         "placementToolName": "placementtool",
         "canLink": true,
         "defaultHeight": 6,
-        "signWidth": 4.95,
+        "customNameRenderHeight": 4.95,
         "colors": [
             16777215,
             16761344

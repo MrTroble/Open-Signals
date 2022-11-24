@@ -4,12 +4,12 @@ import java.util.Objects;
 import java.util.function.Predicate;
 
 @SuppressWarnings("rawtypes")
-public class HeightProperty {
+public class FloatProperty {
 
     public final Predicate predicate;
-    public final int height;
+    public final float height;
 
-    public HeightProperty(final Predicate predicate, final int height) {
+    public FloatProperty(final Predicate predicate, final float height) {
         super();
         this.predicate = predicate;
         this.height = height;
@@ -28,7 +28,9 @@ public class HeightProperty {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final HeightProperty other = (HeightProperty) obj;
-        return height == other.height && Objects.equals(predicate, other.predicate);
+        final FloatProperty other = (FloatProperty) obj;
+        return Float.floatToIntBits(height) == Float.floatToIntBits(other.height)
+                && Objects.equals(predicate, other.predicate);
     }
+
 }
