@@ -22,8 +22,8 @@ import com.troblecodings.signals.EnumSignals.VR;
 import com.troblecodings.signals.EnumSignals.ZS32;
 import com.troblecodings.signals.blocks.signals.SignalHV;
 import com.troblecodings.signals.blocks.signals.SignalKS;
+import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.signalbox.config.HLSignalConfig;
-import com.troblecodings.signals.signalbox.config.ISignalAutoconfig.ConfigInfo;
 import com.troblecodings.signals.test.DummySignal.DummyBuilder;
 
 public class GIRConfigtestHL {

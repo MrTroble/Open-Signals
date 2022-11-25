@@ -25,8 +25,8 @@ import com.troblecodings.signals.EnumSignals.ZS32;
 import com.troblecodings.signals.blocks.signals.SignalHL;
 import com.troblecodings.signals.blocks.signals.SignalHV;
 import com.troblecodings.signals.blocks.signals.SignalKS;
+import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.signalbox.config.KSSignalConfig;
-import com.troblecodings.signals.signalbox.config.ISignalAutoconfig.ConfigInfo;
 import com.troblecodings.signals.test.DummySignal.DummyBuilder;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 

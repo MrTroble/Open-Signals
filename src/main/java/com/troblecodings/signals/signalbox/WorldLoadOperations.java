@@ -49,7 +49,7 @@ public class WorldLoadOperations extends WorldOperations {
         final ISignalAutoconfig config = current.getConfig();
         if (config == null)
             return;
-        config.change(info);
+        ISignalAutoconfig.change(info);
     }
 
     @Override
