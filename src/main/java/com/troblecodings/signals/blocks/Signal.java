@@ -155,6 +155,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                         if (item.getRegistryName().toString().replace(SignalsMain.MODID + ":", "")
                                 .equalsIgnoreCase(placementToolName)) {
                             placementtool = (Placementtool) item;
+                            return;
                         }
                     }
                 });

@@ -6,8 +6,8 @@ import java.util.function.Consumer;
 
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.signalbox.config.ISignalAutoconfig;
-import com.troblecodings.signals.signalbox.config.ISignalAutoconfig.ConfigInfo;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
 import net.minecraft.block.state.IBlockState;
@@ -64,7 +64,6 @@ public class WorldLoadOperations extends WorldOperations {
             final ISignalAutoconfig config = signaltile.getSignal().getConfig();
             if (config == null)
                 return;
-            config.reset(signaltile);
             syncClient(position);
         });
     }

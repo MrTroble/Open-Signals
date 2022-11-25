@@ -20,7 +20,7 @@ import com.troblecodings.signals.blocks.signals.SignalKS;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-public final class HLSignalConfig implements ISignalAutoconfig {
+public final class HLSignalConfig {
 
     public static final HLSignalConfig INSTANCE = new HLSignalConfig();
 
@@ -76,7 +76,6 @@ public final class HLSignalConfig implements ISignalAutoconfig {
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    @Override
     public void change(final ConfigInfo info) {
 
         if (info.type.equals(PathType.SHUNTING)) {
@@ -232,11 +231,9 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             values.put(SignalHL.DISTANTSIGNAL, HLDistant.HL10);
             values.put(SignalHL.ZS2, ZS32.ZS13);
         }
-        this.changeIfPresent(values, info.current);
     }
 
     @SuppressWarnings("rawtypes")
-    @Override
     public void reset(final SignalTileEnity current) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         values.put(SignalHL.LIGHTBAR, HLLightbar.OFF);
@@ -245,6 +242,5 @@ public final class HLSignalConfig implements ISignalAutoconfig {
         values.put(SignalHL.EXITSIGNAL, HLExit.HP0);
         values.put(SignalHL.ZS2, ZS32.OFF);
         values.put(SignalHL.ZS2V, ZS32.OFF);
-        this.changeIfPresent(values, current);
     }
 }

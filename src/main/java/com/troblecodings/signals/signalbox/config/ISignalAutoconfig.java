@@ -1,36 +1,38 @@
 package com.troblecodings.signals.signalbox.config;
 
 import java.util.HashMap;
+import java.util.List;
 
 import com.troblecodings.signals.SEProperty;
-import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.blocks.ConfigProperty;
+import com.troblecodings.signals.blocks.SignalPair;
+import com.troblecodings.signals.contentpacks.SignalConfigParser;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-public interface ISignalAutoconfig {
+public class ISignalAutoconfig {
 
-    public static class ConfigInfo {
-        public final SignalTileEnity current;
-        public final SignalTileEnity next;
-        public final int speed;
-        public PathType type = PathType.NONE;
+    @SuppressWarnings("unchecked")
+    public static void change(final ConfigInfo info) {
+        final SignalPair pair = new SignalPair(info.current.getSignal(), info.next.getSignal());
+        final List<ConfigProperty> values = SignalConfigParser.SIGNALCONFIGS.get(pair);
+        if (values != null) {
+            values.forEach(value -> {
+                if (value.predicate.test(info)) {
 
-        public ConfigInfo(final SignalTileEnity current, final SignalTileEnity next,
-                final int speed) {
-            this.current = current;
-            this.next = next;
-            this.speed = speed;
+                }
+            });
+        } else {
         }
-
     }
 
-    void change(final ConfigInfo info);
+    public static void reset(final SignalTileEnity current) {
 
-    void reset(final SignalTileEnity current);
+    }
 
     @SuppressWarnings({
             "unchecked", "rawtypes"
     })
-    default void changeIfPresent(final HashMap<SEProperty, Object> values,
+    public static void changeIfPresent(final HashMap<SEProperty, Object> values,
             final SignalTileEnity current) {
         values.forEach((sep, value) -> current.getProperty(sep)
                 .ifPresent(_u -> current.setProperty(sep, (Comparable) value)));

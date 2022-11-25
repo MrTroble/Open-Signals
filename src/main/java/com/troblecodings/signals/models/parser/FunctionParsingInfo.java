@@ -51,7 +51,11 @@ public class FunctionParsingInfo {
     }
 
     public Object getProperty() {
-        final String name = argument.toLowerCase();
+        return this.getProperty(argument);
+    }
+
+    public Object getProperty(final String propertyName) {
+        final String name = propertyName.toLowerCase();
         final IUnlistedProperty property = propertyCache.computeIfAbsent(name, _u -> {
             return properties.stream()
                     .filter(noneCache -> noneCache.getName().equalsIgnoreCase(argument)).findAny()

@@ -2,7 +2,7 @@ package com.troblecodings.signals.signalbox;
 
 import java.util.function.Consumer;
 
-import com.troblecodings.signals.signalbox.config.ISignalAutoconfig.ConfigInfo;
+import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.tileentitys.IChunkloadable;
 
 import net.minecraft.util.math.BlockPos;
