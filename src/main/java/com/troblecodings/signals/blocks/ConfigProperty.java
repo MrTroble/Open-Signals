@@ -11,6 +11,10 @@ public class ConfigProperty {
     public final SEProperty property;
     public final Object value;
 
+    public ConfigProperty(final SEProperty property, final Object value) {
+        this(t -> true, property, value);
+    }
+
     public ConfigProperty(final Predicate predicate, final SEProperty property,
             final Object value) {
         super();

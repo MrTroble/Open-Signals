@@ -19,13 +19,13 @@ public class SignalSystemParser {
     private SignalPropertiesBuilder systemProperties;
     private List<SEPropertyParser> seProperties;
 
+    private static transient final Gson GSON = new Gson();
+
     public List<SEPropertyParser> getSEProperties() {
         return seProperties;
     }
 
     public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {
-
-        final Gson gson = new Gson();
 
         final Map<String, String> systems = FileReader.readallFilesfromDierectory(directory);
 
@@ -37,7 +37,7 @@ public class SignalSystemParser {
         }
 
         systems.forEach((name, property) -> properties.put(name,
-                gson.fromJson(property, SignalSystemParser.class)));
+                GSON.fromJson(property, SignalSystemParser.class)));
 
         return properties;
     }

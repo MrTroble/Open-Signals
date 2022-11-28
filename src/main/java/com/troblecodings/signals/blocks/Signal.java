@@ -4,6 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -247,6 +248,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     public static final ArrayList<Signal> SIGNALLIST = new ArrayList<Signal>();
 
+    public static final Map<String, Signal> SIGNALS = new HashMap<>();
+
     public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel",
             SignalAngel.class);
     public static final SEProperty<Boolean> CUSTOMNAME = SEProperty.of("customname", false,
@@ -266,6 +269,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         id = SIGNALLIST.size();
         SIGNALLIST.add(this);
         prop.placementtool.addSignal(this);
+        SIGNALS.put(this.prop.signalTypeName, this);
     }
 
     @Override

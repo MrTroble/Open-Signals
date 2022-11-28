@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import com.google.gson.Gson;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.SignalsMain;
 import com.troblecodings.signals.blocks.ConfigProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalPair;
@@ -15,7 +16,7 @@ import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.LogicParser;
 import com.troblecodings.signals.utils.FileReader;
 
-public class SignalConfigParser {
+public class TwoSignalConfigParser {
 
     private String currentSignal;
     private String nextSignal;
@@ -25,7 +26,7 @@ public class SignalConfigParser {
         return currentSignal;
     }
 
-    public String getNextSignalSystem() {
+    public String getNextSignal() {
         return nextSignal;
     }
 
@@ -33,37 +34,31 @@ public class SignalConfigParser {
         return values;
     }
 
-    public static final Map<SignalPair, List<ConfigProperty>> SIGNALCONFIGS = new HashMap<>();
+    public static final transient Map<SignalPair, List<ConfigProperty>> CHANGECONFIGS = new HashMap<>();
 
-    private static final Gson GSON = new Gson();
+    private static final transient Gson GSON = new Gson();
 
-    public static void loadConfigs() {
-        loadNormalConfigs("/assets/girsignals/signalconfigs/normal");
+    public static void loadInternConfigs() {
+        loadChangeConfigs("/assets/girsignals/signalconfigs/change");
     }
 
     @SuppressWarnings("rawtypes")
-    public static void loadNormalConfigs(final String directory) {
-        final Map<String, String> files = FileReader.readallFilesfromDierectory(directory);
-        files.forEach((_u, content) -> {
-            final SignalConfigParser parser = GSON.fromJson(content, SignalConfigParser.class);
-            Signal start = null;
-            Signal end = null;
-            for (final Signal signal : Signal.SIGNALLIST) {
-                final String name = signal.getSignalTypeName();
+    public static void loadChangeConfigs(final String directory) {
 
-                if (start == null && parser.getCurrentSignal().equalsIgnoreCase(name))
-                    start = signal;
+        for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
+                .entrySet()) {
+            final TwoSignalConfigParser parser = GSON.fromJson(files.getValue(),
+                    TwoSignalConfigParser.class);
 
-                if (end == null && parser.getNextSignalSystem().equalsIgnoreCase(name))
-                    end = signal;
-
-                if (start != null && end != null)
-                    break;
-            }
+            Signal start = Signal.SIGNALS.get(parser.getCurrentSignal());
+            Signal end = Signal.SIGNALS.get(parser.getNextSignal());
             if (start == null || end == null) {
-                throw new ContentPackException(
-                        String.format("The signal [%d] or the signal [%s] don't exists!",
-                                parser.getCurrentSignal(), parser.getNextSignalSystem()));
+                SignalsMain.getLogger()
+                        .warn(String.format(
+                                "The signal [%s] or the signal [%d] doen't exists!"
+                                        + "This config with filename [%a] will be skiped!",
+                                parser.getCurrentSignal(), parser.getNextSignal(), files.getKey()));
+                continue;
             }
             final SignalPair pair = new SignalPair(start, end);
             final FunctionParsingInfo startInfo = new FunctionParsingInfo(start);
@@ -79,7 +74,7 @@ public class SignalConfigParser {
                 properties.add(new ConfigProperty(predicate, property, value[1]));
 
             }
-            SIGNALCONFIGS.put(pair, properties);
-        });
+            CHANGECONFIGS.put(pair, properties);
+        }
     }
 }
