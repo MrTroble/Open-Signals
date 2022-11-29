@@ -17,7 +17,7 @@ import com.troblecodings.signals.blocks.signals.SignalSemaphore;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-public final class SemaphoreConfig {
+public final class SemaphoreConfig implements ISignalAutoconfig {
 
     @SuppressWarnings("rawtypes")
     private static void checkSpeed(final Optional<ZS32> opt,
@@ -62,7 +62,7 @@ public final class SemaphoreConfig {
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-
+    @Override
     public void change(final ConfigInfo info) {
 
         if (info.type.equals(PathType.SHUNTING)) {
@@ -152,9 +152,10 @@ public final class SemaphoreConfig {
             values.put(SignalSemaphore.SEMA_VR, SemaDist.VR0);
             values.put(SignalSemaphore.ZS3, ZS32.OFF);
         }
-
+        this.changeIfPresent(values, info.current);
     }
 
+    @Override
     public void reset(final SignalTileEnity current) {
 
         @SuppressWarnings("rawtypes")
@@ -167,6 +168,7 @@ public final class SemaphoreConfig {
         values.put(SignalSemaphore.RA12, false);
         values.put(SignalSemaphore.ZS3, ZS32.OFF);
         values.put(SignalSemaphore.SEMA_VR, SemaDist.VR0);
+        this.changeIfPresent(values, current);
 
     }
 

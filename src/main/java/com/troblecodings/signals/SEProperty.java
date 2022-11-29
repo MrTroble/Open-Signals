@@ -121,6 +121,10 @@ public class SEProperty<T extends Comparable<T>>
         return (SEProperty) iup;
     }
 
+    public IProperty<?> getParent() {
+        return parent;
+    }
+
     public static <T extends Enum<T> & IStringSerializable> SEProperty<T> of(final String name,
             final T defaultValue) {
         return of(name, defaultValue, ChangeableStage.APISTAGE);

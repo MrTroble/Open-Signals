@@ -18,7 +18,7 @@ import com.troblecodings.signals.blocks.signals.SignalSemaphore;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-public final class RSSignalConfig {
+public final class RSSignalConfig implements ISignalAutoconfig {
 
     public static final RSSignalConfig RS_CONFIG = new RSSignalConfig();
 
@@ -26,7 +26,7 @@ public final class RSSignalConfig {
     }
 
     @SuppressWarnings("rawtypes")
-
+    @Override
     public void change(final ConfigInfo info) {
 
         final HashMap<SEProperty, Object> values = new HashMap<>();
@@ -42,9 +42,10 @@ public final class RSSignalConfig {
         if (info.type.equals(PathType.SHUNTING)) {
             values.put(SignalRA.RALIGHT, true);
         }
-
+        this.changeIfPresent(values, info.current);
     }
 
+    @Override
     public void reset(final SignalTileEnity current) {
         current.getProperty(SignalSHLight.SHLIGHT_0)
                 .ifPresent(_u -> current.setProperty(SignalSHLight.SHLIGHT_0, SHLight.SH0));

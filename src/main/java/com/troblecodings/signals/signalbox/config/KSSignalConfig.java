@@ -19,7 +19,7 @@ import com.troblecodings.signals.blocks.signals.SignalKS;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-public final class KSSignalConfig {
+public final class KSSignalConfig implements ISignalAutoconfig {
 
     public static final KSSignalConfig INSTANCE = new KSSignalConfig();
 
@@ -29,7 +29,7 @@ public final class KSSignalConfig {
     @SuppressWarnings({
             "unchecked", "rawtypes"
     })
-
+    @Override
     public void change(final ConfigInfo info) {
 
         if (info.type.equals(PathType.SHUNTING)) {
@@ -228,10 +228,11 @@ public final class KSSignalConfig {
             values.put(SignalKS.ZS3V, ZS32.OFF);
             values.put(SignalKS.ZS3, ZS32.Z3);
         }
-
+        this.changeIfPresent(values, info.current);
     }
 
     @SuppressWarnings("rawtypes")
+    @Override
     public void reset(final SignalTileEnity current) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         values.put(SignalKS.DISTANTSIGNAL, KSDistant.KS2);
@@ -241,5 +242,6 @@ public final class KSSignalConfig {
         values.put(SignalKS.ZS3, ZS32.OFF);
         values.put(SignalKS.ZS2V, ZS32.OFF);
         values.put(SignalKS.ZS3V, ZS32.OFF);
+        this.changeIfPresent(values, current);
     }
 }

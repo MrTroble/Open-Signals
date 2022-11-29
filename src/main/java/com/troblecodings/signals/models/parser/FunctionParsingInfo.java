@@ -23,6 +23,7 @@ public class FunctionParsingInfo {
     static {
         PARAMETER_PARSER.put(IUnlistedProperty.class, FunctionParsingInfo::getProperty);
         PARAMETER_PARSER.put(ValuePack.class, FunctionParsingInfo::getPredicate);
+        PARAMETER_PARSER.put(Integer.class, FunctionParsingInfo::getInt);
     }
 
     public String argument;
@@ -101,6 +102,10 @@ public class FunctionParsingInfo {
             throw new LogicalParserException(String
                     .format("Could not make predicate=%s with system=%S!", argument, signalName));
         return predicate;
+    }
+
+    public Object getInt() {
+        return Integer.parseInt(argument);
     }
 
 }

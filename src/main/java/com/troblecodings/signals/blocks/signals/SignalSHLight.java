@@ -7,6 +7,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignalItems;
+import com.troblecodings.signals.signalbox.config.RSSignalConfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
 import net.minecraft.client.gui.FontRenderer;
@@ -15,7 +16,7 @@ public class SignalSHLight extends Signal {
 
     public SignalSHLight() {
         super(builder(SignalItems.PLACEMENT_TOOL, "SHLight").height(0).offsetX(-7.5f).offsetY(-6.3f)
-                .signHeight(0.373f).build());
+                .signHeight(0.373f).config(RSSignalConfig.RS_CONFIG).build());
     }
 
     public static final SEProperty<SHLight> SHLIGHT_0 = SEProperty.of("sh_light_bottom",
@@ -38,5 +39,4 @@ public class SignalSHLight extends Signal {
                 te.getProperty(SH_HIGH).filter(b -> (Boolean) b).isPresent() ? 2.373f
                         : this.prop.customNameRenderHeight);
     }
-
 }

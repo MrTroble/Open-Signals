@@ -11,6 +11,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignalItems;
+import com.troblecodings.signals.signalbox.config.HVSignalConfig;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +20,8 @@ import net.minecraft.world.IBlockAccess;
 public class SignalHV extends Signal {
 
     public SignalHV() {
-        super(builder(SignalItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f).build());
+        super(builder(SignalItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f)
+                .config(HVSignalConfig.INSTANCE).build());
     }
 
     public static final SEProperty<HPType> HPTYPE = SEProperty.of("hptype", HPType.STOPSIGNAL,

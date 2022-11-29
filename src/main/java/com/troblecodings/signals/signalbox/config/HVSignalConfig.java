@@ -19,7 +19,7 @@ import com.troblecodings.signals.blocks.signals.SignalKS;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-public final class HVSignalConfig {
+public final class HVSignalConfig implements ISignalAutoconfig {
 
     public static final HVSignalConfig INSTANCE = new HVSignalConfig();
 
@@ -29,6 +29,7 @@ public final class HVSignalConfig {
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
+    @Override
     public void change(final ConfigInfo info) {
 
         if (info.type.equals(PathType.SHUNTING)) {
@@ -218,9 +219,11 @@ public final class HVSignalConfig {
             values.put(SignalHV.ZS1, false);
             values.put(SignalHV.ZS7, false);
         }
+        this.changeIfPresent(values, info.current);
     }
 
     @SuppressWarnings("rawtypes")
+    @Override
     public void reset(final SignalTileEnity current) {
         final HashMap<SEProperty, Object> values = new HashMap<>();
         values.put(SignalHV.HPBLOCK, HPBlock.HP0);
@@ -231,5 +234,6 @@ public final class HVSignalConfig {
         values.put(SignalHV.ZS3V, ZS32.OFF);
         values.put(SignalHV.ZS1, false);
         values.put(SignalHV.ZS7, false);
+        this.changeIfPresent(values, current);
     }
 }

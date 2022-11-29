@@ -44,6 +44,9 @@ public final class LogicParser {
 
         TRANSLATION_TABLE.put("config", new MethodInfo("config",
                 objects -> PredicateHolder.config((ValuePack) objects[0]), ValuePack.class));
+
+        TRANSLATION_TABLE.put("speed", new MethodInfo("speed",
+                objects -> PredicateHolder.speed((int) objects[0]), Integer.class));
     }
 
     public static Predicate nDegreeFunctionParser(final String name,

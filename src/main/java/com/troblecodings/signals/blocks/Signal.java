@@ -578,6 +578,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     public void getUpdate(final World world, final BlockPos pos) {
-        
+
     }
 }

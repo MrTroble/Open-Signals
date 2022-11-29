@@ -8,11 +8,13 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.SignalItems;
+import com.troblecodings.signals.signalbox.config.RSSignalConfig;
 
 public class SignalRA extends Signal {
 
     public SignalRA() {
-        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0).build());
+        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0)
+                .config(RSSignalConfig.RS_CONFIG).build());
     }
 
     public static final SEProperty<RA> RATYPE = SEProperty.of("ratype", RA.RA10,
