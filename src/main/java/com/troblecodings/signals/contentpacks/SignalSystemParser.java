@@ -43,18 +43,18 @@ public class SignalSystemParser {
     }
 
     @SuppressWarnings("rawtypes")
-    public Signal createNewSignalSystem(final String fileName) {
+    public Signal createSignalSystem(final String fileName) {
 
-        final String name = fileName.replace(".json", "").replace("_", "").toLowerCase();
+        final String name = fileName.replace(".json", "").replace("_", "");
 
         final List<IUnlistedProperty> properties = new ArrayList<>();
 
         final FunctionParsingInfo info = new FunctionParsingInfo(name, properties);
         seProperties.forEach(prop -> properties.add(prop.createSEProperty(info)));
-
         Signal.nextConsumer = list -> {
             list.addAll(properties);
         };
+
         return (Signal) new Signal(systemProperties.typename(name).build(info))
                 .setRegistryName(SignalsMain.MODID, name).setUnlocalizedName(name);
     }

@@ -58,15 +58,15 @@ public class FunctionParsingInfo {
         final String name = propertyName.toLowerCase();
         final IUnlistedProperty property = propertyCache.computeIfAbsent(name, _u -> {
             return properties.stream()
-                    .filter(noneCache -> noneCache.getName().equalsIgnoreCase(argument)).findAny()
+                    .filter(noneCache -> noneCache.getName().equalsIgnoreCase(name)).findAny()
                     .orElse(null);
         });
         if (property == null) {
             final IUnlistedProperty backup = JsonEnum.PROPERTIES.get(name);
             if (backup != null)
                 return backup;
-            throw new LogicalParserException(String
-                    .format("Could not find property=%s in system=%S!", argument, signalName));
+            throw new LogicalParserException(
+                    String.format("Could not find property=%s in system=%S!", name, signalName));
         }
         return property;
     }

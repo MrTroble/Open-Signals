@@ -50,14 +50,12 @@ public class TwoSignalConfigParser {
             final TwoSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     TwoSignalConfigParser.class);
 
-            Signal start = Signal.SIGNALS.get(parser.getCurrentSignal());
-            Signal end = Signal.SIGNALS.get(parser.getNextSignal());
+            Signal start = Signal.SIGNALS.get(parser.getCurrentSignal().toLowerCase());
+            Signal end = Signal.SIGNALS.get(parser.getNextSignal().toLowerCase());
             if (start == null || end == null) {
-                SignalsMain.getLogger()
-                        .warn(String.format(
-                                "The signal [%s] or the signal [%d] doen't exists!"
-                                        + "This config with filename [%a] will be skiped!",
-                                parser.getCurrentSignal(), parser.getNextSignal(), files.getKey()));
+                SignalsMain.getLogger().warn("The signal '" + parser.getCurrentSignal()
+                        + "' or the signal '" + parser.getNextSignal() + "' doen't exists! "
+                        + "This config with filename '" + files.getKey() + "' will be skiped!");
                 continue;
             }
             final SignalPair pair = new SignalPair(start, end);

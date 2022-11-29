@@ -58,6 +58,7 @@ public class OneSignalConfigParser {
                 propertes
                         .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
             }
+            SHUNTINGCONFIGS.put(signal, propertes);
         }
     }
 
@@ -79,6 +80,7 @@ public class OneSignalConfigParser {
                 propertes
                         .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
             }
+            DEFAULTCONFIGS.put(signal, propertes);
         }
     }
 
@@ -100,17 +102,15 @@ public class OneSignalConfigParser {
                 propertes
                         .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
             }
+            RESETCONFIGS.put(signal, propertes);
         }
     }
 
     private static Signal checkSignal(final String signalName, final String filename) {
-        final Signal signal = Signal.SIGNALS.get(signalName);
+        final Signal signal = Signal.SIGNALS.get(signalName.toLowerCase());
         if (signal == null) {
-            SignalsMain.getLogger()
-                    .warn(String.format(
-                            "The signal [%d] doesn't exists! "
-                                    + " This config with the filename [%s] will be skiped!",
-                            signalName, filename));
+            SignalsMain.getLogger().warn("The signal '" + signalName + "' doesn't exists! "
+                    + "This config with the filename '" + filename + "' will be skiped!");
             return null;
         }
         return signal;

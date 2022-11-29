@@ -269,7 +269,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         id = SIGNALLIST.size();
         SIGNALLIST.add(this);
         prop.placementtool.addSignal(this);
-        SIGNALS.put(this.prop.signalTypeName, this);
+        SIGNALS.put(this.prop.signalTypeName.toLowerCase(), this);
     }
 
     @Override
@@ -422,6 +422,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         nextConsumer.accept(signalProperties);
         nextConsumer = _u -> {
         };
+
         this.signalProperties.add(CUSTOMNAME);
         return new ExtendedBlockState(this, new IProperty<?>[] {
                 ANGEL
@@ -577,7 +578,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     public void getUpdate(final World world, final BlockPos pos) {
-
+        
     }
-
 }

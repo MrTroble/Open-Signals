@@ -1,9 +1,7 @@
 package com.troblecodings.signals.signalbox.config;
 
-import java.util.HashMap;
 import java.util.List;
 
-import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.ConfigProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalPair;
@@ -17,31 +15,32 @@ public class ISignalAutoconfig {
     public static void change(final ConfigInfo info) {
         final Signal currentSignal = info.current.getSignal();
         if (info.type.equals(PathType.NORMAL)) {
-            if (info.next.getSignal() != null) {
-                final SignalPair pair = new SignalPair(currentSignal, info.next.getSignal());
+            if (info.next != null) {
+                final Signal nextSignal = info.next.getSignal();
+                final SignalPair pair = new SignalPair(currentSignal, nextSignal);
                 final List<ConfigProperty> values = TwoSignalConfigParser.CHANGECONFIGS.get(pair);
                 if (values != null) {
-                    // here needs to be code to check the Predicate of each value and to execute it.
+                    changeIfPresent(values, info.current);
                 } else {
-                    loadDefault(currentSignal);
+                    loadDefault(info.current);
                 }
             } else {
-                loadDefault(currentSignal);
+                loadDefault(info.current);
             }
         } else if (info.type.equals(PathType.SHUNTING)) {
             final List<ConfigProperty> shuntingValues = OneSignalConfigParser.SHUNTINGCONFIGS
                     .get(currentSignal);
             if (shuntingValues != null) {
-                // here needs to be code to check the Predicate of each value and to execute it.
+                changeIfPresent(shuntingValues, info.current);
             }
         }
     }
 
-    private static void loadDefault(final Signal currentSignal) {
+    private static void loadDefault(final SignalTileEnity currentSignal) {
         final List<ConfigProperty> defaultValues = OneSignalConfigParser.DEFAULTCONFIGS
-                .get(currentSignal);
+                .get(currentSignal.getSignal());
         if (defaultValues != null) {
-            // here needs to be code to check the Predicate of each value and to execute it.
+            changeIfPresent(defaultValues, currentSignal);
         }
     }
 
@@ -49,16 +48,20 @@ public class ISignalAutoconfig {
         final List<ConfigProperty> resetValues = OneSignalConfigParser.RESETCONFIGS
                 .get(current.getSignal());
         if (resetValues != null) {
-            // here needs to be code to check the Predicate of each value and to execute it.
+            changeIfPresent(resetValues, current);
         }
     }
 
     @SuppressWarnings({
             "unchecked", "rawtypes"
     })
-    public static void changeIfPresent(final HashMap<SEProperty, Object> values,
+    private static void changeIfPresent(final List<ConfigProperty> values,
             final SignalTileEnity current) {
-        values.forEach((sep, value) -> current.getProperty(sep)
-                .ifPresent(_u -> current.setProperty(sep, (Comparable) value)));
+        values.forEach(property -> {
+            if (property.predicate.test(current.getProperties())) {
+                current.getProperty(property.property).ifPresent(
+                        _u -> current.setProperty(property.property, (Comparable) property.value));
+            }
+        });
     }
 }

@@ -17,8 +17,7 @@ public final class SignalLoader {
     public static void loadSignalsfromDirectory(final String directory) {
         final Map<String, SignalSystemParser> signals = SignalSystemParser
                 .getSignalSystems(directory);
-        signals.forEach((filename, properties) -> {
-            SignalBlocks.blocksToRegister.add(properties.createNewSignalSystem(filename));
-        });
+        signals.forEach((filename, properties) -> SignalBlocks.blocksToRegister
+                .add(properties.createSignalSystem(filename)));
     }
 }
