@@ -22,6 +22,7 @@ import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.LogicParser;
+import com.troblecodings.signals.models.parser.LogicalParserException;
 import com.troblecodings.signals.signalbox.config.ISignalAutoconfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
@@ -125,9 +126,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private String placementToolName = null;
         private String signalTypeName = null;
         private int defaultHeight = 1;
-        private Map<String, Integer> signalHeights = null;
+        private final Map<String, Integer> signalHeights = null;
         private float customNameRenderHeight = -1;
-        private Map<String, Float> renderHeights = null;
+        private final Map<String, Float> renderHeights = null;
         private float signWidth = 22;
         private float offsetX = 0;
         private float offsetY = 0;
@@ -168,18 +169,31 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             final List<HeightProperty> signalheights = new ArrayList<>();
             if (signalHeights != null) {
                 signalHeights.forEach((property, height) -> {
-                    if (info != null)
-                        signalheights.add(
-                                new HeightProperty(LogicParser.predicate(property, info), height));
+                    if (info != null) {
+                        try {
+                            signalheights.add(new HeightProperty(
+                                    LogicParser.predicate(property, info), height));
+                        } catch (final LogicalParserException e) {
+                            SignalsMain.getLogger().error("File: " + signalTypeName);
+                            e.printStackTrace();
+                        }
+                    }
+
                 });
             }
 
             final List<FloatProperty> renderheights = new ArrayList<>();
             if (renderHeights != null) {
                 renderHeights.forEach((property, height) -> {
-                    if (info != null)
-                        renderheights.add(
-                                new FloatProperty(LogicParser.predicate(property, info), height));
+                    if (info != null) {
+                        try {
+                            renderheights.add(new FloatProperty(
+                                    LogicParser.predicate(property, info), height));
+                        } catch (final LogicalParserException e) {
+                            SignalsMain.getLogger().error("File: " + signalTypeName);
+                            e.printStackTrace();
+                        }
+                    }
                 });
             }
 

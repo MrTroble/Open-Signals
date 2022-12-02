@@ -35,9 +35,15 @@ public class SignalSystemParser {
             SignalsMain.log.error("Can't read out signalsystems from " + directory + "!");
             return properties;
         }
-
-        systems.forEach((name, property) -> properties.put(name,
-                GSON.fromJson(property, SignalSystemParser.class)));
+        
+            systems.forEach((name, property) -> {
+                try {
+                    properties.put(name, GSON.fromJson(property, SignalSystemParser.class));
+                } catch (final Exception e) {
+                    SignalsMain.getLogger().error("File: " + name);
+                    e.printStackTrace();
+                }
+            });
 
         return properties;
     }
