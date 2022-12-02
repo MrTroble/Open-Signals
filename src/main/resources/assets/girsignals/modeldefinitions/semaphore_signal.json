@@ -288,6 +288,30 @@
 			],
 			"y": 3
 		},
+		"semaphore_signals/sema_distant_zs3v_plate": {
+			"textures": [
+				{
+					"loadOFFstate": false,
+					"blockstate": "with(SEMATYPE.DIST)",
+					"extentions": {
+						"zs32.json": {
+							"zs3vplate": "overlay"
+						}
+					}
+				}
+			],
+			"y": 1,
+			"x": -1
+		},
+		"mast": {
+			"textures": [
+				{
+					"blockstate": "with(SEMATYPE.DIST) && !with(ZS3VPLATE.OFF)"
+				}
+			],
+			"y": 0,
+			"x": -1
+		},
 		"semaphore_signals/sema_main_wing1": {
 			"textures": [
 				{

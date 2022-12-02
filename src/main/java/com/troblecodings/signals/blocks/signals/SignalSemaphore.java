@@ -12,7 +12,10 @@ import com.troblecodings.signals.init.SignalItems;
 import com.troblecodings.signals.signalbox.config.SemaphoreConfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 
 public class SignalSemaphore extends Signal {
 
@@ -34,6 +37,8 @@ public class SignalSemaphore extends Signal {
                     .and(check(HP2, Boolean.TRUE)));
     public static final SEProperty<ZS32> ZS3 = SEProperty.of("zs3", ZS32.OFF);
     public static final SEProperty<ZS32> ZS3_PLATE = SEProperty.of("zs3plate", ZS32.OFF,
+            ChangeableStage.GUISTAGE);
+    public static final SEProperty<ZS32> ZS3V_PLATE = SEProperty.of("zs3vplate", ZS32.OFF,
             ChangeableStage.GUISTAGE);
     public static final SEProperty<Boolean> ZS1 = SEProperty.of("zs1", false);
     public static final SEProperty<Boolean> ZS7 = SEProperty.of("zs7", false);
@@ -67,5 +72,16 @@ public class SignalSemaphore extends Signal {
                 te.getProperty(SEMATYPE).filter(st -> st.equals(SemaType.MAIN_SMALL)).isPresent()
                         ? 1.04f
                         : this.prop.customNameRenderHeight);
+    }
+    
+    @Override
+    public boolean hasCostumColor() {
+        return true;
+    }
+
+    @Override
+    public int colorMultiplier(final IBlockState state, final IBlockAccess worldIn,
+            final BlockPos pos, final int tintIndex) {
+        return tintIndex == 1 ? 0xFFC200 : 0xFFFFFF;
     }
 }
