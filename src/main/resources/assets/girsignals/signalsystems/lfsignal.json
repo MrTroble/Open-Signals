@@ -1,0 +1,21 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": false,
+        "defaultHeight": 0
+    },
+    "seProperties": [
+        {
+            "name": "indicator",
+            "enumClass": "LF",
+            "defaultState": "Z1",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "lftype",
+            "enumClass": "LFBachground",
+            "defaultState": "LF1",
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

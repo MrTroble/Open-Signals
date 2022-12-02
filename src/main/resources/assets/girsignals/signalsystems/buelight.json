@@ -1,0 +1,24 @@
+{
+    "systemProperties": {
+        "placementToolName": "placementtool",
+        "canLink": true,
+        "defaultHeight": 4
+    },
+    "seProperties": [
+        {
+            "name": "ne2_2",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ne2_4",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "buelight",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG"
+        }
+    ]
+}

@@ -1,0 +1,61 @@
+{
+    "systemProperties": {
+        "placementToolName": "placementtool",
+        "canLink": true,
+        "defaultHeight": 0
+    },
+    "seProperties": [
+        {
+            "name": "signaltramtype",
+            "enumClass": "TramType",
+            "defaultState": "TRAM",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "signaltram",
+            "enumClass": "Tram",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(SIGNALTRAMTYPE.TRAM)"
+        },
+        {
+            "name": "signaltramadd",
+            "enumClass": "TramAdd",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE",
+            "autoname": true,
+            "dependencies": "check(SIGNALTRAMTYPE.TRAM)"
+        },
+        {
+            "name": "signaltrama",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(SIGNALTRAMTYPE.TRAM) && (check(SIGNALTRAMADD.A) || check(SIGNALTRAMADD.AT))"
+        },
+        {
+            "name": "signaltramt",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(SIGNALTRAMTYPE.TRAM) && (check(SIGNALTRAMADD.T) || check(SIGNALTRAMADD.AT))"
+        },
+        {
+            "name": "signaltramswitch",
+            "enumClass": "TramSwitch",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(SIGNALTRAMTYPE.SWITCH)"
+        },
+        {
+            "name": "signalped",
+            "enumClass": "PED",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(SIGNALTRAMTYPE.PEDESTRIAN)"
+        }
+    ]
+}

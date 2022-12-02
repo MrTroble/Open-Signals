@@ -1,0 +1,27 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": false,
+        "defaultHeight": 0
+    },
+    "seProperties": [
+        {
+            "name": "netype",
+            "enumClass": "NE",
+            "defaultState": "NE1",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "neaddition",
+            "enumClass": "NEAddition",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "arrow",
+            "enumClass": "Arrow",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

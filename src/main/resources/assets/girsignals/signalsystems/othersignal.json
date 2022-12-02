@@ -1,0 +1,21 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": false,
+        "defaultHeight": 0,
+        "signScale": 3.5,
+        "offsetX": -5,
+        "offsetY": 1.8,
+        "renderHeights": {
+            "OTHERTYPE.HM": 2.1
+        }
+    },
+    "seProperties": [
+        {
+            "name": "othertype",
+            "enumClass": "OtherSignal",
+            "defaultState": "HM",
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}
