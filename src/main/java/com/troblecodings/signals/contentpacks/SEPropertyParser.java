@@ -3,12 +3,13 @@ package com.troblecodings.signals.contentpacks;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.SEAutoNameProp;
-import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.models.parser.FunctionParsingInfo;
-import eu.gir.girsignals.models.parser.LogicParser;
-import eu.gir.girsignals.utils.JsonEnum;
+import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.SEProperty.SEAutoNameProp;
+import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.models.parser.FunctionParsingInfo;
+import com.troblecodings.signals.models.parser.LogicParser;
+import com.troblecodings.signals.utils.JsonEnum;
+
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 

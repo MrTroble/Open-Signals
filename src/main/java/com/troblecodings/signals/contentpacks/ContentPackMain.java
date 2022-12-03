@@ -2,7 +2,7 @@ package com.troblecodings.signals.contentpacks;
 
 import java.io.File;
 
-import eu.gir.girsignals.GIRSignalsMain;
+import com.troblecodings.signals.OpenSignalsMain;
 
 public class ContentPackMain {
 
@@ -17,7 +17,7 @@ public class ContentPackMain {
         final File[] contentPacks = assetsFolder.listFiles((dir, name) -> name.endsWith(".zip"));
 
         if (contentPacks == null || contentPacks.length == 0)
-            GIRSignalsMain.log.info("No ContentPacks found!");
+            OpenSignalsMain.log.info("No ContentPacks found!");
         }
     }
 }

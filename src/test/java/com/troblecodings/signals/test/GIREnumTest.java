@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import eu.gir.girsignals.utils.JsonEnum;
+import com.troblecodings.signals.utils.JsonEnum;
 
 public class GIREnumTest {
 
