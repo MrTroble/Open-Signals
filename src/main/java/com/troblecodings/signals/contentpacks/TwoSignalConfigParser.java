@@ -7,15 +7,14 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.gson.Gson;
-
-import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.GIRFileReader;
-import eu.gir.girsignals.GIRSignalsMain;
-import eu.gir.girsignals.blocks.ConfigProperty;
-import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.blocks.SignalPair;
-import eu.gir.girsignals.models.parser.FunctionParsingInfo;
-import eu.gir.girsignals.models.parser.LogicParser;
+import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.blocks.ConfigProperty;
+import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.blocks.SignalPair;
+import com.troblecodings.signals.models.parser.FunctionParsingInfo;
+import com.troblecodings.signals.models.parser.LogicParser;
+import com.troblecodings.signals.utils.FileReader;
 
 public class TwoSignalConfigParser {
 
@@ -46,7 +45,7 @@ public class TwoSignalConfigParser {
     @SuppressWarnings("rawtypes")
     public static void loadChangeConfigs(final String directory) {
 
-        for (Map.Entry<String, String> files : GIRFileReader.readallFilesfromDierectory(directory)
+        for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
                 .entrySet()) {
             final TwoSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     TwoSignalConfigParser.class);
@@ -54,7 +53,7 @@ public class TwoSignalConfigParser {
             Signal start = Signal.SIGNALS.get(parser.getCurrentSignal().toLowerCase());
             Signal end = Signal.SIGNALS.get(parser.getNextSignal().toLowerCase());
             if (start == null || end == null) {
-                GIRSignalsMain.getLogger().warn("The signal '" + parser.getCurrentSignal()
+                OpenSignalsMain.getLogger().warn("The signal '" + parser.getCurrentSignal()
                         + "' or the signal '" + parser.getNextSignal() + "' doen't exists! "
                         + "This config with filename '" + files.getKey() + "' will be skiped!");
                 continue;

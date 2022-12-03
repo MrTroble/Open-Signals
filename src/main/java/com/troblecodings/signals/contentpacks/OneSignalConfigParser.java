@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
-
-import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.GIRFileReader;
-import eu.gir.girsignals.GIRSignalsMain;
-import eu.gir.girsignals.blocks.ConfigProperty;
-import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.models.parser.FunctionParsingInfo;
+import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.blocks.ConfigProperty;
+import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.models.parser.FunctionParsingInfo;
+import com.troblecodings.signals.utils.FileReader;
 
 public class OneSignalConfigParser {
 
@@ -43,7 +42,7 @@ public class OneSignalConfigParser {
 
     @SuppressWarnings("rawtypes")
     public static void loadShuntigConfigs(final String directory) {
-        for (Map.Entry<String, String> files : GIRFileReader.readallFilesfromDierectory(directory)
+        for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
                 .entrySet()) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalConfigParser.class);
@@ -65,7 +64,7 @@ public class OneSignalConfigParser {
 
     @SuppressWarnings("rawtypes")
     public static void loadDefaultConfigs(final String directory) {
-        for (Map.Entry<String, String> files : GIRFileReader.readallFilesfromDierectory(directory)
+        for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
                 .entrySet()) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalConfigParser.class);
@@ -87,7 +86,7 @@ public class OneSignalConfigParser {
 
     @SuppressWarnings("rawtypes")
     public static void loadResetConfigs(final String directory) {
-        for (Map.Entry<String, String> files : GIRFileReader.readallFilesfromDierectory(directory)
+        for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
                 .entrySet()) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalConfigParser.class);
@@ -110,7 +109,7 @@ public class OneSignalConfigParser {
     private static Signal checkSignal(final String signalName, final String filename) {
         final Signal signal = Signal.SIGNALS.get(signalName.toLowerCase());
         if (signal == null) {
-            GIRSignalsMain.getLogger().warn("The signal '" + signalName + "' doesn't exists! "
+            OpenSignalsMain.getLogger().warn("The signal '" + signalName + "' doesn't exists! "
                     + "This config with the filename '" + filename + "' will be skiped!");
             return null;
         }

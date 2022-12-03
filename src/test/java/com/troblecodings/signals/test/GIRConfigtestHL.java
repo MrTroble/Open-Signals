@@ -1,31 +1,30 @@
 package com.troblecodings.signals.test;
 
-import static eu.gir.girsignals.blocks.signals.SignalHL.DISTANTSIGNAL;
-import static eu.gir.girsignals.blocks.signals.SignalHL.EXITSIGNAL;
-import static eu.gir.girsignals.blocks.signals.SignalHL.LIGHTBAR;
-import static eu.gir.girsignals.blocks.signals.SignalHL.STOPSIGNAL;
+import static com.troblecodings.signals.blocks.signals.SignalHL.DISTANTSIGNAL;
+import static com.troblecodings.signals.blocks.signals.SignalHL.EXITSIGNAL;
+import static com.troblecodings.signals.blocks.signals.SignalHL.LIGHTBAR;
+import static com.troblecodings.signals.blocks.signals.SignalHL.STOPSIGNAL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.jupiter.api.Test;
 
+import com.troblecodings.signals.EnumSignals.HL;
+import com.troblecodings.signals.EnumSignals.HLDistant;
+import com.troblecodings.signals.EnumSignals.HLExit;
+import com.troblecodings.signals.EnumSignals.HLLightbar;
+import com.troblecodings.signals.EnumSignals.HP;
+import com.troblecodings.signals.EnumSignals.HPBlock;
+import com.troblecodings.signals.EnumSignals.HPHome;
+import com.troblecodings.signals.EnumSignals.KS;
+import com.troblecodings.signals.EnumSignals.KSDistant;
+import com.troblecodings.signals.EnumSignals.KSMain;
+import com.troblecodings.signals.EnumSignals.VR;
+import com.troblecodings.signals.EnumSignals.ZS32;
+import com.troblecodings.signals.blocks.signals.SignalHV;
+import com.troblecodings.signals.blocks.signals.SignalKS;
+import com.troblecodings.signals.signalbox.config.ConfigInfo;
+import com.troblecodings.signals.signalbox.config.HLSignalConfig;
 import com.troblecodings.signals.test.DummySignal.DummyBuilder;
-
-import eu.gir.girsignals.EnumSignals.HL;
-import eu.gir.girsignals.EnumSignals.HLDistant;
-import eu.gir.girsignals.EnumSignals.HLExit;
-import eu.gir.girsignals.EnumSignals.HLLightbar;
-import eu.gir.girsignals.EnumSignals.HP;
-import eu.gir.girsignals.EnumSignals.HPBlock;
-import eu.gir.girsignals.EnumSignals.HPHome;
-import eu.gir.girsignals.EnumSignals.KS;
-import eu.gir.girsignals.EnumSignals.KSDistant;
-import eu.gir.girsignals.EnumSignals.KSMain;
-import eu.gir.girsignals.EnumSignals.VR;
-import eu.gir.girsignals.EnumSignals.ZS32;
-import eu.gir.girsignals.blocks.signals.SignalHV;
-import eu.gir.girsignals.blocks.signals.SignalKS;
-import eu.gir.girsignals.signalbox.config.ConfigInfo;
-import eu.gir.girsignals.signalbox.config.HLSignalConfig;
 
 public class GIRConfigtestHL {
 

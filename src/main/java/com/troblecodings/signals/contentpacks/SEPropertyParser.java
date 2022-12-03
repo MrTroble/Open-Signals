@@ -3,12 +3,13 @@ package com.troblecodings.signals.contentpacks;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SEProperty.SEAutoNameProp;
-import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.models.parser.FunctionParsingInfo;
-import eu.gir.girsignals.models.parser.LogicParser;
-import eu.gir.girsignals.utils.JsonEnum;
+import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.SEProperty.SEAutoNameProp;
+import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.models.parser.FunctionParsingInfo;
+import com.troblecodings.signals.models.parser.LogicParser;
+import com.troblecodings.signals.utils.JsonEnum;
+
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 
@@ -18,7 +19,7 @@ public class SEPropertyParser {
     private String enumClass;
     private Object defaultState;
     private String changeableStage;
-    private boolean autoname = false;
+    private final boolean autoname = false;
     private String dependencies;
     private transient IProperty<?> parent;
 
@@ -33,7 +34,7 @@ public class SEPropertyParser {
         }
 
         if (parent == null)
-            throw new ContentPackException(String.format("Property[%s] not found!", name));
+            throw new ContentPackException(String.format("Property[%s], with class %s not found!", name, enumClass.toLowerCase()));
 
         ChangeableStage stage = ChangeableStage.APISTAGE;
         if (changeableStage != null && !changeableStage.isEmpty()) {
