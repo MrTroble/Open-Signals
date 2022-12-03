@@ -8,6 +8,37 @@ gui.keyprompt=Drücke [LSHIFT] für mehr Informationen!
 item.linkingtool.name=Verlinker
 item.placementtool.name=Signal-Platzierer
 item.signplacementtool.name=Signaltafel-Platzierer
+item.conductortrowelgreen.name=Handkelle Grün
+item.conductortrowelred.name=Handkelle Rot
+item.warningflag.name=Warnflagge
+item.kboard.name=K-Tafel
+item.lboard.name=L-Tafel
+item.reflectivehead.name=Rangierer Sicherheitshelm
+item.reflectivechestplate.name=Rangierer Weste
+item.reflectivepants.name=Rangierer Latzhose
+item.reflectiveshoes.name=Rangierer Sicherheitsschuhe
+item.traindriverhead.name=Lokführer Mütze
+item.traindriverchestplate.name=Lokführer Jacke
+item.traindriverpants.name=Lokführer Hose
+item.traindrivershoes.name=Lokführer Schuhe
+item.dispatcherhead.name=Fahrdienstleiter Mütze
+item.dispatcherchestplate.name=Fahrdienstleiter Jacke
+item.dispatcherpants.name=Fahrdienstleiter Hose
+item.dispatchershoes.name=Fahrdienstleiter Schuhe
+item.stationmanagerhead.name=Bahnhofsaufsicht Mütze
+item.stationmanagerchestplate.name=Bahnhofsaufsicht Jacke
+item.stationmanagerpants.name=Bahnhofsaufsicht Hose
+item.stationmanagershoes.name=Bahnhofsaufsicht Schuhe
+item.conductorhead.name=Zugführer Mütze
+item.conductorchestplate.name=Zugführer Jacke
+item.conductorpants.name=Zugführer Hose
+item.conductorshoes.name=Zugführer Schuhe
+
+item.reflectivechestplate.name=Sicherheitsweste
+item.traindriverhead.name=Lokführer Mütze
+item.dispatcherhead.name=Fahrdienstleiter Mütze
+item.stationmanagerhead.name=Bahnhofsaufsicht Mütze
+item.conductorchestplate.name=Zugführer Anzug
 
 #Blocks
 tile.hvsignalcontroller.name=Signal Steuerer
@@ -34,6 +65,12 @@ tile.redstoneout.name=Redstone Output
 tile.semaphoresignal.name=Formsignal
 tile.shmech.name=Schutzhaltsignal
 tile.andreascross.name=Andreaskreuz
+tile.tssignal.name=Ts Signal
+tile.etcssignal.name=ETCS Signal
+tile.rosignal.name=Ro Signal
+tile.tramsignsignal.name=Tram Signale
+tile.railroadgate.name=Schranken
+tile.switchhandle.name=Weichenhebel/ Wn Signal
 
 #Linktool
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r
@@ -151,7 +188,6 @@ property.wing1.desc=Flügel für Hp0 und Hp1
 property.semavr.desc=§lVr Vorsignal§r - Vorsignale zeigen an, welches Signalbild am zugehörigen Hauptsignal zu erwarten ist.%n§nVr0§r: Halt erwarten%n§nVr1§r: Fahrt erwarten%n§nVr2§r: Fahrt mit Geschwindigkeitsbeschränkung erwarten 
 property.sh_mech.desc=§lSh Schutzhaltsignal§r%n§nSh0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben%n§nWn7/Gsp2§r: Die Gleissperre ist abgelegt.
 
-
 #Sign Names
 property.indicator.name=Aufschrift
 property.lftype.name=Langsamfahrsignal
@@ -176,6 +212,26 @@ property.ac_addition.name=Zusätze
 property.ac_sound.name=Sound
 property.ac_blink_light.name=Blinklicht
 property.ac_car.name=Verkehrsampel für Autos und Fußgänger.
+property.bueshort.name=Verkürzter Bremswegabstand
+property.ne5_addition.name=Ne5 Zusatz
+property.tstype.name=Ts Signale
+property.etcs_type.name=ETCS Signale
+property.rotype.name=Ro Signale
+property.tramsigns.name=Tram Signale
+property.barrier_length.name=Schrankenlänge
+property.manual.name=Wn Signale/Weichenhebel
+property.fallback_switch.name=Rückfallweiche
+property.weightcolor.name=Weichenhebelfarbe
+property.switchside.name=Bogenseite
+property.switchplaceside.name=Weichenhebelseite
+property.blockexitsignal.name=Hl Blockende Signal
+property.blocksignal.name=Hl Block Signal
+property.ne13.name=Ne13a/b
+property.atws.name=Rottenwarnanlage
+property.barrier_open.name=Schrankensteuerung
+property.powered.name=Weichenhebelkontrolle
+property.wn_mech.name=Wn Signale
+property.railroadcrossing.name=Bahnübergangszusatz
 
 #Sign Description
 property.indicator.desc=Aufschrift für Lf Signale.1 bis 20 für die Geschwindigkeit. A für Anfang und E für Ende
@@ -201,6 +257,26 @@ property.ac_addition.desc=Ändert die Zusätze zwischen zwei Arten von blinkende
 property.ac_sound.desc=Wenn das Signal getriggert wird, wird ein Bing-Sound ausgegeben, um akustisch zu warnen.
 property.ac_blink_light.desc=Blinkt als Indikator für einen herannahenden Zug.
 property.ac_car.desc=Ampel
+property.bueshort.desc=Das Signal steht im verkürztem Bremswegabstand.
+property.ne5_addition.desc=Ne5 Zusatz
+property.tstype.desc=Ts Signale
+property.etcs_type.desc=ETCS Signale
+property.rotype.desc=Ro Signale
+property.tramsigns.desc=Tram Signale
+property.barrier_length.desc=Schrankenlänge
+property.manual.desc=Wechsel zwischen mechanischen Wn Signalen und Weichenhebel.
+property.fallback_switch.desc=Wechsel hier zwischen Normaler- und Rückfallweiche.
+property.weightcolor.desc=Weichenhebelfarbe
+property.switchside.desc=Gibt an auf welcher Seite der gebogene Strang der Weiche liegt.
+property.switchplaceside.desc=Gibt an, auf welcher Seite der Weichenhebel liegt.
+property.blockexitsignal.desc=Hl Blockende Signal
+property.blocksignal.desc=Hl Block Signal
+property.ne13.desc=Ne13a - Die Rückfallweiche ist gegen die Spitze befahrbar. Ne13b - Die Rückfallweiche ist gegen die Spitze nicht befahrbar, vor der Weiche halten.
+property.atws.desc=Gibt einen akustischen Warnton aus, der Bauarbeitern einen nahenden Zug ankündigt.
+property.barrier_open.desc=Schrankensteuerung
+property.powered.desc=Weichenhebelkontrolle
+property.wn_mech.desc=Wn Signale
+property.railroadcrossing.desc=Bahnübergangszusatz
 
 #Signalcontroller Names
 property.enummode.name=Modus
@@ -253,7 +329,6 @@ property.profileOn.west.desc=Redstone An
 property.profileOff.east.desc=Redstone Aus
 property.profileOn.east.desc=Redstone An
 
-
 #Directions
 property.value.up=Oben
 property.value.down=Unten
@@ -291,6 +366,18 @@ property.value.ralightsignal=Abdrücksignal
 property.value.buelight=Überwachungssignal
 property.value.wnnormal=Weichensignal
 property.value.wncross=Doppelweichensignal
+property.value.LZB=LZB
+property.value.ZS10=Zs10
+property.value.HM2=Hektometer
+property.value.FIRETORCH=Brandfackel
+property.value.KEEP_DISTANCE=Abstand Halten
+property.value.NO_PASS=Kein Durchgang
+property.value.NARROWING=Bahnsteigverengung
+property.value.NOTE_TRAIN_TRAFFIC=Beachte Zugverkehr
+property.value.RC1=Bahnübergang 1
+property.value.RC2=Bahnübergang 2
+property.value.RC3=Bahnübergang 3
+property.value.STOP_PROTECTING=Halt! Sicherung
 
 #Signal Aspects
 property.value.false=Aus

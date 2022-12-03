@@ -40,6 +40,7 @@ public class ContainerSignalController extends Container implements UIClientSync
 
     public ContainerSignalController(final Runnable onUpdate) {
         this.onUpdate = onUpdate;
+        GuiSyncNetwork.requestRemaining(this);
     }
 
     private NBTTagCompound writeToNBT(final NBTTagCompound compound) {

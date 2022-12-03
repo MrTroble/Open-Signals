@@ -71,6 +71,31 @@
                 }
             ],
             "y": 2
+        },
+        "ne/ne2_2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(BUESHORT) && (with(BUETYPE.BUE2_1) || with(BUETYPE.BUE2_2) || with(BUETYPE.BUE2_3) || with(BUETYPE.BUE2_4))"
+                }
+            ],
+            "y": 2.3125
+        },
+        "bue/het": {
+            "textures": [
+                {
+                    "blockstate": "with(BUETYPE.HET)",
+                    "retexture": {
+                        "2": "girsignals:blocks/bue/het"
+                    }
+                },
+                {
+                    "blockstate": "with(BUETYPE.AUTO_HET)",
+                    "retexture": {
+                        "2": "girsignals:blocks/bue/auto_het"
+                    }
+                }
+            ],
+            "y": 1
         }
     }
 }

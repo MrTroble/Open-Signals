@@ -17,5 +17,7 @@ public class SignalBUE extends Signal {
             ChangeableStage.GUISTAGE);
     public static final SEProperty<BUEAdd> BUEADD = SEProperty.of("bueadd", BUEAdd.ADD,
             ChangeableStage.GUISTAGE);
+    public static final SEProperty<Boolean> BUE_SHORT = SEProperty.of("bueshort", false,
+            ChangeableStage.GUISTAGE);
 
 }

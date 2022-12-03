@@ -52,6 +52,7 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -532,13 +533,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
+        final ITextComponent name = te.getDisplayName();
         final SignalAngel face = state.getValue(Signal.ANGEL);
         final float angel = face.getDegree();
 
-        final String[] display = te.getDisplayName().getFormattedText().split("\\[n\\]");
-        final float width = this.prop.signWidth;
-        final float offsetX = this.prop.offsetX;
-        final float offsetZ = this.prop.offsetY;
+        final String[] display = name.getFormattedText().split("\\[n\\]");
+
         final float scale = this.prop.signScale;
 
         GlStateManager.enableAlpha();
@@ -546,9 +546,22 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         GlStateManager.translate(x + 0.5f, y + customRenderHeight, z + 0.5f);
         GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
         GlStateManager.rotate(angel, 0, 1, 0);
+
+        renderSingleOverlay(display, font, te);
+
+        GlStateManager.popMatrix();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void renderSingleOverlay(final String[] display, final FontRenderer font,
+            final SignalTileEnity te) {
+        final float width = this.prop.signWidth;
+        final float offsetX = this.prop.offsetX;
+        final float offsetZ = this.prop.offsetY;
+        final float scale = this.prop.signScale;
+        GlStateManager.pushMatrix();
         GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         GlStateManager.scale(-1f, 1f, 1f);
-
         for (int i = 0; i < display.length; i++) {
             font.drawSplitString(display[i], 0, (int) (i * scale * 2.8f), (int) width, 0);
         }

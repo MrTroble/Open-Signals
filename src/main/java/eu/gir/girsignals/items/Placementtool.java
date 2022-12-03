@@ -103,7 +103,6 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
             final String str = compound.getString(SIGNAL_CUSTOMNAME);
             if (!str.isEmpty())
                 sig.setCustomName(str);
-            sig.setBlockID();
             worldIn.notifyBlockUpdate(setPosition, ebs.getBaseState(), ebs.getBaseState(), 3);
             return EnumActionResult.SUCCESS;
         }

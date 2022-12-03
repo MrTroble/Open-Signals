@@ -73,7 +73,7 @@ public final class EnumSignals {
     }
 
     public enum HLType implements Offable<HLType> {
-        OFF, MAIN, DISTANT, EXIT;
+        OFF, MAIN, DISTANT, EXIT, BLOCK, BLOCK_EXIT;
     }
 
     public enum HL implements Offable<HL> {
@@ -87,6 +87,14 @@ public final class EnumSignals {
 
     public enum HLExit implements Offable<HLExit> {
         OFF, HP0, HP0_ALTERNATE_RED, HL1, HL2_3, HL_ZS1, HL_SHUNTING, HL_STATUS_LIGHT;
+    }
+
+    public enum HLBlock implements Offable<HLBlock> {
+        OFF, HP0, HP0_ALTERNATE_RED, HL1, HL10, HL_ZS1, HL_STATUS_LIGHT;
+    }
+
+    public enum HLBlockExit implements Offable<HLBlockExit> {
+        OFF, HP0, HL1, HL_ZS1, HL_SHUNTING, HL_STATUS_LIGHT;
     }
 
     public enum HLLightbar implements Offable<HLLightbar> {
@@ -139,11 +147,11 @@ public final class EnumSignals {
     }
 
     public enum LFBachground implements DefaultName<LFBachground> {
-        LF1, LF2, LF3_5, LF4, LF6, LF7;
+        LF1, LF2, LF3_5, LF4, LF6, LF7, LF5;
     }
 
     public enum EL implements DefaultName<EL> {
-        EL1V, EL1, EL2, EL3, EL4, EL5, EL6;
+        EL1V, EL1, EL2, EL3, EL4, EL5, EL6, EL7, EL8A, EL8E;
     }
 
     public enum ELArrow implements Offable<ELArrow> {
@@ -155,7 +163,7 @@ public final class EnumSignals {
     }
 
     public enum RA implements DefaultName<RA> {
-        RA10, RA11A, RA11B, RA12, RA6_9;
+        RA10, RA11A, RA11B, RA12, RA6_9, RA11_DWARF;
     }
 
     public enum RALight implements Offable<RALight> {
@@ -163,7 +171,7 @@ public final class EnumSignals {
     }
 
     public enum BUE implements DefaultName<BUE> {
-        BUE2_1, BUE2_2, BUE2_3, BUE2_4, BUE3, BUE4, BUE5;
+        BUE2_1, BUE2_2, BUE2_3, BUE2_4, BUE3, BUE4, BUE5, HET, AUTO_HET;
     }
 
     public enum BUEAdd implements Offable<BUEAdd> {
@@ -171,7 +179,12 @@ public final class EnumSignals {
     }
 
     public enum OtherSignal implements DefaultName<OtherSignal> {
-        HM, OB, CROSS;
+        HM, OB, CROSS, LZB, ZS10, HM2, FIRETORCH, KEEP_DISTANCE, NO_PASS, NARROWING,
+        NOTE_TRAIN_TRAFFIC, RC1, RC2, RC3, STOP_PROTECTING;
+    }
+    
+    public enum CrossingSign implements Offable<CrossingSign> {
+        OFF, MODERN, OLD, FENCE;
     }
 
     public enum STNumber implements DefaultName<STNumber> {
@@ -189,11 +202,20 @@ public final class EnumSignals {
     }
 
     public enum NE implements DefaultName<NE> {
-        NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_SMALL, NE5, NE6;
+        NE1, NE2, NE2_1, NE3_1, NE3_2, NE3_3, NE3_4, NE3_5, NE4, NE4_SMALL, NE5, NE6, NE7A, NE7B,
+        NE7A_EAST, NE7B_EAST, NE12, NE13, SO1, SO19_1, SO19_2, SO19_3, SO106;
     }
 
     public enum NEAddition implements Offable<NEAddition> {
         OFF, PRE1, PRE2;
+    }
+
+    public enum NE5Addition implements Offable<NE5Addition> {
+        OFF, M50, M70, M100, M120, M150, M200, M250, KURZ, LANG;
+    }
+
+    public enum WNMech implements DefaultName<WNMech> {
+        WN1, WN2;
     }
 
     public enum WNNormal implements Offable<WNNormal> {
@@ -202,6 +224,23 @@ public final class EnumSignals {
 
     public enum WNCross implements Offable<WNCross> {
         OFF, WN3, WN4, WN5, WN6, BLINK;
+    }
+
+    public enum TS implements Offable<TS> {
+        TS1, TS2, TS3;
+    }
+
+    public static enum EnumMode {
+        MANUELL, SINGLE, MUX
+    }
+
+    public static enum EnumState {
+        DISABLED, OFFSTATE, ONSTATE
+    }
+
+    public enum SortOptions implements Offable<SortOptions> {
+        DISABLED, NAME_ASSENDING, NAME_DESCENIDNG, TYPE_ASSANDING, TYPE_DESCENDING,
+        DISTANCE_ASSANDING, DISTANCE_DSECENDING;
     }
 
     public enum SemaType implements DefaultName<SemaType> {
@@ -218,5 +257,25 @@ public final class EnumSignals {
 
     public enum ACCar implements Offable<ACCar> {
         OFF, RED, YELLOW;
+    }
+
+    public enum ETCS implements DefaultName<ETCS> {
+        NE14_LEFT, NE14_RIGHT, NE14_DOWN, BLOCK;
+    }
+
+    public enum RO implements DefaultName<RO> {
+        RO4, ATWS;
+    }
+
+    public enum RailroadGateLength implements DefaultName<RailroadGateLength> {
+        L1, L2, L3, L4, L5, L6;
+    }
+
+    public enum TramSigns implements DefaultName<TramSigns> {
+        SH1, SO1, SO2, SO5, SO5_1, SO5_2, SO6, ST1, ST2, ST7;
+    }
+
+    public enum ColorWeight implements DefaultName<ColorWeight> {
+        WHITE_BLACK, WHITE_BLACK_W, YELLOW, YELLOW_BLACK, RED_YELLOW;
     }
 }

@@ -1,6 +1,46 @@
 # Changelog
 
 ## [Fix]
+fix: desync with ForgeEssentials
+
+## [Opt]
+
+* optimized: image size
+
+## [Update]
+* feat: added staff uniforms and tools
+* feat: double-sided text for hectometer boards
+* feat: added several station and railroadcrossing signs
+
+## [Fix]
+* fix: render overlay issue
+* potential fix: nbt desync (disappearing signals)
+
+## [Fix]
+* fix: missing language keys
+* fix: mechanical wn signal models
+
+## [Update]
+
+* feat: added bue east signal
+* feat: added more el signals
+* feat: added more ne signals
+* feat: added more other signals
+* feat: added etcs signals
+* feat: added ro signals
+* feat: added ra11 dwarf signal
+* feat: added tram signs
+* feat: added railroad gates
+* feat: added spring-loaded switch signals
+* feat: added switch handles and mechanical wn signals
+* feat: added hl block signals
+* update: post block
+* update: bue signs
+* fix: no sounds on servers
+* fix: semaphore signals with control box
+* fix: ne signal heights
+
+## [Fix]
 
 * fix: crash on ressource pack loading
 
