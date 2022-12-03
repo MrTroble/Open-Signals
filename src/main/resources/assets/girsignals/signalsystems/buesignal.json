@@ -16,6 +16,11 @@
             "enumClass": "BUEAdd",
             "defaultState": "ADD",
             "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "bueshort",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
         }
     ]
 }

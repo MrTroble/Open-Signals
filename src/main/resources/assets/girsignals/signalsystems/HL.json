@@ -100,6 +100,22 @@
             "enumClass": "ZS32",
             "defaultState": "OFF",
             "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "blocksignal",
+            "enumClass": "HLBlock",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HLTYPE.BLOCK)"
+        },
+        {
+            "name": "blockexitsignal",
+            "enumClass": "HLBlockExit",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HLTYPE.BLOCK_EXIT)"
         }
     ]
 }

@@ -22,7 +22,7 @@
             "defaultState": false,
             "changeableStage": "APISTAGE",
             "autoname": true,
-            "dependencies": "check(RATYPE.RA11A) || check(RATYPE.RA11B)"
+            "dependencies": "check(RATYPE.RA11A) || check(RATYPE.RA11B) || check(RATYPE.RA11_DWARF)"
         },
         {
             "name": "ralightsignal",

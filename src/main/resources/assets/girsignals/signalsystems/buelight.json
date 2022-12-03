@@ -19,6 +19,11 @@
             "name": "buelight",
             "defaultState": false,
             "changeableStage": "APISTAGE_NONE_CONFIG"
+        },
+        {
+            "name": "buetype",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
         }
     ]
 }

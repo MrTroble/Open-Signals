@@ -1,0 +1,20 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": true,
+        "defaultHeight": 1
+    },
+    "seProperties": [
+        {
+            "name": "barrier_length",
+            "enumClass": "RailroadGateLength",
+            "defaultState": "L1",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "barrier_open",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG"
+        }
+    ]
+}

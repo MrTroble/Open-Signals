@@ -8,6 +8,9 @@
         "offsetY": -9.8,
         "renderHeights": {
             "SH_HIGH.TRUE": 3.04
+        },
+        "signalHeights": {
+            "SH_HIGH.FALSE": 2
         }
     },
     "seProperties": [
