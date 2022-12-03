@@ -1,35 +1,36 @@
 package com.troblecodings.signals.test;
 
-import static com.troblecodings.signals.blocks.signals.SignalHV.DISTANTSIGNAL;
-import static com.troblecodings.signals.blocks.signals.SignalHV.HPBLOCK;
-import static com.troblecodings.signals.blocks.signals.SignalHV.HPHOME;
-import static com.troblecodings.signals.blocks.signals.SignalHV.STOPSIGNAL;
-import static com.troblecodings.signals.blocks.signals.SignalHV.ZS3;
-import static com.troblecodings.signals.blocks.signals.SignalHV.ZS3V;
+import static eu.gir.girsignals.blocks.signals.SignalHV.DISTANTSIGNAL;
+import static eu.gir.girsignals.blocks.signals.SignalHV.HPBLOCK;
+import static eu.gir.girsignals.blocks.signals.SignalHV.HPHOME;
+import static eu.gir.girsignals.blocks.signals.SignalHV.STOPSIGNAL;
+import static eu.gir.girsignals.blocks.signals.SignalHV.ZS3;
+import static eu.gir.girsignals.blocks.signals.SignalHV.ZS3V;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.EnumSignals.HL;
-import com.troblecodings.signals.EnumSignals.HLDistant;
-import com.troblecodings.signals.EnumSignals.HLExit;
-import com.troblecodings.signals.EnumSignals.HLLightbar;
-import com.troblecodings.signals.EnumSignals.HP;
-import com.troblecodings.signals.EnumSignals.HPBlock;
-import com.troblecodings.signals.EnumSignals.HPHome;
-import com.troblecodings.signals.EnumSignals.KS;
-import com.troblecodings.signals.EnumSignals.KSDistant;
-import com.troblecodings.signals.EnumSignals.KSMain;
-import com.troblecodings.signals.EnumSignals.VR;
-import com.troblecodings.signals.EnumSignals.ZS32;
-import com.troblecodings.signals.blocks.signals.SignalHL;
-import com.troblecodings.signals.blocks.signals.SignalHV;
-import com.troblecodings.signals.blocks.signals.SignalKS;
-import com.troblecodings.signals.signalbox.config.ConfigInfo;
-import com.troblecodings.signals.signalbox.config.HVSignalConfig;
 import com.troblecodings.signals.test.DummySignal.DummyBuilder;
-import com.troblecodings.signals.tileentitys.SignalTileEnity;
+
+import eu.gir.girsignals.EnumSignals.HL;
+import eu.gir.girsignals.EnumSignals.HLDistant;
+import eu.gir.girsignals.EnumSignals.HLExit;
+import eu.gir.girsignals.EnumSignals.HLLightbar;
+import eu.gir.girsignals.EnumSignals.HP;
+import eu.gir.girsignals.EnumSignals.HPBlock;
+import eu.gir.girsignals.EnumSignals.HPHome;
+import eu.gir.girsignals.EnumSignals.KS;
+import eu.gir.girsignals.EnumSignals.KSDistant;
+import eu.gir.girsignals.EnumSignals.KSMain;
+import eu.gir.girsignals.EnumSignals.VR;
+import eu.gir.girsignals.EnumSignals.ZS32;
+import eu.gir.girsignals.blocks.signals.SignalHL;
+import eu.gir.girsignals.blocks.signals.SignalHV;
+import eu.gir.girsignals.blocks.signals.SignalKS;
+import eu.gir.girsignals.signalbox.config.ConfigInfo;
+import eu.gir.girsignals.signalbox.config.HVSignalConfig;
+import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public class GIRConfigtestHV {
 

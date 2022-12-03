@@ -4,8 +4,8 @@ import java.util.HashMap;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.troblecodings.signals.SEProperty;
-import com.troblecodings.signals.tileentitys.SignalTileEnity;
+import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.tileentitys.SignalTileEnity;
 
 public class DummySignal extends SignalTileEnity {
 

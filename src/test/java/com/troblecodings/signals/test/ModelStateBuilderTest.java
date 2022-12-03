@@ -2,7 +2,7 @@ package com.troblecodings.signals.test;
 
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.utils.FileReader;
+import eu.gir.girsignals.utils.FileReader;
 
 public final class ModelStateBuilderTest {
 

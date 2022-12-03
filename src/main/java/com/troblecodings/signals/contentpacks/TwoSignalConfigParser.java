@@ -7,14 +7,15 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.gson.Gson;
-import com.troblecodings.signals.SEProperty;
-import com.troblecodings.signals.SignalsMain;
-import com.troblecodings.signals.blocks.ConfigProperty;
-import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.blocks.SignalPair;
-import com.troblecodings.signals.models.parser.FunctionParsingInfo;
-import com.troblecodings.signals.models.parser.LogicParser;
-import com.troblecodings.signals.utils.FileReader;
+
+import eu.gir.girsignals.SEProperty;
+import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.blocks.ConfigProperty;
+import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.blocks.SignalPair;
+import eu.gir.girsignals.models.parser.FunctionParsingInfo;
+import eu.gir.girsignals.models.parser.LogicParser;
+import eu.gir.girsignals.utils.FileReader;
 
 public class TwoSignalConfigParser {
 

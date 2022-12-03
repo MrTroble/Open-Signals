@@ -2,7 +2,7 @@ package com.troblecodings.signals.contentpacks;
 
 import java.io.File;
 
-import com.troblecodings.signals.SignalsMain;
+import eu.gir.girsignals.SignalsMain;
 
 public class ContentPackMain {
 

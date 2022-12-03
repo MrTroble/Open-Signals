@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
-import com.troblecodings.signals.SignalsMain;
-import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.blocks.Signal.SignalPropertiesBuilder;
-import com.troblecodings.signals.models.parser.FunctionParsingInfo;
-import com.troblecodings.signals.utils.FileReader;
 
+import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.blocks.Signal;
+import eu.gir.girsignals.blocks.Signal.SignalPropertiesBuilder;
+import eu.gir.girsignals.models.parser.FunctionParsingInfo;
+import eu.gir.girsignals.utils.FileReader;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class SignalSystemParser {
