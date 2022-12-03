@@ -16,52 +16,56 @@ import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class SignalSystemParser {
 
-    private SignalPropertiesBuilder systemProperties;
-    private List<SEPropertyParser> seProperties;
+	private SignalPropertiesBuilder systemProperties;
+	private List<SEPropertyParser> seProperties;
 
-    private static transient final Gson GSON = new Gson();
+	private static transient final Gson GSON = new Gson();
 
-    public List<SEPropertyParser> getSEProperties() {
-        return seProperties;
-    }
+	public List<SEPropertyParser> getSEProperties() {
+		return seProperties;
+	}
 
-    public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {
+	public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {
 
-        final Map<String, String> systems = FileReader.readallFilesfromDierectory(directory);
+		final Map<String, String> systems = FileReader.readallFilesfromDierectory(directory);
 
-        final Map<String, SignalSystemParser> properties = new HashMap<>();
+		final Map<String, SignalSystemParser> properties = new HashMap<>();
 
-        if (systems == null) {
-            OpenSignalsMain.log.error("Can't read out signalsystems from " + directory + "!");
-            return properties;
-        }
-        
-            systems.forEach((name, property) -> {
-                try {
-                    properties.put(name, GSON.fromJson(property, SignalSystemParser.class));
-                } catch (final Exception e) {
-                    OpenSignalsMain.getLogger().error("File: " + name);
-                    e.printStackTrace();
-                }
-            });
+		if (systems == null) {
+			OpenSignalsMain.log.error("Can't read out signalsystems from " + directory + "!");
+			return properties;
+		}
 
-        return properties;
-    }
+		systems.forEach((name, property) -> {
+			try {
+				properties.put(name, GSON.fromJson(property, SignalSystemParser.class));
+			} catch (final Exception e) {
+				OpenSignalsMain.getLogger().error("File: " + name);
+				e.printStackTrace();
+			}
+		});
 
-    @SuppressWarnings("rawtypes")
-    public Signal createSignalSystem(final String fileName) {
+		return properties;
+	}
 
-        final String name = fileName.replace(".json", "").replace("_", "");
+	@SuppressWarnings("rawtypes")
+	public Signal createSignalSystem(final String fileName) {
 
-        final List<IUnlistedProperty> properties = new ArrayList<>();
+		final String name = fileName.replace(".json", "").replace("_", "");
 
-        final FunctionParsingInfo info = new FunctionParsingInfo(name, properties);
-        seProperties.forEach(prop -> properties.add(prop.createSEProperty(info)));
-        Signal.nextConsumer = list -> {
-            list.addAll(properties);
-        };
+		final List<IUnlistedProperty> properties = new ArrayList<>();
 
-        return (Signal) new Signal(systemProperties.typename(name).build(info))
-                .setRegistryName(OpenSignalsMain.MODID, name).setUnlocalizedName(name);
-    }
+		final FunctionParsingInfo info = new FunctionParsingInfo(name, properties);
+		try {
+			seProperties.forEach(prop -> properties.add(prop.createSEProperty(info)));
+		} catch (final Exception e) {
+			throw new ContentPackException(String.format("Error in file %s caused by parsing!", fileName), e);
+		}
+		Signal.nextConsumer = list -> {
+			list.addAll(properties);
+		};
+
+		return (Signal) new Signal(systemProperties.typename(name).build(info))
+				.setRegistryName(OpenSignalsMain.MODID, name).setUnlocalizedName(name);
+	}
 }

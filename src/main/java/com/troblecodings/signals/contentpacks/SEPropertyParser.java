@@ -19,7 +19,7 @@ public class SEPropertyParser {
     private String enumClass;
     private Object defaultState;
     private String changeableStage;
-    private boolean autoname = false;
+    private final boolean autoname = false;
     private String dependencies;
     private transient IProperty<?> parent;
 
@@ -34,7 +34,7 @@ public class SEPropertyParser {
         }
 
         if (parent == null)
-            throw new ContentPackException(String.format("Property[%s] not found!", name));
+            throw new ContentPackException(String.format("Property[%s], with class %s not found!", name, enumClass.toLowerCase()));
 
         ChangeableStage stage = ChangeableStage.APISTAGE;
         if (changeableStage != null && !changeableStage.isEmpty()) {
