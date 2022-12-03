@@ -3,7 +3,7 @@ package eu.gir.girsignals.guis;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.interfaces.UIAutoSync;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.signalbox.ModeSet;
@@ -18,7 +18,7 @@ import net.minecraft.util.Rotation;
 
 public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 
-    public static final ResourceLocation ICON = new ResourceLocation(SignalsMain.MODID,
+    public static final ResourceLocation ICON = new ResourceLocation(GIRSignalsMain.MODID,
             "gui/textures/symbols.png");
 
     private SignalBoxNode node;

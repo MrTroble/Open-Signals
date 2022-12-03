@@ -1,4 +1,4 @@
-package eu.gir.girsignals.utils;
+package eu.gir.girsignals;
 
 import java.io.IOException;
 import java.net.URI;
@@ -15,14 +15,13 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
-import eu.gir.girsignals.SignalsMain;
-import eu.gir.girsignals.init.SignalBlocks;
+import eu.gir.girsignals.init.GIRBlocks;
 
-public final class FileReader {
+public final class GIRFileReader {
 
     private static FileSystem fileSystemCache = null;
 
-    private FileReader() {
+    private GIRFileReader() {
     }
 
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
@@ -41,20 +40,20 @@ public final class FileReader {
 
                         files.put(name, content);
                     } catch (final IOException e) {
-                        SignalsMain.log.warn("There was a problem during loading " + file + " !");
+                        GIRSignalsMain.log.warn("There was a problem during loading " + file + " !");
                         e.printStackTrace();
                     }
                 });
                 inputs.close();
                 return files;
             } catch (final IOException e) {
-                SignalsMain.log.warn(
+                GIRSignalsMain.log.warn(
                         "There was a problem during listing all files from " + pathlocation + " !");
                 e.printStackTrace();
             }
         }
         if (files.isEmpty())
-            SignalsMain.getLogger().warn("No files found at " + directory + "!");
+            GIRSignalsMain.getLogger().warn("No files found at " + directory + "!");
         return files;
     }
 
@@ -62,7 +61,7 @@ public final class FileReader {
 
         String filelocation = location;
 
-        final URL url = SignalBlocks.class.getResource("/assets/girsignals");
+        final URL url = GIRBlocks.class.getResource("/assets/girsignals");
         try {
             if (url != null) {
 
@@ -73,7 +72,7 @@ public final class FileReader {
                     if (!location.startsWith("/"))
                         filelocation = "/" + filelocation;
 
-                    final URL resource = SignalBlocks.class.getResource(filelocation);
+                    final URL resource = GIRBlocks.class.getResource(filelocation);
 
                     if (resource == null)
                         return Optional.empty();

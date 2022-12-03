@@ -2,7 +2,7 @@ package eu.gir.girsignals.signalbox.debug;
 
 import java.util.Optional;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.signalbox.entrys.PathEntryType;
 import eu.gir.girsignals.signalbox.entrys.PathOptionEntry;
@@ -12,8 +12,8 @@ public class DebugOptionEntry extends PathOptionEntry {
 
     @Override
     public <T> void setEntry(final PathEntryType<T> type, final T value) {
-        SignalsMain.log.debug(type);
-        SignalsMain.log.debug(value);
+        GIRSignalsMain.log.debug(type);
+        GIRSignalsMain.log.debug(value);
         super.setEntry(type, value);
     }
 
@@ -28,13 +28,13 @@ public class DebugOptionEntry extends PathOptionEntry {
 
     @Override
     public void read(final NBTTagCompound tag) {
-        SignalsMain.log.debug("R:" + tag);
+        GIRSignalsMain.log.debug("R:" + tag);
         super.read(tag);
     }
 
     @Override
     public void write(final NBTTagCompound tag) {
         super.write(tag);
-        SignalsMain.log.debug("W:" + tag);
+        GIRSignalsMain.log.debug("W:" + tag);
     }
 }

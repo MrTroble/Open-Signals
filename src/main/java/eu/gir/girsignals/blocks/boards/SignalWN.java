@@ -5,12 +5,12 @@ import eu.gir.girsignals.EnumSignals.WNCross;
 import eu.gir.girsignals.EnumSignals.WNNormal;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 
 public class SignalWN extends Signal {
 
     public SignalWN() {
-        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "wnsignal").height(0).build());
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "wnsignal").height(0).build());
     }
 
     public static final SEProperty<Boolean> WNTYPE = SEProperty.of("wntype", false,

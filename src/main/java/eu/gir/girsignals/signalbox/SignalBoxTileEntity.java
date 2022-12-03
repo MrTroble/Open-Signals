@@ -15,7 +15,7 @@ import com.troblecodings.linkableapi.ILinkableTile;
 
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.LinkType;
-import eu.gir.girsignals.init.SignalBlocks;
+import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.signalbox.debug.SignalBoxFactory;
 import eu.gir.girsignals.tileentitys.IChunkloadable;
 import eu.gir.girsignals.tileentitys.RedstoneIOTileEntity;
@@ -152,12 +152,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         final IBlockState state = world.getBlockState(linkedPos);
         final Block block = state.getBlock();
         LinkType type = LinkType.SIGNAL;
-        if (block == SignalBlocks.REDSTONE_IN) {
+        if (block == GIRBlocks.REDSTONE_IN) {
             type = LinkType.INPUT;
             if (!world.isRemote)
                 loadChunkAndGetTile(RedstoneIOTileEntity.class, world, linkedPos,
                         (tile, _u) -> tile.link(this.pos));
-        } else if (block == SignalBlocks.REDSTONE_OUT) {
+        } else if (block == GIRBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
         if (!world.isRemote) {

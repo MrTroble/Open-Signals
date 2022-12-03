@@ -16,14 +16,14 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = SignalsMain.MODID, dependencies = "after:opencomputers", acceptedMinecraftVersions = "[1.12.2]")
-public class SignalsMain {
+@Mod(modid = GIRSignalsMain.MODID, dependencies = "after:opencomputers", acceptedMinecraftVersions = "[1.12.2]")
+public class GIRSignalsMain {
 
     @Instance
-    private static SignalsMain instance;
+    private static GIRSignalsMain instance;
     public static final String MODID = "girsignals";
 
-    public static SignalsMain getInstance() {
+    public static GIRSignalsMain getInstance() {
         return instance;
     }
 

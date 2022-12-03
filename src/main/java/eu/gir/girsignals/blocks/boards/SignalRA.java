@@ -7,13 +7,13 @@ import eu.gir.girsignals.EnumSignals.RA;
 import eu.gir.girsignals.EnumSignals.RALight;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.signalbox.config.RSSignalConfig;
 
 public class SignalRA extends Signal {
 
     public SignalRA() {
-        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0)
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "rasignal").height(0)
                 .config(RSSignalConfig.RS_CONFIG).build());
     }
 

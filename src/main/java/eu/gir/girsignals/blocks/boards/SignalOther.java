@@ -6,14 +6,14 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.OtherSignal;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.client.gui.FontRenderer;
 
 public class SignalOther extends Signal {
 
     public SignalOther() {
-        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "othersignal").signScale(3.5f).offsetX(-5)
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "othersignal").signScale(3.5f).offsetX(-5)
                 .offsetY(1.8f).noLink().build());
     }
 

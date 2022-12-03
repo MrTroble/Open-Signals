@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.enums.EnumGuiMode;
 import eu.gir.girsignals.enums.EnumPathUsage;
 import eu.gir.girsignals.enums.PathType;
@@ -142,7 +142,7 @@ public class SignalBoxPathway implements INetworkSavable {
             point.read(nodeNBT);
             final SignalBoxNode node = modeGrid.get(point);
             if (node == null) {
-                SignalsMain.log.error("Detecting broken pathway at {}!", point.toString());
+                GIRSignalsMain.log.error("Detecting broken pathway at {}!", point.toString());
                 this.emptyOrBroken = true;
                 return;
             }
@@ -151,7 +151,7 @@ public class SignalBoxPathway implements INetworkSavable {
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         if (this.listOfNodes.size() < 2) {
-            SignalsMain.log.error("Detecting pathway with only 2 elements!");
+            GIRSignalsMain.log.error("Detecting pathway with only 2 elements!");
             this.emptyOrBroken = true;
             return;
         }

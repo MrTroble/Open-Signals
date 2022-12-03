@@ -6,12 +6,12 @@ import eu.gir.girsignals.EnumSignals.NE;
 import eu.gir.girsignals.EnumSignals.NEAddition;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 
 public class SignalNE extends Signal {
 
     public SignalNE() {
-        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "ne").noLink().build());
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "ne").noLink().build());
     }
 
     public static final SEProperty<NE> NETYPE = SEProperty.of("netype", NE.NE1,

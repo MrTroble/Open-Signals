@@ -6,7 +6,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.SHMech;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.signalbox.config.RSSignalConfig;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.client.gui.FontRenderer;
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.FontRenderer;
 public class SignalSHMech extends Signal {
 
     public SignalSHMech() {
-        super(builder(SignalItems.PLACEMENT_TOOL, "SHMech").height(0).offsetX(7.0f).offsetY(-9.8f)
+        super(builder(GIRItems.PLACEMENT_TOOL, "SHMech").height(0).offsetX(7.0f).offsetY(-9.8f)
                 .signHeight(1.04f).config(RSSignalConfig.RS_CONFIG).build());
     }
 

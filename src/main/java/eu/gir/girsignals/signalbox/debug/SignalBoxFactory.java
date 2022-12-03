@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.enums.PathType;
 import eu.gir.girsignals.signalbox.Point;
 import eu.gir.girsignals.signalbox.SignalBoxGrid;
@@ -28,7 +28,7 @@ public class SignalBoxFactory {
 
     public static final SignalBoxFactory getFactory() {
         if (factory == null) {
-            factory = SignalsMain.isDebug() ? new DebugFactory() : new SignalBoxFactory();
+            factory = GIRSignalsMain.isDebug() ? new DebugFactory() : new SignalBoxFactory();
         }
         return factory;
     }

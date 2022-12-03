@@ -6,7 +6,7 @@ import eu.gir.girsignals.SEProperty;
 import eu.gir.girsignals.EnumSignals.SHLight;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.signalbox.config.RSSignalConfig;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.client.gui.FontRenderer;
@@ -14,7 +14,7 @@ import net.minecraft.client.gui.FontRenderer;
 public class SignalSHLight extends Signal {
 
     public SignalSHLight() {
-        super(builder(SignalItems.PLACEMENT_TOOL, "SHLight").height(0).offsetX(-7.5f).offsetY(-6.3f)
+        super(builder(GIRItems.PLACEMENT_TOOL, "SHLight").height(0).offsetX(-7.5f).offsetY(-6.3f)
                 .signHeight(0.373f).config(RSSignalConfig.RS_CONFIG).build());
     }
 

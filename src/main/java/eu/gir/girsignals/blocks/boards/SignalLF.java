@@ -5,12 +5,12 @@ import eu.gir.girsignals.EnumSignals.LF;
 import eu.gir.girsignals.EnumSignals.LFBachground;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 
 public class SignalLF extends Signal {
 
     public SignalLF() {
-        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "lfsignal").noLink().build());
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "lfsignal").noLink().build());
     }
 
     public static final SEProperty<LF> INDICATOR = SEProperty.of("indicator", LF.Z1,

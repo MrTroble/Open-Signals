@@ -10,7 +10,7 @@ import eu.gir.girsignals.EnumSignals.VR;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.signalbox.config.HVSignalConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +19,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalHV extends Signal {
 
     public SignalHV() {
-        super(builder(SignalItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f)
+        super(builder(GIRItems.PLACEMENT_TOOL, "HV").height(6).signHeight(2.775f)
                 .config(HVSignalConfig.INSTANCE).build());
     }
 

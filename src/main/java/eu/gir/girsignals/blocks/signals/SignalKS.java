@@ -9,7 +9,7 @@ import eu.gir.girsignals.EnumSignals.MastSignal;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.signalbox.config.KSSignalConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -18,7 +18,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalKS extends Signal {
 
     public SignalKS() {
-        super(builder(SignalItems.PLACEMENT_TOOL, "KS").height(6).signHeight(4.95f)
+        super(builder(GIRItems.PLACEMENT_TOOL, "KS").height(6).signHeight(4.95f)
                 .config(KSSignalConfig.INSTANCE).build());
     }
 

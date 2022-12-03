@@ -9,12 +9,12 @@ import eu.gir.girsignals.EnumSignals.TramSwitch;
 import eu.gir.girsignals.EnumSignals.TramType;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 
 public class SignalTram extends Signal {
 
     public SignalTram() {
-        super(builder(SignalItems.PLACEMENT_TOOL, "TramSignal").height(0).build());
+        super(builder(GIRItems.PLACEMENT_TOOL, "TramSignal").height(0).build());
     }
 
     public static final SEProperty<TramType> TRAMSIGNAL_TYPE = SEProperty.of("signaltramtype",

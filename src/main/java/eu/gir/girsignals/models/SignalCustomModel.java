@@ -18,7 +18,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.mojang.realmsclient.util.Pair;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
 import eu.gir.girsignals.models.parser.LogicParser;
@@ -136,7 +136,7 @@ public class SignalCustomModel implements IModel {
             final float x, final float y, final float z, final Map<String, String> map) {
 
         IModel m = ModelLoaderRegistry.getModelOrLogError(
-                new ResourceLocation(SignalsMain.MODID, "block/" + name), "Couldn't find " + name);
+                new ResourceLocation(GIRSignalsMain.MODID, "block/" + name), "Couldn't find " + name);
         m = m.smoothLighting(false);
 
         if (map != null && !map.isEmpty()) {
@@ -197,7 +197,7 @@ public class SignalCustomModel implements IModel {
                                             states.createRetexture(texturestate.getRetextures()));
 
                                 } catch (final LogicalParserException e) {
-                                    SignalsMain.log.error(
+                                    GIRSignalsMain.log.error(
                                             "There was an problem during loading an extention into "
                                                     + modelname + " with the blockstate '"
                                                     + texturestate.getBlockstate() + "'!");

@@ -7,11 +7,11 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRFileReader;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalPropertiesBuilder;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
-import eu.gir.girsignals.utils.FileReader;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 public class SignalSystemParser {
@@ -27,12 +27,12 @@ public class SignalSystemParser {
 
     public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {
 
-        final Map<String, String> systems = FileReader.readallFilesfromDierectory(directory);
+        final Map<String, String> systems = GIRFileReader.readallFilesfromDierectory(directory);
 
         final Map<String, SignalSystemParser> properties = new HashMap<>();
 
         if (systems == null) {
-            SignalsMain.log.error("Can't read out signalsystems from " + directory + "!");
+            GIRSignalsMain.log.error("Can't read out signalsystems from " + directory + "!");
             return properties;
         }
         
@@ -40,7 +40,7 @@ public class SignalSystemParser {
                 try {
                     properties.put(name, GSON.fromJson(property, SignalSystemParser.class));
                 } catch (final Exception e) {
-                    SignalsMain.getLogger().error("File: " + name);
+                    GIRSignalsMain.getLogger().error("File: " + name);
                     e.printStackTrace();
                 }
             });
@@ -62,6 +62,6 @@ public class SignalSystemParser {
         };
 
         return (Signal) new Signal(systemProperties.typename(name).build(info))
-                .setRegistryName(SignalsMain.MODID, name).setUnlocalizedName(name);
+                .setRegistryName(GIRSignalsMain.MODID, name).setUnlocalizedName(name);
     }
 }

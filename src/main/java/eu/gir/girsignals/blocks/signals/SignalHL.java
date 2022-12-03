@@ -10,7 +10,7 @@ import eu.gir.girsignals.EnumSignals.MastSignal;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.signalbox.config.HLSignalConfig;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
@@ -19,7 +19,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalHL extends Signal {
 
     public SignalHL() {
-        super(builder(SignalItems.PLACEMENT_TOOL, "HL").height(6).signHeight(1.15f)
+        super(builder(GIRItems.PLACEMENT_TOOL, "HL").height(6).signHeight(1.15f)
                 .config(HLSignalConfig.INSTANCE).build());
     }
 

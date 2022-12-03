@@ -3,14 +3,14 @@ package eu.gir.girsignals.init;
 import java.util.LinkedList;
 import java.util.List;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 
-public final class SignalSounds {
+public final class GIRSounds {
     
-    private SignalSounds() {
+    private GIRSounds() {
     }
     
     public static final List<SoundEvent> SOUNDS = new LinkedList<>();
@@ -22,7 +22,7 @@ public final class SignalSounds {
     }
 
     private static SoundEvent registerSound(final String soundName) {
-        final ResourceLocation resource = new ResourceLocation(SignalsMain.MODID, soundName);
+        final ResourceLocation resource = new ResourceLocation(GIRSignalsMain.MODID, soundName);
         final SoundEvent sound = new SoundEvent(resource).setRegistryName(soundName);
         SOUNDS.add(sound);
         return sound;

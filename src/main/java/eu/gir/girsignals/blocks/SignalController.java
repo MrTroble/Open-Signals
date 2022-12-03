@@ -1,8 +1,8 @@
 package eu.gir.girsignals.blocks;
 
-import eu.gir.girsignals.SignalsMain;
-import eu.gir.girsignals.init.SignalItems;
-import eu.gir.girsignals.init.SignalTabs;
+import eu.gir.girsignals.GIRSignalsMain;
+import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -19,17 +19,17 @@ public class SignalController extends Block implements ITileEntityProvider {
 
     public SignalController() {
         super(Material.ROCK);
-        setCreativeTab(SignalTabs.TAB);
+        setCreativeTab(GIRTabs.TAB);
     }
 
     @Override
     public boolean onBlockActivated(final World worldIn, final BlockPos pos,
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
-        if (!playerIn.getHeldItemMainhand().getItem().equals(SignalItems.LINKING_TOOL)) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
                 return true;
-            SignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos);
+            GIRSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos);
             return true;
         }
         return false;

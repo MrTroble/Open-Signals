@@ -1,6 +1,6 @@
 package eu.gir.girsignals.blocks;
 
-import eu.gir.girsignals.SignalsConfig;
+import eu.gir.girsignals.GIRSignalsConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -97,6 +97,6 @@ public class GhostBlock extends Block implements IConfigUpdatable {
 
     @Override
     public void updateConfigValues() {
-        setLightLevel(SignalsConfig.signalLightValue / 15.0f);
+        setLightLevel(GIRSignalsConfig.signalLightValue / 15.0f);
     }
 }

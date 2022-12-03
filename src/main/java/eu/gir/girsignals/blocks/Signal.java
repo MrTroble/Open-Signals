@@ -16,10 +16,10 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SignalsConfig;
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsConfig;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
 import eu.gir.girsignals.models.parser.LogicParser;
@@ -152,9 +152,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
         public SignalProperties build(final @Nullable FunctionParsingInfo info) {
             if (placementToolName != null) {
-                SignalItems.registeredItems.forEach(item -> {
+                GIRItems.registeredItems.forEach(item -> {
                     if (item instanceof Placementtool) {
-                        if (item.getRegistryName().toString().replace(SignalsMain.MODID + ":", "")
+                        if (item.getRegistryName().toString().replace(GIRSignalsMain.MODID + ":", "")
                                 .equalsIgnoreCase(placementToolName)) {
                             placementtool = (Placementtool) item;
                             return;
@@ -162,7 +162,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                     }
                 });
                 if (placementtool == null)
-                    SignalsMain.getLogger()
+                    GIRSignalsMain.getLogger()
                             .error("There doesn't exists a placementtool with the name '"
                                     + placementToolName + "'!");
             }
@@ -174,7 +174,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                             signalheights.add(new HeightProperty(
                                     LogicParser.predicate(property, info), height));
                         } catch (final LogicalParserException e) {
-                            SignalsMain.getLogger().error("File: " + signalTypeName);
+                            GIRSignalsMain.getLogger().error("File: " + signalTypeName);
                             e.printStackTrace();
                         }
                     }
@@ -190,7 +190,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                             renderheights.add(new FloatProperty(
                                     LogicParser.predicate(property, info), height));
                         } catch (final LogicalParserException e) {
-                            SignalsMain.getLogger().error("File: " + signalTypeName);
+                            GIRSignalsMain.getLogger().error("File: " + signalTypeName);
                             e.printStackTrace();
                         }
                     }
@@ -561,7 +561,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     @Override
     public void updateConfigValues() {
-        setLightLevel(SignalsConfig.signalLightValue / 15.0f);
+        setLightLevel(GIRSignalsConfig.signalLightValue / 15.0f);
     }
 
     public static <T extends Comparable<T>> Predicate<Map<SEProperty<?>, Object>> check(
@@ -583,9 +583,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             final SignalTileEnity signaltile = (SignalTileEnity) tile;
             customname = canHaveCustomname(signaltile.getProperties());
         }
-        if (!playerIn.getHeldItemMainhand().getItem().equals(SignalItems.LINKING_TOOL)
+        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)
                 && (canBeLinked() || customname)) {
-            SignalsMain.handler.invokeGui(Signal.class, playerIn, worldIn, pos);
+            GIRSignalsMain.handler.invokeGui(Signal.class, playerIn, worldIn, pos);
             return true;
         }
         return false;

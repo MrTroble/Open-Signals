@@ -4,7 +4,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.blocks.GhostBlock;
 import eu.gir.girsignals.blocks.IConfigUpdatable;
 import eu.gir.girsignals.blocks.Post;
@@ -26,9 +26,9 @@ import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEve
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public final class SignalBlocks {
+public final class GIRBlocks {
 
-    private SignalBlocks() {
+    private GIRBlocks() {
     }
 
     public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
@@ -61,7 +61,7 @@ public final class SignalBlocks {
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
     public static void init() {
-        final Field[] fields = SignalBlocks.class.getFields();
+        final Field[] fields = GIRBlocks.class.getFields();
         for (final Field field : fields) {
             final int modifiers = field.getModifiers();
             if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
@@ -81,7 +81,7 @@ public final class SignalBlocks {
         if (blocksToRegister.contains(block))
             return;
 
-        block.setRegistryName(new ResourceLocation(SignalsMain.MODID, name));
+        block.setRegistryName(new ResourceLocation(GIRSignalsMain.MODID, name));
         block.setUnlocalizedName(name);
         blocksToRegister.add(block);
         if (block instanceof ITileEntityProvider) {
@@ -92,7 +92,7 @@ public final class SignalBlocks {
                 if (TileEntity.getKey(tileclass) == null)
                     TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
             } catch (final NullPointerException ex) {
-                SignalsMain.log.trace(
+                GIRSignalsMain.log.trace(
                         "All tileentity provide need to call back a default entity if the world is null!",
                         ex);
             }
@@ -124,8 +124,8 @@ public final class SignalBlocks {
 
     @SubscribeEvent
     public static void onConfigChangedEvent(final OnConfigChangedEvent event) {
-        if (event.getModID().equals(SignalsMain.MODID)) {
-            ConfigManager.sync(SignalsMain.MODID, Type.INSTANCE);
+        if (event.getModID().equals(GIRSignalsMain.MODID)) {
+            ConfigManager.sync(GIRSignalsMain.MODID, Type.INSTANCE);
             updateConfigs();
         }
     }

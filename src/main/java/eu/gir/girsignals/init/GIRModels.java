@@ -9,25 +9,25 @@ import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-public final class SignalModels {
+public final class GIRModels {
 
-    private SignalModels() {
+    private GIRModels() {
     }
 
     @SubscribeEvent
     public static void register(final ModelRegistryEvent event) {
-        SignalItems.registeredItems.forEach(SignalModels::registerModel);
-        registerModel(Item.getItemFromBlock(SignalBlocks.HV_SIGNAL_CONTROLLER));
-        registerModel(Item.getItemFromBlock(SignalBlocks.POST));
-        registerModel(Item.getItemFromBlock(SignalBlocks.SIGNAL_BOX));
-        registerModel(Item.getItemFromBlock(SignalBlocks.REDSTONE_IN));
-        registerModel(Item.getItemFromBlock(SignalBlocks.REDSTONE_OUT));
+        GIRItems.registeredItems.forEach(GIRModels::registerModel);
+        registerModel(Item.getItemFromBlock(GIRBlocks.HV_SIGNAL_CONTROLLER));
+        registerModel(Item.getItemFromBlock(GIRBlocks.POST));
+        registerModel(Item.getItemFromBlock(GIRBlocks.SIGNAL_BOX));
+        registerModel(Item.getItemFromBlock(GIRBlocks.REDSTONE_IN));
+        registerModel(Item.getItemFromBlock(GIRBlocks.REDSTONE_OUT));
     }
 
     @SubscribeEvent
     public static void addColor(final ColorHandlerEvent.Block event) {
         final BlockColors colors = event.getBlockColors();
-        SignalBlocks.blocksToRegister.forEach(block -> {
+        GIRBlocks.blocksToRegister.forEach(block -> {
             if (block instanceof Signal) {
                 final Signal sb = (Signal) block;
                 if (sb.hasCostumColor())

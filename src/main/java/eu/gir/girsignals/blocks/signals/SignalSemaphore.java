@@ -8,7 +8,7 @@ import eu.gir.girsignals.EnumSignals.SemaType;
 import eu.gir.girsignals.EnumSignals.ZS32;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.signalbox.config.SemaphoreConfig;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.state.IBlockState;
@@ -19,7 +19,7 @@ import net.minecraft.world.IBlockAccess;
 public class SignalSemaphore extends Signal {
 
     public SignalSemaphore() {
-        super(builder(SignalItems.PLACEMENT_TOOL, "semaphore_signal").height(3).offsetX(10f)
+        super(builder(GIRItems.PLACEMENT_TOOL, "semaphore_signal").height(3).offsetX(10f)
                 .offsetY(-11f).signHeight(1.47f).config(SemaphoreConfig.SEMAPHORE_CONFIG).build());
     }
 

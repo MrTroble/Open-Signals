@@ -6,11 +6,11 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 
 import eu.gir.girsignals.SEProperty;
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalBlocks;
-import eu.gir.girsignals.init.SignalTabs;
+import eu.gir.girsignals.init.GIRBlocks;
+import eu.gir.girsignals.init.GIRTabs;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -34,7 +34,7 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
     public final ArrayList<Integer> signalids = new ArrayList<>();
 
     public Placementtool() {
-        setCreativeTab(SignalTabs.TAB);
+        setCreativeTab(GIRTabs.TAB);
     }
 
     public void addSignal(final Signal sig) {
@@ -51,7 +51,7 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
         if (player.isSneaking()) {
             if (!worldIn.isRemote)
                 return EnumActionResult.SUCCESS;
-            SignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, pos);
+            GIRSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, pos);
             return EnumActionResult.SUCCESS;
         } else {
             if (worldIn.isRemote)
@@ -98,7 +98,7 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
             lastPos = setPosition;
             for (int i = 0; i < height; i++)
                 worldIn.setBlockState(lastPos = lastPos.up(),
-                        SignalBlocks.GHOST_BLOCK.getDefaultState());
+                        GIRBlocks.GHOST_BLOCK.getDefaultState());
 
             final String str = compound.getString(SIGNAL_CUSTOMNAME);
             if (!str.isEmpty())

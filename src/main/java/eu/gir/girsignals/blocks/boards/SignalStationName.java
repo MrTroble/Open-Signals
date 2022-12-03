@@ -1,7 +1,7 @@
 package eu.gir.girsignals.blocks.boards;
 
 import eu.gir.girsignals.blocks.Signal;
-import eu.gir.girsignals.init.SignalItems;
+import eu.gir.girsignals.init.GIRItems;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
@@ -14,7 +14,7 @@ import net.minecraft.world.World;
 public class SignalStationName extends Signal {
 
     public SignalStationName() {
-        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "signname").height(0).signHeight(0.5f)
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "signname").height(0).signHeight(0.5f)
                 .offsetY(2f).noLink().build());
     }
 

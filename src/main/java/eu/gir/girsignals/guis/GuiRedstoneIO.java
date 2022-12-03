@@ -8,7 +8,7 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 
-import eu.gir.girsignals.init.SignalBlocks;
+import eu.gir.girsignals.init.GIRBlocks;
 import eu.gir.girsignals.tileentitys.RedstoneIOTileEntity;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
@@ -72,7 +72,7 @@ public class GuiRedstoneIO extends GuiBase {
         final UIBox layout = new UIBox(UIBox.VBOX, 5);
         list.add(layout);
         this.tile.forEach(pos -> list.add(GuiElements.createLabel(
-                String.format("%s: x=%d, y=%d, z=%d", SignalBlocks.SIGNAL_BOX.getLocalizedName(),
+                String.format("%s: x=%d, y=%d, z=%d", GIRBlocks.SIGNAL_BOX.getLocalizedName(),
                         pos.getX(), pos.getY(), pos.getZ()))));
         inner.add(list);
         inner.add(GuiElements.createPageSelect(layout));

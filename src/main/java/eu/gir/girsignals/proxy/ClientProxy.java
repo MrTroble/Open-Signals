@@ -1,6 +1,6 @@
 package eu.gir.girsignals.proxy;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.blocks.RedstoneIO;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.SignalBox;
@@ -10,7 +10,7 @@ import eu.gir.girsignals.guis.GuiRedstoneIO;
 import eu.gir.girsignals.guis.GuiSignal;
 import eu.gir.girsignals.guis.GuiSignalBox;
 import eu.gir.girsignals.guis.GuiSignalController;
-import eu.gir.girsignals.init.SignalModels;
+import eu.gir.girsignals.init.GIRModels;
 import eu.gir.girsignals.items.Placementtool;
 import eu.gir.girsignals.models.CustomModelLoader;
 import eu.gir.girsignals.signalbox.SignalBoxTileEntity;
@@ -30,16 +30,16 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preinit(final FMLPreInitializationEvent event) {
         super.preinit(event);
-        SignalsMain.handler.addGui(Placementtool.class,
+        GIRSignalsMain.handler.addGui(Placementtool.class,
                 (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
-        SignalsMain.handler.addGui(SignalController.class, SignalControllerTileEntity.class,
+        GIRSignalsMain.handler.addGui(SignalController.class, SignalControllerTileEntity.class,
                 GuiSignalController::new);
-        SignalsMain.handler.addGui(SignalBox.class, SignalBoxTileEntity.class, GuiSignalBox::new);
-        SignalsMain.handler.addGui(RedstoneIO.class, RedstoneIOTileEntity.class,
+        GIRSignalsMain.handler.addGui(SignalBox.class, SignalBoxTileEntity.class, GuiSignalBox::new);
+        GIRSignalsMain.handler.addGui(RedstoneIO.class, RedstoneIOTileEntity.class,
                 GuiRedstoneIO::new);
-        SignalsMain.handler.addGui(Signal.class, SignalTileEnity.class, GuiSignal::new);
+        GIRSignalsMain.handler.addGui(Signal.class, SignalTileEnity.class, GuiSignal::new);
 
-        MinecraftForge.EVENT_BUS.register(SignalModels.class);
+        MinecraftForge.EVENT_BUS.register(GIRModels.class);
         ModelLoaderRegistry.registerLoader(new CustomModelLoader());
         ClientRegistry.bindTileEntitySpecialRenderer(SignalTileEnity.class,
                 new SignalSpecialRenderer());

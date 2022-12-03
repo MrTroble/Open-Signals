@@ -6,7 +6,7 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
-import eu.gir.girsignals.utils.FileReader;
+import eu.gir.girsignals.GIRFileReader;
 
 public class ModelStats {
 
@@ -25,7 +25,7 @@ public class ModelStats {
 
         final Gson gson = new Gson();
 
-        final Map<String, String> entrySet = FileReader.readallFilesfromDierectory(directory);
+        final Map<String, String> entrySet = GIRFileReader.readallFilesfromDierectory(directory);
 
         final Map<String, Object> content = new HashMap<>();
 

@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.troblecodings.signals.contentpacks.SignalSystemParser;
 
-import eu.gir.girsignals.init.SignalBlocks;
+import eu.gir.girsignals.init.GIRBlocks;
 
 public final class SignalLoader {
 
@@ -18,7 +18,7 @@ public final class SignalLoader {
     public static void loadSignalsfromDirectory(final String directory) {
         final Map<String, SignalSystemParser> signals = SignalSystemParser
                 .getSignalSystems(directory);
-        signals.forEach((filename, properties) -> SignalBlocks.blocksToRegister
+        signals.forEach((filename, properties) -> GIRBlocks.blocksToRegister
                 .add(properties.createSignalSystem(filename)));
     }
 }

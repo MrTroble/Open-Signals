@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 
+import eu.gir.girsignals.GIRFileReader;
 import net.minecraft.block.properties.IProperty;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
@@ -102,7 +103,7 @@ public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
     @SuppressWarnings("unchecked")
     public static Map<String, JsonEnum> getProperties() {
         final HashMap<String, JsonEnum> returnmap = new HashMap<>();
-        final Map<String, String> files = FileReader
+        final Map<String, String> files = GIRFileReader
                 .readallFilesfromDierectory("/assets/girsignals/enumdefinition");
         files.forEach((_u, file) -> {
             final Map<String, List<String>> map = GSON.fromJson(file,

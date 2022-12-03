@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 import com.troblecodings.linkableapi.Linkingtool;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.items.Placementtool;
 import net.minecraft.block.Block;
@@ -17,15 +17,15 @@ import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
-public final class SignalItems {
+public final class GIRItems {
 
-    private SignalItems() {
+    private GIRItems() {
     }
 
-    public static final Linkingtool LINKING_TOOL = new Linkingtool(SignalTabs.TAB, (world, pos) -> {
+    public static final Linkingtool LINKING_TOOL = new Linkingtool(GIRTabs.TAB, (world, pos) -> {
         final IBlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();
-        return block == SignalBlocks.REDSTONE_IN || block == SignalBlocks.REDSTONE_OUT
+        return block == GIRBlocks.REDSTONE_IN || block == GIRBlocks.REDSTONE_OUT
                 || (block instanceof Signal && ((Signal) block).canBeLinked());
     });
     public static final Placementtool PLACEMENT_TOOL = new Placementtool();
@@ -34,7 +34,7 @@ public final class SignalItems {
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
     public static void init() {
-        final Field[] fields = SignalItems.class.getFields();
+        final Field[] fields = GIRItems.class.getFields();
         for (final Field field : fields) {
             final int modifiers = field.getModifiers();
             if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
@@ -42,7 +42,7 @@ public final class SignalItems {
                 final String name = field.getName().toLowerCase().replace("_", "");
                 try {
                     final Item item = (Item) field.get(null);
-                    item.setRegistryName(new ResourceLocation(SignalsMain.MODID, name));
+                    item.setRegistryName(new ResourceLocation(GIRSignalsMain.MODID, name));
                     item.setUnlocalizedName(name);
                     registeredItems.add(item);
                 } catch (final IllegalArgumentException | IllegalAccessException e) {

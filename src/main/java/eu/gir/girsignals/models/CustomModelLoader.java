@@ -6,7 +6,7 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import eu.gir.girsignals.SignalsMain;
+import eu.gir.girsignals.GIRSignalsMain;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.blocks.Signal.SignalAngel;
 import eu.gir.girsignals.models.parser.FunctionParsingInfo;
@@ -80,7 +80,7 @@ public class CustomModelLoader implements ICustomModelLoader {
 
                 if (signaltype == null) {
 
-                    SignalsMain.getLogger().error("There doesn't exists a signalsystem named "
+                    GIRSignalsMain.getLogger().error("There doesn't exists a signalsystem named "
                             + filename.replace(".json", "") + "!");
                     FMLCommonHandler.instance().exitJava(-1, false);
                     return;
@@ -89,7 +89,7 @@ public class CustomModelLoader implements ICustomModelLoader {
                 final FunctionParsingInfo parsinginfo = new FunctionParsingInfo(signaltype);
 
                 registeredModels.put(signaltype.getRegistryName().toString()
-                        .replace(SignalsMain.MODID + ":", ""), cm -> {
+                        .replace(GIRSignalsMain.MODID + ":", ""), cm -> {
 
                             for (final Map.Entry<String, Models> modelsmap : content.getModels()
                                     .entrySet()) {
@@ -127,7 +127,7 @@ public class CustomModelLoader implements ICustomModelLoader {
                                                 state = LogicParser.predicate(blockstate,
                                                         parsinginfo);
                                             } catch (final LogicalParserException e) {
-                                                SignalsMain.log.error(
+                                                GIRSignalsMain.log.error(
                                                         "There was an problem during loading "
                                                                 + modelname
                                                                 + " with the blockstate '"
@@ -161,7 +161,7 @@ public class CustomModelLoader implements ICustomModelLoader {
 
                                     } else if (state == null && !texturestate.isautoBlockstate()
                                             && !extentionloaded) {
-                                        SignalsMain.log.warn(
+                                        GIRSignalsMain.log.warn(
                                                 "The predicate of " + modelname + " in " + filename
                                                         + " is null! This shouldn't be the case!");
                                         FMLCommonHandler.instance().exitJava(-1, false);
@@ -176,7 +176,7 @@ public class CustomModelLoader implements ICustomModelLoader {
 
     @Override
     public boolean accepts(final ResourceLocation modelLocation) {
-        if (!modelLocation.getResourceDomain().equals(SignalsMain.MODID))
+        if (!modelLocation.getResourceDomain().equals(GIRSignalsMain.MODID))
             return false;
         return registeredModels.containsKey(modelLocation.getResourcePath())
                 || modelLocation.getResourcePath().equals("ghostblock");

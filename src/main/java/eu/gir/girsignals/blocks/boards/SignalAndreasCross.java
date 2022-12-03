@@ -7,8 +7,8 @@ import eu.gir.girsignals.EnumSignals.ACAddition;
 import eu.gir.girsignals.EnumSignals.ACCar;
 import eu.gir.girsignals.blocks.Signal;
 import eu.gir.girsignals.enums.ChangeableStage;
-import eu.gir.girsignals.init.SignalItems;
-import eu.gir.girsignals.init.SignalSounds;
+import eu.gir.girsignals.init.GIRItems;
+import eu.gir.girsignals.init.GIRSounds;
 import eu.gir.girsignals.tileentitys.SignalTileEnity;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 public class SignalAndreasCross extends Signal {
 
     public SignalAndreasCross() {
-        super(builder(SignalItems.SIGN_PLACEMENT_TOOL, "andreas_cross").height(2).build());
+        super(builder(GIRItems.SIGN_PLACEMENT_TOOL, "andreas_cross").height(2).build());
     }
 
     public static final SEProperty<Boolean> ELECTRICITY = SEProperty.of("ac_electricity", false,
@@ -68,7 +68,7 @@ public class SignalAndreasCross extends Signal {
             return;
         }
         if (checkDoesSound(state, world, pos)) {
-            world.playSound(null, pos, SignalSounds.andreascross, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.playSound(null, pos, GIRSounds.andreascross, SoundCategory.BLOCKS, 1.0F, 1.0F);
             world.scheduleUpdate(pos, this, 84);
         }
     }
