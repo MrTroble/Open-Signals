@@ -1,6 +1,8 @@
 package com.troblecodings.signals.models.parser;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.troblecodings.signals.models.parser.interm.EvaluationLevel;
@@ -15,7 +17,8 @@ import scala.actors.threadpool.Arrays;
 })
 public final class LogicParser {
 
-    private static final HashMap<String, MethodInfo> TRANSLATION_TABLE = new HashMap<>();
+    public static final HashMap<String, MethodInfo> TRANSLATION_TABLE = new HashMap<>();
+    public static final HashMap<String, MethodInfo> UNIVERSAL_TRANSLATION_TABLE = new HashMap<>();
 
     private LogicParser() {
     }
@@ -47,16 +50,27 @@ public final class LogicParser {
 
         TRANSLATION_TABLE.put("speed", new MethodInfo("speed",
                 objects -> PredicateHolder.speed((int) objects[0]), Integer.class));
+        
+        TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name, new MethodInfo(name, objects -> {
+        	final Map<Class, Object> map = (Map<Class, Object>)objects[0];
+        	final Object[] outObj = new Object[info.parameter.length];
+        	int x = 0;
+        	for(final Class clazz : info.parameter) {
+        		final Object obj = Objects.requireNonNull(map.get(clazz));
+        		outObj[x++] = obj;
+        	}
+        	return info.blockState.apply(outObj);
+        }, Map.class)));
     }
 
     public static Predicate nDegreeFunctionParser(final String name,
             final FunctionParsingInfo parser, final String... parameter) {
         final String[] arguments = parameter;
-        final MethodInfo method = TRANSLATION_TABLE.get(name.toLowerCase());
+        final MethodInfo method = parser.getTable().get(name.toLowerCase());
         if (method == null)
             throw new LogicalParserException(
                     String.format("Syntax error function=%s does not exist permitted are:%n%s",
-                            name, TRANSLATION_TABLE.keySet().toString()));
+                            name, parser.getTable().keySet().toString()));
         final int length = method.parameter.length;
         if (arguments.length != length)
             throw new LogicalParserException(

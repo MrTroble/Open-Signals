@@ -4,6 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
@@ -108,4 +109,7 @@ public class FunctionParsingInfo {
         return Integer.parseInt(argument);
     }
 
+    public Map<String, MethodInfo> getTable() {
+    	return LogicParser.TRANSLATION_TABLE;
+    }
 }
