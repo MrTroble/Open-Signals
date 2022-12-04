@@ -5,7 +5,7 @@
 		"1": "girsignals:blocks/default/shield_black",
 		"2": "girsignals:blocks/other_signals/triangle_white",
 		"particle": "girsignals:blocks/default/shield_gray",
-		"overlay": "girsignals:blocks/other_signals/note_train_traffic_black"
+		"overlay": "girsignals:blocks/other_signals/rc_modern"
 	},
 	"elements": [
 		{
