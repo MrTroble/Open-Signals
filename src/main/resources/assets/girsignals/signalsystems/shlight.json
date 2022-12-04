@@ -7,10 +7,10 @@
         "offsetX": -7.5,
         "offsetY": -6.3,
         "renderHeights": {
-            "check(SH_HIGH.TRUE)": 2.373
+            "config(SH_HIGH.TRUE)": 2.373
         },
         "signalHeights": {
-            "check(SH_HIGH.FALSE)": 2
+            "config(SH_HIGH.FALSE)": 2
         }
     },
     "seProperties": [

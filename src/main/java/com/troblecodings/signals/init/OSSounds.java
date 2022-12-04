@@ -26,9 +26,9 @@ public final class OSSounds {
     public static SoundEvent rottenwarn;
 
     public static void init() {
+        loadSoundsfromJson();
         andreascross = registerSound("andreas_cross");
         rottenwarn = registerSound("rottenwarn");
-        loadSoundsfromJson();
     }
 
     public static void loadSoundsfromJson() {

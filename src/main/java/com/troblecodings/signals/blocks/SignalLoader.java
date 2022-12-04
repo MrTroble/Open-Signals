@@ -18,6 +18,7 @@ public final class SignalLoader {
         final Map<String, SignalSystemParser> signals = SignalSystemParser
                 .getSignalSystems(directory);
         signals.forEach((filename, properties) -> OSBlocks.loadBlock(
-                properties.createSignalSystem(filename), filename.replace(".json", " ")));
+                properties.createSignalSystem(filename),
+                filename.replace(".json", " ").toLowerCase()));
     }
 }

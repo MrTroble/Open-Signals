@@ -4,7 +4,10 @@
         "canLink": true,
         "defaultHeight": 2,
         "sounds": {
-            "andreas_cross": "has(ac_sound)|1"
+            "(config(ac_blink_light.TRUE) || (config(ac_car.YELLOW) || config(ac_car.RED))) && config(ac_sound.TRUE)": {
+                "name": "andreas_cross",
+                "length": 84
+            }
         }
     },
     "seProperties": [

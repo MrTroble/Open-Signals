@@ -34,9 +34,9 @@ public class CommonProxy {
                 (p, w, bp) -> new ContainerSignalBox((SignalBoxTileEntity) w.getTileEntity(bp)));
         OpenSignalsMain.handler.addServer(Signal.class, (p, w, bp) -> null);
 
+        OSSounds.init();
         OSItems.init();
         OSBlocks.init();
-        OSSounds.init();
 
         OneSignalConfigParser.loadInternConfigs();
         TwoSignalConfigParser.loadInternConfigs();

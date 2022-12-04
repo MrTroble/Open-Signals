@@ -44,7 +44,7 @@ public class SignalAndreasCross extends Signal {
 
         final SignalTileEnity signalTE = (SignalTileEnity) tile;
 
-        boolean isCarAndOn = signalTE.getProperty(AC_CAR)
+        final boolean isCarAndOn = signalTE.getProperty(AC_CAR)
                 .filter(car -> ACCar.YELLOW.equals(car) || ACCar.RED.equals(car)).isPresent();
 
         return (signalTE.getProperty(AC_BLINK_LIGHT).filter(blink -> (Boolean) blink).isPresent()

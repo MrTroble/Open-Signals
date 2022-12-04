@@ -12,7 +12,7 @@ public class SoundProperty {
     public final int duration;
 
     public SoundProperty() {
-        this(null, t -> true, 0);
+        this(null, t -> true, -1);
     }
 
     public SoundProperty(final SoundEvent sound, final Predicate predicate, final int duration) {

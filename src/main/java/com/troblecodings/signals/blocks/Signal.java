@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsConfig;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.contentpacks.SoundPropertyParser;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
@@ -131,9 +132,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private transient Placementtool placementtool = null;
         private String placementToolName = null;
         private int defaultHeight = 1;
-        private final Map<String, Integer> signalHeights = null;
+        private Map<String, Integer> signalHeights = null;
         private float customNameRenderHeight = -1;
-        private final Map<String, Float> renderHeights = null;
+        private Map<String, Float> renderHeights = null;
         private float signWidth = 22;
         private float offsetX = 0;
         private float offsetY = 0;
@@ -141,7 +142,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private boolean canLink = true;
         private transient ISignalAutoconfig config = null;
         private List<Integer> colors = null;
-        private final Map<String, String> sounds = null;
+        private final Map<String, SoundPropertyParser> sounds = null;
 
         public SignalPropertiesBuilder() {
         }
@@ -202,7 +203,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                         } catch (final LogicalParserException e) {
                             OpenSignalsMain.getLogger().error(
                                     "Something went wrong during the registry of a predicate in "
-                                            + info.signalName + "!");
+                                            + info.signalName + "!\nWith statement:" + property);
                             e.printStackTrace();
                             FMLCommonHandler.instance().exitJava(-1, false);
                         }
@@ -212,21 +213,25 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
             final List<SoundProperty> soundProperties = new ArrayList<>();
             if (sounds != null) {
-                for (final Map.Entry<String, String> soundProperty : sounds.entrySet()) {
-                    final SoundEvent sound = OSSounds.SOUNDS_IN_MAP.get(soundProperty.getKey());
+                for (final Map.Entry<String, SoundPropertyParser> soundProperty : sounds
+                        .entrySet()) {
+                    final SoundPropertyParser soundProp = soundProperty.getValue();
+                    final SoundEvent sound = OSSounds.SOUNDS_IN_MAP
+                            .get(soundProp.getName().toLowerCase());
                     if (sound == null) {
                         OpenSignalsMain.getLogger().error("The sound with the name "
-                                + soundProperty.getKey() + " doesn't exists!");
+                                + soundProp.getName() + " doesn't exists!");
                         continue;
                     }
-                    final String[] value = soundProperty.getValue().split("\\|");
                     try {
                         soundProperties.add(new SoundProperty(sound,
-                                LogicParser.predicate(value[0], info), Integer.parseInt(value[1])));
+                                LogicParser.predicate(soundProperty.getKey(), info),
+                                soundProp.getLength()));
                     } catch (final LogicalParserException e) {
                         OpenSignalsMain.getLogger()
                                 .error("Something went wrong during the registry of a predicate in "
-                                        + info.signalName + "!");
+                                        + info.signalName + "!\nWith statement:"
+                                        + soundProperty.getKey());
                         e.printStackTrace();
                         FMLCommonHandler.instance().exitJava(-1, false);
                     }
@@ -642,7 +647,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         final SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(pos);
         final Map<SEProperty<?>, Object> properties = tile.getProperties();
         final SoundProperty sound = getSound(properties);
-        if (sound.duration == 0)
+        if (sound.duration < 1)
             return;
 
         if (sound.duration == 1) {
@@ -676,10 +681,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
         final SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(pos);
         final SoundProperty sound = getSound(tile.getProperties());
-        if (sound.duration == 1) {
+        if (sound.duration <= 1) {
             return;
         }
         world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        world.scheduleUpdate(pos, this, 84);
+        world.scheduleUpdate(pos, this, sound.duration);
     }
 }

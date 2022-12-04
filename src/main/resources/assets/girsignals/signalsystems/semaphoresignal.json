@@ -11,11 +11,11 @@
             16761344
         ],
         "signalHeights": {
-            "check(SEMATYPE.MAIN)": 7,
-            "check(SEMATYPE.MAIN_SMALL)": 4
+            "config(SEMATYPE.MAIN)": 7,
+            "config(SEMATYPE.MAIN_SMALL)": 4
         },
         "renderHeights": {
-            "check(SEMATYPE.MAIN_SMALL)": 1.04
+            "config(SEMATYPE.MAIN_SMALL)": 1.04
         }
     },
     "seProperties": [

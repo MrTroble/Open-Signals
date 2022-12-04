@@ -8,11 +8,11 @@
 		"offsetX": -5,
 		"offsetY": 1.8,
 		"renderHeights": {
-			"check(OTHERTYPE.HM)": 2.1
+			"config(OTHERTYPE.HM)": 2.1
 		},
 		"signalHeights": {
-			"check(OTHERTYPE.CROSS)": 0,
-			"check(OTHERTYPE.ZS10)": 2
+			"config(OTHERTYPE.CROSS)": 0,
+			"config(OTHERTYPE.ZS10)": 2
 		}
 	},
 	"seProperties": [

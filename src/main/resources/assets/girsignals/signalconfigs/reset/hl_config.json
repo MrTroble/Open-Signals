@@ -1,0 +1,13 @@
+{
+    "currentSignal": "hlsignal",
+    "values": [
+        "mainlightsignallightbar.OFF",
+        "mainlightsignal_distant.HL10",
+        "mainlightsignal.HP0",
+        "exitsignal.HP0",
+        "zs2.OFF",
+        "zs2v.OFF",
+        "blocksignal.HP0",
+        "blockexitsignal.HP0"
+    ]
+}

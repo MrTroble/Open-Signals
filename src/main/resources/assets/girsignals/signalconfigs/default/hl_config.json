@@ -1,0 +1,11 @@
+{
+    "currentSignal": "hlsignal",
+    "values": [
+        "mainlightsignal_distant.HL10",
+        "mainlightsignal.HL11_12",
+        "blocksignal.HL10",
+        "blockexitsignal.HL10",
+        "exitsignal.HL2_3",
+        "zs2.ZS13"
+    ]
+}
