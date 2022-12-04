@@ -216,7 +216,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 for (final Map.Entry<String, SoundPropertyParser> soundProperty : sounds
                         .entrySet()) {
                     final SoundPropertyParser soundProp = soundProperty.getValue();
-                    final SoundEvent sound = OSSounds.SOUNDS_IN_MAP
+                    final SoundEvent sound = OSSounds.SOUNDS
                             .get(soundProp.getName().toLowerCase());
                     if (sound == null) {
                         OpenSignalsMain.getLogger().error("The sound with the name "

@@ -1,8 +1,6 @@
 package com.troblecodings.signals.init;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import com.troblecodings.signals.OpenSignalsMain;
@@ -12,41 +10,31 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.registries.IForgeRegistry;
 
 public final class OSSounds {
 
     private OSSounds() {
     }
 
-    public static final List<SoundEvent> SOUNDS = new LinkedList<>();
-
-    public static final Map<String, SoundEvent> SOUNDS_IN_MAP = new HashMap<>();
+    public static final Map<String, SoundEvent> SOUNDS = new HashMap<>();
 
     public static SoundEvent andreascross;
     public static SoundEvent rottenwarn;
 
     public static void init() {
-        loadSoundsfromJson();
-        andreascross = registerSound("andreas_cross");
-        rottenwarn = registerSound("rottenwarn");
-    }
-
-    public static void loadSoundsfromJson() {
         final Map<String, String> map = FileReader
                 .readallFilesfromDierectory("assets/girsignals/sounds");
-        map.forEach((name, _u) -> SOUNDS_IN_MAP.put(name.toLowerCase().replace(".ogg", ""),
-                registerSound(name.toLowerCase())));
-    }
-
-    private static SoundEvent registerSound(final String soundName) {
-        final ResourceLocation resource = new ResourceLocation(OpenSignalsMain.MODID, soundName);
-        final SoundEvent sound = new SoundEvent(resource).setRegistryName(soundName);
-        SOUNDS.add(sound);
-        return sound;
+        map.forEach((name, _u) -> {
+            final ResourceLocation resource = new ResourceLocation(OpenSignalsMain.MODID, name);
+            final SoundEvent sound = new SoundEvent(resource).setRegistryName(name);
+            SOUNDS.put(name.toLowerCase().replace(".ogg", ""), sound);
+        });
     }
 
     @SubscribeEvent
     public static void soundRegistry(final RegistryEvent.Register<SoundEvent> event) {
-        SOUNDS.forEach(sound -> event.getRegistry().register(sound));
+        final IForgeRegistry<SoundEvent> registry = event.getRegistry();
+        SOUNDS.forEach((_u, sound) -> registry.register(sound));
     }
 }

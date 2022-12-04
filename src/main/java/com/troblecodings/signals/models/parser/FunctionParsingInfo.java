@@ -30,6 +30,13 @@ public class FunctionParsingInfo {
     public String argument;
     public final String signalName;
     public final List<IUnlistedProperty> properties;
+    private Map<String, MethodInfo> translationTable;
+
+    public FunctionParsingInfo(final Map<String, MethodInfo> translationTable,
+            final Signal signal) {
+        this(signal);
+        this.translationTable = translationTable;
+    }
 
     public FunctionParsingInfo(final Signal signalSystem) {
         this(Objects.requireNonNull(signalSystem).getSignalTypeName(),
@@ -41,6 +48,7 @@ public class FunctionParsingInfo {
         this.argument = "";
         this.signalName = signalSystem;
         this.properties = properties;
+        this.translationTable = LogicParser.TRANSLATION_TABLE;
     }
 
     public Object[] getParameter(final Class[] parameter, final String[] arguments) {
@@ -110,6 +118,6 @@ public class FunctionParsingInfo {
     }
 
     public Map<String, MethodInfo> getTable() {
-        return LogicParser.TRANSLATION_TABLE;
+        return translationTable;
     }
 }

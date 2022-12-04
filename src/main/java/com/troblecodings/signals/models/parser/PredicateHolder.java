@@ -81,8 +81,8 @@ public final class PredicateHolder {
     }
 
     public static Predicate<Integer> speed(final int speed) {
-        return t -> {
-            return t == speed;
+        return s -> {
+            return s == speed;
         };
     }
 }
