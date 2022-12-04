@@ -3,6 +3,6 @@
     "values": [
         "exitsignal.HL_SHUNTING",
         "mainlightsignal.HL_SHUNTING",
-        "blocksignal.HL_SHUNTING"
+        "blockexitsignal.HL_SHUNTING"
     ]
 }
