@@ -10,10 +10,10 @@ import com.troblecodings.signals.blocks.IConfigUpdatable;
 import com.troblecodings.signals.blocks.Post;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.RedstoneInput;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.blocks.SignalLoader;
-import com.troblecodings.signals.blocks.SwitchHandle;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -35,36 +35,10 @@ public final class OSBlocks {
 
     public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
     public static final Post POST = new Post();
-//    public static final SignalHV HV_SIGNAL = new SignalHV();
     public static final GhostBlock GHOST_BLOCK = new GhostBlock();
-//    public static final SignalKS KS_SIGNAL = new SignalKS();
-//    public static final SignalHL HL_SIGNAL = new SignalHL();
-//    public static final SignalSHLight SH_LIGHT = new SignalSHLight();
-//    public static final SignalTram TRAM_SIGNAL = new SignalTram();
-//    public static final SignalLF LF_SIGNAL = new SignalLF();
-//    public static final SignalEL EL_SIGNAL = new SignalEL();
-//    public static final Signal SH_SIGNAL = new Signal(
-//            Signal.builder(OSItems.SIGN_PLACEMENT_TOOL, "shsignal").noLink().build());
-//    public static final SignalRA RA_SIGNAL = new SignalRA();
-//    public static final SignalBUE BUE_SIGNAL = new SignalBUE();
-//    public static final SignalBUELight BUE_LIGHT = new SignalBUELight();
-//    public static final SignalOther OTHER_SIGNAL = new SignalOther();
-//    public static final SignalNE NE_SIGNAL = new SignalNE();
-//    public static final SignalTS TS_SIGNAL = new SignalTS();
-//    public static final StationNumberPlate STATION_NUMBER_PLATE = new StationNumberPlate();
-//    public static final SignalWN WN_SIGNAL = new SignalWN();
-//    public static final SignalStationName STATION_NAME = new SignalStationName();
     public static final SignalBox SIGNAL_BOX = new SignalBox();
     public static final RedstoneIO REDSTONE_IN = new RedstoneInput();
     public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
-//    public static final SignalSemaphore SEMAPHORE_SIGNAL = new SignalSemaphore();
-//    public static final SignalSHMech SH_MECH = new SignalSHMech();
-//    public static final SignalAndreasCross ANDREAS_CROSS = new SignalAndreasCross();
-//    public static final SignalETCS ETCS_SIGNAL = new SignalETCS();
-//    public static final SignalRO RO_SIGNAL = new SignalRO();
-//    public static final SignalTramSign TRAM_SIGN_SIGNAL = new SignalTramSign();
-//    public static final RailroadGate RAILROAD_GATE = new RailroadGate();
-    public static final SwitchHandle SWITCH_HANDLE = new SwitchHandle();
 
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
@@ -85,13 +59,16 @@ public final class OSBlocks {
         SignalLoader.loadInternSignals();
     }
 
-    private static void loadBlock(final Block block, final String name) {
+    public static void loadBlock(final Block block, final String pName) {
         if (blocksToRegister.contains(block))
             return;
 
+        final String name = pName.toLowerCase().trim();
         block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
         block.setUnlocalizedName(name);
         blocksToRegister.add(block);
+        if (block instanceof Signal)
+            Signal.SIGNALS.put(name, (Signal) block);
         if (block instanceof ITileEntityProvider) {
             final ITileEntityProvider provider = (ITileEntityProvider) block;
             try {

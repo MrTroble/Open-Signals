@@ -7,13 +7,13 @@
             16777215
         ],
         "signalHeights": {
-            "NETYPE.NE2": 0,
-            "NETYPE.NE2_1": 0,
-            "NETYPE.NE4_SMALL": 0,
-            "NETYPE.NE1": 1,
-            "NETYPE.NE5": 1,
-            "NETYPE.NE6": 1,
-            "NETYPE.SO106": 1
+            "check(NETYPE.NE2)": 0,
+            "check(NETYPE.NE2_1)": 0,
+            "check(NETYPE.NE4_SMALL)": 0,
+            "check(NETYPE.NE1)": 1,
+            "check(NETYPE.NE5)": 1,
+            "check(NETYPE.NE6)": 1,
+            "check(NETYPE.SO106)": 1
         }
     },
     "seProperties": [

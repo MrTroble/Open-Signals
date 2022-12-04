@@ -4,20 +4,24 @@ import java.io.File;
 
 import com.troblecodings.signals.OpenSignalsMain;
 
-public class ContentPackMain {
+public final class ContentPackMain {
 
-    public static final File assetsFolder = new File("./config/girsignals");
+    private ContentPackMain() {
+    }
+
+    public static final File ASSET_FOLDER = new File("./config/girsignals");
 
     public static void loadContentPacks() {
 
-        if (!assetsFolder.exists()) {
-            assetsFolder.mkdirs();
+        if (!ASSET_FOLDER.exists()) {
+            ASSET_FOLDER.mkdirs();
         } else {
 
-        final File[] contentPacks = assetsFolder.listFiles((dir, name) -> name.endsWith(".zip"));
+            final File[] contentPacks = ASSET_FOLDER
+                    .listFiles((dir, name) -> name.endsWith(".zip"));
 
-        if (contentPacks == null || contentPacks.length == 0)
-            OpenSignalsMain.log.info("No ContentPacks found!");
+            if (contentPacks == null || contentPacks.length == 0)
+                OpenSignalsMain.log.info("No ContentPacks found!");
         }
     }
 }

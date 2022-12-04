@@ -31,13 +31,6 @@ public class CustomModelLoader implements ICustomModelLoader {
 
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
-    private static final Map<String, Signal> TRANSLATION_TABLE = new HashMap<>();
-
-    static {
-        Signal.SIGNALLIST
-                .forEach(signal -> TRANSLATION_TABLE.put(signal.getSignalTypeName(), signal));
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void onResourceManagerReload(final IResourceManager resourceManager) {
@@ -65,22 +58,10 @@ public class CustomModelLoader implements ICustomModelLoader {
             if (!filename.endsWith(".extention.json")) {
 
                 final ModelStats content = (ModelStats) modelstatemap.getValue();
-
-                Signal signaltype = null;
-
-                for (final Map.Entry<String, Signal> entry : TRANSLATION_TABLE.entrySet()) {
-
-                    final String signalname = entry.getKey();
-                    final Signal signal = entry.getValue();
-
-                    if (filename.replace(".json", "").equalsIgnoreCase(signalname)) {
-
-                        signaltype = signal;
-                    }
-                }
+                final String lowercaseName = filename.replace(".json", "").toLowerCase();
+                final Signal signaltype = Signal.SIGNALS.get(lowercaseName);
 
                 if (signaltype == null) {
-
                     OpenSignalsMain.getLogger().error("There doesn't exists a signalsystem named "
                             + filename.replace(".json", "") + "!");
                     FMLCommonHandler.instance().exitJava(-1, false);

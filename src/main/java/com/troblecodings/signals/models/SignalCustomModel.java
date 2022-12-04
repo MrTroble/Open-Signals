@@ -136,7 +136,8 @@ public class SignalCustomModel implements IModel {
             final float x, final float y, final float z, final Map<String, String> map) {
 
         IModel m = ModelLoaderRegistry.getModelOrLogError(
-                new ResourceLocation(OpenSignalsMain.MODID, "block/" + name), "Couldn't find " + name);
+                new ResourceLocation(OpenSignalsMain.MODID, "block/" + name),
+                "Couldn't find " + name);
         m = m.smoothLighting(false);
 
         if (map != null && !map.isEmpty()) {

@@ -90,7 +90,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     public static class SignalProperties {
 
         public final Placementtool placementtool;
-        public final String signalTypeName;
         public final float customNameRenderHeight;
         public final int defaultHeight;
         public final List<HeightProperty> signalHeights;
@@ -104,14 +103,13 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public final ISignalAutoconfig config;
         public final List<SoundProperty> sounds;
 
-        public SignalProperties(final Placementtool placementtool, final String signalTypeName,
+        public SignalProperties(final Placementtool placementtool,
                 final float customNameRenderHeight, final int height,
                 final List<HeightProperty> signalHeights, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
                 final boolean canLink, final ISignalAutoconfig config, final List<Integer> colors,
                 final List<FloatProperty> renderheights, final List<SoundProperty> sounds) {
             this.placementtool = placementtool;
-            this.signalTypeName = signalTypeName;
             this.customNameRenderHeight = customNameRenderHeight;
             this.defaultHeight = height;
             this.signWidth = signWidth;
@@ -132,11 +130,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
         private transient Placementtool placementtool = null;
         private String placementToolName = null;
-        private String signalTypeName = null;
         private int defaultHeight = 1;
-        private Map<String, Integer> signalHeights = null;
+        private final Map<String, Integer> signalHeights = null;
         private float customNameRenderHeight = -1;
-        private Map<String, Float> renderHeights = null;
+        private final Map<String, Float> renderHeights = null;
         private float signWidth = 22;
         private float offsetX = 0;
         private float offsetY = 0;
@@ -144,7 +141,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private boolean canLink = true;
         private transient ISignalAutoconfig config = null;
         private List<Integer> colors = null;
-        private Map<String, String> sounds = null;
+        private final Map<String, String> sounds = null;
 
         public SignalPropertiesBuilder() {
         }
@@ -152,7 +149,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public SignalPropertiesBuilder(final Placementtool placementtool,
                 final String signalTypeName) {
             this.placementtool = placementtool;
-            this.signalTypeName = signalTypeName;
         }
 
         public SignalProperties build() {
@@ -187,7 +183,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                         } catch (final LogicalParserException e) {
                             OpenSignalsMain.getLogger().error(
                                     "Something went wrong during the registry of a predicate in "
-                                            + signalTypeName + "!");
+                                            + info.signalName + "!\nWith statement:" + property);
                             e.printStackTrace();
                             FMLCommonHandler.instance().exitJava(-1, false);
                         }
@@ -206,7 +202,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                         } catch (final LogicalParserException e) {
                             OpenSignalsMain.getLogger().error(
                                     "Something went wrong during the registry of a predicate in "
-                                            + signalTypeName + "!");
+                                            + info.signalName + "!");
                             e.printStackTrace();
                             FMLCommonHandler.instance().exitJava(-1, false);
                         }
@@ -216,7 +212,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
             final List<SoundProperty> soundProperties = new ArrayList<>();
             if (sounds != null) {
-                for (Map.Entry<String, String> soundProperty : sounds.entrySet()) {
+                for (final Map.Entry<String, String> soundProperty : sounds.entrySet()) {
                     final SoundEvent sound = OSSounds.SOUNDS_IN_MAP.get(soundProperty.getKey());
                     if (sound == null) {
                         OpenSignalsMain.getLogger().error("The sound with the name "
@@ -230,7 +226,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                     } catch (final LogicalParserException e) {
                         OpenSignalsMain.getLogger()
                                 .error("Something went wrong during the registry of a predicate in "
-                                        + signalTypeName + "!");
+                                        + info.signalName + "!");
                         e.printStackTrace();
                         FMLCommonHandler.instance().exitJava(-1, false);
                     }
@@ -239,15 +235,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
             this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
-            return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight,
-                    defaultHeight, ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY,
-                    signScale, canLink, config, colors, ImmutableList.copyOf(renderheights),
+            return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
+                    ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
+                    canLink, config, colors, ImmutableList.copyOf(renderheights),
                     ImmutableList.copyOf(soundProperties));
-        }
-
-        public SignalPropertiesBuilder typename(final String signalTypeName) {
-            this.signalTypeName = signalTypeName;
-            return this;
         }
 
         public SignalPropertiesBuilder placementtoolname(final String placementToolName) {
@@ -324,7 +315,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         id = SIGNALLIST.size();
         SIGNALLIST.add(this);
         prop.placementtool.addSignal(this);
-        SIGNALS.put(this.prop.signalTypeName.toLowerCase(), this);
     }
 
     @Override
@@ -501,7 +491,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     public String getSignalTypeName() {
-        return this.prop.signalTypeName;
+        return this.getRegistryName().getResourcePath();
     }
 
     public int getID() {
@@ -668,9 +658,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
     }
 
-    @SuppressWarnings({
-            "unchecked"
-    })
+    @SuppressWarnings("unchecked")
     public SoundProperty getSound(final Map<SEProperty<?>, Object> map) {
         for (final SoundProperty property : this.prop.sounds) {
             if (property.predicate.test(map)) {

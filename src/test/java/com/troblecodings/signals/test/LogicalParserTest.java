@@ -53,8 +53,7 @@ public class LogicalParserTest {
 
     @Test
     public void testFunctionParser() throws Exception {
-        for (final Signal signal : new Signal[] {
-        }) {
+        for (final Signal signal : new Signal[] {}) {
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
             for (final IUnlistedProperty property : info.properties) {
                 info.argument = property.getName();
@@ -98,8 +97,7 @@ public class LogicalParserTest {
         final IUnlistedProperty property2 = (IUnlistedProperty) parsed[2];
         assertEquals(SignalHV.STOPSIGNAL, property2);
 
-        assertThrows(LogicalParserException.class,
-                () -> function("", hvSignal).getProperty());
+        assertThrows(LogicalParserException.class, () -> function("", hvSignal).getProperty());
         assertThrows(LogicalParserException.class,
                 () -> function("asdansdkjnkls", hvSignal).getProperty());
         assertThrows(LogicalParserException.class,

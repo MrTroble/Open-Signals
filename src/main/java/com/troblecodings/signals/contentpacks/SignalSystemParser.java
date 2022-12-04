@@ -62,7 +62,6 @@ public class SignalSystemParser {
             list.addAll(properties);
         };
 
-        return (Signal) new Signal(systemProperties.typename(name).build(info))
-                .setRegistryName(OpenSignalsMain.MODID, name).setUnlocalizedName(name);
+        return new Signal(systemProperties.build(info));
     }
 }

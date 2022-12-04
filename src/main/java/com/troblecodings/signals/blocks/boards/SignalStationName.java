@@ -51,21 +51,21 @@ public class SignalStationName extends Signal {
         GlStateManager.pushMatrix();
         GlStateManager.translate(x + 0.5f, y + 0.75f, z + 0.5f);
         GlStateManager.rotate(angel, 0, 1, 0);
-        
+
         GlStateManager.pushMatrix();
         GlStateManager.scale(-scale, -scale, 1);
         GlStateManager.translate(-1.3f / scale, 0, -0.32f);
         font.drawString(display, 0, 0, 0xFFFFFFFF);
         GlStateManager.popMatrix();
-        
+
         GlStateManager.rotate(180, 0, 1, 0);
-        
+
         GlStateManager.pushMatrix();
         GlStateManager.scale(-scale, -scale, 1);
         GlStateManager.translate(-1.3f / scale, 0, -0.32f);
         font.drawString(display, 0, 0, 0xFFFFFFFF);
         GlStateManager.popMatrix();
-        
+
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
     }

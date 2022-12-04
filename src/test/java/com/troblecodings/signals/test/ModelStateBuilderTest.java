@@ -12,7 +12,7 @@ public final class ModelStateBuilderTest {
     @Test
     public static void testModelstats() {
 
-        System.out.println(
-                FileReader.readallFilesfromDierectory("/assets/signals/modeldefinitions"));
+        System.out
+                .println(FileReader.readallFilesfromDierectory("/assets/signals/modeldefinitions"));
     }
 }

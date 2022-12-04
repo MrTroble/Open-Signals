@@ -182,7 +182,7 @@ public final class EnumSignals {
         HM, OB, CROSS, LZB, ZS10, HM2, FIRETORCH, KEEP_DISTANCE, NO_PASS, NARROWING,
         NOTE_TRAIN_TRAFFIC, RC1, RC2, RC3, STOP_PROTECTING;
     }
-    
+
     public enum CrossingSign implements Offable<CrossingSign> {
         OFF, MODERN, OLD, FENCE;
     }

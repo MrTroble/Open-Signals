@@ -79,7 +79,7 @@ public final class PredicateHolder {
             return pack.predicate.test(value);
         };
     }
-    
+
     public static Predicate<Integer> speed(final int speed) {
         return t -> {
             return t == speed;

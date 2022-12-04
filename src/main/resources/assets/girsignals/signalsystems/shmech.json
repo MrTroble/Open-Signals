@@ -1,16 +1,17 @@
 {
     "systemProperties": {
         "placementToolName": "placementtool",
+        "signalTypeName": "SHMech",
         "canLink": true,
         "defaultHeight": 0,
         "customNameRenderHeight": 1.04,
         "offsetX": 7.0,
         "offsetY": -9.8,
         "renderHeights": {
-            "SH_HIGH.TRUE": 3.04
+            "check(SH_HIGH.TRUE)": 3.04
         },
         "signalHeights": {
-            "SH_HIGH.FALSE": 2
+            "check(SH_HIGH.FALSE)": 2
         }
     },
     "seProperties": [

@@ -1,25 +1,35 @@
 {
-    "systemProperties": {
-        "placementToolName": "signplacementtool",
-        "canLink": false,
-        "defaultHeight": 1,
-        "signScale": 3.5,
-        "offsetX": -5,
-        "offsetY": 1.8,
-        "renderHeights": {
-            "OTHERTYPE.HM": 2.1
-        },
-        "signalHeights": {
-            "OTHERTYPE.CROSS": 0,
-            "OTHERTYPE.ZS10": 2
-        }
-    },
-    "seProperties": [
-        {
-            "name": "othertype",
-            "enumClass": "OtherSignal",
-            "defaultState": "HM",
-            "changeableStage": "GUISTAGE"
-        }
-    ]
+	"systemProperties": {
+		"placementToolName": "signplacementtool",
+		"signalTypeName": "othersignal",
+		"canLink": false,
+		"defaultHeight": 1,
+		"signScale": 3.5,
+		"offsetX": -5,
+		"offsetY": 1.8,
+		"renderHeights": {
+			"check(OTHERTYPE.HM)": 2.1
+		},
+		"signalHeights": {
+			"check(OTHERTYPE.CROSS)": 0,
+			"check(OTHERTYPE.ZS10)": 2
+		}
+	},
+	"seProperties": [
+		{
+			"name": "othertype",
+			"enumClass": "OtherSignal",
+			"defaultState": "HM",
+			"changeableStage": "GUISTAGE",
+			"autoname": true
+		},
+		{
+			"name": "railroadcrossing",
+			"enumClass": "CrossingSign",
+			"defaultState": "OFF",
+			"changeableStage": "GUISTAGE",
+			"autoname": true,
+			"dependencies": "check(othertype.RC1)"
+		}
+	]
 }

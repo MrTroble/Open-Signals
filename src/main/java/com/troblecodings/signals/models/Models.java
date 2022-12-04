@@ -25,7 +25,7 @@ public class Models {
     }
 
     public ImmutableList<TextureStats> getTexture() {
-        
+
         if (textures == null)
             textures = new ArrayList<>();
 

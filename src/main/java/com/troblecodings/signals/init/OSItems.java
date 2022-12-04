@@ -33,7 +33,8 @@ public final class OSItems {
     });
     public static final Placementtool PLACEMENT_TOOL = new Placementtool();
     public static final Placementtool SIGN_PLACEMENT_TOOL = new Placementtool();
-    public static final Item CONDUCTOR_TROWEL_GREEN = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item CONDUCTOR_TROWEL_GREEN = new Item()
+            .setCreativeTab(CreativeTabs.COMBAT);
     public static final Item CONDUCTOR_TROWEL_RED = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item WARNING_FLAG = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item K_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
@@ -84,7 +85,7 @@ public final class OSItems {
     public static void init() {
         final Field[] fields = OSItems.class.getFields();
         for (final Field field : fields) {
-            final int modifiers = field.getModifiers(); 
+            final int modifiers = field.getModifiers();
             if (Modifier.isStatic(modifiers) && Modifier.isFinal(modifiers)
                     && Modifier.isPublic(modifiers)) {
                 final String name = field.getName().toLowerCase().replace("_", "");

@@ -73,7 +73,7 @@ public class SignalSemaphore extends Signal {
                         ? 1.04f
                         : this.prop.customNameRenderHeight);
     }
-    
+
     @Override
     public boolean hasCostumColor() {
         return true;

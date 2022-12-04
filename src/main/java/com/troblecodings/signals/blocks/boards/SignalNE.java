@@ -32,7 +32,7 @@ public class SignalNE extends Signal {
     public boolean hasCostumColor() {
         return true;
     }
-    
+
     @Override
     public int getHeight(final Map<SEProperty<?>, Object> map) {
         final NE other = (NE) map.get(NETYPE);

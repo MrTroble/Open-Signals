@@ -39,7 +39,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 
     public ContainerSignalBox(final Consumer<NBTTagCompound> run) {
         this.run = run;
-        //GuiSyncNetwork.requestRemaining(this);
+        // GuiSyncNetwork.requestRemaining(this);
     }
 
     @Override

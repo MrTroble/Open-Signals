@@ -4,10 +4,10 @@
         "canLink": true,
         "defaultHeight": 0,
         "signalHeights": {
-            "RATYPE.RA10": 1,
-            "RATYPE.RA11A": 3,
-            "RATYPE.RA11B": 3,
-            "RATYPE.RA6_9": 4
+            "check(RATYPE.RA10)": 1,
+            "check(RATYPE.RA11A)": 3,
+            "check(RATYPE.RA11B)": 3,
+            "check(RATYPE.RA6_9)": 4
         }
     },
     "seProperties": [

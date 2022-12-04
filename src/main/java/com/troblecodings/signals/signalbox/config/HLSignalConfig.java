@@ -265,7 +265,7 @@ public final class HLSignalConfig implements ISignalAutoconfig {
             values.put(SignalHL.BLOCKEXITSIGNAL, HLBlockExit.HL1);
             values.put(SignalHL.ZS2, ZS32.ZS13);
         }
-        
+
         this.changeIfPresent(values, info.current);
     }
 

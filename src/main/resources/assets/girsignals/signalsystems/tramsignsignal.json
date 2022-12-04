@@ -1,6 +1,7 @@
 {
     "systemProperties": {
         "placementToolName": "signplacementtool",
+        "signalTypeName": "tramsignsignal",
         "canLink": false,
         "defaultHeight": 0
     },

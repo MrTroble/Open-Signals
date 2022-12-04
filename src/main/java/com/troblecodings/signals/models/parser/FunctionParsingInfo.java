@@ -110,6 +110,6 @@ public class FunctionParsingInfo {
     }
 
     public Map<String, MethodInfo> getTable() {
-    	return LogicParser.TRANSLATION_TABLE;
+        return LogicParser.TRANSLATION_TABLE;
     }
 }
