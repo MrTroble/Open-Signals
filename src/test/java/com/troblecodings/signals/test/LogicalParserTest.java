@@ -10,16 +10,15 @@ import java.util.function.Predicate;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.EnumSignals.HP;
 import com.troblecodings.signals.EnumSignals.HPType;
 import com.troblecodings.signals.EnumSignals.MastSignal;
 import com.troblecodings.signals.EnumSignals.NE;
 import com.troblecodings.signals.EnumSignals.VR;
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.boards.SignalNE;
 import com.troblecodings.signals.blocks.signals.SignalHV;
-import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.IntermidiateLogic;
 import com.troblecodings.signals.models.parser.LogicParser;
@@ -55,7 +54,6 @@ public class LogicalParserTest {
     @Test
     public void testFunctionParser() throws Exception {
         for (final Signal signal : new Signal[] {
-                OSBlocks.HV_SIGNAL, OSBlocks.LF_SIGNAL
         }) {
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
             for (final IUnlistedProperty property : info.properties) {
@@ -64,7 +62,8 @@ public class LogicalParserTest {
                 assertEquals(property, object);
             }
         }
-        final FunctionParsingInfo hvSignalInfo = new FunctionParsingInfo(OSBlocks.HV_SIGNAL);
+        final Signal hvSignal = new SignalHV();
+        final FunctionParsingInfo hvSignalInfo = new FunctionParsingInfo(hvSignal);
         for (final SEProperty property : new SEProperty[] {
                 SignalHV.HPHOME, SignalHV.HPBLOCK, SignalHV.ZS3_PLATE
         }) {
@@ -78,7 +77,7 @@ public class LogicalParserTest {
             assertFalse(pack.predicate.negate().test(def));
         }
 
-        final FunctionParsingInfo parsingInfo = new FunctionParsingInfo(OSBlocks.HV_SIGNAL);
+        final FunctionParsingInfo parsingInfo = new FunctionParsingInfo(hvSignal);
         final Object[] parsed = parsingInfo.getParameter(new Class[] {
                 ValuePack.class, IUnlistedProperty.class, IUnlistedProperty.class
         }, new String[] {
@@ -100,21 +99,21 @@ public class LogicalParserTest {
         assertEquals(SignalHV.STOPSIGNAL, property2);
 
         assertThrows(LogicalParserException.class,
-                () -> function("", OSBlocks.HV_SIGNAL).getProperty());
+                () -> function("", hvSignal).getProperty());
         assertThrows(LogicalParserException.class,
-                () -> function("asdansdkjnkls", OSBlocks.HV_SIGNAL).getProperty());
+                () -> function("asdansdkjnkls", hvSignal).getProperty());
         assertThrows(LogicalParserException.class,
-                () -> function("stopsignal.HP0", OSBlocks.HV_SIGNAL).getProperty());
+                () -> function("stopsignal.HP0", hvSignal).getProperty());
         assertThrows(LogicalParserException.class,
-                () -> function("asdansdkjnkls", OSBlocks.HV_SIGNAL).getPredicate());
+                () -> function("asdansdkjnkls", hvSignal).getPredicate());
         assertThrows(LogicalParserException.class,
-                () -> function("stopsignal", OSBlocks.HV_SIGNAL).getPredicate());
+                () -> function("stopsignal", hvSignal).getPredicate());
         assertThrows(LogicalParserException.class,
-                () -> function("asdasdasd.asdasd", OSBlocks.HV_SIGNAL).getPredicate());
+                () -> function("asdasdasd.asdasd", hvSignal).getPredicate());
         assertThrows(LogicalParserException.class,
-                () -> function("stopsignal.asdasds", OSBlocks.HV_SIGNAL).getPredicate());
+                () -> function("stopsignal.asdasds", hvSignal).getPredicate());
         assertThrows(LogicalParserException.class,
-                () -> function("hptype.HP0", OSBlocks.HV_SIGNAL).getPredicate());
+                () -> function("hptype.HP0", hvSignal).getPredicate());
     }
 
     public void assertFunction(final String name, final FunctionParsingInfo info,
@@ -133,7 +132,8 @@ public class LogicalParserTest {
 
     @Test
     public void testMethods() {
-        final FunctionParsingInfo parsingInfo = new FunctionParsingInfo(OSBlocks.HV_SIGNAL);
+        final Signal hvSignal = new SignalHV();
+        final FunctionParsingInfo parsingInfo = new FunctionParsingInfo(hvSignal);
         assertFunction("with", parsingInfo, SignalHV.STOPSIGNAL, HP.HP0, "stopsignal.HP0");
         assertFunction("with", parsingInfo, SignalHV.STOPSIGNAL, HP.HP1, "stopsignal.HP1");
         assertFunction("with", parsingInfo, SignalHV.HPTYPE, HPType.STOPSIGNAL,
@@ -245,7 +245,8 @@ public class LogicalParserTest {
 
     @Test
     public void testInput() {
-        final FunctionParsingInfo info = new FunctionParsingInfo(OSBlocks.HV_SIGNAL);
+        final Signal hvSignal = new SignalHV();
+        final FunctionParsingInfo info = new FunctionParsingInfo(hvSignal);
         testNode(new DummyBlockState(SignalHV.STOPSIGNAL, HP.HP0),
                 LogicParser.parse("has(stopsignal)", info).pop());
         testNode(new DummyBlockState(SignalHV.DISTANTSIGNAL, VR.VR0),

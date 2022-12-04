@@ -2,7 +2,10 @@
     "systemProperties": {
         "placementToolName": "signplacementtool",
         "canLink": true,
-        "defaultHeight": 2
+        "defaultHeight": 2,
+        "sounds": {
+            "andreas_cross": "has(ac_sound)|1"
+        }
     },
     "seProperties": [
         {

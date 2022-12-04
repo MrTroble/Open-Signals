@@ -34,7 +34,7 @@ public final class OSSounds {
     public static void loadSoundsfromJson() {
         final Map<String, String> map = FileReader
                 .readallFilesfromDierectory("assets/girsignals/sounds");
-        map.forEach((name, _u) -> SOUNDS_IN_MAP.put(name.toLowerCase(),
+        map.forEach((name, _u) -> SOUNDS_IN_MAP.put(name.toLowerCase().replace(".ogg", ""),
                 registerSound(name.toLowerCase())));
     }
 

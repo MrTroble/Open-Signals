@@ -25,6 +25,14 @@ public final class FileReader {
     private FileReader() {
     }
 
+    /**
+     * 
+     * @param directory : The path to the directory you want to read out from the
+     *                  resource folder of this mod
+     * @return a map containing all files, as key the filename and as value the
+     *         content of this file
+     */
+
     public static Map<String, String> readallFilesfromDierectory(final String directory) {
         final Map<String, String> files = new HashMap<>();
         final Optional<Path> filepath = getRessourceLocation(directory);
@@ -41,7 +49,8 @@ public final class FileReader {
 
                         files.put(name, content);
                     } catch (final IOException e) {
-                        OpenSignalsMain.log.warn("There was a problem during loading " + file + " !");
+                        OpenSignalsMain.log
+                                .warn("There was a problem during loading " + file + " !");
                         e.printStackTrace();
                     }
                 });

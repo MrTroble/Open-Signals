@@ -50,17 +50,18 @@ public final class LogicParser {
 
         TRANSLATION_TABLE.put("speed", new MethodInfo("speed",
                 objects -> PredicateHolder.speed((int) objects[0]), Integer.class));
-        
-        TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name, new MethodInfo(name, objects -> {
-        	final Map<Class, Object> map = (Map<Class, Object>)objects[0];
-        	final Object[] outObj = new Object[info.parameter.length];
-        	int x = 0;
-        	for(final Class clazz : info.parameter) {
-        		final Object obj = Objects.requireNonNull(map.get(clazz));
-        		outObj[x++] = obj;
-        	}
-        	return info.blockState.apply(outObj);
-        }, Map.class)));
+
+        TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name,
+                new MethodInfo(name, objects -> {
+                    final Map<Class, Object> map = (Map<Class, Object>) objects[0];
+                    final Object[] outObj = new Object[info.parameter.length];
+                    int x = 0;
+                    for (final Class clazz : info.parameter) {
+                        final Object obj = Objects.requireNonNull(map.get(clazz));
+                        outObj[x++] = obj;
+                    }
+                    return info.blockState.apply(outObj);
+                }, Map.class)));
     }
 
     public static Predicate nDegreeFunctionParser(final String name,

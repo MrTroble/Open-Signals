@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -19,6 +20,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.OSItems;
+import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.LogicParser;
@@ -48,6 +50,8 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -58,6 +62,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -97,13 +102,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public final boolean canLink;
         public final List<Integer> colors;
         public final ISignalAutoconfig config;
+        public final List<SoundProperty> sounds;
 
         public SignalProperties(final Placementtool placementtool, final String signalTypeName,
                 final float customNameRenderHeight, final int height,
                 final List<HeightProperty> signalHeights, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
                 final boolean canLink, final ISignalAutoconfig config, final List<Integer> colors,
-                final List<FloatProperty> renderheights) {
+                final List<FloatProperty> renderheights, final List<SoundProperty> sounds) {
             this.placementtool = placementtool;
             this.signalTypeName = signalTypeName;
             this.customNameRenderHeight = customNameRenderHeight;
@@ -117,6 +123,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             this.config = config;
             this.signalHeights = signalHeights;
             this.customRenderHeights = renderheights;
+            this.sounds = sounds;
         }
 
     }
@@ -127,9 +134,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private String placementToolName = null;
         private String signalTypeName = null;
         private int defaultHeight = 1;
-        private final Map<String, Integer> signalHeights = null;
+        private Map<String, Integer> signalHeights = null;
         private float customNameRenderHeight = -1;
-        private final Map<String, Float> renderHeights = null;
+        private Map<String, Float> renderHeights = null;
         private float signWidth = 22;
         private float offsetX = 0;
         private float offsetY = 0;
@@ -137,6 +144,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private boolean canLink = true;
         private transient ISignalAutoconfig config = null;
         private List<Integer> colors = null;
+        private Map<String, String> sounds = null;
 
         public SignalPropertiesBuilder() {
         }
@@ -155,7 +163,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             if (placementToolName != null) {
                 OSItems.registeredItems.forEach(item -> {
                     if (item instanceof Placementtool) {
-                        if (item.getRegistryName().toString().replace(OpenSignalsMain.MODID + ":", "")
+                        if (item.getRegistryName().toString()
+                                .replace(OpenSignalsMain.MODID + ":", "")
                                 .equalsIgnoreCase(placementToolName)) {
                             placementtool = (Placementtool) item;
                             return;
@@ -167,6 +176,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                             .error("There doesn't exists a placementtool with the name '"
                                     + placementToolName + "'!");
             }
+
             final List<HeightProperty> signalheights = new ArrayList<>();
             if (signalHeights != null) {
                 signalHeights.forEach((property, height) -> {
@@ -175,8 +185,11 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                             signalheights.add(new HeightProperty(
                                     LogicParser.predicate(property, info), height));
                         } catch (final LogicalParserException e) {
-                            OpenSignalsMain.getLogger().error("File: " + signalTypeName);
+                            OpenSignalsMain.getLogger().error(
+                                    "Something went wrong during the registry of a predicate in "
+                                            + signalTypeName + "!");
                             e.printStackTrace();
+                            FMLCommonHandler.instance().exitJava(-1, false);
                         }
                     }
 
@@ -191,18 +204,45 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                             renderheights.add(new FloatProperty(
                                     LogicParser.predicate(property, info), height));
                         } catch (final LogicalParserException e) {
-                            OpenSignalsMain.getLogger().error("File: " + signalTypeName);
+                            OpenSignalsMain.getLogger().error(
+                                    "Something went wrong during the registry of a predicate in "
+                                            + signalTypeName + "!");
                             e.printStackTrace();
+                            FMLCommonHandler.instance().exitJava(-1, false);
                         }
                     }
                 });
+            }
+
+            final List<SoundProperty> soundProperties = new ArrayList<>();
+            if (sounds != null) {
+                for (Map.Entry<String, String> soundProperty : sounds.entrySet()) {
+                    final SoundEvent sound = OSSounds.SOUNDS_IN_MAP.get(soundProperty.getKey());
+                    if (sound == null) {
+                        OpenSignalsMain.getLogger().error("The sound with the name "
+                                + soundProperty.getKey() + " doesn't exists!");
+                        continue;
+                    }
+                    final String[] value = soundProperty.getValue().split("\\|");
+                    try {
+                        soundProperties.add(new SoundProperty(sound,
+                                LogicParser.predicate(value[0], info), Integer.parseInt(value[1])));
+                    } catch (final LogicalParserException e) {
+                        OpenSignalsMain.getLogger()
+                                .error("Something went wrong during the registry of a predicate in "
+                                        + signalTypeName + "!");
+                        e.printStackTrace();
+                        FMLCommonHandler.instance().exitJava(-1, false);
+                    }
+                }
             }
 
             this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
             return new SignalProperties(placementtool, signalTypeName, customNameRenderHeight,
                     defaultHeight, ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY,
-                    signScale, canLink, config, colors, ImmutableList.copyOf(renderheights));
+                    signScale, canLink, config, colors, ImmutableList.copyOf(renderheights),
+                    ImmutableList.copyOf(soundProperties));
         }
 
         public SignalPropertiesBuilder typename(final String signalTypeName) {
@@ -551,7 +591,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
         GlStateManager.popMatrix();
     }
-    
+
     @SideOnly(Side.CLIENT)
     public void renderSingleOverlay(final String[] display, final FontRenderer font,
             final SignalTileEnity te) {
@@ -604,7 +644,54 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return false;
     }
 
+    @SuppressWarnings("unchecked")
     public void getUpdate(final World world, final BlockPos pos) {
+        if (this.prop.sounds.isEmpty())
+            return;
 
+        final SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(pos);
+        final Map<SEProperty<?>, Object> properties = tile.getProperties();
+        final SoundProperty sound = getSound(properties);
+        if (sound.duration == 0)
+            return;
+
+        if (sound.duration == 1) {
+            world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        } else {
+            if (world.isUpdateScheduled(pos, this)) {
+                return;
+            } else {
+                if (sound.predicate.test(properties)) {
+                    world.scheduleUpdate(pos, this, 1);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings({
+            "unchecked"
+    })
+    public SoundProperty getSound(final Map<SEProperty<?>, Object> map) {
+        for (final SoundProperty property : this.prop.sounds) {
+            if (property.predicate.test(map)) {
+                return property;
+            }
+        }
+        return new SoundProperty();
+    }
+
+    @Override
+    public void updateTick(final World world, final BlockPos pos, final IBlockState state,
+            final Random rand) {
+        if (this.prop.sounds.isEmpty() || world.isRemote) {
+            return;
+        }
+        final SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(pos);
+        final SoundProperty sound = getSound(tile.getProperties());
+        if (sound.duration == 1) {
+            return;
+        }
+        world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        world.scheduleUpdate(pos, this, 84);
     }
 }
