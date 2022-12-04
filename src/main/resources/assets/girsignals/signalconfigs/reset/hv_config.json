@@ -1,0 +1,13 @@
+{
+    "currentSignal": "hvsignal",
+    "values": [
+        "stopsignal.HP0",
+        "hphome.HP0",
+        "hpblock.HP0",
+        "distantsignal.VR0",
+        "zs3.OFF",
+        "zs3v.OFF",
+        "zs1.FALSE",
+        "zs7.FALSE"
+    ]
+}
