@@ -1,0 +1,21 @@
+{
+ "systemProperties": {
+  "placementToolName": "SIGN_PLACEMENT_TOOL",
+  "signalTypeName": "lfsignal",
+  "canLink": false
+ },
+ "seProperties": [
+  {
+   "name": "indicator",
+   "enumClass": "LF",
+   "defaultState": "Z1",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "lftype",
+   "enumClass": "LFBachground",
+   "defaultState": "LF1",
+   "changeableStage": "GUISTAGE"
+  }
+ ]
+}

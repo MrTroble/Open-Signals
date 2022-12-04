@@ -1,0 +1,27 @@
+{
+ "systemProperties": {
+  "placementToolName": "SIGN_PLACEMENT_TOOL",
+  "signalTypeName": "buesignal",
+  "canLink": false,
+  "defaultHeight": 2
+ },
+ "seProperties": [
+  {
+   "name": "buetype",
+   "enumClass": "BUE",
+   "defaultState": "BUE4",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "bueadd",
+   "enumClass": "BUEAdd",
+   "defaultState": "ADD",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "bueshort",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  }
+ ]
+}

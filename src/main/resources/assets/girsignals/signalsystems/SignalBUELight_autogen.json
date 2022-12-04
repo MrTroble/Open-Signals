@@ -1,0 +1,30 @@
+{
+ "systemProperties": {
+  "placementToolName": "SIGN_PLACEMENT_TOOL",
+  "signalTypeName": "buelight",
+  "canLink": true,
+  "defaultHeight": 4
+ },
+ "seProperties": [
+  {
+   "name": "ne2_2",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "ne2_4",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "buelight",
+   "defaultState": true,
+   "changeableStage": "APISTAGE_NONE_CONFIG"
+  },
+  {
+   "name": "buetype",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  }
+ ]
+}

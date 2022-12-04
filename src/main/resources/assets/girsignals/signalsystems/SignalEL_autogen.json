@@ -1,0 +1,23 @@
+{
+ "systemProperties": {
+  "placementToolName": "SIGN_PLACEMENT_TOOL",
+  "signalTypeName": "elsignal",
+  "canLink": false,
+  "defaultHeight": 2
+ },
+ "seProperties": [
+  {
+   "name": "eltype",
+   "enumClass": "EL",
+   "defaultState": "EL1V",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "elarrow",
+   "enumClass": "ELArrow",
+   "defaultState": "OFF",
+   "changeableStage": "GUISTAGE",
+   "autoname": true
+  }
+ ]
+}

@@ -1,0 +1,51 @@
+{
+ "systemProperties": {
+  "placementToolName": "SIGN_PLACEMENT_TOOL",
+  "signalTypeName": "switchhandle",
+  "canLink": true,
+  "defaultHeight": 0
+ },
+ "seProperties": [
+  {
+   "name": "manual",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "powered",
+   "defaultState": true,
+   "changeableStage": "APISTAGE_NONE_CONFIG",
+   "autoname": true,
+   "dependencies": "check(true)"
+  },
+  {
+   "name": "fallback_switch",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "weightcolor",
+   "enumClass": "ColorWeight",
+   "defaultState": "WHITE_BLACK",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "switchside",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "switchplaceside",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "wn_mech",
+   "enumClass": "WNMech",
+   "defaultState": "WN1",
+   "changeableStage": "APISTAGE_NONE_CONFIG",
+   "autoname": true,
+   "dependencies": "check(false)"
+  }
+ ]
+}

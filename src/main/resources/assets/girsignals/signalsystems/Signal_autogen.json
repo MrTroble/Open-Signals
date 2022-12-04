@@ -1,0 +1,10 @@
+{
+ "systemProperties": {},
+ "seProperties": [
+  {
+   "name": "customname",
+   "defaultState": true,
+   "changeableStage": "AUTOMATICSTAGE"
+  }
+ ]
+}

@@ -1,5 +1,6 @@
 import re
 import os
+import json
 
 builderMatch = re.compile(r"builder\s*([^;]+);")
 seprops = re.compile(r"SEProperty\.of\s*\((\s*[^\)]*\s*)\)")
@@ -61,6 +62,7 @@ def propParser(content):
         if len(checksFound) > 0:
             prop["dependencies"] = "check(" + checksFound[0] + ")"
         lop.append(prop)
+    return lop
 
 outputdir = "../../../../../resources/assets/girsignals/signalsystems"
 
@@ -79,6 +81,5 @@ for root, dirs, files in os.walk("."):
             jsonOut["systemProperties"] = settings
             jsonOut["seProperties"] = propParser(content)
             print(jsonOut)
-            
-
-
+            with open(os.path.join(outputdir, file[:-5] + "_autogen.json"), "w") as op:
+                json.dump(jsonOut, op, indent=1)

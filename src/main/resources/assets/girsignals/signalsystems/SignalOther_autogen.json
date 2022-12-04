@@ -1,0 +1,28 @@
+{
+ "systemProperties": {
+  "placementToolName": "SIGN_PLACEMENT_TOOL",
+  "signalTypeName": "othersignal",
+  "canLink": false,
+  "defaultHeight": 1,
+  "signScale": 3.5,
+  "offsetX": -5,
+  "offsetY": 1.8
+ },
+ "seProperties": [
+  {
+   "name": "othertype",
+   "enumClass": "OtherSignal",
+   "defaultState": "HM",
+   "changeableStage": "GUISTAGE",
+   "autoname": true
+  },
+  {
+   "name": "railroadcrossing",
+   "enumClass": "CrossingSign",
+   "defaultState": "OFF",
+   "changeableStage": "GUISTAGE",
+   "autoname": true,
+   "dependencies": "check(OtherSignal.RC1)"
+  }
+ ]
+}

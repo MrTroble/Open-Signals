@@ -1,0 +1,16 @@
+{
+ "systemProperties": {
+  "placementToolName": "SIGN_PLACEMENT_TOOL",
+  "signalTypeName": "stationnumberplate",
+  "canLink": false,
+  "defaultHeight": 0
+ },
+ "seProperties": [
+  {
+   "name": "stationnumber",
+   "enumClass": "STNumber",
+   "defaultState": "Z1",
+   "changeableStage": "GUISTAGE"
+  }
+ ]
+}

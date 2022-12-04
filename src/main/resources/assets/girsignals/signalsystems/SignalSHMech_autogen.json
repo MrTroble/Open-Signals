@@ -1,0 +1,24 @@
+{
+ "systemProperties": {
+  "placementToolName": "PLACEMENT_TOOL",
+  "signalTypeName": "SHMech",
+  "canLink": true,
+  "defaultHeight": 0,
+  "offsetX": 7.0,
+  "offsetY": -9.8,
+  "customNameRenderHeight": 1.04
+ },
+ "seProperties": [
+  {
+   "name": "sh_high",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "sh_mech",
+   "enumClass": "SHMech",
+   "defaultState": "SH0",
+   "changeableStage": "APISTAGE_NONE_CONFIG"
+  }
+ ]
+}

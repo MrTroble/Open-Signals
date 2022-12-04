@@ -1,0 +1,41 @@
+{
+ "systemProperties": {
+  "placementToolName": "SIGN_PLACEMENT_TOOL",
+  "signalTypeName": "ne",
+  "canLink": true,
+  "defaultHeight": 2
+ },
+ "seProperties": [
+  {
+   "name": "netype",
+   "enumClass": "NE",
+   "defaultState": "NE1",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "neaddition",
+   "enumClass": "NEAddition",
+   "defaultState": "OFF",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "arrow",
+   "enumClass": "Arrow",
+   "defaultState": "OFF",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "ne5_addition",
+   "enumClass": "NE5Addition",
+   "defaultState": "OFF",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "ne13",
+   "defaultState": true,
+   "changeableStage": "APISTAGE_NONE_CONFIG",
+   "autoname": true,
+   "dependencies": "check(NE.NE13)"
+  }
+ ]
+}

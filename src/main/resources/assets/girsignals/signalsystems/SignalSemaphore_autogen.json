@@ -1,0 +1,85 @@
+{
+ "systemProperties": {
+  "placementToolName": "PLACEMENT_TOOL",
+  "signalTypeName": "semaphore_signal",
+  "canLink": true,
+  "defaultHeight": 3,
+  "offsetX": 10.0,
+  "offsetY": -11.0,
+  "customNameRenderHeight": 1.47
+ },
+ "seProperties": [
+  {
+   "name": "sematype",
+   "enumClass": "SemaType",
+   "defaultState": "DIST",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "hp2",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "wing1",
+   "defaultState": true,
+   "changeableStage": "APISTAGE_NONE_CONFIG",
+   "autoname": true,
+   "dependencies": "check(SemaType.MAIN)"
+  },
+  {
+   "name": "wing2",
+   "defaultState": true,
+   "changeableStage": "APISTAGE_NONE_CONFIG",
+   "autoname": true,
+   "dependencies": "check(SemaType.MAIN)"
+  },
+  {
+   "name": "zs3",
+   "enumClass": "ZS32",
+   "defaultState": "OFF"
+  },
+  {
+   "name": "zs3plate",
+   "enumClass": "ZS32",
+   "defaultState": "OFF",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "zs3vplate",
+   "enumClass": "ZS32",
+   "defaultState": "OFF",
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "zs1",
+   "defaultState": true
+  },
+  {
+   "name": "zs7",
+   "defaultState": true
+  },
+  {
+   "name": "ra12",
+   "defaultState": true
+  },
+  {
+   "name": "semavr",
+   "enumClass": "SemaDist",
+   "defaultState": "VR0",
+   "changeableStage": "APISTAGE_NONE_CONFIG",
+   "autoname": true,
+   "dependencies": "check(SemaType.DIST)"
+  },
+  {
+   "name": "ne2_2",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  },
+  {
+   "name": "ne2_3",
+   "defaultState": true,
+   "changeableStage": "GUISTAGE"
+  }
+ ]
+}

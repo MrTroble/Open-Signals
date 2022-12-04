@@ -1,0 +1,15 @@
+{
+ "systemProperties": {
+  "placementToolName": "SIGN_PLACEMENT_TOOL",
+  "signalTypeName": "tssignal",
+  "canLink": false
+ },
+ "seProperties": [
+  {
+   "name": "tstype",
+   "enumClass": "TS",
+   "defaultState": "TS1",
+   "changeableStage": "GUISTAGE"
+  }
+ ]
+}
