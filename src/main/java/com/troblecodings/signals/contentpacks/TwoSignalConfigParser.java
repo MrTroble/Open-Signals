@@ -59,7 +59,8 @@ public class TwoSignalConfigParser {
                 continue;
             }
             final SignalPair pair = new SignalPair(start, end);
-            final FunctionParsingInfo startInfo = new FunctionParsingInfo(start);
+            final FunctionParsingInfo startInfo = new FunctionParsingInfo(
+                    LogicParser.UNIVERSAL_TRANSLATION_TABLE, start);
             final FunctionParsingInfo endInfo = new FunctionParsingInfo(end);
             final List<ConfigProperty> properties = new ArrayList<>();
 
@@ -68,8 +69,12 @@ public class TwoSignalConfigParser {
                 final Predicate predicate = LogicParser.predicate(entry.getKey(), endInfo);
                 final String[] value = entry.getValue().split("\\.");
                 final SEProperty property = (SEProperty) startInfo.getProperty(value[0]);
+                Object valueToSet = value[1];
+                if (value[1].equalsIgnoreCase("false") || value[1].equalsIgnoreCase("true")) {
+                    valueToSet = Boolean.valueOf(value[1]);
+                }
 
-                properties.add(new ConfigProperty(predicate, property, value[1]));
+                properties.add(new ConfigProperty(predicate, property, valueToSet));
 
             }
             CHANGECONFIGS.put(pair, properties);

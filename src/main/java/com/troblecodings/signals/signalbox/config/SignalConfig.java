@@ -10,7 +10,7 @@ import com.troblecodings.signals.contentpacks.TwoSignalConfigParser;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-public class ISignalConfig {
+public class SignalConfig {
 
     public static void change(final ConfigInfo info) {
         final Signal currentSignal = info.current.getSignal();

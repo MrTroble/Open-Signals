@@ -55,8 +55,12 @@ public class OneSignalConfigParser {
             final List<ConfigProperty> propertes = new ArrayList<>();
             for (final String property : parser.getValues()) {
                 final String[] value = property.split("\\.");
-                propertes
-                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
+                Object valueToSet = value[1];
+                if (value[1].equalsIgnoreCase("false") || value[1].equalsIgnoreCase("true")) {
+                    valueToSet = Boolean.valueOf(value[1]);
+                }
+                propertes.add(
+                        new ConfigProperty((SEProperty) info.getProperty(value[0]), valueToSet));
             }
             SHUNTINGCONFIGS.put(signal, propertes);
         }
@@ -77,8 +81,12 @@ public class OneSignalConfigParser {
             final List<ConfigProperty> propertes = new ArrayList<>();
             for (final String property : parser.getValues()) {
                 final String[] value = property.split("\\.");
+                Object valueToSet = value[1];
+                if (value[1].equalsIgnoreCase("false") || value[1].equalsIgnoreCase("true")) {
+                    valueToSet = Boolean.valueOf(value[1]);
+                }
                 propertes
-                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
+                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), valueToSet));
             }
             DEFAULTCONFIGS.put(signal, propertes);
         }
@@ -99,8 +107,12 @@ public class OneSignalConfigParser {
             final List<ConfigProperty> propertes = new ArrayList<>();
             for (final String property : parser.getValues()) {
                 final String[] value = property.split("\\.");
+                Object valueToSet = value[1];
+                if (value[1].equalsIgnoreCase("false") || value[1].equalsIgnoreCase("true")) {
+                    valueToSet = Boolean.valueOf(value[1]);
+                }
                 propertes
-                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
+                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), valueToSet));
             }
             RESETCONFIGS.put(signal, propertes);
         }
