@@ -4,6 +4,6 @@
     "values": {
         "with(kombisignal.HP0) || with(kombisignal_main.HP0)": "kombisignal.KS2",
         "!(with(kombisignal.HP0) && with(kombisignal.HP0))": "kombisignal.KS1",
-        "speed(6)": "zs3.6"
+        "speed(<.0) && speed(>.14)": "zs3.6"
     }
 }

@@ -37,8 +37,7 @@ public class SignalSystemParser {
         }
 
         systems.forEach((name, property) -> {
-            if (!name.contains("autogen"))
-                properties.put(name, GSON.fromJson(property, SignalSystemParser.class));
+            properties.put(name, GSON.fromJson(property, SignalSystemParser.class));
         });
 
         return properties;
