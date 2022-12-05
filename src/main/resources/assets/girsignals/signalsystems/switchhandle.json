@@ -1,8 +1,11 @@
 {
     "systemProperties": {
         "placementToolName": "signplacementtool",
-        "canLink": true,
-        "defaultHeight": 0
+        "canLink": false,
+        "defaultHeight": 0,
+        "redstoneOutputs": {
+            "config(manual.TRUE)" : "powered"
+        }
     },
     "seProperties": [
         {

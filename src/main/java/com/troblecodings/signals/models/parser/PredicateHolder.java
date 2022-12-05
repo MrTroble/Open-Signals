@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.enums.CompareValues;
 
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -86,23 +87,24 @@ public final class PredicateHolder {
 
     public static Predicate<Integer> speed(final String compare, final int speed) {
         return s -> {
-            switch (compare) {
-                case ">":
+            final CompareValues values = CompareValues.getValuefromString(compare);
+            switch (values) {
+                case GREATER:
                     return s > speed;
 
-                case ">=":
+                case GREATEREQUALS:
                     return s >= speed;
 
-                case "==":
+                case EQUALS:
                     return s == speed;
 
-                case "<=":
+                case SMALLEREQUALS:
                     return s <= speed;
 
-                case "<":
+                case SMALLER:
                     return s < speed;
 
-                case "!=":
+                case UNEQUALS:
                     return s != speed;
 
                 default:

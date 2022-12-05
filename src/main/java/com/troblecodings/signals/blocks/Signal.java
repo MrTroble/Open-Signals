@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsConfig;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.contentpacks.ContentPackException;
 import com.troblecodings.signals.contentpacks.SoundPropertyParser;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.OSItems;
@@ -26,6 +27,7 @@ import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.LogicParser;
 import com.troblecodings.signals.models.parser.LogicalParserException;
+import com.troblecodings.signals.models.parser.ValuePack;
 import com.troblecodings.signals.signalbox.config.ISignalAutoconfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
@@ -33,6 +35,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
@@ -103,13 +106,15 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public final List<Integer> colors;
         public final ISignalAutoconfig config;
         public final List<SoundProperty> sounds;
+        public final List<ValuePack> redstoneOutputs;
 
         public SignalProperties(final Placementtool placementtool,
                 final float customNameRenderHeight, final int height,
                 final List<HeightProperty> signalHeights, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
                 final boolean canLink, final ISignalAutoconfig config, final List<Integer> colors,
-                final List<FloatProperty> renderheights, final List<SoundProperty> sounds) {
+                final List<FloatProperty> renderheights, final List<SoundProperty> sounds,
+                final List<ValuePack> redstoneOutputs) {
             this.placementtool = placementtool;
             this.customNameRenderHeight = customNameRenderHeight;
             this.defaultHeight = height;
@@ -123,6 +128,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             this.signalHeights = signalHeights;
             this.customRenderHeights = renderheights;
             this.sounds = sounds;
+            this.redstoneOutputs = redstoneOutputs;
         }
 
     }
@@ -132,17 +138,18 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private transient Placementtool placementtool = null;
         private String placementToolName = null;
         private int defaultHeight = 1;
-        private Map<String, Integer> signalHeights = null;
+        private Map<String, Integer> signalHeights;
         private float customNameRenderHeight = -1;
-        private Map<String, Float> renderHeights = null;
+        private Map<String, Float> renderHeights;
         private float signWidth = 22;
         private float offsetX = 0;
         private float offsetY = 0;
         private float signScale = 1;
         private boolean canLink = true;
         private transient ISignalAutoconfig config = null;
-        private List<Integer> colors = null;
-        private final Map<String, SoundPropertyParser> sounds = null;
+        private List<Integer> colors;
+        private Map<String, SoundPropertyParser> sounds;
+        private Map<String, String> redstoneOutputs;
 
         public SignalPropertiesBuilder() {
         }
@@ -156,6 +163,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             return this.build(null);
         }
 
+        @SuppressWarnings("rawtypes")
         public SignalProperties build(final @Nullable FunctionParsingInfo info) {
             if (placementToolName != null) {
                 OSItems.registeredItems.forEach(item -> {
@@ -216,8 +224,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 for (final Map.Entry<String, SoundPropertyParser> soundProperty : sounds
                         .entrySet()) {
                     final SoundPropertyParser soundProp = soundProperty.getValue();
-                    final SoundEvent sound = OSSounds.SOUNDS
-                            .get(soundProp.getName().toLowerCase());
+                    final SoundEvent sound = OSSounds.SOUNDS.get(soundProp.getName().toLowerCase());
                     if (sound == null) {
                         OpenSignalsMain.getLogger().error("The sound with the name "
                                 + soundProp.getName() + " doesn't exists!");
@@ -238,12 +245,25 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 }
             }
 
+            final List<ValuePack> rsOutputs = new ArrayList<>();
+            if (redstoneOutputs != null) {
+                for (final Map.Entry<String, String> outputs : redstoneOutputs.entrySet()) {
+                    final SEProperty property = (SEProperty) info.getProperty(outputs.getValue());
+                    if (!property.getParent().getClass().equals(PropertyBool.class)) {
+                        throw new ContentPackException("The proprty " + outputs.getValue()
+                                + " needs to be an bool property to us it with an RS output but it wasn't!");
+                    }
+                    rsOutputs.add(
+                            new ValuePack(property, LogicParser.predicate(outputs.getKey(), info)));
+                }
+            }
+
             this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
             return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
                     ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
                     canLink, config, colors, ImmutableList.copyOf(renderheights),
-                    ImmutableList.copyOf(soundProperties));
+                    ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs));
         }
 
         public SignalPropertiesBuilder placementtoolname(final String placementToolName) {
@@ -555,8 +575,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     public void renderOverlay(final double x, final double y, final double z,
             final SignalTileEnity te, final FontRenderer font, final float renderHeight) {
         float customRenderHeight = renderHeight;
+        final Map<SEProperty<?>, Object> map = te.getProperties();
         for (final FloatProperty property : this.prop.customRenderHeights) {
-            if (property.predicate.test(te.getProperties())) {
+            if (property.predicate.test(map)) {
                 customRenderHeight = property.height;
             }
         }
@@ -621,6 +642,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return this.prop.config;
     }
 
+    @SuppressWarnings("rawtypes")
+    private SEProperty popwerProperty = null;
+
+    @SuppressWarnings({
+            "unchecked", "rawtypes"
+    })
     @Override
     public boolean onBlockActivated(final World worldIn, final BlockPos pos,
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
@@ -636,7 +663,52 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             OpenSignalsMain.handler.invokeGui(Signal.class, playerIn, worldIn, pos);
             return true;
         }
+        if (!this.prop.redstoneOutputs.isEmpty()) {
+            if (worldIn.isRemote) {
+                return true;
+            }
+            final SignalTileEnity signalTE = (SignalTileEnity) tile;
+            final Map<SEProperty<?>, Object> properties = signalTE.getProperties();
+            for (final ValuePack pack : this.prop.redstoneOutputs) {
+                if (pack.predicate.test(properties)) {
+                    final SEProperty seProperty = (SEProperty) pack.property;
+                    this.popwerProperty = seProperty;
+                    signalTE.getProperty(seProperty)
+                            .ifPresent(power -> signalTE.setProperty(seProperty, !(Boolean) power));
+                    break;
+                }
+            }
+            worldIn.setBlockState(pos, state, 3);
+            worldIn.notifyNeighborsOfStateChange(pos, this, false);
+            worldIn.markAndNotifyBlock(pos, null, state, state, 3);
+            return true;
+        }
         return false;
+    }
+
+    @Override
+    public boolean canProvidePower(IBlockState state) {
+        return !this.prop.redstoneOutputs.isEmpty();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,
+            EnumFacing side) {
+        if (this.prop.redstoneOutputs.isEmpty() || this.popwerProperty == null)
+            return 0;
+
+        final SignalTileEnity tile = (SignalTileEnity) blockAccess.getTileEntity(pos);
+        if (tile.getProperty(popwerProperty).filter(power -> !(Boolean) power).isPresent()) {
+            return 0;
+        }
+        final Map<SEProperty<?>, Object> properties = tile.getProperties();
+        for (final ValuePack pack : this.prop.redstoneOutputs) {
+            if (pack.predicate.test(properties)) {
+                return 15;
+            }
+        }
+        return 0;
     }
 
     @SuppressWarnings("unchecked")
