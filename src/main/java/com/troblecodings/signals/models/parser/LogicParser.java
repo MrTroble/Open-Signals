@@ -49,7 +49,7 @@ public final class LogicParser {
                 objects -> PredicateHolder.config((ValuePack) objects[0]), ValuePack.class));
 
         TRANSLATION_TABLE.put("speed", new MethodInfo("speed",
-                objects -> PredicateHolder.speed((int) objects[0]), Integer.class));
+                objects -> PredicateHolder.speed((StringInteger) objects[0]), StringInteger.class));
 
         TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name,
                 new MethodInfo(name, objects -> {

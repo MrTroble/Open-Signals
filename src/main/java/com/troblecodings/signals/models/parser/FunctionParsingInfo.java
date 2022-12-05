@@ -20,11 +20,12 @@ public class FunctionParsingInfo {
 
     private final HashMap<String, IUnlistedProperty> propertyCache = new HashMap<>();
     private final HashMap<String, ValuePack> predicateCache = new HashMap<>();
+    private final HashMap<String, StringInteger> strIntCache = new HashMap<>();
 
     static {
         PARAMETER_PARSER.put(IUnlistedProperty.class, FunctionParsingInfo::getProperty);
         PARAMETER_PARSER.put(ValuePack.class, FunctionParsingInfo::getPredicate);
-        PARAMETER_PARSER.put(Integer.class, FunctionParsingInfo::getInt);
+        PARAMETER_PARSER.put(StringInteger.class, FunctionParsingInfo::getStringInt);
     }
 
     public String argument;
@@ -113,8 +114,16 @@ public class FunctionParsingInfo {
         return predicate;
     }
 
-    public Object getInt() {
-        return Integer.parseInt(argument);
+    public Object getStringInt() {
+        final StringInteger strInt = strIntCache.computeIfAbsent(argument.toLowerCase(), _u -> {
+            final String[] parts = argument.split("\\.");
+            if (parts.length != 2)
+                throw new LogicalParserException(String.format(
+                        "Syntax error speedValue need to have the form PROPERTY.NAME but was %s",
+                        argument));
+            return new StringInteger(parts[0], Integer.parseInt(parts[1]));
+        });
+        return strInt;
     }
 
     public Map<String, MethodInfo> getTable() {

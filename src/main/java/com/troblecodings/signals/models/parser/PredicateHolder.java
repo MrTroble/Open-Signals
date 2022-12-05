@@ -80,9 +80,34 @@ public final class PredicateHolder {
         };
     }
 
-    public static Predicate<Integer> speed(final int speed) {
+    public static Predicate<Integer> speed(final StringInteger stringInt) {
+        return speed(stringInt.string, stringInt.integer);
+    }
+
+    public static Predicate<Integer> speed(final String compare, final int speed) {
         return s -> {
-            return s == speed;
+            switch (compare) {
+                case ">":
+                    return s > speed;
+
+                case ">=":
+                    return s >= speed;
+
+                case "==":
+                    return s == speed;
+
+                case "<=":
+                    return s <= speed;
+
+                case "<":
+                    return s < speed;
+
+                case "!=":
+                    return s != speed;
+
+                default:
+                    return s == speed;
+            }
         };
     }
 }
