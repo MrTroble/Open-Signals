@@ -643,7 +643,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @SuppressWarnings("rawtypes")
-    private SEProperty popwerProperty = null;
+    private SEProperty powerProperty = null;
 
     @SuppressWarnings({
             "unchecked", "rawtypes"
@@ -672,7 +672,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (pack.predicate.test(properties)) {
                     final SEProperty seProperty = (SEProperty) pack.property;
-                    this.popwerProperty = seProperty;
+                    this.powerProperty = seProperty;
                     signalTE.getProperty(seProperty)
                             .ifPresent(power -> signalTE.setProperty(seProperty, !(Boolean) power));
                     break;
@@ -695,11 +695,11 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     @Override
     public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,
             EnumFacing side) {
-        if (this.prop.redstoneOutputs.isEmpty() || this.popwerProperty == null)
+        if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null)
             return 0;
 
         final SignalTileEnity tile = (SignalTileEnity) blockAccess.getTileEntity(pos);
-        if (tile.getProperty(popwerProperty).filter(power -> !(Boolean) power).isPresent()) {
+        if (tile.getProperty(powerProperty).filter(power -> !(Boolean) power).isPresent()) {
             return 0;
         }
         final Map<SEProperty<?>, Object> properties = tile.getProperties();

@@ -50,8 +50,8 @@ public class TwoSignalConfigParser {
             final TwoSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     TwoSignalConfigParser.class);
 
-            Signal start = Signal.SIGNALS.get(parser.getCurrentSignal().toLowerCase());
-            Signal end = Signal.SIGNALS.get(parser.getNextSignal().toLowerCase());
+            final Signal start = Signal.SIGNALS.get(parser.getCurrentSignal().toLowerCase());
+            final Signal end = Signal.SIGNALS.get(parser.getNextSignal().toLowerCase());
             if (start == null || end == null) {
                 OpenSignalsMain.getLogger().warn("The signal '" + parser.getCurrentSignal()
                         + "' or the signal '" + parser.getNextSignal() + "' doen't exists! "
