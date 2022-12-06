@@ -1,0 +1,67 @@
+{
+    "currentSignal": "hlsignal",
+    "nextSignal": "hvsignal",
+    "savedPredicates": [
+        "with(stopsignal.HP1) || with(stopsignal.HP2) || with(hphome.HP1) || with(hphome.HP2) || with(hpblock.HP1)",
+        "with(hphome.HP2) || with(stopsignal.HP2)"
+    ],
+    "values": {
+        "list(0) && list(1) && speed(<.1) && speed(>=.11)": [
+            "mainlightsignal_distant.HL7",
+            "blocksignal.HL1",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && list(1) && speed(<=.5) && speed(>=.1)": [
+            "mainlightsignal_distant.HL8_9",
+            "blocksignal.HL1",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && list(1) && speed(<=.9) && speed(>=.1)": [
+            "mainlightsignal_distant.HL8_9",
+            "blocksignal.HL1",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.YELLOW"
+        ],
+        "list(0) && list(1) && speed(<=.10) && speed(>=.1)": [
+            "mainlightsignal_distant.HL8_9",
+            "blocksignal.HL1",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.GREEN"
+        ],
+        "list(0) && !list(1) && speed(<.1) && speed(>=.11)": [
+            "mainlightsignal_distant.HL1",
+            "blocksignal.HL1",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && !list(1) && speed(<=.5) && speed(>=.1)": [
+            "mainlightsignal_distant.HL2_3",
+            "blocksignal.HL1",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && !list(1) && speed(<=.9) && speed(>=.1)": [
+            "mainlightsignal_distant.HL2_3",
+            "blocksignal.HL1",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.YELLOW"
+        ],
+        "list(0) && !list(1) && speed(<=.10) && speed(>=.1)": [
+            "mainlightsignal_distant.HL2_3",
+            "blocksignal.HL1",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.OFF"
+        ],
+        "speed(>=.1) && speed(<=.10)": [
+            "exitsignal.HL2_3"
+        ],
+        "!(speed(>=.1) && speed(<=.10))": [
+            "exitsignal.HL1"
+        ],
+        "true": [
+            "blockexitsignal.HL1"
+        ]
+    }
+}

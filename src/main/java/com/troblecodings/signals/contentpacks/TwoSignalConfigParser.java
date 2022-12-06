@@ -86,6 +86,7 @@ public class TwoSignalConfigParser {
 
                         final String current = builder.append(letter).toString();
                         builder.setLength(0);
+
                         if (readInt) {
                             try {
                                 final int postionFromList = Integer.parseInt(current);
@@ -98,7 +99,7 @@ public class TwoSignalConfigParser {
                                         + " Did you use your predicate saver correctly?");
                             }
                         }
-                        if (Character.isWhitespace(letter)) {
+                        if (Character.isWhitespace(letter) || current.equals("!")) {
                             names = "";
                             continue;
                         }
@@ -110,7 +111,8 @@ public class TwoSignalConfigParser {
                     }
                 }
 
-                if (valueToParse != null && !valueToParse.isEmpty()) {
+                if (valueToParse != null && !valueToParse.isEmpty()
+                        && valueToParse.equalsIgnoreCase("true")) {
                     predicate = LogicParser.predicate(valueToParse, endInfo);
                 }
 
