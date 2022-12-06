@@ -112,7 +112,7 @@ public class TwoSignalConfigParser {
                 }
 
                 if (valueToParse != null && !valueToParse.isEmpty()
-                        && valueToParse.equalsIgnoreCase("true")) {
+                        && !valueToParse.equalsIgnoreCase("true")) {
                     predicate = LogicParser.predicate(valueToParse, endInfo);
                 }
 
