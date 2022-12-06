@@ -20,6 +20,7 @@ public class TwoSignalConfigParser {
 
     private String currentSignal;
     private String nextSignal;
+    private List<String> savedPredicates;
     private Map<String, List<String>> values;
 
     public String getCurrentSignal() {
@@ -28,6 +29,10 @@ public class TwoSignalConfigParser {
 
     public String getNextSignal() {
         return nextSignal;
+    }
+
+    public List<String> getSavedPredicates() {
+        return savedPredicates;
     }
 
     public Map<String, List<String>> getValuesToChange() {
@@ -64,9 +69,50 @@ public class TwoSignalConfigParser {
             final FunctionParsingInfo endInfo = new FunctionParsingInfo(end);
             final List<ConfigProperty> properties = new ArrayList<>();
 
+            final List<String> savedPredicates = parser.getSavedPredicates();
+
             for (Map.Entry<String, List<String>> entry : parser.getValuesToChange().entrySet()) {
 
-                final Predicate predicate = LogicParser.predicate(entry.getKey(), endInfo);
+                String valueToParse = entry.getKey();
+                Predicate predicate = t -> true;
+
+                if (valueToParse.contains("list(") && savedPredicates != null
+                        && !savedPredicates.isEmpty()) {
+                    final char[] chars = ((String) entry.getKey()).toCharArray();
+                    String names = "";
+                    boolean readInt = false;
+                    final StringBuilder builder = new StringBuilder();
+                    for (final char letter : chars) {
+
+                        final String current = builder.append(letter).toString();
+                        builder.setLength(0);
+                        if (readInt) {
+                            try {
+                                final int postionFromList = Integer.parseInt(current);
+                                valueToParse = valueToParse.replace("list(" + current + ")",
+                                        "(" + savedPredicates.get(postionFromList) + ")");
+                                readInt = false;
+                                continue;
+                            } catch (final NumberFormatException e) {
+                                throw new ContentPackException(current + " was not an integer! "
+                                        + " Did you use your predicate saver correctly?");
+                            }
+                        }
+                        if (Character.isWhitespace(letter)) {
+                            names = "";
+                            continue;
+                        }
+                        if (current.equals("(") && names.equals("list")) {
+                            readInt = true;
+                            continue;
+                        }
+                        names += current;
+                    }
+                }
+
+                if (valueToParse != null && !valueToParse.isEmpty()) {
+                    predicate = LogicParser.predicate(valueToParse, endInfo);
+                }
 
                 final Map<SEProperty, Object> values = new HashMap<>();
 
