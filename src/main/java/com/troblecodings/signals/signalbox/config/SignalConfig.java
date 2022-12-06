@@ -10,7 +10,7 @@ import com.troblecodings.signals.contentpacks.TwoSignalConfigParser;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-public class SignalConfig {
+public final class SignalConfig {
 
     public static void change(final ConfigInfo info) {
         final Signal currentSignal = info.current.getSignal();
@@ -59,8 +59,10 @@ public class SignalConfig {
             final SignalTileEnity current) {
         values.forEach(property -> {
             if (property.predicate.test(current.getProperties())) {
-                current.getProperty(property.property).ifPresent(
-                        _u -> current.setProperty(property.property, (Comparable) property.value));
+                property.values.forEach((prop, val) -> {
+                    current.getProperty(prop)
+                            .ifPresent(_u -> current.setProperty(prop, (Comparable) val));
+                });
             }
         });
     }

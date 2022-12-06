@@ -1,0 +1,9 @@
+{
+    "currentSignal": "hlsignal",
+    "nextSignal": "hlsignal",
+    "values": {
+        "((with(mainlightsignal.HP0) || with(mainlightsignal.HP0_ALTERNATE_RED)) || with (mainlightsignal.HL_ZS1) || with(mainlightsignal.HL_SHUNTING)) || (with(exitsignal.HP0) || with(exitsignal.HP0_ALTERNATE_RED) || with(exitsignal.HL_ZS1) || with(exitsignal.HL_SHUNTING)) || (with(blocksignal.HP0) || with(blocksignal.HP0_ALTERNATE_RED) || with(blocksignal.HL_ZS1)) || (with(blockexitsignal.HP0) || with(blockexitsignal.HL_ZS1) || with(blockexitsignal.HL_SHUNTING))) && with(mainlightsignallightbar.OFF)": [
+            
+        ]
+    }
+}

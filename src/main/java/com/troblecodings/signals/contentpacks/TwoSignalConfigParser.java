@@ -20,7 +20,7 @@ public class TwoSignalConfigParser {
 
     private String currentSignal;
     private String nextSignal;
-    private Map<String, String> values;
+    private Map<String, List<String>> values;
 
     public String getCurrentSignal() {
         return currentSignal;
@@ -30,7 +30,7 @@ public class TwoSignalConfigParser {
         return nextSignal;
     }
 
-    public Map<String, String> getValuesToChange() {
+    public Map<String, List<String>> getValuesToChange() {
         return values;
     }
 
@@ -64,17 +64,27 @@ public class TwoSignalConfigParser {
             final FunctionParsingInfo endInfo = new FunctionParsingInfo(end);
             final List<ConfigProperty> properties = new ArrayList<>();
 
-            for (Map.Entry<String, String> entry : parser.getValuesToChange().entrySet()) {
+            for (Map.Entry<String, List<String>> entry : parser.getValuesToChange().entrySet()) {
 
                 final Predicate predicate = LogicParser.predicate(entry.getKey(), endInfo);
-                final String[] value = entry.getValue().split("\\.");
-                final SEProperty property = (SEProperty) startInfo.getProperty(value[0]);
-                Object valueToSet = value[1];
-                if (value[1].equalsIgnoreCase("false") || value[1].equalsIgnoreCase("true")) {
-                    valueToSet = Boolean.valueOf(value[1]);
+
+                final Map<SEProperty, Object> values = new HashMap<>();
+
+                for (final String value : entry.getValue()) {
+
+                    final String[] valuetoChange = value.split("\\.");
+                    final SEProperty property = (SEProperty) startInfo
+                            .getProperty(valuetoChange[0]);
+
+                    Object valueToSet = valuetoChange[1];
+                    if (valuetoChange[1].equalsIgnoreCase("false")
+                            || valuetoChange[1].equalsIgnoreCase("true")) {
+                        valueToSet = Boolean.valueOf(valuetoChange[1]);
+                    }
+                    values.put(property, valueToSet);
                 }
 
-                properties.add(new ConfigProperty(predicate, property, valueToSet));
+                properties.add(new ConfigProperty(predicate, values));
 
             }
             CHANGECONFIGS.put(pair, properties);
