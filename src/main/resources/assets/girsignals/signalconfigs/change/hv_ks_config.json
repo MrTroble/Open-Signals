@@ -1,0 +1,28 @@
+{
+    "currentSignal": "hvsignal",
+    "nextSignal": "kssignal",
+    "savedPredicates": [
+        "with(kombisignal.HP0) || with(kombisignal.KS_ZS1) || with(kombisignal.KS_ZS7) || with(kombisignal.KS_SHUNTING) || with(kombisignal.KS_STATUS_LIGHT) || with(kombisignal_main.HP0) || with(kombisignal_main.KS_ZS1) || with(kombisignal_main.KS_ZS7) || with(kombisignal_main.KS_SHUNTING) || with(kombisignal_main.KS_STATUS_LIGHT)",
+        "with(kombisignal.KS1) || with(kombisignal.KS1_BLINK) || with(kombisignal.KS1_BLINK_LIGHT) || with(kombisignal.KS2) || with(kombisignal.KS2_LIGHT)",
+        "with(kombisignal.KS1) || with(kombisignal_main.KS1) || with(kombisignal.KS1_BLINK) || with(kombisignal.KS1_BLINK_LIGHT) || with(kombisignal.KS2) || with(kombisignal.KS2_LIGHT)"
+    ],
+    "values": {
+        "list(0)": ["distantsignal.VR0"],
+        "list(1)": ["distantsignal.VR1"],
+        "list(2) && speed(==.1)": ["distantsignal.VR2", "zs3v.Z1"],
+        "list(2) && speed(==.2)": ["distantsignal.VR2", "zs3v.Z2"],
+        "list(2) && speed(==.3)": ["distantsignal.VR2", "zs3v.Z3"],
+        "list(2) && speed(==.4)": ["distantsignal.VR2"],
+        "list(2) && speed(==.5)": ["distantsignal.VR2", "zs3v.Z5"],
+        "list(2) && speed(==.6)": ["distantsignal.VR2", "zs3v.Z6"],
+        "list(2) && speed(==.7)": ["distantsignal.VR1", "zs3v.Z7"],
+        "list(2) && speed(==.8)": ["distantsignal.VR1", "zs3v.Z8"],
+        "list(2) && speed(==.9)": ["distantsignal.VR1", "zs3v.Z9"],
+        "list(2) && speed(==.10)": ["distantsignal.VR1", "zs3v.Z10"],
+        "list(2) && speed(==.11)": ["distantsignal.VR1", "zs3v.Z11"],
+        "list(2) && speed(==.12)": ["distantsignal.VR1", "zs3v.Z12"],
+        "list(2) && speed(==.13)": ["distantsignal.VR1", "zs3v.Z13"],
+        "list(2) && speed(==.14)": ["distantsignal.VR1", "zs3v.Z14"],
+        "list(2) && speed(==.15)": ["distantsignal.VR1", "zs3v.Z15"]
+    }
+}
