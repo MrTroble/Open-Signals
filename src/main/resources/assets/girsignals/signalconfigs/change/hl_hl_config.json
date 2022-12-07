@@ -102,7 +102,7 @@
             "blocksignal.HL1"
         ],
         "!list(0) && !list(1) && !list(2) && speed(<=.15) && speed(>=.1)": [
-            "mainlightsignal.HL7",
+            "mainlightsignal.HL8_9",
             "mainlightsignal_distant.HL7",
             "mainlightsignallightbar.GREEN",
             "blocksignal.HL1"
