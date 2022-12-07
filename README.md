@@ -8,9 +8,7 @@
 [
 ![Discord](https://img.shields.io/discord/166953995951276032?logo=discord&style=for-the-badge)
 ](https://discord.gg/Um97SHnrYp)
-[
-![Buid](https://img.shields.io/appveyor/build/MrTroble/girsignals/master?logo=appveyor&style=for-the-badge)
-](https://ci.appveyor.com/project/MrTroble/girsignals)
+[![Java CI with Gradle](https://github.com/MrTroble/Open-Signals/actions/workflows/gradle.yml/badge.svg)](https://github.com/MrTroble/Open-Signals/actions/workflows/gradle.yml)
 [
 ![Sponsor](https://img.shields.io/github/sponsors/MrTroble?logo=github&style=for-the-badge)
 ](https://github.com/sponsors/MrTroble)
