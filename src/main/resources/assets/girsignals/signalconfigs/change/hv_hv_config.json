@@ -1,0 +1,16 @@
+{
+    "currentSignal": "hvsignal",
+    "nextSignal": "hvsignal",
+    "savedPredicates": [
+        "with(stopsignal.HP0) || with(stopsignal.SHUNTING) || with(hphome.HP0) || with(hphome.HP0_ALTERNATE_RED) || with(hpblock.HP0)",
+        "with(stopsignal.HP1) || with(hphome.HP1) || with(hpblock.HP1)",
+        "with(stopsignal.HP2) || with(hphome.HP2)"
+    ],
+    "values": {
+        "list(0)": ["distantsignal.VR0"],
+        "list(1)": ["distantsignal.VR1"],
+        "list(2) && speed(==.4)": ["distantsignal.VR2"],
+        "list(2) && (speed(>=.1) && speed(<=.3) || speed(>=.5) && speed(<=.6))": ["distantsignal.VR2"],
+        "list(1) && speed(>=.7)": ["distantsignal.VR1"]
+    }
+}

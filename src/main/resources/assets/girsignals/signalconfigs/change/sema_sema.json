@@ -1,0 +1,14 @@
+{
+    "currentSignal": "semaphoresignal",
+    "nextSignal": "semaphoresignal",
+    "savedPredicates": [
+        "with(wing1.FALSE) && with(wing2.FALSE)",
+        "with(wing1.TRUE) && with(wing2.FALSE)",
+        "with(wing1.TRUE) && with(wing2.TRUE)"
+    ],
+    "values": {
+        "list(0)": ["semavr.VR0"],
+        "list(1)": ["semavr.VR1"],
+        "list(2)": ["semavr.VR2"]
+    }
+}

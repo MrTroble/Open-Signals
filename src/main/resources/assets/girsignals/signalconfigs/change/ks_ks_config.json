@@ -1,9 +1,14 @@
 {
     "currentSignal": "kssignal",
     "nextSignal": "kssignal",
+    "savedPredicates": [
+        "with(kombisignal.HP0) || with(kombisignal.KS_ZS1) || with(kombisignal.KS_ZS7) || with(kombisignal.KS_SHUNTING) || with(kombisignal.KS_STATUS_LIGHT) || with(kombisignal_main.HP0) || with(kombisignal_main.KS_ZS1) || with(kombisignal_main.KS_ZS7) || with(kombisignal_main.KS_SHUNTING) || with(kombisignal_main.KS_STATUS_LIGHT)",
+        "with(kombisignal.KS1) || with(kombisignal.KS1_BLINK) || with(kombisignal.KS1_BLINK_LIGHT) || with(kombisignal.KS2) || with(kombisignal.KS2_LIGHT)",
+        "with(kombisignal.KS1) || with(kombisignal_main.KS1) || with(kombisignal.KS1_BLINK) || with(kombisignal.KS1_BLINK_LIGHT) || with(kombisignal.KS2) || with(kombisignal.KS2_LIGHT)"
+    ],
     "values": {
-        "with(kombisignal.HP0) || with(kombisignal_main.HP0)": ["kombisignal.KS2", "kombisignal_main.KS1"],
-        "!(with(kombisignal.HP0) && with(kombisignal.HP0))": ["kombisignal.KS1", "kombisignal_main.KS1"],
-        "speed(<.0) && speed(>.14)": ["zs3.6"]
+        "list(0)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2"],
+        "list(1)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
+        "list(2) && speed(>=.1) && speed(<=.15)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"]
     }
 }
