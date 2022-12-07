@@ -7,7 +7,7 @@
         "(with(mainlightsignal.HL1) || with(mainlightsignal.HL4) || with(mainlightsignal.HL7) || with(mainlightsignal.HL10) || with(exitsignal.HL1) || with(blocksignal.HL1) || with(blockexitsignal.HL1)) && with(mainlightsignallightbar.OFF)"
     ],
     "values": {
-        "list(0) && speed(<.1) && speed(>=.11)": [
+        "list(0) && speed(<.1) && speed(>.15)": [
             "mainlightsignallightbar.OFF",
             "mainlightsignal.HL10",
             "mainlightsignal_distant.HL10",
@@ -35,7 +35,7 @@
             "zs2v.OFF",
             "blocksignal.HL10"
         ],
-        "list(1) && speed(>=.11) && speed(<.1)": [
+        "list(1) && speed(>.15) && speed(<.1)": [
             "mainlightsignallightbar.OFF",
             "mainlightsignal_distant.HL4",
             "blocksignal.HL1",
@@ -53,13 +53,13 @@
             "blocksignal.HL1",
             "mainlightsignal.HL5_6"
         ],
-        "list(1) && speed(<=.10) && speed(>=.1)": [
+        "list(1) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignallightbar.GREEN",
             "mainlightsignal_distant.HL4",
             "blocksignal.HL1",
             "mainlightsignal.HL5_6"
         ],
-        "list(2) && speed(>=.11) && speed(<.1)": [
+        "list(2) && speed(>.15) && speed(<.1)": [
             "mainlightsignal.HL1",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.OFF",
@@ -77,13 +77,13 @@
             "mainlightsignallightbar.YELLOW",
             "blocksignal.HL1"
         ],
-        "list(2) && speed(<=.10) && speed(>=.1)": [
+        "list(2) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal.HL2_3",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.GREEN",
             "blocksignal.HL1"
         ],
-        "!list(0) && !list(1) && !list(2) && speed(>=.11) && speed(<.1)": [
+        "!list(0) && !list(1) && !list(2) && speed(>.15) && speed(<.1)": [
             "mainlightsignal.HL7",
             "mainlightsignal_distant.HL7",
             "mainlightsignallightbar.OFF",
@@ -101,7 +101,7 @@
             "mainlightsignallightbar.YELLOW",
             "blocksignal.HL1"
         ],
-        "!list(0) && !list(1) && !list(2) && speed(<=.10) && speed(>=.1)": [
+        "!list(0) && !list(1) && !list(2) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal.HL7",
             "mainlightsignal_distant.HL7",
             "mainlightsignallightbar.GREEN",

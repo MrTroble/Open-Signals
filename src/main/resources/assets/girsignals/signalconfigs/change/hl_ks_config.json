@@ -1,0 +1,80 @@
+{
+    "currentSignal": "hlsignal",
+    "nextSignal": "hvsignal",
+    "savedPredicates": [
+        "with(kombisignal.KS1) || with(kombisignal.KS1_BLINK) || with(kombisignal.KS1_BLINK_LIGHT) || with(kombisignal.KS2) || with(kombisignal.KS2_LIGHT) || with(kombisignal_main.KS1)",
+        "with(zs3.Z1) || with(zs3.Z2) || with(zs3.Z3) || with(zs3.Z4) || with(zs3.Z5) || with(zs3.Z6) || with(zs3.Z7) || with(zs3.Z8) || with(zs3.Z9)",
+        "with(zs3.Z10) || with(zs3.Z11) || with(zs3.Z12) || with(zs3.Z13) || with(zs3.Z14) || with(zs3.Z15)"
+    ],
+    "values": {
+        "list(0) && list(1) && speed(<.1) && speed(>.15)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && list(1) && speed(<=.5) && speed(>=.1)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL8_9",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && list(1) && speed(<=.9) && speed(>=.1)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL8_9",
+            "mainlightsignallightbar.YELLOW"
+        ],
+        "list(0) && list(1) && speed(<=.15) && speed(>=.1)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.GREEN"
+        ],
+        "list(0) && list(2) && speed(<.1) && speed(>.15)": [
+            "mainlightsignal_distant.HL4",
+            "mainlightsignal.HL4",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && list(2) && speed(<=.5) && speed(>=.1)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL8_9",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && list(2) && speed(<=.9) && speed(>=.1)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL8_9",
+            "mainlightsignallightbar.YELLOW"
+        ],
+        "list(0) && list(2) && speed(<=.15) && speed(>=.1)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.GREEN"
+        ],
+        "list(0) && !list(1) && !list(2) && speed(<.1) && speed(>.15)": [
+            "mainlightsignal_distant.HL1",
+            "mainlightsignal.HL1",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && !list(1) && !list(2) && speed(<=.5) && speed(>=.1)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL8_9",
+            "mainlightsignallightbar.OFF"
+        ],
+        "list(0) && !list(1) && !list(2) && speed(<=.9) && speed(>=.1)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL8_9",
+            "mainlightsignallightbar.YELLOW"
+        ],
+        "list(0) && !list(1) && !list(2) && speed(<=.15) && speed(>=.1)": [
+            "mainlightsignal_distant.HL7",
+            "mainlightsignal.HL7",
+            "mainlightsignallightbar.GREEN"
+        ],
+        "speed(>=.1) && speed(<=.10)": [
+            "exitsignal.HL2_3"
+        ],
+        "!(speed(>=.1) && speed(<=.10))": [
+            "exitsignal.HL1"
+        ],
+        "true": [
+            "blockexitsignal.HL1"
+        ]
+    }
+}
