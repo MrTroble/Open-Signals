@@ -90,7 +90,7 @@ public final class PredicateHolder {
         final CompareValues values = CompareValues.getValuefromString(compare);
         if (values == null)
             throw new LogicalParserException(
-                    "The given operator of the speed function (" + compare + ") is permitted!");
+                    "The given operator of the speed function (" + compare + ") is not permitted!");
         switch (values) {
             case GREATER:
                 return s -> {
