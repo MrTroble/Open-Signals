@@ -1,0 +1,28 @@
+{
+    "currentSignal": "kssignal",
+    "nextSignal": "semaphoresignal",
+    "savedPredicates": [
+        "with(wing1.FALSE) && with(wing2.FALSE)",
+        "with(wing1.TRUE) && with(wing2.FALSE)",
+        "with(wing1.TRUE) && with(wing2.TRUE)"
+    ],
+    "values": {
+        "list(0)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2"],
+        "list(1)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
+        "list(2) && speed(==.1)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z1"],
+        "list(2) && speed(==.2)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z2"],
+        "list(2) && speed(==.3)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z3"],
+        "list(2) && speed(==.4)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z4"],
+        "list(2) && speed(==.5)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z5"],
+        "list(2) && speed(==.6)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z6"],
+        "list(1) && speed(==.7)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z7"],
+        "list(1) && speed(==.8)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z8"],
+        "list(1) && speed(==.9)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z9"],
+        "list(1) && speed(==.10)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z10"],
+        "list(1) && speed(==.11)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z11"],
+        "list(1) && speed(==.12)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z12"],
+        "list(1) && speed(==.13)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z13"],
+        "list(1) && speed(==.14)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z14"],
+        "list(1) && speed(==.15)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z15"]
+    }
+}
