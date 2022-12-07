@@ -86,30 +86,47 @@ public final class PredicateHolder {
     }
 
     public static Predicate<Integer> speed(final String compare, final int speed) {
-        return s -> {
-            final CompareValues values = CompareValues.getValuefromString(compare);
-            switch (values) {
-                case GREATER:
+
+        final CompareValues values = CompareValues.getValuefromString(compare);
+        if (values == null)
+            throw new LogicalParserException(
+                    "The given operator of the speed function (" + compare + ") is permitted!");
+        switch (values) {
+            case GREATER:
+                return s -> {
                     return s > speed;
+                };
 
-                case GREATEREQUALS:
+            case GREATEREQUALS:
+                return s -> {
                     return s >= speed;
+                };
 
-                case EQUALS:
+            case EQUALS:
+                return s -> {
                     return s == speed;
+                };
 
-                case SMALLEREQUALS:
+            case SMALLEREQUALS:
+                return s -> {
                     return s <= speed;
+                };
 
-                case SMALLER:
+            case SMALLER:
+                return s -> {
                     return s < speed;
+                };
 
-                case UNEQUALS:
+            case UNEQUALS:
+                return s -> {
                     return s != speed;
+                };
 
-                default:
+            default:
+                return s -> {
                     return s == speed;
-            }
-        };
+                };
+        }
+
     }
 }

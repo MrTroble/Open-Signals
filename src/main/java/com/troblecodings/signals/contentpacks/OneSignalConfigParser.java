@@ -11,6 +11,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.ConfigProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
+import com.troblecodings.signals.models.parser.LogicalParserException;
 import com.troblecodings.signals.utils.FileReader;
 
 public class OneSignalConfigParser {
@@ -50,6 +51,12 @@ public class OneSignalConfigParser {
             final Signal signal = checkSignal(parser.getCurrentSignal(), files.getKey());
             if (signal == null)
                 continue;
+            if (SHUNTINGCONFIGS.containsKey(signal)) {
+                throw new LogicalParserException(
+                        "A signalconfig with the signals [" + signal.getSignalTypeName()
+                                + "] does alredy exists! A new config with the filename "
+                                + files.getKey() + " was tried to register the same signal!");
+            }
 
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
             final List<ConfigProperty> propertes = new ArrayList<>();
@@ -77,6 +84,13 @@ public class OneSignalConfigParser {
             if (signal == null)
                 continue;
 
+            if (DEFAULTCONFIGS.containsKey(signal)) {
+                throw new LogicalParserException(
+                        "A signalconfig with the signals [" + signal.getSignalTypeName()
+                                + "] does alredy exists! A new config with the filename "
+                                + files.getKey() + " was tried to register the same signal!");
+            }
+
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
             final List<ConfigProperty> propertes = new ArrayList<>();
             for (final String property : parser.getValues()) {
@@ -85,8 +99,8 @@ public class OneSignalConfigParser {
                 if (value[1].equalsIgnoreCase("false") || value[1].equalsIgnoreCase("true")) {
                     valueToSet = Boolean.valueOf(value[1]);
                 }
-                propertes
-                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), valueToSet));
+                propertes.add(
+                        new ConfigProperty((SEProperty) info.getProperty(value[0]), valueToSet));
             }
             DEFAULTCONFIGS.put(signal, propertes);
         }
@@ -103,6 +117,13 @@ public class OneSignalConfigParser {
             if (signal == null)
                 continue;
 
+            if (RESETCONFIGS.containsKey(signal)) {
+                throw new LogicalParserException(
+                        "A signalconfig with the signals [" + signal.getSignalTypeName()
+                                + "] does alredy exists! A new config with the filename "
+                                + files.getKey() + " was tried to register the same signal!");
+            }
+
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
             final List<ConfigProperty> propertes = new ArrayList<>();
             for (final String property : parser.getValues()) {
@@ -111,8 +132,8 @@ public class OneSignalConfigParser {
                 if (value[1].equalsIgnoreCase("false") || value[1].equalsIgnoreCase("true")) {
                     valueToSet = Boolean.valueOf(value[1]);
                 }
-                propertes
-                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), valueToSet));
+                propertes.add(
+                        new ConfigProperty((SEProperty) info.getProperty(value[0]), valueToSet));
             }
             RESETCONFIGS.put(signal, propertes);
         }

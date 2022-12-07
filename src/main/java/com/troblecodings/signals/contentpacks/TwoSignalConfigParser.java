@@ -14,6 +14,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalPair;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.LogicParser;
+import com.troblecodings.signals.models.parser.LogicalParserException;
 import com.troblecodings.signals.utils.FileReader;
 
 public class TwoSignalConfigParser {
@@ -64,9 +65,15 @@ public class TwoSignalConfigParser {
                 continue;
             }
             final SignalPair pair = new SignalPair(start, end);
-            final FunctionParsingInfo startInfo = new FunctionParsingInfo(
-                    LogicParser.UNIVERSAL_TRANSLATION_TABLE, start);
-            final FunctionParsingInfo endInfo = new FunctionParsingInfo(end);
+            if (CHANGECONFIGS.containsKey(pair)) {
+                throw new LogicalParserException("A signalconfig with the signals ["
+                        + start.getSignalTypeName() + ", " + end.getSignalTypeName()
+                        + "] does alredy exists! A new config with the filename " + files.getKey()
+                        + " was tried to register the same pair!");
+            }
+            final FunctionParsingInfo startInfo = new FunctionParsingInfo(start);
+            final FunctionParsingInfo endInfo = new FunctionParsingInfo(
+                    LogicParser.UNIVERSAL_TRANSLATION_TABLE, end);
             final List<ConfigProperty> properties = new ArrayList<>();
 
             final List<String> savedPredicates = parser.getSavedPredicates();
