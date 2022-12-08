@@ -66,10 +66,10 @@ public class TwoSignalConfigParser {
             }
             final SignalPair pair = new SignalPair(start, end);
             if (CHANGECONFIGS.containsKey(pair)) {
-                throw new LogicalParserException("A signalconfig with the signals ["
-                        + start.getSignalTypeName() + ", " + end.getSignalTypeName()
-                        + "] does alredy exists! A new config with the filename " + files.getKey()
-                        + " was tried to register the same pair!");
+                throw new LogicalParserException(
+                        "A signalconfig with the signals [" + start.getSignalTypeName() + ", "
+                                + end.getSignalTypeName() + "] does alredy exists! '"
+                                + files.getKey() + "' tried to register the same pairconfig!");
             }
             final FunctionParsingInfo startInfo = new FunctionParsingInfo(start);
             final FunctionParsingInfo endInfo = new FunctionParsingInfo(
@@ -80,12 +80,12 @@ public class TwoSignalConfigParser {
 
             for (Map.Entry<String, List<String>> entry : parser.getValuesToChange().entrySet()) {
 
-                String valueToParse = entry.getKey();
+                String valueToParse = entry.getKey().toLowerCase();
                 Predicate predicate = t -> true;
 
                 if (valueToParse.contains("list(") && savedPredicates != null
                         && !savedPredicates.isEmpty()) {
-                    final char[] chars = ((String) entry.getKey()).toCharArray();
+                    final char[] chars = entry.getKey().toCharArray();
                     String names = "";
                     boolean readInt = false;
                     final StringBuilder builder = new StringBuilder();
@@ -97,13 +97,14 @@ public class TwoSignalConfigParser {
                         if (readInt) {
                             try {
                                 final int postionFromList = Integer.parseInt(current);
-                                valueToParse = valueToParse.replace("list(" + current + ")",
-                                        "(" + savedPredicates.get(postionFromList) + ")");
+                                valueToParse = valueToParse.replace("list(" + current + ")", "("
+                                        + savedPredicates.get(postionFromList).toLowerCase() + ")");
                                 readInt = false;
                                 continue;
                             } catch (final NumberFormatException e) {
-                                throw new ContentPackException(current + " was not an integer! "
-                                        + " Did you use your predicate saver correctly?");
+                                throw new ContentPackException(
+                                        current + " was not an integer but should! "
+                                                + " Did you use your predicate saver correctly?");
                             }
                         }
                         if (Character.isWhitespace(letter) || current.equals("!")) {

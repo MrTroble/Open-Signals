@@ -52,10 +52,9 @@ public class OneSignalConfigParser {
             if (signal == null)
                 continue;
             if (SHUNTINGCONFIGS.containsKey(signal)) {
-                throw new LogicalParserException(
-                        "A signalconfig with the signals [" + signal.getSignalTypeName()
-                                + "] does alredy exists! A new config with the filename "
-                                + files.getKey() + " was tried to register the same signal!");
+                throw new LogicalParserException("A signalconfig with the signals ["
+                        + signal.getSignalTypeName() + "] does alredy exists! '" + files.getKey()
+                        + "' tried to register the same signalconfig!");
             }
 
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
@@ -85,10 +84,9 @@ public class OneSignalConfigParser {
                 continue;
 
             if (DEFAULTCONFIGS.containsKey(signal)) {
-                throw new LogicalParserException(
-                        "A signalconfig with the signals [" + signal.getSignalTypeName()
-                                + "] does alredy exists! A new config with the filename "
-                                + files.getKey() + " was tried to register the same signal!");
+                throw new LogicalParserException("A signalconfig with the signals ["
+                        + signal.getSignalTypeName() + "] does alredy exists! '" + files.getKey()
+                        + "' tried to register the same signalconfig!");
             }
 
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
@@ -118,10 +116,9 @@ public class OneSignalConfigParser {
                 continue;
 
             if (RESETCONFIGS.containsKey(signal)) {
-                throw new LogicalParserException(
-                        "A signalconfig with the signals [" + signal.getSignalTypeName()
-                                + "] does alredy exists! A new config with the filename "
-                                + files.getKey() + " was tried to register the same signal!");
+                throw new LogicalParserException("A signalconfig with the signals ["
+                        + signal.getSignalTypeName() + "] does alredy exists! '" + files.getKey()
+                        + "' tried to register the same signalconfig!");
             }
 
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
