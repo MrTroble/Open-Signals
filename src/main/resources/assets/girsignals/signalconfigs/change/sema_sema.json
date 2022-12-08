@@ -1,15 +1,15 @@
 {
     "currentSignal": "semaphoresignal",
     "nextSignal": "semaphoresignal",
-    "savedPredicates": [
-        "with(wing1.FALSE) && with(wing2.FALSE)",
-        "with(wing1.TRUE) && with(wing2.FALSE)",
-        "with(wing1.TRUE) && with(wing2.TRUE)"
-    ],
+    "savedPredicates": {
+        "stop": "config(wing1.FALSE) && config(wing2.FALSE)",
+        "drive": "config(wing1.TRUE) && config(wing2.FALSE)",
+        "slow": "config(wing1.TRUE) && config(wing2.TRUE)"
+    },
     "values": {
-        "list(0)": ["semavr.VR0"],
-        "list(1)": ["semavr.VR1"],
-        "list(2)": ["semavr.VR2"],
+        "map(stop)": ["semavr.VR0"],
+        "map(drive)": ["semavr.VR1"],
+        "map(slow)": ["semavr.VR2"],
 
         "speed(==.1)": ["zs3.Z1", "wing1.TRUE", "wing2.TRUE"],
         "speed(==.2)": ["zs3.Z2", "wing1.TRUE", "wing2.TRUE"],

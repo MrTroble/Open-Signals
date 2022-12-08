@@ -1,117 +1,117 @@
 {
     "currentSignal": "hlsignal",
     "nextSignal": "semaphoresignal",
-    "savedPredicates": [
-        "with(wing1.TRUE) && with(wing2.FALSE)",
-        "with(wing1.TRUE) && with(wing2.TRUE)",
-        "with(zs3.Z1) || with(zs3.Z2) || with(zs3.Z3) || with(zs3.Z4) || with(zs3.Z5) || with(zs3.Z6) || with(zs3.Z7) || with(zs3.Z8) || with(zs3.Z9)",
-        "with(zs3.Z10) || with(zs3.Z11) || with(zs3.Z12) || with(zs3.Z13) || with(zs3.Z14) || with(zs3.Z15)"
-    ],
+    "savedPredicates": {
+        "drive": "config(wing1.TRUE) && config(wing2.FALSE)",
+        "slow": "config(wing1.TRUE) && config(wing2.TRUE)",
+        "zs3_1": "config(zs3.Z1) || config(zs3.Z2) || config(zs3.Z3) || config(zs3.Z4) || config(zs3.Z5) || config(zs3.Z6) || config(zs3.Z7) || config(zs3.Z8) || config(zs3.Z9)",
+        "zs3_2": "config(zs3.Z10) || config(zs3.Z11) || config(zs3.Z12) || config(zs3.Z13) || config(zs3.Z14) || config(zs3.Z15)"
+    },
     "values": {
-        "!(list(0) || list(1)) && speed(<.1) && speed(>.15)": [
+        "!(map(drive) || map(slow)) && speed(<.1) && speed(>.15)": [
             "mainlightsignal_distant.HL10",
             "mainlightsignal.HL10",
             "mainlightsignallightbar.OFF"
         ],
-        "!(list(0) || list(1)) && speed(<=.5) && speed(>=.1)": [
+        "!(map(drive) || map(slow)) && speed(<=.5) && speed(>=.1)": [
             "mainlightsignal_distant.HL10",
             "mainlightsignal.HL11_12",
             "mainlightsignallightbar.OFF"
         ],
-        "!(list(0) || list(1)) && speed(<=.9) && speed(>=.1)": [
+        "!(map(drive) || map(slow)) && speed(<=.9) && speed(>=.1)": [
             "mainlightsignal_distant.HL10",
             "mainlightsignal.HL11_12",
             "mainlightsignallightbar.YELLOW"
         ],
-        "!(list(0) || list(1)) && speed(<=.15) && speed(>=.1)": [
+        "!(map(drive) || map(slow)) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal_distant.HL10",
             "mainlightsignal.HL11_12",
             "mainlightsignallightbar.GREEN"
         ],
-        "list(0) && speed(>.15) && speed(<.1)": [
+        "map(drive) && speed(>.15) && speed(<.1)": [
             "mainlightsignal.HL1",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.OFF",
             "blocksignal.HL1"
         ],
-        "list(0) && speed(<=.5) && speed(>=.1)": [
+        "map(drive) && speed(<=.5) && speed(>=.1)": [
             "mainlightsignal.HL2_3",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.OFF",
             "blocksignal.HL1"
         ],
-        "list(0) && && speed(<=.9) && speed(>=.1)": [
+        "map(drive) && && speed(<=.9) && speed(>=.1)": [
             "mainlightsignal.HL2_3",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.YELLOW",
             "blocksignal.HL1"
         ],
-        "list(0) && speed(<=.15) && speed(>=.1)": [
+        "map(drive) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal.HL2_3",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.GREEN",
             "blocksignal.HL1"
         ],
-        "list(1) && speed(>.15) && speed(<.1)": [
+        "map(slow) && speed(>.15) && speed(<.1)": [
             "mainlightsignal.HL7",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.OFF",
             "blocksignal.HL1"
         ],
-        "list(1) && speed(<=.5) && speed(>=.1)": [
+        "map(slow) && speed(<=.5) && speed(>=.1)": [
             "mainlightsignal.HL8_9",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.OFF",
             "blocksignal.HL1"
         ],
-        "list(1) && speed(<=.9) && speed(>=.1)": [
+        "map(slow) && speed(<=.9) && speed(>=.1)": [
             "mainlightsignal.HL8_9",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.YELLOW",
             "blocksignal.HL1"
         ],
-        "list(1) && speed(<=.15) && speed(>=.1)": [
+        "map(slow) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal.HL8_9",
             "mainlightsignal_distant.HL1",
             "mainlightsignallightbar.GREEN",
             "blocksignal.HL1"
         ],
-        "(list(0) || list(1)) && !list(2) && list(3) && speed(<.1) && speed(>.15)": [
+        "(map(drive) || map(slow)) && !map(zs3_1) && map(zs3_2) && speed(<.1) && speed(>.15)": [
             "mainlightsignal_distant.HL4",
             "mainlightsignal.HL4",
             "mainlightsignallightbar.OFF"
         ],
-        "(list(0) || list(1)) && !list(2) && list(3) && speed(<=.5) && speed(>=.1)": [
+        "(map(drive) || map(slow)) && !map(zs3_1) && map(zs3_2) && speed(<=.5) && speed(>=.1)": [
             "mainlightsignal_distant.HL4",
             "mainlightsignal.HL5_6",
             "mainlightsignallightbar.OFF"
         ],
-        "(list(0) || list(1)) && !list(2) && list(3) && speed(<=.9) && speed(>=.1)": [
+        "(map(drive) || map(slow)) && !map(zs3_1) && map(zs3_2) && speed(<=.9) && speed(>=.1)": [
             "mainlightsignal_distant.HL4",
             "mainlightsignal.HL5_6",
             "mainlightsignallightbar.YELLOW"
         ],
-        "(list(0) || list(1)) && !list(2) && list(3) && speed(<=.15) && speed(>=.1)": [
+        "(map(drive) || map(slow)) && !map(zs3_1) && map(zs3_2) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal_distant.HL4",
             "mainlightsignal.HL5_6",
             "mainlightsignallightbar.GREEN"
         ],
-        "(list(0) || list(1)) && list(2) && !list(3) && speed(<.1) && speed(>.15)": [
+        "(map(drive) || map(slow)) && map(zs3_1) && !map(zs3_2) && speed(<.1) && speed(>.15)": [
             "mainlightsignal_distant.HL7",
             "mainlightsignal.HL7",
             "mainlightsignallightbar.OFF"
         ],
-        "(list(0) || list(1)) && list(2) && !list(3) && speed(<=.5) && speed(>=.1)": [
+        "(map(drive) || map(slow)) && map(zs3_1) && !map(zs3_2) && speed(<=.5) && speed(>=.1)": [
             "mainlightsignal_distant.HL7",
             "mainlightsignal.HL8_9",
             "mainlightsignallightbar.OFF"
         ],
-        "(list(0) || list(1)) && list(2) && !list(3) && speed(<=.9) && speed(>=.1)": [
+        "(map(drive) || map(slow)) && map(zs3_1) && !map(zs3_2) && speed(<=.9) && speed(>=.1)": [
             "mainlightsignal_distant.HL7",
             "mainlightsignal.HL8_9",
             "mainlightsignallightbar.YELLOW"
         ],
-        "(list(0) || list(1)) && list(2) && !list(3) && speed(<=.15) && speed(>=.1)": [
+        "(map(drive) || map(slow)) && map(zs3_1) && !map(zs3_2) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal_distant.HL7",
             "mainlightsignal.HL8_9",
             "mainlightsignallightbar.GREEN"

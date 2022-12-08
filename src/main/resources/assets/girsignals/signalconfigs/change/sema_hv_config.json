@@ -1,15 +1,15 @@
 {
     "currentSignal": "semaphoresignal",
     "nextSignal": "hvsignal",
-    "savedPredicates": [
-        "with(stopsignal.HP0) || with(stopsignal.SHUNTING) || with(hphome.HP0) || with(hphome.HP0_ALTERNATE_RED) || with(hpblock.HP0)",
-        "with(stopsignal.HP1) || with(hphome.HP1) || with(hpblock.HP1)",
-        "with(stopsignal.HP2) || with(hphome.HP2)"
-    ],
+    "savedPredicates": {
+        "stop": "config(stopsignal.HP0) || config(stopsignal.SHUNTING) || config(hphome.HP0) || config(hphome.HP0_ALTERNATE_RED) || config(hpblock.HP0)",
+        "drive": "config(stopsignal.HP1) || config(hphome.HP1) || config(hpblock.HP1)",
+        "slow": "config(stopsignal.HP2) || config(hphome.HP2)"
+    },
     "values": {
-        "list(0)": ["semavr.VR0"],
-        "list(1)": ["semavr.VR1"],
-        "list(2)": ["semavr.VR2"],
+        "map(stop)": ["semavr.VR0"],
+        "map(drive)": ["semavr.VR1"],
+        "map(slow)": ["semavr.VR2"],
 
         "speed(==.1)": ["zs3.Z1", "wing1.TRUE", "wing2.TRUE"],
         "speed(==.2)": ["zs3.Z2", "wing1.TRUE", "wing2.TRUE"],

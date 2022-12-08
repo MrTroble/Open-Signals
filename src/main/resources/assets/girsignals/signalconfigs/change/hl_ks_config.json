@@ -2,9 +2,9 @@
     "currentSignal": "hlsignal",
     "nextSignal": "kssignal",
     "savedPredicates": [
-        "with(kombisignal.KS1) || with(kombisignal.KS1_BLINK) || with(kombisignal.KS1_BLINK_LIGHT) || with(kombisignal.KS2) || with(kombisignal.KS2_LIGHT) || with(kombisignal_main.KS1)",
-        "with(zs3.Z1) || with(zs3.Z2) || with(zs3.Z3) || with(zs3.Z4) || with(zs3.Z5) || with(zs3.Z6) || with(zs3.Z7) || with(zs3.Z8) || with(zs3.Z9)",
-        "with(zs3.Z10) || with(zs3.Z11) || with(zs3.Z12) || with(zs3.Z13) || with(zs3.Z14) || with(zs3.Z15)"
+        "config(kombisignal.KS1) || config(kombisignal.KS1_BLINK) || config(kombisignal.KS1_BLINK_LIGHT) || config(kombisignal.KS2) || config(kombisignal.KS2_LIGHT) || config(kombisignal_main.KS1)",
+        "config(zs3.Z1) || config(zs3.Z2) || config(zs3.Z3) || config(zs3.Z4) || config(zs3.Z5) || config(zs3.Z6) || config(zs3.Z7) || config(zs3.Z8) || config(zs3.Z9)",
+        "config(zs3.Z10) || config(zs3.Z11) || config(zs3.Z12) || config(zs3.Z13) || config(zs3.Z14) || config(zs3.Z15)"
     ],
     "values": {
         "list(0) && !list(1) && list(2) && speed(<.1) && speed(>.15)": [
