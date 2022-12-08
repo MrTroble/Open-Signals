@@ -22,9 +22,9 @@ public final class SignalConfig {
                 final SignalPair pair = new SignalPair(currentSignal, nextSignal);
                 final List<ConfigProperty> values = TwoSignalConfigParser.CHANGECONFIGS.get(pair);
                 if (values != null && info.next != null) {
-                    changeIfPresent(values, info.next, info.speed);
+                    changeIfPresent(values, info);
                 } else {
-                    loadDefault(info.next);
+                    loadDefault(info.current);
                 }
             } else {
                 loadDefault(info.current);
@@ -33,16 +33,16 @@ public final class SignalConfig {
             final List<ConfigProperty> shuntingValues = OneSignalConfigParser.SHUNTINGCONFIGS
                     .get(currentSignal);
             if (shuntingValues != null) {
-                changeIfPresent(shuntingValues, info.current, 0);
+                loadIfNextIsNull(shuntingValues, info.current);
             }
         }
     }
 
-    private static void loadDefault(final SignalTileEnity currentSignal) {
+    private static void loadDefault(final SignalTileEnity current) {
         final List<ConfigProperty> defaultValues = OneSignalConfigParser.DEFAULTCONFIGS
-                .get(currentSignal.getSignal());
+                .get(current.getSignal());
         if (defaultValues != null) {
-            changeIfPresent(defaultValues, currentSignal, 0);
+            loadIfNextIsNull(defaultValues, current);
         }
     }
 
@@ -50,25 +50,42 @@ public final class SignalConfig {
         final List<ConfigProperty> resetValues = OneSignalConfigParser.RESETCONFIGS
                 .get(current.getSignal());
         if (resetValues != null) {
-            changeIfPresent(resetValues, current, 0);
+            loadIfNextIsNull(resetValues, current);
         }
     }
 
     @SuppressWarnings({
             "unchecked", "rawtypes"
     })
-    private static void changeIfPresent(final List<ConfigProperty> values,
-            final SignalTileEnity current, final int speed) {
+    private static void changeIfPresent(final List<ConfigProperty> values, final ConfigInfo info) {
+        if (info.next == null) {
+            loadIfNextIsNull(values, info.current);
+        }
         final Map<Class, Object> object = new HashMap<>();
-        object.put(Map.class, current.getProperties());
-        object.put(Integer.class, speed);
+        object.put(Map.class, info.next.getProperties());
+        object.put(Integer.class, info.speed);
         values.forEach(property -> {
             if (property.predicate.test(object)) {
+                property.values.forEach((prop, val) -> {
+                    info.current.getProperty(prop)
+                            .ifPresent(_u -> info.current.setProperty(prop, (Comparable) val));
+                });
+            }
+        });
+    }
+
+    @SuppressWarnings({
+            "unchecked", "rawtypes"
+    })
+    private static void loadIfNextIsNull(final List<ConfigProperty> values,
+            final SignalTileEnity current) {
+        if (values != null) {
+            values.forEach(property -> {
                 property.values.forEach((prop, val) -> {
                     current.getProperty(prop)
                             .ifPresent(_u -> current.setProperty(prop, (Comparable) val));
                 });
-            }
-        });
+            });
+        }
     }
 }
