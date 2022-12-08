@@ -1,88 +1,88 @@
 {
     "currentSignal": "hlsignal",
     "nextSignal": "kssignal",
-    "savedPredicates": [
-        "config(kombisignal.KS1) || config(kombisignal.KS1_BLINK) || config(kombisignal.KS1_BLINK_LIGHT) || config(kombisignal.KS2) || config(kombisignal.KS2_LIGHT) || config(kombisignal_main.KS1)",
-        "config(zs3.Z1) || config(zs3.Z2) || config(zs3.Z3) || config(zs3.Z4) || config(zs3.Z5) || config(zs3.Z6) || config(zs3.Z7) || config(zs3.Z8) || config(zs3.Z9)",
-        "config(zs3.Z10) || config(zs3.Z11) || config(zs3.Z12) || config(zs3.Z13) || config(zs3.Z14) || config(zs3.Z15)"
-    ],
+    "savedPredicates": {
+        "ksgo": "config(kombisignal.KS1) || config(kombisignal.KS1_BLINK) || config(kombisignal.KS1_BLINK_LIGHT) || config(kombisignal.KS2) || config(kombisignal.KS2_LIGHT) || config(kombisignal_main.KS1)",
+        "zs3_1": "config(zs3.Z1) || config(zs3.Z2) || config(zs3.Z3) || config(zs3.Z4) || config(zs3.Z5) || config(zs3.Z6) || config(zs3.Z7) || config(zs3.Z8) || config(zs3.Z9)",
+        "zs3_2": "config(zs3.Z10) || config(zs3.Z11) || config(zs3.Z12) || config(zs3.Z13) || config(zs3.Z14) || config(zs3.Z15)"
+    },
     "values": {
-        "list(0) && !list(1) && list(2) && speed(<.1) && speed(>.15)": [
+        "map(ksgo) && !map(zs3_1) && map(zs3_2) && speed(<.1) && speed(>.15)": [
             "mainlightsignal_distant.HL4",
             "mainlightsignal.HL4",
             "mainlightsignallightbar.OFF"
         ],
-        "list(0) && !list(1) && list(2) && speed(<=.5) && speed(>=.1)": [
+        "map(ksgo) && !map(zs3_1) && map(zs3_2) && speed(<=.5) && speed(>=.1)": [
             "mainlightsignal_distant.HL4",
             "mainlightsignal.HL5_6",
             "mainlightsignallightbar.OFF"
         ],
-        "list(0) && !list(1) && list(2) && speed(<=.9) && speed(>=.1)": [
+        "map(ksgo) && !map(zs3_1) && map(zs3_2) && speed(<=.9) && speed(>=.1)": [
             "mainlightsignal_distant.HL4",
             "mainlightsignal.HL5_6",
             "mainlightsignallightbar.YELLOW"
         ],
-        "list(0) && !list(1) && list(2) && speed(<=.15) && speed(>=.1)": [
+        "map(ksgo) && !map(zs3_1) && map(zs3_2) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal_distant.HL4",
             "mainlightsignal.HL5_6",
             "mainlightsignallightbar.GREEN"
         ],
-        "list(0) && list(1) && !list(2) && speed(<.1) && speed(>.15)": [
+        "map(ksgo) && map(zs3_1) && !map(zs3_2) && speed(<.1) && speed(>.15)": [
             "mainlightsignal_distant.HL7",
             "mainlightsignal.HL7",
             "mainlightsignallightbar.OFF"
         ],
-        "list(0) && list(1) && !list(2) && speed(<=.5) && speed(>=.1)": [
+        "map(ksgo) && map(zs3_1) && !map(zs3_2) && speed(<=.5) && speed(>=.1)": [
             "mainlightsignal_distant.HL7",
             "mainlightsignal.HL8_9",
             "mainlightsignallightbar.OFF"
         ],
-        "list(0) && list(1) && !list(2) && speed(<=.9) && speed(>=.1)": [
+        "map(ksgo) && map(zs3_1) && !map(zs3_2) && speed(<=.9) && speed(>=.1)": [
             "mainlightsignal_distant.HL7",
             "mainlightsignal.HL8_9",
             "mainlightsignallightbar.YELLOW"
         ],
-        "list(0) && list(1) && !list(2) && speed(<=.15) && speed(>=.1)": [
+        "map(ksgo) && map(zs3_1) && !map(zs3_2) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal_distant.HL7",
             "mainlightsignal.HL8_9",
             "mainlightsignallightbar.GREEN"
         ],
-        "list(0) && !list(1) && !list(2) && speed(<.1) && speed(>.15)": [
+        "map(ksgo) && !map(zs3_1) && !map(zs3_2) && speed(<.1) && speed(>.15)": [
             "mainlightsignal_distant.HL1",
             "mainlightsignal.HL1",
             "mainlightsignallightbar.OFF"
         ],
-        "list(0) && !list(1) && !list(2) && speed(<=.5) && speed(>=.1)": [
+        "map(ksgo) && !map(zs3_1) && !map(zs3_2) && speed(<=.5) && speed(>=.1)": [
             "mainlightsignal_distant.HL1",
             "mainlightsignal.HL2_3",
             "mainlightsignallightbar.OFF"
         ],
-        "list(0) && !list(1) && !list(2) && speed(<=.9) && speed(>=.1)": [
+        "map(ksgo) && !map(zs3_1) && !map(zs3_2) && speed(<=.9) && speed(>=.1)": [
             "mainlightsignal_distant.HL1",
             "mainlightsignal.HL2_3",
             "mainlightsignallightbar.YELLOW"
         ],
-        "list(0) && !list(1) && !list(2) && speed(<=.15) && speed(>=.1)": [
+        "map(ksgo) && !map(zs3_1) && !map(zs3_2) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal_distant.HL1",
             "mainlightsignal.HL2_3",
             "mainlightsignallightbar.GREEN"
         ],
-        "!list(0) && speed(<.1) && speed(>.15)": [
+        "!map(ksgo) && speed(<.1) && speed(>.15)": [
             "mainlightsignal_distant.HL10",
             "mainlightsignal.HL10",
             "mainlightsignallightbar.OFF"
         ],
-        "!list(0) && speed(<=.5) && speed(>=.1)": [
+        "!map(ksgo) && speed(<=.5) && speed(>=.1)": [
             "mainlightsignal_distant.HL10",
             "mainlightsignal.HL11_12",
             "mainlightsignallightbar.OFF"
         ],
-        "!list(0) && speed(<=.9) && speed(>=.1)": [
+        "!map(ksgo) && speed(<=.9) && speed(>=.1)": [
             "mainlightsignal_distant.HL10",
             "mainlightsignal.HL11_12",
             "mainlightsignallightbar.YELLOW"
         ],
-        "!list(0) && speed(<=.15) && speed(>=.1)": [
+        "!map(ksgo) && speed(<=.15) && speed(>=.1)": [
             "mainlightsignal_distant.HL10",
             "mainlightsignal.HL11_12",
             "mainlightsignallightbar.GREEN"

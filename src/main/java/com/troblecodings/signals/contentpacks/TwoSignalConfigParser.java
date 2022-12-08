@@ -21,7 +21,7 @@ public class TwoSignalConfigParser {
 
     private String currentSignal;
     private String nextSignal;
-    private List<String> savedPredicates;
+    private Map<String, String> savedPredicates;
     private Map<String, List<String>> values;
 
     public String getCurrentSignal() {
@@ -32,7 +32,7 @@ public class TwoSignalConfigParser {
         return nextSignal;
     }
 
-    public List<String> getSavedPredicates() {
+    public Map<String, String> getSavedPredicates() {
         return savedPredicates;
     }
 
@@ -76,46 +76,56 @@ public class TwoSignalConfigParser {
                     LogicParser.UNIVERSAL_TRANSLATION_TABLE, end);
             final List<ConfigProperty> properties = new ArrayList<>();
 
-            final List<String> savedPredicates = parser.getSavedPredicates();
+            final Map<String, String> savedPredicates = parser.getSavedPredicates();
 
             for (Map.Entry<String, List<String>> entry : parser.getValuesToChange().entrySet()) {
 
                 String valueToParse = entry.getKey().toLowerCase();
                 Predicate predicate = t -> true;
 
-                if (valueToParse.contains("list(") && savedPredicates != null
+                if (valueToParse.contains("map(") && savedPredicates != null
                         && !savedPredicates.isEmpty()) {
                     final char[] chars = entry.getKey().toCharArray();
                     String names = "";
-                    boolean readInt = false;
+                    boolean readKey = false;
                     final StringBuilder builder = new StringBuilder();
+                    String mapKey = "";
                     for (final char letter : chars) {
 
                         final String current = builder.append(letter).toString();
+                        final boolean isOpenBracket = current.equals("(");
+                        final boolean isCloseBracket = current.equals(")");
                         builder.setLength(0);
 
-                        if (readInt) {
+                        if (readKey) {
                             try {
-                                final int postionFromList = Integer.parseInt(current);
-                                valueToParse = valueToParse.replace("list(" + current + ")", "("
-                                        + savedPredicates.get(postionFromList).toLowerCase() + ")");
-                                readInt = false;
+                                if (isCloseBracket) {
+                                    valueToParse = valueToParse.replace("map(" + mapKey + ")",
+                                            "(" + savedPredicates.get(mapKey).toLowerCase() + ")");
+                                    names = "";
+                                    mapKey = "";
+                                    readKey = false;
+                                    continue;
+                                }
+                                mapKey += current;
                                 continue;
-                            } catch (final NumberFormatException e) {
+                            } catch (final Exception e) {
                                 throw new ContentPackException(
-                                        current + " was not an integer but should! "
-                                                + " Did you use your predicate saver correctly?");
+                                        "Something went wrong with the predicate saver in "
+                                                + files.getKey() + "! Did you used it correctly?");
                             }
                         }
-                        if (current.equals("(") && names.equals("list")) {
-                            readInt = true;
+                        if (current.equals("(") && names.equals("map")) {
+                            readKey = true;
+                            mapKey = "";
                             continue;
                         }
-                        final boolean isBracket = current.equals(")") || current.equals("(");
+                        final boolean isBracket = isCloseBracket || isOpenBracket;
                         if (Character.isWhitespace(letter) || current.equals("!") || isBracket) {
                             names = "";
+                            mapKey = "";
                             continue;
-                        }   
+                        }
                         names += current;
                     }
                 }
