@@ -1,6 +1,6 @@
 {
     "currentSignal": "hlsignal",
-    "nextSignal": "hvsignal",
+    "nextSignal": "kssignal",
     "savedPredicates": [
         "with(kombisignal.KS1) || with(kombisignal.KS1_BLINK) || with(kombisignal.KS1_BLINK_LIGHT) || with(kombisignal.KS2) || with(kombisignal.KS2_LIGHT) || with(kombisignal_main.KS1)",
         "with(zs3.Z1) || with(zs3.Z2) || with(zs3.Z3) || with(zs3.Z4) || with(zs3.Z5) || with(zs3.Z6) || with(zs3.Z7) || with(zs3.Z8) || with(zs3.Z9)",
