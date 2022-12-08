@@ -2,7 +2,6 @@ package com.troblecodings.signals.models.parser;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.troblecodings.signals.models.parser.interm.EvaluationLevel;
@@ -57,7 +56,11 @@ public final class LogicParser {
                     final Predicate original = info.blockState.apply(objects);
                     return (Predicate<Map>) inMap -> {
                         final Map<Class, Object> map = inMap;
-                        final Object obj = Objects.requireNonNull(map.get(info.getSubtype()));
+                        final Object obj = map.get(info.getSubtype());
+                        if (obj == null)
+                            throw new IllegalArgumentException(
+                                    String.format("No data for type=%s was passed to function=%s!",
+                                            info.getSubtype().toString(), name));
                         return original.test(obj);
                     };
                 }, info.parameter)));

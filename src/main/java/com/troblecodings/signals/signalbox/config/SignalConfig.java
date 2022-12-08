@@ -1,6 +1,8 @@
 package com.troblecodings.signals.signalbox.config;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.troblecodings.signals.blocks.ConfigProperty;
 import com.troblecodings.signals.blocks.Signal;
@@ -19,10 +21,10 @@ public final class SignalConfig {
                 final Signal nextSignal = info.next.getSignal();
                 final SignalPair pair = new SignalPair(currentSignal, nextSignal);
                 final List<ConfigProperty> values = TwoSignalConfigParser.CHANGECONFIGS.get(pair);
-                if (values != null) {
-                    changeIfPresent(values, info.current);
+                if (values != null && info.next != null) {
+                    changeIfPresent(values, info.next, info.speed);
                 } else {
-                    loadDefault(info.current);
+                    loadDefault(info.next);
                 }
             } else {
                 loadDefault(info.current);
@@ -31,7 +33,7 @@ public final class SignalConfig {
             final List<ConfigProperty> shuntingValues = OneSignalConfigParser.SHUNTINGCONFIGS
                     .get(currentSignal);
             if (shuntingValues != null) {
-                changeIfPresent(shuntingValues, info.current);
+                changeIfPresent(shuntingValues, info.current, 0);
             }
         }
     }
@@ -40,7 +42,7 @@ public final class SignalConfig {
         final List<ConfigProperty> defaultValues = OneSignalConfigParser.DEFAULTCONFIGS
                 .get(currentSignal.getSignal());
         if (defaultValues != null) {
-            changeIfPresent(defaultValues, currentSignal);
+            changeIfPresent(defaultValues, currentSignal, 0);
         }
     }
 
@@ -48,7 +50,7 @@ public final class SignalConfig {
         final List<ConfigProperty> resetValues = OneSignalConfigParser.RESETCONFIGS
                 .get(current.getSignal());
         if (resetValues != null) {
-            changeIfPresent(resetValues, current);
+            changeIfPresent(resetValues, current, 0);
         }
     }
 
@@ -56,9 +58,12 @@ public final class SignalConfig {
             "unchecked", "rawtypes"
     })
     private static void changeIfPresent(final List<ConfigProperty> values,
-            final SignalTileEnity current) {
+            final SignalTileEnity current, final int speed) {
+        final Map<Class, Object> object = new HashMap<>();
+        object.put(Map.class, current.getProperties());
+        object.put(Integer.class, speed);
         values.forEach(property -> {
-            if (property.predicate.test(current.getProperties())) {
+            if (property.predicate.test(object)) {
                 property.values.forEach((prop, val) -> {
                     current.getProperty(prop)
                             .ifPresent(_u -> current.setProperty(prop, (Comparable) val));
