@@ -2,7 +2,13 @@
     "systemProperties": {
         "placementToolName": "signplacementtool",
         "canLink": true,
-        "defaultHeight": 1
+        "defaultHeight": 1,
+        "sounds": {
+            "config(atws.TRUE) && config(rotype.ATWS)": {
+                "name": "rottenwarn",
+                "length": 1
+            }
+        }
     },
     "seProperties": [
         {
