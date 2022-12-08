@@ -107,14 +107,15 @@ public class TwoSignalConfigParser {
                                                 + " Did you use your predicate saver correctly?");
                             }
                         }
-                        if (Character.isWhitespace(letter) || current.equals("!")) {
-                            names = "";
-                            continue;
-                        }
                         if (current.equals("(") && names.equals("list")) {
                             readInt = true;
                             continue;
                         }
+                        final boolean isBracket = current.equals(")") || current.equals("(");
+                        if (Character.isWhitespace(letter) || current.equals("!") || isBracket) {
+                            names = "";
+                            continue;
+                        }   
                         names += current;
                     }
                 }
