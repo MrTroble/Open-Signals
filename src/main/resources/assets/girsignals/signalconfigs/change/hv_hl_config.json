@@ -1,31 +1,18 @@
 {
     "currentSignal": "hvsignal",
-    "nextSignal": "semaphoresignal",
+    "nextSignal": "hlsignal",
     "savedPredicates": [
-        "with(wing1.FALSE) && with(wing2.FALSE)",
-        "with(wing1.TRUE) && with(wing2.FALSE)",
-        "with(wing1.TRUE) && with(wing2.TRUE)"
+        "(with(mainlightsignal.HP0) || with(mainlightsignal.HP0_ALTERNATE_RED) || with(mainlightsignal.HL_ZS1) || with(mainlightsignal.HL_SHUNTING) || with(mainlightsignal.HL_STATUS_LIGHT) || with(exitsignal.HP0) || with(exitsignal.HP0_ALTERNATE_RED) || with(exitsignal.HL_ZS1) || with(exitsignal.HL_SHUNTING) || with(exitsignal.HL_STATUS_LIGHT) || with(blocksignal.HP0) || with(blocksignal.HP0_ALTERNATE_RED) || with(blocksignal.HL_ZS1) || with(blocksignal.HL_STATUS_LIGHT) || with(blockexitsignal.HP0) || with(blockexitsignal.HL_ZS1) || with(blockexitsignal.HL_SHUNTING) || with(blockexitsignal.HL_STATUS_LIGHT)) && with(mainlightsignallightbar.OFF)",
+        "(with(mainlightsignal.HL1) || with(mainlightsignal.HL4) || with(mainlightsignal.HL7) || with(mainlightsignal.HL10) || with(exitsignal.HL1) || with(blocksignal.HL1) || with(blocksignal.HL10) || with(blockexitsignal.HL1)) && with(mainlightsignallightbar.OFF)",
+        "with(mainlightsignal.HL2_3) || with(mainlightsignal.HL5_6) || with(mainlightsignal.HL8_9) || with(mainlightsignal.HL11_12) || with(exitsignal.HL2_3)"
     ],
     "values": {
         "list(0)": ["distantsignal.VR0"],
         "list(1)": ["distantsignal.VR1"],
-        "list(2)": ["distantsignal.VR2"],
-
-        "(with(zs3.Z1) || with(zs3plate.Z1))": ["zs3v.Z1"],
-        "(with(zs3.Z2) || with(zs3plate.Z2))": ["zs3v.Z2"],
-        "(with(zs3.Z3) || with(zs3plate.Z3))": ["zs3v.Z3"],
-        "(with(zs3.Z4) || with(zs3plate.Z4))": ["zs3v.Z4"],
-        "(with(zs3.Z5) || with(zs3plate.Z5))": ["zs3v.Z5"],
-        "(with(zs3.Z6) || with(zs3plate.Z6))": ["zs3v.Z6"],
-        "(with(zs3.Z7) || with(zs3plate.Z7))": ["zs3v.Z7"],
-        "(with(zs3.Z8) || with(zs3plate.Z8))": ["zs3v.Z8"],
-        "(with(zs3.Z9) || with(zs3plate.Z9))": ["zs3v.Z9"],
-        "(with(zs3.Z10) || with(zs3plate.Z10))": ["zs3v.Z10"],
-        "(with(zs3.Z11) || with(zs3plate.Z11))": ["zs3v.Z11"],
-        "(with(zs3.Z12) || with(zs3plate.Z12))": ["zs3v.Z12"],
-        "(with(zs3.Z13) || with(zs3plate.Z13))": ["zs3v.Z13"],
-        "(with(zs3.Z14) || with(zs3plate.Z14))": ["zs3v.Z14"],
-        "(with(zs3.Z15) || with(zs3plate.Z15))": ["zs3v.Z15"],
+        
+        "list(2) && with(mainlightsignallightbar.OFF)": ["zs3v.Z4", "distantsignal.VR2"],
+        "list(2) && with(mainlightsignallightbar.GREEN)": ["zs3v.Z10", "distantsignal.VR1"],
+        "list(2) && with(mainlightsignallightbar.YELLOW)": ["zs3v.Z6", "distantsignal.VR2"],
 
         "speed(==.1)": ["zs3.Z1", "stopsignal.HP2", "hphome.HP2", "hpblock.HP1"],
         "speed(==.2)": ["zs3.Z2", "stopsignal.HP2", "hphome.HP2", "hpblock.HP1"],

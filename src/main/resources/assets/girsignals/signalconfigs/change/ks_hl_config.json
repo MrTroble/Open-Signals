@@ -1,0 +1,33 @@
+{
+    "currentSignal": "kssignal",
+    "nextSignal": "hlsignal",
+    "savedPredicates": [
+        "(with(mainlightsignal.HP0) || with(mainlightsignal.HP0_ALTERNATE_RED) || with(mainlightsignal.HL_ZS1) || with(mainlightsignal.HL_SHUNTING) || with(mainlightsignal.HL_STATUS_LIGHT) || with(exitsignal.HP0) || with(exitsignal.HP0_ALTERNATE_RED) || with(exitsignal.HL_ZS1) || with(exitsignal.HL_SHUNTING) || with(exitsignal.HL_STATUS_LIGHT) || with(blocksignal.HP0) || with(blocksignal.HP0_ALTERNATE_RED) || with(blocksignal.HL_ZS1) || with(blocksignal.HL_STATUS_LIGHT) || with(blockexitsignal.HP0) || with(blockexitsignal.HL_ZS1) || with(blockexitsignal.HL_SHUNTING) || with(blockexitsignal.HL_STATUS_LIGHT)) && with(mainlightsignallightbar.OFF)",
+        "(with(mainlightsignal.HL1) || with(mainlightsignal.HL4) || with(mainlightsignal.HL7) || with(mainlightsignal.HL10) || with(exitsignal.HL1) || with(blocksignal.HL1) || with(blocksignal.HL10) || with(blockexitsignal.HL1)) && with(mainlightsignallightbar.OFF)",
+        "with(mainlightsignal.HL2_3) || with(mainlightsignal.HL5_6) || with(mainlightsignal.HL8_9) || with(mainlightsignal.HL11_12) || with(exitsignal.HL2_3)"
+    ],
+    "values": {
+        "list(0)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2"],
+        "list(1)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
+
+        "list(2) && with(mainlightsignallightbar.OFF)": ["zs3v.Z4", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
+        "list(2) && with(mainlightsignallightbar.GREEN)": ["zs3v.Z10", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
+        "list(2) && with(mainlightsignallightbar.YELLOW)": ["zs3v.Z6", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
+
+        "speed(==.1)": ["zs3.Z1"],
+        "speed(==.2)": ["zs3.Z2"],
+        "speed(==.3)": ["zs3.Z3"],
+        "speed(==.4)": ["zs3.Z4"],
+        "speed(==.5)": ["zs3.Z5"],
+        "speed(==.6)": ["zs3.Z6"],
+        "speed(==.7)": ["zs3.Z7"],
+        "speed(==.8)": ["zs3.Z8"],
+        "speed(==.9)": ["zs3.Z9"],
+        "speed(==.10)": ["zs3.Z10"],
+        "speed(==.11)": ["zs3.Z11"],
+        "speed(==.12)": ["zs3.Z12"],
+        "speed(==.13)": ["zs3.Z13"],
+        "speed(==.14)": ["zs3.Z14"],
+        "speed(==.15)": ["zs3.Z15"]
+    }
+}

@@ -3,13 +3,33 @@
     "nextSignal": "kssignal",
     "savedPredicates": [
         "with(kombisignal.HP0) || with(kombisignal.KS_ZS1) || with(kombisignal.KS_ZS7) || with(kombisignal.KS_SHUNTING) || with(kombisignal.KS_STATUS_LIGHT) || with(kombisignal_main.HP0) || with(kombisignal_main.KS_ZS1) || with(kombisignal_main.KS_ZS7) || with(kombisignal_main.KS_SHUNTING) || with(kombisignal_main.KS_STATUS_LIGHT)",
-        "with(kombisignal.KS1) || with(kombisignal.KS1_BLINK) || with(kombisignal.KS1_BLINK_LIGHT) || with(kombisignal.KS2) || with(kombisignal.KS2_LIGHT)",
         "with(kombisignal.KS1) || with(kombisignal_main.KS1) || with(kombisignal.KS1_BLINK) || with(kombisignal.KS1_BLINK_LIGHT) || with(kombisignal.KS2) || with(kombisignal.KS2_LIGHT)"
     ],
     "values": {
         "list(0)": ["semavr.VR0"],
         "list(1)": ["semavr.VR1"],
-        "list(2) && speed(>=.1) && speed(<=.6)": ["semavr.VR2"],
-        "list(2) && speed(>=.7) && speed(<=.15)": ["semavr.VR1"]
+
+        "(with(zs3.Z1) || with(zs3plate.Z1))": ["semavr.VR2"],
+        "(with(zs3.Z2) || with(zs3plate.Z2))": ["semavr.VR2"],
+        "(with(zs3.Z3) || with(zs3plate.Z3))": ["semavr.VR2"],
+        "(with(zs3.Z4) || with(zs3plate.Z4))": ["semavr.VR2"],
+        "(with(zs3.Z5) || with(zs3plate.Z5))": ["semavr.VR2"],
+        "(with(zs3.Z6) || with(zs3plate.Z6))": ["semavr.VR2"],
+
+        "speed(==.1)": ["zs3.Z1", "wing1.TRUE", "wing2.TRUE"],
+        "speed(==.2)": ["zs3.Z2", "wing1.TRUE", "wing2.TRUE"],
+        "speed(==.3)": ["zs3.Z3", "wing1.TRUE", "wing2.TRUE"],
+        "speed(==.4)": ["wing1.TRUE", "wing2.TRUE"],
+        "speed(==.5)": ["zs3.Z5", "wing1.TRUE", "wing2.TRUE"],
+        "speed(==.6)": ["zs3.Z6", "wing1.TRUE", "wing2.TRUE"],
+        "speed(==.7)": ["zs3.Z7", "wing1.TRUE", "wing2.TRUE"],
+        "speed(==.8)": ["zs3.Z8", "wing1.TRUE", "wing2.FALSE"],
+        "speed(==.9)": ["zs3.Z9", "wing1.TRUE", "wing2.FALSE"],
+        "speed(==.10)": ["zs3.Z10", "wing1.TRUE", "wing2.FALSE"],
+        "speed(==.11)": ["zs3.Z11", "wing1.TRUE", "wing2.FALSE"],
+        "speed(==.12)": ["zs3.Z12", "wing1.TRUE", "wing2.FALSE"],
+        "speed(==.13)": ["zs3.Z13", "wing1.TRUE", "wing2.FALSE"],
+        "speed(==.14)": ["zs3.Z14", "wing1.TRUE", "wing2.FALSE"],
+        "speed(==.15)": ["zs3.Z15", "wing1.TRUE", "wing2.FALSE"]
     }
 }
