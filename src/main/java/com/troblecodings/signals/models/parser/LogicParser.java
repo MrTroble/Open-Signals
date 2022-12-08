@@ -9,6 +9,7 @@ import com.troblecodings.signals.models.parser.interm.EvaluationLevel;
 import com.troblecodings.signals.models.parser.interm.IntermidiateNode;
 import com.troblecodings.signals.models.parser.interm.LogicalSymbols;
 
+import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import scala.actors.threadpool.Arrays;
 
@@ -24,44 +25,42 @@ public final class LogicParser {
     }
 
     static {
-        TRANSLATION_TABLE.put("with", new MethodInfo("with",
+        TRANSLATION_TABLE.put("with", new MethodInfo(IExtendedBlockState.class, "with",
                 objects -> PredicateHolder.with((ValuePack) objects[0]), ValuePack.class));
 
         TRANSLATION_TABLE.put("has",
-                new MethodInfo("has",
+                new MethodInfo(IExtendedBlockState.class, "has",
                         objects -> PredicateHolder.has((IUnlistedProperty) objects[0]),
                         IUnlistedProperty.class));
 
         TRANSLATION_TABLE.put("hasandis",
-                new MethodInfo("hasandis",
+                new MethodInfo(IExtendedBlockState.class, "hasandis",
                         objects -> PredicateHolder.hasAndIs((IUnlistedProperty) objects[0]),
                         IUnlistedProperty.class));
 
         TRANSLATION_TABLE.put("hasandisnot",
-                new MethodInfo("hasandisnot",
+                new MethodInfo(IExtendedBlockState.class, "hasandisnot",
                         objects -> PredicateHolder.hasAndIsNot((IUnlistedProperty) objects[0]),
                         IUnlistedProperty.class));
 
-        TRANSLATION_TABLE.put("check", new MethodInfo("check",
+        TRANSLATION_TABLE.put("check", new MethodInfo(Map.class, "check",
                 objects -> PredicateHolder.check((ValuePack) objects[0]), ValuePack.class));
 
-        TRANSLATION_TABLE.put("config", new MethodInfo("config",
+        TRANSLATION_TABLE.put("config", new MethodInfo(Map.class, "config",
                 objects -> PredicateHolder.config((ValuePack) objects[0]), ValuePack.class));
 
-        TRANSLATION_TABLE.put("speed", new MethodInfo("speed",
+        TRANSLATION_TABLE.put("speed", new MethodInfo(Integer.class, "speed",
                 objects -> PredicateHolder.speed((StringInteger) objects[0]), StringInteger.class));
 
         TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name,
-                new MethodInfo(name, objects -> {
-                    final Map<Class, Object> map = (Map<Class, Object>) objects[0];
-                    final Object[] outObj = new Object[info.parameter.length];
-                    int x = 0;
-                    for (final Class clazz : info.parameter) {
-                        final Object obj = Objects.requireNonNull(map.get(clazz));
-                        outObj[x++] = obj;
-                    }
-                    return info.blockState.apply(outObj);
-                }, Map.class)));
+                new MethodInfo(Map.class, name, objects -> {
+                    final Predicate original = info.blockState.apply(objects);
+                    return (Predicate<Map>) inMap -> {
+                        final Map<Class, Object> map = inMap;
+                        final Object obj = Objects.requireNonNull(map.get(info.getSubtype()));
+                        return original.test(obj);
+                    };
+                }, info.parameter)));
     }
 
     public static Predicate nDegreeFunctionParser(final String name,
