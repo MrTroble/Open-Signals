@@ -2,7 +2,7 @@
     "currentSignal": "semaphoresignal",
     "nextSignal": "kssignal",
     "savedPredicates": {
-        "stop": "config(kombisignal.HP0) || config(kombisignal.KS_ZS1) || config(kombisignal.KS_ZS7) || config(kombisignal.KS_SHUNTING) || config(kombisignal.KS_STATUS_LIGHT) || config(kombisignal_main.HP0) || config(kombisignal_main.KS_ZS1) || config(kombisignal_main.KS_ZS7) || config(kombisignal_main.KS_SHUNTING) || config(kombisignal_main.KS_STATUS_LIGHT)",
+        "stop": "config(kombisignal.HP0) || config(kombisignal.KS_ZS1) || config(kombisignal.KS_ZS7) || config(kombisignal.KS_SHUNTING) || config(kombisignal_main.HP0) || config(kombisignal_main.KS_ZS1) || config(kombisignal_main.KS_ZS7) || config(kombisignal_main.KS_SHUNTING)",
         "drive": "config(kombisignal.KS1) || config(kombisignal_main.KS1) || config(kombisignal.KS1_BLINK) || config(kombisignal.KS1_BLINK_LIGHT) || config(kombisignal.KS2) || config(kombisignal.KS2_LIGHT)"
     },
     "values": {
@@ -16,6 +16,7 @@
         "(config(zs3.Z5) || config(zs3plate.Z5))": ["semavr.VR2"],
         "(config(zs3.Z6) || config(zs3plate.Z6))": ["semavr.VR2"],
 
+        "speed(<.1) || speed(>.15)": ["wing1.TRUE", "wing2.FALSE"],
         "speed(==.1)": ["zs3.Z1", "wing1.TRUE", "wing2.TRUE"],
         "speed(==.2)": ["zs3.Z2", "wing1.TRUE", "wing2.TRUE"],
         "speed(==.3)": ["zs3.Z3", "wing1.TRUE", "wing2.TRUE"],
