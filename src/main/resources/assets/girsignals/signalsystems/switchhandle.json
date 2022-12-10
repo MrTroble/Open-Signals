@@ -1,7 +1,7 @@
 {
     "systemProperties": {
         "placementToolName": "signplacementtool",
-        "canLink": false,
+        "canLink": true,
         "defaultHeight": 0,
         "redstoneOutputs": {
             "config(manual.TRUE)" : "powered"

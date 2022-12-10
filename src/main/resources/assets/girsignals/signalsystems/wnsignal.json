@@ -1,6 +1,6 @@
 {
     "systemProperties": {
-        "placementToolName": "placementtool",
+        "placementToolName": "signplacementtool",
         "canLink": true,
         "defaultHeight": 0
     },

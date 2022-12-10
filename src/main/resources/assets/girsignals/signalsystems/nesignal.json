@@ -4,7 +4,7 @@
         "canLink": true,
         "defaultHeight": 2,
         "colors": [
-            16777215
+            0
         ],
         "signalHeights": {
             "config(NETYPE.NE2)": 0,

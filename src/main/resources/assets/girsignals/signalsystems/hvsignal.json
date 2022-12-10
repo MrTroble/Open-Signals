@@ -68,11 +68,6 @@
             "changeableStage": "GUISTAGE"
         },
         {
-            "name": "mastsigndistant",
-            "defaultState": false,
-            "changeableStage": "GUISTAGE"
-        },
-        {
             "name": "zs3",
             "enumClass": "ZS32",
             "defaultState": "OFF"
