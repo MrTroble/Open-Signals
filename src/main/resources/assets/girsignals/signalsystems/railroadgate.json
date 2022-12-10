@@ -9,6 +9,7 @@
             "name": "barrier_length",
             "enumClass": "RailroadGateLength",
             "defaultState": "L1",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {

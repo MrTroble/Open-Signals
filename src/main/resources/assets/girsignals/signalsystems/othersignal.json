@@ -8,7 +8,8 @@
 		"offsetX": -5,
 		"offsetY": 1.8,
 		"renderHeights": {
-			"config(OTHERTYPE.HM)": 2.1
+			"config(OTHERTYPE.HM)": 2.1,
+			"config(OTHERTYPE.HM2)": 2.1
 		},
 		"signalHeights": {
 			"config(OTHERTYPE.CROSS)": 0,
@@ -20,15 +21,13 @@
 			"name": "othertype",
 			"enumClass": "OtherSignal",
 			"defaultState": "HM",
-			"changeableStage": "GUISTAGE",
-			"autoname": true
+			"changeableStage": "GUISTAGE"
 		},
 		{
 			"name": "railroadcrossing",
 			"enumClass": "CrossingSign",
 			"defaultState": "OFF",
 			"changeableStage": "GUISTAGE",
-			"autoname": true,
 			"dependencies": "check(othertype.RC1)"
 		}
 	]

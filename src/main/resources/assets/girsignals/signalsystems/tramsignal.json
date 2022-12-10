@@ -34,7 +34,7 @@
 			"defaultState": "OFF",
 			"changeableStage": "APISTAGE_NONE_CONFIG",
 			"autoname": true,
-			"dependencies": "check(TramType.CAR)"
+			"dependencies": "check(SIGNALTRAMTYPE.CAR)"
 		},
 		{
 			"name": "signaltrama",

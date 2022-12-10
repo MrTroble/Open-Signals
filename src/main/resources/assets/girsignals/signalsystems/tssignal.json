@@ -9,6 +9,7 @@
             "name": "tstype",
             "enumClass": "TS",
             "defaultState": "TS1",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         }
     ]

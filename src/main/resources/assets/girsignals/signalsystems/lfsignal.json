@@ -12,12 +12,14 @@
             "name": "indicator",
             "enumClass": "LF",
             "defaultState": "Z1",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {
             "name": "lftype",
             "enumClass": "LFBachground",
             "defaultState": "LF1",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         }
     ]

@@ -13,7 +13,7 @@
         {
             "name": "kombitype",
             "enumClass": "KSType",
-            "defaultState": "MAIN",
+            "defaultState": "KS_MAIN",
             "changeableStage": "GUISTAGE"
         },
         {
@@ -22,7 +22,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(KOMBITYPE.STOPSIGNAL)"
+            "dependencies": "check(KOMBITYPE.KS_STOPSIGNAL)"
         },
         {
             "name": "kombisignal_main",
@@ -30,7 +30,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(KOMBITYPE.MAIN)"
+            "dependencies": "check(KOMBITYPE.KS_MAIN)"
         },
         {
             "name": "kombisignal_distant",
@@ -59,33 +59,39 @@
         {
             "name": "zs2",
             "enumClass": "ZS32",
-            "defaultState": "OFF"
+            "defaultState": "OFF",
+            "autoname": true
         },
         {
             "name": "zs2v",
             "enumClass": "ZS32",
-            "defaultState": "OFF"
+            "defaultState": "OFF",
+            "autoname": true
         },
         {
             "name": "zs3",
             "enumClass": "ZS32",
-            "defaultState": "OFF"
+            "defaultState": "OFF",
+            "autoname": true
         },
         {
             "name": "zs3v",
             "enumClass": "ZS32",
-            "defaultState": "OFF"
+            "defaultState": "OFF",
+            "autoname": true
         },
         {
             "name": "zs3plate",
             "enumClass": "ZS32",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {
             "name": "zs3vplate",
             "enumClass": "ZS32",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         }
     ]

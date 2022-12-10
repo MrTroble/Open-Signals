@@ -10,6 +10,7 @@
             "name": "tramsigns",
             "enumClass": "TramSigns",
             "defaultState": "SH1",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         }
     ]

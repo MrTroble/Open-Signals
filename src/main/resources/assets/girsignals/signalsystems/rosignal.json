@@ -15,6 +15,7 @@
             "name": "rotype",
             "enumClass": "RO",
             "defaultState": "RO4",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {

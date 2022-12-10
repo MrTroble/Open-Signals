@@ -20,6 +20,7 @@
             "name": "ac_addition",
             "enumClass": "ACAddition",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {

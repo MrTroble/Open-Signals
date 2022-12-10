@@ -302,81 +302,81 @@
         "hl/hl_shield1": {
             "textures": [
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.OFF) && (with(HLTYPE.MAIN) || !has(HLTYPE))"
+                    "blockstate": "with(MAINLIGHTSIGNAL.OFF) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))"
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HP0) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HP0) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_rednorth": "lamp_red"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HP0_ALTERNATE_RED) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HP0_ALTERNATE_RED) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_red2north": "lamp_red"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL1) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL1) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_greennorth": "lamp_green"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL2_3) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL2_3) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_greennorth": "lamp_green",
                         "lamp_yellow2north": "lamp_yellow"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL4) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL4) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_greennorth": "lamp_green_blink"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL5_6) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL5_6) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_greennorth": "lamp_green_blink",
                         "lamp_yellow2north": "lamp_yellow"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL7) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL7) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_yellownorth": "lamp_yellow_blink"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL8_9) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL8_9) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_yellownorth": "lamp_yellow_blink",
                         "lamp_yellow2north": "lamp_yellow"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL10) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL10) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_yellownorth": "lamp_yellow"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL11_12) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL11_12) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_yellownorth": "lamp_yellow",
                         "lamp_yellow2north": "lamp_yellow"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL_ZS1) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL_ZS1) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
                         "lamp_white_sh_2north": "lamp_white_blink"
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL_SHUNTING) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL_SHUNTING) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
                         "lamp_white_sh_1north": "lamp_white",
@@ -384,7 +384,7 @@
                     }
                 },
                 {
-                    "blockstate": "with(MAINLIGHTSIGNAL.HL_STATUS_LIGHT) && (with(HLTYPE.MAIN) || !has(HLTYPE))",
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL_STATUS_LIGHT) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_white_sh_2north": "lamp_white"
                     }

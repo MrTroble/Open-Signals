@@ -9,12 +9,14 @@
             "name": "eltype",
             "enumClass": "EL",
             "defaultState": "EL1V",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {
             "name": "elarrow",
             "enumClass": "ELArrow",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         }
     ]

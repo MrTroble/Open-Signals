@@ -65,61 +65,61 @@
         "ks/ks_signal": {
             "textures": [
                 {
-                    "blockstate": "with(KOMBISIGNAL.OFF) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))"
+                    "blockstate": "with(KOMBISIGNAL.OFF) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))"
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.HP0) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.HP0) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_rednorth": "lamp_red"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.KS1) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.KS1) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_greennorth": "lamp_green"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.KS1_BLINK) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.KS1_BLINK) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_greennorth": "lamp_green_blink"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.KS1_BLINK_LIGHT) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.KS1_BLINK_LIGHT) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_greennorth": "lamp_green_blink",
                         "lamp_white_identifiernorth": "lamp_white"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.KS2) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.KS2) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_yellownorth": "lamp_yellow"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.KS2_LIGHT) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.KS2_LIGHT) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_yellownorth": "lamp_yellow"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.KS_ZS1) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.KS_ZS1) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
                         "lamp_white_sh_zsnorth": "lamp_white_blink"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.KS_ZS7) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.KS_ZS7) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
                         "lamp_white_zs7north": "lamp_yellow"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.KS_SHUNTING) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.KS_SHUNTING) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
                         "lamp_white_sh_zsnorth": "lamp_white",
@@ -127,7 +127,7 @@
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL.KS_STATUS_LIGHT) && (with(KOMBITYPE.STOPSIGNAL) || !has(KOMBITYPE))",
+                    "blockstate": "with(KOMBISIGNAL.KS_STATUS_LIGHT) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
                         "lamp_white_identifiernorth": "lamp_white"
                     }
@@ -138,36 +138,36 @@
         "ks/ks_signal_main": {
             "textures": [
                 {
-                    "blockstate": "with(KOMBISIGNAL_MAIN.OFF) && with(KOMBITYPE.MAIN)"
+                    "blockstate": "with(KOMBISIGNAL_MAIN.OFF) && with(KOMBITYPE.KS_MAIN)"
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL_MAIN.HP0) && with(KOMBITYPE.MAIN)",
+                    "blockstate": "with(KOMBISIGNAL_MAIN.HP0) && with(KOMBITYPE.KS_MAIN)",
                     "retexture": {
                         "lamp_rednorth": "lamp_red"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL_MAIN.KS1) && with(KOMBITYPE.MAIN)",
+                    "blockstate": "with(KOMBISIGNAL_MAIN.KS1) && with(KOMBITYPE.KS_MAIN)",
                     "retexture": {
                         "lamp_greennorth": "lamp_green"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL_MAIN.KS_ZS1) && with(KOMBITYPE.MAIN)",
+                    "blockstate": "with(KOMBISIGNAL_MAIN.KS_ZS1) && with(KOMBITYPE.KS_MAIN)",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
                         "lamp_white_sh_zsnorth": "lamp_white_blink"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL_MAIN.KS_ZS7) && with(KOMBITYPE.MAIN)",
+                    "blockstate": "with(KOMBISIGNAL_MAIN.KS_ZS7) && with(KOMBITYPE.KS_MAIN)",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
                         "lamp_white_zs7north": "lamp_yellow"
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL_MAIN.KS_SHUNTING) && with(KOMBITYPE.MAIN)",
+                    "blockstate": "with(KOMBISIGNAL_MAIN.KS_SHUNTING) && with(KOMBITYPE.KS_MAIN)",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
                         "lamp_white_sh_zsnorth": "lamp_white",
@@ -175,7 +175,7 @@
                     }
                 },
                 {
-                    "blockstate": "with(KOMBISIGNAL_MAIN.KS_STATUS_LIGHT) && with(KOMBITYPE.MAIN)",
+                    "blockstate": "with(KOMBISIGNAL_MAIN.KS_STATUS_LIGHT) && with(KOMBITYPE.KS_MAIN)",
                     "retexture": {
                         "lamp_white_identifiernorth": "lamp_white"
                     }

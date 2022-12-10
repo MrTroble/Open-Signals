@@ -21,6 +21,7 @@
             "name": "netype",
             "enumClass": "NE",
             "defaultState": "NE1",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {
@@ -33,12 +34,14 @@
             "name": "arrow",
             "enumClass": "Arrow",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {
             "name": "ne5_addition",
             "enumClass": "NE5Addition",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {

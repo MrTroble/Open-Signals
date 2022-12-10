@@ -13,7 +13,7 @@
         {
             "name": "hltype",
             "enumClass": "HLType",
-            "defaultState": "MAIN",
+            "defaultState": "HL_MAIN",
             "changeableStage": "GUISTAGE"
         },
         {
@@ -22,7 +22,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(HLTYPE.MAIN)"
+            "dependencies": "check(HLTYPE.HL_MAIN)"
         },
         {
             "name": "mainlightsignal_distant",
@@ -81,24 +81,28 @@
             "name": "zs2",
             "enumClass": "ZS32",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "APISTAGE"
         },
         {
             "name": "zs2v",
             "enumClass": "ZS32",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "APISTAGE"
         },
         {
             "name": "zs3plate",
             "enumClass": "ZS32",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {
             "name": "zs3vplate",
             "enumClass": "ZS32",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {

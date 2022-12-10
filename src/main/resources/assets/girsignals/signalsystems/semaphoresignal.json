@@ -47,18 +47,21 @@
         {
             "name": "zs3",
             "enumClass": "ZS32",
-            "defaultState": "OFF"
+            "defaultState": "OFF",
+            "autoname": true
         },
         {
             "name": "zs3plate",
             "enumClass": "ZS32",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {
             "name": "zs3vplate",
             "enumClass": "ZS32",
             "defaultState": "OFF",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {

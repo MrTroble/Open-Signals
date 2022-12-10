@@ -9,12 +9,14 @@
             "name": "buetype",
             "enumClass": "BUE",
             "defaultState": "BUE4",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {
             "name": "bueadd",
             "enumClass": "BUEAdd",
             "defaultState": "ADD",
+            "autoname": true,
             "changeableStage": "GUISTAGE"
         },
         {
