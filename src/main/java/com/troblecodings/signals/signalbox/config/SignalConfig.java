@@ -34,7 +34,7 @@ public final class SignalConfig {
             final List<ConfigProperty> shuntingValues = OneSignalConfigParser.SHUNTINGCONFIGS
                     .get(currentSignal);
             if (shuntingValues != null) {
-                loadIfNextIsNull(shuntingValues, info.current);
+                loadWithoutPredicate(shuntingValues, info.current);
             }
         }
     }
@@ -63,7 +63,7 @@ public final class SignalConfig {
         final List<ConfigProperty> resetValues = OneSignalConfigParser.RESETCONFIGS
                 .get(current.getSignal());
         if (resetValues != null) {
-            loadIfNextIsNull(resetValues, current);
+            loadWithoutPredicate(resetValues, current);
         }
     }
 
@@ -87,7 +87,7 @@ public final class SignalConfig {
     @SuppressWarnings({
             "unchecked", "rawtypes"
     })
-    private static void loadIfNextIsNull(final List<ConfigProperty> values,
+    private static void loadWithoutPredicate(final List<ConfigProperty> values,
             final SignalTileEnity current) {
         if (values != null) {
             values.forEach(property -> {

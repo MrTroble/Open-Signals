@@ -7,7 +7,7 @@
         "slow": "config(wing1.TRUE) && config(wing2.TRUE)"
     },
     "values": {
-        "map(stop)": ["distantsignal.VR0"],
+        "map(stop)": ["distantsignal.VR0", "zs3v.OFF"],
         "map(drive)": ["distantsignal.VR1"],
         "map(slow)": ["distantsignal.VR2"],
 

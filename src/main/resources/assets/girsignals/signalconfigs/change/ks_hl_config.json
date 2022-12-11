@@ -7,7 +7,7 @@
         "slow": "config(mainlightsignal.HL2_3) || config(mainlightsignal.HL5_6) || config(mainlightsignal.HL8_9) || config(mainlightsignal.HL11_12) || config(exitsignal.HL2_3)"
     },
     "values": {
-        "map(stop)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2"],
+        "map(stop)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF"],
         "map(drive)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
 
         "map(slow) && config(mainlightsignallightbar.OFF)": ["zs3v.Z4", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],

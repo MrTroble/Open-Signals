@@ -7,7 +7,7 @@
         "slow": "config(mainlightsignal.HL2_3) || config(mainlightsignal.HL5_6) || config(mainlightsignal.HL8_9) || config(mainlightsignal.HL11_12) || config(exitsignal.HL2_3)"
     },
     "values": {
-        "map(stop)": ["distantsignal.VR0"],
+        "map(stop)": ["distantsignal.VR0", "zs3v.OFF"],
         "map(drive)": ["distantsignal.VR1"],
         
         "map(slow) && config(mainlightsignallightbar.OFF)": ["zs3v.Z4", "distantsignal.VR2"],

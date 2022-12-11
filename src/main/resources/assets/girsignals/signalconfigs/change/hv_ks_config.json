@@ -6,7 +6,7 @@
         "drive": "config(kombisignal.KS1) || config(kombisignal_main.KS1) || config(kombisignal.KS1_BLINK) || config(kombisignal.KS1_BLINK_LIGHT) || config(kombisignal.KS2) || config(kombisignal.KS2_LIGHT)"
     },
     "values": {
-        "map(stop)": ["distantsignal.VR0"],
+        "map(stop)": ["distantsignal.VR0", "zs3v.OFF"],
         "map(drive)": ["distantsignal.VR1"],
 
         "(config(zs3.Z1) || config(zs3plate.Z1))": ["zs3v.Z1", "distantsignal.VR2"],

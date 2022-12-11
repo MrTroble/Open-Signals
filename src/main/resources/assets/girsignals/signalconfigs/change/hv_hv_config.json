@@ -7,7 +7,7 @@
         "slow": "config(stopsignal.HP2) || config(hphome.HP2)"
     },
     "values": {
-        "map(stop)": ["distantsignal.VR0"],
+        "map(stop)": ["distantsignal.VR0", "zs3v.OFF"],
         "map(drive)": ["distantsignal.VR1"],
         "map(slow)": ["distantsignal.VR2"],
         
