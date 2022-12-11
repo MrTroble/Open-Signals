@@ -11,25 +11,19 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.ConfigProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.blocks.SignalPair;
 import com.troblecodings.signals.models.parser.FunctionParsingInfo;
 import com.troblecodings.signals.models.parser.LogicParser;
 import com.troblecodings.signals.models.parser.LogicalParserException;
 import com.troblecodings.signals.utils.FileReader;
 
-public class TwoSignalConfigParser {
+public class DefaultConfigParser {
 
     private String currentSignal;
-    private String nextSignal;
     private Map<String, String> savedPredicates;
     private Map<String, List<String>> values;
 
     public String getCurrentSignal() {
         return currentSignal;
-    }
-
-    public String getNextSignal() {
-        return nextSignal;
     }
 
     public Map<String, String> getSavedPredicates() {
@@ -40,40 +34,37 @@ public class TwoSignalConfigParser {
         return values;
     }
 
-    public static final transient Map<SignalPair, List<ConfigProperty>> CHANGECONFIGS = new HashMap<>();
+    public static transient final Map<Signal, List<ConfigProperty>> DEFAULTCONFIGS = new HashMap<>();
 
-    private static final transient Gson GSON = new Gson();
+    private static transient final Gson GSON = new Gson();
 
     public static void loadInternConfigs() {
-        loadChangeConfigs("/assets/girsignals/signalconfigs/change");
+        loadDefaultConfigs("/assets/girsignals/signalconfigs/default");
     }
 
     @SuppressWarnings("rawtypes")
-    public static void loadChangeConfigs(final String directory) {
+    public static void loadDefaultConfigs(final String directory) {
 
         for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
                 .entrySet()) {
-            final TwoSignalConfigParser parser = GSON.fromJson(files.getValue(),
-                    TwoSignalConfigParser.class);
+            final DefaultConfigParser parser = GSON.fromJson(files.getValue(),
+                    DefaultConfigParser.class);
 
-            final Signal start = Signal.SIGNALS.get(parser.getCurrentSignal().toLowerCase());
-            final Signal end = Signal.SIGNALS.get(parser.getNextSignal().toLowerCase());
-            if (start == null || end == null) {
-                OpenSignalsMain.getLogger().warn("The signal '" + parser.getCurrentSignal()
-                        + "' or the signal '" + parser.getNextSignal() + "' doen't exists! "
-                        + "This config with filename '" + files.getKey() + "' will be skiped!");
+            final Signal signal = Signal.SIGNALS.get(parser.getCurrentSignal().toLowerCase());
+            if (signal == null) {
+                OpenSignalsMain.getLogger()
+                        .warn("The signal '" + parser.getCurrentSignal() + "' doesn't exists! "
+                                + "This config with the filename '" + files.getKey()
+                                + "' will be skiped!");
                 continue;
             }
-            final SignalPair pair = new SignalPair(start, end);
-            if (CHANGECONFIGS.containsKey(pair)) {
-                throw new LogicalParserException(
-                        "A signalconfig with the signals [" + start.getSignalTypeName() + ", "
-                                + end.getSignalTypeName() + "] does alredy exists! '"
-                                + files.getKey() + "' tried to register the same pairconfig!");
+            if (DEFAULTCONFIGS.containsKey(signal)) {
+                throw new LogicalParserException("A signalconfig with the signals ["
+                        + signal.getSignalTypeName() + "] does alredy exists! '" + files.getKey()
+                        + "' tried to register the same signalconfig!");
             }
-            final FunctionParsingInfo startInfo = new FunctionParsingInfo(start);
-            final FunctionParsingInfo endInfo = new FunctionParsingInfo(
-                    LogicParser.UNIVERSAL_TRANSLATION_TABLE, end);
+            final FunctionParsingInfo info = new FunctionParsingInfo(
+                    LogicParser.UNIVERSAL_TRANSLATION_TABLE, signal);
             final List<ConfigProperty> properties = new ArrayList<>();
 
             final Map<String, String> savedPredicates = parser.getSavedPredicates();
@@ -132,7 +123,7 @@ public class TwoSignalConfigParser {
 
                 if (valueToParse != null && !valueToParse.isEmpty()
                         && !valueToParse.equalsIgnoreCase("true")) {
-                    predicate = LogicParser.predicate(valueToParse, endInfo);
+                    predicate = LogicParser.predicate(valueToParse, info);
                 }
 
                 final Map<SEProperty, Object> values = new HashMap<>();
@@ -140,8 +131,7 @@ public class TwoSignalConfigParser {
                 for (final String value : entry.getValue()) {
 
                     final String[] valuetoChange = value.split("\\.");
-                    final SEProperty property = (SEProperty) startInfo
-                            .getProperty(valuetoChange[0]);
+                    final SEProperty property = (SEProperty) info.getProperty(valuetoChange[0]);
 
                     Object valueToSet = valuetoChange[1];
                     if (valuetoChange[1].equalsIgnoreCase("false")
@@ -154,7 +144,8 @@ public class TwoSignalConfigParser {
                 properties.add(new ConfigProperty(predicate, values));
 
             }
-            CHANGECONFIGS.put(pair, properties);
+            DEFAULTCONFIGS.put(signal, properties);
         }
     }
+
 }

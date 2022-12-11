@@ -7,8 +7,9 @@ import java.util.Map;
 import com.troblecodings.signals.blocks.ConfigProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalPair;
+import com.troblecodings.signals.contentpacks.DefaultConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
-import com.troblecodings.signals.contentpacks.TwoSignalConfigParser;
+import com.troblecodings.signals.contentpacks.ChangeConfigParser;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
@@ -20,14 +21,14 @@ public final class SignalConfig {
             if (info.next != null) {
                 final Signal nextSignal = info.next.getSignal();
                 final SignalPair pair = new SignalPair(currentSignal, nextSignal);
-                final List<ConfigProperty> values = TwoSignalConfigParser.CHANGECONFIGS.get(pair);
-                if (values != null && info.next != null) {
+                final List<ConfigProperty> values = ChangeConfigParser.CHANGECONFIGS.get(pair);
+                if (values != null) {
                     changeIfPresent(values, info);
                 } else {
-                    loadDefault(info.current);
+                    loadDefault(info);
                 }
             } else {
-                loadDefault(info.current);
+                loadDefault(info);
             }
         } else if (info.type.equals(PathType.SHUNTING)) {
             final List<ConfigProperty> shuntingValues = OneSignalConfigParser.SHUNTINGCONFIGS
@@ -38,11 +39,23 @@ public final class SignalConfig {
         }
     }
 
-    private static void loadDefault(final SignalTileEnity current) {
-        final List<ConfigProperty> defaultValues = OneSignalConfigParser.DEFAULTCONFIGS
-                .get(current.getSignal());
+    @SuppressWarnings({
+            "rawtypes", "unchecked"
+    })
+    private static void loadDefault(final ConfigInfo info) {
+        final List<ConfigProperty> defaultValues = DefaultConfigParser.DEFAULTCONFIGS
+                .get(info.current.getSignal());
         if (defaultValues != null) {
-            loadIfNextIsNull(defaultValues, current);
+            final Map<Class, Object> object = new HashMap<>();
+            object.put(Integer.class, info.speed);
+            defaultValues.forEach(value -> {
+                if (value.predicate.test(object)) {
+                    value.values.forEach((prop, val) -> {
+                        info.current.getProperty(prop)
+                                .ifPresent(_u -> info.current.setProperty(prop, (Comparable) val));
+                    });
+                }
+            });
         }
     }
 
@@ -58,9 +71,6 @@ public final class SignalConfig {
             "unchecked", "rawtypes"
     })
     private static void changeIfPresent(final List<ConfigProperty> values, final ConfigInfo info) {
-        if (info.next == null) {
-            loadIfNextIsNull(values, info.current);
-        }
         final Map<Class, Object> object = new HashMap<>();
         object.put(Map.class, info.next.getProperties());
         object.put(Integer.class, info.speed);

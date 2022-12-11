@@ -1,13 +1,15 @@
 {
     "currentSignal": "hvsignal",
-    "values": [
-        "stopsignal.HP2",
-        "hphome.HP2",
-        "hpblock.HP1",
-        "distantsignal.VR0",
-        "zs3.Z3",
-        "zs3v.OFF",
-        "zs1.FALSE",
-        "zs7.FALSE"
-    ]
+    "values": {
+        "true": [
+            "stopsignal.HP2",
+            "hphome.HP2",
+            "hpblock.HP1",
+            "distantsignal.VR0",
+            "zs3.Z3",
+            "zs3v.OFF",
+            "zs1.FALSE",
+            "zs7.FALSE"
+        ]
+    }
 }

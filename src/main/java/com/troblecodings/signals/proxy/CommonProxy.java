@@ -6,7 +6,8 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
-import com.troblecodings.signals.contentpacks.TwoSignalConfigParser;
+import com.troblecodings.signals.contentpacks.ChangeConfigParser;
+import com.troblecodings.signals.contentpacks.DefaultConfigParser;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.init.OSBlocks;
@@ -39,7 +40,8 @@ public class CommonProxy {
         OSBlocks.init();
 
         OneSignalConfigParser.loadInternConfigs();
-        TwoSignalConfigParser.loadInternConfigs();
+        ChangeConfigParser.loadInternConfigs();
+        DefaultConfigParser.loadInternConfigs();
 
         MinecraftForge.EVENT_BUS.register(OSItems.class);
         MinecraftForge.EVENT_BUS.register(OSBlocks.class);
