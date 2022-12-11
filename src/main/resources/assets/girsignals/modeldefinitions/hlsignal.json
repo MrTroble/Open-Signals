@@ -223,39 +223,17 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(HL_SH1) && has(EXITSIGNAL) && (!with(EXITSIGNAL.HL_SHUNTING) && (with(HLTYPE.EXIT) || !has(HLTYPE)))"
-                },
-                {
-                    "blockstate": "with(EXITSIGNAL.HL_SHUNTING) && hasandisnot(HL_SH1) && (with(HLTYPE.EXIT) || !has(HLTYPE))",
-                    "retexture": {
-                        "lamp_rednorth": "lamp_red"
-                    }
-                },
-                {
-                    "blockstate": "with(EXITSIGNAL.HL_SHUNTING) && hasandis(HL_SH1) && (with(HLTYPE.EXIT) || !has(HLTYPE) && with(HLTYPE.EXIT) || !has(HLTYPE))",
+                    "blockstate": "with(EXITSIGNAL.HL_SHUNTING) && (with(HLTYPE.EXIT) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_rednorth": "lamp_red",
-                        "lamp_white_sh_2north": "lamp_white"
+                        "lamp_white_sh_2north": "lamp_white",
+                        "lamp_white_sh_1north": "lamp_white"
                     }
                 },
                 {
                     "blockstate": "with(EXITSIGNAL.HL_STATUS_LIGHT) && with(HLTYPE.EXIT)",
                     "retexture": {
                         "lamp_white_sh_2north": "lamp_white"
-                    }
-                }
-            ],
-            "y": 5
-        },
-        "hl/hl_sh1": {
-            "textures": [
-                {
-                    "blockstate": "hasandis(HL_SH1) && has(EXITSIGNAL) && !with(EXITSIGNAL.HL_SHUNTING) && (with(HLTYPE.EXIT) || !has(HLTYPE))"
-                },
-                {
-                    "blockstate": "hasandis(HL_SH1) && has(EXITSIGNAL) && with(EXITSIGNAL.HL_SHUNTING) && (with(HLTYPE.EXIT) || !has(HLTYPE))",
-                    "retexture": {
-                        "lamp_white_sh_1north": "lamp_white"
                     }
                 }
             ],

@@ -53,11 +53,6 @@
             "changeableStage": "GUISTAGE"
         },
         {
-            "name": "hl_sh1",
-            "defaultState": false,
-            "changeableStage": "GUISTAGE"
-        },
-        {
             "name": "mastsigndistant",
             "defaultState": false,
             "changeableStage": "GUISTAGE"

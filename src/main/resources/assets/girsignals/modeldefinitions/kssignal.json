@@ -101,7 +101,8 @@
                 {
                     "blockstate": "with(KOMBISIGNAL.KS2_LIGHT) && (with(KOMBITYPE.KS_STOPSIGNAL) || !has(KOMBITYPE))",
                     "retexture": {
-                        "lamp_yellownorth": "lamp_yellow"
+                        "lamp_yellownorth": "lamp_yellow",
+                        "lamp_white_identifiernorth": "lamp_white"
                     }
                 },
                 {
