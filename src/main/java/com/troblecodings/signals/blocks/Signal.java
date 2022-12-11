@@ -645,38 +645,46 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     @SuppressWarnings("rawtypes")
     private SEProperty powerProperty = null;
 
-    @SuppressWarnings({
-            "unchecked", "rawtypes"
-    })
     @Override
     public boolean onBlockActivated(final World worldIn, final BlockPos pos,
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         final TileEntity tile = worldIn.getTileEntity(pos);
-        boolean customname = false;
-        if (tile instanceof SignalTileEnity) {
-            final SignalTileEnity signaltile = (SignalTileEnity) tile;
-            customname = canHaveCustomname(signaltile.getProperties());
+        if (!(tile instanceof SignalTileEnity)) {
+            return false;
         }
+        final SignalTileEnity signalTile = (SignalTileEnity) tile;
+        if (loadRedstoneOutput(worldIn, state, pos, signalTile) && worldIn.isRemote) {
+            return true;
+        }
+        final boolean customname = canHaveCustomname(signalTile.getProperties());
         if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)
                 && (canBeLinked() || customname)) {
             OpenSignalsMain.handler.invokeGui(Signal.class, playerIn, worldIn, pos);
             return true;
         }
+        return false;
+    }
+
+    @SuppressWarnings({
+            "rawtypes", "unchecked"
+    })
+    private boolean loadRedstoneOutput(final World worldIn, final IBlockState state,
+            final BlockPos pos, final SignalTileEnity tile) {
         if (!this.prop.redstoneOutputs.isEmpty()) {
-            if (worldIn.isRemote) {
-                return true;
-            }
-            final SignalTileEnity signalTE = (SignalTileEnity) tile;
-            final Map<SEProperty<?>, Object> properties = signalTE.getProperties();
+            final Map<SEProperty<?>, Object> properties = tile.getProperties();
+            this.powerProperty = null;
             for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (pack.predicate.test(properties)) {
                     final SEProperty seProperty = (SEProperty) pack.property;
                     this.powerProperty = seProperty;
-                    signalTE.getProperty(seProperty)
-                            .ifPresent(power -> signalTE.setProperty(seProperty, !(Boolean) power));
+                    tile.getProperty(seProperty)
+                            .ifPresent(power -> tile.setProperty(seProperty, !(Boolean) power));
                     break;
                 }
+            }
+            if (this.powerProperty == null) {
+                return false;
             }
             worldIn.setBlockState(pos, state, 3);
             worldIn.notifyNeighborsOfStateChange(pos, this, false);
