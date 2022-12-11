@@ -541,7 +541,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     public boolean canHaveCustomname(final Map<SEProperty<?>, Object> map) {
-        return this.prop.customNameRenderHeight != -1;
+        return this.prop.customNameRenderHeight != -1 || !this.prop.customRenderHeights.isEmpty();
     }
 
     @Override
