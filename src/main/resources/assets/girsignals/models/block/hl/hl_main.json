@@ -10,7 +10,7 @@
 		"lamp_white_sh_2north": "girsignals:blocks/lamps/lamp_dark",
 		"lamp_yellow2north": "girsignals:blocks/lamps/lamp_dark",
 		"lamp_red2north": "girsignals:blocks/lamps/lamp_dark",
-		"lamp_white_sh_1": "girsignals:blocks/lamps/lamp_dark"
+		"lamp_white_sh_1north": "girsignals:blocks/lamps/lamp_dark"
 	},
 	"elements": [
 		{
