@@ -554,7 +554,7 @@
 			"from": [4, 13, 4.9],
 			"to": [6, 15, 4.9],
 			"faces": {
-				"north": {"uv": [1, 1, 3, 3], "texture": "#lamp_white_sh_1"}
+				"north": {"uv": [1, 1, 3, 3], "texture": "#lamp_white_sh_1north"}
 			}
 		},
 		{
