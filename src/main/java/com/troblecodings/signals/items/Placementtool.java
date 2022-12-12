@@ -1,7 +1,6 @@
 package com.troblecodings.signals.items;
 
 import java.util.ArrayList;
-
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -12,19 +11,22 @@ import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.InteractionResult;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Placementtool extends Item implements IIntegerable<Signal>, ITagableItem {
 
@@ -34,38 +36,36 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
     public final ArrayList<Integer> signalids = new ArrayList<>();
 
     public Placementtool() {
-        setCreativeTab(OSTabs.TAB);
+    	super(new Item.Properties().tab(OSTabs.TAB));
     }
 
     public void addSignal(final Signal sig) {
         signalids.add(sig.getID());
     }
-
-    @SuppressWarnings({
-            "rawtypes", "unchecked"
-    })
+    
     @Override
-    public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
-            final BlockPos pos, final EnumHand hand, final EnumFacing facing, final float hitX,
-            final float hitY, final float hitZ) {
-        if (player.isSneaking()) {
-            if (!worldIn.isRemote)
-                return EnumActionResult.SUCCESS;
+    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+    	Player player = context.getPlayer();
+    	Level worldIn = context.getLevel();
+    	BlockPos pos = context.getClickedPos();
+        if (player.isShiftKeyDown()) {
+            if (!worldIn.isClientSide)
+                return InteractionResult.SUCCESS;
             OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, pos);
-            return EnumActionResult.SUCCESS;
+            return InteractionResult.SUCCESS;
         } else {
-            if (worldIn.isRemote)
-                return EnumActionResult.SUCCESS;
+            if (worldIn.isClientSide)
+                return InteractionResult.SUCCESS;
             final BlockPos setPosition = pos.offset(facing);
-            if (!worldIn.isAirBlock(setPosition))
-                return EnumActionResult.FAIL;
+            if (!worldIn.isEmptyBlock(setPosition))
+                return InteractionResult.FAIL;
 
-            final NBTTagCompound compound = player.getHeldItemMainhand().getTagCompound();
-            if (compound == null || !compound.hasKey(BLOCK_TYPE_ID)) {
+            final CompoundTag compound = player.getMainHandItem().getOrCreateTag();
+            if(!compound.hasKey(BLOCK_TYPE_ID)) {
                 player.sendMessage(new TextComponentTranslation("pt.itemnotset"));
-                return EnumActionResult.FAIL;
+                return InteractionResult.FAIL;
             }
-            final Signal block = Signal.SIGNALLIST.get(compound.getInteger(BLOCK_TYPE_ID));
+            final Signal block = Signal.SIGNALLIST.get(compound.getInt(BLOCK_TYPE_ID));
 
             BlockPos lastPos = setPosition;
             worldIn.setBlockState(setPosition, block.getStateForPlacement(worldIn, lastPos, facing,
@@ -82,9 +82,9 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
                 if (!compound.hasKey(iup.getName()))
                     return;
                 if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-                    sig.setProperty(sep, sep.getObjFromID(compound.getInteger(iup.getName())));
+                    sig.setProperty(sep, sep.getObjFromID(compound.getInt(iup.getName())));
                 } else if (sep.isChangabelAtStage(ChangeableStage.APISTAGE)
-                        && compound.getInteger(iup.getName()) == 1) {
+                        && compound.getInt(iup.getName()) == 1) {
                     sig.setProperty(sep, sep.getDefault());
                 }
             });
@@ -93,7 +93,7 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
             for (int i = 0; i < height; i++)
                 if (!worldIn.isAirBlock(lastPos = lastPos.up())) {
                     worldIn.setBlockToAir(setPosition);
-                    return EnumActionResult.FAIL;
+                    return InteractionResult.FAIL;
                 }
             lastPos = setPosition;
             for (int i = 0; i < height; i++)
@@ -104,15 +104,14 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
             if (!str.isEmpty())
                 sig.setCustomName(str);
             worldIn.notifyBlockUpdate(setPosition, ebs.getBaseState(), ebs.getBaseState(), 3);
-            return EnumActionResult.SUCCESS;
-        }
+            return InteractionResult.SUCCESS;
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     @Override
     public String getNamedObj(final int obj) {
-        return I18n.format("property." + this.getName() + ".name") + ": "
-                + this.getObjFromID(obj).getLocalizedName();
+        return I18n.get("property." + this.getName() + ".name") + ": "
+                + this.getObjFromID(obj);
     }
 
     @Override

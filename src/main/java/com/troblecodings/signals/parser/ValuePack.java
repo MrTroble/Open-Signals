@@ -3,15 +3,15 @@ package com.troblecodings.signals.parser;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import net.minecraftforge.common.property.IUnlistedProperty;
+import com.troblecodings.signals.SEProperty;
 
 @SuppressWarnings("rawtypes")
 public class ValuePack {
 
-    public final IUnlistedProperty property;
+    public final SEProperty property;
     public final Predicate predicate;
 
-    public ValuePack(final IUnlistedProperty property, final Predicate predicate) {
+    public ValuePack(final SEProperty property, final Predicate predicate) {
         super();
         this.property = property;
         this.predicate = predicate;

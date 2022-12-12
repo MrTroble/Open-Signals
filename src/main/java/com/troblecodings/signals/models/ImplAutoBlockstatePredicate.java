@@ -3,9 +3,9 @@ package com.troblecodings.signals.models;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.client.model.data.IModelData;
 
-public class ImplAutoBlockstatePredicate implements Predicate<IExtendedBlockState> {
+public class ImplAutoBlockstatePredicate implements Predicate<IModelData> {
 
     private final int id;
 
@@ -16,7 +16,8 @@ public class ImplAutoBlockstatePredicate implements Predicate<IExtendedBlockStat
     }
 
     @Override
-    public boolean test(final IExtendedBlockState t) {
+    public boolean test(final IModelData t) {
+    	
         return true;
     }
 

@@ -7,7 +7,7 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public class DebugOptionEntry extends PathOptionEntry {
 
@@ -28,13 +28,13 @@ public class DebugOptionEntry extends PathOptionEntry {
     }
 
     @Override
-    public void read(final NBTTagCompound tag) {
+    public void read(final CompoundTag tag) {
         OpenSignalsMain.log.debug("R:" + tag);
         super.read(tag);
     }
 
     @Override
-    public void write(final NBTTagCompound tag) {
+    public void write(final CompoundTag tag) {
         super.write(tag);
         OpenSignalsMain.log.debug("W:" + tag);
     }

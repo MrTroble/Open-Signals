@@ -16,10 +16,10 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.Level;
 
 public class SignalBoxGrid implements INetworkSavable {
 
@@ -29,11 +29,11 @@ public class SignalBoxGrid implements INetworkSavable {
     protected final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
     protected final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
-    protected final Consumer<NBTTagCompound> sendToAll;
+    protected final Consumer<CompoundTag> sendToAll;
     protected final SignalBoxFactory factory;
-    private World world = null;
+    private Level world = null;
 
-    public SignalBoxGrid(final Consumer<NBTTagCompound> sendToAll) {
+    public SignalBoxGrid(final Consumer<CompoundTag> sendToAll) {
         this.sendToAll = sendToAll;
         this.factory = SignalBoxFactory.getFactory();
     }
@@ -69,7 +69,7 @@ public class SignalBoxGrid implements INetworkSavable {
             return false;
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
-            way.setWorld(world);
+            way.setLevel(world);
             way.setPathStatus(EnumPathUsage.SELECTED);
             way.updatePathwaySignals();
             this.onWayAdd(way);
@@ -97,14 +97,14 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     protected void onWayAdd(final SignalBoxPathway pathway) {
-        pathway.setWorld(world);
+        pathway.setLevel(world);
         startsToPath.put(pathway.getFirstPoint(), pathway);
         endsToPath.put(pathway.getLastPoint(), pathway);
         updatePrevious(pathway);
     }
 
     protected void updateToNet(final SignalBoxPathway pathway) {
-        final NBTTagCompound update = new NBTTagCompound();
+        final CompoundTag update = new CompoundTag();
         pathway.writeEntryNetwork(update, false);
         this.sendToAll.accept(update);
     }
@@ -135,23 +135,23 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     @Override
-    public void write(final NBTTagCompound tag) {
-        final NBTTagList list = new NBTTagList();
+    public void write(final CompoundTag tag) {
+        final ListTag list = new ListTag();
         modeGrid.values().forEach(node -> {
-            final NBTTagCompound nodeTag = new NBTTagCompound();
+            final CompoundTag nodeTag = new CompoundTag();
             node.write(nodeTag);
-            list.appendTag(nodeTag);
+            list.add(nodeTag);
         });
-        tag.setTag(NODE_LIST, list);
-        final NBTTagList pathList = new NBTTagList();
+        tag.put(NODE_LIST, list);
+        final ListTag pathList = new ListTag();
         startsToPath.values().forEach(pathway -> {
             if (pathway.isEmptyOrBroken())
                 return;
-            final NBTTagCompound path = new NBTTagCompound();
+            final CompoundTag path = new CompoundTag();
             pathway.write(path);
-            pathList.appendTag(path);
+            pathList.add(path);
         });
-        tag.setTag(PATHWAY_LIST, pathList);
+        tag.put(PATHWAY_LIST, pathList);
     }
 
     protected void clearPaths() {
@@ -160,24 +160,24 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     @Override
-    public void read(final NBTTagCompound tag) {
+    public void read(final CompoundTag tag) {
         clearPaths();
         modeGrid.clear();
-        final NBTTagList nodes = (NBTTagList) tag.getTag(NODE_LIST);
+        final ListTag nodes = (ListTag) tag.get(NODE_LIST);
         if (nodes == null)
             return;
         nodes.forEach(comp -> {
             final SignalBoxNode node = new SignalBoxNode();
-            node.read((NBTTagCompound) comp);
+            node.read((CompoundTag) comp);
             node.post();
             modeGrid.put(node.getPoint(), node);
         });
-        final NBTTagList list = (NBTTagList) tag.getTag(PATHWAY_LIST);
+        final ListTag list = (ListTag) tag.get(PATHWAY_LIST);
         if (list == null)
             return;
         list.forEach(comp -> {
             final SignalBoxPathway pathway = factory.getPathway(this.modeGrid);
-            pathway.read((NBTTagCompound) comp);
+            pathway.read((CompoundTag) comp);
             if (pathway.isEmptyOrBroken()) {
                 OpenSignalsMain.log.error("Remove empty or broken pathway, try to recover!");
                 return;
@@ -189,9 +189,9 @@ public class SignalBoxGrid implements INetworkSavable {
     /**
      * @param world the world to set
      */
-    public void setWorld(final World world) {
+    public void setLevel(final Level world) {
         this.world = world;
-        startsToPath.values().forEach(pw -> pw.setWorld(world));
+        startsToPath.values().forEach(pw -> pw.setLevel(world));
     }
 
     @Override
@@ -228,7 +228,7 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     @Override
-    public void writeEntryNetwork(final NBTTagCompound tag, final boolean writeAll) {
+    public void writeEntryNetwork(final CompoundTag tag, final boolean writeAll) {
         this.modeGrid.entrySet().removeIf(entry -> {
             final SignalBoxNode node = entry.getValue();
             if (node.isEmpty())
@@ -241,8 +241,8 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     @Override
-    public void readEntryNetwork(final NBTTagCompound tag) {
-        final Set<String> keys = tag.getKeySet();
+    public void readEntryNetwork(final CompoundTag tag) {
+        final Set<String> keys = tag.getAllKeys();
         keys.forEach(identifier -> saveRead(identifier).ifPresent(
                 point -> modeGrid.computeIfAbsent(point, key -> new SignalBoxNode(key))));
         this.modeGrid.entrySet().removeIf(entry -> {

@@ -15,6 +15,7 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.troblecodings.properties.FloatProperty;
 import com.troblecodings.properties.HeightProperty;
 import com.troblecodings.properties.SoundProperty;
@@ -33,44 +34,37 @@ import com.troblecodings.signals.parser.LogicalParserException;
 import com.troblecodings.signals.parser.ValuePack;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.core.BlockPos;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Signal extends Block implements ITileEntityProvider, IConfigUpdatable {
 
@@ -284,7 +278,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     protected final SignalProperties prop;
 
     @SuppressWarnings("rawtypes")
-    public static Consumer<List<IUnlistedProperty>> nextConsumer = _u -> {
+    public static Consumer<List<SEProperty>> nextConsumer = _u -> {
     };
 
     public Signal(final SignalProperties prop) {
@@ -297,12 +291,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public void dropBlockAsItemWithChance(final World worldIn, final BlockPos pos,
-            final IBlockState state, final float chance, final int fortune) {
+    public void dropBlockAsItemWithChance(final Level worldIn, final BlockPos pos,
+            final BlockState state, final float chance, final int fortune) {
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
+    public AABB getBoundingBox(final BlockState state, final LevelAccessor source,
             final BlockPos pos) {
         final SignalTileEnity te = (SignalTileEnity) source.getTileEntity(pos);
         if (te == null)
@@ -311,12 +305,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(final IBlockState blockState,
-            final IBlockAccess worldIn, final BlockPos pos) {
+    public AABB getCollisionBoundingBox(final BlockState blockState,
+            final LevelAccessor worldIn, final BlockPos pos) {
         return getBoundingBox(blockState, worldIn, pos);
     }
 
-    public static ItemStack pickBlock(final EntityPlayer player, final Item item) {
+    public static ItemStack pickBlock(final Player player, final Item item) {
         // Compatibility issues with other mods ...
         if (!Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown())
             return new ItemStack(item);
@@ -330,14 +324,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target,
-            final World world, final BlockPos pos, final EntityPlayer player) {
+    public ItemStack getPickBlock(final BlockState state, final RayTraceResult target,
+            final Level world, final BlockPos pos, final Player player) {
         return pickBlock(player, prop.placementtool);
     }
 
     @Override
-    public IBlockState getStateForPlacement(final World world, final BlockPos pos,
-            final EnumFacing facing, final float hitX, final float hitY, final float hitZ,
+    public BlockState getStateForPlacement(final Level world, final BlockPos pos,
+            final Direction facing, final float hitX, final float hitY, final float hitZ,
             final int meta, final EntityLivingBase placer, final EnumHand hand) {
         final int index = 15
                 - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
@@ -345,27 +339,27 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public IBlockState getStateFromMeta(final int meta) {
+    public BlockState getStateFromMeta(final int meta) {
         return getDefaultState().withProperty(ANGEL, SignalAngel.values()[meta]);
     }
 
     @Override
-    public int getMetaFromState(final IBlockState state) {
+    public int getMetaFromState(final BlockState state) {
         return state.getValue(ANGEL).ordinal();
     }
 
     @Override
-    public IBlockState withRotation(final IBlockState state, final Rotation rot) {
+    public BlockState withRotation(final BlockState state, final Rotation rot) {
         return state.withRotation(rot);
     }
 
     @Override
-    public IBlockState withMirror(final IBlockState state, final Mirror mirrorIn) {
+    public BlockState withMirror(final BlockState state, final Mirror mirrorIn) {
         return state.withMirror(mirrorIn);
     }
 
     @Override
-    public boolean canRenderInLayer(final IBlockState state, final BlockRenderLayer layer) {
+    public boolean canRenderInLayer(final BlockState state, final BlockRenderLayer layer) {
         return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
     }
 
@@ -373,10 +367,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             "unchecked", "rawtypes"
     })
     @Override
-    public IBlockState getExtendedState(final IBlockState state, final IBlockAccess world,
+    public BlockState getExtendedState(final BlockState state, final LevelAccessor world,
             final BlockPos pos) {
-        final AtomicReference<IExtendedBlockState> blockState = new AtomicReference<>(
-                (IExtendedBlockState) super.getExtendedState(state, world, pos));
+        final AtomicReference<IModelData> blockState = new AtomicReference<>(
+                (IModelData) super.getExtendedState(state, world, pos));
         final SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
         if (entity != null)
             entity.getProperties().forEach((property, value) -> blockState.getAndUpdate(
@@ -385,31 +379,31 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public boolean isTranslucent(final IBlockState state) {
+    public boolean isTranslucent(final BlockState state) {
         return true;
     }
 
     @Override
-    public boolean isOpaqueCube(final IBlockState state) {
+    public boolean isOpaqueCube(final BlockState state) {
         return false;
     }
 
     @Override
-    public boolean isFullCube(final IBlockState state) {
+    public boolean isFullCube(final BlockState state) {
         return false;
     }
 
-    private IUnlistedProperty<?>[] propcache = null;
+    private SEProperty<?>[] propcache = null;
 
     private void buildCacheIfNull() {
         if (propcache == null) {
-            final Collection<IUnlistedProperty<?>> props = ((ExtendedBlockState) this
+            final Collection<SEProperty<?>> props = ((ExtendedBlockState) this
                     .getBlockState()).getUnlistedProperties();
-            propcache = props.toArray(new IUnlistedProperty[props.size()]);
+            propcache = props.toArray(new SEProperty[props.size()]);
         }
     }
 
-    public int getIDFromProperty(final IUnlistedProperty<?> propertyIn) {
+    public int getIDFromProperty(final SEProperty<?> propertyIn) {
         buildCacheIfNull();
         for (int i = 0; i < propcache.length; i++)
             if (propcache[i].equals(propertyIn))
@@ -417,13 +411,13 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return -1;
     }
 
-    public IUnlistedProperty<?> getPropertyFromID(final int id) {
+    public SEProperty<?> getPropertyFromID(final int id) {
         buildCacheIfNull();
         return propcache[id];
     }
 
     @SuppressWarnings("rawtypes")
-    private ArrayList<IUnlistedProperty> signalProperties;
+    private ArrayList<SEProperty> signalProperties;
 
     @SuppressWarnings("rawtypes")
     @Override
@@ -435,7 +429,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 final int mods = f.getModifiers();
                 if (Modifier.isFinal(mods) && Modifier.isStatic(mods) && Modifier.isPublic(mods)) {
                     try {
-                        this.signalProperties.add((IUnlistedProperty) f.get(null));
+                        this.signalProperties.add((SEProperty) f.get(null));
                     } catch (final IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
@@ -450,22 +444,22 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         this.signalProperties.add(CUSTOMNAME);
         return new ExtendedBlockState(this, new IProperty<?>[] {
                 ANGEL
-        }, this.signalProperties.toArray(new IUnlistedProperty[signalProperties.size()]));
+        }, this.signalProperties.toArray(new SEProperty[signalProperties.size()]));
     }
 
     @SuppressWarnings("rawtypes")
-    public ImmutableList<IUnlistedProperty> getProperties() {
+    public ImmutableList<SEProperty> getProperties() {
         return ImmutableList.copyOf(this.signalProperties);
     }
 
     @Override
-    public boolean eventReceived(final IBlockState state, final World worldIn, final BlockPos pos,
+    public boolean eventReceived(final BlockState state, final Level worldIn, final BlockPos pos,
             final int id, final int param) {
         return true;
     }
 
     @Override
-    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
+    public TileEntity createNewTileEntity(final Level worldIn, final int meta) {
         return new SignalTileEnity();
     }
 
@@ -478,7 +472,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
+    public void breakBlock(final Level worldIn, final BlockPos pos, final BlockState state) {
         super.breakBlock(worldIn, pos, state);
 
         if (!worldIn.isRemote)
@@ -486,7 +480,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @SuppressWarnings("unchecked")
-    public int getHeight(final Map<SEProperty<?>, Object> map) {
+    public int getHeight(final Map<SEProperty, Object> map) {
         for (final HeightProperty property : this.prop.signalHeights) {
             if (property.predicate.test(map))
                 return property.height;
@@ -494,7 +488,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return this.prop.defaultHeight;
     }
 
-    public boolean canHaveCustomname(final Map<SEProperty<?>, Object> map) {
+    public boolean canHaveCustomname(final Map<SEProperty, Object> map) {
         return this.prop.customNameRenderHeight != -1 || !this.prop.customRenderHeights.isEmpty();
     }
 
@@ -507,29 +501,29 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return this.prop.canLink;
     }
 
-    @SideOnly(Side.CLIENT)
-    public int colorMultiplier(final IBlockState state, final IBlockAccess worldIn,
+    @OnlyIn(Dist.CLIENT)
+    public int colorMultiplier(final BlockState state, final LevelAccessor worldIn,
             final BlockPos pos, final int tintIndex) {
         return this.prop.colors.get(tintIndex);
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public boolean hasCostumColor() {
         return !this.prop.colors.isEmpty();
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
             final SignalTileEnity te, final FontRenderer font) {
         this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight);
     }
 
     @SuppressWarnings("unchecked")
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
             final SignalTileEnity te, final FontRenderer font, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        final Map<SEProperty<?>, Object> map = te.getProperties();
+        final Map<SEProperty, Object> map = te.getProperties();
         for (final FloatProperty property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
                 customRenderHeight = property.height;
@@ -537,9 +531,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         }
         if (customRenderHeight == -1)
             return;
-        final World world = te.getWorld();
+        final Level world = te.getLevel();
         final BlockPos pos = te.getPos();
-        final IBlockState state = world.getBlockState(pos);
+        final BlockState state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
@@ -562,7 +556,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         GlStateManager.popMatrix();
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void renderSingleOverlay(final String[] display, final FontRenderer font,
             final SignalTileEnity te) {
         final float width = this.prop.signWidth;
@@ -587,7 +581,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         setLightLevel(OpenSignalsConfig.signalLightValue / 15.0f);
     }
 
-    public static <T extends Comparable<T>> Predicate<Map<SEProperty<?>, Object>> check(
+    public static <T extends Comparable<T>> Predicate<Map<SEProperty, Object>> check(
             final SEProperty<T> property, final T type) {
         return map -> map.containsKey(property) ? map.get(property).equals(type) : true;
     }
@@ -596,9 +590,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     private SEProperty powerProperty = null;
 
     @Override
-    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
-            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
-            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+    public boolean onBlockActivated(final Level worldIn, final BlockPos pos,
+            final BlockState state, final Player playerIn, final EnumHand hand,
+            final Direction facing, final float hitX, final float hitY, final float hitZ) {
         final TileEntity tile = worldIn.getTileEntity(pos);
         if (!(tile instanceof SignalTileEnity)) {
             return false;
@@ -619,10 +613,10 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    private boolean loadRedstoneOutput(final World worldIn, final IBlockState state,
+    private boolean loadRedstoneOutput(final Level worldIn, final BlockState state,
             final BlockPos pos, final SignalTileEnity tile) {
         if (!this.prop.redstoneOutputs.isEmpty()) {
-            final Map<SEProperty<?>, Object> properties = tile.getProperties();
+            final Map<SEProperty, Object> properties = tile.getProperties();
             this.powerProperty = null;
             for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (pack.predicate.test(properties)) {
@@ -645,14 +639,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public boolean canProvidePower(IBlockState state) {
+    public boolean canProvidePower(BlockState state) {
         return !this.prop.redstoneOutputs.isEmpty();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,
-            EnumFacing side) {
+    public int getWeakPower(BlockState blockState, LevelAccessor blockAccess, BlockPos pos,
+            Direction side) {
         if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null)
             return 0;
 
@@ -660,7 +654,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         if (tile.getProperty(powerProperty).filter(power -> !(Boolean) power).isPresent()) {
             return 0;
         }
-        final Map<SEProperty<?>, Object> properties = tile.getProperties();
+        final Map<SEProperty, Object> properties = tile.getProperties();
         for (final ValuePack pack : this.prop.redstoneOutputs) {
             if (pack.predicate.test(properties)) {
                 return 15;
@@ -670,12 +664,12 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @SuppressWarnings("unchecked")
-    public void getUpdate(final World world, final BlockPos pos) {
+    public void getUpdate(final Level world, final BlockPos pos) {
         if (this.prop.sounds.isEmpty())
             return;
 
         final SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(pos);
-        final Map<SEProperty<?>, Object> properties = tile.getProperties();
+        final Map<SEProperty, Object> properties = tile.getProperties();
         final SoundProperty sound = getSound(properties);
         if (sound.duration < 1)
             return;
@@ -694,7 +688,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @SuppressWarnings("unchecked")
-    public SoundProperty getSound(final Map<SEProperty<?>, Object> map) {
+    public SoundProperty getSound(final Map<SEProperty, Object> map) {
         for (final SoundProperty property : this.prop.sounds) {
             if (property.predicate.test(map)) {
                 return property;
@@ -704,7 +698,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public void updateTick(final World world, final BlockPos pos, final IBlockState state,
+    public void updateTick(final Level world, final BlockPos pos, final BlockState state,
             final Random rand) {
         if (this.prop.sounds.isEmpty() || world.isRemote) {
             return;

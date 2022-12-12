@@ -5,16 +5,13 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalController extends Block implements ITileEntityProvider {
 
@@ -24,9 +21,9 @@ public class SignalController extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
-            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
-            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+    public boolean onBlockActivated(final Level worldIn, final BlockPos pos,
+            final BlockState state, final Player playerIn, final EnumHand hand,
+            final Direction facing, final float hitX, final float hitY, final float hitZ) {
         if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
                 return true;
@@ -37,12 +34,12 @@ public class SignalController extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
+    public TileEntity createNewTileEntity(final Level worldIn, final int meta) {
         return new SignalControllerTileEntity();
     }
 
     @Override
-    public void neighborChanged(final IBlockState state, final World world, final BlockPos pos,
+    public void neighborChanged(final BlockState state, final Level world, final BlockPos pos,
             final Block blockIn, final BlockPos fromPos) {
         final TileEntity tile = world.getTileEntity(pos);
         if (tile instanceof SignalControllerTileEntity) {

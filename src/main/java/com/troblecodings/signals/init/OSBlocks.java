@@ -6,7 +6,6 @@ import java.util.ArrayList;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.GhostBlock;
-import com.troblecodings.signals.blocks.IConfigUpdatable;
 import com.troblecodings.signals.blocks.Post;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.RedstoneInput;
@@ -15,17 +14,13 @@ import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.blocks.SignalLoader;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.config.Config.Type;
-import net.minecraftforge.common.config.ConfigManager;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent.OnConfigChangedEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public final class OSBlocks {
@@ -65,28 +60,13 @@ public final class OSBlocks {
 
         final String name = pName.toLowerCase().trim();
         block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
-        block.setUnlocalizedName(name);
         blocksToRegister.add(block);
         if (block instanceof Signal)
             Signal.SIGNALS.put(name, (Signal) block);
-        if (block instanceof ITileEntityProvider) {
-            final ITileEntityProvider provider = (ITileEntityProvider) block;
-            try {
-                final Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0)
-                        .getClass();
-                if (TileEntity.getKey(tileclass) == null)
-                    TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
-            } catch (final NullPointerException ex) {
-                OpenSignalsMain.log.trace(
-                        "All tileentity provide need to call back a default entity if the world is null!",
-                        ex);
-            }
-        }
     }
 
     @SubscribeEvent
     public static void registerBlock(final RegistryEvent.Register<Block> event) {
-        updateConfigs();
         final IForgeRegistry<Block> registry = event.getRegistry();
         blocksToRegister.forEach(registry::register);
     }
@@ -95,23 +75,7 @@ public final class OSBlocks {
     public static void registerItem(final RegistryEvent.Register<Item> event) {
         final IForgeRegistry<Item> registry = event.getRegistry();
         blocksToRegister.forEach(block -> registry
-                .register(new ItemBlock(block).setRegistryName(block.getRegistryName())));
+                .register(new BlockItem(block, new Properties().tab(OSTabs.TAB)).setRegistryName(block.getRegistryName())));
     }
 
-    private static void updateConfigs() {
-        blocksToRegister.forEach(b -> {
-            if (b instanceof IConfigUpdatable) {
-                final IConfigUpdatable configUpdate = (IConfigUpdatable) b;
-                configUpdate.updateConfigValues();
-            }
-        });
-    }
-
-    @SubscribeEvent
-    public static void onConfigChangedEvent(final OnConfigChangedEvent event) {
-        if (event.getModID().equals(OpenSignalsMain.MODID)) {
-            ConfigManager.sync(OpenSignalsMain.MODID, Type.INSTANCE);
-            updateConfigs();
-        }
-    }
 }

@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -11,9 +12,6 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.Rotation;
 
 public class UIMenu extends UIComponent {
 

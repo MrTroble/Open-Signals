@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public class PathOptionEntry implements INetworkSavable {
 
@@ -57,16 +57,16 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     @Override
-    public void write(final NBTTagCompound tag) {
+    public void write(final CompoundTag tag) {
         pathEntrys.forEach((type, option) -> {
-            final NBTTagCompound entry = new NBTTagCompound();
+            final CompoundTag entry = new CompoundTag();
             option.write(entry);
-            tag.setTag(type.getName(), entry);
+            tag.put(type.getName(), entry);
         });
     }
 
     @Override
-    public void read(final NBTTagCompound tag) {
+    public void read(final CompoundTag tag) {
         final List<PathEntryType<?>> tagSet = tag.getKeySet().stream().map(PathEntryType::getType)
                 .collect(Collectors.toList());
         tagSet.forEach(entry -> {
@@ -83,12 +83,12 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     @Override
-    public void writeEntryNetwork(final NBTTagCompound tag, final boolean writeAll) {
+    public void writeEntryNetwork(final CompoundTag tag, final boolean writeAll) {
         pathEntrys.forEach((type, option) -> {
-            final NBTTagCompound entry = new NBTTagCompound();
+            final CompoundTag entry = new CompoundTag();
             option.writeEntryNetwork(entry, writeAll);
             if (entry.getSize() > 0)
-                tag.setTag(type.getName(), entry);
+                tag.put(type.getName(), entry);
         });
         removedEntrys.keySet().removeIf(type -> {
             tag.setBoolean(type.getName(), false);
@@ -97,7 +97,7 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     @Override
-    public void readEntryNetwork(final NBTTagCompound tag) {
+    public void readEntryNetwork(final CompoundTag tag) {
         this.read(tag);
     }
 

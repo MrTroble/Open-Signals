@@ -10,20 +10,20 @@ import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.IWorldNameable;
+import net.minecraft.world.ILevelNameable;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SignalTileEnity extends SyncableTileEntity implements IWorldNameable, ISyncable {
+public class SignalTileEnity extends SyncableTileEntity implements ILevelNameable, ISyncable {
 
-    private final HashMap<SEProperty<?>, Object> map = new HashMap<>();
+    private final HashMap<SEProperty, Object> map = new HashMap<>();
 
     public static final String PROPERTIES = "properties";
     public static final String CUSTOMNAME = "customname";
@@ -32,22 +32,22 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     private String formatCustomName = null;
 
     @Override
-    public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
-        final NBTTagCompound comp = new NBTTagCompound();
+    public CompoundTag writeToNBT(final CompoundTag compound) {
+        final CompoundTag comp = new CompoundTag();
         map.forEach((prop, in) -> prop.writeToNBT(comp, in));
         if (formatCustomName != null)
             comp.setString(CUSTOMNAME, formatCustomName);
-        compound.setTag(PROPERTIES, comp);
+        compound.put(PROPERTIES, comp);
         super.writeToNBT(compound);
         return compound;
     }
 
-    private NBTTagCompound temporary = null;
+    private CompoundTag temporary = null;
 
     @Override
-    public void readFromNBT(final NBTTagCompound compound) {
+    public void readFromNBT(final CompoundTag compound) {
         super.readFromNBT(compound);
-        final NBTTagCompound comp = compound.getCompoundTag(PROPERTIES);
+        final CompoundTag comp = compound.getCompoundTag(PROPERTIES);
         if (world == null) {
             temporary = comp.copy();
         } else {
@@ -56,10 +56,10 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         }
     }
 
-    private void read(final NBTTagCompound comp) {
+    private void read(final CompoundTag comp) {
         ((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState())
                 .getUnlistedProperties().stream().forEach(prop -> {
-                    final SEProperty<?> sep = SEProperty.cst(prop);
+                    final SEProperty sep = SEProperty.cst(prop);
                     sep.readFromNBT(comp).ifPresent(obj -> map.put(sep, obj));
                 });
         if (comp.hasKey(CUSTOMNAME))
@@ -71,7 +71,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         if (temporary != null) {
             read(temporary);
             if (!world.isRemote) {
-                final IBlockState state = world.getBlockState(pos);
+                final BlockState state = world.getBlockState(pos);
                 world.notifyBlockUpdate(pos, state, state, 3);
             }
             temporary = null;
@@ -84,11 +84,11 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         getSignal().getUpdate(world, pos);
     }
 
-    public Map<SEProperty<?>, Object> getProperties() {
+    public Map<SEProperty, Object> getProperties() {
         return ImmutableMap.copyOf(map);
     }
 
-    public Optional<?> getProperty(final SEProperty<?> prop) {
+    public Optional<?> getProperty(final SEProperty prop) {
         if (map.containsKey(prop))
             return Optional.of(map.get(prop));
         return Optional.empty();
@@ -122,7 +122,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
         this.syncClient();
     }
 
-    @SideOnly(Side.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
             final FontRenderer font) {
         getSignal().renderOverlay(x, y, z, this, font);
@@ -137,7 +137,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     }
 
     @Override
-    public void updateTag(final NBTTagCompound compound) {
+    public void updateTag(final CompoundTag compound) {
         if (compound.hasKey(CUSTOMNAME)) {
             setCustomName(compound.getString(CUSTOMNAME));
             this.syncClient();
@@ -145,7 +145,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     }
 
     @Override
-    public NBTTagCompound getTag() {
+    public CompoundTag getTag() {
         return null;
     }
 
@@ -169,7 +169,7 @@ public class SignalTileEnity extends SyncableTileEntity implements IWorldNameabl
     }
 
     @Override
-    public boolean isValid(final EntityPlayer player) {
+    public boolean isValid(final Player player) {
         return true;
     }
 }

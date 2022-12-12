@@ -5,13 +5,12 @@ import java.util.ArrayList;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SyncableTileEntity extends TileEntity {
 
@@ -26,20 +25,20 @@ public class SyncableTileEntity extends TileEntity {
     public void onDataPacket(final NetworkManager net, final SPacketUpdateTileEntity pkt) {
         this.readFromNBT(pkt.getNbtCompound());
         final BlockPos pos = getPos();
-        getWorld().markBlockRangeForRenderUpdate(pos, pos);
+        getLevel().markBlockRangeForRenderUpdate(pos, pos);
     }
 
     @Override
-    public NBTTagCompound getUpdateTag() {
-        return writeToNBT(new NBTTagCompound());
+    public CompoundTag getUpdateTag() {
+        return writeToNBT(new CompoundTag());
     }
 
     public void syncClient() {
-        syncClient(getWorld(), getPos());
+        syncClient(getLevel(), getPos());
     }
 
-    public void syncClient(final World world, final BlockPos pos) {
-        final IBlockState state = world.getBlockState(pos);
+    public void syncClient(final Level world, final BlockPos pos) {
+        final BlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);
         world.markBlockRangeForRenderUpdate(pos, pos);
     }
@@ -52,7 +51,7 @@ public class SyncableTileEntity extends TileEntity {
         return this.clientSyncs.removeIf(s -> s.getPlayer().equals(sync.getPlayer()));
     }
 
-    public void sendToAll(final NBTTagCompound compound) {
+    public void sendToAll(final CompoundTag compound) {
         this.clientSyncs.forEach(sync -> GuiSyncNetwork.sendToClient(compound, sync.getPlayer()));
     }
 

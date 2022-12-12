@@ -6,7 +6,7 @@ import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public class DebugFactory extends SignalBoxFactory {
 
@@ -22,7 +22,7 @@ public class DebugFactory extends SignalBoxFactory {
     }
 
     @Override
-    public SignalBoxGrid getGrid(final Consumer<NBTTagCompound> sendToAll) {
+    public SignalBoxGrid getGrid(final Consumer<CompoundTag> sendToAll) {
         if (enableDebugGrid)
             return new DebugGrid(sendToAll);
         return super.getGrid(sendToAll);

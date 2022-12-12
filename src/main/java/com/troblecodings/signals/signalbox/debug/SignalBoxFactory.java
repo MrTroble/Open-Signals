@@ -8,17 +8,16 @@ import javax.annotation.Nullable;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.signalbox.LevelLoadOperations;
+import com.troblecodings.signals.signalbox.LevelOperations;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxPathway;
-import com.troblecodings.signals.signalbox.WorldLoadOperations;
-import com.troblecodings.signals.signalbox.WorldOperations;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
 
 public class SignalBoxFactory {
 
@@ -38,10 +37,10 @@ public class SignalBoxFactory {
         return new ConnectionChecker();
     }
 
-    public WorldOperations getWorldOperations(final @Nullable World world) {
+    public LevelOperations getLevelOperations(final @Nullable Level world) {
         if (world == null)
-            return new WorldOperations();
-        return new WorldLoadOperations(world);
+            return new LevelOperations();
+        return new LevelLoadOperations(world);
     }
 
     public SignalBoxPathway getPathway(final Map<Point, SignalBoxNode> modeGrid,
@@ -53,7 +52,7 @@ public class SignalBoxFactory {
         return new SignalBoxPathway(modeGrid);
     }
 
-    public SignalBoxGrid getGrid(final Consumer<NBTTagCompound> sendToAll) {
+    public SignalBoxGrid getGrid(final Consumer<CompoundTag> sendToAll) {
         return new SignalBoxGrid(sendToAll);
     }
 

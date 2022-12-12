@@ -26,32 +26,31 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.property.ExtendedBlockState;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class GuiPlacementtool extends GuiBase {
 
     private final UIEntity list = new UIEntity();
     private final UIBlockRender blockRender = new UIBlockRender();
-    private final HashMap<String, IUnlistedProperty<?>> lookup = new HashMap<String, IUnlistedProperty<?>>();
+    private final HashMap<String, SEProperty<?>> lookup = new HashMap<String, SEProperty<?>>();
     private Signal currentSelectedBlock;
     private final Placementtool tool;
     public static final int GUI_PLACEMENTTOOL = 0;
 
     public GuiPlacementtool(final ItemStack stack) {
-        this.compound = stack.getTagCompound();
+        this.compound = stack.getCompound();
         if (this.compound == null)
-            this.compound = new NBTTagCompound();
+            this.compound = new CompoundTag();
         tool = (Placementtool) stack.getItem();
         final int usedBlock = this.compound.hasKey(Placementtool.BLOCK_TYPE_ID)
-                ? this.compound.getInteger(Placementtool.BLOCK_TYPE_ID)
+                ? this.compound.getInt(Placementtool.BLOCK_TYPE_ID)
                 : tool.getObjFromID(0).getID();
         currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
 
@@ -61,10 +60,10 @@ public class GuiPlacementtool extends GuiBase {
     private void initList() {
         final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock
                 .getBlockState();
-        final Collection<IUnlistedProperty<?>> unlistedProperties = hVExtendedBlockState
+        final Collection<SEProperty<?>> unlistedProperties = hVExtendedBlockState
                 .getUnlistedProperties();
-        for (final IUnlistedProperty<?> property : unlistedProperties) {
-            final SEProperty<?> prop = SEProperty.cst(property);
+        for (final SEProperty<?> property : unlistedProperties) {
+            final SEProperty prop = SEProperty.cst(property);
             of(prop, inp -> applyModelChanges());
         }
         if (currentSelectedBlock.canHaveCustomname(new HashMap<>()))
@@ -124,7 +123,7 @@ public class GuiPlacementtool extends GuiBase {
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
 
-        final UILabel titlelabel = new UILabel(I18n.format("property.signal.name"));
+        final UILabel titlelabel = new UILabel(I18n.get("property.signal.name"));
         titlelabel.setCenterX(false);
 
         final UIEntity titel = new UIEntity();
@@ -146,7 +145,7 @@ public class GuiPlacementtool extends GuiBase {
         this.entity.read(compound);
     }
 
-    public void of(final SEProperty<?> property, final IntConsumer consumer) {
+    public void of(final SEProperty property, final IntConsumer consumer) {
         if (property == null)
             return;
         if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
@@ -168,7 +167,7 @@ public class GuiPlacementtool extends GuiBase {
 
     @Override
     public void onGuiClosed() {
-        compound.setInteger(Placementtool.BLOCK_TYPE_ID, currentSelectedBlock.getID());
+        compound.putInt(Placementtool.BLOCK_TYPE_ID, currentSelectedBlock.getID());
         super.onGuiClosed();
         GuiSyncNetwork.sendToItemServer(compound);
     }
@@ -177,7 +176,7 @@ public class GuiPlacementtool extends GuiBase {
             "rawtypes", "unchecked"
     })
     public void applyModelChanges() {
-        IExtendedBlockState ebs = (IExtendedBlockState) currentSelectedBlock.getDefaultState();
+        IModelData ebs = (IModelData) currentSelectedBlock.getDefaultState();
 
         final List<UIEnumerable> enumerables = this.list.findRecursive(UIEnumerable.class);
         for (final UIEnumerable enumerable : enumerables) {
@@ -199,7 +198,7 @@ public class GuiPlacementtool extends GuiBase {
             }
         }
 
-        for (final Entry<IUnlistedProperty<?>, Optional<?>> prop : ebs.getUnlistedProperties()
+        for (final Entry<SEProperty<?>, Optional<?>> prop : ebs.getUnlistedProperties()
                 .entrySet()) {
             final SEProperty property = SEProperty.cst(prop.getKey());
             if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {

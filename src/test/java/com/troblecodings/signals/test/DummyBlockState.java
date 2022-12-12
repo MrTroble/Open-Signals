@@ -8,45 +8,40 @@ import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
 
-import net.minecraft.block.Block;
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MapColor;
-import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockFaceShape;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.Mirror;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.AABB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraft.world.LevelAccessor;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.property.IModelData;
+import net.minecraftforge.common.property.SEProperty;
 
 @SuppressWarnings({
         "rawtypes", "unchecked"
 })
-public class DummyBlockState implements IExtendedBlockState {
+public class DummyBlockState implements IModelData {
 
-    private final Map<IUnlistedProperty, Object> map = new HashMap<>();
+    private final Map<SEProperty, Object> map = new HashMap<>();
 
-    public DummyBlockState(final IUnlistedProperty property, final Object value) {
+    public DummyBlockState(final SEProperty property, final Object value) {
         super();
         map.put(property, value);
     }
 
-    public DummyBlockState(final Map<IUnlistedProperty, Object> in) {
+    public DummyBlockState(final Map<SEProperty, Object> in) {
         this.map.putAll(in);
     }
 
-    public DummyBlockState put(final IUnlistedProperty prop, final Object obj) {
+    public DummyBlockState put(final SEProperty prop, final Object obj) {
         map.put(prop, obj);
         return this;
     }
@@ -62,13 +57,13 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public <T extends Comparable<T>, V extends T> IBlockState withProperty(
+    public <T extends Comparable<T>, V extends T> BlockState withProperty(
             final IProperty<T> property, final V value) {
         return null;
     }
 
     @Override
-    public <T extends Comparable<T>> IBlockState cycleProperty(final IProperty<T> property) {
+    public <T extends Comparable<T>> BlockState cycleProperty(final IProperty<T> property) {
         return null;
     }
 
@@ -83,13 +78,13 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public boolean onBlockEventReceived(final World worldIn, final BlockPos pos, final int id,
+    public boolean onBlockEventReceived(final Level worldIn, final BlockPos pos, final int id,
             final int param) {
         return false;
     }
 
     @Override
-    public void neighborChanged(final World worldIn, final BlockPos pos, final Block blockIn,
+    public void neighborChanged(final Level worldIn, final BlockPos pos, final Block blockIn,
             final BlockPos fromPos) {
 
     }
@@ -119,7 +114,7 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public int getLightOpacity(final IBlockAccess world, final BlockPos pos) {
+    public int getLightOpacity(final LevelAccessor world, final BlockPos pos) {
 
         return 0;
     }
@@ -131,7 +126,7 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public int getLightValue(final IBlockAccess world, final BlockPos pos) {
+    public int getLightValue(final LevelAccessor world, final BlockPos pos) {
 
         return 0;
     }
@@ -149,19 +144,19 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public MapColor getMapColor(final IBlockAccess access, final BlockPos pos) {
+    public MapColor getMapColor(final LevelAccessor access, final BlockPos pos) {
 
         return null;
     }
 
     @Override
-    public IBlockState withRotation(final Rotation rot) {
+    public BlockState withRotation(final Rotation rot) {
 
         return null;
     }
 
     @Override
-    public IBlockState withMirror(final Mirror mirrorIn) {
+    public BlockState withMirror(final Mirror mirrorIn) {
 
         return null;
     }
@@ -185,7 +180,7 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public int getPackedLightmapCoords(final IBlockAccess source, final BlockPos pos) {
+    public int getPackedLightmapCoords(final LevelAccessor source, final BlockPos pos) {
 
         return 0;
     }
@@ -215,8 +210,8 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public int getWeakPower(final IBlockAccess blockAccess, final BlockPos pos,
-            final EnumFacing side) {
+    public int getWeakPower(final LevelAccessor blockAccess, final BlockPos pos,
+            final Direction side) {
 
         return 0;
     }
@@ -228,27 +223,27 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public int getComparatorInputOverride(final World worldIn, final BlockPos pos) {
+    public int getComparatorInputOverride(final Level worldIn, final BlockPos pos) {
 
         return 0;
     }
 
     @Override
-    public float getBlockHardness(final World worldIn, final BlockPos pos) {
+    public float getBlockHardness(final Level worldIn, final BlockPos pos) {
 
         return 0;
     }
 
     @Override
-    public float getPlayerRelativeBlockHardness(final EntityPlayer player, final World worldIn,
+    public float getPlayerRelativeBlockHardness(final Player player, final Level worldIn,
             final BlockPos pos) {
 
         return 0;
     }
 
     @Override
-    public int getStrongPower(final IBlockAccess blockAccess, final BlockPos pos,
-            final EnumFacing side) {
+    public int getStrongPower(final LevelAccessor blockAccess, final BlockPos pos,
+            final Direction side) {
 
         return 0;
     }
@@ -260,20 +255,20 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public IBlockState getActualState(final IBlockAccess blockAccess, final BlockPos pos) {
+    public BlockState getActualState(final LevelAccessor blockAccess, final BlockPos pos) {
 
         return null;
     }
 
     @Override
-    public AxisAlignedBB getSelectedBoundingBox(final World worldIn, final BlockPos pos) {
+    public AABB getSelectedBoundingBox(final Level worldIn, final BlockPos pos) {
 
         return null;
     }
 
     @Override
-    public boolean shouldSideBeRendered(final IBlockAccess blockAccess, final BlockPos pos,
-            final EnumFacing facing) {
+    public boolean shouldSideBeRendered(final LevelAccessor blockAccess, final BlockPos pos,
+            final Direction facing) {
 
         return false;
     }
@@ -285,26 +280,26 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(final IBlockAccess worldIn, final BlockPos pos) {
+    public AABB getCollisionBoundingBox(final LevelAccessor worldIn, final BlockPos pos) {
 
         return null;
     }
 
     @Override
-    public void addCollisionBoxToList(final World worldIn, final BlockPos pos,
-            final AxisAlignedBB entityBox, final List<AxisAlignedBB> collidingBoxes,
+    public void addCollisionBoxToList(final Level worldIn, final BlockPos pos,
+            final AABB entityBox, final List<AABB> collidingBoxes,
             final Entity entityIn, final boolean flag) {
 
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox(final IBlockAccess blockAccess, final BlockPos pos) {
+    public AABB getBoundingBox(final LevelAccessor blockAccess, final BlockPos pos) {
 
         return null;
     }
 
     @Override
-    public RayTraceResult collisionRayTrace(final World worldIn, final BlockPos pos,
+    public RayTraceResult collisionRayTrace(final Level worldIn, final BlockPos pos,
             final Vec3d start, final Vec3d end) {
 
         return null;
@@ -317,28 +312,28 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public boolean doesSideBlockRendering(final IBlockAccess world, final BlockPos pos,
-            final EnumFacing side) {
+    public boolean doesSideBlockRendering(final LevelAccessor world, final BlockPos pos,
+            final Direction side) {
 
         return false;
     }
 
     @Override
-    public boolean isSideSolid(final IBlockAccess world, final BlockPos pos,
-            final EnumFacing side) {
+    public boolean isSideSolid(final LevelAccessor world, final BlockPos pos,
+            final Direction side) {
 
         return false;
     }
 
     @Override
-    public boolean doesSideBlockChestOpening(final IBlockAccess world, final BlockPos pos,
-            final EnumFacing side) {
+    public boolean doesSideBlockChestOpening(final LevelAccessor world, final BlockPos pos,
+            final Direction side) {
 
         return false;
     }
 
     @Override
-    public Vec3d getOffset(final IBlockAccess access, final BlockPos pos) {
+    public Vec3d getOffset(final LevelAccessor access, final BlockPos pos) {
 
         return null;
     }
@@ -350,38 +345,38 @@ public class DummyBlockState implements IExtendedBlockState {
     }
 
     @Override
-    public BlockFaceShape getBlockFaceShape(final IBlockAccess worldIn, final BlockPos pos,
-            final EnumFacing facing) {
+    public BlockFaceShape getBlockFaceShape(final LevelAccessor worldIn, final BlockPos pos,
+            final Direction facing) {
 
         return null;
     }
 
     @Override
-    public Collection<IUnlistedProperty<?>> getUnlistedNames() {
+    public Collection<SEProperty<?>> getUnlistedNames() {
 
         return null;
     }
 
     @Override
-    public <V> V getValue(final IUnlistedProperty<V> property) {
+    public <V> V getValue(final SEProperty<V> property) {
         final Object value = map.get(property);
         return (V) value;
     }
 
     @Override
-    public <V> IExtendedBlockState withProperty(final IUnlistedProperty<V> property,
+    public <V> IModelData withProperty(final SEProperty<V> property,
             final V value) {
         return null;
     }
 
     @Override
-    public ImmutableMap<IUnlistedProperty<?>, Optional<?>> getUnlistedProperties() {
+    public ImmutableMap<SEProperty<?>, Optional<?>> getUnlistedProperties() {
 
         return null;
     }
 
     @Override
-    public IBlockState getClean() {
+    public BlockState getClean() {
 
         return null;
     }

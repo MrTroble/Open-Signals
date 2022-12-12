@@ -2,7 +2,6 @@ package com.troblecodings.signals.guis;
 
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.POINT1;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.POINT2;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.RESET_WAY;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.toNBT;
 
 import java.util.List;
@@ -12,11 +11,11 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
+import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
+import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
-import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
-import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
@@ -44,11 +43,10 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
 
 public class GuiSignalBox extends GuiBase {
 
@@ -62,7 +60,7 @@ public class GuiSignalBox extends GuiBase {
     private Page page = Page.USAGE;
     private SignalBoxNode node = null;
     private boolean dirty = false;
-    private NBTTagCompound dirtyCompound = new NBTTagCompound();
+    private CompoundTag dirtyCompound = new CompoundTag();
     private UIEntity mainButton;
 
     public GuiSignalBox(final SignalBoxTileEntity box) {
@@ -70,8 +68,8 @@ public class GuiSignalBox extends GuiBase {
         this.container = new ContainerSignalBox(this::update);
         Minecraft.getMinecraft().player.openContainer = this.container;
         initializeBasicUI();
-        if (this.box.getTag() != null)
-            this.compound = this.box.getTag();
+        if (this.box.get() != null)
+            this.compound = this.box.get();
         this.entity.read(this.compound);
     }
 
@@ -80,10 +78,10 @@ public class GuiSignalBox extends GuiBase {
         super.initGui();
     }
 
-    private void update(final NBTTagCompound compound) {
+    private void update(final CompoundTag compound) {
         this.resetTileSelection();
         if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
-            final String error = I18n.format(compound.getString(SignalBoxTileEntity.ERROR_STRING));
+            final String error = I18n.get(compound.getString(SignalBoxTileEntity.ERROR_STRING));
             final UIToolTip tooltip = new UIToolTip(error);
             entity.add(tooltip);
             new Thread(() -> {
@@ -147,15 +145,15 @@ public class GuiSignalBox extends GuiBase {
         final String customName = names == null ? null : names.get(signalPos);
         return String.format("%s (x=%d, y=%d. z=%d)",
                 customName == null
-                        ? (type.equals(LinkType.SIGNAL) ? "" : I18n.format("type." + type.name()))
+                        ? (type.equals(LinkType.SIGNAL) ? "" : I18n.get("type." + type.name()))
                         : customName,
                 signalPos.getX(), signalPos.getY(), signalPos.getZ());
     }
 
     private void setupModeSettings(final UIEntity parent, final EnumGuiMode mode,
             final Rotation rotation, final SignalBoxNode node, final PathOptionEntry option) {
-        final String modeName = I18n.format("property." + mode.name());
-        final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
+        final String modeName = I18n.get("property." + mode.name());
+        final String rotationName = I18n.get("property." + rotation.name() + ".rotation");
         final UIEntity entity = new UIEntity();
         entity.setInheritWidth(true);
         entity.setHeight(20);
@@ -176,8 +174,8 @@ public class GuiSignalBox extends GuiBase {
                 final UIEntity stateEntity = new UIEntity();
                 stateEntity.setInheritWidth(true);
                 stateEntity.setHeight(15);
-                final String pathUsageName = I18n.format("property.status") + ": ";
-                final String pathUsage = I18n.format("property." + path);
+                final String pathUsageName = I18n.get("property.status") + ": ";
+                final String pathUsage = I18n.get("property." + path);
                 stateEntity.add(new UILabel(pathUsageName + pathUsage));
                 parent.add(stateEntity);
 
@@ -198,14 +196,14 @@ public class GuiSignalBox extends GuiBase {
                         ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
                         ".resetting");
-                parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
+                parent.add(GuiElements.createButton(I18n.get("button.reset"), e -> {
                     this.lowerEntity.clear();
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
                     initializeFieldUsage(mainButton);
-                    final NBTTagCompound compound = new NBTTagCompound();
-                    final NBTTagCompound wayComp = new NBTTagCompound();
+                    final CompoundTag compound = new CompoundTag();
+                    final CompoundTag wayComp = new CompoundTag();
                     toNBT(wayComp, POINT1, node.getPoint());
-                    compound.setTag(RESET_WAY, wayComp);
+                    compound.put(RESET_WAY, wayComp);
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
                 }));
             }
@@ -252,11 +250,11 @@ public class GuiSignalBox extends GuiBase {
                     this.resetTileSelection();
                     return;
                 }
-                final NBTTagCompound comp = new NBTTagCompound();
-                final NBTTagCompound way = new NBTTagCompound();
+                final CompoundTag comp = new CompoundTag();
+                final CompoundTag way = new CompoundTag();
                 toNBT(way, POINT1, lastTile.getNode().getPoint());
                 toNBT(way, POINT2, currentNode.getPoint());
-                comp.setTag(SignalBoxUtil.REQUEST_WAY, way);
+                comp.put(SignalBoxUtil.REQUEST_WAY, way);
                 GuiSyncNetwork.sendToPosServer(comp, box.getPos());
                 lastTile = null;
             }
@@ -322,13 +320,13 @@ public class GuiSignalBox extends GuiBase {
             icon.add(new UITexture(UISignalBoxTile.ICON, 0.25 * id, 0.5, 0.25 * id + 0.25, 1));
             icon.setHeight(20);
             icon.setWidth(20);
-            icon.add(new UIToolTip(I18n.format("type." + t.name())));
+            icon.add(new UIToolTip(I18n.get("type." + t.name())));
             layout.add(icon);
 
             layout.add(GuiElements.createButton(name));
             layout.add(GuiElements.createButton("x", 20, e -> {
-                final NBTTagCompound resetPos = new NBTTagCompound();
-                resetPos.setTag(SignalBoxTileEntity.REMOVE_SIGNAL, NBTUtil.createPosTag(p));
+                final CompoundTag resetPos = new CompoundTag();
+                resetPos.put(SignalBoxTileEntity.REMOVE_SIGNAL, NBTUtil.createPosTag(p));
                 GuiSyncNetwork.sendToPosServer(resetPos, this.box.getPos());
                 list.remove(layout);
             }));
@@ -412,7 +410,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void initializeBasicUI() {
-        final String name = I18n.format("tile.signalbox.name");
+        final String name = I18n.get("tile.signalbox.name");
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);
@@ -429,10 +427,10 @@ public class GuiSignalBox extends GuiBase {
         header.add(new UIBox(UIBox.HBOX, 4));
         header.add(titel);
         header.add(GuiElements.createSpacerH(80));
-        header.add(GuiElements.createButton(I18n.format("btn.settings"),
+        header.add(GuiElements.createButton(I18n.get("btn.settings"),
                 this::initializePageSettings));
-        header.add(GuiElements.createButton(I18n.format("btn.edit"), this::initializeFieldEdit));
-        mainButton = GuiElements.createButton(I18n.format("btn.main"), this::initializeFieldUsage);
+        header.add(GuiElements.createButton(I18n.get("btn.edit"), this::initializeFieldEdit));
+        mainButton = GuiElements.createButton(I18n.get("btn.main"), this::initializeFieldUsage);
         header.add(mainButton);
         resetSelection(mainButton);
 
@@ -465,7 +463,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void reset() {
         if (page.equals(Page.EDIT)) {
-            compound = new NBTTagCompound();
+            compound = new CompoundTag();
         }
         if (!page.equals(Page.SETTINGS)) {
             this.entity.write(compound);

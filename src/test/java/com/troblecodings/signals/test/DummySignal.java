@@ -9,10 +9,10 @@ import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
 public class DummySignal extends SignalTileEnity {
 
-    private final HashMap<SEProperty<?>, Object> seproperty = new HashMap<>();
+    private final HashMap<SEProperty, Object> seproperty = new HashMap<>();
 
     @Override
-    public Optional<?> getProperty(final SEProperty<?> prop) {
+    public Optional<?> getProperty(final SEProperty prop) {
         if (seproperty.containsKey(prop))
             return Optional.of(seproperty.get(prop));
         return Optional.empty();

@@ -6,8 +6,7 @@ import java.util.function.Predicate;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.enums.CompareValues;
 
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.client.model.data.IModelData;
 
 @SuppressWarnings({
         "rawtypes", "unchecked"
@@ -17,19 +16,19 @@ public final class PredicateHolder {
     private PredicateHolder() {
     }
 
-    public static Predicate<IExtendedBlockState> has(final IUnlistedProperty property) {
+    public static Predicate<IModelData> has(final SEProperty property) {
         return ebs -> ebs.getValue(property) != null;
     }
 
-    public static Predicate<IExtendedBlockState> hasNot(final IUnlistedProperty property) {
+    public static Predicate<IModelData> hasNot(final SEProperty property) {
         return ebs -> ebs.getValue(property) == null;
     }
 
-    public static Predicate<IExtendedBlockState> with(final ValuePack pack) {
+    public static Predicate<IModelData> with(final ValuePack pack) {
         return with(pack.property, pack.predicate);
     }
 
-    public static Predicate<IExtendedBlockState> with(final IUnlistedProperty property,
+    public static Predicate<IModelData> with(final SEProperty property,
             final Predicate t) {
         return bs -> {
             final Object test = bs.getValue(property);
@@ -37,32 +36,32 @@ public final class PredicateHolder {
         };
     }
 
-    public static Predicate<IExtendedBlockState> hasAndIs(
-            final IUnlistedProperty<Boolean> property) {
+    public static Predicate<IModelData> hasAndIs(
+            final SEProperty<Boolean> property) {
         return ebs -> {
             final Boolean bool = ebs.getValue(property);
             return bool != null && bool.booleanValue();
         };
     }
 
-    public static Predicate<IExtendedBlockState> hasAndIsNot(
-            final IUnlistedProperty<Boolean> property) {
+    public static Predicate<IModelData> hasAndIsNot(
+            final SEProperty<Boolean> property) {
         return ebs -> {
             final Boolean bool = ebs.getValue(property);
             return bool != null && !bool.booleanValue();
         };
     }
 
-    public static Predicate<Map<SEProperty<?>, Object>> check(final ValuePack pack) {
+    public static Predicate<Map<SEProperty, Object>> check(final ValuePack pack) {
         return check(pack.property, pack.predicate);
     }
 
-    public static Predicate<Map<SEProperty<?>, Object>> check(final IUnlistedProperty property,
+    public static Predicate<Map<SEProperty, Object>> check(final SEProperty property,
             final Object type) {
         return check(property, type::equals);
     }
 
-    public static Predicate<Map<SEProperty<?>, Object>> check(final IUnlistedProperty property,
+    public static Predicate<Map<SEProperty, Object>> check(final SEProperty property,
             final Predicate type) {
         return t -> {
             final Object value = t.get(property);
@@ -72,7 +71,7 @@ public final class PredicateHolder {
         };
     }
 
-    public static Predicate<Map<SEProperty<?>, Object>> config(final ValuePack pack) {
+    public static Predicate<Map<SEProperty, Object>> config(final ValuePack pack) {
         return t -> {
             final Object value = t.get(pack.property);
             if (value == null)

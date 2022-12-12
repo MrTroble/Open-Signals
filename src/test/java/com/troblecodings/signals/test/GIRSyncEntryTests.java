@@ -40,10 +40,8 @@ import com.troblecodings.signals.signalbox.entrys.IntegerEntry;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import scala.util.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 
 public class GIRSyncEntryTests {
 
@@ -60,7 +58,7 @@ public class GIRSyncEntryTests {
     }
 
     public static void testISavable(final ISaveable toSave, final Supplier<ISaveable> getter) {
-        final NBTTagCompound compound = new NBTTagCompound();
+        final CompoundTag compound = new CompoundTag();
         toSave.write(compound);
         final AtomicReference<ISaveable> fresh = new AtomicReference<>();
         assertTimeoutPreemptively(Duration.ofSeconds(1), () -> {
@@ -76,7 +74,7 @@ public class GIRSyncEntryTests {
     public static void testReadWriteSingle(final PathEntryType<?> entry, final Object value) {
         final IPathEntry<Object> pathEntry = (IPathEntry<Object>) entry.newValue();
         pathEntry.setValue(value);
-        final NBTTagCompound compound = new NBTTagCompound();
+        final CompoundTag compound = new CompoundTag();
         pathEntry.write(compound);
         final IPathEntry<Object> pathEntry2 = (IPathEntry<Object>) entry.newValue();
         pathEntry2.read(compound);
@@ -287,7 +285,7 @@ public class GIRSyncEntryTests {
             final Supplier<T> supplier, final Consumer<T> consumer) {
         final AtomicReference<T> atomic = new AtomicReference<>();
         testISavable(savable, () -> atomic.updateAndGet(old -> supplier.get()));
-        final NBTTagCompound network1 = new NBTTagCompound();
+        final CompoundTag network1 = new CompoundTag();
         savable.writeEntryNetwork(network1, false);
         final T test = atomic.get();
         assertEquals(savable, test);
@@ -298,7 +296,7 @@ public class GIRSyncEntryTests {
                 consumer.accept(savable);
             } while (savable.equals(test));
         });
-        final NBTTagCompound network2 = new NBTTagCompound();
+        final CompoundTag network2 = new CompoundTag();
         savable.writeEntryNetwork(network2, false);
         test.readEntryNetwork(network2);
         assertEquals(savable, test);
@@ -393,7 +391,7 @@ public class GIRSyncEntryTests {
 
         final SignalBoxPathway pathwayCopy = new SignalBoxPathway(map);
         testISavable(pathway, () -> pathwayCopy);
-        final NBTTagCompound testCompound = new NBTTagCompound();
+        final CompoundTag testCompound = new CompoundTag();
         pathwayCopy.writeEntryNetwork(testCompound, false);
         assertEquals(pathway, pathwayCopy);
         pathwayCopy.readEntryNetwork(testCompound);
@@ -409,7 +407,7 @@ public class GIRSyncEntryTests {
         final Map<Point, SignalBoxNode> map2 = new HashMap<>();
         map.forEach((p, n) -> {
             final SignalBoxNode node = new SignalBoxNode(new Point(p));
-            final NBTTagCompound comp = new NBTTagCompound();
+            final CompoundTag comp = new CompoundTag();
             n.write(comp);
             node.read(comp);
             map2.put(node.getPoint(), node);
@@ -428,7 +426,7 @@ public class GIRSyncEntryTests {
         });
         final Map<Point, SignalBoxNode> map = generateMap(50, 50);
         consumer.accept(map);
-        final NBTTagCompound compound = new NBTTagCompound();
+        final CompoundTag compound = new CompoundTag();
         map.values().forEach(node -> node.writeEntryNetwork(compound, false));
         grid.readEntryNetwork(compound);
         assertFalse(grid.isEmpty());
@@ -439,7 +437,7 @@ public class GIRSyncEntryTests {
     public void testSignalBoxGrid() {
         final SignalBoxGrid grid = makeGrid(_u -> {
         });
-        final NBTTagCompound compound = new NBTTagCompound();
+        final CompoundTag compound = new CompoundTag();
         grid.write(compound);
         final SignalBoxGrid gridCopy = new SignalBoxGrid(_u -> {
         });
@@ -481,7 +479,7 @@ public class GIRSyncEntryTests {
         }), g -> g.getNodes().stream().findAny().ifPresent(node -> {
             final ArrayList<ModeSet> setRemove = Lists.newArrayList(node);
             setRemove.forEach(set -> node.remove(set));
-            final NBTTagCompound network = new NBTTagCompound();
+            final CompoundTag network = new CompoundTag();
             g.writeEntryNetwork(network, false);
             assertFalse(g.getNodes().contains(node));
         }));

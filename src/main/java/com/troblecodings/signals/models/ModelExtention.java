@@ -1,7 +1,7 @@
 package com.troblecodings.signals.models;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 

@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.interfaces.UIAutoSync;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -11,10 +12,8 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Rotation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 
 public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 
@@ -71,12 +70,12 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
     }
 
     @Override
-    public void write(final NBTTagCompound compound) {
+    public void write(final CompoundTag compound) {
         this.node.writeEntryNetwork(compound, true);
     }
 
     @Override
-    public void read(final NBTTagCompound compound) {
+    public void read(final CompoundTag compound) {
         this.node.readEntryNetwork(compound);
     }
 

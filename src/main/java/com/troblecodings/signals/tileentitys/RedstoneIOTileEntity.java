@@ -7,17 +7,16 @@ import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldNameable;
-import net.minecraft.world.World;
+import net.minecraft.world.ILevelNameable;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity
-        implements IWorldNameable, IChunkloadable, ISyncable, Iterable<BlockPos> {
+        implements ILevelNameable, IChunkloadable, ISyncable, Iterable<BlockPos> {
 
     public static final String NAME_NBT = "name";
     public static final String LINKED_LIST = "linkedList";
@@ -33,23 +32,23 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
-        final NBTTagList list = new NBTTagList();
-        linkedPositions.forEach(pos -> list.appendTag(NBTUtil.createPosTag(pos)));
-        compound.setTag(LINKED_LIST, list);
+    public CompoundTag writeToNBT(final CompoundTag compound) {
+        final ListTag list = new ListTag();
+        linkedPositions.forEach(pos -> list.add(NBTUtil.createPosTag(pos)));
+        compound.put(LINKED_LIST, list);
         if (this.name != null)
             compound.setString(NAME_NBT, this.name);
         return super.writeToNBT(compound);
     }
 
     @Override
-    public void readFromNBT(final NBTTagCompound compound) {
+    public void readFromNBT(final CompoundTag compound) {
         super.readFromNBT(compound);
         linkedPositions.clear();
-        final NBTTagList list = (NBTTagList) compound.getTag(LINKED_LIST);
+        final ListTag list = (ListTag) compound.get(LINKED_LIST);
         if (list == null)
             return;
-        list.forEach(nbt -> linkedPositions.add(NBTUtil.getPosFromTag((NBTTagCompound) nbt)));
+        list.forEach(nbt -> linkedPositions.add(NBTUtil.getPosFromTag((CompoundTag) nbt)));
         if (compound.hasKey(NAME_NBT))
             this.name = compound.getString(NAME_NBT);
     }
@@ -84,13 +83,13 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean shouldRefresh(final World world, final BlockPos pos, final IBlockState oldState,
-            final IBlockState newSate) {
+    public boolean shouldRefresh(final Level world, final BlockPos pos, final BlockState oldState,
+            final BlockState newSate) {
         return false;
     }
 
     @Override
-    public void updateTag(final NBTTagCompound compound) {
+    public void updateTag(final CompoundTag compound) {
         if (compound.hasKey(NAME_NBT)) {
             this.name = compound.getString(NAME_NBT);
             this.syncClient();
@@ -98,8 +97,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public NBTTagCompound getTag() {
-        return writeToNBT(new NBTTagCompound());
+    public CompoundTag getTag() {
+        return writeToNBT(new CompoundTag());
     }
 
     @Override
@@ -108,7 +107,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean isValid(final EntityPlayer player) {
+    public boolean isValid(final Player player) {
         return true;
     }
 }

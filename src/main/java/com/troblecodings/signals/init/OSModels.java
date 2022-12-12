@@ -2,13 +2,12 @@ package com.troblecodings.signals.init;
 
 import com.troblecodings.signals.blocks.Signal;
 
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.client.renderer.color.BlockColors;
-import net.minecraft.item.Item;
+import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class OSModels {
 

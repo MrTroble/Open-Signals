@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.awt.Container;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -10,14 +11,13 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.Container;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.entity.player.PlayerMP;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IWorldNameable;
+import net.minecraft.world.ILevelNameable;
+import net.minecraft.world.entity.player.Player;
 
 public class ContainerSignalBox extends Container implements UIClientSync {
 
@@ -28,16 +28,16 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
-    private EntityPlayerMP player;
+    private PlayerMP player;
     private SignalBoxTileEntity tile;
-    private Consumer<NBTTagCompound> run;
+    private Consumer<CompoundTag> run;
     private boolean send = true;
 
     public ContainerSignalBox(final SignalBoxTileEntity tile) {
         this.tile = tile;
     }
 
-    public ContainerSignalBox(final Consumer<NBTTagCompound> run) {
+    public ContainerSignalBox(final Consumer<CompoundTag> run) {
         this.run = run;
         // GuiSyncNetwork.requestRemaining(this);
     }
@@ -46,46 +46,46 @@ public class ContainerSignalBox extends Container implements UIClientSync {
     public void detectAndSendChanges() {
         if (this.player != null && send) {
             send = false;
-            final NBTTagCompound compound = new NBTTagCompound();
-            final NBTTagList typeList = new NBTTagList();
+            final CompoundTag compound = new CompoundTag();
+            final ListTag typeList = new ListTag();
             this.tile.getPositions().keySet().forEach(pos -> {
-                final NBTTagCompound entry = new NBTTagCompound();
-                entry.setTag(POS_ID, NBTUtil.createPosTag(pos));
-                tile.loadChunkAndGetTile(IWorldNameable.class, tile.getWorld(), pos,
+                final CompoundTag entry = new CompoundTag();
+                entry.put(POS_ID, NBTUtil.createPosTag(pos));
+                tile.loadChunkAndGetTile(ILevelNameable.class, tile.getLevel(), pos,
                         (sig, _u) -> entry.setString(SIGNAL_NAME, sig.getName()));
                 final Signal signal = tile.getSignal(pos);
                 if (signal != null) {
-                    entry.setInteger(SIGNAL_ID, signal.getID());
+                    entry.putInt(SIGNAL_ID, signal.getID());
                 }
-                typeList.appendTag(entry);
+                typeList.add(entry);
             });
-            compound.setTag(UPDATE_SET, typeList);
+            compound.put(UPDATE_SET, typeList);
             GuiSyncNetwork.sendToClient(compound, getPlayer());
         }
     }
 
     @Override
-    public boolean canInteractWith(final EntityPlayer playerIn) {
+    public boolean canInteractWith(final Player playerIn) {
         if (tile.isBlocked() && !tile.isValid(playerIn))
             return false;
-        if (playerIn instanceof EntityPlayerMP && this.player == null) {
-            this.player = (EntityPlayerMP) playerIn;
+        if (playerIn instanceof PlayerMP && this.player == null) {
+            this.player = (PlayerMP) playerIn;
             this.tile.add(this);
         }
         return true;
     }
 
     @Override
-    public void readFromNBT(final NBTTagCompound compound) {
+    public void readFromNBT(final CompoundTag compound) {
         if (compound.hasKey(UPDATE_SET)) {
-            final NBTTagList update = (NBTTagList) compound.getTag(UPDATE_SET);
+            final ListTag update = (ListTag) compound.get(UPDATE_SET);
             final Builder<BlockPos, Signal> immutableMap = new Builder<>();
             final Builder<BlockPos, String> nameBuilder = new Builder<>();
             update.forEach(nbt -> {
-                final NBTTagCompound comp = (NBTTagCompound) nbt;
+                final CompoundTag comp = (CompoundTag) nbt;
                 final BlockPos pos = NBTUtil.getPosFromTag(comp.getCompoundTag(POS_ID));
                 if (compound.hasKey(SIGNAL_ID)) {
-                    final Signal signal = Signal.SIGNALLIST.get(compound.getInteger(SIGNAL_ID));
+                    final Signal signal = Signal.SIGNALLIST.get(compound.getInt(SIGNAL_ID));
                     immutableMap.put(pos, signal);
                 }
                 nameBuilder.put(pos, comp.getString(SIGNAL_NAME));
@@ -98,13 +98,13 @@ public class ContainerSignalBox extends Container implements UIClientSync {
     }
 
     @Override
-    public void onContainerClosed(final EntityPlayer playerIn) {
+    public void onContainerClosed(final Player playerIn) {
         if (this.tile != null)
             this.tile.remove(this);
     }
 
     @Override
-    public EntityPlayerMP getPlayer() {
+    public PlayerMP getPlayer() {
         return this.player;
     }
 

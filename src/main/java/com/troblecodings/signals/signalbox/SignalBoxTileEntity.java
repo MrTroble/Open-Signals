@@ -21,15 +21,13 @@ import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalBoxTileEntity extends SyncableTileEntity
         implements ISyncable, IChunkloadable, ILinkableTile {
@@ -52,41 +50,41 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     private WorldOperations worldLoadOps = new WorldOperations();
 
     @Override
-    public void setWorld(final World worldIn) {
-        super.setWorld(worldIn);
-        worldLoadOps = SignalBoxFactory.getFactory().getWorldOperations(worldIn);
-        grid.setWorld(worldIn);
+    public void setLevel(final Level worldIn) {
+        super.setLevel(worldIn);
+        worldLoadOps = SignalBoxFactory.getFactory().getLevelOperations(worldIn);
+        grid.setLevel(worldIn);
     }
 
     @Override
-    public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
-        final NBTTagList list = new NBTTagList();
+    public CompoundTag writeToNBT(final CompoundTag compound) {
+        final ListTag list = new ListTag();
         linkedBlocks.forEach((p, t) -> {
-            final NBTTagCompound item = NBTUtil.createPosTag(p);
+            final CompoundTag item = NBTUtil.createPosTag(p);
             item.setString(LINK_TYPE, t.name());
-            list.appendTag(item);
+            list.add(item);
         });
-        compound.setTag(LINKED_POS_LIST, list);
-        final NBTTagCompound gridTag = new NBTTagCompound();
+        compound.put(LINKED_POS_LIST, list);
+        final CompoundTag gridTag = new CompoundTag();
         this.grid.write(gridTag);
-        compound.setTag(GUI_TAG, gridTag);
+        compound.put(GUI_TAG, gridTag);
         return super.writeToNBT(compound);
     }
 
     @Override
-    public void readFromNBT(final NBTTagCompound compound) {
+    public void readFromNBT(final CompoundTag compound) {
         super.readFromNBT(compound);
-        final NBTTagList list = (NBTTagList) compound.getTag(LINKED_POS_LIST);
+        final ListTag list = (ListTag) compound.get(LINKED_POS_LIST);
         if (list != null) {
             linkedBlocks.clear();
             list.forEach(pos -> {
-                final NBTTagCompound item = (NBTTagCompound) pos;
+                final CompoundTag item = (CompoundTag) pos;
                 if (item.hasKey(LINK_TYPE))
                     linkedBlocks.put(NBTUtil.getPosFromTag(item),
                             LinkType.valueOf(item.getString(LINK_TYPE)));
             });
         }
-        final NBTTagCompound gridComp = compound.getCompoundTag(GUI_TAG);
+        final CompoundTag gridComp = compound.getCompoundTag(GUI_TAG);
         grid.read(gridComp);
         if (world != null) {
             onLoad();
@@ -94,12 +92,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void updateTag(final NBTTagCompound compound) {
+    public void updateTag(final CompoundTag compound) {
         this.markDirty();
         if (compound == null)
             return;
         if (compound.hasKey(REMOVE_SIGNAL)) {
-            final NBTTagCompound request = (NBTTagCompound) compound.getTag(REMOVE_SIGNAL);
+            final CompoundTag request = (CompoundTag) compound.get(REMOVE_SIGNAL);
             final BlockPos p1 = NBTUtil.getPosFromTag(request);
             if (signals.containsKey(p1)) {
                 signals.remove(p1);
@@ -110,18 +108,18 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             return;
         }
         if (compound.hasKey(RESET_WAY)) {
-            final NBTTagCompound request = (NBTTagCompound) compound.getTag(RESET_WAY);
+            final CompoundTag request = (CompoundTag) compound.get(RESET_WAY);
             final Point p1 = fromNBT(request, POINT1);
             grid.resetPathway(p1);
             this.syncClient();
             return;
         }
         if (compound.hasKey(REQUEST_WAY)) {
-            final NBTTagCompound request = (NBTTagCompound) compound.getTag(REQUEST_WAY);
+            final CompoundTag request = (CompoundTag) compound.get(REQUEST_WAY);
             final Point p1 = fromNBT(request, POINT1);
             final Point p2 = fromNBT(request, POINT2);
             if (!grid.requestWay(p1, p2)) {
-                final NBTTagCompound error = new NBTTagCompound();
+                final CompoundTag error = new CompoundTag();
                 error.setString(ERROR_STRING, "error.nopathfound");
                 sendToAll(error);
             } else {
@@ -134,8 +132,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public NBTTagCompound getTag() {
-        final NBTTagCompound gridComp = new NBTTagCompound();
+    public CompoundTag getTag() {
+        final CompoundTag gridComp = new CompoundTag();
         this.grid.writeEntryNetwork(gridComp, true);
         return gridComp;
     }
@@ -149,7 +147,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     public boolean link(final BlockPos linkedPos) {
         if (linkedBlocks.containsKey(linkedPos))
             return false;
-        final IBlockState state = world.getBlockState(linkedPos);
+        final BlockState state = world.getBlockState(linkedPos);
         final Block block = state.getBlock();
         LinkType type = LinkType.SIGNAL;
         if (block == OSBlocks.REDSTONE_IN) {
@@ -222,7 +220,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean isValid(final EntityPlayer player) {
+    public boolean isValid(final Player player) {
         if (clientSyncs.isEmpty())
             return false;
         return this.clientSyncs.get(0).getPlayer().equals(player);

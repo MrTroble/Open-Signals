@@ -5,9 +5,9 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
-import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
 import com.troblecodings.signals.contentpacks.ChangeConfigParser;
 import com.troblecodings.signals.contentpacks.DefaultConfigParser;
+import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.init.OSBlocks;
@@ -18,13 +18,11 @@ import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class CommonProxy {
 
-    public void preinit(final FMLPreInitializationEvent event) {
+    public void preinit(final FMLCommonSetupEvent event) {
         OpenSignalsMain.handler = UIInit.initCommon(OpenSignalsMain.MODID, OpenSignalsMain.log,
                 OpenSignalsMain.isDebug());
         OpenSignalsMain.handler.addServer(Placementtool.class, (p, w, bp) -> null);
@@ -48,12 +46,5 @@ public class CommonProxy {
         MinecraftForge.EVENT_BUS.register(OSSounds.class);
     }
 
-    public void init(final FMLInitializationEvent event) {
-
-    }
-
-    public void postinit(final FMLPostInitializationEvent event) {
-
-    }
 
 }

@@ -13,10 +13,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
 
-import net.minecraft.block.properties.IProperty;
-import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.client.model.data.ModelProperty;
 
-public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
+public class JsonEnum extends ModelProperty<String> {
 
     private final String name;
     private final List<String> values;
@@ -28,27 +27,22 @@ public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
         this.valueSet = ImmutableSet.copyOf(values);
     }
 
-    @Override
     public String getName() {
         return name;
     }
 
-    @Override
     public boolean isValid(final String value) {
         return valueSet.contains(value);
     }
 
-    @Override
     public Class<String> getType() {
         return String.class;
     }
 
-    @Override
     public String valueToString(final String value) {
         return value;
     }
 
-    @Override
     public Collection<String> getAllowedValues() {
         if (values != null) {
             return values;
@@ -74,19 +68,16 @@ public class JsonEnum implements IUnlistedProperty<String>, IProperty<String> {
                 && Objects.equals(values, other.values);
     }
 
-    @Override
     public Class<String> getValueClass() {
         return getType();
     }
 
-    @Override
     public Optional<String> parseValue(final String value) {
         if (isValid(value))
             return Optional.of(value);
         return Optional.absent();
     }
 
-    @Override
     public String getName(final String value) {
         return value;
     }

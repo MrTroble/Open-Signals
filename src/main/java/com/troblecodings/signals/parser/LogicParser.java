@@ -4,13 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.parser.interm.EvaluationLevel;
 import com.troblecodings.signals.parser.interm.IntermidiateNode;
 import com.troblecodings.signals.parser.interm.LogicalSymbols;
 
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.common.property.IUnlistedProperty;
-import scala.actors.threadpool.Arrays;
+import net.minecraftforge.client.model.data.IModelData;
 
 @SuppressWarnings({
         "rawtypes", "unchecked"
@@ -24,23 +23,23 @@ public final class LogicParser {
     }
 
     static {
-        TRANSLATION_TABLE.put("with", new MethodInfo(IExtendedBlockState.class, "with",
+        TRANSLATION_TABLE.put("with", new MethodInfo(IModelData.class, "with",
                 objects -> PredicateHolder.with((ValuePack) objects[0]), ValuePack.class));
 
         TRANSLATION_TABLE.put("has",
-                new MethodInfo(IExtendedBlockState.class, "has",
-                        objects -> PredicateHolder.has((IUnlistedProperty) objects[0]),
-                        IUnlistedProperty.class));
+                new MethodInfo(IModelData.class, "has",
+                        objects -> PredicateHolder.has((SEProperty) objects[0]),
+                        SEProperty.class));
 
         TRANSLATION_TABLE.put("hasandis",
-                new MethodInfo(IExtendedBlockState.class, "hasandis",
-                        objects -> PredicateHolder.hasAndIs((IUnlistedProperty) objects[0]),
-                        IUnlistedProperty.class));
+                new MethodInfo(IModelData.class, "hasandis",
+                        objects -> PredicateHolder.hasAndIs((SEProperty) objects[0]),
+                        SEProperty.class));
 
         TRANSLATION_TABLE.put("hasandisnot",
-                new MethodInfo(IExtendedBlockState.class, "hasandisnot",
-                        objects -> PredicateHolder.hasAndIsNot((IUnlistedProperty) objects[0]),
-                        IUnlistedProperty.class));
+                new MethodInfo(IModelData.class, "hasandisnot",
+                        objects -> PredicateHolder.hasAndIsNot((SEProperty) objects[0]),
+                        SEProperty.class));
 
         TRANSLATION_TABLE.put("check", new MethodInfo(Map.class, "check",
                 objects -> PredicateHolder.check((ValuePack) objects[0]), ValuePack.class));

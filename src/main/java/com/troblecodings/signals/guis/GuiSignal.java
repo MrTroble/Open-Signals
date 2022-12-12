@@ -9,8 +9,8 @@ import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.nbt.CompoundTag;
 
 public class GuiSignal extends GuiBase {
 
@@ -56,7 +56,7 @@ public class GuiSignal extends GuiBase {
         textfield.add(input);
 
         hbox.add(textfield);
-        final UIEntity apply = GuiElements.createButton(I18n.format("btn.apply"),
+        final UIEntity apply = GuiElements.createButton(I18n.get("btn.apply"),
                 _u -> this.updateText(input.getText()));
         apply.setInheritWidth(false);
         apply.setWidth(60);
@@ -66,7 +66,7 @@ public class GuiSignal extends GuiBase {
     }
 
     private void updateText(final String input) {
-        final NBTTagCompound compound = new NBTTagCompound();
+        final CompoundTag compound = new CompoundTag();
         this.entity.write(compound);
         GuiSyncNetwork.sendToPosServer(compound, tile.getPos());
         labelComp.setText(input);

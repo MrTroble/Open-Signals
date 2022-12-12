@@ -1,17 +1,17 @@
 package com.troblecodings.signals.init;
 
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 
 public final class OSTabs {
 
     private OSTabs() {
     }
 
-    public static final CreativeTabs TAB = new CreativeTabs("Open Signals") {
+    public static final CreativeModeTab TAB = new CreativeModeTab("Open Signals") {
 
         @Override
-        public ItemStack getTabIconItem() {
+        public ItemStack makeIcon() {
             return new ItemStack(OSItems.PLACEMENT_TOOL);
         }
     };

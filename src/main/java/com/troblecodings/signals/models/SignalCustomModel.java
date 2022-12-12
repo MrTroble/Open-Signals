@@ -10,13 +10,13 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.vecmath.AxisAngle4f;
-import javax.vecmath.Matrix4f;
-import javax.vecmath.Vector3f;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
-import com.mojang.realmsclient.util.Pair;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Matrix4f;
+import com.mojang.math.Vector3f;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal.SignalAngel;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
@@ -26,24 +26,23 @@ import com.troblecodings.signals.parser.LogicalParserException;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
-import net.minecraft.client.renderer.block.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.model.SimpleBakedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Direction;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class SignalCustomModel implements IModel {
 
-    private final HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
+    private final HashMap<Predicate<IModelData>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
     private List<ResourceLocation> textures = new ArrayList<>();
     private IBakedModel cachedModel = null;
     private SignalAngel angel = SignalAngel.ANGEL0;
@@ -72,7 +71,7 @@ public class SignalCustomModel implements IModel {
     private BakedQuad transform(final BakedQuad quad) {
         final int[] data = quad.getVertexData();
         final VertexFormat format = quad.getFormat();
-        for (int i = 0; i < data.length - 3; i += format.getIntegerSize()) {
+        for (int i = 0; i < data.length - 3; i += format.getIntSize()) {
             final Vector3f vector = new Vector3f(Float.intBitsToFloat(data[i]) - 0.5f,
                     Float.intBitsToFloat(data[i + 1]), Float.intBitsToFloat(data[i + 2]) - 0.5f);
             final Vector3f out = multiply(vector, rotation);
@@ -90,9 +89,9 @@ public class SignalCustomModel implements IModel {
         for (final BakedQuad quad : model.getQuads(null, null, 0)) {
             outgoing.add(transform(quad));
         }
-        final com.google.common.collect.ImmutableMap.Builder<EnumFacing, List<BakedQuad>> faceOutgoing = ImmutableMap
+        final com.google.common.collect.ImmutableMap.Builder<Direction, List<BakedQuad>> faceOutgoing = ImmutableMap
                 .builder();
-        for (final EnumFacing face : EnumFacing.VALUES) {
+        for (final Direction face : Direction.VALUES) {
             final com.google.common.collect.ImmutableList.Builder<BakedQuad> current = ImmutableList
                     .builder();
             for (final BakedQuad quad : model.getQuads(null, face, 0)) {
@@ -114,7 +113,7 @@ public class SignalCustomModel implements IModel {
                 final IModel model = m.first();
                 final Vector3f f = m.second();
                 final TRSRTransformation baseState = new TRSRTransformation(f, null, null, null);
-                build.putModel(blockstate -> pr.test((IExtendedBlockState) blockstate),
+                build.putModel(blockstate -> pr.test((IModelData) blockstate),
                         transform(model.bake(baseState, format, bakedTextureGetter)));
             });
             return cachedModel = build.makeMultipartModel();
@@ -132,7 +131,7 @@ public class SignalCustomModel implements IModel {
         return textures;
     }
 
-    protected void register(final String name, final Predicate<IExtendedBlockState> state,
+    protected void register(final String name, final Predicate<IModelData> state,
             final float x, final float y, final float z, final Map<String, String> map) {
 
         IModel m = ModelLoaderRegistry.getModelOrLogError(

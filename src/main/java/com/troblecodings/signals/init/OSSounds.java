@@ -6,10 +6,9 @@ import java.util.Map;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.utils.FileReader;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public final class OSSounds {

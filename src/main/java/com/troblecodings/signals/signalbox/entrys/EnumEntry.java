@@ -4,7 +4,7 @@ import java.util.function.IntConsumer;
 
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
         implements IIntegerable<T>, IntConsumer {
@@ -20,7 +20,7 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
      * {@inheritDoc}
      */
     @Override
-    public void write(final NBTTagCompound tag) {
+    public void write(final CompoundTag tag) {
         tag.setString(getName(), this.enumValue.name());
     }
 
@@ -28,7 +28,7 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
      * {@inheritDoc}
      */
     @Override
-    public void read(final NBTTagCompound tag) {
+    public void read(final CompoundTag tag) {
         this.enumValue = Enum.valueOf(this.enumClass, tag.getString(getName()));
     }
 

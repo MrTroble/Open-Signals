@@ -1,8 +1,8 @@
 package com.troblecodings.signals.signalbox.entrys;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.util.math.BlockPos;
 
 public final class BlockposEntry extends IPathEntry<BlockPos> {
 
@@ -12,16 +12,16 @@ public final class BlockposEntry extends IPathEntry<BlockPos> {
      * {@inheritDoc}
      */
     @Override
-    public void write(final NBTTagCompound tag) {
-        tag.setTag(this.getName(), NBTUtil.createPosTag(position));
+    public void write(final CompoundTag tag) {
+        tag.put(this.getName(), NBTUtil.createPosTag(position));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public void read(final NBTTagCompound tag) {
-        final NBTTagCompound compound = (NBTTagCompound) tag.getTag(getName());
+    public void read(final CompoundTag tag) {
+        final CompoundTag compound = (CompoundTag) tag.get(getName());
         if (compound != null)
             this.position = NBTUtil.getPosFromTag(compound);
     }

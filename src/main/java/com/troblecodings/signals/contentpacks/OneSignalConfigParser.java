@@ -38,7 +38,6 @@ public class OneSignalConfigParser {
         loadResetConfigs("/assets/girsignals/signalconfigs/reset");
     }
 
-    @SuppressWarnings("rawtypes")
     public static void loadShuntigConfigs(final String directory) {
         for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
                 .entrySet()) {
@@ -69,7 +68,6 @@ public class OneSignalConfigParser {
         }
     }
 
-    @SuppressWarnings("rawtypes")
     public static void loadResetConfigs(final String directory) {
         for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
                 .entrySet()) {

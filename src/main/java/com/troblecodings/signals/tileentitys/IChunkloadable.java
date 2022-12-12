@@ -3,20 +3,19 @@ package com.troblecodings.signals.tileentitys;
 import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ChunkProviderClient;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
 import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.level.block.state.BlockState;
 
 public interface IChunkloadable {
 
-    default <T> boolean loadChunkAndGetTile(final Class<T> clazz, final World world,
+    default <T> boolean loadChunkAndGetTile(final Class<T> clazz, final Level world,
             final BlockPos pos, final BiConsumer<T, Chunk> consumer) {
         if (pos == null)
             return false;
@@ -69,13 +68,13 @@ public interface IChunkloadable {
         return false;
     }
 
-    default boolean loadChunkAndGetBlock(final World world, final BlockPos pos,
-            final BiConsumer<IBlockState, Chunk> consumer) {
+    default boolean loadChunkAndGetBlock(final Level world, final BlockPos pos,
+            final BiConsumer<BlockState, Chunk> consumer) {
         if (pos == null)
             return false;
         try {
             final Callable<Boolean> call = () -> {
-                IBlockState entity = null;
+                BlockState entity = null;
                 Chunk chunk = world.getChunkFromBlockCoords(pos);
                 final boolean flag = !chunk.isLoaded();
                 if (flag) {

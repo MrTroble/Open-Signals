@@ -8,29 +8,28 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.utils.JsonEnum;
-
-import net.minecraftforge.common.property.IUnlistedProperty;
 
 @SuppressWarnings("rawtypes")
 public class FunctionParsingInfo {
 
     private static final HashMap<Class, Function<FunctionParsingInfo, Object>> PARAMETER_PARSER = new HashMap<>();
 
-    private final HashMap<String, IUnlistedProperty> propertyCache = new HashMap<>();
+    private final HashMap<String, SEProperty> propertyCache = new HashMap<>();
     private final HashMap<String, ValuePack> predicateCache = new HashMap<>();
     private final HashMap<String, StringInteger> strIntCache = new HashMap<>();
 
     static {
-        PARAMETER_PARSER.put(IUnlistedProperty.class, FunctionParsingInfo::getProperty);
+        PARAMETER_PARSER.put(SEProperty.class, FunctionParsingInfo::getProperty);
         PARAMETER_PARSER.put(ValuePack.class, FunctionParsingInfo::getPredicate);
         PARAMETER_PARSER.put(StringInteger.class, FunctionParsingInfo::getStringInt);
     }
 
     public String argument;
     public final String signalName;
-    public final List<IUnlistedProperty> properties;
+    public final List<SEProperty> properties;
     private Map<String, MethodInfo> translationTable;
 
     public FunctionParsingInfo(final Map<String, MethodInfo> translationTable,
@@ -45,7 +44,7 @@ public class FunctionParsingInfo {
     }
 
     public FunctionParsingInfo(final String signalSystem,
-            final List<IUnlistedProperty> properties) {
+            final List<SEProperty> properties) {
         this.argument = "";
         this.signalName = signalSystem;
         this.properties = properties;
@@ -67,13 +66,13 @@ public class FunctionParsingInfo {
 
     public Object getProperty(final String propertyName) {
         final String name = propertyName.toLowerCase();
-        final IUnlistedProperty property = propertyCache.computeIfAbsent(name, _u -> {
+        final SEProperty property = propertyCache.computeIfAbsent(name, _u -> {
             return properties.stream()
                     .filter(noneCache -> noneCache.getName().equalsIgnoreCase(name)).findAny()
                     .orElse(null);
         });
         if (property == null) {
-            final IUnlistedProperty backup = JsonEnum.PROPERTIES.get(name);
+            final SEProperty backup = JsonEnum.PROPERTIES.get(name);
             if (backup != null)
                 return backup;
             throw new LogicalParserException(
@@ -92,7 +91,7 @@ public class FunctionParsingInfo {
                         argument));
             final String nextInfo = argument;
             argument = parts[0];
-            final IUnlistedProperty property = (IUnlistedProperty) getProperty();
+            final SEProperty property = (SEProperty) getProperty();
             final Class clazz = property.getType();
             try {
                 final Method method = clazz.equals(String.class)

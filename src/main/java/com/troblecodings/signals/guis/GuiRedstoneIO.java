@@ -10,8 +10,8 @@ import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.nbt.CompoundTag;
 
 public class GuiRedstoneIO extends GuiBase {
 
@@ -57,7 +57,7 @@ public class GuiRedstoneIO extends GuiBase {
         input.setText(tile.getName());
         textField.add(input);
         hbox.add(textField);
-        final UIEntity apply = GuiElements.createButton(I18n.format("btn.apply"),
+        final UIEntity apply = GuiElements.createButton(I18n.get("btn.apply"),
                 _u -> this.updateText(input.getText()));
         apply.setInheritWidth(false);
         apply.setWidth(80);
@@ -65,7 +65,7 @@ public class GuiRedstoneIO extends GuiBase {
 
         inner.add(hbox);
 
-        inner.add(GuiElements.createLabel(I18n.format("label.linkedto")));
+        inner.add(GuiElements.createLabel(I18n.get("label.linkedto")));
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
         list.setInheritWidth(true);
@@ -79,7 +79,7 @@ public class GuiRedstoneIO extends GuiBase {
     }
 
     private void updateText(final String input) {
-        final NBTTagCompound compound = new NBTTagCompound();
+        final CompoundTag compound = new CompoundTag();
         this.entity.write(compound);
         GuiSyncNetwork.sendToPosServer(compound, tile.getPos());
         labelComp.setText(input);

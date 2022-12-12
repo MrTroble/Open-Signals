@@ -16,9 +16,9 @@ import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.Rotation;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.block.Rotation;
 
 public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
@@ -112,26 +112,26 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private static final String POINT_LIST = "pointList";
 
     @Override
-    public void write(final NBTTagCompound compound) {
-        final NBTTagList pointList = new NBTTagList();
+    public void write(final CompoundTag compound) {
+        final ListTag pointList = new ListTag();
         possibleModes.forEach((mode, option) -> {
-            final NBTTagCompound entry = new NBTTagCompound();
+            final CompoundTag entry = new CompoundTag();
             mode.write(entry);
             option.write(entry);
-            pointList.appendTag(entry);
+            pointList.add(entry);
         });
-        compound.setTag(POINT_LIST, pointList);
+        compound.put(POINT_LIST, pointList);
         this.point.write(compound);
     }
 
     @Override
-    public void read(final NBTTagCompound compound) {
-        final NBTTagList pointList = (NBTTagList) compound.getTag(POINT_LIST);
+    public void read(final CompoundTag compound) {
+        final ListTag pointList = (ListTag) compound.get(POINT_LIST);
         if (pointList == null)
             return;
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         pointList.forEach(e -> {
-            final NBTTagCompound tag = (NBTTagCompound) e;
+            final CompoundTag tag = (CompoundTag) e;
             final PathOptionEntry entry = factory.getEntry();
             entry.read(tag);
             possibleModes.put(new ModeSet(tag), entry);
@@ -228,32 +228,32 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     @Override
-    public void writeEntryNetwork(final NBTTagCompound tag, final boolean writeAll) {
+    public void writeEntryNetwork(final CompoundTag tag, final boolean writeAll) {
         if (this.isEmpty())
             return;
-        final NBTTagList pointList = new NBTTagList();
+        final ListTag pointList = new ListTag();
         this.possibleModes.forEach((modeset, option) -> {
-            final NBTTagCompound compound = new NBTTagCompound();
+            final CompoundTag compound = new CompoundTag();
             option.writeEntryNetwork(compound, writeAll);
             modeset.write(compound);
-            pointList.appendTag(compound);
+            pointList.add(compound);
         });
-        tag.setTag(this.identifier, pointList);
+        tag.put(this.identifier, pointList);
     }
 
     @Override
-    public void readEntryNetwork(final NBTTagCompound tag) {
-        final NBTTagList points = (NBTTagList) tag.getTag(this.identifier);
+    public void readEntryNetwork(final CompoundTag tag) {
+        final ListTag points = (ListTag) tag.get(this.identifier);
         if (points == null)
             return;
-        if (points.hasNoTags()) {
+        if (points.isEmpty()) {
             this.possibleModes.clear();
             return;
         }
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         final Set<ModeSet> modeSets = new HashSet<>();
         points.forEach(nbt -> {
-            final NBTTagCompound compound = (NBTTagCompound) nbt;
+            final CompoundTag compound = (CompoundTag) nbt;
             final ModeSet set = new ModeSet(compound);
             modeSets.add(set);
             final PathOptionEntry entry = this.possibleModes.computeIfAbsent(set,

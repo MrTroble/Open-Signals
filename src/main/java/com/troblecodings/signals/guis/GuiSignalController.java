@@ -32,18 +32,18 @@ import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
-import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.property.IExtendedBlockState;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Direction;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class GuiSignalController extends GuiBase {
 
     private final BlockPos pos;
@@ -59,7 +59,7 @@ public class GuiSignalController extends GuiBase {
         this.linkedPos = tile.getLinkedPosition();
         this.controller = new ContainerSignalController(this::init);
         Minecraft.getMinecraft().player.openContainer = this.controller;
-        this.compound = tile.getTag();
+        this.compound = tile.get();
         init();
     }
 
@@ -83,7 +83,7 @@ public class GuiSignalController extends GuiBase {
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    private void createPageForSide(final EnumFacing face, final UIEntity leftSide,
+    private void createPageForSide(final Direction face, final UIEntity leftSide,
             final UIBlockRender bRender) {
         final UIEntity middlePart = new UIEntity();
 
@@ -108,10 +108,10 @@ public class GuiSignalController extends GuiBase {
         final UIBox boxMode = new UIBox(UIBox.VBOX, 1);
         middlePart.add(boxMode);
 
-        final Map<SEProperty<?>, Object> map = this.controller.getReference();
+        final Map<SEProperty, Object> map = this.controller.getReference();
         if (map == null)
             return;
-        for (final SEProperty<?> entry : map.keySet()) {
+        for (final SEProperty entry : map.keySet()) {
             if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
                     || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
                     && entry.test(map)) {
@@ -159,11 +159,11 @@ public class GuiSignalController extends GuiBase {
         rightSide.add(new UIBox(UIBox.VBOX, 4));
 
         final Minecraft mc = Minecraft.getMinecraft();
-        final IBlockState state = mc.player.world.getBlockState(pos);
+        final BlockState state = mc.player.world.getBlockState(pos);
         final IBakedModel model = mc.getBlockRendererDispatcher().getModelForState(state);
-        final UIEnumerable toggle = new UIEnumerable(EnumFacing.VALUES.length, "singleModeFace");
+        final UIEnumerable toggle = new UIEnumerable(Direction.VALUES.length, "singleModeFace");
         toggle.setOnChange(e -> {
-            final EnumFacing faceing = EnumFacing.VALUES[e];
+            final Direction faceing = Direction.VALUES[e];
 
             final List<UIColor> colors = rightSide.findRecursive(UIColor.class);
             colors.forEach(c -> c.setColor(0x70000000));
@@ -175,7 +175,7 @@ public class GuiSignalController extends GuiBase {
         });
         rightSide.add(toggle);
 
-        for (final EnumFacing face : EnumFacing.VALUES) {
+        for (final Direction face : Direction.VALUES) {
             final List<BakedQuad> quad = model.getQuads(state, face, 0);
             final UIEntity faceEntity = new UIEntity();
             faceEntity.setWidth(20);
@@ -246,7 +246,7 @@ public class GuiSignalController extends GuiBase {
     }
 
     private UIEntity createPreview(final UIBlockRender blockRender) {
-        final UIToolTip tooltip = new UIToolTip(I18n.format("controller.preview", previewMode));
+        final UIToolTip tooltip = new UIToolTip(I18n.get("controller.preview", previewMode));
 
         final UIEntity rightSide = new UIEntity();
         rightSide.setWidth(60);
@@ -256,7 +256,7 @@ public class GuiSignalController extends GuiBase {
         rightSide.add(new UIClickable(e -> {
             previewMode = !previewMode;
             applyModelChange(blockRender);
-            tooltip.setDescripton(I18n.format("controller.preview", previewMode));
+            tooltip.setDescripton(I18n.get("controller.preview", previewMode));
         }, 1));
         rightSide.add(new UIDrag((x, y) -> rotation.setRotateY(rotation.getRotateY() + x)));
         rightSide.add(tooltip);
@@ -290,10 +290,10 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 
         holders.clear();
-        final Map<SEProperty<?>, Object> map = this.controller.getReference();
+        final Map<SEProperty, Object> map = this.controller.getReference();
         if (map == null)
             return;
-        for (final SEProperty<?> entry : map.keySet()) {
+        for (final SEProperty entry : map.keySet()) {
             if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
                     || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
                     && entry.test(map)) {
@@ -310,9 +310,9 @@ public class GuiSignalController extends GuiBase {
             "unchecked", "rawtypes"
     })
     private void applyModelChange(final UIBlockRender blockRender) {
-        IExtendedBlockState currentState = (IExtendedBlockState) this.controller.getSignal()
+        IModelData currentState = (IModelData) this.controller.getSignal()
                 .getDefaultState();
-        for (final Entry<SEProperty<?>, Object> e : controller.getReference().entrySet()) {
+        for (final Entry<SEProperty, Object> e : controller.getReference().entrySet()) {
             currentState = currentState.withProperty((SEProperty) e.getKey(), e.getValue());
         }
 

@@ -4,7 +4,7 @@ import java.util.function.IntConsumer;
 
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boolean>, IntConsumer {
 
@@ -14,7 +14,7 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
      * {@inheritDoc}
      */
     @Override
-    public void write(final NBTTagCompound tag) {
+    public void write(final CompoundTag tag) {
         tag.setBoolean(getName(), value);
     }
 
@@ -22,7 +22,7 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
      * {@inheritDoc}
      */
     @Override
-    public void read(final NBTTagCompound tag) {
+    public void read(final CompoundTag tag) {
         this.value = tag.getBoolean(getName());
     }
 

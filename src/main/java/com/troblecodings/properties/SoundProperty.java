@@ -2,7 +2,7 @@ package com.troblecodings.properties;
 
 import java.util.function.Predicate;
 
-import net.minecraft.util.SoundEvent;
+import net.minecraft.sounds.SoundEvent;
 
 @SuppressWarnings("rawtypes")
 public class SoundProperty {

@@ -10,11 +10,11 @@ import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxPathway;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public class DebugGrid extends SignalBoxGrid {
 
-    public DebugGrid(final Consumer<NBTTagCompound> sendToAll) {
+    public DebugGrid(final Consumer<CompoundTag> sendToAll) {
         super(sendToAll);
     }
 

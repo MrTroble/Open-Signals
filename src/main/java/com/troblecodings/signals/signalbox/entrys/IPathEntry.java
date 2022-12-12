@@ -2,7 +2,7 @@ package com.troblecodings.signals.signalbox.entrys;
 
 import java.util.Objects;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public abstract class IPathEntry<T> implements INetworkSavable {
 
@@ -39,7 +39,7 @@ public abstract class IPathEntry<T> implements INetworkSavable {
     public abstract void setValue(T value);
 
     @Override
-    public void writeEntryNetwork(final NBTTagCompound tag, final boolean writeAll) {
+    public void writeEntryNetwork(final CompoundTag tag, final boolean writeAll) {
         if (this.isDirty || writeAll) {
             this.write(tag);
             this.isDirty = true;
@@ -70,7 +70,7 @@ public abstract class IPathEntry<T> implements INetworkSavable {
     }
 
     @Override
-    public void readEntryNetwork(final NBTTagCompound tag) {
+    public void readEntryNetwork(final CompoundTag tag) {
         this.read(tag);
     }
 }

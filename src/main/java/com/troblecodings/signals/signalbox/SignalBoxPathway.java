@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.Maps;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -24,13 +25,12 @@ import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
-import com.google.common.collect.Maps;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Rotation;
 
 public class SignalBoxPathway implements INetworkSavable {
 
@@ -107,7 +107,7 @@ public class SignalBoxPathway implements INetworkSavable {
     private BlockPos makeFromNext(final PathType type, final SignalBoxNode first,
             final SignalBoxNode next, final Rotation pRotation) {
         final Point delta = first.getPoint().delta(next.getPoint());
-        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta).add(pRotation);
+        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta).getRotated(pRotation);
         for (final EnumGuiMode mode : type.getModes()) {
             final BlockPos possiblePosition = first.getOption(new ModeSet(mode, rotation))
                     .flatMap(option -> option.getEntry(PathEntryType.SIGNAL)).orElse(null);
@@ -121,23 +121,23 @@ public class SignalBoxPathway implements INetworkSavable {
     private static final String PATH_TYPE = "pathType";
 
     @Override
-    public void write(final NBTTagCompound tag) {
-        final NBTTagList nodesNBT = new NBTTagList();
+    public void write(final CompoundTag tag) {
+        final ListTag nodesNBT = new ListTag();
         listOfNodes.forEach(node -> {
-            final NBTTagCompound entry = new NBTTagCompound();
+            final CompoundTag entry = new CompoundTag();
             node.getPoint().write(entry);
-            nodesNBT.appendTag(entry);
+            nodesNBT.add(entry);
         });
-        tag.setTag(LIST_OF_NODES, nodesNBT);
-        tag.setString(PATH_TYPE, this.type.name());
+        tag.put(LIST_OF_NODES, nodesNBT);
+        tag.putString(PATH_TYPE, this.type.name());
     }
 
     @Override
-    public void read(final NBTTagCompound tag) {
-        final NBTTagList nodesNBT = (NBTTagList) tag.getTag(LIST_OF_NODES);
+    public void read(final CompoundTag tag) {
+        final ListTag nodesNBT = (ListTag) tag.get(LIST_OF_NODES);
         final Builder<SignalBoxNode> nodeBuilder = ImmutableList.builder();
         nodesNBT.forEach(c -> {
-            final NBTTagCompound nodeNBT = (NBTTagCompound) c;
+            final CompoundTag nodeNBT = (CompoundTag) c;
             final Point point = new Point();
             point.read(nodeNBT);
             final SignalBoxNode node = modeGrid.get(point);
@@ -158,7 +158,7 @@ public class SignalBoxPathway implements INetworkSavable {
         this.initalize();
     }
 
-    public void setWorld(final @Nullable World world) {
+    public void setLevel(final @Nullable Level world) {
         if (world == null) {
             this.loadOps = new WorldOperations();
             return;
@@ -316,12 +316,12 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     @Override
-    public void writeEntryNetwork(final NBTTagCompound tag, final boolean writeAll) {
+    public void writeEntryNetwork(final CompoundTag tag, final boolean writeAll) {
         listOfNodes.forEach(node -> node.writeEntryNetwork(tag, writeAll));
     }
 
     @Override
-    public void readEntryNetwork(final NBTTagCompound tag) {
+    public void readEntryNetwork(final CompoundTag tag) {
         listOfNodes.forEach(node -> node.readEntryNetwork(tag));
     }
 
