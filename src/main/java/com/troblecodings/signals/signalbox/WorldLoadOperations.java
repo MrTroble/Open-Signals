@@ -6,7 +6,6 @@ import java.util.function.Consumer;
 
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
-import com.troblecodings.signals.signalbox.config.ISignalAutoconfig;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
@@ -45,13 +44,7 @@ public class WorldLoadOperations extends WorldOperations {
     public void config(final ConfigInfo info) {
         if (world == null)
             return;
-        final ISignalAutoconfig config = info.current.getSignal().getConfig();
-        if (config == null) {
-            SignalConfig.change(info);
-        } else {
-            config.change(info);
-        }
-
+        SignalConfig.change(info);
     }
 
     @Override
@@ -63,13 +56,7 @@ public class WorldLoadOperations extends WorldOperations {
     @Override
     public void loadAndReset(final BlockPos position) {
         loadChunkAndGetTile(SignalTileEnity.class, world, position, (signaltile, chunk) -> {
-            final ISignalAutoconfig config = signaltile.getSignal().getConfig();
-            if (config == null) {
-                SignalConfig.reset(signaltile);
-            } else {
-                config.reset(signaltile);
-            }
-
+            SignalConfig.reset(signaltile);
             syncClient(position);
         });
     }

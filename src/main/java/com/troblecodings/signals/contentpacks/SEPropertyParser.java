@@ -6,8 +6,8 @@ import java.util.function.Predicate;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SEProperty.SEAutoNameProp;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.models.parser.FunctionParsingInfo;
-import com.troblecodings.signals.models.parser.LogicParser;
+import com.troblecodings.signals.parser.FunctionParsingInfo;
+import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.utils.JsonEnum;
 
 import net.minecraft.block.properties.IProperty;

@@ -9,9 +9,9 @@ import java.util.function.Predicate;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.Signal.SignalAngel;
-import com.troblecodings.signals.models.parser.FunctionParsingInfo;
-import com.troblecodings.signals.models.parser.LogicParser;
-import com.troblecodings.signals.models.parser.LogicalParserException;
+import com.troblecodings.signals.parser.FunctionParsingInfo;
+import com.troblecodings.signals.parser.LogicParser;
+import com.troblecodings.signals.parser.LogicalParserException;
 
 import net.minecraft.client.renderer.block.model.BuiltInModel;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;

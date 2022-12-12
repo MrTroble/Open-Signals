@@ -15,6 +15,9 @@ import java.util.function.Predicate;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.properties.FloatProperty;
+import com.troblecodings.properties.HeightProperty;
+import com.troblecodings.properties.SoundProperty;
 import com.troblecodings.signals.OpenSignalsConfig;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -24,11 +27,10 @@ import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
-import com.troblecodings.signals.models.parser.FunctionParsingInfo;
-import com.troblecodings.signals.models.parser.LogicParser;
-import com.troblecodings.signals.models.parser.LogicalParserException;
-import com.troblecodings.signals.models.parser.ValuePack;
-import com.troblecodings.signals.signalbox.config.ISignalAutoconfig;
+import com.troblecodings.signals.parser.FunctionParsingInfo;
+import com.troblecodings.signals.parser.LogicParser;
+import com.troblecodings.signals.parser.LogicalParserException;
+import com.troblecodings.signals.parser.ValuePack;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
 import net.minecraft.block.Block;
@@ -104,7 +106,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         public final float signScale;
         public final boolean canLink;
         public final List<Integer> colors;
-        public final ISignalAutoconfig config;
         public final List<SoundProperty> sounds;
         public final List<ValuePack> redstoneOutputs;
 
@@ -112,7 +113,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
                 final float customNameRenderHeight, final int height,
                 final List<HeightProperty> signalHeights, final float signWidth,
                 final float offsetX, final float offsetY, final float signScale,
-                final boolean canLink, final ISignalAutoconfig config, final List<Integer> colors,
+                final boolean canLink, final List<Integer> colors,
                 final List<FloatProperty> renderheights, final List<SoundProperty> sounds,
                 final List<ValuePack> redstoneOutputs) {
             this.placementtool = placementtool;
@@ -124,7 +125,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             this.signScale = signScale;
             this.canLink = canLink;
             this.colors = colors;
-            this.config = config;
             this.signalHeights = signalHeights;
             this.customRenderHeights = renderheights;
             this.sounds = sounds;
@@ -146,7 +146,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         private float offsetY = 0;
         private float signScale = 1;
         private boolean canLink = true;
-        private transient ISignalAutoconfig config = null;
         private List<Integer> colors;
         private Map<String, SoundPropertyParser> sounds;
         private Map<String, String> redstoneOutputs;
@@ -262,53 +261,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
             return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
                     ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
-                    canLink, config, colors, ImmutableList.copyOf(renderheights),
+                    canLink, colors, ImmutableList.copyOf(renderheights),
                     ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs));
-        }
-
-        public SignalPropertiesBuilder placementtoolname(final String placementToolName) {
-            this.placementToolName = placementToolName;
-            return this;
-        }
-
-        public SignalPropertiesBuilder signWidth(final float signWidth) {
-            this.signWidth = signWidth;
-            return this;
-        }
-
-        public SignalPropertiesBuilder offsetX(final float offsetX) {
-            this.offsetX = offsetX;
-            return this;
-        }
-
-        public SignalPropertiesBuilder offsetY(final float offsetY) {
-            this.offsetY = offsetY;
-            return this;
-        }
-
-        public SignalPropertiesBuilder signScale(final float signScale) {
-            this.signScale = signScale;
-            return this;
-        }
-
-        public SignalPropertiesBuilder height(final int height) {
-            this.defaultHeight = height;
-            return this;
-        }
-
-        public SignalPropertiesBuilder signHeight(final float customNameRenderHeight) {
-            this.customNameRenderHeight = customNameRenderHeight;
-            return this;
-        }
-
-        public SignalPropertiesBuilder noLink() {
-            this.canLink = false;
-            return this;
-        }
-
-        public SignalPropertiesBuilder config(final ISignalAutoconfig config) {
-            this.config = config;
-            return this;
         }
     }
 
@@ -636,10 +590,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     public static <T extends Comparable<T>> Predicate<Map<SEProperty<?>, Object>> check(
             final SEProperty<T> property, final T type) {
         return map -> map.containsKey(property) ? map.get(property).equals(type) : true;
-    }
-
-    public ISignalAutoconfig getConfig() {
-        return this.prop.config;
     }
 
     @SuppressWarnings("rawtypes")

@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.Signal.SignalPropertiesBuilder;
-import com.troblecodings.signals.models.parser.FunctionParsingInfo;
+import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.utils.FileReader;
 
 import net.minecraftforge.common.property.IUnlistedProperty;

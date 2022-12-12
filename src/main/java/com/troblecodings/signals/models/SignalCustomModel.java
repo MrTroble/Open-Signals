@@ -19,9 +19,9 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.mojang.realmsclient.util.Pair;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal.SignalAngel;
-import com.troblecodings.signals.models.parser.FunctionParsingInfo;
-import com.troblecodings.signals.models.parser.LogicParser;
-import com.troblecodings.signals.models.parser.LogicalParserException;
+import com.troblecodings.signals.parser.FunctionParsingInfo;
+import com.troblecodings.signals.parser.LogicParser;
+import com.troblecodings.signals.parser.LogicalParserException;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
