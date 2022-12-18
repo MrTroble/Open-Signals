@@ -152,26 +152,20 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             this.placementtool = placementtool;
         }
 
-        public SignalProperties build() {
-            return this.build(null);
-        }
-
         @SuppressWarnings("rawtypes")
-        public SignalProperties build(final @Nullable FunctionParsingInfo info) {
+        public SignalProperties build(final FunctionParsingInfo info) {
             if (placementToolName != null) {
-                OSItems.registeredItems.forEach(item -> {
-                    if (item instanceof Placementtool) {
-                        if (item.getRegistryName().toString()
-                                .replace(OpenSignalsMain.MODID + ":", "")
-                                .equalsIgnoreCase(placementToolName)) {
-                            placementtool = (Placementtool) item;
-                            return;
-                        }
+                OSItems.placementtools.forEach(item -> {
+                    if (item.getRegistryName().toString().replace(OpenSignalsMain.MODID + ":", "")
+                            .equalsIgnoreCase(placementToolName)) {
+                        placementtool = item;
+                        return;
                     }
+
                 });
                 if (placementtool == null)
-                    OpenSignalsMain.getLogger()
-                            .error("There doesn't exists a placementtool with the name '"
+                    throw new ContentPackException(
+                            "There doesn't exists a placementtool with the name '"
                                     + placementToolName + "'!");
             }
 
@@ -305,8 +299,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public AABB getCollisionBoundingBox(final BlockState blockState,
-            final LevelAccessor worldIn, final BlockPos pos) {
+    public AABB getCollisionBoundingBox(final BlockState blockState, final LevelAccessor worldIn,
+            final BlockPos pos) {
         return getBoundingBox(blockState, worldIn, pos);
     }
 
@@ -397,8 +391,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     private void buildCacheIfNull() {
         if (propcache == null) {
-            final Collection<SEProperty<?>> props = ((ExtendedBlockState) this
-                    .getBlockState()).getUnlistedProperties();
+            final Collection<SEProperty<?>> props = ((ExtendedBlockState) this.getBlockState())
+                    .getUnlistedProperties();
             propcache = props.toArray(new SEProperty[props.size()]);
         }
     }
@@ -590,9 +584,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     private SEProperty powerProperty = null;
 
     @Override
-    public boolean onBlockActivated(final Level worldIn, final BlockPos pos,
-            final BlockState state, final Player playerIn, final EnumHand hand,
-            final Direction facing, final float hitX, final float hitY, final float hitZ) {
+    public boolean onBlockActivated(final Level worldIn, final BlockPos pos, final BlockState state,
+            final Player playerIn, final EnumHand hand, final Direction facing, final float hitX,
+            final float hitY, final float hitZ) {
         final TileEntity tile = worldIn.getTileEntity(pos);
         if (!(tile instanceof SignalTileEnity)) {
             return false;
