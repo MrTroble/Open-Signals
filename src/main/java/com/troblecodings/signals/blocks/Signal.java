@@ -16,9 +16,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.troblecodings.properties.FloatProperty;
-import com.troblecodings.properties.HeightProperty;
-import com.troblecodings.properties.SoundProperty;
 import com.troblecodings.signals.OpenSignalsConfig;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -32,7 +29,11 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 import com.troblecodings.signals.parser.ValuePack;
+import com.troblecodings.signals.properties.FloatProperty;
+import com.troblecodings.signals.properties.HeightProperty;
+import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
+import com.troblecodings.signals.utils.JsonEnum;
 
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.properties.IProperty;
@@ -265,8 +266,8 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
 
     public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel",
             SignalAngel.class);
-    public static final SEProperty<Boolean> CUSTOMNAME = SEProperty.of("customname", false,
-            ChangeableStage.AUTOMATICSTAGE);
+    public static final SEProperty CUSTOMNAME = new SEProperty("customname",
+            JsonEnum.PROPERTIES.get("boolean"), "false", ChangeableStage.AUTOMATICSTAGE, t -> true);
 
     private final int id;
     protected final SignalProperties prop;
@@ -387,17 +388,17 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return false;
     }
 
-    private SEProperty<?>[] propcache = null;
+    private SEProperty[] propcache = null;
 
     private void buildCacheIfNull() {
         if (propcache == null) {
-            final Collection<SEProperty<?>> props = ((ExtendedBlockState) this.getBlockState())
+            final Collection<SEProperty> props = ((ExtendedBlockState) this.getBlockState())
                     .getUnlistedProperties();
             propcache = props.toArray(new SEProperty[props.size()]);
         }
     }
 
-    public int getIDFromProperty(final SEProperty<?> propertyIn) {
+    public int getIDFromProperty(final SEProperty propertyIn) {
         buildCacheIfNull();
         for (int i = 0; i < propcache.length; i++)
             if (propcache[i].equals(propertyIn))
@@ -405,7 +406,7 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         return -1;
     }
 
-    public SEProperty<?> getPropertyFromID(final int id) {
+    public SEProperty getPropertyFromID(final int id) {
         buildCacheIfNull();
         return propcache[id];
     }
@@ -575,11 +576,6 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
         setLightLevel(OpenSignalsConfig.signalLightValue / 15.0f);
     }
 
-    public static <T extends Comparable<T>> Predicate<Map<SEProperty, Object>> check(
-            final SEProperty<T> property, final T type) {
-        return map -> map.containsKey(property) ? map.get(property).equals(type) : true;
-    }
-
     @SuppressWarnings("rawtypes")
     private SEProperty powerProperty = null;
 
@@ -614,10 +610,9 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
             this.powerProperty = null;
             for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (pack.predicate.test(properties)) {
-                    final SEProperty seProperty = (SEProperty) pack.property;
-                    this.powerProperty = seProperty;
-                    tile.getProperty(seProperty)
-                            .ifPresent(power -> tile.setProperty(seProperty, !(Boolean) power));
+                    this.powerProperty = pack.property;
+                    tile.getProperty(pack.property)
+                            .ifPresent(power -> tile.setProperty(pack.property, !(Boolean) power));
                     break;
                 }
             }
