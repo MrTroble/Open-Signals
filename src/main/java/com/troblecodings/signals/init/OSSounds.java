@@ -7,6 +7,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.utils.FileReader;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;

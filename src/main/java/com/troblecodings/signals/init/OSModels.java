@@ -4,6 +4,7 @@ import com.troblecodings.signals.blocks.Signal;
 
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;

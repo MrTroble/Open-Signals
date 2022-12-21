@@ -3,27 +3,29 @@ package com.troblecodings.signals.blocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class RedstoneInput extends RedstoneIO {
 
     @Override
     public void neighborChanged(final BlockState state, final Level worldIn, final BlockPos pos,
-            final Block blockIn, final BlockPos fromPos) {
-        if (worldIn.isRemote)
+            final Block blockIn, final BlockPos fromPos, final boolean isMoving) {
+        if (worldIn.isClientSide)
             return;
-        if (worldIn.isBlockPowered(pos)) {
+        if (worldIn.hasNeighborSignal(pos)) {
             if (state.getValue(RedstoneIO.POWER) != true) {
-                worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, true));
-                final TileEntity entity = worldIn.getTileEntity(pos);
+                worldIn.setBlockAndUpdate(pos, state.setValue(RedstoneIO.POWER, true));
+                final BlockEntity entity = worldIn.getBlockEntity(pos);
                 if (entity instanceof RedstoneIOTileEntity)
                     ((RedstoneIOTileEntity) entity).sendToAll();
             }
         } else {
-            worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, false));
+            worldIn.setBlockAndUpdate(pos, state.setValue(RedstoneIO.POWER, false));
         }
     }
 

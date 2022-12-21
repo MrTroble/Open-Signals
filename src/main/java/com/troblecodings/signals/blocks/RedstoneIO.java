@@ -2,21 +2,17 @@ package com.troblecodings.signals.blocks;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.init.OSItems;
-import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumHand;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
@@ -29,47 +25,40 @@ public class RedstoneIO extends Block {
         super(Properties.of(Material.METAL));
         this.registerDefaultState(stateDefinition.any().setValue(POWER, false));
     }
-    
+
     @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> p_49915_) {
-    	this.stateDefinition = new StateDefinition<Block, BlockState>();
+    protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
+        builder.add(POWER);
     }
 
     @Override
-    protected BlockStateContainer createBlockState() {
-        return new BlockStateContainer(this, new IProperty[] {
-                POWER
-        });
+    public int getSignal(final BlockState blockState, final BlockGetter world, final BlockPos pos,
+            final Direction direction) {
+        return this.getDirectSignal(blockState, world, pos, direction);
     }
 
     @Override
-    public int getStrongPower(final BlockState blockState, final LevelAccessor blockAccess,
-            final BlockPos pos, final Direction side) {
-        return getWeakPower(blockState, blockAccess, pos, side);
-    }
-
-    @Override
-    public int getWeakPower(final BlockState blockState, final LevelAccessor blockAccess,
-            final BlockPos pos, final Direction side) {
+    public int getDirectSignal(final BlockState blockState, final BlockGetter world,
+            final BlockPos pos, final Direction direction) {
         return blockState.getValue(POWER) ? 15 : 0;
     }
 
     @Override
-    public boolean canProvidePower(final BlockState state) {
+    public boolean isSignalSource(final BlockState blockState) {
         return true;
     }
 
     @Override
-    public TileEntity createNewTileEntity(final Level worldIn, final int meta) {
+    public BlockEntity newBlockEntity(final BlockPos pos, final BlockState state) {
         return new RedstoneIOTileEntity();
     }
 
     @Override
-    public boolean onBlockActivated(final Level worldIn, final BlockPos pos,
-            final BlockState state, final Player playerIn, final EnumHand hand,
-            final Direction facing, final float hitX, final float hitY, final float hitZ) {
+    public boolean onBlockActivated(final Level worldIn, final BlockPos pos, final BlockState state,
+            final Player playerIn, final InteractionHand hand, final Direction facing, final float hitX,
+            final float hitY, final float hitZ) {
         if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
-            if (worldIn.isRemote)
+            if (worldIn.isClientSide)
                 OpenSignalsMain.handler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
             return true;
         }

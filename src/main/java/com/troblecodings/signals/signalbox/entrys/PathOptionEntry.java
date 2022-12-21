@@ -73,7 +73,7 @@ public class PathOptionEntry implements INetworkSavable {
             if (entry != null) {
                 if (tag.hasKey(entry.getName(), 10)) {
                     final IPathEntry<?> path = entry.newValue();
-                    path.read(tag.getCompoundTag(entry.getName()));
+                    path.read(tag.getCompound(entry.getName()));
                     pathEntrys.put(entry, path);
                 } else {
                     pathEntrys.remove(entry);
@@ -87,11 +87,11 @@ public class PathOptionEntry implements INetworkSavable {
         pathEntrys.forEach((type, option) -> {
             final CompoundTag entry = new CompoundTag();
             option.writeEntryNetwork(entry, writeAll);
-            if (entry.getSize() > 0)
+            if (entry.size() > 0)
                 tag.put(type.getName(), entry);
         });
         removedEntrys.keySet().removeIf(type -> {
-            tag.setBoolean(type.getName(), false);
+            tag.putBoolean(type.getName(), false);
             return true;
         });
     }
