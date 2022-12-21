@@ -7,6 +7,7 @@ import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -16,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class RedstoneIO extends Block {
 
@@ -48,20 +50,19 @@ public class RedstoneIO extends Block {
         return true;
     }
 
-    @Override
+    
     public BlockEntity newBlockEntity(final BlockPos pos, final BlockState state) {
         return new RedstoneIOTileEntity();
     }
 
     @Override
-    public boolean onBlockActivated(final Level worldIn, final BlockPos pos, final BlockState state,
-            final Player playerIn, final InteractionHand hand, final Direction facing, final float hitX,
-            final float hitY, final float hitZ) {
-        if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
+    public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
+            final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
+        if (!playerIn.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)) {
             if (worldIn.isClientSide)
                 OpenSignalsMain.handler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
-            return true;
+            return InteractionResult.SUCCESS;
         }
-        return false;
+        return InteractionResult.FAIL;
     }
 }

@@ -10,9 +10,6 @@ import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
-
-import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -35,7 +32,6 @@ import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 import com.troblecodings.signals.utils.JsonEnum;
 
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.properties.PropertyEnum;
@@ -47,7 +43,6 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.SoundCategory;
@@ -58,6 +53,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -67,7 +63,7 @@ import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
-public class Signal extends Block implements ITileEntityProvider, IConfigUpdatable {
+public class Signal extends Block implements EntityBlock, IConfigUpdatable {
 
     public static enum SignalAngel implements IStringSerializable {
 
@@ -131,16 +127,16 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     public static class SignalPropertiesBuilder {
 
         private transient Placementtool placementtool = null;
-        private String placementToolName = null;
-        private int defaultHeight = 1;
+        private final String placementToolName = null;
+        private final int defaultHeight = 1;
         private Map<String, Integer> signalHeights;
-        private float customNameRenderHeight = -1;
+        private final float customNameRenderHeight = -1;
         private Map<String, Float> renderHeights;
-        private float signWidth = 22;
-        private float offsetX = 0;
-        private float offsetY = 0;
-        private float signScale = 1;
-        private boolean canLink = true;
+        private final float signWidth = 22;
+        private final float offsetX = 0;
+        private final float offsetY = 0;
+        private final float signScale = 1;
+        private final boolean canLink = true;
         private List<Integer> colors;
         private Map<String, SoundPropertyParser> sounds;
         private Map<String, String> redstoneOutputs;
@@ -628,14 +624,14 @@ public class Signal extends Block implements ITileEntityProvider, IConfigUpdatab
     }
 
     @Override
-    public boolean canProvidePower(BlockState state) {
+    public boolean canProvidePower(final BlockState state) {
         return !this.prop.redstoneOutputs.isEmpty();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int getWeakPower(BlockState blockState, LevelAccessor blockAccess, BlockPos pos,
-            Direction side) {
+    public int getWeakPower(final BlockState blockState, final LevelAccessor blockAccess, final BlockPos pos,
+            final Direction side) {
         if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null)
             return 0;
 

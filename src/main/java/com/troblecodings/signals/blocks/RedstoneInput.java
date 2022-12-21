@@ -4,8 +4,8 @@ import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,15 +28,15 @@ public class RedstoneInput extends RedstoneIO {
             worldIn.setBlockAndUpdate(pos, state.setValue(RedstoneIO.POWER, false));
         }
     }
-
+    
     @Override
-    public int getWeakPower(final BlockState blockState, final LevelAccessor blockAccess,
-            final BlockPos pos, final Direction side) {
+    public int getDirectSignal(final BlockState blockState, final BlockGetter world,
+            final BlockPos pos, final Direction direction) {
         return 0;
     }
 
     @Override
-    public boolean canProvidePower(final BlockState state) {
+    public boolean isSignalSource(final BlockState blockState) {
         return true;
     }
 }
