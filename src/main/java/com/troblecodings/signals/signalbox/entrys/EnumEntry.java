@@ -21,7 +21,7 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
      */
     @Override
     public void write(final CompoundTag tag) {
-        tag.setString(getName(), this.enumValue.name());
+        tag.putString(getName(), this.enumValue.name());
     }
 
     /**

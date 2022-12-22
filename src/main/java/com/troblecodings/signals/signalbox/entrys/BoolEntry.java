@@ -15,7 +15,7 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
      */
     @Override
     public void write(final CompoundTag tag) {
-        tag.setBoolean(getName(), value);
+        tag.putBoolean(getName(), value);
     }
 
     /**

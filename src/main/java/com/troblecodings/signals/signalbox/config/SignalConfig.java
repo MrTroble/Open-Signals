@@ -4,13 +4,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.troblecodings.properties.ConfigProperty;
-import com.troblecodings.properties.SignalPair;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.ChangeConfigParser;
 import com.troblecodings.signals.contentpacks.DefaultConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
 import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.SignalPair;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
 public final class SignalConfig {

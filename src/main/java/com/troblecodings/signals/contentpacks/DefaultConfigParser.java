@@ -7,13 +7,13 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.gson.Gson;
-import com.troblecodings.properties.ConfigProperty;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
+import com.troblecodings.signals.properties.ConfigProperty;
 import com.troblecodings.signals.utils.FileReader;
 
 public class DefaultConfigParser {

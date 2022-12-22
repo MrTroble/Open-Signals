@@ -5,44 +5,47 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
-import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 
-public class SignalBox extends Block implements ITileEntityProvider {
+public class SignalBox extends Block implements EntityBlock {
 
     public SignalBox() {
-        super(Material.ROCK);
+        super(BlockBehaviour.Properties.of(Material.STONE));
         setCreativeTab(OSTabs.TAB);
     }
 
     @Override
-    public boolean onBlockActivated(final Level worldIn, final BlockPos pos,
-            final BlockState state, final Player playerIn, final EnumHand hand,
-            final Direction facing, final float hitX, final float hitY, final float hitZ) {
-        if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
-            if (worldIn.isRemote)
+    public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos, 
+            final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
+        if (!playerIn.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)) {
+            if (worldIn.isClientSide)
                 return true;
-            final TileEntity entity = worldIn.getTileEntity(pos);
+            final BlockEntity entity = worldIn.getBlockEntity(pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {
                 OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
             } else {
-                playerIn.sendStatusMessage(new TextComponentTranslation("msg.isblocked"), true);
+                playerIn.sendStatusMessage(new TranslatableComponent("msg.isblocked"), true);
             }
-            return true;
+            return InteractionResult.SUCCESS;
         }
-        return false;
+        return InteractionResult.FAIL;
     }
 
     @Override
-    public TileEntity createNewTileEntity(final Level worldIn, final int meta) {
+    public BlockEntity newBlockEntity(final BlockPos p_153215_, final BlockState p_153216_) {
         return new SignalBoxTileEntity();
     }
 

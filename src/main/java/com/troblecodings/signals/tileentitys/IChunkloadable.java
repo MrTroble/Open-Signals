@@ -4,29 +4,27 @@ import java.util.concurrent.Callable;
 import java.util.function.BiConsumer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ChunkProviderClient;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
-import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 public interface IChunkloadable {
 
     default <T> boolean loadChunkAndGetTile(final Class<T> clazz, final Level world,
-            final BlockPos pos, final BiConsumer<T, Chunk> consumer) {
+            final BlockPos pos, final BiConsumer<T, LevelChunk> consumer) {
         if (pos == null)
             return false;
         try {
             @SuppressWarnings("unchecked")
             final Callable<Boolean> call = () -> {
-                TileEntity entity = null;
-                Chunk chunk = world.getChunkFromBlockCoords(pos);
+                BlockEntity entity = null;
+                LevelChunk chunk = world.getChunkAt(pos);
                 final boolean flag = !chunk.isLoaded();
                 if (flag) {
-                    if (world.isRemote) {
+                    if (world.isClientSide) {
                         final ChunkProviderClient client = (ChunkProviderClient) world
                                 .getChunkProvider();
                         chunk = client.loadChunk(chunk.x, chunk.z);
@@ -46,7 +44,7 @@ public interface IChunkloadable {
                 }
 
                 if (flag) {
-                    if (world.isRemote) {
+                    if (world.isClientSide) {
                         final ChunkProviderClient client = (ChunkProviderClient) world
                                 .getChunkProvider();
                         client.unloadChunk(chunk.x, chunk.z);
@@ -78,7 +76,7 @@ public interface IChunkloadable {
                 Chunk chunk = world.getChunkFromBlockCoords(pos);
                 final boolean flag = !chunk.isLoaded();
                 if (flag) {
-                    if (world.isRemote) {
+                    if (world.isClientSide) {
                         final ChunkProviderClient client = (ChunkProviderClient) world
                                 .getChunkProvider();
                         chunk = client.loadChunk(chunk.x, chunk.z);
@@ -98,7 +96,7 @@ public interface IChunkloadable {
                 }
 
                 if (flag) {
-                    if (world.isRemote) {
+                    if (world.isClientSide) {
                         final ChunkProviderClient client = (ChunkProviderClient) world
                                 .getChunkProvider();
                         client.unloadChunk(chunk.x, chunk.z);

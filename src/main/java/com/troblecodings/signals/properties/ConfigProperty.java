@@ -1,4 +1,4 @@
-package com.troblecodings.properties;
+package com.troblecodings.signals.properties;
 
 import java.util.HashMap;
 import java.util.Map;

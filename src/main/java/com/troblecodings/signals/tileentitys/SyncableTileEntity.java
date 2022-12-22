@@ -8,24 +8,33 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SPacketUpdateTileEntity;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket;
+import net.minecraft.network.protocol.game.ClientboundGameEventPacket;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SyncableTileEntity extends BlockEntity {
 
+    public SyncableTileEntity(final BlockEntityType<?> p_155228_, final BlockPos p_155229_,
+            final BlockState p_155230_) {
+        super(p_155228_, p_155229_, p_155230_);
+    }
+
     protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();
 
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(getPos(), 0, getUpdateTag());
+    public Packet<ClientGamePacketListener> getUpdatePacket() {
+        return new ClientboundBlockE<ClientGamePacketListener>(getBlockPos(), 0, getUpdateTag());
     }
 
     @Override
-    public void onDataPacket(final NetworkManager net, final SPacketUpdateTileEntity pkt) {
+    public void onDataPacket(final NetworkManager net, final Packet<ClientGamePacketListener> pkt) {
         this.readFromNBT(pkt.getNbtCompound());
-        final BlockPos pos = getPos();
+        final BlockPos pos = getBlockPos();
         getLevel().markBlockRangeForRenderUpdate(pos, pos);
     }
 
@@ -35,7 +44,7 @@ public class SyncableTileEntity extends BlockEntity {
     }
 
     public void syncClient() {
-        syncClient(getLevel(), getPos());
+        syncClient(getLevel(), getBlockPos());
     }
 
     public void syncClient(final Level world, final BlockPos pos) {
