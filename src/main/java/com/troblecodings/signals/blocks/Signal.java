@@ -1,5 +1,7 @@
 package com.troblecodings.signals.blocks;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,16 +11,10 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
-
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
-import com.troblecodings.signals.OpenSignalsConfig;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
-import com.troblecodings.signals.blocks.Signal.SignalAngel;
-import com.troblecodings.signals.blocks.Signal.SignalProperties;
-import com.troblecodings.signals.blocks.Signal.SignalPropertiesBuilder;
 import com.troblecodings.signals.contentpacks.ContentPackException;
 import com.troblecodings.signals.contentpacks.SoundPropertyParser;
 import com.troblecodings.signals.enums.ChangeableStage;
@@ -35,31 +31,36 @@ import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 import com.troblecodings.signals.utils.JsonEnum;
 
-import net.minecraft.block.properties.PropertyBool;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.data.models.blockstates.VariantProperties.Rotation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
 
 public class Signal extends Block implements EntityBlock {
 
-    public static enum SignalAngel implements IStringSerializable {
+    public static enum SignalAngel {
 
         ANGEL0, ANGEL22P5, ANGEL45, ANGEL67P5, ANGEL90, ANGEL112P5, ANGEL135, ANGEL157P5, ANGEL180,
         ANGEL202P5, ANGEL225, ANGEL247P5, ANGEL270, ANGEL292P5, ANGEL315, ANGEL337P5;
 
-        @Override
         public String getName() {
             return this.name().toLowerCase();
         }
@@ -167,7 +168,6 @@ public class Signal extends Block implements EntityBlock {
                                     "Something went wrong during the registry of a predicate in "
                                             + info.signalName + "!\nWith statement:" + property);
                             e.printStackTrace();
-                            FMLCommonHandler.instance().exitJava(-1, false);
                         }
                     }
 
@@ -186,7 +186,6 @@ public class Signal extends Block implements EntityBlock {
                                     "Something went wrong during the registry of a predicate in "
                                             + info.signalName + "!\nWith statement:" + property);
                             e.printStackTrace();
-                            FMLCommonHandler.instance().exitJava(-1, false);
                         }
                     }
                 });
@@ -213,7 +212,6 @@ public class Signal extends Block implements EntityBlock {
                                         + info.signalName + "!\nWith statement:"
                                         + soundProperty.getKey());
                         e.printStackTrace();
-                        FMLCommonHandler.instance().exitJava(-1, false);
                     }
                 }
             }
@@ -222,10 +220,6 @@ public class Signal extends Block implements EntityBlock {
             if (redstoneOutputs != null) {
                 for (final Map.Entry<String, String> outputs : redstoneOutputs.entrySet()) {
                     final SEProperty property = (SEProperty) info.getProperty(outputs.getValue());
-                    if (!property.getParent().getClass().equals(PropertyBool.class)) {
-                        throw new ContentPackException("The proprty " + outputs.getValue()
-                                + " needs to be an bool property to us it with an RS output but it wasn't!");
-                    }
                     rsOutputs.add(
                             new ValuePack(property, LogicParser.predicate(outputs.getKey(), info)));
                 }
@@ -249,7 +243,7 @@ public class Signal extends Block implements EntityBlock {
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
 
-    public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel",
+    public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
             SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname",
             JsonEnum.PROPERTIES.get("boolean"), "false", ChangeableStage.AUTOMATICSTAGE, t -> true);
@@ -262,7 +256,7 @@ public class Signal extends Block implements EntityBlock {
     };
 
     public Signal(final SignalProperties prop) {
-        super(Material.ROCK);
+        super(Properties.of(Material.STONE));
         this.prop = prop;
         setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
         id = SIGNALLIST.size();
@@ -271,14 +265,9 @@ public class Signal extends Block implements EntityBlock {
     }
 
     @Override
-    public void dropBlockAsItemWithChance(final Level worldIn, final BlockPos pos,
-            final BlockState state, final float chance, final int fortune) {
-    }
-
-    @Override
     public AABB getBoundingBox(final BlockState state, final LevelAccessor source,
             final BlockPos pos) {
-        final SignalTileEnity te = (SignalTileEnity) source.getTileEntity(pos);
+        final SignalTileEnity te = (SignalTileEnity) source.getBlockEntity(pos);
         if (te == null)
             return FULL_BLOCK_AABB;
         return FULL_BLOCK_AABB.expand(0, getHeight(te.getProperties()), 0);
@@ -351,7 +340,7 @@ public class Signal extends Block implements EntityBlock {
             final BlockPos pos) {
         final AtomicReference<IModelData> blockState = new AtomicReference<>(
                 (IModelData) super.getExtendedState(state, world, pos));
-        final SignalTileEnity entity = (SignalTileEnity) world.getTileEntity(pos);
+        final SignalTileEnity entity = (SignalTileEnity) world.getBlockEntity(pos);
         if (entity != null)
             entity.getProperties().forEach((property, value) -> blockState.getAndUpdate(
                     oldState -> oldState.withProperty((SEProperty) (property), value)));
@@ -455,7 +444,7 @@ public class Signal extends Block implements EntityBlock {
     public void breakBlock(final Level worldIn, final BlockPos pos, final BlockState state) {
         super.breakBlock(worldIn, pos, state);
 
-        if (!worldIn.isRemote)
+        if (!worldIn.isClientSide)
             GhostBlock.destroyUpperBlock(worldIn, pos);
     }
 
@@ -556,11 +545,6 @@ public class Signal extends Block implements EntityBlock {
         return this.prop.placementtool;
     }
 
-    @Override
-    public void updateConfigValues() {
-        setLightLevel(OpenSignalsConfig.signalLightValue / 15.0f);
-    }
-
     @SuppressWarnings("rawtypes")
     private SEProperty powerProperty = null;
 
@@ -568,12 +552,12 @@ public class Signal extends Block implements EntityBlock {
     public boolean onBlockActivated(final Level worldIn, final BlockPos pos, final BlockState state,
             final Player playerIn, final EnumHand hand, final Direction facing, final float hitX,
             final float hitY, final float hitZ) {
-        final TileEntity tile = worldIn.getTileEntity(pos);
+        final TileEntity tile = worldIn.getBlockEntity(pos);
         if (!(tile instanceof SignalTileEnity)) {
             return false;
         }
         final SignalTileEnity signalTile = (SignalTileEnity) tile;
-        if (loadRedstoneOutput(worldIn, state, pos, signalTile) && worldIn.isRemote) {
+        if (loadRedstoneOutput(worldIn, state, pos, signalTile) && worldIn.isClientSide) {
             return true;
         }
         final boolean customname = canHaveCustomname(signalTile.getProperties());
@@ -619,12 +603,12 @@ public class Signal extends Block implements EntityBlock {
 
     @SuppressWarnings("unchecked")
     @Override
-    public int getWeakPower(final BlockState blockState, final LevelAccessor blockAccess, final BlockPos pos,
-            final Direction side) {
+    public int getWeakPower(final BlockState blockState, final LevelAccessor blockAccess,
+            final BlockPos pos, final Direction side) {
         if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null)
             return 0;
 
-        final SignalTileEnity tile = (SignalTileEnity) blockAccess.getTileEntity(pos);
+        final SignalTileEnity tile = (SignalTileEnity) blockAccess.getBlockEntity(pos);
         if (tile.getProperty(powerProperty).filter(power -> !(Boolean) power).isPresent()) {
             return 0;
         }
@@ -642,20 +626,20 @@ public class Signal extends Block implements EntityBlock {
         if (this.prop.sounds.isEmpty())
             return;
 
-        final SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(pos);
+        final SignalTileEnity tile = (SignalTileEnity) world.getBlockEntity(pos);
         final Map<SEProperty, Object> properties = tile.getProperties();
         final SoundProperty sound = getSound(properties);
         if (sound.duration < 1)
             return;
 
         if (sound.duration == 1) {
-            world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.playSound(null, pos, sound.sound, SoundSource.BLOCKS, 1.0F, 1.0F);
         } else {
             if (world.isUpdateScheduled(pos, this)) {
                 return;
             } else {
                 if (sound.predicate.test(properties)) {
-                    world.scheduleUpdate(pos, this, 1);
+                    world.scheduleTick(pos, this, 1);
                 }
             }
         }
@@ -674,16 +658,20 @@ public class Signal extends Block implements EntityBlock {
     @Override
     public void updateTick(final Level world, final BlockPos pos, final BlockState state,
             final Random rand) {
-        if (this.prop.sounds.isEmpty() || world.isRemote) {
+        if (this.prop.sounds.isEmpty() || !world.isClientSide) {
             return;
         }
-        final SignalTileEnity tile = (SignalTileEnity) world.getTileEntity(pos);
+        final SignalTileEnity tile = (SignalTileEnity) world.getBlockEntity(pos);
         final SoundProperty sound = getSound(tile.getProperties());
         if (sound.duration <= 1) {
             return;
         }
-        world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        world.scheduleUpdate(pos, this, sound.duration);
+        world.playSound(null, pos, sound.sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+        world.scheduleTick(pos, this, sound.duration);
     }
->>>>>>> 5bd183fe03c1fae86922d793e7ed3e6546fcc1e9
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos p_153215_, BlockState p_153216_) {
+        return new SignalTileEnity();
+    }
 }

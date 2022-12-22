@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Player;
 
 public class ContainerSignalBox extends Container implements UIClientSync {
 
+    private static final long serialVersionUID = -2076092400025320207L;
     public final static String UPDATE_SET = "update";
     public final static String SIGNAL_ID = "signal";
     public final static String POS_ID = "posid";
@@ -28,7 +29,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
 
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
-    private PlayerMP player;
+    private Player player;
     private SignalBoxTileEntity tile;
     private Consumer<CompoundTag> run;
     private boolean send = true;
@@ -83,7 +84,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
             final Builder<BlockPos, String> nameBuilder = new Builder<>();
             update.forEach(nbt -> {
                 final CompoundTag comp = (CompoundTag) nbt;
-                final BlockPos pos = NBTUtil.getPosFromTag(comp.getCompoundTag(POS_ID));
+                final BlockPos pos = NBTUtil.getPosFromTag(comp.getCompound(POS_ID));
                 if (compound.hasKey(SIGNAL_ID)) {
                     final Signal signal = Signal.SIGNALLIST.get(compound.getInt(SIGNAL_ID));
                     immutableMap.put(pos, signal);
@@ -104,7 +105,7 @@ public class ContainerSignalBox extends Container implements UIClientSync {
     }
 
     @Override
-    public PlayerMP getPlayer() {
+    public Player getPlayer() {
         return this.player;
     }
 

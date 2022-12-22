@@ -117,36 +117,12 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         }
     }
 
-    @Callback
-    @Optional.Method(modid = "opencomputers")
-    public Object[] hasLink(final Context context, final Arguments args) {
-        return new Object[] {
-                hasLink()
-        };
-    }
-
-    @Callback
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getSupportedSignalTypes(final Context context, final Arguments args) {
-        return new Object[] {
-                tableOfSupportedSignalTypes
-        };
-    }
-
     public int[] getSupportedSignalTypesImpl() {
         return listOfSupportedIndicies;
     }
 
     public static boolean find(final int[] arr, final int i) {
         return Arrays.stream(arr).anyMatch(x -> i == x);
-    }
-
-    @Callback
-    @Optional.Method(modid = "opencomputers")
-    public Object[] changeSignal(final Context context, final Arguments args) {
-        return new Object[] {
-                changeSignalImpl(args.checkInteger(0), args.checkInteger(1))
-        };
     }
 
     @SuppressWarnings({
@@ -170,24 +146,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return rtc.get();
     }
 
-    @Callback
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getSignalType(final Context context, final Arguments args) {
-        return new Object[] {
-                Signal.SIGNALLIST.get(getSignalTypeImpl()).getSignalTypeName()
-        };
-    }
-
     public int getSignalTypeImpl() {
         return signalTypeCache;
-    }
-
-    @Callback
-    @Optional.Method(modid = "opencomputers")
-    public Object[] getSignalState(final Context context, final Arguments args) {
-        return new Object[] {
-                getSignalStateImpl(args.checkInteger(0))
-        };
     }
 
     @SuppressWarnings("rawtypes")
@@ -219,29 +179,29 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     @Override
     public String getName() {
-        return ""; // TODO Replace with loading variant
+        return "";
     }
 
     @Override
     public boolean hasCustomName() {
-        return false; // TODO Replace with loading variant
+        return false;
     }
 
     @Override
     public boolean hasLink() {
         if (linkedSignalPosition == null)
             return false;
-        if (loadChunkAndGetTile(SignalTileEnity.class, world, linkedSignalPosition, (x, y) -> {
+        if (loadChunkAndGetTile(SignalTileEnity.class, level, linkedSignalPosition, (x, y) -> {
         }))
             return true;
-        if (!world.isRemote)
+        if (level.isClientSide)
             unlink();
         return false;
     }
 
     @Override
     public boolean link(final BlockPos pos) {
-        final BlockState state = world.getBlockState(pos);
+        final BlockState state = level.getBlockState(pos);
         if (state.getBlock() instanceof Signal) {
             this.linkedSignalPosition = pos;
             onLink();
@@ -259,8 +219,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     private boolean inMode(final EnumMode mode) {
-        return this.compound.getInt(EnumMode.class.getSimpleName().toLowerCase()) == mode
-                .ordinal();
+        return this.compound.getInt(EnumMode.class.getSimpleName().toLowerCase()) == mode.ordinal();
     }
 
     @Override

@@ -58,7 +58,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
     }
 
     private void read(final CompoundTag comp) {
-        ((ExtendedBlockState) world.getBlockState(pos).getBlock().getBlockState())
+        ((ExtendedBlockState) world.getBlockState(worldPosition).getBlock().getBlockState())
                 .getUnlistedProperties().stream().forEach(prop -> {
                     final SEProperty sep = SEProperty.cst(prop);
                     sep.readFromNBT(comp).ifPresent(obj -> map.put(sep, obj));
@@ -71,9 +71,9 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
     public void onLoad() {
         if (temporary != null) {
             read(temporary);
-            if (!world.isRemote) {
-                final BlockState state = world.getBlockState(pos);
-                world.notifyBlockUpdate(pos, state, state, 3);
+            if (level.isClientSide) {
+                final BlockState state = level.getBlockState(worldPosition);
+                level.notifyBlockUpdate(worldPosition, state, state, 3);
             }
             temporary = null;
         }
@@ -82,7 +82,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
     public <T extends Comparable<T>> void setProperty(final SEProperty<T> prop, final T opt) {
         map.put(prop, opt);
         this.markDirty();
-        getSignal().getUpdate(world, pos);
+        getSignal().getUpdate(level, worldPosition);
     }
 
     public Map<SEProperty, Object> getProperties() {
