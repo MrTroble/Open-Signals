@@ -49,8 +49,10 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 
-public class Signal extends Block implements EntityBlock, IConfigUpdatable {
+public class Signal extends Block implements EntityBlock {
 
     public static enum SignalAngel implements IStringSerializable {
 

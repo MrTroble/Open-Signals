@@ -66,16 +66,11 @@ public class GuiSignalBox extends GuiBase {
     public GuiSignalBox(final SignalBoxTileEntity box) {
         this.box = box;
         this.container = new ContainerSignalBox(this::update);
-        Minecraft.getMinecraft().player.openContainer = this.container;
+        Minecraft.getInstance().player.containerMenu = this.container;
         initializeBasicUI();
         if (this.box.get() != null)
             this.compound = this.box.get();
         this.entity.read(this.compound);
-    }
-
-    @Override
-    public void initGui() {
-        super.initGui();
     }
 
     private void update(final CompoundTag compound) {

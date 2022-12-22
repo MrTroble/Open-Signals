@@ -20,10 +20,10 @@ public class GuiRedstoneIO extends GuiBase {
 
     public GuiRedstoneIO(final RedstoneIOTileEntity tile) {
         this.tile = tile;
-        init();
+        initOwn();
     }
 
-    private void init() {
+    private void initOwn() {
         this.entity.clear();
         this.entity.add(new UIBox(UIBox.HBOX, 5));
 
@@ -72,7 +72,7 @@ public class GuiRedstoneIO extends GuiBase {
         final UIBox layout = new UIBox(UIBox.VBOX, 5);
         list.add(layout);
         this.tile.forEach(pos -> list.add(GuiElements.createLabel(
-                String.format("%s: x=%d, y=%d, z=%d", OSBlocks.SIGNAL_BOX.getLocalizedName(),
+                String.format("%s: x=%d, y=%d, z=%d", OSBlocks.SIGNAL_BOX.getName().getString(),
                         pos.getX(), pos.getY(), pos.getZ()))));
         inner.add(list);
         inner.add(GuiElements.createPageSelect(layout));
@@ -81,7 +81,7 @@ public class GuiRedstoneIO extends GuiBase {
     private void updateText(final String input) {
         final CompoundTag compound = new CompoundTag();
         this.entity.write(compound);
-        GuiSyncNetwork.sendToPosServer(compound, tile.getPos());
+        GuiSyncNetwork.sendToPosServer(compound, tile.getBlockPos());
         labelComp.setText(input);
     }
 

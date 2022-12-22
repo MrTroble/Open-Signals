@@ -19,10 +19,10 @@ public class GuiSignal extends GuiBase {
 
     public GuiSignal(final SignalTileEnity tile) {
         this.tile = tile;
-        init();
+        initOwn();
     }
 
-    private void init() {
+    private void initOwn() {
         this.entity.clear();
         this.entity.add(new UIBox(UIBox.HBOX, 5));
 
@@ -68,7 +68,7 @@ public class GuiSignal extends GuiBase {
     private void updateText(final String input) {
         final CompoundTag compound = new CompoundTag();
         this.entity.write(compound);
-        GuiSyncNetwork.sendToPosServer(compound, tile.getPos());
+        GuiSyncNetwork.sendToPosServer(compound, tile.getBlockPos());
         labelComp.setText(input);
     }
 
