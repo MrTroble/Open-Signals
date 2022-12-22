@@ -52,7 +52,7 @@ public final class SignalConfig {
                 if (value.predicate.test(object)) {
                     value.values.forEach((prop, val) -> {
                         info.current.getProperty(prop)
-                                .ifPresent(_u -> info.current.setProperty(prop, (Comparable) val));
+                                .ifPresent(_u -> info.current.setProperty(prop, val));
                     });
                 }
             });

@@ -4,12 +4,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import javax.annotation.Nullable;
-
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.PathType;
-import com.troblecodings.signals.signalbox.LevelLoadOperations;
-import com.troblecodings.signals.signalbox.LevelOperations;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
@@ -18,7 +14,6 @@ import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
 
 public class SignalBoxFactory {
 
@@ -36,12 +31,6 @@ public class SignalBoxFactory {
 
     public ConnectionChecker getConnectionChecker() {
         return new ConnectionChecker();
-    }
-
-    public LevelOperations getLevelOperations(final @Nullable Level world) {
-        if (world == null)
-            return new LevelOperations();
-        return new LevelLoadOperations(world);
     }
 
     public SignalBoxPathway getPathway(final Map<Point, SignalBoxNode> modeGrid,

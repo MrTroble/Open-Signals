@@ -29,7 +29,6 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 
 public class SignalBoxPathway implements INetworkSavable {
@@ -156,14 +155,6 @@ public class SignalBoxPathway implements INetworkSavable {
             return;
         }
         this.initalize();
-    }
-
-    public void setLevel(final @Nullable Level world) {
-        if (world == null) {
-            this.loadOps = new WorldOperations();
-            return;
-        }
-        this.loadOps = new WorldLoadOperations(world);
     }
 
     private void foreachEntry(final Consumer<PathOptionEntry> consumer,

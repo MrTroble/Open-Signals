@@ -24,9 +24,9 @@ import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalBoxTileEntity extends SyncableTileEntity
@@ -53,7 +53,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     public void setLevel(final Level worldIn) {
         super.setLevel(worldIn);
         worldLoadOps = SignalBoxFactory.getFactory().getLevelOperations(worldIn);
-        grid.setLevel(worldIn);
     }
 
     @Override
@@ -61,7 +60,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         final ListTag list = new ListTag();
         linkedBlocks.forEach((p, t) -> {
             final CompoundTag item = NBTUtil.createPosTag(p);
-            item.setString(LINK_TYPE, t.name());
+            item.putString(LINK_TYPE, t.name());
             list.add(item);
         });
         compound.put(LINKED_POS_LIST, list);
@@ -86,7 +85,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         }
         final CompoundTag gridComp = compound.getCompoundTag(GUI_TAG);
         grid.read(gridComp);
-        if (world != null) {
+        if (level != null) {
             onLoad();
         }
     }
@@ -120,7 +119,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
             final Point p2 = fromNBT(request, POINT2);
             if (!grid.requestWay(p1, p2)) {
                 final CompoundTag error = new CompoundTag();
-                error.setString(ERROR_STRING, "error.nopathfound");
+                error.putString(ERROR_STRING, "error.nopathfound");
                 sendToAll(error);
             } else {
                 this.syncClient();
@@ -152,15 +151,15 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         LinkType type = LinkType.SIGNAL;
         if (block == OSBlocks.REDSTONE_IN) {
             type = LinkType.INPUT;
-            if (!world.isRemote)
-                loadChunkAndGetTile(RedstoneIOTileEntity.class, world, linkedPos,
-                        (tile, _u) -> tile.link(this.pos));
+            if (level.isClientSide)
+                loadChunkAndGetTile(RedstoneIOTileEntity.class, level, linkedPos,
+                        (tile, _u) -> tile.link(this.worldPosition));
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
-        if (!world.isRemote) {
+        if (level.isClientSide) {
             if (type.equals(LinkType.SIGNAL)) {
-                loadChunkAndGetTile(SignalTileEnity.class, world, linkedPos, this::updateSingle);
+                loadChunkAndGetTile(SignalTileEnity.class, level, linkedPos, this::updateSingle);
                 worldLoadOps.loadAndReset(linkedPos);
             }
         }
@@ -170,19 +169,19 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     private void updateSingle(final SignalTileEnity signaltile, final Chunk unused) {
-        final BlockPos signalPos = signaltile.getPos();
+        final BlockPos signalPos = signaltile.getBlockPos();
         signals.put(signalPos, signaltile.getSignal());
         syncClient();
     }
 
     @Override
     public void onLoad() {
-        if (world.isRemote)
+        if (!level.isClientSide)
             return;
         signals.clear();
         new Thread(() -> {
             linkedBlocks.forEach((linkedPos, _u) -> loadChunkAndGetTile(SignalTileEnity.class,
-                    world, linkedPos, this::updateSingle));
+                    level, linkedPos, this::updateSingle));
         }).start();
     }
 
@@ -191,8 +190,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity
         signals.keySet().forEach(worldLoadOps::loadAndReset);
         linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue()))
                 .forEach(entry -> {
-                    loadChunkAndGetTile(RedstoneIOTileEntity.class, world, entry.getKey(),
-                            (tile, _u) -> tile.unlink(pos));
+                    loadChunkAndGetTile(RedstoneIOTileEntity.class, level, entry.getKey(),
+                            (tile, _u) -> tile.unlink(worldPosition));
                 });
         linkedBlocks.clear();
         signals.clear();
@@ -209,7 +208,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     }
 
     public void updateRedstonInput(final BlockPos pos, final boolean power) {
-        if (power && !this.world.isRemote) {
+        if (power && this.level.isClientSide) {
             grid.setPowered(pos);
             syncClient();
         }

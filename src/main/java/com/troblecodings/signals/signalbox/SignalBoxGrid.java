@@ -19,7 +19,6 @@ import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
-import net.minecraft.world.level.Level;
 
 public class SignalBoxGrid implements INetworkSavable {
 
@@ -31,7 +30,6 @@ public class SignalBoxGrid implements INetworkSavable {
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final Consumer<CompoundTag> sendToAll;
     protected final SignalBoxFactory factory;
-    private Level world = null;
 
     public SignalBoxGrid(final Consumer<CompoundTag> sendToAll) {
         this.sendToAll = sendToAll;
@@ -69,7 +67,6 @@ public class SignalBoxGrid implements INetworkSavable {
             return false;
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
-            way.setLevel(world);
             way.setPathStatus(EnumPathUsage.SELECTED);
             way.updatePathwaySignals();
             this.onWayAdd(way);
@@ -97,7 +94,6 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     protected void onWayAdd(final SignalBoxPathway pathway) {
-        pathway.setLevel(world);
         startsToPath.put(pathway.getFirstPoint(), pathway);
         endsToPath.put(pathway.getLastPoint(), pathway);
         updatePrevious(pathway);
@@ -184,14 +180,6 @@ public class SignalBoxGrid implements INetworkSavable {
             }
             onWayAdd(pathway);
         });
-    }
-
-    /**
-     * @param world the world to set
-     */
-    public void setLevel(final Level world) {
-        this.world = world;
-        startsToPath.values().forEach(pw -> pw.setLevel(world));
     }
 
     @Override

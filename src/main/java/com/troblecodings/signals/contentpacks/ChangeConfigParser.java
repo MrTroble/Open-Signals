@@ -135,20 +135,14 @@ public class ChangeConfigParser {
                     predicate = LogicParser.predicate(valueToParse, endInfo);
                 }
 
-                final Map<SEProperty, Object> values = new HashMap<>();
+                final Map<SEProperty, String> values = new HashMap<>();
 
                 for (final String value : entry.getValue()) {
 
                     final String[] valuetoChange = value.split("\\.");
                     final SEProperty property = (SEProperty) startInfo
                             .getProperty(valuetoChange[0]);
-
-                    Object valueToSet = valuetoChange[1];
-                    if (valuetoChange[1].equalsIgnoreCase("false")
-                            || valuetoChange[1].equalsIgnoreCase("true")) {
-                        valueToSet = Boolean.valueOf(valuetoChange[1]);
-                    }
-                    values.put(property, valueToSet);
+                    values.put(property, valuetoChange[1]);
                 }
 
                 properties.add(new ConfigProperty(predicate, values));

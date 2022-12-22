@@ -24,7 +24,7 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 
 public class SignalTileEnity extends SyncableTileEntity implements ILevelNameable, ISyncable {
 
-    private final HashMap<SEProperty, Object> map = new HashMap<>();
+    private final HashMap<SEProperty, String> map = new HashMap<>();
 
     public static final String PROPERTIES = "properties";
     public static final String CUSTOMNAME = "customname";
@@ -49,7 +49,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
     public void readFromNBT(final CompoundTag compound) {
         super.readFromNBT(compound);
         final CompoundTag comp = compound.getCompoundTag(PROPERTIES);
-        if (world == null) {
+        if (level == null) {
             temporary = comp.copy();
         } else {
             temporary = null;
@@ -79,7 +79,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
         }
     }
 
-    public <T extends Comparable<T>> void setProperty(final SEProperty<T> prop, final T opt) {
+    public void setProperty(final SEProperty prop, final String opt) {
         map.put(prop, opt);
         this.markDirty();
         getSignal().getUpdate(level, worldPosition);
@@ -89,7 +89,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
         return ImmutableMap.copyOf(map);
     }
 
-    public Optional<?> getProperty(final SEProperty prop) {
+    public Optional<String> getProperty(final SEProperty prop) {
         if (map.containsKey(prop))
             return Optional.of(map.get(prop));
         return Optional.empty();
@@ -107,7 +107,6 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
         return formatCustomName != null && getSignal().canHaveCustomname(this.map);
     }
 
-
     public void setCustomName(final String str) {
         this.formatCustomName = str;
         if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
@@ -120,8 +119,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void renderOverlay(final double x, final double y, final double z,
-            final Font font) {
+    public void renderOverlay(final double x, final double y, final double z, final Font font) {
         getSignal().renderOverlay(x, y, z, this, font);
     }
 
@@ -161,7 +159,8 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
             return false;
         final SignalTileEnity other = (SignalTileEnity) obj;
         return Objects.equals(formatCustomName, other.formatCustomName)
-                && Objects.equals(map, other.map) && Objects.equals(worldPosition, other.worldPosition)
+                && Objects.equals(map, other.map)
+                && Objects.equals(worldPosition, other.worldPosition)
                 && Objects.equals(level, other.level);
     }
 

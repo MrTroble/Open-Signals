@@ -6,7 +6,7 @@ import net.minecraft.nbt.NBTUtil;
 
 public final class BlockposEntry extends IPathEntry<BlockPos> {
 
-    private BlockPos position = BlockPos.ORIGIN;
+    private BlockPos position = BlockPos.ZERO;
 
     /**
      * {@inheritDoc}
