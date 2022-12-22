@@ -25,14 +25,15 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ClientProxy extends CommonProxy {
 
     @Override
-    public void preinit(final FMLPreInitializationEvent event) {
+    public void preinit(final FMLCommonSetupEvent event) {
         super.preinit(event);
         OpenSignalsMain.handler.addGui(Placementtool.class,
-                (p, w, bp) -> new GuiPlacementtool(p.getHeldItemMainhand()));
+                (p, w, bp) -> new GuiPlacementtool(p.getMainHandItem()));
         OpenSignalsMain.handler.addGui(SignalController.class, SignalControllerTileEntity.class,
                 GuiSignalController::new);
         OpenSignalsMain.handler.addGui(SignalBox.class, SignalBoxTileEntity.class,
@@ -45,18 +46,6 @@ public class ClientProxy extends CommonProxy {
         ModelLoaderRegistry.registerLoader(new CustomModelLoader());
         ClientRegistry.bindTileEntitySpecialRenderer(SignalTileEnity.class,
                 new SignalSpecialRenderer());
-    }
-
-    @Override
-    public void init(final FMLInitializationEvent event) {
-        super.init(event);
-
-    }
-
-    @Override
-    public void postinit(final FMLPostInitializationEvent event) {
-        super.postinit(event);
-
     }
 
 }

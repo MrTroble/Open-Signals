@@ -12,6 +12,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalBox extends Block implements ITileEntityProvider {

@@ -1,19 +1,19 @@
 package com.troblecodings.signals.tileentitys;
 
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import com.mojang.blaze3d.vertex.PoseStack;
 
-public class SignalSpecialRenderer extends TileEntitySpecialRenderer<SignalTileEnity> {
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+
+public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnity> {
 
     @Override
-    public void render(final SignalTileEnity te, final double x, final double y, final double z,
-            final float partialTicks, final int destroyStage, final float alpha) {
+    public void render(SignalTileEnity te, float tick, PoseStack stack, MultiBufferSource source,
+			int rand1, int rand2) {
         if (!te.hasCustomName())
             return;
-        te.renderOverlay(x, y, z, getFontRenderer());
+        te.renderOverlay(0, 0, 0, Minecraft.getInstance().font);
     }
 
-    @Override
-    public boolean isGlobalRenderer(final SignalTileEnity te) {
-        return te.hasCustomName();
-    }
 }

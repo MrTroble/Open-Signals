@@ -10,6 +10,7 @@ import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.text.ITextComponent;
@@ -106,10 +107,6 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
         return formatCustomName != null && getSignal().canHaveCustomname(this.map);
     }
 
-    @Override
-    public ITextComponent getDisplayName() {
-        return new TextComponentString(String.format(formatCustomName));
-    }
 
     public void setCustomName(final String str) {
         this.formatCustomName = str;
@@ -124,12 +121,12 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
 
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
-            final FontRenderer font) {
+            final Font font) {
         getSignal().renderOverlay(x, y, z, this, font);
     }
 
     public Signal getSignal() {
-        return (Signal) super.getBlockType();
+        return (Signal) super.getBlockState().getBlock();
     }
 
     public int getBlockID() {
@@ -138,7 +135,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
 
     @Override
     public void updateTag(final CompoundTag compound) {
-        if (compound.hasKey(CUSTOMNAME)) {
+        if (compound.contains(CUSTOMNAME)) {
             setCustomName(compound.getString(CUSTOMNAME));
             this.syncClient();
         }
@@ -151,7 +148,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
 
     @Override
     public int hashCode() {
-        return Objects.hash(formatCustomName, map, pos, world);
+        return Objects.hash(formatCustomName, map, worldPosition, level);
     }
 
     @Override
@@ -164,8 +161,8 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
             return false;
         final SignalTileEnity other = (SignalTileEnity) obj;
         return Objects.equals(formatCustomName, other.formatCustomName)
-                && Objects.equals(map, other.map) && Objects.equals(pos, other.pos)
-                && Objects.equals(world, other.world);
+                && Objects.equals(map, other.map) && Objects.equals(worldPosition, other.worldPosition)
+                && Objects.equals(level, other.level);
     }
 
     @Override

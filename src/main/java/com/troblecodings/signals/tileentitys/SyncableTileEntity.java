@@ -10,9 +10,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class SyncableTileEntity extends TileEntity {
+public class SyncableTileEntity extends BlockEntity {
 
     protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();
 

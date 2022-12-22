@@ -28,9 +28,9 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(Placementtool.class, (p, w, bp) -> null);
         OpenSignalsMain.handler.addServer(SignalController.class,
                 (p, w, bp) -> new ContainerSignalController(
-                        (SignalControllerTileEntity) w.getTileEntity(bp)));
+                        (SignalControllerTileEntity) w.getBlockEntity(bp)));
         OpenSignalsMain.handler.addServer(SignalBox.class,
-                (p, w, bp) -> new ContainerSignalBox((SignalBoxTileEntity) w.getTileEntity(bp)));
+                (p, w, bp) -> new ContainerSignalBox((SignalBoxTileEntity) w.getBlockEntity(bp)));
         OpenSignalsMain.handler.addServer(Signal.class, (p, w, bp) -> null);
 
         OSSounds.init();

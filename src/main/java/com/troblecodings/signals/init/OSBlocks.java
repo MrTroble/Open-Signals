@@ -30,10 +30,10 @@ public final class OSBlocks {
 
     public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
     public static final Post POST = new Post();
-    public static final GhostBlock GHOST_BLOCK = new GhostBlock();
-    public static final SignalBox SIGNAL_BOX = new SignalBox();
-    public static final RedstoneIO REDSTONE_IN = new RedstoneInput();
-    public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
+    public static final Block GHOST_BLOCK = new GhostBlock();
+    public static final Block SIGNAL_BOX = new SignalBox();
+    public static final Block REDSTONE_IN = new RedstoneInput();
+    public static final Block REDSTONE_OUT = new RedstoneIO();
 
     public static ArrayList<Block> blocksToRegister = new ArrayList<>();
 
