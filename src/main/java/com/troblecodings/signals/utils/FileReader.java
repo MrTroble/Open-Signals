@@ -20,7 +20,7 @@ import com.troblecodings.signals.init.OSBlocks;
 
 public final class FileReader {
 
-    private static FileSystem fileSystemCache = null;
+    public static FileSystem fileSystemCache = null;
 
     private FileReader() {
     }
@@ -39,9 +39,7 @@ public final class FileReader {
         if (filepath.isPresent()) {
             final Path pathlocation = filepath.get();
             try {
-
                 final Stream<Path> inputs = Files.list(pathlocation);
-
                 inputs.forEach(file -> {
                     try {
                         final String content = new String(Files.readAllBytes(file));
@@ -62,35 +60,32 @@ public final class FileReader {
                 e.printStackTrace();
             }
         }
-        if (files.isEmpty())
-            OpenSignalsMain.getLogger().warn("No files found at " + directory + "!");
+        if (files.isEmpty()) {
+            // OpenSignalsMain.getLogger().warn("No files found at " + directory + "!");
+        }
         return files;
     }
 
     public static Optional<Path> getRessourceLocation(final String location) {
-
         String filelocation = location;
-
         final URL url = OSBlocks.class.getResource("/assets/girsignals");
         try {
             if (url != null) {
-
                 final URI uri = url.toURI();
-
                 if ("file".equals(uri.getScheme())) {
-
                     if (!location.startsWith("/"))
                         filelocation = "/" + filelocation;
 
-                    final URL resource = OSBlocks.class.getResource(filelocation);
+                    if (fileSystemCache == null) {
+                        fileSystemCache = FileSystems.getDefault();
+                    }
 
+                    final URL resource = OSBlocks.class.getResource(filelocation);
                     if (resource == null)
                         return Optional.empty();
-
                     return Optional.of(Paths.get(resource.toURI()));
 
                 } else {
-
                     if (!"jar".equals(uri.getScheme())) {
                         return Optional.empty();
                     }
@@ -105,5 +100,17 @@ public final class FileReader {
             e.printStackTrace();
         }
         return Optional.empty();
+    }
+
+    public static void addToFileSystem(final FileSystem system) {
+        for (final Path path : system.getRootDirectories()) {
+            final String scheme = path.toUri().getScheme();
+            if (scheme.equals("file")) {
+                
+            } else if (scheme.equals("jar")) {
+                
+            }
+        }
+
     }
 }
