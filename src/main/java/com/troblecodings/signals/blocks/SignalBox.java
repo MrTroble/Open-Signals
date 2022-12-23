@@ -22,7 +22,7 @@ import net.minecraft.world.phys.BlockHitResult;
 public class SignalBox extends Block implements EntityBlock {
 
     public SignalBox() {
-        super(BlockBehaviour.Properties.of(Material.STONE));
+        super(Properties.of(Material.STONE));
         setCreativeTab(OSTabs.TAB);
     }
 

@@ -111,7 +111,7 @@ public final class OSItems {
             tools.getPlacementTools().forEach(placementtool -> {
                 final Placementtool tool = new Placementtool();
                 final String name = placementtool.toLowerCase().replace("_", "");
-                tool.setRegistryName(OpenSignalsMain.MODID, name);
+                tool.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
                 placementtools.add(tool);
                 registeredItems.add(tool);
             });
