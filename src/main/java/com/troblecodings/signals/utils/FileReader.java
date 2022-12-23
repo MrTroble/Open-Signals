@@ -136,7 +136,7 @@ public final class FileReader {
                     return FileVisitResult.CONTINUE;
                 }
             });
-        } catch (URISyntaxException | IOException e) {
+        } catch (final URISyntaxException | IOException e) {
             e.printStackTrace();
         }
     }

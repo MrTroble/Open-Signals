@@ -17,92 +17,94 @@ import net.minecraftforge.client.model.data.ModelProperty;
 
 public class JsonEnum extends ModelProperty<String> {
 
-	private final String name;
-	private final List<String> values;
-	private final Set<String> valueSet;
+    private final String name;
+    private final List<String> values;
+    private final Set<String> valueSet;
 
-	public JsonEnum(final String name, final List<String> values) {
-		this.name = name;
-		this.values = ImmutableList.copyOf(values);
-		this.valueSet = ImmutableSet.copyOf(values);
-	}
+    public JsonEnum(final String name, final List<String> values) {
+        this.name = name;
+        this.values = ImmutableList.copyOf(values);
+        this.valueSet = ImmutableSet.copyOf(values);
+    }
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public boolean isValid(final String value) {
-		return valueSet.contains(value);
-	}
+    public boolean isValid(final String value) {
+        return valueSet.contains(value);
+    }
 
-	public Class<String> getType() {
-		return String.class;
-	}
+    public Class<String> getType() {
+        return String.class;
+    }
 
-	public String valueToString(final String value) {
-		return value;
-	}
+    public String valueToString(final String value) {
+        return value;
+    }
 
-	public Collection<String> getAllowedValues() {
-		if (values != null) {
-			return values;
-		}
-		return new ArrayList<>();
-	}
+    public Collection<String> getAllowedValues() {
+        if (values != null) {
+            return values;
+        }
+        return new ArrayList<>();
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(name, valueSet, values);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, valueSet, values);
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		final JsonEnum other = (JsonEnum) obj;
-		return Objects.equals(name, other.name) && Objects.equals(valueSet, other.valueSet)
-				&& Objects.equals(values, other.values);
-	}
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final JsonEnum other = (JsonEnum) obj;
+        return Objects.equals(name, other.name) && Objects.equals(valueSet, other.valueSet)
+                && Objects.equals(values, other.values);
+    }
 
-	public Class<String> getValueClass() {
-		return getType();
-	}
+    public Class<String> getValueClass() {
+        return getType();
+    }
 
-	public Optional<String> parseValue(final String value) {
-		if (isValid(value))
-			return Optional.of(value);
-		return Optional.absent();
-	}
+    public Optional<String> parseValue(final String value) {
+        if (isValid(value))
+            return Optional.of(value);
+        return Optional.absent();
+    }
 
-	public String getName(final String value) {
-		return value;
-	}
+    public String getName(final String value) {
+        return value;
+    }
 
-	@Override
-	public String toString() {
-		return name;
-	}
+    @Override
+    public String toString() {
+        return name;
+    }
 
-	private static final Gson GSON = new Gson();
-	public static JsonEnum BOOLEAN = new JsonEnum("boolean", ImmutableList.of("true", "false"));
-	public static final Map<String, JsonEnum> PROPERTIES = getProperties();
+    private static final Gson GSON = new Gson();
+    public static JsonEnum BOOLEAN = new JsonEnum("boolean", ImmutableList.of("true", "false"));
+    public static final Map<String, JsonEnum> PROPERTIES = getProperties();
 
-	@SuppressWarnings("unchecked")
-	public static Map<String, JsonEnum> getProperties() {
-		final HashMap<String, JsonEnum> returnmap = new HashMap<>();
-		final Map<String, String> files = FileReader.readallFilesfromDierectory("/assets/girsignals/enumdefinition");
-		files.forEach((_u, file) -> {
-			final Map<String, List<String>> map = GSON.fromJson(file,
-					(Class<Map<String, List<String>>>) (Class<?>) Map.class);
-			if (map == null)
-				throw new IllegalStateException("Could not parse " + file);
-			map.forEach((name, list) -> returnmap.put(name.toLowerCase(), new JsonEnum(name, list)));
-		});
-		PROPERTIES.put(BOOLEAN.name, BOOLEAN);
-		return returnmap;
-	}
+    @SuppressWarnings("unchecked")
+    public static Map<String, JsonEnum> getProperties() {
+        final HashMap<String, JsonEnum> returnmap = new HashMap<>();
+        final Map<String, String> files = FileReader
+                .readallFilesfromDierectory("/assets/girsignals/enumdefinition");
+        files.forEach((_u, file) -> {
+            final Map<String, List<String>> map = GSON.fromJson(file,
+                    (Class<Map<String, List<String>>>) (Class<?>) Map.class);
+            if (map == null)
+                throw new IllegalStateException("Could not parse " + file);
+            map.forEach(
+                    (name, list) -> returnmap.put(name.toLowerCase(), new JsonEnum(name, list)));
+        });
+        PROPERTIES.put(BOOLEAN.name, BOOLEAN);
+        return returnmap;
+    }
 }

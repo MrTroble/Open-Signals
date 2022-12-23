@@ -37,6 +37,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.data.models.blockstates.VariantProperties.Rotation;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -49,7 +51,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.storage.LevelData;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
@@ -281,7 +285,7 @@ public class Signal extends Block implements EntityBlock {
 
     public static ItemStack pickBlock(final Player player, final Item item) {
         // Compatibility issues with other mods ...
-        if (!Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown())
+        if (!Minecraft.getInstance().gameSettings.keyBindPickBlock.isKeyDown())
             return new ItemStack(item);
         for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k) {
             if (player.inventory.getStackInSlot(k).getItem().equals(item)) {
@@ -421,17 +425,6 @@ public class Signal extends Block implements EntityBlock {
         return ImmutableList.copyOf(this.signalProperties);
     }
 
-    @Override
-    public boolean eventReceived(final BlockState state, final Level worldIn, final BlockPos pos,
-            final int id, final int param) {
-        return true;
-    }
-
-    @Override
-    public TileEntity createNewTileEntity(final Level worldIn, final int meta) {
-        return new SignalTileEnity();
-    }
-
     public String getSignalTypeName() {
         return this.getRegistryName().getResourcePath();
     }
@@ -441,10 +434,10 @@ public class Signal extends Block implements EntityBlock {
     }
 
     @Override
-    public void breakBlock(final Level worldIn, final BlockPos pos, final BlockState state) {
-        super.breakBlock(worldIn, pos, state);
+    public void destroy(final LevelAccessor accessor, final BlockPos pos, final BlockState state) {
+        super.destroy(accessor, pos, state);
 
-        if (!worldIn.isClientSide)
+        if (!level.isClientSide)
             GhostBlock.destroyUpperBlock(worldIn, pos);
     }
 
@@ -549,24 +542,24 @@ public class Signal extends Block implements EntityBlock {
     private SEProperty powerProperty = null;
 
     @Override
-    public boolean onBlockActivated(final Level worldIn, final BlockPos pos, final BlockState state,
-            final Player playerIn, final EnumHand hand, final Direction facing, final float hitX,
-            final float hitY, final float hitZ) {
-        final TileEntity tile = worldIn.getBlockEntity(pos);
+    public InteractionResult use(final BlockState blockstate, final Level level,
+            final BlockPos blockPos, final Player placer, final InteractionHand hand,
+            final BlockHitResult blockHit) {
+        final BlockEntity tile = level.getBlockEntity(blockPos);
         if (!(tile instanceof SignalTileEnity)) {
-            return false;
+            return InteractionResult.FAIL;
         }
         final SignalTileEnity signalTile = (SignalTileEnity) tile;
-        if (loadRedstoneOutput(worldIn, state, pos, signalTile) && worldIn.isClientSide) {
-            return true;
+        if (loadRedstoneOutput(level, blockstate, blockPos, signalTile) && level.isClientSide) {
+            return InteractionResult.SUCCESS;
         }
         final boolean customname = canHaveCustomname(signalTile.getProperties());
-        if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)
+        if (!placer.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)
                 && (canBeLinked() || customname)) {
-            OpenSignalsMain.handler.invokeGui(Signal.class, playerIn, worldIn, pos);
-            return true;
+            OpenSignalsMain.handler.invokeGui(Signal.class, placer, level, blockPos);
+            return InteractionResult.SUCCESS;
         }
-        return false;
+        return InteractionResult.FAIL;
     }
 
     @SuppressWarnings({
@@ -580,17 +573,23 @@ public class Signal extends Block implements EntityBlock {
             for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (pack.predicate.test(properties)) {
                     this.powerProperty = pack.property;
-                    tile.getProperty(pack.property)
-                            .ifPresent(power -> tile.setProperty(pack.property, !(Boolean) power));
+                    tile.getProperty(pack.property).ifPresent(power -> {
+                        if (power.equals("false")) {
+                            tile.setProperty(pack.property, "true");
+                        } else if (power.equals("true")) {
+                            tile.setProperty(pack.property, "false");
+                        }
+
+                    });
                     break;
                 }
             }
             if (this.powerProperty == null) {
                 return false;
             }
-            worldIn.setBlockState(pos, state, 3);
+            worldIn.setBlock(pos, state, 3);
             worldIn.notifyNeighborsOfStateChange(pos, this, false);
-            worldIn.markAndNotifyBlock(pos, null, state, state, 3);
+            worldIn.markAndNotifyBlock(pos, null, state, state, 3, 0);
             return true;
         }
         return false;
@@ -671,7 +670,7 @@ public class Signal extends Block implements EntityBlock {
     }
 
     @Override
-    public BlockEntity newBlockEntity(BlockPos p_153215_, BlockState p_153216_) {
+    public BlockEntity newBlockEntity(final BlockPos p_153215_, final BlockState p_153216_) {
         return new SignalTileEnity();
     }
 }

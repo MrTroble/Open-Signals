@@ -42,7 +42,6 @@ public class SignalSystemParser {
         return properties;
     }
 
-    @SuppressWarnings("rawtypes")
     public Signal createSignalSystem(final String fileName) {
 
         final String name = fileName.replace(".json", "").replace("_", "");
