@@ -138,11 +138,6 @@ public class Signal extends Block implements EntityBlock {
         public SignalPropertiesBuilder() {
         }
 
-        public SignalPropertiesBuilder(final Placementtool placementtool,
-                final String signalTypeName) {
-            this.placementtool = placementtool;
-        }
-
         @SuppressWarnings("rawtypes")
         public SignalProperties build(final FunctionParsingInfo info) {
             if (placementToolName != null) {
@@ -236,11 +231,6 @@ public class Signal extends Block implements EntityBlock {
                     canLink, colors, ImmutableList.copyOf(renderheights),
                     ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs));
         }
-    }
-
-    public static final SignalPropertiesBuilder builder(final Placementtool placementtool,
-            final String signalTypeName) {
-        return new SignalPropertiesBuilder(placementtool, signalTypeName);
     }
 
     public static final ArrayList<Signal> SIGNALLIST = new ArrayList<Signal>();
