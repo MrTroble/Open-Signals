@@ -60,7 +60,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     public void link(final BlockPos pos) {
-        if (!level.isClientSide)
+        if (level.isClientSide)
             return;
         if (!linkedPositions.contains(pos))
             linkedPositions.add(pos);
@@ -68,7 +68,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     public void unlink(final BlockPos pos) {
-        if (!level.isClientSide)
+        if (level.isClientSide)
             return;
         if (linkedPositions.contains(pos))
             linkedPositions.remove(pos);
@@ -76,7 +76,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
     }
 
     public void sendToAll() {
-        if (!level.isClientSide)
+        if (level.isClientSide)
             return;
         final boolean power = this.level.getBlockState(pos).getValue(RedstoneIO.POWER);
         this.linkedPositions.forEach(position -> loadChunkAndGetTile(SignalBoxTileEntity.class,

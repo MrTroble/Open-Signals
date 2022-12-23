@@ -71,7 +71,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
     public void onLoad() {
         if (temporary != null) {
             read(temporary);
-            if (level.isClientSide) {
+            if (!level.isClientSide) {
                 final BlockState state = level.getBlockState(worldPosition);
                 level.notifyBlockUpdate(worldPosition, state, state, 3);
             }

@@ -194,7 +194,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (loadChunkAndGetTile(SignalTileEnity.class, level, linkedSignalPosition, (x, y) -> {
         }))
             return true;
-        if (level.isClientSide)
+        if (!level.isClientSide)
             unlink();
         return false;
     }

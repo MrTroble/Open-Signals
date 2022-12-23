@@ -25,7 +25,7 @@ import com.troblecodings.signals.init.OSBlocks;
 
 public final class FileReader {
 
-    public static FileSystem fileSystemCache = null;
+    private static FileSystem fileSystemCache = null;
 
     private FileReader() {
     }
@@ -66,7 +66,7 @@ public final class FileReader {
             }
         }
         if (files.isEmpty()) {
-            // OpenSignalsMain.getLogger().warn("No files found at " + directory + "!");
+            OpenSignalsMain.getLogger().warn("No files found at " + directory + "!");
         }
         return files;
     }
@@ -110,6 +110,7 @@ public final class FileReader {
     public static void addToFileSystem(final FileSystem system) {
         if (fileSystemCache == null)
             getRessourceLocation("");
+
         final URL url = OSBlocks.class.getResource("/assets/girsignals");
         try {
             final URI uri = url.toURI();
@@ -128,7 +129,7 @@ public final class FileReader {
             final Path finalPath = path;
             Files.walkFileTree(system.getPath("/"), new SimplePathVisitor() {
                 @Override
-                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
                         throws IOException {
                     Path nextPath = finalPath.resolve(file.getFileName().toString());
                     ByteStreams.copy(Files.newInputStream(file), Files.newOutputStream(nextPath));
