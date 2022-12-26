@@ -2,7 +2,6 @@ package com.troblecodings.signals.blocks;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.init.OSItems;
-import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -21,7 +20,6 @@ public class SignalController extends Block implements EntityBlock {
 
     public SignalController() {
         super(Properties.of(Material.METAL));
-        setCreativeTab(OSTabs.TAB);
     }
 
     @Override

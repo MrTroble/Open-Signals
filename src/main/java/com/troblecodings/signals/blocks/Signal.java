@@ -1,5 +1,6 @@
 package com.troblecodings.signals.blocks;
 
+import java.awt.font.FontRenderContext;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import com.troblecodings.signals.utils.JsonEnum;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.data.models.blockstates.VariantProperties.Rotation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -42,18 +43,22 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.storage.LevelData;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
@@ -252,25 +257,25 @@ public class Signal extends Block implements EntityBlock {
     public Signal(final SignalProperties prop) {
         super(Properties.of(Material.STONE));
         this.prop = prop;
-        setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
+        registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         id = SIGNALLIST.size();
         SIGNALLIST.add(this);
         prop.placementtool.addSignal(this);
     }
 
     @Override
-    public AABB getBoundingBox(final BlockState state, final LevelAccessor source,
-            final BlockPos pos) {
+    public VoxelShape getShape(final BlockState state, final BlockGetter source, final BlockPos pos,
+            final CollisionContext context) {
         final SignalTileEnity te = (SignalTileEnity) source.getBlockEntity(pos);
         if (te == null)
-            return FULL_BLOCK_AABB;
-        return FULL_BLOCK_AABB.expand(0, getHeight(te.getProperties()), 0);
+            return Shapes.block();
+        return Shapes.block().expand(0, getHeight(te.getProperties()), 0);
     }
 
     @Override
-    public AABB getCollisionBoundingBox(final BlockState blockState, final LevelAccessor worldIn,
-            final BlockPos pos) {
-        return getBoundingBox(blockState, worldIn, pos);
+    public VoxelShape getCollisionShape(final BlockState blockState, final BlockGetter worldIn,
+            final BlockPos pos, final CollisionContext context) {
+        return getShape(blockState, worldIn, pos, context);
     }
 
     public static ItemStack pickBlock(final Player player, final Item item) {
@@ -291,19 +296,17 @@ public class Signal extends Block implements EntityBlock {
             final Level world, final BlockPos pos, final Player player) {
         return pickBlock(player, prop.placementtool);
     }
-
+    
     @Override
-    public BlockState getStateForPlacement(final Level world, final BlockPos pos,
-            final Direction facing, final float hitX, final float hitY, final float hitZ,
-            final int meta, final EntityLivingBase placer, final EnumHand hand) {
+    public BlockState getStateForPlacement(final BlockPlaceContext p_49820_) {
         final int index = 15
                 - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
-        return getDefaultState().withProperty(ANGEL, SignalAngel.values()[index]);
+        return defaultBlockState().setValue(ANGEL, SignalAngel.values()[index]);
     }
 
     @Override
-    public BlockState getStateFromMeta(final int meta) {
-        return getDefaultState().withProperty(ANGEL, SignalAngel.values()[meta]);
+    public BlockState stateById(final int meta) {
+        return defaultBlockState().setValue(ANGEL, SignalAngel.values()[meta]);
     }
 
     @Override
@@ -311,14 +314,15 @@ public class Signal extends Block implements EntityBlock {
         return state.getValue(ANGEL).ordinal();
     }
 
+    @SuppressWarnings("deprecation")
     @Override
-    public BlockState withRotation(final BlockState state, final Rotation rot) {
-        return state.withRotation(rot);
+    public BlockState rotate(final BlockState state, final Rotation rot) {
+        return state.rotate(rot);
     }
 
     @Override
-    public BlockState withMirror(final BlockState state, final Mirror mirrorIn) {
-        return state.withMirror(mirrorIn);
+    public BlockState mirror(final BlockState state, final Mirror mirrorIn) {
+        return state.mirror(mirrorIn);
     }
 
     @Override
@@ -416,7 +420,7 @@ public class Signal extends Block implements EntityBlock {
     }
 
     public String getSignalTypeName() {
-        return this.getRegistryName().getResourcePath();
+        return this.getRegistryName().getPath();
     }
 
     public int getID() {
@@ -424,10 +428,10 @@ public class Signal extends Block implements EntityBlock {
     }
 
     @Override
-    public void destroy(final LevelAccessor accessor, final BlockPos pos, final BlockState state) {
-        super.destroy(accessor, pos, state);
+    public void destroy(final LevelAccessor worldIn, final BlockPos pos, final BlockState state) {
+        super.destroy(worldIn, pos, state);
 
-        if (!level.isClientSide)
+        if (!worldIn.isClientSide())
             GhostBlock.destroyUpperBlock(worldIn, pos);
     }
 
@@ -466,14 +470,14 @@ public class Signal extends Block implements EntityBlock {
 
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderer font) {
+            final SignalTileEnity te, final FontRenderContext font) {
         this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight);
     }
 
     @SuppressWarnings("unchecked")
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderer font, final float renderHeight) {
+            final SignalTileEnity te, final FontRenderContext font, final float renderHeight) {
         float customRenderHeight = renderHeight;
         final Map<SEProperty, Object> map = te.getProperties();
         for (final FloatProperty property : this.prop.customRenderHeights) {
@@ -484,7 +488,7 @@ public class Signal extends Block implements EntityBlock {
         if (customRenderHeight == -1)
             return;
         final Level world = te.getLevel();
-        final BlockPos pos = te.getPos();
+        final BlockPos pos = te.getBlockPos();
         final BlockState state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof Signal)) {
             return;
@@ -509,7 +513,7 @@ public class Signal extends Block implements EntityBlock {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void renderSingleOverlay(final String[] display, final FontRenderer font,
+    public void renderSingleOverlay(final String[] display, final FontRenderContext font,
             final SignalTileEnity te) {
         final float width = this.prop.signWidth;
         final float offsetX = this.prop.offsetX;
@@ -578,7 +582,7 @@ public class Signal extends Block implements EntityBlock {
                 return false;
             }
             worldIn.setBlock(pos, state, 3);
-            worldIn.notifyNeighborsOfStateChange(pos, this, false);
+            worldIn.updateNeighborsAt(pos, this);
             worldIn.markAndNotifyBlock(pos, null, state, state, 3, 0);
             return true;
         }
@@ -586,13 +590,13 @@ public class Signal extends Block implements EntityBlock {
     }
 
     @Override
-    public boolean canProvidePower(final BlockState state) {
+    public boolean isSignalSource(final BlockState state) {
         return !this.prop.redstoneOutputs.isEmpty();
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int getWeakPower(final BlockState blockState, final LevelAccessor blockAccess,
+    public int getDirectSignal(final BlockState blockState, final BlockGetter blockAccess,
             final BlockPos pos, final Direction side) {
         if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null)
             return 0;
@@ -645,7 +649,7 @@ public class Signal extends Block implements EntityBlock {
     }
 
     @Override
-    public void updateTick(final Level world, final BlockPos pos, final BlockState state,
+    public void tick(final BlockState state, final ServerLevel world, final BlockPos pos,
             final Random rand) {
         if (this.prop.sounds.isEmpty() || !world.isClientSide) {
             return;

@@ -1,6 +1,8 @@
 package com.troblecodings.signals.items;
 
 import java.util.ArrayList;
+import java.util.UUID;
+
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -14,6 +16,7 @@ import com.troblecodings.signals.tileentitys.SignalTileEnity;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.util.InteractionResult;
 import net.minecraft.util.Direction;
 import net.minecraft.util.EnumHand;
@@ -24,6 +27,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.property.ExtendedBlockState;
@@ -44,10 +48,11 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
     }
     
     @Override
-    public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-    	Player player = context.getPlayer();
-    	Level worldIn = context.getLevel();
-    	BlockPos pos = context.getClickedPos();
+    public InteractionResult onItemUseFirst(final ItemStack stack, final UseOnContext context) {
+    	final Player player = context.getPlayer();
+    	final Level worldIn = context.getLevel();
+    	final BlockPos pos = context.getClickedPos();
+    	final UUID uuid = player.getUUID();
         if (player.isShiftKeyDown()) {
             if (!worldIn.isClientSide)
                 return InteractionResult.SUCCESS;
@@ -56,20 +61,20 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
         } else {
             if (worldIn.isClientSide)
                 return InteractionResult.SUCCESS;
-            final BlockPos setPosition = pos.offset(facing);
+            final BlockPos setPosition = context.getClickedPos();
             if (!worldIn.isEmptyBlock(setPosition))
                 return InteractionResult.FAIL;
-
+            
             final CompoundTag compound = player.getMainHandItem().getOrCreateTag();
             if(!compound.hasKey(BLOCK_TYPE_ID)) {
-                player.sendMessage(new TextComponentTranslation("pt.itemnotset"));
+                player.sendMessage(new TranslatableComponent("pt.itemnotset"), uuid);
                 return InteractionResult.FAIL;
             }
             final Signal block = Signal.SIGNALLIST.get(compound.getInt(BLOCK_TYPE_ID));
 
             BlockPos lastPos = setPosition;
             worldIn.setBlockState(setPosition, block.getStateForPlacement(worldIn, lastPos, facing,
-                    hitX, hitY, hitZ, 0, player, hand));
+                    hitX, hitY, hitZ, 0, player, context.getHand()));
 
             final SignalTileEnity sig = (SignalTileEnity) worldIn.getTileEntity(setPosition);
             final ExtendedBlockState ebs = ((ExtendedBlockState) block.getBlockState());
