@@ -74,8 +74,9 @@ public final class OSBlocks {
     @SubscribeEvent
     public static void registerItem(final RegistryEvent.Register<Item> event) {
         final IForgeRegistry<Item> registry = event.getRegistry();
-        blocksToRegister.forEach(block -> registry
-                .register(new BlockItem(block, new Properties().tab(OSTabs.TAB)).setRegistryName(block.getRegistryName())));
+        blocksToRegister.forEach(
+                block -> registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
+                        .setRegistryName(block.getRegistryName())));
     }
 
 }

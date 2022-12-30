@@ -44,7 +44,7 @@ public class SignalSystemParser {
 
     public Signal createSignalSystem(final String fileName) {
 
-        final String name = fileName.replace(".json", "").replace("_", "");
+        final String name = fileName.replace(".json", "").replace("_", "").toLowerCase().trim();
 
         final List<SEProperty> properties = new ArrayList<>();
 

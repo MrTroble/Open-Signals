@@ -61,7 +61,7 @@ public class DefaultConfigParser {
             if (DEFAULTCONFIGS.containsKey(signal)) {
                 throw new LogicalParserException("A signalconfig with the signals ["
                         + signal.getSignalTypeName() + "] does alredy exists! '" + files.getKey()
-                        + "' tried to register the same signalconfig!");
+                        + "' tried to register a defaultconfig for the same signal!");
             }
             final FunctionParsingInfo info = new FunctionParsingInfo(
                     LogicParser.UNIVERSAL_TRANSLATION_TABLE, signal);

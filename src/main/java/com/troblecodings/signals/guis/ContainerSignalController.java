@@ -22,6 +22,10 @@ import net.minecraftforge.common.property.ExtendedBlockState;
 
 public class ContainerSignalController extends Container implements UIClientSync {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 7809917666570199392L;
     private final AtomicReference<Map<SEProperty, Object>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
     private boolean send = false;

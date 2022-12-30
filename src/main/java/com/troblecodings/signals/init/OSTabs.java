@@ -1,5 +1,8 @@
 package com.troblecodings.signals.init;
 
+import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.items.Placementtool;
+
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 
@@ -12,8 +15,13 @@ public final class OSTabs {
 
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(OSItems.PLACEMENT_TOOL);
+            for (final Placementtool tool : OSItems.placementtools) {
+                if (tool.getRegistryName().toString().replace(OpenSignalsMain.MODID + ":", "")
+                        .equalsIgnoreCase("placementool")) {
+                    return new ItemStack(tool);
+                }
+            }
+            throw new IllegalArgumentException();
         }
     };
-
 }

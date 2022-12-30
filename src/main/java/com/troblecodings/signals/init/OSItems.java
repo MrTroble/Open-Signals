@@ -110,7 +110,7 @@ public final class OSItems {
             final ToolParser tools = GSON.fromJson(content, ToolParser.class);
             tools.getPlacementTools().forEach(placementtool -> {
                 final Placementtool tool = new Placementtool();
-                final String name = placementtool.toLowerCase().replace("_", "");
+                final String name = placementtool.toLowerCase().replace("_", "").trim();
                 tool.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
                 placementtools.add(tool);
                 registeredItems.add(tool);
