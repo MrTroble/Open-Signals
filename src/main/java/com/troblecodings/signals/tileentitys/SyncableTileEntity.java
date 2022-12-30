@@ -3,19 +3,20 @@ package com.troblecodings.signals.tileentitys;
 import java.util.ArrayList;
 
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
+import com.troblecodings.guilib.ecs.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.NetworkManager;
+import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class SyncableTileEntity extends BlockEntity {
+public class SyncableTileEntity extends BasicBlockEntity {
 
     public SyncableTileEntity(final BlockEntityType<?> p_155228_, final BlockPos p_155229_,
             final BlockState p_155230_) {
@@ -26,19 +27,19 @@ public class SyncableTileEntity extends BlockEntity {
 
     @Override
     public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return new ClientboundBlockE<ClientGamePacketListener>(getBlockPos(), 0, getUpdateTag());
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override
-    public void onDataPacket(final NetworkManager net, final Packet<ClientGamePacketListener> pkt) {
-        this.readFromNBT(pkt.getNbtCompound());
-        final BlockPos pos = getBlockPos();
-        getLevel().markBlockRangeForRenderUpdate(pos, pos);
+    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
+    	super.onDataPacket(net, pkt);
     }
-
+    
     @Override
     public CompoundTag getUpdateTag() {
-        return writeToNBT(new CompoundTag());
+    	NBTWrapper wrapper = new NBTWrapper();
+    	saveWrapper(wrapper);
+        return wrapper.tag;
     }
 
     public void syncClient() {
@@ -46,9 +47,7 @@ public class SyncableTileEntity extends BlockEntity {
     }
 
     public void syncClient(final Level world, final BlockPos pos) {
-        final BlockState state = world.getBlockState(pos);
-        world.notifyBlockUpdate(pos, state, state, 3);
-        world.markBlockRangeForRenderUpdate(pos, pos);
+        // TODO Client notification
     }
 
     public boolean add(final UIClientSync sync) {

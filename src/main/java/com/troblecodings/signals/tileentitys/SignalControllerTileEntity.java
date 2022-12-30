@@ -11,6 +11,7 @@ import org.openjdk.nashorn.internal.runtime.regexp.joni.constants.Arguments;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
+import com.troblecodings.guilib.ecs.interfaces.NamableWrapper;
 import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
@@ -27,7 +28,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalControllerTileEntity extends SyncableTileEntity
-        implements ISyncable, ILevelNameable, ILinkableTile, IChunkloadable {
+        implements ISyncable, ILinkableTile, IChunkloadable {
 
     private BlockPos linkedSignalPosition = null;
     private int[] listOfSupportedIndicies;
@@ -45,23 +46,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private static final String ID_COMP = "COMP";
 
     public SignalControllerTileEntity() {
-    }
-
-    public static BlockPos readBlockPosFromNBT(final CompoundTag compound) {
-        if (compound != null && compound.hasKey(ID_X) && compound.hasKey(ID_Y)
-                && compound.hasKey(ID_Z)) {
-            return new BlockPos(compound.getInt(ID_X), compound.getInt(ID_Y),
-                    compound.getInt(ID_Z));
-        }
-        return null;
-    }
-
-    public static void writeBlockPosToNBT(final BlockPos pos, final CompoundTag compound) {
-        if (pos != null && compound != null) {
-            compound.putInt(ID_X, pos.getX());
-            compound.putInt(ID_Y, pos.getY());
-            compound.putInt(ID_Z, pos.getZ());
-        }
     }
 
     @Override
@@ -170,21 +154,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     public BlockPos getLinkedPosition() {
         return linkedSignalPosition;
-    }
-
-    @Override
-    public String getComponentName() {
-        return "signalcontroller";
-    }
-
-    @Override
-    public String getName() {
-        return "";
-    }
-
-    @Override
-    public boolean hasCustomName() {
-        return false;
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
+import com.troblecodings.guilib.ecs.interfaces.NamableWrapper;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 
@@ -21,7 +22,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
-public class SignalTileEnity extends SyncableTileEntity implements ILevelNameable, ISyncable {
+public class SignalTileEnity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
     public SignalTileEnity(final BlockEntityType<?> blockType, final BlockPos blockPos,
             final BlockState state) {
@@ -100,7 +101,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
     }
 
     @Override
-    public String getName() {
+    public String getNameWrapper() {
         if (formatCustomName == null)
             return getSignal().getSignalTypeName();
         return formatCustomName;
