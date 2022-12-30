@@ -68,7 +68,7 @@ public final class SignalConfig {
     }
 
     @SuppressWarnings({
-            "unchecked", "rawtypes"
+            "rawtypes", "unchecked"
     })
     private static void changeIfPresent(final List<ConfigProperty> values, final ConfigInfo info) {
         final Map<Class, Object> object = new HashMap<>();
@@ -78,22 +78,18 @@ public final class SignalConfig {
             if (property.predicate.test(object)) {
                 property.values.forEach((prop, val) -> {
                     info.current.getProperty(prop)
-                            .ifPresent(_u -> info.current.setProperty(prop, (Comparable) val));
+                            .ifPresent(_u -> info.current.setProperty(prop, val));
                 });
             }
         });
     }
 
-    @SuppressWarnings({
-            "unchecked", "rawtypes"
-    })
     private static void loadWithoutPredicate(final List<ConfigProperty> values,
             final SignalTileEnity current) {
         if (values != null) {
             values.forEach(property -> {
                 property.values.forEach((prop, val) -> {
-                    current.getProperty(prop)
-                            .ifPresent(_u -> current.setProperty(prop, (Comparable) val));
+                    current.getProperty(prop).ifPresent(_u -> current.setProperty(prop, val));
                 });
             });
         }

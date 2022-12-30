@@ -38,7 +38,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
         linkedPositions.forEach(pos -> list.add(NBTUtil.createPosTag(pos)));
         compound.put(LINKED_LIST, list);
         if (this.name != null)
-            compound.setString(NAME_NBT, this.name);
+            compound.putString(NAME_NBT, this.name);
         return super.writeToNBT(compound);
     }
 

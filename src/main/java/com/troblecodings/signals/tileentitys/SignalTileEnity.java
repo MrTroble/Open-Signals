@@ -11,18 +11,22 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.ILevelNameable;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.property.ExtendedBlockState;
 
 public class SignalTileEnity extends SyncableTileEntity implements ILevelNameable, ISyncable {
+
+    public SignalTileEnity(final BlockEntityType<?> blockType, final BlockPos blockPos,
+            final BlockState state) {
+        super(blockType, blockPos, state);
+    }
 
     private final HashMap<SEProperty, String> map = new HashMap<>();
 
@@ -104,7 +108,7 @@ public class SignalTileEnity extends SyncableTileEntity implements ILevelNameabl
 
     @Override
     public boolean hasCustomName() {
-        return formatCustomName != null && getSignal().canHaveCustomname(this.map);
+        return formatCustomName != null && getSignal().canHaveCustomname();
     }
 
     public void setCustomName(final String str) {

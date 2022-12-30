@@ -15,10 +15,12 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMap.Builder;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Vector3f;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal.SignalAngel;
+import com.troblecodings.signals.contentpacks.ContentPackException;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
@@ -28,8 +30,8 @@ import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.renderer.block.model.MultipartBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.SimpleBakedModel;
+import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModel;
@@ -37,7 +39,6 @@ import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 
 @OnlyIn(Dist.CLIENT)
 public class SignalCustomModel implements IModel {
@@ -131,8 +132,8 @@ public class SignalCustomModel implements IModel {
         return textures;
     }
 
-    protected void register(final String name, final Predicate<IModelData> state,
-            final float x, final float y, final float z, final Map<String, String> map) {
+    protected void register(final String name, final Predicate<IModelData> state, final float x,
+            final float y, final float z, final Map<String, String> map) {
 
         IModel m = ModelLoaderRegistry.getModelOrLogError(
                 new ResourceLocation(OpenSignalsMain.MODID, "block/" + name),
@@ -154,64 +155,58 @@ public class SignalCustomModel implements IModel {
     @SuppressWarnings("unchecked")
     protected void loadExtention(final TextureStats texturestate,
             final Map<String, ModelExtention> extention, final String modelname,
-            final ModelStats states, final Models models, final FunctionParsingInfo signaltype) {
+            final ModelStats states, final Models models, final FunctionParsingInfo info) {
 
         final String blockstate = texturestate.getBlockstate();
 
         final Map<String, String> retexture = texturestate.getRetextures();
 
-        for (final Map.Entry<String, ModelExtention> extentionvalues : extention.entrySet()) {
+        for (final Map.Entry<String, Map<String, String>> extentions : texturestate.getExtentions()
+                .entrySet()) {
 
-            for (final Map.Entry<String, Map<String, String>> modelExtentions : texturestate
-                    .getExtentions().entrySet()) {
+            final String extentionName = extentions.getKey();
+            final Map<String, String> extentionProperties = extentions.getValue();
+            final ModelExtention extentionValues = extention.get(extentionName);
+            if (extentionValues == null)
+                throw new ContentPackException(String
+                        .format("There doesn't exists an extention named [%s]!", extentionName));
 
-                final String extentionInFilename = modelExtentions.getKey();
-                final Map<String, String> extentionprops = modelExtentions.getValue();
+            for (final Map.Entry<String, String> entry : extentionValues.getExtention()
+                    .entrySet()) {
 
-                if (extentionInFilename.equalsIgnoreCase(extentionvalues.getKey())) {
+                final String enumValue = entry.getKey();
+                final String retextureValue = entry.getValue();
 
-                    for (final Map.Entry<String, String> entry : extentionvalues.getValue()
-                            .getExtention().entrySet()) {
+                for (final Map.Entry<String, String> extProperties : extentionProperties
+                        .entrySet()) {
+                    final String seProperty = extProperties.getKey();
+                    final String retextureKey = extProperties.getValue();
 
-                        final String enumValue = entry.getKey();
-                        final String retextureValue = entry.getValue();
+                    final boolean load = texturestate.appendExtention(seProperty, enumValue,
+                            retextureKey, retextureValue);
 
-                        for (final Map.Entry<String, String> extentionProperties : extentionprops
-                                .entrySet()) {
-                            final String seProperty = extentionProperties.getKey();
-                            final String retexturekey = extentionProperties.getValue();
+                    if (load) {
 
-                            final boolean load = texturestate.appendExtention(seProperty, enumValue,
-                                    retexturekey, retextureValue);
-
-                            if (load) {
-
-                                try {
-
-                                    this.register(modelname,
-                                            LogicParser.predicate(texturestate.getBlockstate(),
-                                                    signaltype),
-                                            models.getX(texturestate.getOffsetX()),
-                                            models.getY(texturestate.getOffsetY()),
-                                            models.getZ(texturestate.getOffsetZ()),
-                                            states.createRetexture(texturestate.getRetextures()));
-
-                                } catch (final LogicalParserException e) {
-                                    OpenSignalsMain.log.error(
-                                            "There was an problem during loading an extention into "
-                                                    + modelname + " with the blockstate '"
-                                                    + texturestate.getBlockstate() + "'!");
-                                    e.printStackTrace();
-                                    FMLCommonHandler.instance().exitJava(-1, false);
-                                    return;
-                                }
-
-                                texturestate.resetStates(blockstate, retexture);
-                            }
+                        try {
+                            this.register(modelname,
+                                    LogicParser.predicate(texturestate.getBlockstate(), info),
+                                    models.getX(texturestate.getOffsetX()),
+                                    models.getY(texturestate.getOffsetY()),
+                                    models.getZ(texturestate.getOffsetZ()),
+                                    states.createRetexture(texturestate.getRetextures()));
+                        } catch (final LogicalParserException e) {
+                            OpenSignalsMain.log
+                                    .error("There was an problem during loading an extention into "
+                                            + modelname + " with the blockstate '"
+                                            + texturestate.getBlockstate() + "'!");
+                            e.printStackTrace();
+                            return;
                         }
+                        texturestate.resetStates(blockstate, retexture);
                     }
                 }
             }
+
         }
     }
 }

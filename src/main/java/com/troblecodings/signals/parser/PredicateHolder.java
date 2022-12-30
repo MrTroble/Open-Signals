@@ -28,24 +28,21 @@ public final class PredicateHolder {
         return with(pack.property, pack.predicate);
     }
 
-    public static Predicate<IModelData> with(final SEProperty property,
-            final Predicate t) {
+    public static Predicate<IModelData> with(final SEProperty property, final Predicate t) {
         return bs -> {
             final Object test = bs.getValue(property);
             return test != null && t.test(test);
         };
     }
 
-    public static Predicate<IModelData> hasAndIs(
-            final SEProperty<Boolean> property) {
+    public static Predicate<IModelData> hasAndIs(final SEProperty property) {
         return ebs -> {
             final Boolean bool = ebs.getValue(property);
             return bool != null && bool.booleanValue();
         };
     }
 
-    public static Predicate<IModelData> hasAndIsNot(
-            final SEProperty<Boolean> property) {
+    public static Predicate<IModelData> hasAndIsNot(final SEProperty property) {
         return ebs -> {
             final Boolean bool = ebs.getValue(property);
             return bool != null && !bool.booleanValue();

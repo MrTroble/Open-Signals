@@ -442,7 +442,7 @@ public class Signal extends Block implements EntityBlock {
         return this.prop.defaultHeight;
     }
 
-    public boolean canHaveCustomname(final Map<SEProperty, Object> map) {
+    public boolean canHaveCustomname() {
         return this.prop.customNameRenderHeight != -1 || !this.prop.customRenderHeights.isEmpty();
     }
 
@@ -600,7 +600,7 @@ public class Signal extends Block implements EntityBlock {
             return 0;
 
         final SignalTileEnity tile = (SignalTileEnity) blockAccess.getBlockEntity(pos);
-        if (tile.getProperty(powerProperty).filter(power -> !(Boolean) power).isPresent()) {
+        if (tile.getProperty(powerProperty).filter(power -> power.equals("false")).isPresent()) {
             return 0;
         }
         final Map<SEProperty, Object> properties = tile.getProperties();

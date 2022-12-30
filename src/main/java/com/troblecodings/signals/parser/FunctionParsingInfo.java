@@ -10,7 +10,6 @@ import java.util.function.Function;
 
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.utils.JsonEnum;
 
 @SuppressWarnings("rawtypes")
 public class FunctionParsingInfo {
@@ -43,8 +42,7 @@ public class FunctionParsingInfo {
                 signalSystem.getProperties());
     }
 
-    public FunctionParsingInfo(final String signalSystem,
-            final List<SEProperty> properties) {
+    public FunctionParsingInfo(final String signalSystem, final List<SEProperty> properties) {
         this.argument = "";
         this.signalName = signalSystem;
         this.properties = properties;
@@ -72,9 +70,6 @@ public class FunctionParsingInfo {
                     .orElse(null);
         });
         if (property == null) {
-            final SEProperty backup = JsonEnum.PROPERTIES.get(name);
-            if (backup != null)
-                return backup;
             throw new LogicalParserException(
                     String.format("Could not find property=%s in system=%S!", name, signalName));
         }
@@ -92,7 +87,7 @@ public class FunctionParsingInfo {
             final String nextInfo = argument;
             argument = parts[0];
             final SEProperty property = (SEProperty) getProperty();
-            final Class clazz = property.getType();
+            final Class clazz = property.getClass();
             try {
                 final Method method = clazz.equals(String.class)
                         ? clazz.getMethod("valueOf", Object.class)

@@ -62,9 +62,8 @@ public class CustomModelLoader implements ICustomModelLoader {
                 final Signal signaltype = Signal.SIGNALS.get(lowercaseName);
 
                 if (signaltype == null) {
-                    OpenSignalsMain.getLogger().error("There doesn't exists a signalsystem named "
-                            + filename.replace(".json", "") + "!");
-                    FMLCommonHandler.instance().exitJava(-1, false);
+                    OpenSignalsMain.getLogger().error(
+                            "There doesn't exists a signalsystem named " + lowercaseName + "!");
                     return;
                 }
 
@@ -116,7 +115,6 @@ public class CustomModelLoader implements ICustomModelLoader {
                                                                 + texturestate.getBlockstate()
                                                                 + " '!");
                                                 e.printStackTrace();
-                                                FMLCommonHandler.instance().exitJava(-1, false);
                                                 return;
                                             }
                                         }
@@ -143,10 +141,9 @@ public class CustomModelLoader implements ICustomModelLoader {
 
                                     } else if (state == null && !texturestate.isautoBlockstate()
                                             && !extentionloaded) {
-                                        OpenSignalsMain.log.warn(
+                                        OpenSignalsMain.log.error(
                                                 "The predicate of " + modelname + " in " + filename
                                                         + " is null! This shouldn't be the case!");
-                                        FMLCommonHandler.instance().exitJava(-1, false);
                                         return;
                                     }
                                 }
