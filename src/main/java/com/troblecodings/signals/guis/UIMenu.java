@@ -13,6 +13,8 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 
+import net.minecraft.world.level.block.Rotation;
+
 public class UIMenu extends UIComponent {
 
     private int mX, mY, selection = 0, rotation = 0;

@@ -29,7 +29,7 @@ public class ContainerSignalController extends Container implements UIClientSync
     private final AtomicReference<Map<SEProperty, Object>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
     private boolean send = false;
-    private PlayerMP player;
+    private Player player;
     private Runnable onUpdate;
 
     public ContainerSignalController(final SignalControllerTileEntity tile) {
@@ -97,14 +97,14 @@ public class ContainerSignalController extends Container implements UIClientSync
 
     @Override
     public boolean canInteractWith(final Player playerIn) {
-        if (playerIn instanceof PlayerMP) {
-            this.player = (PlayerMP) playerIn;
+        if (playerIn instanceof Player) {
+            this.player = (Player) playerIn;
         }
         return true;
     }
 
     @Override
-    public PlayerMP getPlayer() {
+    public Player getPlayer() {
         return player;
     }
 }

@@ -53,8 +53,7 @@ public class GuiPlacementtool extends GuiBase {
                 ? this.compound.getInt(Placementtool.BLOCK_TYPE_ID)
                 : tool.getObjFromID(0).getID();
         currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
-
-        init();
+        initInternal();
     }
 
     private void initList() {
@@ -71,7 +70,7 @@ public class GuiPlacementtool extends GuiBase {
         this.list.read(compound);
     }
 
-    private void init() {
+    private void initInternal() {
         initList();
         final UIBox vbox = new UIBox(UIBox.VBOX, 5);
         this.list.add(vbox);

@@ -43,6 +43,7 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.Rotation;
 
 public class GIRSyncEntryTests {
 

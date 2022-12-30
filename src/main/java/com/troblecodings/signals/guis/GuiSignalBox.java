@@ -47,6 +47,7 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NBTUtil;
+import net.minecraft.world.level.block.Rotation;
 
 public class GuiSignalBox extends GuiBase {
 
