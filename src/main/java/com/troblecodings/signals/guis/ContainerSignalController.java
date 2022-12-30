@@ -12,7 +12,6 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
-import net.minecraft.entity.player.PlayerMP;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
@@ -98,7 +97,7 @@ public class ContainerSignalController extends Container implements UIClientSync
     @Override
     public boolean canInteractWith(final Player playerIn) {
         if (playerIn instanceof Player) {
-            this.player = (Player) playerIn;
+            this.player = playerIn;
         }
         return true;
     }
