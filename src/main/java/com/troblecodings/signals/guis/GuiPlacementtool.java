@@ -39,7 +39,7 @@ public class GuiPlacementtool extends GuiBase {
 
     private final UIEntity list = new UIEntity();
     private final UIBlockRender blockRender = new UIBlockRender();
-    private final HashMap<String, SEProperty<?>> lookup = new HashMap<String, SEProperty<?>>();
+    private final HashMap<String, SEProperty> lookup = new HashMap<String, SEProperty>();
     private Signal currentSelectedBlock;
     private final Placementtool tool;
     public static final int GUI_PLACEMENTTOOL = 0;
@@ -60,9 +60,9 @@ public class GuiPlacementtool extends GuiBase {
     private void initList() {
         final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock
                 .getBlockState();
-        final Collection<SEProperty<?>> unlistedProperties = hVExtendedBlockState
+        final Collection<SEProperty> unlistedProperties = hVExtendedBlockState
                 .getUnlistedProperties();
-        for (final SEProperty<?> property : unlistedProperties) {
+        for (final SEProperty property : unlistedProperties) {
             final SEProperty prop = SEProperty.cst(property);
             of(prop, inp -> applyModelChanges());
         }
@@ -198,7 +198,7 @@ public class GuiPlacementtool extends GuiBase {
             }
         }
 
-        for (final Entry<SEProperty<?>, Optional<?>> prop : ebs.getUnlistedProperties()
+        for (final Entry<SEProperty, Optional<?>> prop : ebs.getUnlistedProperties()
                 .entrySet()) {
             final SEProperty property = SEProperty.cst(prop.getKey());
             if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {

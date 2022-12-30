@@ -7,23 +7,29 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.signals.SEProperty;
 
 import net.minecraft.block.material.EnumPushReaction;
 import net.minecraft.block.material.MapColor;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.data.models.blockstates.VariantProperties.Rotation;
 import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.AABB;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.LevelAccessor;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.property.IModelData;
-import net.minecraftforge.common.property.SEProperty;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelProperty;
 
 @SuppressWarnings({
         "rawtypes", "unchecked"
@@ -286,9 +292,8 @@ public class DummyBlockState implements IModelData {
     }
 
     @Override
-    public void addCollisionBoxToList(final Level worldIn, final BlockPos pos,
-            final AABB entityBox, final List<AABB> collidingBoxes,
-            final Entity entityIn, final boolean flag) {
+    public void addCollisionBoxToList(final Level worldIn, final BlockPos pos, final AABB entityBox,
+            final List<AABB> collidingBoxes, final Entity entityIn, final boolean flag) {
 
     }
 
@@ -352,25 +357,24 @@ public class DummyBlockState implements IModelData {
     }
 
     @Override
-    public Collection<SEProperty<?>> getUnlistedNames() {
+    public Collection<SEProperty> getUnlistedNames() {
 
         return null;
     }
 
     @Override
-    public <V> V getValue(final SEProperty<V> property) {
+    public <V> V getValue(final SEProperty property) {
         final Object value = map.get(property);
         return (V) value;
     }
 
     @Override
-    public <V> IModelData withProperty(final SEProperty<V> property,
-            final V value) {
+    public <V> IModelData withProperty(final SEProperty property, final V value) {
         return null;
     }
 
     @Override
-    public ImmutableMap<SEProperty<?>, Optional<?>> getUnlistedProperties() {
+    public ImmutableMap<SEProperty, Optional<?>> getUnlistedProperties() {
 
         return null;
     }
@@ -378,6 +382,21 @@ public class DummyBlockState implements IModelData {
     @Override
     public BlockState getClean() {
 
+        return null;
+    }
+
+    @Override
+    public boolean hasProperty(ModelProperty<?> prop) {
+        return false;
+    }
+
+    @Override
+    public <T> T getData(ModelProperty<T> prop) {
+        return null;
+    }
+
+    @Override
+    public <T> T setData(ModelProperty<T> prop, T data) {
         return null;
     }
 

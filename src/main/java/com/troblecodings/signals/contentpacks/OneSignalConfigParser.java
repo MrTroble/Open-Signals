@@ -50,7 +50,7 @@ public class OneSignalConfigParser {
             if (SHUNTINGCONFIGS.containsKey(signal)) {
                 throw new LogicalParserException("A signalconfig with the signals ["
                         + signal.getSignalTypeName() + "] does alredy exists! '" + files.getKey()
-                        + "' tried to register the same signalconfig!");
+                        + "' tried to register a shuntingconfig for the same signal!");
             }
 
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);

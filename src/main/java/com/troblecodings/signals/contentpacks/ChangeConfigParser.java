@@ -66,10 +66,10 @@ public class ChangeConfigParser {
             }
             final SignalPair pair = new SignalPair(start, end);
             if (CHANGECONFIGS.containsKey(pair)) {
-                throw new LogicalParserException(
-                        "A signalconfig with the signals [" + start.getSignalTypeName() + ", "
-                                + end.getSignalTypeName() + "] does alredy exists! '"
-                                + files.getKey() + "' tried to register the same pairconfig!");
+                throw new LogicalParserException("A signalconfig with the signals ["
+                        + start.getSignalTypeName() + ", " + end.getSignalTypeName()
+                        + "] does alredy exists! '" + files.getKey()
+                        + "' tried to register a chaneconfig for the same signalpair!");
             }
             final FunctionParsingInfo startInfo = new FunctionParsingInfo(start);
             final FunctionParsingInfo endInfo = new FunctionParsingInfo(

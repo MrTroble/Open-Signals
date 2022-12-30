@@ -152,7 +152,6 @@ public class Signal extends Block implements EntityBlock {
                         placementtool = item;
                         return;
                     }
-
                 });
                 if (placementtool == null)
                     throw new ContentPackException(
@@ -174,7 +173,6 @@ public class Signal extends Block implements EntityBlock {
                             e.printStackTrace();
                         }
                     }
-
                 });
             }
 
@@ -296,7 +294,7 @@ public class Signal extends Block implements EntityBlock {
             final Level world, final BlockPos pos, final Player player) {
         return pickBlock(player, prop.placementtool);
     }
-    
+
     @Override
     public BlockState getStateForPlacement(final BlockPlaceContext p_49820_) {
         final int index = 15
