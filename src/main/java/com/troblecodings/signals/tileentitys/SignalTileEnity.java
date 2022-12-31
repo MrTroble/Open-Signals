@@ -6,69 +6,59 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
-import com.troblecodings.guilib.ecs.interfaces.NamableWrapper;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.ILevelNameable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.property.ExtendedBlockState;
 
 public class SignalTileEnity extends SyncableTileEntity implements NamableWrapper, ISyncable {
+
+    public static final String PROPERTIES = "properties";
+    public static final String CUSTOMNAME = "customname";
+    public static final String BLOCKID = "blockid";
+
+    private final HashMap<SEProperty, String> map = new HashMap<>();
+    private String formatCustomName = null;
+    private NBTWrapper temporary = null;
 
     public SignalTileEnity(final BlockEntityType<?> blockType, final BlockPos blockPos,
             final BlockState state) {
         super(blockType, blockPos, state);
     }
 
-    private final HashMap<SEProperty, String> map = new HashMap<>();
-
-    public static final String PROPERTIES = "properties";
-    public static final String CUSTOMNAME = "customname";
-    public static final String BLOCKID = "blockid";
-
-    private String formatCustomName = null;
-
     @Override
-    public CompoundTag writeToNBT(final CompoundTag compound) {
-        final CompoundTag comp = new CompoundTag();
-        map.forEach((prop, in) -> prop.writeToNBT(comp, in));
+    public void saveWrapper(NBTWrapper wrapper) {
+    	final NBTWrapper properties = new NBTWrapper();
+        map.forEach((prop, in) -> prop.writeToNBT(properties, in));
         if (formatCustomName != null)
-            comp.setString(CUSTOMNAME, formatCustomName);
-        compound.put(PROPERTIES, comp);
-        super.writeToNBT(compound);
-        return compound;
+        	properties.putString(CUSTOMNAME, formatCustomName);
+        wrapper.putWrapper(PROPERTIES, properties);
     }
-
-    private CompoundTag temporary = null;
-
+    
     @Override
-    public void readFromNBT(final CompoundTag compound) {
-        super.readFromNBT(compound);
-        final CompoundTag comp = compound.getCompoundTag(PROPERTIES);
+    public void loadWrapper(NBTWrapper wrapper) {
+        final NBTWrapper properties = wrapper.getWrapper(PROPERTIES);
         if (level == null) {
-            temporary = comp.copy();
+            temporary = properties.copy();
         } else {
             temporary = null;
-            read(comp);
+            read(properties);
         }
     }
-
-    private void read(final CompoundTag comp) {
-        ((ExtendedBlockState) world.getBlockState(worldPosition).getBlock().getBlockState())
-                .getUnlistedProperties().stream().forEach(prop -> {
-                    final SEProperty sep = SEProperty.cst(prop);
-                    sep.readFromNBT(comp).ifPresent(obj -> map.put(sep, obj));
-                });
-        if (comp.hasKey(CUSTOMNAME))
+    
+    private void read(final NBTWrapper comp) {
+    	// TODO read
+        if (comp.contains(CUSTOMNAME))
             setCustomName(comp.getString(CUSTOMNAME));
     }
 
@@ -78,7 +68,7 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
             read(temporary);
             if (!level.isClientSide) {
                 final BlockState state = level.getBlockState(worldPosition);
-                level.notifyBlockUpdate(worldPosition, state, state, 3);
+                // TODO update
             }
             temporary = null;
         }
@@ -86,7 +76,6 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
 
     public void setProperty(final SEProperty prop, final String opt) {
         map.put(prop, opt);
-        this.markDirty();
         getSignal().getUpdate(level, worldPosition);
     }
 
@@ -117,9 +106,8 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
         if (str == null && map.containsKey(Signal.CUSTOMNAME)) {
             map.remove(Signal.CUSTOMNAME);
         } else if (str != null) {
-            map.put(Signal.CUSTOMNAME, true);
+            map.put(Signal.CUSTOMNAME, "TRUE");
         }
-        this.markDirty();
         this.syncClient();
     }
 
@@ -130,10 +118,6 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
 
     public Signal getSignal() {
         return (Signal) super.getBlockState().getBlock();
-    }
-
-    public int getBlockID() {
-        return getSignal().getID();
     }
 
     @Override

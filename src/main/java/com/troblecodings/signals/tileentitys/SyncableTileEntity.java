@@ -2,8 +2,8 @@ package com.troblecodings.signals.tileentitys;
 
 import java.util.ArrayList;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
-import com.troblecodings.guilib.ecs.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 
 import net.minecraft.core.BlockPos;

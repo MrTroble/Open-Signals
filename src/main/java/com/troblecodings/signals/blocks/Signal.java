@@ -14,6 +14,7 @@ import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.platform.GlStateManager;
+import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.contentpacks.ContentPackException;
@@ -33,6 +34,8 @@ import com.troblecodings.signals.tileentitys.SignalTileEnity;
 import com.troblecodings.signals.utils.JsonEnum;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -40,7 +43,9 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -65,14 +70,10 @@ import net.minecraftforge.client.model.data.IModelData;
 
 public class Signal extends Block implements EntityBlock {
 
-    public static enum SignalAngel {
+    public static enum SignalAngel implements NamableWrapper {
 
         ANGEL0, ANGEL22P5, ANGEL45, ANGEL67P5, ANGEL90, ANGEL112P5, ANGEL135, ANGEL157P5, ANGEL180,
         ANGEL202P5, ANGEL225, ANGEL247P5, ANGEL270, ANGEL292P5, ANGEL315, ANGEL337P5;
-
-        public String getName() {
-            return this.name().toLowerCase();
-        }
 
         public float getDegree() {
             return this.ordinal() * 22.5f;
@@ -81,6 +82,11 @@ public class Signal extends Block implements EntityBlock {
         public double getRadians() {
             return (this.ordinal() / 16.0) * Math.PI * 2.0;
         }
+
+		@Override
+		public String getNameWrapper() {
+            return "angel" + getDegree();
+		}
     }
 
     public static class SignalProperties {
@@ -236,8 +242,6 @@ public class Signal extends Block implements EntityBlock {
         }
     }
 
-    public static final ArrayList<Signal> SIGNALLIST = new ArrayList<Signal>();
-
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
 
     public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
@@ -245,7 +249,6 @@ public class Signal extends Block implements EntityBlock {
     public static final SEProperty CUSTOMNAME = new SEProperty("customname",
             JsonEnum.PROPERTIES.get("boolean"), "false", ChangeableStage.AUTOMATICSTAGE, t -> true);
 
-    private final int id;
     protected final SignalProperties prop;
 
     @SuppressWarnings("rawtypes")
@@ -256,8 +259,6 @@ public class Signal extends Block implements EntityBlock {
         super(Properties.of(Material.STONE));
         this.prop = prop;
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
-        id = SIGNALLIST.size();
-        SIGNALLIST.add(this);
         prop.placementtool.addSignal(this);
     }
 
@@ -275,14 +276,18 @@ public class Signal extends Block implements EntityBlock {
             final BlockPos pos, final CollisionContext context) {
         return getShape(blockState, worldIn, pos, context);
     }
+    
+    public static final int HOTBAR_SLOT = 9;
 
     public static ItemStack pickBlock(final Player player, final Item item) {
         // Compatibility issues with other mods ...
-        if (!Minecraft.getInstance().gameSettings.keyBindPickBlock.isKeyDown())
+    	final Minecraft minecraft = Minecraft.getInstance();
+        if (!minecraft.options.keyPickItem.isDown())
             return new ItemStack(item);
-        for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k) {
-            if (player.inventory.getStackInSlot(k).getItem().equals(item)) {
-                player.inventory.currentItem = k;
+        for (int k = 0; k < HOTBAR_SLOT; ++k) {
+        	final ItemStack currentStack = player.inventoryMenu.getSlot(k).getItem();
+            if (currentStack.getItem().equals(item)) {
+                player.inventoryMenu.setItem(k, k, currentStack);
                 return ItemStack.EMPTY;
             }
         }
@@ -293,39 +298,6 @@ public class Signal extends Block implements EntityBlock {
     public ItemStack getPickBlock(final BlockState state, final RayTraceResult target,
             final Level world, final BlockPos pos, final Player player) {
         return pickBlock(player, prop.placementtool);
-    }
-
-    @Override
-    public BlockState getStateForPlacement(final BlockPlaceContext p_49820_) {
-        final int index = 15
-                - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
-        return defaultBlockState().setValue(ANGEL, SignalAngel.values()[index]);
-    }
-
-    @Override
-    public BlockState stateById(final int meta) {
-        return defaultBlockState().setValue(ANGEL, SignalAngel.values()[meta]);
-    }
-
-    @Override
-    public int getMetaFromState(final BlockState state) {
-        return state.getValue(ANGEL).ordinal();
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public BlockState rotate(final BlockState state, final Rotation rot) {
-        return state.rotate(rot);
-    }
-
-    @Override
-    public BlockState mirror(final BlockState state, final Mirror mirrorIn) {
-        return state.mirror(mirrorIn);
-    }
-
-    @Override
-    public boolean canRenderInLayer(final BlockState state, final BlockRenderLayer layer) {
-        return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
     }
 
     @SuppressWarnings({
@@ -341,44 +313,6 @@ public class Signal extends Block implements EntityBlock {
             entity.getProperties().forEach((property, value) -> blockState.getAndUpdate(
                     oldState -> oldState.withProperty((SEProperty) (property), value)));
         return blockState.get();
-    }
-
-    @Override
-    public boolean isTranslucent(final BlockState state) {
-        return true;
-    }
-
-    @Override
-    public boolean isOpaqueCube(final BlockState state) {
-        return false;
-    }
-
-    @Override
-    public boolean isFullCube(final BlockState state) {
-        return false;
-    }
-
-    private SEProperty[] propcache = null;
-
-    private void buildCacheIfNull() {
-        if (propcache == null) {
-            final Collection<SEProperty> props = ((ExtendedBlockState) this.getBlockState())
-                    .getUnlistedProperties();
-            propcache = props.toArray(new SEProperty[props.size()]);
-        }
-    }
-
-    public int getIDFromProperty(final SEProperty propertyIn) {
-        buildCacheIfNull();
-        for (int i = 0; i < propcache.length; i++)
-            if (propcache[i].equals(propertyIn))
-                return i;
-        return -1;
-    }
-
-    public SEProperty getPropertyFromID(final int id) {
-        buildCacheIfNull();
-        return propcache[id];
     }
 
     @SuppressWarnings("rawtypes")
@@ -421,10 +355,6 @@ public class Signal extends Block implements EntityBlock {
         return this.getRegistryName().getPath();
     }
 
-    public int getID() {
-        return id;
-    }
-
     @Override
     public void destroy(final LevelAccessor worldIn, final BlockPos pos, final BlockState state) {
         super.destroy(worldIn, pos, state);
@@ -448,7 +378,7 @@ public class Signal extends Block implements EntityBlock {
 
     @Override
     public String toString() {
-        return this.getUnlocalizedName();
+        return this.getDescriptionId();
     }
 
     public final boolean canBeLinked() {
@@ -468,14 +398,14 @@ public class Signal extends Block implements EntityBlock {
 
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderContext font) {
+            final SignalTileEnity te, final Font font) {
         this.renderOverlay(x, y, z, te, font, this.prop.customNameRenderHeight);
     }
 
     @SuppressWarnings("unchecked")
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final double x, final double y, final double z,
-            final SignalTileEnity te, final FontRenderContext font, final float renderHeight) {
+            final SignalTileEnity te, final Font font, final float renderHeight) {
         float customRenderHeight = renderHeight;
         final Map<SEProperty, Object> map = te.getProperties();
         for (final FloatProperty property : this.prop.customRenderHeights) {
@@ -491,11 +421,11 @@ public class Signal extends Block implements EntityBlock {
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
-        final ITextComponent name = te.getDisplayName();
+        final String name = te.getNameAsStringWrapper();
         final SignalAngel face = state.getValue(Signal.ANGEL);
         final float angel = face.getDegree();
 
-        final String[] display = name.getFormattedText().split("\\[n\\]");
+        final String[] display = name.split("\\[n\\]");
 
         final float scale = this.prop.signScale;
 
@@ -626,7 +556,7 @@ public class Signal extends Block implements EntityBlock {
         if (sound.duration == 1) {
             world.playSound(null, pos, sound.sound, SoundSource.BLOCKS, 1.0F, 1.0F);
         } else {
-            if (world.isUpdateScheduled(pos, this)) {
+            if (world.getBlockTicks().hasScheduledTick(pos, this)) {
                 return;
             } else {
                 if (sound.predicate.test(properties)) {

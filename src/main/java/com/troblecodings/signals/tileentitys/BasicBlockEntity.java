@@ -1,6 +1,6 @@
 package com.troblecodings.signals.tileentitys;
 
-import com.troblecodings.guilib.ecs.NBTWrapper;
+import com.troblecodings.core.NBTWrapper;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;

@@ -4,9 +4,9 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import com.troblecodings.guilib.ecs.BaseContainer;
+import com.troblecodings.core.BaseContainer;
+import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
-import com.troblecodings.guilib.ecs.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;

@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.stream.Collectors;
 
-import com.troblecodings.guilib.ecs.NBTWrapper;
+import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
-import com.troblecodings.guilib.ecs.interfaces.NamableWrapper;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 

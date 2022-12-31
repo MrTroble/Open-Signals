@@ -7,17 +7,19 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.utils.JsonEnum;
 
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelProperty;
 
-public class SEProperty
-        implements IIntegerable<String>, Predicate<Map<SEProperty, Object>> {
+public class SEProperty extends ModelProperty<String>
+        implements IIntegerable<String> {
 
     private final String name;
     private final JsonEnum parent;
@@ -40,6 +42,10 @@ public class SEProperty
         }
     }
 
+    public Object getWrapper(Object object) {
+    	return ((IModelData)object).getData(this);
+    }
+    
     @Override
     public String getName() {
         return name;
@@ -54,17 +60,17 @@ public class SEProperty
         return parent.getName(value);
     }
 
-    public Optional<String> readFromNBT(final CompoundTag comp) {
+    public Optional<String> readFromNBT(final NBTWrapper comp) {
         if (comp.contains(this.getName())) {
-            final int id = comp.getInt(this.getName());
+            final int id = comp.getInteger(this.getName());
             return Optional.of(getObjFromID(id));
         }
         return Optional.empty();
     }
 
-    public CompoundTag writeToNBT(final CompoundTag comp, final Object value) {
+    public NBTWrapper writeToNBT(final NBTWrapper comp, final Object value) {
         if (value != null && isValid((String) value))
-            comp.putInt(getName(), this.allowedValues.indexOf(value));
+            comp.putInteger(getName(), this.allowedValues.indexOf(value));
         return comp;
     }
 
@@ -95,8 +101,7 @@ public class SEProperty
         return "SEP[" + this.getName() + "]";
     }
 
-    @Override
-    public boolean test(final Map<SEProperty, Object> t) {
+    public boolean testMap(final Map<SEProperty, Object> t) {
         return this.deps.test(t);
     }
 
