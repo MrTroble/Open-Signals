@@ -1,36 +1,40 @@
 package com.troblecodings.signals.init;
 
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class OSModels {
 
-    private OSModels() {
-    }
+	private OSModels() {
+	}
 
-    @SubscribeEvent
-    public static void register(final ModelRegistryEvent event) {
-        OSItems.registeredItems.forEach(OSModels::registerModel);
-    }
+	@SubscribeEvent
+	public static void register(final ModelRegistryEvent event) {
+		OSItems.registeredItems.forEach(OSModels::registerModel);
+		OSBlocks.blocksToRegister.stream().filter(block -> (block instanceof Signal)).forEach(
+				block -> ModelLoaderRegistry.registerLoader(block.getRegistryName(), CustomModelLoader.INSTANCE));
+	}
 
-    @SubscribeEvent
-    public static void addColor(final ColorHandlerEvent.Block event) {
-        final BlockColors colors = event.getBlockColors();
-        OSBlocks.blocksToRegister.forEach(block -> {
-            if (block instanceof Signal) {
-                final Signal signal = (Signal) block;
-                if (signal.hasCostumColor())
-                    colors.register((_u1, _u2, _u3, index) -> signal.colorMultiplier(index), block);
-            }
-        });
-    }
+	@SubscribeEvent
+	public static void addColor(final ColorHandlerEvent.Block event) {
+		final BlockColors colors = event.getBlockColors();
+		OSBlocks.blocksToRegister.forEach(block -> {
+			if (block instanceof Signal) {
+				final Signal signal = (Signal) block;
+				if (signal.hasCostumColor())
+					colors.register((_u1, _u2, _u3, index) -> signal.colorMultiplier(index), block);
+			}
+		});
+	}
 
-    private static void registerModel(final Item item) {
-    	// TODO Check if correct
-    }
+	private static void registerModel(final Item item) {
+		// TODO Check if correct
+	}
 }

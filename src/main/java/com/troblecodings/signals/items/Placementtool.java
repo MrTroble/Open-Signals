@@ -1,23 +1,19 @@
 package com.troblecodings.signals.items;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -26,9 +22,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -63,8 +57,12 @@ public class Placementtool extends BlockItem implements IIntegerable<Signal>, IT
 	    	final Player player = context.getPlayer();
 	    	final Level worldIn = context.getLevel();
 	        final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
-			final Signal signal = (Signal) getPlacementState(context).getBlock();
-            final int height = signal.getHeight(signal.getProperties());
+			final SignalTileEntity tile = (SignalTileEntity) worldIn.getBlockEntity(context.getClickedPos());
+			final Signal signal = (Signal) tile.getBlockState().getBlock();
+			
+			// TODO set signal
+			
+            final int height = signal.getHeight(tile.getProperties());
             BlockPos lastPos = context.getClickedPos();
             for (int i = 0; i < height; i++) {
                 if (!worldIn.isEmptyBlock(lastPos = lastPos.above())) {
@@ -80,7 +78,7 @@ public class Placementtool extends BlockItem implements IIntegerable<Signal>, IT
 
             final String name = compound.getString(SIGNAL_CUSTOMNAME);
             if (!name.isEmpty())
-                sig.setCustomName(name);
+            	tile.setCustomName(name);
 		}
 		return result;
 	}

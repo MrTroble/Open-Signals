@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -26,24 +27,32 @@ import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.ItemOverrides;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBakery;
+import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.MultiPartBakedModel;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.IForgeModelState;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.IModelConfiguration;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.geometry.IModelGeometry;
 import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
 
 @OnlyIn(Dist.CLIENT)
-public class SignalCustomModel implements IModel {
+public class SignalCustomModel implements IModelGeometry<SignalCustomModel> {
 
     private final HashMap<Predicate<IModelData>, Pair<IModelData, Vector3f>> modelCache = new HashMap<>();
-    private List<ResourceLocation> textures = new ArrayList<>();
+    private List<Material> textures = new ArrayList<>();
     private MultiPartBakedModel cachedModel = null;
     private SignalAngel angel = SignalAngel.ANGEL0;
     private final Matrix4f rotation;
@@ -121,20 +130,10 @@ public class SignalCustomModel implements IModel {
         return cachedModel;
     }
 
-    @Override
-    public IModelState getDefaultState() {
-        return TRSRTransformation.identity();
-    }
-
-    @Override
-    public Collection<ResourceLocation> getTextures() {
-        return textures;
-    }
-
     protected void register(final String name, final Predicate<IModelData> state, final float x,
             final float y, final float z, final Map<String, String> map) {
 
-        IModel m = ModelLoaderRegistry.getModelOrLogError(
+        IModelGeometry<?> m = ModelLoaderRegistry.getModel(
                 new ResourceLocation(OpenSignalsMain.MODID, "block/" + name),
                 "Couldn't find " + name);
         m = m.smoothLighting(false);
@@ -208,4 +207,18 @@ public class SignalCustomModel implements IModel {
 
         }
     }
+
+	@Override
+	public BakedModel bake(IModelConfiguration owner, ModelBakery bakery,
+			Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides,
+			ResourceLocation modelLocation) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<Material> getTextures(IModelConfiguration owner,
+			Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
+		return null;
+	}
 }

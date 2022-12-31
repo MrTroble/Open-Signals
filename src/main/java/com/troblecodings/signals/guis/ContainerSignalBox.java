@@ -43,28 +43,6 @@ public class ContainerSignalBox extends BaseContainer implements UIClientSync {
         this.run = run;
     }
 
-    // TODO rewrite
-    public void detectAndSendChanges() {
-        if (this.player != null && send) {
-            send = false;
-            final CompoundTag compound = new CompoundTag();
-            final ListTag typeList = new ListTag();
-            this.tile.getPositions().keySet().forEach(pos -> {
-                final CompoundTag entry = new CompoundTag();
-                entry.put(POS_ID, NbtUtils.writeBlockPos(pos));
-                tile.loadChunkAndGetTile(NamableWrapper.class, tile.getLevel(), pos,
-                        (sig, _u) -> entry.putString(SIGNAL_NAME, sig.getNameAsStringWrapper()));
-                final Signal signal = tile.getSignal(pos);
-                if (signal != null) {
-                    entry.putInt(SIGNAL_ID, signal.getID());
-                }
-                typeList.add(entry);
-            });
-            compound.put(UPDATE_SET, typeList);
-            GuiSyncNetwork.sendToClient(compound, getPlayer());
-        }
-    }
-
     @Override
     public void removed(Player playerIn) {
     	super.removed(playerIn);
