@@ -1,5 +1,7 @@
 package com.troblecodings.signals.blocks;
 
+import java.util.Optional;
+
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
@@ -12,16 +14,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class RedstoneIO extends Block {
+public class RedstoneIO extends BasicBlock {
 
     public static final BooleanProperty POWER = BooleanProperty.create("power");
+    public static final TileEntitySupplierWrapper SUPPLIER = RedstoneIOTileEntity::new;
 
     public RedstoneIO() {
         super(Properties.of(Material.METAL));
@@ -50,11 +52,6 @@ public class RedstoneIO extends Block {
         return true;
     }
 
-    
-    public BlockEntity newBlockEntity(final BlockPos pos, final BlockState state) {
-        return new RedstoneIOTileEntity();
-    }
-
     @Override
     public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
             final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
@@ -64,5 +61,10 @@ public class RedstoneIO extends Block {
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
+    }
+    
+    @Override
+    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
+    	return Optional.of(SUPPLIER);
     }
 }

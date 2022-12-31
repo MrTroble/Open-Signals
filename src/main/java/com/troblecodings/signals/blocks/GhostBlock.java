@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 
-public class GhostBlock extends Block {
+public class GhostBlock extends BasicBlock {
 
     public GhostBlock() {
         super(Properties.of(Material.GLASS));

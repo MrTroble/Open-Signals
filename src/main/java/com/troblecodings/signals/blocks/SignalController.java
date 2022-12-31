@@ -1,7 +1,10 @@
 package com.troblecodings.signals.blocks;
 
+import java.util.Optional;
+
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.init.OSItems;
+import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -10,13 +13,14 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class SignalController extends Block implements EntityBlock {
+public class SignalController extends BasicBlock {
+
+	public static final TileEntitySupplierWrapper SUPPLIER = SignalBoxTileEntity::new;
 
     public SignalController() {
         super(Properties.of(Material.METAL));
@@ -44,7 +48,8 @@ public class SignalController extends Block implements EntityBlock {
     }
 
     @Override
-    public BlockEntity newBlockEntity(final BlockPos p_153215_, final BlockState p_153216_) {
-        return new SignalControllerTileEntity();
+    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
+    	return Optional.of(SUPPLIER);
     }
+
 }

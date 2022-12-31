@@ -11,12 +11,11 @@ import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.RenderOverlayInfo;
+import com.troblecodings.signals.core.TileEntityInfo;
 
-import net.minecraft.client.gui.Font;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -31,9 +30,8 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
     private String formatCustomName = null;
     private NBTWrapper temporary = null;
 
-    public SignalTileEnity(final BlockEntityType<?> blockType, final BlockPos blockPos,
-            final BlockState state) {
-        super(blockType, blockPos, state);
+    public SignalTileEnity(final TileEntityInfo info) {
+        super(info);
     }
 
     @Override
@@ -79,7 +77,7 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
         getSignal().getUpdate(level, worldPosition);
     }
 
-    public Map<SEProperty, Object> getProperties() {
+    public Map<SEProperty, String> getProperties() {
         return ImmutableMap.copyOf(map);
     }
 
@@ -98,7 +96,7 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
 
     @Override
     public boolean hasCustomName() {
-        return formatCustomName != null && getSignal().canHaveCustomname();
+        return formatCustomName != null && getSignal().canHaveCustomname(this.map);
     }
 
     public void setCustomName(final String str) {
@@ -112,8 +110,8 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void renderOverlay(final double x, final double y, final double z, final Font font) {
-        getSignal().renderOverlay(x, y, z, this, font);
+    public void renderOverlay(final RenderOverlayInfo info) {
+        getSignal().renderOverlay(info.with(this));
     }
 
     public Signal getSignal() {

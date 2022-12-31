@@ -1,4 +1,4 @@
-package com.troblecodings.signals.blocks;
+package com.troblecodings.signals.core;
 
 import java.util.Map;
 

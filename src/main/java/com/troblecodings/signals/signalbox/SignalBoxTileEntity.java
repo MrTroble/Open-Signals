@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableMap;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -43,7 +44,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity
     private final Map<BlockPos, Signal> signals = new HashMap<>();
     private final SignalBoxGrid grid;
 
-    public SignalBoxTileEntity() {
+    public SignalBoxTileEntity(final TileEntityInfo info) {
+    	super(info);
         grid = SignalBoxFactory.getFactory().getGrid(this::sendToAll);
     }
 

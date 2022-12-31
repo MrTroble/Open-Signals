@@ -1,17 +1,15 @@
 package com.troblecodings.signals.tileentitys;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.core.TileEntityInfo;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicBlockEntity extends BlockEntity {
 
-	public BasicBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-		super(type, pos, state);
+	public BasicBlockEntity(final TileEntityInfo info) {
+		super(info.type, info.pos, info.state);
 	}
 
 	public void saveWrapper(NBTWrapper wrapper) {}

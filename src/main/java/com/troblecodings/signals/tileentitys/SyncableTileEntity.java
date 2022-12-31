@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
+import com.troblecodings.signals.core.TileEntityInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -13,14 +14,11 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class SyncableTileEntity extends BasicBlockEntity {
 
-    public SyncableTileEntity(final BlockEntityType<?> p_155228_, final BlockPos p_155229_,
-            final BlockState p_155230_) {
-        super(p_155228_, p_155229_, p_155230_);
+    public SyncableTileEntity(final TileEntityInfo info) {
+        super(info);
     }
 
     protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();

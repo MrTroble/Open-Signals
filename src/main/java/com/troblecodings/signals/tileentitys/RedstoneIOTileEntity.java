@@ -2,28 +2,24 @@ package com.troblecodings.signals.tileentitys;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.stream.Collectors;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.RedstoneIO;
+import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NBTUtil;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.world.ILevelNameable;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity
 		implements NamableWrapper, IChunkloadable, ISyncable, Iterable<BlockPos> {
+	
+	public RedstoneIOTileEntity(TileEntityInfo info) {
+		super(info);
+	}
 
 	public static final String NAME_NBT = "name";
 	public static final String LINKED_LIST = "linkedList";
@@ -77,21 +73,17 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
 	public void sendToAll() {
 		if (level.isClientSide)
 			return;
-		final boolean power = this.level.getBlockState(pos).getValue(RedstoneIO.POWER);
+		final boolean power = this.level.getBlockState(this.worldPosition).getValue(RedstoneIO.POWER);
 		this.linkedPositions.forEach(position -> loadChunkAndGetTile(SignalBoxTileEntity.class, level, position,
-				(tile, _u) -> tile.updateRedstonInput(this.pos, power)));
+				(tile, _u) -> tile.updateRedstonInput(this.worldPosition, power)));
 	}
 
-	@Override
-	public boolean shouldRefresh(final Level world, final BlockPos pos, final BlockState oldState,
-			final BlockState newSate) {
-		return false;
-	}
-
+	
 	@Override
 	public void updateTag(final CompoundTag compound) {
-		if (compound.hasKey(NAME_NBT)) {
-			this.name = compound.getString(NAME_NBT);
+		final NBTWrapper wrapper = new NBTWrapper(compound);
+		if (wrapper.contains(NAME_NBT)) {
+			this.name = wrapper.getString(NAME_NBT);
 			this.syncClient();
 		}
 	}
@@ -104,5 +96,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
 	@Override
 	public boolean isValid(final Player player) {
 		return true;
+	}
+
+	@Override
+	public CompoundTag getTag() {
+		return null;
 	}
 }

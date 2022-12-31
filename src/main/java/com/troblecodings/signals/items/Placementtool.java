@@ -37,14 +37,10 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
     public static final String BLOCK_TYPE_ID = "blocktypeid";
     public static final String SIGNAL_CUSTOMNAME = "customname";
 
-    public final ArrayList<Integer> signalids = new ArrayList<>();
+    public final ArrayList<Signal> signals = new ArrayList<>();
 
     public Placementtool() {
     	super(new Item.Properties().tab(OSTabs.TAB));
-    }
-
-    public void addSignal(final Signal sig) {
-        signalids.add(sig.getID());
     }
     
     @Override
@@ -121,12 +117,12 @@ public class Placementtool extends Item implements IIntegerable<Signal>, ITagabl
 
     @Override
     public Signal getObjFromID(final int obj) {
-        return Signal.SIGNALLIST.get(signalids.get(obj));
+        return signals.get(obj);
     }
 
     @Override
     public int count() {
-        return signalids.size();
+        return signals.size();
     }
 
     @Override

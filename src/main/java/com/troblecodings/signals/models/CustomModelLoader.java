@@ -6,9 +6,11 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonObject;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.blocks.Signal.SignalAngel;
+import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
@@ -19,15 +21,18 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.model.BuiltInModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.geometry.IModelGeometry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 
 @OnlyIn(Dist.CLIENT)
-public class CustomModelLoader implements ICustomModelLoader {
+public class CustomModelLoader implements IModelLoader {
 
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
