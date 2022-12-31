@@ -5,9 +5,9 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.troblecodings.signals.SEProperty;
-import com.troblecodings.signals.tileentitys.SignalTileEnity;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
-public class DummySignal extends SignalTileEnity {
+public class DummySignal extends SignalTileEntity {
 
     private final HashMap<SEProperty, Object> seproperty = new HashMap<>();
 

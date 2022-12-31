@@ -21,7 +21,7 @@ import com.troblecodings.signals.parser.ValuePack;
 import com.troblecodings.signals.properties.FloatProperty;
 import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
-import com.troblecodings.signals.tileentitys.SignalTileEnity;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import com.troblecodings.signals.utils.JsonEnum;
 
 import net.minecraft.client.Minecraft;
@@ -59,7 +59,7 @@ public class Signal extends BasicBlock {
 	public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel", SignalAngel.class);
 	public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.PROPERTIES.get("boolean"),
 			"false", ChangeableStage.AUTOMATICSTAGE, t -> true);
-	public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEnity::new;
+	public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
 
 	protected final SignalProperties prop;
 	private List<SEProperty> signalProperties;
@@ -75,7 +75,7 @@ public class Signal extends BasicBlock {
 	@Override
 	public VoxelShape getShape(final BlockState state, final BlockGetter source, final BlockPos pos,
 			final CollisionContext context) {
-		final SignalTileEnity te = (SignalTileEnity) source.getBlockEntity(pos);
+		final SignalTileEntity te = (SignalTileEntity) source.getBlockEntity(pos);
 		if (te == null)
 			return Shapes.block();
 		return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(te.getProperties()), 0));
@@ -226,10 +226,10 @@ public class Signal extends BasicBlock {
 	public InteractionResult use(final BlockState blockstate, final Level level, final BlockPos blockPos,
 			final Player placer, final InteractionHand hand, final BlockHitResult blockHit) {
 		final BlockEntity tile = level.getBlockEntity(blockPos);
-		if (!(tile instanceof SignalTileEnity)) {
+		if (!(tile instanceof SignalTileEntity)) {
 			return InteractionResult.FAIL;
 		}
-		final SignalTileEnity signalTile = (SignalTileEnity) tile;
+		final SignalTileEntity signalTile = (SignalTileEntity) tile;
 		if (loadRedstoneOutput(level, blockstate, blockPos, signalTile) && level.isClientSide) {
 			return InteractionResult.SUCCESS;
 		}
@@ -243,7 +243,7 @@ public class Signal extends BasicBlock {
 
 	@SuppressWarnings("unchecked")
 	private boolean loadRedstoneOutput(final Level worldIn, final BlockState state, final BlockPos pos,
-			final SignalTileEnity tile) {
+			final SignalTileEntity tile) {
 		if (!this.prop.redstoneOutputs.isEmpty()) {
 			final Map<SEProperty, String> properties = tile.getProperties();
 			this.powerProperty = null;
@@ -284,7 +284,7 @@ public class Signal extends BasicBlock {
 		if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null)
 			return 0;
 
-		final SignalTileEnity tile = (SignalTileEnity) blockAccess.getBlockEntity(pos);
+		final SignalTileEntity tile = (SignalTileEntity) blockAccess.getBlockEntity(pos);
 		if (tile.getProperty(powerProperty).filter(power -> power.equals("false")).isPresent()) {
 			return 0;
 		}
@@ -302,7 +302,7 @@ public class Signal extends BasicBlock {
 		if (this.prop.sounds.isEmpty())
 			return;
 
-		final SignalTileEnity tile = (SignalTileEnity) world.getBlockEntity(pos);
+		final SignalTileEntity tile = (SignalTileEntity) world.getBlockEntity(pos);
 		final Map<SEProperty, String> properties = tile.getProperties();
 		final SoundProperty sound = getSound(properties);
 		if (sound.duration < 1)
@@ -336,7 +336,7 @@ public class Signal extends BasicBlock {
 		if (this.prop.sounds.isEmpty() || !world.isClientSide) {
 			return;
 		}
-		final SignalTileEnity tile = (SignalTileEnity) world.getBlockEntity(pos);
+		final SignalTileEntity tile = (SignalTileEntity) world.getBlockEntity(pos);
 		final SoundProperty sound = getSound(tile.getProperties());
 		if (sound.duration <= 1) {
 			return;

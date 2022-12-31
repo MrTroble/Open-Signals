@@ -17,6 +17,7 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -27,8 +28,6 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.level.block.Rotation;
 
 public class SignalBoxPathway implements INetworkSavable {
@@ -120,23 +119,19 @@ public class SignalBoxPathway implements INetworkSavable {
     private static final String PATH_TYPE = "pathType";
 
     @Override
-    public void write(final CompoundTag tag) {
-        final ListTag nodesNBT = new ListTag();
-        listOfNodes.forEach(node -> {
-            final CompoundTag entry = new CompoundTag();
+    public void write(final NBTWrapper tag) {
+        tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
+            final NBTWrapper entry = new NBTWrapper();
             node.getPoint().write(entry);
-            nodesNBT.add(entry);
-        });
-        tag.put(LIST_OF_NODES, nodesNBT);
+            return entry;
+        })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
     }
 
     @Override
-    public void read(final CompoundTag tag) {
-        final ListTag nodesNBT = (ListTag) tag.get(LIST_OF_NODES);
+    public void read(final NBTWrapper tag) {
         final Builder<SignalBoxNode> nodeBuilder = ImmutableList.builder();
-        nodesNBT.forEach(c -> {
-            final CompoundTag nodeNBT = (CompoundTag) c;
+        tag.getList(LIST_OF_NODES).forEach(nodeNBT -> {
             final Point point = new Point();
             point.read(nodeNBT);
             final SignalBoxNode node = modeGrid.get(point);
@@ -304,16 +299,6 @@ public class SignalBoxPathway implements INetworkSavable {
     @Override
     public String toString() {
         return "SignalBoxPathway [start=" + firstPoint + ", end=" + lastPoint + "]";
-    }
-
-    @Override
-    public void writeEntryNetwork(final CompoundTag tag, final boolean writeAll) {
-        listOfNodes.forEach(node -> node.writeEntryNetwork(tag, writeAll));
-    }
-
-    @Override
-    public void readEntryNetwork(final CompoundTag tag) {
-        listOfNodes.forEach(node -> node.readEntryNetwork(tag));
     }
 
     /**

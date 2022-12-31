@@ -11,7 +11,7 @@ import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.properties.ConfigProperty;
 import com.troblecodings.signals.properties.SignalPair;
-import com.troblecodings.signals.tileentitys.SignalTileEnity;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 public final class SignalConfig {
 
@@ -59,7 +59,7 @@ public final class SignalConfig {
         }
     }
 
-    public static void reset(final SignalTileEnity current) {
+    public static void reset(final SignalTileEntity current) {
         final List<ConfigProperty> resetValues = OneSignalConfigParser.RESETCONFIGS
                 .get(current.getSignal());
         if (resetValues != null) {
@@ -85,7 +85,7 @@ public final class SignalConfig {
     }
 
     private static void loadWithoutPredicate(final List<ConfigProperty> values,
-            final SignalTileEnity current) {
+            final SignalTileEntity current) {
         if (values != null) {
             values.forEach(property -> {
                 property.values.forEach((prop, val) -> {

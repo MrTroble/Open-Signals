@@ -7,17 +7,17 @@ import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.signals.tileentitys.SignalTileEnity;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 
 public class GuiSignal extends GuiBase {
 
-    private final SignalTileEnity tile;
+    private final SignalTileEntity tile;
     private UILabel labelComp;
 
-    public GuiSignal(final SignalTileEnity tile) {
+    public GuiSignal(final SignalTileEntity tile) {
         this.tile = tile;
         initOwn();
     }
@@ -51,7 +51,7 @@ public class GuiSignal extends GuiBase {
         textfield.setHeight(20);
         textfield.setInheritWidth(true);
 
-        final UITextInput input = new UITextInput(SignalTileEnity.CUSTOMNAME);
+        final UITextInput input = new UITextInput(SignalTileEntity.CUSTOMNAME);
         input.setText(tile.getName());
         textfield.add(input);
 

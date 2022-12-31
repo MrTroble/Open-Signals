@@ -10,7 +10,7 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
-import com.troblecodings.signals.tileentitys.SignalTileEnity;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
@@ -32,7 +32,7 @@ public class ContainerSignalController extends Container implements UIClientSync
     private Runnable onUpdate;
 
     public ContainerSignalController(final SignalControllerTileEntity tile) {
-        if (!tile.loadChunkAndGetTile(SignalTileEnity.class, tile.getLevel(),
+        if (!tile.loadChunkAndGetTile(SignalTileEntity.class, tile.getLevel(),
                 tile.getLinkedPosition(), (t, c) -> {
                     reference.set(t.getProperties());
                     final BlockState state = c.getBlockState(t.getPos());

@@ -68,14 +68,4 @@ public class PathOptionEntry implements INetworkSavable {
     	// TODO new sync system
     }
 
-    @Override
-    public void writeEntryNetwork(final NBTWrapper tag, final boolean writeAll) {
-    	// TODO new sync system
-    }
-
-    @Override
-    public void readEntryNetwork(final NBTWrapper tag) {
-        this.read(tag);
-    }
-
 }

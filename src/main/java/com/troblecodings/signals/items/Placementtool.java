@@ -3,6 +3,8 @@ package com.troblecodings.signals.items;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import com.troblecodings.core.MessageWrapper;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -11,123 +13,112 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
-import com.troblecodings.signals.tileentitys.SignalTileEnity;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.util.InteractionResult;
-import net.minecraft.util.Direction;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.property.ExtendedBlockState;
 
-public class Placementtool extends Item implements IIntegerable<Signal>, ITagableItem {
+public class Placementtool extends BlockItem implements IIntegerable<Signal>, ITagableItem, MessageWrapper {
 
-    public static final String BLOCK_TYPE_ID = "blocktypeid";
-    public static final String SIGNAL_CUSTOMNAME = "customname";
+	public static final String BLOCK_TYPE_ID = "blocktypeid";
+	public static final String SIGNAL_CUSTOMNAME = "customname";
 
-    public final ArrayList<Signal> signals = new ArrayList<>();
+	public final ArrayList<Signal> signals = new ArrayList<>();
 
-    public Placementtool() {
-    	super(new Item.Properties().tab(OSTabs.TAB));
-    }
-    
-    @Override
-    public InteractionResult onItemUseFirst(final ItemStack stack, final UseOnContext context) {
-    	final Player player = context.getPlayer();
-    	final Level worldIn = context.getLevel();
-    	final BlockPos pos = context.getClickedPos();
-    	final UUID uuid = player.getUUID();
-        if (player.isShiftKeyDown()) {
-            if (!worldIn.isClientSide)
-                return InteractionResult.SUCCESS;
-            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, pos);
-            return InteractionResult.SUCCESS;
-        } else {
-            if (worldIn.isClientSide)
-                return InteractionResult.SUCCESS;
-            final BlockPos setPosition = context.getClickedPos();
-            if (!worldIn.isEmptyBlock(setPosition))
-                return InteractionResult.FAIL;
-            
-            final CompoundTag compound = player.getMainHandItem().getOrCreateTag();
-            if(!compound.hasKey(BLOCK_TYPE_ID)) {
-                player.sendMessage(new TranslatableComponent("pt.itemnotset"), uuid);
-                return InteractionResult.FAIL;
-            }
-            final Signal block = Signal.SIGNALLIST.get(compound.getInt(BLOCK_TYPE_ID));
+	public Placementtool() {
+		super(Blocks.AIR, new Item.Properties().tab(OSTabs.TAB));
+	}
 
-            BlockPos lastPos = setPosition;
-            worldIn.setBlockState(setPosition, block.getStateForPlacement(worldIn, lastPos, facing,
-                    hitX, hitY, hitZ, 0, player, context.getHand()));
+	@Override
+	public InteractionResultHolder<ItemStack> use(Level worldIn, Player player, InteractionHand hand) {
+		if (player.isShiftKeyDown()) {
+			if (worldIn.isClientSide)
+				return InteractionResultHolder.success(player.getItemInHand(hand));
+			OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, player.getOnPos());
+			return InteractionResultHolder.success(player.getItemInHand(hand));
+		}
+		return super.use(worldIn, player, hand);
+	}
 
-            final SignalTileEnity sig = (SignalTileEnity) worldIn.getTileEntity(setPosition);
-            final ExtendedBlockState ebs = ((ExtendedBlockState) block.getBlockState());
-            ebs.getUnlistedProperties().forEach(iup -> {
-                final SEProperty sep = SEProperty.cst(iup);
-                if (sep.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
-                    sig.setProperty(sep, sep.getDefault());
-                    return;
-                }
-                if (!compound.hasKey(iup.getName()))
-                    return;
-                if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-                    sig.setProperty(sep, sep.getObjFromID(compound.getInt(iup.getName())));
-                } else if (sep.isChangabelAtStage(ChangeableStage.APISTAGE)
-                        && compound.getInt(iup.getName()) == 1) {
-                    sig.setProperty(sep, sep.getDefault());
-                }
-            });
-
-            final int height = block.getHeight(sig.getProperties());
-            for (int i = 0; i < height; i++)
-                if (!worldIn.isAirBlock(lastPos = lastPos.up())) {
-                    worldIn.setBlockToAir(setPosition);
+	@Override
+	public InteractionResult place(BlockPlaceContext context) {
+		final InteractionResult result = super.place(context);
+		if(result == InteractionResult.SUCCESS) {
+	    	final Player player = context.getPlayer();
+	    	final Level worldIn = context.getLevel();
+	        final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
+			final Signal signal = (Signal) getPlacementState(context).getBlock();
+            final int height = signal.getHeight(signal.getProperties());
+            BlockPos lastPos = context.getClickedPos();
+            for (int i = 0; i < height; i++) {
+                if (!worldIn.isEmptyBlock(lastPos = lastPos.above())) {
+                    worldIn.removeBlock(lastPos, true);
                     return InteractionResult.FAIL;
                 }
-            lastPos = setPosition;
-            for (int i = 0; i < height; i++)
-                worldIn.setBlockState(lastPos = lastPos.up(),
-                        OSBlocks.GHOST_BLOCK.getDefaultState());
+            }
+            lastPos = context.getClickedPos();
+            for (int i = 0; i < height; i++) {
+                worldIn.setBlockAndUpdate(lastPos = lastPos.above(),
+                        OSBlocks.GHOST_BLOCK.getStateForPlacement(context));
+            }
 
-            final String str = compound.getString(SIGNAL_CUSTOMNAME);
-            if (!str.isEmpty())
-                sig.setCustomName(str);
-            worldIn.notifyBlockUpdate(setPosition, ebs.getBaseState(), ebs.getBaseState(), 3);
-            return InteractionResult.SUCCESS;
-    }
+            final String name = compound.getString(SIGNAL_CUSTOMNAME);
+            if (!name.isEmpty())
+                sig.setCustomName(name);
+		}
+		return result;
+	}
+	
+	@Override
+	protected BlockState getPlacementState(BlockPlaceContext context) {
+    	final Player player = context.getPlayer();
+        final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
+        if(!compound.contains(BLOCK_TYPE_ID)) {
+            translateMessageWrapper(player, "pt.itemnotset");
+            return null;
+        }
+        return this.signals.get(compound.getInteger(BLOCK_TYPE_ID)).getStateForPlacement(context);
+	}
+	
+	@OnlyIn(Dist.CLIENT)
+	@Override
+	public String getNamedObj(final int obj) {
+		return I18n.get("property." + this.getName() + ".name") + ": " + this.getObjFromID(obj);
+	}
 
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public String getNamedObj(final int obj) {
-        return I18n.get("property." + this.getName() + ".name") + ": "
-                + this.getObjFromID(obj);
-    }
+	@Override
+	public Signal getObjFromID(final int obj) {
+		return signals.get(obj);
+	}
 
-    @Override
-    public Signal getObjFromID(final int obj) {
-        return signals.get(obj);
-    }
+	@Override
+	public int count() {
+		return signals.size();
+	}
 
-    @Override
-    public int count() {
-        return signals.size();
-    }
+	@Override
+	public String getName() {
+		return "signaltype";
+	}
 
-    @Override
-    public String getName() {
-        return "signaltype";
-    }
+	public void addSignal(Signal signal) {
+		this.signals.add(signal);
+	}
 
 }

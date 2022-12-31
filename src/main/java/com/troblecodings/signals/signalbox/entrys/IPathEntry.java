@@ -2,8 +2,6 @@ package com.troblecodings.signals.signalbox.entrys;
 
 import java.util.Objects;
 
-import com.troblecodings.core.NBTWrapper;
-
 public abstract class IPathEntry<T> implements INetworkSavable {
 
     protected boolean isDirty = false;
@@ -39,14 +37,6 @@ public abstract class IPathEntry<T> implements INetworkSavable {
     public abstract void setValue(T value);
 
     @Override
-    public void writeEntryNetwork(final NBTWrapper tag, final boolean writeAll) {
-        if (this.isDirty || writeAll) {
-            this.write(tag);
-            this.isDirty = true;
-        }
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(name, this.getValue());
     }
@@ -67,10 +57,5 @@ public abstract class IPathEntry<T> implements INetworkSavable {
     public String toString() {
         return "IPathEntry [isDirty=" + isDirty + ", name=" + name + ", value=" + this.getValue()
                 + "]";
-    }
-
-    @Override
-    public void readEntryNetwork(final NBTWrapper tag) {
-        this.read(tag);
     }
 }

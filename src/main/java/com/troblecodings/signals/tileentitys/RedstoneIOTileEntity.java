@@ -11,7 +11,6 @@ import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity
@@ -78,16 +77,6 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
 				(tile, _u) -> tile.updateRedstonInput(this.worldPosition, power)));
 	}
 
-	
-	@Override
-	public void updateTag(final CompoundTag compound) {
-		final NBTWrapper wrapper = new NBTWrapper(compound);
-		if (wrapper.contains(NAME_NBT)) {
-			this.name = wrapper.getString(NAME_NBT);
-			this.syncClient();
-		}
-	}
-
 	@Override
 	public Iterator<BlockPos> iterator() {
 		return this.linkedPositions.iterator();
@@ -96,10 +85,5 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
 	@Override
 	public boolean isValid(final Player player) {
 		return true;
-	}
-
-	@Override
-	public CompoundTag getTag() {
-		return null;
 	}
 }

@@ -5,12 +5,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -19,7 +17,6 @@ import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 
 public class SignalBoxGrid implements INetworkSavable {
 
@@ -101,9 +98,7 @@ public class SignalBoxGrid implements INetworkSavable {
 	}
 
 	protected void updateToNet(final SignalBoxPathway pathway) {
-		final CompoundTag update = new CompoundTag();
-		pathway.writeEntryNetwork(update, false);
-		this.sendToAll.accept(update);
+		// TODO new networking
 	}
 
 	public void setPowered(final BlockPos pos) {
@@ -152,24 +147,18 @@ public class SignalBoxGrid implements INetworkSavable {
 	}
 
 	@Override
-	public void read(final CompoundTag tag) {
+	public void read(final NBTWrapper tag) {
 		clearPaths();
 		modeGrid.clear();
-		final ListTag nodes = (ListTag) tag.get(NODE_LIST);
-		if (nodes == null)
-			return;
-		nodes.forEach(comp -> {
+		tag.getList(NODE_LIST).forEach(comp -> {
 			final SignalBoxNode node = new SignalBoxNode();
-			node.read((CompoundTag) comp);
+			node.read(comp);
 			node.post();
 			modeGrid.put(node.getPoint(), node);
 		});
-		final ListTag list = (ListTag) tag.get(PATHWAY_LIST);
-		if (list == null)
-			return;
-		list.forEach(comp -> {
+		tag.getList(PATHWAY_LIST).forEach(comp -> {
 			final SignalBoxPathway pathway = factory.getPathway(this.modeGrid);
-			pathway.read((CompoundTag) comp);
+			pathway.read(comp);
 			if (pathway.isEmptyOrBroken()) {
 				OpenSignalsMain.log.error("Remove empty or broken pathway, try to recover!");
 				return;
@@ -210,30 +199,4 @@ public class SignalBoxGrid implements INetworkSavable {
 		return ImmutableList.copyOf(this.modeGrid.values());
 	}
 
-	@Override
-	public void writeEntryNetwork(final CompoundTag tag, final boolean writeAll) {
-		this.modeGrid.entrySet().removeIf(entry -> {
-			final SignalBoxNode node = entry.getValue();
-			if (node.isEmpty())
-				return true;
-			node.writeEntryNetwork(tag, writeAll);
-			return false;
-		});
-		Lists.newArrayList(this.startsToPath.values()).stream().filter(pathway -> pathway.isEmptyOrBroken())
-				.forEach(this::resetPathway);
-	}
-
-	@Override
-	public void readEntryNetwork(final CompoundTag tag) {
-		final Set<String> keys = tag.getAllKeys();
-		keys.forEach(identifier -> saveRead(identifier)
-				.ifPresent(point -> modeGrid.computeIfAbsent(point, key -> new SignalBoxNode(key))));
-		this.modeGrid.entrySet().removeIf(entry -> {
-			final SignalBoxNode node = entry.getValue();
-			node.readEntryNetwork(tag);
-			return !keys.contains(node.getIdentifier()) || node.isEmpty();
-		});
-		Lists.newArrayList(this.startsToPath.values()).stream().filter(pathway -> pathway.isEmptyOrBroken())
-				.forEach(this::resetPathway);
-	}
 }

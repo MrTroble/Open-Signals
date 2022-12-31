@@ -19,6 +19,7 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.model.BuiltInModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModel;
@@ -32,7 +33,7 @@ public class CustomModelLoader implements IModelLoader {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onResourceManagerReload(final IResourceManager resourceManager) {
+    public void onResourceManagerReload(final ResourceManager resourceManager) {
 
         registeredModels.clear();
 

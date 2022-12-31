@@ -14,13 +14,12 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class SignalTileEnity extends SyncableTileEntity implements NamableWrapper, ISyncable {
+public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
     public static final String PROPERTIES = "properties";
     public static final String CUSTOMNAME = "customname";
@@ -30,7 +29,7 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
     private String formatCustomName = null;
     private NBTWrapper temporary = null;
 
-    public SignalTileEnity(final TileEntityInfo info) {
+    public SignalTileEntity(final TileEntityInfo info) {
         super(info);
     }
 
@@ -119,19 +118,6 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
     }
 
     @Override
-    public void updateTag(final CompoundTag compound) {
-        if (compound.contains(CUSTOMNAME)) {
-            setCustomName(compound.getString(CUSTOMNAME));
-            this.syncClient();
-        }
-    }
-
-    @Override
-    public CompoundTag getTag() {
-        return null;
-    }
-
-    @Override
     public int hashCode() {
         return Objects.hash(formatCustomName, map, worldPosition, level);
     }
@@ -144,7 +130,7 @@ public class SignalTileEnity extends SyncableTileEntity implements NamableWrappe
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final SignalTileEnity other = (SignalTileEnity) obj;
+        final SignalTileEntity other = (SignalTileEntity) obj;
         return Objects.equals(formatCustomName, other.formatCustomName)
                 && Objects.equals(map, other.map)
                 && Objects.equals(worldPosition, other.worldPosition)

@@ -8,6 +8,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 
 public class BasicBlockEntity extends BlockEntity {
 
+	public static final String GUI_TAG = "guiTag";
+
 	public BasicBlockEntity(final TileEntityInfo info) {
 		super(info.type, info.pos, info.state);
 	}

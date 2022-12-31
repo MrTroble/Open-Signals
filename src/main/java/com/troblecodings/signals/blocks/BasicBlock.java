@@ -7,7 +7,10 @@ import java.util.Optional;
 import java.util.Set;
 
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.tileentitys.SignalSpecialRenderer;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,7 +31,7 @@ public class BasicBlock extends Block {
 	}
 
 	private static Map<TileEntitySupplierWrapper, Set<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
-	public static Map<TileEntitySupplierWrapper, BlockEntityType<BlockEntity>> BLOCK_ENTITYS = new HashMap<>();
+	public static Map<TileEntitySupplierWrapper, BlockEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
 
 	public BasicBlock(Properties properties) {
 		super(properties);
@@ -40,7 +43,7 @@ public class BasicBlock extends Block {
 		return Optional.empty();
 	}
 
-	public Optional<BlockEntityType<BlockEntity>> getBlockEntityType() {
+	public Optional<BlockEntityType<?>> getBlockEntityType() {
 		return getSupplierWrapper().map(BLOCK_ENTITYS::get);
 	}
 
@@ -48,6 +51,8 @@ public class BasicBlock extends Block {
 	public static void prepare() {
 		BLOCK_SUPPLIER
 				.forEach((wrapper, blocks) -> BLOCK_ENTITYS.put(wrapper, new BlockEntityType(wrapper, blocks, null)));
+        BlockEntityRenderers.register((BlockEntityType<SignalTileEntity>)BLOCK_ENTITYS.get(Signal.SUPPLIER),
+                SignalSpecialRenderer::new);
 	}
 
 }

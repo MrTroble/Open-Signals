@@ -2,7 +2,6 @@ package com.troblecodings.signals.signalbox;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,14 +9,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
 import net.minecraft.world.level.block.Rotation;
 
 public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
@@ -112,26 +110,20 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private static final String POINT_LIST = "pointList";
 
     @Override
-    public void write(final CompoundTag compound) {
-        final ListTag pointList = new ListTag();
-        possibleModes.forEach((mode, option) -> {
-            final CompoundTag entry = new CompoundTag();
-            mode.write(entry);
-            option.write(entry);
-            pointList.add(entry);
-        });
-        compound.put(POINT_LIST, pointList);
+    public void write(final NBTWrapper compound) {
+        compound.putList(POINT_LIST, possibleModes.entrySet().stream().map((entry) -> {
+            final NBTWrapper wrapper = new NBTWrapper();
+            entry.getKey().write(wrapper);
+            entry.getValue().write(wrapper);
+            return wrapper;
+        })::iterator);
         this.point.write(compound);
     }
 
     @Override
-    public void read(final CompoundTag compound) {
-        final ListTag pointList = (ListTag) compound.get(POINT_LIST);
-        if (pointList == null)
-            return;
+    public void read(final NBTWrapper compound) {
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
-        pointList.forEach(e -> {
-            final CompoundTag tag = (CompoundTag) e;
+        compound.getList(POINT_LIST).forEach(tag -> {
             final PathOptionEntry entry = factory.getEntry();
             entry.read(tag);
             possibleModes.put(new ModeSet(tag), entry);
@@ -225,43 +217,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     @Override
     public Iterator<ModeSet> iterator() {
         return this.possibleModes.keySet().iterator();
-    }
-
-    @Override
-    public void writeEntryNetwork(final CompoundTag tag, final boolean writeAll) {
-        if (this.isEmpty())
-            return;
-        final ListTag pointList = new ListTag();
-        this.possibleModes.forEach((modeset, option) -> {
-            final CompoundTag compound = new CompoundTag();
-            option.writeEntryNetwork(compound, writeAll);
-            modeset.write(compound);
-            pointList.add(compound);
-        });
-        tag.put(this.identifier, pointList);
-    }
-
-    @Override
-    public void readEntryNetwork(final CompoundTag tag) {
-        final ListTag points = (ListTag) tag.get(this.identifier);
-        if (points == null)
-            return;
-        if (points.isEmpty()) {
-            this.possibleModes.clear();
-            return;
-        }
-        final SignalBoxFactory factory = SignalBoxFactory.getFactory();
-        final Set<ModeSet> modeSets = new HashSet<>();
-        points.forEach(nbt -> {
-            final CompoundTag compound = (CompoundTag) nbt;
-            final ModeSet set = new ModeSet(compound);
-            modeSets.add(set);
-            final PathOptionEntry entry = this.possibleModes.computeIfAbsent(set,
-                    _u -> factory.getEntry());
-            entry.readEntryNetwork(compound);
-        });
-        this.possibleModes.keySet().removeIf(mode -> !modeSets.contains(mode));
-        this.post();
     }
 
     /**

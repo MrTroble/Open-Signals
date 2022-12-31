@@ -17,8 +17,9 @@ import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SignalSpecialRenderer;
-import com.troblecodings.signals.tileentitys.SignalTileEnity;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.common.MinecraftForge;
@@ -37,12 +38,10 @@ public class ClientProxy extends CommonProxy {
                 GuiSignalBox::new);
         OpenSignalsMain.handler.addGui(RedstoneIO.class, RedstoneIOTileEntity.class,
                 GuiRedstoneIO::new);
-        OpenSignalsMain.handler.addGui(Signal.class, SignalTileEnity.class, GuiSignal::new);
+        OpenSignalsMain.handler.addGui(Signal.class, SignalTileEntity.class, GuiSignal::new);
 
         MinecraftForge.EVENT_BUS.register(OSModels.class);
         ModelLoaderRegistry.registerLoader(new CustomModelLoader());
-        ClientRegistry.bindTileEntitySpecialRenderer(SignalTileEnity.class,
-                new SignalSpecialRenderer());
     }
 
 }
