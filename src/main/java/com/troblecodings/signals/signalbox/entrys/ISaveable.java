@@ -1,6 +1,6 @@
 package com.troblecodings.signals.signalbox.entrys;
 
-import net.minecraft.nbt.CompoundTag;
+import com.troblecodings.core.NBTWrapper;
 
 public interface ISaveable {
 
@@ -9,13 +9,13 @@ public interface ISaveable {
      * 
      * @param tag the tag to write to
      */
-    void write(CompoundTag tag);
+    void write(NBTWrapper tag);
 
     /**
      * Reads this element from a given NBT Compound
      * 
      * @param tag the tag to read from
      */
-    void read(CompoundTag tag);
+    void read(NBTWrapper tag);
 
 }

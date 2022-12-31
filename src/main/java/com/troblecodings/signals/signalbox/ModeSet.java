@@ -2,10 +2,10 @@ package com.troblecodings.signals.signalbox;
 
 import java.util.Objects;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.entrys.ISaveable;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Rotation;
 
 public class ModeSet implements ISaveable {
@@ -16,7 +16,7 @@ public class ModeSet implements ISaveable {
     public EnumGuiMode mode;
     public Rotation rotation;
 
-    public ModeSet(final CompoundTag compound) {
+    public ModeSet(final NBTWrapper compound) {
         this.read(Objects.requireNonNull(compound));
     }
 
@@ -48,13 +48,13 @@ public class ModeSet implements ISaveable {
     }
 
     @Override
-    public void write(final CompoundTag tag) {
+    public void write(final NBTWrapper tag) {
         tag.putString(MODE, this.mode.name());
         tag.putString(ROTATION, this.rotation.name());
     }
 
     @Override
-    public void read(final CompoundTag tag) {
+    public void read(final NBTWrapper tag) {
         this.mode = EnumGuiMode.valueOf(tag.getString(MODE));
         this.rotation = Rotation.valueOf(tag.getString(ROTATION));
     }

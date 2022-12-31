@@ -1,8 +1,7 @@
 package com.troblecodings.signals.signalbox;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.signalbox.entrys.ISaveable;
-
-import net.minecraft.nbt.CompoundTag;
 
 public class Point implements ISaveable {
 
@@ -70,14 +69,14 @@ public class Point implements ISaveable {
     }
 
     @Override
-    public void write(final CompoundTag tag) {
-        tag.putInt("x", x);
-        tag.putInt("y", y);
+    public void write(final NBTWrapper tag) {
+        tag.putInteger("x", x);
+        tag.putInteger("y", y);
     }
 
     @Override
-    public void read(final CompoundTag tag) {
-        this.x = tag.getInt("x");
-        this.y = tag.getInt("y");
+    public void read(final NBTWrapper tag) {
+        this.x = tag.getInteger("x");
+        this.y = tag.getInteger("y");
     }
 }

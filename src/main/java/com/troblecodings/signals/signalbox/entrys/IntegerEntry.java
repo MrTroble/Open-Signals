@@ -2,20 +2,20 @@ package com.troblecodings.signals.signalbox.entrys;
 
 import java.util.function.IntConsumer;
 
-import net.minecraft.nbt.CompoundTag;
+import com.troblecodings.core.NBTWrapper;
 
 public class IntegerEntry extends IPathEntry<Integer> implements IntConsumer {
 
     private int value = -1;
 
     @Override
-    public void write(final CompoundTag tag) {
-        tag.putInt(getName(), value);
+    public void write(final NBTWrapper tag) {
+        tag.putInteger(getName(), value);
     }
 
     @Override
-    public void read(final CompoundTag tag) {
-        this.value = tag.getInt(getName());
+    public void read(final NBTWrapper tag) {
+        this.value = tag.getInteger(getName());
     }
 
     @Override

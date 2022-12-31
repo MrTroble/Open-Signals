@@ -1,13 +1,11 @@
 package com.troblecodings.signals.signalbox.entrys;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import net.minecraft.nbt.CompoundTag;
+import com.troblecodings.core.NBTWrapper;
 
 public class PathOptionEntry implements INetworkSavable {
 
@@ -57,47 +55,26 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     @Override
-    public void write(final CompoundTag tag) {
+    public void write(final NBTWrapper tag) {
         pathEntrys.forEach((type, option) -> {
-            final CompoundTag entry = new CompoundTag();
+            final NBTWrapper entry = new NBTWrapper();
             option.write(entry);
-            tag.put(type.getName(), entry);
+            tag.putWrapper(type.getName(), entry);
         });
     }
 
     @Override
-    public void read(final CompoundTag tag) {
-        final List<PathEntryType<?>> tagSet = tag.getKeySet().stream().map(PathEntryType::getType)
-                .collect(Collectors.toList());
-        tagSet.forEach(entry -> {
-            if (entry != null) {
-                if (tag.hasKey(entry.getName(), 10)) {
-                    final IPathEntry<?> path = entry.newValue();
-                    path.read(tag.getCompound(entry.getName()));
-                    pathEntrys.put(entry, path);
-                } else {
-                    pathEntrys.remove(entry);
-                }
-            }
-        });
+    public void read(final NBTWrapper tag) {
+    	// TODO new sync system
     }
 
     @Override
-    public void writeEntryNetwork(final CompoundTag tag, final boolean writeAll) {
-        pathEntrys.forEach((type, option) -> {
-            final CompoundTag entry = new CompoundTag();
-            option.writeEntryNetwork(entry, writeAll);
-            if (entry.size() > 0)
-                tag.put(type.getName(), entry);
-        });
-        removedEntrys.keySet().removeIf(type -> {
-            tag.putBoolean(type.getName(), false);
-            return true;
-        });
+    public void writeEntryNetwork(final NBTWrapper tag, final boolean writeAll) {
+    	// TODO new sync system
     }
 
     @Override
-    public void readEntryNetwork(final CompoundTag tag) {
+    public void readEntryNetwork(final NBTWrapper tag) {
         this.read(tag);
     }
 

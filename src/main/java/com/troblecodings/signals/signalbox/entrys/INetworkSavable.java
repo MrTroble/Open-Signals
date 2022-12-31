@@ -1,6 +1,6 @@
 package com.troblecodings.signals.signalbox.entrys;
 
-import net.minecraft.nbt.CompoundTag;
+import com.troblecodings.core.NBTWrapper;
 
 public interface INetworkSavable extends ISaveable {
 
@@ -11,12 +11,12 @@ public interface INetworkSavable extends ISaveable {
      * @param tag      , the network tag to write to
      * @param writeAll , whether to write all or only dirty values
      */
-    public void writeEntryNetwork(final CompoundTag tag, boolean writeAll);
+    public void writeEntryNetwork(final NBTWrapper tag, boolean writeAll);
 
     /**
      * Reads from the network to this entry
      * 
      * @param tag , the network tag to read from
      */
-    public void readEntryNetwork(final CompoundTag tag);
+    public void readEntryNetwork(final NBTWrapper tag);
 }

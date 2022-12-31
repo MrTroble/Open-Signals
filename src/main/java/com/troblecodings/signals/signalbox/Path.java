@@ -2,9 +2,8 @@ package com.troblecodings.signals.signalbox;
 
 import java.util.Objects;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.signalbox.entrys.ISaveable;
-
-import net.minecraft.nbt.CompoundTag;
 
 public class Path implements ISaveable {
 
@@ -43,20 +42,20 @@ public class Path implements ISaveable {
     }
 
     @Override
-    public void write(final CompoundTag tag) {
-        final CompoundTag compound1 = new CompoundTag();
+    public void write(final NBTWrapper tag) {
+        final NBTWrapper compound1 = new NBTWrapper();
         this.point1.write(compound1);
-        tag.put(POINT_1, compound1);
+        tag.putWrapper(POINT_1, compound1);
 
-        final CompoundTag compound2 = new CompoundTag();
+        final NBTWrapper compound2 = new NBTWrapper();
         this.point2.write(compound2);
-        tag.put(POINT_2, compound2);
+        tag.putWrapper(POINT_2, compound2);
     }
 
     @Override
-    public void read(final CompoundTag tag) {
-        this.point1.read(tag.getCompound(POINT_1));
-        this.point2.read(tag.getCompound(POINT_2));
+    public void read(final NBTWrapper tag) {
+        this.point1.read(tag.getWrapper(POINT_1));
+        this.point2.read(tag.getWrapper(POINT_2));
     }
 
     @Override

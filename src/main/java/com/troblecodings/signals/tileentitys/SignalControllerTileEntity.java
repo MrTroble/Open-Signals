@@ -6,11 +6,8 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.openjdk.nashorn.internal.runtime.regexp.joni.constants.Arguments;
-
 import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Maps;
-import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.SEProperty;

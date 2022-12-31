@@ -2,9 +2,8 @@ package com.troblecodings.signals.signalbox.entrys;
 
 import java.util.function.IntConsumer;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
-
-import net.minecraft.nbt.CompoundTag;
 
 public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boolean>, IntConsumer {
 
@@ -14,7 +13,7 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
      * {@inheritDoc}
      */
     @Override
-    public void write(final CompoundTag tag) {
+    public void write(final NBTWrapper tag) {
         tag.putBoolean(getName(), value);
     }
 
@@ -22,7 +21,7 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
      * {@inheritDoc}
      */
     @Override
-    public void read(final CompoundTag tag) {
+    public void read(final NBTWrapper tag) {
         this.value = tag.getBoolean(getName());
     }
 
