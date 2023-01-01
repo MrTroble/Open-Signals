@@ -33,17 +33,17 @@ public final class SignalStateHandler {
         }
     }
 
-    public static Optional<Map<SEProperty, String>> getStates(final SignalStateInfo info) {
+    public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
         if (currentlyLoadedStates.containsKey(info)) {
-            return Optional.of(currentlyLoadedStates.get(info));
+            return currentlyLoadedStates.get(info);
         } else {
             final SignalStateFile file = allLevelFiles.get(info.world);
             if (file == null) {
-                return Optional.empty();
+                return Map.of();
             }
             final ByteBuf buffer = file.read(new SignalStatePos(0, 0));
         }
-        return Optional.empty();
+        return Map.of();
     }
 
     public static void setState(final SignalStateInfo info, final SEProperty property,
@@ -54,11 +54,8 @@ public final class SignalStateHandler {
     }
 
     public static Optional<String> getState(final SignalStateInfo info, final SEProperty property) {
-        final Optional<Map<SEProperty, String>> properties = getStates(info);
-        if (!properties.isPresent()) {
-            return Optional.empty();
-        }
-        return Optional.of(properties.get().get(property));
+        final Map<SEProperty, String> properties = getStates(info);
+        return Optional.ofNullable(properties.get(property));
     }
 
     @SubscribeEvent

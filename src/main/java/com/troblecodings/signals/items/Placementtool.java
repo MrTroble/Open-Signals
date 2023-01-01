@@ -10,6 +10,8 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
+import com.troblecodings.signals.statehandler.SignalStateHandler;
+import com.troblecodings.signals.statehandler.SignalStateInfo;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.resources.language.I18n;
@@ -57,12 +59,13 @@ public class Placementtool extends BlockItem implements IIntegerable<Signal>, IT
 	    	final Player player = context.getPlayer();
 	    	final Level worldIn = context.getLevel();
 	        final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
-			final SignalTileEntity tile = (SignalTileEntity) worldIn.getBlockEntity(context.getClickedPos());
+	        final BlockPos pos = context.getClickedPos();
+			final SignalTileEntity tile = (SignalTileEntity) worldIn.getBlockEntity(pos);
 			final Signal signal = (Signal) tile.getBlockState().getBlock();
 			
 			// TODO set signal
 			
-            final int height = signal.getHeight(tile.getProperties());
+            final int height = signal.getHeight(SignalStateHandler.getStates(new SignalStateInfo(worldIn, pos)));
             BlockPos lastPos = context.getClickedPos();
             for (int i = 0; i < height; i++) {
                 if (!worldIn.isEmptyBlock(lastPos = lastPos.above())) {
@@ -77,8 +80,7 @@ public class Placementtool extends BlockItem implements IIntegerable<Signal>, IT
             }
 
             final String name = compound.getString(SIGNAL_CUSTOMNAME);
-            if (!name.isEmpty())
-            	tile.setCustomName(name);
+            // TODO Custom name
 		}
 		return result;
 	}

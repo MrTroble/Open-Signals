@@ -52,7 +52,7 @@ public class GuiSignal extends GuiBase {
         textfield.setHeight(20);
         textfield.setInheritWidth(true);
 
-        final UITextInput input = new UITextInput(SignalTileEntity.CUSTOMNAME);
+        final UITextInput input = new UITextInput(""); // TODO
         input.setText(tile.getNameWrapper());
         textfield.add(input);
 
