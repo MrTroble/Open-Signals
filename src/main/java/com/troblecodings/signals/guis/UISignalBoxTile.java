@@ -3,6 +3,7 @@ package com.troblecodings.signals.guis;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Quaternion;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.interfaces.UIAutoSync;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -15,7 +16,6 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.AbstractTexture;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraftforge.common.util.Lazy;
@@ -76,11 +76,11 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
 
     // TODO Sync
     @Override
-    public void write(final CompoundTag compound) {
+    public void write(final NBTWrapper compound) {
     }
 
     @Override
-    public void read(final CompoundTag compound) {
+    public void read(final NBTWrapper compound) {
     }
 
     @Override

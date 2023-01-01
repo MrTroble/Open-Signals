@@ -4,17 +4,16 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxPathway;
 
-import net.minecraft.nbt.CompoundTag;
-
 public class DebugGrid extends SignalBoxGrid {
 
-    public DebugGrid(final Consumer<CompoundTag> sendToAll) {
+    public DebugGrid(final Consumer<NBTWrapper> sendToAll) {
         super(sendToAll);
     }
 

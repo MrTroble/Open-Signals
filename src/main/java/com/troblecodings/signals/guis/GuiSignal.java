@@ -1,7 +1,9 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
+import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -10,15 +12,14 @@ import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.nbt.CompoundTag;
 
 public class GuiSignal extends GuiBase {
 
     private final SignalTileEntity tile;
     private UILabel labelComp;
 
-    public GuiSignal(final SignalTileEntity tile) {
-        this.tile = tile;
+    public GuiSignal(final GuiCreateInfo info) {
+        this.tile = info.getTile();
         initOwn();
     }
 
@@ -66,7 +67,7 @@ public class GuiSignal extends GuiBase {
     }
 
     private void updateText(final String input) {
-        final CompoundTag compound = new CompoundTag();
+        final NBTWrapper compound = new NBTWrapper();
         this.entity.write(compound);
         GuiSyncNetwork.sendToPosServer(compound, tile.getBlockPos());
         labelComp.setText(input);

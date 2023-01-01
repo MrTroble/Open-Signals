@@ -2,11 +2,10 @@ package com.troblecodings.signals.signalbox.debug;
 
 import java.util.function.Consumer;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
-
-import net.minecraft.nbt.CompoundTag;
 
 public class DebugFactory extends SignalBoxFactory {
 
@@ -22,7 +21,7 @@ public class DebugFactory extends SignalBoxFactory {
     }
 
     @Override
-    public SignalBoxGrid getGrid(final Consumer<CompoundTag> sendToAll) {
+    public SignalBoxGrid getGrid(final Consumer<NBTWrapper> sendToAll) {
         if (enableDebugGrid)
             return new DebugGrid(sendToAll);
         return super.getGrid(sendToAll);

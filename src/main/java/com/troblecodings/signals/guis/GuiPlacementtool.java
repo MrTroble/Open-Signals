@@ -7,9 +7,11 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.function.IntConsumer;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
+import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UICheckBox;
@@ -25,6 +27,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
+import com.troblecodings.signals.utils.JsonEnum;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
@@ -32,46 +35,32 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.common.property.ExtendedBlockState;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiPlacementtool extends GuiBase {
+
+    public static final int GUI_PLACEMENTTOOL = 0;
 
     private final UIEntity list = new UIEntity();
     private final UIBlockRender blockRender = new UIBlockRender();
     private final HashMap<String, SEProperty> lookup = new HashMap<String, SEProperty>();
     private Signal currentSelectedBlock;
     private final Placementtool tool;
-    public static final int GUI_PLACEMENTTOOL = 0;
-
-    public GuiPlacementtool(final ItemStack stack) {
-        this.compound = stack.getCompound();
+    
+    public GuiPlacementtool(final GuiCreateInfo info) {
+    	final ItemStack stack = info.player.getMainHandItem();
+        this.compound = new NBTWrapper(stack.getOrCreateTag());
         if (this.compound == null)
-            this.compound = new CompoundTag();
+            this.compound = new NBTWrapper();
         tool = (Placementtool) stack.getItem();
-        final int usedBlock = this.compound.hasKey(Placementtool.BLOCK_TYPE_ID)
-                ? this.compound.getInt(Placementtool.BLOCK_TYPE_ID)
-                : tool.getObjFromID(0).getID();
-        currentSelectedBlock = Signal.SIGNALLIST.get(usedBlock);
+        final int usedBlock = this.compound.contains(Placementtool.BLOCK_TYPE_ID)
+                ? this.compound.getInteger(Placementtool.BLOCK_TYPE_ID)
+                : 0;
+        currentSelectedBlock = tool.getObjFromID(usedBlock);
         initInternal();
     }
 
-    private void initList() {
-        final ExtendedBlockState hVExtendedBlockState = (ExtendedBlockState) currentSelectedBlock
-                .getBlockState();
-        final Collection<SEProperty> unlistedProperties = hVExtendedBlockState
-                .getUnlistedProperties();
-        for (final SEProperty property : unlistedProperties) {
-            final SEProperty prop = SEProperty.cst(property);
-            of(prop, inp -> applyModelChanges());
-        }
-        if (currentSelectedBlock.canHaveCustomname())
-            list.add(GuiElements.createInputElement(Signal.CUSTOMNAME, in -> applyModelChanges()));
-        this.list.read(compound);
-    }
-
     private void initInternal() {
-        initList();
         final UIBox vbox = new UIBox(UIBox.VBOX, 5);
         this.list.add(vbox);
         this.list.setInheritHeight(true);
@@ -82,12 +71,7 @@ public class GuiPlacementtool extends GuiBase {
 
         final UIEntity selectBlockEntity = GuiElements.createEnumElement(tool, input -> {
             currentSelectedBlock = tool.getObjFromID(input);
-            final ExtendedBlockState bsc = (ExtendedBlockState) currentSelectedBlock
-                    .getBlockState();
-            lookup.clear();
-            bsc.getUnlistedProperties().forEach(p -> lookup.put(p.getName(), p));
-            this.list.clearChildren();
-            initList();
+            // TODO
             this.entity.update();
             applyModelChanges();
         });
@@ -106,7 +90,7 @@ public class GuiPlacementtool extends GuiBase {
 
         final UIRotate rotation = new UIRotate();
         rotation.setRotateY(180);
-        blockRenderEntity.add(new UIDrag((x, y) -> rotation.setRotateY(rotation.getRotateY() + x)));
+        blockRenderEntity.add(new UIDrag((x, y) -> rotation.setRotateY((float)(rotation.getRotateY() + x))));
 
         blockRenderEntity.add(new UIScissor());
         blockRenderEntity.add(new UIIndependentTranslate(35, 150, 40));
@@ -148,7 +132,7 @@ public class GuiPlacementtool extends GuiBase {
         if (property == null)
             return;
         if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-            if (property.getType().equals(Boolean.class)) {
+            if (property.getParent().equals(JsonEnum.BOOLEAN)) {
                 list.add(GuiElements.createBoolElement(property, consumer));
                 return;
             }
@@ -159,51 +143,13 @@ public class GuiPlacementtool extends GuiBase {
     }
 
     @Override
-    public void initGui() {
-        super.initGui();
-        applyModelChanges();
-    }
-
-    @Override
-    public void onGuiClosed() {
-        compound.putInt(Placementtool.BLOCK_TYPE_ID, currentSelectedBlock.getID());
-        super.onGuiClosed();
+    public void removed() {
+    	// TODO Save ID
+        super.removed();
         GuiSyncNetwork.sendToItemServer(compound);
     }
 
-    @SuppressWarnings({
-            "rawtypes", "unchecked"
-    })
     public void applyModelChanges() {
-        IModelData ebs = (IModelData) currentSelectedBlock.getDefaultState();
-
-        final List<UIEnumerable> enumerables = this.list.findRecursive(UIEnumerable.class);
-        for (final UIEnumerable enumerable : enumerables) {
-            final SEProperty sep = (SEProperty) lookup.get(enumerable.getID());
-            if (sep == null)
-                return;
-            ebs = ebs.withProperty(sep, sep.getObjFromID(enumerable.getIndex()));
-        }
-
-        final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
-        for (final UICheckBox checkb : checkbox) {
-            final SEProperty sep = (SEProperty) lookup.get(checkb.getID());
-            if (sep == null)
-                return;
-            if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-                ebs = ebs.withProperty(sep, checkb.isChecked());
-            } else if (checkb.isChecked()) {
-                ebs = ebs.withProperty(sep, sep.getDefault());
-            }
-        }
-
-        for (final Entry<SEProperty, Optional<?>> prop : ebs.getUnlistedProperties().entrySet()) {
-            final SEProperty property = SEProperty.cst(prop.getKey());
-            if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
-                ebs = ebs.withProperty(property, property.getDefault());
-            }
-        }
-
-        blockRender.setBlockState(ebs);
+    	// TODO Model render
     }
 }

@@ -11,10 +11,12 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
+import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -45,8 +47,6 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NBTUtil;
 import net.minecraft.world.level.block.Rotation;
 
 public class GuiSignalBox extends GuiBase {
@@ -61,22 +61,22 @@ public class GuiSignalBox extends GuiBase {
     private Page page = Page.USAGE;
     private SignalBoxNode node = null;
     private boolean dirty = false;
-    private CompoundTag dirtyCompound = new CompoundTag();
+    private NBTWrapper dirtyCompound = new NBTWrapper();
     private UIEntity mainButton;
 
-    public GuiSignalBox(final SignalBoxTileEntity box) {
-        this.box = box;
-        this.container = new ContainerSignalBox(this::update);
+    public GuiSignalBox(final GuiCreateInfo info) {
+        this.box = info.getTile();
+        this.container = new ContainerSignalBox(info, this::update);
         Minecraft.getInstance().player.containerMenu = this.container;
         initializeBasicUI();
-        if (this.box.get() != null)
-            this.compound = this.box.get();
+        if (this.box.getUpdateTag() != null)
+            this.compound = new NBTWrapper(this.box.getUpdateTag());
         this.entity.read(this.compound);
     }
 
-    private void update(final CompoundTag compound) {
+    private void update(final NBTWrapper compound) {
         this.resetTileSelection();
-        if (compound.hasKey(SignalBoxTileEntity.ERROR_STRING)) {
+        if (compound.contains(SignalBoxTileEntity.ERROR_STRING)) {
             final String error = I18n.get(compound.getString(SignalBoxTileEntity.ERROR_STRING));
             final UIToolTip tooltip = new UIToolTip(error);
             entity.add(tooltip);
@@ -196,10 +196,10 @@ public class GuiSignalBox extends GuiBase {
                     this.lowerEntity.clear();
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getBlockPos());
                     initializeFieldUsage(mainButton);
-                    final CompoundTag compound = new CompoundTag();
-                    final CompoundTag wayComp = new CompoundTag();
+                    final NBTWrapper compound = new NBTWrapper();
+                    final NBTWrapper wayComp = new NBTWrapper();
                     toNBT(wayComp, POINT1, node.getPoint());
-                    compound.put(RESET_WAY, wayComp);
+                    compound.putWrapper(SignalBoxUtil.RESET_WAY, wayComp);
                     GuiSyncNetwork.sendToPosServer(compound, this.box.getBlockPos());
                 }));
             }
@@ -246,11 +246,11 @@ public class GuiSignalBox extends GuiBase {
                     this.resetTileSelection();
                     return;
                 }
-                final CompoundTag comp = new CompoundTag();
-                final CompoundTag way = new CompoundTag();
+                final NBTWrapper comp = new NBTWrapper();
+                final NBTWrapper way = new NBTWrapper();
                 toNBT(way, POINT1, lastTile.getNode().getPoint());
                 toNBT(way, POINT2, currentNode.getPoint());
-                comp.put(SignalBoxUtil.REQUEST_WAY, way);
+                comp.putWrapper(SignalBoxUtil.REQUEST_WAY, way);
                 GuiSyncNetwork.sendToPosServer(comp, box.getBlockPos());
                 lastTile = null;
             }
@@ -321,8 +321,8 @@ public class GuiSignalBox extends GuiBase {
 
             layout.add(GuiElements.createButton(name));
             layout.add(GuiElements.createButton("x", 20, e -> {
-                final CompoundTag resetPos = new CompoundTag();
-                resetPos.put(SignalBoxTileEntity.REMOVE_SIGNAL, NBTUtil.createPosTag(p));
+                final NBTWrapper resetPos = new NBTWrapper();
+                resetPos.putBlockPos(SignalBoxTileEntity.REMOVE_SIGNAL, p);
                 GuiSyncNetwork.sendToPosServer(resetPos, this.box.getBlockPos());
                 list.remove(layout);
             }));
@@ -359,7 +359,7 @@ public class GuiSignalBox extends GuiBase {
         plane.setInheritWidth(true);
         plane.setInheritHeight(true);
         lowerEntity.add(new UIScroll(s -> {
-            final float newScale = plane.getScaleX() + s * 0.001f;
+            final float newScale = (float) (plane.getScaleX() + s * 0.001f);
             if (newScale <= 0)
                 return;
             plane.setScaleX(newScale);
@@ -449,24 +449,16 @@ public class GuiSignalBox extends GuiBase {
         this.entity.read(compound);
     }
 
-    @Override
-    public void onGuiClosed() {
-        this.reset();
-        if (this.mc.player != null) {
-            this.container.onContainerClosed(this.mc.player);
-        }
-    }
-
     private void reset() {
         if (page.equals(Page.EDIT)) {
-            compound = new CompoundTag();
+            compound = new NBTWrapper();
         }
         if (!page.equals(Page.SETTINGS)) {
             this.entity.write(compound);
             if (page.equals(Page.TILE_CONFIG) && node != null) {
-                node.writeEntryNetwork(compound, false);
+            	// TODO Networking
             }
-            GuiSyncNetwork.sendToPosServer(compound, this.box.getBlockPos());
+        	// TODO Networking
         }
         this.page = Page.NONE;
         lowerEntity.clear();

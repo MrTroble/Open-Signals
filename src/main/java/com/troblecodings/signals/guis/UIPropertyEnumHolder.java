@@ -8,7 +8,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
 
 @OnlyIn(Dist.CLIENT)
-@SuppressWarnings("rawtypes")
 public class UIPropertyEnumHolder {
 
     private final SEProperty property;
@@ -19,12 +18,12 @@ public class UIPropertyEnumHolder {
         this.enumarable = enumarable;
     }
 
-    @SuppressWarnings("unchecked")
     public IModelData apply(final IModelData blockstate) {
-        final Object value = property.getObjFromID(enumarable.getIndex());
+        final String value = property.getObjFromID(enumarable.getIndex());
         if (value == null)
             return blockstate;
-        return blockstate.withProperty(property, value);
+        blockstate.setData(property, value);
+        return blockstate;
     }
 
 }

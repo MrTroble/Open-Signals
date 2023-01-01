@@ -28,11 +28,11 @@ public class SEProperty extends ModelProperty<String>
     private final JsonEnum parent;
     private final String defaultValue;
     private final ChangeableStage stage;
-    private final Predicate<Map<SEProperty, Object>> deps;
+    private final Predicate<Map<SEProperty, String>> deps;
     private final List<String> allowedValues;
 
     public SEProperty(final String name, final JsonEnum parent, final String defaultValue,
-            final ChangeableStage stage, final Predicate<Map<SEProperty, Object>> deps) {
+            final ChangeableStage stage, final Predicate<Map<SEProperty, String>> deps) {
         this.name = name;
         this.parent = parent;
         this.defaultValue = defaultValue;
@@ -104,7 +104,7 @@ public class SEProperty extends ModelProperty<String>
         return "SEP[" + this.getName() + "]";
     }
 
-    public boolean testMap(final Map<SEProperty, Object> t) {
+    public boolean testMap(final Map<SEProperty, String> t) {
         return this.deps.test(t);
     }
 
@@ -119,7 +119,7 @@ public class SEProperty extends ModelProperty<String>
     public static class SEAutoNameProp extends SEProperty {
 
         public SEAutoNameProp(final String name, final JsonEnum parent, final String defaultValue,
-                final ChangeableStage stage, final Predicate<Map<SEProperty, Object>> deps) {
+                final ChangeableStage stage, final Predicate<Map<SEProperty, String>> deps) {
             super(name, parent, defaultValue, stage, deps);
         }
 

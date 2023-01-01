@@ -5,7 +5,10 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.troblecodings.core.BaseContainer;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
+import com.troblecodings.guilib.ecs.ContainerBase;
+import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -19,7 +22,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.player.Player;
 
-public class ContainerSignalBox extends BaseContainer implements UIClientSync {
+public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     public final static String UPDATE_SET = "update";
     public final static String SIGNAL_ID = "signal";
@@ -30,16 +33,16 @@ public class ContainerSignalBox extends BaseContainer implements UIClientSync {
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
     private Player player;
     private SignalBoxTileEntity tile;
-    private Consumer<CompoundTag> run;
+    private Consumer<NBTWrapper> run;
     private boolean send = true;
-
-    public ContainerSignalBox(final SignalBoxTileEntity tile) {
-    	super(OpenSignalsMain.handler.getContainerInfo(SignalBox.class));
-        this.tile = tile;
+    
+    public ContainerSignalBox(final GuiCreateInfo info) {
+    	super(info);
+        this.tile = info.getTile();
     }
 
-    public ContainerSignalBox(final Consumer<CompoundTag> run) {
-    	super(OpenSignalsMain.handler.getContainerInfo(SignalBox.class));
+    public ContainerSignalBox(final GuiCreateInfo info, final Consumer<NBTWrapper> run) {
+    	super(info);
         this.run = run;
     }
 

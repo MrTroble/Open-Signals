@@ -3,6 +3,8 @@ package com.troblecodings.signals.guis;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
+import com.troblecodings.guilib.ecs.ContainerBase;
+import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
@@ -10,7 +12,7 @@ import com.troblecodings.signals.blocks.Signal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 
-public class ContainerSignalController extends AbstractContainerMenu implements UIClientSync {
+public class ContainerSignalController extends ContainerBase implements UIClientSync {
 
     private final AtomicReference<Map<SEProperty, String>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
@@ -18,8 +20,8 @@ public class ContainerSignalController extends AbstractContainerMenu implements 
     private Player player;
     private Runnable onUpdate;
 
-    public ContainerSignalController() {
-    	super(null, 0);
+    public ContainerSignalController(final GuiCreateInfo info) {
+    	super(info);
     }
 
 

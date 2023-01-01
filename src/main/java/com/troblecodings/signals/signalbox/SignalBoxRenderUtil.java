@@ -61,7 +61,7 @@ public class SignalBoxRenderUtil {
 	
 	public static void drawBUE(Object parent, int color) {
 		final int part = (int) (((UIEntity) parent).getHeight() / 3);
-		SignalBoxRenderUtil.drawLines(0, ((UIEntity) parent).getWidth(), part, part, color);
-		SignalBoxRenderUtil.drawLines(0, ((UIEntity) parent).getWidth(), part * 2, part * 2, color);
+		SignalBoxRenderUtil.drawLines(0, (int)((UIEntity) parent).getWidth(), part, part, color);
+		SignalBoxRenderUtil.drawLines(0, (int)((UIEntity) parent).getWidth(), part * 2, part * 2, color);
 	}
 }

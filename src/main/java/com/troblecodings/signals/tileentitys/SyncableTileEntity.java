@@ -56,7 +56,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
         return this.clientSyncs.removeIf(s -> s.getPlayer().equals(sync.getPlayer()));
     }
 
-    public void sendToAll(final CompoundTag compound) {
+    public void sendToAll(final NBTWrapper compound) {
         this.clientSyncs.forEach(sync -> GuiSyncNetwork.sendToClient(compound, sync.getPlayer()));
     }
 

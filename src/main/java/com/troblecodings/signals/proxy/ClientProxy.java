@@ -22,20 +22,16 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ClientProxy extends CommonProxy {
 
-    @Override
-    public void preinit(final FMLCommonSetupEvent event) {
-        super.preinit(event);
-        OpenSignalsMain.handler.addGui(Placementtool.class,
-                (p, w, bp) -> new GuiPlacementtool(p.getMainHandItem()));
-        OpenSignalsMain.handler.addGui(SignalController.class, SignalControllerTileEntity.class,
-                GuiSignalController::new);
-        OpenSignalsMain.handler.addGui(SignalBox.class, SignalBoxTileEntity.class,
-                GuiSignalBox::new);
-        OpenSignalsMain.handler.addGui(RedstoneIO.class, RedstoneIOTileEntity.class,
-                GuiRedstoneIO::new);
-        OpenSignalsMain.handler.addGui(Signal.class, SignalTileEntity.class, GuiSignal::new);
+	@Override
+	public void preinit(final FMLCommonSetupEvent event) {
+		super.preinit(event);
+		OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);
+		OpenSignalsMain.handler.addGui(SignalController.class, GuiSignalController::new);
+		OpenSignalsMain.handler.addGui(SignalBox.class, GuiSignalBox::new);
+		OpenSignalsMain.handler.addGui(RedstoneIO.class, GuiRedstoneIO::new);
+		OpenSignalsMain.handler.addGui(Signal.class, GuiSignal::new);
 
-        MinecraftForge.EVENT_BUS.register(OSModels.class);
-    }
+		MinecraftForge.EVENT_BUS.register(OSModels.class);
+	}
 
 }

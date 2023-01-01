@@ -38,7 +38,7 @@ public class SEPropertyParser {
             stage = Enum.valueOf(ChangeableStage.class, changeableStage);
         }
 
-        Predicate<Map<SEProperty, Object>> predicate = t -> true;
+        Predicate<Map<SEProperty, String>> predicate = t -> true;
         if (dependencies != null && !dependencies.isEmpty()) {
             predicate = LogicParser.predicate(dependencies, info);
         }

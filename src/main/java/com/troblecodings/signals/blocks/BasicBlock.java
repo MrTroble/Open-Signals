@@ -27,7 +27,7 @@ public class BasicBlock extends Block {
             return supply(new TileEntityInfo(pos, state)
                     .with(((BasicBlock) state.getBlock()).getBlockEntityType().get()));
         }
-        BlockEntity supply(TileEntityInfo info);
+        BlockEntity supply(final TileEntityInfo info);
     }
 
     private static Map<TileEntitySupplierWrapper, Set<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();

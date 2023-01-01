@@ -8,12 +8,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.Rotation;
 
 public final class SignalBoxUtil {
@@ -31,13 +31,13 @@ public final class SignalBoxUtil {
     public static final String POINT1 = "P1";
     public static final String POINT2 = "P2";
 
-    public static Point fromNBT(final CompoundTag comp, final String name) {
-        return new Point(comp.getInt("x" + name), comp.getInt("y" + name));
+    public static Point fromNBT(final NBTWrapper comp, final String name) {
+        return new Point(comp.getInteger("x" + name), comp.getInteger("y" + name));
     }
 
-    public static void toNBT(final CompoundTag comp, final String name, final Point point) {
-        comp.putInt("x" + name, point.getX());
-        comp.putInt("y" + name, point.getY());
+    public static void toNBT(final NBTWrapper comp, final String name, final Point point) {
+        comp.putInteger("x" + name, point.getX());
+        comp.putInteger("y" + name, point.getY());
     }
 
     private static double calculateHeuristic(final Point p1, final Point p2) {

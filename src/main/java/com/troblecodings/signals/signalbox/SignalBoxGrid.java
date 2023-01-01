@@ -26,10 +26,10 @@ public class SignalBoxGrid implements INetworkSavable {
     protected final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
     protected final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
-    protected final Consumer<CompoundTag> sendToAll;
+    protected final Consumer<NBTWrapper> sendToAll;
     protected final SignalBoxFactory factory;
 
-    public SignalBoxGrid(final Consumer<CompoundTag> sendToAll) {
+    public SignalBoxGrid(final Consumer<NBTWrapper> sendToAll) {
         this.sendToAll = sendToAll;
         this.factory = SignalBoxFactory.getFactory();
     }
