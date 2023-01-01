@@ -15,9 +15,12 @@ import com.troblecodings.signals.proxy.CommonProxy;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.forgespi.locating.IModFile;
 
 @Mod(OpenSignalsMain.MODID)
 public class OpenSignalsMain {
@@ -54,8 +57,15 @@ public class OpenSignalsMain {
 
     public static final int GUI_SIGNAL_CONTROLLER = 1;
 
+    public IModFile file;
+    
     @SubscribeEvent
-    public void preinit(final FMLCommonSetupEvent event) {
+    public void preInit(final FMLConstructModEvent event) {
+    	file = ModLoadingContext.get().getActiveContainer().getModInfo().getOwningFile().getFile();
+    }
+    
+    @SubscribeEvent
+    public void init(final FMLCommonSetupEvent event) {
         debug = true;
         log = LoggerContext.getContext().getLogger(MODID);
         proxy.preinit(event);

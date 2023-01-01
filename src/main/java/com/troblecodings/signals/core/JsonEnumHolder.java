@@ -15,7 +15,7 @@ public class JsonEnumHolder {
 	public static Map<String, JsonEnum> getProperties() {
 	    final HashMap<String, JsonEnum> returnmap = new HashMap<>();
 	    final Map<String, String> files = FileReader
-	            .readallFilesfromDierectory("/assets/girsignals/enumdefinition");
+	            .readallFilesfromDierectory("/assets/opensignals/enumdefinition");
 	    files.forEach((_u, file) -> {
 	        final Map<String, List<String>> map = JsonEnum.GSON.fromJson(file,
 	                (Class<Map<String, List<String>>>) (Class<?>) Map.class);
@@ -34,7 +34,7 @@ public class JsonEnumHolder {
 	            returnmap.put(name.toLowerCase(), new JsonEnum(name, list));
 	        });
 	    });
-	    PROPERTIES.put(JsonEnum.BOOLEAN.getName(), JsonEnum.BOOLEAN);
+	    returnmap.put(JsonEnum.BOOLEAN.getName(), JsonEnum.BOOLEAN);
 	    return returnmap;
 	}
 

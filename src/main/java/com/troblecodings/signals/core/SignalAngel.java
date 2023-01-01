@@ -28,6 +28,6 @@ public enum SignalAngel implements NamableWrapper {
     
 	@Override
 	public String getNameWrapper() {
-        return "angel" + getDegree();
+        return "angel" + this.ordinal();
 	}
 }

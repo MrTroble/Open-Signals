@@ -13,7 +13,7 @@ public final class SignalLoader {
 
     public static void loadAllSignals() {
         final Map<String, SignalSystemParser> signals = SignalSystemParser
-                .getSignalSystems("/assets/girsignals/signalsystems");
+                .getSignalSystems("/assets/opensignals/signalsystems");
         signals.forEach((filename, properties) -> {
             try {
                 OSBlocks.loadBlock(properties.createSignalSystem(filename),

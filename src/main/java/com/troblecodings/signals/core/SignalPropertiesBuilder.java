@@ -45,7 +45,7 @@ public class SignalPropertiesBuilder {
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
             OSItems.placementtools.forEach(item -> {
-                if (item.getRegistryName().toString().replace(OpenSignalsMain.MODID + ":", "")
+                if (item.getRegistryName().getPath()
                         .equalsIgnoreCase(placementToolName)) {
                     placementtool = item;
                     return;

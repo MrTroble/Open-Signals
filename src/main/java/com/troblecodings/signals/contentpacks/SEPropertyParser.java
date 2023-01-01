@@ -24,8 +24,9 @@ public class SEPropertyParser {
     @SuppressWarnings("unchecked")
     public SEProperty createSEProperty(final FunctionParsingInfo info) {
         if (defaultState instanceof Boolean) {
-            parent = JsonEnumHolder.PROPERTIES
-                    .get(Boolean.toString((boolean) defaultState).toLowerCase());
+            parent = JsonEnum.BOOLEAN;
+            enumClass = JsonEnum.BOOLEAN.getName();
+            defaultState = String.valueOf(defaultState);
         } else {
             parent = JsonEnumHolder.PROPERTIES.get(enumClass.toLowerCase());
         }

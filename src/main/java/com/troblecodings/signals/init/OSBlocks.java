@@ -40,7 +40,7 @@ public final class OSBlocks {
 
 	public static final List<BasicBlock> blocksToRegister = new ArrayList<>();
 
-	static {
+	public static void init() {
 		final Field[] fields = OSBlocks.class.getFields();
 		for (final Field field : fields) {
 			final int modifiers = field.getModifiers();
@@ -55,6 +55,8 @@ public final class OSBlocks {
 				}
 			}
 		}
+    	if(OSItems.LINKING_TOOL.getRegistryName() == null)
+    		OSItems.init();
 		SignalLoader.loadAllSignals();
 		BasicBlock.prepare();
 	}
@@ -62,7 +64,6 @@ public final class OSBlocks {
 	public static void loadBlock(final BasicBlock block, final String pName) {
 		if (blocksToRegister.contains(block))
 			return;
-
 		final String name = pName.toLowerCase().trim();
 		block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
 		blocksToRegister.add(block);
@@ -72,18 +73,24 @@ public final class OSBlocks {
 
 	@SubscribeEvent
 	public static void registerBlock(final RegistryEvent.Register<Block> event) {
+		if(POST.getRegistryName() == null)
+	    	OSBlocks.init();
 		final IForgeRegistry<Block> registry = event.getRegistry();
 		blocksToRegister.forEach(registry::register);
 	}
 
 	@SubscribeEvent
 	public static void registerBlockEntitys(final RegistryEvent.Register<BlockEntityType<?>> event) {
+		if(POST.getRegistryName() == null)
+	    	OSBlocks.init();
 		final IForgeRegistry<BlockEntityType<?>> registry = event.getRegistry();
 		BasicBlock.BLOCK_ENTITYS.values().forEach(registry::register);
 	}
 
 	@SubscribeEvent
 	public static void registerItem(final RegistryEvent.Register<Item> event) {
+		if(POST.getRegistryName() == null)
+	    	OSBlocks.init();
 		final IForgeRegistry<Item> registry = event.getRegistry();
 		blocksToRegister.forEach(block -> registry.register(
 				new BlockItem(block, new Properties().tab(OSTabs.TAB)).setRegistryName(block.getRegistryName())));
