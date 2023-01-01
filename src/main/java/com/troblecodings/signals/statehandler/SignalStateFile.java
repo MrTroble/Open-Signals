@@ -1,5 +1,8 @@
 package com.troblecodings.signals.statehandler;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Objects;
 
@@ -18,7 +21,13 @@ public class SignalStateFile {
     }
 
     public SignalStatePos find(BlockPos pos) {
-        return null;
+    	try(InputStream stream = Files.newInputStream(path)) {
+    		byte[] header = new byte[4];
+    		stream.read(header);
+    	} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
     }
 
     public ByteBuf read(final SignalStatePos pos) {
