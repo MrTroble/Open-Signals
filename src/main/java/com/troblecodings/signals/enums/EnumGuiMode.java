@@ -8,13 +8,8 @@ import com.troblecodings.signals.signalbox.SignalBoxRenderUtil;
 public enum EnumGuiMode {
 
     STRAIGHT(0, 0.5, 1, 0.5), CORNER(0, 0.5, 0.5, 1), END(1, 0.30, 1, 0.70),
-    PLATFORM((parent, color) -> SignalBoxRenderUtil.drawRect(0, 0, ((UIEntity) parent).getWidth(),
-            ((UIEntity) parent).getHeight() / 3, color)),
-    BUE((parent, color) -> {
-        final int part = ((UIEntity) parent).getHeight() / 3;
-        SignalBoxRenderUtil.drawLines(0, ((UIEntity) parent).getWidth(), part, part, color);
-        SignalBoxRenderUtil.drawLines(0, ((UIEntity) parent).getWidth(), part * 2, part * 2, color);
-    }), HP(0), VP(1), RS(2), RA10(3);
+    PLATFORM(SignalBoxRenderUtil::drawPlatform),
+    BUE(SignalBoxRenderUtil::drawBUE), HP(0), VP(1), RS(2), RA10(3);
 
     /**
      * Naming

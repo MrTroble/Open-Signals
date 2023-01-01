@@ -12,8 +12,6 @@ import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
-import com.troblecodings.signals.tileentitys.IChunkloadable;
-import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
@@ -24,7 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 
-public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, IChunkloadable, ILinkableTile {
+public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
 	public static final String ERROR_STRING = "error";
 	public static final String REMOVE_SIGNAL = "removeSignal";
@@ -84,15 +82,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		LinkType type = LinkType.SIGNAL;
 		if (block == OSBlocks.REDSTONE_IN) {
 			type = LinkType.INPUT;
-			if (level.isClientSide)
-				loadChunkAndGetTile(RedstoneIOTileEntity.class, level, linkedPos,
-						(tile, _u) -> tile.link(this.worldPosition));
 		} else if (block == OSBlocks.REDSTONE_OUT) {
 			type = LinkType.OUTPUT;
 		}
 		if (level.isClientSide) {
 			if (type.equals(LinkType.SIGNAL)) {
-				loadChunkAndGetTile(SignalTileEntity.class, level, linkedPos, this::updateSingle);
 				worldLoadOps.loadAndReset(linkedPos);
 			}
 		}
@@ -112,18 +106,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 		if (!level.isClientSide)
 			return;
 		signals.clear();
-		new Thread(() -> {
-			linkedBlocks.forEach((linkedPos, _u) -> loadChunkAndGetTile(SignalTileEntity.class, level, linkedPos,
-					this::updateSingle));
-		}).start();
 	}
 
 	@Override
 	public boolean unlink() {
 		signals.keySet().forEach(worldLoadOps::loadAndReset);
 		linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue())).forEach(entry -> {
-			loadChunkAndGetTile(RedstoneIOTileEntity.class, level, entry.getKey(),
-					(tile, _u) -> tile.unlink(worldPosition));
 		});
 		linkedBlocks.clear();
 		signals.clear();

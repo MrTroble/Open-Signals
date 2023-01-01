@@ -12,6 +12,7 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,6 +24,7 @@ public class BasicBlock extends Block {
 	public static interface TileEntitySupplierWrapper extends BlockEntitySupplier<BlockEntity> {
 		@Override
 		default BlockEntity create(BlockPos pos, BlockState state) {
+			Level.RESOURCE_KEY_CODEC.encode(null, null, null);
 			return supply(
 					new TileEntityInfo(pos, state).with(((BasicBlock) state.getBlock()).getBlockEntityType().get()));
 		}

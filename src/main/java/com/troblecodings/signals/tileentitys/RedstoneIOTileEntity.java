@@ -14,7 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity
-		implements NamableWrapper, IChunkloadable, ISyncable, Iterable<BlockPos> {
+		implements NamableWrapper, ISyncable, Iterable<BlockPos> {
 	
 	public RedstoneIOTileEntity(TileEntityInfo info) {
 		super(info);
@@ -73,8 +73,6 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
 		if (level.isClientSide)
 			return;
 		final boolean power = this.level.getBlockState(this.worldPosition).getValue(RedstoneIO.POWER);
-		this.linkedPositions.forEach(position -> loadChunkAndGetTile(SignalBoxTileEntity.class, level, position,
-				(tile, _u) -> tile.updateRedstonInput(this.worldPosition, power)));
 	}
 
 	@Override

@@ -17,7 +17,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class SignalControllerTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile, IChunkloadable {
+public class SignalControllerTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
 	private BlockPos linkedSignalPosition = null;
 	private NBTWrapper compound = new NBTWrapper();
@@ -49,13 +49,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity implements IS
 	}
 	
 	public void onLink() {
-		new Thread(() -> {
-			loadChunkAndGetTile(SignalTileEntity.class, level, linkedSignalPosition, (signaltile, _u) -> {
-				properties.clear();
-				properties.putAll(signaltile.getProperties());
-				syncClient();
-			});
-		}).start();
 	}
 
 	@Override
@@ -74,9 +67,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity implements IS
 	public boolean hasLink() {
 		if (linkedSignalPosition == null)
 			return false;
-		if (loadChunkAndGetTile(SignalTileEntity.class, level, linkedSignalPosition, (x, y) -> {
-		}))
-			return true;
 		if (!level.isClientSide)
 			unlink();
 		return false;

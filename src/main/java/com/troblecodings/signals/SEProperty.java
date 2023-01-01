@@ -12,11 +12,14 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.utils.JsonEnum;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
+import net.minecraftforge.common.util.Lazy;
+import net.minecraftforge.event.world.ChunkEvent;
 
 public class SEProperty extends ModelProperty<String>
         implements IIntegerable<String> {
