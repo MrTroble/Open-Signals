@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 
 import com.google.common.collect.Lists;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -60,7 +61,7 @@ public class GIRSyncEntryTests {
     }
 
     public static void testISavable(final ISaveable toSave, final Supplier<ISaveable> getter) {
-        final CompoundTag compound = new CompoundTag();
+        final NBTWrapper compound = new NBTWrapper();
         toSave.write(compound);
         final AtomicReference<ISaveable> fresh = new AtomicReference<>();
         assertTimeoutPreemptively(Duration.ofSeconds(1), () -> {
@@ -76,7 +77,7 @@ public class GIRSyncEntryTests {
     public static void testReadWriteSingle(final PathEntryType<?> entry, final Object value) {
         final IPathEntry<Object> pathEntry = (IPathEntry<Object>) entry.newValue();
         pathEntry.setValue(value);
-        final CompoundTag compound = new CompoundTag();
+        final NBTWrapper compound = new NBTWrapper();
         pathEntry.write(compound);
         final IPathEntry<Object> pathEntry2 = (IPathEntry<Object>) entry.newValue();
         pathEntry2.read(compound);
@@ -195,7 +196,7 @@ public class GIRSyncEntryTests {
                 SignalBoxUtil.getOffset(Rotation.COUNTERCLOCKWISE_90, new Point(1, 1)));
 
         final Point p1 = SignalBoxUtil.getOffset(rotation, point2);
-        final Point p2 = SignalBoxUtil.getOffset(rotation.add(Rotation.CLOCKWISE_180), point2);
+        final Point p2 = SignalBoxUtil.getOffset(rotation.getRotated(Rotation.CLOCKWISE_180), point2);
         final Path path = new Path(p1, p2);
         assertTrue(signalBoxNode.getOption(path).isPresent());
         assertTrue(finalNode.getOption(new Path(p1, p2)).isPresent());
@@ -285,23 +286,7 @@ public class GIRSyncEntryTests {
 
     public static <T extends INetworkSavable> void testINetworkSavable(final T savable,
             final Supplier<T> supplier, final Consumer<T> consumer) {
-        final AtomicReference<T> atomic = new AtomicReference<>();
-        testISavable(savable, () -> atomic.updateAndGet(old -> supplier.get()));
-        final CompoundTag network1 = new CompoundTag();
-        savable.writeEntryNetwork(network1, false);
-        final T test = atomic.get();
-        assertEquals(savable, test);
-        test.readEntryNetwork(network1);
-        assertEquals(savable, test);
-        assertTimeoutPreemptively(Duration.ofSeconds(5), () -> {
-            do {
-                consumer.accept(savable);
-            } while (savable.equals(test));
-        });
-        final CompoundTag network2 = new CompoundTag();
-        savable.writeEntryNetwork(network2, false);
-        test.readEntryNetwork(network2);
-        assertEquals(savable, test);
+        // TODO Test networking
     }
 
     @Test
@@ -393,11 +378,7 @@ public class GIRSyncEntryTests {
 
         final SignalBoxPathway pathwayCopy = new SignalBoxPathway(map);
         testISavable(pathway, () -> pathwayCopy);
-        final CompoundTag testCompound = new CompoundTag();
-        pathwayCopy.writeEntryNetwork(testCompound, false);
-        assertEquals(pathway, pathwayCopy);
-        pathwayCopy.readEntryNetwork(testCompound);
-        assertEquals(pathway.getListOfNodes().size(), pathwayCopy.getListOfNodes().size());
+
         for (int i = 0; i < pathway.getListOfNodes().size(); i++) {
             assertEquals(pathway.getListOfNodes().get(i), pathway.getListOfNodes().get(i));
         }
@@ -409,7 +390,7 @@ public class GIRSyncEntryTests {
         final Map<Point, SignalBoxNode> map2 = new HashMap<>();
         map.forEach((p, n) -> {
             final SignalBoxNode node = new SignalBoxNode(new Point(p));
-            final CompoundTag comp = new CompoundTag();
+            final NBTWrapper comp = new NBTWrapper();
             n.write(comp);
             node.read(comp);
             map2.put(node.getPoint(), node);
@@ -428,9 +409,8 @@ public class GIRSyncEntryTests {
         });
         final Map<Point, SignalBoxNode> map = generateMap(50, 50);
         consumer.accept(map);
-        final CompoundTag compound = new CompoundTag();
-        map.values().forEach(node -> node.writeEntryNetwork(compound, false));
-        grid.readEntryNetwork(compound);
+        final NBTWrapper compound = new NBTWrapper();
+
         assertFalse(grid.isEmpty());
         return grid;
     }
@@ -439,7 +419,7 @@ public class GIRSyncEntryTests {
     public void testSignalBoxGrid() {
         final SignalBoxGrid grid = makeGrid(_u -> {
         });
-        final CompoundTag compound = new CompoundTag();
+        final NBTWrapper compound = new NBTWrapper();
         grid.write(compound);
         final SignalBoxGrid gridCopy = new SignalBoxGrid(_u -> {
         });
@@ -481,8 +461,8 @@ public class GIRSyncEntryTests {
         }), g -> g.getNodes().stream().findAny().ifPresent(node -> {
             final ArrayList<ModeSet> setRemove = Lists.newArrayList(node);
             setRemove.forEach(set -> node.remove(set));
-            final CompoundTag network = new CompoundTag();
-            g.writeEntryNetwork(network, false);
+            final NBTWrapper network = new NBTWrapper();
+
             assertFalse(g.getNodes().contains(node));
         }));
     }

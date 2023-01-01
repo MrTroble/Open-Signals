@@ -102,9 +102,8 @@ public class SignalCustomModel implements IModelGeometry<SignalCustomModel> {
             }
             faceOutgoing.put(face, current.build());
         }
-        return new MultiPartBakedModel(outgoing.build(), faceOutgoing.build(),
-                model.useAmbientOcclusion(), model.isGui3d(), model.getParticleIcon(),
-                model.getTransforms(), model.getOverrides());
+        // TODO
+        return null;
     }
 
     protected void register(final String name, final Predicate<IModelData> state, final float x,
