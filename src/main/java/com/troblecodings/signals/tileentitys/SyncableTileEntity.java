@@ -29,14 +29,14 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt) {
-    	super.onDataPacket(net, pkt);
+    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket pkt) {
+        super.onDataPacket(net, pkt);
     }
-    
+
     @Override
     public CompoundTag getUpdateTag() {
-    	NBTWrapper wrapper = new NBTWrapper();
-    	saveWrapper(wrapper);
+        NBTWrapper wrapper = new NBTWrapper();
+        saveWrapper(wrapper);
         return wrapper.tag;
     }
 

@@ -54,10 +54,10 @@ public class GuiSignalController extends GuiBase {
     private final List<UIPropertyEnumHolder> holders = new ArrayList<>();
 
     public GuiSignalController(final SignalControllerTileEntity tile) {
-        this.pos = tile.getPos();
+        this.pos = tile.getBlockPos();
         this.linkedPos = tile.getLinkedPosition();
         this.controller = new ContainerSignalController(this::init);
-        Minecraft.getMinecraft().player.openContainer = this.controller;
+        Minecraft.getInstance().player.openContainer = this.controller;
         this.compound = tile.get();
         init();
     }
@@ -113,7 +113,7 @@ public class GuiSignalController extends GuiBase {
         for (final SEProperty entry : map.keySet()) {
             if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
                     || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-                    && entry.test(map)) {
+                    && entry.testMap(map)) {
                 final UIEntity entity = GuiElements.createEnumElement(
                         new DisableIntegerable<>(entry), e -> applyModelChange(bRender));
                 entity.findRecursive(UIEnumerable.class).forEach(e -> {
@@ -157,7 +157,7 @@ public class GuiSignalController extends GuiBase {
         rightSide.setWidth(30);
         rightSide.add(new UIBox(UIBox.VBOX, 4));
 
-        final Minecraft mc = Minecraft.getMinecraft();
+        final Minecraft mc = Minecraft.getInstance();
         final BlockState state = mc.player.world.getBlockState(pos);
         final IBakedModel model = mc.getBlockRendererDispatcher().getModelForState(state);
         final UIEnumerable toggle = new UIEnumerable(Direction.VALUES.length, "singleModeFace");
@@ -174,7 +174,7 @@ public class GuiSignalController extends GuiBase {
         });
         rightSide.add(toggle);
 
-        for (final Direction face : Direction.VALUES) {
+        for (final Direction face : Direction.values()) {
             final List<BakedQuad> quad = model.getQuads(state, face, 0);
             final UIEntity faceEntity = new UIEntity();
             faceEntity.setWidth(20);
@@ -295,7 +295,7 @@ public class GuiSignalController extends GuiBase {
         for (final SEProperty entry : map.keySet()) {
             if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
                     || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-                    && entry.test(map)) {
+                    && entry.testMap(map)) {
                 final UIEnumerable enumarable = new UIEnumerable(entry.count(), entry.getName());
                 list.add(GuiElements.createEnumElement(enumarable, entry,
                         e -> applyModelChange(blockRender)));
@@ -309,8 +309,7 @@ public class GuiSignalController extends GuiBase {
             "unchecked", "rawtypes"
     })
     private void applyModelChange(final UIBlockRender blockRender) {
-        IModelData currentState = (IModelData) this.controller.getSignal()
-                .getDefaultState();
+        IModelData currentState = (IModelData) this.controller.getSignal().getDefaultState();
         for (final Entry<SEProperty, Object> e : controller.getReference().entrySet()) {
             currentState = currentState.withProperty((SEProperty) e.getKey(), e.getValue());
         }

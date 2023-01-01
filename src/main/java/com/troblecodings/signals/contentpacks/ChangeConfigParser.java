@@ -44,15 +44,11 @@ public class ChangeConfigParser {
 
     private static final transient Gson GSON = new Gson();
 
-    public static void loadInternConfigs() {
-        loadChangeConfigs("/assets/girsignals/signalconfigs/change");
-    }
-
     @SuppressWarnings("rawtypes")
-    public static void loadChangeConfigs(final String directory) {
+    public static void loadChangeConfigs() {
 
-        for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
-                .entrySet()) {
+        for (Map.Entry<String, String> files : FileReader
+                .readallFilesfromDierectory("/assets/girsignals/signalconfigs/change").entrySet()) {
             final ChangeConfigParser parser = GSON.fromJson(files.getValue(),
                     ChangeConfigParser.class);
 

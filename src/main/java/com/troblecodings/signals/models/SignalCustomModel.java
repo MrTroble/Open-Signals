@@ -208,17 +208,18 @@ public class SignalCustomModel implements IModelGeometry<SignalCustomModel> {
         }
     }
 
-	@Override
-	public BakedModel bake(IModelConfiguration owner, ModelBakery bakery,
-			Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform, ItemOverrides overrides,
-			ResourceLocation modelLocation) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    public BakedModel bake(IModelConfiguration owner, ModelBakery bakery,
+            Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelTransform,
+            ItemOverrides overrides, ResourceLocation modelLocation) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
-	@Override
-	public Collection<Material> getTextures(IModelConfiguration owner,
-			Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors) {
-		return null;
-	}
+    @Override
+    public Collection<Material> getTextures(IModelConfiguration owner,
+            Function<ResourceLocation, UnbakedModel> modelGetter,
+            Set<Pair<String, String>> missingTextureErrors) {
+        return null;
+    }
 }

@@ -16,7 +16,8 @@ public class CPLoaderTest {
     @Test
     public void test() {
         try {
-            final URI uri = new URI("jar:" + CPLoaderTest.class.getResource("sounds.zip").toExternalForm());
+            final URI uri = new URI(
+                    "jar:" + CPLoaderTest.class.getResource("sounds.zip").toExternalForm());
             final FileSystem system = FileSystems.newFileSystem(uri, Collections.emptyMap());
             FileReader.addToFileSystem(system);
         } catch (final IOException | URISyntaxException e) {

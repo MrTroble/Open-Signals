@@ -33,7 +33,7 @@ public class GuiSignal extends GuiBase {
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(inner);
 
-        final UIEntity label = GuiElements.createLabel(tile.getName(), 0x7678a0);
+        final UIEntity label = GuiElements.createLabel(tile.getNameWrapper(), 0x7678a0);
         label.setScaleX(1.5f);
         label.setScaleY(1.5f);
         label.findRecursive(UILabel.class).forEach(l -> labelComp = l);
@@ -52,7 +52,7 @@ public class GuiSignal extends GuiBase {
         textfield.setInheritWidth(true);
 
         final UITextInput input = new UITextInput(SignalTileEntity.CUSTOMNAME);
-        input.setText(tile.getName());
+        input.setText(tile.getNameWrapper());
         textfield.add(input);
 
         hbox.add(textfield);

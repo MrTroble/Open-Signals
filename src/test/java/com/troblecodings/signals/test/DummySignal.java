@@ -5,21 +5,26 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 public class DummySignal extends SignalTileEntity {
 
-    private final HashMap<SEProperty, Object> seproperty = new HashMap<>();
+    public DummySignal() {
+        super(null);
+    }
+
+    private final HashMap<SEProperty, String> seproperty = new HashMap<>();
 
     @Override
-    public Optional<?> getProperty(final SEProperty prop) {
+    public Optional<String> getProperty(final SEProperty prop) {
         if (seproperty.containsKey(prop))
             return Optional.of(seproperty.get(prop));
         return Optional.empty();
     }
 
     @Override
-    public <T extends Comparable<T>> void setProperty(final SEProperty<T> prop, final T opt) {
+    public void setProperty(final SEProperty prop, final String opt) {
         seproperty.put(prop, opt);
     }
 
@@ -59,8 +64,7 @@ public class DummySignal extends SignalTileEntity {
             this.signal = signal;
         }
 
-        public <T extends Comparable<T>> DummyBuilder of(final SEProperty<T> property,
-                final T object) {
+        public DummyBuilder of(final SEProperty property, final String object) {
             this.signal.setProperty(property, object);
             return this;
         }
@@ -69,8 +73,7 @@ public class DummySignal extends SignalTileEntity {
             return this.signal;
         }
 
-        public static <T extends Comparable<T>> DummyBuilder start(final SEProperty<T> property,
-                final T object) {
+        public static DummyBuilder start(final SEProperty property, final String object) {
             final DummySignal signal = new DummySignal();
             final DummyBuilder builder = new DummyBuilder(signal);
             return builder.of(property, object);

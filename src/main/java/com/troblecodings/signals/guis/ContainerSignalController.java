@@ -25,7 +25,7 @@ public class ContainerSignalController extends Container implements UIClientSync
      * 
      */
     private static final long serialVersionUID = 7809917666570199392L;
-    private final AtomicReference<Map<SEProperty, Object>> reference = new AtomicReference<>();
+    private final AtomicReference<Map<SEProperty, String>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
     private boolean send = false;
     private Player player;
@@ -35,7 +35,7 @@ public class ContainerSignalController extends Container implements UIClientSync
         if (!tile.loadChunkAndGetTile(SignalTileEntity.class, tile.getLevel(),
                 tile.getLinkedPosition(), (t, c) -> {
                     reference.set(t.getProperties());
-                    final BlockState state = c.getBlockState(t.getPos());
+                    final BlockState state = c.getBlockState(t.getBlockPos());
                     referenceBlock.set((Signal) state.getBlock());
                 }))
             referenceBlock.set(null);

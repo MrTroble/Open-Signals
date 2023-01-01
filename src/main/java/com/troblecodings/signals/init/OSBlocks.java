@@ -54,7 +54,7 @@ public final class OSBlocks {
                 }
             }
         }
-        SignalLoader.loadInternSignals();
+        SignalLoader.loadAllSignals();
     }
 
     public static void loadBlock(final BasicBlock block, final String pName) {
@@ -75,12 +75,13 @@ public final class OSBlocks {
     }
 
     @SubscribeEvent
-    public static void registerBlockEntitys(final RegistryEvent.Register<BlockEntityType<?>> event) {
+    public static void registerBlockEntitys(
+            final RegistryEvent.Register<BlockEntityType<?>> event) {
         final IForgeRegistry<BlockEntityType<?>> registry = event.getRegistry();
         BasicBlock.prepare();
         BasicBlock.BLOCK_ENTITYS.values().forEach(registry::register);
     }
-    
+
     @SubscribeEvent
     public static void registerItem(final RegistryEvent.Register<Item> event) {
         final IForgeRegistry<Item> registry = event.getRegistry();
