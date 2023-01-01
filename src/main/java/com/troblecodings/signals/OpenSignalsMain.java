@@ -17,7 +17,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public class OpenSignalsMain {
 
     private static OpenSignalsMain instance;
-    public static final String MODID = "girsignals";
+    public static final String MODID = "opensignals";
 
     public static OpenSignalsMain getInstance() {
         return instance;

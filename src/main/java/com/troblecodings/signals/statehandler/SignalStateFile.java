@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 import io.netty.buffer.ByteBuf;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
 public class SignalStateFile {
@@ -16,8 +17,7 @@ public class SignalStateFile {
         this.path = path;
     }
 
-    public SignalStatePos find() {
-        // TODO read out files
+    public SignalStatePos find(BlockPos pos) {
         return null;
     }
 
