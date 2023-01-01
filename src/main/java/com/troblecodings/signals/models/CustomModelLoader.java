@@ -19,17 +19,17 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.geometry.IModelGeometry;
 
 @OnlyIn(Dist.CLIENT)
 public class CustomModelLoader implements IModelLoader<SignalCustomModel> {
 
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
-    
+
     public static final CustomModelLoader INSTANCE = new CustomModelLoader();
-    
-    private CustomModelLoader() {}
-    
+
+    private CustomModelLoader() {
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public void onResourceManagerReload(final ResourceManager resourceManager) {
@@ -152,9 +152,10 @@ public class CustomModelLoader implements IModelLoader<SignalCustomModel> {
         }
     }
 
-	@Override
-	public SignalCustomModel read(JsonDeserializationContext deserializationContext, JsonObject modelContents) {
-		// TODO check whats going on here?
-		return null;
-	}
+    @Override
+    public SignalCustomModel read(final JsonDeserializationContext deserializationContext,
+            final JsonObject modelContents) {
+        // TODO check whats going on here?
+        return null;
+    }
 }

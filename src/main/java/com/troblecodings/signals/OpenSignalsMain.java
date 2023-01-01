@@ -24,11 +24,12 @@ public class OpenSignalsMain {
     }
 
     public OpenSignalsMain() {
-    	instance = this;
-    	FMLJavaModLoadingContext.get().getModEventBus().addListener(null);
-	}
-    
-    public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+        instance = this;
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(null);
+    }
+
+    public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new,
+            () -> CommonProxy::new);
     public static Logger log = null;
     public static GuiHandler handler = null;
     private static boolean debug;
@@ -42,7 +43,6 @@ public class OpenSignalsMain {
 
     public static final int GUI_SIGNAL_CONTROLLER = 1;
 
-    
     public void preinit(final FMLCommonSetupEvent event) {
         debug = true;
         log = LoggerContext.getContext().getLogger(MODID);

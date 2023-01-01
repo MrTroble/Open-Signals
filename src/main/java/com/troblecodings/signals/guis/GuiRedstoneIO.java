@@ -35,7 +35,7 @@ public class GuiRedstoneIO extends GuiBase {
         this.entity.add(inner);
         this.entity.add(GuiElements.createSpacerH(10));
 
-        final UIEntity label = GuiElements.createLabel(tile.getName(), 0x7678a0);
+        final UIEntity label = GuiElements.createLabel(tile.getNameWrapper(), 0x7678a0);
         label.setScaleX(1.5f);
         label.setScaleY(1.5f);
         label.findRecursive(UILabel.class).forEach(l -> labelComp = l);
@@ -54,7 +54,7 @@ public class GuiRedstoneIO extends GuiBase {
         textField.setInheritWidth(true);
 
         final UITextInput input = new UITextInput(RedstoneIOTileEntity.NAME_NBT);
-        input.setText(tile.getName());
+        input.setText(tile.getNameWrapper());
         textField.add(input);
         hbox.add(textField);
         final UIEntity apply = GuiElements.createButton(I18n.get("btn.apply"),

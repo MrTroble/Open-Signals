@@ -38,14 +38,11 @@ public class DefaultConfigParser {
 
     private static transient final Gson GSON = new Gson();
 
-    public static void loadInternConfigs() {
-        loadDefaultConfigs("/assets/girsignals/signalconfigs/default");
-    }
-
     @SuppressWarnings("rawtypes")
-    public static void loadDefaultConfigs(final String directory) {
+    public static void loadDefaultConfigs() {
 
-        for (Map.Entry<String, String> files : FileReader.readallFilesfromDierectory(directory)
+        for (Map.Entry<String, String> files : FileReader
+                .readallFilesfromDierectory("/assets/girsignals/signalconfigs/default")
                 .entrySet()) {
             final DefaultConfigParser parser = GSON.fromJson(files.getValue(),
                     DefaultConfigParser.class);

@@ -194,13 +194,13 @@ public class GuiSignalBox extends GuiBase {
                         ".resetting");
                 parent.add(GuiElements.createButton(I18n.get("button.reset"), e -> {
                     this.lowerEntity.clear();
-                    GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+                    GuiSyncNetwork.sendToPosServer(compound, this.box.getBlockPos());
                     initializeFieldUsage(mainButton);
                     final CompoundTag compound = new CompoundTag();
                     final CompoundTag wayComp = new CompoundTag();
                     toNBT(wayComp, POINT1, node.getPoint());
                     compound.put(RESET_WAY, wayComp);
-                    GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+                    GuiSyncNetwork.sendToPosServer(compound, this.box.getBlockPos());
                 }));
             }
                 break;
@@ -251,7 +251,7 @@ public class GuiSignalBox extends GuiBase {
                 toNBT(way, POINT1, lastTile.getNode().getPoint());
                 toNBT(way, POINT2, currentNode.getPoint());
                 comp.put(SignalBoxUtil.REQUEST_WAY, way);
-                GuiSyncNetwork.sendToPosServer(comp, box.getPos());
+                GuiSyncNetwork.sendToPosServer(comp, box.getBlockPos());
                 lastTile = null;
             }
         }));
@@ -323,7 +323,7 @@ public class GuiSignalBox extends GuiBase {
             layout.add(GuiElements.createButton("x", 20, e -> {
                 final CompoundTag resetPos = new CompoundTag();
                 resetPos.put(SignalBoxTileEntity.REMOVE_SIGNAL, NBTUtil.createPosTag(p));
-                GuiSyncNetwork.sendToPosServer(resetPos, this.box.getPos());
+                GuiSyncNetwork.sendToPosServer(resetPos, this.box.getBlockPos());
                 list.remove(layout);
             }));
             list.add(layout);
@@ -423,8 +423,8 @@ public class GuiSignalBox extends GuiBase {
         header.add(new UIBox(UIBox.HBOX, 4));
         header.add(titel);
         header.add(GuiElements.createSpacerH(80));
-        header.add(GuiElements.createButton(I18n.get("btn.settings"),
-                this::initializePageSettings));
+        header.add(
+                GuiElements.createButton(I18n.get("btn.settings"), this::initializePageSettings));
         header.add(GuiElements.createButton(I18n.get("btn.edit"), this::initializeFieldEdit));
         mainButton = GuiElements.createButton(I18n.get("btn.main"), this::initializeFieldUsage);
         header.add(mainButton);
@@ -466,7 +466,7 @@ public class GuiSignalBox extends GuiBase {
             if (page.equals(Page.TILE_CONFIG) && node != null) {
                 node.writeEntryNetwork(compound, false);
             }
-            GuiSyncNetwork.sendToPosServer(compound, this.box.getPos());
+            GuiSyncNetwork.sendToPosServer(compound, this.box.getBlockPos());
         }
         this.page = Page.NONE;
         lowerEntity.clear();

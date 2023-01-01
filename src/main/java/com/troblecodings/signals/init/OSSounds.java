@@ -19,9 +19,6 @@ public final class OSSounds {
 
     public static final Map<String, SoundEvent> SOUNDS = new HashMap<>();
 
-    public static SoundEvent andreascross;
-    public static SoundEvent rottenwarn;
-
     public static void init() {
         final Map<String, String> map = FileReader
                 .readallFilesfromDierectory("assets/girsignals/sounds");

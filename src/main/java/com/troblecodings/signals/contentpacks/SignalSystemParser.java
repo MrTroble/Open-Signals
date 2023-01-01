@@ -50,7 +50,18 @@ public class SignalSystemParser {
 
         final FunctionParsingInfo info = new FunctionParsingInfo(name, properties);
         try {
-            seProperties.forEach(prop -> properties.add(prop.createSEProperty(info)));
+            seProperties.forEach(prop -> {
+                properties.add(prop.createSEProperty(info));
+                if (properties.size() > 256) {
+                    OpenSignalsMain.getLogger()
+                            .info("Congratulations, you are probably one of the first people on "
+                                    + "earth to try to register more than 256 SEProperties. We "
+                                    + "don't want to ruin your work, but 256 is the maximum "
+                                    + "number of SEProperties!");
+                    throw new ContentPackException(
+                            "You added to many properties to your signalsystem. Max. is 256!");
+                }
+            });
         } catch (final Exception e) {
             throw new ContentPackException(
                     String.format("Error in file %s caused by parsing!", fileName), e);

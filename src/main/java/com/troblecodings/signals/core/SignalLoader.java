@@ -11,13 +11,9 @@ public final class SignalLoader {
     private SignalLoader() {
     }
 
-    public static void loadInternSignals() {
-        loadSignalsfromDirectory("/assets/girsignals/signalsystems");
-    }
-
-    public static void loadSignalsfromDirectory(final String directory) {
+    public static void loadAllSignals() {
         final Map<String, SignalSystemParser> signals = SignalSystemParser
-                .getSignalSystems(directory);
+                .getSignalSystems("/assets/girsignals/signalsystems");
         signals.forEach((filename, properties) -> {
             try {
                 OSBlocks.loadBlock(properties.createSignalSystem(filename),

@@ -23,8 +23,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 public class CommonProxy {
 
     public void preinit(final FMLCommonSetupEvent event) {
-        OpenSignalsMain.handler = UIInit.initCommon(OpenSignalsMain.MODID, OpenSignalsMain.log,
-                OpenSignalsMain.isDebug());
+        OpenSignalsMain.handler = UIInit.initCommon(OpenSignalsMain.MODID,
+                OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
         OpenSignalsMain.handler.addServer(Placementtool.class, (p, w, bp) -> null);
         OpenSignalsMain.handler.addServer(SignalController.class,
                 (p, w, bp) -> new ContainerSignalController(
@@ -37,14 +37,13 @@ public class CommonProxy {
         OSItems.init();
         OSBlocks.init();
 
-        OneSignalConfigParser.loadInternConfigs();
-        ChangeConfigParser.loadInternConfigs();
-        DefaultConfigParser.loadInternConfigs();
+        OneSignalConfigParser.loadOneSignalConfigs();
+        ChangeConfigParser.loadChangeConfigs();
+        DefaultConfigParser.loadDefaultConfigs();
 
         MinecraftForge.EVENT_BUS.register(OSItems.class);
         MinecraftForge.EVENT_BUS.register(OSBlocks.class);
         MinecraftForge.EVENT_BUS.register(OSSounds.class);
     }
-
 
 }

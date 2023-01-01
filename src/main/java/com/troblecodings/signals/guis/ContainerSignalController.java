@@ -12,7 +12,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public class ContainerSignalController extends AbstractContainerMenu implements UIClientSync {
 
-    private final AtomicReference<Map<SEProperty, Object>> reference = new AtomicReference<>();
+    private final AtomicReference<Map<SEProperty, String>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
     private boolean send = false;
     private Player player;
@@ -23,7 +23,7 @@ public class ContainerSignalController extends AbstractContainerMenu implements 
     }
 
 
-    public Map<SEProperty, Object> getReference() {
+    public Map<SEProperty, String> getReference() {
         return reference.get();
     }
 
