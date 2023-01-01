@@ -5,9 +5,14 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 
 import com.troblecodings.guilib.ecs.GuiHandler;
+import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.init.OSItems;
+import com.troblecodings.signals.init.OSSounds;
+import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
 
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
@@ -26,7 +31,12 @@ public class OpenSignalsMain {
 
     public OpenSignalsMain() {
         instance = this;
-        FMLJavaModLoadingContext.get().getModEventBus().register(this);
+        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        eventBus.register(this);
+        eventBus.register(OSBlocks.class);
+        eventBus.register(OSItems.class);
+        eventBus.register(OSSounds.class);
+        eventBus.register(OSTabs.class);
     }
 
     public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new,

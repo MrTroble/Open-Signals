@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.utils.FileReader;
+import com.troblecodings.signals.core.FileReader;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;

@@ -11,9 +11,11 @@ import java.util.function.Consumer;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
+import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.items.Placementtool;
@@ -22,7 +24,6 @@ import com.troblecodings.signals.properties.FloatProperty;
 import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
-import com.troblecodings.signals.utils.JsonEnum;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -59,7 +60,7 @@ public class Signal extends BasicBlock {
     public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
             SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname",
-            JsonEnum.PROPERTIES.get("boolean"), "false", ChangeableStage.AUTOMATICSTAGE, t -> true);
+            JsonEnum.BOOLEAN, "false", ChangeableStage.AUTOMATICSTAGE, t -> true);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
 
     protected final SignalProperties prop;

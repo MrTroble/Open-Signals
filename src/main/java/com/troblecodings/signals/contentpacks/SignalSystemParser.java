@@ -9,9 +9,9 @@ import com.google.gson.Gson;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.FileReader;
 import com.troblecodings.signals.core.SignalPropertiesBuilder;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
-import com.troblecodings.signals.utils.FileReader;
 
 public class SignalSystemParser {
 

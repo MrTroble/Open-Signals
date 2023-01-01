@@ -30,8 +30,7 @@ public class CommonProxy {
 
         OSSounds.init();
         OSItems.init();
-        OSBlocks.init();
-
+        
         OneSignalConfigParser.loadOneSignalConfigs();
         ChangeConfigParser.loadChangeConfigs();
         DefaultConfigParser.loadDefaultConfigs();

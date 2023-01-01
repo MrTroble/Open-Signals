@@ -7,7 +7,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.utils.JsonEnum;
+import com.troblecodings.signals.core.JsonEnum;
+import com.troblecodings.signals.core.JsonEnumHolder;
 
 public class GIREnumTest {
 
@@ -17,7 +18,7 @@ public class GIREnumTest {
 
     @Test
     public void testEnum() {
-        final Map<String, JsonEnum> map = JsonEnum.PROPERTIES;
+        final Map<String, JsonEnum> map = JsonEnumHolder.PROPERTIES;
         assertTrue(map.containsKey("zs32"));
         assertTrue(map.containsKey("bue"));
         final String[] array = map.get("bue").getAllowedValues().toArray(new String[0]);

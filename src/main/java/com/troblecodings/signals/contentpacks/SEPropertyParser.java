@@ -5,10 +5,11 @@ import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SEProperty.SEAutoNameProp;
+import com.troblecodings.signals.core.JsonEnum;
+import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
-import com.troblecodings.signals.utils.JsonEnum;
 
 public class SEPropertyParser {
 
@@ -23,10 +24,10 @@ public class SEPropertyParser {
     @SuppressWarnings("unchecked")
     public SEProperty createSEProperty(final FunctionParsingInfo info) {
         if (defaultState instanceof Boolean) {
-            parent = JsonEnum.PROPERTIES
+            parent = JsonEnumHolder.PROPERTIES
                     .get(Boolean.toString((boolean) defaultState).toLowerCase());
         } else {
-            parent = JsonEnum.PROPERTIES.get(enumClass.toLowerCase());
+            parent = JsonEnumHolder.PROPERTIES.get(enumClass.toLowerCase());
         }
 
         if (parent == null)

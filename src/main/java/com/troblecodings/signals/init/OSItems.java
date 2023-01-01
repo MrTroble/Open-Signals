@@ -8,10 +8,10 @@ import com.google.gson.Gson;
 import com.troblecodings.linkableapi.Linkingtool;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.FileReader;
 import com.troblecodings.signals.items.ItemArmorTemplate;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.items.ToolParser;
-import com.troblecodings.signals.utils.FileReader;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;

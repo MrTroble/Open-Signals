@@ -1,4 +1,4 @@
-package com.troblecodings.signals.utils;
+package com.troblecodings.signals.core;
 
 import java.io.IOException;
 import java.net.URI;

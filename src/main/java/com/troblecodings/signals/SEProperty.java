@@ -9,8 +9,8 @@ import java.util.function.Predicate;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
+import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.utils.JsonEnum;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.resources.language.I18n;
