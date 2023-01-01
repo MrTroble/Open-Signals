@@ -12,6 +12,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.contentpacks.ContentPackException;
 
 import net.minecraftforge.client.model.data.ModelProperty;
@@ -104,6 +105,11 @@ public class JsonEnum extends ModelProperty<String> {
                 throw new IllegalStateException("Could not parse " + file);
             map.forEach((name, list) -> {
                 if (list.size() > 256) {
+                    OpenSignalsMain.getLogger()
+                            .info("Congratulations, you are probably one of the first people on "
+                                    + "earth to try to register more than 256 EnumValues. We "
+                                    + "don't want to ruin your work, but 256 is the maximum "
+                                    + "number of EnumValues!");
                     throw new ContentPackException(
                             "You have added to many EnumValues! Max. is 256!");
                 }

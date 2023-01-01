@@ -53,8 +53,13 @@ public class SignalSystemParser {
             seProperties.forEach(prop -> {
                 properties.add(prop.createSEProperty(info));
                 if (properties.size() > 256) {
+                    OpenSignalsMain.getLogger()
+                            .info("Congratulations, you are probably one of the first people on "
+                                    + "earth to try to register more than 256 SEProperties. We "
+                                    + "don't want to ruin your work, but 256 is the maximum "
+                                    + "number of SEProperties!");
                     throw new ContentPackException(
-                            "You added to many properties to your signalsystem. Max. is 2556");
+                            "You added to many properties to your signalsystem. Max. is 256!");
                 }
             });
         } catch (final Exception e) {
