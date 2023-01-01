@@ -12,6 +12,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.gson.Gson;
+import com.troblecodings.signals.contentpacks.ContentPackException;
 
 import net.minecraftforge.client.model.data.ModelProperty;
 
@@ -101,8 +102,13 @@ public class JsonEnum extends ModelProperty<String> {
                     (Class<Map<String, List<String>>>) (Class<?>) Map.class);
             if (map == null)
                 throw new IllegalStateException("Could not parse " + file);
-            map.forEach(
-                    (name, list) -> returnmap.put(name.toLowerCase(), new JsonEnum(name, list)));
+            map.forEach((name, list) -> {
+                if (list.size() > 256) {
+                    throw new ContentPackException(
+                            "You have added to many EnumValues! Max. is 256!");
+                }
+                returnmap.put(name.toLowerCase(), new JsonEnum(name, list));
+            });
         });
         PROPERTIES.put(BOOLEAN.name, BOOLEAN);
         return returnmap;
