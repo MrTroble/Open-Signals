@@ -7,9 +7,11 @@ import java.util.Optional;
 
 import com.troblecodings.signals.SEProperty;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class SignalStateHandler {
 
@@ -20,9 +22,14 @@ public final class SignalStateHandler {
     public static void setStates(final SignalStateInfo info, final Map<SEProperty, String> states) {
         if (currentlyLoadedStates.containsKey(info)) {
             currentlyLoadedStates.put(info, states);
-            // TODO Update Client
+
         } else {
-            // TODO Write into an file
+            final SignalStateFile file = allLevelFiles.get(info.world);
+            if (file == null) {
+                return;
+            }
+            file.write(new SignalStatePos(0, 0), null);
+            // TODO Update Client
         }
     }
 
@@ -30,7 +37,11 @@ public final class SignalStateHandler {
         if (currentlyLoadedStates.containsKey(info)) {
             return Optional.of(currentlyLoadedStates.get(info));
         } else {
-            // TODO Read out of files
+            final SignalStateFile file = allLevelFiles.get(info.world);
+            if (file == null) {
+                return Optional.empty();
+            }
+            final ByteBuf buffer = file.read(new SignalStatePos(0, 0));
         }
         return Optional.empty();
     }
@@ -50,10 +61,12 @@ public final class SignalStateHandler {
         return Optional.of(properties.get().get(property));
     }
 
+    @SubscribeEvent
     public static void onChunkLoad(final ChunkEvent.Load event) {
         // TODO ad chunk to currentlyLoadedChunks and read out signals and sync client
     }
 
+    @SubscribeEvent
     public static void onChunkUnload(final ChunkEvent.Unload event) {
         // TODO remove from currentlyLoadedChunks all signals and sync client
     }
