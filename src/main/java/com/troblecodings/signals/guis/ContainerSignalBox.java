@@ -35,24 +35,24 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private SignalBoxTileEntity tile;
     private Consumer<NBTWrapper> run;
     private boolean send = true;
-    
+
     public ContainerSignalBox(final GuiCreateInfo info) {
-    	super(info);
+        super(info);
         this.tile = info.getTile();
     }
 
     public ContainerSignalBox(final GuiCreateInfo info, final Consumer<NBTWrapper> run) {
-    	super(info);
+        super(info);
         this.run = run;
     }
 
     @Override
     public void removed(Player playerIn) {
-    	super.removed(playerIn);
+        super.removed(playerIn);
         if (this.tile != null)
             this.tile.remove(this);
     }
-    
+
     @Override
     public Player getPlayer() {
         return this.player;
@@ -66,14 +66,14 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         return this.names.get();
     }
 
-	@Override
-	public boolean stillValid(Player playerIn) {
+    @Override
+    public boolean stillValid(Player playerIn) {
         if (tile.isBlocked() && !tile.isValid(playerIn))
             return false;
         if (this.player == null) {
             this.player = playerIn;
             this.tile.add(this);
         }
-		return true;
-	}
+        return true;
+    }
 }

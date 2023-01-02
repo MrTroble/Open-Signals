@@ -21,13 +21,13 @@ public class SignalStateFile {
     }
 
     public SignalStatePos find(BlockPos pos) {
-    	try(InputStream stream = Files.newInputStream(path)) {
-    		byte[] header = new byte[4];
-    		stream.read(header);
-    	} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
+        try (InputStream stream = Files.newInputStream(path)) {
+            byte[] header = new byte[4];
+            stream.read(header);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public ByteBuf read(final SignalStatePos pos) {

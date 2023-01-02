@@ -10,12 +10,12 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEntity> {
 
-	private BlockEntityRendererProvider.Context context;
-	
-	public SignalSpecialRenderer(BlockEntityRendererProvider.Context context) {
-		this.context = context;
-	}
-	
+    private BlockEntityRendererProvider.Context context;
+
+    public SignalSpecialRenderer(BlockEntityRendererProvider.Context context) {
+        this.context = context;
+    }
+
     @Override
     public void render(SignalTileEntity tile, float tick, PoseStack stack, MultiBufferSource source,
             int rand1, int rand2) {

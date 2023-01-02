@@ -76,8 +76,8 @@ public class EnumHelper {
 
     }
 
-    public static ArmorMaterial addArmorMaterial(final String name, final int durability, final int[] defense,
-            final int enchant, final SoundEvent event, final float toughness) {
+    public static ArmorMaterial addArmorMaterial(final String name, final int durability,
+            final int[] defense, final int enchant, final SoundEvent event, final float toughness) {
         return new ImplArmorMat(defense, durability, enchant, event, Ingredient.EMPTY, name,
                 toughness, toughness);
     }

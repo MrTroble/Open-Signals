@@ -27,20 +27,14 @@ public final class LogicParser {
         TRANSLATION_TABLE.put("with", new MethodInfo(IModelData.class, "with",
                 objects -> PredicateHolder.with((ValuePack) objects[0]), ValuePack.class));
 
-        TRANSLATION_TABLE.put("has",
-                new MethodInfo(IModelData.class, "has",
-                        objects -> PredicateHolder.has((SEProperty) objects[0]),
-                        SEProperty.class));
+        TRANSLATION_TABLE.put("has", new MethodInfo(IModelData.class, "has",
+                objects -> PredicateHolder.has((SEProperty) objects[0]), SEProperty.class));
 
-        TRANSLATION_TABLE.put("hasandis",
-                new MethodInfo(IModelData.class, "hasandis",
-                        objects -> PredicateHolder.hasAndIs((SEProperty) objects[0]),
-                        SEProperty.class));
+        TRANSLATION_TABLE.put("hasandis", new MethodInfo(IModelData.class, "hasandis",
+                objects -> PredicateHolder.hasAndIs((SEProperty) objects[0]), SEProperty.class));
 
-        TRANSLATION_TABLE.put("hasandisnot",
-                new MethodInfo(IModelData.class, "hasandisnot",
-                        objects -> PredicateHolder.hasAndIsNot((SEProperty) objects[0]),
-                        SEProperty.class));
+        TRANSLATION_TABLE.put("hasandisnot", new MethodInfo(IModelData.class, "hasandisnot",
+                objects -> PredicateHolder.hasAndIsNot((SEProperty) objects[0]), SEProperty.class));
 
         TRANSLATION_TABLE.put("check", new MethodInfo(Map.class, "check",
                 objects -> PredicateHolder.check((ValuePack) objects[0]), ValuePack.class));

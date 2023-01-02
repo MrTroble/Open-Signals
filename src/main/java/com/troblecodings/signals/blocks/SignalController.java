@@ -21,7 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class SignalController extends BasicBlock {
 
-	public static final TileEntitySupplierWrapper SUPPLIER = SignalBoxTileEntity::new;
+    public static final TileEntitySupplierWrapper SUPPLIER = SignalBoxTileEntity::new;
 
     public SignalController() {
         super(Properties.of(Material.METAL));
@@ -50,7 +50,7 @@ public class SignalController extends BasicBlock {
 
     @Override
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
-    	return Optional.of(SUPPLIER);
+        return Optional.of(SUPPLIER);
     }
 
 }

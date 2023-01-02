@@ -12,5 +12,4 @@ public class SoundPropertyParser {
     public int getLength() {
         return length;
     }
-
 }

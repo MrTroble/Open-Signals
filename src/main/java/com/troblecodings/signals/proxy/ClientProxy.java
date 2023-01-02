@@ -21,19 +21,19 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 public class ClientProxy extends CommonProxy {
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void preinit(final FMLCommonSetupEvent event) {
-		super.preinit(event);
-		OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);
-		OpenSignalsMain.handler.addGui(SignalController.class, GuiSignalController::new);
-		OpenSignalsMain.handler.addGui(SignalBox.class, GuiSignalBox::new);
-		OpenSignalsMain.handler.addGui(RedstoneIO.class, GuiRedstoneIO::new);
-		OpenSignalsMain.handler.addGui(Signal.class, GuiSignal::new);
+    @SuppressWarnings("unchecked")
+    @Override
+    public void preinit(final FMLCommonSetupEvent event) {
+        super.preinit(event);
+        OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);
+        OpenSignalsMain.handler.addGui(SignalController.class, GuiSignalController::new);
+        OpenSignalsMain.handler.addGui(SignalBox.class, GuiSignalBox::new);
+        OpenSignalsMain.handler.addGui(RedstoneIO.class, GuiRedstoneIO::new);
+        OpenSignalsMain.handler.addGui(Signal.class, GuiSignal::new);
 
         BlockEntityRenderers.register(
                 (BlockEntityType<SignalTileEntity>) BasicBlock.BLOCK_ENTITYS.get(Signal.SUPPLIER),
                 SignalSpecialRenderer::new);
-	}
+    }
 
 }

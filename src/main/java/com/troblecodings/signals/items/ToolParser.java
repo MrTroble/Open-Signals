@@ -9,5 +9,4 @@ public class ToolParser {
     public List<String> getPlacementTools() {
         return placementtools;
     }
-
 }

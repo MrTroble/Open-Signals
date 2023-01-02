@@ -10,7 +10,8 @@ public class ConfigInfo {
     public final int speed;
     public PathType type = PathType.NONE;
 
-    public ConfigInfo(final SignalStateInfo nextinfo, final SignalStateInfo currentinfo, final int speed) {
+    public ConfigInfo(final SignalStateInfo nextinfo, final SignalStateInfo currentinfo,
+            final int speed) {
         this.currentinfo = currentinfo;
         this.nextinfo = nextinfo;
         this.speed = speed;

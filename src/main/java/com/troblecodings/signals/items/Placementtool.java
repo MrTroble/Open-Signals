@@ -30,42 +30,46 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class Placementtool extends BlockItem implements IIntegerable<Signal>, ITagableItem, MessageWrapper {
+public class Placementtool extends BlockItem
+        implements IIntegerable<Signal>, ITagableItem, MessageWrapper {
 
-	public static final String BLOCK_TYPE_ID = "blocktypeid";
-	public static final String SIGNAL_CUSTOMNAME = "customname";
+    public static final String BLOCK_TYPE_ID = "blocktypeid";
+    public static final String SIGNAL_CUSTOMNAME = "customname";
 
-	public final ArrayList<Signal> signals = new ArrayList<>();
+    public final ArrayList<Signal> signals = new ArrayList<>();
 
-	public Placementtool() {
-		super(Blocks.AIR, new Item.Properties().tab(OSTabs.TAB));
-	}
+    public Placementtool() {
+        super(Blocks.AIR, new Item.Properties().tab(OSTabs.TAB));
+    }
 
-	@Override
-	public InteractionResultHolder<ItemStack> use(Level worldIn, Player player, InteractionHand hand) {
-		if (player.isShiftKeyDown()) {
-			if (worldIn.isClientSide)
-				return InteractionResultHolder.success(player.getItemInHand(hand));
-			OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, player.getOnPos());
-			return InteractionResultHolder.success(player.getItemInHand(hand));
-		}
-		return super.use(worldIn, player, hand);
-	}
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level worldIn, Player player,
+            InteractionHand hand) {
+        if (player.isShiftKeyDown()) {
+            if (worldIn.isClientSide)
+                return InteractionResultHolder.success(player.getItemInHand(hand));
+            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
+                    player.getOnPos());
+            return InteractionResultHolder.success(player.getItemInHand(hand));
+        }
+        return super.use(worldIn, player, hand);
+    }
 
-	@Override
-	public InteractionResult place(BlockPlaceContext context) {
-		final InteractionResult result = super.place(context);
-		if(result == InteractionResult.SUCCESS) {
-	    	final Player player = context.getPlayer();
-	    	final Level worldIn = context.getLevel();
-	        final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
-	        final BlockPos pos = context.getClickedPos();
-			final SignalTileEntity tile = (SignalTileEntity) worldIn.getBlockEntity(pos);
-			final Signal signal = (Signal) tile.getBlockState().getBlock();
-			
-			// TODO set signal
-			
-            final int height = signal.getHeight(SignalStateHandler.getStates(new SignalStateInfo(worldIn, pos)));
+    @Override
+    public InteractionResult place(BlockPlaceContext context) {
+        final InteractionResult result = super.place(context);
+        if (result == InteractionResult.SUCCESS) {
+            final Player player = context.getPlayer();
+            final Level worldIn = context.getLevel();
+            final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
+            final BlockPos pos = context.getClickedPos();
+            final SignalTileEntity tile = (SignalTileEntity) worldIn.getBlockEntity(pos);
+            final Signal signal = (Signal) tile.getBlockState().getBlock();
+
+            // TODO set signal
+
+            final int height = signal
+                    .getHeight(SignalStateHandler.getStates(new SignalStateInfo(worldIn, pos)));
             BlockPos lastPos = context.getClickedPos();
             for (int i = 0; i < height; i++) {
                 if (!worldIn.isEmptyBlock(lastPos = lastPos.above())) {
@@ -81,44 +85,44 @@ public class Placementtool extends BlockItem implements IIntegerable<Signal>, IT
 
             final String name = compound.getString(SIGNAL_CUSTOMNAME);
             // TODO Custom name
-		}
-		return result;
-	}
-	
-	@Override
-	protected BlockState getPlacementState(BlockPlaceContext context) {
-    	final Player player = context.getPlayer();
+        }
+        return result;
+    }
+
+    @Override
+    protected BlockState getPlacementState(BlockPlaceContext context) {
+        final Player player = context.getPlayer();
         final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
-        if(!compound.contains(BLOCK_TYPE_ID)) {
+        if (!compound.contains(BLOCK_TYPE_ID)) {
             translateMessageWrapper(player, "pt.itemnotset");
             return null;
         }
         return this.signals.get(compound.getInteger(BLOCK_TYPE_ID)).getStateForPlacement(context);
-	}
-	
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public String getNamedObj(final int obj) {
-		return I18n.get("property." + this.getName() + ".name") + ": " + this.getObjFromID(obj);
-	}
+    }
 
-	@Override
-	public Signal getObjFromID(final int obj) {
-		return signals.get(obj);
-	}
+    @OnlyIn(Dist.CLIENT)
+    @Override
+    public String getNamedObj(final int obj) {
+        return I18n.get("property." + this.getName() + ".name") + ": " + this.getObjFromID(obj);
+    }
 
-	@Override
-	public int count() {
-		return signals.size();
-	}
+    @Override
+    public Signal getObjFromID(final int obj) {
+        return signals.get(obj);
+    }
 
-	@Override
-	public String getName() {
-		return "signaltype";
-	}
+    @Override
+    public int count() {
+        return signals.size();
+    }
 
-	public void addSignal(Signal signal) {
-		this.signals.add(signal);
-	}
+    @Override
+    public String getName() {
+        return "signaltype";
+    }
+
+    public void addSignal(Signal signal) {
+        this.signals.add(signal);
+    }
 
 }

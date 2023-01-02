@@ -59,12 +59,12 @@ public class OpenSignalsMain {
     public static final int GUI_SIGNAL_CONTROLLER = 1;
 
     public IModFile file;
-    
+
     @SubscribeEvent
     public void preInit(final FMLConstructModEvent event) {
-    	file = ModLoadingContext.get().getActiveContainer().getModInfo().getOwningFile().getFile();
+        file = ModLoadingContext.get().getActiveContainer().getModInfo().getOwningFile().getFile();
     }
-    
+
     @SubscribeEvent
     public void init(final FMLCommonSetupEvent event) {
         debug = true;

@@ -15,7 +15,7 @@ import net.minecraftforge.client.model.data.ModelProperty;
 
 public class JsonEnum extends ModelProperty<String> {
 
-	private final String name;
+    private final String name;
     private final List<String> values;
     private final Set<String> valueSet;
 

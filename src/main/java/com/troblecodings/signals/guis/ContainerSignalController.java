@@ -21,9 +21,8 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     private Runnable onUpdate;
 
     public ContainerSignalController(final GuiCreateInfo info) {
-    	super(info);
+        super(info);
     }
-
 
     public Map<SEProperty, String> getReference() {
         return reference.get();
@@ -38,11 +37,11 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         return player;
     }
 
-	@Override
-	public boolean stillValid(Player playerIn) {
+    @Override
+    public boolean stillValid(Player playerIn) {
         if (playerIn instanceof Player) {
             this.player = playerIn;
         }
         return true;
-	}
+    }
 }

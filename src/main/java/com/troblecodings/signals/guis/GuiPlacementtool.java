@@ -46,9 +46,9 @@ public class GuiPlacementtool extends GuiBase {
     private final HashMap<String, SEProperty> lookup = new HashMap<String, SEProperty>();
     private Signal currentSelectedBlock;
     private final Placementtool tool;
-    
+
     public GuiPlacementtool(final GuiCreateInfo info) {
-    	final ItemStack stack = info.player.getMainHandItem();
+        final ItemStack stack = info.player.getMainHandItem();
         this.compound = new NBTWrapper(stack.getOrCreateTag());
         if (this.compound == null)
             this.compound = new NBTWrapper();
@@ -90,7 +90,8 @@ public class GuiPlacementtool extends GuiBase {
 
         final UIRotate rotation = new UIRotate();
         rotation.setRotateY(180);
-        blockRenderEntity.add(new UIDrag((x, y) -> rotation.setRotateY((float)(rotation.getRotateY() + x))));
+        blockRenderEntity.add(
+                new UIDrag((x, y) -> rotation.setRotateY((float) (rotation.getRotateY() + x))));
 
         blockRenderEntity.add(new UIScissor());
         blockRenderEntity.add(new UIIndependentTranslate(35, 150, 40));
@@ -144,12 +145,12 @@ public class GuiPlacementtool extends GuiBase {
 
     @Override
     public void removed() {
-    	// TODO Save ID
+        // TODO Save ID
         super.removed();
         GuiSyncNetwork.sendToItemServer(compound);
     }
 
     public void applyModelChanges() {
-    	// TODO Model render
+        // TODO Model render
     }
 }

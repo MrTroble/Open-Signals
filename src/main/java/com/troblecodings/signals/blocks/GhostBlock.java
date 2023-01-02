@@ -11,7 +11,6 @@ public class GhostBlock extends BasicBlock {
     public GhostBlock() {
         super(Properties.of(Material.GLASS));
     }
-    
 
     public static void destroyUpperBlock(final LevelAccessor worldIn, final BlockPos pos) {
         final BlockPos posup = pos.above();
@@ -23,8 +22,8 @@ public class GhostBlock extends BasicBlock {
 
     @Override
     public void destroy(LevelAccessor worldIn, BlockPos pos, BlockState stat) {
-    	super.destroy(worldIn, pos, stat);
-    	
+        super.destroy(worldIn, pos, stat);
+
         if (worldIn.isClientSide())
             return;
         destroyUpperBlock(worldIn, pos);

@@ -28,7 +28,7 @@ public class RedstoneInput extends RedstoneIO {
             worldIn.setBlockAndUpdate(pos, state.setValue(RedstoneIO.POWER, false));
         }
     }
-    
+
     @Override
     public int getDirectSignal(final BlockState blockState, final BlockGetter world,
             final BlockPos pos, final Direction direction) {
