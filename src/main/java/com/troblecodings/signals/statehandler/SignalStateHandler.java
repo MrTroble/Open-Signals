@@ -20,6 +20,9 @@ public final class SignalStateHandler {
     private static final Map<Level, SignalStateFile> allLevelFiles = new HashMap<>();
 
     public static void setStates(final SignalStateInfo info, final Map<SEProperty, String> states) {
+        if (info == null) {
+            return;
+        }
         if (currentlyLoadedStates.containsKey(info)) {
             currentlyLoadedStates.put(info, states);
 
@@ -34,6 +37,9 @@ public final class SignalStateHandler {
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
+        if (info == null) {
+            return Map.of();
+        }
         if (currentlyLoadedStates.containsKey(info)) {
             return currentlyLoadedStates.get(info);
         } else {
@@ -48,12 +54,18 @@ public final class SignalStateHandler {
 
     public static void setState(final SignalStateInfo info, final SEProperty property,
             final String value) {
+        if (info == null) {
+            return;
+        }
         final Map<SEProperty, String> map = new HashMap<>();
         map.put(property, value);
         setStates(info, map);
     }
 
     public static Optional<String> getState(final SignalStateInfo info, final SEProperty property) {
+        if (info == null) {
+            return Optional.empty();
+        }
         final Map<SEProperty, String> properties = getStates(info);
         return Optional.ofNullable(properties.get(property));
     }
