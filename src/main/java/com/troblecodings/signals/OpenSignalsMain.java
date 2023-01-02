@@ -7,11 +7,12 @@ import org.apache.logging.log4j.core.LoggerContext;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSItems;
+import com.troblecodings.signals.init.OSModels;
 import com.troblecodings.signals.init.OSSounds;
-import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
 
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -39,7 +40,7 @@ public class OpenSignalsMain {
         eventBus.register(OSBlocks.class);
         eventBus.register(OSItems.class);
         eventBus.register(OSSounds.class);
-        eventBus.register(OSTabs.class);
+        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
     }
 
     public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new,
