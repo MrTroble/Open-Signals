@@ -8,8 +8,8 @@ import com.troblecodings.signals.signalbox.SignalBoxRenderUtil;
 public enum EnumGuiMode {
 
     STRAIGHT(0, 0.5, 1, 0.5), CORNER(0, 0.5, 0.5, 1), END(1, 0.30, 1, 0.70),
-    PLATFORM(SignalBoxRenderUtil::drawPlatform),
-    BUE(SignalBoxRenderUtil::drawBUE), HP(0), VP(1), RS(2), RA10(3);
+    PLATFORM(SignalBoxRenderUtil::drawPlatform), BUE(SignalBoxRenderUtil::drawBUE), HP(0), VP(1),
+    RS(2), RA10(3);
 
     /**
      * Naming

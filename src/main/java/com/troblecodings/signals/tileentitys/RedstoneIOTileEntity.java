@@ -14,8 +14,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity
-		implements NamableWrapper, ISyncable, Iterable<BlockPos> {
-	
+        implements NamableWrapper, ISyncable, Iterable<BlockPos> {
+
     public RedstoneIOTileEntity(final TileEntityInfo info) {
         super(info);
     }
@@ -56,11 +56,13 @@ public class RedstoneIOTileEntity extends SyncableTileEntity
         return this.name != null;
     }
 
-	public void sendToAll() {
-		if (level.isClientSide)
-			return;
-		final boolean power = this.level.getBlockState(this.worldPosition).getValue(RedstoneIO.POWER);
-	}
+    public void sendToAll() {
+        if (level.isClientSide)
+            return;
+        final boolean power = this.level.getBlockState(this.worldPosition)
+                .getValue(RedstoneIO.POWER);
+    }
+
     public void link(final BlockPos pos) {
         if (level.isClientSide)
             return;

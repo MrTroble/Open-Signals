@@ -1,9 +1,9 @@
 {
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"textures": {
-		"0": "blocks/planks_oak",
+		"0": "block/oak_planks",
 		"1": "opensignals:items/wrw",
-		"particle": "blocks/planks_oak"
+		"particle": "block/oak_planks"
 	},
 	"elements": [
 		{

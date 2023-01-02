@@ -1,81 +1,84 @@
 package com.troblecodings.signals.items;
 
+import com.troblecodings.signals.OpenSignalsMain;
+
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public class EnumHelper {
-	
-	private static class ImplArmorMat implements ArmorMaterial{
 
-		int[] defense;
-		int durability;
-		int enchant;
-		SoundEvent event;
-		Ingredient ingrediant;
-		String name;
-		float toughness;
-		float knock;
-		
-		public ImplArmorMat(int[] defense, int durability, int enchant, SoundEvent event, Ingredient ingrediant,
-				String name, float toughness, float knock) {
-			super();
-			this.defense = defense;
-			this.durability = durability;
-			this.enchant = enchant;
-			this.event = event;
-			this.ingrediant = ingrediant;
-			this.name = name;
-			this.toughness = toughness;
-			this.knock = knock;
-		}
-		
+    private static class ImplArmorMat implements ArmorMaterial {
 
-		@Override
-		public int getDurabilityForSlot(EquipmentSlot slot) {
-			return durability;
-		}
+        int[] defense;
+        int durability;
+        int enchant;
+        SoundEvent event;
+        Ingredient ingrediant;
+        String name;
+        float toughness;
+        float knock;
 
-		@Override
-		public int getDefenseForSlot(EquipmentSlot slot) {
-			return this.defense[slot.getIndex()];
-		}
+        public ImplArmorMat(final int[] defense, final int durability, final int enchant,
+                final SoundEvent event, final Ingredient ingrediant, final String name,
+                final float toughness, final float knock) {
+            super();
+            this.defense = defense;
+            this.durability = durability;
+            this.enchant = enchant;
+            this.event = event;
+            this.ingrediant = ingrediant;
+            this.name = name;
+            this.toughness = toughness;
+            this.knock = knock;
+        }
 
-		@Override
-		public int getEnchantmentValue() {
-			return this.enchant;
-		}
+        @Override
+        public int getDurabilityForSlot(final EquipmentSlot slot) {
+            return durability;
+        }
 
-		@Override
-		public SoundEvent getEquipSound() {
-			return this.event;
-		}
+        @Override
+        public int getDefenseForSlot(final EquipmentSlot slot) {
+            return this.defense[slot.getIndex()];
+        }
 
-		@Override
-		public Ingredient getRepairIngredient() {
-			return this.ingrediant;
-		}
+        @Override
+        public int getEnchantmentValue() {
+            return this.enchant;
+        }
 
-		@Override
-		public String getName() {
-			return this.name;
-		}
+        @Override
+        public SoundEvent getEquipSound() {
+            return this.event;
+        }
 
-		@Override
-		public float getToughness() {
-			return this.toughness;
-		}
+        @Override
+        public Ingredient getRepairIngredient() {
+            return this.ingrediant;
+        }
 
-		@Override
-		public float getKnockbackResistance() {
-			return this.knock;
-		}
-		
-	}
+        @Override
+        public String getName() {
+            return OpenSignalsMain.MODID + ":" + this.name;
+        }
 
-	public static ArmorMaterial addArmorMaterial(String name, int durability, int[] defense, int enchant, SoundEvent event,
-			float toughness) {
-		return new ImplArmorMat(defense, durability, enchant, event, Ingredient.EMPTY, name, toughness, toughness);
-	}
+        @Override
+        public float getToughness() {
+            return this.toughness;
+        }
+
+        @Override
+        public float getKnockbackResistance() {
+            return this.knock;
+        }
+
+    }
+
+    public static ArmorMaterial addArmorMaterial(final String name, final int durability,
+            final int[] defense, final int enchant, final SoundEvent event, final float toughness) {
+        return new ImplArmorMat(defense, durability, enchant, event, Ingredient.EMPTY, name,
+                toughness, toughness);
+    }
 }

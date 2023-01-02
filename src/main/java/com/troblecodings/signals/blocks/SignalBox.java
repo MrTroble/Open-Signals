@@ -20,7 +20,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class SignalBox extends BasicBlock {
 
-	public static final TileEntitySupplierWrapper SUPPLIER = SignalBoxTileEntity::new;
+    public static final TileEntitySupplierWrapper SUPPLIER = SignalBoxTileEntity::new;
 
     public SignalBox() {
         super(Properties.of(Material.STONE));
@@ -44,10 +44,10 @@ public class SignalBox extends BasicBlock {
         }
         return InteractionResult.FAIL;
     }
-    
+
     @Override
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
-    	return Optional.of(SUPPLIER);
+        return Optional.of(SUPPLIER);
     }
 
 }

@@ -13,21 +13,22 @@ public class SignalTileEntity extends BasicBlockEntity implements NamableWrapper
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
     }
+
     @Override
     public boolean isValid(final Player player) {
         return true;
     }
-    
+
     public void renderOverlay(final RenderOverlayInfo info) {
         getSignal().renderOverlay(info.with(this));
     }
-    
+
     @Override
     public String getNameWrapper() {
         return "";
     }
-    
+
     public Signal getSignal() {
-        return ((Signal)getBlockState().getBlock());
+        return ((Signal) getBlockState().getBlock());
     }
 }

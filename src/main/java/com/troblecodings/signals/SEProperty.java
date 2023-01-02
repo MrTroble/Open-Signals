@@ -12,17 +12,13 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.enums.ChangeableStage;
 
-import io.netty.buffer.ByteBuf;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
-import net.minecraftforge.common.util.Lazy;
-import net.minecraftforge.event.world.ChunkEvent;
 
-public class SEProperty extends ModelProperty<String>
-        implements IIntegerable<String> {
+public class SEProperty extends ModelProperty<String> implements IIntegerable<String> {
 
     private final String name;
     private final JsonEnum parent;
@@ -46,9 +42,9 @@ public class SEProperty extends ModelProperty<String>
     }
 
     public Object getWrapper(Object object) {
-    	return ((IModelData)object).getData(this);
+        return ((IModelData) object).getData(this);
     }
-    
+
     @Override
     public String getName() {
         return name;
@@ -57,7 +53,6 @@ public class SEProperty extends ModelProperty<String>
     public boolean isValid(final String value) {
         return this.allowedValues.contains(value);
     }
-
 
     public String valueToString(final String value) {
         return parent.getName(value);

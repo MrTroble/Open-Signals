@@ -456,9 +456,9 @@ public class GuiSignalBox extends GuiBase {
         if (!page.equals(Page.SETTINGS)) {
             this.entity.write(compound);
             if (page.equals(Page.TILE_CONFIG) && node != null) {
-            	// TODO Networking
+                // TODO Networking
             }
-        	// TODO Networking
+            // TODO Networking
         }
         this.page = Page.NONE;
         lowerEntity.clear();

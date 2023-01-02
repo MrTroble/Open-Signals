@@ -63,9 +63,9 @@ public class RedstoneIO extends BasicBlock {
         }
         return InteractionResult.FAIL;
     }
-    
+
     @Override
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
-    	return Optional.of(SUPPLIER);
+        return Optional.of(SUPPLIER);
     }
 }

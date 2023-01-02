@@ -50,8 +50,8 @@ import net.minecraftforge.client.model.geometry.IModelGeometry;
 @OnlyIn(Dist.CLIENT)
 public class SignalCustomModel implements IModelGeometry<SignalCustomModel> {
 
-	public static final Random RANDOM = new Random();
-	
+    public static final Random RANDOM = new Random();
+
     private final HashMap<Predicate<IModelData>, Pair<IModelData, Vector3f>> modelCache = new HashMap<>();
     private List<Material> textures = new ArrayList<>();
     private MultiPartBakedModel cachedModel = null;
@@ -66,9 +66,9 @@ public class SignalCustomModel implements IModelGeometry<SignalCustomModel> {
     }
 
     private Vector3f multiply(final Vector3f vec, final Matrix4f mat) {
-    	Vector4f vec4 = new Vector4f(vec);
-    	vec4.transform(mat);
-    	return new Vector3f(vec4);
+        Vector4f vec4 = new Vector4f(vec);
+        vec4.transform(mat);
+        return new Vector3f(vec4);
     }
 
     private BakedQuad transform(final BakedQuad quad) {

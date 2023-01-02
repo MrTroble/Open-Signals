@@ -17,7 +17,7 @@ public class ImplAutoBlockstatePredicate implements Predicate<IModelData> {
 
     @Override
     public boolean test(final IModelData t) {
-    	
+
         return true;
     }
 

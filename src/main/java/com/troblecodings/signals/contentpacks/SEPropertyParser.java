@@ -17,7 +17,7 @@ public class SEPropertyParser {
     private String enumClass;
     private Object defaultState;
     private String changeableStage;
-    private final boolean autoname = false;
+    private boolean autoname = false;
     private String dependencies;
     private transient JsonEnum parent;
 
