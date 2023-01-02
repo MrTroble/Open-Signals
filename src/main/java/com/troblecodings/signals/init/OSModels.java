@@ -1,9 +1,11 @@
 package com.troblecodings.signals.init;
 
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -19,9 +21,9 @@ public final class OSModels {
     @SubscribeEvent
     public static void register(final ModelRegistryEvent event) {
         OSItems.registeredItems.forEach(OSModels::registerModel);
-        OSBlocks.blocksToRegister.stream().filter(block -> (block instanceof Signal))
-                .forEach(block -> ModelLoaderRegistry.registerLoader(block.getRegistryName(),
-                        CustomModelLoader.INSTANCE));
+        ModelLoaderRegistry.registerLoader(
+                new ResourceLocation(OpenSignalsMain.MODID, "signalloader"),
+                CustomModelLoader.INSTANCE);
     }
 
     @SubscribeEvent
