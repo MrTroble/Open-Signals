@@ -6,22 +6,22 @@ import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.IModelLoader;
 import net.minecraftforge.client.model.data.IModelData;
 
 @OnlyIn(Dist.CLIENT)
-public class CustomModelLoader implements IModelLoader<SignalCustomModel> {
+public class CustomModelLoader implements ResourceManagerReloadListener {
 
     private static HashMap<String, Consumer<SignalCustomModel>> registeredModels = new HashMap<>();
 
@@ -152,10 +152,7 @@ public class CustomModelLoader implements IModelLoader<SignalCustomModel> {
         }
     }
 
-    @Override
-    public SignalCustomModel read(final JsonDeserializationContext deserializationContext,
-            final JsonObject modelContents) {
-        // TODO check whats going on here?
-        return null;
+    public void register(Map<ResourceLocation, BakedModel> registry) {
+        
     }
 }
