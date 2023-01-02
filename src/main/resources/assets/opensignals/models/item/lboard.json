@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"textures": {
 		"0": "blocks/planks_oak",
-		"1": "girsignals:items/l-board",
-		"2": "girsignals:items/l",
+		"1": "opensignals:items/l-board",
+		"2": "opensignals:items/l",
 		"particle": "blocks/planks_oak"
 	},
 	"elements": [

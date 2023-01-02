@@ -1,6 +1,6 @@
 {
     "textures": {
-        "lamp": "girsignals:blocks/lamps/lamp_yellow_blink"
+        "lamp": "opensignals:blocks/lamps/lamp_yellow_blink"
     },
     "models": {
         "ro/ro_mast": {

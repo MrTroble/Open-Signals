@@ -1,11 +1,11 @@
 {
     "textures": {
-        "lamp_red": "girsignals:blocks/lamps/lamp_red",
-        "lamp_green": "girsignals:blocks/lamps/lamp_green",
-        "lamp_green_blink": "girsignals:blocks/lamps/lamp_green_blink",
-        "lamp_white_blink": "girsignals:blocks/lamps/lamp_white_blink",
-        "lamp_white": "girsignals:blocks/lamps/lamp_white",
-        "lamp_yellow": "girsignals:blocks/lamps/lamp_yellow"
+        "lamp_red": "opensignals:blocks/lamps/lamp_red",
+        "lamp_green": "opensignals:blocks/lamps/lamp_green",
+        "lamp_green_blink": "opensignals:blocks/lamps/lamp_green_blink",
+        "lamp_white_blink": "opensignals:blocks/lamps/lamp_white_blink",
+        "lamp_white": "opensignals:blocks/lamps/lamp_white",
+        "lamp_yellow": "opensignals:blocks/lamps/lamp_yellow"
     },
     "models": {
         "ks/ks_base": {

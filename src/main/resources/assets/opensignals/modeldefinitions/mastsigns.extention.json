@@ -1,7 +1,7 @@
 {
     "extention": {
-        "WRW": "girsignals:blocks/mast_sign/wrw",
-        "WYWYW": "girsignals:blocks/mast_sign/wywyw",
-        "WBWBW": "girsignals:blocks/mast_sign/wbwbw"
+        "WRW": "opensignals:blocks/mast_sign/wrw",
+        "WYWYW": "opensignals:blocks/mast_sign/wywyw",
+        "WBWBW": "opensignals:blocks/mast_sign/wbwbw"
     }
 }

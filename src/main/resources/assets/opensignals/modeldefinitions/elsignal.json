@@ -12,49 +12,49 @@
                 {
                     "blockstate": "with(ELTYPE.EL1V)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el1v"
+                        "2": "opensignals:blocks/el/el1v"
                     }
                 },
                 {
                     "blockstate": "with(ELTYPE.EL1)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el1"
+                        "2": "opensignals:blocks/el/el1"
                     }
                 },
                 {
                     "blockstate": "with(ELTYPE.EL2)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el2"
+                        "2": "opensignals:blocks/el/el2"
                     }
                 },
                 {
                     "blockstate": "with(ELTYPE.EL3)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el3"
+                        "2": "opensignals:blocks/el/el3"
                     }
                 },
                 {
                     "blockstate": "with(ELTYPE.EL4)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el4"
+                        "2": "opensignals:blocks/el/el4"
                     }
                 },
                 {
                     "blockstate": "with(ELTYPE.EL5)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el5"
+                        "2": "opensignals:blocks/el/el5"
                     }
                 },
                 {
                     "blockstate": "with(ELTYPE.EL6)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el6"
+                        "2": "opensignals:blocks/el/el6"
                     }
                 },
                 {
                     "blockstate": "with(ELTYPE.EL7)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el7"
+                        "2": "opensignals:blocks/el/el7"
                     }
                 }
             ],
@@ -65,13 +65,13 @@
                 {
                     "blockstate": "with(ELTYPE.EL8A)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el8a"
+                        "2": "opensignals:blocks/el/el8a"
                     }
                 },
                 {
                     "blockstate": "with(ELTYPE.EL8E)",
                     "retexture": {
-                        "2": "girsignals:blocks/el/el8e"
+                        "2": "opensignals:blocks/el/el8e"
                     }
                 }
             ],

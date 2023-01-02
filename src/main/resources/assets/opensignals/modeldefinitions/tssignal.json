@@ -1,8 +1,8 @@
 {
     "textures": {
-        "ts1": "girsignals:blocks/ts/ts1",
-        "ts2": "girsignals:blocks/ts/ts2",
-        "ts3": "girsignals:blocks/ts/ts3"
+        "ts1": "opensignals:blocks/ts/ts1",
+        "ts2": "opensignals:blocks/ts/ts2",
+        "ts3": "opensignals:blocks/ts/ts3"
     },
     "models": {
         "mast": {

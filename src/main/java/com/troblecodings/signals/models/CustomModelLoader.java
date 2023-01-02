@@ -39,7 +39,7 @@ public class CustomModelLoader implements IModelLoader<SignalCustomModel> {
         final Map<String, ModelExtention> extentions = new HashMap<>();
 
         final Map<String, Object> modelmap = ModelStats
-                .getfromJson("/assets/girsignals/modeldefinitions");
+                .getfromJson("/assets/opensignals/modeldefinitions");
 
         modelmap.forEach((filename, content) -> {
 

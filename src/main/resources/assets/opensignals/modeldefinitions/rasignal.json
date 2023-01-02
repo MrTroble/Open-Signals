@@ -1,8 +1,8 @@
 {
     "textures": {
-        "lamp_white": "girsignals:blocks/lamps/lamp_white",
-        "ra11a": "girsignals:blocks/ra/ra11a",
-        "ra11b": "girsignals:blocks/ra/ra11b"
+        "lamp_white": "opensignals:blocks/lamps/lamp_white",
+        "ra11a": "opensignals:blocks/ra/ra11a",
+        "ra11b": "opensignals:blocks/ra/ra11b"
     },
     "models": {
         "mast": {

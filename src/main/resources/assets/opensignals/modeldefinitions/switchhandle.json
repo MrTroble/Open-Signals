@@ -1,16 +1,16 @@
 {
     "textures": {
-        "handle_blackwhite": "girsignals:blocks/wn/handle_black_white",
-        "handle_blackwhite_w": "girsignals:blocks/wn/handle_black_white_w",
-        "handle_blackyellow": "girsignals:blocks/wn/handle_black_yellow",
-        "handle_redyellow": "girsignals:blocks/wn/handle_red_yellow_red",
-        "handle_yellow": "girsignals:blocks/wn/handle_yellow",
-        "wn2_2": "girsignals:blocks/wn/wn2_2",
-        "orange": "girsignals:blocks/default/orange",
-        "wn1_orange": "girsignals:blocks/wn/wn1_orange",
-        "wn2_1_orange": "girsignals:blocks/wn/wn2_1_orange",
-        "wn2_2_orange": "girsignals:blocks/wn/wn2_2_orange",
-        "wn2_3_orange": "girsignals:blocks/wn/wn2_3_orange"
+        "handle_blackwhite": "opensignals:blocks/wn/handle_black_white",
+        "handle_blackwhite_w": "opensignals:blocks/wn/handle_black_white_w",
+        "handle_blackyellow": "opensignals:blocks/wn/handle_black_yellow",
+        "handle_redyellow": "opensignals:blocks/wn/handle_red_yellow_red",
+        "handle_yellow": "opensignals:blocks/wn/handle_yellow",
+        "wn2_2": "opensignals:blocks/wn/wn2_2",
+        "orange": "opensignals:blocks/default/orange",
+        "wn1_orange": "opensignals:blocks/wn/wn1_orange",
+        "wn2_1_orange": "opensignals:blocks/wn/wn2_1_orange",
+        "wn2_2_orange": "opensignals:blocks/wn/wn2_2_orange",
+        "wn2_3_orange": "opensignals:blocks/wn/wn2_3_orange"
     },
     "models": {
         "wn/switchhandle_on": {

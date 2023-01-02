@@ -1,9 +1,9 @@
 {
     "textures": {
-        "ne14_left": "girsignals:blocks/etcs/ne14_left",
-        "ne14_right": "girsignals:blocks/etcs/ne14_right",
-        "ne14_down": "girsignals:blocks/etcs/ne14_down",
-        "etcs_block": "girsignals:blocks/etcs/etcs_block"
+        "ne14_left": "opensignals:blocks/etcs/ne14_left",
+        "ne14_right": "opensignals:blocks/etcs/ne14_right",
+        "ne14_down": "opensignals:blocks/etcs/ne14_down",
+        "etcs_block": "opensignals:blocks/etcs/etcs_block"
     },
     "models": {
         "mast": {

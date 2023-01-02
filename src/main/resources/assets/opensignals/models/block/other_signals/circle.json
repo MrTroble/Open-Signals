@@ -1,11 +1,11 @@
 {
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"textures": {
-		"0": "girsignals:blocks/default/shield_gray",
-		"1": "girsignals:blocks/default/shield_black",
-		"2": "girsignals:blocks/other_signals/circle",
-		"particle": "girsignals:blocks/default/shield_gray",
-		"overlay": "girsignals:blocks/other_signals/no_pass"
+		"0": "opensignals:blocks/default/shield_gray",
+		"1": "opensignals:blocks/default/shield_black",
+		"2": "opensignals:blocks/other_signals/circle",
+		"particle": "opensignals:blocks/default/shield_gray",
+		"overlay": "opensignals:blocks/other_signals/no_pass"
 	},
 	"elements": [
 		{

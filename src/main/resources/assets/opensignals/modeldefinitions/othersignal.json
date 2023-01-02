@@ -1,8 +1,8 @@
 {
     "textures": {
-        "keep_distance": "girsignals:blocks/other_signals/keep_distance",
-        "narrowing": "girsignals:blocks/other_signals/narrowing",
-        "note_train_traffic": "girsignals:blocks/other_signals/note_train_traffic"
+        "keep_distance": "opensignals:blocks/other_signals/keep_distance",
+        "narrowing": "opensignals:blocks/other_signals/narrowing",
+        "note_train_traffic": "opensignals:blocks/other_signals/note_train_traffic"
 
     },
     "models": {
@@ -30,7 +30,7 @@
                 {
                     "blockstate": "with(OTHERTYPE.LZB)",
                     "retexture": {
-                        "2": "girsignals:blocks/other_signals/lzb"
+                        "2": "opensignals:blocks/other_signals/lzb"
                     }
                 }
             ],
@@ -104,19 +104,19 @@
                 {
                     "blockstate": "with(OTHERTYPE.RC1)",
                     "retexture": {
-                        "2": "girsignals:blocks/other_signals/rc_1"
+                        "2": "opensignals:blocks/other_signals/rc_1"
                     }
                 },
                 {
                     "blockstate": "with(OTHERTYPE.RC2)",
                     "retexture": {
-                        "2": "girsignals:blocks/other_signals/rc_2"
+                        "2": "opensignals:blocks/other_signals/rc_2"
                     }
                 },
                 {
                     "blockstate": "with(OTHERTYPE.RC3)",
                     "retexture": {
-                        "2": "girsignals:blocks/other_signals/rc_3"
+                        "2": "opensignals:blocks/other_signals/rc_3"
                     }
                 }
             ],
@@ -127,19 +127,19 @@
                 {
                     "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && with(RAILROADCROSSING.MODERN)",
                     "retexture": {
-                        "overlay": "girsignals:blocks/other_signals/rc_modern"
+                        "overlay": "opensignals:blocks/other_signals/rc_modern"
                     }
                 },
                 {
                     "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && with(RAILROADCROSSING.OLD)",
                     "retexture": {
-                        "overlay": "girsignals:blocks/other_signals/rc_old"
+                        "overlay": "opensignals:blocks/other_signals/rc_old"
                     }
                 },
                 {
                     "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && with(RAILROADCROSSING.FENCE)",
                     "retexture": {
-                        "overlay": "girsignals:blocks/other_signals/rc_fence"
+                        "overlay": "opensignals:blocks/other_signals/rc_fence"
                     }
                 }
             ],

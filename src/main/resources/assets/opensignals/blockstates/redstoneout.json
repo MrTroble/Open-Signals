@@ -1,1 +1,1 @@
-{"variants": {"power=false": {"model": "girsignals:redstoneout_off"}, "power=true": {"model": "girsignals:redstoneout_on"}}}
+{"variants": {"power=false": {"model": "opensignals:redstoneout_off"}, "power=true": {"model": "opensignals:redstoneout_on"}}}

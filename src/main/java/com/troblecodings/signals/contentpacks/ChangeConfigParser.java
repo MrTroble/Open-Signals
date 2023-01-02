@@ -48,7 +48,7 @@ public class ChangeConfigParser {
     public static void loadChangeConfigs() {
 
         for (Map.Entry<String, String> files : FileReader
-                .readallFilesfromDierectory("/assets/girsignals/signalconfigs/change").entrySet()) {
+                .readallFilesfromDierectory("/assets/opensignals/signalconfigs/change").entrySet()) {
             final ChangeConfigParser parser = GSON.fromJson(files.getValue(),
                     ChangeConfigParser.class);
 

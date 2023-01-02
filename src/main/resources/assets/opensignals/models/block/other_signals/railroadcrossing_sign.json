@@ -2,10 +2,10 @@
 	"credit": "Made with Blockbench by Mc_Jeronimo",
 	"texture_size": [32, 32],
 	"textures": {
-		"0": "girsignals:blocks/default/shield_gray",
-		"1": "girsignals:blocks/default/shield_black",
-		"2": "girsignals:blocks/ne/ne3_1",
-		"particle": "girsignals:blocks/default/shield_gray"
+		"0": "opensignals:blocks/default/shield_gray",
+		"1": "opensignals:blocks/default/shield_black",
+		"2": "opensignals:blocks/ne/ne3_1",
+		"particle": "opensignals:blocks/default/shield_gray"
 	},
 	"elements": [
 		{

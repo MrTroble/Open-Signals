@@ -42,7 +42,7 @@ public class DefaultConfigParser {
     public static void loadDefaultConfigs() {
 
         for (Map.Entry<String, String> files : FileReader
-                .readallFilesfromDierectory("/assets/girsignals/signalconfigs/default")
+                .readallFilesfromDierectory("/assets/opensignals/signalconfigs/default")
                 .entrySet()) {
             final DefaultConfigParser parser = GSON.fromJson(files.getValue(),
                     DefaultConfigParser.class);

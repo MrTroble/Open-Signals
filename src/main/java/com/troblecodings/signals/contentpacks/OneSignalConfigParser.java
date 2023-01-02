@@ -40,7 +40,7 @@ public class OneSignalConfigParser {
 
     public static void loadShuntigConfigs() {
         for (Map.Entry<String, String> files : FileReader
-                .readallFilesfromDierectory("/assets/girsignals/signalconfigs/shunting")
+                .readallFilesfromDierectory("/assets/opensignals/signalconfigs/shunting")
                 .entrySet()) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalConfigParser.class);
@@ -67,7 +67,7 @@ public class OneSignalConfigParser {
 
     public static void loadResetConfigs() {
         for (Map.Entry<String, String> files : FileReader
-                .readallFilesfromDierectory("/assets/girsignals/signalconfigs/reset").entrySet()) {
+                .readallFilesfromDierectory("/assets/opensignals/signalconfigs/reset").entrySet()) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalConfigParser.class);
 

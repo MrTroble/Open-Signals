@@ -21,7 +21,7 @@ public final class OSSounds {
 
     public static void init() {
         final Map<String, String> map = FileReader
-                .readallFilesfromDierectory("assets/girsignals/sounds");
+                .readallFilesfromDierectory("assets/opensignals/sounds");
         map.forEach((name, _u) -> {
             final String soundName = name.toLowerCase().replace(".ogg", "");
             final ResourceLocation resource = new ResourceLocation(OpenSignalsMain.MODID,

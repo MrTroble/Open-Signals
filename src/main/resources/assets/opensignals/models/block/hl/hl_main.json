@@ -3,14 +3,14 @@
 	"texture_size": [32, 32],
 	"textures":
 	{
-		"1": "girsignals:blocks/default/shield_black",
-		"particle": "girsignals:blocks/default/shield_black",
-		"lamp_rednorth": "girsignals:blocks/lamps/lamp_dark",
-		"lamp_greennorth": "girsignals:blocks/lamps/lamp_dark",
-		"lamp_white_sh_2north": "girsignals:blocks/lamps/lamp_dark",
-		"lamp_yellow2north": "girsignals:blocks/lamps/lamp_dark",
-		"lamp_red2north": "girsignals:blocks/lamps/lamp_dark",
-		"lamp_white_sh_1north": "girsignals:blocks/lamps/lamp_dark"
+		"1": "opensignals:blocks/default/shield_black",
+		"particle": "opensignals:blocks/default/shield_black",
+		"lamp_rednorth": "opensignals:blocks/lamps/lamp_dark",
+		"lamp_greennorth": "opensignals:blocks/lamps/lamp_dark",
+		"lamp_white_sh_2north": "opensignals:blocks/lamps/lamp_dark",
+		"lamp_yellow2north": "opensignals:blocks/lamps/lamp_dark",
+		"lamp_red2north": "opensignals:blocks/lamps/lamp_dark",
+		"lamp_white_sh_1north": "opensignals:blocks/lamps/lamp_dark"
 	},
 	"elements": [
 		{

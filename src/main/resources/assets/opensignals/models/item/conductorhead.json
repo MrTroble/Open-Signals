@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "girsignals:items/conductor_head"
+        "layer0": "opensignals:items/conductor_head"
     }
 }

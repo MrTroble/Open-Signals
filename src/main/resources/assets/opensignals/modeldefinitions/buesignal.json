@@ -12,25 +12,25 @@
                 {
                     "blockstate": "with(BUETYPE.BUE2_1)",
                     "retexture": {
-                        "2": "girsignals:blocks/bue/bue2_1"
+                        "2": "opensignals:blocks/bue/bue2_1"
                     }
                 },
                 {
                     "blockstate": "with(BUETYPE.BUE2_2)",
                     "retexture": {
-                        "2": "girsignals:blocks/bue/bue2_2"
+                        "2": "opensignals:blocks/bue/bue2_2"
                     }
                 },
                 {
                     "blockstate": "with(BUETYPE.BUE2_3)",
                     "retexture": {
-                        "2": "girsignals:blocks/bue/bue2_3"
+                        "2": "opensignals:blocks/bue/bue2_3"
                     }
                 },
                 {
                     "blockstate": "with(BUETYPE.BUE2_4)",
                     "retexture": {
-                        "2": "girsignals:blocks/bue/bue2_4"
+                        "2": "opensignals:blocks/bue/bue2_4"
                     }
                 }
             ],
@@ -85,13 +85,13 @@
                 {
                     "blockstate": "with(BUETYPE.HET)",
                     "retexture": {
-                        "2": "girsignals:blocks/bue/het"
+                        "2": "opensignals:blocks/bue/het"
                     }
                 },
                 {
                     "blockstate": "with(BUETYPE.AUTO_HET)",
                     "retexture": {
-                        "2": "girsignals:blocks/bue/auto_het"
+                        "2": "opensignals:blocks/bue/auto_het"
                     }
                 }
             ],

@@ -1,7 +1,7 @@
 {
     "textures": {
-        "ne7_east": "girsignals:blocks/ne/ne7_yellow",
-        "lamp_white": "girsignals:blocks/lamps/lamp_white"
+        "ne7_east": "opensignals:blocks/ne/ne7_yellow",
+        "lamp_white": "opensignals:blocks/lamps/lamp_white"
     },
     "models": {
         "mast": {
@@ -21,7 +21,7 @@
                 {
                     "blockstate": "with(NETYPE.NE1)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne1"
+                        "2": "opensignals:blocks/ne/ne1"
                     }
                 }
             ],
@@ -32,13 +32,13 @@
                 {
                     "blockstate": "with(NETYPE.NE2)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne2"
+                        "2": "opensignals:blocks/ne/ne2"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.NE2_1)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne2_1"
+                        "2": "opensignals:blocks/ne/ne2_1"
                     }
                 }
             ],
@@ -49,61 +49,61 @@
                 {
                     "blockstate": "with(NETYPE.NE3_1)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne3_1"
+                        "2": "opensignals:blocks/ne/ne3_1"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.NE3_2)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne3_2"
+                        "2": "opensignals:blocks/ne/ne3_2"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.NE3_3)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne3_3"
+                        "2": "opensignals:blocks/ne/ne3_3"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.NE3_4)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne3_4"
+                        "2": "opensignals:blocks/ne/ne3_4"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.NE3_5)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne3_5"
+                        "2": "opensignals:blocks/ne/ne3_5"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.NE4)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne4"
+                        "2": "opensignals:blocks/ne/ne4"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.NE12)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne12"
+                        "2": "opensignals:blocks/ne/ne12"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.SO19_1)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/so19_1"
+                        "2": "opensignals:blocks/ne/so19_1"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.SO19_2)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/so19_2"
+                        "2": "opensignals:blocks/ne/so19_2"
                     }
                 },
                 {
                     "blockstate": "with(NETYPE.SO19_3)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/so19_3"
+                        "2": "opensignals:blocks/ne/so19_3"
                     }
                 }
             ],
@@ -122,7 +122,7 @@
                 {
                     "blockstate": "with(NETYPE.NE5)",
                     "retexture": {
-                        "overlay": "girsignals:blocks/zs3/h"
+                        "overlay": "opensignals:blocks/zs3/h"
                     }
                 }
             ],
@@ -133,7 +133,7 @@
                 {
                     "blockstate": "with(NETYPE.NE6)",
                     "retexture": {
-                        "2": "girsignals:blocks/ne/ne6"
+                        "2": "opensignals:blocks/ne/ne6"
                     }
                 }
             ],

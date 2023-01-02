@@ -1,9 +1,9 @@
 {
 	"textures": {
-		"lamp_green": "girsignals:blocks/lamps/lamp_green",
-		"lamp_white": "girsignals:blocks/lamps/lamp_white",
-		"lamp_red": "girsignals:blocks/lamps/lamp_red",
-		"lamp_yellow": "girsignals:blocks/lamps/lamp_yellow"
+		"lamp_green": "opensignals:blocks/lamps/lamp_green",
+		"lamp_white": "opensignals:blocks/lamps/lamp_white",
+		"lamp_red": "opensignals:blocks/lamps/lamp_red",
+		"lamp_yellow": "opensignals:blocks/lamps/lamp_yellow"
 	},
 	"models": {
 		"hv/hv_base": {

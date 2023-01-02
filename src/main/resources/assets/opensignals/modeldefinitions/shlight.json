@@ -1,7 +1,7 @@
 {
 	"textures": {
-		"lamp_white": "girsignals:blocks/lamps/lamp_white",
-		"lamp_red": "girsignals:blocks/lamps/lamp_red"
+		"lamp_white": "opensignals:blocks/lamps/lamp_white",
+		"lamp_red": "opensignals:blocks/lamps/lamp_red"
 	},
 	"models": {
 		"sh/sh_light": {

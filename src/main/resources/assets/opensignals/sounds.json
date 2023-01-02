@@ -1,4 +1,4 @@
 {
-    "andreas_cross": {"category": "block", "sounds": [{"name": "girsignals:andreas_cross"}]},
-    "rottenwarn": {"category": "block", "sounds": [{"name": "girsignals:rottenwarn"}]}
+    "andreas_cross": {"category": "block", "sounds": [{"name": "opensignals:andreas_cross"}]},
+    "rottenwarn": {"category": "block", "sounds": [{"name": "opensignals:rottenwarn"}]}
 }

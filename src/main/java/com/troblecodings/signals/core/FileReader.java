@@ -74,7 +74,7 @@ public final class FileReader {
 		if (fileSystemCache == null)
 			getRessourceLocation("");
 
-		final URL url = OSBlocks.class.getResource("/assets/girsignals");
+		final URL url = OSBlocks.class.getResource("/assets/opensignals");
 		try {
 			final URI uri = url.toURI();
 			final String scheme = uri.getScheme();

@@ -1,6 +1,6 @@
 {
     "parent": "item/generated",
     "textures": {
-        "layer0": "girsignals:items/train_driver_pants"
+        "layer0": "opensignals:items/train_driver_pants"
     }
 }
