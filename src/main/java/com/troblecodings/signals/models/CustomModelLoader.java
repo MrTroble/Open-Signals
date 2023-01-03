@@ -19,7 +19,6 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.model.data.IModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class CustomModelLoader implements ResourceManagerReloadListener {
@@ -175,9 +174,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
                         if ((state != null || texturestate.isautoBlockstate())
                                 && !extentionloaded) {
                             accumulator.add(new SignalModelLoaderInfo(modelname,
-                                    texturestate.isautoBlockstate()
-                                            ? new ImplAutoBlockstatePredicate()
-                                            : state,
+                                    texturestate.isautoBlockstate() ? (_u -> true) : state,
                                     modelstats.getX(texturestate.getOffsetX()),
                                     modelstats.getY(texturestate.getOffsetY()),
                                     modelstats.getZ(texturestate.getOffsetZ()),
@@ -196,6 +193,8 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
     }
 
     public void register(ModelBakeEvent event) {
-
+        registeredModels.forEach((name, loaderList) -> {
+            SignalCustomModel.getModel(name, loaderList, event.getModelLoader());
+        });
     }
 }
