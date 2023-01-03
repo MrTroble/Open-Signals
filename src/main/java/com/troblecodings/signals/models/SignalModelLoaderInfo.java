@@ -8,18 +8,17 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-@SuppressWarnings("rawtypes")
 public class SignalModelLoaderInfo {
     public String name;
-    public Predicate state;
+    public Predicate<ModelInfoWrapper> state;
     public float x;
     public float y;
     public float z;
     public Map<String, String> retexture;
     public UnbakedModel model;
 
-    public SignalModelLoaderInfo(String name, Predicate state, float x, float y, float z,
-            Map<String, String> retexture) {
+    public SignalModelLoaderInfo(final String name, final Predicate<ModelInfoWrapper> state,
+            final float x, final float y, final float z, final Map<String, String> retexture) {
         super();
         this.name = name;
         this.state = state;
@@ -28,8 +27,8 @@ public class SignalModelLoaderInfo {
         this.z = z;
         this.retexture = retexture;
     }
-    
-    public SignalModelLoaderInfo with(UnbakedModel model) {
+
+    public SignalModelLoaderInfo with(final UnbakedModel model) {
         this.model = model;
         return this;
     }

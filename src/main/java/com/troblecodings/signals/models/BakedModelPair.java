@@ -4,12 +4,11 @@ import java.util.function.Predicate;
 
 import net.minecraft.client.resources.model.BakedModel;
 
-@SuppressWarnings("rawtypes")
 public class BakedModelPair {
-    public Predicate predicate;
+    public Predicate<ModelInfoWrapper> predicate;
     public BakedModel model;
 
-    public BakedModelPair(Predicate predicate, BakedModel model) {
+    public BakedModelPair(final Predicate<ModelInfoWrapper> predicate, final BakedModel model) {
         this.predicate = predicate;
         this.model = model;
     }

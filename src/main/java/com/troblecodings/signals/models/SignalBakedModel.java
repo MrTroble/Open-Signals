@@ -18,10 +18,10 @@ import net.minecraftforge.client.model.data.IModelData;
 @OnlyIn(Dist.CLIENT)
 public class SignalBakedModel implements IDynamicBakedModel {
 
-    private BakedModel baseGetter;
-    private List<BakedModelPair> bakedCache;
+    private final BakedModel baseGetter;
+    private final List<BakedModelPair> bakedCache;
 
-    public SignalBakedModel(List<BakedModelPair> bakedCache) {
+    public SignalBakedModel(final List<BakedModelPair> bakedCache) {
         this.bakedCache = bakedCache;
         this.baseGetter = bakedCache.iterator().next().model;
     }
@@ -57,14 +57,14 @@ public class SignalBakedModel implements IDynamicBakedModel {
         return baseGetter.getOverrides();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public List<BakedQuad> getQuads(BlockState state, Direction side, Random rand,
-            IModelData extraData) {
+    public List<BakedQuad> getQuads(final BlockState state, final Direction side, final Random rand,
+            final IModelData extraData) {
         final List<BakedQuad> quadBuilder = new ArrayList<>();
+        final ModelInfoWrapper modelData = new ModelInfoWrapper(extraData);
         for (final BakedModelPair pair : bakedCache) {
-            if (pair.predicate.test(extraData))
-                quadBuilder.addAll(pair.model.getQuads(state, side, rand, extraData));
+            if (pair.predicate.test(modelData))
+                quadBuilder.addAll(pair.model.getQuads(state, side, rand, modelData));
         }
         return quadBuilder;
     }

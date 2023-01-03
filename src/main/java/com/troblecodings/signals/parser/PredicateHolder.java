@@ -7,11 +7,6 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.enums.CompareValues;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
-import net.minecraftforge.client.model.data.IModelData;
-
-@SuppressWarnings({
-        "rawtypes", "unchecked"
-})
 public final class PredicateHolder {
 
     private PredicateHolder() {
@@ -21,35 +16,39 @@ public final class PredicateHolder {
         return ebs -> ebs.get(property) != null;
     }
 
-    public static Predicate hasNot(final SEProperty property) {
-        return ebs -> property.getWrapper(ebs) == null;
+    public static Predicate<ModelInfoWrapper> hasNot(final SEProperty property) {
+        return ebs -> ebs.get(property) == null;
     }
 
-    public static Predicate with(final ValuePack pack) {
+    
+    @SuppressWarnings("unchecked")
+    public static Predicate<ModelInfoWrapper> with(final ValuePack pack) {
         return with(pack.property, pack.predicate);
     }
 
-    public static Predicate with(final SEProperty property, final Predicate t) {
+    public static Predicate<ModelInfoWrapper> with(final SEProperty property,
+            final Predicate<ModelInfoWrapper> t) {
         return ebs -> {
-            final Object test = property.getWrapper(ebs);
-            return test != null && t.test(test);
+            final Object test = ebs.get(property);
+            return test != null && t.test((ModelInfoWrapper) test);
         };
     }
 
-    public static Predicate hasAndIs(final SEProperty property) {
+    public static Predicate<ModelInfoWrapper> hasAndIs(final SEProperty property) {
         return ebs -> {
-            final Boolean bool = ((String) property.getWrapper(ebs)).equalsIgnoreCase("TRUE");
+            final Boolean bool = ebs.get(property).equalsIgnoreCase("TRUE");
             return bool != null && bool.booleanValue();
         };
     }
 
-    public static Predicate hasAndIsNot(final SEProperty property) {
+    public static Predicate<ModelInfoWrapper> hasAndIsNot(final SEProperty property) {
         return ebs -> {
-            final Boolean bool = ((String) property.getWrapper(ebs)).equalsIgnoreCase("TRUE");
+            final Boolean bool = ebs.get(property).equalsIgnoreCase("TRUE");
             return bool != null && !bool.booleanValue();
         };
     }
 
+    @SuppressWarnings("unchecked")
     public static Predicate<Map<SEProperty, Object>> check(final ValuePack pack) {
         return check(pack.property, pack.predicate);
     }
@@ -60,15 +59,16 @@ public final class PredicateHolder {
     }
 
     public static Predicate<Map<SEProperty, Object>> check(final SEProperty property,
-            final Predicate type) {
+            final Predicate<ModelInfoWrapper> type) {
         return t -> {
             final Object value = t.get(property);
             if (value == null)
                 return true;
-            return type.test(value);
+            return type.test((ModelInfoWrapper) value);
         };
     }
 
+    @SuppressWarnings("unchecked")
     public static Predicate<Map<SEProperty, Object>> config(final ValuePack pack) {
         return t -> {
             final Object value = t.get(pack.property);
