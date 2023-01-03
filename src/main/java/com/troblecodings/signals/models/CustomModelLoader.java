@@ -10,12 +10,15 @@ import java.util.function.Predicate;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.ContentPackException;
+import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.world.inventory.CraftingMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelBakeEvent;
@@ -174,9 +177,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
                         if ((state != null || texturestate.isautoBlockstate())
                                 && !extentionloaded) {
                             accumulator.add(new SignalModelLoaderInfo(modelname,
-                                    texturestate.isautoBlockstate()
-                                            ? new ImplAutoBlockstatePredicate()
-                                            : state,
+                                    texturestate.isautoBlockstate() ? (_u -> true) : state,
                                     modelstats.getX(texturestate.getOffsetX()),
                                     modelstats.getY(texturestate.getOffsetY()),
                                     modelstats.getZ(texturestate.getOffsetZ()),
@@ -194,7 +195,14 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
         }
     }
 
-    public void register(final ModelBakeEvent event) {
-
+    public void register(ModelBakeEvent event) {
+        registeredModels.forEach((name, loaderList) -> {
+            for (SignalAngel angel : SignalAngel.values()) {
+                event.getModelRegistry().put(
+                        new ModelResourceLocation(OpenSignalsMain.MODID, name,
+                                "angle=" + angel.getNameWrapper()),
+                        SignalCustomModel.getModel(name, loaderList, event.getModelLoader()));
+            }
+        });
     }
 }

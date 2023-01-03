@@ -23,7 +23,7 @@ public class SignalCustomModel {
     }
 
     public static BakedModel getModel(String name, List<SignalModelLoaderInfo> list,
-            ForgeModelBakery bakery, SignalAngel angel) {
+            ForgeModelBakery bakery) {
         list.forEach(info -> {
             if (info.model == null)
                 info.with(bakery.getModel(new ResourceLocation(OpenSignalsMain.MODID, info.name)));
