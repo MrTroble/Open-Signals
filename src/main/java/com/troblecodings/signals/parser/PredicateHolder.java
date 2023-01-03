@@ -20,7 +20,6 @@ public final class PredicateHolder {
         return ebs -> ebs.get(property) == null;
     }
 
-    
     @SuppressWarnings("unchecked")
     public static Predicate<ModelInfoWrapper> with(final ValuePack pack) {
         return with(pack.property, pack.predicate);
@@ -36,15 +35,18 @@ public final class PredicateHolder {
 
     public static Predicate<ModelInfoWrapper> hasAndIs(final SEProperty property) {
         return ebs -> {
-            final Boolean bool = ebs.get(property).equalsIgnoreCase("TRUE");
-            return bool != null && bool.booleanValue();
+            final Boolean bool = "TRUE".equalsIgnoreCase(ebs.get(property));
+            return bool.booleanValue();
         };
     }
 
     public static Predicate<ModelInfoWrapper> hasAndIsNot(final SEProperty property) {
         return ebs -> {
-            final Boolean bool = ebs.get(property).equalsIgnoreCase("TRUE");
-            return bool != null && !bool.booleanValue();
+            final String cacheString = ebs.get(property);
+            if (cacheString == null)
+                return false;
+            final Boolean bool = "TRUE".equalsIgnoreCase(ebs.get(property));
+            return !bool.booleanValue();
         };
     }
 

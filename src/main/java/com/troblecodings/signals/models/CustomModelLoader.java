@@ -15,13 +15,15 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.world.inventory.CraftingMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.model.ForgeModelBakery;
 
 @OnlyIn(Dist.CLIENT)
 public class CustomModelLoader implements ResourceManagerReloadListener {
@@ -116,9 +118,9 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
         for (final Entry<String, Object> modelstatemap : modelmap.entrySet()) {
 
             final String filename = modelstatemap.getKey();
-            final List<SignalModelLoaderInfo> accumulator = new ArrayList<>();
 
             if (!filename.endsWith(".extention.json")) {
+                final List<SignalModelLoaderInfo> accumulator = new ArrayList<>();
 
                 final ModelStats content = (ModelStats) modelstatemap.getValue();
                 final String lowercaseName = filename.replace(".json", "").toLowerCase();
@@ -190,18 +192,29 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
                         }
                     }
                 }
-
+                registeredModels.put(lowercaseName, accumulator);
             }
         }
     }
 
+    public void prepare() {
+        final ForgeModelBakery bakery = ForgeModelBakery.instance();
+        if (registeredModels.isEmpty())
+            this.onResourceManagerReload(null);
+        registeredModels.forEach((name, loaderList) -> loaderList.forEach(info -> {
+            if (info.model == null)
+                info.with(bakery.getModel(
+                        new ResourceLocation(OpenSignalsMain.MODID, "block/" + info.name)));
+        }));
+    }
+
     public void register(ModelBakeEvent event) {
+        final Map<ResourceLocation, BakedModel> topLevel = event.getModelRegistry();
         registeredModels.forEach((name, loaderList) -> {
             for (SignalAngel angel : SignalAngel.values()) {
-                event.getModelRegistry().put(
-                        new ModelResourceLocation(OpenSignalsMain.MODID, name,
-                                "angle=" + angel.getNameWrapper()),
-                        SignalCustomModel.getModel(name, loaderList, event.getModelLoader()));
+                final ModelResourceLocation location = new ModelResourceLocation(
+                        OpenSignalsMain.MODID, name, "angel=" + angel.getNameWrapper());
+                topLevel.put(location, SignalCustomModel.getModel(location, loaderList, event));
             }
         });
     }
