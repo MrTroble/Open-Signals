@@ -21,7 +21,7 @@ public class SignalStateInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(pos, world);
+        return Objects.hash(pos, signal, world);
     }
 
     @Override
@@ -33,7 +33,7 @@ public class SignalStateInfo {
         if (getClass() != obj.getClass())
             return false;
         SignalStateInfo other = (SignalStateInfo) obj;
-        return Objects.equals(pos, other.pos) && Objects.equals(world, other.world);
+        return Objects.equals(pos, other.pos) && Objects.equals(signal, other.signal)
+                && Objects.equals(world, other.world);
     }
-
 }
