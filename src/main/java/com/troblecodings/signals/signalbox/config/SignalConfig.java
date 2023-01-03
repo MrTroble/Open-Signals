@@ -65,7 +65,7 @@ public final class SignalConfig {
         final Map<Class, Object> object = new HashMap<>();
         final Map<SEProperty, String> oldProperties = SignalStateHandler
                 .getStates(info.currentinfo);
-        object.put(Map.class, SignalStateHandler.getStates(info.nextinfo);
+        object.put(Map.class, SignalStateHandler.getStates(info.nextinfo));
         object.put(Integer.class, info.speed);
         values.forEach(property -> {
             if (property.predicate.test(object)) {

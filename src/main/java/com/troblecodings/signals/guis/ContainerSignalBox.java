@@ -4,22 +4,14 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import com.troblecodings.core.BaseContainer;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
-import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.world.entity.player.Player;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {

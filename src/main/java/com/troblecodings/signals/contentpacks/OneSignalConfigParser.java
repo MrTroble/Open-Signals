@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.FileReader;
@@ -95,9 +94,8 @@ public class OneSignalConfigParser {
     private static Signal checkSignal(final String signalName, final String filename) {
         final Signal signal = Signal.SIGNALS.get(signalName.toLowerCase());
         if (signal == null) {
-            OpenSignalsMain.getLogger().warn("The signal '" + signalName + "' doesn't exists! "
-                    + "This config with the filename '" + filename + "' will be skiped!");
-            return null;
+            throw new ContentPackException("The signal '" + signalName + "' doesn't exists! "
+                    + "Please check " + filename + " where to problem is!");
         }
         return signal;
     }
