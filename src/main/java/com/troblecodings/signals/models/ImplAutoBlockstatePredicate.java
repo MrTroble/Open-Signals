@@ -3,9 +3,8 @@ package com.troblecodings.signals.models;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import net.minecraftforge.client.model.data.IModelData;
-
-public class ImplAutoBlockstatePredicate implements Predicate<IModelData> {
+@SuppressWarnings("rawtypes")
+public class ImplAutoBlockstatePredicate implements Predicate {
 
     private final int id;
 
@@ -16,8 +15,7 @@ public class ImplAutoBlockstatePredicate implements Predicate<IModelData> {
     }
 
     @Override
-    public boolean test(final IModelData t) {
-
+    public boolean test(final Object t) {
         return true;
     }
 

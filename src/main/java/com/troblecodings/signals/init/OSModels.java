@@ -1,19 +1,14 @@
 package com.troblecodings.signals.init;
 
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
-import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class OSModels {
@@ -33,7 +28,7 @@ public final class OSModels {
 
     @SubscribeEvent
     public static void bakery(ModelBakeEvent event) {
-        CustomModelLoader.INSTANCE.register(event.getModelRegistry());
+        CustomModelLoader.INSTANCE.register(event);
     }
     
     @SubscribeEvent

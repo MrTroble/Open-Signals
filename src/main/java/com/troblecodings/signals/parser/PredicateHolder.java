@@ -5,6 +5,9 @@ import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.enums.CompareValues;
+import com.troblecodings.signals.models.ModelInfoWrapper;
+
+import net.minecraftforge.client.model.data.IModelData;
 
 @SuppressWarnings({
         "rawtypes", "unchecked"
@@ -14,8 +17,8 @@ public final class PredicateHolder {
     private PredicateHolder() {
     }
 
-    public static Predicate has(final SEProperty property) {
-        return ebs -> property.getWrapper(ebs) != null;
+    public static Predicate<ModelInfoWrapper> has(final SEProperty property) {
+        return ebs -> ebs.get(property) != null;
     }
 
     public static Predicate hasNot(final SEProperty property) {
