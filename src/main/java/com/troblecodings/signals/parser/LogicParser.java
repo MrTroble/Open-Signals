@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.parser.interm.EvaluationLevel;
 import com.troblecodings.signals.parser.interm.IntermidiateNode;
 import com.troblecodings.signals.parser.interm.LogicalSymbols;
@@ -47,10 +48,10 @@ public final class LogicParser {
 
         TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name,
                 new MethodInfo(Map.class, name, objects -> {
-                    final Predicate original = info.blockState.apply(objects);
+                    final Predicate<ModelInfoWrapper> original = info.blockState.apply(objects);
                     return (Predicate<Map>) inMap -> {
                         final Map<Class, Object> map = inMap;
-                        final Object obj = map.get(info.getSubtype());
+                        final ModelInfoWrapper obj = (ModelInfoWrapper) map.get(info.getSubtype());
                         if (obj == null)
                             throw new IllegalArgumentException(
                                     String.format("No data for type=%s was passed to function=%s!",
@@ -60,7 +61,7 @@ public final class LogicParser {
                 }, info.parameter)));
     }
 
-    public static Predicate nDegreeFunctionParser(final String name,
+    public static Predicate<ModelInfoWrapper> nDegreeFunctionParser(final String name,
             final FunctionParsingInfo parser, final String... parameter) {
         final String[] arguments = parameter;
         final MethodInfo method = parser.getTable().get(name.toLowerCase());
@@ -141,7 +142,8 @@ public final class LogicParser {
         return logic;
     }
 
-    public static Predicate predicate(final String input, final FunctionParsingInfo info) {
+    public static Predicate predicate(final String input,
+            final FunctionParsingInfo info) {
         return parse(input, info).pop().getPredicate();
     }
 }

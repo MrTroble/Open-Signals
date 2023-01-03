@@ -19,7 +19,6 @@ import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelBakeEvent;
-import net.minecraftforge.client.model.data.IModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class CustomModelLoader implements ResourceManagerReloadListener {
@@ -195,7 +194,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
         }
     }
 
-    public void register(ModelBakeEvent event) {
+    public void register(final ModelBakeEvent event) {
 
     }
 }

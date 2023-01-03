@@ -3,8 +3,7 @@ package com.troblecodings.signals.models;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-@SuppressWarnings("rawtypes")
-public class ImplAutoBlockstatePredicate implements Predicate {
+public class ImplAutoBlockstatePredicate implements Predicate<ModelInfoWrapper> {
 
     private final int id;
 
@@ -15,7 +14,7 @@ public class ImplAutoBlockstatePredicate implements Predicate {
     }
 
     @Override
-    public boolean test(final Object t) {
+    public boolean test(final ModelInfoWrapper t) {
         return true;
     }
 
@@ -32,7 +31,7 @@ public class ImplAutoBlockstatePredicate implements Predicate {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ImplAutoBlockstatePredicate other = (ImplAutoBlockstatePredicate) obj;
+        final ImplAutoBlockstatePredicate other = (ImplAutoBlockstatePredicate) obj;
         return id == other.id;
     }
 }
