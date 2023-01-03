@@ -11,8 +11,10 @@ import com.troblecodings.signals.init.OSModels;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
+import com.troblecodings.signals.statehandler.SignalStateHandler;
 
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -35,11 +37,12 @@ public class OpenSignalsMain {
 
     public OpenSignalsMain() {
         instance = this;
-        IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
         eventBus.register(this);
         eventBus.register(OSBlocks.class);
         eventBus.register(OSItems.class);
         eventBus.register(OSSounds.class);
+        MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
     }
 
