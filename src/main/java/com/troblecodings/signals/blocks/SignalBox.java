@@ -30,9 +30,11 @@ public class SignalBox extends BasicBlock {
     public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
             final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
         if (!playerIn.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)) {
-            if (worldIn.isClientSide)
+            if (!worldIn.isClientSide)
                 return InteractionResult.SUCCESS;
             final BlockEntity entity = worldIn.getBlockEntity(pos);
+            // Just for testing of the UI Lib
+            OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {
                 OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
