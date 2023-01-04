@@ -13,6 +13,7 @@ import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
 import com.troblecodings.signals.statehandler.SignalStateHandler;
 
+import net.minecraft.world.inventory.FurnaceMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;

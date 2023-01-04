@@ -20,6 +20,7 @@ public class GuiRedstoneIO extends GuiBase {
     private UILabel labelComp;
 
     public GuiRedstoneIO(final GuiInfo info) {
+        super(info);
         this.tile = info.getTile();
         initOwn();
     }

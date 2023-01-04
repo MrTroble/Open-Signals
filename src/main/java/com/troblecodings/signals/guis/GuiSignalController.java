@@ -47,28 +47,24 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class GuiSignalController extends GuiBase {
 
-    private final BlockPos pos;
     private final ContainerSignalController controller;
     private final UIEntity lowerEntity = new UIEntity();
     private boolean previewMode = false;
     private String profileName = null;
-    private BlockPos linkedPos = null;
     private final List<UIPropertyEnumHolder> holders = new ArrayList<>();
 
     public GuiSignalController(final GuiInfo info) {
-        final SignalControllerTileEntity tile = info.getTile();
-        this.pos = tile.getBlockPos();
-        this.linkedPos = tile.getLinkedPosition();
-        this.controller = new ContainerSignalController(info);
+        super(info);
+        this.controller = (ContainerSignalController)info.base;
         info.player.containerMenu = this.controller;
-        this.compound = new NBTWrapper(tile.getUpdateTag());
+        this.compound = new NBTWrapper();
         initInternal();
     }
 
     @Override
     public void removed() {
         this.entity.write(compound);
-        GuiSyncNetwork.sendToPosServer(compound, pos);
+        GuiSyncNetwork.sendToPosServer(compound, controller.getPos());
     }
 
     private void initMode(final EnumMode mode, final Signal signal) {
@@ -167,7 +163,7 @@ public class GuiSignalController extends GuiBase {
         rightSide.add(new UIBox(UIBox.VBOX, 4));
 
         final Minecraft mc = Minecraft.getInstance();
-        final BlockState state = mc.player.level.getBlockState(pos);
+        final BlockState state = mc.player.level.getBlockState(controller.getPos());
         final BakedModel model = mc.getBlockRenderer().getBlockModel(state);
         final UIEnumerable toggle = new UIEnumerable(Direction.values().length, "singleModeFace");
         toggle.setOnChange(e -> {

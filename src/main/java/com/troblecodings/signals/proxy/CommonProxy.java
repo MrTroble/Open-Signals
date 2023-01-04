@@ -1,7 +1,9 @@
 package com.troblecodings.signals.proxy;
 
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.UIInit;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
@@ -22,10 +24,11 @@ public class CommonProxy {
     public void initModEvent(final FMLConstructModEvent event) {
         OpenSignalsMain.handler = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
-        OpenSignalsMain.handler.addServer(Placementtool.class, _u -> null);
+        OpenSignalsMain.handler.addServer(Placementtool.class, ContainerBase::new);
         OpenSignalsMain.handler.addServer(SignalController.class, ContainerSignalController::new);
         OpenSignalsMain.handler.addServer(SignalBox.class, ContainerSignalBox::new);
-        OpenSignalsMain.handler.addServer(Signal.class, _u -> null);
+        OpenSignalsMain.handler.addServer(Signal.class, ContainerBase::new);
+        OpenSignalsMain.handler.addServer(RedstoneIO.class, ContainerBase::new);
     }
 
     public void preinit(final FMLCommonSetupEvent event) {

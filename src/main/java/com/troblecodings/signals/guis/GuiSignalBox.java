@@ -64,6 +64,7 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity mainButton;
 
     public GuiSignalBox(final GuiInfo info) {
+        super(info);
         this.box = info.getTile();
         this.container = new ContainerSignalBox(info, this::update);
         info.player.containerMenu = this.container;

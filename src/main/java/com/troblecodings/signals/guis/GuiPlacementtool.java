@@ -40,6 +40,7 @@ public class GuiPlacementtool extends GuiBase {
     private final Placementtool tool;
 
     public GuiPlacementtool(final GuiInfo info) {
+        super(info);
         final ItemStack stack = info.player.getMainHandItem();
         this.compound = new NBTWrapper(stack.getOrCreateTag());
         if (this.compound == null)

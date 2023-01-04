@@ -19,6 +19,7 @@ public class GuiSignal extends GuiBase {
     private UILabel labelComp;
 
     public GuiSignal(final GuiInfo info) {
+        super(info);
         this.tile = info.getTile();
         initOwn();
     }
