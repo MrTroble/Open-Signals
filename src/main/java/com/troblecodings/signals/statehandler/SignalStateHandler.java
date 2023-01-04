@@ -7,11 +7,13 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.event.world.ChunkEvent;
@@ -68,12 +70,10 @@ public final class SignalStateHandler {
         final ChunkAccess chunk = event.getChunk();
         final List<SignalStateInfo> states = new ArrayList<>();
         chunk.getBlockEntitiesPos().forEach(pos -> {
-            final LevelAccessor level = chunk.getWorldForge();
-            final BlockEntity block = level.getBlockEntity(pos);
-            if (!(block instanceof SignalTileEntity)) {
+            final Block block = chunk.getBlockState(pos).getBlock();
+            if (!(block instanceof Signal)) {
                 return;
             }
-            final SignalTileEntity signal = (SignalTileEntity) block;
             // TODO read states out of files and add them to currentlyLoadedStates
             states.add(new SignalStateInfo(chunk, pos));
         });

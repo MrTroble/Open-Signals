@@ -35,6 +35,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
     private CustomModelLoader() {
     }
 
+    @SuppressWarnings("unchecked")
     private static void loadExtention(final TextureStats texturestate,
             final Map<String, ModelExtention> extention, final String modelname,
             final ModelStats states, final Models models, final FunctionParsingInfo info,
@@ -214,7 +215,8 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
             for (SignalAngel angel : SignalAngel.values()) {
                 final ModelResourceLocation location = new ModelResourceLocation(
                         OpenSignalsMain.MODID, name, "angel=" + angel.getNameWrapper());
-                topLevel.put(location, SignalCustomModel.getModel(location, loaderList, event));
+                topLevel.put(location,
+                        SignalCustomModel.getModel(location, loaderList, event, angel));
             }
         });
     }
