@@ -81,7 +81,7 @@ public class Signal extends BasicBlock {
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
-    
+
     @Override
     public VoxelShape getShape(final BlockState state, final BlockGetter source, final BlockPos pos,
             final CollisionContext context) {
@@ -249,7 +249,7 @@ public class Signal extends BasicBlock {
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
         if (!placer.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)
                 && (canBeLinked() || customname)) {
-            OpenSignalsMain.handler.invokeGui(Signal.class, placer, level, blockPos);
+            OpenSignalsMain.handler.invokeGui(Signal.class, placer, level, blockPos, "signal");
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;

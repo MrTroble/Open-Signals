@@ -1,22 +1,16 @@
 package com.troblecodings.signals.guis;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-import java.util.Optional;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
+import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
-import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
-import com.troblecodings.guilib.ecs.entitys.UICheckBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
@@ -30,11 +24,9 @@ import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.client.resources.language.I18n;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiPlacementtool extends GuiBase {
@@ -47,7 +39,7 @@ public class GuiPlacementtool extends GuiBase {
     private Signal currentSelectedBlock;
     private final Placementtool tool;
 
-    public GuiPlacementtool(final GuiCreateInfo info) {
+    public GuiPlacementtool(final GuiInfo info) {
         final ItemStack stack = info.player.getMainHandItem();
         this.compound = new NBTWrapper(stack.getOrCreateTag());
         if (this.compound == null)

@@ -49,7 +49,7 @@ public class Placementtool extends BlockItem
             if (worldIn.isClientSide)
                 return InteractionResultHolder.success(player.getItemInHand(hand));
             OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
-                    player.getOnPos());
+                    player.getOnPos(), "placementtool");
             return InteractionResultHolder.success(player.getItemInHand(hand));
         }
         return super.use(worldIn, player, hand);

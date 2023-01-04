@@ -4,13 +4,12 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.guilib.ecs.ContainerBase;
-import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
+import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
 
 public class ContainerSignalController extends ContainerBase implements UIClientSync {
 
@@ -20,7 +19,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     private Player player;
     private Runnable onUpdate;
 
-    public ContainerSignalController(final GuiCreateInfo info) {
+    public ContainerSignalController(final GuiInfo info) {
         super(info);
     }
 

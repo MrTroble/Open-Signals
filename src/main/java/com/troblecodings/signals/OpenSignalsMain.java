@@ -66,6 +66,7 @@ public class OpenSignalsMain {
     @SubscribeEvent
     public void preInit(final FMLConstructModEvent event) {
         file = ModLoadingContext.get().getActiveContainer().getModInfo().getOwningFile().getFile();
+        proxy.initModEvent(event);
     }
 
     @SubscribeEvent

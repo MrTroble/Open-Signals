@@ -33,11 +33,10 @@ public class SignalBox extends BasicBlock {
             if (!worldIn.isClientSide)
                 return InteractionResult.SUCCESS;
             final BlockEntity entity = worldIn.getBlockEntity(pos);
-            // Just for testing of the UI Lib
-            OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {
-                OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
+                OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos,
+                        "signalbox");
             } else {
                 playerIn.sendMessage(new TranslatableComponent("msg.isblocked"),
                         playerIn.getUUID());

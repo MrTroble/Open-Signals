@@ -16,7 +16,7 @@ import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
-import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
+import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -44,7 +44,6 @@ import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Rotation;
@@ -64,17 +63,17 @@ public class GuiSignalBox extends GuiBase {
     private NBTWrapper dirtyCompound = new NBTWrapper();
     private UIEntity mainButton;
 
-    public GuiSignalBox(final GuiCreateInfo info) {
+    public GuiSignalBox(final GuiInfo info) {
         this.box = info.getTile();
         this.container = new ContainerSignalBox(info, this::update);
-        Minecraft.getInstance().player.containerMenu = this.container;
+        info.player.containerMenu = this.container;
         initializeBasicUI();
         if (this.box.getUpdateTag() != null)
             this.compound = new NBTWrapper(this.box.getUpdateTag());
         this.entity.read(this.compound);
     }
 
-    private void update(final NBTWrapper compound) {
+    public void update(final NBTWrapper compound) {
         this.resetTileSelection();
         if (compound.contains(SignalBoxTileEntity.ERROR_STRING)) {
             final String error = I18n.get(compound.getString(SignalBoxTileEntity.ERROR_STRING));

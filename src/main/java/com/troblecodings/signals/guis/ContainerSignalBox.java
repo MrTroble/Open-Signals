@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.ContainerBase;
-import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
+import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
@@ -28,12 +28,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private Consumer<NBTWrapper> run;
     private boolean send = true;
 
-    public ContainerSignalBox(final GuiCreateInfo info) {
+    public ContainerSignalBox(final GuiInfo info) {
         super(info);
         this.tile = info.getTile();
     }
 
-    public ContainerSignalBox(final GuiCreateInfo info, final Consumer<NBTWrapper> run) {
+    public ContainerSignalBox(final GuiInfo info, final Consumer<NBTWrapper> run) {
         super(info);
         this.run = run;
     }

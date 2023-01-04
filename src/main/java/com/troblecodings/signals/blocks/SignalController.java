@@ -33,7 +33,8 @@ public class SignalController extends BasicBlock {
         if (!playerIn.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)) {
             if (worldIn.isClientSide)
                 return InteractionResult.SUCCESS;
-            OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos);
+            OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
+                    "signalcontroller");
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;

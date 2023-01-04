@@ -3,7 +3,7 @@ package com.troblecodings.signals.guis;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
-import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
+import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -18,7 +18,7 @@ public class GuiSignal extends GuiBase {
     private final SignalTileEntity tile;
     private UILabel labelComp;
 
-    public GuiSignal(final GuiCreateInfo info) {
+    public GuiSignal(final GuiInfo info) {
         this.tile = info.getTile();
         initOwn();
     }

@@ -3,15 +3,14 @@ package com.troblecodings.signals.guis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
-import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
+import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
@@ -44,7 +43,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiSignalController extends GuiBase {
@@ -57,12 +55,12 @@ public class GuiSignalController extends GuiBase {
     private BlockPos linkedPos = null;
     private final List<UIPropertyEnumHolder> holders = new ArrayList<>();
 
-    public GuiSignalController(final GuiCreateInfo info) {
+    public GuiSignalController(final GuiInfo info) {
         final SignalControllerTileEntity tile = info.getTile();
         this.pos = tile.getBlockPos();
         this.linkedPos = tile.getLinkedPosition();
         this.controller = new ContainerSignalController(info);
-        Minecraft.getInstance().player.containerMenu = this.controller;
+        info.player.containerMenu = this.controller;
         this.compound = new NBTWrapper(tile.getUpdateTag());
         initInternal();
     }

@@ -3,7 +3,7 @@ package com.troblecodings.signals.guis;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
-import com.troblecodings.guilib.ecs.GuiHandler.GuiCreateInfo;
+import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -19,7 +19,7 @@ public class GuiRedstoneIO extends GuiBase {
     private final RedstoneIOTileEntity tile;
     private UILabel labelComp;
 
-    public GuiRedstoneIO(final GuiCreateInfo info) {
+    public GuiRedstoneIO(final GuiInfo info) {
         this.tile = info.getTile();
         initOwn();
     }
