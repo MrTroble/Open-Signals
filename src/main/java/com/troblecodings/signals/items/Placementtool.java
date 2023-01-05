@@ -1,6 +1,8 @@
 package com.troblecodings.signals.items;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
@@ -36,15 +38,16 @@ public class Placementtool extends BlockItem
     public static final String BLOCK_TYPE_ID = "blocktypeid";
     public static final String SIGNAL_CUSTOMNAME = "customname";
 
-    public final ArrayList<Signal> signals = new ArrayList<>();
+    public final HashMap<Integer, Signal> signals = new HashMap<>();
+    public Signal firstSignal = null;
 
     public Placementtool() {
         super(Blocks.AIR, new Item.Properties().tab(OSTabs.TAB));
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level worldIn, Player player,
-            InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(final Level worldIn, final Player player,
+            final InteractionHand hand) {
         if (player.isShiftKeyDown()) {
             if (worldIn.isClientSide)
                 return InteractionResultHolder.success(player.getItemInHand(hand));
@@ -56,7 +59,7 @@ public class Placementtool extends BlockItem
     }
 
     @Override
-    public InteractionResult place(BlockPlaceContext context) {
+    public InteractionResult place(final BlockPlaceContext context) {
         final InteractionResult result = super.place(context);
         if (result == InteractionResult.SUCCESS) {
             final Player player = context.getPlayer();
@@ -121,8 +124,11 @@ public class Placementtool extends BlockItem
         return "signaltype";
     }
 
-    public void addSignal(Signal signal) {
-        this.signals.add(signal);
+    public void addSignal(final Signal signal) {
+        if (firstSignal != null) {
+            firstSignal = signal;
+        }
+        this.signals.put(Objects.hash(signal.getSignalTypeName()), signal);
     }
 
 }

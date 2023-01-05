@@ -1,6 +1,10 @@
 package com.troblecodings.signals.guis;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
@@ -10,7 +14,9 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
+import com.troblecodings.guilib.ecs.entitys.UICheckBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
@@ -25,6 +31,7 @@ import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -48,7 +55,7 @@ public class GuiPlacementtool extends GuiBase {
         tool = (Placementtool) stack.getItem();
         final int usedBlock = this.compound.contains(Placementtool.BLOCK_TYPE_ID)
                 ? this.compound.getInteger(Placementtool.BLOCK_TYPE_ID)
-                : 0;
+                : Objects.hash(tool.firstSignal.getSignalTypeName());
         currentSelectedBlock = tool.getObjFromID(usedBlock);
         initInternal();
     }
@@ -64,8 +71,11 @@ public class GuiPlacementtool extends GuiBase {
 
         final UIEntity selectBlockEntity = GuiElements.createEnumElement(tool, input -> {
             currentSelectedBlock = tool.getObjFromID(input);
-            // TODO
+            lookup.clear();
+            this.list.clearChildren();
+            currentSelectedBlock.getProperties().forEach(prop -> lookup.put(prop.getName(), prop));
             this.entity.update();
+            initProperties();
             applyModelChanges();
         });
         final UIEntity leftSide = new UIEntity();
@@ -122,6 +132,12 @@ public class GuiPlacementtool extends GuiBase {
         this.entity.read(compound);
     }
 
+    private void initProperties() {
+        for (final SEProperty property : currentSelectedBlock.getProperties()) {
+            of(property, inp -> applyModelChanges());
+        }
+    }
+
     public void of(final SEProperty property, final IntConsumer consumer) {
         if (property == null)
             return;
@@ -138,12 +154,44 @@ public class GuiPlacementtool extends GuiBase {
 
     @Override
     public void removed() {
-        // TODO Save ID
+        this.compound.putInteger(Placementtool.BLOCK_TYPE_ID,
+                Objects.hash(currentSelectedBlock.getSignalTypeName()));
         super.removed();
         GuiSyncNetwork.sendToItemServer(compound);
     }
 
     public void applyModelChanges() {
-        // TODO Model render
+        BlockState ebs = currentSelectedBlock.defaultBlockState();
+        // Just until the erros are fixed
+        return;
+
+        final List<UIEnumerable> enumerables = this.list.findRecursive(UIEnumerable.class);
+        for (final UIEnumerable enumerable : enumerables) {
+            final SEProperty sep = (SEProperty) lookup.get(enumerable.getID());
+            if (sep == null)
+                return;
+        }
+
+        final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
+        for (final UICheckBox checkb : checkbox) {
+            final SEProperty sep = (SEProperty) lookup.get(checkb.getID());
+            if (sep == null)
+                return;
+            if (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+                ebs = ebs.withProperty(sep, checkb.isChecked());
+            } else if (checkb.isChecked()) {
+                ebs = ebs.withProperty(sep, sep.getDefault());
+            }
+        }
+
+        for (final Entry<IUnlistedProperty<?>, Optional<?>> prop : ebs.getUnlistedProperties()
+                .entrySet()) {
+            final SEProperty property = SEProperty.cst(prop.getKey());
+            if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+                ebs = ebs.withProperty(property, property.getDefault());
+            }
+        }
+
+        blockRender.setBlockState(ebs);
     }
 }
