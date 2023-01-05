@@ -77,10 +77,6 @@ public class Signal extends BasicBlock {
         prop.placementtool.addSignal(this);
     }
 
-    @Override
-    public RenderShape getRenderShape(BlockState state) {
-        return RenderShape.MODEL;
-    }
 
     @Override
     public VoxelShape getShape(final BlockState state, final BlockGetter source, final BlockPos pos,

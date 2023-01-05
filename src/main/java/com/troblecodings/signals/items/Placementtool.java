@@ -1,6 +1,7 @@
 package com.troblecodings.signals.items;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
@@ -24,7 +25,9 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -45,14 +48,26 @@ public class Placementtool extends BlockItem
     @Override
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player player,
             InteractionHand hand) {
-        if (player.isShiftKeyDown()) {
-            if (worldIn.isClientSide)
-                return InteractionResultHolder.success(player.getItemInHand(hand));
+        if (!worldIn.isClientSide) {
             OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
                     player.getOnPos(), "placementtool");
-            return InteractionResultHolder.success(player.getItemInHand(hand));
         }
-        return super.use(worldIn, player, hand);
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand),
+                worldIn.isClientSide);
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        final Player player = context.getPlayer();
+        final Level worldIn = context.getLevel();
+        if (player.isShiftKeyDown()) {
+            if (!worldIn.isClientSide) {
+                OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
+                        player.getOnPos(), "placementtool");
+            }
+            return InteractionResult.sidedSuccess(worldIn.isClientSide);
+        }
+        return super.useOn(context);
     }
 
     @Override
@@ -87,6 +102,19 @@ public class Placementtool extends BlockItem
             // TODO Custom name
         }
         return result;
+    }
+
+    @Override
+    public void registerBlocks(Map<Block, Item> map, Item item) {
+    }
+
+    @Override
+    public void removeFromBlockToItemMap(Map<Block, Item> blockToItemMap, Item itemIn) {
+    }
+
+    @Override
+    public String getDescriptionId() {
+        return this.getOrCreateDescriptionId();
     }
 
     @Override
