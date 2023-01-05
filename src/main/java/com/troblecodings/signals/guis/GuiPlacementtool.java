@@ -170,6 +170,7 @@ public class GuiPlacementtool extends GuiBase {
             final SEProperty sep = (SEProperty) lookup.get(enumerable.getID());
             if (sep == null)
                 return;
+            ebs = ebs.withProperty(sep, sep.getObjFromID(enumerable.getIndex()));
         }
 
         final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
