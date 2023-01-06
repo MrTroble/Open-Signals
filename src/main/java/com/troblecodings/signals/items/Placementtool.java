@@ -1,5 +1,6 @@
 package com.troblecodings.signals.items;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -38,8 +39,7 @@ public class Placementtool extends BlockItem
     public static final String BLOCK_TYPE_ID = "blocktypeid";
     public static final String SIGNAL_CUSTOMNAME = "customname";
 
-    public final HashMap<Integer, Signal> signals = new HashMap<>();
-    public Signal firstSignal = null;
+    public final ArrayList<Signal> signals = new ArrayList<>();
 
     public Placementtool() {
         super(Blocks.AIR, new Item.Properties().tab(OSTabs.TAB));
@@ -48,22 +48,29 @@ public class Placementtool extends BlockItem
     @Override
     public InteractionResultHolder<ItemStack> use(final Level worldIn, final Player player,
             final InteractionHand hand) {
-        if (player.isShiftKeyDown()) {
-            if (worldIn.isClientSide)
-                return InteractionResultHolder.success(player.getItemInHand(hand));
-            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
-                    player.getOnPos(), "placementtool");
+        if (worldIn.isClientSide)
             return InteractionResultHolder.success(player.getItemInHand(hand));
-        }
-        return super.use(worldIn, player, hand);
+        OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, player.getOnPos(),
+                "placementtool");
+        return InteractionResultHolder.success(player.getItemInHand(hand));
     }
 
     @Override
     public InteractionResult place(final BlockPlaceContext context) {
         final InteractionResult result = super.place(context);
+        final Player player = context.getPlayer();
+        final Level worldIn = context.getLevel();
+        if (player.isShiftKeyDown()) {
+            if (worldIn.isClientSide())
+                return result;
+            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
+                    player.getOnPos(), "placementtool");
+            return result;
+
+        }
+
         if (result == InteractionResult.SUCCESS) {
-            final Player player = context.getPlayer();
-            final Level worldIn = context.getLevel();
+
             final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
             final BlockPos pos = context.getClickedPos();
             final SignalTileEntity tile = (SignalTileEntity) worldIn.getBlockEntity(pos);
@@ -125,10 +132,7 @@ public class Placementtool extends BlockItem
     }
 
     public void addSignal(final Signal signal) {
-        if (firstSignal == null) {
-            firstSignal = signal;
-        }
-        this.signals.put(Objects.hash(signal.getSignalTypeName()), signal);
+        this.signals.add(signal);
     }
 
 }
