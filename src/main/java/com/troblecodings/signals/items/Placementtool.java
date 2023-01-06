@@ -125,7 +125,7 @@ public class Placementtool extends BlockItem
     }
 
     public void addSignal(final Signal signal) {
-        if (firstSignal != null) {
+        if (firstSignal == null) {
             firstSignal = signal;
         }
         this.signals.put(Objects.hash(signal.getSignalTypeName()), signal);
