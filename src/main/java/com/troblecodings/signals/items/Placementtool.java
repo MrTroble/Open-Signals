@@ -1,9 +1,6 @@
 package com.troblecodings.signals.items;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
