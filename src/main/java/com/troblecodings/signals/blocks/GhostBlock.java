@@ -1,37 +1,54 @@
 package com.troblecodings.signals.blocks;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class GhostBlock extends BasicBlock {
 
     public GhostBlock() {
         super(Properties.of(Material.GLASS));
+        registerDefaultState(defaultBlockState());
+    }
+
+    @Override
+    public RenderShape getRenderShape(final BlockState p_60550_) {
+        return RenderShape.INVISIBLE;
+    }
+
+    @Override
+    public VoxelShape getShape(final BlockState p_60555_, final BlockGetter p_60556_,
+            final BlockPos p_60557_, final CollisionContext p_60558_) {
+        return Shapes.block();
     }
 
     public static void destroyUpperBlock(final LevelAccessor worldIn, final BlockPos pos) {
-        final BlockPos posup = pos.above();
-        final Block upperBlock = worldIn.getBlockState(posup).getBlock();
-        if (upperBlock instanceof GhostBlock) {
-            worldIn.destroyBlock(posup, false);
+        final BlockPos posUp = pos.above();
+        final BlockState state = worldIn.getBlockState(posUp);
+        final Block blockUp = state.getBlock();
+        if (blockUp instanceof GhostBlock) {
+            worldIn.destroyBlock(posUp, false);
+            blockUp.destroy(worldIn, posUp, state);
         }
     }
 
     @Override
-    public void destroy(LevelAccessor worldIn, BlockPos pos, BlockState stat) {
-        super.destroy(worldIn, pos, stat);
-
-        if (worldIn.isClientSide())
-            return;
+    public void destroy(final LevelAccessor worldIn, final BlockPos pos, final BlockState state) {
+        super.destroy(worldIn, pos, state);
         destroyUpperBlock(worldIn, pos);
 
         final BlockPos posdown = pos.below();
         final Block lowerBlock = worldIn.getBlockState(posdown).getBlock();
         if (lowerBlock instanceof GhostBlock || lowerBlock instanceof Signal) {
             worldIn.destroyBlock(posdown, false);
+            lowerBlock.destroy(worldIn, posdown, state);
         }
     }
 

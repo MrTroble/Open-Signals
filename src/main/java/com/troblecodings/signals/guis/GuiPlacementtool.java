@@ -73,11 +73,11 @@ public class GuiPlacementtool extends GuiBase {
             currentSelectedBlock = tool.getObjFromID(input);
             lookup.clear();
             this.list.clearChildren();
-            currentSelectedBlock.getProperties().forEach(prop -> lookup.put(prop.getName(), prop));
-            this.entity.update();
             initProperties();
             applyModelChanges();
             this.compound.putInteger(Placementtool.BLOCK_TYPE_ID, input);
+            this.list.read(compound);
+            this.entity.update();
         });
         final UIEntity leftSide = new UIEntity();
         leftSide.setInheritHeight(true);
@@ -136,6 +136,7 @@ public class GuiPlacementtool extends GuiBase {
     private void initProperties() {
         for (final SEProperty property : currentSelectedBlock.getProperties()) {
             of(property, inp -> applyModelChanges());
+            lookup.put(property.getName(), property);
         }
     }
 

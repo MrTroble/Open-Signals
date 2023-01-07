@@ -1,13 +1,19 @@
 package com.troblecodings.signals.items;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.statehandler.SignalStateHandler;
@@ -16,6 +22,7 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -57,43 +64,67 @@ public class Placementtool extends BlockItem
         final InteractionResult result = super.place(context);
         final Player player = context.getPlayer();
         final Level worldIn = context.getLevel();
+        final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
+        final BlockPos pos = context.getClickedPos();
+        if (!compound.contains(BLOCK_TYPE_ID)) {
+            if (!worldIn.isClientSide)
+                return result;
+            translateMessageWrapper(player, "pt.itemnotset");
+            return InteractionResult.FAIL;
+        }
         if (player.isShiftKeyDown()) {
             if (worldIn.isClientSide())
                 return result;
             OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
                     player.getOnPos(), "placementtool");
             return result;
-
         }
 
-        if (result == InteractionResult.SUCCESS) {
+        final Signal signal = getObjFromID(compound.getInteger(BLOCK_TYPE_ID));
+        final Map<SEProperty, String> states = new HashMap<>();
+        final List<SEProperty> properties = signal.getProperties();
 
-            final NBTWrapper compound = new NBTWrapper(player.getMainHandItem().getOrCreateTag());
-            final BlockPos pos = context.getClickedPos();
-            final SignalTileEntity tile = (SignalTileEntity) worldIn.getBlockEntity(pos);
-            final Signal signal = (Signal) tile.getBlockState().getBlock();
-
-            // TODO set signal
-
-            final int height = signal
-                    .getHeight(SignalStateHandler.getStates(new SignalStateInfo(worldIn, pos)));
-            BlockPos lastPos = context.getClickedPos();
-            for (int i = 0; i < height; i++) {
-                if (!worldIn.isEmptyBlock(lastPos = lastPos.above())) {
-                    worldIn.removeBlock(lastPos, true);
-                    return InteractionResult.FAIL;
-                }
+        properties.forEach(property -> {
+            if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+                states.put(property, property.getDefault());
+                return;
             }
-            lastPos = context.getClickedPos();
-            for (int i = 0; i < height; i++) {
-                worldIn.setBlockAndUpdate(lastPos = lastPos.above(),
-                        OSBlocks.GHOST_BLOCK.getStateForPlacement(context));
+            if (!compound.contains(property.getName())) {
+                return;
             }
-
-            final String name = compound.getString(SIGNAL_CUSTOMNAME);
-            // TODO Custom name
+            if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+                states.put(property,
+                        property.getObjFromID(compound.getInteger(property.getName())));
+            } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)
+                    && compound.getInteger(property.getName()) == 1) {
+                states.put(property, property.getDefault());
+            }
+        });
+        final SignalTileEntity tile = new SignalTileEntity(
+                new TileEntityInfo(pos, signal.defaultBlockState()));
+        final int height = signal.getHeight(states);
+        BlockPos lastPos = context.getClickedPos();
+        for (int i = 0; i < height; i++) {
+            if (!worldIn.isEmptyBlock(lastPos = lastPos.above())) {
+                worldIn.removeBlock(lastPos, true);
+                return InteractionResult.FAIL;
+            }
         }
-        return result;
+        lastPos = context.getClickedPos();
+        for (int i = 0; i < height; i++) {
+            worldIn.setBlockAndUpdate(lastPos = lastPos.above(),
+                    OSBlocks.GHOST_BLOCK.getStateForPlacement(context));
+        }
+
+        final String name = compound.getString(SIGNAL_CUSTOMNAME);
+        if (name != null && tile != null) {
+            tile.setNameWithOutSync(name);
+            states.put(Signal.CUSTOMNAME, name);
+        }
+        worldIn.setBlockAndUpdate(pos, signal.getStateForPlacement(context));
+        worldIn.setBlockEntity(tile);
+        SignalStateHandler.setStates(new SignalStateInfo(worldIn, pos), states);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
