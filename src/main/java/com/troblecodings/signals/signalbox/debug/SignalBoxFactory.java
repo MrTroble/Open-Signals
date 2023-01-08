@@ -14,8 +14,6 @@ import com.troblecodings.signals.signalbox.SignalBoxPathway;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.nbt.CompoundTag;
-
 public class SignalBoxFactory {
 
     protected SignalBoxFactory() {
