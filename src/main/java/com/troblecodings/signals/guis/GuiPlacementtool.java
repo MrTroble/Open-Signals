@@ -25,6 +25,7 @@ import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -64,9 +65,13 @@ public class GuiPlacementtool extends GuiBase {
 
         final UIEntity selectBlockEntity = GuiElements.createEnumElement(tool, input -> {
             currentSelectedBlock = tool.getObjFromID(input);
-            // TODO
-            this.entity.update();
+            lookup.clear();
+            this.list.clearChildren();
+            initProperties();
             applyModelChanges();
+            this.compound.putInteger(Placementtool.BLOCK_TYPE_ID, input);
+            this.list.read(compound);
+            this.entity.update();
         });
         final UIEntity leftSide = new UIEntity();
         leftSide.setInheritHeight(true);
@@ -122,6 +127,13 @@ public class GuiPlacementtool extends GuiBase {
         this.entity.read(compound);
     }
 
+    private void initProperties() {
+        for (final SEProperty property : currentSelectedBlock.getProperties()) {
+            of(property, inp -> applyModelChanges());
+            lookup.put(property.getName(), property);
+        }
+    }
+
     public void of(final SEProperty property, final IntConsumer consumer) {
         if (property == null)
             return;
@@ -138,12 +150,35 @@ public class GuiPlacementtool extends GuiBase {
 
     @Override
     public void removed() {
-        // TODO Save ID
         super.removed();
         GuiSyncNetwork.sendToItemServer(compound);
     }
 
     public void applyModelChanges() {
-        // TODO Model render
+        BlockState ebs = currentSelectedBlock.defaultBlockState();
+        // Just until the erros are fixed
+        return;
+        /*
+         * final List<UIEnumerable> enumerables =
+         * this.list.findRecursive(UIEnumerable.class); for (final UIEnumerable
+         * enumerable : enumerables) { final SEProperty sep = (SEProperty)
+         * lookup.get(enumerable.getID()); if (sep == null) return; ebs =
+         * ebs.withProperty(sep, sep.getObjFromID(enumerable.getIndex())); }
+         * 
+         * final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
+         * for (final UICheckBox checkb : checkbox) { final SEProperty sep =
+         * (SEProperty) lookup.get(checkb.getID()); if (sep == null) return; if
+         * (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) { ebs =
+         * ebs.withProperty(sep, checkb.isChecked()); } else if (checkb.isChecked()) {
+         * ebs = ebs.withProperty(sep, sep.getDefault()); } }
+         * 
+         * for (final Entry<IUnlistedProperty<?>, Optional<?>> prop :
+         * ebs.getUnlistedProperties() .entrySet()) { final SEProperty property =
+         * SEProperty.cst(prop.getKey()); if
+         * (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) { ebs =
+         * ebs.withProperty(property, property.getDefault()); } }
+         * 
+         * blockRender.setBlockState(ebs);
+         */
     }
 }

@@ -41,7 +41,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
@@ -76,7 +75,6 @@ public class Signal extends BasicBlock {
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
     }
-
 
     @Override
     public VoxelShape getShape(final BlockState state, final BlockGetter source, final BlockPos pos,

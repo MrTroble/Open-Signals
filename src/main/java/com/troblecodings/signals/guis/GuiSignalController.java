@@ -32,13 +32,11 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.models.SignalCustomModel;
-import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;

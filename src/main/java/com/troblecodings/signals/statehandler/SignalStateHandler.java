@@ -40,8 +40,9 @@ public final class SignalStateHandler {
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
-        if (currentlyLoadedStates.containsKey(info)) {
-            return currentlyLoadedStates.get(info);
+        final Map<SEProperty, String> states = currentlyLoadedStates.get(info);
+        if (states != null) {
+            return states;
         } else {
             final SignalStateFile file = allLevelFiles.get(info.world);
             if (file == null) {
@@ -84,7 +85,10 @@ public final class SignalStateHandler {
     @SubscribeEvent
     public static void onChunkUnload(final ChunkEvent.Unload event) {
         final ChunkAccess chunk = event.getChunk();
-        currentlyLoadedChunks.get(chunk).forEach(signal -> currentlyLoadedStates.remove(signal));
+        currentlyLoadedChunks.get(chunk).forEach(signal -> {
+            // TODO Write Properties in Files
+            currentlyLoadedStates.remove(signal);
+        });
         currentlyLoadedChunks.remove(chunk);
         // TODO sync client
     }
