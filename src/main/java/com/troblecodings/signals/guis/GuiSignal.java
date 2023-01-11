@@ -4,7 +4,6 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
-import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
@@ -68,9 +67,7 @@ public class GuiSignal extends GuiBase {
     }
 
     private void updateText(final String input) {
-        final NBTWrapper compound = new NBTWrapper();
-        this.entity.write(compound);
-        GuiSyncNetwork.sendToPosServer(compound, tile.getBlockPos());
+        // TODO
         labelComp.setText(input);
     }
 

@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox.entrys;
 
+import java.nio.ByteBuffer;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
@@ -61,6 +62,16 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
     @Override
     public void accept(final int value) {
         setValue(getObjFromID(value));
+    }
+
+    @Override
+    public void readNetwork(ByteBuffer buffer) {
+        buffer.putInt(this.enumValue.ordinal());
+    }
+
+    @Override
+    public void writeNetwork(ByteBuffer buffer) {
+        this.enumValue = getObjFromID(buffer.getInt());
     }
 
 }

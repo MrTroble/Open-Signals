@@ -3,9 +3,7 @@ package com.troblecodings.signals.guis;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Quaternion;
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
-import com.troblecodings.guilib.ecs.interfaces.UIAutoSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -20,7 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraftforge.common.util.Lazy;
 
-public class UISignalBoxTile extends UIComponent implements UIAutoSync {
+public class UISignalBoxTile extends UIComponent {
 
     public static final ResourceLocation ICON = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/symbols.png");
@@ -74,23 +72,4 @@ public class UISignalBoxTile extends UIComponent implements UIAutoSync {
     public void setNode(final SignalBoxNode node) {
         this.node = node;
     }
-
-    // TODO Sync
-    @Override
-    public void write(final NBTWrapper compound) {
-    }
-
-    @Override
-    public void read(final NBTWrapper compound) {
-    }
-
-    @Override
-    public String getID() {
-        return this.node.getIdentifier();
-    }
-
-    @Override
-    public void setID(final String id) {
-    }
-
 }

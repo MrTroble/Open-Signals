@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -313,6 +314,18 @@ public class SignalBoxPathway implements INetworkSavable {
      */
     public boolean isEmptyOrBroken() {
         return emptyOrBroken;
+    }
+
+    @Override
+    public void readNetwork(ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    public void writeNetwork(ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

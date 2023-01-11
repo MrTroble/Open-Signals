@@ -3,11 +3,9 @@ package com.troblecodings.signals.guis;
 import java.util.HashMap;
 import java.util.function.IntConsumer;
 
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
-import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -24,6 +22,7 @@ import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
@@ -39,17 +38,14 @@ public class GuiPlacementtool extends GuiBase {
     private final HashMap<String, SEProperty> lookup = new HashMap<String, SEProperty>();
     private Signal currentSelectedBlock;
     private final Placementtool tool;
+    private final Player player;
 
     public GuiPlacementtool(final GuiInfo info) {
         super(info);
+        this.player = info.player;
         final ItemStack stack = info.player.getMainHandItem();
-        this.compound = new NBTWrapper(stack.getOrCreateTag());
-        if (this.compound == null)
-            this.compound = new NBTWrapper();
         tool = (Placementtool) stack.getItem();
-        final int usedBlock = this.compound.contains(Placementtool.BLOCK_TYPE_ID)
-                ? this.compound.getInteger(Placementtool.BLOCK_TYPE_ID)
-                : 0;
+        final int usedBlock = 0;
         currentSelectedBlock = tool.getObjFromID(usedBlock);
         initInternal();
     }
@@ -69,8 +65,6 @@ public class GuiPlacementtool extends GuiBase {
             this.list.clearChildren();
             initProperties();
             applyModelChanges();
-            this.compound.putInteger(Placementtool.BLOCK_TYPE_ID, input);
-            this.list.read(compound);
             this.entity.update();
         });
         final UIEntity leftSide = new UIEntity();
@@ -124,7 +118,6 @@ public class GuiPlacementtool extends GuiBase {
 
         this.entity.add(new UIBox(UIBox.VBOX, 5));
         this.entity.add(lowerEntity);
-        this.entity.read(compound);
     }
 
     private void initProperties() {
@@ -151,7 +144,6 @@ public class GuiPlacementtool extends GuiBase {
     @Override
     public void removed() {
         super.removed();
-        GuiSyncNetwork.sendToItemServer(compound);
     }
 
     public void applyModelChanges() {

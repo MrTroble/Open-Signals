@@ -3,7 +3,6 @@ package com.troblecodings.signals.tileentitys;
 import java.util.ArrayList;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.core.TileEntityInfo;
 
@@ -57,7 +56,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     public void sendToAll(final NBTWrapper compound) {
-        this.clientSyncs.forEach(sync -> GuiSyncNetwork.sendToClient(compound, sync.getPlayer()));
+        // TODO 
     }
 
 }

@@ -7,17 +7,16 @@ import static com.troblecodings.signals.signalbox.SignalBoxUtil.toNBT;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
-import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
@@ -54,7 +53,6 @@ public class GuiSignalBox extends GuiBase {
     private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
 
     private final UIEntity lowerEntity = new UIEntity();
-    private final SignalBoxTileEntity box;
     private final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
     private Page page = Page.USAGE;
@@ -65,13 +63,9 @@ public class GuiSignalBox extends GuiBase {
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
-        this.box = info.getTile();
         this.container = new ContainerSignalBox(info, this::update);
         info.player.containerMenu = this.container;
         initializeBasicUI();
-        if (this.box.getUpdateTag() != null)
-            this.compound = new NBTWrapper(this.box.getUpdateTag());
-        this.entity.read(this.compound);
     }
 
     public void update(final NBTWrapper compound) {
@@ -90,13 +84,6 @@ public class GuiSignalBox extends GuiBase {
             }).start();
             return;
         }
-        this.compound = compound;
-        if (this.page.equals(Page.EDIT) || this.page.equals(Page.USAGE)) {
-            this.entity.read(compound);
-        } else {
-            this.dirtyCompound = compound;
-            this.dirty = true;
-        }
     }
 
     private void resetTileSelection() {
@@ -106,13 +93,13 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void selectLink(final UIEntity parent, final SignalBoxNode node,
-            final PathOptionEntry option, final ImmutableSet<Entry<BlockPos, LinkType>> entrySet,
+            final PathOptionEntry option, final Set<Entry<BlockPos, LinkType>> entrySet,
             final LinkType type, final PathEntryType<BlockPos> entryType) {
         this.selectLink(parent, node, option, entrySet, type, entryType, "");
     }
 
     private void selectLink(final UIEntity parent, final SignalBoxNode node,
-            final PathOptionEntry option, final ImmutableSet<Entry<BlockPos, LinkType>> entrySet,
+            final PathOptionEntry option, final Set<Entry<BlockPos, LinkType>> entrySet,
             final LinkType type, final PathEntryType<BlockPos> entryType, final String suffix) {
         final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList());
@@ -130,7 +117,6 @@ public class GuiSignalBox extends GuiBase {
                 final int index = option.getEntry(entryType).map(entry -> positions.indexOf(entry))
                         .orElse(-1);
                 e.setIndex(index);
-                e.setID(null);
             });
             parent.add(blockSelect);
         }
@@ -160,7 +146,7 @@ public class GuiSignalBox extends GuiBase {
         entity.add(modeLabel);
         parent.add(entity);
         this.node = node;
-        final ImmutableSet<Entry<BlockPos, LinkType>> entrySet = box.getPositions().entrySet();
+        final Set<Entry<BlockPos, LinkType>> entrySet = container.getPositionForTypes().entrySet();
 
         switch (mode) {
             case CORNER:
@@ -182,7 +168,6 @@ public class GuiSignalBox extends GuiBase {
                 final int speed = option.getEntry(PathEntryType.SPEED).filter(n -> n < 16)
                         .orElse(Integer.MAX_VALUE);
                 speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
-                    e.setID(null);
                     e.setIndex(speed);
                 });
                 parent.add(speedSelection);
@@ -194,13 +179,11 @@ public class GuiSignalBox extends GuiBase {
                         ".resetting");
                 parent.add(GuiElements.createButton(I18n.get("button.reset"), e -> {
                     this.lowerEntity.clear();
-                    GuiSyncNetwork.sendToPosServer(compound, this.box.getBlockPos());
                     initializeFieldUsage(mainButton);
                     final NBTWrapper compound = new NBTWrapper();
                     final NBTWrapper wayComp = new NBTWrapper();
                     toNBT(wayComp, POINT1, node.getPoint());
                     compound.putWrapper(SignalBoxUtil.RESET_WAY, wayComp);
-                    GuiSyncNetwork.sendToPosServer(compound, this.box.getBlockPos());
                 }));
             }
                 break;
@@ -251,7 +234,6 @@ public class GuiSignalBox extends GuiBase {
                 toNBT(way, POINT1, lastTile.getNode().getPoint());
                 toNBT(way, POINT2, currentNode.getPoint());
                 comp.putWrapper(SignalBoxUtil.REQUEST_WAY, way);
-                GuiSyncNetwork.sendToPosServer(comp, box.getBlockPos());
                 lastTile = null;
             }
         }));
@@ -288,10 +270,6 @@ public class GuiSignalBox extends GuiBase {
 
     private void pageCheck(final Page page) {
         this.page = page;
-        if (this.dirty && (this.page.equals(Page.EDIT) || this.page.equals(Page.USAGE))) {
-            this.entity.read(this.dirtyCompound);
-            this.dirty = false;
-        }
     }
 
     private void initializePageSettings(final UIEntity entity) {
@@ -304,7 +282,7 @@ public class GuiSignalBox extends GuiBase {
         list.add(uibox);
         list.setInheritHeight(true);
         list.setInheritWidth(true);
-        box.getPositions().forEach((p, t) -> {
+        container.getPositionForTypes().forEach((p, t) -> {
             final String name = getSignalInfo(p, t);
             final UIEntity layout = new UIEntity();
             layout.setHeight(20);
@@ -323,7 +301,6 @@ public class GuiSignalBox extends GuiBase {
             layout.add(GuiElements.createButton("x", 20, e -> {
                 final NBTWrapper resetPos = new NBTWrapper();
                 resetPos.putBlockPos(SignalBoxTileEntity.REMOVE_SIGNAL, p);
-                GuiSyncNetwork.sendToPosServer(resetPos, this.box.getBlockPos());
                 list.remove(layout);
             }));
             list.add(layout);
@@ -402,7 +379,6 @@ public class GuiSignalBox extends GuiBase {
         frame.setInheritWidth(true);
         frame.add(new UIBorder(0xFF000000, 6));
         lowerEntity.add(frame);
-        this.entity.read(compound);
     }
 
     private void initializeBasicUI() {
@@ -445,21 +421,9 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-
-        this.entity.read(compound);
     }
 
     private void reset() {
-        if (page.equals(Page.EDIT)) {
-            compound = new NBTWrapper();
-        }
-        if (!page.equals(Page.SETTINGS)) {
-            this.entity.write(compound);
-            if (page.equals(Page.TILE_CONFIG) && node != null) {
-                // TODO Networking
-            }
-            // TODO Networking
-        }
         this.page = Page.NONE;
         lowerEntity.clear();
     }

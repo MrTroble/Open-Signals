@@ -1,10 +1,8 @@
 package com.troblecodings.signals.guis;
 
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
-import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
@@ -80,11 +78,9 @@ public class GuiRedstoneIO extends GuiBase {
         inner.add(GuiElements.createPageSelect(layout));
     }
 
-    private void updateText(final String input) {
-        final NBTWrapper compound = new NBTWrapper();
-        this.entity.write(compound);
-        GuiSyncNetwork.sendToPosServer(compound, tile.getBlockPos());
-        labelComp.setText(input);
+    private Object updateText(String text) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

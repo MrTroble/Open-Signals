@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -197,6 +198,18 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public List<SignalBoxNode> getNodes() {
         return ImmutableList.copyOf(this.modeGrid.values());
+    }
+
+    @Override
+    public void readNetwork(ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void writeNetwork(ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

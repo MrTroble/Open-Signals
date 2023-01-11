@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox.entrys;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -66,6 +67,18 @@ public class PathOptionEntry implements INetworkSavable {
     @Override
     public void read(final NBTWrapper tag) {
     	// TODO new sync system
+    }
+
+    @Override
+    public void readNetwork(ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void writeNetwork(ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

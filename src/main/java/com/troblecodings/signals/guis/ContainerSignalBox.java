@@ -9,6 +9,7 @@ import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -21,6 +22,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     public final static String POS_ID = "posid";
     public final static String SIGNAL_NAME = "signalName";
 
+    private final AtomicReference<Map<BlockPos, LinkType>> propertiesForType = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
     private Player player;
@@ -57,6 +59,11 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     public Map<BlockPos, String> getNames() {
         return this.names.get();
     }
+    
+    public Map<BlockPos, LinkType> getPositionForTypes() {
+        return this.propertiesForType.get();
+    }
+
 
     @Override
     public boolean stillValid(Player playerIn) {

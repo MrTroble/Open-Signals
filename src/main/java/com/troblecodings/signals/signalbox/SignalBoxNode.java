@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -224,6 +225,18 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
      */
     public String getIdentifier() {
         return identifier;
+    }
+
+    @Override
+    public void readNetwork(ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void writeNetwork(ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

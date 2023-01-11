@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox.entrys;
 
+import java.nio.ByteBuffer;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
@@ -55,6 +56,16 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
     @Override
     public void accept(final int value) {
         this.setValue(getObjFromID(value));
+    }
+
+    @Override
+    public void readNetwork(ByteBuffer buffer) {
+        buffer.put((byte)(value ? 1:0));
+    }
+
+    @Override
+    public void writeNetwork(ByteBuffer buffer) {
+        value = buffer.get() != 0;
     }
 
 }

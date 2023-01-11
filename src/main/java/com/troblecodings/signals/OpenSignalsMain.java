@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 
+import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSItems;
@@ -50,6 +51,7 @@ public class OpenSignalsMain {
             () -> CommonProxy::new);
     public static Logger log = null;
     public static GuiHandler handler = null;
+    public static NetworkHandler network = null;
     private static boolean debug;
 
     /**

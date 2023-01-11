@@ -1,7 +1,11 @@
 package com.troblecodings.signals.proxy;
 
+import java.util.Map;
+
+import com.troblecodings.core.UIInit;
+import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.ContainerBase;
-import com.troblecodings.guilib.ecs.UIInit;
+import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
@@ -22,8 +26,10 @@ import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 public class CommonProxy {
 
     public void initModEvent(final FMLConstructModEvent event) {
-        OpenSignalsMain.handler = UIInit.initCommon(OpenSignalsMain.MODID,
+        Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
+        OpenSignalsMain.handler = init.getKey();
+        OpenSignalsMain.network = init.getValue();
         OpenSignalsMain.handler.addServer(Placementtool.class, ContainerBase::new);
         OpenSignalsMain.handler.addServer(SignalController.class, ContainerSignalController::new);
         OpenSignalsMain.handler.addServer(SignalBox.class, ContainerSignalBox::new);

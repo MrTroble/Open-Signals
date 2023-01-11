@@ -4,14 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
-import com.troblecodings.guilib.ecs.GuiSyncNetwork;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -55,14 +53,11 @@ public class GuiSignalController extends GuiBase {
         super(info);
         this.controller = (ContainerSignalController)info.base;
         info.player.containerMenu = this.controller;
-        this.compound = new NBTWrapper();
         initInternal();
     }
 
     @Override
     public void removed() {
-        this.entity.write(compound);
-        GuiSyncNetwork.sendToPosServer(compound, controller.getPos());
     }
 
     private void initMode(final EnumMode mode, final Signal signal) {
@@ -94,13 +89,7 @@ public class GuiSignalController extends GuiBase {
         leftSide.add(GuiElements.createEnumElement(profile, x -> {
             this.profileName = "p" + x;
             middlePart.findRecursive(UIEnumerable.class).forEach(e -> {
-                final String[] id = e.getID().split("\\.");
-                if (id.length > 1) {
-                    e.write(compound);
-                    e.setID(id[0] + "." + profileName
-                            + (id.length > 2 ? ("." + face.getName()) : ""));
-                    e.read(compound);
-                }
+                // TODO
             });
             applyModelChange(bRender);
         }));
@@ -120,7 +109,6 @@ public class GuiSignalController extends GuiBase {
                 final UIEntity entity = GuiElements.createEnumElement(
                         new DisableIntegerable<>(entry), e -> applyModelChange(bRender));
                 entity.findRecursive(UIEnumerable.class).forEach(e -> {
-                    e.setID(entry.getName() + ".unknown");
                     e.setMin(-1);
                 });
                 middlePart.add(entity);
@@ -170,10 +158,8 @@ public class GuiSignalController extends GuiBase {
             final List<UIColor> colors = rightSide.findRecursive(UIColor.class);
             colors.forEach(c -> c.setColor(0x70000000));
             colors.get(e).setColor(0x70FF0000);
-            leftSide.write(compound);
             leftSide.clearChildren();
             createPageForSide(faceing, leftSide, bRender);
-            leftSide.read(compound);
         });
         rightSide.add(toggle);
 
@@ -224,10 +210,8 @@ public class GuiSignalController extends GuiBase {
         header.add(titel);
         final EnumIntegerable<EnumMode> enumMode = new EnumIntegerable<EnumMode>(EnumMode.class);
         final UIEntity rsMode = GuiElements.createEnumElement(enumMode, in -> {
-            lowerEntity.write(compound);
             lowerEntity.clearChildren();
             initMode(enumMode.getObjFromID(in), signal);
-            this.lowerEntity.read(compound);
         });
         header.add(rsMode);
 
@@ -242,8 +226,6 @@ public class GuiSignalController extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-
-        this.entity.read(compound);
     }
 
     private UIEntity createPreview(final UIBlockRender blockRender) {

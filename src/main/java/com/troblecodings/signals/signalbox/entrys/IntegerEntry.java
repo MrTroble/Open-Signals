@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox.entrys;
 
+import java.nio.ByteBuffer;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
@@ -32,6 +33,16 @@ public class IntegerEntry extends IPathEntry<Integer> implements IntConsumer {
     @Override
     public void accept(final int value) {
         this.setValue(value);
+    }
+    
+    @Override
+    public void readNetwork(ByteBuffer buffer) {
+        buffer.putInt(value);
+    }
+    
+    @Override
+    public void writeNetwork(ByteBuffer buffer) {
+        this.value = buffer.getInt();
     }
 
 }
