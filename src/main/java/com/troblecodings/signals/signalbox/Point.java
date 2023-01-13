@@ -1,9 +1,11 @@
 package com.troblecodings.signals.signalbox;
 
-import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.signalbox.entrys.ISaveable;
+import java.nio.ByteBuffer;
 
-public class Point implements ISaveable {
+import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
+
+public class Point implements INetworkSavable {
 
     private int x, y;
 
@@ -78,5 +80,17 @@ public class Point implements ISaveable {
     public void read(final NBTWrapper tag) {
         this.x = tag.getInteger("x");
         this.y = tag.getInteger("y");
+    }
+
+    @Override
+    public void readNetwork(final ByteBuffer buffer) {
+        this.x = buffer.get();
+        this.y = buffer.get();
+    }
+
+    @Override
+    public void writeNetwork(final ByteBuffer buffer) {
+        buffer.put((byte) x);
+        buffer.put((byte) y);
     }
 }

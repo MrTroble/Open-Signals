@@ -51,6 +51,7 @@ public final class PathEntryType<T> {
      */
     public IPathEntry<T> newValue() {
         try {
+            @SuppressWarnings("deprecation")
             final IPathEntry<T> t = this.entryClass.newInstance();
             t.setName(name);
             return t;
@@ -108,5 +109,4 @@ public final class PathEntryType<T> {
     public String toString() {
         return name;
     }
-
 }

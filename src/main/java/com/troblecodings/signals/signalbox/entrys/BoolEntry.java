@@ -40,7 +40,7 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
     @Override
     public void setValue(final Boolean value) {
         this.value = value.booleanValue();
-        this.isDirty = true;
+        updateValue(1);
     }
 
     @Override
@@ -60,12 +60,11 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
 
     @Override
     public void readNetwork(ByteBuffer buffer) {
-        buffer.put((byte)(value ? 1:0));
+        value = buffer.get() != 0;
     }
 
     @Override
     public void writeNetwork(ByteBuffer buffer) {
-        value = buffer.get() != 0;
+        buffer.put((byte) (value ? 1 : 0));
     }
-
 }
