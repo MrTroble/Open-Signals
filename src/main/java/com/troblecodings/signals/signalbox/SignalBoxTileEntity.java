@@ -74,27 +74,27 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         return !linkedBlocks.isEmpty();
     }
 
-	@Override
-	public boolean link(final BlockPos linkedPos) {
-		if (linkedBlocks.containsKey(linkedPos))
-			return false;
-		final BlockState state = level.getBlockState(linkedPos);
-		final Block block = state.getBlock();
-		LinkType type = LinkType.SIGNAL;
-		if (block == OSBlocks.REDSTONE_IN) {
-			type = LinkType.INPUT;
-		} else if (block == OSBlocks.REDSTONE_OUT) {
-			type = LinkType.OUTPUT;
-		}
-		if (level.isClientSide) {
-			if (type.equals(LinkType.SIGNAL)) {
-				worldLoadOps.loadAndReset(linkedPos);
-			}
-		}
-		linkedBlocks.put(linkedPos, type);
-		this.syncClient();
-		return true;
-	}
+    @Override
+    public boolean link(final BlockPos linkedPos) {
+        if (linkedBlocks.containsKey(linkedPos))
+            return false;
+        final BlockState state = level.getBlockState(linkedPos);
+        final Block block = state.getBlock();
+        LinkType type = LinkType.SIGNAL;
+        if (block == OSBlocks.REDSTONE_IN) {
+            type = LinkType.INPUT;
+        } else if (block == OSBlocks.REDSTONE_OUT) {
+            type = LinkType.OUTPUT;
+        }
+        if (level.isClientSide) {
+            if (type.equals(LinkType.SIGNAL)) {
+                worldLoadOps.loadAndReset(linkedPos);
+            }
+        }
+        linkedBlocks.put(linkedPos, type);
+        this.syncClient();
+        return true;
+    }
 
     private void updateSingle(final SignalTileEntity signaltile, final LevelChunk unused) {
         final BlockPos signalPos = signaltile.getBlockPos();
@@ -102,23 +102,24 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         syncClient();
     }
 
-	@Override
-	public void onLoad() {
-		if (!level.isClientSide)
-			return;
-		signals.clear();
-	}
+    @Override
+    public void onLoad() {
+        if (!level.isClientSide)
+            return;
+        signals.clear();
+    }
 
-	@Override
-	public boolean unlink() {
-		signals.keySet().forEach(worldLoadOps::loadAndReset);
-		linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue())).forEach(entry -> {
-		});
-		linkedBlocks.clear();
-		signals.clear();
-		syncClient();
-		return true;
-	}
+    @Override
+    public boolean unlink() {
+        signals.keySet().forEach(worldLoadOps::loadAndReset);
+        linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue()))
+                .forEach(entry -> {
+                });
+        linkedBlocks.clear();
+        signals.clear();
+        syncClient();
+        return true;
+    }
 
     public Signal getSignal(final BlockPos pos) {
         return this.signals.get(pos);
@@ -144,5 +145,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (clientSyncs.isEmpty())
             return false;
         return this.clientSyncs.get(0).getPlayer().equals(player);
+    }
+
+    public SignalBoxGrid getSignalBoxGrid() {
+        return grid;
     }
 }

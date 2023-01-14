@@ -21,7 +21,7 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.world.level.block.Rotation;
 
-public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observable {
+public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observable, Observer {
 
     public static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
             EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
@@ -249,6 +249,12 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
     @Override
     public void removeListener(final Observer observer) {
         possibleModes.values().forEach(mode -> mode.removeListener(observer));
+
+    }
+
+    @Override
+    public void update(final ByteBuffer buffer) {
+        // TODO Auto-generated method stub
 
     }
 
