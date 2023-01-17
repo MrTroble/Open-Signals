@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
