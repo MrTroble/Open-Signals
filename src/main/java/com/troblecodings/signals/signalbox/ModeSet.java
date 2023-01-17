@@ -1,14 +1,15 @@
 package com.troblecodings.signals.signalbox;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.enums.EnumGuiMode;
-import com.troblecodings.signals.signalbox.entrys.ISaveable;
+import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 import net.minecraft.world.level.block.Rotation;
 
-public class ModeSet implements ISaveable {
+public class ModeSet implements INetworkSavable {
 
     private static final String MODE = "mode";
     private static final String ROTATION = "rotation";
@@ -59,4 +60,15 @@ public class ModeSet implements ISaveable {
         this.rotation = Rotation.valueOf(tag.getString(ROTATION));
     }
 
+    @Override
+    public void readNetwork(final ByteBuffer buffer) {
+        this.mode = EnumGuiMode.class.getEnumConstants()[buffer.get()];
+        this.rotation = Rotation.class.getEnumConstants()[buffer.get()];
+    }
+
+    @Override
+    public void writeNetwork(final ByteBuffer buffer) {
+        buffer.put((byte) mode.ordinal());
+        buffer.put((byte) rotation.ordinal());
+    }
 }

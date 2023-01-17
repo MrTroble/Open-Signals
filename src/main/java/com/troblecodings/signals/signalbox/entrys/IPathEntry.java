@@ -1,10 +1,16 @@
 package com.troblecodings.signals.signalbox.entrys;
 
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
-public abstract class IPathEntry<T> implements INetworkSavable {
+import com.troblecodings.signals.core.Observable;
+import com.troblecodings.signals.core.Observer;
 
-    protected boolean isDirty = false;
+public abstract class IPathEntry<T> implements INetworkSavable, Observable {
+
+    protected final List<Observer> observers = new ArrayList<>();
 
     private String name = "defaultEntry";
 
@@ -55,7 +61,24 @@ public abstract class IPathEntry<T> implements INetworkSavable {
 
     @Override
     public String toString() {
-        return "IPathEntry [isDirty=" + isDirty + ", name=" + name + ", value=" + this.getValue()
-                + "]";
+        return "IPathEntry [name=" + name + ", value=" + this.getValue() + "]";
+    }
+
+    @Override
+    public void addListener(final Observer observer) {
+        if (!observers.contains(observer)) {
+            observers.add(observer);
+        }
+    }
+
+    @Override
+    public void removeListener(final Observer observer) {
+        observers.remove(observer);
+    }
+
+    public void updateValue(final int capacity) {
+        final ByteBuffer buffer = ByteBuffer.allocate(capacity);
+        readNetwork(buffer);
+        this.observers.forEach(observer -> observer.update(buffer));
     }
 }

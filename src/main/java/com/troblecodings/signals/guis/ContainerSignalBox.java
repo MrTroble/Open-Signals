@@ -9,6 +9,8 @@ import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.GuiObserver;
+import com.troblecodings.signals.core.Observer;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
@@ -29,20 +31,25 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private SignalBoxTileEntity tile;
     private Consumer<NBTWrapper> run;
     private boolean send = true;
+    private final Observer observer;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
         this.tile = info.getTile();
+        this.player = info.player;
+        this.observer = new GuiObserver(this);
+        this.tile.getSignalBoxGrid().addListener(observer);
     }
 
     public ContainerSignalBox(final GuiInfo info, final Consumer<NBTWrapper> run) {
-        super(info);
+        this(info);
         this.run = run;
     }
 
     @Override
     public void removed(Player playerIn) {
         super.removed(playerIn);
+        this.tile.getSignalBoxGrid().removeListener(observer);
         if (this.tile != null)
             this.tile.remove(this);
     }
@@ -59,11 +66,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     public Map<BlockPos, String> getNames() {
         return this.names.get();
     }
-    
+
     public Map<BlockPos, LinkType> getPositionForTypes() {
         return this.propertiesForType.get();
     }
-
 
     @Override
     public boolean stillValid(Player playerIn) {

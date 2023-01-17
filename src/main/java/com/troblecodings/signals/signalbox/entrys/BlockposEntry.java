@@ -40,19 +40,18 @@ public final class BlockposEntry extends IPathEntry<BlockPos> {
     @Override
     public void setValue(final BlockPos pPosition) {
         this.position = pPosition;
-        this.isDirty = true;
+        updateValue(12);
     }
 
     @Override
-    public void readNetwork(ByteBuffer buffer) {
+    public void readNetwork(final ByteBuffer buffer) {
+        this.position = new BlockPos(buffer.getInt(), buffer.getInt(), buffer.getInt());
+    }
+
+    @Override
+    public void writeNetwork(final ByteBuffer buffer) {
         buffer.putInt(this.position.getX());
         buffer.putInt(this.position.getY());
         buffer.putInt(this.position.getZ());
     }
-
-    @Override
-    public void writeNetwork(ByteBuffer buffer) {
-        this.position = new BlockPos(buffer.getInt(), buffer.getInt(), buffer.getInt());
-    }
-
 }

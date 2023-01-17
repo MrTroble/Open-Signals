@@ -46,7 +46,7 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
     @Override
     public void setValue(final T value) {
         this.enumValue = value;
-        this.isDirty = true;
+        updateValue(4);
     }
 
     @Override
@@ -66,12 +66,12 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
 
     @Override
     public void readNetwork(ByteBuffer buffer) {
-        buffer.putInt(this.enumValue.ordinal());
+        this.enumValue = getObjFromID(buffer.getInt());
+
     }
 
     @Override
     public void writeNetwork(ByteBuffer buffer) {
-        this.enumValue = getObjFromID(buffer.getInt());
+        buffer.putInt(this.enumValue.ordinal());
     }
-
 }

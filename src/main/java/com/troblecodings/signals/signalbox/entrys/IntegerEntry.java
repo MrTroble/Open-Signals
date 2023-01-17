@@ -27,22 +27,21 @@ public class IntegerEntry extends IPathEntry<Integer> implements IntConsumer {
     @Override
     public void setValue(final Integer value) {
         this.value = value;
-        this.isDirty = true;
+        updateValue(4);
     }
 
     @Override
     public void accept(final int value) {
         this.setValue(value);
     }
-    
+
     @Override
     public void readNetwork(ByteBuffer buffer) {
-        buffer.putInt(value);
-    }
-    
-    @Override
-    public void writeNetwork(ByteBuffer buffer) {
         this.value = buffer.getInt();
     }
 
+    @Override
+    public void writeNetwork(ByteBuffer buffer) {
+        buffer.putInt(value);
+    }
 }

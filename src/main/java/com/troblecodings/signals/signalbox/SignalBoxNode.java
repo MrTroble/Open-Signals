@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.core.Observable;
+import com.troblecodings.signals.core.Observer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -19,7 +21,7 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.world.level.block.Rotation;
 
-public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
+public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observable, Observer {
 
     public static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
             EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
@@ -228,15 +230,32 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     @Override
-    public void readNetwork(ByteBuffer buffer) {
+    public void readNetwork(final ByteBuffer buffer) {
         // TODO Auto-generated method stub
-        
+
     }
 
     @Override
-    public void writeNetwork(ByteBuffer buffer) {
+    public void writeNetwork(final ByteBuffer buffer) {
         // TODO Auto-generated method stub
-        
+
+    }
+
+    @Override
+    public void addListener(final Observer observer) {
+        possibleModes.values().forEach(mode -> mode.addListener(observer));
+    }
+
+    @Override
+    public void removeListener(final Observer observer) {
+        possibleModes.values().forEach(mode -> mode.removeListener(observer));
+
+    }
+
+    @Override
+    public void update(final ByteBuffer buffer) {
+        // TODO Auto-generated method stub
+
     }
 
 }

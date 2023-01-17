@@ -7,8 +7,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.core.Observable;
+import com.troblecodings.signals.core.Observer;
 
-public class PathOptionEntry implements INetworkSavable {
+public class PathOptionEntry implements INetworkSavable, Observable {
 
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
     private final Map<PathEntryType<?>, IPathEntry<?>> removedEntrys = new HashMap<>(2);
@@ -66,19 +68,33 @@ public class PathOptionEntry implements INetworkSavable {
 
     @Override
     public void read(final NBTWrapper tag) {
-    	// TODO new sync system
+        // TODO new sync system
     }
 
     @Override
-    public void readNetwork(ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-        
+    public void readNetwork(final ByteBuffer buffer) {
     }
 
     @Override
-    public void writeNetwork(ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-        
+    public void writeNetwork(final ByteBuffer buffer) {
+        pathEntrys.forEach((type, entry) -> {
+            entry.writeNetwork(buffer);
+        });
+        removedEntrys.forEach((type, entry) -> {
+            entry.writeNetwork(buffer);
+        });
+    }
+
+    @Override
+    public void addListener(final Observer observer) {
+        pathEntrys.values().forEach(entry -> entry.addListener(observer));
+        removedEntrys.values().forEach(entry -> entry.addListener(observer));
+    }
+
+    @Override
+    public void removeListener(final Observer observer) {
+        pathEntrys.values().forEach(entry -> entry.removeListener(observer));
+        removedEntrys.values().forEach(entry -> entry.removeListener(observer));
     }
 
 }

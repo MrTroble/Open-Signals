@@ -1,11 +1,12 @@
 package com.troblecodings.signals.signalbox;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.signalbox.entrys.ISaveable;
+import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
-public class Path implements ISaveable {
+public class Path implements INetworkSavable {
 
     private static final String POINT_1 = "point1";
     private static final String POINT_2 = "point2";
@@ -78,6 +79,18 @@ public class Path implements ISaveable {
     @Override
     public String toString() {
         return "Path [point1=" + point1 + ", point2=" + point2 + "]";
+    }
+
+    @Override
+    public void readNetwork(final ByteBuffer buffer) {
+        this.point1.readNetwork(buffer);
+        this.point2.readNetwork(buffer);
+    }
+
+    @Override
+    public void writeNetwork(final ByteBuffer buffer) {
+        this.point1.writeNetwork(buffer);
+        this.point2.writeNetwork(buffer);
     }
 
 }
