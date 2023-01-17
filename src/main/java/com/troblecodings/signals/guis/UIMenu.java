@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;

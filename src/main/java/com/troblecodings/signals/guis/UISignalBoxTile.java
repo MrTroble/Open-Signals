@@ -3,6 +3,7 @@ package com.troblecodings.signals.guis;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Quaternion;
+import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.EnumGuiMode;
