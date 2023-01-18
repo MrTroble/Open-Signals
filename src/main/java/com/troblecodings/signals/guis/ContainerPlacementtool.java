@@ -8,12 +8,13 @@ import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.PropertyPacket;
 import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class ContainerPlacementtool extends ContainerBase implements INetworkSync {
+public class ContainerPlacementtool extends ContainerBase implements INetworkSync, PropertyPacket {
 
     private final Player player;
     private Signal signal;
@@ -33,10 +34,12 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
             final int id = buf.getInt();
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
+            System.out.println("Signal: " + this.signal);
         } else {
             final SEProperty property = signal.getProperties().get(first);
             final String value = property.getObjFromID(Byte.toUnsignedInt(buf.get()));
             wrapper.putString(property.getName(), value);
+            System.out.printf("Property change %s: %s %n", property, value);
         }
     }
 
