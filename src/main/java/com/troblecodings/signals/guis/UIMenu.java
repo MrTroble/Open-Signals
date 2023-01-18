@@ -89,7 +89,7 @@ public class UIMenu extends UIComponent {
     @Override
     public void keyEvent(final KeyEvent event) {
         super.keyEvent(event);
-        if (event.typed == 'r') {
+        if (event.typedChar == 'r') {
             this.rotation++;
             if (this.rotation >= Rotation.values().length)
                 this.rotation = 0;
