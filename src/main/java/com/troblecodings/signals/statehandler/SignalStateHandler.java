@@ -1,5 +1,6 @@
 package com.troblecodings.signals.statehandler;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,7 @@ public final class SignalStateHandler {
                 return;
             }
             final SignalStatePos pos = file.find(info.pos);
-            final ByteBuf buf = file.read(pos);
+            final ByteBuffer buf = file.read(pos);
             // TODO Sync Client and update properties in file
         }
     }
@@ -46,7 +47,7 @@ public final class SignalStateHandler {
                 return Map.of();
             }
             final SignalStatePos pos = file.find(info.pos);
-            final ByteBuf buffer = file.read(pos);
+            final ByteBuffer buffer = file.read(pos);
         }
         return Map.of();
     }
