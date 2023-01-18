@@ -57,6 +57,31 @@ public class Placementtool extends Item
     }
 
     @Override
+    public InteractionResultHolder<ItemStack> use(Level worldIn, Player player,
+            InteractionHand hand) {
+        if (!worldIn.isClientSide) {
+            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
+                    player.getOnPos(), "placementtool");
+        }
+        return InteractionResultHolder.sidedSuccess(player.getItemInHand(hand),
+                worldIn.isClientSide);
+    }
+
+    @Override
+    public InteractionResult useOn(UseOnContext context) {
+        final Player player = context.getPlayer();
+        final Level worldIn = context.getLevel();
+        if (player.isShiftKeyDown()) {
+            if (!worldIn.isClientSide) {
+                OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
+                        player.getOnPos(), "placementtool");
+            }
+            return InteractionResult.sidedSuccess(worldIn.isClientSide);
+        }
+        return super.useOn(context);
+    }
+
+    @Override
     public Signal getObjFromID(final int obj) {
         return signals.get(obj);
     }
