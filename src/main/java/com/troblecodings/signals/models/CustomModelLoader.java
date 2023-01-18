@@ -15,20 +15,15 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.model.ForgeModelBakery;
 
 @OnlyIn(Dist.CLIENT)
 public class CustomModelLoader implements ResourceManagerReloadListener {
-
-    public static boolean nico = false;
 
     private static HashMap<String, List<SignalModelLoaderInfo>> registeredModels = new HashMap<>();
 
@@ -204,26 +199,24 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
         final ForgeModelBakery bakery = ForgeModelBakery.instance();
         if (registeredModels.isEmpty())
             this.onResourceManagerReload(null);
+        final MapWrapper wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
+        bakery.unbakedCache = wrapper;
+        wrapper.putNormal(
+                new ModelResourceLocation(OpenSignalsMain.MODID, "ghostblock", "inventory"),
+                new DefaultModel());
+        wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, "ghostblock", ""),
+                new DefaultModel());
         registeredModels.forEach((name, loaderList) -> {
-            loaderList.forEach(info -> {
-                if (info.model == null)
-                    info.with(bakery.getModel(
-                            new ResourceLocation(OpenSignalsMain.MODID, "block/" + info.name)));
-            });
-        });
-        nico = true;
-    }
-
-    public void register(final ModelBakeEvent event) {
-        final Map<ResourceLocation, BakedModel> topLevel = event.getModelRegistry();
-        registeredModels.forEach((name, loaderList) -> {
+            wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, ""),
+                    new SignalCustomModel(SignalAngel.ANGEL0, loaderList));
+            wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, "inventory"),
+                    new DefaultModel());
             for (final SignalAngel angel : SignalAngel.values()) {
-                final ModelResourceLocation location = new ModelResourceLocation(
-                        OpenSignalsMain.MODID, name, "angel=" + angel.getNameWrapper());
-                topLevel.put(location,
-                        SignalCustomModel.getModel(location, loaderList, event, angel));
+                wrapper.putNormal(
+                        new ModelResourceLocation(OpenSignalsMain.MODID, name,
+                                "angel=" + angel.getNameWrapper()),
+                        new SignalCustomModel(angel, loaderList));
             }
         });
-        nico = false;
     }
 }

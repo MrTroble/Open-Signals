@@ -36,7 +36,6 @@ public final class OSModels {
     
     @SubscribeEvent
     public static void reg(ModelBakeEvent event) {
-        CustomModelLoader.INSTANCE.register(event);
         Map<ResourceLocation, BakedModel> model = event.getModelRegistry();
         BakedModel mod = model.get(new ModelResourceLocation(OpenSignalsMain.MODID, "hvsignal", "angel=angel0"));
         System.out.println(mod);

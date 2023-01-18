@@ -33,7 +33,6 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -47,7 +46,7 @@ public class Placementtool extends BlockItem
     public final ArrayList<Signal> signals = new ArrayList<>();
 
     public Placementtool() {
-        super(Blocks.AIR, new Item.Properties().tab(OSTabs.TAB));
+        super(null, new Item.Properties().tab(OSTabs.TAB));
     }
 
     @Override
@@ -144,6 +143,11 @@ public class Placementtool extends BlockItem
     }
 
     @Override
+    public Block getBlock() {
+        return OSBlocks.GHOST_BLOCK;
+    }
+
+    @Override
     public void registerBlocks(Map<Block, Item> map, Item item) {
     }
 
@@ -170,7 +174,8 @@ public class Placementtool extends BlockItem
     @OnlyIn(Dist.CLIENT)
     @Override
     public String getNamedObj(final int obj) {
-        return I18n.get("property." + this.getName() + ".name") + ": " + this.getObjFromID(obj);
+        return I18n.get("property." + this.getName() + ".name") + ": "
+                + I18n.get(this.getObjFromID(obj).toString());
     }
 
     @Override
