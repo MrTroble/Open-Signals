@@ -19,6 +19,8 @@ import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.items.Placementtool;
+import com.troblecodings.signals.models.CustomModelLoader;
+import com.troblecodings.signals.models.CustomStateDefinition;
 import com.troblecodings.signals.parser.ValuePack;
 import com.troblecodings.signals.properties.FloatProperty;
 import com.troblecodings.signals.properties.HeightProperty;
@@ -43,8 +45,10 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -110,14 +114,24 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
-        List<SEProperty> properties = new ArrayList<>();
+    protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
+        final List<SEProperty> properties = new ArrayList<>();
         nextConsumer.accept(properties);
         nextConsumer = _u -> {
         };
         properties.add(CUSTOMNAME);
         this.signalProperties = ImmutableList.copyOf(properties);
         builder.add(ANGEL);
+    }
+
+    @Override
+    public StateDefinition<Block, BlockState> getStateDefinition() {
+        if (CustomModelLoader.nico) {
+            return new CustomStateDefinition<Block, BlockState>(block -> block.defaultBlockState(),
+                    this, BlockState::new, new HashMap<String, Property<?>>());
+        } else {
+            return super.getStateDefinition();
+        }
     }
 
     public List<SEProperty> getProperties() {
@@ -145,7 +159,7 @@ public class Signal extends BasicBlock {
         return this.prop.defaultHeight;
     }
 
-    public boolean canHaveCustomname(Map<SEProperty, String> map) {
+    public boolean canHaveCustomname(final Map<SEProperty, String> map) {
         return this.prop.customNameRenderHeight != -1 || !this.prop.customRenderHeights.isEmpty();
     }
 

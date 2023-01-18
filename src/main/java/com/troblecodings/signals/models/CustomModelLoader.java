@@ -28,6 +28,8 @@ import net.minecraftforge.client.model.ForgeModelBakery;
 @OnlyIn(Dist.CLIENT)
 public class CustomModelLoader implements ResourceManagerReloadListener {
 
+    public static boolean nico = false;
+
     private static HashMap<String, List<SignalModelLoaderInfo>> registeredModels = new HashMap<>();
 
     public static final CustomModelLoader INSTANCE = new CustomModelLoader();
@@ -202,22 +204,26 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
         final ForgeModelBakery bakery = ForgeModelBakery.instance();
         if (registeredModels.isEmpty())
             this.onResourceManagerReload(null);
-        registeredModels.forEach((name, loaderList) -> loaderList.forEach(info -> {
-            if (info.model == null)
-                info.with(bakery.getModel(
-                        new ResourceLocation(OpenSignalsMain.MODID, "block/" + info.name)));
-        }));
+        registeredModels.forEach((name, loaderList) -> {
+            loaderList.forEach(info -> {
+                if (info.model == null)
+                    info.with(bakery.getModel(
+                            new ResourceLocation(OpenSignalsMain.MODID, "block/" + info.name)));
+            });
+        });
+        nico = true;
     }
 
-    public void register(ModelBakeEvent event) {
+    public void register(final ModelBakeEvent event) {
         final Map<ResourceLocation, BakedModel> topLevel = event.getModelRegistry();
         registeredModels.forEach((name, loaderList) -> {
-            for (SignalAngel angel : SignalAngel.values()) {
+            for (final SignalAngel angel : SignalAngel.values()) {
                 final ModelResourceLocation location = new ModelResourceLocation(
                         OpenSignalsMain.MODID, name, "angel=" + angel.getNameWrapper());
                 topLevel.put(location,
                         SignalCustomModel.getModel(location, loaderList, event, angel));
             }
         });
+        nico = false;
     }
 }
