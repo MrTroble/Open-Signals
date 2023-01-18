@@ -1,8 +1,11 @@
 package com.troblecodings.signals.guis;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.function.IntConsumer;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -15,9 +18,11 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnum;
+import com.troblecodings.signals.core.PropertyPacket;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
@@ -29,7 +34,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiPlacementtool extends GuiBase {
+public class GuiPlacementtool extends GuiBase implements PropertyPacket {
 
     public static final int GUI_PLACEMENTTOOL = 0;
 
@@ -45,7 +50,8 @@ public class GuiPlacementtool extends GuiBase {
         this.player = info.player;
         final ItemStack stack = info.player.getMainHandItem();
         tool = (Placementtool) stack.getItem();
-        final int usedBlock = 0;
+        final int usedBlock = NBTWrapper.getOrCreateWrapper(stack)
+                .getInteger(Placementtool.BLOCK_TYPE_ID);
         currentSelectedBlock = tool.getObjFromID(usedBlock);
         initInternal();
     }
@@ -60,8 +66,8 @@ public class GuiPlacementtool extends GuiBase {
         lowerEntity.add(GuiElements.createSpacerH(10));
 
         final UIEntity selectBlockEntity = GuiElements.createEnumElement(tool, input -> {
+            sendSignalId(input);
             currentSelectedBlock = tool.getObjFromID(input);
-            lookup.clear();
             this.list.clearChildren();
             initProperties();
             applyModelChanges();
@@ -121,8 +127,15 @@ public class GuiPlacementtool extends GuiBase {
     }
 
     private void initProperties() {
-        for (final SEProperty property : currentSelectedBlock.getProperties()) {
-            of(property, inp -> applyModelChanges());
+        initProperties(currentSelectedBlock.getProperties());
+    }
+
+    private void initProperties(final List<SEProperty> properties) {
+        lookup.clear();
+        for (int i = 0; i < properties.size(); i++) {
+            final SEProperty property = properties.get(i);
+            final int id = i;
+            of(property, inp -> applyPropertyChanges(id, inp));
             lookup.put(property.getName(), property);
         }
     }
@@ -144,6 +157,18 @@ public class GuiPlacementtool extends GuiBase {
     @Override
     public void removed() {
         super.removed();
+    }
+
+    private void applyPropertyChanges(final int propertyId, final int valueId) {
+        sendProperty(player, propertyId, valueId);
+        applyModelChanges();
+    }
+
+    private void sendSignalId(final int id) {
+        final ByteBuffer buffer = ByteBuffer.allocate(5);
+        buffer.put((byte) 255);
+        buffer.putInt(id);
+        OpenSignalsMain.network.sendTo(player, buffer);
     }
 
     public void applyModelChanges() {
