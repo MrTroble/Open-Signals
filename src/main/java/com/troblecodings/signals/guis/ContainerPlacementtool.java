@@ -29,17 +29,16 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final int first = Byte.toUnsignedInt(buf.get());
         final ItemStack stack = player.getMainHandItem();
         final Placementtool tool = (Placementtool) stack.getItem();
-        final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
         if (first == 255) {
+            final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
             final int id = buf.getInt();
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
-            System.out.println("Signal: " + this.signal);
         } else {
+            final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
             final SEProperty property = signal.getProperties().get(first);
             final String value = property.getObjFromID(Byte.toUnsignedInt(buf.get()));
             wrapper.putString(property.getName(), value);
-            System.out.printf("Property change %s: %s %n", property, value);
         }
     }
 
