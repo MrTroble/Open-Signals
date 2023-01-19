@@ -47,7 +47,7 @@ import net.minecraft.world.level.block.Rotation;
 
 public class GIRSyncEntryTests {
 
-    private static final Random RANDOM = new Random();
+    public static final Random RANDOM = new Random();
 
     public static <T extends Enum<T>> T randomEnum(final Class<T> clazz) {
         final T[] values = clazz.getEnumConstants();

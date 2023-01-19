@@ -108,7 +108,6 @@ public class SignalStateFile {
                 "r")) {
             ByteBuffer buffer = ByteBuffer.allocate(STATE_BLOCK_SIZE);
             stream.seek(pos.offset);
-            stream.writeInt(0);
             stream.read(buffer.array());
             return buffer;
         } catch (IOException e) {
@@ -133,7 +132,7 @@ public class SignalStateFile {
             final int lastFile = pathCache.size() - 1;
             final Path path = pathCache.get(lastFile);
             try (RandomAccessFile stream = new RandomAccessFile(path.toFile(), "rw")) {
-                byte[] header = new byte[START_OFFSET];
+                byte[] header = new byte[HEADER_SIZE];
                 stream.read(header);
                 if (header[0] != HEADER_VERSION) {
                     OpenSignalsMain.log.error("Header version miss match! No write!");
