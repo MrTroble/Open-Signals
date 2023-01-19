@@ -2,13 +2,14 @@ package com.troblecodings.signals.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
 
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 
 import net.minecraftforge.client.model.data.ModelProperty;
@@ -17,12 +18,20 @@ public class JsonEnum extends ModelProperty<String> {
 
     private final String name;
     private final List<String> values;
-    private final Set<String> valueSet;
+    private final Map<String, Integer> valueToInt;
 
     public JsonEnum(final String name, final List<String> values) {
         this.name = name;
         this.values = ImmutableList.copyOf(values);
-        this.valueSet = ImmutableSet.copyOf(values);
+        Map<String, Integer> copyValues = new HashMap<>();
+        for (int i = 0; i < values.size(); i++) {
+            copyValues.put(values.get(i), i);
+        }
+        valueToInt = ImmutableMap.copyOf(copyValues);
+    }
+
+    public int getIDFromValue(String value) {
+        return this.valueToInt.get(value);
     }
 
     public String getName() {
@@ -30,7 +39,7 @@ public class JsonEnum extends ModelProperty<String> {
     }
 
     public boolean isValid(final String value) {
-        return valueSet.contains(value);
+        return valueToInt.containsKey(value);
     }
 
     public Class<String> getType() {
@@ -50,7 +59,7 @@ public class JsonEnum extends ModelProperty<String> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, valueSet, values);
+        return Objects.hash(name, valueToInt, values);
     }
 
     @Override
@@ -62,7 +71,7 @@ public class JsonEnum extends ModelProperty<String> {
         if (getClass() != obj.getClass())
             return false;
         final JsonEnum other = (JsonEnum) obj;
-        return Objects.equals(name, other.name) && Objects.equals(valueSet, other.valueSet)
+        return Objects.equals(name, other.name) && Objects.equals(valueToInt, other.valueToInt)
                 && Objects.equals(values, other.values);
     }
 

@@ -67,6 +67,7 @@ public class Signal extends BasicBlock {
 
     protected final SignalProperties prop;
     private List<SEProperty> signalProperties;
+    private Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
     private SEProperty powerProperty = null;
 
     public Signal(final SignalProperties prop) {
@@ -74,6 +75,13 @@ public class Signal extends BasicBlock {
         this.prop = prop;
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
+        for (int i = 0; i < signalProperties.size(); i++) {
+            signalPropertiesToInt.put(signalProperties.get(i), i);
+        }
+    }
+
+    public int getIDFromProperty(SEProperty property) {
+        return this.signalPropertiesToInt.get(property);
     }
 
     @Override
@@ -351,5 +359,5 @@ public class Signal extends BasicBlock {
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
     }
-    
+
 }
