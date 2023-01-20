@@ -2,7 +2,7 @@ package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
@@ -44,10 +44,12 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
     private Signal currentSelectedBlock;
     private final Placementtool tool;
     private final Player player;
+    private final ContainerPlacementtool container;
 
     public GuiPlacementtool(final GuiInfo info) {
         super(info);
         this.player = info.player;
+        this.container = (ContainerPlacementtool) info.base;
         final ItemStack stack = info.player.getMainHandItem();
         tool = (Placementtool) stack.getItem();
         final int usedBlock = NBTWrapper.getOrCreateWrapper(stack)
@@ -66,12 +68,7 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
         lowerEntity.add(GuiElements.createSpacerH(10));
 
         final UIEntity selectBlockEntity = GuiElements.createEnumElement(tool, input -> {
-            sendSignalId(input);
-            currentSelectedBlock = tool.getObjFromID(input);
-            this.list.clearChildren();
-            initProperties();
-            applyModelChanges();
-            this.entity.update();
+            initProperties(input);
         });
         final UIEntity leftSide = new UIEntity();
         leftSide.setInheritHeight(true);
@@ -126,32 +123,39 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
         this.entity.add(lowerEntity);
     }
 
-    private void initProperties() {
-        initProperties(currentSelectedBlock.getProperties());
-    }
-
-    private void initProperties(final List<SEProperty> properties) {
+    private void initProperties(final int id) {
+        currentSelectedBlock = tool.getObjFromID(id);
+        sendSignalId(id);
         lookup.clear();
-        for (int i = 0; i < properties.size(); i++) {
-            final SEProperty property = properties.get(i);
-            final int id = i;
-            of(property, inp -> applyPropertyChanges(id, inp));
+        this.list.clearChildren();
+        final Map<SEProperty, Integer> properties = container.getProperties();
+        properties.forEach((property, value) -> {
+            of(property,
+                    inp -> applyPropertyChanges(currentSelectedBlock.getIDFromProperty(property),
+                            inp),
+                    value);
             lookup.put(property.getName(), property);
-        }
+        });
+        this.entity.update();
     }
 
-    public void of(final SEProperty property, final IntConsumer consumer) {
+    public void of(final SEProperty property, final IntConsumer consumer, final int value) {
         if (property == null)
             return;
         if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
             if (property.getParent().equals(JsonEnum.BOOLEAN)) {
-                list.add(GuiElements.createBoolElement(property, consumer));
+                list.add(GuiElements.createBoolElement(property, consumer, value));
                 return;
             }
-            list.add(GuiElements.createEnumElement(property, consumer));
+            list.add(GuiElements.createEnumElement(property, consumer, value));
         } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-            list.add(GuiElements.createBoolElement(property, consumer));
+            list.add(GuiElements.createBoolElement(property, consumer, value));
         }
+    }
+
+    @Override
+    public void updateFromContainer() {
+        initProperties(container.getSignalID());
     }
 
     @Override
@@ -169,6 +173,11 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
         buffer.put((byte) 255);
         buffer.putInt(id);
         OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    @Override
+    public void deserializeClient(final ByteBuffer buf) {
+        this.container.deserializeClient(buf);
     }
 
     public void applyModelChanges() {

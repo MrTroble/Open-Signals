@@ -76,11 +76,12 @@ public class Signal extends BasicBlock {
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
         for (int i = 0; i < signalProperties.size(); i++) {
-            signalPropertiesToInt.put(signalProperties.get(i), i);
+            final SEProperty property = signalProperties.get(i);
+            signalPropertiesToInt.put(property, i);
         }
     }
 
-    public int getIDFromProperty(SEProperty property) {
+    public int getIDFromProperty(final SEProperty property) {
         return this.signalPropertiesToInt.get(property);
     }
 

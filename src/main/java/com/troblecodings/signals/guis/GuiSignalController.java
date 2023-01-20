@@ -51,7 +51,7 @@ public class GuiSignalController extends GuiBase {
 
     public GuiSignalController(final GuiInfo info) {
         super(info);
-        this.controller = (ContainerSignalController)info.base;
+        this.controller = (ContainerSignalController) info.base;
         info.player.containerMenu = this.controller;
         initInternal();
     }
