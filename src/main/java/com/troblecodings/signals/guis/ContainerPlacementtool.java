@@ -13,13 +13,12 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.PropertyPacket;
 import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
-public class ContainerPlacementtool extends ContainerBase implements INetworkSync, PropertyPacket {
+public class ContainerPlacementtool extends ContainerBase implements INetworkSync {
 
     private int signalID;
     public Map<SEProperty, Integer> properties = new HashMap<>();
