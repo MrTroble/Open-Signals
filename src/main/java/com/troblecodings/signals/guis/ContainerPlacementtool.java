@@ -21,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
 public class ContainerPlacementtool extends ContainerBase implements INetworkSync {
 
     private int signalID;
-    public Map<SEProperty, Integer> properties = new HashMap<>();
+    public final Map<SEProperty, Integer> properties = new HashMap<>();
     private final Player player;
     private Signal signal;
 

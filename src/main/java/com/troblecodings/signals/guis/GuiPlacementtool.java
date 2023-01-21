@@ -1,6 +1,7 @@
 package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
@@ -147,11 +148,12 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
     @Override
     public void updateFromContainer() {
         enumerable.setIndex(container.getSignalID());
-        container.properties.forEach((property, value) -> {
+        final List<SEProperty> originalProperties = currentSelectedBlock.getProperties();
+        originalProperties.forEach(property -> {
             of(property,
                     inp -> applyPropertyChanges(currentSelectedBlock.getIDFromProperty(property),
                             inp),
-                    value);
+                    container.properties.get(property));
         });
         this.entity.update();
         loaded = true;
