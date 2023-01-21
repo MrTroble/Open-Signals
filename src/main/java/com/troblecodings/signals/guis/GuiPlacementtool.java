@@ -1,8 +1,6 @@
 package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
@@ -12,6 +10,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
@@ -40,11 +39,12 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
 
     private final UIEntity list = new UIEntity();
     private final UIBlockRender blockRender = new UIBlockRender();
-    private final HashMap<String, SEProperty> lookup = new HashMap<String, SEProperty>();
     private Signal currentSelectedBlock;
     private final Placementtool tool;
     private final Player player;
     private final ContainerPlacementtool container;
+    private UIEnumerable enumerable;
+    private boolean loaded = false;
 
     public GuiPlacementtool(final GuiInfo info) {
         super(info);
@@ -67,9 +67,16 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
         final UIEntity lowerEntity = new UIEntity();
         lowerEntity.add(GuiElements.createSpacerH(10));
 
-        final UIEntity selectBlockEntity = GuiElements.createEnumElement(tool, input -> {
-            initProperties(input);
-        });
+        enumerable = new UIEnumerable(tool.count(), tool.getName());
+
+        final UIEntity selectBlockEntity = GuiElements.createEnumElement(enumerable, tool,
+                input -> {
+                    currentSelectedBlock = tool.getObjFromID(input);
+                    this.list.clearChildren();
+                    if (container.getSignalID() != input) {
+                        sendSignalId(input);
+                    }
+                });
         final UIEntity leftSide = new UIEntity();
         leftSide.setInheritHeight(true);
         leftSide.setInheritWidth(true);
@@ -123,22 +130,6 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
         this.entity.add(lowerEntity);
     }
 
-    private void initProperties(final int id) {
-        currentSelectedBlock = tool.getObjFromID(id);
-        sendSignalId(id);
-        lookup.clear();
-        this.list.clearChildren();
-        final Map<SEProperty, Integer> properties = container.getProperties();
-        properties.forEach((property, value) -> {
-            of(property,
-                    inp -> applyPropertyChanges(currentSelectedBlock.getIDFromProperty(property),
-                            inp),
-                    value);
-            lookup.put(property.getName(), property);
-        });
-        this.entity.update();
-    }
-
     public void of(final SEProperty property, final IntConsumer consumer, final int value) {
         if (property == null)
             return;
@@ -155,7 +146,15 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
 
     @Override
     public void updateFromContainer() {
-        initProperties(container.getSignalID());
+        enumerable.setIndex(container.getSignalID());
+        container.properties.forEach((property, value) -> {
+            of(property,
+                    inp -> applyPropertyChanges(currentSelectedBlock.getIDFromProperty(property),
+                            inp),
+                    value);
+        });
+        this.entity.update();
+        loaded = true;
     }
 
     @Override
@@ -169,15 +168,12 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
     }
 
     private void sendSignalId(final int id) {
+        if (!loaded)
+            return;
         final ByteBuffer buffer = ByteBuffer.allocate(5);
         buffer.put((byte) 255);
         buffer.putInt(id);
         OpenSignalsMain.network.sendTo(player, buffer);
-    }
-
-    @Override
-    public void deserializeClient(final ByteBuffer buf) {
-        this.container.deserializeClient(buf);
     }
 
     public void applyModelChanges() {

@@ -81,10 +81,6 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
         return this.allowedValues.get(pObjID);
     }
 
-    public int getIDFromObj(final String str) {
-        return this.allowedValues.indexOf(str);
-    }
-
     @Override
     public int count() {
         return this.allowedValues.size();

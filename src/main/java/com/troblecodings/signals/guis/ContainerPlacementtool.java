@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.guilib.ecs.ContainerBase;
@@ -17,14 +16,13 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.PropertyPacket;
 import com.troblecodings.signals.items.Placementtool;
 
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
 public class ContainerPlacementtool extends ContainerBase implements INetworkSync, PropertyPacket {
 
     private int signalID;
-    private Map<SEProperty, Integer> properties = new HashMap<>();
+    public Map<SEProperty, Integer> properties = new HashMap<>();
     private final Player player;
     private Signal signal;
 
@@ -33,9 +31,11 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         info.base = this;
         this.player = info.player;
         info.player.containerMenu = this;
-        if (player instanceof ServerPlayer) {
-            sendItemProperties(player);
-        }
+    }
+
+    @Override
+    public void sendAllDataToRemote() {
+        sendItemProperties(player);
     }
 
     private void sendItemProperties(final Player player) {
@@ -43,14 +43,15 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final Placementtool tool = (Placementtool) stack.getItem();
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
         final int signalID = wrapper.getInteger(Placementtool.BLOCK_TYPE_ID);
-        final Signal signal = tool.getObjFromID(signalID);
+        signal = tool.getObjFromID(signalID);
         final List<SEProperty> properites = signal.getProperties();
         final List<Byte> propertiesToSend = new ArrayList<>();
         for (int i = 0; i < properites.size(); i++) {
             final SEProperty property = properites.get(i);
             if (wrapper.contains(property.getName())) {
                 propertiesToSend.add((byte) i);
-                propertiesToSend.add((byte) wrapper.getInteger(property.getName()));
+                final String value = wrapper.getString(property.getName());
+                propertiesToSend.add((byte) property.getParent().getIDFromValue(value));
             }
         }
         final ByteBuffer buffer = ByteBuffer.allocate(propertiesToSend.size() + 5);
@@ -70,8 +71,13 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         if (first == 255) {
             final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
             final int id = buf.getInt();
+            if (wrapper.getInteger(Placementtool.BLOCK_TYPE_ID) == id) {
+                return;
+            }
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
+            properties.clear();
+            sendItemProperties(player);
         } else {
             final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
             final SEProperty property = signal.getProperties().get(first);
@@ -87,6 +93,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final Placementtool tool = (Placementtool) player.getMainHandItem().getItem();
         final Signal signal = tool.getObjFromID(signalID);
         final List<SEProperty> signalProperties = signal.getProperties();
+        properties.clear();
         for (int i = 0; i < size / 2; i++) {
             final SEProperty property = signalProperties.get(Byte.toUnsignedInt(buf.get()));
             final int value = Byte.toUnsignedInt(buf.get());
@@ -94,14 +101,11 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         }
         signalProperties.forEach(property -> {
             if (!properties.containsKey(property)) {
-                properties.put(property, property.getIDFromObj(property.getDefault()));
+                properties.put(property,
+                        property.getParent().getIDFromValue(property.getDefault()));
             }
         });
         update();
-    }
-
-    public Map<SEProperty, Integer> getProperties() {
-        return ImmutableMap.copyOf(properties);
     }
 
     public int getSignalID() {

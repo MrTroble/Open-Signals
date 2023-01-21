@@ -29,7 +29,6 @@ public class Placementtool extends Item
     public static final String SIGNAL_CUSTOMNAME = "customname";
 
     public final ArrayList<Signal> signals = new ArrayList<>();
-    public GuiPlacementtool guiPlacementtool;
 
     public Placementtool() {
         super(new Item.Properties().tab(OSTabs.TAB));
@@ -43,8 +42,8 @@ public class Placementtool extends Item
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level worldIn, Player player,
-            InteractionHand hand) {
+    public InteractionResultHolder<ItemStack> use(final Level worldIn, final Player player,
+            final InteractionHand hand) {
         if (!worldIn.isClientSide) {
             OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
                     player.getOnPos(), "placementtool");

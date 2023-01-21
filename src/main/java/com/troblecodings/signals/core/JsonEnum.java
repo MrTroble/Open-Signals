@@ -95,5 +95,5 @@ public class JsonEnum extends ModelProperty<String> {
     }
 
     static final Gson GSON = new Gson();
-    public static JsonEnum BOOLEAN = new JsonEnum("boolean", ImmutableList.of("true", "false"));
+    public static JsonEnum BOOLEAN = new JsonEnum("boolean", ImmutableList.of("false", "true"));
 }
