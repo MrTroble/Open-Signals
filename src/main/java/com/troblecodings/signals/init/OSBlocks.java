@@ -94,9 +94,13 @@ public final class OSBlocks {
         if (POST.getRegistryName() == null)
             OSBlocks.init();
         final IForgeRegistry<Item> registry = event.getRegistry();
-        blocksToRegister.forEach(
-                block -> registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
-                        .setRegistryName(block.getRegistryName())));
+        blocksToRegister.forEach(block -> {
+            if (block instanceof Signal || block instanceof GhostBlock)
+                return;
+            registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
+                    .setRegistryName(block.getRegistryName()));
+        });
+
     }
 
 }

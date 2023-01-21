@@ -1,22 +1,27 @@
 package com.troblecodings.signals.items;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import com.troblecodings.core.MessageWrapper;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.guis.GuiPlacementtool;
+import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
 
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
@@ -53,7 +58,7 @@ public class Placementtool extends Item
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext context) {
+    public InteractionResult useOn(final UseOnContext context) {
         final Player player = context.getPlayer();
         final Level worldIn = context.getLevel();
         if (player.isShiftKeyDown()) {
@@ -63,7 +68,26 @@ public class Placementtool extends Item
             }
             return InteractionResult.sidedSuccess(worldIn.isClientSide);
         }
-        return super.useOn(context);
+        final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(player.getMainHandItem());
+        final Signal signal = getObjFromID(wrapper.getInteger(BLOCK_TYPE_ID));
+        final int height = signal.getHeight(new HashMap<>()); // TODO SignalStateHander
+        final BlockPos pos = context.getClickedPos().above();
+        BlockPos checkPos = pos;
+        for (int i = 0; i < height; i++) {
+            if (!worldIn.isEmptyBlock(checkPos = checkPos.above())) {
+                if (!worldIn.isClientSide)
+                    messageWrapper(player,
+                            "Not able to place because other blocks are in the way!");
+                return InteractionResult.FAIL;
+            }
+        }
+        BlockPos ghostPos = pos.above();
+        for (int i = 0; i < height; i++) {
+            worldIn.setBlock(ghostPos, OSBlocks.GHOST_BLOCK.defaultBlockState(), 3);
+            ghostPos = ghostPos.above();
+        }
+        worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
