@@ -2,6 +2,8 @@ package com.troblecodings.signals.items;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
@@ -12,6 +14,8 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
+import com.troblecodings.signals.statehandler.SignalStateHandler;
+import com.troblecodings.signals.statehandler.SignalStateInfo;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -69,15 +73,23 @@ public class Placementtool extends Item
             return InteractionResult.sidedSuccess(worldIn.isClientSide);
         }
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(player.getMainHandItem());
+        if (!wrapper.contains(BLOCK_TYPE_ID)) {
+            translateMessageWrapper(player, "pt.itemnotset");
+            return InteractionResult.FAIL;
+        }
         final Signal signal = getObjFromID(wrapper.getInteger(BLOCK_TYPE_ID));
-        final int height = signal.getHeight(new HashMap<>()); // TODO SignalStateHander
+        final List<SEProperty> properties = signal.getProperties();
+        final Map<SEProperty, String> signalProperties = new HashMap<>();
+        properties.forEach(property -> {
+            signalProperties.put(property, wrapper.getString(property.getName()));
+        });
+        final int height = signal.getHeight(signalProperties);
         final BlockPos pos = context.getClickedPos().above();
         BlockPos checkPos = pos;
         for (int i = 0; i < height; i++) {
             if (!worldIn.isEmptyBlock(checkPos = checkPos.above())) {
                 if (!worldIn.isClientSide)
-                    messageWrapper(player,
-                            "Not able to place because other blocks are in the way!");
+                    translateMessageWrapper(player, "pt.blockinway");
                 return InteractionResult.FAIL;
             }
         }
@@ -87,6 +99,8 @@ public class Placementtool extends Item
             ghostPos = ghostPos.above();
         }
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
+        final SignalStateInfo info = new SignalStateInfo(worldIn, pos);
+        SignalStateHandler.setStates(info, signalProperties);
         return InteractionResult.SUCCESS;
     }
 

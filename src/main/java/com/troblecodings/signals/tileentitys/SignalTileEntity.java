@@ -1,7 +1,10 @@
 package com.troblecodings.signals.tileentitys;
 
+import java.util.Map;
+
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
@@ -9,6 +12,9 @@ import com.troblecodings.signals.statehandler.SignalStateHandler;
 import com.troblecodings.signals.statehandler.SignalStateInfo;
 
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelDataMap.Builder;
 
 public class SignalTileEntity extends BasicBlockEntity implements NamableWrapper, ISyncable {
 
@@ -47,7 +53,14 @@ public class SignalTileEntity extends BasicBlockEntity implements NamableWrapper
                 str);
     }
 
-    public String getSignalName() {
-        return customName;
+    @Override
+    public IModelData getModelData() {
+        final Map<SEProperty, String> states = SignalStateHandler
+                .getStates(new SignalStateInfo(level, worldPosition));
+        final Builder builder = new ModelDataMap.Builder();
+        states.forEach((property, value) -> {
+            builder.withInitial(property, value);
+        });
+        return builder.build();
     }
 }

@@ -92,7 +92,8 @@ public class Signal extends BasicBlock {
         if (te == null)
             return Shapes.block();
         return Shapes.create(Shapes.block().bounds().expandTowards(0,
-                getHeight(SignalStateHandler.getStates(new SignalStateInfo(source, pos))), 0));
+                getHeight(SignalStateHandler.getStates(new SignalStateInfo(te.getLevel(), pos))),
+                0));
     }
 
     @Override
@@ -293,7 +294,10 @@ public class Signal extends BasicBlock {
             final BlockPos pos, final Direction side) {
         if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null)
             return 0;
-        final SignalStateInfo stateInfo = new SignalStateInfo(blockAccess, pos);
+        if (!(blockAccess instanceof Level)) {
+            return 0;
+        }
+        final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos);
         if (SignalStateHandler.getState(stateInfo, powerProperty)
                 .filter(power -> power.equals("false")).isPresent()) {
             return 0;
