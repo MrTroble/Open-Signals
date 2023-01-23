@@ -167,7 +167,10 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static void unRenderClients(final SignalStateInfo stateInfo) {
-        final ByteBuffer buffer = ByteBuffer.allocate(1);
+        final ByteBuffer buffer = ByteBuffer.allocate(13);
+        buffer.putInt(stateInfo.pos.getX());
+        buffer.putInt(stateInfo.pos.getY());
+        buffer.putInt(stateInfo.pos.getZ());
         buffer.put((byte) 255);
         stateInfo.world.players().forEach(player -> {
             if (checkInRange(player.blockPosition(), stateInfo.pos)) {
@@ -185,6 +188,9 @@ public final class SignalStateHandler implements INetworkSync {
         buffer.putInt(stateInfo.pos.getX());
         buffer.putInt(stateInfo.pos.getY());
         buffer.putInt(stateInfo.pos.getZ());
+        if (properties.size() > 254) {
+            throw new IllegalStateException("To many SEProperties!");
+        }
         buffer.put((byte) properties.size());
         properties.forEach((property, value) -> {
             buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
