@@ -8,7 +8,8 @@ import net.minecraft.world.entity.player.Player;
 
 public interface PropertyPacket {
 
-    default void sendProperty(final Player player, final int idProperty, final int idvalue) {
+    default void sendPropertytoServer(final Player player, final int idProperty,
+            final int idvalue) {
         final ByteBuffer buffer = ByteBuffer.allocate(2);
         buffer.put((byte) idProperty);
         buffer.put((byte) idvalue);

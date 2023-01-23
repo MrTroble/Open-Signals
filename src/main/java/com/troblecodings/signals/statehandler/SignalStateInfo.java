@@ -5,7 +5,6 @@ import java.util.Objects;
 import com.troblecodings.signals.blocks.Signal;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 
 public class SignalStateInfo {

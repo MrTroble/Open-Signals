@@ -34,6 +34,7 @@ public final class SignalStateHandler {
         synchronized (currentlyLoadedStates) {
             if (currentlyLoadedStates.containsKey(info)) {
                 currentlyLoadedStates.put(info, states);
+                sendPropertiesToClient(info, states);
                 return;
             }
         }
@@ -95,6 +96,22 @@ public final class SignalStateHandler {
             map.put(property, value);
         }
         return map;
+    }
+
+    private static void sendPropertiesToClient(final SignalStateInfo stateInfo,
+            final Map<SEProperty, String> properties) {
+        if (properties.isEmpty())
+            return;
+        final ByteBuffer buffer = ByteBuffer.allocate(13 + properties.size() * 2);
+        buffer.putInt(stateInfo.pos.getX());
+        buffer.putInt(stateInfo.pos.getY());
+        buffer.putInt(stateInfo.pos.getZ());
+        buffer.put((byte) properties.size());
+        properties.forEach((property, value) -> {
+            buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
+            buffer.put((byte) property.getParent().getIDFromValue(value));
+        });
+        // TODO add network handler
     }
 
     @SubscribeEvent
