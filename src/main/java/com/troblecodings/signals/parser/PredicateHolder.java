@@ -20,16 +20,17 @@ public final class PredicateHolder {
         return ebs -> ebs.get(property) == null;
     }
 
-    @SuppressWarnings("unchecked")
     public static Predicate<ModelInfoWrapper> with(final ValuePack pack) {
         return with(pack.property, pack.predicate);
     }
 
-    public static Predicate<ModelInfoWrapper> with(final SEProperty property,
-            final Predicate<ModelInfoWrapper> t) {
+    @SuppressWarnings({
+            "unchecked", "rawtypes"
+    })
+    public static Predicate<ModelInfoWrapper> with(final SEProperty property, final Predicate t) {
         return ebs -> {
             final Object test = ebs.get(property);
-            return test != null && t.test(ebs);
+            return test != null && t.test(test);
         };
     }
 
