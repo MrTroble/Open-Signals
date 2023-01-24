@@ -65,6 +65,9 @@ public class Placementtool extends Item
     public InteractionResult useOn(final UseOnContext context) {
         final Player player = context.getPlayer();
         final Level worldIn = context.getLevel();
+        if (worldIn.isEmptyBlock(context.getClickedPos())) {
+            return InteractionResult.FAIL;
+        }
         if (player.isShiftKeyDown()) {
             if (!worldIn.isClientSide) {
                 OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,

@@ -70,9 +70,6 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         if (first == 255) {
             final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
             final int id = buf.getInt();
-            if (wrapper.getInteger(Placementtool.BLOCK_TYPE_ID) == id) {
-                return;
-            }
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
             properties.clear();

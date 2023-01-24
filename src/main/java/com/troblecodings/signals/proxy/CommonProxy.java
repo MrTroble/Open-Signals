@@ -15,6 +15,7 @@ import com.troblecodings.signals.contentpacks.ChangeConfigParser;
 import com.troblecodings.signals.contentpacks.DefaultConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
 import com.troblecodings.signals.guis.ContainerPlacementtool;
+import com.troblecodings.signals.guis.ContainerSignal;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.init.OSItems;
@@ -36,7 +37,7 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(Placementtool.class, ContainerPlacementtool::new);
         OpenSignalsMain.handler.addServer(SignalController.class, ContainerSignalController::new);
         OpenSignalsMain.handler.addServer(SignalBox.class, ContainerSignalBox::new);
-        OpenSignalsMain.handler.addServer(Signal.class, ContainerBase::new);
+        OpenSignalsMain.handler.addServer(Signal.class, ContainerSignal::new);
         OpenSignalsMain.handler.addServer(RedstoneIO.class, ContainerBase::new);
     }
 

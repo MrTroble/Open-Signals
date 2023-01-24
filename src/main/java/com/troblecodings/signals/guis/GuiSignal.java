@@ -7,19 +7,17 @@ import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.resources.language.I18n;
 
 public class GuiSignal extends GuiBase {
 
-    private final SignalTileEntity tile;
     private UILabel labelComp;
+    private final ContainerSignal container;
 
     public GuiSignal(final GuiInfo info) {
         super(info);
-        this.tile = info.getTile();
-        initOwn();
+        this.container = (ContainerSignal) info.base;
     }
 
     private void initOwn() {
@@ -33,7 +31,8 @@ public class GuiSignal extends GuiBase {
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(inner);
 
-        final UIEntity label = GuiElements.createLabel(tile.getNameWrapper(), 0x7678a0);
+        final UIEntity label = GuiElements.createLabel(container.signalTile.getNameWrapper(),
+                0x7678a0);
         label.setScaleX(1.5f);
         label.setScaleY(1.5f);
         label.findRecursive(UILabel.class).forEach(l -> labelComp = l);
@@ -52,7 +51,6 @@ public class GuiSignal extends GuiBase {
         textfield.setInheritWidth(true);
 
         final UITextInput input = new UITextInput(""); // TODO
-        input.setText(tile.getNameWrapper());
         textfield.add(input);
 
         hbox.add(textfield);
@@ -70,4 +68,8 @@ public class GuiSignal extends GuiBase {
         labelComp.setText(input);
     }
 
+    @Override
+    public void updateFromContainer() {
+        initOwn();
+    }
 }

@@ -36,6 +36,8 @@ public class SignalTileEntity extends BasicBlockEntity implements NamableWrapper
 
     @Override
     public String getNameWrapper() {
+        if (customName == null || customName.isEmpty())
+            return getSignal().getSignalTypeName();
         return customName;
     }
 
