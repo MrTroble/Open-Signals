@@ -10,6 +10,7 @@ import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -26,8 +27,11 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ClientCustomPayloadEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
@@ -49,7 +53,7 @@ public final class SignalStateHandler implements INetworkSync {
         channel.registerObject(new SignalStateHandler());
     }
 
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
+    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(3);
 
     public static void createStates(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
@@ -214,6 +218,17 @@ public final class SignalStateHandler implements INetworkSync {
         });
     }
 
+    @SubscribeEvent
+    public static void onWorldSave(WorldEvent.Save save) {
+        SERVICE.execute(() -> {
+            final Map<SignalStateInfo, Map<SEProperty, String>> maps;
+            synchronized (currentlyLoadedStates) {
+                maps = ImmutableMap.copyOf(currentlyLoadedStates);
+            }
+            maps.forEach(SignalStateHandler::createToFile);
+        });
+    }
+
     private static void unRenderClients(final SignalStateInfo stateInfo) {
         final ByteBuffer buffer = ByteBuffer.allocate(13);
         buffer.putInt(stateInfo.pos.getX());
@@ -264,7 +279,6 @@ public final class SignalStateHandler implements INetworkSync {
         return playerPos.distManhattan(signalPos) <= RENDER_DISTANCE;
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public void deserializeClient(final ByteBuffer buf) {
         final BlockPos signalPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
@@ -277,16 +291,17 @@ public final class SignalStateHandler implements INetworkSync {
         }
         SERVICE.execute(() -> {
             final Minecraft mc = Minecraft.getInstance();
-            while (!mc.player.level.isAreaLoaded(signalPos, 1))
+            BlockState state;
+            while ((state = mc.player.level.getBlockState(signalPos)) == null
+                    || state.equals(Blocks.VOID_AIR.defaultBlockState())) {
                 continue;
+            }
             final SignalStateInfo stateInfo = new SignalStateInfo(mc.player.level, signalPos);
             final List<SEProperty> signalProperties = stateInfo.signal.getProperties();
-            Map<SEProperty, String> properties;
+            Map<SEProperty, String> properties = new HashMap<>();
             synchronized (currentlyLoadedStates) {
                 if (currentlyLoadedStates.containsKey(stateInfo)) {
                     properties = currentlyLoadedStates.get(stateInfo);
-                } else {
-                    properties = new HashMap<>();
                 }
             }
             for (int i = 0; i < propertiesSize; i++) {
@@ -298,6 +313,7 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (currentlyLoadedStates) {
                 currentlyLoadedStates.put(stateInfo, properties);
             }
+            mc.player.level.setBlocksDirty(signalPos, state, state);
         });
     }
 
