@@ -56,7 +56,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (currentlyLoadedStates) {
             currentlyLoadedStates.put(info, states);
         }
-        if(info.world.isClientSide)
+        if (info.world.isClientSide)
             return;
         sendPropertiesToClient(info, states);
         createToFile(info, states);
@@ -241,6 +241,10 @@ public final class SignalStateHandler implements INetworkSync {
         }
         buffer.put((byte) properties.size());
         properties.forEach((property, value) -> {
+            if (property.equals(Signal.CUSTOMNAME)) {
+                // TODO send SignalName
+                return;
+            }
             buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
             buffer.put((byte) property.getParent().getIDFromValue(value));
         });
@@ -260,6 +264,7 @@ public final class SignalStateHandler implements INetworkSync {
         return playerPos.distManhattan(signalPos) <= RENDER_DISTANCE;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void deserializeClient(final ByteBuffer buf) {
         final BlockPos signalPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());

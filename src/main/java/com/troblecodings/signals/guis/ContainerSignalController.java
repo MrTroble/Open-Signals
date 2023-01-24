@@ -23,7 +23,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
 
     public ContainerSignalController(final GuiInfo info) {
         super(info);
-        this.pos = info.pos == null ? BlockPos.ZERO:info.pos;
+        this.pos = info.pos == null ? BlockPos.ZERO : info.pos;
     }
 
     public Map<SEProperty, String> getReference() {

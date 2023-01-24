@@ -3,6 +3,7 @@ package com.troblecodings.signals;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -109,6 +110,26 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
 
     public JsonEnum getParent() {
         return parent;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(allowedValues, defaultValue, deps, name, parent, stage);
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        final SEProperty other = (SEProperty) obj;
+        return Objects.equals(allowedValues, other.allowedValues)
+                && Objects.equals(defaultValue, other.defaultValue)
+                && Objects.equals(deps, other.deps) && Objects.equals(name, other.name)
+                && Objects.equals(parent, other.parent) && stage == other.stage;
     }
 
     public static class SEAutoNameProp extends SEProperty {

@@ -32,11 +32,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -79,6 +81,13 @@ public class Signal extends BasicBlock {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
+    }
+
+    @Override
+    public BlockState getStateForPlacement(final BlockPlaceContext context) {
+        int angel = Integer
+                .valueOf(Mth.floor((double) (context.getRotation() * 16.0F / 360.0F) + 0.5D) & 15);
+        return defaultBlockState().setValue(ANGEL, SignalAngel.values()[angel]);
     }
 
     public int getIDFromProperty(final SEProperty property) {
@@ -141,9 +150,7 @@ public class Signal extends BasicBlock {
     @Override
     public void destroy(final LevelAccessor worldIn, final BlockPos pos, final BlockState state) {
         super.destroy(worldIn, pos, state);
-
-        if (!worldIn.isClientSide())
-            GhostBlock.destroyUpperBlock(worldIn, pos);
+        GhostBlock.destroyUpperBlock(worldIn, pos);
     }
 
     @SuppressWarnings("unchecked")

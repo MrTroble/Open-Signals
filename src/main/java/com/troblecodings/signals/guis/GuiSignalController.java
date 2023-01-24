@@ -164,6 +164,7 @@ public class GuiSignalController extends GuiBase {
         rightSide.add(toggle);
 
         for (final Direction face : Direction.values()) {
+            @SuppressWarnings("deprecation")
             final List<BakedQuad> quad = model.getQuads(state, face, SignalCustomModel.RANDOM);
             final UIEntity faceEntity = new UIEntity();
             faceEntity.setWidth(20);
