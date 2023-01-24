@@ -29,7 +29,7 @@ public final class PredicateHolder {
             final Predicate<ModelInfoWrapper> t) {
         return ebs -> {
             final Object test = ebs.get(property);
-            return test != null && t.test((ModelInfoWrapper) test);
+            return test != null && t.test(ebs);
         };
     }
 

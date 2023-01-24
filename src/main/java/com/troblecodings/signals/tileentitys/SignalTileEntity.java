@@ -8,6 +8,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.statehandler.SignalStateHandler;
 import com.troblecodings.signals.statehandler.SignalStateInfo;
 
@@ -61,6 +62,6 @@ public class SignalTileEntity extends BasicBlockEntity implements NamableWrapper
         states.forEach((property, value) -> {
             builder.withInitial(property, value);
         });
-        return builder.build();
+        return new ModelInfoWrapper(builder.build());
     }
 }

@@ -20,6 +20,7 @@ import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
+import com.troblecodings.signals.statehandler.SignalStateHandler;
 
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
@@ -27,6 +28,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 public class CommonProxy {
 
     public void initModEvent(final FMLConstructModEvent event) {
+        SignalStateHandler.init();
         Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
         OpenSignalsMain.handler = init.getKey();

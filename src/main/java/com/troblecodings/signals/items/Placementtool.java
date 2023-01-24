@@ -81,7 +81,9 @@ public class Placementtool extends Item
         final List<SEProperty> properties = signal.getProperties();
         final Map<SEProperty, String> signalProperties = new HashMap<>();
         properties.forEach(property -> {
-            signalProperties.put(property, wrapper.getString(property.getName()));
+            final String name = property.getName();
+            if(wrapper.contains(name))
+                signalProperties.put(property, wrapper.getString(name));
         });
         final int height = signal.getHeight(signalProperties);
         final BlockPos pos = context.getClickedPos().above();
@@ -100,7 +102,7 @@ public class Placementtool extends Item
         }
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos);
-        SignalStateHandler.setStates(info, signalProperties);
+        SignalStateHandler.createStates(info, signalProperties);
         return InteractionResult.SUCCESS;
     }
 
