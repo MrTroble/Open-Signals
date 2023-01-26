@@ -1,5 +1,7 @@
 package com.troblecodings.signals.guis;
 
+import java.nio.ByteBuffer;
+
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -7,17 +9,24 @@ import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
 
-public class GuiSignal extends GuiBase {
+public class NamableGui extends GuiBase {
 
     private UILabel labelComp;
-    private final ContainerSignal container;
+    private final NamableContainer container;
+    private final Player player;
 
-    public GuiSignal(final GuiInfo info) {
+    public NamableGui(final GuiInfo info) {
         super(info);
-        this.container = (ContainerSignal) info.base;
+        this.container = (NamableContainer) info.base;
+        this.player = info.player;
     }
 
     private void initOwn() {
@@ -30,9 +39,9 @@ public class GuiSignal extends GuiBase {
         inner.add(new UIBox(UIBox.VBOX, 2));
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(inner);
+        this.entity.add(GuiElements.createSpacerH(10));
 
-        final UIEntity label = GuiElements.createLabel(container.signalTile.getNameWrapper(),
-                0x7678a0);
+        final UIEntity label = GuiElements.createLabel(container.tile.getNameWrapper(), 0x7678a0);
         label.setScaleX(1.5f);
         label.setScaleY(1.5f);
         label.findRecursive(UILabel.class).forEach(l -> labelComp = l);
@@ -51,6 +60,7 @@ public class GuiSignal extends GuiBase {
         textfield.setInheritWidth(true);
 
         final UITextInput input = new UITextInput(""); // TODO
+        input.setText(container.tile.getNameWrapper());
         textfield.add(input);
 
         hbox.add(textfield);
@@ -59,12 +69,33 @@ public class GuiSignal extends GuiBase {
         apply.setInheritWidth(false);
         apply.setWidth(60);
         hbox.add(apply);
-
         inner.add(hbox);
+        if (!(container.tile instanceof RedstoneIOTileEntity)) {
+            return;
+        }
+        inner.add(GuiElements.createLabel(I18n.get("label.linkedto")));
+        final UIEntity list = new UIEntity();
+        list.setInheritHeight(true);
+        list.setInheritWidth(true);
+        final UIBox layout = new UIBox(UIBox.VBOX, 5);
+        list.add(layout);
+        this.container.tile.getLinkedPos().forEach(pos -> list.add(GuiElements.createLabel(
+                String.format("%s: x=%d, y=%d, z=%d", OSBlocks.SIGNAL_BOX.getName().getString(),
+                        pos.getX(), pos.getY(), pos.getZ()))));
+        inner.add(list);
+        inner.add(GuiElements.createPageSelect(layout));
     }
 
     private void updateText(final String input) {
-        // TODO
+        if (input.isEmpty() || NameHandler.getName(container.pos).equalsIgnoreCase(input))
+            return;
+        final byte[] bytes = input.getBytes();
+        final ByteBuffer buffer = ByteBuffer.allocate(1 + bytes.length);
+        buffer.put((byte) input.length());
+        for (final byte b : bytes) {
+            buffer.put(b);
+        }
+        OpenSignalsMain.network.sendTo(player, buffer);
         labelComp.setText(input);
     }
 

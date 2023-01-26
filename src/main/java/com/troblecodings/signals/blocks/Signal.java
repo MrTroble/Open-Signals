@@ -17,14 +17,14 @@ import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.handler.SignalStateHandler;
+import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.parser.ValuePack;
 import com.troblecodings.signals.properties.FloatProperty;
 import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
-import com.troblecodings.signals.statehandler.SignalStateHandler;
-import com.troblecodings.signals.statehandler.SignalStateInfo;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.Minecraft;

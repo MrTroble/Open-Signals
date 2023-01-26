@@ -1,4 +1,4 @@
-package com.troblecodings.signals.statehandler;
+package com.troblecodings.signals.handler;
 
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
@@ -47,7 +47,7 @@ public final class SignalStateHandler implements INetworkSync {
     private static ResourceLocation channelName;
 
     public static void init() {
-        channelName = new ResourceLocation(OpenSignalsMain.MODID, "signal");
+        channelName = new ResourceLocation(OpenSignalsMain.MODID, "signalstatehandler");
         channel = NetworkRegistry.newEventChannel(channelName, () -> OpenSignalsMain.MODID,
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new SignalStateHandler());

@@ -1,4 +1,4 @@
-package com.troblecodings.signals.statehandler;
+package com.troblecodings.signals.handler;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;

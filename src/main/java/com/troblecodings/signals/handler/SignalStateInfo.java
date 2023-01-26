@@ -1,4 +1,4 @@
-package com.troblecodings.signals.statehandler;
+package com.troblecodings.signals.handler;
 
 import java.util.Objects;
 
