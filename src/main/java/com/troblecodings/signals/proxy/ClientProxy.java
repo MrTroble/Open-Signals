@@ -7,10 +7,9 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.guis.GuiPlacementtool;
-import com.troblecodings.signals.guis.GuiRedstoneIO;
-import com.troblecodings.signals.guis.GuiSignal;
 import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.GuiSignalController;
+import com.troblecodings.signals.guis.NamableGui;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.tileentitys.SignalSpecialRenderer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
@@ -28,8 +27,8 @@ public class ClientProxy extends CommonProxy {
         OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);
         OpenSignalsMain.handler.addGui(SignalController.class, GuiSignalController::new);
         OpenSignalsMain.handler.addGui(SignalBox.class, GuiSignalBox::new);
-        OpenSignalsMain.handler.addGui(RedstoneIO.class, GuiRedstoneIO::new);
-        OpenSignalsMain.handler.addGui(Signal.class, GuiSignal::new);
+        OpenSignalsMain.handler.addGui(RedstoneIO.class, NamableGui::new);
+        OpenSignalsMain.handler.addGui(Signal.class, NamableGui::new);
     }
 
     @SuppressWarnings("unchecked")

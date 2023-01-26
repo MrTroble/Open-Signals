@@ -1,14 +1,22 @@
 package com.troblecodings.signals.tileentitys;
 
-import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.TileEntityInfo;
+import java.util.ArrayList;
+import java.util.List;
 
+import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.interfaces.NamableWrapper;
+import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.handler.NameHandler;
+
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class BasicBlockEntity extends BlockEntity {
+public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
     public static final String GUI_TAG = "guiTag";
+    protected final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
+    protected String customName = null;
 
     public BasicBlockEntity(final TileEntityInfo info) {
         super(info.type, info.pos, info.state);
@@ -30,5 +38,20 @@ public class BasicBlockEntity extends BlockEntity {
     public final void load(final CompoundTag tag) {
         this.loadWrapper(new NBTWrapper(tag));
         super.load(tag);
+    }
+
+    public List<BlockPos> getLinkedPos() {
+        return linkedPositions;
+    }
+
+    @Override
+    public String getNameWrapper() {
+        if (customName == null)
+            customName = NameHandler.getName(worldPosition);
+        return customName;
+    }
+
+    public boolean hasCustomName() {
+        return customName != null;
     }
 }

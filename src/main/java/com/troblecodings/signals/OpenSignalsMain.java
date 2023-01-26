@@ -6,13 +6,14 @@ import org.apache.logging.log4j.core.LoggerContext;
 
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
+import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSModels;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
-import com.troblecodings.signals.statehandler.SignalStateHandler;
 
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -48,6 +49,7 @@ public class OpenSignalsMain {
         eventBus.register(OSItems.class);
         eventBus.register(OSSounds.class);
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
+        MinecraftForge.EVENT_BUS.register(NameHandler.class);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
     }
 

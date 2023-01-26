@@ -12,10 +12,10 @@ import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.handler.SignalStateHandler;
+import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
-import com.troblecodings.signals.statehandler.SignalStateHandler;
-import com.troblecodings.signals.statehandler.SignalStateInfo;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;

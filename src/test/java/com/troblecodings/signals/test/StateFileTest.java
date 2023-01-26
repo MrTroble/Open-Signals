@@ -18,8 +18,8 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.statehandler.SignalStateFile;
-import com.troblecodings.signals.statehandler.SignalStatePos;
+import com.troblecodings.signals.handler.SignalStateFile;
+import com.troblecodings.signals.handler.SignalStatePos;
 
 import net.minecraft.core.BlockPos;
 

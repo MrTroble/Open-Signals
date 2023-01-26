@@ -1,7 +1,7 @@
 package com.troblecodings.signals.signalbox.config;
 
 import com.troblecodings.signals.enums.PathType;
-import com.troblecodings.signals.statehandler.SignalStateInfo;
+import com.troblecodings.signals.handler.SignalStateInfo;
 
 public class ConfigInfo {
 
