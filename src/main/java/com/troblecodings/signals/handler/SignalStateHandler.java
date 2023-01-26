@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -229,6 +230,19 @@ public final class SignalStateHandler implements INetworkSync {
         });
     }
 
+    @SubscribeEvent
+    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
+        final Player player = event.getPlayer();
+        Map<SignalStateInfo, Map<SEProperty, String>> map;
+        synchronized (currentlyLoadedStates) {
+            map = ImmutableMap.copyOf(currentlyLoadedStates);
+        }
+        map.forEach((state, properites) -> {
+            final ByteBuffer buffer = packToByteBuffer(state, properites);
+            sendTo(player, buffer);
+        });
+    }
+
     private static void unRenderClients(final SignalStateInfo stateInfo) {
         final ByteBuffer buffer = ByteBuffer.allocate(13);
         buffer.putInt(stateInfo.pos.getX());
@@ -242,11 +256,8 @@ public final class SignalStateHandler implements INetworkSync {
         });
     }
 
-    private static void sendPropertiesToClient(final SignalStateInfo stateInfo,
+    private static ByteBuffer packToByteBuffer(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties) {
-        if (properties == null || properties.isEmpty()) {
-            return;
-        }
         final ByteBuffer buffer = ByteBuffer.allocate(13 + properties.size() * 2);
         buffer.putInt(stateInfo.pos.getX());
         buffer.putInt(stateInfo.pos.getY());
@@ -263,6 +274,15 @@ public final class SignalStateHandler implements INetworkSync {
             buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
             buffer.put((byte) property.getParent().getIDFromValue(value));
         });
+        return buffer;
+    }
+
+    private static void sendPropertiesToClient(final SignalStateInfo stateInfo,
+            final Map<SEProperty, String> properties) {
+        if (properties == null || properties.isEmpty()) {
+            return;
+        }
+        final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         stateInfo.world.players().forEach(player -> {
             if (checkInRange(player.blockPosition(), stateInfo.pos)) {
                 sendTo(player, buffer);
@@ -310,8 +330,7 @@ public final class SignalStateHandler implements INetworkSync {
             }
             for (int i = 0; i < propertiesSize; i++) {
                 final SEProperty property = signalProperties.get(propertyIDs[i]);
-                final List<String> values = (List<String>) property.getParent().getAllowedValues();
-                final String value = values.get(valueIDs[i]);
+                final String value = property.getObjFromID(valueIDs[i]);
                 properties.put(property, value);
             }
             synchronized (currentlyLoadedStates) {

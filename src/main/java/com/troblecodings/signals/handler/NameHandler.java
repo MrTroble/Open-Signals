@@ -18,6 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkRegistry;
@@ -49,10 +50,19 @@ public final class NameHandler implements INetworkSync {
     }
 
     public static String getName(final BlockPos pos) {
-        return allNames.get(pos);
+        synchronized (allNames) {
+            return allNames.get(pos);
+        }
     }
 
     private static void sendNameToClient(final Level world, final BlockPos pos, final String name) {
+        final ByteBuffer buffer = packToBuffer(pos, name);
+        world.players().forEach(player -> {
+            sendTo(player, buffer);
+        });
+    }
+
+    private static ByteBuffer packToBuffer(final BlockPos pos, final String name) {
         final byte[] bytes = name.getBytes();
         final ByteBuffer buffer = ByteBuffer.allocate(13 + bytes.length);
         buffer.putInt(pos.getX());
@@ -62,9 +72,7 @@ public final class NameHandler implements INetworkSync {
         for (final byte b : bytes) {
             buffer.put(b);
         }
-        world.players().forEach(player -> {
-            sendTo(player, buffer);
-        });
+        return buffer;
     }
 
     @Override
@@ -75,7 +83,6 @@ public final class NameHandler implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buf.get();
         }
-        final String str = new String(array);
         synchronized (allNames) {
             allNames.put(pos, new String(array));
         }
@@ -90,6 +97,15 @@ public final class NameHandler implements INetworkSync {
         map.forEach((pos, name) -> {
             // TODO write into files
         });
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
+        final Player player = event.getPlayer();
+        allNames.forEach((pos, name) -> {
+            sendTo(player, packToBuffer(pos, name));
+        });
+
     }
 
     public static void sendTo(final Player player, final ByteBuffer buf) {
