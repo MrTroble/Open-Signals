@@ -16,7 +16,10 @@ import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.SignalLoader;
 
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.datafix.fixes.ObjectiveRenderTypeFix;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
@@ -68,8 +71,9 @@ public final class OSBlocks {
         final String name = pName.toLowerCase().trim();
         block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
         blocksToRegister.add(block);
-        if (block instanceof Signal)
+        if (block instanceof Signal) {
             Signal.SIGNALS.put(name, (Signal) block);
+        }
     }
 
     @SubscribeEvent

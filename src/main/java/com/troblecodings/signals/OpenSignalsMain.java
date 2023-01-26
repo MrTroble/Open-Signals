@@ -14,6 +14,9 @@ import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
 import com.troblecodings.signals.statehandler.SignalStateHandler;
 
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -21,6 +24,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -69,6 +73,13 @@ public class OpenSignalsMain {
     public void preInit(final FMLConstructModEvent event) {
         file = ModLoadingContext.get().getActiveContainer().getModInfo().getOwningFile().getFile();
         proxy.initModEvent(event);
+    }
+
+    @SubscribeEvent
+    public void client(final FMLClientSetupEvent event) {
+        OSBlocks.blocksToRegister.forEach(block -> {
+            ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped());
+        });
     }
 
     @SubscribeEvent

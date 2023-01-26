@@ -1,18 +1,11 @@
 package com.troblecodings.signals.init;
 
-import java.util.Map;
-
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -35,14 +28,6 @@ public final class OSModels {
     }
     
     @SubscribeEvent
-    public static void reg(ModelBakeEvent event) {
-        Map<ResourceLocation, BakedModel> model = event.getModelRegistry();
-        BakedModel mod = model.get(new ModelResourceLocation(OpenSignalsMain.MODID, "hvsignal", "angel=angel0"));
-        System.out.println(mod);
-        return;
-    }
-
-    @SubscribeEvent
     public static void addColor(final ColorHandlerEvent.Block event) {
         final BlockColors colors = event.getBlockColors();
         OSBlocks.blocksToRegister.forEach(block -> {
@@ -55,6 +40,5 @@ public final class OSModels {
     }
 
     private static void registerModel(final Item item) {
-
     }
 }

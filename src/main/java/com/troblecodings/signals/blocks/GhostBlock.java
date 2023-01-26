@@ -14,7 +14,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class GhostBlock extends BasicBlock {
 
     public GhostBlock() {
-        super(Properties.of(Material.GLASS));
+        super(Properties.of(Material.GLASS).noOcclusion());
         registerDefaultState(defaultBlockState());
     }
 

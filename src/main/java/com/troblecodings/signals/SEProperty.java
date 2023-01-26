@@ -79,6 +79,8 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
 
     @Override
     public String getObjFromID(final int pObjID) {
+        if(pObjID < 0 || pObjID >= this.allowedValues.size())
+            return "";
         return this.allowedValues.get(pObjID);
     }
 

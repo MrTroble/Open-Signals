@@ -42,7 +42,10 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.BarrierBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
@@ -73,7 +76,7 @@ public class Signal extends BasicBlock {
     private SEProperty powerProperty = null;
 
     public Signal(final SignalProperties prop) {
-        super(Properties.of(Material.STONE));
+        super(Properties.of(Material.STONE).noOcclusion());
         this.prop = prop;
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
@@ -81,6 +84,20 @@ public class Signal extends BasicBlock {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
+    }
+
+    public boolean propagatesSkylightDown(BlockState p_49100_, BlockGetter p_49101_,
+            BlockPos p_49102_) {
+        return true;
+    }
+
+    public float getShadeBrightness(BlockState p_49094_, BlockGetter p_49095_, BlockPos p_49096_) {
+        return 1.0F;
+    }
+
+    @Override
+    public VoxelShape getBlockSupportShape(BlockState stat, BlockGetter getter, BlockPos pos) {
+        return Shapes.empty();
     }
 
     @Override
