@@ -87,7 +87,7 @@ public class NamableGui extends GuiBase {
     }
 
     private void updateText(final String input) {
-        if (input.isEmpty() || NameHandler.getName(container.pos).equalsIgnoreCase(input))
+        if (input.isEmpty() || input.equalsIgnoreCase(NameHandler.getName(container.pos)))
             return;
         final byte[] bytes = input.getBytes();
         final ByteBuffer buffer = ByteBuffer.allocate(1 + bytes.length);

@@ -57,9 +57,8 @@ public class RedstoneIO extends BasicBlock {
     public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
             final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
         if (!playerIn.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)) {
-            if (worldIn.isClientSide)
-                OpenSignalsMain.handler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos,
-                        "redstoneio");
+            OpenSignalsMain.handler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos,
+                    "redstoneio");
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
