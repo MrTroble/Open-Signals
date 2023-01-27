@@ -299,10 +299,10 @@ public class GuiSignalController extends GuiBase implements PropertyPacket {
                 final UIEnumerable enumarable = new UIEnumerable(property.count(),
                         property.getName());
                 final int index = property.getParent().getIDFromValue(value);
-                enumarable.setIndex(index);
                 list.add(GuiElements.createEnumElement(enumarable, property, e -> {
                     if (loaded) {
-                        sendPropertyToClient(property, enumarable.getIndex());
+                        sendPropertyToServer(player, controller.getSignal(), property,
+                                enumarable.getIndex());
                     }
                     applyModelChange(blockRender);
                 }, index));
@@ -310,13 +310,6 @@ public class GuiSignalController extends GuiBase implements PropertyPacket {
             }
         });
         applyModelChange(blockRender);
-    }
-
-    private void sendPropertyToClient(final SEProperty property, final int value) {
-        final ByteBuffer buffer = ByteBuffer.allocate(2);
-        buffer.put((byte) controller.getSignal().getIDFromProperty(property));
-        buffer.put((byte) value);
-        OpenSignalsMain.network.sendTo(player, buffer);
     }
 
     @Override
