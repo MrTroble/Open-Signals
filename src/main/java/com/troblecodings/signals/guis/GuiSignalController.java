@@ -298,13 +298,14 @@ public class GuiSignalController extends GuiBase implements PropertyPacket {
                     && property.testMap(map)) {
                 final UIEnumerable enumarable = new UIEnumerable(property.count(),
                         property.getName());
-                enumarable.setIndex(property.getParent().getIDFromValue(value));
+                final int index = property.getParent().getIDFromValue(value);
+                enumarable.setIndex(index);
                 list.add(GuiElements.createEnumElement(enumarable, property, e -> {
                     if (loaded) {
                         sendPropertyToClient(property, enumarable.getIndex());
                     }
                     applyModelChange(blockRender);
-                }));
+                }, index));
                 holders.add(new UIPropertyEnumHolder(property, enumarable));
             }
         });
