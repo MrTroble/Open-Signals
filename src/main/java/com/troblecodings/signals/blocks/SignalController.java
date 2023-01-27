@@ -5,7 +5,6 @@ import java.util.Optional;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.init.OSItems;
-import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -21,7 +20,7 @@ import net.minecraft.world.phys.BlockHitResult;
 
 public class SignalController extends BasicBlock {
 
-    public static final TileEntitySupplierWrapper SUPPLIER = SignalBoxTileEntity::new;
+    public static final TileEntitySupplierWrapper SUPPLIER = SignalControllerTileEntity::new;
 
     public SignalController() {
         super(Properties.of(Material.METAL));
@@ -30,9 +29,8 @@ public class SignalController extends BasicBlock {
     @Override
     public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
             final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
-        if (!playerIn.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)) {
-            if (worldIn.isClientSide)
-                return InteractionResult.SUCCESS;
+        if (!playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem()
+                .equals(OSItems.LINKING_TOOL)) {
             OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
                     "signalcontroller");
             return InteractionResult.SUCCESS;

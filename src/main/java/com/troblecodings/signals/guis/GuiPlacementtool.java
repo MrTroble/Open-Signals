@@ -165,7 +165,9 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
     }
 
     private void applyPropertyChanges(final int propertyId, final int valueId) {
-        sendPropertytoServer(player, propertyId, valueId);
+        if (loaded) {
+            sendPropertytoServer(player, propertyId, valueId);
+        }
         applyModelChanges();
     }
 

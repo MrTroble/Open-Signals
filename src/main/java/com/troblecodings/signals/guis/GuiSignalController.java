@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -25,8 +26,10 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.PropertyPacket;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.models.SignalCustomModel;
@@ -36,23 +39,26 @@ import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiSignalController extends GuiBase {
+public class GuiSignalController extends GuiBase implements PropertyPacket {
 
     private final ContainerSignalController controller;
     private final UIEntity lowerEntity = new UIEntity();
     private boolean previewMode = false;
     private String profileName = null;
     private final List<UIPropertyEnumHolder> holders = new ArrayList<>();
+    private boolean loaded = false;
+    private final Player player;
 
     public GuiSignalController(final GuiInfo info) {
         super(info);
         this.controller = (ContainerSignalController) info.base;
-        info.player.containerMenu = this.controller;
+        this.player = info.player;
         initInternal();
     }
 
@@ -71,6 +77,7 @@ public class GuiSignalController extends GuiBase {
                 addSingleRSMode();
                 break;
             case MUX:
+                addMUXMode();
                 break;
             default:
                 break;
@@ -148,9 +155,11 @@ public class GuiSignalController extends GuiBase {
         rightSide.setWidth(30);
         rightSide.add(new UIBox(UIBox.VBOX, 4));
 
+        createPageForSide(Direction.DOWN, leftSide, bRender);
+
         final Minecraft mc = Minecraft.getInstance();
         final BlockState state = mc.player.level.getBlockState(controller.getPos());
-        final BakedModel model = mc.getBlockRenderer().getBlockModel(state);
+        // final BakedModel model = mc.getBlockRenderer().getBlockModel(state);
         final UIEnumerable toggle = new UIEnumerable(Direction.values().length, "singleModeFace");
         toggle.setOnChange(e -> {
             final Direction faceing = Direction.values()[e];
@@ -164,12 +173,12 @@ public class GuiSignalController extends GuiBase {
         rightSide.add(toggle);
 
         for (final Direction face : Direction.values()) {
-            @SuppressWarnings("deprecation")
-            final List<BakedQuad> quad = model.getQuads(state, face, SignalCustomModel.RANDOM);
+            // final List<BakedQuad> quad = model.getQuads(state, face,
+            // SignalCustomModel.RANDOM);
             final UIEntity faceEntity = new UIEntity();
             faceEntity.setWidth(20);
             faceEntity.setHeight(20);
-            faceEntity.add(new UITexture(quad.get(0).getSprite()));
+            // faceEntity.add(new UITexture(quad.get(0).getSprite()));
             final UIColor color = new UIColor(0x70000000);
             faceEntity.add(color);
             faceEntity.add(new UIClickable(e -> toggle.setIndex(face.ordinal())));
@@ -180,6 +189,10 @@ public class GuiSignalController extends GuiBase {
         }
 
         this.lowerEntity.add(rightSide);
+    }
+
+    private void addMUXMode() {
+        this.lowerEntity.add(new UILabel("Currently Not in Use!"));
     }
 
     private void initInternal() {
@@ -214,6 +227,7 @@ public class GuiSignalController extends GuiBase {
             lowerEntity.clearChildren();
             initMode(enumMode.getObjFromID(in), signal);
         });
+        initMode(EnumMode.MANUELL, signal);
         header.add(rsMode);
 
         final UIEntity middlePart = new UIEntity();
@@ -278,22 +292,38 @@ public class GuiSignalController extends GuiBase {
         final Map<SEProperty, String> map = this.controller.getReference();
         if (map == null)
             return;
-        for (final SEProperty entry : map.keySet()) {
-            if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
-                    || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-                    && entry.testMap(map)) {
-                final UIEnumerable enumarable = new UIEnumerable(entry.count(), entry.getName());
-                list.add(GuiElements.createEnumElement(enumarable, entry,
-                        e -> applyModelChange(blockRender)));
-                holders.add(new UIPropertyEnumHolder(entry, enumarable));
+        map.forEach((property, value) -> {
+            if ((property.isChangabelAtStage(ChangeableStage.APISTAGE)
+                    || property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
+                    && property.testMap(map)) {
+                final UIEnumerable enumarable = new UIEnumerable(property.count(),
+                        property.getName());
+                enumarable.setIndex(property.getParent().getIDFromValue(value));
+                list.add(GuiElements.createEnumElement(enumarable, property, e -> {
+                    if (loaded) {
+                        sendPropertyToClient(property, enumarable.getIndex());
+                    }
+                    applyModelChange(blockRender);
+                }));
+                holders.add(new UIPropertyEnumHolder(property, enumarable));
             }
-        }
+        });
         applyModelChange(blockRender);
     }
 
-    @SuppressWarnings({
-            "unchecked", "rawtypes"
-    })
+    private void sendPropertyToClient(final SEProperty property, final int value) {
+        final ByteBuffer buffer = ByteBuffer.allocate(2);
+        buffer.put((byte) controller.getSignal().getIDFromProperty(property));
+        buffer.put((byte) value);
+        OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    @Override
+    public void updateFromContainer() {
+        initInternal();
+        loaded = true;
+    }
+
     private void applyModelChange(final UIBlockRender blockRender) {
         // TODO new model system
     }
