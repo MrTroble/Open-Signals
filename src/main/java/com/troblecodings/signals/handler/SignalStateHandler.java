@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -84,8 +85,8 @@ public final class SignalStateHandler implements INetworkSync {
             final ByteBuffer buffer = file.read(pos);
             final byte[] readData = buffer.array();
             states.forEach((property, string) -> {
-                readData[info.signal.getIDFromProperty(property)] = (byte) property.getParent()
-                        .getIDFromValue(string);
+                readData[info.signal.getIDFromProperty(
+                        property)] = (byte) (property.getParent().getIDFromValue(string) + 1);
             });
             file.write(pos, buffer);
         });
@@ -106,7 +107,11 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
-        final Map<SEProperty, String> states = currentlyLoadedStates.get(info);
+        final Map<SEProperty, String> states;
+        synchronized (currentlyLoadedStates) {
+            final Map<SEProperty, String> stateVolitile = currentlyLoadedStates.get(info);
+            states = stateVolitile == null ? null : ImmutableMap.copyOf(stateVolitile);
+        }
         if (states != null) {
             return states;
         } else {
@@ -149,7 +154,10 @@ public final class SignalStateHandler implements INetworkSync {
         final List<SEProperty> properties = stateInfo.signal.getProperties();
         for (int i = 0; i < properties.size(); i++) {
             final SEProperty property = properties.get(i);
-            final String value = property.getObjFromID(Byte.toUnsignedInt(buffer.get()));
+            final int typeID = Byte.toUnsignedInt(buffer.get());
+            if (typeID < 0)
+                continue;
+            final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
         }
         return map;
@@ -161,13 +169,18 @@ public final class SignalStateHandler implements INetworkSync {
         if (chunk.getWorldForge().isClientSide())
             return;
         final Level world = (Level) chunk.getWorldForge();
-        if (!allLevelFiles.containsKey(world)) {
-            allLevelFiles.put(world,
-                    new SignalStateFile(Paths
-                            .get("ossignalfiles/" + world.dimension().getRegistryName().toString()
-                                    .replace(":", "").replace("/", "").replace("\\", ""))));
+        synchronized (allLevelFiles) {
+            if (!allLevelFiles.containsKey(world)) {
+                allLevelFiles
+                        .put(world,
+                                new SignalStateFile(Paths.get("ossignalfiles/" + world.dimension()
+                                        .getRegistryName().toString().replace(":", "")
+                                        .replace("/", "").replace("\\", ""))));
+            }
         }
         SERVICE.submit(() -> {
+            while (!chunk.getStatus().equals(ChunkStatus.FULL))
+                continue;
             final List<SignalStateInfo> states = new ArrayList<>();
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
@@ -263,7 +276,7 @@ public final class SignalStateHandler implements INetworkSync {
         buffer.putInt(stateInfo.pos.getY());
         buffer.putInt(stateInfo.pos.getZ());
         if (properties.size() > 254) {
-            throw new IllegalStateException("To many SEProperties!");
+            throw new IllegalStateException("Too many SEProperties!");
         }
         buffer.put((byte) properties.size());
         properties.forEach((property, value) -> {
@@ -296,7 +309,7 @@ public final class SignalStateHandler implements INetworkSync {
     private static final int RENDER_DISTANCE = 512;
 
     private static boolean checkInRange(final BlockPos playerPos, final BlockPos signalPos) {
-        return playerPos.distManhattan(signalPos) <= RENDER_DISTANCE;
+        return true;
     }
 
     @Override
@@ -316,8 +329,10 @@ public final class SignalStateHandler implements INetworkSync {
         SERVICE.execute(() -> {
             final Minecraft mc = Minecraft.getInstance();
             BlockState state;
+            if(mc.player == null)
+                return;
             while ((state = mc.player.level.getBlockState(signalPos)) == null
-                    || state.equals(Blocks.VOID_AIR.defaultBlockState())) {
+                    || !(state.getBlock() instanceof Signal)) {
                 continue;
             }
             final SignalStateInfo stateInfo = new SignalStateInfo(mc.player.level, signalPos);

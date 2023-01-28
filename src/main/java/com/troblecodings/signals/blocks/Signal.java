@@ -42,10 +42,7 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.BarrierBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LeverBlock;
-import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
@@ -183,6 +180,11 @@ public class Signal extends BasicBlock {
         return this.prop.customNameRenderHeight != -1 || !this.prop.customRenderHeights.isEmpty();
     }
 
+    @Override
+    public Optional<String> getSupplierWrapperName() {
+        return Optional.of("signal");
+    }
+    
     @Override
     public String toString() {
         return this.getDescriptionId();

@@ -22,7 +22,7 @@ public class SignalTileEntity extends BasicBlockEntity implements NamableWrapper
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
     }
-
+    
     @Override
     public boolean isValid(final Player player) {
         return true;

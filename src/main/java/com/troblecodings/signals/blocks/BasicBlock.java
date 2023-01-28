@@ -17,17 +17,26 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicBlock extends Block implements EntityBlock {
 
+    private static Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
     private static Map<TileEntitySupplierWrapper, Set<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
     public static Map<TileEntitySupplierWrapper, BlockEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
 
     public BasicBlock(final Properties properties) {
         super(properties);
         Optional<TileEntitySupplierWrapper> optional = getSupplierWrapper();
-        optional.ifPresent(supplier -> BLOCK_SUPPLIER
-                .computeIfAbsent(supplier, _u -> new HashSet<>()).add(this));
+        getSupplierWrapperName().ifPresent(name -> {
+            optional.ifPresent(supplier -> {
+                BLOCK_SUPPLIER.computeIfAbsent(supplier, _u -> new HashSet<>()).add(this);
+                BLOCK_NAMES.computeIfAbsent(supplier, _u -> name);
+            });
+        });
     }
 
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
+        return Optional.empty();
+    }
+
+    public Optional<String> getSupplierWrapperName() {
         return Optional.empty();
     }
 
@@ -41,7 +50,7 @@ public class BasicBlock extends Block implements EntityBlock {
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> {
             final BlockEntityType type = new BlockEntityType(wrapper, blocks, null);
-            type.setRegistryName(blocks.iterator().next().getRegistryName());
+            type.setRegistryName(BLOCK_NAMES.get(wrapper));
             BLOCK_ENTITYS.put(wrapper, type);
         });
     }

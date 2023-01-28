@@ -59,8 +59,7 @@ public final class OSBlocks {
                 }
             }
         }
-        if (OSItems.LINKING_TOOL.getRegistryName() == null)
-            OSItems.init();
+        OSItems.init();
         SignalLoader.loadAllSignals();
         BasicBlock.prepare();
     }
