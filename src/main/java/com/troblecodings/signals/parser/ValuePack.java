@@ -9,10 +9,9 @@ import com.troblecodings.signals.SEProperty;
 public class ValuePack {
 
     public final SEProperty property;
-    
     public final Predicate predicate;
-    public ValuePack(final SEProperty property,
-            final Predicate predicate) {
+
+    public ValuePack(final SEProperty property, final Predicate predicate) {
         super();
         this.property = property;
         this.predicate = predicate;

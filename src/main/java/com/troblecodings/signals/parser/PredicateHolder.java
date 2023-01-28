@@ -51,7 +51,6 @@ public final class PredicateHolder {
         };
     }
 
-    @SuppressWarnings("unchecked")
     public static Predicate<Map<SEProperty, Object>> check(final ValuePack pack) {
         return check(pack.property, pack.predicate);
     }
@@ -61,13 +60,16 @@ public final class PredicateHolder {
         return check(property, type::equals);
     }
 
+    @SuppressWarnings({
+            "unchecked", "rawtypes"
+    })
     public static Predicate<Map<SEProperty, Object>> check(final SEProperty property,
-            final Predicate<ModelInfoWrapper> type) {
+            final Predicate type) {
         return t -> {
             final Object value = t.get(property);
             if (value == null)
                 return true;
-            return type.test((ModelInfoWrapper) value);
+            return type.test(value);
         };
     }
 
