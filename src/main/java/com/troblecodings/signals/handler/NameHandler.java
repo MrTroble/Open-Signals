@@ -51,7 +51,10 @@ public final class NameHandler implements INetworkSync {
 
     public static String getName(final BlockPos pos) {
         synchronized (allNames) {
-            return allNames.get(pos);
+            final String name = allNames.get(pos);
+            if (name == null)
+                return "";
+            return name;
         }
     }
 
