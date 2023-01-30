@@ -61,9 +61,6 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> states) {
         if (info.world.isClientSide)
             return;
-        if (states.containsKey(Signal.CUSTOMNAME)) {
-            states.remove(Signal.CUSTOMNAME);
-        }
         synchronized (currentlyLoadedStates) {
             currentlyLoadedStates.put(info, states);
         }
@@ -98,9 +95,6 @@ public final class SignalStateHandler implements INetworkSync {
     public static void setStates(final SignalStateInfo info, final Map<SEProperty, String> states) {
         if (info.world.isClientSide || states == null || states.isEmpty()) {
             return;
-        }
-        if (states.containsKey(Signal.CUSTOMNAME)) {
-            states.remove(Signal.CUSTOMNAME);
         }
         synchronized (currentlyLoadedStates) {
             if (currentlyLoadedStates.containsKey(info)) {
