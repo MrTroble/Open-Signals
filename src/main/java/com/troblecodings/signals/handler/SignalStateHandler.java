@@ -24,11 +24,11 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -160,6 +160,9 @@ public final class SignalStateHandler implements INetworkSync {
             final int typeID = Byte.toUnsignedInt(byteArray[i]);
             if (typeID <= 0)
                 continue;
+            if (property.equals(Signal.CUSTOMNAME)) {
+                map.put(property, NameHandler.getName(stateInfo.pos));
+            }
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
         }
@@ -175,11 +178,10 @@ public final class SignalStateHandler implements INetworkSync {
         final Level world = (Level) chunk.getWorldForge();
         synchronized (allLevelFiles) {
             if (!allLevelFiles.containsKey(world)) {
-                allLevelFiles
-                        .put(world,
-                                new SignalStateFile(Paths.get("ossignalfiles/" + world.dimension()
-                                        .getRegistryName().toString().replace(":", "")
-                                        .replace("/", "").replace("\\", ""))));
+                allLevelFiles.put(world, new SignalStateFile(Paths.get("ossignalfiles/"
+                        + ((ServerLevel) world).getServer().getWorldData().getLevelName()
+                                .replace(":", "").replace("/", "").replace("\\", "")
+                        + "/" + world.dimension().getRegistryName().toString().replace(":", ""))));
             }
         }
         SERVICE.submit(() -> {
@@ -285,6 +287,9 @@ public final class SignalStateHandler implements INetworkSync {
         buffer.put((byte) properties.size());
         properties.forEach((property, value) -> {
             if (property.equals(Signal.CUSTOMNAME)) {
+                buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
+                buffer.put((byte) (value.isEmpty() ? 0 : 1));
+                NameHandler.setName(stateInfo.world, stateInfo.pos, value);
                 return;
             }
             buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
@@ -332,7 +337,7 @@ public final class SignalStateHandler implements INetworkSync {
         SERVICE.execute(() -> {
             final Minecraft mc = Minecraft.getInstance();
             BlockState state;
-            if(mc.player == null)
+            if (mc.player == null)
                 return;
             while ((state = mc.player.level.getBlockState(signalPos)) == null
                     || !(state.getBlock() instanceof Signal)) {

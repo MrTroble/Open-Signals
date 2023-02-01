@@ -25,13 +25,13 @@ public class JsonEnum extends ModelProperty<String> {
         this.values = ImmutableList.copyOf(values);
         Map<String, Integer> copyValues = new HashMap<>();
         for (int i = 0; i < values.size(); i++) {
-            copyValues.put(values.get(i), i);
+            copyValues.put(values.get(i).toLowerCase(), i);
         }
         valueToInt = ImmutableMap.copyOf(copyValues);
     }
 
     public int getIDFromValue(String value) {
-        return this.valueToInt.get(value);
+        return this.valueToInt.get(value.toLowerCase());
     }
 
     public String getName() {
