@@ -12,6 +12,7 @@ import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
@@ -88,6 +89,9 @@ public class Placementtool extends Item
             final String name = property.getName();
             if (wrapper.contains(name))
                 signalProperties.put(property, wrapper.getString(name));
+            else if(property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+                signalProperties.put(property, property.getDefault());
+            }
         });
         final int height = signal.getHeight(signalProperties);
         final BlockPos pos = context.getClickedPos().above();

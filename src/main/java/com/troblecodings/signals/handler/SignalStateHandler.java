@@ -3,6 +3,7 @@ package com.troblecodings.signals.handler;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -61,11 +62,8 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> states) {
         if (info.world.isClientSide)
             return;
-        if (states.containsKey(Signal.CUSTOMNAME)) {
-            states.remove(Signal.CUSTOMNAME);
-        }
         synchronized (currentlyLoadedStates) {
-            currentlyLoadedStates.put(info, states);
+            currentlyLoadedStates.put(info, ImmutableMap.copyOf(states));
         }
         sendPropertiesToClient(info, states);
         createToFile(info, states);
@@ -99,12 +97,9 @@ public final class SignalStateHandler implements INetworkSync {
         if (info.world.isClientSide || states == null || states.isEmpty()) {
             return;
         }
-        if (states.containsKey(Signal.CUSTOMNAME)) {
-            states.remove(Signal.CUSTOMNAME);
-        }
         synchronized (currentlyLoadedStates) {
             if (currentlyLoadedStates.containsKey(info)) {
-                currentlyLoadedStates.put(info, states);
+                currentlyLoadedStates.put(info, ImmutableMap.copyOf(states));
                 sendPropertiesToClient(info, states);
                 return;
             }
@@ -158,14 +153,17 @@ public final class SignalStateHandler implements INetworkSync {
         }
         final ByteBuffer buffer = file.read(pos);
         final List<SEProperty> properties = stateInfo.signal.getProperties();
+        byte[] byteArray = buffer.array();
+        System.out.println(Arrays.toString(byteArray));
         for (int i = 0; i < properties.size(); i++) {
             final SEProperty property = properties.get(i);
-            final int typeID = Byte.toUnsignedInt(buffer.get());
-            if (typeID < 0)
+            final int typeID = Byte.toUnsignedInt(byteArray[i]);
+            if (typeID <= 0)
                 continue;
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
         }
+        System.out.println(map);
         return map;
     }
 
