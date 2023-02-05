@@ -181,7 +181,7 @@ public final class SignalStateHandler implements INetworkSync {
                 allLevelFiles.put(world, new SignalStateFile(Paths.get("ossignalfiles/"
                         + ((ServerLevel) world).getServer().getWorldData().getLevelName()
                                 .replace(":", "").replace("/", "").replace("\\", "")
-                        + "/" + world.dimension().getRegistryName().toString().replace(":", ""))));
+                        + "/" + world.dimension().location().toString().replace(":", ""))));
             }
         }
         SERVICE.submit(() -> {
