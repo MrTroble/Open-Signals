@@ -29,6 +29,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.ChunkStatus;
@@ -65,8 +66,8 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (currentlyLoadedStates) {
             currentlyLoadedStates.put(info, ImmutableMap.copyOf(states));
         }
-        sendPropertiesToClient(info, states);
         createToFile(info, states);
+        sendPropertiesToClient(info, states);
     }
 
     private static void createToFile(final SignalStateInfo info,
@@ -185,8 +186,6 @@ public final class SignalStateHandler implements INetworkSync {
             }
         }
         SERVICE.submit(() -> {
-            while (!chunk.getStatus().equals(ChunkStatus.FULL))
-                continue;
             final List<SignalStateInfo> states = new ArrayList<>();
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
@@ -359,7 +358,11 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (currentlyLoadedStates) {
                 currentlyLoadedStates.put(stateInfo, properties);
             }
-            mc.player.level.setBlocksDirty(signalPos, state, state);
+            BlockEntity entity;
+            while((entity = mc.level.getBlockEntity(signalPos)) == null)
+                continue;
+            entity.requestModelDataUpdate();
+            mc.level.setSectionDirtyWithNeighbors(signalPos.getX(), signalPos.getY(), signalPos.getZ());
         });
     }
 
