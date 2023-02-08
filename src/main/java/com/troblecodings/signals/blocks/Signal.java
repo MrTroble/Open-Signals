@@ -165,6 +165,9 @@ public class Signal extends BasicBlock {
     public void destroy(final LevelAccessor worldIn, final BlockPos pos, final BlockState state) {
         super.destroy(worldIn, pos, state);
         GhostBlock.destroyUpperBlock(worldIn, pos);
+        if (!worldIn.isClientSide() && worldIn instanceof Level) {
+            SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos));
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -184,7 +187,7 @@ public class Signal extends BasicBlock {
     public Optional<String> getSupplierWrapperName() {
         return Optional.of("signal");
     }
-    
+
     @Override
     public String toString() {
         return this.getDescriptionId();

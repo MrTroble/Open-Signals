@@ -32,7 +32,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -239,7 +238,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     @SubscribeEvent
-    public static void onWorldSave(WorldEvent.Save save) {
+    public static void onWorldSave(final WorldEvent.Save save) {
         SERVICE.execute(() -> {
             final Map<SignalStateInfo, Map<SEProperty, String>> maps;
             synchronized (currentlyLoadedStates) {
@@ -259,6 +258,13 @@ public final class SignalStateHandler implements INetworkSync {
         map.forEach((state, properites) -> {
             final ByteBuffer buffer = packToByteBuffer(state, properites);
             sendTo(player, buffer);
+        });
+    }
+
+    public static void setRemoved(final SignalStateInfo info) {
+        SERVICE.execute(() -> {
+            currentlyLoadedStates.remove(info);
+            // TODO remove from Files
         });
     }
 
@@ -322,7 +328,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     private static final Map<SignalStateInfo, Map<SEProperty, String>> currentlyLoadedStatesClient = new HashMap<>();
 
-    public static final Map<SEProperty, String> getClientStates(SignalStateInfo info) {
+    public static final Map<SEProperty, String> getClientStates(final SignalStateInfo info) {
         return currentlyLoadedStatesClient.computeIfAbsent(info, _u -> new HashMap<>());
     }
 
