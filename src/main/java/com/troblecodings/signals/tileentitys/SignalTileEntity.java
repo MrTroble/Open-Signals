@@ -17,7 +17,7 @@ import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelDataMap.Builder;
 
-public class SignalTileEntity extends BasicBlockEntity implements NamableWrapper, ISyncable {
+public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
