@@ -84,13 +84,15 @@ public final class SignalStateHandler implements INetworkSync {
             if (pos == null) {
                 pos = file.create(info.pos);
             }
-            final ByteBuffer buffer = file.read(pos);
-            final byte[] readData = buffer.array();
-            states.forEach((property, string) -> {
-                readData[info.signal.getIDFromProperty(
-                        property)] = (byte) (property.getParent().getIDFromValue(string) + 1);
-            });
-            file.write(pos, buffer);
+            synchronized (file) {
+                final ByteBuffer buffer = file.read(pos);
+                final byte[] readData = buffer.array();
+                states.forEach((property, string) -> {
+                    readData[info.signal.getIDFromProperty(
+                            property)] = (byte) (property.getParent().getIDFromValue(string) + 1);
+                });
+                file.write(pos, buffer);
+            }
         });
     }
 
@@ -155,7 +157,6 @@ public final class SignalStateHandler implements INetworkSync {
         final ByteBuffer buffer = file.read(pos);
         final List<SEProperty> properties = stateInfo.signal.getProperties();
         byte[] byteArray = buffer.array();
-        System.out.println(Arrays.toString(byteArray));
         for (int i = 0; i < properties.size(); i++) {
             final SEProperty property = properties.get(i);
             final int typeID = Byte.toUnsignedInt(byteArray[i]);
@@ -167,7 +168,6 @@ public final class SignalStateHandler implements INetworkSync {
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
         }
-        System.out.println(map);
         return map;
     }
 
@@ -179,10 +179,11 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         synchronized (allLevelFiles) {
             if (!allLevelFiles.containsKey(world)) {
-                allLevelFiles.put(world, new SignalStateFile(Paths.get("ossignalfiles/"
-                        + ((ServerLevel) world).getServer().getWorldData().getLevelName()
-                                .replace(":", "").replace("/", "").replace("\\", "")
-                        + "/" + world.dimension().location().toString().replace(":", ""))));
+                allLevelFiles.put(world,
+                        new SignalStateFile(Paths.get("ossignalfiles/"
+                                + ((ServerLevel) world).getServer().getWorldData().getLevelName()
+                                        .replace(":", "").replace("/", "").replace("\\", "")
+                                + "/" + world.dimension().location().toString().replace(":", ""))));
             }
         }
         SERVICE.submit(() -> {

@@ -2,13 +2,18 @@ package com.troblecodings.signals.models;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Quaternion;
@@ -19,6 +24,8 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.SignalAngel;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
@@ -40,6 +47,7 @@ public class SignalCustomModel implements UnbakedModel {
     private final SignalAngel angel;
     private final List<SignalModelLoaderInfo> list;
     private final List<ResourceLocation> dependencies;
+    private final Map<String, Either<Material, String>> materialsFromString = new HashMap<>();
 
     public SignalCustomModel(SignalAngel angel, List<SignalModelLoaderInfo> list) {
         super();
@@ -48,6 +56,10 @@ public class SignalCustomModel implements UnbakedModel {
         this.dependencies = list.stream()
                 .map(info -> new ResourceLocation(OpenSignalsMain.MODID, "block/" + info.name))
                 .collect(Collectors.toUnmodifiableList());
+        list.forEach(info -> info.retexture
+                .forEach((id, texture) -> materialsFromString.computeIfAbsent(texture,
+                        _u -> Either.left(new Material(TextureAtlas.LOCATION_BLOCKS,
+                                new ResourceLocation(texture))))));
     }
 
     private static void transform(BakedQuad quad, Matrix4f quaterion) {
@@ -68,11 +80,18 @@ public class SignalCustomModel implements UnbakedModel {
 
     private static BakedModelPair transform(final SignalModelLoaderInfo info,
             final ModelBakery bakery, ResourceLocation location,
-            Function<Material, TextureAtlasSprite> function, Quaternion rotation) {
+            Function<Material, TextureAtlasSprite> function,
+            Map<String, Either<Material, String>> material, Quaternion rotation) {
         final Transformation transformation = new Transformation(
                 new Vector3f(info.x, info.y, info.z), null, null, null);
+        final BlockModel blockModel = (BlockModel) info.model;
+        final ImmutableMap<String, Either<Material, String>> defaultMap = ImmutableMap
+                .copyOf(blockModel.textureMap);
+        info.retexture.forEach((id, texture) -> blockModel.textureMap.computeIfPresent(id,
+                (_u, old) -> material.get(texture)));
         final BakedModel model = info.model.bake(bakery, function,
                 new SimpleModelState(transformation), location);
+        blockModel.textureMap.putAll(defaultMap);
         final Matrix4f reverse = new Matrix4f();
         reverse.setIdentity();
         reverse.multiplyWithTranslation(-0.5f, 0, -0.5f);
@@ -102,6 +121,8 @@ public class SignalCustomModel implements UnbakedModel {
         List<Material> material = new ArrayList<>();
         this.dependencies.forEach(location -> material
                 .addAll(function.apply(location).getMaterials(function, modelState)));
+        materialsFromString.values().stream().map(either -> either.left())
+                .filter(Optional::isPresent).forEach(opt -> material.add(opt.get()));
         return material;
     }
 
@@ -116,7 +137,9 @@ public class SignalCustomModel implements UnbakedModel {
         });
         final Quaternion quaternion = angel.getQuaternion();
         return new SignalBakedModel(
-                list.stream().map(info -> transform(info, bakery, resource, function, quaternion))
+                list.stream()
+                        .map(info -> transform(info, bakery, resource, function,
+                                materialsFromString, quaternion))
                         .collect(Collectors.toUnmodifiableList()));
     }
 
