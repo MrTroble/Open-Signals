@@ -14,12 +14,8 @@ public enum SignalAngel implements NamableWrapper {
         quaternion = Quaternion.fromXYZ(0, (float) getRadians(), 0);
     }
 
-    public float getDegree() {
-        return this.ordinal() * 22.5f;
-    }
-
     public double getRadians() {
-        return (this.ordinal() / 16.0) * Math.PI * 2.0;
+        return Math.PI * 2.0 - (this.ordinal() / 16.0) * Math.PI * 2.0;
     }
 
     public Quaternion getQuaternion() {

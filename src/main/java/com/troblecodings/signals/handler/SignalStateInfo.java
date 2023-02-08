@@ -14,9 +14,14 @@ public class SignalStateInfo {
     public final Signal signal;
 
     public SignalStateInfo(final Level world, final BlockPos pos) {
+        this(world, pos, (Signal) world.getBlockState(pos).getBlock());
+    }
+
+    public SignalStateInfo(Level world, BlockPos pos, Signal signal) {
+        super();
         this.world = world;
         this.pos = pos;
-        this.signal = (Signal) world.getBlockState(pos).getBlock();
+        this.signal = signal;
     }
 
     @Override

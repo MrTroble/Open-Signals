@@ -262,8 +262,10 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void setRemoved(final SignalStateInfo info) {
-        SERVICE.execute(() -> {
+        synchronized (currentlyLoadedStates) {
             currentlyLoadedStates.remove(info);
+        }
+        SERVICE.execute(() -> {
             // TODO remove from Files
         });
     }
