@@ -47,7 +47,7 @@ public class SignalTileEntity extends BasicBlockEntity implements NamableWrapper
     @Override
     public IModelData getModelData() {
         final Map<SEProperty, String> states = SignalStateHandler
-                .getStates(new SignalStateInfo(level, worldPosition));
+                .getClientStates(new SignalStateInfo(level, worldPosition));
         final Builder builder = new ModelDataMap.Builder();
         states.forEach((property, value) -> {
             builder.withInitial(property, value);

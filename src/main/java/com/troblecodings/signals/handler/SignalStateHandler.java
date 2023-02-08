@@ -174,9 +174,9 @@ public final class SignalStateHandler implements INetworkSync {
     @SubscribeEvent
     public static void onChunkLoad(final ChunkEvent.Load event) {
         final ChunkAccess chunk = event.getChunk();
-        if (chunk.getWorldForge().isClientSide())
-            return;
         final Level world = (Level) chunk.getWorldForge();
+        if (world.isClientSide())
+            return;
         synchronized (allLevelFiles) {
             if (!allLevelFiles.containsKey(world)) {
                 allLevelFiles.put(world, new SignalStateFile(Paths.get("ossignalfiles/"
@@ -319,6 +319,12 @@ public final class SignalStateHandler implements INetworkSync {
         return true;
     }
 
+    private static final Map<SignalStateInfo, Map<SEProperty, String>> currentlyLoadedStatesClient = new HashMap<>();
+
+    public static final Map<SEProperty, String> getClientStates(SignalStateInfo info) {
+        return currentlyLoadedStatesClient.computeIfAbsent(info, _u -> new HashMap<>());
+    }
+
     @Override
     public void deserializeClient(final ByteBuffer buf) {
         final BlockPos signalPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
@@ -344,25 +350,20 @@ public final class SignalStateHandler implements INetworkSync {
             }
             final SignalStateInfo stateInfo = new SignalStateInfo(mc.player.level, signalPos);
             final List<SEProperty> signalProperties = stateInfo.signal.getProperties();
-            Map<SEProperty, String> properties = new HashMap<>();
-            synchronized (currentlyLoadedStates) {
-                if (currentlyLoadedStates.containsKey(stateInfo)) {
-                    properties = currentlyLoadedStates.get(stateInfo);
+            synchronized (currentlyLoadedStatesClient) {
+                final Map<SEProperty, String> properties = currentlyLoadedStatesClient
+                        .computeIfAbsent(stateInfo, _u -> new HashMap<>());
+                for (int i = 0; i < propertiesSize; i++) {
+                    final SEProperty property = signalProperties.get(propertyIDs[i]);
+                    final String value = property.getObjFromID(valueIDs[i]);
+                    properties.put(property, value);
                 }
             }
-            for (int i = 0; i < propertiesSize; i++) {
-                final SEProperty property = signalProperties.get(propertyIDs[i]);
-                final String value = property.getObjFromID(valueIDs[i]);
-                properties.put(property, value);
-            }
-            synchronized (currentlyLoadedStates) {
-                currentlyLoadedStates.put(stateInfo, properties);
-            }
             BlockEntity entity;
-            while((entity = mc.level.getBlockEntity(signalPos)) == null)
+            while ((entity = mc.level.getBlockEntity(signalPos)) == null)
                 continue;
             entity.requestModelDataUpdate();
-            mc.level.setSectionDirtyWithNeighbors(signalPos.getX(), signalPos.getY(), signalPos.getZ());
+            mc.levelRenderer.blockChanged(null, signalPos, state, state, 8);
         });
     }
 
