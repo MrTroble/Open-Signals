@@ -6,8 +6,8 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
 import java.util.Collections;
 
+import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.FileReader;
 
 public final class ContentPackMain {
 

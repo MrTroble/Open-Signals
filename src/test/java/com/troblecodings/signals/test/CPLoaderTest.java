@@ -9,7 +9,7 @@ import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.core.FileReader;
+import com.troblecodings.contentpacklib.FileReader;
 
 public class CPLoaderTest {
 

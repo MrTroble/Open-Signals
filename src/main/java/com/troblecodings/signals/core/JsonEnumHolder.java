@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.contentpacks.ContentPackException;
 

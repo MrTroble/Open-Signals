@@ -6,3 +6,6 @@
 	path = linkableapi
 	url = https://github.com/MrTroble/linkableapi
         branch = 1.18-master
+[submodule "contentPackLib"]
+	path = contentPackLib
+	url = https://github.com/MrTroble/contentPackLib
