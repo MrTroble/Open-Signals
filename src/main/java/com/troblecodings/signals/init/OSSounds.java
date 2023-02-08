@@ -3,8 +3,8 @@ package com.troblecodings.signals.init;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.FileReader;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;

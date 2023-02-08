@@ -5,7 +5,7 @@ import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
-import com.troblecodings.signals.core.FileReader;
+import com.troblecodings.contentpacklib.FileReader;
 
 public class ModelStats {
 
