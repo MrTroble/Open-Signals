@@ -13,6 +13,11 @@ public class SignalStatePos {
     }
 
     @Override
+    public String toString() {
+        return "SignalStatePos [file=" + file + ", offset=" + offset + "]";
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(file, offset);
     }

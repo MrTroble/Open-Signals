@@ -15,6 +15,7 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -68,6 +69,14 @@ public final class SignalStateHandler implements INetworkSync {
         sendPropertiesToClient(info, states);
     }
 
+    private static void statesToBuffer(final Signal signal, final Map<SEProperty, String> states,
+            byte[] readData) {
+        states.forEach((property, string) -> {
+            readData[signal.getIDFromProperty(
+                    property)] = (byte) (property.getParent().getIDFromValue(string) + 1);
+        });
+    }
+
     private static void createToFile(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
         final SignalStateFile file;
@@ -84,11 +93,7 @@ public final class SignalStateHandler implements INetworkSync {
             }
             synchronized (file) {
                 final ByteBuffer buffer = file.read(pos);
-                final byte[] readData = buffer.array();
-                states.forEach((property, string) -> {
-                    readData[info.signal.getIDFromProperty(
-                            property)] = (byte) (property.getParent().getIDFromValue(string) + 1);
-                });
+                statesToBuffer(info.signal, states, buffer.array());
                 file.write(pos, buffer);
             }
         });
@@ -182,7 +187,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (allLevelFiles) {
             if (!allLevelFiles.containsKey(world)) {
                 allLevelFiles.put(world,
-                        new SignalStateFile(Paths.get("ossignalfiles/"
+                        new DebugSignalStateFile(Paths.get("ossignalfiles/"
                                 + ((ServerLevel) world).getServer().getWorldData().getLevelName()
                                         .replace(":", "").replace("/", "").replace("\\", "")
                                 + "/" + world.dimension().location().toString().replace(":", ""))));
@@ -230,10 +235,8 @@ public final class SignalStateHandler implements INetworkSync {
                     properties = currentlyLoadedStates.remove(stateInfo);
                 }
                 final SignalStatePos pos = file.find(stateInfo.pos);
-                final ByteBuffer buffer = ByteBuffer.allocate(properties.size());
-                properties.forEach((property, value) -> {
-                    buffer.put((byte) property.getParent().getIDFromValue(value));
-                });
+                final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
+                statesToBuffer(stateInfo.signal, properties, buffer.array());
                 file.write(pos, buffer);
                 unRenderClients(stateInfo);
             });
@@ -356,14 +359,13 @@ public final class SignalStateHandler implements INetworkSync {
         }
         SERVICE.execute(() -> {
             final Minecraft mc = Minecraft.getInstance();
-            BlockState state;
-            if (mc.player == null)
+            Level level = mc.level;
+            if(level == null)
                 return;
-            while ((state = mc.player.level.getBlockState(signalPos)) == null
-                    || !(state.getBlock() instanceof Signal)) {
+            BlockEntity entity;
+            while ((entity = level.getBlockEntity(signalPos)) == null)
                 continue;
-            }
-            final SignalStateInfo stateInfo = new SignalStateInfo(mc.player.level, signalPos);
+            final SignalStateInfo stateInfo = new SignalStateInfo(level, signalPos);
             final List<SEProperty> signalProperties = stateInfo.signal.getProperties();
             synchronized (currentlyLoadedStatesClient) {
                 final Map<SEProperty, String> properties = currentlyLoadedStatesClient
@@ -374,11 +376,8 @@ public final class SignalStateHandler implements INetworkSync {
                     properties.put(property, value);
                 }
             }
-            BlockEntity entity;
-            while ((entity = mc.level.getBlockEntity(signalPos)) == null)
-                continue;
             entity.requestModelDataUpdate();
-            mc.levelRenderer.blockChanged(null, signalPos, state, state, 8);
+            mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
         });
     }
 
