@@ -3,7 +3,6 @@ package com.troblecodings.signals.handler;
 import java.nio.ByteBuffer;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +126,11 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void setState(final SignalStateInfo info, final SEProperty property,
             final String value) {
-        final Map<SEProperty, String> map = new HashMap<>();
+        Map<SEProperty, String> map = new HashMap<>();
+        synchronized (currentlyLoadedStates) {
+            final Map<SEProperty, String> savedProperties = currentlyLoadedStates.get(info);
+            map.putAll(savedProperties == null ? new HashMap<>() : savedProperties);
+        }
         map.put(property, value);
         setStates(info, map);
     }
@@ -245,6 +248,9 @@ public final class SignalStateHandler implements INetworkSync {
                 maps = ImmutableMap.copyOf(currentlyLoadedStates);
             }
             maps.forEach(SignalStateHandler::createToFile);
+            if (save.getWorld().isClientSide()) {
+                currentlyLoadedStatesClient.clear();
+            }
         });
     }
 

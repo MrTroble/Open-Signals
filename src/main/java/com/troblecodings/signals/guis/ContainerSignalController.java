@@ -51,14 +51,11 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         if (linkedPos == null) {
             return;
         }
-        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, tile.getLinkedPosition());
+        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos);
         referenceBlock.set((Signal) info.world.getBlockState(linkedPos).getBlock());
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
         if (properties == null || properties.isEmpty())
             return;
-        if (properties.containsKey(Signal.CUSTOMNAME)) {
-            properties.remove(Signal.CUSTOMNAME);
-        }
         final ByteBuffer buffer = ByteBuffer.allocate(13 + (properties.size() * 2));
         buffer.putInt(stateInfo.pos.getX());
         buffer.putInt(stateInfo.pos.getY());

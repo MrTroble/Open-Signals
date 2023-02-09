@@ -30,7 +30,7 @@ public class JsonEnum extends ModelProperty<String> {
         valueToInt = ImmutableMap.copyOf(copyValues);
     }
 
-    public int getIDFromValue(String value) {
+    public int getIDFromValue(final String value) {
         return this.valueToInt.get(value.toLowerCase());
     }
 
