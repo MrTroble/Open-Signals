@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.gson.Gson;
-import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
@@ -48,7 +47,7 @@ public class ChangeConfigParser {
     public static void loadChangeConfigs() {
 
         for (Map.Entry<String, String> files : OpenSignalsMain.contentPacks
-                .getFiles("signalconfigs/change").entrySet()) {
+                .getFiles("signalconfigs/change")) {
             final ChangeConfigParser parser = GSON.fromJson(files.getValue(),
                     ChangeConfigParser.class);
 

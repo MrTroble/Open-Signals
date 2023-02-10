@@ -78,9 +78,7 @@ public class Placementtool extends Item
         }
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(player.getMainHandItem());
         if (!wrapper.contains(BLOCK_TYPE_ID)) {
-            if (!worldIn.isClientSide)
-                translateMessageWrapper(player, "pt.itemnotset");
-            return InteractionResult.FAIL;
+            wrapper.putInteger(BLOCK_TYPE_ID, 0);
         }
         final Signal signal = getObjFromID(wrapper.getInteger(BLOCK_TYPE_ID));
         final List<SEProperty> properties = signal.getProperties();

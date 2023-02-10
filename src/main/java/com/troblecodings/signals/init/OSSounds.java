@@ -19,9 +19,8 @@ public final class OSSounds {
     public static final Map<String, SoundEvent> SOUNDS = new HashMap<>();
 
     public static void init() {
-        final Map<String, String> map = OpenSignalsMain.contentPacks.getFiles("sounds");
-        map.forEach((name, _u) -> {
-            final String soundName = name.toLowerCase().replace(".ogg", "");
+        OpenSignalsMain.contentPacks.getFiles("sounds").forEach(entry -> {
+            final String soundName = entry.getKey().toLowerCase().replace(".ogg", "");
             final ResourceLocation resource = new ResourceLocation(OpenSignalsMain.MODID,
                     soundName);
             final SoundEvent sound = new SoundEvent(resource).setRegistryName(soundName);

@@ -40,8 +40,8 @@ public class DefaultConfigParser {
     @SuppressWarnings("rawtypes")
     public static void loadDefaultConfigs() {
 
-        for (Map.Entry<String, String> files : OpenSignalsMain.contentPacks.getFiles("signalconfigs/default")
-                .entrySet()) {
+        for (Map.Entry<String, String> files : OpenSignalsMain.contentPacks
+                .getFiles("signalconfigs/default")) {
             final DefaultConfigParser parser = GSON.fromJson(files.getValue(),
                     DefaultConfigParser.class);
 

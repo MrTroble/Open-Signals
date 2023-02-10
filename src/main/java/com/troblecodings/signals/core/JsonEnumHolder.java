@@ -14,8 +14,8 @@ public class JsonEnumHolder {
     @SuppressWarnings("unchecked")
     public static Map<String, JsonEnum> getProperties() {
         final HashMap<String, JsonEnum> returnmap = new HashMap<>();
-        final Map<String, String> files = OpenSignalsMain.contentPacks.getFiles("enumdefinition");
-        files.forEach((_u, file) -> {
+        OpenSignalsMain.contentPacks.getFiles("enumdefinition").forEach((entry) -> {
+            final String file = entry.getValue();
             final Map<String, List<String>> map = JsonEnum.GSON.fromJson(file,
                     (Class<Map<String, List<String>>>) (Class<?>) Map.class);
             if (map == null)

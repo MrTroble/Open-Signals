@@ -5,7 +5,6 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
-import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.linkableapi.Linkingtool;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
@@ -114,8 +113,8 @@ public final class OSItems {
     private static final Gson GSON = new Gson();
 
     private static void loadTools() {
-        OpenSignalsMain.contentPacks.getFiles("tools").forEach((_u, content) -> {
-            final ToolParser tools = GSON.fromJson(content, ToolParser.class);
+        OpenSignalsMain.contentPacks.getFiles("tools").forEach(entry -> {
+            final ToolParser tools = GSON.fromJson(entry.getValue(), ToolParser.class);
             tools.getPlacementTools().forEach(placementtool -> {
                 final Placementtool tool = new Placementtool();
                 final String name = placementtool.toLowerCase().replace("_", "").trim();

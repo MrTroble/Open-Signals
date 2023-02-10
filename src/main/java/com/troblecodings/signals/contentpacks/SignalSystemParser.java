@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gson.Gson;
-import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
@@ -26,7 +26,7 @@ public class SignalSystemParser {
 
     public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {
 
-        final Map<String, String> systems = OpenSignalsMain.contentPacks.getFiles(directory);
+        final List<Entry<String, String>> systems = OpenSignalsMain.contentPacks.getFiles(directory);
 
         final Map<String, SignalSystemParser> properties = new HashMap<>();
 
@@ -35,8 +35,8 @@ public class SignalSystemParser {
             return properties;
         }
 
-        systems.forEach((name, property) -> {
-            properties.put(name, GSON.fromJson(property, SignalSystemParser.class));
+        systems.forEach(entry -> {
+            properties.put(entry.getKey(), GSON.fromJson(entry.getValue(), SignalSystemParser.class));
         });
 
         return properties;
