@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.contentpacks.ContentPackException;
 
@@ -15,8 +14,7 @@ public class JsonEnumHolder {
     @SuppressWarnings("unchecked")
     public static Map<String, JsonEnum> getProperties() {
         final HashMap<String, JsonEnum> returnmap = new HashMap<>();
-        final Map<String, String> files = FileReader
-                .readallFilesfromDierectory("/assets/opensignals/enumdefinition");
+        final Map<String, String> files = OpenSignalsMain.contentPacks.getFiles("enumdefinition");
         files.forEach((_u, file) -> {
             final Map<String, List<String>> map = JsonEnum.GSON.fromJson(file,
                     (Class<Map<String, List<String>>>) (Class<?>) Map.class);

@@ -101,8 +101,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
 
         final Map<String, ModelExtention> extentions = new HashMap<>();
 
-        final Map<String, Object> modelmap = ModelStats
-                .getfromJson("/assets/opensignals/modeldefinitions");
+        final Map<String, Object> modelmap = ModelStats.getfromJson("modeldefinitions");
 
         modelmap.forEach((filename, content) -> {
 

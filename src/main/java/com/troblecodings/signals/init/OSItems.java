@@ -114,17 +114,16 @@ public final class OSItems {
     private static final Gson GSON = new Gson();
 
     private static void loadTools() {
-        FileReader.readallFilesfromDierectory("/assets/opensignals/tools")
-                .forEach((_u, content) -> {
-                    final ToolParser tools = GSON.fromJson(content, ToolParser.class);
-                    tools.getPlacementTools().forEach(placementtool -> {
-                        final Placementtool tool = new Placementtool();
-                        final String name = placementtool.toLowerCase().replace("_", "").trim();
-                        tool.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
-                        placementtools.add(tool);
-                        registeredItems.add(tool);
-                    });
-                });
+        OpenSignalsMain.contentPacks.getFiles("tools").forEach((_u, content) -> {
+            final ToolParser tools = GSON.fromJson(content, ToolParser.class);
+            tools.getPlacementTools().forEach(placementtool -> {
+                final Placementtool tool = new Placementtool();
+                final String name = placementtool.toLowerCase().replace("_", "").trim();
+                tool.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
+                placementtools.add(tool);
+                registeredItems.add(tool);
+            });
+        });
     }
 
     @SubscribeEvent

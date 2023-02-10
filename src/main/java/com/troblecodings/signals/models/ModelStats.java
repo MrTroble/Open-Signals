@@ -6,6 +6,7 @@ import java.util.Map;
 import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.troblecodings.contentpacklib.FileReader;
+import com.troblecodings.signals.OpenSignalsMain;
 
 public class ModelStats {
 
@@ -24,7 +25,7 @@ public class ModelStats {
 
         final Gson gson = new Gson();
 
-        final Map<String, String> entrySet = FileReader.readallFilesfromDierectory(directory);
+        final Map<String, String> entrySet = OpenSignalsMain.contentPacks.getFiles(directory);
 
         final Map<String, Object> content = new HashMap<>();
 

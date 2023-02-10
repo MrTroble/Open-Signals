@@ -47,9 +47,8 @@ public class ChangeConfigParser {
     @SuppressWarnings("rawtypes")
     public static void loadChangeConfigs() {
 
-        for (Map.Entry<String, String> files : FileReader
-                .readallFilesfromDierectory("/assets/opensignals/signalconfigs/change")
-                .entrySet()) {
+        for (Map.Entry<String, String> files : OpenSignalsMain.contentPacks
+                .getFiles("signalconfigs/change").entrySet()) {
             final ChangeConfigParser parser = GSON.fromJson(files.getValue(),
                     ChangeConfigParser.class);
 

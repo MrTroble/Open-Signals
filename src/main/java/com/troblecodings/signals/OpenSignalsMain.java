@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 
+import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.handler.NameHandler;
@@ -29,6 +30,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
 
 @Mod(OpenSignalsMain.MODID)
@@ -58,6 +60,7 @@ public class OpenSignalsMain {
     public static Logger log = null;
     public static GuiHandler handler = null;
     public static NetworkHandler network = null;
+    public static FileReader contentPacks = null;
     private static boolean debug;
 
     /**
@@ -73,7 +76,12 @@ public class OpenSignalsMain {
 
     @SubscribeEvent
     public void preInit(final FMLConstructModEvent event) {
-        file = ModLoadingContext.get().getActiveContainer().getModInfo().getOwningFile().getFile();
+        debug = true;
+        log = LoggerContext.getContext().getLogger(MODID);
+        final IModInfo modInfo = ModLoadingContext.get().getActiveContainer().getModInfo();
+        file = modInfo.getOwningFile().getFile();
+        contentPacks = new FileReader(MODID, "assets/" + MODID, log,
+                name -> file.findResource(name));
         proxy.initModEvent(event);
     }
 
@@ -86,8 +94,6 @@ public class OpenSignalsMain {
 
     @SubscribeEvent
     public void init(final FMLCommonSetupEvent event) {
-        debug = true;
-        log = LoggerContext.getContext().getLogger(MODID);
         proxy.preinit(event);
     }
 

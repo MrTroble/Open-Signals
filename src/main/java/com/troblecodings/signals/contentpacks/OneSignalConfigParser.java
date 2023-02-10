@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.google.gson.Gson;
-import com.troblecodings.contentpacklib.FileReader;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
@@ -38,9 +38,8 @@ public class OneSignalConfigParser {
     }
 
     public static void loadShuntigConfigs() {
-        for (Map.Entry<String, String> files : FileReader
-                .readallFilesfromDierectory("/assets/opensignals/signalconfigs/shunting")
-                .entrySet()) {
+        for (Map.Entry<String, String> files : OpenSignalsMain.contentPacks
+                .getFiles("signalconfigs/shunting").entrySet()) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalConfigParser.class);
 
@@ -65,8 +64,8 @@ public class OneSignalConfigParser {
     }
 
     public static void loadResetConfigs() {
-        for (Map.Entry<String, String> files : FileReader
-                .readallFilesfromDierectory("/assets/opensignals/signalconfigs/reset").entrySet()) {
+        for (Map.Entry<String, String> files : OpenSignalsMain.contentPacks
+                .getFiles("signalconfigs/reset").entrySet()) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalConfigParser.class);
 

@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.gson.Gson;
-import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
@@ -41,8 +40,7 @@ public class DefaultConfigParser {
     @SuppressWarnings("rawtypes")
     public static void loadDefaultConfigs() {
 
-        for (Map.Entry<String, String> files : FileReader
-                .readallFilesfromDierectory("/assets/opensignals/signalconfigs/default")
+        for (Map.Entry<String, String> files : OpenSignalsMain.contentPacks.getFiles("signalconfigs/default")
                 .entrySet()) {
             final DefaultConfigParser parser = GSON.fromJson(files.getValue(),
                     DefaultConfigParser.class);

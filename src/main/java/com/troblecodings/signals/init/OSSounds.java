@@ -3,7 +3,6 @@ package com.troblecodings.signals.init;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.signals.OpenSignalsMain;
 
 import net.minecraft.resources.ResourceLocation;
@@ -20,8 +19,7 @@ public final class OSSounds {
     public static final Map<String, SoundEvent> SOUNDS = new HashMap<>();
 
     public static void init() {
-        final Map<String, String> map = FileReader
-                .readallFilesfromDierectory("assets/opensignals/sounds");
+        final Map<String, String> map = OpenSignalsMain.contentPacks.getFiles("sounds");
         map.forEach((name, _u) -> {
             final String soundName = name.toLowerCase().replace(".ogg", "");
             final ResourceLocation resource = new ResourceLocation(OpenSignalsMain.MODID,

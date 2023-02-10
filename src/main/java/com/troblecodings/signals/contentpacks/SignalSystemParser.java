@@ -26,7 +26,7 @@ public class SignalSystemParser {
 
     public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {
 
-        final Map<String, String> systems = FileReader.readallFilesfromDierectory(directory);
+        final Map<String, String> systems = OpenSignalsMain.contentPacks.getFiles(directory);
 
         final Map<String, SignalSystemParser> properties = new HashMap<>();
 
