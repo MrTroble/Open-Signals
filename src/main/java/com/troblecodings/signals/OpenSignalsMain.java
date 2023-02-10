@@ -1,11 +1,14 @@
 package com.troblecodings.signals;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
-
 import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
@@ -23,14 +26,15 @@ import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
+import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.Pack.Position;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.PackSource;
-import net.minecraft.world.entity.vehicle.Minecart;
-import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -97,19 +101,26 @@ public class OpenSignalsMain {
     }
 
     @SubscribeEvent
-    public void client(final FMLClientSetupEvent event) {
-        PackRepository repo = Minecraft.getInstance().getResourcePackRepository();
-        repo.addPackFinder((consumer, instance) -> {
+    public void packEvent(AddPackFindersEvent event) {
+        Map<String, Pack> packs = new HashMap<>();
+        event.addRepositorySource((consumer, instance) -> {
+            if(!packs.isEmpty()) {
+                packs.values().forEach(consumer);
+                return;
+            }
             for (Path path : contentPacks.getPaths()) {
-                String fileName = path.getFileName().toString();
+                String fileName = MODID + "internal" + packs.size();
                 Component component = new TextComponent(fileName);
                 consumer.accept(instance.create(fileName, component, false,
                         () -> new PathResourcePack(fileName, path),
-                        new PackMetadataSection(component, 8), Position.BOTTOM, PackSource.DEFAULT,
-                        debug));
+                        new PackMetadataSection(component, 8), Position.TOP, PackSource.DEFAULT,
+                        !debug));
             }
         });
-        repo.reload();
+    }
+
+    @SubscribeEvent
+    public void client(final FMLClientSetupEvent event) {
         OSBlocks.blocksToRegister.forEach(block -> {
             ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped());
         });

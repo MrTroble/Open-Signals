@@ -96,7 +96,6 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
     @SuppressWarnings("unchecked")
     @Override
     public void onResourceManagerReload(final ResourceManager resourceManager) {
-
         registeredModels.clear();
 
         final Map<String, ModelExtention> extentions = new HashMap<>();
@@ -192,12 +191,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
                 registeredModels.put(lowercaseName, accumulator);
             }
         }
-    }
-
-    public void prepare() {
         final ForgeModelBakery bakery = ForgeModelBakery.instance();
-        if (registeredModels.isEmpty())
-            this.onResourceManagerReload(null);
         final MapWrapper wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
         bakery.unbakedCache = wrapper;
         wrapper.putNormal(
@@ -218,4 +212,5 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
             }
         });
     }
+
 }
