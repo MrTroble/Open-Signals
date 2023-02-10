@@ -131,6 +131,7 @@ property.wing2.name=Second Wing
 property.wing1.name=Primary Wing
 property.semavr.name=Distant Signal
 property.sh_mech.name=Protection Signal
+property.zs12.name=Zs12
 
 #Signal Description
 property.signaltype.desc=Here you can toggle between the different signal types.
@@ -182,6 +183,7 @@ property.wing1.desc=Wing for Hp0 and Hp1
 property.semavr.desc=§lVr Distant signal§r - Distant signals indicate which signal aspect is to be expected at the associated main signal.%n§nVr0§r: Expect stop%n§nVr1§r: Expect run%n§nVr2§r: Expect run with speed restriction
 property.sh_mech.desc=§lSh Protection signal§r%n§nSh0§r: Stop for train and shunting movements%n§nSh1§r: Shunting permitted.%n§nWn7/Gsp2§r:The track lock is set aside.
 property.customname.desc=Here you can enter the signal name respectively the signal inscription, which will be displayed on the sign. With '[n]' you get into the next line.
+property.zs12.desc=§nZs12 M-Board§r - Pass Hp0 signal or disturbed main light signal with verbal order.
 
 #Sign Names
 property.indicator.name=Indicator

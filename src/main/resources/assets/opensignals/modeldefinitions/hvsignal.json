@@ -292,6 +292,14 @@
 				}
 			],
 			"y": 1
-		}
+		},
+        "zs/zs12": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(ZS12)"
+                }
+            ],
+            "y": 2.8125
+        }
 	}
 }

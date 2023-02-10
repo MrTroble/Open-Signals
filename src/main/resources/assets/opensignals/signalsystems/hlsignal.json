@@ -101,6 +101,11 @@
             "changeableStage": "GUISTAGE"
         },
         {
+            "name": "zs12",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
             "name": "blocksignal",
             "enumClass": "HLBlock",
             "defaultState": "OFF",

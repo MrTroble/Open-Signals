@@ -51,7 +51,7 @@
                     "blockstate": "hasandis(MASTSIGNDISTANT)"
                 }
             ],
-            "y": 1
+            "y": 1.125
         },
         "hl/hl_mast2": {
             "textures": [
@@ -381,7 +381,7 @@
                     }
                 }
             ],
-            "y": 2
+            "y": 2.125
         },
         "hl/hl_zs2": {
             "textures": [
@@ -436,6 +436,14 @@
                 }
             ],
             "y": 3.6875
+        },
+        "zs/zs12": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(ZS12)"
+                }
+            ],
+            "y": 1.375
         }
     }
 }
