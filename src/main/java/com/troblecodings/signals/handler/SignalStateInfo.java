@@ -25,6 +25,11 @@ public class SignalStateInfo {
     }
 
     @Override
+    public String toString() {
+        return "SignalStateInfo [world=" + world + ", pos=" + pos + ", signal=" + signal + "]";
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(pos, signal, world);
     }

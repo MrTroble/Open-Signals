@@ -115,7 +115,7 @@ public class Signal extends BasicBlock {
         if (te == null)
             return Shapes.block();
         return Shapes.create(Shapes.block().bounds().expandTowards(0,
-                getHeight(SignalStateHandler.getStates(new SignalStateInfo(te.getLevel(), pos))),
+                getHeight(SignalStateHandler.getStates(new SignalStateInfo(te.getLevel(), pos, this))),
                 0));
     }
 
@@ -217,7 +217,7 @@ public class Signal extends BasicBlock {
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
         final Map<SEProperty, String> map = SignalStateHandler.getStates(
-                new SignalStateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos()));
+                new SignalStateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos(), this));
         for (final FloatProperty property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
                 customRenderHeight = property.height;
@@ -275,7 +275,7 @@ public class Signal extends BasicBlock {
         if (!(tile instanceof SignalTileEntity)) {
             return InteractionResult.FAIL;
         }
-        final SignalStateInfo stateInfo = new SignalStateInfo(level, blockPos);
+        final SignalStateInfo stateInfo = new SignalStateInfo(level, blockPos, this);
         if (loadRedstoneOutput(level, stateInfo) && level.isClientSide) {
             return InteractionResult.SUCCESS;
         }
@@ -326,7 +326,7 @@ public class Signal extends BasicBlock {
         if (!(blockAccess instanceof Level)) {
             return 0;
         }
-        final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos);
+        final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
         if (SignalStateHandler.getState(stateInfo, powerProperty)
                 .filter(power -> power.equals("false")).isPresent()) {
             return 0;
@@ -345,7 +345,7 @@ public class Signal extends BasicBlock {
         if (this.prop.sounds.isEmpty())
             return;
 
-        final SignalStateInfo stateInfo = new SignalStateInfo(world, pos);
+        final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
         final SoundProperty sound = getSound(properties);
         if (sound.duration < 1)
@@ -380,7 +380,7 @@ public class Signal extends BasicBlock {
         if (this.prop.sounds.isEmpty() || !world.isClientSide) {
             return;
         }
-        final SignalStateInfo stateInfo = new SignalStateInfo(world, pos);
+        final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
         final SoundProperty sound = getSound(SignalStateHandler.getStates(stateInfo));
         if (sound.duration <= 1) {
             return;
