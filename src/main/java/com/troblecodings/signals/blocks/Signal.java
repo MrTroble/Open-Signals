@@ -166,7 +166,7 @@ public class Signal extends BasicBlock {
         super.destroy(worldIn, pos, state);
         GhostBlock.destroyUpperBlock(worldIn, pos);
         if (!worldIn.isClientSide() && worldIn instanceof Level) {
-            // SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos));
+            SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos, this));
         }
     }
 
