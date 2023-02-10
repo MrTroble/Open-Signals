@@ -93,6 +93,11 @@
             "name": "ne2_3",
             "defaultState": false,
             "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs12",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
         }
     ]
 }
