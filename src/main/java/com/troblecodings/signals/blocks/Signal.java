@@ -73,7 +73,7 @@ public class Signal extends BasicBlock {
     private SEProperty powerProperty = null;
 
     public Signal(final SignalProperties prop) {
-        super(Properties.of(Material.STONE).noOcclusion());
+        super(Properties.of(Material.STONE).noOcclusion().lightLevel(u -> 1));
         this.prop = prop;
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
@@ -114,9 +114,8 @@ public class Signal extends BasicBlock {
         final SignalTileEntity te = (SignalTileEntity) source.getBlockEntity(pos);
         if (te == null)
             return Shapes.block();
-        return Shapes.create(Shapes.block().bounds().expandTowards(0,
-                getHeight(SignalStateHandler.getStates(new SignalStateInfo(te.getLevel(), pos, this))),
-                0));
+        return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(
+                SignalStateHandler.getStates(new SignalStateInfo(te.getLevel(), pos, this))), 0));
     }
 
     @Override
@@ -216,8 +215,8 @@ public class Signal extends BasicBlock {
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        final Map<SEProperty, String> map = SignalStateHandler.getStates(
-                new SignalStateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos(), this));
+        final Map<SEProperty, String> map = SignalStateHandler.getStates(new SignalStateInfo(
+                info.tileEntity.getLevel(), info.tileEntity.getBlockPos(), this));
         for (final FloatProperty property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
                 customRenderHeight = property.height;

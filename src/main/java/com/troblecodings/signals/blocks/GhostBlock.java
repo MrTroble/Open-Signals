@@ -1,11 +1,15 @@
 package com.troblecodings.signals.blocks;
 
+import com.troblecodings.signals.models.CustomModelLoader;
+
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -14,7 +18,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 public class GhostBlock extends BasicBlock {
 
     public GhostBlock() {
-        super(Properties.of(Material.GLASS).noOcclusion());
+        super(Properties.of(Material.GLASS).noOcclusion().lightLevel(u -> 1));
         registerDefaultState(defaultBlockState());
     }
 
@@ -50,6 +54,14 @@ public class GhostBlock extends BasicBlock {
             worldIn.destroyBlock(posdown, false);
             lowerBlock.destroy(worldIn, posdown, state);
         }
+    }
+
+    @Override
+    public StateDefinition<Block, BlockState> getStateDefinition() {
+        if (!Minecraft.getInstance().isLocalServer()) {
+            CustomModelLoader.INSTANCE.prepare();
+        }
+        return super.getStateDefinition();
     }
 
 }

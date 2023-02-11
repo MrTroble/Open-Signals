@@ -15,12 +15,16 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
+import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
+import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ForgeModelBakery;
+import net.minecraftforge.eventbus.api.Event;
 
 @OnlyIn(Dist.CLIENT)
 public class CustomModelLoader implements ResourceManagerReloadListener {
@@ -28,6 +32,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
     private static HashMap<String, List<SignalModelLoaderInfo>> registeredModels = new HashMap<>();
 
     public static final CustomModelLoader INSTANCE = new CustomModelLoader();
+    MapWrapper wrapper;
 
     private CustomModelLoader() {
     }
@@ -93,9 +98,33 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    private void defaultModel(MapWrapper wrapper, String name) {
+        wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, "inventory"),
+                DefaultModel.INSTANCE);
+        wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, ""),
+                DefaultModel.INSTANCE);
+    }
+
+    public void prepare() {
+        final ForgeModelBakery bakery = ForgeModelBakery.instance();
+        if (!(bakery.unbakedCache instanceof MapWrapper)) {
+            wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
+            defaultModel(wrapper, "ghostblock");
+            registeredModels.forEach((name, loaderList) -> {
+                defaultModel(wrapper, name);
+                for (final SignalAngel angel : SignalAngel.values()) {
+                    wrapper.putNormal(
+                            new ModelResourceLocation(OpenSignalsMain.MODID, name,
+                                    "angel=" + angel.getNameWrapper()),
+                            new SignalCustomModel(angel, loaderList));
+                }
+            });
+            bakery.unbakedCache = wrapper;
+        }
+    }
+
     @Override
-    public void onResourceManagerReload(final ResourceManager resourceManager) {
+    public void onResourceManagerReload(ResourceManager p_10758_) {
         registeredModels.clear();
 
         final Map<String, ModelExtention> extentions = new HashMap<>();
@@ -191,26 +220,6 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
                 registeredModels.put(lowercaseName, accumulator);
             }
         }
-        final ForgeModelBakery bakery = ForgeModelBakery.instance();
-        final MapWrapper wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
-        bakery.unbakedCache = wrapper;
-        wrapper.putNormal(
-                new ModelResourceLocation(OpenSignalsMain.MODID, "ghostblock", "inventory"),
-                new DefaultModel());
-        wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, "ghostblock", ""),
-                new DefaultModel());
-        registeredModels.forEach((name, loaderList) -> {
-            wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, ""),
-                    new SignalCustomModel(SignalAngel.ANGEL0, loaderList));
-            wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, "inventory"),
-                    new DefaultModel());
-            for (final SignalAngel angel : SignalAngel.values()) {
-                wrapper.putNormal(
-                        new ModelResourceLocation(OpenSignalsMain.MODID, name,
-                                "angel=" + angel.getNameWrapper()),
-                        new SignalCustomModel(angel, loaderList));
-            }
-        });
     }
 
 }

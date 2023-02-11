@@ -22,6 +22,10 @@ import net.minecraft.resources.ResourceLocation;
 
 public class DefaultModel implements UnbakedModel {
 
+    public static final DefaultModel INSTANCE = new DefaultModel();
+    
+    private DefaultModel() {}
+    
     @Override
     public Collection<ResourceLocation> getDependencies() {
         return new ArrayList<>();
