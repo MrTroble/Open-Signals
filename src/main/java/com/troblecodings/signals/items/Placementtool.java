@@ -87,10 +87,12 @@ public class Placementtool extends Item
             final String name = property.getName();
             if (wrapper.contains(name) && !property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
                 signalProperties.put(property, wrapper.getString(name));
-            } else if ((property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
-                    && property.testMap(signalProperties))
-                    || (property.isChangabelAtStage(ChangeableStage.APISTAGE)
-                            && wrapper.contains(name))) {
+            }
+            if (property.isChangabelAtStage(ChangeableStage.APISTAGE) && wrapper.contains(name)) {
+                signalProperties.put(property, property.getDefault());
+            }
+            if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
+                    && property.testMap(signalProperties)) {
                 signalProperties.put(property, property.getDefault());
             }
         });
@@ -98,11 +100,12 @@ public class Placementtool extends Item
         final BlockPos pos = context.getClickedPos().above();
         BlockPos checkPos = pos;
         for (int i = 0; i < height; i++) {
-            if (!worldIn.isEmptyBlock(checkPos = checkPos.above())) {
+            if (!worldIn.isEmptyBlock(checkPos)) {
                 if (!worldIn.isClientSide)
                     translateMessageWrapper(player, "pt.blockinway");
                 return InteractionResult.FAIL;
             }
+            checkPos = checkPos.above();
         }
         BlockPos ghostPos = pos.above();
         for (int i = 0; i < height; i++) {

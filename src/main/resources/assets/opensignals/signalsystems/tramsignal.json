@@ -9,7 +9,7 @@
 		{
 			"name": "signaltramtype",
 			"enumClass": "TramType",
-			"defaultState": "TRAM",
+			"defaultState": "OFF",
 			"changeableStage": "GUISTAGE"
 		},
 		{
