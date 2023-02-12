@@ -101,25 +101,6 @@ public class OpenSignalsMain {
     }
 
     @SubscribeEvent
-    public void packEvent(AddPackFindersEvent event) {
-        Map<String, Pack> packs = new HashMap<>();
-        event.addRepositorySource((consumer, instance) -> {
-            if(!packs.isEmpty()) {
-                packs.values().forEach(consumer);
-                return;
-            }
-            for (Path path : contentPacks.getPaths()) {
-                String fileName = MODID + "internal" + packs.size();
-                Component component = new TextComponent(fileName);
-                consumer.accept(instance.create(fileName, component, true,
-                        () -> new PathResourcePack(fileName, path),
-                        new PackMetadataSection(component, 8), Position.TOP, PackSource.DEFAULT,
-                        !debug));
-            }
-        });
-    }
-
-    @SubscribeEvent
     public void client(final FMLClientSetupEvent event) {
         OSBlocks.blocksToRegister.forEach(block -> {
             ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped());
