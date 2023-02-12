@@ -111,7 +111,7 @@ public class OpenSignalsMain {
             for (Path path : contentPacks.getPaths()) {
                 String fileName = MODID + "internal" + packs.size();
                 Component component = new TextComponent(fileName);
-                consumer.accept(instance.create(fileName, component, false,
+                consumer.accept(instance.create(fileName, component, true,
                         () -> new PathResourcePack(fileName, path),
                         new PackMetadataSection(component, 8), Position.TOP, PackSource.DEFAULT,
                         !debug));
