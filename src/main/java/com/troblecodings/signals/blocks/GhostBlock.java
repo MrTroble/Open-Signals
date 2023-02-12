@@ -1,5 +1,7 @@
 package com.troblecodings.signals.blocks;
 
+import org.spongepowered.asm.mixin.MixinEnvironment.Side;
+
 import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.Minecraft;
@@ -14,6 +16,8 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class GhostBlock extends BasicBlock {
 
@@ -56,6 +60,7 @@ public class GhostBlock extends BasicBlock {
         }
     }
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public StateDefinition<Block, BlockState> getStateDefinition() {
         if (!Minecraft.getInstance().isLocalServer()) {

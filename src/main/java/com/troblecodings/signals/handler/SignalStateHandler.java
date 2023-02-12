@@ -29,16 +29,13 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkEvent.ClientCustomPayloadEvent;
-import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.NetworkEvent.ClientCustomPayloadEvent;
 import net.minecraftforge.network.event.EventNetworkChannel;
 
 public final class SignalStateHandler implements INetworkSync {
@@ -54,6 +51,10 @@ public final class SignalStateHandler implements INetworkSync {
         channel = NetworkRegistry.newEventChannel(channelName, () -> OpenSignalsMain.MODID,
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new SignalStateHandler());
+    }
+
+    public static void add(Object object) {
+        channel.registerObject(object);
     }
 
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(4);
@@ -251,9 +252,6 @@ public final class SignalStateHandler implements INetworkSync {
                 maps = ImmutableMap.copyOf(currentlyLoadedStates);
             }
             maps.forEach(SignalStateHandler::createToFile);
-            if (save.getWorld().isClientSide()) {
-                currentlyLoadedStatesClient.clear();
-            }
         });
     }
 
@@ -337,50 +335,6 @@ public final class SignalStateHandler implements INetworkSync {
         return true;
     }
 
-    private static final Map<SignalStateInfo, Map<SEProperty, String>> currentlyLoadedStatesClient = new HashMap<>();
-
-    public static final Map<SEProperty, String> getClientStates(final SignalStateInfo info) {
-        return currentlyLoadedStatesClient.computeIfAbsent(info, _u -> new HashMap<>());
-    }
-
-    @Override
-    public void deserializeClient(final ByteBuffer buf) {
-        final BlockPos signalPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
-        final int propertiesSize = Byte.toUnsignedInt(buf.get());
-        if (propertiesSize == 255) {
-            // TODO inform client to unrender
-            return;
-        }
-        final int[] propertyIDs = new int[propertiesSize];
-        final int[] valueIDs = new int[propertiesSize];
-        for (int i = 0; i < propertiesSize; i++) {
-            propertyIDs[i] = Byte.toUnsignedInt(buf.get());
-            valueIDs[i] = Byte.toUnsignedInt(buf.get());
-        }
-        SERVICE.execute(() -> {
-            final Minecraft mc = Minecraft.getInstance();
-            Level level = mc.level;
-            if (level == null)
-                return;
-            BlockEntity entity;
-            while ((entity = level.getBlockEntity(signalPos)) == null)
-                continue;
-            final SignalStateInfo stateInfo = new SignalStateInfo(level, signalPos);
-            final List<SEProperty> signalProperties = stateInfo.signal.getProperties();
-            synchronized (currentlyLoadedStatesClient) {
-                final Map<SEProperty, String> properties = currentlyLoadedStatesClient
-                        .computeIfAbsent(stateInfo, _u -> new HashMap<>());
-                for (int i = 0; i < propertiesSize; i++) {
-                    final SEProperty property = signalProperties.get(propertyIDs[i]);
-                    final String value = property.getObjFromID(valueIDs[i]);
-                    properties.put(property, value);
-                }
-            }
-            entity.requestModelDataUpdate();
-            mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
-        });
-    }
-
     public static void sendTo(final Player player, final ByteBuffer buf) {
         final FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.copiedBuffer(buf.position(0)));
         if (player instanceof ServerPlayer) {
@@ -395,12 +349,6 @@ public final class SignalStateHandler implements INetworkSync {
     @SubscribeEvent
     public void clientEvent(final ClientCustomPayloadEvent event) {
         deserializeServer(event.getPayload().nioBuffer());
-        event.getSource().get().setPacketHandled(true);
-    }
-
-    @SubscribeEvent
-    public void serverEvent(final ServerCustomPayloadEvent event) {
-        deserializeClient(event.getPayload().nioBuffer());
         event.getSource().get().setPacketHandled(true);
     }
 }

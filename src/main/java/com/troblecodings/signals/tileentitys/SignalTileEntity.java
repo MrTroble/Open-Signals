@@ -8,6 +8,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.handler.ClientSignalsStateHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.models.ModelInfoWrapper;
@@ -22,7 +23,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
     }
-    
+
     @Override
     public boolean isValid(final Player player) {
         return true;
@@ -46,7 +47,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public IModelData getModelData() {
-        final Map<SEProperty, String> states = SignalStateHandler
+        final Map<SEProperty, String> states = ClientSignalsStateHandler
                 .getClientStates(new SignalStateInfo(level, worldPosition));
         final Builder builder = new ModelDataMap.Builder();
         states.forEach((property, value) -> {

@@ -1,14 +1,9 @@
 package com.troblecodings.signals;
 
-import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
+
 import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
@@ -21,20 +16,10 @@ import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.server.packs.PackType;
-import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
-import net.minecraft.server.packs.repository.Pack;
-import net.minecraft.server.packs.repository.Pack.Position;
-import net.minecraft.server.packs.repository.PackRepository;
-import net.minecraft.server.packs.repository.PackSource;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddPackFindersEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -46,7 +31,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
-import net.minecraftforge.resource.PathResourcePack;
 
 @Mod(OpenSignalsMain.MODID)
 public class OpenSignalsMain {

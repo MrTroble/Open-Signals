@@ -10,6 +10,8 @@ import com.troblecodings.signals.guis.GuiPlacementtool;
 import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.GuiSignalController;
 import com.troblecodings.signals.guis.NamableGui;
+import com.troblecodings.signals.handler.ClientSignalsStateHandler;
+import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.tileentitys.SignalSpecialRenderer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
@@ -24,6 +26,7 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void initModEvent(FMLConstructModEvent event) {
         super.initModEvent(event);
+        SignalStateHandler.add(new ClientSignalsStateHandler());
         OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);
         OpenSignalsMain.handler.addGui(SignalController.class, GuiSignalController::new);
         OpenSignalsMain.handler.addGui(SignalBox.class, GuiSignalBox::new);
