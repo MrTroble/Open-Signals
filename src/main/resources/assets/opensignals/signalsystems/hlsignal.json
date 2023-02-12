@@ -13,7 +13,7 @@
         {
             "name": "hltype",
             "enumClass": "HLType",
-            "defaultState": "HL_MAIN",
+            "defaultState": "OFF",
             "changeableStage": "GUISTAGE"
         },
         {

@@ -31,6 +31,7 @@ public class NamableGui extends GuiBase {
 
     private void initOwn() {
         this.entity.clear();
+        this.entity.add(new UILabel("Currently Not in Use!"));
         this.entity.add(new UIBox(UIBox.HBOX, 5));
 
         final UIEntity inner = new UIEntity();
@@ -101,6 +102,7 @@ public class NamableGui extends GuiBase {
 
     @Override
     public void updateFromContainer() {
-        initOwn();
+        this.entity.add(new UILabel("Currently Not Usable!"));
+        // initOwn();
     }
 }

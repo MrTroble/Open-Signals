@@ -114,8 +114,12 @@ public class Signal extends BasicBlock {
         final SignalTileEntity te = (SignalTileEntity) source.getBlockEntity(pos);
         if (te == null)
             return Shapes.block();
-        return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(
-                SignalStateHandler.getStates(new SignalStateInfo(te.getLevel(), pos, this))), 0));
+        final Level world = te.getLevel();
+        final SignalStateInfo info = new SignalStateInfo(world, pos, this);
+        final Map<SEProperty, String> properties = world.isClientSide
+                ? SignalStateHandler.getClientStates(info)
+                : SignalStateHandler.getStates(info);
+        return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
 
     @Override

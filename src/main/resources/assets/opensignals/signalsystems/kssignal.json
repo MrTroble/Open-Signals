@@ -13,7 +13,7 @@
         {
             "name": "kombitype",
             "enumClass": "KSType",
-            "defaultState": "KS_MAIN",
+            "defaultState": "OFF",
             "changeableStage": "GUISTAGE"
         },
         {

@@ -51,35 +51,35 @@ public final class PredicateHolder {
         };
     }
 
-    public static Predicate<Map<SEProperty, Object>> check(final ValuePack pack) {
+    public static Predicate<Map<SEProperty, String>> check(final ValuePack pack) {
         return check(pack.property, pack.predicate);
     }
 
-    public static Predicate<Map<SEProperty, Object>> check(final SEProperty property,
-            final Object type) {
+    public static Predicate<Map<SEProperty, String>> check(final SEProperty property,
+            final String type) {
         return check(property, type::equals);
     }
 
     @SuppressWarnings({
             "unchecked", "rawtypes"
     })
-    public static Predicate<Map<SEProperty, Object>> check(final SEProperty property,
+    public static Predicate<Map<SEProperty, String>> check(final SEProperty property,
             final Predicate type) {
         return t -> {
-            final Object value = t.get(property);
+            final String value = t.get(property);
             if (value == null)
-                return true;
-            return type.test(value);
+                return false;
+            return type.test(value.toUpperCase());
         };
     }
 
     @SuppressWarnings("unchecked")
-    public static Predicate<Map<SEProperty, Object>> config(final ValuePack pack) {
+    public static Predicate<Map<SEProperty, String>> config(final ValuePack pack) {
         return t -> {
-            final Object value = t.get(pack.property);
+            final String value = t.get(pack.property);
             if (value == null)
                 return false;
-            return pack.predicate.test(value);
+            return pack.predicate.test(value.toUpperCase());
         };
     }
 
@@ -92,7 +92,7 @@ public final class PredicateHolder {
         final CompareValues values = CompareValues.getValuefromString(compare);
         if (values == null)
             throw new LogicalParserException(
-                    "The given operator of the speed function (" + compare + ") is not permitted!");
+                    "The given operator of the speed function [" + compare + "] is not permitted!");
         switch (values) {
             case GREATER:
                 return s -> {

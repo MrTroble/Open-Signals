@@ -56,7 +56,7 @@ public final class SignalStateHandler implements INetworkSync {
         channel.registerObject(new SignalStateHandler());
     }
 
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(3);
+    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(4);
 
     public static void createStates(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
@@ -360,7 +360,7 @@ public final class SignalStateHandler implements INetworkSync {
         SERVICE.execute(() -> {
             final Minecraft mc = Minecraft.getInstance();
             Level level = mc.level;
-            if(level == null)
+            if (level == null)
                 return;
             BlockEntity entity;
             while ((entity = level.getBlockEntity(signalPos)) == null)

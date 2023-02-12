@@ -13,7 +13,7 @@
         {
             "name": "hptype",
             "enumClass": "HPType",
-            "defaultState": "STOPSIGNAL",
+            "defaultState": "OFF",
             "changeableStage": "GUISTAGE"
         },
         {

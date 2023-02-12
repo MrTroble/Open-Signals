@@ -22,7 +22,7 @@
         {
             "name": "sematype",
             "enumClass": "SemaType",
-            "defaultState": "DIST",
+            "defaultState": "OFF",
             "changeableStage": "GUISTAGE"
         },
         {
