@@ -1,0 +1,80 @@
+{
+    "textures": {
+        "lamp_white": "opensignals:blocks/lamps/lamp_white",
+        "lamp_white_blink": "opensignals:blocks/lamps/lamp_white_blink"
+    },
+    "models": {
+        "wn/wn1_2": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(WNTYPE) && with(WNNORMAL.OFF)"
+                },
+                {
+                    "blockstate":"hasandisnot(WNTYPE) && with(WNNORMAL.WN1)",
+                    "retexture":{
+                        "lamp_1": "lamp_white",
+                        "lamp_3": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate":"hasandisnot(WNTYPE) && with(WNNORMAL.WN2)",
+                    "retexture":{
+                        "lamp_2": "lamp_white",
+                        "lamp_3": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate":"hasandisnot(WNTYPE) && with(WNNORMAL.BLINK)",
+                    "retexture":{
+                        "lamp_3": "lamp_white_blink"
+                    }
+                }
+            ]
+        },
+        "wn/wn3_6": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(WNTYPE) && with(WNCROSS.OFF)"
+                },
+                {
+                    "blockstate":"hasandis(WNTYPE) && with(WNCROSS.WN3)",
+                    "retexture":{
+                        "lamp_1": "lamp_white",
+                        "lamp_3": "lamp_white",
+                        "lamp_5": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate":"hasandis(WNTYPE) && with(WNCROSS.WN4)",
+                    "retexture":{
+                        "lamp_1": "lamp_white",
+                        "lamp_2": "lamp_white",
+                        "lamp_4": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate":"hasandis(WNTYPE) && with(WNCROSS.WN5)",
+                    "retexture":{
+                        "lamp_1": "lamp_white",
+                        "lamp_3": "lamp_white",
+                        "lamp_4": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate":"hasandis(WNTYPE) && with(WNCROSS.WN6)",
+                    "retexture":{
+                        "lamp_1": "lamp_white",
+                        "lamp_2": "lamp_white",
+                        "lamp_5": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate":"hasandis(WNTYPE) && with(WNCROSS.BLINK)",
+                    "retexture":{
+                        "lamp_1": "lamp_white_blink"
+                    }
+                }
+            ]
+        }
+    }
+}

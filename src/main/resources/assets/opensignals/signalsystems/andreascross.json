@@ -1,0 +1,47 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": true,
+        "defaultHeight": 2,
+        "sounds": {
+            "(config(ac_blink_light.TRUE) || (config(ac_car.YELLOW) || config(ac_car.RED))) && config(ac_sound.TRUE)": {
+                "name": "andreas_cross",
+                "length": 84
+            }
+        }
+    },
+    "seProperties": [
+        {
+            "name": "ac_electricity",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ac_addition",
+            "enumClass": "ACAddition",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ac_blink_light",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(AC_ADDITION.BLINK1) || check(AC_ADDITION.BLINK2)"
+        },
+        {
+            "name": "ac_car",
+            "enumClass": "ACCar",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(AC_ADDITION.TRAFFIC_LIGHT)"
+        },
+        {
+            "name": "ac_sound",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

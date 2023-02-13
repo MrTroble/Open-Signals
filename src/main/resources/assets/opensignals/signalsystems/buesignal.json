@@ -1,0 +1,28 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": false,
+        "defaultHeight": 2
+    },
+    "seProperties": [
+        {
+            "name": "buetype",
+            "enumClass": "BUE",
+            "defaultState": "BUE4",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "bueadd",
+            "enumClass": "BUEAdd",
+            "defaultState": "ADD",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "bueshort",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

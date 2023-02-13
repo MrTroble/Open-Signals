@@ -1,0 +1,16 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": false,
+        "defaultHeight": 3
+    },
+    "seProperties": [
+        {
+            "name": "etcs_type",
+            "enumClass": "ETCS",
+            "defaultState": "NE14_LEFT",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

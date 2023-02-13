@@ -1,0 +1,116 @@
+{
+    "systemProperties": {
+        "placementToolName": "placementtool",
+        "canLink": true,
+        "defaultHeight": 6,
+        "customNameRenderHeight": 2.775,
+        "colors": [
+            16777215,
+            16761344
+        ]
+    },
+    "seProperties": [
+        {
+            "name": "hptype",
+            "enumClass": "HPType",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "stopsignal",
+            "enumClass": "HP",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HPTYPE.STOPSIGNAL)"
+        },
+        {
+            "name": "hphome",
+            "enumClass": "HPHome",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HPTYPE.HPHOME)"
+        },
+        {
+            "name": "hpblock",
+            "enumClass": "HPBlock",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HPTYPE.HPBLOCK)"
+        },
+        {
+            "name": "identifier",
+            "defaultState": false,
+            "autoname": true,
+            "changeableStage": "APISTAGE"
+        },
+        {
+            "name": "distantsignal",
+            "enumClass": "VR",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "APISTAGE"
+        },
+        {
+            "name": "vrlight",
+            "defaultState": false,
+            "autoname": true,
+            "changeableStage": "APISTAGE"
+        },
+        {
+            "name": "ne2",
+            "defaultState": false,
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "mastsign",
+            "enumClass": "MastSignal",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs3",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs3v",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs1",
+            "defaultState": false,
+            "autoname": true
+        },
+        {
+            "name": "zs7",
+            "defaultState": false,
+            "autoname": true
+        },
+        {
+            "name": "zs3plate",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs3vplate",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs12",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

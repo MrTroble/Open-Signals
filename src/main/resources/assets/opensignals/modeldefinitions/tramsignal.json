@@ -1,0 +1,218 @@
+{
+    "textures": {
+        "f_0": "opensignals:blocks/tram/f_0",
+        "f_1": "opensignals:blocks/tram/f_1",
+        "f_2": "opensignals:blocks/tram/f_2",
+        "f_3": "opensignals:blocks/tram/f_3",
+        "f_4": "opensignals:blocks/tram/f_4",
+        "f_5": "opensignals:blocks/tram/f_5",
+        "a": "opensignals:blocks/tram/a",
+        "t": "opensignals:blocks/tram/t", 
+        "w1": "opensignals:blocks/tram/w1",
+        "w11": "opensignals:blocks/tram/w11",
+        "w2": "opensignals:blocks/tram/w2",
+        "w12": "opensignals:blocks/tram/w12",
+        "w3": "opensignals:blocks/tram/w3",
+        "w13": "opensignals:blocks/tram/w13",
+        "w14": "opensignals:blocks/tram/w14",
+        "lamp_red": "opensignals:blocks/lamps/lamp_red",
+        "lamp_yellow": "opensignals:blocks/lamps/lamp_yellow",
+        "lamp_green": "opensignals:blocks/lamps/lamp_green",
+        "lamp_yellow_blink": "opensignals:blocks/lamps/lamp_yellow_blink",
+        "lamp_yellow_blink_i": "opensignals:blocks/lamps/lamp_yellow_blink_i"
+    },
+    "models": {
+        "trafficlight/trafficlight_tram": {
+            "textures": [
+                {
+                    "blockstate": "with(SIGNALTRAM.OFF) && with(SIGNALTRAMTYPE.TRAM)"
+                },
+                {
+                    "blockstate": "with(SIGNALTRAM.F0) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "rednorth": "f_0"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAM.F1) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "greennorth": "f_1"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAM.F2) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "greennorth": "f_2"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAM.F3) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "greennorth": "f_3"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAM.F4) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "yellownorth": "f_4"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAM.F5) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "greennorth": "f_5"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMSWITCH.OFF) && with(SIGNALTRAMTYPE.SWITCH)"
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMSWITCH.W1) && with(SIGNALTRAMTYPE.SWITCH)",
+                    "retexture": {
+                        "rednorth": "w1"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMSWITCH.W11) && with(SIGNALTRAMTYPE.SWITCH)",
+                    "retexture": {
+                        "rednorth": "w11"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMSWITCH.W2) && with(SIGNALTRAMTYPE.SWITCH)",
+                    "retexture": {
+                        "yellownorth": "w2"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMSWITCH.W3) && with(SIGNALTRAMTYPE.SWITCH)",
+                    "retexture": {
+                        "greennorth": "w3"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMSWITCH.W12) && with(SIGNALTRAMTYPE.SWITCH)",
+                    "retexture": {
+                        "yellownorth": "w12"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMSWITCH.W13) && with(SIGNALTRAMTYPE.SWITCH)",
+                    "retexture": {
+                        "greennorth": "w13"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMSWITCH.W14) && with(SIGNALTRAMTYPE.SWITCH)",
+                    "retexture": {
+                        "greennorth": "w14"
+                    }
+                }
+            ],
+            "y": 0
+        },
+        "trafficlight/trafficlight_tram_single": {
+            "textures": [
+                {
+                    "blockstate": "with(SIGNALTRAMADD.A) && hasandisnot(SIGNALTRAMA) && with(SIGNALTRAMTYPE.TRAM)"
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMADD.A) && hasandis(SIGNALTRAMA) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "rednorth": "a"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMADD.T) && hasandisnot(SIGNALTRAMT) && with(SIGNALTRAMTYPE.TRAM)"
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMADD.T) && hasandis(SIGNALTRAMT) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "rednorth": "t"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMADD.AT) && with(SIGNALTRAMTYPE.TRAM)"
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMADD.AT) && hasandis(SIGNALTRAMT) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "rednorth": "t"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMADD.AT) && hasandisnot(SIGNALTRAMA) && with(SIGNALTRAMTYPE.TRAM)",
+                    "y": 0.375
+                },
+                {
+                    "blockstate": "with(SIGNALTRAMADD.AT) && hasandis(SIGNALTRAMA) && with(SIGNALTRAMTYPE.TRAM)",
+                    "retexture": {
+                        "rednorth": "a"
+                    },
+                    "y": 0.375
+                }
+            ],
+            "y": 1
+        },
+        "trafficlight/trafficlight_car": {
+            "textures": [
+                {
+                    "blockstate": "with(SIGNALCAR.OFF) && with(SIGNALTRAMTYPE.CAR)"
+                },
+                {
+                    "blockstate": "with(SIGNALCAR.RED) && with(SIGNALTRAMTYPE.CAR)",
+                    "retexture": {
+                        "rednorth": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALCAR.YELLOW) && with(SIGNALTRAMTYPE.CAR)",
+                    "retexture": {
+                        "yellownorth": "lamp_yellow"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALCAR.GREEN) && with(SIGNALTRAMTYPE.CAR)",
+                    "retexture": {
+                        "greennorth": "lamp_green"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALCAR.RED_YELLOW) && with(SIGNALTRAMTYPE.CAR)",
+                    "retexture": {
+                        "rednorth": "lamp_red",
+                        "yellownorth": "lamp_yellow"
+                    }
+                }
+            ],
+            "y": 0
+        },
+        "trafficlight/trafficlight_ped": {
+            "textures": [
+                {
+                    "blockstate": "with(SIGNALPED.OFF) && with(SIGNALTRAMTYPE.PEDESTRIAN)"
+                },
+                {
+                    "blockstate": "with(SIGNALPED.RED) && with(SIGNALTRAMTYPE.PEDESTRIAN)",
+                    "retexture": {
+                        "rednorth": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALPED.GREEN) && with(SIGNALTRAMTYPE.PEDESTRIAN)",
+                    "retexture": {
+                        "greennorth": "lamp_green"
+                    }
+                },
+                {
+                    "blockstate": "with(SIGNALPED.YELLOW) && with(SIGNALTRAMTYPE.PEDESTRIAN)",
+                    "retexture": {
+                        "rednorth": "lamp_yellow_blink",
+                        "greennorth": "lamp_yellow_blink_i"
+                    }
+                }
+            ],
+            "y": 0
+        }
+    }
+}

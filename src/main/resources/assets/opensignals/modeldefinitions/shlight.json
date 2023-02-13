@@ -1,0 +1,74 @@
+{
+	"textures": {
+		"lamp_white": "opensignals:blocks/lamps/lamp_white",
+		"lamp_red": "opensignals:blocks/lamps/lamp_red"
+	},
+	"models": {
+		"sh/sh_light": {
+			"textures": [
+				{
+					"blockstate": "with(sh_light_bottom.OFF) && with(sh_high.LOW)"
+				},
+				{
+					"blockstate": "with(sh_light_bottom.SH0) && with(sh_high.LOW)",
+					"retexture": {
+						"lamp_rednorth": "lamp_red"
+					}
+				},
+				{
+					"blockstate": "with(sh_light_bottom.SH1) && with(sh_high.LOW)",
+					"retexture": {
+						"lamp_whitenorth": "lamp_white",
+						"lamp_white2north": "lamp_white"
+					}
+				},
+				{
+					"blockstate": "with(sh_light_bottom.STATUS_LIGHT) && with(sh_high.LOW)",
+					"retexture": {
+						"lamp_whitenorth": "lamp_white"
+					}
+				},
+				{
+					"blockstate": "with(sh_light_bottom.OFF) && with(sh_high.HIGH)",
+					"y": 2
+				},
+				{
+					"blockstate": "with(sh_light_bottom.SH0) && with(sh_high.HIGH)",
+					"retexture": {
+						"lamp_rednorth": "lamp_red"
+					},
+					"y": 2
+				},
+				{
+					"blockstate": "with(sh_light_bottom.SH1) && with(sh_high.HIGH)",
+					"retexture": {
+						"lamp_whitenorth": "lamp_white",
+						"lamp_white2north": "lamp_white"
+					},
+					"y": 2
+				},
+				{
+					"blockstate": "with(sh_light_bottom.STATUS_LIGHT) && with(sh_high.HIGH)",
+					"retexture": {
+						"lamp_whitenorth": "lamp_white"
+					},
+					"y": 2
+				}
+
+			],
+			"y": 0
+		},
+		"sh/sh_mast": {
+			"textures": [
+				{
+					"blockstate": "with(sh_high.HIGH)"
+				},
+				{
+					"blockstate": "with(sh_high.HIGH)",
+					"y": 1
+				}
+			],
+			"y": 0
+		}
+	}
+}

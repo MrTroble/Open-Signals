@@ -1,0 +1,77 @@
+{
+    "textures": {
+        "lamp_red": "opensignals:blocks/lamps/lamp_red",
+        "lamp_red_blink": "opensignals:blocks/lamps/lamp_red_blink",
+        "lamp_yellow": "opensignals:blocks/lamps/lamp_yellow"
+    },
+    "models": {
+        "mast": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "bue/andreas_cross": {
+            "textures": [
+                {}
+            ],
+            "y": 1
+        },
+        "bue/andreas_cross_arrow": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(AC_ELECTRICITY)"   
+                }
+            ],
+            "y": 1
+        },
+        "bue/andreas_cross_blink1": {
+            "textures": [
+                {
+                    "blockstate": "with(AC_ADDITION.BLINK1) && hasandis(AC_BLINK_LIGHT)",
+                    "retexture": {
+                        "5": "lamp_red_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(AC_ADDITION.BLINK1) && hasandisnot(AC_BLINK_LIGHT)"
+                }
+            ],
+            "y": 1
+        },
+        "bue/andreas_cross_blink2": {
+            "textures": [
+                {
+                    "blockstate": "with(AC_ADDITION.BLINK2) && hasandis(AC_BLINK_LIGHT)",
+                    "retexture": {
+                        "5": "lamp_red_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(AC_ADDITION.BLINK2) && hasandisnot(AC_BLINK_LIGHT)"
+                }
+            ],
+            "y": 2
+        },
+        "bue/andreas_cross_traffic_light": {
+            "textures": [
+                {
+                    "blockstate": "with(AC_ADDITION.TRAFFIC_LIGHT) && with(AC_CAR.OFF)"
+                },
+                {
+                    "blockstate": "with(AC_ADDITION.TRAFFIC_LIGHT) && with(AC_CAR.RED)",
+                    "retexture": {
+                        "7": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(AC_ADDITION.TRAFFIC_LIGHT) && with(AC_CAR.YELLOW)",
+                    "retexture": {
+                        "8": "lamp_yellow"
+                    }
+                }
+            ],
+            "y": 2
+        }
+    }
+}

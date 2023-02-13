@@ -1,0 +1,4 @@
+{
+    "andreas_cross": {"category": "block", "sounds": [{"name": "opensignals:andreas_cross"}]},
+    "rottenwarn": {"category": "block", "sounds": [{"name": "opensignals:rottenwarn"}]}
+}

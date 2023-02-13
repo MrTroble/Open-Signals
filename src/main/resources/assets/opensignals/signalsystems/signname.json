@@ -1,0 +1,11 @@
+{
+	"systemProperties": {
+		"placementToolName": "signplacementtool",
+		"height": 0,
+		"offsetY": 2,
+		"customNameRenderHeight": 0.5,
+		"canLink": false
+	},
+	"seProperties": [
+	]
+}

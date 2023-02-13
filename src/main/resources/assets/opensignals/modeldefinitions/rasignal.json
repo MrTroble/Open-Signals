@@ -1,0 +1,165 @@
+{
+    "textures": {
+        "lamp_white": "opensignals:blocks/lamps/lamp_white",
+        "ra11a": "opensignals:blocks/ra/ra11a",
+        "ra11b": "opensignals:blocks/ra/ra11b"
+    },
+    "models": {
+        "mast": {
+            "textures": [
+                {
+                    "blockstate": "!with(RATYPE.RA12) && !with(RATYPE.RA6_9) && !with(RATYPE.RA11_DWARF)"
+                },
+                {
+                    "blockstate": "!with(RATYPE.RA12) && !with(RATYPE.RA6_9) && !with(RATYPE.RA10) && !with(RATYPE.RA11_DWARF)",
+                    "y": 1
+                },
+                {
+                    "blockstate": "!with(RATYPE.RA12) && !with(RATYPE.RA6_9) && !with(RATYPE.RA10) && !with(RATYPE.RA11_DWARF)",
+                    "y": 2
+                }
+            ],
+            "y": 0
+        },
+        "ra/ra10": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA10)"
+                }
+            ],
+            "y": 1
+        },
+        "ra/ra11": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA11A)",
+                    "retexture": {
+                        "2": "ra11a"
+                    }
+                },
+                {
+                    "blockstate": "with(RATYPE.RA11B)",
+                    "retexture": {
+                        "2": "ra11b"
+                    }
+                }
+            ],
+            "y": 3
+        },
+        "ra/ra11_dwarf": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA11_DWARF) && hasandisnot(RALIGHT)"
+                },
+                {
+                    "blockstate": "with(RATYPE.RA11_DWARF) && hasandis(RALIGHT)",
+                    "retexture": {
+                        "lamp_whitenorth": "lamp_white"
+                    }
+                }
+            ],
+            "y": 0
+        },
+        "ra/ra12": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA12)"
+                }
+            ],
+            "y": 0
+        },
+        "ra/ra11_sh1": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(RALIGHT) && (with(RATYPE.RA11A) || (with(RATYPE.RA11B)))"
+                },
+                {
+                    "blockstate": "hasandis(RALIGHT) && (with(RATYPE.RA11A) || (with(RATYPE.RA11B)))",
+                    "retexture": {
+                        "3": "lamp_white"
+                    }
+                }
+            ],
+            "y": 3
+        },
+        "hv/hv_base": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA6_9)"
+                }
+            ],
+            "y": 0
+        },
+        "hv/hv_mast1": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA6_9)"
+                }
+            ],
+            "y": 1
+        },
+        "hv/hv_mast2": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA6_9)"
+                }
+            ],
+            "y": 2
+        },
+        "hv/hv_mast3": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA6_9)"
+                }
+            ],
+            "y": 3
+        },
+        "ra/basket": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA6_9)"
+                }
+            ],
+            "y": 3
+        },
+        "ra/ra6_9": {
+            "textures": [
+                {
+                    "blockstate": "with(RATYPE.RA6_9) && with(RALIGHTSIGNAL.OFF)"
+                },
+                {
+                    "blockstate": "with(RATYPE.RA6_9) && with(RALIGHTSIGNAL.RA6)",
+                    "retexture": {
+                        "lamp_2": "lamp_white",
+                        "lamp_4": "lamp_white",
+                        "lamp_5": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate": "with(RATYPE.RA6_9) && with(RALIGHTSIGNAL.RA7)",
+                    "retexture": {
+                        "lamp_2": "lamp_white",
+                        "lamp_6": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate": "with(RATYPE.RA6_9) && with(RALIGHTSIGNAL.RA8)",
+                    "retexture": {
+                        "lamp_1": "lamp_white",
+                        "lamp_2": "lamp_white",
+                        "lamp_3": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate": "with(RATYPE.RA6_9) && with(RALIGHTSIGNAL.RA9)",
+                    "retexture": {
+                        "lamp_1": "lamp_white",
+                        "lamp_2": "lamp_white",
+                        "lamp_5": "lamp_white"
+                    }
+                }
+            ],
+            "y": "4"
+        }
+    }
+}

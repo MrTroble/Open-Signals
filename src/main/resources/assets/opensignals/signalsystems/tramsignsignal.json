@@ -1,0 +1,17 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "signalTypeName": "tramsignsignal",
+        "canLink": false,
+        "defaultHeight": 0
+    },
+    "seProperties": [
+        {
+            "name": "tramsigns",
+            "enumClass": "TramSigns",
+            "defaultState": "SH1",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

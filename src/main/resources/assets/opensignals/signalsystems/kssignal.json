@@ -1,0 +1,103 @@
+{
+    "systemProperties": {
+        "placementToolName": "placementtool",
+        "canLink": true,
+        "defaultHeight": 6,
+        "customNameRenderHeight": 4.95,
+        "colors": [
+            16777215,
+            16761344
+        ]
+    },
+    "seProperties": [
+        {
+            "name": "kombitype",
+            "enumClass": "KSType",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "kombisignal",
+            "enumClass": "KS",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(KOMBITYPE.KS_STOPSIGNAL)"
+        },
+        {
+            "name": "kombisignal_main",
+            "enumClass": "KSMain",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(KOMBITYPE.KS_MAIN)"
+        },
+        {
+            "name": "kombisignal_distant",
+            "enumClass": "KSDistant",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(KOMBITYPE.DISTANT)"
+        },
+        {
+            "name": "mastsign",
+            "enumClass": "MastSignal",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "mastsigndistant",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ne2",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs2",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs2v",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs3",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs3v",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs3plate",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs3vplate",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs12",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

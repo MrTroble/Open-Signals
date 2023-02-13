@@ -1,0 +1,70 @@
+{
+    "textures": {
+        "lamp_white_blink": "opensignals:blocks/lamps/lamp_white_blink",
+        "lamp_white": "opensignals:blocks/lamps/lamp_white"
+    },
+    "models": {
+        "bue/bue_base": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "bue/bue_mast_1": {
+            "textures": [
+                {}
+            ],
+            "y": 1
+        },
+        "bue/bue_mast_2": {
+            "textures": [
+                {}
+            ],
+            "y": 2
+        },
+        "bue/bue_signal_head": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(BUELIGHT) && hasandisnot(BUETYPE)"
+                },
+                {
+                    "blockstate": "hasandis(BUELIGHT) && hasandisnot(BUETYPE)",
+                    "retexture": {
+                        "7": "lamp_white_blink"
+                    }
+                }
+            ],
+            "y": 3
+        },
+        "bue/bue_signal_head_east": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(BUELIGHT) && hasandis(BUETYPE)"
+                },
+                {
+                    "blockstate": "hasandis(BUELIGHT) && hasandis(BUETYPE)",
+                    "retexture": {
+                        "lamp_whitenorth": "lamp_white"
+                    }
+                }
+            ],
+            "y": 3
+        },
+        "bue/bue_ne_2_2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2_2)"
+                }
+            ],
+            "y": 1
+        },
+        "bue/bue_ne_2_4": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2_4)"
+                }
+            ],
+            "y": 1
+        }
+    }
+}

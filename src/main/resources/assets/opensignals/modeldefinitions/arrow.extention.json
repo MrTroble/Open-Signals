@@ -1,0 +1,7 @@
+{
+    "extention": {
+        "ARROW_LEFT": "opensignals:blocks/arrows/arrow_left",
+        "ARROW_RIGHT": "opensignals:blocks/arrows/arrow_right",
+        "ARROW_LEFT_RIGHT": "opensignals:blocks/arrows/arrow_left_right"
+    }
+}

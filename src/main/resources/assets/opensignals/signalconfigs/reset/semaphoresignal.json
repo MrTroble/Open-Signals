@@ -1,0 +1,12 @@
+{
+    "currentSignal": "semaphoresignal",
+    "values": [
+        "semavr.VR0",
+        "zs3.OFF",
+        "wing1.FALSE",
+        "wing2.FALSE",
+        "zs1.FALSE",
+        "zs7.FALSE",
+        "ra12.FALSE"
+    ]
+}

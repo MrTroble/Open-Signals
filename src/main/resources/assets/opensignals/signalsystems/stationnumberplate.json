@@ -1,0 +1,16 @@
+{
+	"systemProperties": {
+		"placementToolName": "signplacementtool",
+		"height": 0,
+		"canLink": false
+	},
+	"seProperties": [
+		{
+			"name": "stationnumber",
+			"autoname": true,
+			"enumClass": "STNumber",
+			"defaultState": "Z1",
+			"changeableStage": "GUISTAGE"
+		}
+	]
+}

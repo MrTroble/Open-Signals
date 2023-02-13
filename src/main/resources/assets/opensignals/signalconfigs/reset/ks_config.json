@@ -1,0 +1,12 @@
+{
+    "currentSignal": "kssignal",
+    "values": [
+        "kombisignal_distant.KS2",
+        "kombisignal.HP0",
+        "kombisignal_main.HP0",
+        "zs2.OFF",
+        "zs2v.OFF",
+        "zs3v.OFF",
+        "zs3.OFF"
+    ]
+}

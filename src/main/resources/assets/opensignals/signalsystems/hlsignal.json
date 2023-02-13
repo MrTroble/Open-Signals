@@ -1,0 +1,125 @@
+{
+    "systemProperties": {
+        "placementToolName": "placementtool",
+        "canLink": true,
+        "defaultHeight": 6,
+        "customNameRenderHeight": 1.15,
+        "colors": [
+            16777215,
+            16761344
+        ]
+    },
+    "seProperties": [
+        {
+            "name": "hltype",
+            "enumClass": "HLType",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "mainlightsignal",
+            "enumClass": "HL",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HLTYPE.HL_MAIN)"
+        },
+        {
+            "name": "mainlightsignal_distant",
+            "enumClass": "HLDistant",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HLTYPE.DISTANT)"
+        },
+        {
+            "name": "exitsignal",
+            "enumClass": "HLExit",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HLTYPE.EXIT)"
+        },
+        {
+            "name": "mainlightsignallightbar",
+            "enumClass": "HLLightbar",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE"
+        },
+        {
+            "name": "mastsign",
+            "enumClass": "MastSignal",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "mastsigndistant",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ne2",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ne2_2",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ne2_4",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs2",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "APISTAGE"
+        },
+        {
+            "name": "zs2v",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "APISTAGE"
+        },
+        {
+            "name": "zs3plate",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs3vplate",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs12",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "blocksignal",
+            "enumClass": "HLBlock",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HLTYPE.BLOCK)"
+        },
+        {
+            "name": "blockexitsignal",
+            "enumClass": "HLBlockExit",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(HLTYPE.BLOCK_EXIT)"
+        }
+    ]
+}

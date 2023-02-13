@@ -1,0 +1,157 @@
+{
+    "textures": {
+        "keep_distance": "opensignals:blocks/other_signals/keep_distance",
+        "narrowing": "opensignals:blocks/other_signals/narrowing",
+        "note_train_traffic": "opensignals:blocks/other_signals/note_train_traffic"
+
+    },
+    "models": {
+        "mast": {
+            "textures": [
+                {
+                    "blockstate": "!with(OTHERTYPE.CROSS)"
+                }
+            ],
+            "y": 0
+        },
+        "other_signals/hm_sign": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.HM)"
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/ob_sign": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.OB)"
+                },
+                {
+                    "blockstate": "with(OTHERTYPE.LZB)",
+                    "retexture": {
+                        "2": "opensignals:blocks/other_signals/lzb"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/cross_sign": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.CROSS)"
+                }
+            ],
+            "y": 0
+        },
+        "other_signals/zs10": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.ZS10)"
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/hm_sign_double": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.HM2)"
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/square": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.FIRETORCH)"
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/triangle": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.KEEP_DISTANCE)",
+                    "retexture": {
+                        "overlay": "keep_distance"
+                    }
+                },
+                {
+                    "blockstate": "with(OTHERTYPE.NARROWING)",
+                    "retexture": {
+                        "overlay": "narrowing"
+                    }
+                },
+                {
+                    "blockstate": "with(OTHERTYPE.NOTE_TRAIN_TRAFFIC)",
+                    "retexture": {
+                        "overlay": "note_train_traffic"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/circle": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.NO_PASS)"
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/railroadcrossing_sign": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.RC1)",
+                    "retexture": {
+                        "2": "opensignals:blocks/other_signals/rc_1"
+                    }
+                },
+                {
+                    "blockstate": "with(OTHERTYPE.RC2)",
+                    "retexture": {
+                        "2": "opensignals:blocks/other_signals/rc_2"
+                    }
+                },
+                {
+                    "blockstate": "with(OTHERTYPE.RC3)",
+                    "retexture": {
+                        "2": "opensignals:blocks/other_signals/rc_3"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "other_signals/railroadcrossing": {
+            "textures": [
+                {
+                    "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && with(RAILROADCROSSING.MODERN)",
+                    "retexture": {
+                        "overlay": "opensignals:blocks/other_signals/rc_modern"
+                    }
+                },
+                {
+                    "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && with(RAILROADCROSSING.OLD)",
+                    "retexture": {
+                        "overlay": "opensignals:blocks/other_signals/rc_old"
+                    }
+                },
+                {
+                    "blockstate": "(with(OTHERTYPE.RC1) || with(OTHERTYPE.RC2) || with(OTHERTYPE.RC3)) && with(RAILROADCROSSING.FENCE)",
+                    "retexture": {
+                        "overlay": "opensignals:blocks/other_signals/rc_fence"
+                    }
+                }
+            ],
+            "y": 2
+        },
+        "other_signals/stop_protecting": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.STOP_PROTECTING)"
+                }
+            ],
+            "y": 1
+        }
+    }
+}

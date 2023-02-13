@@ -1,0 +1,37 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": true,
+        "defaultHeight": 0,
+        "signalHeights": {
+            "config(RATYPE.RA10)": 1,
+            "config(RATYPE.RA11A)": 3,
+            "config(RATYPE.RA11B)": 3,
+            "config(RATYPE.RA6_9)": 4
+        }
+    },
+    "seProperties": [
+        {
+            "name": "ratype",
+            "enumClass": "RA",
+            "defaultState": "RA10",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ralight",
+            "defaultState": false,
+            "changeableStage": "APISTAGE",
+            "autoname": true,
+            "dependencies": "check(RATYPE.RA11A) || check(RATYPE.RA11B) || check(RATYPE.RA11_DWARF)"
+        },
+        {
+            "name": "ralightsignal",
+            "enumClass": "RALight",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(RATYPE.RA6_9)"
+        }
+    ]
+}

@@ -1,0 +1,51 @@
+{
+    "textures": {
+        "ne14_left": "opensignals:blocks/etcs/ne14_left",
+        "ne14_right": "opensignals:blocks/etcs/ne14_right",
+        "ne14_down": "opensignals:blocks/etcs/ne14_down",
+        "etcs_block": "opensignals:blocks/etcs/etcs_block"
+    },
+    "models": {
+        "mast": {
+            "textures": [
+                {},
+                {
+                    "y": 1
+                },
+                {
+                    "y": 2
+                }
+            ],
+            "y": 0
+        },
+        "etcs/etcs": {
+            "textures": [
+                {
+                    "blockstate": "with(ETCS_TYPE.NE14_LEFT)",
+                    "retexture": {
+                        "2": "ne14_left"
+                    }
+                },
+                {
+                    "blockstate": "with(ETCS_TYPE.NE14_RIGHT)",
+                    "retexture": {
+                        "2": "ne14_right"
+                    }
+                },
+                {
+                    "blockstate": "with(ETCS_TYPE.NE14_DOWN)",
+                    "retexture": {
+                        "2": "ne14_down"
+                    }
+                },
+                {
+                    "blockstate": "with(ETCS_TYPE.BLOCK)",
+                    "retexture": {
+                        "2": "etcs_block"
+                    }
+                }
+            ],
+            "y": 3
+        }
+    }
+}

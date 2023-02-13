@@ -1,0 +1,1 @@
+{"variants": {"power=false": {"model": "opensignals:block/redstonein_off"}, "power=true": {"model": "opensignals:block/redstonein_on"}}}

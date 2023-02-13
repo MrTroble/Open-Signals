@@ -1,0 +1,55 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": true,
+        "defaultHeight": 2,
+        "colors": [
+            0
+        ],
+        "signalHeights": {
+            "config(NETYPE.NE2)": 0,
+            "config(NETYPE.NE2_1)": 0,
+            "config(NETYPE.NE4_SMALL)": 0,
+            "config(NETYPE.NE1)": 1,
+            "config(NETYPE.NE5)": 1,
+            "config(NETYPE.NE6)": 1,
+            "config(NETYPE.SO106)": 1
+        }
+    },
+    "seProperties": [
+        {
+            "name": "netype",
+            "enumClass": "NE",
+            "defaultState": "NE1",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "neaddition",
+            "enumClass": "NEAddition",
+            "defaultState": "OFF",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "arrow",
+            "enumClass": "Arrow",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ne5_addition",
+            "enumClass": "NE5Addition",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ne13",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(NETYPE.NE13)"
+        }
+    ]
+}

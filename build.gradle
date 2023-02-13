@@ -22,10 +22,13 @@ apply plugin: "com.matthewprenger.cursegradle"
 sourceSets{
     main {
         java {
-            srcDirs("guilib/src/", "linkableapi/src/")
+            srcDirs("guilib/src/", "linkableapi/src/", "contentPackLib/src")
         }
     }
 }
+
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
 
 
 def ver = System.getenv("APPVEYOR_BUILD_VERSION")
@@ -40,13 +43,12 @@ curseforge {
   project {
     id = '440990'
     changelog = file('changelog.md')
-    releaseType = 'release'
+    releaseType = 'alpha'
     changelogType = 'markdown'
-    mainArtifact(jar) {
-      relations {
-        optionalDependency 'opencomputers'
-      }
-    }
+    addGameVersion '1.18.2'
+  }
+  options {
+    detectNewerJava = true
   }
 }
 
@@ -54,14 +56,15 @@ version = ver
 group = 'com.troblecodings'
 archivesBaseName = 'OpenSignals'
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 repositories {
     maven{ url="https://maven.cil.li/" }
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20171003-1.12'
+	mappings channel: 'official', version: '1.18.2'
+	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     runs {
         client {
             workingDirectory project.file('run')
@@ -76,13 +79,8 @@ minecraft {
     }
 }
 
-def ocVersion = "MC1.12.2-1.7.5.218"
-def copyName = ""
-
 dependencies {   
-    minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2860'
-    compileOnly "li.cil.oc:OpenComputers:$ocVersion:api"
-    runtimeOnly "li.cil.oc:OpenComputers:$ocVersion"
+    minecraft 'net.minecraftforge:forge:1.18.2-40.1.86'
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
 }
 
@@ -96,7 +94,7 @@ processResources {
 	inputs.property "version", project.version
 	
 	filesMatching("mcmod.info") {
-		expand "version": project.version, "mcversion": "1.12.2"
+		expand "version": project.version, "mcversion": "1.18.2"
 	}
 }
 
@@ -104,39 +102,14 @@ jar {
     manifest {
         attributes([
             "Specification-Title": archivesBaseName,
-            "Specification-Vendor": "German Immersive Railroading Community",
+            "Specification-Vendor": "troblecodings",
             "Specification-Version": ver,
             "Implementation-Title": project.name,
             "Implementation-Version": ver,
-            "Implementation-Vendor" :"German Immersive Railroading Community",
+            "Implementation-Vendor" :"troblecodings",
             "Implementation-Timestamp": new Date().format("dd-MM-yyyy'T'HH:mm:ssZ")
         ])
     }
 }
 
 jar.finalizedBy('reobfJar')
-
-tasks.getByName("eclipse").finalizedBy('update')
-task update(type: Copy) {
-	dependsOn "eclipse"
-	def username = System.getProperty("user.home")
-    println("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
-    def fl = new File("$username/.gradle/caches/modules-2/files-2.1/li.cil.oc/OpenComputers/$ocVersion/")
-    if(fl.exists()) {
-    	fl.eachDir() {
-        	dire -> dire.eachFileMatch("OpenComputers-$ocVersion" + ".jar") {
-         	   file2 -> copyName = file2.getAbsolutePath() 
-        	}
-    	}
-        def filef = new File('run/mods')
-        if(filef.exists()) {
-		    filef.eachFile {
-		    	file -> file.delete()
-			}	
-			if(copyName != "") {
-    	    	from copyName
-    	    	into 'run/mods'
-    		}
-        }
-    }
-}

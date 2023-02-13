@@ -1,0 +1,29 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": true,
+        "defaultHeight": 1,
+        "sounds": {
+            "config(atws.TRUE) && config(rotype.ATWS)": {
+                "name": "rottenwarn",
+                "length": 1
+            }
+        }
+    },
+    "seProperties": [
+        {
+            "name": "rotype",
+            "enumClass": "RO",
+            "defaultState": "RO4",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "atws",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(ROTYPE.ATWS)"
+        }
+    ]
+}

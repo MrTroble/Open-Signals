@@ -1,0 +1,16 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": false,
+        "defaultHeight": 1
+    },
+    "seProperties": [
+        {
+            "name": "tstype",
+            "enumClass": "TS",
+            "defaultState": "TS1",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}

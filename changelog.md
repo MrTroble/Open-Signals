@@ -1,5 +1,18 @@
 # Changelog
 
+## [1.18-Alpha]
+
+### BREAKING CHANGES!
+
+* feat: added zs12
+* feat: drop-down selection menu
+* feat: added ContentPackSystem
+* feat: new network system
+* fix: serveral bugs
+* chore: cleanup
+
+  **This update is an alpha version and does not contain the whole features. We ask you to test the mod and give us feedback on functionality, bugs and features. Warning: Contains a lot of known issues that will be fixed with coming versions.**
+
 ## [Fix]
 fix: desync with ForgeEssentials
 

@@ -1,0 +1,7 @@
+{
+    "extention": {
+        "WRW": "opensignals:blocks/mast_sign/wrw",
+        "WYWYW": "opensignals:blocks/mast_sign/wywyw",
+        "WBWBW": "opensignals:blocks/mast_sign/wbwbw"
+    }
+}

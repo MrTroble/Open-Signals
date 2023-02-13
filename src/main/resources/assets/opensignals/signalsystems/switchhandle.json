@@ -1,0 +1,53 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": true,
+        "defaultHeight": 0,
+        "redstoneOutputs": {
+            "config(manual.TRUE)" : "powered"
+        }
+    },
+    "seProperties": [
+        {
+            "name": "manual",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "powered",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(MANUAL.TRUE)"
+        },
+        {
+            "name": "fallback_switch",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "weightcolor",
+            "enumClass": "ColorWeight",
+            "defaultState": "WHITE_BLACK",
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "switchside",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "switchplaceside",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "wn_mech",
+            "enumClass": "WNMech",
+            "defaultState": "WN1",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(MANUAL.FALSE)"
+        }
+    ]
+}

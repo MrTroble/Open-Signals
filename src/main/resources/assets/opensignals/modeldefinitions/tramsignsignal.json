@@ -1,0 +1,81 @@
+{
+    "textures": {
+       "sh1": "opensignals:blocks/tramsigns/sh1",
+       "so1": "opensignals:blocks/tramsigns/so1",
+       "so2": "opensignals:blocks/tramsigns/so2", 
+       "so5": "opensignals:blocks/tramsigns/so5", 
+       "so5_1": "opensignals:blocks/tramsigns/so5_1", 
+       "so5_2": "opensignals:blocks/tramsigns/so5_2", 
+       "so6": "opensignals:blocks/tramsigns/so6",
+       "st1": "opensignals:blocks/tramsigns/st1", 
+       "st2": "opensignals:blocks/tramsigns/st2", 
+       "st7": "opensignals:blocks/tramsigns/st7"
+    },
+    "models": {
+        "trafficlight/tramsigns": {
+            "textures": [
+                {
+                    "blockstate": "with(TRAMSIGNS.SH1)",
+                    "retexture": {
+                        "2": "sh1"
+                    }
+                },
+                {
+                    "blockstate": "with(TRAMSIGNS.SO1)",
+                    "retexture": {
+                        "2": "so1"
+                    }
+                },
+                {
+                    "blockstate": "with(TRAMSIGNS.SO2)",
+                    "retexture": {
+                        "2": "so2"
+                    }
+                },
+                {
+                    "blockstate": "with(TRAMSIGNS.SO5)",
+                    "retexture": {
+                        "2": "so5"
+                    }
+                },
+                {
+                    "blockstate": "with(TRAMSIGNS.SO5_1)",
+                    "retexture": {
+                        "2": "so5_1"
+                    }
+                },
+                {
+                    "blockstate": "with(TRAMSIGNS.SO5_2)",
+                    "retexture": {
+                        "2": "so5_2"
+                    }
+                },
+                {
+                    "blockstate": "with(TRAMSIGNS.SO6)",
+                    "retexture": {
+                        "2": "so6"
+                    }
+                },
+                {
+                    "blockstate": "with(TRAMSIGNS.ST1)",
+                    "retexture": {
+                        "2": "st1"
+                    }
+                },
+                {
+                    "blockstate": "with(TRAMSIGNS.ST2)",
+                    "retexture": {
+                        "2": "st2"
+                    }
+                },
+                {
+                    "blockstate": "with(TRAMSIGNS.ST7)",
+                    "retexture": {
+                        "2": "st7"
+                    }
+                }
+            ],
+            "y": 0
+        }
+    }
+}

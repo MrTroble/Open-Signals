@@ -1,0 +1,13 @@
+{
+    "extention": {
+        "M50": "opensignals:blocks/ne/ne5_add_50",
+        "M70": "opensignals:blocks/ne/ne5_add_70",
+        "M100": "opensignals:blocks/ne/ne5_add_100",
+        "M120": "opensignals:blocks/ne/ne5_add_120",
+        "M150": "opensignals:blocks/ne/ne5_add_150",
+        "M200": "opensignals:blocks/ne/ne5_add_200",
+        "M250": "opensignals:blocks/ne/ne5_add_250",
+        "KURZ": "opensignals:blocks/ne/ne5_add_kurzzug",
+        "LANG": "opensignals:blocks/ne/ne5_add_langzug"
+    }
+}

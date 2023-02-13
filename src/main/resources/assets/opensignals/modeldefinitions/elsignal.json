@@ -1,0 +1,113 @@
+{
+    "textures": {},
+    "models": {
+        "mast": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "el/el": {
+            "textures": [
+                {
+                    "blockstate": "with(ELTYPE.EL1V)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el1v"
+                    }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL1)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el1"
+                    }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL2)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el2"
+                    }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL3)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el3"
+                    }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL4)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el4"
+                    }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL5)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el5"
+                    }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL6)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el6"
+                    }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL7)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el7"
+                    }
+                }
+            ],
+            "y" : 1
+        },
+        "ne/ne2": {
+            "textures": [
+                {
+                    "blockstate": "with(ELTYPE.EL8A)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el8a"
+                    }
+                },
+                {
+                    "blockstate": "with(ELTYPE.EL8E)",
+                    "retexture": {
+                        "2": "opensignals:blocks/el/el8e"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "el/el_arrow_lr": {
+            "textures": [
+                {
+                    "blockstate": "with(ELARROW.LEFT_RIGHT)"
+                }
+            ],
+            "y": 2
+        },
+        "el/el_arrow_l": {
+            "textures": [
+                {
+                    "blockstate": "with(ELARROW.LEFT)"
+                }
+            ],
+            "y": 2
+        },
+        "el/el_arrow_r": {
+            "textures": [
+                {
+                    "blockstate": "with(ELARROW.RIGHT)"
+                }
+            ],
+            "y": 2
+        },
+        "el/el_arrow_up": {
+            "textures": [
+                {
+                    "blockstate": "with(ELARROW.UP)"
+                }
+            ],
+            "y": 2
+        }
+    }
+}

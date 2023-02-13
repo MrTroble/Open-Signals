@@ -1,0 +1,43 @@
+{
+    "textures": {
+        "ts1": "opensignals:blocks/ts/ts1",
+        "ts2": "opensignals:blocks/ts/ts2",
+        "ts3": "opensignals:blocks/ts/ts3"
+    },
+    "models": {
+        "mast": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "ne/ne2": {
+            "textures": [
+                {
+                    "blockstate": "with(TSTYPE.TS1)",
+                    "retexture": {
+                        "2": "ts1"
+                    }
+                }
+            ],
+            "y": 1
+        },
+        "el/el": {
+            "textures": [
+                {
+                    "blockstate": "with(TSTYPE.TS2)",
+                    "retexture": {
+                        "2": "ts2"
+                    }
+                },
+                {
+                    "blockstate": "with(TSTYPE.TS3)",
+                    "retexture": {
+                        "2": "ts3"
+                    }
+                } 
+            ],
+            "y": 1
+        }
+    }
+}

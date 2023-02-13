@@ -1,0 +1,46 @@
+{
+    "currentSignal": "kssignal",
+    "nextSignal": "hvsignal",
+    "savedPredicates": {
+        "stop": "config(stopsignal.HP0) || config(stopsignal.SHUNTING) || config(hphome.HP0) || config(hphome.HP0_ALTERNATE_RED) || config(hpblock.HP0)",
+        "drive": "config(stopsignal.HP1) || config(hphome.HP1) || config(hpblock.HP1) || config(stopsignal.HP2) || config(hphome.HP2)",
+        "zs3": "!config(zs3.OFF) || !config(zs3plate.OFF)"
+    },
+    "values": {
+        "map(stop)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF"],
+        "map(drive)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
+        "map(drive) && map(zs3)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
+
+        "(config(zs3.Z1) || config(zs3plate.Z1))": ["zs3v.Z1"],
+        "(config(zs3.Z2) || config(zs3plate.Z2))": ["zs3v.Z2"],
+        "(config(zs3.Z3) || config(zs3plate.Z3))": ["zs3v.Z3"],
+        "(config(zs3.Z4) || config(zs3plate.Z4))": ["zs3v.Z4"],
+        "(config(zs3.Z5) || config(zs3plate.Z5))": ["zs3v.Z5"],
+        "(config(zs3.Z6) || config(zs3plate.Z6))": ["zs3v.Z6"],
+        "(config(zs3.Z7) || config(zs3plate.Z7))": ["zs3v.Z7"],
+        "(config(zs3.Z8) || config(zs3plate.Z8))": ["zs3v.Z8"],
+        "(config(zs3.Z9) || config(zs3plate.Z9))": ["zs3v.Z9"],
+        "(config(zs3.Z10) || config(zs3plate.Z10))": ["zs3v.Z10"],
+        "(config(zs3.Z11) || config(zs3plate.Z11))": ["zs3v.Z11"],
+        "(config(zs3.Z12) || config(zs3plate.Z12))": ["zs3v.Z12"],
+        "(config(zs3.Z13) || config(zs3plate.Z13))": ["zs3v.Z13"],
+        "(config(zs3.Z14) || config(zs3plate.Z14))": ["zs3v.Z14"],
+        "(config(zs3.Z15) || config(zs3plate.Z15))": ["zs3v.Z15"],
+
+        "speed(==.1)": ["zs3.Z1"],
+        "speed(==.2)": ["zs3.Z2"],
+        "speed(==.3)": ["zs3.Z3"],
+        "speed(==.4)": ["zs3.Z4"],
+        "speed(==.5)": ["zs3.Z5"],
+        "speed(==.6)": ["zs3.Z6"],
+        "speed(==.7)": ["zs3.Z7"],
+        "speed(==.8)": ["zs3.Z8"],
+        "speed(==.9)": ["zs3.Z9"],
+        "speed(==.10)": ["zs3.Z10"],
+        "speed(==.11)": ["zs3.Z11"],
+        "speed(==.12)": ["zs3.Z12"],
+        "speed(==.13)": ["zs3.Z13"],
+        "speed(==.14)": ["zs3.Z14"],
+        "speed(==.15)": ["zs3.Z15"]
+    }
+}

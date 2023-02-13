@@ -1,0 +1,30 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": true,
+        "defaultHeight": 0
+    },
+    "seProperties": [
+        {
+            "name": "wntype",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "wnnormal",
+            "enumClass": "WNNormal",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(WNTYPE.FALSE)"
+        },
+        {
+            "name": "wncross",
+            "enumClass": "WNCross",
+            "defaultState": "OFF",
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "check(WNTYPE.TRUE)"
+        }
+    ]
+}

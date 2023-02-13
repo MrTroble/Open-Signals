@@ -1,0 +1,449 @@
+{
+    "textures": {
+        "lamp_green": "opensignals:blocks/lamps/lamp_green",
+        "lamp_green_blink": "opensignals:blocks/lamps/lamp_green_blink",
+        "lamp_yellow": "opensignals:blocks/lamps/lamp_yellow",
+        "lamp_yellow_blink": "opensignals:blocks/lamps/lamp_yellow_blink",
+        "lamp_red": "opensignals:blocks/lamps/lamp_red",
+        "lamp_white": "opensignals:blocks/lamps/lamp_white",
+        "lamp_white_blink": "opensignals:blocks/lamps/lamp_white_blink"
+    },
+    "models": {
+        "hl/hl_base": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "hl/hl_ne2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2) && has(MAINLIGHTSIGNAL_DISTANT)"
+                }
+            ],
+            "y": 0
+        },
+        "hl/hl_ne2_4": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2_4) && has(MAINLIGHTSIGNAL_DISTANT)"
+                }
+            ],
+            "y": 0
+        },
+        "hl/hl_mast1": {
+            "textures": [
+                {}
+            ],
+            "y": 1
+        },
+        "hl/hl_ne2_2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2) && hasandis(NE2_2) && has(MAINLIGHTSIGNAL_DISTANT)"
+                }
+            ],
+            "y": 1
+        },
+        "hl/hl_sign_distant": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(MASTSIGNDISTANT)"
+                }
+            ],
+            "y": 1.125
+        },
+        "hl/hl_mast2": {
+            "textures": [
+                {}
+            ],
+            "y": 2
+        },
+        "hl/hl_number": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(CUSTOMNAME)"
+                }
+            ],
+            "y": 0
+        },
+        "hl/hl_mast3": {
+            "textures": [
+                {}
+            ],
+            "y": 3
+        },
+        "hl/hl_mast4": {
+            "textures": [
+                {}
+            ],
+            "y": 4
+        },
+        "hl/hl_shield2": {
+            "textures": [
+                {
+                    "blockstate": "with(MAINLIGHTSIGNALLIGHTBAR.OFF)"
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNALLIGHTBAR.GREEN)",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNALLIGHTBAR.YELLOW)",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow"
+                    }
+                }
+            ],
+            "y": 4
+        },
+        "hl/hl_block1": {
+            "textures": [
+                {
+                    "blockstate": "with(BLOCKSIGNAL.OFF) && (with(HLTYPE.BLOCK) || !has(HLTYPE))"
+                },
+                {
+                    "blockstate": "with(BLOCKSIGNAL.HP0) && (with(HLTYPE.BLOCK) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKSIGNAL.HP0_ALTERNATE_RED) && (with(HLTYPE.BLOCK) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_red2north": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKSIGNAL.HL1) && (with(HLTYPE.BLOCK) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKSIGNAL.HL10) && (with(HLTYPE.BLOCK) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKSIGNAL.HL_ZS1) && (with(HLTYPE.BLOCK) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red",
+                        "lamp_white_sh_2north": "lamp_white_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKSIGNAL.HL_STATUS_LIGHT) && (with(HLTYPE.BLOCK) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_white_sh_2north": "lamp_white"
+                    }
+                }
+            ],
+            "y": 5
+        },
+        "hl/hl_block2": {
+            "textures": [
+                {
+                    "blockstate": "with(BLOCKEXITSIGNAL.OFF) && (with(HLTYPE.BLOCK_EXIT) || !has(HLTYPE))"
+                },
+                {
+                    "blockstate": "with(BLOCKEXITSIGNAL.HP0) && (with(HLTYPE.BLOCK_EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKEXITSIGNAL.HL1) && (with(HLTYPE.BLOCK_EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKEXITSIGNAL.HL_ZS1) && (with(HLTYPE.BLOCK_EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red",
+                        "lamp_white_sh_2north": "lamp_white_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKEXITSIGNAL.HL_SHUNTING) && (with(HLTYPE.BLOCK_EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red",
+                        "lamp_white_sh_1north": "lamp_white",
+                        "lamp_white_sh_2north": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKEXITSIGNAL.HL_STATUS_LIGHT) && (with(HLTYPE.BLOCK_EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_white_sh_2north": "lamp_white"
+                    }
+                }
+            ],
+            "y": 5
+        },
+        "hl/hl_main": {
+            "textures": [
+                {
+                    "blockstate": "with(EXITSIGNAL.OFF) && (with(HLTYPE.EXIT) || !has(HLTYPE))"
+                },
+                {
+                    "blockstate": "with(EXITSIGNAL.HP0) && (with(HLTYPE.EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(EXITSIGNAL.HP0_ALTERNATE_RED) && (with(HLTYPE.EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_red2north": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(EXITSIGNAL.HL1) && (with(HLTYPE.EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green"
+                    }
+                },
+                {
+                    "blockstate": "with(EXITSIGNAL.HL2_3) && (with(HLTYPE.EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green",
+                        "lamp_yellow2north": "lamp_yellow"
+                    }
+                },
+                {
+                    "blockstate": "with(EXITSIGNAL.HL_ZS1) && (with(HLTYPE.EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red",
+                        "lamp_white_sh_2north": "lamp_white_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(EXITSIGNAL.HL_SHUNTING) && (with(HLTYPE.EXIT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red",
+                        "lamp_white_sh_2north": "lamp_white",
+                        "lamp_white_sh_1north": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate": "with(EXITSIGNAL.HL_STATUS_LIGHT) && with(HLTYPE.EXIT)",
+                    "retexture": {
+                        "lamp_white_sh_2north": "lamp_white"
+                    }
+                }
+            ],
+            "y": 5
+        },
+        "hl/hl_shield_dist": {
+            "textures": [
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL_DISTANT.OFF) && (with(HLTYPE.DISTANT) || !has(HLTYPE))"
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL_DISTANT.HL1) && (with(HLTYPE.DISTANT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL_DISTANT.HL4) && (with(HLTYPE.DISTANT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL_DISTANT.HL7) && (with(HLTYPE.DISTANT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL_DISTANT.HL10) && (with(HLTYPE.DISTANT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL_DISTANT.HL_STATUS_LIGHT) && (with(HLTYPE.DISTANT) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_white_sh_2north": "lamp_white"
+                    }
+                }
+            ],
+            "y": 5
+        },
+        "hl/hl_shield1": {
+            "textures": [
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.OFF) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))"
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HP0) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HP0_ALTERNATE_RED) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_red2north": "lamp_red"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL1) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL2_3) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green",
+                        "lamp_yellow2north": "lamp_yellow"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL4) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL5_6) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green_blink",
+                        "lamp_yellow2north": "lamp_yellow"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL7) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL8_9) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow_blink",
+                        "lamp_yellow2north": "lamp_yellow"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL10) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL11_12) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow",
+                        "lamp_yellow2north": "lamp_yellow"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL_ZS1) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red",
+                        "lamp_white_sh_2north": "lamp_white_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL_SHUNTING) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_rednorth": "lamp_red",
+                        "lamp_white_sh_1north": "lamp_white",
+                        "lamp_white_sh_2north": "lamp_white"
+                    }
+                },
+                {
+                    "blockstate": "with(MAINLIGHTSIGNAL.HL_STATUS_LIGHT) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_white_sh_2north": "lamp_white"
+                    }
+                }
+            ],
+            "y": 5
+        },
+        "hl/hl_sign_main": {
+            "textures": [
+                {
+                    "blockstate": "",
+                    "extentions": {
+                        "mastsigns.json": {
+                            "mastsign": "9"
+                        }
+                    }
+                }
+            ],
+            "y": 2.125
+        },
+        "hl/hl_zs2": {
+            "textures": [
+                {
+                    "blockstate": "",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 3
+        },
+        "hl/hl_zs2v": {
+            "textures": [
+                {
+                    "blockstate": "",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 3
+        },
+        "zs/zs3": {
+            "textures": [
+                {
+                    "loadOFFstate": false,
+                    "blockstate": "",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS3PLATE": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 3.6875
+        },
+        "zs/zs3v": {
+            "textures": [
+                {
+                    "loadOFFstate": false,
+                    "blockstate": "",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS3VPLATE": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 3.6875
+        },
+        "zs/zs12": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(ZS12)"
+                }
+            ],
+            "y": 1.375
+        }
+    }
+}

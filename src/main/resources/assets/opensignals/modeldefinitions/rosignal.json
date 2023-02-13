@@ -1,0 +1,37 @@
+{
+    "textures": {
+        "lamp": "opensignals:blocks/lamps/lamp_yellow_blink"
+    },
+    "models": {
+        "ro/ro_mast": {
+            "textures": [
+                {
+                    "blockstate": "with(ROTYPE.RO4)"
+                }
+            ],
+            "y": 0
+        },
+        "ro/ro4": {
+            "textures": [
+                {
+                    "blockstate": "with(ROTYPE.RO4)"
+                }
+            ],
+            "y": 1
+        },
+        "ro/atws": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(ATWS) && with(ROTYPE.ATWS)"
+                },
+                {
+                    "blockstate": "hasandis(ATWS) && with(ROTYPE.ATWS)",
+                    "retexture": {
+                        "3": "lamp"
+                    }
+                }
+            ],
+            "y": 0
+        }
+    }
+}

@@ -1,6 +1,11 @@
 [submodule "guilib"]
 	path = guilib
 	url = https://github.com/MrTroble/guilib
+        branch = 1.18-master
 [submodule "linkableapi"]
 	path = linkableapi
 	url = https://github.com/MrTroble/linkableapi
+        branch = 1.18-master
+[submodule "contentPackLib"]
+	path = contentPackLib
+	url = https://github.com/MrTroble/contentPackLib
