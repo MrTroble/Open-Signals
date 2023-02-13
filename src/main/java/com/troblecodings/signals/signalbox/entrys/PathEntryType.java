@@ -46,7 +46,7 @@ public final class PathEntryType<T> {
 
     /**
      * Creates a new value holder
-     * 
+     *
      * @return new IPathEntry with the given name
      */
     public IPathEntry<T> newValue() {
@@ -64,7 +64,7 @@ public final class PathEntryType<T> {
 
     /**
      * Gets the class type of the given entry
-     * 
+     *
      * @return the entryClass
      */
     public Class<? extends IPathEntry<T>> getEntryClass() {
@@ -73,7 +73,7 @@ public final class PathEntryType<T> {
 
     /**
      * Gets the type name
-     * 
+     *
      * @return the name
      */
     public String getName() {
@@ -97,9 +97,7 @@ public final class PathEntryType<T> {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final PathEntryType<?> other = (PathEntryType<?>) obj;
         return Objects.equals(entryClass, other.entryClass) && Objects.equals(name, other.name);

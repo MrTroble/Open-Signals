@@ -18,7 +18,7 @@ public class RedstoneInput extends RedstoneIO {
         if (worldIn.isClientSide)
             return;
         if (worldIn.hasNeighborSignal(pos)) {
-            if (state.getValue(RedstoneIO.POWER) != true) {
+            if (!state.getValue(RedstoneIO.POWER)) {
                 worldIn.setBlockAndUpdate(pos, state.setValue(RedstoneIO.POWER, true));
                 final BlockEntity entity = worldIn.getBlockEntity(pos);
                 if (entity instanceof RedstoneIOTileEntity)

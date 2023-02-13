@@ -25,17 +25,17 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     @Override
-    public void saveWrapper(NBTWrapper wrapper) {
+    public void saveWrapper(final NBTWrapper wrapper) {
         wrapper.putList(LINKED_LIST,
                 linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper).toList());
     }
 
     @Override
-    public void loadWrapper(NBTWrapper wrapper) {
+    public void loadWrapper(final NBTWrapper wrapper) {
         linkedPositions.clear();
         wrapper.getList(LINKED_LIST).stream().map(NBTWrapper::getAsPos)
                 .forEach(linkedPositions::add);
-        ;
+
     }
 
     public void sendToAll() {

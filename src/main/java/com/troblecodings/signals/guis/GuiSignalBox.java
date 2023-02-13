@@ -57,8 +57,8 @@ public class GuiSignalBox extends GuiBase {
     private UISignalBoxTile lastTile = null;
     private Page page = Page.USAGE;
     private SignalBoxNode node = null;
-    private boolean dirty = false;
-    private NBTWrapper dirtyCompound = new NBTWrapper();
+    private final boolean dirty = false;
+    private final NBTWrapper dirtyCompound = new NBTWrapper();
     private UIEntity mainButton;
 
     public GuiSignalBox(final GuiInfo info) {
@@ -104,7 +104,7 @@ public class GuiSignalBox extends GuiBase {
         final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList());
         if (!positions.isEmpty()) {
-            final DisableIntegerable<String> blockPos = new DisableIntegerable<String>(
+            final DisableIntegerable<String> blockPos = new DisableIntegerable<>(
                     SizeIntegerables.of("prop." + type.name() + suffix, positions.size(), id -> {
                         final BlockPos pos = positions.get(id);
                         return getSignalInfo(pos, type);

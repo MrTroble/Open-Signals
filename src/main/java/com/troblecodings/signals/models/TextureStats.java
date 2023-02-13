@@ -7,14 +7,14 @@ import com.google.common.collect.ImmutableMap;
 
 public class TextureStats {
 
-    private float x = 0;
-    private float y = 0;
-    private float z = 0;
+    protected float x = 0;
+    protected float y = 0;
+    protected float z = 0;
 
-    private boolean loadOFFstate = true;
-    private String blockstate;
-    private Map<String, String> retexture;
-    private Map<String, Map<String, String>> extentions;
+    protected final boolean loadOFFstate = true;
+    protected String blockstate;
+    protected Map<String, String> retexture;
+    protected Map<String, Map<String, String>> extentions;
 
     public float getOffsetX() {
         return x;

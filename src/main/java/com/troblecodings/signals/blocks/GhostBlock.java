@@ -1,7 +1,5 @@
 package com.troblecodings.signals.blocks;
 
-import org.spongepowered.asm.mixin.MixinEnvironment.Side;
-
 import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.Minecraft;

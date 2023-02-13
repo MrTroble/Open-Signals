@@ -16,10 +16,7 @@ import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.SignalLoader;
 
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.datafix.fixes.ObjectiveRenderTypeFix;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Item.Properties;
@@ -51,7 +48,7 @@ public final class OSBlocks {
                     && Modifier.isPublic(modifiers)) {
                 final String name = field.getName().toLowerCase().replace("_", "");
                 try {
-                    Object object = field.get(null);
+                    final Object object = field.get(null);
                     if (object instanceof BasicBlock)
                         loadBlock((BasicBlock) object, name);
                 } catch (final IllegalArgumentException | IllegalAccessException e) {

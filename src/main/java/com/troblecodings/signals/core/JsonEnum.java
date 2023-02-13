@@ -23,7 +23,7 @@ public class JsonEnum extends ModelProperty<String> {
     public JsonEnum(final String name, final List<String> values) {
         this.name = name;
         this.values = ImmutableList.copyOf(values);
-        Map<String, Integer> copyValues = new HashMap<>();
+        final Map<String, Integer> copyValues = new HashMap<>();
         for (int i = 0; i < values.size(); i++) {
             copyValues.put(values.get(i).toLowerCase(), i);
         }
@@ -63,12 +63,10 @@ public class JsonEnum extends ModelProperty<String> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final JsonEnum other = (JsonEnum) obj;
         return Objects.equals(name, other.name) && Objects.equals(valueToInt, other.valueToInt)

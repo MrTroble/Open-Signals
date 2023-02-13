@@ -17,9 +17,9 @@ import com.troblecodings.signals.properties.ConfigProperty;
 
 public class DefaultConfigParser {
 
-    private String currentSignal;
-    private Map<String, String> savedPredicates;
-    private Map<String, List<String>> values;
+    protected String currentSignal;
+    protected Map<String, String> savedPredicates;
+    protected Map<String, List<String>> values;
 
     public String getCurrentSignal() {
         return currentSignal;
@@ -40,7 +40,7 @@ public class DefaultConfigParser {
     @SuppressWarnings("rawtypes")
     public static void loadDefaultConfigs() {
 
-        for (Map.Entry<String, String> files : OpenSignalsMain.contentPacks
+        for (final Map.Entry<String, String> files : OpenSignalsMain.contentPacks
                 .getFiles("signalconfigs/default")) {
             final DefaultConfigParser parser = GSON.fromJson(files.getValue(),
                     DefaultConfigParser.class);
@@ -64,7 +64,8 @@ public class DefaultConfigParser {
 
             final Map<String, String> savedPredicates = parser.getSavedPredicates();
 
-            for (Map.Entry<String, List<String>> entry : parser.getValuesToChange().entrySet()) {
+            for (final Map.Entry<String, List<String>> entry : parser.getValuesToChange()
+                    .entrySet()) {
 
                 String valueToParse = entry.getKey().toLowerCase();
                 Predicate predicate = t -> true;

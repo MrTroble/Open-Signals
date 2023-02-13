@@ -42,7 +42,7 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
         }
     }
 
-    public Object getWrapper(Object object) {
+    public Object getWrapper(final Object object) {
         return ((IModelData) object).getData(this);
     }
 
@@ -120,12 +120,10 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final SEProperty other = (SEProperty) obj;
         return Objects.equals(allowedValues, other.allowedValues)

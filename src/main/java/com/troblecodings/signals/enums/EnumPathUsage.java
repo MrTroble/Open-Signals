@@ -16,7 +16,7 @@ public enum EnumPathUsage {
 
     /**
      * The color of this path status
-     * 
+     *
      * @return the color
      */
     public int getColor() {

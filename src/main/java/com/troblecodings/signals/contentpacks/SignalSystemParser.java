@@ -15,8 +15,8 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 
 public class SignalSystemParser {
 
-    private SignalPropertiesBuilder systemProperties;
-    private List<SEPropertyParser> seProperties;
+    protected SignalPropertiesBuilder systemProperties;
+    protected List<SEPropertyParser> seProperties;
 
     private static transient final Gson GSON = new Gson();
 

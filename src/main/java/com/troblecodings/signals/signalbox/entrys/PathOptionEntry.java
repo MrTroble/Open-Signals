@@ -44,9 +44,7 @@ public class PathOptionEntry implements INetworkSavable, Observable {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final PathOptionEntry other = (PathOptionEntry) obj;
         return Objects.equals(pathEntrys, other.pathEntrys);

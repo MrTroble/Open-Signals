@@ -22,7 +22,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private BlockPos linkedSignalPosition = null;
     private NBTWrapper compound = new NBTWrapper();
     private final HashMap<Direction, Map<EnumState, String>> statesEnabled //
-            = new HashMap<Direction, Map<EnumState, String>>();
+            = new HashMap<>();
     private final boolean[] currentStates = new boolean[Direction.values().length];
 
     public static final String BLOCK_POS_ID = "blockpos";
@@ -33,7 +33,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void saveWrapper(NBTWrapper wrapper) {
+    public void saveWrapper(final NBTWrapper wrapper) {
         wrapper.putWrapper(GUI_TAG, compound);
         if (linkedSignalPosition != null) {
             wrapper.putBlockPos(BLOCK_POS_ID, linkedSignalPosition);
@@ -41,7 +41,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void loadWrapper(NBTWrapper wrapper) {
+    public void loadWrapper(final NBTWrapper wrapper) {
         if (wrapper.contains(BLOCK_POS_ID)) {
             linkedSignalPosition = wrapper.getBlockPos(BLOCK_POS_ID);
         }

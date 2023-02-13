@@ -106,7 +106,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     }
 
     @Override
-    public boolean stillValid(Player playerIn) {
+    public boolean stillValid(final Player playerIn) {
         if (playerIn instanceof Player) {
             this.player = playerIn;
         }

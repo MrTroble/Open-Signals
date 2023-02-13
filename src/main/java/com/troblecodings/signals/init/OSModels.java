@@ -23,7 +23,7 @@ public final class OSModels {
     }
 
     @SubscribeEvent
-    public static void registerReload(RegisterClientReloadListenersEvent event) {
+    public static void registerReload(final RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(CustomModelLoader.INSTANCE);
     }
 

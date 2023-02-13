@@ -70,7 +70,7 @@ public class Signal extends BasicBlock {
 
     protected final SignalProperties prop;
     private List<SEProperty> signalProperties;
-    private Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
+    private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
     private SEProperty powerProperty = null;
 
     public Signal(final SignalProperties prop) {
@@ -84,24 +84,28 @@ public class Signal extends BasicBlock {
         }
     }
 
-    public boolean propagatesSkylightDown(BlockState p_49100_, BlockGetter p_49101_,
-            BlockPos p_49102_) {
+    @Override
+    public boolean propagatesSkylightDown(final BlockState p_49100_, final BlockGetter p_49101_,
+            final BlockPos p_49102_) {
         return true;
     }
 
-    public float getShadeBrightness(BlockState p_49094_, BlockGetter p_49095_, BlockPos p_49096_) {
+    @Override
+    public float getShadeBrightness(final BlockState p_49094_, final BlockGetter p_49095_,
+            final BlockPos p_49096_) {
         return 1.0F;
     }
 
     @Override
-    public VoxelShape getBlockSupportShape(BlockState stat, BlockGetter getter, BlockPos pos) {
+    public VoxelShape getBlockSupportShape(final BlockState stat, final BlockGetter getter,
+            final BlockPos pos) {
         return Shapes.empty();
     }
 
     @Override
     public BlockState getStateForPlacement(final BlockPlaceContext context) {
-        int angel = Integer
-                .valueOf(Mth.floor((double) (context.getRotation() * 16.0F / 360.0F) + 0.5D) & 15);
+        final int angel = Integer
+                .valueOf(Mth.floor(context.getRotation() * 16.0F / 360.0F + 0.5D) & 15);
         return defaultBlockState().setValue(ANGEL, SignalAngel.values()[angel]);
     }
 
@@ -325,9 +329,8 @@ public class Signal extends BasicBlock {
     @Override
     public int getDirectSignal(final BlockState blockState, final BlockGetter blockAccess,
             final BlockPos pos, final Direction side) {
-        if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null)
-            return 0;
-        if (!(blockAccess instanceof Level)) {
+        if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null
+                || !(blockAccess instanceof Level)) {
             return 0;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);

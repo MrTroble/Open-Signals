@@ -21,12 +21,10 @@ public class SignalPair {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final SignalPair other = (SignalPair) obj;
         return Objects.equals(end, other.end) && Objects.equals(start, other.start);

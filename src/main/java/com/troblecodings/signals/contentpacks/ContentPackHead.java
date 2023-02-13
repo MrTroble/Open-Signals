@@ -2,9 +2,9 @@ package com.troblecodings.signals.contentpacks;
 
 public class ContentPackHead {
 
-    private String packname;
-    private float packversion;
-    private String author;
+    protected String packname;
+    protected float packversion;
+    protected String author;
 
     public String getPackname() {
         return packname;

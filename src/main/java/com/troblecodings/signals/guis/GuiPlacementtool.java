@@ -181,7 +181,7 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
     }
 
     public void applyModelChanges() {
-        BlockState ebs = currentSelectedBlock.defaultBlockState();
+        final BlockState ebs = currentSelectedBlock.defaultBlockState();
         // Just until the erros are fixed
         return;
         /*
@@ -190,20 +190,20 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
          * enumerable : enumerables) { final SEProperty sep = (SEProperty)
          * lookup.get(enumerable.getID()); if (sep == null) return; ebs =
          * ebs.withProperty(sep, sep.getObjFromID(enumerable.getIndex())); }
-         * 
+         *
          * final List<UICheckBox> checkbox = this.list.findRecursive(UICheckBox.class);
          * for (final UICheckBox checkb : checkbox) { final SEProperty sep =
          * (SEProperty) lookup.get(checkb.getID()); if (sep == null) return; if
          * (sep.isChangabelAtStage(ChangeableStage.GUISTAGE)) { ebs =
          * ebs.withProperty(sep, checkb.isChecked()); } else if (checkb.isChecked()) {
          * ebs = ebs.withProperty(sep, sep.getDefault()); } }
-         * 
+         *
          * for (final Entry<IUnlistedProperty<?>, Optional<?>> prop :
          * ebs.getUnlistedProperties() .entrySet()) { final SEProperty property =
          * SEProperty.cst(prop.getKey()); if
          * (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) { ebs =
          * ebs.withProperty(property, property.getDefault()); } }
-         * 
+         *
          * blockRender.setBlockState(ebs);
          */
     }

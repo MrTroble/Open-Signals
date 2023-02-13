@@ -23,7 +23,7 @@ public class BasicBlock extends Block implements EntityBlock {
 
     public BasicBlock(final Properties properties) {
         super(properties);
-        Optional<TileEntitySupplierWrapper> optional = getSupplierWrapper();
+        final Optional<TileEntitySupplierWrapper> optional = getSupplierWrapper();
         getSupplierWrapperName().ifPresent(name -> {
             optional.ifPresent(supplier -> {
                 BLOCK_SUPPLIER.computeIfAbsent(supplier, _u -> new HashSet<>()).add(this);

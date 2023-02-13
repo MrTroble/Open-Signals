@@ -26,9 +26,7 @@ public class SignalStatePos {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final SignalStatePos other = (SignalStatePos) obj;
         return file == other.file && offset == other.offset;

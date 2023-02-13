@@ -9,8 +9,8 @@ import com.troblecodings.signals.OpenSignalsMain;
 
 public class ModelStats {
 
-    private Map<String, String> textures;
-    private Map<String, Models> models;
+    protected Map<String, String> textures;
+    protected Map<String, Models> models;
 
     public ImmutableMap<String, Models> getModels() {
 
@@ -27,8 +27,8 @@ public class ModelStats {
         final Map<String, Object> content = new HashMap<>();
 
         OpenSignalsMain.contentPacks.getFiles(directory).forEach(entry -> {
-            String filename = entry.getKey();
-            String file = entry.getValue();
+            final String filename = entry.getKey();
+            final String file = entry.getValue();
             if (!filename.endsWith("extention.json")) {
 
                 final ModelStats json = gson.fromJson(file, ModelStats.class);

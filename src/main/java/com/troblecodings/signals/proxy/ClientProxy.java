@@ -24,7 +24,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 public class ClientProxy extends CommonProxy {
 
     @Override
-    public void initModEvent(FMLConstructModEvent event) {
+    public void initModEvent(final FMLConstructModEvent event) {
         super.initModEvent(event);
         SignalStateHandler.add(new ClientSignalsStateHandler());
         OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);

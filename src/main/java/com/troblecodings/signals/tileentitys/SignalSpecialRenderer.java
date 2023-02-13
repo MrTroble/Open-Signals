@@ -9,15 +9,15 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEntity> {
 
-    private BlockEntityRendererProvider.Context context;
+    private final BlockEntityRendererProvider.Context context;
 
-    public SignalSpecialRenderer(BlockEntityRendererProvider.Context context) {
+    public SignalSpecialRenderer(final BlockEntityRendererProvider.Context context) {
         this.context = context;
     }
 
     @Override
-    public void render(SignalTileEntity tile, float tick, PoseStack stack, MultiBufferSource source,
-            int rand1, int rand2) {
+    public void render(final SignalTileEntity tile, final float tick, final PoseStack stack,
+            final MultiBufferSource source, final int rand1, final int rand2) {
         if (!tile.hasCustomName())
             return;
         tile.renderOverlay(new RenderOverlayInfo(stack, 0, 0, 0, context.getFont()));

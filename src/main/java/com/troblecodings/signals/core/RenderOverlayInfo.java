@@ -23,7 +23,7 @@ public class RenderOverlayInfo {
         this.font = font;
     }
 
-    public RenderOverlayInfo with(SignalTileEntity tileEntity) {
+    public RenderOverlayInfo with(final SignalTileEntity tileEntity) {
         this.tileEntity = tileEntity;
         return this;
     }

@@ -9,11 +9,11 @@ public enum LinkType implements NamableWrapper {
     private static final String LINK_TYPE = "linkType";
     private String name;
 
-    private LinkType(String name) {
+    private LinkType(final String name) {
         this.name = name;
     }
 
-    public void write(NBTWrapper wrapper) {
+    public void write(final NBTWrapper wrapper) {
         wrapper.putString(LINK_TYPE, name);
     }
 
@@ -22,14 +22,14 @@ public enum LinkType implements NamableWrapper {
         return this.name;
     }
 
-    public static LinkType of(String name) {
-        for (LinkType type : values())
+    public static LinkType of(final String name) {
+        for (final LinkType type : values())
             if (type.name.equalsIgnoreCase(name))
                 return type;
         return null;
     }
 
-    public static LinkType of(NBTWrapper wrapper) {
+    public static LinkType of(final NBTWrapper wrapper) {
         return of(wrapper.getString(LINK_TYPE));
     }
 }

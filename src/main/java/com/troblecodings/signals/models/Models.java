@@ -7,10 +7,10 @@ import com.google.common.collect.ImmutableList;
 
 public class Models {
 
-    private List<TextureStats> textures;
-    private float x = 0;
-    private float y = 0;
-    private float z = 0;
+    protected List<TextureStats> textures;
+    protected float x = 0;
+    protected float y = 0;
+    protected float z = 0;
 
     public float getX(final float xOffset) {
         return x + xOffset;

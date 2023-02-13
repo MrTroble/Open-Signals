@@ -30,14 +30,14 @@ public abstract class IPathEntry<T> implements INetworkSavable, Observable {
 
     /**
      * Returns the value to hold
-     * 
+     *
      * @return the value
      */
     public abstract T getValue();
 
     /**
      * Sets the value of this entry
-     * 
+     *
      * @param the value to set
      */
     public abstract void setValue(T value);
@@ -51,9 +51,7 @@ public abstract class IPathEntry<T> implements INetworkSavable, Observable {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final IPathEntry<?> other = (IPathEntry<?>) obj;
         return Objects.equals(name, other.name) && Objects.equals(getValue(), other.getValue());

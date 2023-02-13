@@ -34,7 +34,7 @@ public class StateFileTest {
             Files.list(path).forEach(t -> {
                 try {
                     Files.deleteIfExists(t);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     e.printStackTrace();
                 }
             });
@@ -47,7 +47,7 @@ public class StateFileTest {
             Files.list(path).forEach(t -> {
                 try {
                     Files.deleteIfExists(t);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     e.printStackTrace();
                 }
             });
@@ -56,47 +56,47 @@ public class StateFileTest {
 
     @Test
     public void creationAndAddition() {
-        SignalStateFile file = new SignalStateFile(path);
-        BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
-        SignalStatePos createPos = file.create(firstcreate);
+        final SignalStateFile file = new SignalStateFile(path);
+        final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
+        final SignalStatePos createPos = file.create(firstcreate);
         assertFalse(createPos.offset < SignalStateFile.MAX_OFFSET_OF_INDEX);
         assertNotNull(createPos);
 
-        SignalStatePos position = file.find(firstcreate);
+        final SignalStatePos position = file.find(firstcreate);
         assertNotNull(position);
         assertEquals(position, createPos);
 
-        SignalStateFile file2 = new SignalStateFile(path);
-        SignalStatePos position2 = file2.find(firstcreate);
+        final SignalStateFile file2 = new SignalStateFile(path);
+        final SignalStatePos position2 = file2.find(firstcreate);
         assertNotNull(position2);
         assertEquals(position2, createPos);
     }
 
     @Test
     public void readAndWrite() {
-        SignalStateFile file = new SignalStateFile(path);
+        final SignalStateFile file = new SignalStateFile(path);
 
-        BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
-        SignalStatePos positionInFile = file.create(firstcreate);
-        ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
+        final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
+        final SignalStatePos positionInFile = file.create(firstcreate);
+        final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
         GIRSyncEntryTests.RANDOM.nextBytes(buffer.array());
         file.write(positionInFile, buffer);
 
-        ByteBuffer outbuffer = file.read(positionInFile);
+        final ByteBuffer outbuffer = file.read(positionInFile);
 
         assertArrayEquals(buffer.array(), outbuffer.array());
     }
 
     @Test
     public void moreThenPossible() {
-        SignalStateFile file = new SignalStateFile(path);
-        List<Map.Entry<BlockPos, SignalStatePos>> listOfPos = new ArrayList<>();
+        final SignalStateFile file = new SignalStateFile(path);
+        final List<Map.Entry<BlockPos, SignalStatePos>> listOfPos = new ArrayList<>();
         for (int i = 0; i < SignalStateFile.MAX_ELEMENTS_PER_FILE + 10; i++) {
-            BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
+            final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
             listOfPos.add(Map.entry(firstcreate, file.create(firstcreate)));
         }
         for (int i = 0; i < listOfPos.size() / 1000; i++) {
-            Map.Entry<BlockPos, SignalStatePos> entry = listOfPos.get(i);
+            final Map.Entry<BlockPos, SignalStatePos> entry = listOfPos.get(i);
             assertEquals(entry.getValue(), file.find(entry.getKey()));
         }
     }

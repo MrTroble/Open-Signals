@@ -34,7 +34,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
 
     @Override
     public CompoundTag getUpdateTag() {
-        NBTWrapper wrapper = new NBTWrapper();
+        final NBTWrapper wrapper = new NBTWrapper();
         saveWrapper(wrapper);
         return wrapper.tag;
     }

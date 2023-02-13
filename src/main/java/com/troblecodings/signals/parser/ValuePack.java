@@ -26,9 +26,7 @@ public class ValuePack {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final ValuePack other = (ValuePack) obj;
         return Objects.equals(predicate, other.predicate)

@@ -31,7 +31,7 @@ public class CommonProxy {
     public void initModEvent(final FMLConstructModEvent event) {
         SignalStateHandler.init();
         NameHandler.init();
-        Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
+        final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
         OpenSignalsMain.handler = init.getKey();
         OpenSignalsMain.network = init.getValue();

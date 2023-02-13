@@ -2,8 +2,8 @@ package com.troblecodings.signals.contentpacks;
 
 public class SoundPropertyParser {
 
-    private String name;
-    private int length;
+    protected String name;
+    protected int length;
 
     public String getName() {
         return name;
