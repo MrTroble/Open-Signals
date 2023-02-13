@@ -13,9 +13,8 @@ public final class JsonEnumHolder {
     private JsonEnumHolder() {
     }
 
-    public static final Map<String, JsonEnum> PROPERTIES = JsonEnumHolder.getProperties();
-
     private static final Gson GSON = new Gson();
+    public static final Map<String, JsonEnum> PROPERTIES = JsonEnumHolder.getProperties();
 
     @SuppressWarnings("unchecked")
     public static Map<String, JsonEnum> getProperties() {
