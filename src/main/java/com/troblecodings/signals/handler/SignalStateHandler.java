@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
@@ -30,12 +31,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.NetworkEvent.ClientCustomPayloadEvent;
+import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.event.EventNetworkChannel;
 
 public final class SignalStateHandler implements INetworkSync {
@@ -51,13 +54,26 @@ public final class SignalStateHandler implements INetworkSync {
         channel = NetworkRegistry.newEventChannel(channelName, () -> OpenSignalsMain.MODID,
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new SignalStateHandler());
+        MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
+        SERVICE = Executors.newFixedThreadPool(3);
+    }
+    
+    @SubscribeEvent
+    public static void shutdown(ServerStoppingEvent event) {
+        SERVICE.shutdown();
+        try {
+            SERVICE.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        SERVICE = Executors.newFixedThreadPool(3);
     }
 
     public static void add(Object object) {
         channel.registerObject(object);
     }
 
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(4);
+    private static ExecutorService SERVICE;
 
     public static void createStates(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
