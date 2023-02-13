@@ -19,12 +19,12 @@ import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientSignalsStateHandler implements INetworkSync {
 
-    private static final Map<SignalStateInfo, Map<SEProperty, String>> currentlyLoadedStatesClient = new HashMap<>();
+    private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
 
     public static final Map<SEProperty, String> getClientStates(final SignalStateInfo info) {
-        return currentlyLoadedStatesClient.computeIfAbsent(info, _u -> new HashMap<>());
+        return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
     }
 
     @Override
@@ -51,8 +51,8 @@ public class ClientSignalsStateHandler implements INetworkSync {
                 continue;
             final SignalStateInfo stateInfo = new SignalStateInfo(level, signalPos);
             final List<SEProperty> signalProperties = stateInfo.signal.getProperties();
-            synchronized (currentlyLoadedStatesClient) {
-                final Map<SEProperty, String> properties = currentlyLoadedStatesClient
+            synchronized (CURRENTLY_LOADED_STATES) {
+                final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
                         .computeIfAbsent(stateInfo, _u -> new HashMap<>());
                 for (int i = 0; i < propertiesSize; i++) {
                     final SEProperty property = signalProperties.get(propertyIDs[i]);

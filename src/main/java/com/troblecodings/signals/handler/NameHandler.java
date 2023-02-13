@@ -28,7 +28,7 @@ import net.minecraftforge.network.event.EventNetworkChannel;
 
 public final class NameHandler implements INetworkSync {
 
-    private static final Map<BlockPos, String> allNames = new HashMap<>();
+    private static final Map<BlockPos, String> ALL_NAMES = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
 
@@ -42,16 +42,16 @@ public final class NameHandler implements INetworkSync {
     public static void setName(final Level world, final BlockPos pos, final String name) {
         if (world.isClientSide || name.isEmpty())
             return;
-        synchronized (allNames) {
-            allNames.put(pos, name);
+        synchronized (ALL_NAMES) {
+            ALL_NAMES.put(pos, name);
         }
         sendNameToClient(world, pos, name);
         // TODO add system to save into files
     }
 
     public static String getName(final BlockPos pos) {
-        synchronized (allNames) {
-            final String name = allNames.get(pos);
+        synchronized (ALL_NAMES) {
+            final String name = ALL_NAMES.get(pos);
             if (name == null)
                 return "";
             return name;
@@ -86,16 +86,16 @@ public final class NameHandler implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buf.get();
         }
-        synchronized (allNames) {
-            allNames.put(pos, new String(array));
+        synchronized (ALL_NAMES) {
+            ALL_NAMES.put(pos, new String(array));
         }
     }
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
         Map<BlockPos, String> map;
-        synchronized (allNames) {
-            map = ImmutableMap.copyOf(allNames);
+        synchronized (ALL_NAMES) {
+            map = ImmutableMap.copyOf(ALL_NAMES);
         }
         map.forEach((pos, name) -> {
             // TODO write into files
@@ -105,7 +105,7 @@ public final class NameHandler implements INetworkSync {
     @SubscribeEvent
     public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
         final Player player = event.getPlayer();
-        allNames.forEach((pos, name) -> {
+        ALL_NAMES.forEach((pos, name) -> {
             sendTo(player, packToBuffer(pos, name));
         });
 

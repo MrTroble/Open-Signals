@@ -30,7 +30,7 @@ public final class OSModels {
     @SubscribeEvent
     public static void addColor(final ColorHandlerEvent.Block event) {
         final BlockColors colors = event.getBlockColors();
-        OSBlocks.blocksToRegister.forEach(block -> {
+        OSBlocks.BLOCKS_TO_REGISTER.forEach(block -> {
             if (block instanceof Signal) {
                 final Signal signal = (Signal) block;
                 if (signal.hasCostumColor())

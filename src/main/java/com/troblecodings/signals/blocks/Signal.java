@@ -85,14 +85,14 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public boolean propagatesSkylightDown(final BlockState p_49100_, final BlockGetter p_49101_,
-            final BlockPos p_49102_) {
+    public boolean propagatesSkylightDown(final BlockState state, final BlockGetter getter,
+            final BlockPos pos) {
         return true;
     }
 
     @Override
-    public float getShadeBrightness(final BlockState p_49094_, final BlockGetter p_49095_,
-            final BlockPos p_49096_) {
+    public float getShadeBrightness(final BlockState state, final BlockGetter getter,
+            final BlockPos pos) {
         return 1.0F;
     }
 

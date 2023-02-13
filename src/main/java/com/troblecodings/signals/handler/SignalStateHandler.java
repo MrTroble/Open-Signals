@@ -43,11 +43,12 @@ import net.minecraftforge.network.event.EventNetworkChannel;
 
 public final class SignalStateHandler implements INetworkSync {
 
-    private static final Map<SignalStateInfo, Map<SEProperty, String>> currentlyLoadedStates = new HashMap<>();
-    private static final Map<ChunkAccess, List<SignalStateInfo>> currentlyLoadedChunks = new HashMap<>();
-    private static final Map<Level, SignalStateFile> allLevelFiles = new HashMap<>();
+    private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
+    private static final Map<ChunkAccess, List<SignalStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
+    private static final Map<Level, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
+    private static ExecutorService service;
 
     public static void init() {
         channelName = new ResourceLocation(OpenSignalsMain.MODID, "signalstatehandler");
@@ -55,32 +56,30 @@ public final class SignalStateHandler implements INetworkSync {
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new SignalStateHandler());
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
-        SERVICE = Executors.newFixedThreadPool(3);
+        service = Executors.newFixedThreadPool(3);
     }
 
     @SubscribeEvent
     public static void shutdown(final ServerStoppingEvent event) {
-        SERVICE.shutdown();
+        service.shutdown();
         try {
-            SERVICE.awaitTermination(1, TimeUnit.DAYS);
+            service.awaitTermination(1, TimeUnit.DAYS);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        SERVICE = Executors.newFixedThreadPool(3);
+        service = Executors.newFixedThreadPool(3);
     }
 
     public static void add(final Object object) {
         channel.registerObject(object);
     }
 
-    private static ExecutorService SERVICE;
-
     public static void createStates(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
         if (info.world.isClientSide)
             return;
-        synchronized (currentlyLoadedStates) {
-            currentlyLoadedStates.put(info, ImmutableMap.copyOf(states));
+        synchronized (CURRENTLY_LOADED_STATES) {
+            CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
         createToFile(info, states);
         sendPropertiesToClient(info, states);
@@ -97,13 +96,13 @@ public final class SignalStateHandler implements INetworkSync {
     private static void createToFile(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
         final SignalStateFile file;
-        synchronized (allLevelFiles) {
-            file = allLevelFiles.get(info.world);
+        synchronized (ALL_LEVEL_FILES) {
+            file = ALL_LEVEL_FILES.get(info.world);
             if (file == null) {
                 return;
             }
         }
-        SERVICE.submit(() -> {
+        service.submit(() -> {
             SignalStatePos pos = file.find(info.pos);
             if (pos == null) {
                 pos = file.create(info.pos);
@@ -120,9 +119,9 @@ public final class SignalStateHandler implements INetworkSync {
         if (info.world.isClientSide || states == null || states.isEmpty()) {
             return;
         }
-        synchronized (currentlyLoadedStates) {
-            if (currentlyLoadedStates.containsKey(info)) {
-                currentlyLoadedStates.put(info, ImmutableMap.copyOf(states));
+        synchronized (CURRENTLY_LOADED_STATES) {
+            if (CURRENTLY_LOADED_STATES.containsKey(info)) {
+                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
                 sendPropertiesToClient(info, states);
                 return;
             }
@@ -132,8 +131,8 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
         final Map<SEProperty, String> states;
-        synchronized (currentlyLoadedStates) {
-            final Map<SEProperty, String> stateVolitile = currentlyLoadedStates.get(info);
+        synchronized (CURRENTLY_LOADED_STATES) {
+            final Map<SEProperty, String> stateVolitile = CURRENTLY_LOADED_STATES.get(info);
             states = stateVolitile == null ? null : ImmutableMap.copyOf(stateVolitile);
         }
         if (states != null) {
@@ -149,8 +148,8 @@ public final class SignalStateHandler implements INetworkSync {
     public static void setState(final SignalStateInfo info, final SEProperty property,
             final String value) {
         final Map<SEProperty, String> map = new HashMap<>();
-        synchronized (currentlyLoadedStates) {
-            final Map<SEProperty, String> savedProperties = currentlyLoadedStates.get(info);
+        synchronized (CURRENTLY_LOADED_STATES) {
+            final Map<SEProperty, String> savedProperties = CURRENTLY_LOADED_STATES.get(info);
             map.putAll(savedProperties == null ? new HashMap<>() : savedProperties);
         }
         map.put(property, value);
@@ -165,8 +164,8 @@ public final class SignalStateHandler implements INetworkSync {
     private static Map<SEProperty, String> readAndSerialize(final SignalStateInfo stateInfo) {
         final Map<SEProperty, String> map = new HashMap<>();
         SignalStateFile file;
-        synchronized (allLevelFiles) {
-            file = allLevelFiles.get(stateInfo.world);
+        synchronized (ALL_LEVEL_FILES) {
+            file = ALL_LEVEL_FILES.get(stateInfo.world);
         }
         SignalStatePos pos = file.find(stateInfo.pos);
         if (pos == null) {
@@ -201,16 +200,16 @@ public final class SignalStateHandler implements INetworkSync {
         final Level world = (Level) chunk.getWorldForge();
         if (world.isClientSide())
             return;
-        synchronized (allLevelFiles) {
-            if (!allLevelFiles.containsKey(world)) {
-                allLevelFiles.put(world,
+        synchronized (ALL_LEVEL_FILES) {
+            if (!ALL_LEVEL_FILES.containsKey(world)) {
+                ALL_LEVEL_FILES.put(world,
                         new DebugSignalStateFile(Paths.get("ossignalfiles/"
                                 + ((ServerLevel) world).getServer().getWorldData().getLevelName()
                                         .replace(":", "").replace("/", "").replace("\\", "")
                                 + "/" + world.dimension().location().toString().replace(":", ""))));
             }
         }
-        SERVICE.submit(() -> {
+        service.submit(() -> {
             final List<SignalStateInfo> states = new ArrayList<>();
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
@@ -219,14 +218,14 @@ public final class SignalStateHandler implements INetworkSync {
                 }
                 final SignalStateInfo stateInfo = new SignalStateInfo(world, pos);
                 final Map<SEProperty, String> map = readAndSerialize(stateInfo);
-                synchronized (currentlyLoadedStates) {
-                    currentlyLoadedStates.put(stateInfo, map);
+                synchronized (CURRENTLY_LOADED_STATES) {
+                    CURRENTLY_LOADED_STATES.put(stateInfo, map);
                 }
                 states.add(stateInfo);
                 sendPropertiesToClient(stateInfo, map);
             });
-            synchronized (currentlyLoadedChunks) {
-                currentlyLoadedChunks.put(chunk, states);
+            synchronized (CURRENTLY_LOADED_CHUNKS) {
+                CURRENTLY_LOADED_CHUNKS.put(chunk, states);
             }
         });
     }
@@ -238,18 +237,18 @@ public final class SignalStateHandler implements INetworkSync {
         if (level.isClientSide())
             return;
         SignalStateFile file;
-        synchronized (allLevelFiles) {
-            file = allLevelFiles.get(level);
+        synchronized (ALL_LEVEL_FILES) {
+            file = ALL_LEVEL_FILES.get(level);
         }
-        SERVICE.submit(() -> {
+        service.submit(() -> {
             List<SignalStateInfo> states;
-            synchronized (currentlyLoadedChunks) {
-                states = currentlyLoadedChunks.remove(chunk);
+            synchronized (CURRENTLY_LOADED_CHUNKS) {
+                states = CURRENTLY_LOADED_CHUNKS.remove(chunk);
             }
             states.forEach(stateInfo -> {
                 Map<SEProperty, String> properties;
-                synchronized (currentlyLoadedStates) {
-                    properties = currentlyLoadedStates.remove(stateInfo);
+                synchronized (CURRENTLY_LOADED_STATES) {
+                    properties = CURRENTLY_LOADED_STATES.remove(stateInfo);
                 }
                 final SignalStatePos pos = file.find(stateInfo.pos);
                 final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
@@ -262,10 +261,10 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save save) {
-        SERVICE.execute(() -> {
+        service.execute(() -> {
             final Map<SignalStateInfo, Map<SEProperty, String>> maps;
-            synchronized (currentlyLoadedStates) {
-                maps = ImmutableMap.copyOf(currentlyLoadedStates);
+            synchronized (CURRENTLY_LOADED_STATES) {
+                maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
             }
             maps.forEach(SignalStateHandler::createToFile);
         });
@@ -275,8 +274,8 @@ public final class SignalStateHandler implements INetworkSync {
     public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
         final Player player = event.getPlayer();
         Map<SignalStateInfo, Map<SEProperty, String>> map;
-        synchronized (currentlyLoadedStates) {
-            map = ImmutableMap.copyOf(currentlyLoadedStates);
+        synchronized (CURRENTLY_LOADED_STATES) {
+            map = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
         map.forEach((state, properites) -> {
             final ByteBuffer buffer = packToByteBuffer(state, properites);
@@ -285,10 +284,10 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void setRemoved(final SignalStateInfo info) {
-        synchronized (currentlyLoadedStates) {
-            currentlyLoadedStates.remove(info);
+        synchronized (CURRENTLY_LOADED_STATES) {
+            CURRENTLY_LOADED_STATES.remove(info);
         }
-        SERVICE.execute(() -> {
+        service.execute(() -> {
             // TODO remove from Files
         });
     }

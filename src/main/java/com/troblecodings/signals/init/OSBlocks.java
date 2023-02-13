@@ -38,7 +38,7 @@ public final class OSBlocks {
     public static final BasicBlock REDSTONE_IN = new RedstoneInput();
     public static final BasicBlock REDSTONE_OUT = new RedstoneIO();
 
-    public static final List<BasicBlock> blocksToRegister = new ArrayList<>();
+    public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 
     public static void init() {
         final Field[] fields = OSBlocks.class.getFields();
@@ -62,11 +62,11 @@ public final class OSBlocks {
     }
 
     public static void loadBlock(final BasicBlock block, final String pName) {
-        if (blocksToRegister.contains(block))
+        if (BLOCKS_TO_REGISTER.contains(block))
             return;
         final String name = pName.toLowerCase().trim();
         block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
-        blocksToRegister.add(block);
+        BLOCKS_TO_REGISTER.add(block);
         if (block instanceof Signal) {
             Signal.SIGNALS.put(name, (Signal) block);
         }
@@ -77,7 +77,7 @@ public final class OSBlocks {
         if (POST.getRegistryName() == null)
             OSBlocks.init();
         final IForgeRegistry<Block> registry = event.getRegistry();
-        blocksToRegister.forEach(registry::register);
+        BLOCKS_TO_REGISTER.forEach(registry::register);
     }
 
     @SubscribeEvent
@@ -94,7 +94,7 @@ public final class OSBlocks {
         if (POST.getRegistryName() == null)
             OSBlocks.init();
         final IForgeRegistry<Item> registry = event.getRegistry();
-        blocksToRegister.forEach(block -> {
+        BLOCKS_TO_REGISTER.forEach(block -> {
             if (block instanceof Signal || block instanceof GhostBlock)
                 return;
             registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))

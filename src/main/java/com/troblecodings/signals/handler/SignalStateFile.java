@@ -96,8 +96,8 @@ public class SignalStateFile {
                     return new SignalStatePos(counter, offset);
                 }
             }
-        } catch (final IOException e1) {
-            e1.printStackTrace();
+        } catch (final IOException exception) {
+            exception.printStackTrace();
         }
         return null;
     }

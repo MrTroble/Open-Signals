@@ -17,9 +17,9 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicBlock extends Block implements EntityBlock {
 
-    private static Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
-    private static Map<TileEntitySupplierWrapper, Set<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
-    public static Map<TileEntitySupplierWrapper, BlockEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
+    private static final Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
+    private static final Map<TileEntitySupplierWrapper, Set<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
+    public static final Map<TileEntitySupplierWrapper, BlockEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
 
     public BasicBlock(final Properties properties) {
         super(properties);

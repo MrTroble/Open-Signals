@@ -7,7 +7,10 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 
-public class EnumHelper {
+public final class EnumHelper {
+
+    private EnumHelper() {
+    }
 
     private static class ImplArmorMat implements ArmorMaterial {
 
