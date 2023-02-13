@@ -4,19 +4,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.gson.Gson;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.contentpacks.ContentPackException;
 
-public class JsonEnumHolder {
+public final class JsonEnumHolder {
+
+    private JsonEnumHolder() {
+    }
 
     public static final Map<String, JsonEnum> PROPERTIES = JsonEnumHolder.getProperties();
+
+    private static final Gson GSON = new Gson();
 
     @SuppressWarnings("unchecked")
     public static Map<String, JsonEnum> getProperties() {
         final HashMap<String, JsonEnum> returnmap = new HashMap<>();
         OpenSignalsMain.contentPacks.getFiles("enumdefinition").forEach((entry) -> {
             final String file = entry.getValue();
-            final Map<String, List<String>> map = JsonEnum.GSON.fromJson(file,
+            final Map<String, List<String>> map = GSON.fromJson(file,
                     (Class<Map<String, List<String>>>) (Class<?>) Map.class);
             if (map == null)
                 throw new IllegalStateException("Could not parse " + file);

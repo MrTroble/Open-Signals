@@ -23,12 +23,12 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ForgeModelBakery;
 
 @OnlyIn(Dist.CLIENT)
-public class CustomModelLoader implements ResourceManagerReloadListener {
+public final class CustomModelLoader implements ResourceManagerReloadListener {
 
     private static HashMap<String, List<SignalModelLoaderInfo>> registeredModels = new HashMap<>();
 
     public static final CustomModelLoader INSTANCE = new CustomModelLoader();
-    MapWrapper wrapper;
+    private MapWrapper wrapper;
 
     private CustomModelLoader() {
     }
@@ -120,7 +120,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
     }
 
     @Override
-    public void onResourceManagerReload(final ResourceManager p_10758_) {
+    public void onResourceManagerReload(final ResourceManager manager) {
         registeredModels.clear();
 
         final Map<String, ModelExtention> extentions = new HashMap<>();

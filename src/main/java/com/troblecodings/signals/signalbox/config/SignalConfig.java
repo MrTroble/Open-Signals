@@ -18,6 +18,8 @@ import com.troblecodings.signals.properties.SignalPair;
 
 public final class SignalConfig {
 
+    private SignalConfig() {}
+    
     public static void change(final ConfigInfo info) {
         final Signal currentSignal = info.currentinfo.signal;
         if (info.type.equals(PathType.NORMAL)) {

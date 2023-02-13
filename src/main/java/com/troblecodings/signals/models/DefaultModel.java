@@ -20,7 +20,7 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.resources.ResourceLocation;
 
-public class DefaultModel implements UnbakedModel {
+public final class DefaultModel implements UnbakedModel {
 
     public static final DefaultModel INSTANCE = new DefaultModel();
 

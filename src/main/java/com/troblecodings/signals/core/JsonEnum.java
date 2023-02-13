@@ -10,7 +10,6 @@ import java.util.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.gson.Gson;
 
 import net.minecraftforge.client.model.data.ModelProperty;
 
@@ -92,6 +91,5 @@ public class JsonEnum extends ModelProperty<String> {
         return name;
     }
 
-    static final Gson GSON = new Gson();
-    public static JsonEnum BOOLEAN = new JsonEnum("boolean", ImmutableList.of("false", "true"));
+    public static final JsonEnum BOOLEAN = new JsonEnum("boolean", ImmutableList.of("false", "true"));
 }

@@ -8,8 +8,10 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat.Mode;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 
-public class SignalBoxRenderUtil {
+public final class SignalBoxRenderUtil {
 
+    private SignalBoxRenderUtil() {}
+    
     public static void drawRect(final int left, final int top, final int right, final int bottom,
             final int color) {
         // TODO COLORS
