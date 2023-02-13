@@ -38,7 +38,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         grid = SignalBoxFactory.getFactory().getGrid(this::sendToAll);
     }
 
-    private WorldOperations worldLoadOps = new WorldOperations();
+    private final WorldOperations worldLoadOps = new WorldOperations();
 
     @Override
     public void setLevel(final Level worldIn) {

@@ -15,16 +15,12 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
-import net.minecraft.server.packs.resources.SimplePreparableReloadListener;
-import net.minecraft.util.profiling.ProfilerFiller;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ForgeModelBakery;
-import net.minecraftforge.eventbus.api.Event;
 
 @OnlyIn(Dist.CLIENT)
 public class CustomModelLoader implements ResourceManagerReloadListener {
@@ -98,7 +94,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
         }
     }
 
-    private void defaultModel(MapWrapper wrapper, String name) {
+    private void defaultModel(final MapWrapper wrapper, final String name) {
         wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, "inventory"),
                 DefaultModel.INSTANCE);
         wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, ""),
@@ -124,7 +120,7 @@ public class CustomModelLoader implements ResourceManagerReloadListener {
     }
 
     @Override
-    public void onResourceManagerReload(ResourceManager p_10758_) {
+    public void onResourceManagerReload(final ResourceManager p_10758_) {
         registeredModels.clear();
 
         final Map<String, ModelExtention> extentions = new HashMap<>();

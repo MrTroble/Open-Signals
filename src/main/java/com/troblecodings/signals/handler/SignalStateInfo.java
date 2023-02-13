@@ -17,7 +17,7 @@ public class SignalStateInfo {
         this(world, pos, (Signal) world.getBlockState(pos).getBlock());
     }
 
-    public SignalStateInfo(Level world, BlockPos pos, Signal signal) {
+    public SignalStateInfo(final Level world, final BlockPos pos, final Signal signal) {
         super();
         this.world = world;
         this.pos = pos;
@@ -35,14 +35,14 @@ public class SignalStateInfo {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        SignalStateInfo other = (SignalStateInfo) obj;
+        final SignalStateInfo other = (SignalStateInfo) obj;
         return Objects.equals(pos, other.pos) && Objects.equals(signal, other.signal)
                 && Objects.equals(world, other.world);
     }

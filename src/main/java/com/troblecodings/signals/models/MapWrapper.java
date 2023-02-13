@@ -16,7 +16,7 @@ public class MapWrapper implements Map<ResourceLocation, UnbakedModel> {
     private final Map<ResourceLocation, UnbakedModel> map;
     private final Set<String> whitelist;
 
-    public MapWrapper(Map<ResourceLocation, UnbakedModel> map, Set<String> whitelist) {
+    public MapWrapper(final Map<ResourceLocation, UnbakedModel> map, final Set<String> whitelist) {
         super();
         this.map = map;
         this.whitelist = new HashSet<>(whitelist);
@@ -34,42 +34,42 @@ public class MapWrapper implements Map<ResourceLocation, UnbakedModel> {
     }
 
     @Override
-    public boolean containsKey(Object key) {
-        ResourceLocation loc = (ResourceLocation) key;
+    public boolean containsKey(final Object key) {
+        final ResourceLocation loc = (ResourceLocation) key;
         if (loc.getNamespace().equalsIgnoreCase(OpenSignalsMain.MODID))
             return this.map.containsKey(key);
         return this.map.containsKey(key);
     }
 
     @Override
-    public boolean containsValue(Object value) {
+    public boolean containsValue(final Object value) {
         return this.map.containsValue(value);
     }
 
     @Override
-    public UnbakedModel get(Object key) {
+    public UnbakedModel get(final Object key) {
         return this.map.get(key);
     }
 
     @Override
-    public UnbakedModel put(ResourceLocation key, UnbakedModel value) {
+    public UnbakedModel put(final ResourceLocation key, final UnbakedModel value) {
         if (!key.getNamespace().equalsIgnoreCase(OpenSignalsMain.MODID)
                 || !whitelist.contains(key.getPath()))
             return this.map.put(key, value);
         return value;
     }
 
-    public UnbakedModel putNormal(ResourceLocation key, UnbakedModel value) {
+    public UnbakedModel putNormal(final ResourceLocation key, final UnbakedModel value) {
         return this.map.put(key, value);
     }
 
     @Override
-    public UnbakedModel remove(Object key) {
+    public UnbakedModel remove(final Object key) {
         return this.map.remove(key);
     }
 
     @Override
-    public void putAll(Map<? extends ResourceLocation, ? extends UnbakedModel> m) {
+    public void putAll(final Map<? extends ResourceLocation, ? extends UnbakedModel> m) {
         final HashMap<? extends ResourceLocation, ? extends UnbakedModel> map = new HashMap<>(m);
         map.keySet().removeIf(loc -> loc.getNamespace().equalsIgnoreCase(OpenSignalsMain.MODID));
         this.map.putAll(map);

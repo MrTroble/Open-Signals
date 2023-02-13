@@ -56,7 +56,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     public void sendToAll(final NBTWrapper compound) {
-        // TODO 
+        // TODO
     }
 
 }

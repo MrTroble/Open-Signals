@@ -21,9 +21,9 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.NetworkEvent.ClientCustomPayloadEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
+import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.event.EventNetworkChannel;
 
 public final class NameHandler implements INetworkSync {

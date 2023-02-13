@@ -69,7 +69,7 @@ public class RedstoneIO extends BasicBlock {
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
     }
-    
+
     @Override
     public Optional<String> getSupplierWrapperName() {
         return Optional.of("redstoneio");

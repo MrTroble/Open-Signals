@@ -17,33 +17,33 @@ import net.minecraft.core.BlockPos;
 
 public class DebugSignalStateFile extends SignalStateFile {
 
-    private HashMap<BlockPos, SignalStatePos> createdPositions = new HashMap<>();
-    private HashMap<BlockPos, SignalStatePos> foundPositions = new HashMap<>();
-    private HashMap<SignalStatePos, byte[]> dataCache = new HashMap<>();
-    private Logger logger;
+    private final HashMap<BlockPos, SignalStatePos> createdPositions = new HashMap<>();
+    private final HashMap<BlockPos, SignalStatePos> foundPositions = new HashMap<>();
+    private final HashMap<SignalStatePos, byte[]> dataCache = new HashMap<>();
+    private final Logger logger;
 
-    public DebugSignalStateFile(Path path) {
+    public DebugSignalStateFile(final Path path) {
         super(path);
         this.logger = OpenSignalsMain.log;
     }
 
     @Override
     @Nullable
-    public synchronized SignalStatePos create(BlockPos pos) {
+    public synchronized SignalStatePos create(final BlockPos pos) {
         if (createdPositions.containsKey(pos)) {
             this.logger.warn("{} was already created!", pos.toString());
         }
-        SignalStatePos statePos = super.create(pos);
+        final SignalStatePos statePos = super.create(pos);
         createdPositions.put(pos, statePos);
         return statePos;
     }
 
     @Override
     @Nullable
-    public synchronized SignalStatePos find(BlockPos pos) {
-        SignalStatePos statePos = super.find(pos);
+    public synchronized SignalStatePos find(final BlockPos pos) {
+        final SignalStatePos statePos = super.find(pos);
         if (foundPositions.containsKey(pos) && statePos != null) {
-            SignalStatePos oldPosition = foundPositions.get(pos);
+            final SignalStatePos oldPosition = foundPositions.get(pos);
             if (!oldPosition.equals(statePos)) {
                 this.logger.warn("{} unpersistent data detected!", pos.toString());
                 this.logger.warn("Old: {}, New: {}", oldPosition.toString(), statePos.toString());
@@ -54,25 +54,25 @@ public class DebugSignalStateFile extends SignalStateFile {
 
     @Override
     @Nullable
-    public synchronized ByteBuffer read(SignalStatePos pos) {
-        ByteBuffer buffer = super.read(pos);
+    public synchronized ByteBuffer read(final SignalStatePos pos) {
+        final ByteBuffer buffer = super.read(pos);
         if (dataCache.containsKey(pos)) {
-            byte[] array = dataCache.get(pos);
+            final byte[] array = dataCache.get(pos);
             if (!Arrays.equals(array, buffer.array())) {
                 this.logger.warn("Data wrong from read!");
                 this.logger.warn("Old: {}, New: {}", Arrays.toString(array),
                         Arrays.toString(buffer.array()));
             }
         }
-        if(buffer.array().length != STATE_BLOCK_SIZE) {
+        if (buffer.array().length != STATE_BLOCK_SIZE) {
             this.logger.warn("Wrong buffer size for read: {}!", buffer.array().length);
         }
         return buffer;
     }
 
     @Override
-    public synchronized void write(SignalStatePos pos, ByteBuffer buffer) {
-        if(buffer.array().length != STATE_BLOCK_SIZE) {
+    public synchronized void write(final SignalStatePos pos, final ByteBuffer buffer) {
+        if (buffer.array().length != STATE_BLOCK_SIZE) {
             this.logger.warn("Wrong buffer size for write: {}!", buffer.array().length);
         }
         super.write(pos, buffer);

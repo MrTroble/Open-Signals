@@ -68,9 +68,7 @@ public class Path implements INetworkSavable {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final Path other = (Path) obj;
         return Objects.equals(point1, other.point1) && Objects.equals(point2, other.point2);

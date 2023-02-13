@@ -100,14 +100,14 @@ public class StateFileTest {
             assertEquals(entry.getValue(), file.find(entry.getKey()));
         }
     }
-    
+
     @Test
     public void readAndWriteCritical() {
         final SignalStateFile file = new SignalStateFile(path);
 
         final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
         final SignalStatePos positionInFile = file.create(firstcreate);
-        
+
         final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
         buffer.array()[0] = (byte) 0xFF;
         buffer.array()[255] = (byte) 0x0F;
@@ -119,7 +119,7 @@ public class StateFileTest {
 
         final ByteBuffer outbuffer = file.read(positionInFile);
         assertArrayEquals(buffer.array(), outbuffer.array());
-        
+
         final ByteBuffer outbuffer2 = file.read(secondpositionInFile);
         assertArrayEquals(buffer.array(), outbuffer2.array());
     }

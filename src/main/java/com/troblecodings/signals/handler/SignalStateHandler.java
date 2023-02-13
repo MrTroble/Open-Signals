@@ -57,19 +57,19 @@ public final class SignalStateHandler implements INetworkSync {
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
         SERVICE = Executors.newFixedThreadPool(3);
     }
-    
+
     @SubscribeEvent
-    public static void shutdown(ServerStoppingEvent event) {
+    public static void shutdown(final ServerStoppingEvent event) {
         SERVICE.shutdown();
         try {
             SERVICE.awaitTermination(1, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
+        } catch (final InterruptedException e) {
             e.printStackTrace();
         }
         SERVICE = Executors.newFixedThreadPool(3);
     }
 
-    public static void add(Object object) {
+    public static void add(final Object object) {
         channel.registerObject(object);
     }
 
@@ -87,7 +87,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static void statesToBuffer(final Signal signal, final Map<SEProperty, String> states,
-            byte[] readData) {
+            final byte[] readData) {
         states.forEach((property, string) -> {
             readData[signal.getIDFromProperty(
                     property)] = (byte) (property.getParent().getIDFromValue(string) + 1);
@@ -148,7 +148,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void setState(final SignalStateInfo info, final SEProperty property,
             final String value) {
-        Map<SEProperty, String> map = new HashMap<>();
+        final Map<SEProperty, String> map = new HashMap<>();
         synchronized (currentlyLoadedStates) {
             final Map<SEProperty, String> savedProperties = currentlyLoadedStates.get(info);
             map.putAll(savedProperties == null ? new HashMap<>() : savedProperties);
@@ -163,7 +163,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static Map<SEProperty, String> readAndSerialize(final SignalStateInfo stateInfo) {
-        Map<SEProperty, String> map = new HashMap<>();
+        final Map<SEProperty, String> map = new HashMap<>();
         SignalStateFile file;
         synchronized (allLevelFiles) {
             file = allLevelFiles.get(stateInfo.world);
@@ -180,7 +180,7 @@ public final class SignalStateHandler implements INetworkSync {
         }
         final ByteBuffer buffer = file.read(pos);
         final List<SEProperty> properties = stateInfo.signal.getProperties();
-        byte[] byteArray = buffer.array();
+        final byte[] byteArray = buffer.array();
         for (int i = 0; i < properties.size(); i++) {
             final SEProperty property = properties.get(i);
             final int typeID = Byte.toUnsignedInt(byteArray[i]);

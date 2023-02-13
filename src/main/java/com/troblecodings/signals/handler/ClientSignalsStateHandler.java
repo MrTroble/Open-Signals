@@ -15,7 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkEvent.ClientCustomPayloadEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientSignalsStateHandler implements INetworkSync {
@@ -44,7 +43,7 @@ public class ClientSignalsStateHandler implements INetworkSync {
         }
         SERVICE.execute(() -> {
             final Minecraft mc = Minecraft.getInstance();
-            Level level = mc.level;
+            final Level level = mc.level;
             if (level == null)
                 return;
             BlockEntity entity;
@@ -65,7 +64,7 @@ public class ClientSignalsStateHandler implements INetworkSync {
             mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
         });
     }
-    
+
     @SubscribeEvent
     public void serverEvent(final ServerCustomPayloadEvent event) {
         deserializeClient(event.getPayload().nioBuffer());

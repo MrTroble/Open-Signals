@@ -7,36 +7,36 @@ import net.minecraftforge.client.model.data.ModelProperty;
 
 public class ModelInfoWrapper implements IModelData {
 
-    private IModelData data;
-        
-    public ModelInfoWrapper(IModelData data) {
+    private final IModelData data;
+
+    public ModelInfoWrapper(final IModelData data) {
         this.data = data;
     }
 
     @Override
-    public boolean hasProperty(ModelProperty<?> prop) {
+    public boolean hasProperty(final ModelProperty<?> prop) {
         return data.hasProperty(prop);
     }
 
     @Override
-    public <T> T getData(ModelProperty<T> prop) {
+    public <T> T getData(final ModelProperty<T> prop) {
         return data.getData(prop);
     }
 
     @Override
-    public <T> T setData(ModelProperty<T> prop, T value) {
+    public <T> T setData(final ModelProperty<T> prop, final T value) {
         return data.setData(prop, value);
     }
 
-    public boolean has(SEProperty property) {
+    public boolean has(final SEProperty property) {
         return hasProperty(property);
     }
-    
-    public String get(SEProperty property) {
+
+    public String get(final SEProperty property) {
         return getData(property);
     }
 
-    public void set(SEProperty property, String value) {
+    public void set(final SEProperty property, final String value) {
         setData(property, value);
     }
 }

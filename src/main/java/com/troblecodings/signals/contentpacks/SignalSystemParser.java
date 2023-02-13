@@ -26,7 +26,8 @@ public class SignalSystemParser {
 
     public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {
 
-        final List<Entry<String, String>> systems = OpenSignalsMain.contentPacks.getFiles(directory);
+        final List<Entry<String, String>> systems = OpenSignalsMain.contentPacks
+                .getFiles(directory);
 
         final Map<String, SignalSystemParser> properties = new HashMap<>();
 
@@ -36,7 +37,8 @@ public class SignalSystemParser {
         }
 
         systems.forEach(entry -> {
-            properties.put(entry.getKey(), GSON.fromJson(entry.getValue(), SignalSystemParser.class));
+            properties.put(entry.getKey(),
+                    GSON.fromJson(entry.getValue(), SignalSystemParser.class));
         });
 
         return properties;

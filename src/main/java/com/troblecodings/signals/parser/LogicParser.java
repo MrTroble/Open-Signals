@@ -142,8 +142,7 @@ public final class LogicParser {
         return logic;
     }
 
-    public static Predicate predicate(final String input,
-            final FunctionParsingInfo info) {
+    public static Predicate predicate(final String input, final FunctionParsingInfo info) {
         return parse(input, info).pop().getPredicate();
     }
 }

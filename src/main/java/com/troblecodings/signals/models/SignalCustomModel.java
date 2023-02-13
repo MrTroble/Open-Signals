@@ -50,7 +50,7 @@ public class SignalCustomModel implements UnbakedModel {
     private final List<ResourceLocation> dependencies;
     private final Map<String, Either<Material, String>> materialsFromString = new HashMap<>();
 
-    public SignalCustomModel(SignalAngel angel, List<SignalModelLoaderInfo> list) {
+    public SignalCustomModel(final SignalAngel angel, final List<SignalModelLoaderInfo> list) {
         super();
         this.angel = angel;
         this.list = list;
@@ -63,14 +63,14 @@ public class SignalCustomModel implements UnbakedModel {
                                 new ResourceLocation(texture))))));
     }
 
-    private static void transform(BakedQuad quad, Matrix4f quaterion) {
+    private static void transform(final BakedQuad quad, final Matrix4f quaterion) {
         final int[] oldVertex = quad.getVertices();
 
         final int size = DefaultVertexFormat.BLOCK.getIntegerSize();
         for (int i = 0; i < oldVertex.length; i += size) {
-            float x = Float.intBitsToFloat(oldVertex[i]);
-            float y = Float.intBitsToFloat(oldVertex[i + 1]);
-            float z = Float.intBitsToFloat(oldVertex[i + 2]);
+            final float x = Float.intBitsToFloat(oldVertex[i]);
+            final float y = Float.intBitsToFloat(oldVertex[i + 1]);
+            final float z = Float.intBitsToFloat(oldVertex[i + 2]);
             final Vector4f vector = new Vector4f(x, y, z, 1);
             vector.transform(quaterion);
             oldVertex[i + 0] = Float.floatToIntBits(vector.x());
@@ -80,9 +80,9 @@ public class SignalCustomModel implements UnbakedModel {
     }
 
     private static BakedModelPair transform(final SignalModelLoaderInfo info,
-            final ModelBakery bakery, ResourceLocation location,
-            Function<Material, TextureAtlasSprite> function,
-            Map<String, Either<Material, String>> material, Quaternion rotation) {
+            final ModelBakery bakery, final ResourceLocation location,
+            final Function<Material, TextureAtlasSprite> function,
+            final Map<String, Either<Material, String>> material, final Quaternion rotation) {
         final Transformation transformation = new Transformation(
                 new Vector3f(info.x, info.y, info.z), null, null, null);
         final BlockModel blockModel = (BlockModel) info.model;
@@ -104,7 +104,7 @@ public class SignalCustomModel implements UnbakedModel {
 
         model.getQuads(null, null, RANDOM, EmptyModelData.INSTANCE)
                 .forEach(quad -> transform(quad, matrix));
-        for (Direction direction : Direction.values()) {
+        for (final Direction direction : Direction.values()) {
             model.getQuads(null, direction, RANDOM, EmptyModelData.INSTANCE)
                     .forEach(quad -> transform(quad, matrix));
         }
@@ -117,9 +117,10 @@ public class SignalCustomModel implements UnbakedModel {
     }
 
     @Override
-    public Collection<Material> getMaterials(Function<ResourceLocation, UnbakedModel> function,
-            Set<Pair<String, String>> modelState) {
-        List<Material> material = new ArrayList<>();
+    public Collection<Material> getMaterials(
+            final Function<ResourceLocation, UnbakedModel> function,
+            final Set<Pair<String, String>> modelState) {
+        final List<Material> material = new ArrayList<>();
         this.dependencies.forEach(location -> material
                 .addAll(function.apply(location).getMaterials(function, modelState)));
         materialsFromString.values().stream().map(either -> either.left())
@@ -128,11 +129,12 @@ public class SignalCustomModel implements UnbakedModel {
     }
 
     @Override
-    public BakedModel bake(ModelBakery bakery, Function<Material, TextureAtlasSprite> function,
-            ModelState state, ResourceLocation resource) {
+    public BakedModel bake(final ModelBakery bakery,
+            final Function<Material, TextureAtlasSprite> function, final ModelState state,
+            final ResourceLocation resource) {
         list.forEach(info -> {
             if (info.model == null) {
-                ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
+                final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
                         "block/" + info.name);
                 if (bakery instanceof ForgeModelBakery) {
                     info.model = ((ForgeModelBakery) bakery).getModelOrLogError(location,

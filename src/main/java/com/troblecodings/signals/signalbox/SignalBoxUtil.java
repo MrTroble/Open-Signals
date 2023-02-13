@@ -102,7 +102,7 @@ public final class SignalBoxUtil {
         final Map<Point, Double> fscores = new HashMap<>();
         final Map<Point, Double> gscores = new HashMap<>();
 
-        final List<Point> openList = new ArrayList<Point>();
+        final List<Point> openList = new ArrayList<>();
         final Set<Path> visitedPaths = new HashSet<>();
 
         openList.add(p1);

@@ -39,7 +39,7 @@ public class SignalStateFile {
         Path current = null;
         try {
             Files.createDirectories(path);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
         while (Files.exists(current = path.resolve(String.valueOf(count++)))) {
@@ -54,32 +54,32 @@ public class SignalStateFile {
         final Path nextFile = this.path.resolve(String.valueOf(pathCache.size()));
         try (RandomAccessFile stream = new RandomAccessFile(nextFile.toFile(), "rw")) {
             stream.write(DEFAULT_HEADER);
-            byte[] zeroMemory = new byte[SIZE_OF_INDEX];
+            final byte[] zeroMemory = new byte[SIZE_OF_INDEX];
             stream.write(zeroMemory);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
         return nextFile;
     }
 
-    private static long hash(BlockPos pos) {
+    private static long hash(final BlockPos pos) {
         return (Integer.toUnsignedLong(pos.hashCode()) % MAX_ELEMENTS_PER_FILE)
                 * ALIGNMENT_PER_INDEX_ITEM + START_OFFSET;
     }
 
     @Nullable
-    public synchronized SignalStatePos find(BlockPos pos) {
+    public synchronized SignalStatePos find(final BlockPos pos) {
         try {
             nextFile: for (int counter = 0; counter < pathCache.size(); counter++) {
                 final Path next = pathCache.get(counter);
                 try (RandomAccessFile stream = new RandomAccessFile(next.toFile(), "r")) {
-                    byte[] header = new byte[HEADER_SIZE];
+                    final byte[] header = new byte[HEADER_SIZE];
                     stream.read(header);
                     if (header[0] != HEADER_VERSION)
                         continue nextFile;
                     if (stream.readInt() == 0)
                         return null;
-                    long hashOffset = hash(pos);
+                    final long hashOffset = hash(pos);
                     stream.seek(hashOffset);
                     BlockPos currenPosition = null;
                     long offset = 0;
@@ -96,7 +96,7 @@ public class SignalStateFile {
                     return new SignalStatePos(counter, offset);
                 }
             }
-        } catch (IOException e1) {
+        } catch (final IOException e1) {
             e1.printStackTrace();
         }
         return null;
@@ -106,11 +106,11 @@ public class SignalStateFile {
     public synchronized ByteBuffer read(final SignalStatePos pos) {
         try (RandomAccessFile stream = new RandomAccessFile(pathCache.get(pos.file).toFile(),
                 "r")) {
-            ByteBuffer buffer = ByteBuffer.allocate(STATE_BLOCK_SIZE);
+            final ByteBuffer buffer = ByteBuffer.allocate(STATE_BLOCK_SIZE);
             stream.seek(pos.offset);
             stream.read(buffer.array());
             return buffer;
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
         return null;
@@ -121,7 +121,7 @@ public class SignalStateFile {
                 "rw")) {
             stream.seek(pos.offset);
             stream.write(buffer.array());
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
@@ -132,7 +132,7 @@ public class SignalStateFile {
             final int lastFile = pathCache.size() - 1;
             final Path path = pathCache.get(lastFile);
             try (RandomAccessFile stream = new RandomAccessFile(path.toFile(), "rw")) {
-                byte[] header = new byte[HEADER_SIZE];
+                final byte[] header = new byte[HEADER_SIZE];
                 stream.read(header);
                 if (header[0] != HEADER_VERSION) {
                     OpenSignalsMain.log.error("Header version miss match! No write!");
@@ -167,7 +167,7 @@ public class SignalStateFile {
                 stream.writeInt(addedElements + 1);
                 return new SignalStatePos(lastFile, offset);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
         return null;
@@ -179,14 +179,14 @@ public class SignalStateFile {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        SignalStateFile other = (SignalStateFile) obj;
+        final SignalStateFile other = (SignalStateFile) obj;
         return Objects.equals(path, other.path);
     }
 

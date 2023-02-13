@@ -26,7 +26,7 @@ public final class OSModels {
     public static void registerReload(RegisterClientReloadListenersEvent event) {
         event.registerReloadListener(CustomModelLoader.INSTANCE);
     }
-    
+
     @SubscribeEvent
     public static void addColor(final ColorHandlerEvent.Block event) {
         final BlockColors colors = event.getBlockColors();

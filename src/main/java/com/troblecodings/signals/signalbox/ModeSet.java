@@ -35,9 +35,7 @@ public class ModeSet implements INetworkSavable {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final ModeSet other = (ModeSet) obj;
         return mode == other.mode && rotation == other.rotation;

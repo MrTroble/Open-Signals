@@ -43,7 +43,7 @@ public class SignalBoxPathway implements INetworkSavable {
     private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
     private Optional<BlockPos> lastSignal = Optional.empty();
     private ImmutableList<BlockPos> distantSignalPositions = ImmutableList.of();
-    private WorldOperations loadOps = new WorldOperations();
+    private final WorldOperations loadOps = new WorldOperations();
     private Map<Point, SignalBoxNode> modeGrid = null;
     private boolean emptyOrBroken = false;
 
@@ -263,7 +263,7 @@ public class SignalBoxPathway implements INetworkSavable {
 
     /**
      * Getter for the first point of this pathway
-     * 
+     *
      * @return the firstPoint
      */
     public Point getFirstPoint() {
@@ -286,9 +286,7 @@ public class SignalBoxPathway implements INetworkSavable {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
+        if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final SignalBoxPathway other = (SignalBoxPathway) obj;
         return Objects.equals(firstPoint, other.firstPoint)
@@ -317,15 +315,15 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(ByteBuffer buffer) {
+    public void readNetwork(final ByteBuffer buffer) {
         // TODO Auto-generated method stub
 
     }
 
     @Override
-    public void writeNetwork(ByteBuffer buffer) {
+    public void writeNetwork(final ByteBuffer buffer) {
         // TODO Auto-generated method stub
-        
+
     }
 
 }
