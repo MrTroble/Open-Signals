@@ -1,6 +1,8 @@
 package com.troblecodings.signals.guis;
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,11 +26,13 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.PropertyPacket;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.enums.EnumMode;
+import com.troblecodings.signals.enums.EnumState;
+import com.troblecodings.signals.enums.SignalControllerNetwork;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
@@ -39,15 +43,16 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiSignalController extends GuiBase implements PropertyPacket {
+public class GuiSignalController extends GuiBase {
 
     private final ContainerSignalController controller;
     private final UIEntity lowerEntity = new UIEntity();
     private boolean previewMode = false;
-    private String profileName = null;
     private final List<UIPropertyEnumHolder> holders = new ArrayList<>();
     private boolean loaded = false;
     private final Player player;
+    private EnumMode currentMode;
+    private int currentProfile = 0;
 
     public GuiSignalController(final GuiInfo info) {
         super(info);
@@ -56,13 +61,10 @@ public class GuiSignalController extends GuiBase implements PropertyPacket {
         initInternal();
     }
 
-    @Override
-    public void removed() {
-    }
-
     private void initMode(final EnumMode mode, final Signal signal) {
         lowerEntity.clear();
-        profileName = null;
+        this.currentMode = mode;
+        sendCurrentMode();
         switch (mode) {
             case MANUELL:
                 addManuellMode();
@@ -87,49 +89,76 @@ public class GuiSignalController extends GuiBase implements PropertyPacket {
 
         final IIntegerable<String> profile = SizeIntegerables.of("profile", 32,
                 in -> String.valueOf(in));
-        leftSide.add(GuiElements.createEnumElement(profile, x -> {
-            this.profileName = "p" + x;
-            middlePart.findRecursive(UIEnumerable.class).forEach(e -> {
-                // TODO
-            });
+        final UIEnumerable profileEnum = new UIEnumerable(32, "profile");
+        leftSide.add(GuiElements.createEnumElement(profileEnum, profile, x -> {
+            currentProfile = x;
+            sendRSProfile(x);
+            updateProfileProperties(middlePart, bRender, profileEnum);
             applyModelChange(bRender);
-        }));
+        }, this.controller.lastProfile));
+        currentProfile = this.controller.lastProfile;
 
         middlePart.setInheritHeight(true);
         middlePart.setInheritWidth(true);
         final UIBox boxMode = new UIBox(UIBox.VBOX, 1);
         middlePart.add(boxMode);
 
-        final Map<SEProperty, String> map = this.controller.getReference();
-        if (map == null)
-            return;
-        for (final SEProperty entry : map.keySet()) {
-            if ((entry.isChangabelAtStage(ChangeableStage.APISTAGE)
-                    || entry.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-                    && entry.testMap(map)) {
-                final UIEntity entity = GuiElements.createEnumElement(
-                        new DisableIntegerable<>(entry), e -> applyModelChange(bRender));
-                entity.findRecursive(UIEnumerable.class).forEach(e -> {
-                    e.setMin(-1);
-                });
-                middlePart.add(entity);
-            }
-        }
+        updateProfileProperties(middlePart, bRender, profileEnum);
         leftSide.add(middlePart);
 
+        int onIndex = 0;
+        int offIndex = 0;
+        if (controller.enabledRSStates.containsKey(face)) {
+            final Map<EnumState, Integer> states = controller.enabledRSStates.get(face);
+            if (states.containsKey(EnumState.ONSTATE)) {
+                onIndex = states.get(EnumState.ONSTATE);
+            }
+            if (states.containsKey(EnumState.OFFSTATE)) {
+                offIndex = states.get(EnumState.OFFSTATE);
+            }
+        }
         final IIntegerable<Object> offProfile = new DisableIntegerable(
                 SizeIntegerables.of("profileOff." + face.getName(), 32, in -> String.valueOf(in)));
         final IIntegerable<Object> onProfile = new DisableIntegerable(
                 SizeIntegerables.of("profileOn." + face.getName(), 32, in -> String.valueOf(in)));
         final UIEntity offElement = GuiElements.createEnumElement(offProfile, e -> {
-        });
+            sendAndSetProfile(face, e, EnumState.OFFSTATE);
+        }, offIndex);
         final UIEntity onElement = GuiElements.createEnumElement(onProfile, e -> {
-        });
+            sendAndSetProfile(face, e, EnumState.ONSTATE);
+        }, onIndex);
         offElement.findRecursive(UIEnumerable.class).forEach(e -> e.setMin(-1));
         onElement.findRecursive(UIEnumerable.class).forEach(e -> e.setMin(-1));
         leftSide.add(offElement);
         leftSide.add(onElement);
         leftSide.add(GuiElements.createPageSelect(boxMode));
+        initializeDirection(face);
+    }
+
+    private void updateProfileProperties(final UIEntity middlePart, final UIBlockRender bRender,
+            final UIEnumerable profile) {
+        middlePart.clearChildren();
+        profile.setIndex(currentProfile);
+        final Map<SEProperty, String> properties = controller.allRSStates.containsKey(
+                currentProfile) ? controller.allRSStates.get(currentProfile) : new HashMap<>();
+        controller.getReference().forEach((property, value) -> {
+            if (!properties.containsKey(property)) {
+                properties.put(property, property.getDefault());
+            }
+        });
+        properties.forEach((property, value) -> {
+            final UIEntity entity = GuiElements
+                    .createEnumElement(new DisableIntegerable<>(property), e -> {
+                        applyModelChange(bRender);
+                        sendPropertyToServer(property, e);
+                        final Map<SEProperty, String> map = controller.allRSStates.containsKey(
+                                currentProfile) ? controller.allRSStates.get(currentProfile)
+                                        : new HashMap<>();
+                        map.put(property, property.getObjFromID(e));
+                        controller.allRSStates.put(currentProfile, map);
+                    }, property.getParent().getIDFromValue(value));
+            middlePart.add(entity);
+        });
     }
 
     private void addSingleRSMode() {
@@ -149,6 +178,7 @@ public class GuiSignalController extends GuiBase implements PropertyPacket {
         rightSide.setWidth(30);
         rightSide.add(new UIBox(UIBox.VBOX, 4));
 
+        currentProfile = controller.lastProfile;
         createPageForSide(Direction.DOWN, leftSide, bRender);
 
         final Minecraft mc = Minecraft.getInstance();
@@ -217,11 +247,12 @@ public class GuiSignalController extends GuiBase implements PropertyPacket {
         header.add(new UIBox(UIBox.VBOX, 1));
         header.add(titel);
         final EnumIntegerable<EnumMode> enumMode = new EnumIntegerable<>(EnumMode.class);
-        final UIEntity rsMode = GuiElements.createEnumElement(enumMode, in -> {
+        final UIEnumerable enumModes = new UIEnumerable(enumMode.count(), enumMode.getName());
+        final UIEntity rsMode = GuiElements.createEnumElement(enumModes, enumMode, in -> {
             lowerEntity.clearChildren();
             initMode(enumMode.getObjFromID(in), signal);
-        });
-        initMode(EnumMode.MANUELL, signal);
+        }, controller.currentMode.ordinal());
+        initMode(controller.currentMode, signal);
         header.add(rsMode);
 
         final UIEntity middlePart = new UIEntity();
@@ -287,23 +318,77 @@ public class GuiSignalController extends GuiBase implements PropertyPacket {
         if (map == null)
             return;
         map.forEach((property, value) -> {
-            if ((property.isChangabelAtStage(ChangeableStage.APISTAGE)
-                    || property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG))
-                    && property.testMap(map)) {
-                final UIEnumerable enumarable = new UIEnumerable(property.count(),
-                        property.getName());
-                final int index = property.getParent().getIDFromValue(value);
-                list.add(GuiElements.createEnumElement(enumarable, property, e -> {
-                    if (loaded) {
-                        sendPropertyToServer(player, controller.getSignal(), property,
-                                enumarable.getIndex());
-                    }
-                    applyModelChange(blockRender);
-                }, index));
-                holders.add(new UIPropertyEnumHolder(property, enumarable));
-            }
+            final UIEnumerable enumarable = new UIEnumerable(property.count(), property.getName());
+            final int index = property.getParent().getIDFromValue(value);
+            list.add(GuiElements.createEnumElement(enumarable, property, e -> {
+                if (loaded) {
+                    sendPropertyToServer(property, enumarable.getIndex());
+                }
+                applyModelChange(blockRender);
+            }, index));
+            holders.add(new UIPropertyEnumHolder(property, enumarable));
+
         });
         applyModelChange(blockRender);
+    }
+
+    private void sendAndSetProfile(final Direction facing, final int profile,
+            final EnumState state) {
+        if (!loaded) {
+            return;
+        }
+        final Map<EnumState, Integer> map = controller.enabledRSStates.containsKey(facing)
+                ? controller.enabledRSStates.get(facing)
+                : new HashMap<>();
+        map.put(state, profile);
+        controller.enabledRSStates.put(facing, map);
+        final ByteBuffer buffer = ByteBuffer.allocate(4);
+        buffer.put((byte) SignalControllerNetwork.SET_PROFILE.ordinal());
+        buffer.put((byte) state.ordinal());
+        buffer.put((byte) facing.ordinal());
+        buffer.put((byte) profile);
+        OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    private void initializeDirection(final Direction direction) {
+        if (controller.enabledRSStates.containsKey(direction)) {
+            return;
+        }
+        final ByteBuffer buffer = ByteBuffer.allocate(2);
+        buffer.put((byte) SignalControllerNetwork.INITIALIZE_DIRECTION.ordinal());
+        buffer.put((byte) direction.ordinal());
+        OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    private void sendCurrentMode() {
+        if (!loaded) {
+            return;
+        }
+        final ByteBuffer buffer = ByteBuffer.allocate(2);
+        buffer.put((byte) SignalControllerNetwork.SEND_MODE.ordinal());
+        buffer.put((byte) currentMode.ordinal());
+        OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    private void sendRSProfile(final int profile) {
+        if (!loaded) {
+            return;
+        }
+        final ByteBuffer buffer = ByteBuffer.allocate(2);
+        buffer.put((byte) SignalControllerNetwork.SEND_RS_PROFILE.ordinal());
+        buffer.put((byte) profile);
+        OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    private void sendPropertyToServer(final SEProperty property, final int value) {
+        if (!loaded) {
+            return;
+        }
+        final ByteBuffer buffer = ByteBuffer.allocate(3);
+        buffer.put((byte) SignalControllerNetwork.SEND_PROPERTY.ordinal());
+        buffer.put((byte) controller.getSignal().getIDFromProperty(property));
+        buffer.put((byte) value);
+        OpenSignalsMain.network.sendTo(player, buffer);
     }
 
     @Override

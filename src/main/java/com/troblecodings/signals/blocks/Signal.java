@@ -311,11 +311,6 @@ public class Signal extends BasicBlock {
                     break;
                 }
             }
-            if (this.powerProperty == null) {
-                return false;
-            }
-            // TODO update
-            return true;
         }
         return false;
     }
