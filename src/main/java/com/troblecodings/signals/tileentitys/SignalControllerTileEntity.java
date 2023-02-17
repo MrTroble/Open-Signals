@@ -240,7 +240,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             if (profile == null || !allStates.containsKey(profile)) {
                 continue;
             }
-            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition);
+            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition, signal);
             final Map<SEProperty, String> properties = new HashMap<>(
                     SignalStateHandler.getStates(info));
             properties.putAll(this.allStates.get(profile));
