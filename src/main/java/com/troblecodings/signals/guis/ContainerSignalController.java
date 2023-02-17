@@ -123,7 +123,6 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         currentMode = controllerEntity.getLastMode();
         buffer.put((byte) currentMode.ordinal());
         allBytes.forEach(entry -> buffer.put(entry));
-        System.out.println("The packetSize for all Properties: " + allBytes.size());
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
