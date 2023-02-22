@@ -282,29 +282,30 @@ public class GuiSignalBox extends GuiBase {
         list.add(uibox);
         list.setInheritHeight(true);
         list.setInheritWidth(true);
-        container.getPositionForTypes().forEach((p, t) -> {
-            final String name = getSignalInfo(p, t);
-            final UIEntity layout = new UIEntity();
-            layout.setHeight(20);
-            layout.setInheritWidth(true);
-            layout.add(new UIBox(UIBox.HBOX, 2));
+        if (container.getPositionForTypes() != null)
+            container.getPositionForTypes().forEach((p, t) -> {
+                final String name = getSignalInfo(p, t);
+                final UIEntity layout = new UIEntity();
+                layout.setHeight(20);
+                layout.setInheritWidth(true);
+                layout.add(new UIBox(UIBox.HBOX, 2));
 
-            final int id = t.ordinal();
-            final UIEntity icon = new UIEntity();
-            icon.add(new UITexture(UISignalBoxTile.ICON, 0.25 * id, 0.5, 0.25 * id + 0.25, 1));
-            icon.setHeight(20);
-            icon.setWidth(20);
-            icon.add(new UIToolTip(I18n.get("type." + t.name())));
-            layout.add(icon);
+                final int id = t.ordinal();
+                final UIEntity icon = new UIEntity();
+                icon.add(new UITexture(UISignalBoxTile.ICON, 0.25 * id, 0.5, 0.25 * id + 0.25, 1));
+                icon.setHeight(20);
+                icon.setWidth(20);
+                icon.add(new UIToolTip(I18n.get("type." + t.name())));
+                layout.add(icon);
 
-            layout.add(GuiElements.createButton(name));
-            layout.add(GuiElements.createButton("x", 20, e -> {
-                final NBTWrapper resetPos = new NBTWrapper();
-                resetPos.putBlockPos(SignalBoxTileEntity.REMOVE_SIGNAL, p);
-                list.remove(layout);
-            }));
-            list.add(layout);
-        });
+                layout.add(GuiElements.createButton(name));
+                layout.add(GuiElements.createButton("x", 20, e -> {
+                    final NBTWrapper resetPos = new NBTWrapper();
+                    resetPos.putBlockPos(SignalBoxTileEntity.REMOVE_SIGNAL, p);
+                    list.remove(layout);
+                }));
+                list.add(layout);
+            });
         lowerEntity.add(list);
         lowerEntity.add(GuiElements.createPageSelect(uibox));
         resetSelection(entity);

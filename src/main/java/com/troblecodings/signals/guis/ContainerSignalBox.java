@@ -28,17 +28,18 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
     private Player player;
-    private final SignalBoxTileEntity tile;
+    private SignalBoxTileEntity tile;
     private Consumer<NBTWrapper> run;
     private final boolean send = true;
     private final Observer observer;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
-        this.tile = info.getTile();
+        if (!info.world.isClientSide) {
+            this.tile = info.getTile();
+        }
         this.player = info.player;
         this.observer = new GuiObserver(this);
-        this.tile.getSignalBoxGrid().addListener(observer);
     }
 
     public ContainerSignalBox(final GuiInfo info, final Consumer<NBTWrapper> run) {
@@ -49,7 +50,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     @Override
     public void removed(final Player playerIn) {
         super.removed(playerIn);
-        this.tile.getSignalBoxGrid().removeListener(observer);
+        // this.tile.getSignalBoxGrid().removeListener(observer);
         if (this.tile != null)
             this.tile.remove(this);
     }
