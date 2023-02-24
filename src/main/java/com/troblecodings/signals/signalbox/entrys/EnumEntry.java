@@ -74,4 +74,9 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
     public void writeNetwork(final ByteBuffer buffer) {
         buffer.putInt(this.enumValue.ordinal());
     }
+
+    @Override
+    public int getMinBufferSize() {
+        return 1;
+    }
 }

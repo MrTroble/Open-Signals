@@ -1,5 +1,6 @@
 package com.troblecodings.signals.enums;
 
+import java.nio.ByteBuffer;
 import java.util.function.BiConsumer;
 
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -31,6 +32,10 @@ public enum EnumGuiMode {
 
     private EnumGuiMode(final BiConsumer<Object, Integer> consumer) {
         this.consumer = consumer;
+    }
+
+    public static EnumGuiMode of(final ByteBuffer buffer) {
+        return EnumGuiMode.values()[buffer.get()];
     }
 
 }

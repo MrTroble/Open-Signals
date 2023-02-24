@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
@@ -17,6 +18,7 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.world.level.block.Rotation;
@@ -42,6 +44,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
 
     public void add(final ModeSet modeSet) {
         possibleModes.put(modeSet, SignalBoxFactory.getFactory().getEntry());
+    }
+
+    public <T> void addAndSetEntry(final ModeSet mode, final PathEntryType<T> entry, final T type) {
+        this.add(mode);
+        getOption(mode).get().setEntry(entry, type);
     }
 
     public boolean has(final ModeSet modeSet) {
@@ -229,14 +236,48 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
 
     @Override
     public void readNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
+        final int size = Byte.toUnsignedInt(buffer.get());
+        for (int i = 0; i < size; i++) {
+            final ModeSet mode = new ModeSet(buffer);
+            final PathOptionEntry entry = SignalBoxFactory.getFactory().getEntry();
+            entry.readNetwork(buffer);
+            possibleModes.put(mode, entry);
+        }
     }
 
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
+        buffer.put((byte) possibleModes.size());
+        possibleModes.forEach((mode, entry) -> {
+            mode.writeNetwork(buffer);
+            entry.writeNetwork(buffer);
+        });
+    }
 
+    public void writePathWayUpdateToNetwork(final ByteBuffer buffer) {
+        buffer.put((byte) possibleModes.size());
+        possibleModes.forEach((mode, entry) -> {
+            mode.writeNetwork(buffer);
+            entry.writePathWayUpdateToNetwork(buffer);
+        });
+    }
+
+    public int getBufferSizeForPathWayUpdate() {
+        final AtomicReference<Integer> size = new AtomicReference<>();
+        size.set(possibleModes.keySet().size() * 2 + 1);
+        possibleModes.values().forEach(value -> {
+            size.set(size.get() + value.getBufferSizeForPathWayUpdate());
+        });
+        return size.get();
+    }
+
+    public int getBufferSize() {
+        final AtomicReference<Integer> size = new AtomicReference<>();
+        size.set(possibleModes.keySet().size() * 2 + 1);
+        possibleModes.values().forEach(value -> {
+            size.set(size.get() + value.getBufferSize());
+        });
+        return size.get();
     }
 
     @Override

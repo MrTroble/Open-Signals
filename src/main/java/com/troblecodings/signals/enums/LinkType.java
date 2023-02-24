@@ -1,5 +1,7 @@
 package com.troblecodings.signals.enums;
 
+import java.nio.ByteBuffer;
+
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
 
@@ -31,5 +33,9 @@ public enum LinkType implements NamableWrapper {
 
     public static LinkType of(final NBTWrapper wrapper) {
         return of(wrapper.getString(LINK_TYPE));
+    }
+
+    public static LinkType of(final ByteBuffer buffer) {
+        return LinkType.values()[Byte.toUnsignedInt(buffer.get())];
     }
 }

@@ -44,4 +44,9 @@ public class IntegerEntry extends IPathEntry<Integer> implements IntConsumer {
     public void writeNetwork(final ByteBuffer buffer) {
         buffer.putInt(value);
     }
+
+    @Override
+    public int getMinBufferSize() {
+        return 4;
+    }
 }

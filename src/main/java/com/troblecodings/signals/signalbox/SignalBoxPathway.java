@@ -31,7 +31,7 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Rotation;
 
-public class SignalBoxPathway implements INetworkSavable {
+public class SignalBoxPathway {
 
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
     private final Map<BlockPos, SignalBoxNode> mapOfBlockingPositions = new HashMap<>();
@@ -119,7 +119,6 @@ public class SignalBoxPathway implements INetworkSavable {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
 
-    @Override
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
             final NBTWrapper entry = new NBTWrapper();
@@ -129,7 +128,6 @@ public class SignalBoxPathway implements INetworkSavable {
         tag.putString(PATH_TYPE, this.type.name());
     }
 
-    @Override
     public void read(final NBTWrapper tag) {
         final Builder<SignalBoxNode> nodeBuilder = ImmutableList.builder();
         tag.getList(LIST_OF_NODES).forEach(nodeNBT -> {
@@ -313,17 +311,4 @@ public class SignalBoxPathway implements INetworkSavable {
     public boolean isEmptyOrBroken() {
         return emptyOrBroken;
     }
-
-    @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

@@ -4,6 +4,7 @@ import static com.troblecodings.signals.signalbox.SignalBoxUtil.POINT1;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.POINT2;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.toNBT;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,9 +33,11 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
@@ -60,11 +63,13 @@ public class GuiSignalBox extends GuiBase {
     private final boolean dirty = false;
     private final NBTWrapper dirtyCompound = new NBTWrapper();
     private UIEntity mainButton;
+    private final GuiInfo info;
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = new ContainerSignalBox(info, this::update);
         info.player.containerMenu = this.container;
+        this.info = info;
         initializeBasicUI();
     }
 
@@ -94,13 +99,15 @@ public class GuiSignalBox extends GuiBase {
 
     private void selectLink(final UIEntity parent, final SignalBoxNode node,
             final PathOptionEntry option, final Set<Entry<BlockPos, LinkType>> entrySet,
-            final LinkType type, final PathEntryType<BlockPos> entryType) {
-        this.selectLink(parent, node, option, entrySet, type, entryType, "");
+            final LinkType type, final PathEntryType<BlockPos> entryType, final EnumGuiMode mode,
+            final Rotation rotation) {
+        this.selectLink(parent, node, option, entrySet, type, entryType, mode, rotation, "");
     }
 
     private void selectLink(final UIEntity parent, final SignalBoxNode node,
             final PathOptionEntry option, final Set<Entry<BlockPos, LinkType>> entrySet,
-            final LinkType type, final PathEntryType<BlockPos> entryType, final String suffix) {
+            final LinkType type, final PathEntryType<BlockPos> entryType, final EnumGuiMode mode,
+            final Rotation rotation, final String suffix) {
         final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList());
         if (!positions.isEmpty()) {
@@ -110,7 +117,13 @@ public class GuiSignalBox extends GuiBase {
                         return getSignalInfo(pos, type);
                     }));
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
-                option.setEntry(entryType, id >= 0 ? positions.get(id) : null);
+                final BlockPos setPos = id >= 0 ? positions.get(id) : null;
+                option.setEntry(entryType, setPos);
+                if (setPos == null) {
+                    removeEntryFromServer(node.getPoint(), null, null, entryType);
+                } else {
+                    sendPosEntryToServer(setPos, node.getPoint(), null, null, entryType);
+                }
             });
             blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
                 e.setMin(-1);
@@ -163,36 +176,43 @@ public class GuiSignalBox extends GuiBase {
 
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
-                    option.setEntry(PathEntryType.SPEED, id > 0 ? id : Integer.MAX_VALUE);
+                    final int speed = id > 0 ? id : 17;
+                    option.setEntry(PathEntryType.SPEED, speed);
+                    if (speed == 17) {
+                        removeEntryFromServer(node.getPoint(), mode, rotation, PathEntryType.SPEED);
+                    } else {
+                        sendIntEntryToServer(speed, node.getPoint(), mode, rotation,
+                                PathEntryType.SPEED);
+                    }
                 });
                 final int speed = option.getEntry(PathEntryType.SPEED).filter(n -> n < 16)
-                        .orElse(Integer.MAX_VALUE);
+                        .orElse(17);
                 speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
                     e.setIndex(speed);
                 });
                 parent.add(speedSelection);
 
-                selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT);
+                selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
+                        mode, rotation);
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
-                        ".blocking");
+                        mode, rotation, ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
-                        ".resetting");
+                        mode, rotation, ".resetting");
                 parent.add(GuiElements.createButton(I18n.get("button.reset"), e -> {
                     this.lowerEntity.clear();
                     initializeFieldUsage(mainButton);
-                    final NBTWrapper compound = new NBTWrapper();
-                    final NBTWrapper wayComp = new NBTWrapper();
-                    toNBT(wayComp, POINT1, node.getPoint());
-                    compound.putWrapper(SignalBoxUtil.RESET_WAY, wayComp);
+                    resetPathwayOnServer(node);
                 }));
             }
                 break;
             case VP:
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
+                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
+                        mode, rotation);
                 break;
             case HP:
             case RS: {
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
+                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
+                        mode, rotation);
             }
                 break;
             default:
@@ -229,11 +249,7 @@ public class GuiSignalBox extends GuiBase {
                     this.resetTileSelection();
                     return;
                 }
-                final NBTWrapper comp = new NBTWrapper();
-                final NBTWrapper way = new NBTWrapper();
-                toNBT(way, POINT1, lastTile.getNode().getPoint());
-                toNBT(way, POINT2, currentNode.getPoint());
-                comp.putWrapper(SignalBoxUtil.REQUEST_WAY, way);
+                sendPWRequest(currentNode);
                 lastTile = null;
             }
         }));
@@ -422,6 +438,64 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
+    }
+
+    private void sendPWRequest(final SignalBoxNode currentNode) {
+        final ByteBuffer buffer = ByteBuffer.allocate(5);
+        buffer.put((byte) SignalBoxNetwork.REQUEST_PW.ordinal());
+        buffer.put((byte) lastTile.getNode().getPoint().getX());
+        buffer.put((byte) lastTile.getNode().getPoint().getY());
+        buffer.put((byte) currentNode.getPoint().getX());
+        buffer.put((byte) currentNode.getPoint().getY());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void resetPathwayOnServer(final SignalBoxNode node) {
+        final ByteBuffer buffer = ByteBuffer.allocate(3);
+        buffer.put((byte) SignalBoxNetwork.RESET_PW.ordinal());
+        buffer.put((byte) node.getPoint().getX());
+        buffer.put((byte) node.getPoint().getY());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void sendPosEntryToServer(final BlockPos pos, final Point point, final EnumGuiMode mode,
+            final Rotation rotation, final PathEntryType<?> entry) {
+        final ByteBuffer buffer = ByteBuffer.allocate(18);
+        buffer.put((byte) SignalBoxNetwork.SEND_INT_ENTRY.ordinal());
+        buffer.putInt(pos.getX());
+        buffer.putInt(pos.getY());
+        buffer.putInt(pos.getZ());
+        buffer.put((byte) point.getX());
+        buffer.put((byte) point.getY());
+        buffer.put((byte) mode.ordinal());
+        buffer.put((byte) rotation.ordinal());
+        buffer.put((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void sendIntEntryToServer(final int speed, final Point point, final EnumGuiMode mode,
+            final Rotation rotation, final PathEntryType<?> entry) {
+        final ByteBuffer buffer = ByteBuffer.allocate(7);
+        buffer.put((byte) SignalBoxNetwork.SEND_INT_ENTRY.ordinal());
+        buffer.put((byte) speed);
+        buffer.put((byte) point.getX());
+        buffer.put((byte) point.getY());
+        buffer.put((byte) mode.ordinal());
+        buffer.put((byte) rotation.ordinal());
+        buffer.put((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void removeEntryFromServer(final Point point, final EnumGuiMode mode,
+            final Rotation rotation, final PathEntryType<?> entry) {
+        final ByteBuffer buffer = ByteBuffer.allocate(6);
+        buffer.put((byte) SignalBoxNetwork.REMOVE_ENTRY.ordinal());
+        buffer.put((byte) point.getX());
+        buffer.put((byte) point.getY());
+        buffer.put((byte) mode.ordinal());
+        buffer.put((byte) rotation.ordinal());
+        buffer.put((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     private void reset() {

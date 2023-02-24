@@ -42,6 +42,8 @@ public abstract class IPathEntry<T> implements INetworkSavable, Observable {
      */
     public abstract void setValue(T value);
 
+    public abstract int getMinBufferSize();
+
     @Override
     public int hashCode() {
         return Objects.hash(name, this.getValue());

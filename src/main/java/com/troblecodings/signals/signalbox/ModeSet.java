@@ -1,6 +1,7 @@
 package com.troblecodings.signals.signalbox;
 
 import java.nio.ByteBuffer;
+import java.util.List;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
@@ -19,6 +20,10 @@ public class ModeSet implements INetworkSavable {
 
     public ModeSet(final NBTWrapper compound) {
         this.read(Objects.requireNonNull(compound));
+    }
+
+    public ModeSet(final ByteBuffer buffer) {
+        readNetwork(buffer);
     }
 
     public ModeSet(final EnumGuiMode mode, final Rotation rotation) {
@@ -58,14 +63,19 @@ public class ModeSet implements INetworkSavable {
         this.rotation = Rotation.valueOf(tag.getString(ROTATION));
     }
 
-    @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        this.mode = EnumGuiMode.class.getEnumConstants()[buffer.get()];
-        this.rotation = Rotation.class.getEnumConstants()[buffer.get()];
+    public void writeToBufferList(final List<Byte> buffer) {
+        buffer.add((byte) mode.ordinal());
+        buffer.add((byte) rotation.ordinal());
     }
 
     @Override
-    public void writeNetwork(final ByteBuffer buffer) {
+    public void readNetwork(final ByteBuffer buffer) {
+        this.mode = EnumGuiMode.values()[Byte.toUnsignedInt(buffer.get())];
+        this.rotation = Rotation.values()[Byte.toUnsignedInt(buffer.get())];
+    }
+
+    @Override
+    public void writeNetwork(ByteBuffer buffer) {
         buffer.put((byte) mode.ordinal());
         buffer.put((byte) rotation.ordinal());
     }

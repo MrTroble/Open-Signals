@@ -54,4 +54,9 @@ public final class BlockposEntry extends IPathEntry<BlockPos> {
         buffer.putInt(this.position.getY());
         buffer.putInt(this.position.getZ());
     }
+
+    @Override
+    public int getMinBufferSize() {
+        return 12;
+    }
 }

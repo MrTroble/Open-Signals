@@ -44,7 +44,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -279,12 +278,12 @@ public class Signal extends BasicBlock {
     public InteractionResult use(final BlockState blockstate, final Level level,
             final BlockPos blockPos, final Player placer, final InteractionHand hand,
             final BlockHitResult blockHit) {
-        final BlockEntity tile = level.getBlockEntity(blockPos);
-        if (!(tile instanceof SignalTileEntity)) {
+        if (!(blockstate.getBlock() instanceof Signal)) {
             return InteractionResult.FAIL;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(level, blockPos, this);
-        if (loadRedstoneOutput(level, stateInfo) && level.isClientSide) {
+        if (loadRedstoneOutput(level, stateInfo)) {
+            level.blockUpdated(blockPos, blockstate.getBlock());
             return InteractionResult.SUCCESS;
         }
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
@@ -308,7 +307,7 @@ public class Signal extends BasicBlock {
                         SignalStateHandler.setState(info, pack.property,
                                 Boolean.toString(!Boolean.valueOf(power)));
                     });
-                    break;
+                    return true;
                 }
             }
         }
@@ -318,6 +317,12 @@ public class Signal extends BasicBlock {
     @Override
     public boolean isSignalSource(final BlockState state) {
         return !this.prop.redstoneOutputs.isEmpty();
+    }
+
+    @Override
+    public int getSignal(final BlockState state, final BlockGetter getter, final BlockPos pos,
+            final Direction direction) {
+        return getDirectSignal(state, getter, pos, direction);
     }
 
     @SuppressWarnings("unchecked")

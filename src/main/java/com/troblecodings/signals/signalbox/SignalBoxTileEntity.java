@@ -10,17 +10,16 @@ import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
-import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunk;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
@@ -40,14 +39,22 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     private final WorldOperations worldLoadOps = new WorldOperations();
 
-    @Override
-    public void setLevel(final Level worldIn) {
-        super.setLevel(worldIn);
-        // TODO World ops?
+    public void removeSignal(final BlockPos pos) {
+        if (level.isClientSide)
+            return;
+        signals.remove(pos);
+    }
+
+    public void removeLinkedPos(final BlockPos pos) {
+        if (level.isClientSide)
+            return;
+        linkedBlocks.remove(pos);
     }
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
+        if (level.isClientSide)
+            return;
         wrapper.putList(LINKED_POS_LIST, linkedBlocks.entrySet().stream().map(entry -> {
             final NBTWrapper item = NBTWrapper.getBlockPosWrapper(entry.getKey());
             entry.getValue().write(item);
@@ -60,6 +67,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
+        if (level.isClientSide)
+            return;
         linkedBlocks.clear();
         wrapper.getList(LINKED_POS_LIST)
                 .forEach(nbt -> linkedBlocks.put(nbt.getAsPos(), LinkType.of(nbt)));
@@ -76,7 +85,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean link(final BlockPos linkedPos) {
-        if (linkedBlocks.containsKey(linkedPos))
+        if (linkedBlocks.containsKey(linkedPos) || level.isClientSide)
             return false;
         final BlockState state = level.getBlockState(linkedPos);
         final Block block = state.getBlock();
@@ -86,20 +95,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
-        if (level.isClientSide) {
-            if (type.equals(LinkType.SIGNAL)) {
-                worldLoadOps.loadAndReset(linkedPos);
-            }
+        if (type.equals(LinkType.SIGNAL)) {
+            SignalConfig.reset(new SignalStateInfo(level, linkedPos, (Signal) block));
+            signals.put(linkedPos, (Signal) block);
         }
         linkedBlocks.put(linkedPos, type);
         this.syncClient();
         return true;
-    }
-
-    private void updateSingle(final SignalTileEntity signaltile, final LevelChunk unused) {
-        final BlockPos signalPos = signaltile.getBlockPos();
-        signals.put(signalPos, signaltile.getSignal());
-        syncClient();
     }
 
     @Override

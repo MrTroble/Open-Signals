@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.core.Observable;
@@ -13,7 +14,6 @@ import com.troblecodings.signals.core.Observer;
 public class PathOptionEntry implements INetworkSavable, Observable {
 
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
-    private final Map<PathEntryType<?>, IPathEntry<?>> removedEntrys = new HashMap<>(2);
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getEntry(final PathEntryType<T> type) {
@@ -25,14 +25,16 @@ public class PathOptionEntry implements INetworkSavable, Observable {
     @SuppressWarnings("unchecked")
     public <T> void setEntry(final PathEntryType<T> type, final T value) {
         if (value == null) {
-            removedEntrys.put(type, pathEntrys.remove(type));
+            pathEntrys.remove(type);
             return;
-        } else if (removedEntrys.containsKey(type)) {
-            removedEntrys.remove(type);
         }
         final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
                 pType -> pType.newValue());
         pathEntry.setValue(value);
+    }
+
+    public void removeEntry(final PathEntryType<?> type) {
+        pathEntrys.remove(type);
     }
 
     @Override
@@ -66,33 +68,54 @@ public class PathOptionEntry implements INetworkSavable, Observable {
 
     @Override
     public void read(final NBTWrapper tag) {
-        // TODO new sync system
     }
 
     @Override
     public void readNetwork(final ByteBuffer buffer) {
+        final int size = Byte.toUnsignedInt(buffer.get());
+        for (int i = 0; i < size; i++) {
+            final PathEntryType<?> type = PathEntryType.ALL_ENTRIES
+                    .get(Byte.toUnsignedInt(buffer.get()));
+            final IPathEntry<?> entry = type.newValue();
+            entry.readNetwork(buffer);
+            pathEntrys.put(type, entry);
+        }
     }
 
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
+        buffer.put((byte) pathEntrys.size());
         pathEntrys.forEach((type, entry) -> {
+            buffer.put((byte) type.getID());
             entry.writeNetwork(buffer);
         });
-        removedEntrys.forEach((type, entry) -> {
-            entry.writeNetwork(buffer);
+    }
+
+    public void writePathWayUpdateToNetwork(final ByteBuffer buffer) {
+        buffer.put((byte) PathEntryType.PATHUSAGE.getID());
+        pathEntrys.get(PathEntryType.PATHUSAGE).writeNetwork(buffer);
+    }
+
+    public int getBufferSizeForPathWayUpdate() {
+        return pathEntrys.get(PathEntryType.OUTPUT).getMinBufferSize() + 1;
+    }
+
+    public int getBufferSize() {
+        final AtomicReference<Integer> size = new AtomicReference<>();
+        size.set(pathEntrys.keySet().size() + 1);
+        pathEntrys.values().forEach(value -> {
+            size.set(size.get() + value.getMinBufferSize());
         });
+        return size.get();
     }
 
     @Override
     public void addListener(final Observer observer) {
         pathEntrys.values().forEach(entry -> entry.addListener(observer));
-        removedEntrys.values().forEach(entry -> entry.addListener(observer));
     }
 
     @Override
     public void removeListener(final Observer observer) {
         pathEntrys.values().forEach(entry -> entry.removeListener(observer));
-        removedEntrys.values().forEach(entry -> entry.removeListener(observer));
     }
-
 }

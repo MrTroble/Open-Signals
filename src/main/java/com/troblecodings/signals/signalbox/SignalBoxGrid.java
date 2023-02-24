@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -34,15 +35,6 @@ public class SignalBoxGrid implements INetworkSavable, Observable {
     public SignalBoxGrid(final Consumer<NBTWrapper> sendToAll) {
         this.sendToAll = sendToAll;
         this.factory = SignalBoxFactory.getFactory();
-    }
-
-    private Optional<Point> saveRead(final String id) {
-        try {
-            final String[] ids = id.split("\\.");
-            return Optional.of(new Point(Integer.parseInt(ids[0]), Integer.parseInt(ids[1])));
-        } catch (final Exception ex) {
-        }
-        return Optional.empty();
     }
 
     public void resetPathway(final Point p1) {
@@ -100,7 +92,18 @@ public class SignalBoxGrid implements INetworkSavable, Observable {
     }
 
     protected void updateToNet(final SignalBoxPathway pathway) {
-        // TODO new networking
+        final List<SignalBoxNode> nodes = pathway.getListOfNodes();
+        final AtomicReference<Integer> bufSize = new AtomicReference<>();
+        bufSize.set(nodes.size() + 1);
+        nodes.forEach(node -> {
+            bufSize.set(bufSize.get() + node.getBufferSizeForPathWayUpdate());
+        });
+        final ByteBuffer buffer = ByteBuffer.allocate(bufSize.get());
+        buffer.putInt(nodes.size());
+        nodes.forEach(node -> {
+            node.writePathWayUpdateToNetwork(buffer);
+        });
+        // TODO Check if TE is loaded and when not, send to TE otherwise to container
     }
 
     public void setPowered(final BlockPos pos) {
@@ -196,20 +199,41 @@ public class SignalBoxGrid implements INetworkSavable, Observable {
         return this.modeGrid.isEmpty();
     }
 
+    public SignalBoxNode getNode(final Point point) {
+        return modeGrid.get(point);
+    }
+
     public List<SignalBoxNode> getNodes() {
         return ImmutableList.copyOf(this.modeGrid.values());
     }
 
+    public int getBufferSize() {
+        final AtomicReference<Integer> size = new AtomicReference<>();
+        size.set(modeGrid.keySet().size() * 2 + 4);
+        modeGrid.values().forEach(value -> {
+            size.set(size.get() + value.getBufferSize());
+        });
+        return size.get();
+    }
+
     @Override
     public void readNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
+        final int size = buffer.getInt();
+        for (int i = 0; i < size; i++) {
+            final Point point = new Point(buffer);
+            final SignalBoxNode node = new SignalBoxNode(point);
+            node.readNetwork(buffer);
+            modeGrid.put(point, node);
+        }
     }
 
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
+        buffer.putInt(modeGrid.size());
+        modeGrid.forEach((point, node) -> {
+            point.writeNetwork(buffer);
+            node.writeNetwork(buffer);
+        });
     }
 
     @Override

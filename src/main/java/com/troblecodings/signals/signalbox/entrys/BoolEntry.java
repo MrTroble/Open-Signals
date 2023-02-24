@@ -67,4 +67,9 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
     public void writeNetwork(final ByteBuffer buffer) {
         buffer.put((byte) (value ? 1 : 0));
     }
+
+    @Override
+    public int getMinBufferSize() {
+        return 1;
+    }
 }
