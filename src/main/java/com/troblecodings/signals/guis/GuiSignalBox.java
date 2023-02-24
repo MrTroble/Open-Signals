@@ -115,9 +115,9 @@ public class GuiSignalBox extends GuiBase {
                 final BlockPos setPos = id >= 0 ? positions.get(id) : null;
                 option.setEntry(entryType, setPos);
                 if (setPos == null) {
-                    removeEntryFromServer(node.getPoint(), null, null, entryType);
+                    removeEntryFromServer(node.getPoint(), mode, rotation, entryType);
                 } else {
-                    sendPosEntryToServer(setPos, node.getPoint(), null, null, entryType);
+                    sendPosEntryToServer(setPos, node.getPoint(), mode, rotation, entryType);
                 }
             });
             blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
