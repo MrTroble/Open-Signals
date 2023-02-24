@@ -54,7 +54,6 @@ public class GuiSignalBox extends GuiBase {
     private final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
     private Page page = Page.USAGE;
-    private SignalBoxNode node = null;
     private final boolean dirty = false;
     private final NBTWrapper dirtyCompound = new NBTWrapper();
     private UIEntity mainButton;
@@ -153,7 +152,6 @@ public class GuiSignalBox extends GuiBase {
         modeLabel.setCenterX(false);
         entity.add(modeLabel);
         parent.add(entity);
-        this.node = node;
         final Set<Entry<BlockPos, LinkType>> entrySet = container.getPositionForTypes().entrySet();
 
         switch (mode) {
@@ -218,22 +216,20 @@ public class GuiSignalBox extends GuiBase {
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
         tile.add(new UIClickable(e -> {
-            final SignalBoxNode node = sbt.getNode();
             final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
             final Rotation rotation = Rotation.values()[menu.getRotation()];
             final ModeSet modeSet = new ModeSet(mode, rotation);
-            if (node.has(modeSet)) {
-                node.remove(modeSet);
+            if (sbt.has(modeSet)) {
+                sbt.remove(modeSet);
             } else {
-                node.add(modeSet);
+                sbt.add(modeSet);
             }
         }));
     }
 
     private void tileNormal(final UIEntity tile, final UISignalBoxTile currentTile) {
         tile.add(new UIClickable(c -> {
-            final SignalBoxNode currentNode = currentTile.getNode();
-            if (!currentNode.isValidStart())
+            if (!currentTile.isValidStart())
                 return;
             c.add(new UIColor(SELECTION_COLOR));
             if (lastTile == null) {
@@ -244,7 +240,7 @@ public class GuiSignalBox extends GuiBase {
                     this.resetTileSelection();
                     return;
                 }
-                sendPWRequest(currentNode);
+                sendPWRequest(currentTile.getNode());
                 lastTile = null;
             }
         }));
@@ -374,12 +370,12 @@ public class GuiSignalBox extends GuiBase {
                 final UIEntity tile = new UIEntity();
                 tile.setHeight(10);
                 tile.setWidth(10);
-                tile.add(new UIBorder(0xFF7F7F7F, 2));
                 final Point name = new Point(y, x);
                 final SignalBoxNode node = new SignalBoxNode(name);
                 final UISignalBoxTile sbt = new UISignalBoxTile(node);
                 tile.add(sbt);
                 consumer.accept(tile, sbt);
+                tile.add(new UIBorder(0xFF7F7F7F, 2));
                 row.add(tile);
             }
             plane.add(row);
