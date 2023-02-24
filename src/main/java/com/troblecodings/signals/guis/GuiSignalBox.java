@@ -1,9 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.POINT1;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.POINT2;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.toNBT;
-
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +38,6 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
-import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
