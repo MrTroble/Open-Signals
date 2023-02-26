@@ -21,6 +21,7 @@ import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
+import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
@@ -32,14 +33,19 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
+import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.models.SignalCustomModel;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.data.EmptyModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiSignalController extends GuiBase {
@@ -181,8 +187,8 @@ public class GuiSignalController extends GuiBase {
         createPageForSide(Direction.DOWN, leftSide, bRender);
 
         final Minecraft mc = Minecraft.getInstance();
-        final BlockState state = mc.player.level.getBlockState(controller.getPos());
-        // final BakedModel model = mc.getBlockRenderer().getBlockModel(state);
+        final BlockState state = OSBlocks.HV_SIGNAL_CONTROLLER.defaultBlockState();
+        final BakedModel model = mc.getBlockRenderer().getBlockModel(state);
         final UIEnumerable toggle = new UIEnumerable(Direction.values().length, "singleModeFace");
         toggle.setOnChange(e -> {
             final Direction faceing = Direction.values()[e];
@@ -196,12 +202,12 @@ public class GuiSignalController extends GuiBase {
         rightSide.add(toggle);
 
         for (final Direction face : Direction.values()) {
-            // final List<BakedQuad> quad = model.getQuads(state, face,
-            // SignalCustomModel.RANDOM);
+            final List<BakedQuad> quad = model.getQuads(state, face, SignalCustomModel.RANDOM,
+                    EmptyModelData.INSTANCE);
             final UIEntity faceEntity = new UIEntity();
             faceEntity.setWidth(20);
             faceEntity.setHeight(20);
-            // faceEntity.add(new UITexture(quad.get(0).getSprite()));
+            faceEntity.add(new UITexture(quad.get(0).getSprite()));
             final UIColor color = new UIColor(0x70000000);
             faceEntity.add(color);
             faceEntity.add(new UIClickable(e -> toggle.setIndex(face.ordinal())));

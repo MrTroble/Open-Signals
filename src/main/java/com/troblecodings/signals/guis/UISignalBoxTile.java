@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
@@ -19,7 +20,7 @@ public class UISignalBoxTile extends UIComponentEntity {
             "gui/textures/symbols.png");
 
     private SignalBoxNode node;
-    private Map<ModeSet, UIEntity> setToEntity;
+    private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
 
     public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
