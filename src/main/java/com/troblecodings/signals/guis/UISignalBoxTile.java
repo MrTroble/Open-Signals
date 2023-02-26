@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEntity.UpdateEvent;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -57,7 +58,14 @@ public class UISignalBoxTile extends UIComponentEntity {
         setToEntity.values().forEach(e -> {
             e.setHeight(entity.getHeight());
             e.setWidth(entity.getWidth());
+            e.update();
         });
+    }
+    
+    @Override
+    public void updateEvent(final UpdateEvent event) {
+        super.updateEvent(event);
+        this.update();
     }
 
     private void localRemove(final ModeSet modeSet) {
@@ -67,6 +75,7 @@ public class UISignalBoxTile extends UIComponentEntity {
     public void add(final ModeSet modeSet) {
         this.node.add(modeSet);
         localAdd(modeSet);
+        this.update();
     }
 
     public boolean has(final ModeSet modeSet) {
