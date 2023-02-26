@@ -39,6 +39,8 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     private void localAdd(final ModeSet modeSet) {
         final UIEntity entity = new UIEntity();
+        entity.setX(0);
+        entity.setY(0);
         if (!modeSet.rotation.equals(Rotation.NONE)) {
             final UIRotate rotation = new UIRotate();
             rotation.setRotateZ(modeSet.rotation.ordinal() * 90);
@@ -47,6 +49,15 @@ public class UISignalBoxTile extends UIComponentEntity {
         entity.add(modeSet.mode.consumer.get());
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
+    }
+
+    @Override
+    public void update() {
+        super.update();
+        setToEntity.values().forEach(e -> {
+            e.setHeight(entity.getHeight());
+            e.setWidth(entity.getWidth());
+        });
     }
 
     private void localRemove(final ModeSet modeSet) {

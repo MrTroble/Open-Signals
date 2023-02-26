@@ -21,7 +21,7 @@ public enum EnumGuiMode {
     public final Supplier<UIComponent> consumer;
 
     private EnumGuiMode(final int id) {
-        this(() -> new UITexture(UISignalBoxTile.ICON, id * 0.25, 0, id * 0.25 + 0.25, 1));
+        this(() -> new UITexture(UISignalBoxTile.ICON, id * 0.25, 0, id * 0.25 + 0.25, 0.5));
     }
 
     private EnumGuiMode(final double x1, final double y1, final double x2, final double y2) {
