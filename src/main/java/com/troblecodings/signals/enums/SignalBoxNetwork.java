@@ -4,21 +4,11 @@ import java.nio.ByteBuffer;
 
 public enum SignalBoxNetwork {
 
-    SEND_POS_ENTRY(false), SEND_INT_ENTRY(false), REMOVE_ENTRY(false), REQUEST_PW(false),
-    REMOVE_POS(false), RESET_PW(false), SEND_GRID(true), SEND_PW_UPDATE(true);
-
-    private final boolean isForClientSide;
-
-    private SignalBoxNetwork(final boolean isForClientSide) {
-        this.isForClientSide = isForClientSide;
-    }
+    SEND_POS_ENTRY, SEND_INT_ENTRY, REMOVE_ENTRY, REQUEST_PW, REMOVE_POS, RESET_PW, SEND_GRID,
+    SEND_PW_UPDATE, RESET_ALL_PW, SEND_CHANGED_MODES, REQUEST_LINKED_POS, SEND_ALL_POS;
 
     public static SignalBoxNetwork of(final ByteBuffer buffer) {
         return SignalBoxNetwork.values()[Byte.toUnsignedInt(buffer.get())];
-    }
-
-    public boolean isForClientSide() {
-        return isForClientSide;
     }
 
 }

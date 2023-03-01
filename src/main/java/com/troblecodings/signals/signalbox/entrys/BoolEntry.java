@@ -5,6 +5,7 @@ import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
+import com.troblecodings.signals.core.BufferBuilder;
 
 public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boolean>, IntConsumer {
 
@@ -40,7 +41,6 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
     @Override
     public void setValue(final Boolean value) {
         this.value = value.booleanValue();
-        updateValue(1);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
     }
 
     @Override
-    public int getMinBufferSize() {
-        return 1;
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putByte((byte) (value ? 1 : 0));
     }
 }

@@ -1,16 +1,10 @@
 package com.troblecodings.signals.signalbox.entrys;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-import com.troblecodings.signals.core.Observable;
-import com.troblecodings.signals.core.Observer;
+import com.troblecodings.signals.core.BufferBuilder;
 
-public abstract class IPathEntry<T> implements INetworkSavable, Observable {
-
-    protected final List<Observer> observers = new ArrayList<>();
+public abstract class IPathEntry<T> implements INetworkSavable {
 
     private String name = "defaultEntry";
 
@@ -42,7 +36,7 @@ public abstract class IPathEntry<T> implements INetworkSavable, Observable {
      */
     public abstract void setValue(T value);
 
-    public abstract int getMinBufferSize();
+    public abstract void writeToBuffer(final BufferBuilder buffer);
 
     @Override
     public int hashCode() {
@@ -62,23 +56,5 @@ public abstract class IPathEntry<T> implements INetworkSavable, Observable {
     @Override
     public String toString() {
         return "IPathEntry [name=" + name + ", value=" + this.getValue() + "]";
-    }
-
-    @Override
-    public void addListener(final Observer observer) {
-        if (!observers.contains(observer)) {
-            observers.add(observer);
-        }
-    }
-
-    @Override
-    public void removeListener(final Observer observer) {
-        observers.remove(observer);
-    }
-
-    public void updateValue(final int capacity) {
-        final ByteBuffer buffer = ByteBuffer.allocate(capacity);
-        readNetwork(buffer);
-        this.observers.forEach(observer -> observer.update(buffer));
     }
 }

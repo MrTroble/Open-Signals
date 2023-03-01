@@ -6,22 +6,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.Observable;
-import com.troblecodings.signals.core.Observer;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.enums.EnumPathUsage;
+import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
+import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
-public class SignalBoxGrid implements INetworkSavable, Observable {
+public class SignalBoxGrid implements INetworkSavable {
 
     private static final String NODE_LIST = "nodeList";
     private static final String PATHWAY_LIST = "pathwayList";
@@ -31,10 +33,24 @@ public class SignalBoxGrid implements INetworkSavable, Observable {
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final Consumer<NBTWrapper> sendToAll;
     protected final SignalBoxFactory factory;
+    private Level world;
+    private BlockPos boxPos;
 
     public SignalBoxGrid(final Consumer<NBTWrapper> sendToAll) {
         this.sendToAll = sendToAll;
         this.factory = SignalBoxFactory.getFactory();
+    }
+
+    public void setWorldAndPos(final Level world, final BlockPos pos) {
+        this.world = world;
+        this.boxPos = pos;
+    }
+
+    public void resetAllPathways() {
+        this.startsToPath.values().forEach(pathway -> {
+            pathway.resetPathway();
+        });
+        clearPaths();
     }
 
     public void resetPathway(final Point p1) {
@@ -92,18 +108,24 @@ public class SignalBoxGrid implements INetworkSavable, Observable {
     }
 
     protected void updateToNet(final SignalBoxPathway pathway) {
+        if (world == null || boxPos == null) {
+            OpenSignalsMain.getLogger()
+                    .warn("World or Pos are null for this grid. This shouldn't be the case!");
+            return;
+        }
+        final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(boxPos);
+        if (tile == null || !tile.isBlocked()) {
+            return;
+        }
         final List<SignalBoxNode> nodes = pathway.getListOfNodes();
-        final AtomicReference<Integer> bufSize = new AtomicReference<>();
-        bufSize.set(nodes.size() + 1);
-        nodes.forEach(node -> {
-            bufSize.set(bufSize.get() + node.getBufferSizeForPathWayUpdate());
-        });
-        final ByteBuffer buffer = ByteBuffer.allocate(bufSize.get());
+        final BufferBuilder buffer = new BufferBuilder();
+        buffer.putByte((byte) SignalBoxNetwork.SEND_PW_UPDATE.ordinal());
         buffer.putInt(nodes.size());
         nodes.forEach(node -> {
-            node.writePathWayUpdateToNetwork(buffer);
+            node.getPoint().writeToBuffer(buffer);
+            node.writeUpdateBuffer(buffer);
         });
-        // TODO Check if TE is loaded and when not, send to TE otherwise to container
+        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer.build());
     }
 
     public void setPowered(final BlockPos pos) {
@@ -207,13 +229,8 @@ public class SignalBoxGrid implements INetworkSavable, Observable {
         return ImmutableList.copyOf(this.modeGrid.values());
     }
 
-    public int getBufferSize() {
-        final AtomicReference<Integer> size = new AtomicReference<>();
-        size.set(modeGrid.keySet().size() * 2 + 4);
-        modeGrid.values().forEach(value -> {
-            size.set(size.get() + value.getBufferSize());
-        });
-        return size.get();
+    public Map<Point, SignalBoxNode> getModeGrid() {
+        return ImmutableMap.copyOf(modeGrid);
     }
 
     @Override
@@ -227,6 +244,22 @@ public class SignalBoxGrid implements INetworkSavable, Observable {
         }
     }
 
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putInt(modeGrid.size());
+        modeGrid.forEach((point, node) -> {
+            point.writeToBuffer(buffer);
+            node.writeToBuffer(buffer);
+        });
+    }
+
+    public void writeUpdateToBuffer(final BufferBuilder buffer) {
+        buffer.putInt(modeGrid.size());
+        modeGrid.forEach((point, node) -> {
+            point.writeToBuffer(buffer);
+            node.writeUpdateBuffer(buffer);
+        });
+    }
+
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
         buffer.putInt(modeGrid.size());
@@ -234,15 +267,5 @@ public class SignalBoxGrid implements INetworkSavable, Observable {
             point.writeNetwork(buffer);
             node.writeNetwork(buffer);
         });
-    }
-
-    @Override
-    public void addListener(final Observer observer) {
-        modeGrid.values().forEach(node -> node.addListener(observer));
-    }
-
-    @Override
-    public void removeListener(final Observer observer) {
-        modeGrid.values().forEach(node -> node.removeListener(observer));
     }
 }

@@ -29,7 +29,8 @@ public class SignalBox extends BasicBlock {
     @Override
     public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
             final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
-        if (!playerIn.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)) {
+        if (!playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem()
+                .equals(OSItems.LINKING_TOOL)) {
             final BlockEntity entity = worldIn.getBlockEntity(pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {

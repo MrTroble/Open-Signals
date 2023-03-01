@@ -7,13 +7,11 @@ import java.util.Iterator;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.Observable;
-import com.troblecodings.signals.core.Observer;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -23,7 +21,7 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.world.level.block.Rotation;
 
-public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observable, Observer {
+public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
             EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
@@ -245,6 +243,14 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
         }
     }
 
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putByte((byte) possibleModes.size());
+        possibleModes.forEach((mode, entry) -> {
+            mode.writeToBuffer(buffer);
+            entry.writeToBuffer(buffer);
+        });
+    }
+
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
         buffer.put((byte) possibleModes.size());
@@ -254,47 +260,12 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
         });
     }
 
-    public void writePathWayUpdateToNetwork(final ByteBuffer buffer) {
-        buffer.put((byte) possibleModes.size());
+    public void writeUpdateBuffer(final BufferBuilder buffer) {
         possibleModes.forEach((mode, entry) -> {
-            mode.writeNetwork(buffer);
-            entry.writePathWayUpdateToNetwork(buffer);
+            if (entry.containsEntry(PathEntryType.PATHUSAGE)) {
+                mode.writeToBuffer(buffer);
+                entry.writeUpdateBuffer(buffer);
+            }
         });
     }
-
-    public int getBufferSizeForPathWayUpdate() {
-        final AtomicReference<Integer> size = new AtomicReference<>();
-        size.set(possibleModes.keySet().size() * 2 + 1);
-        possibleModes.values().forEach(value -> {
-            size.set(size.get() + value.getBufferSizeForPathWayUpdate());
-        });
-        return size.get();
-    }
-
-    public int getBufferSize() {
-        final AtomicReference<Integer> size = new AtomicReference<>();
-        size.set(possibleModes.keySet().size() * 2 + 1);
-        possibleModes.values().forEach(value -> {
-            size.set(size.get() + value.getBufferSize());
-        });
-        return size.get();
-    }
-
-    @Override
-    public void addListener(final Observer observer) {
-        possibleModes.values().forEach(mode -> mode.addListener(observer));
-    }
-
-    @Override
-    public void removeListener(final Observer observer) {
-        possibleModes.values().forEach(mode -> mode.removeListener(observer));
-
-    }
-
-    @Override
-    public void update(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

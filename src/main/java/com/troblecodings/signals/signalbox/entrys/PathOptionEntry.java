@@ -5,13 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.Observable;
-import com.troblecodings.signals.core.Observer;
+import com.troblecodings.signals.core.BufferBuilder;
 
-public class PathOptionEntry implements INetworkSavable, Observable {
+public class PathOptionEntry implements INetworkSavable {
 
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
 
@@ -35,6 +33,10 @@ public class PathOptionEntry implements INetworkSavable, Observable {
 
     public void removeEntry(final PathEntryType<?> type) {
         pathEntrys.remove(type);
+    }
+
+    public boolean containsEntry(final PathEntryType<?> type) {
+        return pathEntrys.containsKey(type);
     }
 
     @Override
@@ -82,6 +84,14 @@ public class PathOptionEntry implements INetworkSavable, Observable {
         }
     }
 
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putByte((byte) pathEntrys.size());
+        pathEntrys.forEach((type, entry) -> {
+            buffer.putByte((byte) type.getID());
+            entry.writeToBuffer(buffer);
+        });
+    }
+
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
         buffer.put((byte) pathEntrys.size());
@@ -91,31 +101,8 @@ public class PathOptionEntry implements INetworkSavable, Observable {
         });
     }
 
-    public void writePathWayUpdateToNetwork(final ByteBuffer buffer) {
-        buffer.put((byte) PathEntryType.PATHUSAGE.getID());
-        pathEntrys.get(PathEntryType.PATHUSAGE).writeNetwork(buffer);
-    }
-
-    public int getBufferSizeForPathWayUpdate() {
-        return pathEntrys.get(PathEntryType.OUTPUT).getMinBufferSize() + 1;
-    }
-
-    public int getBufferSize() {
-        final AtomicReference<Integer> size = new AtomicReference<>();
-        size.set(pathEntrys.keySet().size() + 1);
-        pathEntrys.values().forEach(value -> {
-            size.set(size.get() + value.getMinBufferSize());
-        });
-        return size.get();
-    }
-
-    @Override
-    public void addListener(final Observer observer) {
-        pathEntrys.values().forEach(entry -> entry.addListener(observer));
-    }
-
-    @Override
-    public void removeListener(final Observer observer) {
-        pathEntrys.values().forEach(entry -> entry.removeListener(observer));
+    public void writeUpdateBuffer(final BufferBuilder builder) {
+        builder.putByte((byte) PathEntryType.PATHUSAGE.getID());
+        pathEntrys.get(PathEntryType.PATHUSAGE).writeToBuffer(builder);
     }
 }

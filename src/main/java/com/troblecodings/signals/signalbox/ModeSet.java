@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
@@ -63,9 +64,9 @@ public class ModeSet implements INetworkSavable {
         this.rotation = Rotation.valueOf(tag.getString(ROTATION));
     }
 
-    public void writeToBufferList(final List<Byte> buffer) {
-        buffer.add((byte) mode.ordinal());
-        buffer.add((byte) rotation.ordinal());
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
     }
 
     @Override

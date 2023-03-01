@@ -1,6 +1,7 @@
 package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -30,10 +31,12 @@ import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
@@ -54,17 +57,18 @@ public class GuiSignalBox extends GuiBase {
     private final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
     private Page page = Page.USAGE;
-    private final boolean dirty = false;
-    private final NBTWrapper dirtyCompound = new NBTWrapper();
     private UIEntity mainButton;
     private final GuiInfo info;
+    private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
+    private boolean callFromContainer = false;
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
-        this.container = new ContainerSignalBox(info, this::update);
+        this.container = (ContainerSignalBox) info.base;
         info.player.containerMenu = this.container;
         this.info = info;
-        initializeBasicUI();
+        if (callFromContainer)
+            initializeBasicUI();
     }
 
     public void update(final NBTWrapper compound) {
@@ -130,8 +134,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private String getSignalInfo(final BlockPos signalPos, final LinkType type) {
-        final Map<BlockPos, String> names = this.container.getNames();
-        final String customName = names == null ? null : names.get(signalPos);
+        final String customName = NameHandler.getClientName(signalPos);
         return String.format("%s (x=%d, y=%d. z=%d)",
                 customName == null
                         ? (type.equals(LinkType.SIGNAL) ? "" : I18n.get("type." + type.name()))
@@ -221,8 +224,25 @@ public class GuiSignalBox extends GuiBase {
             final ModeSet modeSet = new ModeSet(mode, rotation);
             if (sbt.has(modeSet)) {
                 sbt.remove(modeSet);
+                SignalBoxNode node;
+                if (changedModes.containsKey(sbt.getPoint())) {
+                    node = changedModes.get(sbt.getPoint());
+                } else {
+                    node = container.modeGrid.get(sbt.getPoint());
+                }
+                node.remove(modeSet);
+                if (node.isEmpty()) {
+                    changedModes.remove(sbt.getPoint());
+                } else {
+                    changedModes.put(sbt.getPoint(), node);
+                }
             } else {
                 sbt.add(modeSet);
+                final SignalBoxNode node = changedModes.containsKey(sbt.getPoint())
+                        ? changedModes.get(sbt.getPoint())
+                        : new SignalBoxNode(sbt.getPoint());
+                node.add(modeSet);
+                changedModes.put(sbt.getPoint(), node);
             }
         }));
     }
@@ -242,6 +262,7 @@ public class GuiSignalBox extends GuiBase {
                 }
                 sendPWRequest(currentTile.getNode());
                 lastTile = null;
+                this.resetTileSelection();
             }
         }));
         tile.add(new UIClickable(e -> initializePageTileConfig(currentTile.getNode()), 1));
@@ -281,6 +302,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializePageSettings(final UIEntity entity) {
         reset();
+        this.pageCheck(Page.SETTINGS);
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
@@ -289,38 +311,35 @@ public class GuiSignalBox extends GuiBase {
         list.add(uibox);
         list.setInheritHeight(true);
         list.setInheritWidth(true);
-        if (container.getPositionForTypes() != null)
-            container.getPositionForTypes().forEach((p, t) -> {
-                final String name = getSignalInfo(p, t);
-                final UIEntity layout = new UIEntity();
-                layout.setHeight(20);
-                layout.setInheritWidth(true);
-                layout.add(new UIBox(UIBox.HBOX, 2));
+        container.getPositionForTypes().forEach((p, t) -> {
+            final String name = getSignalInfo(p, t);
+            final UIEntity layout = new UIEntity();
+            layout.setHeight(20);
+            layout.setInheritWidth(true);
+            layout.add(new UIBox(UIBox.HBOX, 2));
 
-                final int id = t.ordinal();
-                final UIEntity icon = new UIEntity();
-                icon.add(new UITexture(UISignalBoxTile.ICON, 0.25 * id, 0.5, 0.25 * id + 0.25, 1));
-                icon.setHeight(20);
-                icon.setWidth(20);
-                icon.add(new UIToolTip(I18n.get("type." + t.name())));
-                layout.add(icon);
+            final int id = t.ordinal();
+            final UIEntity icon = new UIEntity();
+            icon.add(new UITexture(UISignalBoxTile.ICON, 0.25 * id, 0.5, 0.25 * id + 0.25, 1));
+            icon.setHeight(20);
+            icon.setWidth(20);
+            icon.add(new UIToolTip(I18n.get("type." + t.name())));
+            layout.add(icon);
 
-                layout.add(GuiElements.createButton(name));
-                layout.add(GuiElements.createButton("x", 20, e -> {
-                    final NBTWrapper resetPos = new NBTWrapper();
-                    resetPos.putBlockPos(SignalBoxTileEntity.REMOVE_SIGNAL, p);
-                    list.remove(layout);
-                }));
-                list.add(layout);
-            });
+            layout.add(GuiElements.createButton(name));
+            layout.add(GuiElements.createButton("x", 20, e -> {
+                removeBlockPos(p, t);
+            }));
+            list.add(layout);
+        });
         lowerEntity.add(list);
         lowerEntity.add(GuiElements.createPageSelect(uibox));
         resetSelection(entity);
-        this.pageCheck(Page.SETTINGS);
     }
 
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
+        sendModeChanges();
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
         this.pageCheck(Page.USAGE);
@@ -333,6 +352,7 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(menu);
         resetSelection(entity);
         this.pageCheck(Page.EDIT);
+        resetAllPathways();
     }
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
@@ -371,7 +391,10 @@ public class GuiSignalBox extends GuiBase {
                 tile.setHeight(10);
                 tile.setWidth(10);
                 final Point name = new Point(y, x);
-                final SignalBoxNode node = new SignalBoxNode(name);
+                SignalBoxNode node = container.modeGrid.get(name);
+                if (node == null) {
+                    node = new SignalBoxNode(name);
+                }
                 final UISignalBoxTile sbt = new UISignalBoxTile(node);
                 tile.add(sbt);
                 consumer.accept(tile, sbt);
@@ -449,10 +472,10 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void sendPosEntryToServer(final BlockPos pos, final Point point, final EnumGuiMode mode,
-            final Rotation rotation, final PathEntryType<?> entry) {
+    private <T extends BlockPos> void sendPosEntryToServer(final T pos, final Point point,
+            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<T> entry) {
         final ByteBuffer buffer = ByteBuffer.allocate(18);
-        buffer.put((byte) SignalBoxNetwork.SEND_INT_ENTRY.ordinal());
+        buffer.put((byte) SignalBoxNetwork.SEND_POS_ENTRY.ordinal());
         buffer.putInt(pos.getX());
         buffer.putInt(pos.getY());
         buffer.putInt(pos.getZ());
@@ -462,19 +485,31 @@ public class GuiSignalBox extends GuiBase {
         buffer.put((byte) rotation.ordinal());
         buffer.put((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
+        SignalBoxNode node = container.modeGrid.get(point);
+        if (node == null) {
+            node = new SignalBoxNode(point);
+        }
+        node.addAndSetEntry(new ModeSet(mode, rotation), entry, pos);
+        container.modeGrid.put(point, node);
     }
 
-    private void sendIntEntryToServer(final int speed, final Point point, final EnumGuiMode mode,
-            final Rotation rotation, final PathEntryType<?> entry) {
+    private <T extends Integer> void sendIntEntryToServer(final T speed, final Point point,
+            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<T> entry) {
         final ByteBuffer buffer = ByteBuffer.allocate(7);
         buffer.put((byte) SignalBoxNetwork.SEND_INT_ENTRY.ordinal());
-        buffer.put((byte) speed);
+        buffer.put((byte) speed.intValue());
         buffer.put((byte) point.getX());
         buffer.put((byte) point.getY());
         buffer.put((byte) mode.ordinal());
         buffer.put((byte) rotation.ordinal());
         buffer.put((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
+        SignalBoxNode node = container.modeGrid.get(point);
+        if (node == null) {
+            node = new SignalBoxNode(point);
+        }
+        node.addAndSetEntry(new ModeSet(mode, rotation), entry, speed);
+        container.modeGrid.put(point, node);
     }
 
     private void removeEntryFromServer(final Point point, final EnumGuiMode mode,
@@ -487,6 +522,41 @@ public class GuiSignalBox extends GuiBase {
         buffer.put((byte) rotation.ordinal());
         buffer.put((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
+        container.modeGrid.get(point).getOption(new ModeSet(mode, rotation)).get()
+                .removeEntry(entry);
+    }
+
+    private void resetAllPathways() {
+        final ByteBuffer buffer = ByteBuffer.allocate(1);
+        buffer.put((byte) SignalBoxNetwork.RESET_ALL_PW.ordinal());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void sendModeChanges() {
+        if (changedModes.isEmpty())
+            return;
+        final BufferBuilder buffer = new BufferBuilder();
+        buffer.putByte((byte) SignalBoxNetwork.SEND_CHANGED_MODES.ordinal());
+        buffer.putInt(changedModes.size());
+        changedModes.forEach((point, node) -> {
+            point.writeToBuffer(buffer);
+            node.writeToBuffer(buffer);
+            if (!container.modeGrid.containsKey(point)) {
+                container.modeGrid.put(point, node);
+            }
+        });
+        changedModes.clear();
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+    }
+
+    private void removeBlockPos(final BlockPos pos, final LinkType type) {
+        final ByteBuffer buffer = ByteBuffer.allocate(14);
+        buffer.put((byte) SignalBoxNetwork.REMOVE_POS.ordinal());
+        buffer.put((byte) type.ordinal());
+        buffer.putInt(pos.getX());
+        buffer.putInt(pos.getY());
+        buffer.putInt(pos.getZ());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     private void reset() {
@@ -498,4 +568,8 @@ public class GuiSignalBox extends GuiBase {
         USAGE, EDIT, SETTINGS, TILE_CONFIG, NONE;
     }
 
+    @Override
+    public void updateFromContainer() {
+        initializeBasicUI();
+    }
 }

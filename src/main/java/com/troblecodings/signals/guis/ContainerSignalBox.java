@@ -1,8 +1,7 @@
 package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -14,8 +13,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.GuiObserver;
-import com.troblecodings.signals.core.Observer;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
@@ -24,6 +22,7 @@ import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
+import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -43,26 +42,37 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
     private SignalBoxTileEntity tile;
     private Consumer<NBTWrapper> run;
-    private final Observer observer;
     private final GuiInfo info;
+    protected Map<Point, SignalBoxNode> modeGrid;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
         if (!info.world.isClientSide) {
             this.tile = info.getTile();
+            tile.add(this);
         }
         info.player.containerMenu = this;
         this.info = info;
-        this.observer = new GuiObserver(this);
     }
 
     @Override
     public void sendAllDataToRemote() {
         final SignalBoxGrid grid = tile.getSignalBoxGrid();
-        final ByteBuffer buffer = ByteBuffer.allocate(grid.getBufferSize() + 1);
-        buffer.put((byte) SignalBoxNetwork.SEND_GRID.ordinal());
-        grid.writeNetwork(buffer);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final BufferBuilder buffer = new BufferBuilder();
+        buffer.putByte((byte) SignalBoxNetwork.SEND_GRID.ordinal());
+        buffer.putInt(info.pos.getX());
+        buffer.putInt(info.pos.getY());
+        buffer.putInt(info.pos.getZ());
+        grid.writeToBuffer(buffer);
+        final Map<BlockPos, LinkType> positions = tile.getPositions();
+        buffer.putInt(positions.size());
+        positions.forEach((pos, type) -> {
+            buffer.putInt(pos.getX());
+            buffer.putInt(pos.getY());
+            buffer.putInt(pos.getZ());
+            buffer.putByte((byte) type.ordinal());
+        });
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
     public ContainerSignalBox(final GuiInfo info, final Consumer<NBTWrapper> run) {
@@ -73,7 +83,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     @Override
     public void removed(final Player playerIn) {
         super.removed(playerIn);
-        // TODO Maby? this.tile.getSignalBoxGrid().removeListener(observer);
         if (this.tile != null)
             this.tile.remove(this);
     }
@@ -109,30 +118,48 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     @Override
     public void deserializeClient(final ByteBuffer buf) {
         final SignalBoxNetwork mode = SignalBoxNetwork.of(buf);
-        if (!mode.isForClientSide()) {
-            throw new IllegalStateException("SignalBoxNetworkMode [" + mode
-                    + "] must be for ClientSide but was for ServerSide!");
-        }
         if (mode.equals(SignalBoxNetwork.SEND_GRID)) {
+            final BlockPos pos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
+            if (this.tile == null) {
+                this.tile = (SignalBoxTileEntity) info.world.getBlockEntity(pos);
+            }
             final SignalBoxGrid grid = tile.getSignalBoxGrid();
             grid.readNetwork(buf);
+            final int size = buf.getInt();
+            final Map<BlockPos, LinkType> allPos = new HashMap<>();
+            for (int i = 0; i < size; i++) {
+                final BlockPos blockPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
+                final LinkType type = LinkType.of(buf);
+                allPos.put(blockPos, type);
+            }
+            propertiesForType.set(allPos);
+            modeGrid = new HashMap<>(grid.getModeGrid());
+            update();
         }
-        update();
+        if (mode.equals(SignalBoxNetwork.SEND_PW_UPDATE)) {
+            tile.getSignalBoxGrid().readNetwork(buf);
+        }
+        if (mode.equals(SignalBoxNetwork.SEND_ALL_POS)) {
+            final int size = buf.getInt();
+            final Map<BlockPos, LinkType> allPos = new HashMap<>();
+            for (int i = 0; i < size; i++) {
+                final BlockPos pos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
+                final LinkType type = LinkType.of(buf);
+                allPos.put(pos, type);
+            }
+            propertiesForType.set(allPos);
+        }
     }
 
     @Override
     public void deserializeServer(final ByteBuffer buf) {
         final SignalBoxNetwork mode = SignalBoxNetwork.of(buf);
-        if (mode.isForClientSide()) {
-            throw new IllegalStateException("SignalBoxNetworkMode [" + mode
-                    + "] must be for ServerSide but was ClientSide!");
-        }
         if (mode.equals(SignalBoxNetwork.SEND_INT_ENTRY)) {
             deserializeEntry(buf, Byte.toUnsignedInt(buf.get()));
             return;
         }
         if (mode.equals(SignalBoxNetwork.REMOVE_ENTRY)) {
-            final Point point = Point.of(buf);
+            final Point point = new Point(buf);
             final EnumGuiMode guiMode = EnumGuiMode.of(buf);
             final Rotation rotation = deserializeRotation(buf);
             final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES
@@ -156,20 +183,29 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             return;
         }
         if (mode.equals(SignalBoxNetwork.RESET_PW)) {
-            final Point point = Point.of(buf);
+            final Point point = new Point(buf);
             tile.getSignalBoxGrid().resetPathway(point);
             return;
         }
         if (mode.equals(SignalBoxNetwork.REQUEST_PW)) {
-            final Point start = Point.of(buf);
-            final Point end = Point.of(buf);
+            final Point start = new Point(buf);
+            final Point end = new Point(buf);
             tile.getSignalBoxGrid().requestWay(start, end);
+            return;
+        }
+        if (mode.equals(SignalBoxNetwork.RESET_ALL_PW)) {
+            tile.getSignalBoxGrid().resetAllPathways();
+            return;
+        }
+        if (mode.equals(SignalBoxNetwork.SEND_CHANGED_MODES)) {
+            tile.getSignalBoxGrid().readNetwork(buf);
+            return;
         }
     }
 
     @SuppressWarnings("unchecked")
     private <T> void deserializeEntry(final ByteBuffer buffer, final T type) {
-        final Point point = Point.of(buffer);
+        final Point point = new Point(buffer);
         final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
         final Rotation rotation = deserializeRotation(buffer);
         final PathEntryType<T> entryType = (PathEntryType<T>) PathEntryType.ALL_ENTRIES

@@ -4,6 +4,7 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 public class Point implements INetworkSavable {
@@ -99,12 +100,8 @@ public class Point implements INetworkSavable {
         buffer.put((byte) y);
     }
 
-    public void writeToBufferList(final List<Byte> bytes) {
-        bytes.add((byte) x);
-        bytes.add((byte) y);
-    }
-
-    public static Point of(final ByteBuffer buffer) {
-        return new Point(buffer.get(), buffer.get());
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putByte((byte) x);
+        buffer.putByte((byte) y);
     }
 }

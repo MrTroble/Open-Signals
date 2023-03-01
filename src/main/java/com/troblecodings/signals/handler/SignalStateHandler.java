@@ -120,7 +120,9 @@ public final class SignalStateHandler implements INetworkSync {
         }
         synchronized (CURRENTLY_LOADED_STATES) {
             if (CURRENTLY_LOADED_STATES.containsKey(info)) {
-                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
+                final Map<SEProperty, String> oldStates = new HashMap<>(getStates(info));
+                oldStates.putAll(states);
+                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
                 sendPropertiesToClient(info, states);
                 return;
             }
