@@ -2,9 +2,11 @@ package com.troblecodings.signals.signalbox.entrys;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.core.BufferBuilder;
@@ -70,6 +72,19 @@ public class PathOptionEntry implements INetworkSavable {
 
     @Override
     public void read(final NBTWrapper tag) {
+        final List<PathEntryType<?>> tagSet = tag.keySet().stream().map(PathEntryType::getType)
+                .collect(Collectors.toList());
+        tagSet.forEach(entry -> {
+            if (entry != null) {
+                if (tag.contains(entry.getName())) {
+                    final IPathEntry<?> path = entry.newValue();
+                    path.read(tag.getWrapper(entry.getName()));
+                    pathEntrys.put(entry, path);
+                } else {
+                    pathEntrys.remove(entry);
+                }
+            }
+        });
     }
 
     @Override
@@ -78,7 +93,7 @@ public class PathOptionEntry implements INetworkSavable {
         for (int i = 0; i < size; i++) {
             final PathEntryType<?> type = PathEntryType.ALL_ENTRIES
                     .get(Byte.toUnsignedInt(buffer.get()));
-            final IPathEntry<?> entry = type.newValue();
+            final IPathEntry<?> entry = pathEntrys.computeIfAbsent(type, _u -> type.newValue());
             entry.readNetwork(buffer);
             pathEntrys.put(type, entry);
         }
@@ -102,6 +117,7 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     public void writeUpdateBuffer(final BufferBuilder builder) {
+        builder.putByte((byte) 1);
         builder.putByte((byte) PathEntryType.PATHUSAGE.getID());
         pathEntrys.get(PathEntryType.PATHUSAGE).writeToBuffer(builder);
     }

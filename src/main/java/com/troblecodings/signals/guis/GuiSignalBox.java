@@ -60,15 +60,13 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity mainButton;
     private final GuiInfo info;
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
-    private boolean callFromContainer = false;
+    private UIEntity plane = null;
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
         info.player.containerMenu = this.container;
         this.info = info;
-        if (callFromContainer)
-            initializeBasicUI();
     }
 
     public void update(final NBTWrapper compound) {
@@ -224,23 +222,16 @@ public class GuiSignalBox extends GuiBase {
             final ModeSet modeSet = new ModeSet(mode, rotation);
             if (sbt.has(modeSet)) {
                 sbt.remove(modeSet);
-                SignalBoxNode node;
-                if (changedModes.containsKey(sbt.getPoint())) {
-                    node = changedModes.get(sbt.getPoint());
-                } else {
-                    node = container.modeGrid.get(sbt.getPoint());
-                }
+                final SignalBoxNode node = container.grid.computeIfAbsent(sbt.getPoint(),
+                        _u -> new SignalBoxNode(sbt.getPoint()));
                 node.remove(modeSet);
-                if (node.isEmpty()) {
-                    changedModes.remove(sbt.getPoint());
-                } else {
-                    changedModes.put(sbt.getPoint(), node);
-                }
+                if (node.isEmpty())
+                    container.grid.removeNode(sbt.getPoint());
+                changedModes.put(sbt.getPoint(), node);
             } else {
                 sbt.add(modeSet);
-                final SignalBoxNode node = changedModes.containsKey(sbt.getPoint())
-                        ? changedModes.get(sbt.getPoint())
-                        : new SignalBoxNode(sbt.getPoint());
+                final SignalBoxNode node = container.grid.computeIfAbsent(sbt.getPoint(),
+                        _u -> new SignalBoxNode(sbt.getPoint()));
                 node.add(modeSet);
                 changedModes.put(sbt.getPoint(), node);
             }
@@ -329,6 +320,7 @@ public class GuiSignalBox extends GuiBase {
             layout.add(GuiElements.createButton(name));
             layout.add(GuiElements.createButton("x", 20, e -> {
                 removeBlockPos(p, t);
+                list.remove(layout);
             }));
             list.add(layout);
         });
@@ -360,7 +352,8 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(new UIStack());
         lowerEntity.add(new UIScissor());
 
-        final UIEntity plane = new UIEntity();
+        plane = new UIEntity();
+        plane.clearChildren();
         plane.setInheritWidth(true);
         plane.setInheritHeight(true);
         lowerEntity.add(new UIScroll(s -> {
@@ -391,7 +384,7 @@ public class GuiSignalBox extends GuiBase {
                 tile.setHeight(10);
                 tile.setWidth(10);
                 final Point name = new Point(y, x);
-                SignalBoxNode node = container.modeGrid.get(name);
+                SignalBoxNode node = container.grid.getNode(name);
                 if (node == null) {
                     node = new SignalBoxNode(name);
                 }
@@ -485,12 +478,12 @@ public class GuiSignalBox extends GuiBase {
         buffer.put((byte) rotation.ordinal());
         buffer.put((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
-        SignalBoxNode node = container.modeGrid.get(point);
+        SignalBoxNode node = container.grid.getNode(point);
         if (node == null) {
             node = new SignalBoxNode(point);
         }
         node.addAndSetEntry(new ModeSet(mode, rotation), entry, pos);
-        container.modeGrid.put(point, node);
+        container.grid.putNode(point, node);
     }
 
     private <T extends Integer> void sendIntEntryToServer(final T speed, final Point point,
@@ -504,12 +497,12 @@ public class GuiSignalBox extends GuiBase {
         buffer.put((byte) rotation.ordinal());
         buffer.put((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
-        SignalBoxNode node = container.modeGrid.get(point);
+        SignalBoxNode node = container.grid.getNode(point);
         if (node == null) {
             node = new SignalBoxNode(point);
         }
         node.addAndSetEntry(new ModeSet(mode, rotation), entry, speed);
-        container.modeGrid.put(point, node);
+        container.grid.putNode(point, node);
     }
 
     private void removeEntryFromServer(final Point point, final EnumGuiMode mode,
@@ -522,7 +515,7 @@ public class GuiSignalBox extends GuiBase {
         buffer.put((byte) rotation.ordinal());
         buffer.put((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
-        container.modeGrid.get(point).getOption(new ModeSet(mode, rotation)).get()
+        container.grid.getNode(point).getOption(new ModeSet(mode, rotation)).get()
                 .removeEntry(entry);
     }
 
@@ -541,9 +534,6 @@ public class GuiSignalBox extends GuiBase {
         changedModes.forEach((point, node) -> {
             point.writeToBuffer(buffer);
             node.writeToBuffer(buffer);
-            if (!container.modeGrid.containsKey(point)) {
-                container.modeGrid.put(point, node);
-            }
         });
         changedModes.clear();
         OpenSignalsMain.network.sendTo(info.player, buffer.build());

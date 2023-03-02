@@ -1,7 +1,6 @@
 package com.troblecodings.signals.signalbox;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.core.BufferBuilder;

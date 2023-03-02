@@ -43,7 +43,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private SignalBoxTileEntity tile;
     private Consumer<NBTWrapper> run;
     private final GuiInfo info;
-    protected Map<Point, SignalBoxNode> modeGrid;
+    protected SignalBoxGrid grid;
+    protected boolean planeUpdate = false;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -123,7 +124,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             if (this.tile == null) {
                 this.tile = (SignalBoxTileEntity) info.world.getBlockEntity(pos);
             }
-            final SignalBoxGrid grid = tile.getSignalBoxGrid();
+            grid = tile.getSignalBoxGrid();
             grid.readNetwork(buf);
             final int size = buf.getInt();
             final Map<BlockPos, LinkType> allPos = new HashMap<>();
@@ -133,21 +134,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 allPos.put(blockPos, type);
             }
             propertiesForType.set(allPos);
-            modeGrid = new HashMap<>(grid.getModeGrid());
             update();
         }
         if (mode.equals(SignalBoxNetwork.SEND_PW_UPDATE)) {
-            tile.getSignalBoxGrid().readNetwork(buf);
-        }
-        if (mode.equals(SignalBoxNetwork.SEND_ALL_POS)) {
-            final int size = buf.getInt();
-            final Map<BlockPos, LinkType> allPos = new HashMap<>();
-            for (int i = 0; i < size; i++) {
-                final BlockPos pos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
-                final LinkType type = LinkType.of(buf);
-                allPos.put(pos, type);
-            }
-            propertiesForType.set(allPos);
+            grid.readNetwork(buf);
         }
     }
 

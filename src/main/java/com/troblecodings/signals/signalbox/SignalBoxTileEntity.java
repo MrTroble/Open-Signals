@@ -108,6 +108,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             signals.clear();
             return;
         }
+        grid.setWorldAndPos(level, worldPosition);
         final Optional<LinkedList<RedstonePacket>> updates = SignalBoxHandler
                 .getPacket(worldPosition);
         if (!updates.isPresent()) {

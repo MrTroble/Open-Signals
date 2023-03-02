@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -18,7 +19,6 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
-import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -54,6 +54,8 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void resetPathway(final Point p1) {
+        if (startsToPath.isEmpty())
+            return;
         final SignalBoxPathway pathway = startsToPath.get(p1);
         if (pathway == null) {
             OpenSignalsMain.log.warn("Signalboxpath is null, this should not be the case!");
@@ -75,6 +77,7 @@ public class SignalBoxGrid implements INetworkSavable {
             return false;
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
+            way.setWorld(world);
             way.setPathStatus(EnumPathUsage.SELECTED);
             way.updatePathwaySignals();
             this.onWayAdd(way);
@@ -111,6 +114,9 @@ public class SignalBoxGrid implements INetworkSavable {
         if (world == null || boxPos == null) {
             OpenSignalsMain.getLogger()
                     .warn("World or Pos are null for this grid. This shouldn't be the case!");
+            pathway.resetPathway();
+            startsToPath.remove(pathway.getFirstPoint());
+            endsToPath.remove(pathway.getLastPoint());
             return;
         }
         final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(boxPos);
@@ -233,14 +239,28 @@ public class SignalBoxGrid implements INetworkSavable {
         return ImmutableMap.copyOf(modeGrid);
     }
 
+    public void putNode(final Point point, final SignalBoxNode node) {
+        modeGrid.put(point, node);
+    }
+
+    public SignalBoxNode removeNode(final Point point) {
+        return modeGrid.remove(point);
+    }
+
+    public SignalBoxNode computeIfAbsent(final Point point,
+            final Function<? super Point, ? extends SignalBoxNode> funtion) {
+        return modeGrid.computeIfAbsent(point, funtion);
+    }
+
     @Override
     public void readNetwork(final ByteBuffer buffer) {
         final int size = buffer.getInt();
         for (int i = 0; i < size; i++) {
             final Point point = new Point(buffer);
-            final SignalBoxNode node = new SignalBoxNode(point);
+            final SignalBoxNode node = modeGrid.computeIfAbsent(point,
+                    _u -> new SignalBoxNode(point));
             node.readNetwork(buffer);
-            modeGrid.put(point, node);
+            node.post();
         }
     }
 
