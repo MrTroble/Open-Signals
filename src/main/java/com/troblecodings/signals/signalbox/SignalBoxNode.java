@@ -4,13 +4,11 @@ import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.core.BufferBuilder;
@@ -47,8 +45,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public <T> void addAndSetEntry(final ModeSet mode, final PathEntryType<T> entry, final T type) {
-        this.add(mode);
-        getOption(mode).get().setEntry(entry, type);
+        final PathOptionEntry optionEntry = possibleModes.computeIfAbsent(mode,
+                _u -> SignalBoxFactory.getFactory().getEntry());
+        optionEntry.setEntry(entry, type);
     }
 
     public boolean has(final ModeSet modeSet) {

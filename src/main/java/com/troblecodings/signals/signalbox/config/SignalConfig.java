@@ -13,8 +13,12 @@ import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.properties.ConfigProperty;
 import com.troblecodings.signals.properties.SignalPair;
+
+import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelDataMap.Builder;
 
 public final class SignalConfig {
 
@@ -68,8 +72,9 @@ public final class SignalConfig {
         final Map<Class, Object> object = new HashMap<>();
         final Map<SEProperty, String> oldProperties = SignalStateHandler
                 .getStates(info.currentinfo);
-        if (info.nextinfo != null)
+        if (info.nextinfo != null) {
             object.put(Map.class, SignalStateHandler.getStates(info.nextinfo));
+        }
         object.put(Integer.class, info.speed);
         final Map<SEProperty, String> propertiesToSet = new HashMap<>();
         values.forEach(property -> {

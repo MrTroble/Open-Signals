@@ -138,6 +138,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         }
         if (mode.equals(SignalBoxNetwork.SEND_PW_UPDATE)) {
             grid.readNetwork(buf);
+            update();
         }
     }
 
