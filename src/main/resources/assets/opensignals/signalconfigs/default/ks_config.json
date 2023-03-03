@@ -1,14 +1,21 @@
 {
     "currentSignal": "kssignal",
     "values": {
-        "true": [
-            "kombisignal_distant.KS2",
-            "kombisignal.KS2",
-            "kombisignal_main.KS1",
-            "zs2.OFF",
-            "zs2v.OFF",
-            "zs3v.OFF",
-            "zs3.OFF"
-        ]
+        "speed(==.1)": ["zs3.Z1"],
+        "speed(==.2)": ["zs3.Z2"],
+        "speed(==.3)": ["zs3.Z3"],
+        "speed(==.4)": ["zs3.Z4"],
+        "speed(==.5)": ["zs3.Z5"],
+        "speed(==.6)": ["zs3.Z6"],
+        "speed(==.7)": ["zs3.Z7"],
+        "speed(==.8)": ["zs3.Z8"],
+        "speed(==.9)": ["zs3.Z9"],
+        "speed(==.10)": ["zs3.Z10"],
+        "speed(==.11)": ["zs3.Z11"],
+        "speed(==.12)": ["zs3.Z12"],
+        "speed(==.13)": ["zs3.Z13"],
+        "speed(==.14)": ["zs3.Z14"],
+        "speed(==.15)": ["zs3.Z15"],
+        "true": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF"]
     }
 }

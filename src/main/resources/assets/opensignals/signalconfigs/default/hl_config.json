@@ -1,13 +1,9 @@
 {
     "currentSignal": "hlsignal",
     "values": {
-        "true": [
-            "mainlightsignal_distant.HL10",
-            "mainlightsignal.HL11_12",
-            "blocksignal.HL10",
-            "blockexitsignal.HL1",
-            "exitsignal.HL2_3",
-            "zs2.ZS13"
-        ]
+        "speed(<.1) || speed(>=.11)": ["mainlightsignallightbar.OFF", "mainlightsignal.HL10", "mainlightsignal_distant.HL10", "exitsignal.HL1", "blocksignal.HL10", "blockexitsignal.HL1"],
+        "speed(>=.1) && speed(<=.5)": ["mainlightsignallightbar.OFF", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1", "zs2.ZS13"],
+        "speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1"],
+        "speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1"]
     }
 }
