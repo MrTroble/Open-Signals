@@ -364,11 +364,11 @@ public class GuiSignalBox extends GuiBase {
             question.setScaleX(1.1f);
             question.setScaleY(1.1f);
             question.add(label);
-            question.setInterhirts(true);
+            question.setInherits(true);
             final UILabel info = new UILabel("All pathways are going to get reset!");
             final UIEntity infoEntity = new UIEntity();
             infoEntity.add(info);
-            infoEntity.setInterhirts(true);
+            infoEntity.setInherits(true);
             selectionEntity.add(question);
             selectionEntity.add(infoEntity);
             final UIEntity buttons = new UIEntity();
@@ -387,7 +387,7 @@ public class GuiSignalBox extends GuiBase {
             final UIEntity buttonNo = GuiElements.createButton("No", e -> {
                 pop();
             });
-            buttons.setInterhirts(true);
+            buttons.setInherits(true);
             final UIBox vbox = new UIBox(UIBox.HBOX, 1);
             buttons.add(vbox);
             buttons.add(buttonYes);
