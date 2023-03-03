@@ -6,9 +6,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
+
+import org.antlr.v4.parse.ANTLRParser.option_return;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
@@ -42,6 +45,7 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
+import com.troblecodings.signals.signalbox.entrys.IPathEntry;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -121,9 +125,14 @@ public class GuiSignalBox extends GuiBase {
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
                 final BlockPos setPos = id >= 0 ? positions.get(id) : null;
                 if (setPos == null) {
+                    if (option.getEntry(entryType).isEmpty())
+                        return;
                     option.removeEntry(entryType);
                     removeEntryFromServer(node, mode, rotation, entryType);
                 } else {
+                    final Optional<BlockPos> pathEntry = option.getEntry(entryType);
+                    if (pathEntry.isPresent() && pathEntry.get().equals(setPos))
+                        return;
                     option.setEntry(entryType, setPos);
                     sendPosEntryToServer(setPos, node, mode, rotation, entryType);
                 }
@@ -178,6 +187,9 @@ public class GuiSignalBox extends GuiBase {
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
                     final int speed = id > 0 ? id : 127;
+                    final Optional<Integer> opt = option.getEntry(PathEntryType.SPEED);
+                    if (opt.isPresent() && opt.get() == speed)
+                        return;
                     option.setEntry(PathEntryType.SPEED, speed);
                     if (speed == 127) {
                         removeEntryFromServer(node, mode, rotation, PathEntryType.SPEED);
@@ -290,7 +302,7 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(new UIClickable(e -> {
             initializeFieldUsage(mainButton);
         }, 1));
-        this.page = Page.TILE_CONFIG;
+        pageCheck(Page.TILE_CONFIG);
     }
 
     private void pageCheck(final Page page) {
@@ -344,13 +356,46 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
-        reset();
-        final UIMenu menu = new UIMenu();
-        initializeFieldTemplate((e, name) -> this.tileEdit(e, menu, name));
-        lowerEntity.add(menu);
-        resetSelection(entity);
-        this.pageCheck(Page.EDIT);
-        resetAllPathways();
+        final UIEntity screen = GuiElements.createScreen(selectionEntity -> {
+            final UIBox hbox = new UIBox(UIBox.VBOX, 3);
+            selectionEntity.add(hbox);
+            final UIEntity question = new UIEntity();
+            final UILabel label = new UILabel("Change To Edit Mode?");
+            question.setScaleX(1.1f);
+            question.setScaleY(1.1f);
+            question.add(label);
+            question.setInterhirts(true);
+            final UILabel info = new UILabel("All pathways are going to get reset!");
+            final UIEntity infoEntity = new UIEntity();
+            infoEntity.add(info);
+            infoEntity.setInterhirts(true);
+            selectionEntity.add(question);
+            selectionEntity.add(infoEntity);
+            final UIEntity buttons = new UIEntity();
+            final UIEntity buttonYes = GuiElements.createButton("Yes", e -> {
+                pop();
+                reset();
+                final UIMenu menu = new UIMenu();
+                menu.setVisible(false);
+                initializeFieldTemplate(
+                        (fieldEntity, name) -> this.tileEdit(fieldEntity, menu, name));
+                lowerEntity.add(menu);
+                resetSelection(entity);
+                this.pageCheck(Page.EDIT);
+                resetAllPathways();
+            });
+            final UIEntity buttonNo = GuiElements.createButton("No", e -> {
+                pop();
+            });
+            buttons.setInterhirts(true);
+            final UIBox vbox = new UIBox(UIBox.HBOX, 1);
+            buttons.add(vbox);
+            buttons.add(buttonYes);
+            buttons.add(buttonNo);
+            selectionEntity.add(buttons);
+        });
+        push(screen);
+        pageCheck(Page.CHANGE_MODE);
     }
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
@@ -566,7 +611,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private static enum Page {
-        USAGE, EDIT, SETTINGS, TILE_CONFIG, NONE;
+        USAGE, EDIT, SETTINGS, TILE_CONFIG, CHANGE_MODE, NONE;
     }
 
     @Override
@@ -574,9 +619,10 @@ public class GuiSignalBox extends GuiBase {
         if (!allPacketsRecived) {
             initializeBasicUI();
             allPacketsRecived = true;
+            return;
         }
         if (this.page.equals(Page.USAGE)) {
-            this.lowerEntity.clear();
+            reset();
             initializeFieldUsage(mainButton);
         }
     }

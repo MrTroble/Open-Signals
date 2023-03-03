@@ -236,12 +236,12 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     @Override
     public void readNetwork(final ByteBuffer buffer) {
         final int size = Byte.toUnsignedInt(buffer.get());
+        final boolean isEmpty = Byte.toUnsignedInt(buffer.get()) == 1 ? true : false;
+        if (isEmpty) {
+            possibleModes.clear();
+            return;
+        }
         for (int i = 0; i < size; i++) {
-            final boolean isEmpty = Byte.toUnsignedInt(buffer.get()) == 1 ? true : false;
-            if (isEmpty) {
-                possibleModes.clear();
-                continue;
-            }
             final ModeSet mode = new ModeSet(buffer);
             final PathOptionEntry entry = possibleModes.computeIfAbsent(mode,
                     _u -> SignalBoxFactory.getFactory().getEntry());
@@ -251,10 +251,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public void writeToBuffer(final BufferBuilder buffer) {
         buffer.putByte((byte) possibleModes.size());
+        buffer.putByte((byte) (isEmpty() ? 1 : 0));
+        if (isEmpty())
+            return;
         possibleModes.forEach((mode, entry) -> {
-            buffer.putByte((byte) (isEmpty() ? 1 : 0));
-            if (isEmpty())
-                return;
             mode.writeToBuffer(buffer);
             entry.writeToBuffer(buffer);
         });
@@ -264,9 +264,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     public void writeNetwork(final ByteBuffer buffer) {
         buffer.put((byte) possibleModes.size());
         possibleModes.forEach((mode, entry) -> {
-            buffer.put((byte) (isEmpty() ? 1 : 0));
-            if (isEmpty())
-                return;
             mode.writeNetwork(buffer);
             entry.writeNetwork(buffer);
         });
@@ -279,11 +276,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 size++;
         }
         buffer.putByte((byte) size);
+        buffer.putByte((byte) (isEmpty() ? 1 : 0));
+        if (isEmpty())
+            return;
         possibleModes.forEach((mode, entry) -> {
             if (entry.containsEntry(PathEntryType.PATHUSAGE)) {
-                buffer.putByte((byte) (isEmpty() ? 1 : 0));
-                if (isEmpty())
-                    return;
                 mode.writeToBuffer(buffer);
                 entry.writeUpdateBuffer(buffer);
             }

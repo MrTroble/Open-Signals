@@ -260,7 +260,6 @@ public class SignalBoxGrid implements INetworkSavable {
             final SignalBoxNode node = modeGrid.computeIfAbsent(point,
                     _u -> new SignalBoxNode(point));
             node.readNetwork(buffer);
-            node.post();
         }
     }
 
