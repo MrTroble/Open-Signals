@@ -11,8 +11,6 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import org.antlr.v4.parse.ANTLRParser.option_return;
-
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -45,7 +43,6 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
-import com.troblecodings.signals.signalbox.entrys.IPathEntry;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -361,11 +358,13 @@ public class GuiSignalBox extends GuiBase {
             selectionEntity.add(hbox);
             final UIEntity question = new UIEntity();
             final UILabel label = new UILabel("Change To Edit Mode?");
+            label.setTextColor(0xFFFFFFFF);
             question.setScaleX(1.1f);
             question.setScaleY(1.1f);
             question.add(label);
             question.setInherits(true);
             final UILabel info = new UILabel("All pathways are going to get reset!");
+            info.setTextColor(0xFFFFFFFF);
             final UIEntity infoEntity = new UIEntity();
             infoEntity.add(info);
             infoEntity.setInherits(true);
