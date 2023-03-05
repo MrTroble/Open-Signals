@@ -42,6 +42,7 @@ import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.SignalBoxPathway;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -262,7 +263,6 @@ public class GuiSignalBox extends GuiBase {
                 lastTile = currentTile;
             } else {
                 if (lastTile == currentTile) {
-                    lastTile = null;
                     this.resetTileSelection();
                     return;
                 }
@@ -357,13 +357,13 @@ public class GuiSignalBox extends GuiBase {
             final UIBox hbox = new UIBox(UIBox.VBOX, 3);
             selectionEntity.add(hbox);
             final UIEntity question = new UIEntity();
-            final UILabel label = new UILabel("Change To Edit Mode?");
+            final UILabel label = new UILabel(I18n.get("sb.editmode"));
             label.setTextColor(0xFFFFFFFF);
             question.setScaleX(1.1f);
             question.setScaleY(1.1f);
             question.add(label);
             question.setInherits(true);
-            final UILabel info = new UILabel("All pathways are going to get reset!");
+            final UILabel info = new UILabel(I18n.get("sb.allreset"));
             info.setTextColor(0xFFFFFFFF);
             final UIEntity infoEntity = new UIEntity();
             infoEntity.add(info);
@@ -371,7 +371,7 @@ public class GuiSignalBox extends GuiBase {
             selectionEntity.add(question);
             selectionEntity.add(infoEntity);
             final UIEntity buttons = new UIEntity();
-            final UIEntity buttonYes = GuiElements.createButton("Yes", e -> {
+            final UIEntity buttonYes = GuiElements.createButton(I18n.get("btn.yes"), e -> {
                 pop();
                 reset();
                 final UIMenu menu = new UIMenu();
@@ -383,7 +383,7 @@ public class GuiSignalBox extends GuiBase {
                 this.pageCheck(Page.EDIT);
                 resetAllPathways();
             });
-            final UIEntity buttonNo = GuiElements.createButton("No", e -> {
+            final UIEntity buttonNo = GuiElements.createButton(I18n.get("btn.no"), e -> {
                 pop();
             });
             buttons.setInherits(true);
@@ -619,10 +619,15 @@ public class GuiSignalBox extends GuiBase {
             initializeBasicUI();
             allPacketsRecived = true;
             return;
-        }
-        if (this.page.equals(Page.USAGE)) {
-            reset();
-            initializeFieldUsage(mainButton);
+        } else {
+            final SignalBoxPathway pathwayToUpdate = container.grid.clientPathways
+                    .get(lastTile.getPoint());
+            if (pathwayToUpdate == null) {
+                OpenSignalsMain.getLogger()
+                        .warn("Pathway to Update is null. This shouldn't be the case!");
+                return;
+            }
+            lastTile = null;
         }
     }
 }

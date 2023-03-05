@@ -1,6 +1,7 @@
 package com.troblecodings.signals.signalbox;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.enums.EnumPathUsage;
+import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
@@ -28,6 +30,7 @@ public class SignalBoxGrid implements INetworkSavable {
     private static final String NODE_LIST = "nodeList";
     private static final String PATHWAY_LIST = "pathwayList";
 
+    public final Map<Point, SignalBoxPathway> clientPathways = new HashMap<>();
     protected final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
     protected final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
@@ -261,6 +264,21 @@ public class SignalBoxGrid implements INetworkSavable {
                     _u -> new SignalBoxNode(point));
             node.readNetwork(buffer);
         }
+    }
+
+    public void readUpdateNetwork(final ByteBuffer buffer) {
+        final int size = buffer.getInt();
+        final List<SignalBoxNode> allNodesForPathway = new ArrayList<>();
+        for (int i = 0; i < size; i++) {
+            final Point point = new Point(buffer);
+            final SignalBoxNode node = modeGrid.computeIfAbsent(point,
+                    _u -> new SignalBoxNode(point));
+            node.readNetwork(buffer);
+            allNodesForPathway.add(node);
+        }
+        final SignalBoxPathway pathway = new SignalBoxPathway(modeGrid, allNodesForPathway,
+                PathType.NORMAL);
+        clientPathways.put(pathway.getFirstPoint(), pathway);
     }
 
     public void writeToBuffer(final BufferBuilder buffer) {
