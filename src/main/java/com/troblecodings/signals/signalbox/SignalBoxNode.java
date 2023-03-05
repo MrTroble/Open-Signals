@@ -239,6 +239,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final boolean isEmpty = Byte.toUnsignedInt(buffer.get()) == 1 ? true : false;
         if (isEmpty) {
             possibleModes.clear();
+            possibleConnections.clear();
             return;
         }
         for (int i = 0; i < size; i++) {
@@ -247,6 +248,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                     _u -> SignalBoxFactory.getFactory().getEntry());
             entry.readNetwork(buffer);
         }
+        post();
     }
 
     public void writeToBuffer(final BufferBuilder buffer) {

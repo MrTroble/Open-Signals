@@ -11,7 +11,6 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
@@ -43,7 +42,6 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxPathway;
-import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -69,26 +67,25 @@ public class GuiSignalBox extends GuiBase {
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
+        container.setConsumer(this::update);
         info.player.containerMenu = this.container;
         this.info = info;
     }
 
-    public void update(final NBTWrapper compound) {
+    public void update(final String errorString) {
         this.resetTileSelection();
-        if (compound.contains(SignalBoxTileEntity.ERROR_STRING)) {
-            final String error = I18n.get(compound.getString(SignalBoxTileEntity.ERROR_STRING));
-            final UIToolTip tooltip = new UIToolTip(error);
-            entity.add(tooltip);
-            new Thread(() -> {
-                try {
-                    Thread.sleep(4000);
-                } catch (final InterruptedException e) {
-                    e.printStackTrace();
-                }
-                entity.remove(tooltip);
-            }).start();
-            return;
-        }
+        final UIToolTip tooltip = new UIToolTip(errorString);
+        lowerEntity.add(tooltip);
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+            }
+            lowerEntity.remove(tooltip);
+        }).start();
+        return;
+
     }
 
     private void resetTileSelection() {
@@ -186,13 +183,13 @@ public class GuiSignalBox extends GuiBase {
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
                     final int speed = id > 0 ? id : 127;
                     final Optional<Integer> opt = option.getEntry(PathEntryType.SPEED);
-                    if (opt.isPresent() && opt.get() == speed)
-                        return;
-                    option.setEntry(PathEntryType.SPEED, speed);
-                    if (speed == 127) {
+                    if (speed == 127 && opt.isPresent()) {
                         removeEntryFromServer(node, mode, rotation, PathEntryType.SPEED);
-                    } else {
+                        option.removeEntry(PathEntryType.SPEED);
+                    } else if ((opt.isPresent() && opt.get() != speed)
+                            || (opt.isEmpty() && speed != 127)) {
                         sendIntEntryToServer(speed, node, mode, rotation, PathEntryType.SPEED);
+                        option.setEntry(PathEntryType.SPEED, speed);
                     }
                 });
                 final int speed = option.getEntry(PathEntryType.SPEED).filter(n -> n < 16)
@@ -267,8 +264,8 @@ public class GuiSignalBox extends GuiBase {
                     return;
                 }
                 sendPWRequest(currentTile.getNode());
-                lastTile = null;
                 this.resetTileSelection();
+                lastTile = null;
             }
         }));
         tile.add(new UIClickable(e -> initializePageTileConfig(currentTile.getNode()), 1));
@@ -619,15 +616,8 @@ public class GuiSignalBox extends GuiBase {
             initializeBasicUI();
             allPacketsRecived = true;
             return;
-        } else {
-            final SignalBoxPathway pathwayToUpdate = container.grid.clientPathways
-                    .get(lastTile.getPoint());
-            if (pathwayToUpdate == null) {
-                OpenSignalsMain.getLogger()
-                        .warn("Pathway to Update is null. This shouldn't be the case!");
-                return;
-            }
-            lastTile = null;
+        } else if (page.equals(Page.USAGE)) {
+            // TODO add System to update Nodes from Pathway
         }
     }
 }

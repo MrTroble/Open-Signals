@@ -198,6 +198,8 @@ public class SignalBoxPathway {
     }
 
     public void updatePathwaySignals() {
+        if (world == null)
+            return;
         this.signalPositions.ifPresent(entry -> {
             final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey());
             SignalStateInfo nextInfo = null;

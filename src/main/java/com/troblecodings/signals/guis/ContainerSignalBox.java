@@ -7,7 +7,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
@@ -25,6 +24,7 @@ import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
+import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Rotation;
@@ -40,10 +40,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
     private SignalBoxTileEntity tile;
-    private Consumer<NBTWrapper> run;
     private final GuiInfo info;
     protected SignalBoxGrid grid;
-    protected boolean planeUpdate = false;
+    private Consumer<String> run;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -75,46 +74,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    public ContainerSignalBox(final GuiInfo info, final Consumer<NBTWrapper> run) {
-        this(info);
-        this.run = run;
-    }
-
-    @Override
-    public void removed(final Player playerIn) {
-        super.removed(playerIn);
-        if (this.tile != null)
-            this.tile.remove(this);
-    }
-
-    @Override
-    public Player getPlayer() {
-        return this.info.player;
-    }
-
-    public Map<BlockPos, Signal> getProperties() {
-        return this.properties.get();
-    }
-
-    public Map<BlockPos, String> getNames() {
-        return this.names.get();
-    }
-
-    public Map<BlockPos, LinkType> getPositionForTypes() {
-        return this.propertiesForType.get();
-    }
-
-    @Override
-    public boolean stillValid(final Player playerIn) {
-        if (tile.isBlocked() && !tile.isValid(playerIn))
-            return false;
-        if (this.info.player == null) {
-            this.info.player = playerIn;
-            this.tile.add(this);
-        }
-        return true;
-    }
-
     @Override
     public void deserializeClient(final ByteBuffer buf) {
         final SignalBoxNetwork mode = SignalBoxNetwork.of(buf);
@@ -134,10 +93,18 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             }
             propertiesForType.set(allPos);
             update();
+            return;
         }
         if (mode.equals(SignalBoxNetwork.SEND_PW_UPDATE)) {
             grid.readUpdateNetwork(buf);
             update();
+            return;
+        }
+        if (mode.equals(SignalBoxNetwork.NO_PW_FOUND)) {
+            if (run != null) {
+                run.accept(I18n.get("error.nopathfound"));
+                return;
+            }
         }
     }
 
@@ -180,7 +147,11 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         if (mode.equals(SignalBoxNetwork.REQUEST_PW)) {
             final Point start = new Point(buf);
             final Point end = new Point(buf);
-            tile.getSignalBoxGrid().requestWay(start, end);
+            if (!tile.getSignalBoxGrid().requestWay(start, end)) {
+                final ByteBuffer buffer = ByteBuffer.allocate(1);
+                buffer.put((byte) SignalBoxNetwork.NO_PW_FOUND.ordinal());
+                OpenSignalsMain.network.sendTo(info.player, buffer);
+            }
             return;
         }
         if (mode.equals(SignalBoxNetwork.RESET_ALL_PW)) {
@@ -216,5 +187,44 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     private static BlockPos deserializeBlockPos(final ByteBuffer buffer) {
         return new BlockPos(buffer.getInt(), buffer.getInt(), buffer.getInt());
+    }
+
+    @Override
+    public void removed(final Player playerIn) {
+        super.removed(playerIn);
+        if (this.tile != null)
+            this.tile.remove(this);
+    }
+
+    @Override
+    public Player getPlayer() {
+        return this.info.player;
+    }
+
+    public Map<BlockPos, Signal> getProperties() {
+        return this.properties.get();
+    }
+
+    public Map<BlockPos, String> getNames() {
+        return this.names.get();
+    }
+
+    public Map<BlockPos, LinkType> getPositionForTypes() {
+        return this.propertiesForType.get();
+    }
+
+    @Override
+    public boolean stillValid(final Player playerIn) {
+        if (tile.isBlocked() && !tile.isValid(playerIn))
+            return false;
+        if (this.info.player == null) {
+            this.info.player = playerIn;
+            this.tile.add(this);
+        }
+        return true;
+    }
+
+    public void setConsumer(final Consumer<String> run) {
+        this.run = run;
     }
 }

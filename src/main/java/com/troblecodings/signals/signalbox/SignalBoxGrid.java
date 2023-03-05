@@ -69,6 +69,7 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     protected void resetPathway(final SignalBoxPathway pathway) {
+        pathway.setWorld(world);
         pathway.resetPathway();
         updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());
@@ -169,8 +170,8 @@ public class SignalBoxGrid implements INetworkSavable {
             node.write(nodeTag);
             return nodeTag;
         })::iterator);
-        tag.putList(PATHWAY_LIST, startsToPath.values().stream()
-                .filter(SignalBoxPathway::isEmptyOrBroken).map(pathway -> {
+        tag.putList(PATHWAY_LIST,
+                startsToPath.values().stream().filter(pw -> !pw.isEmptyOrBroken()).map(pathway -> {
                     final NBTWrapper path = new NBTWrapper();
                     pathway.write(path);
                     return path;
@@ -199,6 +200,8 @@ public class SignalBoxGrid implements INetworkSavable {
                 OpenSignalsMain.log.error("Remove empty or broken pathway, try to recover!");
                 return;
             }
+            if (world != null)
+                pathway.setWorld(world);
             onWayAdd(pathway);
         });
     }
