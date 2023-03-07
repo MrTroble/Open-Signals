@@ -30,8 +30,8 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final BlockGetter getter,
-            final BlockPos pos, final CollisionContext context) {
+    public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
+            final CollisionContext context) {
         return Shapes.block();
     }
 

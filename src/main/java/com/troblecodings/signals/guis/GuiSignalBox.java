@@ -41,7 +41,6 @@ import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.SignalBoxPathway;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 

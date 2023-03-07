@@ -18,8 +18,8 @@ public class Post extends BasicBlock {
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final BlockGetter getter,
-            final BlockPos pos, final CollisionContext context) {
+    public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
+            final CollisionContext context) {
         return BOUNDING_BOX;
     }
 }
