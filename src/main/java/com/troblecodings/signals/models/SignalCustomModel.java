@@ -11,6 +11,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.datafixers.util.Either;
@@ -43,6 +45,7 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 @OnlyIn(Dist.CLIENT)
 public class SignalCustomModel implements UnbakedModel {
 
+    @Nonnull
     public static final Random RANDOM = new Random();
 
     private final SignalAngel angel;

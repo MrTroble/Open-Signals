@@ -3,6 +3,7 @@ package com.troblecodings.signals.signalbox;
 import java.nio.ByteBuffer;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 public class Point implements INetworkSavable {
@@ -22,6 +23,10 @@ public class Point implements INetworkSavable {
     public Point(final Point point) {
         this.x = point.x;
         this.y = point.y;
+    }
+
+    public Point(final ByteBuffer buffer) {
+        readNetwork(buffer);
     }
 
     public int getX() {
@@ -84,13 +89,18 @@ public class Point implements INetworkSavable {
 
     @Override
     public void readNetwork(final ByteBuffer buffer) {
-        this.x = buffer.get();
-        this.y = buffer.get();
+        this.x = Byte.toUnsignedInt(buffer.get());
+        this.y = Byte.toUnsignedInt(buffer.get());
     }
 
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
         buffer.put((byte) x);
         buffer.put((byte) y);
+    }
+
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putByte((byte) x);
+        buffer.putByte((byte) y);
     }
 }

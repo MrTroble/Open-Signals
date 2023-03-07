@@ -6,8 +6,9 @@ import net.minecraft.core.BlockPos;
 
 public final class GIRSyncEntryTests {
 
-    private GIRSyncEntryTests() {}
-    
+    private GIRSyncEntryTests() {
+    }
+
     public static final Random RANDOM = new Random();
 
     public static <T extends Enum<T>> T randomEnum(final Class<T> clazz) {

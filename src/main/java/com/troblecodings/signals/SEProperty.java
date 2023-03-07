@@ -67,9 +67,9 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
         return Optional.empty();
     }
 
-    public NBTWrapper writeToNBT(final NBTWrapper comp, final Object value) {
-        if (value != null && isValid((String) value))
-            comp.putInteger(getName(), this.allowedValues.indexOf(value));
+    public NBTWrapper writeToNBT(final NBTWrapper comp, final String value) {
+        if (value != null && isValid(value))
+            comp.putInteger(getName(), parent.getIDFromValue(value));
         return comp;
     }
 

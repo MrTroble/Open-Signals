@@ -31,10 +31,6 @@ public class ClientSignalsStateHandler implements INetworkSync {
     public void deserializeClient(final ByteBuffer buf) {
         final BlockPos signalPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
         final int propertiesSize = Byte.toUnsignedInt(buf.get());
-        if (propertiesSize == 255) {
-            // TODO inform client to unrender
-            return;
-        }
         final int[] propertyIDs = new int[propertiesSize];
         final int[] valueIDs = new int[propertiesSize];
         for (int i = 0; i < propertiesSize; i++) {

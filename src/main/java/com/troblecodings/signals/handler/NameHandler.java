@@ -29,6 +29,7 @@ import net.minecraftforge.network.event.EventNetworkChannel;
 public final class NameHandler implements INetworkSync {
 
     private static final Map<BlockPos, String> ALL_NAMES = new HashMap<>();
+    private static final Map<BlockPos, String> CLIENT_NAMES = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
 
@@ -52,6 +53,15 @@ public final class NameHandler implements INetworkSync {
     public static String getName(final BlockPos pos) {
         synchronized (ALL_NAMES) {
             final String name = ALL_NAMES.get(pos);
+            if (name == null)
+                return "";
+            return name;
+        }
+    }
+
+    public static String getClientName(final BlockPos pos) {
+        synchronized (CLIENT_NAMES) {
+            final String name = CLIENT_NAMES.get(pos);
             if (name == null)
                 return "";
             return name;
@@ -86,8 +96,8 @@ public final class NameHandler implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buf.get();
         }
-        synchronized (ALL_NAMES) {
-            ALL_NAMES.put(pos, new String(array));
+        synchronized (CLIENT_NAMES) {
+            CLIENT_NAMES.put(pos, new String(array));
         }
     }
 
@@ -111,7 +121,7 @@ public final class NameHandler implements INetworkSync {
 
     }
 
-    public static void sendTo(final Player player, final ByteBuffer buf) {
+    private static void sendTo(final Player player, final ByteBuffer buf) {
         final FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.copiedBuffer(buf.position(0)));
         if (player instanceof ServerPlayer) {
             final ServerPlayer server = (ServerPlayer) player;

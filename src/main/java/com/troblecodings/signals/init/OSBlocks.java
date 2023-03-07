@@ -68,6 +68,10 @@ public final class OSBlocks {
         block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
         BLOCKS_TO_REGISTER.add(block);
         if (block instanceof Signal) {
+            if (Signal.SIGNALS.containsKey(name)) {
+                throw new IllegalArgumentException(
+                        "A Signal with the name '" + name + "' alredy exists!");
+            }
             Signal.SIGNALS.put(name, (Signal) block);
         }
     }

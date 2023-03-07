@@ -5,6 +5,7 @@ import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
+import com.troblecodings.signals.core.BufferBuilder;
 
 public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
         implements IIntegerable<T>, IntConsumer {
@@ -46,7 +47,6 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
     @Override
     public void setValue(final T value) {
         this.enumValue = value;
-        updateValue(4);
     }
 
     @Override
@@ -73,5 +73,10 @@ public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
         buffer.putInt(this.enumValue.ordinal());
+    }
+
+    @Override
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putInt(enumValue.ordinal());
     }
 }

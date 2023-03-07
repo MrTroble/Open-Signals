@@ -1,6 +1,5 @@
 package com.troblecodings.signals.signalbox;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -23,15 +22,17 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
-import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
+import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 
-public class SignalBoxPathway implements INetworkSavable {
+public class SignalBoxPathway {
 
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
     private final Map<BlockPos, SignalBoxNode> mapOfBlockingPositions = new HashMap<>();
@@ -46,9 +47,14 @@ public class SignalBoxPathway implements INetworkSavable {
     private final WorldOperations loadOps = new WorldOperations();
     private Map<Point, SignalBoxNode> modeGrid = null;
     private boolean emptyOrBroken = false;
+    private Level world;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
+    }
+
+    public void setWorld(final Level world) {
+        this.world = world;
     }
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid,
@@ -119,7 +125,6 @@ public class SignalBoxPathway implements INetworkSavable {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
 
-    @Override
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
             final NBTWrapper entry = new NBTWrapper();
@@ -129,7 +134,6 @@ public class SignalBoxPathway implements INetworkSavable {
         tag.putString(PATH_TYPE, this.type.name());
     }
 
-    @Override
     public void read(final NBTWrapper tag) {
         final Builder<SignalBoxNode> nodeBuilder = ImmutableList.builder();
         tag.getList(LIST_OF_NODES).forEach(nodeNBT -> {
@@ -193,16 +197,28 @@ public class SignalBoxPathway implements INetworkSavable {
         setPathStatus(status, null);
     }
 
-    private void configUpdate(final ConfigInfo info) {
-        info.type = this.type;
-    }
-
     public void updatePathwaySignals() {
+        if (world == null)
+            return;
         this.signalPositions.ifPresent(entry -> {
-            loadOps.loadAndConfig(speed, entry.getKey(), entry.getValue(), this::configUpdate);
+            final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey());
+            SignalStateInfo nextInfo = null;
+            if (entry.getValue() != null) {
+                nextInfo = new SignalStateInfo(world, entry.getValue());
+            }
+            final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed);
+            info.type = this.type;
+            SignalConfig.change(info);
         });
-        distantSignalPositions.forEach(position -> loadOps.loadAndConfig(speed, position,
-                lastSignal.orElse(null), this::configUpdate));
+        distantSignalPositions.forEach(position -> {
+            final SignalStateInfo nextInfo = lastSignal.isPresent()
+                    ? new SignalStateInfo(world, lastSignal.get())
+                    : null;
+            final ConfigInfo info = new ConfigInfo(new SignalStateInfo(world, position), nextInfo,
+                    speed);
+            info.type = this.type;
+            SignalConfig.change(info);
+        });
     }
 
     public void resetPathway() {
@@ -210,11 +226,13 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     private void resetFirstSignal() {
-        this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
+        this.signalPositions
+                .ifPresent(entry -> SignalConfig.reset(new SignalStateInfo(world, entry.getKey())));
     }
 
     private void resetOther() {
-        distantSignalPositions.forEach(position -> loadOps.loadAndReset(position));
+        distantSignalPositions
+                .forEach(position -> SignalConfig.reset(new SignalStateInfo(world, position)));
     }
 
     public void resetPathway(final @Nullable Point point) {
@@ -228,7 +246,9 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     public void compact(final Point point) {
-        foreachEntry(entry -> entry.getEntry(PathEntryType.SIGNAL).ifPresent(loadOps::loadAndReset),
+        foreachEntry(
+                entry -> entry.getEntry(PathEntryType.SIGNAL)
+                        .ifPresent(pos -> SignalConfig.reset(new SignalStateInfo(world, pos))),
                 point);
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
@@ -313,17 +333,4 @@ public class SignalBoxPathway implements INetworkSavable {
     public boolean isEmptyOrBroken() {
         return emptyOrBroken;
     }
-
-    @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

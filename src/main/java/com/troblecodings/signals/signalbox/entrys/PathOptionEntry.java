@@ -2,18 +2,18 @@ package com.troblecodings.signals.signalbox.entrys;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.Observable;
-import com.troblecodings.signals.core.Observer;
+import com.troblecodings.signals.core.BufferBuilder;
 
-public class PathOptionEntry implements INetworkSavable, Observable {
+public class PathOptionEntry implements INetworkSavable {
 
     private final Map<PathEntryType<?>, IPathEntry<?>> pathEntrys = new HashMap<>();
-    private final Map<PathEntryType<?>, IPathEntry<?>> removedEntrys = new HashMap<>(2);
 
     @SuppressWarnings("unchecked")
     public <T> Optional<T> getEntry(final PathEntryType<T> type) {
@@ -25,14 +25,20 @@ public class PathOptionEntry implements INetworkSavable, Observable {
     @SuppressWarnings("unchecked")
     public <T> void setEntry(final PathEntryType<T> type, final T value) {
         if (value == null) {
-            removedEntrys.put(type, pathEntrys.remove(type));
+            pathEntrys.remove(type);
             return;
-        } else if (removedEntrys.containsKey(type)) {
-            removedEntrys.remove(type);
         }
         final IPathEntry<T> pathEntry = (IPathEntry<T>) pathEntrys.computeIfAbsent(type,
                 pType -> pType.newValue());
         pathEntry.setValue(value);
+    }
+
+    public void removeEntry(final PathEntryType<?> type) {
+        pathEntrys.remove(type);
+    }
+
+    public boolean containsEntry(final PathEntryType<?> type) {
+        return pathEntrys.containsKey(type);
     }
 
     @Override
@@ -66,33 +72,53 @@ public class PathOptionEntry implements INetworkSavable, Observable {
 
     @Override
     public void read(final NBTWrapper tag) {
-        // TODO new sync system
+        final List<PathEntryType<?>> tagSet = tag.keySet().stream().map(PathEntryType::getType)
+                .collect(Collectors.toList());
+        tagSet.forEach(entry -> {
+            if (entry != null) {
+                if (tag.contains(entry.getName())) {
+                    final IPathEntry<?> path = entry.newValue();
+                    path.read(tag.getWrapper(entry.getName()));
+                    pathEntrys.put(entry, path);
+                } else {
+                    pathEntrys.remove(entry);
+                }
+            }
+        });
     }
 
     @Override
     public void readNetwork(final ByteBuffer buffer) {
+        final int size = Byte.toUnsignedInt(buffer.get());
+        for (int i = 0; i < size; i++) {
+            final PathEntryType<?> type = PathEntryType.ALL_ENTRIES
+                    .get(Byte.toUnsignedInt(buffer.get()));
+            final IPathEntry<?> entry = pathEntrys.computeIfAbsent(type, _u -> type.newValue());
+            entry.readNetwork(buffer);
+            pathEntrys.put(type, entry);
+        }
+    }
+
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putByte((byte) pathEntrys.size());
+        pathEntrys.forEach((type, entry) -> {
+            buffer.putByte((byte) type.getID());
+            entry.writeToBuffer(buffer);
+        });
     }
 
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
+        buffer.put((byte) pathEntrys.size());
         pathEntrys.forEach((type, entry) -> {
+            buffer.put((byte) type.getID());
             entry.writeNetwork(buffer);
         });
-        removedEntrys.forEach((type, entry) -> {
-            entry.writeNetwork(buffer);
-        });
     }
 
-    @Override
-    public void addListener(final Observer observer) {
-        pathEntrys.values().forEach(entry -> entry.addListener(observer));
-        removedEntrys.values().forEach(entry -> entry.addListener(observer));
+    public void writeUpdateBuffer(final BufferBuilder builder) {
+        builder.putByte((byte) 1);
+        builder.putByte((byte) PathEntryType.PATHUSAGE.getID());
+        pathEntrys.get(PathEntryType.PATHUSAGE).writeToBuffer(builder);
     }
-
-    @Override
-    public void removeListener(final Observer observer) {
-        pathEntrys.values().forEach(entry -> entry.removeListener(observer));
-        removedEntrys.values().forEach(entry -> entry.removeListener(observer));
-    }
-
 }

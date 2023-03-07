@@ -31,6 +31,8 @@ public class CommonProxy {
     public void initModEvent(final FMLConstructModEvent event) {
         SignalStateHandler.init();
         NameHandler.init();
+        OSSounds.init();
+
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
         OpenSignalsMain.handler = init.getKey();
@@ -43,8 +45,6 @@ public class CommonProxy {
     }
 
     public void preinit(final FMLCommonSetupEvent event) {
-
-        OSSounds.init();
         OSItems.init();
 
         OneSignalConfigParser.loadOneSignalConfigs();

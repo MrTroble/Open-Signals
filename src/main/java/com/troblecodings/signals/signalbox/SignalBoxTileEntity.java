@@ -1,26 +1,29 @@
 package com.troblecodings.signals.signalbox;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.RedstonePacket;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
-import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.LevelChunk;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
@@ -40,10 +43,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     private final WorldOperations worldLoadOps = new WorldOperations();
 
-    @Override
-    public void setLevel(final Level worldIn) {
-        super.setLevel(worldIn);
-        // TODO World ops?
+    public void removeSignal(final BlockPos pos) {
+        if (level.isClientSide)
+            return;
+        SignalConfig.reset(new SignalStateInfo(level, pos, signals.remove(pos)));
+    }
+
+    public void removeLinkedPos(final BlockPos pos) {
+        linkedBlocks.remove(pos);
     }
 
     @Override
@@ -76,7 +83,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean link(final BlockPos linkedPos) {
-        if (linkedBlocks.containsKey(linkedPos))
+        if (linkedBlocks.containsKey(linkedPos) || level.isClientSide)
             return false;
         final BlockState state = level.getBlockState(linkedPos);
         final Block block = state.getBlock();
@@ -86,27 +93,33 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
-        if (level.isClientSide) {
-            if (type.equals(LinkType.SIGNAL)) {
-                worldLoadOps.loadAndReset(linkedPos);
-            }
+        if (type.equals(LinkType.SIGNAL)) {
+            SignalConfig.reset(new SignalStateInfo(level, linkedPos, (Signal) block));
+            signals.put(linkedPos, (Signal) block);
         }
         linkedBlocks.put(linkedPos, type);
         this.syncClient();
         return true;
     }
 
-    private void updateSingle(final SignalTileEntity signaltile, final LevelChunk unused) {
-        final BlockPos signalPos = signaltile.getBlockPos();
-        signals.put(signalPos, signaltile.getSignal());
-        syncClient();
-    }
-
     @Override
     public void onLoad() {
-        if (!level.isClientSide)
+        if (level.isClientSide) {
+            signals.clear();
             return;
-        signals.clear();
+        }
+        grid.setWorldAndPos(level, worldPosition);
+        final Optional<LinkedList<RedstonePacket>> updates = SignalBoxHandler
+                .getPacket(worldPosition);
+        if (!updates.isPresent()) {
+            return;
+        }
+        RedstonePacket packet;
+        while ((packet = updates.get().poll()) != null) {
+            if (packet.world.equals(level)) {
+                updateRedstonInput(packet.pos, packet.state);
+            }
+        }
     }
 
     @Override
@@ -125,12 +138,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         return this.signals.get(pos);
     }
 
-    public ImmutableMap<BlockPos, LinkType> getPositions() {
+    public Map<BlockPos, LinkType> getPositions() {
         return ImmutableMap.copyOf(this.linkedBlocks);
     }
 
     public void updateRedstonInput(final BlockPos pos, final boolean power) {
-        if (power && this.level.isClientSide) {
+        if (power && !this.level.isClientSide) {
             grid.setPowered(pos);
             syncClient();
         }

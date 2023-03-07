@@ -11,17 +11,17 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.Observable;
-import com.troblecodings.signals.core.Observer;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.world.level.block.Rotation;
 
-public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observable, Observer {
+public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
             EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
@@ -42,6 +42,12 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
 
     public void add(final ModeSet modeSet) {
         possibleModes.put(modeSet, SignalBoxFactory.getFactory().getEntry());
+    }
+
+    public <T> void addAndSetEntry(final ModeSet mode, final PathEntryType<T> entry, final T type) {
+        final PathOptionEntry optionEntry = possibleModes.computeIfAbsent(mode,
+                _u -> SignalBoxFactory.getFactory().getEntry());
+        optionEntry.setEntry(entry, type);
     }
 
     public boolean has(final ModeSet modeSet) {
@@ -229,31 +235,57 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
 
     @Override
     public void readNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
+        final int size = Byte.toUnsignedInt(buffer.get());
+        final boolean isEmpty = Byte.toUnsignedInt(buffer.get()) == 1 ? true : false;
+        if (isEmpty) {
+            possibleModes.clear();
+            possibleConnections.clear();
+            return;
+        }
+        for (int i = 0; i < size; i++) {
+            final ModeSet mode = new ModeSet(buffer);
+            final PathOptionEntry entry = possibleModes.computeIfAbsent(mode,
+                    _u -> SignalBoxFactory.getFactory().getEntry());
+            entry.readNetwork(buffer);
+        }
+        post();
+    }
 
+    public void writeToBuffer(final BufferBuilder buffer) {
+        buffer.putByte((byte) possibleModes.size());
+        buffer.putByte((byte) (isEmpty() ? 1 : 0));
+        if (isEmpty())
+            return;
+        possibleModes.forEach((mode, entry) -> {
+            mode.writeToBuffer(buffer);
+            entry.writeToBuffer(buffer);
+        });
     }
 
     @Override
     public void writeNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
+        buffer.put((byte) possibleModes.size());
+        possibleModes.forEach((mode, entry) -> {
+            mode.writeNetwork(buffer);
+            entry.writeNetwork(buffer);
+        });
     }
 
-    @Override
-    public void addListener(final Observer observer) {
-        possibleModes.values().forEach(mode -> mode.addListener(observer));
+    public void writeUpdateBuffer(final BufferBuilder buffer) {
+        int size = 0;
+        for (final PathOptionEntry entry : possibleModes.values()) {
+            if (entry.containsEntry(PathEntryType.PATHUSAGE))
+                size++;
+        }
+        buffer.putByte((byte) size);
+        buffer.putByte((byte) (isEmpty() ? 1 : 0));
+        if (isEmpty())
+            return;
+        possibleModes.forEach((mode, entry) -> {
+            if (entry.containsEntry(PathEntryType.PATHUSAGE)) {
+                mode.writeToBuffer(buffer);
+                entry.writeUpdateBuffer(buffer);
+            }
+        });
     }
-
-    @Override
-    public void removeListener(final Observer observer) {
-        possibleModes.values().forEach(mode -> mode.removeListener(observer));
-
-    }
-
-    @Override
-    public void update(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

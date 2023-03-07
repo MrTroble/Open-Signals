@@ -20,7 +20,6 @@ import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
@@ -121,7 +120,9 @@ public final class SignalStateHandler implements INetworkSync {
         }
         synchronized (CURRENTLY_LOADED_STATES) {
             if (CURRENTLY_LOADED_STATES.containsKey(info)) {
-                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
+                final Map<SEProperty, String> oldStates = new HashMap<>(getStates(info));
+                oldStates.putAll(states);
+                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
                 sendPropertiesToClient(info, states);
                 return;
             }
@@ -299,9 +300,7 @@ public final class SignalStateHandler implements INetworkSync {
         buffer.putInt(stateInfo.pos.getZ());
         buffer.put((byte) 255);
         stateInfo.world.players().forEach(player -> {
-            if (checkInRange(player.blockPosition(), stateInfo.pos)) {
-                sendTo(player, buffer);
-            }
+            sendTo(player, buffer);
         });
     }
 
@@ -335,19 +334,8 @@ public final class SignalStateHandler implements INetworkSync {
         }
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         stateInfo.world.players().forEach(player -> {
-            if (checkInRange(player.blockPosition(), stateInfo.pos)) {
-                sendTo(player, buffer);
-            }
+            sendTo(player, buffer);
         });
-    }
-
-    /**
-     * This is the distance in blocks in which signals get rendered
-     */
-    private static final int RENDER_DISTANCE = 512;
-
-    private static boolean checkInRange(final BlockPos playerPos, final BlockPos signalPos) {
-        return true;
     }
 
     public static void sendTo(final Player player, final ByteBuffer buf) {

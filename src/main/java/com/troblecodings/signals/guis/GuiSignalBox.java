@@ -1,17 +1,16 @@
 package com.troblecodings.signals.guis;
 
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.POINT1;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.POINT2;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.toNBT;
-
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
@@ -32,14 +31,16 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
+import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
-import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -56,34 +57,34 @@ public class GuiSignalBox extends GuiBase {
     private final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
     private Page page = Page.USAGE;
-    private SignalBoxNode node = null;
-    private final boolean dirty = false;
-    private final NBTWrapper dirtyCompound = new NBTWrapper();
     private UIEntity mainButton;
+    private final GuiInfo info;
+    private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
+    private UIEntity plane = null;
+    private boolean allPacketsRecived = false;
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
-        this.container = new ContainerSignalBox(info, this::update);
+        this.container = (ContainerSignalBox) info.base;
+        container.setConsumer(this::update);
         info.player.containerMenu = this.container;
-        initializeBasicUI();
+        this.info = info;
     }
 
-    public void update(final NBTWrapper compound) {
+    public void update(final String errorString) {
         this.resetTileSelection();
-        if (compound.contains(SignalBoxTileEntity.ERROR_STRING)) {
-            final String error = I18n.get(compound.getString(SignalBoxTileEntity.ERROR_STRING));
-            final UIToolTip tooltip = new UIToolTip(error);
-            entity.add(tooltip);
-            new Thread(() -> {
-                try {
-                    Thread.sleep(4000);
-                } catch (final InterruptedException e) {
-                    e.printStackTrace();
-                }
-                entity.remove(tooltip);
-            }).start();
-            return;
-        }
+        final UIToolTip tooltip = new UIToolTip(errorString);
+        lowerEntity.add(tooltip);
+        new Thread(() -> {
+            try {
+                Thread.sleep(2000);
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+            }
+            lowerEntity.remove(tooltip);
+        }).start();
+        return;
+
     }
 
     private void resetTileSelection() {
@@ -94,23 +95,41 @@ public class GuiSignalBox extends GuiBase {
 
     private void selectLink(final UIEntity parent, final SignalBoxNode node,
             final PathOptionEntry option, final Set<Entry<BlockPos, LinkType>> entrySet,
-            final LinkType type, final PathEntryType<BlockPos> entryType) {
-        this.selectLink(parent, node, option, entrySet, type, entryType, "");
+            final LinkType type, final PathEntryType<BlockPos> entryType, final EnumGuiMode mode,
+            final Rotation rotation) {
+        this.selectLink(parent, node, option, entrySet, type, entryType, mode, rotation, "");
     }
 
     private void selectLink(final UIEntity parent, final SignalBoxNode node,
             final PathOptionEntry option, final Set<Entry<BlockPos, LinkType>> entrySet,
-            final LinkType type, final PathEntryType<BlockPos> entryType, final String suffix) {
-        final List<BlockPos> positions = entrySet.stream().filter(e -> e.getValue().equals(type))
-                .map(e -> e.getKey()).collect(Collectors.toList());
-        if (!positions.isEmpty()) {
+            final LinkType type, final PathEntryType<BlockPos> entryType, final EnumGuiMode mode,
+            final Rotation rotation, final String suffix) {
+        final List<BlockPos> positions = new ArrayList<>();
+        positions.add(null);
+        positions.addAll(entrySet.stream().filter(e -> e.getValue().equals(type))
+                .map(e -> e.getKey()).collect(Collectors.toList()));
+        if (positions.size() > 1) {
             final DisableIntegerable<String> blockPos = new DisableIntegerable<>(
                     SizeIntegerables.of("prop." + type.name() + suffix, positions.size(), id -> {
                         final BlockPos pos = positions.get(id);
+                        if (pos == null)
+                            return "disabled";
                         return getSignalInfo(pos, type);
                     }));
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
-                option.setEntry(entryType, id >= 0 ? positions.get(id) : null);
+                final BlockPos setPos = id >= 0 ? positions.get(id) : null;
+                if (setPos == null) {
+                    if (option.getEntry(entryType).isEmpty())
+                        return;
+                    option.removeEntry(entryType);
+                    removeEntryFromServer(node, mode, rotation, entryType);
+                } else {
+                    final Optional<BlockPos> pathEntry = option.getEntry(entryType);
+                    if (pathEntry.isPresent() && pathEntry.get().equals(setPos))
+                        return;
+                    option.setEntry(entryType, setPos);
+                    sendPosEntryToServer(setPos, node, mode, rotation, entryType);
+                }
             });
             blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
                 e.setMin(-1);
@@ -123,8 +142,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private String getSignalInfo(final BlockPos signalPos, final LinkType type) {
-        final Map<BlockPos, String> names = this.container.getNames();
-        final String customName = names == null ? null : names.get(signalPos);
+        final String customName = NameHandler.getClientName(signalPos);
         return String.format("%s (x=%d, y=%d. z=%d)",
                 customName == null
                         ? (type.equals(LinkType.SIGNAL) ? "" : I18n.get("type." + type.name()))
@@ -145,7 +163,6 @@ public class GuiSignalBox extends GuiBase {
         modeLabel.setCenterX(false);
         entity.add(modeLabel);
         parent.add(entity);
-        this.node = node;
         final Set<Entry<BlockPos, LinkType>> entrySet = container.getPositionForTypes().entrySet();
 
         switch (mode) {
@@ -163,36 +180,45 @@ public class GuiSignalBox extends GuiBase {
 
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
-                    option.setEntry(PathEntryType.SPEED, id > 0 ? id : Integer.MAX_VALUE);
+                    final int speed = id > 0 ? id : 127;
+                    final Optional<Integer> opt = option.getEntry(PathEntryType.SPEED);
+                    if (speed == 127 && opt.isPresent()) {
+                        removeEntryFromServer(node, mode, rotation, PathEntryType.SPEED);
+                        option.removeEntry(PathEntryType.SPEED);
+                    } else if ((opt.isPresent() && opt.get() != speed)
+                            || (opt.isEmpty() && speed != 127)) {
+                        sendIntEntryToServer(speed, node, mode, rotation, PathEntryType.SPEED);
+                        option.setEntry(PathEntryType.SPEED, speed);
+                    }
                 });
                 final int speed = option.getEntry(PathEntryType.SPEED).filter(n -> n < 16)
-                        .orElse(Integer.MAX_VALUE);
+                        .orElse(127);
                 speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
                     e.setIndex(speed);
                 });
                 parent.add(speedSelection);
 
-                selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT);
+                selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
+                        mode, rotation);
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
-                        ".blocking");
+                        mode, rotation, ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
-                        ".resetting");
+                        mode, rotation, ".resetting");
                 parent.add(GuiElements.createButton(I18n.get("button.reset"), e -> {
                     this.lowerEntity.clear();
                     initializeFieldUsage(mainButton);
-                    final NBTWrapper compound = new NBTWrapper();
-                    final NBTWrapper wayComp = new NBTWrapper();
-                    toNBT(wayComp, POINT1, node.getPoint());
-                    compound.putWrapper(SignalBoxUtil.RESET_WAY, wayComp);
+                    resetPathwayOnServer(node);
                 }));
             }
                 break;
             case VP:
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
+                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
+                        mode, rotation);
                 break;
             case HP:
             case RS: {
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL);
+                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
+                        mode, rotation);
             }
                 break;
             default:
@@ -203,37 +229,41 @@ public class GuiSignalBox extends GuiBase {
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
         tile.add(new UIClickable(e -> {
-            final SignalBoxNode node = sbt.getNode();
             final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
             final Rotation rotation = Rotation.values()[menu.getRotation()];
             final ModeSet modeSet = new ModeSet(mode, rotation);
-            if (node.has(modeSet)) {
+            if (sbt.has(modeSet)) {
+                sbt.remove(modeSet);
+                final SignalBoxNode node = container.grid.computeIfAbsent(sbt.getPoint(),
+                        _u -> new SignalBoxNode(sbt.getPoint()));
                 node.remove(modeSet);
+                if (node.isEmpty())
+                    container.grid.removeNode(sbt.getPoint());
+                changedModes.put(sbt.getPoint(), node);
             } else {
+                sbt.add(modeSet);
+                final SignalBoxNode node = container.grid.computeIfAbsent(sbt.getPoint(),
+                        _u -> new SignalBoxNode(sbt.getPoint()));
                 node.add(modeSet);
+                changedModes.put(sbt.getPoint(), node);
             }
         }));
     }
 
     private void tileNormal(final UIEntity tile, final UISignalBoxTile currentTile) {
         tile.add(new UIClickable(c -> {
-            final SignalBoxNode currentNode = currentTile.getNode();
-            if (!currentNode.isValidStart())
+            if (!currentTile.isValidStart())
                 return;
             c.add(new UIColor(SELECTION_COLOR));
             if (lastTile == null) {
                 lastTile = currentTile;
             } else {
                 if (lastTile == currentTile) {
-                    lastTile = null;
                     this.resetTileSelection();
                     return;
                 }
-                final NBTWrapper comp = new NBTWrapper();
-                final NBTWrapper way = new NBTWrapper();
-                toNBT(way, POINT1, lastTile.getNode().getPoint());
-                toNBT(way, POINT2, currentNode.getPoint());
-                comp.putWrapper(SignalBoxUtil.REQUEST_WAY, way);
+                sendPWRequest(currentTile.getNode());
+                this.resetTileSelection();
                 lastTile = null;
             }
         }));
@@ -265,7 +295,7 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(new UIClickable(e -> {
             initializeFieldUsage(mainButton);
         }, 1));
-        this.page = Page.TILE_CONFIG;
+        pageCheck(Page.TILE_CONFIG);
     }
 
     private void pageCheck(final Page page) {
@@ -274,6 +304,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializePageSettings(final UIEntity entity) {
         reset();
+        this.pageCheck(Page.SETTINGS);
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
@@ -299,8 +330,7 @@ public class GuiSignalBox extends GuiBase {
 
             layout.add(GuiElements.createButton(name));
             layout.add(GuiElements.createButton("x", 20, e -> {
-                final NBTWrapper resetPos = new NBTWrapper();
-                resetPos.putBlockPos(SignalBoxTileEntity.REMOVE_SIGNAL, p);
+                removeBlockPos(p, t);
                 list.remove(layout);
             }));
             list.add(layout);
@@ -308,23 +338,59 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(list);
         lowerEntity.add(GuiElements.createPageSelect(uibox));
         resetSelection(entity);
-        this.pageCheck(Page.SETTINGS);
     }
 
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
+        sendModeChanges();
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
         this.pageCheck(Page.USAGE);
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
-        reset();
-        final UIMenu menu = new UIMenu();
-        initializeFieldTemplate((e, name) -> this.tileEdit(e, menu, name));
-        lowerEntity.add(menu);
-        resetSelection(entity);
-        this.pageCheck(Page.EDIT);
+        final UIEntity screen = GuiElements.createScreen(selectionEntity -> {
+            final UIBox hbox = new UIBox(UIBox.VBOX, 3);
+            selectionEntity.add(hbox);
+            final UIEntity question = new UIEntity();
+            final UILabel label = new UILabel(I18n.get("sb.editmode"));
+            label.setTextColor(0xFFFFFFFF);
+            question.setScaleX(1.1f);
+            question.setScaleY(1.1f);
+            question.add(label);
+            question.setInherits(true);
+            final UILabel info = new UILabel(I18n.get("sb.allreset"));
+            info.setTextColor(0xFFFFFFFF);
+            final UIEntity infoEntity = new UIEntity();
+            infoEntity.add(info);
+            infoEntity.setInherits(true);
+            selectionEntity.add(question);
+            selectionEntity.add(infoEntity);
+            final UIEntity buttons = new UIEntity();
+            final UIEntity buttonYes = GuiElements.createButton(I18n.get("btn.yes"), e -> {
+                pop();
+                reset();
+                final UIMenu menu = new UIMenu();
+                menu.setVisible(false);
+                initializeFieldTemplate(
+                        (fieldEntity, name) -> this.tileEdit(fieldEntity, menu, name));
+                lowerEntity.add(menu);
+                resetSelection(entity);
+                this.pageCheck(Page.EDIT);
+                resetAllPathways();
+            });
+            final UIEntity buttonNo = GuiElements.createButton(I18n.get("btn.no"), e -> {
+                pop();
+            });
+            buttons.setInherits(true);
+            final UIBox vbox = new UIBox(UIBox.HBOX, 1);
+            buttons.add(vbox);
+            buttons.add(buttonYes);
+            buttons.add(buttonNo);
+            selectionEntity.add(buttons);
+        });
+        push(screen);
+        pageCheck(Page.CHANGE_MODE);
     }
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
@@ -332,7 +398,8 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(new UIStack());
         lowerEntity.add(new UIScissor());
 
-        final UIEntity plane = new UIEntity();
+        plane = new UIEntity();
+        plane.clearChildren();
         plane.setInheritWidth(true);
         plane.setInheritHeight(true);
         lowerEntity.add(new UIScroll(s -> {
@@ -362,12 +429,15 @@ public class GuiSignalBox extends GuiBase {
                 final UIEntity tile = new UIEntity();
                 tile.setHeight(10);
                 tile.setWidth(10);
-                tile.add(new UIBorder(0xFF7F7F7F, 2));
                 final Point name = new Point(y, x);
-                final SignalBoxNode node = new SignalBoxNode(name);
+                SignalBoxNode node = container.grid.getNode(name);
+                if (node == null) {
+                    node = new SignalBoxNode(name);
+                }
                 final UISignalBoxTile sbt = new UISignalBoxTile(node);
                 tile.add(sbt);
                 consumer.accept(tile, sbt);
+                tile.add(new UIBorder(0xFF7F7F7F, 2));
                 row.add(tile);
             }
             plane.add(row);
@@ -423,13 +493,130 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(new UIBox(UIBox.HBOX, 1));
     }
 
+    private void sendPWRequest(final SignalBoxNode currentNode) {
+        if (!allPacketsRecived)
+            return;
+        final ByteBuffer buffer = ByteBuffer.allocate(5);
+        buffer.put((byte) SignalBoxNetwork.REQUEST_PW.ordinal());
+        buffer.put((byte) lastTile.getNode().getPoint().getX());
+        buffer.put((byte) lastTile.getNode().getPoint().getY());
+        buffer.put((byte) currentNode.getPoint().getX());
+        buffer.put((byte) currentNode.getPoint().getY());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void resetPathwayOnServer(final SignalBoxNode node) {
+        if (!allPacketsRecived)
+            return;
+        final ByteBuffer buffer = ByteBuffer.allocate(3);
+        buffer.put((byte) SignalBoxNetwork.RESET_PW.ordinal());
+        buffer.put((byte) node.getPoint().getX());
+        buffer.put((byte) node.getPoint().getY());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private <T extends BlockPos> void sendPosEntryToServer(final T pos, final SignalBoxNode node,
+            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<T> entry) {
+        if (!allPacketsRecived)
+            return;
+        final ByteBuffer buffer = ByteBuffer.allocate(18);
+        buffer.put((byte) SignalBoxNetwork.SEND_POS_ENTRY.ordinal());
+        buffer.putInt(pos.getX());
+        buffer.putInt(pos.getY());
+        buffer.putInt(pos.getZ());
+        buffer.put((byte) node.getPoint().getX());
+        buffer.put((byte) node.getPoint().getY());
+        buffer.put((byte) mode.ordinal());
+        buffer.put((byte) rotation.ordinal());
+        buffer.put((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+        node.addAndSetEntry(new ModeSet(mode, rotation), entry, pos);
+        container.grid.putNode(node.getPoint(), node);
+    }
+
+    private <T extends Integer> void sendIntEntryToServer(final T speed, final SignalBoxNode node,
+            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<T> entry) {
+        if (speed == 127 || !allPacketsRecived)
+            return;
+        final ByteBuffer buffer = ByteBuffer.allocate(7);
+        buffer.put((byte) SignalBoxNetwork.SEND_INT_ENTRY.ordinal());
+        buffer.put((byte) speed.intValue());
+        buffer.put((byte) node.getPoint().getX());
+        buffer.put((byte) node.getPoint().getY());
+        buffer.put((byte) mode.ordinal());
+        buffer.put((byte) rotation.ordinal());
+        buffer.put((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+        node.addAndSetEntry(new ModeSet(mode, rotation), entry, speed);
+        container.grid.putNode(node.getPoint(), node);
+    }
+
+    private void removeEntryFromServer(final SignalBoxNode node, final EnumGuiMode mode,
+            final Rotation rotation, final PathEntryType<?> entry) {
+        if (!allPacketsRecived)
+            return;
+        final ByteBuffer buffer = ByteBuffer.allocate(6);
+        buffer.put((byte) SignalBoxNetwork.REMOVE_ENTRY.ordinal());
+        buffer.put((byte) node.getPoint().getX());
+        buffer.put((byte) node.getPoint().getY());
+        buffer.put((byte) mode.ordinal());
+        buffer.put((byte) rotation.ordinal());
+        buffer.put((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+        node.getOption(new ModeSet(mode, rotation)).get().removeEntry(entry);
+    }
+
+    private void resetAllPathways() {
+        if (!allPacketsRecived)
+            return;
+        final ByteBuffer buffer = ByteBuffer.allocate(1);
+        buffer.put((byte) SignalBoxNetwork.RESET_ALL_PW.ordinal());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void sendModeChanges() {
+        if (changedModes.isEmpty() || !allPacketsRecived)
+            return;
+        final BufferBuilder buffer = new BufferBuilder();
+        buffer.putByte((byte) SignalBoxNetwork.SEND_CHANGED_MODES.ordinal());
+        buffer.putInt(changedModes.size());
+        changedModes.forEach((point, node) -> {
+            point.writeToBuffer(buffer);
+            node.writeToBuffer(buffer);
+        });
+        changedModes.clear();
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+    }
+
+    private void removeBlockPos(final BlockPos pos, final LinkType type) {
+        if (!allPacketsRecived)
+            return;
+        final ByteBuffer buffer = ByteBuffer.allocate(14);
+        buffer.put((byte) SignalBoxNetwork.REMOVE_POS.ordinal());
+        buffer.put((byte) type.ordinal());
+        buffer.putInt(pos.getX());
+        buffer.putInt(pos.getY());
+        buffer.putInt(pos.getZ());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
     private void reset() {
         this.page = Page.NONE;
         lowerEntity.clear();
     }
 
     private static enum Page {
-        USAGE, EDIT, SETTINGS, TILE_CONFIG, NONE;
+        USAGE, EDIT, SETTINGS, TILE_CONFIG, CHANGE_MODE, NONE;
     }
 
+    @Override
+    public void updateFromContainer() {
+        if (!allPacketsRecived) {
+            initializeBasicUI();
+            allPacketsRecived = true;
+            return;
+        } else if (page.equals(Page.USAGE)) {
+            // TODO add System to update Nodes from Pathway
+        }
+    }
 }
