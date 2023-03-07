@@ -49,6 +49,8 @@ public final class SignalStateHandler implements INetworkSync {
     private static ResourceLocation channelName;
     private static ExecutorService service;
 
+    private SignalStateHandler() {}
+    
     public static void init() {
         channelName = new ResourceLocation(OpenSignalsMain.MODID, "signalstatehandler");
         channel = NetworkRegistry.newEventChannel(channelName, () -> OpenSignalsMain.MODID,
