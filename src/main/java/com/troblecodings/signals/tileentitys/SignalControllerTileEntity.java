@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.linkableapi.ILinkableTile;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.TileEntityInfo;
@@ -20,8 +21,11 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Block;
 
 public class SignalControllerTileEntity extends SyncableTileEntity
         implements ISyncable, ILinkableTile {
@@ -208,10 +212,14 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean link(final BlockPos pos) {
-        final BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof Signal) {
-            this.linkedSignalPosition = pos;
+    public boolean link(final BlockPos pos, final CompoundTag tag) {
+        @SuppressWarnings("deprecation")
+        final Block block = Registry.BLOCK
+                .get(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
+        if (block == null)
+            return false;
+        if (block instanceof Signal) {
+            linkedSignalPosition = pos;
             return true;
         }
         return false;
