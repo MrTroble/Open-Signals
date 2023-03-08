@@ -227,8 +227,8 @@ public class GuiSignalBox extends GuiBase {
                         final ModeSet modeSet = new ModeSet(mode, rotation);
                         for (final SubsidiaryType type : SubsidiaryType.values()) {
                             final String name = type.getNameWrapper();
-                            int defaultValue = container.grid.getSubsidiaryState(node.getPoint(),
-                                    modeSet, type) ? 0 : 1;
+                            final int defaultValue = container.grid
+                                    .getSubsidiaryState(node.getPoint(), modeSet, type) ? 0 : 1;
                             selection.add(GuiElements.createEnumElement(
                                     new SizeIntegerables<>(name, 2, i -> i == 1 ? "false" : "true"),
                                     a -> {
@@ -542,8 +542,8 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private <T extends BlockPos> void sendPosEntryToServer(final T pos, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<T> entry) {
+    private void sendPosEntryToServer(final BlockPos pos, final SignalBoxNode node,
+            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<BlockPos> entry) {
         if (!allPacketsRecived)
             return;
         final ByteBuffer buffer = ByteBuffer.allocate(18);
@@ -561,13 +561,13 @@ public class GuiSignalBox extends GuiBase {
         container.grid.putNode(node.getPoint(), node);
     }
 
-    private <T extends Integer> void sendIntEntryToServer(final T speed, final SignalBoxNode node,
-            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<T> entry) {
+    private void sendIntEntryToServer(final int speed, final SignalBoxNode node,
+            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<Integer> entry) {
         if (speed == 127 || !allPacketsRecived)
             return;
         final ByteBuffer buffer = ByteBuffer.allocate(7);
         buffer.put((byte) SignalBoxNetwork.SEND_INT_ENTRY.ordinal());
-        buffer.put((byte) speed.intValue());
+        buffer.put((byte) speed);
         buffer.put((byte) node.getPoint().getX());
         buffer.put((byte) node.getPoint().getY());
         buffer.put((byte) mode.ordinal());
