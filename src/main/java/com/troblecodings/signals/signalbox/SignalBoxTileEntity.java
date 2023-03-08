@@ -50,6 +50,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     public void removeLinkedPos(final BlockPos pos) {
+        if (level.isClientSide)
+            return;
         linkedBlocks.remove(pos);
     }
 
@@ -68,6 +70,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
         linkedBlocks.clear();
+        signals.clear();
         wrapper.getList(LINKED_POS_LIST)
                 .forEach(nbt -> linkedBlocks.put(nbt.getAsPos(), LinkType.of(nbt)));
         grid.read(wrapper.getWrapper(GUI_TAG));
@@ -83,7 +86,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean link(final BlockPos linkedPos) {
-        if (linkedBlocks.containsKey(linkedPos) || level.isClientSide)
+        if (linkedBlocks.containsKey(linkedPos))
             return false;
         final BlockState state = level.getBlockState(linkedPos);
         final Block block = state.getBlock();
@@ -105,10 +108,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public void onLoad() {
         if (level.isClientSide) {
-            signals.clear();
             return;
         }
-        grid.setWorldAndPos(level, worldPosition);
+        grid.setTile(this);
         final Optional<LinkedList<RedstonePacket>> updates = SignalBoxHandler
                 .getPacket(worldPosition);
         if (!updates.isPresent()) {

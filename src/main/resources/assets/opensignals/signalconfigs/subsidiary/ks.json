@@ -1,0 +1,9 @@
+{
+    "currentSignal": "kssignal",
+    "zs1Values" : [
+        "kombisignal.KS_ZS1"
+    ],
+    "zs7Values": [
+        "kombisignal.KS_ZS7"
+    ]
+}

@@ -13,9 +13,11 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.enums.SubsidiaryType;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -43,6 +45,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private final GuiInfo info;
     protected SignalBoxGrid grid;
     private Consumer<String> run;
+    protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -84,6 +87,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             }
             grid = tile.getSignalBoxGrid();
             grid.readNetwork(buf);
+            enabledSubsidiaryTypes = grid.getAllSubsidiaries();
             final int size = buf.getInt();
             final Map<BlockPos, LinkType> allPos = new HashMap<>();
             for (int i = 0; i < size; i++) {
@@ -159,7 +163,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             return;
         }
         if (mode.equals(SignalBoxNetwork.SEND_CHANGED_MODES)) {
-            tile.getSignalBoxGrid().readNetwork(buf);
+            tile.getSignalBoxGrid().readUpdateNetwork(buf);
+            return;
+        }
+        if (mode.equals(SignalBoxNetwork.REQUEST_SUBSIDIARY)) {
+            final SubsidiaryType type = SubsidiaryType.of(buf);
+            final boolean state = buf.get() == 1 ? true : false;
+            final Point point = new Point(buf);
+            final ModeSet modeSet = new ModeSet(buf);
+            tile.getSignalBoxGrid().updateSubsidiarySignal(state, modeSet, point, type);
             return;
         }
     }

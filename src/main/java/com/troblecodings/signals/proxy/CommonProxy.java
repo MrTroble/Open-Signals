@@ -13,6 +13,7 @@ import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.contentpacks.ChangeConfigParser;
 import com.troblecodings.signals.contentpacks.DefaultConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
+import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.guis.ContainerPlacementtool;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
@@ -50,5 +51,6 @@ public class CommonProxy {
         OneSignalConfigParser.loadOneSignalConfigs();
         ChangeConfigParser.loadChangeConfigs();
         DefaultConfigParser.loadDefaultConfigs();
+        SubsidiarySignalParser.loadAllSubsidiarySignals();
     }
 }
