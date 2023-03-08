@@ -31,6 +31,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public static final String REMOVE_SIGNAL = "removeSignal";
 
     private static final String LINKED_POS_LIST = "linkedPos";
+    private static final String LINKED_SIGNALS = "linkedSignals";
+    private static final String SIGNAL_NAME = "signalName";
 
     private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
     private final Map<BlockPos, Signal> signals = new HashMap<>();
@@ -62,6 +64,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             entry.getValue().write(item);
             return item;
         })::iterator);
+        wrapper.putList(LINKED_SIGNALS, signals.entrySet().stream().map(entry -> {
+            final NBTWrapper signal = NBTWrapper.getBlockPosWrapper(entry.getKey());
+            signal.putString(SIGNAL_NAME, entry.getValue().getSignalTypeName());
+            return signal;
+        })::iterator);
         final NBTWrapper gridTag = new NBTWrapper();
         this.grid.write(gridTag);
         wrapper.putWrapper(GUI_TAG, gridTag);
@@ -73,6 +80,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         signals.clear();
         wrapper.getList(LINKED_POS_LIST)
                 .forEach(nbt -> linkedBlocks.put(nbt.getAsPos(), LinkType.of(nbt)));
+        wrapper.getList(LINKED_SIGNALS).forEach(
+                nbt -> signals.put(nbt.getAsPos(), Signal.SIGNALS.get(nbt.getString(SIGNAL_NAME))));
         grid.read(wrapper.getWrapper(GUI_TAG));
         if (level != null) {
             onLoad();

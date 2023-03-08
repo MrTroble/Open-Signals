@@ -359,6 +359,7 @@ public class SignalBoxGrid implements INetworkSavable {
                 return;
             SignalConfig.reset(new SignalStateInfo(tile.getLevel(), pos.get(), signal));
             final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
+            states.remove(mode);
             if (states.isEmpty()) {
                 enabledSubsidiaryTypes.remove(point);
             }
