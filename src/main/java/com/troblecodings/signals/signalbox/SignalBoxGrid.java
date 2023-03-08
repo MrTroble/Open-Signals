@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.core.BufferBuilder;
@@ -376,12 +377,10 @@ public class SignalBoxGrid implements INetworkSavable {
             return;
         final SignalStateInfo info = new SignalStateInfo(tile.getLevel(), pos.get(), signal);
         SignalConfig.reset(info);
-        SignalStateHandler.getStates(info).keySet().forEach(property -> {
-            if (!properties.values.containsKey(property)) {
-                properties.values.remove(property);
-            }
-        });
-        SignalStateHandler.setStates(info, properties.values);
+        final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(info);
+        SignalStateHandler.setStates(info, properties.values.entrySet().stream()
+                .filter(entry -> oldProperties.containsKey(entry.getKey()))
+                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
         states.put(mode, new SubsidiaryEntry(type, state));
         enabledSubsidiaryTypes.put(point, states);
     }

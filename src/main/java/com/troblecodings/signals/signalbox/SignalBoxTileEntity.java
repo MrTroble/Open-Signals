@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.linkableapi.ILinkableTile;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RedstonePacket;
 import com.troblecodings.signals.core.TileEntityInfo;
@@ -18,12 +19,16 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
+import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
@@ -94,11 +99,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public boolean link(final BlockPos linkedPos) {
-        if (linkedBlocks.containsKey(linkedPos))
+    public boolean link(final BlockPos pos, final CompoundTag tag) {
+        if (linkedBlocks.containsKey(pos))
             return false;
-        final BlockState state = level.getBlockState(linkedPos);
-        final Block block = state.getBlock();
+        @SuppressWarnings("deprecation")
+        final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
+                tag.getString(SignalControllerTileEntity.SIGNAL_NAME)));
+        if (block == null || block instanceof AirBlock)
+            return false;
         LinkType type = LinkType.SIGNAL;
         if (block == OSBlocks.REDSTONE_IN) {
             type = LinkType.INPUT;
@@ -106,11 +114,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             type = LinkType.OUTPUT;
         }
         if (type.equals(LinkType.SIGNAL)) {
-            SignalConfig.reset(new SignalStateInfo(level, linkedPos, (Signal) block));
-            signals.put(linkedPos, (Signal) block);
+            SignalConfig.reset(new SignalStateInfo(level, pos, (Signal) block));
+            signals.put(pos, (Signal) block);
         }
-        linkedBlocks.put(linkedPos, type);
-        this.syncClient();
+        linkedBlocks.put(pos, type);
         return true;
     }
 
