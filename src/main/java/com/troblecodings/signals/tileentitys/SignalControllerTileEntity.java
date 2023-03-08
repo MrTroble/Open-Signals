@@ -242,10 +242,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
                 continue;
             }
             final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition, signal);
-            final Map<SEProperty, String> properties = new HashMap<>(
-                    SignalStateHandler.getStates(info));
-            properties.putAll(this.allStates.get(profile));
-            SignalStateHandler.setStates(info, properties);
+            SignalStateHandler.setStates(info, allStates.get(profile));
         }
     }
 

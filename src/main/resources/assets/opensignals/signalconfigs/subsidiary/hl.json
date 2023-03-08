@@ -1,0 +1,7 @@
+{
+    "currentSignal" : "hlsignal",
+    "zs1Values": [
+        "mainlightsignal.HL_ZS1",
+        "exitsignal.HL_ZS1"
+    ]
+}
