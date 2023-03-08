@@ -49,8 +49,9 @@ public final class SignalStateHandler implements INetworkSync {
     private static ResourceLocation channelName;
     private static ExecutorService service;
 
-    private SignalStateHandler() {}
-    
+    private SignalStateHandler() {
+    }
+
     public static void init() {
         channelName = new ResourceLocation(OpenSignalsMain.MODID, "signalstatehandler");
         channel = NetworkRegistry.newEventChannel(channelName, () -> OpenSignalsMain.MODID,
@@ -291,7 +292,11 @@ public final class SignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.remove(info);
         }
         service.execute(() -> {
-            // TODO remove from Files
+            SignalStateFile file;
+            synchronized (ALL_LEVEL_FILES) {
+                file = ALL_LEVEL_FILES.get(info.world);
+            }
+            file.deleteIndex(info.pos);
         });
     }
 

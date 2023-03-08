@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -124,4 +125,30 @@ public class StateFileTest {
         assertArrayEquals(buffer.array(), outbuffer2.array());
     }
 
+    @Test
+    public void testDelete() {
+        final SignalStateFile file = new SignalStateFile(path);
+        final BlockPos first = GIRSyncEntryTests.randomBlockPos();
+        final SignalStatePos posInFile = file.create(first);
+
+        final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
+        buffer.array()[0] = (byte) 0xFF;
+        buffer.array()[255] = (byte) 0x0F;
+        file.write(posInFile, buffer);
+
+        final SignalStatePos posToFind = file.find(first);
+
+        assertEquals(posInFile, posToFind);
+        file.deleteIndex(first);
+        assertNull(file.find(first));
+
+        final SignalStatePos secondPos = file.create(first);
+        file.write(secondPos, buffer);
+
+        final SignalStatePos secondPosToFind = file.find(first);
+
+        assertEquals(secondPos, secondPosToFind);
+        file.deleteIndex(first);
+        assertNull(file.find(first));
+    }
 }

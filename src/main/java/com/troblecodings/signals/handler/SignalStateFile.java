@@ -69,10 +69,31 @@ public class SignalStateFile {
 
     @Nullable
     public synchronized SignalStatePos find(final BlockPos pos) {
+        return (SignalStatePos) internalFind(pos,
+                (stream, blockPos, offset, file) -> new SignalStatePos(file, offset), "r");
+    }
+
+    public synchronized void deleteIndex(final BlockPos pos) {
+        internalFind(pos, (stream, blockPos, offset, file) -> {
+            try {
+                final long pointer = stream.getFilePointer();
+                stream.seek(pointer - 16);
+                stream.writeLong(0);
+                stream.writeLong(0);
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }, "rw");
+    }
+
+    @Nullable
+    private synchronized Object internalFind(final BlockPos pos, final InternalFunction function,
+            final String access) {
         try {
             nextFile: for (int counter = 0; counter < pathCache.size(); counter++) {
                 final Path next = pathCache.get(counter);
-                try (RandomAccessFile stream = new RandomAccessFile(next.toFile(), "r")) {
+                try (RandomAccessFile stream = new RandomAccessFile(next.toFile(), access)) {
                     final byte[] header = new byte[HEADER_SIZE];
                     stream.read(header);
                     if (header[0] != HEADER_VERSION)
@@ -93,7 +114,7 @@ public class SignalStateFile {
                         if (currentOffset == hashOffset)
                             continue nextFile; // Nothing found
                     } while (!pos.equals(currenPosition));
-                    return new SignalStatePos(counter, offset);
+                    return function.apply(stream, currenPosition, offset, counter);
                 }
             }
         } catch (final IOException exception) {
@@ -186,6 +207,12 @@ public class SignalStateFile {
             return false;
         final SignalStateFile other = (SignalStateFile) obj;
         return Objects.equals(path, other.path);
+    }
+
+    @FunctionalInterface
+    public interface InternalFunction {
+        public Object apply(final RandomAccessFile stream, final BlockPos pos, final long offset,
+                final int file);
     }
 
 }
