@@ -1,9 +1,12 @@
 {
     "currentSignal": "kssignal",
     "zs1Values" : [
-        "kombisignal.KS_ZS1"
+        "kombisignal.KS_ZS1", "kombisignal_main.KS_ZS1"
     ],
     "zs7Values": [
-        "kombisignal.KS_ZS7"
+        "kombisignal.KS_ZS7", "kombisignal_main.KS_ZS7"
+    ],
+    "zs8Values": [
+        "zs2.ZS8"
     ]
 }
