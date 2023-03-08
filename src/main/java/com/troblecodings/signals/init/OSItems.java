@@ -5,12 +5,14 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.linkableapi.Linkingtool;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.ItemArmorTemplate;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.items.ToolParser;
+import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -33,6 +35,10 @@ public final class OSItems {
         final Block block = state.getBlock();
         return block == OSBlocks.REDSTONE_IN || block == OSBlocks.REDSTONE_OUT
                 || (block instanceof Signal && ((Signal) block).canBeLinked());
+    }, _u -> true, (level, pos, tag) -> {
+        final BlockState state = level.getBlockState(pos);
+        new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
+                state.getBlock().getRegistryName().getPath());
     });
     public static final Item CONDUCTOR_TROWEL_GREEN = new Item(
             new Properties().tab(CreativeModeTab.TAB_COMBAT));

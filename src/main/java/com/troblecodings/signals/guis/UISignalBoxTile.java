@@ -61,7 +61,7 @@ public class UISignalBoxTile extends UIComponentEntity {
             e.update();
         });
     }
-    
+
     @Override
     public void updateEvent(final UpdateEvent event) {
         super.updateEvent(event);

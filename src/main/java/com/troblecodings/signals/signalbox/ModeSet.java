@@ -1,7 +1,6 @@
 package com.troblecodings.signals.signalbox;
 
 import java.nio.ByteBuffer;
-import java.util.List;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
@@ -76,7 +75,7 @@ public class ModeSet implements INetworkSavable {
     }
 
     @Override
-    public void writeNetwork(ByteBuffer buffer) {
+    public void writeNetwork(final ByteBuffer buffer) {
         buffer.put((byte) mode.ordinal());
         buffer.put((byte) rotation.ordinal());
     }

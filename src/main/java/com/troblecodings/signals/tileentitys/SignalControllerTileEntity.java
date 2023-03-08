@@ -41,6 +41,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public static final String ALLSTATES = "allstates";
     public static final String LAST_PROFILE = "lastprofile";
     public static final String ENUM_MODE = "enummode";
+    public static final String SIGNAL_NAME = "signalname";
 
     public SignalControllerTileEntity(final TileEntityInfo info) {
         super(info);
