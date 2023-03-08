@@ -38,7 +38,7 @@ public final class OSItems {
     }, _u -> true, (level, pos, tag) -> {
         final BlockState state = level.getBlockState(pos);
         new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
-                ((Signal)state.getBlock()).getSignalTypeName());
+                state.getBlock().getRegistryName().getPath());
     });
     public static final Item CONDUCTOR_TROWEL_GREEN = new Item(
             new Properties().tab(CreativeModeTab.TAB_COMBAT));
