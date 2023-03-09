@@ -7,7 +7,7 @@ import com.troblecodings.signals.core.BufferBuilder;
 
 public enum SubsidiaryType implements NamableWrapper {
 
-    ZS1("zs1"), ZS7("zs7"), ZS8("zs8");
+    ZS1("zs1"), ZS7("zs7"), ZS8("zs8"), ZP9("zp9");
 
     private final String name;
 

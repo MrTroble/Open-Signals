@@ -72,6 +72,7 @@ public class SignalBoxGrid implements INetworkSavable {
             OpenSignalsMain.log.warn("Signalboxpath is null, this should not be the case!");
             return;
         }
+
         resetPathway(pathway);
         updateToNet(pathway);
     }
@@ -82,16 +83,12 @@ public class SignalBoxGrid implements INetworkSavable {
         updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
+        enabledSubsidiaryTypes.remove(pathway.getFirstPoint());
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
         if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
             return false;
-        if (enabledSubsidiaryTypes.containsKey(p1)) {
-            OpenSignalsMain.getLogger()
-                    .warn("Pathway can't not be set because subsidiary Signals are enabled!");
-            return false;
-        }
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
             way.setWorld(tile.getLevel());
@@ -271,6 +268,7 @@ public class SignalBoxGrid implements INetworkSavable {
 
     @Override
     public void readNetwork(final ByteBuffer buffer) {
+        enabledSubsidiaryTypes.clear();
         final int size = buffer.getInt();
         for (int i = 0; i < size; i++) {
             final Point point = new Point(buffer);
@@ -343,11 +341,6 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public void updateSubsidiarySignal(final boolean state, final ModeSet mode, final Point point,
             final SubsidiaryType type) {
-        if (startsToPath.containsKey(point)) {
-            OpenSignalsMain.getLogger().warn(
-                    "Signal at Node [" + point + "] can't be set because it is part of a pathway!");
-            return;
-        }
         final SignalBoxNode node = modeGrid.get(point);
         if (node == null)
             return;
@@ -376,7 +369,6 @@ public class SignalBoxGrid implements INetworkSavable {
         if (properties == null)
             return;
         final SignalStateInfo info = new SignalStateInfo(tile.getLevel(), pos.get(), signal);
-        SignalConfig.reset(info);
         final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(info);
         SignalStateHandler.setStates(info, properties.values.entrySet().stream()
                 .filter(entry -> oldProperties.containsKey(entry.getKey()))

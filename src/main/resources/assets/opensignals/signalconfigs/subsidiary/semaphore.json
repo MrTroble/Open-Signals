@@ -1,6 +1,6 @@
 {
     "currentSignal": "semaphoresignal",
-    "zs1Values" : [
+    "zs1Values": [
         "zs1.TRUE"
     ],
     "zs7Values": [
@@ -8,5 +8,8 @@
     ],
     "zs8Values": [
         "zs3.ZS8"
+    ],
+    "zp9Values": [
+        "zs3.ZP9"
     ]
 }

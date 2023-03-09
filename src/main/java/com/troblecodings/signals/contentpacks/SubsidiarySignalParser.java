@@ -18,6 +18,7 @@ public class SubsidiarySignalParser {
     private List<String> zs1Values;
     private List<String> zs7Values;
     private List<String> zs8Values;
+    private List<String> zp9Values;
 
     public String getCurrentSignal() {
         return currentSignal;
@@ -33,6 +34,10 @@ public class SubsidiarySignalParser {
 
     public List<String> getZs8Values() {
         return zs8Values;
+    }
+
+    public List<String> getZp9Values() {
+        return zp9Values;
     }
 
     public static transient final Map<Signal, Map<SubsidiaryType, ConfigProperty>> SUBSIDIARY_SIGNALS = new HashMap<>();
@@ -54,6 +59,7 @@ public class SubsidiarySignalParser {
             convertToProperites(signal, info, parser.getZs1Values(), SubsidiaryType.ZS1);
             convertToProperites(signal, info, parser.getZs7Values(), SubsidiaryType.ZS7);
             convertToProperites(signal, info, parser.getZs8Values(), SubsidiaryType.ZS8);
+            convertToProperites(signal, info, parser.getZp9Values(), SubsidiaryType.ZP9);
         });
     }
 
