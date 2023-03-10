@@ -99,6 +99,11 @@ public class Point implements INetworkSavable {
         buffer.put((byte) y);
     }
 
+    public void writeBufferNetwork(final BufferBuilder buffer) {
+        buffer.putByte((byte) x);
+        buffer.putByte((byte) y);
+    }
+
     public void writeToBuffer(final BufferBuilder buffer) {
         buffer.putByte((byte) x);
         buffer.putByte((byte) y);

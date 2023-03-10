@@ -79,4 +79,9 @@ public class ModeSet implements INetworkSavable {
         buffer.put((byte) mode.ordinal());
         buffer.put((byte) rotation.ordinal());
     }
+
+    public void writeBufferNetwork(final BufferBuilder buffer) {
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+    }
 }

@@ -1,26 +1,42 @@
 package com.troblecodings.signals.core;
 
+import java.nio.ByteBuffer;
 import java.util.Objects;
-
-import com.troblecodings.signals.enums.SubsidiaryType;
 
 public class SubsidiaryEntry {
 
-    public final SubsidiaryType type;
-    public final boolean state;
+    public SubsidiaryState enumValue;
+    public boolean state;
 
-    public SubsidiaryEntry(final SubsidiaryType type, final boolean state) {
-        this.type = type;
+    public SubsidiaryEntry(final SubsidiaryState enumValue, final boolean state) {
         this.state = state;
+        this.enumValue = enumValue;
+    }
+
+    private SubsidiaryEntry() {
+        state = false;
+        enumValue = null;
+    }
+
+    public void writeNetwork(final BufferBuilder buffer) {
+        enumValue.writeNetwork(buffer);
+        buffer.putByte((byte) (state ? 1 : 0));
+    }
+
+    public static SubsidiaryEntry of(final ByteBuffer buffer) {
+        final SubsidiaryEntry entry = new SubsidiaryEntry();
+        entry.enumValue = SubsidiaryState.of(buffer);
+        entry.state = buffer.get() == 1 ? true : false;
+        return entry;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(state, type);
+        return Objects.hash(enumValue, state);
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
@@ -28,7 +44,6 @@ public class SubsidiaryEntry {
         if (getClass() != obj.getClass())
             return false;
         SubsidiaryEntry other = (SubsidiaryEntry) obj;
-        return state == other.state && type == other.type;
+        return Objects.equals(enumValue, other.enumValue) && state == other.state;
     }
-
 }
