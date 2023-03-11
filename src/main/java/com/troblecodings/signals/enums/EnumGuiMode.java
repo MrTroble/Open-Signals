@@ -35,7 +35,7 @@ public enum EnumGuiMode {
     }
 
     public static EnumGuiMode of(final ByteBuffer buffer) {
-        return EnumGuiMode.values()[buffer.get()];
+        return EnumGuiMode.values()[Byte.toUnsignedInt(buffer.get())];
     }
 
 }
