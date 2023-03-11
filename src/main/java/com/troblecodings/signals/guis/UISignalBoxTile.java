@@ -6,7 +6,6 @@ import java.util.Map;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.UpdateEvent;
-import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -42,8 +41,6 @@ public class UISignalBoxTile extends UIComponentEntity {
     private void localAdd(final ModeSet modeSet) {
         final UIEntity entity = new UIEntity();
         if (!modeSet.rotation.equals(Rotation.NONE)) {
-            final UIIndependentTranslate translate = new UIIndependentTranslate(parent.getWidth() / 2.0f, parent.getWidth() / 2.0f, 0);
-            entity.add(translate);
             final UIRotate rotation = new UIRotate();
             rotation.setRotateZ(modeSet.rotation.ordinal() * ((float)Math.PI/2.0f));
             entity.add(rotation);
