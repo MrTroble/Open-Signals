@@ -17,7 +17,6 @@ import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
-import com.troblecodings.signals.enums.SubsidiaryType;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -167,11 +166,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             return;
         }
         if (mode.equals(SignalBoxNetwork.REQUEST_SUBSIDIARY)) {
-            final SubsidiaryType type = SubsidiaryType.of(buf);
-            final boolean state = buf.get() == 1 ? true : false;
+            final SubsidiaryEntry entry = SubsidiaryEntry.of(buf);
             final Point point = new Point(buf);
             final ModeSet modeSet = new ModeSet(buf);
-            tile.getSignalBoxGrid().updateSubsidiarySignal(state, modeSet, point, type);
+            tile.getSignalBoxGrid().updateSubsidiarySignal(point, modeSet, entry);
             return;
         }
     }

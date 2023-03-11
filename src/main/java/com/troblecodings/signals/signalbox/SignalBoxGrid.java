@@ -20,10 +20,10 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.core.SubsidiaryEntry;
+import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
-import com.troblecodings.signals.enums.SubsidiaryType;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.properties.ConfigProperty;
@@ -72,6 +72,7 @@ public class SignalBoxGrid implements INetworkSavable {
             OpenSignalsMain.log.warn("Signalboxpath is null, this should not be the case!");
             return;
         }
+
         resetPathway(pathway);
         updateToNet(pathway);
     }
@@ -82,16 +83,12 @@ public class SignalBoxGrid implements INetworkSavable {
         updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
+        enabledSubsidiaryTypes.remove(pathway.getFirstPoint());
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
         if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
             return false;
-        if (enabledSubsidiaryTypes.containsKey(p1)) {
-            OpenSignalsMain.getLogger()
-                    .warn("Pathway can't not be set because subsidiary Signals are enabled!");
-            return false;
-        }
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
             way.setWorld(tile.getLevel());
@@ -271,6 +268,7 @@ public class SignalBoxGrid implements INetworkSavable {
 
     @Override
     public void readNetwork(final ByteBuffer buffer) {
+        enabledSubsidiaryTypes.clear();
         final int size = buffer.getInt();
         for (int i = 0; i < size; i++) {
             final Point point = new Point(buffer);
@@ -282,9 +280,8 @@ public class SignalBoxGrid implements INetworkSavable {
                     final Map<ModeSet, SubsidiaryEntry> allTypes = enabledSubsidiaryTypes
                             .computeIfAbsent(point, _u -> new HashMap<>());
                     final ModeSet mode = new ModeSet(buffer);
-                    final SubsidiaryType type = SubsidiaryType.of(buffer);
-                    final boolean state = buffer.get() == 1 ? true : false;
-                    allTypes.put(mode, new SubsidiaryEntry(type, state));
+                    final SubsidiaryEntry type = SubsidiaryEntry.of(buffer);
+                    allTypes.put(mode, type);
                     enabledSubsidiaryTypes.put(point, allTypes);
                 }
             }
@@ -321,8 +318,7 @@ public class SignalBoxGrid implements INetworkSavable {
                 buffer.putByte((byte) enabledSubsidiaries.size());
                 enabledSubsidiaries.forEach((mode, state) -> {
                     mode.writeToBuffer(buffer);
-                    state.type.writeNetwork(buffer);
-                    buffer.putByte((byte) (state.state ? 1 : 0));
+                    state.writeNetwork(buffer);
                 });
             }
             node.writeToBuffer(buffer);
@@ -341,13 +337,8 @@ public class SignalBoxGrid implements INetworkSavable {
     public void writeNetwork(final ByteBuffer buffer) {
     }
 
-    public void updateSubsidiarySignal(final boolean state, final ModeSet mode, final Point point,
-            final SubsidiaryType type) {
-        if (startsToPath.containsKey(point)) {
-            OpenSignalsMain.getLogger().warn(
-                    "Signal at Node [" + point + "] can't be set because it is part of a pathway!");
-            return;
-        }
+    public void updateSubsidiarySignal(final Point point, final ModeSet mode,
+            final SubsidiaryEntry entry) {
         final SignalBoxNode node = modeGrid.get(point);
         if (node == null)
             return;
@@ -355,7 +346,7 @@ public class SignalBoxGrid implements INetworkSavable {
         if (pos.isEmpty())
             return;
         final Signal signal = tile.getSignal(pos.get());
-        if (!state) {
+        if (!entry.state) {
             if (!enabledSubsidiaryTypes.containsKey(point))
                 return;
             SignalConfig.reset(new SignalStateInfo(tile.getLevel(), pos.get(), signal));
@@ -368,41 +359,43 @@ public class SignalBoxGrid implements INetworkSavable {
         }
         final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.computeIfAbsent(point,
                 _u -> new HashMap<>());
-        final Map<SubsidiaryType, ConfigProperty> configs = SubsidiarySignalParser.SUBSIDIARY_SIGNALS
+        final Map<SubsidiaryState, ConfigProperty> configs = SubsidiarySignalParser.SUBSIDIARY_SIGNALS
                 .get(signal);
         if (configs == null)
             return;
-        final ConfigProperty properties = configs.get(type);
+        final ConfigProperty properties = configs.get(entry.enumValue);
         if (properties == null)
             return;
         final SignalStateInfo info = new SignalStateInfo(tile.getLevel(), pos.get(), signal);
-        SignalConfig.reset(info);
         final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(info);
         SignalStateHandler.setStates(info, properties.values.entrySet().stream()
-                .filter(entry -> oldProperties.containsKey(entry.getKey()))
+                .filter(propertyEntry -> oldProperties.containsKey(propertyEntry.getKey()))
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
-        states.put(mode, new SubsidiaryEntry(type, state));
+        states.put(mode, entry);
         enabledSubsidiaryTypes.put(point, states);
     }
 
     public boolean getSubsidiaryState(final Point point, final ModeSet mode,
-            final SubsidiaryType type) {
+            final SubsidiaryState type) {
         final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
         if (states == null)
             return false;
         final SubsidiaryEntry entry = states.get(mode);
         if (entry == null)
             return false;
-        if (entry.type.equals(type))
+        if (entry.enumValue.equals(type))
             return entry.state;
         return false;
     }
 
-    public void setClientState(final Point point, final ModeSet mode, final boolean state,
-            final SubsidiaryType type) {
+    public void setClientState(final Point point, final ModeSet mode, final SubsidiaryEntry entry) {
+        if (!entry.state) {
+            enabledSubsidiaryTypes.remove(point);
+            return;
+        }
         final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.computeIfAbsent(point,
                 _u -> new HashMap<>());
-        states.put(mode, new SubsidiaryEntry(type, state));
+        states.put(mode, entry);
         enabledSubsidiaryTypes.put(point, states);
     }
 

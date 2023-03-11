@@ -1,12 +1,17 @@
 {
-    "currentSignal" : "hlsignal",
-    "zs1Values": [
-        "mainlightsignal.HL_ZS1",
-        "exitsignal.HL_ZS1",
-        "blocksignal.HL_ZS1",
-        "blockexitsignal.HL_ZS1"
-    ],
-    "zs8Values": [
-        "zs2.ZS8"
-    ]
+    "currentSignal": "hlsignal",
+    "allStates": {
+        "ZS1": [
+            "mainlightsignal.HL_ZS1",
+            "exitsignal.HL_ZS1",
+            "blocksignal.HL_ZS1",
+            "blockexitsignal.HL_ZS1"
+        ],
+        "ZS8": [
+            "zs2.ZS8"
+        ],
+        "ZP9": [
+            "zs2.ZP9"
+        ]
+    }
 }

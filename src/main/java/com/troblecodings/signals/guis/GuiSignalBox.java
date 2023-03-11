@@ -33,11 +33,12 @@ import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.SubsidiaryEntry;
+import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
-import com.troblecodings.signals.enums.SubsidiaryType;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -225,20 +226,19 @@ public class GuiSignalBox extends GuiBase {
                             pop();
                         }));
                         final ModeSet modeSet = new ModeSet(mode, rotation);
-                        for (final SubsidiaryType type : SubsidiaryType.values()) {
-                            final String name = type.getNameWrapper();
+                        SubsidiaryState.ALL_STATES.forEach(state -> {
                             final int defaultValue = container.grid
-                                    .getSubsidiaryState(node.getPoint(), modeSet, type) ? 0 : 1;
-                            selection.add(GuiElements.createEnumElement(
-                                    new SizeIntegerables<>(name, 2, i -> i == 1 ? "false" : "true"),
-                                    a -> {
-                                        sendSubsidiaryRequest(type, a == 0 ? true : false, node,
-                                                modeSet);
+                                    .getSubsidiaryState(node.getPoint(), modeSet, state) ? 0 : 1;
+                            selection.add(GuiElements.createEnumElement(new SizeIntegerables<>(
+                                    state.getName(), 2, i -> i == 1 ? "false" : "true"), a -> {
+                                        final SubsidiaryEntry entry = new SubsidiaryEntry(state,
+                                                a == 0 ? true : false);
+                                        sendSubsidiaryRequest(entry, node, modeSet);
                                         container.grid.setClientState(node.getPoint(), modeSet,
-                                                a == 0 ? true : false, type);
+                                                entry);
                                         pop();
                                     }, defaultValue));
-                        }
+                        });
                     });
                     push(screen);
                 }));
@@ -627,17 +627,16 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void sendSubsidiaryRequest(final SubsidiaryType type, final boolean state,
-            final SignalBoxNode node, final ModeSet mode) {
+    private void sendSubsidiaryRequest(final SubsidiaryEntry entry, final SignalBoxNode node,
+            final ModeSet mode) {
         if (!allPacketsRecived)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(7);
-        buffer.put((byte) SignalBoxNetwork.REQUEST_SUBSIDIARY.ordinal());
-        buffer.put((byte) type.ordinal());
-        buffer.put((byte) (state ? 1 : 0));
-        node.getPoint().writeNetwork(buffer);
-        mode.writeNetwork(buffer);
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final BufferBuilder buffer = new BufferBuilder();
+        buffer.putByte((byte) SignalBoxNetwork.REQUEST_SUBSIDIARY.ordinal());
+        entry.writeNetwork(buffer);
+        node.getPoint().writeBufferNetwork(buffer);
+        mode.writeBufferNetwork(buffer);
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
     private void reset() {
