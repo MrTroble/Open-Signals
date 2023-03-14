@@ -1,17 +1,13 @@
 package com.troblecodings.signals.signalbox;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Optional;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.linkableapi.ILinkableTile;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.RedstonePacket;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
@@ -19,13 +15,10 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
-import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.AirBlock;
 import net.minecraft.world.level.block.Block;
@@ -45,7 +38,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     public SignalBoxTileEntity(final TileEntityInfo info) {
         super(info);
-        grid = SignalBoxFactory.getFactory().getGrid(this::sendToAll);
+        grid = SignalBoxFactory.getFactory().getGrid();
     }
 
     private final WorldOperations worldLoadOps = new WorldOperations();
@@ -76,8 +69,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         })::iterator);
         final NBTWrapper gridTag = new NBTWrapper();
         this.grid.write(gridTag);
+        SignalBoxHandler.writeToNBT(worldPosition, gridTag);
         wrapper.putWrapper(GUI_TAG, gridTag);
     }
+
+    private NBTWrapper copy = null;
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
@@ -85,9 +81,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         signals.clear();
         wrapper.getList(LINKED_POS_LIST)
                 .forEach(nbt -> linkedBlocks.put(nbt.getAsPos(), LinkType.of(nbt)));
-        wrapper.getList(LINKED_SIGNALS).forEach(
-                nbt -> signals.put(nbt.getAsPos(), Signal.SIGNALS.get(nbt.getString(SIGNAL_NAME))));
+        wrapper.getList(LINKED_SIGNALS).forEach(nbt -> {
+            final BlockPos pos = nbt.getAsPos();
+            final Signal signal = Signal.SIGNALS.get(nbt.getString(SIGNAL_NAME));
+            signals.put(pos, signal);
+        });
         grid.read(wrapper.getWrapper(GUI_TAG));
+        copy = wrapper.copy();
         if (level != null) {
             onLoad();
         }
@@ -99,12 +99,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public boolean link(final BlockPos pos, final CompoundTag tag) {
+    public boolean link(final BlockPos pos) {
         if (linkedBlocks.containsKey(pos))
             return false;
-        @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
-                tag.getString(SignalControllerTileEntity.SIGNAL_NAME)));
+        final Block block = level.getBlockState(pos).getBlock();
         if (block == null || block instanceof AirBlock)
             return false;
         LinkType type = LinkType.SIGNAL;
@@ -119,6 +117,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         }
         linkedBlocks.put(pos, type);
         return true;
+
+    }
+
+    @Override
+    public boolean link(final BlockPos pos, final CompoundTag tag) {
+        return link(pos);
     }
 
     @Override
@@ -127,17 +131,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             return;
         }
         grid.setTile(this);
-        final Optional<LinkedList<RedstonePacket>> updates = SignalBoxHandler
-                .getPacket(worldPosition);
-        if (!updates.isPresent()) {
-            return;
-        }
-        RedstonePacket packet;
-        while ((packet = updates.get().poll()) != null) {
-            if (packet.world.equals(level)) {
-                updateRedstonInput(packet.pos, packet.state);
-            }
-        }
+        final GridComponent component = SignalBoxHandler.computeIfAbsent(worldPosition, level);
+        component.read(copy == null ? new NBTWrapper() : copy, grid.getModeGrid());
     }
 
     @Override
@@ -158,13 +153,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     public Map<BlockPos, LinkType> getPositions() {
         return ImmutableMap.copyOf(this.linkedBlocks);
-    }
-
-    public void updateRedstonInput(final BlockPos pos, final boolean power) {
-        if (power && !this.level.isClientSide) {
-            grid.setPowered(pos);
-            syncClient();
-        }
     }
 
     public boolean isBlocked() {

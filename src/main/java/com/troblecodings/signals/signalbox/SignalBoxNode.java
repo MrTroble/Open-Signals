@@ -246,6 +246,18 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         post();
     }
 
+    public void readUpdateNetwork(final ByteBuffer buffer) {
+        final int size = Byte.toUnsignedInt(buffer.get());
+        for (int i = 0; i < size; i++) {
+            final ModeSet mode = new ModeSet(buffer);
+            final PathOptionEntry entry = possibleModes.computeIfAbsent(mode,
+                    _u -> SignalBoxFactory.getFactory().getEntry());
+            entry.readNetwork(buffer);
+            possibleModes.put(mode, entry);
+        }
+        post();
+    }
+
     public void writeToBuffer(final BufferBuilder buffer) {
         buffer.putByte((byte) possibleModes.size());
         possibleModes.forEach((mode, entry) -> {

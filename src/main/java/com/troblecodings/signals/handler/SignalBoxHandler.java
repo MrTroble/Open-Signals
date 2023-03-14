@@ -1,26 +1,68 @@
 package com.troblecodings.signals.handler;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Optional;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.core.RedstonePacket;
+import com.troblecodings.signals.signalbox.GridComponent;
+import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public final class SignalBoxHandler {
 
-    private static final Map<BlockPos, LinkedList<RedstonePacket>> UPDATES = new HashMap<>();
+    private static final Map<BlockPos, GridComponent> ALL_GRIDS = new HashMap<>();
 
-    public static void addToQueue(final BlockPos pos, final RedstonePacket packet) {
-        final LinkedList<RedstonePacket> packets = UPDATES.computeIfAbsent(pos,
-                _u -> new LinkedList<>());
-        packets.add(packet);
-        UPDATES.put(pos, packets);
+    public static void resetPathway(final BlockPos tilePos, final Point point) {
+        final GridComponent grid = ALL_GRIDS.get(tilePos);
+        if (grid == null)
+            return;
+        grid.resetPathway(point);
     }
 
-    public static Optional<LinkedList<RedstonePacket>> getPacket(final BlockPos pos) {
-        return Optional.ofNullable(UPDATES.get(pos));
+    public static boolean requestPathway(final BlockPos tilePos, final Point p1, final Point p2,
+            final Map<Point, SignalBoxNode> modeGrid) {
+        final GridComponent grid = ALL_GRIDS.get(tilePos);
+        if (grid == null)
+            return false;
+        return grid.requestWay(p1, p2, modeGrid);
+    }
+
+    public static void resetAllPathways(final BlockPos tilePos) {
+        final GridComponent grid = ALL_GRIDS.get(tilePos);
+        if (grid == null)
+            return;
+        grid.resetAllPathways();
+    }
+
+    public static void updateInput(final BlockPos tilePos, final RedstonePacket update) {
+        final GridComponent grid = ALL_GRIDS.get(tilePos);
+        if (grid == null)
+            return;
+        grid.setPowered(update.pos);
+    }
+
+    public static GridComponent computeIfAbsent(final BlockPos tilePos, final Level world) {
+        if (world.isClientSide)
+            return null;
+        return ALL_GRIDS.computeIfAbsent(tilePos, _u -> new GridComponent(world, tilePos));
+    }
+
+    public static void readFromNBT(final BlockPos tilePos, final NBTWrapper wrapper,
+            final Map<Point, SignalBoxNode> modeGrid) {
+        final GridComponent grid = ALL_GRIDS.get(tilePos);
+        if (grid == null)
+            return;
+        grid.read(wrapper, modeGrid);
+    }
+
+    public static void writeToNBT(final BlockPos tilePos, final NBTWrapper wrapper) {
+        final GridComponent grid = ALL_GRIDS.get(tilePos);
+        if (grid == null)
+            return;
+        grid.write(wrapper);
     }
 }

@@ -287,6 +287,7 @@ public class GuiSignalBox extends GuiBase {
             } else {
                 if (lastTile == currentTile) {
                     this.resetTileSelection();
+                    lastTile = null;
                     return;
                 }
                 sendPWRequest(currentTile.getNode());

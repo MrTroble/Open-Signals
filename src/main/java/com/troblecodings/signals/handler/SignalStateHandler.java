@@ -126,7 +126,7 @@ public final class SignalStateHandler implements INetworkSync {
                 final Map<SEProperty, String> oldStates = new HashMap<>(getStates(info));
                 oldStates.putAll(states);
                 CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
-                sendPropertiesToClient(info, states);
+                sendPropertiesToClient(info, oldStates);
                 return;
             }
         }
@@ -258,7 +258,6 @@ public final class SignalStateHandler implements INetworkSync {
                 final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
                 statesToBuffer(stateInfo.signal, properties, buffer.array());
                 file.write(pos, buffer);
-                unRenderClients(stateInfo);
             });
         });
     }
@@ -297,17 +296,6 @@ public final class SignalStateHandler implements INetworkSync {
                 file = ALL_LEVEL_FILES.get(info.world);
             }
             file.deleteIndex(info.pos);
-        });
-    }
-
-    private static void unRenderClients(final SignalStateInfo stateInfo) {
-        final ByteBuffer buffer = ByteBuffer.allocate(13);
-        buffer.putInt(stateInfo.pos.getX());
-        buffer.putInt(stateInfo.pos.getY());
-        buffer.putInt(stateInfo.pos.getZ());
-        buffer.put((byte) 255);
-        stateInfo.world.players().forEach(player -> {
-            sendTo(player, buffer);
         });
     }
 

@@ -6,7 +6,6 @@ import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.core.RedstonePacket;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
-import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -46,15 +45,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
             return;
         final boolean power = this.level.getBlockState(this.worldPosition)
                 .getValue(RedstoneIO.POWER);
-        linkedPositions.forEach(pos -> {
-            final SignalBoxTileEntity tile = (SignalBoxTileEntity) level.getBlockEntity(pos);
-            final RedstonePacket packet = new RedstonePacket(level, pos, power);
-            if (tile == null) {
-                SignalBoxHandler.addToQueue(pos, packet);
-                return;
-            }
-            tile.updateRedstonInput(pos, power);
-        });
+        linkedPositions.forEach(
+                pos -> SignalBoxHandler.updateInput(pos, new RedstonePacket(level, pos, power)));
     }
 
     public void link(final BlockPos pos) {

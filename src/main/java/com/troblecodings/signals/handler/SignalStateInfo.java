@@ -21,7 +21,7 @@ public class SignalStateInfo {
         super();
         this.world = world;
         this.pos = pos;
-        this.signal = signal;
+        this.signal = signal == null ? (Signal) world.getBlockState(pos).getBlock() : signal;
     }
 
     @Override
@@ -35,12 +35,14 @@ public class SignalStateInfo {
     }
 
     @Override
-    public boolean equals(final Object obj) {
+    public boolean equals(Object obj) {
         if (this == obj)
             return true;
-        if ((obj == null) || (getClass() != obj.getClass()))
+        if (obj == null)
             return false;
-        final SignalStateInfo other = (SignalStateInfo) obj;
+        if (getClass() != obj.getClass())
+            return false;
+        SignalStateInfo other = (SignalStateInfo) obj;
         return Objects.equals(pos, other.pos) && Objects.equals(signal, other.signal)
                 && Objects.equals(world, other.world);
     }

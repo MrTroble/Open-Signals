@@ -7,23 +7,20 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
-import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
-import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.properties.ConfigProperty;
@@ -37,19 +34,14 @@ import net.minecraft.core.BlockPos;
 public class SignalBoxGrid implements INetworkSavable {
 
     private static final String NODE_LIST = "nodeList";
-    private static final String PATHWAY_LIST = "pathwayList";
 
     public final Map<Point, SignalBoxPathway> clientPathways = new HashMap<>();
-    protected final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
-    protected final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
-    protected final Consumer<NBTWrapper> sendToAll;
     protected final SignalBoxFactory factory;
     private SignalBoxTileEntity tile;
 
-    public SignalBoxGrid(final Consumer<NBTWrapper> sendToAll) {
-        this.sendToAll = sendToAll;
+    public SignalBoxGrid() {
         this.factory = SignalBoxFactory.getFactory();
     }
 
@@ -57,118 +49,17 @@ public class SignalBoxGrid implements INetworkSavable {
         this.tile = tile;
     }
 
-    public void resetAllPathways() {
-        this.startsToPath.values().forEach(pathway -> {
-            pathway.resetPathway();
-        });
-        clearPaths();
-    }
-
     public void resetPathway(final Point p1) {
-        if (startsToPath.isEmpty())
-            return;
-        final SignalBoxPathway pathway = startsToPath.get(p1);
-        if (pathway == null) {
-            OpenSignalsMain.log.warn("Signalboxpath is null, this should not be the case!");
-            return;
-        }
-
-        resetPathway(pathway);
-        updateToNet(pathway);
-    }
-
-    protected void resetPathway(final SignalBoxPathway pathway) {
-        pathway.setWorld(tile.getLevel());
-        pathway.resetPathway();
-        updatePrevious(pathway);
-        this.startsToPath.remove(pathway.getFirstPoint());
-        this.endsToPath.remove(pathway.getLastPoint());
-        enabledSubsidiaryTypes.remove(pathway.getFirstPoint());
+        SignalBoxHandler.resetPathway(tile.getBlockPos(), p1);
+        enabledSubsidiaryTypes.remove(p1);
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
-        if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
-            return false;
-        final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
-        ways.ifPresent(way -> {
-            way.setWorld(tile.getLevel());
-            way.setPathStatus(EnumPathUsage.SELECTED);
-            way.updatePathwaySignals();
-            this.onWayAdd(way);
-            updateToNet(way);
-        });
-        return ways.isPresent();
+        return SignalBoxHandler.requestPathway(tile.getBlockPos(), p1, p2, modeGrid);
     }
 
-    protected void updatePrevious(final SignalBoxPathway pathway) {
-        SignalBoxPathway previousPath = pathway;
-        int count = 0;
-        while ((previousPath = endsToPath.get(previousPath.getFirstPoint())) != null) {
-            if (count > endsToPath.size()) {
-                OpenSignalsMain.getLogger().error("Detected signalpath cycle, aborting!");
-                startsToPath.values().forEach(path -> path.resetPathway());
-                this.clearPaths();
-                break;
-            }
-            previousPath.updatePathwaySignals();
-            count++;
-        }
-        if (count == 0) {
-            OpenSignalsMain.getLogger().debug("Could not find previous! " + pathway);
-        }
-    }
-
-    protected void onWayAdd(final SignalBoxPathway pathway) {
-        startsToPath.put(pathway.getFirstPoint(), pathway);
-        endsToPath.put(pathway.getLastPoint(), pathway);
-        updatePrevious(pathway);
-    }
-
-    protected void updateToNet(final SignalBoxPathway pathway) {
-        if (tile == null) {
-            OpenSignalsMain.getLogger().warn("SignalBoxTile is null. This shouldn't be the case!");
-            pathway.resetPathway();
-            startsToPath.remove(pathway.getFirstPoint());
-            endsToPath.remove(pathway.getLastPoint());
-            return;
-        }
-        if (tile == null || !tile.isBlocked()) {
-            return;
-        }
-        final List<SignalBoxNode> nodes = pathway.getListOfNodes();
-        final BufferBuilder buffer = new BufferBuilder();
-        buffer.putByte((byte) SignalBoxNetwork.SEND_PW_UPDATE.ordinal());
-        buffer.putInt(nodes.size());
-        nodes.forEach(node -> {
-            node.getPoint().writeToBuffer(buffer);
-            node.writeUpdateBuffer(buffer);
-        });
-        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer.build());
-    }
-
-    public void setPowered(final BlockPos pos) {
-        final List<SignalBoxPathway> nodeCopy = ImmutableList.copyOf(startsToPath.values());
-        nodeCopy.forEach(pathway -> {
-            if (pathway.tryBlock(pos)) {
-                updateToNet(pathway);
-                updatePrevious(pathway);
-            }
-        });
-        nodeCopy.forEach(pathway -> {
-            final Point first = pathway.getFirstPoint();
-            final Optional<Point> optPoint = pathway.tryReset(pos);
-            if (optPoint.isPresent()) {
-                if (pathway.isEmptyOrBroken()) {
-                    resetPathway(pathway);
-                    updateToNet(pathway);
-                } else {
-                    updateToNet(pathway);
-                    pathway.compact(optPoint.get());
-                    this.startsToPath.remove(first);
-                    this.startsToPath.put(pathway.getFirstPoint(), pathway);
-                }
-            }
-        });
+    public void resetAllPathways() {
+        SignalBoxHandler.resetAllPathways(tile.getBlockPos());
     }
 
     @Override
@@ -178,22 +69,10 @@ public class SignalBoxGrid implements INetworkSavable {
             node.write(nodeTag);
             return nodeTag;
         })::iterator);
-        tag.putList(PATHWAY_LIST,
-                startsToPath.values().stream().filter(pw -> !pw.isEmptyOrBroken()).map(pathway -> {
-                    final NBTWrapper path = new NBTWrapper();
-                    pathway.write(path);
-                    return path;
-                })::iterator);
-    }
-
-    protected void clearPaths() {
-        startsToPath.clear();
-        endsToPath.clear();
     }
 
     @Override
     public void read(final NBTWrapper tag) {
-        clearPaths();
         modeGrid.clear();
         tag.getList(NODE_LIST).forEach(comp -> {
             final SignalBoxNode node = new SignalBoxNode();
@@ -201,34 +80,24 @@ public class SignalBoxGrid implements INetworkSavable {
             node.post();
             modeGrid.put(node.getPoint(), node);
         });
-        tag.getList(PATHWAY_LIST).forEach(comp -> {
-            final SignalBoxPathway pathway = factory.getPathway(this.modeGrid);
-            pathway.read(comp);
-            if (pathway.isEmptyOrBroken()) {
-                OpenSignalsMain.log.error("Remove empty or broken pathway, try to recover!");
-                return;
-            }
-            if (tile != null)
-                pathway.setWorld(tile.getLevel());
-            onWayAdd(pathway);
-        });
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(endsToPath, modeGrid, startsToPath);
+        return Objects.hash(enabledSubsidiaryTypes, modeGrid, tile);
     }
 
     @Override
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if ((obj == null) || (getClass() != obj.getClass()))
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
             return false;
         final SignalBoxGrid other = (SignalBoxGrid) obj;
-        return Objects.equals(endsToPath, other.endsToPath)
-                && Objects.equals(modeGrid, other.modeGrid)
-                && Objects.equals(startsToPath, other.startsToPath);
+        return Objects.equals(enabledSubsidiaryTypes, other.enabledSubsidiaryTypes)
+                && Objects.equals(modeGrid, other.modeGrid) && Objects.equals(tile, other.tile);
     }
 
     @Override
@@ -250,7 +119,7 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public Map<Point, SignalBoxNode> getModeGrid() {
-        return ImmutableMap.copyOf(modeGrid);
+        return modeGrid;
     }
 
     public void putNode(final Point point, final SignalBoxNode node) {
@@ -289,15 +158,21 @@ public class SignalBoxGrid implements INetworkSavable {
         }
     }
 
-    public void readUpdateNetwork(final ByteBuffer buffer) {
+    public void readUpdateNetwork(final ByteBuffer buffer, final boolean override) {
         final int size = buffer.getInt();
         final List<SignalBoxNode> allNodesForPathway = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             final Point point = new Point(buffer);
-            final SignalBoxNode node = modeGrid.computeIfAbsent(point,
-                    _u -> new SignalBoxNode(point));
-            node.readNetwork(buffer);
+            final SignalBoxNode node;
+            if (override) {
+                modeGrid.remove(point);
+                node = new SignalBoxNode(point);
+            } else {
+                node = modeGrid.computeIfAbsent(point, _u -> new SignalBoxNode(point));
+            }
+            node.readUpdateNetwork(buffer);
             allNodesForPathway.add(node);
+            modeGrid.put(point, node);
         }
         if (tile != null && !tile.getLevel().isClientSide())
             return;

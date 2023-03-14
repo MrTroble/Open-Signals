@@ -31,12 +31,12 @@ public final class OSBlocks {
     private OSBlocks() {
     }
 
-    public static final BasicBlock HV_SIGNAL_CONTROLLER = new SignalController();
-    public static final BasicBlock POST = new Post();
-    public static final BasicBlock GHOST_BLOCK = new GhostBlock();
-    public static final BasicBlock SIGNAL_BOX = new SignalBox();
-    public static final BasicBlock REDSTONE_IN = new RedstoneInput();
-    public static final BasicBlock REDSTONE_OUT = new RedstoneIO();
+    public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
+    public static final Post POST = new Post();
+    public static final GhostBlock GHOST_BLOCK = new GhostBlock();
+    public static final SignalBox SIGNAL_BOX = new SignalBox();
+    public static final RedstoneInput REDSTONE_IN = new RedstoneInput();
+    public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
 
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 

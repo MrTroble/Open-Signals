@@ -99,7 +99,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             return;
         }
         if (mode.equals(SignalBoxNetwork.SEND_PW_UPDATE)) {
-            grid.readUpdateNetwork(buf);
+            grid.readUpdateNetwork(buf, false);
             update();
             return;
         }
@@ -162,7 +162,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             return;
         }
         if (mode.equals(SignalBoxNetwork.SEND_CHANGED_MODES)) {
-            tile.getSignalBoxGrid().readUpdateNetwork(buf);
+            tile.getSignalBoxGrid().readUpdateNetwork(buf, true);
             return;
         }
         if (mode.equals(SignalBoxNetwork.REQUEST_SUBSIDIARY)) {

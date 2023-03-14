@@ -202,10 +202,9 @@ public class SignalBoxPathway {
             return;
         this.signalPositions.ifPresent(entry -> {
             final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey());
-            SignalStateInfo nextInfo = null;
-            if (entry.getValue() != null) {
-                nextInfo = new SignalStateInfo(world, entry.getValue());
-            }
+            final SignalStateInfo nextInfo = entry.getValue() != null
+                    ? new SignalStateInfo(world, entry.getValue())
+                    : null;
             final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed);
             info.type = this.type;
             SignalConfig.change(info);

@@ -78,4 +78,10 @@ public class DebugSignalStateFile extends SignalStateFile {
         super.write(pos, buffer);
         dataCache.put(pos, Arrays.copyOf(buffer.array(), buffer.array().length));
     }
+
+    @Override
+    public synchronized void deleteIndex(final BlockPos pos) {
+        super.deleteIndex(pos);
+        createdPositions.remove(pos);
+    }
 }
