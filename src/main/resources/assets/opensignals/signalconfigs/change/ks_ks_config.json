@@ -41,6 +41,9 @@
         "speed(==.12)": ["zs3.Z12"],
         "speed(==.13)": ["zs3.Z13"],
         "speed(==.14)": ["zs3.Z14"],
-        "speed(==.15)": ["zs3.Z15"]
+        "speed(==.15)": ["zs3.Z15"],
+
+        "zs2value(A)": ["zs2.A"],
+        "zs2value(B)": ["zs2.B"]
     }
 }

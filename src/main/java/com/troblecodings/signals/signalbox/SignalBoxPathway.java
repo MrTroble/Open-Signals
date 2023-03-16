@@ -9,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -41,6 +42,7 @@ public class SignalBoxPathway {
     private Point firstPoint = new Point();
     private Point lastPoint = new Point();
     private int speed = -1;
+    private String zs2Value = "";
     private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
     private Optional<BlockPos> lastSignal = Optional.empty();
     private ImmutableList<BlockPos> distantSignalPositions = ImmutableList.of();
@@ -71,6 +73,7 @@ public class SignalBoxPathway {
 
     private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
+        final AtomicReference<String> zs2 = new AtomicReference<>("");
         final Builder<BlockPos> distantPosBuilder = ImmutableList.builder();
         foreachEntry((optionEntry, node) -> {
             optionEntry.getEntry(PathEntryType.SPEED)
@@ -79,6 +82,7 @@ public class SignalBoxPathway {
                     .ifPresent(position -> mapOfBlockingPositions.put(position, node));
             optionEntry.getEntry(PathEntryType.RESETING)
                     .ifPresent(position -> mapOfResetPositions.put(position, node));
+            optionEntry.getEntry(PathEntryType.ZS2).ifPresent(str -> zs2.set(str));
         });
         foreachPath((path, node) -> {
             final Rotation rotation = SignalBoxUtil
@@ -107,6 +111,7 @@ public class SignalBoxPathway {
             this.signalPositions = Optional.empty();
         }
         this.speed = atomic.get();
+        this.zs2Value = zs2.get();
     }
 
     private BlockPos makeFromNext(final PathType type, final SignalBoxNode first,
@@ -205,7 +210,7 @@ public class SignalBoxPathway {
             final SignalStateInfo nextInfo = entry.getValue() != null
                     ? new SignalStateInfo(world, entry.getValue())
                     : null;
-            final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed);
+            final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed, zs2Value);
             info.type = this.type;
             SignalConfig.change(info);
         });
@@ -214,7 +219,7 @@ public class SignalBoxPathway {
                     ? new SignalStateInfo(world, lastSignal.get())
                     : null;
             final ConfigInfo info = new ConfigInfo(new SignalStateInfo(world, position), nextInfo,
-                    speed);
+                    speed, zs2Value);
             info.type = this.type;
             SignalConfig.change(info);
         });

@@ -24,6 +24,7 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
+import com.troblecodings.signals.signalbox.entrys.ZS2Entry;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -131,6 +132,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         }
         if (mode.equals(SignalBoxNetwork.SEND_POS_ENTRY)) {
             deserializeEntry(buf, deserializeBlockPos(buf));
+            return;
+        }
+        if (mode.equals(SignalBoxNetwork.SEND_ZS2_ENTRY)) {
+            deserializeEntry(buf, ZS2Entry.ZS32.getObjFromID(Byte.toUnsignedInt(buf.get())));
             return;
         }
         if (mode.equals(SignalBoxNetwork.REMOVE_POS)) {
