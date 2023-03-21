@@ -7,6 +7,7 @@ import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.core.BlockPos;
@@ -53,6 +54,6 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buf.get();
         }
-        NameHandler.setName(info.world, info.pos, new String(array));
+        NameHandler.setName(new NameStateInfo(info.world, info.pos), new String(array));
     }
 }

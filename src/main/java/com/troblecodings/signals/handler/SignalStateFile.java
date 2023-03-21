@@ -149,6 +149,11 @@ public class SignalStateFile {
 
     @Nullable
     public synchronized SignalStatePos create(final BlockPos pos) {
+        return create(pos, new byte[STATE_BLOCK_SIZE]);
+    }
+
+    @Nullable
+    public synchronized SignalStatePos create(final BlockPos pos, final byte[] array) {
         try {
             final int lastFile = pathCache.size() - 1;
             final Path path = pathCache.get(lastFile);
@@ -183,7 +188,7 @@ public class SignalStateFile {
                 final int offset = addedElements * STATE_BLOCK_SIZE + MAX_OFFSET_OF_INDEX;
                 stream.writeInt(offset);
                 stream.seek(offset);
-                stream.write(new byte[STATE_BLOCK_SIZE]);
+                stream.write(array);
                 stream.seek(HEADER_SIZE);
                 stream.writeInt(addedElements + 1);
                 return new SignalStatePos(lastFile, offset);

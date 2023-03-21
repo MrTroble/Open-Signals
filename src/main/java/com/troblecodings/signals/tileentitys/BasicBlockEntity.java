@@ -7,6 +7,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -47,7 +48,7 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
     @Override
     public String getNameWrapper() {
         if (customName == null)
-            customName = NameHandler.getName(worldPosition);
+            customName = NameHandler.getName(new NameStateInfo(level, worldPosition));
         return customName;
     }
 
