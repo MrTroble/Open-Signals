@@ -1,9 +1,7 @@
 package com.troblecodings.signals.signalbox;
 
-import java.nio.ByteBuffer;
-
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 public class Point implements INetworkSavable {
@@ -23,10 +21,6 @@ public class Point implements INetworkSavable {
     public Point(final Point point) {
         this.x = point.x;
         this.y = point.y;
-    }
-
-    public Point(final ByteBuffer buffer) {
-        readNetwork(buffer);
     }
 
     public int getX() {
@@ -54,6 +48,10 @@ public class Point implements INetworkSavable {
         final Point point = new Point(this);
         point.translate(-other.getX(), -other.getY());
         return point;
+    }
+
+    public static Point of(final BufferFactory buffer) {
+        return new Point(buffer.getByteAsInt(), buffer.getByteAsInt());
     }
 
     @Override
@@ -88,23 +86,14 @@ public class Point implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        this.x = Byte.toUnsignedInt(buffer.get());
-        this.y = Byte.toUnsignedInt(buffer.get());
+    public void readNetwork(final BufferFactory buffer) {
+        this.x = buffer.getByteAsInt();
+        this.y = buffer.getByteAsInt();
+
     }
 
     @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        buffer.put((byte) x);
-        buffer.put((byte) y);
-    }
-
-    public void writeBufferNetwork(final BufferBuilder buffer) {
-        buffer.putByte((byte) x);
-        buffer.putByte((byte) y);
-    }
-
-    public void writeToBuffer(final BufferBuilder buffer) {
+    public void writeNetwork(final BufferFactory buffer) {
         buffer.putByte((byte) x);
         buffer.putByte((byte) y);
     }

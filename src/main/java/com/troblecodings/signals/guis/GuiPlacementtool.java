@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.function.IntConsumer;
 
@@ -21,6 +20,7 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.PropertyPacket;
 import com.troblecodings.signals.enums.ChangeableStage;
@@ -174,10 +174,10 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
     private void sendSignalId(final int id) {
         if (!loaded)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(5);
-        buffer.put((byte) 255);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) 255);
         buffer.putInt(id);
-        OpenSignalsMain.network.sendTo(player, buffer);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
     public void applyModelChanges() {

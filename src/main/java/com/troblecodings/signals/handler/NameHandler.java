@@ -15,7 +15,7 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.BufferFactory;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -110,7 +110,7 @@ public final class NameHandler implements INetworkSync {
 
     private static ByteBuffer packToBuffer(final BlockPos pos, final String name) {
         final byte[] bytes = name.getBytes();
-        final BufferBuilder buffer = new BufferBuilder();
+        final BufferFactory buffer = new BufferFactory();
         buffer.putInt(pos.getX());
         buffer.putInt(pos.getY());
         buffer.putInt(pos.getZ());

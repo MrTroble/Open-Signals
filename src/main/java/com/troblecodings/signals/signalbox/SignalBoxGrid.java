@@ -1,6 +1,5 @@
 package com.troblecodings.signals.signalbox;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +15,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
-import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.PathType;
@@ -77,7 +76,6 @@ public class SignalBoxGrid implements INetworkSavable {
         tag.getList(NODE_LIST).forEach(comp -> {
             final SignalBoxNode node = new SignalBoxNode();
             node.read(comp);
-            node.post();
             modeGrid.put(node.getPoint(), node);
         });
     }
@@ -136,19 +134,19 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(final ByteBuffer buffer) {
+    public void readNetwork(final BufferFactory buffer) {
         enabledSubsidiaryTypes.clear();
         final int size = buffer.getInt();
         for (int i = 0; i < size; i++) {
-            final Point point = new Point(buffer);
+            final Point point = Point.of(buffer);
             final SignalBoxNode node = modeGrid.computeIfAbsent(point,
                     _u -> new SignalBoxNode(point));
-            final int enabledSubsidariesSize = Byte.toUnsignedInt(buffer.get());
+            final int enabledSubsidariesSize = buffer.getByteAsInt();
             if (enabledSubsidariesSize != 0) {
                 for (int j = 0; j < enabledSubsidariesSize; j++) {
                     final Map<ModeSet, SubsidiaryEntry> allTypes = enabledSubsidiaryTypes
                             .computeIfAbsent(point, _u -> new HashMap<>());
-                    final ModeSet mode = new ModeSet(buffer);
+                    final ModeSet mode = ModeSet.of(buffer);
                     final SubsidiaryEntry type = SubsidiaryEntry.of(buffer);
                     allTypes.put(mode, type);
                     enabledSubsidiaryTypes.put(point, allTypes);
@@ -158,11 +156,31 @@ public class SignalBoxGrid implements INetworkSavable {
         }
     }
 
-    public void readUpdateNetwork(final ByteBuffer buffer, final boolean override) {
+    @Override
+    public void writeNetwork(final BufferFactory buffer) {
+        buffer.putInt(modeGrid.size());
+        modeGrid.forEach((point, node) -> {
+            point.writeNetwork(buffer);
+            final Map<ModeSet, SubsidiaryEntry> enabledSubsidiaries = enabledSubsidiaryTypes
+                    .get(point);
+            if (enabledSubsidiaries == null) {
+                buffer.putByte((byte) 0);
+            } else {
+                buffer.putByte((byte) enabledSubsidiaries.size());
+                enabledSubsidiaries.forEach((mode, state) -> {
+                    mode.writeNetwork(buffer);
+                    state.writeNetwork(buffer);
+                });
+            }
+            node.writeNetwork(buffer);
+        });
+    }
+
+    public void readUpdateNetwork(final BufferFactory buffer, final boolean override) {
         final int size = buffer.getInt();
         final List<SignalBoxNode> allNodesForPathway = new ArrayList<>();
         for (int i = 0; i < size; i++) {
-            final Point point = new Point(buffer);
+            final Point point = Point.of(buffer);
             final SignalBoxNode node;
             if (override) {
                 modeGrid.remove(point);
@@ -179,37 +197,6 @@ public class SignalBoxGrid implements INetworkSavable {
         final SignalBoxPathway pathway = new SignalBoxPathway(modeGrid, allNodesForPathway,
                 PathType.NORMAL);
         clientPathways.put(pathway.getFirstPoint(), pathway);
-    }
-
-    public void writeToBuffer(final BufferBuilder buffer) {
-        buffer.putInt(modeGrid.size());
-        modeGrid.forEach((point, node) -> {
-            point.writeToBuffer(buffer);
-            final Map<ModeSet, SubsidiaryEntry> enabledSubsidiaries = enabledSubsidiaryTypes
-                    .get(point);
-            if (enabledSubsidiaries == null) {
-                buffer.putByte((byte) 0);
-            } else {
-                buffer.putByte((byte) enabledSubsidiaries.size());
-                enabledSubsidiaries.forEach((mode, state) -> {
-                    mode.writeToBuffer(buffer);
-                    state.writeNetwork(buffer);
-                });
-            }
-            node.writeToBuffer(buffer);
-        });
-    }
-
-    public void writeUpdateToBuffer(final BufferBuilder buffer) {
-        buffer.putInt(modeGrid.size());
-        modeGrid.forEach((point, node) -> {
-            point.writeToBuffer(buffer);
-            node.writeUpdateBuffer(buffer);
-        });
-    }
-
-    @Override
-    public void writeNetwork(final ByteBuffer buffer) {
     }
 
     public void updateSubsidiarySignal(final Point point, final ModeSet mode,

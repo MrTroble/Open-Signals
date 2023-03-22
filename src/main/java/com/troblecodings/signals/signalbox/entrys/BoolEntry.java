@@ -1,11 +1,10 @@
 package com.troblecodings.signals.signalbox.entrys;
 
-import java.nio.ByteBuffer;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
-import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.BufferFactory;
 
 public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boolean>, IntConsumer {
 
@@ -59,17 +58,12 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
     }
 
     @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        value = buffer.get() != 0;
+    public void readNetwork(final BufferFactory buffer) {
+        value = buffer.getByte() != 0;
     }
 
     @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        buffer.put((byte) (value ? 1 : 0));
-    }
-
-    @Override
-    public void writeToBuffer(final BufferBuilder buffer) {
+    public void writeNetwork(final BufferFactory buffer) {
         buffer.putByte((byte) (value ? 1 : 0));
     }
 }

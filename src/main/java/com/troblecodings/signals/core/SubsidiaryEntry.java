@@ -1,6 +1,5 @@
 package com.troblecodings.signals.core;
 
-import java.nio.ByteBuffer;
 import java.util.Objects;
 
 public class SubsidiaryEntry {
@@ -18,15 +17,15 @@ public class SubsidiaryEntry {
         enumValue = null;
     }
 
-    public void writeNetwork(final BufferBuilder buffer) {
+    public void writeNetwork(final BufferFactory buffer) {
         enumValue.writeNetwork(buffer);
         buffer.putByte((byte) (state ? 1 : 0));
     }
 
-    public static SubsidiaryEntry of(final ByteBuffer buffer) {
+    public static SubsidiaryEntry of(final BufferFactory buffer) {
         final SubsidiaryEntry entry = new SubsidiaryEntry();
         entry.enumValue = SubsidiaryState.of(buffer);
-        entry.state = buffer.get() == 1 ? true : false;
+        entry.state = buffer.getByte() == 1 ? true : false;
         return entry;
     }
 

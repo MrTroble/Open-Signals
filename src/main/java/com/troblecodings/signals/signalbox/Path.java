@@ -1,9 +1,9 @@
 package com.troblecodings.signals.signalbox;
 
-import java.nio.ByteBuffer;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 public class Path implements INetworkSavable {
@@ -80,15 +80,14 @@ public class Path implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(final ByteBuffer buffer) {
+    public void readNetwork(final BufferFactory buffer) {
         this.point1.readNetwork(buffer);
         this.point2.readNetwork(buffer);
     }
 
     @Override
-    public void writeNetwork(final ByteBuffer buffer) {
+    public void writeNetwork(final BufferFactory buffer) {
         this.point1.writeNetwork(buffer);
         this.point2.writeNetwork(buffer);
     }
-
 }

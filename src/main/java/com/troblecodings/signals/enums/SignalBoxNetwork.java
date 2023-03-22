@@ -1,6 +1,6 @@
 package com.troblecodings.signals.enums;
 
-import java.nio.ByteBuffer;
+import com.troblecodings.signals.core.BufferFactory;
 
 public enum SignalBoxNetwork {
 
@@ -8,8 +8,7 @@ public enum SignalBoxNetwork {
     SEND_PW_UPDATE, RESET_ALL_PW, SEND_CHANGED_MODES, REQUEST_LINKED_POS, NO_PW_FOUND,
     REQUEST_SUBSIDIARY, SEND_ZS2_ENTRY;
 
-    public static SignalBoxNetwork of(final ByteBuffer buffer) {
-        return SignalBoxNetwork.values()[Byte.toUnsignedInt(buffer.get())];
+    public static SignalBoxNetwork of(final BufferFactory buffer) {
+        return values()[buffer.getByteAsInt()];
     }
-
 }

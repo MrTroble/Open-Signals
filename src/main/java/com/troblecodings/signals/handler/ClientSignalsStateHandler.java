@@ -9,6 +9,7 @@ import java.util.concurrent.Executors;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.Minecraft;
@@ -32,10 +33,11 @@ public class ClientSignalsStateHandler implements INetworkSync {
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
+        final BufferFactory buffer = new BufferFactory(buf);
         final Minecraft mc = Minecraft.getInstance();
         final Level level = mc.level;
-        final BlockPos signalPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
-        final int propertiesSize = Byte.toUnsignedInt(buf.get());
+        final BlockPos signalPos = buffer.getBlockPos();
+        final int propertiesSize = buffer.getByteAsInt();
         if (propertiesSize == 255) {
             setRemoved(signalPos);
             return;
@@ -43,8 +45,8 @@ public class ClientSignalsStateHandler implements INetworkSync {
         final int[] propertyIDs = new int[propertiesSize];
         final int[] valueIDs = new int[propertiesSize];
         for (int i = 0; i < propertiesSize; i++) {
-            propertyIDs[i] = Byte.toUnsignedInt(buf.get());
-            valueIDs[i] = Byte.toUnsignedInt(buf.get());
+            propertyIDs[i] = buffer.getByteAsInt();
+            valueIDs[i] = buffer.getByteAsInt();
         }
         SERVICE.execute(() -> {
             if (level == null)

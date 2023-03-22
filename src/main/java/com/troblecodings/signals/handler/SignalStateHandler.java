@@ -16,7 +16,7 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
 
 import io.netty.buffer.Unpooled;
@@ -315,35 +315,33 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static void sendRemoved(final SignalStateInfo info) {
-        final BufferBuilder buffer = new BufferBuilder();
+        final BufferFactory buffer = new BufferFactory();
         buffer.putInt(info.pos.getX());
         buffer.putInt(info.pos.getY());
         buffer.putInt(info.pos.getZ());
         buffer.putByte((byte) 255);
-        info.world.players().forEach(player -> sendTo(player, buffer.getReadyBuffer()));
+        info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
     public static ByteBuffer packToByteBuffer(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties) {
-        final ByteBuffer buffer = ByteBuffer.allocate(13 + properties.size() * 2);
-        buffer.putInt(stateInfo.pos.getX());
-        buffer.putInt(stateInfo.pos.getY());
-        buffer.putInt(stateInfo.pos.getZ());
         if (properties.size() > 254) {
             throw new IllegalStateException("Too many SEProperties!");
         }
-        buffer.put((byte) properties.size());
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putBlockPos(stateInfo.pos);
+        buffer.putByte((byte) properties.size());
         properties.forEach((property, value) -> {
             if (property.equals(Signal.CUSTOMNAME)) {
-                buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
-                buffer.put((byte) (value.isEmpty() ? 0 : 1));
+                buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
+                buffer.putByte((byte) (value.isEmpty() ? 0 : 1));
                 NameHandler.setName(new NameStateInfo(stateInfo.world, stateInfo.pos), value);
                 return;
             }
-            buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
-            buffer.put((byte) property.getParent().getIDFromValue(value));
+            buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
+            buffer.putByte((byte) property.getParent().getIDFromValue(value));
         });
-        return buffer;
+        return buffer.build();
     }
 
     private static void sendPropertiesToClient(final SignalStateInfo stateInfo,

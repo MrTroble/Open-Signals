@@ -8,7 +8,7 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -138,12 +138,12 @@ public class GridComponent {
         if (tile == null || !tile.isBlocked())
             return;
         final List<SignalBoxNode> nodes = pathway.getListOfNodes();
-        final BufferBuilder buffer = new BufferBuilder();
+        final BufferFactory buffer = new BufferFactory();
         buffer.putByte((byte) SignalBoxNetwork.SEND_PW_UPDATE.ordinal());
         buffer.putInt(nodes.size());
         nodes.forEach(node -> {
-            node.getPoint().writeToBuffer(buffer);
-            node.writeUpdateBuffer(buffer);
+            node.getPoint().writeNetwork(buffer);
+            node.writeUpdateNetwork(buffer);
         });
         OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer.build());
     }
