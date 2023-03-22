@@ -80,8 +80,10 @@ public class DebugSignalStateFile extends SignalStateFile {
     }
 
     @Override
-    public synchronized void deleteIndex(final BlockPos pos) {
-        super.deleteIndex(pos);
+    public synchronized SignalStatePos deleteIndex(final BlockPos pos) {
+        final SignalStatePos statePos = super.deleteIndex(pos);
         createdPositions.remove(pos);
+        dataCache.remove(statePos);
+        return statePos;
     }
 }

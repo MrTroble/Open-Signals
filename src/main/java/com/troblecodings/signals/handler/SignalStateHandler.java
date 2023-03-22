@@ -16,6 +16,7 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.BufferBuilder;
 import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
 
 import io.netty.buffer.Unpooled;
@@ -126,11 +127,12 @@ public final class SignalStateHandler implements INetworkSync {
                 final Map<SEProperty, String> oldStates = new HashMap<>(getStates(info));
                 oldStates.putAll(states);
                 CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
-                sendPropertiesToClient(info, oldStates);
+                sendPropertiesToClient(info, states);
                 return;
             }
         }
         createToFile(info, states);
+        sendPropertiesToClient(info, states);
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
@@ -221,7 +223,7 @@ public final class SignalStateHandler implements INetworkSync {
                 if (!(block instanceof Signal)) {
                     return;
                 }
-                final SignalStateInfo stateInfo = new SignalStateInfo(world, pos);
+                final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, (Signal) block);
                 final Map<SEProperty, String> map = readAndSerialize(stateInfo);
                 synchronized (CURRENTLY_LOADED_STATES) {
                     CURRENTLY_LOADED_STATES.put(stateInfo, map);
@@ -265,12 +267,23 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save save) {
+        if (save.getWorld().isClientSide())
+            return;
         service.execute(() -> {
             final Map<SignalStateInfo, Map<SEProperty, String>> maps;
             synchronized (CURRENTLY_LOADED_STATES) {
                 maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
             }
             maps.forEach(SignalStateHandler::createToFile);
+        });
+    }
+
+    @SubscribeEvent
+    public static void onWorldUnload(final WorldEvent.Unload unload) {
+        if (unload.getWorld().isClientSide())
+            return;
+        service.execute(() -> {
+            ALL_LEVEL_FILES.remove(unload.getWorld());
         });
     }
 
@@ -297,7 +310,17 @@ public final class SignalStateHandler implements INetworkSync {
                 file = ALL_LEVEL_FILES.get(info.world);
             }
             file.deleteIndex(info.pos);
+            sendRemoved(info);
         });
+    }
+
+    private static void sendRemoved(final SignalStateInfo info) {
+        final BufferBuilder buffer = new BufferBuilder();
+        buffer.putInt(info.pos.getX());
+        buffer.putInt(info.pos.getY());
+        buffer.putInt(info.pos.getZ());
+        buffer.putByte((byte) 255);
+        info.world.players().forEach(player -> sendTo(player, buffer.getReadyBuffer()));
     }
 
     public static ByteBuffer packToByteBuffer(final SignalStateInfo stateInfo,
@@ -334,7 +357,7 @@ public final class SignalStateHandler implements INetworkSync {
         });
     }
 
-    public static void sendTo(final Player player, final ByteBuffer buf) {
+    private static void sendTo(final Player player, final ByteBuffer buf) {
         final FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.copiedBuffer(buf.position(0)));
         if (player instanceof ServerPlayer) {
             final ServerPlayer server = (ServerPlayer) player;

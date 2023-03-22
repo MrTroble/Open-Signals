@@ -73,18 +73,20 @@ public class SignalStateFile {
                 (stream, blockPos, offset, file) -> new SignalStatePos(file, offset), "r");
     }
 
-    public synchronized void deleteIndex(final BlockPos pos) {
+    public synchronized SignalStatePos deleteIndex(final BlockPos pos) {
         internalFind(pos, (stream, blockPos, offset, file) -> {
             try {
                 final long pointer = stream.getFilePointer();
                 stream.seek(pointer - 16);
                 stream.writeLong(0);
                 stream.writeLong(0);
+                return new SignalStatePos(file, offset);
             } catch (final IOException e) {
                 e.printStackTrace();
             }
             return null;
         }, "rw");
+        return null;
     }
 
     @Nullable

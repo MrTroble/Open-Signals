@@ -61,8 +61,8 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         if (linkedPos == null) {
             return;
         }
-        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos);
-        referenceBlock.set((Signal) info.world.getBlockState(linkedPos).getBlock());
+        referenceBlock.set(controllerEntity.getLinkedSignal());
+        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos, getSignal());
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
         if (properties == null || properties.isEmpty())
             return;

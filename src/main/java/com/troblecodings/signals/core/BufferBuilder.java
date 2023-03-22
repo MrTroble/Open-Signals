@@ -7,6 +7,7 @@ import java.util.List;
 public class BufferBuilder {
 
     private final List<Byte> allBytes;
+    private ByteBuffer readyBuffer;
 
     public BufferBuilder() {
         allBytes = new ArrayList<>();
@@ -26,10 +27,16 @@ public class BufferBuilder {
         allBytes.clear();
     }
 
+    public ByteBuffer getReadyBuffer() {
+        if (readyBuffer == null)
+            return build();
+        return readyBuffer;
+    }
+
     public ByteBuffer build() {
-        final ByteBuffer buffer = ByteBuffer.allocate(allBytes.size());
-        allBytes.forEach(b -> buffer.put(b));
+        readyBuffer = ByteBuffer.allocate(allBytes.size());
+        allBytes.forEach(b -> readyBuffer.put(b));
         resetBuilder();
-        return buffer;
+        return readyBuffer;
     }
 }

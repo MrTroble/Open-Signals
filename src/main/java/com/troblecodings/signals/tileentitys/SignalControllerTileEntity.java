@@ -31,6 +31,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         implements ISyncable, ILinkableTile {
 
     private BlockPos linkedSignalPosition = null;
+    private Signal linkedSignal = null;
     private Signal signal;
     private int lastProfile = 0;
     private NBTWrapper copy;
@@ -206,6 +207,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return linkedSignalPosition;
     }
 
+    public Signal getLinkedSignal() {
+        return linkedSignal;
+    }
+
     @Override
     public boolean hasLink() {
         return linkedSignalPosition != null;
@@ -216,10 +221,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK
                 .get(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
-        if (block == null)
-            return false;
-        if (block instanceof Signal) {
+        if (block != null && block instanceof Signal) {
             linkedSignalPosition = pos;
+            linkedSignal = (Signal) block;
             return true;
         }
         return false;

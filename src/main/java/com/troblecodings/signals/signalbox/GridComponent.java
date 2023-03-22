@@ -22,12 +22,17 @@ public class GridComponent {
 
     private final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
     private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
-    private final Level world;
+    private Level world;
     private final BlockPos tilePos;
 
     public GridComponent(final Level world, final BlockPos pos) {
         this.world = world;
         this.tilePos = pos;
+    }
+
+    public void setWorld(final Level world) {
+        this.world = world;
+        startsToPath.values().forEach(pw -> pw.setWorldAndPos(world, tilePos));
     }
 
     private void onWayAdd(final SignalBoxPathway pathway) {
@@ -42,7 +47,7 @@ public class GridComponent {
             return false;
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
-            way.setWorld(world);
+            way.setWorldAndPos(world, tilePos);
             way.setPathStatus(EnumPathUsage.SELECTED);
             way.updatePathwaySignals();
             this.onWayAdd(way);
@@ -156,7 +161,7 @@ public class GridComponent {
                         .error("Remove empty or broken pathway, try to recover!");
                 return;
             }
-            pathway.setWorld(world);
+            pathway.setWorldAndPos(world, tilePos);
             onWayAdd(pathway);
         });
     }

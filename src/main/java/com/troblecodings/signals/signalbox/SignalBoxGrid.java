@@ -220,7 +220,7 @@ public class SignalBoxGrid implements INetworkSavable {
         final Optional<BlockPos> pos = node.getOption(mode).get().getEntry(PathEntryType.SIGNAL);
         if (pos.isEmpty())
             return;
-        final Signal signal = tile.getSignal(pos.get());
+        final Signal signal = SignalBoxHandler.getSignal(tile.getBlockPos(), pos.get());
         if (!entry.state) {
             if (!enabledSubsidiaryTypes.containsKey(point))
                 return;
