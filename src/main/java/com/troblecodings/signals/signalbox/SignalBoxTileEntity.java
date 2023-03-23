@@ -30,9 +30,6 @@ import net.minecraft.world.level.block.Block;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
-    public static final String ERROR_STRING = "error";
-    public static final String REMOVE_SIGNAL = "removeSignal";
-
     private static final String LINKED_POS_LIST = "linkedPos";
     private static final String LINKED_SIGNALS = "linkedSignals";
     private static final String SIGNAL_NAME = "signalName";
@@ -48,9 +45,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public void setLevel(final Level world) {
         super.setLevel(world);
-        if (world.isClientSide)
-           return;
         grid.setTile(this);
+        if (world.isClientSide)
+            return;
         SignalBoxHandler.setWorld(worldPosition, world);
     }
 
@@ -67,6 +64,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (level.isClientSide)
             return;
         linkedBlocks.remove(pos);
+        SignalBoxHandler.addRemovedInputPos(pos, worldPosition, level);
     }
 
     @Override
@@ -129,6 +127,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         LinkType type = LinkType.SIGNAL;
         if (block == OSBlocks.REDSTONE_IN) {
             type = LinkType.INPUT;
+            SignalBoxHandler.linkRedstoneInput(pos, worldPosition, level);
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }

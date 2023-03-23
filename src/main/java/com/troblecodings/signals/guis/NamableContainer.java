@@ -30,7 +30,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
 
     private void sendSignalPos() {
         final BufferFactory buffer = new BufferFactory();
-        buffer.putBlockPos(pos);
+        buffer.putBlockPos(info.pos);
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 

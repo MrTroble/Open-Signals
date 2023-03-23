@@ -1,22 +1,30 @@
 package com.troblecodings.signals.handler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RedstonePacket;
 import com.troblecodings.signals.signalbox.GridComponent;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
 public final class SignalBoxHandler {
 
     private static final Map<BlockPos, GridComponent> ALL_GRIDS = new HashMap<>();
     private static final Map<BlockPos, Map<BlockPos, Signal>> ALL_SIGNALS = new HashMap<>();
+    private static final Map<BlockPos, List<BlockPos>> REMOVED_POS_FROM_INPUT = new HashMap<>();
+    private static final Map<BlockPos, List<BlockPos>> NEW_LINKED_POS = new HashMap<>();
 
     public static void resetPathway(final BlockPos tilePos, final Point point) {
         final GridComponent grid = ALL_GRIDS.get(tilePos);
@@ -98,11 +106,17 @@ public final class SignalBoxHandler {
     }
 
     public static Map<BlockPos, Signal> clearSignals(final BlockPos tilePos) {
-        return ALL_SIGNALS.remove(tilePos);
+        final Map<BlockPos, Signal> signals = ALL_SIGNALS.get(tilePos);
+        if (signals == null)
+            return new HashMap<>();
+        return ImmutableMap.copyOf(ALL_SIGNALS.remove(tilePos));
     }
 
     public static Map<BlockPos, Signal> getSignals(final BlockPos tilePos) {
-        return ALL_SIGNALS.get(tilePos);
+        final Map<BlockPos, Signal> signals = ALL_SIGNALS.get(tilePos);
+        if (signals == null)
+            return new HashMap<>();
+        return ImmutableMap.copyOf(ALL_SIGNALS.get(tilePos));
     }
 
     public static boolean containsTilePos(final BlockPos tilePos) {
@@ -111,5 +125,46 @@ public final class SignalBoxHandler {
 
     public static void setSignals(final BlockPos tilePos, final Map<BlockPos, Signal> signals) {
         ALL_SIGNALS.put(tilePos, signals);
+    }
+
+    public static void addRemovedInputPos(final BlockPos ioPos, final BlockPos posToRemove,
+            final Level world) {
+        final BlockEntity entity = world.getBlockEntity(ioPos);
+        if (entity != null) {
+            ((RedstoneIOTileEntity) entity).unlink(posToRemove);
+            return;
+        }
+        final List<BlockPos> removePos = REMOVED_POS_FROM_INPUT.computeIfAbsent(ioPos,
+                _u -> new ArrayList<>());
+        removePos.add(posToRemove);
+        REMOVED_POS_FROM_INPUT.put(ioPos, removePos);
+        final List<BlockPos> newPos = NEW_LINKED_POS.get(ioPos);
+        if (newPos != null && newPos.contains(posToRemove)) {
+            newPos.remove(posToRemove);
+            NEW_LINKED_POS.put(ioPos, newPos);
+        }
+    }
+
+    public static List<BlockPos> getAndRemovePos(final BlockPos ioPos) {
+        final List<BlockPos> positions = REMOVED_POS_FROM_INPUT.get(ioPos);
+        if (positions == null)
+            return new ArrayList<>();
+        return ImmutableList.copyOf(REMOVED_POS_FROM_INPUT.remove(ioPos));
+    }
+
+    public static void linkRedstoneInput(final BlockPos ioPos, final BlockPos tilePos,
+            final Level world) {
+        final BlockEntity entity = world.getBlockEntity(ioPos);
+        if (entity != null) {
+            ((RedstoneIOTileEntity) entity).link(tilePos);
+            return;
+        }
+    }
+
+    public static List<BlockPos> getNewLinkedPos(final BlockPos ioPos) {
+        final List<BlockPos> positions = NEW_LINKED_POS.get(ioPos);
+        if (positions == null)
+            return new ArrayList<>();
+        return ImmutableList.copyOf(NEW_LINKED_POS.get(ioPos));
     }
 }

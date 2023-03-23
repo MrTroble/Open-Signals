@@ -37,7 +37,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         linkedPositions.clear();
         wrapper.getList(LINKED_LIST).stream().map(NBTWrapper::getAsPos)
                 .forEach(linkedPositions::add);
-
+        SignalBoxHandler.getAndRemovePos(worldPosition).forEach(pos -> linkedPositions.remove(pos));
+        linkedPositions.addAll(SignalBoxHandler.getNewLinkedPos(worldPosition));
     }
 
     public void sendToAll() {
@@ -45,8 +46,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
             return;
         final boolean power = this.level.getBlockState(this.worldPosition)
                 .getValue(RedstoneIO.POWER);
-        linkedPositions.forEach(
-                pos -> SignalBoxHandler.updateInput(pos, new RedstonePacket(level, pos, power)));
+        linkedPositions.forEach(pos -> SignalBoxHandler.updateInput(pos,
+                new RedstonePacket(level, worldPosition, power)));
     }
 
     public void link(final BlockPos pos) {

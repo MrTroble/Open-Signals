@@ -20,10 +20,12 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
@@ -256,10 +258,7 @@ public class SignalBoxPathway {
     }
 
     public void compact(final Point point) {
-        foreachEntry(
-                entry -> entry.getEntry(PathEntryType.SIGNAL).ifPresent(pos -> SignalConfig.reset(
-                        new SignalStateInfo(world, pos, SignalBoxHandler.getSignal(tilePos, pos)))),
-                point);
+        // TODO Reset other signals until point
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
         this.initalize();
