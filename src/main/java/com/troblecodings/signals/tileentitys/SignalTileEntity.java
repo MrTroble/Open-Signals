@@ -8,8 +8,8 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.ClientSignalsStateHandler;
-import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.world.entity.player.Player;
@@ -47,7 +47,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     @Override
     public IModelData getModelData() {
         final Map<SEProperty, String> states = ClientSignalsStateHandler
-                .getClientStates(new SignalStateInfo(level, worldPosition, getSignal()));
+                .getClientStates(new ClientSignalStateInfo(level, worldPosition));
         final Builder builder = new ModelDataMap.Builder();
         states.forEach((property, value) -> {
             builder.withInitial(property, value);

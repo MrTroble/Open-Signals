@@ -17,6 +17,7 @@ import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.ClientSignalsStateHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
@@ -123,7 +124,7 @@ public class Signal extends BasicBlock {
         final Level world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
-                ? ClientSignalsStateHandler.getClientStates(info)
+                ? ClientSignalsStateHandler.getClientStates(new ClientSignalStateInfo(info))
                 : SignalStateHandler.getStates(info);
         return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }

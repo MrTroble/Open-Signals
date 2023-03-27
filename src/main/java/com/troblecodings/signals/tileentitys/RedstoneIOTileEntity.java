@@ -37,7 +37,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         linkedPositions.clear();
         wrapper.getList(LINKED_LIST).stream().map(NBTWrapper::getAsPos)
                 .forEach(linkedPositions::add);
-        SignalBoxHandler.getAndRemovePos(worldPosition).forEach(pos -> linkedPositions.remove(pos));
+        SignalBoxHandler.getUnlinkedPos(worldPosition).forEach(pos -> linkedPositions.remove(pos));
         linkedPositions.addAll(SignalBoxHandler.getNewLinkedPos(worldPosition));
     }
 

@@ -1,6 +1,8 @@
 package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.guilib.ecs.ContainerBase;
@@ -18,6 +20,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
     public BasicBlockEntity tile;
     private final GuiInfo info;
     protected BlockPos pos;
+    protected List<BlockPos> linkedPos = new ArrayList<>();
 
     public NamableContainer(final GuiInfo info) {
         super(info);
@@ -31,6 +34,8 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
     private void sendSignalPos() {
         final BufferFactory buffer = new BufferFactory();
         buffer.putBlockPos(info.pos);
+        buffer.putByte((byte) tile.getLinkedPos().size());
+        tile.getLinkedPos().forEach(pos -> buffer.putBlockPos(pos));
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
@@ -43,6 +48,9 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
     public void deserializeClient(final ByteBuffer buf) {
         final BufferFactory buffer = new BufferFactory(buf);
         pos = buffer.getBlockPos();
+        final int size = buffer.getByteAsInt();
+        for (int i = 0; i < size; i++)
+            linkedPos.add(buffer.getBlockPos());
         tile = (BasicBlockEntity) info.world.getBlockEntity(pos);
         update();
     }

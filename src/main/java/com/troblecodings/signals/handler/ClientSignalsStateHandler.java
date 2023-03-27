@@ -16,7 +16,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
@@ -27,7 +26,7 @@ public class ClientSignalsStateHandler implements INetworkSync {
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
     private static final ExecutorService REMOVE_SERVICE = Executors.newFixedThreadPool(3);
 
-    public static final Map<SEProperty, String> getClientStates(final SignalStateInfo info) {
+    public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
         return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
     }
 
@@ -54,9 +53,9 @@ public class ClientSignalsStateHandler implements INetworkSync {
             BlockEntity entity;
             while ((entity = level.getBlockEntity(signalPos)) == null)
                 continue;
-            final SignalStateInfo stateInfo = new SignalStateInfo(level, signalPos,
-                    ((SignalTileEntity) entity).getSignal());
-            final List<SEProperty> signalProperties = stateInfo.signal.getProperties();
+            final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);
+            final List<SEProperty> signalProperties = ((SignalTileEntity) entity).getSignal()
+                    .getProperties();
             synchronized (CURRENTLY_LOADED_STATES) {
                 final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
                         .computeIfAbsent(stateInfo, _u -> new HashMap<>());
@@ -75,12 +74,11 @@ public class ClientSignalsStateHandler implements INetworkSync {
     private static void setRemoved(final BlockPos pos) {
         final Minecraft mc = Minecraft.getInstance();
         REMOVE_SERVICE.execute(() -> {
-            BlockState state;
-            while ((state = mc.level.getBlockState(pos)) == null)
-                continue;
-            // final Signal signal = (Signal) state.getBlock();
-            // CURRENTLY_LOADED_STATES.remove(new SignalStateInfo(mc.level, pos, signal));
+            synchronized (CURRENTLY_LOADED_STATES) {
+                CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.level, pos));
+            }
         });
+        System.out.println();
     }
 
     @SubscribeEvent

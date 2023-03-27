@@ -1,7 +1,6 @@
 package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,6 +13,7 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
@@ -91,82 +91,78 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         });
         final Map<Direction, Map<EnumState, Byte>> enabledStates = controllerEntity
                 .getEnabledStates();
-        final List<Byte> allBytes = new ArrayList<>();
-
-        allBytes.add((byte) propertiesToSend.size());
-        propertiesToSend.forEach((property, value) -> {
-            packPropertyToBuffer(allBytes, stateInfo, property, value);
-        });
-        allBytes.add((byte) controllerEntity.getProfile());
-        allBytes.add((byte) allStatesToSend.size());
-        allStatesToSend.forEach((profile, props) -> {
-            allBytes.add(profile);
-            allBytes.add((byte) props.size());
-            props.forEach((property, value) -> {
-                packPropertyToBuffer(allBytes, stateInfo, property, value);
-            });
-        });
-
-        allBytes.add((byte) enabledStates.size());
-        enabledStates.forEach((direction, states) -> {
-            allBytes.add((byte) direction.ordinal());
-            allBytes.add((byte) states.size());
-            states.forEach((mode, profile) -> {
-                allBytes.add((byte) mode.ordinal());
-                allBytes.add(profile);
-            });
-        });
-        final ByteBuffer buffer = ByteBuffer.allocate(13 + allBytes.size());
-        buffer.putInt(stateInfo.pos.getX());
-        buffer.putInt(stateInfo.pos.getY());
-        buffer.putInt(stateInfo.pos.getZ());
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putBlockPos(stateInfo.pos);
         currentMode = controllerEntity.getLastMode();
-        buffer.put((byte) currentMode.ordinal());
-        allBytes.forEach(entry -> buffer.put(entry));
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        buffer.putByte((byte) currentMode.ordinal());
+        buffer.putByte((byte) propertiesToSend.size());
+        propertiesToSend.forEach((property, value) -> {
+            packPropertyToBuffer(buffer, stateInfo, property, value);
+        });
+        buffer.putByte((byte) controllerEntity.getProfile());
+        buffer.putByte((byte) allStatesToSend.size());
+        allStatesToSend.forEach((profile, props) -> {
+            buffer.putByte(profile);
+            buffer.putByte((byte) props.size());
+            props.forEach((property, value) -> {
+                packPropertyToBuffer(buffer, stateInfo, property, value);
+            });
+        });
+
+        buffer.putByte((byte) enabledStates.size());
+        enabledStates.forEach((direction, states) -> {
+            buffer.putByte((byte) direction.ordinal());
+            buffer.putByte((byte) states.size());
+            states.forEach((mode, profile) -> {
+                buffer.putByte((byte) mode.ordinal());
+                buffer.putByte(profile);
+            });
+        });
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void packPropertyToBuffer(final List<Byte> allBytes, final SignalStateInfo stateInfo,
+    private void packPropertyToBuffer(final BufferFactory buffer, final SignalStateInfo stateInfo,
             final SEProperty property, final String value) {
-        allBytes.add((byte) stateInfo.signal.getIDFromProperty(property));
-        allBytes.add((byte) property.getParent().getIDFromValue(value));
+        buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
+        buffer.putByte((byte) property.getParent().getIDFromValue(value));
     }
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
-        linkedPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
-        currentMode = EnumMode.values()[Byte.toUnsignedInt(buf.get())];
+        final BufferFactory buffer = new BufferFactory(buf);
+        linkedPos = buffer.getBlockPos();
+        currentMode = EnumMode.values()[buffer.getByteAsInt()];
         final Signal signal = (Signal) info.world.getBlockState(linkedPos).getBlock();
         referenceBlock.set(signal);
-        final int size = Byte.toUnsignedInt(buf.get());
+        final int size = buffer.getByteAsInt();
         final Map<SEProperty, String> properites = new HashMap<>();
         propertiesList = signal.getProperties();
         for (int i = 0; i < size; i++) {
-            final SEProperty property = propertiesList.get(Byte.toUnsignedInt(buf.get()));
-            properites.put(property, property.getObjFromID(Byte.toUnsignedInt(buf.get())));
+            final SEProperty property = propertiesList.get(buffer.getByteAsInt());
+            properites.put(property, property.getObjFromID(buffer.getByteAsInt()));
         }
         reference.set(properites);
-        lastProfile = Byte.toUnsignedInt(buf.get());
-        final int allStatesSize = Byte.toUnsignedInt(buf.get());
+        lastProfile = buffer.getByteAsInt();
+        final int allStatesSize = buffer.getByteAsInt();
         for (int i = 0; i < allStatesSize; i++) {
-            final int profile = Byte.toUnsignedInt(buf.get());
-            final int propertySize = Byte.toUnsignedInt(buf.get());
+            final int profile = buffer.getByteAsInt();
+            final int propertySize = buffer.getByteAsInt();
             final Map<SEProperty, String> profileProps = new HashMap<>();
             for (int j = 0; j < propertySize; j++) {
-                final SEProperty property = propertiesList.get(Byte.toUnsignedInt(buf.get()));
-                final String value = property.getObjFromID(Byte.toUnsignedInt(buf.get()));
+                final SEProperty property = propertiesList.get(buffer.getByteAsInt());
+                final String value = property.getObjFromID(buffer.getByteAsInt());
                 profileProps.put(property, value);
             }
             allRSStates.put(profile, profileProps);
         }
-        final int enabledStatesSize = Byte.toUnsignedInt(buf.get());
+        final int enabledStatesSize = buffer.getByteAsInt();
         for (int i = 0; i < enabledStatesSize; i++) {
-            final Direction direction = Direction.values()[Byte.toUnsignedInt(buf.get())];
-            final int propSize = Byte.toUnsignedInt(buf.get());
+            final Direction direction = Direction.values()[buffer.getByteAsInt()];
+            final int propSize = buffer.getByteAsInt();
             final Map<EnumState, Integer> states = new HashMap<>();
             for (int j = 0; j < propSize; j++) {
-                final EnumState mode = EnumState.values()[Byte.toUnsignedInt(buf.get())];
-                states.put(mode, Byte.toUnsignedInt(buf.get()));
+                final EnumState mode = EnumState.values()[buffer.getByteAsInt()];
+                states.put(mode, buffer.getByteAsInt());
             }
             enabledRSStates.put(direction, states);
         }
@@ -175,23 +171,24 @@ public class ContainerSignalController extends ContainerBase implements UIClient
 
     @Override
     public void deserializeServer(final ByteBuffer buf) {
+        final BufferFactory buffer = new BufferFactory(buf);
         if (propertiesList == null) {
             propertiesList = getSignal().getProperties();
         }
-        final SignalControllerNetwork mode = SignalControllerNetwork.values()[Byte
-                .toUnsignedInt(buf.get())];
+        final SignalControllerNetwork mode = SignalControllerNetwork.values()[buffer
+                .getByteAsInt()];
         if (mode.equals(SignalControllerNetwork.SEND_MODE)) {
-            currentMode = EnumMode.values()[Byte.toUnsignedInt(buf.get())];
+            currentMode = EnumMode.values()[buffer.getByteAsInt()];
             controllerEntity.setLastMode(currentMode);
             return;
         }
         if (mode.equals(SignalControllerNetwork.SEND_RS_PROFILE)) {
-            currentRSProfile = Byte.toUnsignedInt(buf.get());
+            currentRSProfile = buffer.getByteAsInt();
             return;
         }
         if (mode.equals(SignalControllerNetwork.SEND_PROPERTY)) {
-            final SEProperty property = propertiesList.get(Byte.toUnsignedInt(buf.get()));
-            final String value = property.getObjFromID(Byte.toUnsignedInt(buf.get()));
+            final SEProperty property = propertiesList.get(buffer.getByteAsInt());
+            final String value = property.getObjFromID(buffer.getByteAsInt());
             if (currentMode.equals(EnumMode.MANUELL)) {
                 SignalStateHandler.setState(new SignalStateInfo(info.world, linkedPos, getSignal()),
                         property, value);
@@ -204,14 +201,14 @@ public class ContainerSignalController extends ContainerBase implements UIClient
             return;
         }
         if (mode.equals(SignalControllerNetwork.SET_PROFILE)) {
-            final EnumState state = EnumState.values()[Byte.toUnsignedInt(buf.get())];
-            final Direction direction = Direction.values()[Byte.toUnsignedInt(buf.get())];
-            final int profile = Byte.toUnsignedInt(buf.get());
+            final EnumState state = EnumState.values()[buffer.getByteAsInt()];
+            final Direction direction = Direction.values()[buffer.getByteAsInt()];
+            final int profile = buffer.getByteAsInt();
             controllerEntity.updateEnabledStates(direction, state, profile);
             return;
         }
         if (mode.equals(SignalControllerNetwork.INITIALIZE_DIRECTION)) {
-            final Direction direction = Direction.values()[Byte.toUnsignedInt(buf.get())];
+            final Direction direction = Direction.values()[buffer.getByteAsInt()];
             final Map<EnumState, Byte> states = new HashMap<>();
             states.put(EnumState.OFFSTATE, (byte) 0);
             states.put(EnumState.ONSTATE, (byte) 0);

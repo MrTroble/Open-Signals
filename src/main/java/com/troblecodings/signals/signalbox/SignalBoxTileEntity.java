@@ -51,8 +51,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         SignalBoxHandler.setWorld(worldPosition, world);
     }
 
-    private final WorldOperations worldLoadOps = new WorldOperations();
-
     public void removeSignal(final BlockPos pos) {
         if (level.isClientSide)
             return;
@@ -64,7 +62,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (level.isClientSide)
             return;
         linkedBlocks.remove(pos);
-        SignalBoxHandler.addRemovedInputPos(pos, worldPosition, level);
+        SignalBoxHandler.unlinkInputPos(pos, worldPosition, level);
     }
 
     @Override
@@ -74,9 +72,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             entry.getValue().write(item);
             return item;
         })::iterator);
-        final Map<BlockPos, Signal> allSignals = SignalBoxHandler.containsTilePos(worldPosition)
-                ? SignalBoxHandler.getSignals(worldPosition)
-                : new HashMap<>();
+        final Map<BlockPos, Signal> allSignals = SignalBoxHandler.getSignals(worldPosition);
         wrapper.putList(LINKED_SIGNALS, allSignals.entrySet().stream().map(entry -> {
             final NBTWrapper signal = NBTWrapper.getBlockPosWrapper(entry.getKey());
             signal.putString(SIGNAL_NAME, entry.getValue().getSignalTypeName());
@@ -137,7 +133,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         }
         linkedBlocks.put(pos, type);
         return true;
-
     }
 
     @Override
@@ -153,13 +148,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean unlink() {
-        final Map<BlockPos, Signal> signals = SignalBoxHandler.containsTilePos(worldPosition)
-                ? SignalBoxHandler.clearSignals(worldPosition)
-                : new HashMap<>();
+        final Map<BlockPos, Signal> signals = SignalBoxHandler.clearSignals(worldPosition);
         signals.forEach(
                 (pos, signal) -> SignalConfig.reset(new SignalStateInfo(level, pos, signal)));
         linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue()))
                 .forEach(entry -> {
+                    SignalBoxHandler.unlinkInputPos(entry.getKey(), worldPosition, level);
                 });
         linkedBlocks.clear();
         syncClient();

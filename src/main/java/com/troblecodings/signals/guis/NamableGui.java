@@ -79,9 +79,10 @@ public class NamableGui extends GuiBase {
         list.setInheritWidth(true);
         final UIBox layout = new UIBox(UIBox.VBOX, 5);
         list.add(layout);
-        this.container.tile.getLinkedPos().forEach(pos -> list.add(GuiElements.createLabel(
-                String.format("%s: x=%d, y=%d, z=%d", OSBlocks.SIGNAL_BOX.getName().getString(),
-                        pos.getX(), pos.getY(), pos.getZ()))));
+        this.container.linkedPos.forEach(
+                pos -> list.add(GuiElements.createLabel(String.format("%s: x = %d, y = %d, z = %d",
+                        OSBlocks.SIGNAL_BOX.getName().getString(), pos.getX(), pos.getY(),
+                        pos.getZ()))));
         inner.add(list);
         inner.add(GuiElements.createPageSelect(layout));
     }

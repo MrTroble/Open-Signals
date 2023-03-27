@@ -55,4 +55,11 @@ public class SignalBox extends BasicBlock {
         return Optional.of("signalbox");
     }
 
+    @Override
+    public void playerWillDestroy(final Level world, final BlockPos pos, final BlockState state,
+            final Player player) {
+        if (!world.isClientSide)
+            ((SignalBoxTileEntity) world.getBlockEntity(pos)).unlink();
+        super.playerWillDestroy(world, pos, state, player);
+    }
 }

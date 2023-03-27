@@ -121,6 +121,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         } else {
             return;
         }
+        if (linkedSignal != null) {
+            final NBTWrapper signal = NBTWrapper.getBlockPosWrapper(linkedSignalPosition);
+            signal.putString(SIGNAL_NAME, linkedSignal.getSignalTypeName());
+            wrapper.putWrapper(SIGNAL_NAME, signal);
+        }
         wrapper.putInteger(LAST_PROFILE, lastProfile);
         if (lastState != null)
             wrapper.putInteger(ENUM_MODE, lastState.ordinal());
@@ -161,6 +166,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private void readFromWrapper(final NBTWrapper wrapper) {
         if (level == null || level.isClientSide || linkedSignalPosition == null)
             return;
+        if (wrapper.contains(SIGNAL_NAME)) {
+            final NBTWrapper signal = wrapper.getWrapper(SIGNAL_NAME);
+            linkedSignal = Signal.SIGNALS.get(signal.getString(SIGNAL_NAME));
+        }
         if (wrapper.contains(LAST_PROFILE)) {
             lastProfile = wrapper.getInteger(LAST_PROFILE);
         }

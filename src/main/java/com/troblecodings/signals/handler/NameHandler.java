@@ -152,12 +152,23 @@ public final class NameHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
+        if (event.getWorld().isClientSide())
+            return;
         service.execute(() -> {
             Map<NameStateInfo, String> map;
             synchronized (ALL_NAMES) {
                 map = ImmutableMap.copyOf(ALL_NAMES);
             }
             map.forEach(NameHandler::createToFile);
+        });
+    }
+
+    @SubscribeEvent
+    public static void onWorldUnload(final WorldEvent.Unload unload) {
+        if (unload.getWorld().isClientSide())
+            return;
+        service.execute(() -> {
+            ALL_LEVEL_FILES.remove(unload.getWorld());
         });
     }
 

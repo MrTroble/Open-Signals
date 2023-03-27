@@ -119,15 +119,11 @@ public final class SignalBoxHandler {
         return ImmutableMap.copyOf(ALL_SIGNALS.get(tilePos));
     }
 
-    public static boolean containsTilePos(final BlockPos tilePos) {
-        return ALL_SIGNALS.containsKey(tilePos);
-    }
-
     public static void setSignals(final BlockPos tilePos, final Map<BlockPos, Signal> signals) {
         ALL_SIGNALS.put(tilePos, signals);
     }
 
-    public static void addRemovedInputPos(final BlockPos ioPos, final BlockPos posToRemove,
+    public static void unlinkInputPos(final BlockPos ioPos, final BlockPos posToRemove,
             final Level world) {
         final BlockEntity entity = world.getBlockEntity(ioPos);
         if (entity != null) {
@@ -145,7 +141,7 @@ public final class SignalBoxHandler {
         }
     }
 
-    public static List<BlockPos> getAndRemovePos(final BlockPos ioPos) {
+    public static List<BlockPos> getUnlinkedPos(final BlockPos ioPos) {
         final List<BlockPos> positions = REMOVED_POS_FROM_INPUT.get(ioPos);
         if (positions == null)
             return new ArrayList<>();
