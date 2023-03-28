@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
     public static final String GUI_TAG = "guiTag";
+    public static final String POS_TAG = "posTag";
     protected final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
     protected String customName = null;
 

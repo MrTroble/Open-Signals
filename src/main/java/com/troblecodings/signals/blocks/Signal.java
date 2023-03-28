@@ -179,7 +179,7 @@ public class Signal extends BasicBlock {
         if (!worldIn.isClientSide() && worldIn instanceof Level) {
             SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos, this));
             NameHandler.setRemoved(new NameStateInfo((Level) worldIn, pos));
-            SignalBoxHandler.onSignalRemoved(pos);
+            SignalBoxHandler.onPosRemove(pos);
         }
     }
 

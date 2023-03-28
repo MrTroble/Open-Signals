@@ -17,6 +17,7 @@ import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -62,11 +63,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         final SignalBoxGrid grid = tile.getSignalBoxGrid();
         final BufferFactory buffer = new BufferFactory();
         buffer.putByte((byte) SignalBoxNetwork.SEND_GRID.ordinal());
-        buffer.putInt(info.pos.getX());
-        buffer.putInt(info.pos.getY());
-        buffer.putInt(info.pos.getZ());
+        buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
-        final Map<BlockPos, LinkType> positions = tile.getPositions();
+        final Map<BlockPos, LinkType> positions = SignalBoxHandler
+                .getAllLinkedPos(tile.getBlockPos());
         buffer.putInt(positions.size());
         positions.forEach((pos, type) -> {
             buffer.putBlockPos(pos);
@@ -138,12 +138,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             return;
         }
         if (mode.equals(SignalBoxNetwork.REMOVE_POS)) {
-            final LinkType type = LinkType.of(buffer);
             final BlockPos pos = buffer.getBlockPos();
-            tile.removeLinkedPos(pos);
-            if (type.equals(LinkType.SIGNAL)) {
-                tile.removeSignal(pos);
-            }
+            SignalBoxHandler.removeLinkedPos(tile.getBlockPos(), pos);
             return;
         }
         if (mode.equals(SignalBoxNetwork.RESET_PW)) {

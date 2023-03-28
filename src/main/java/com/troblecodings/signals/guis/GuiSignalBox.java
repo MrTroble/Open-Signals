@@ -366,7 +366,7 @@ public class GuiSignalBox extends GuiBase {
 
             layout.add(GuiElements.createButton(name));
             layout.add(GuiElements.createButton("x", 20, e -> {
-                removeBlockPos(p, t);
+                removeBlockPos(p);
                 list.remove(layout);
             }));
             list.add(layout);
@@ -632,12 +632,11 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void removeBlockPos(final BlockPos pos, final LinkType type) {
+    private void removeBlockPos(final BlockPos pos) {
         if (!allPacketsRecived)
             return;
         final BufferFactory buffer = new BufferFactory();
         buffer.putByte((byte) SignalBoxNetwork.REMOVE_POS.ordinal());
-        buffer.putByte((byte) type.ordinal());
         buffer.putBlockPos(pos);
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }

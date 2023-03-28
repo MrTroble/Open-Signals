@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -34,7 +33,6 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalBoxPathway {
 
@@ -197,18 +195,10 @@ public class SignalBoxPathway {
 
     public void setPathStatus(final EnumPathUsage status, final @Nullable Point point) {
         foreachEntry(option -> {
-            option.getEntry(PathEntryType.OUTPUT)
-                    .ifPresent(pos -> setPower(pos, !status.equals(EnumPathUsage.FREE)));
+            option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(pos, world, !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
-    }
-
-    private void setPower(final BlockPos pos, final boolean power) {
-        if (pos == null)
-            return;
-        BlockState state = world.getBlockState(pos);
-        state = state.setValue(RedstoneIO.POWER, power);
-        world.setBlockAndUpdate(pos, state);
     }
 
     public void setPathStatus(final EnumPathUsage status) {

@@ -1,13 +1,10 @@
 package com.troblecodings.signals.signalbox;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
@@ -30,11 +27,6 @@ import net.minecraft.world.level.block.Block;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
-    private static final String LINKED_POS_LIST = "linkedPos";
-    private static final String LINKED_SIGNALS = "linkedSignals";
-    private static final String SIGNAL_NAME = "signalName";
-
-    private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
     private final SignalBoxGrid grid;
 
     public SignalBoxTileEntity(final TileEntityInfo info) {
@@ -51,38 +43,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         SignalBoxHandler.setWorld(worldPosition, world);
     }
 
-    public void removeSignal(final BlockPos pos) {
-        if (level.isClientSide)
-            return;
-        if (!SignalBoxHandler.containsSignal(worldPosition, pos))
-            return;
-        SignalConfig.reset(new SignalStateInfo(level, pos,
-                SignalBoxHandler.removeSignal(worldPosition, pos, level)));
-    }
-
-    public void removeLinkedPos(final BlockPos pos) {
-        if (level.isClientSide)
-            return;
-        linkedBlocks.remove(pos);
-        SignalBoxHandler.unlinkPosFromTile(pos, worldPosition, level);
-    }
-
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
-        wrapper.putList(LINKED_POS_LIST, linkedBlocks.entrySet().stream().map(entry -> {
-            final NBTWrapper item = NBTWrapper.getBlockPosWrapper(entry.getKey());
-            entry.getValue().write(item);
-            return item;
-        })::iterator);
-        final Map<BlockPos, Signal> allSignals = SignalBoxHandler.getSignals(worldPosition);
-        wrapper.putList(LINKED_SIGNALS, allSignals.entrySet().stream().map(entry -> {
-            final NBTWrapper signal = NBTWrapper.getBlockPosWrapper(entry.getKey());
-            signal.putString(SIGNAL_NAME, entry.getValue().getSignalTypeName());
-            return signal;
-        })::iterator);
         final NBTWrapper gridTag = new NBTWrapper();
         this.grid.write(gridTag);
-        SignalBoxHandler.writeToNBT(worldPosition, gridTag);
+        SignalBoxHandler.writeTileNBT(worldPosition, wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
     }
 
@@ -90,17 +55,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
-        linkedBlocks.clear();
-        SignalBoxHandler.clearSignals(worldPosition);
-        wrapper.getList(LINKED_POS_LIST)
-                .forEach(nbt -> linkedBlocks.put(nbt.getAsPos(), LinkType.of(nbt)));
-        final Map<BlockPos, Signal> allSignals = new HashMap<>();
-        wrapper.getList(LINKED_SIGNALS).forEach(nbt -> {
-            final BlockPos pos = nbt.getAsPos();
-            final Signal signal = Signal.SIGNALS.get(nbt.getString(SIGNAL_NAME));
-            allSignals.put(pos, signal);
-        });
-        SignalBoxHandler.setSignals(worldPosition, allSignals);
         grid.read(wrapper.getWrapper(GUI_TAG));
         copy = wrapper.copy();
         if (level != null) {
@@ -110,13 +64,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean hasLink() {
-        return !linkedBlocks.isEmpty();
+        return SignalBoxHandler.isTileEmpty(worldPosition);
     }
 
     @Override
     public boolean link(final BlockPos pos, final CompoundTag tag) {
-        if (linkedBlocks.containsKey(pos))
-            return false;
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
                 tag.getString(SignalControllerTileEntity.SIGNAL_NAME)));
@@ -125,15 +77,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         LinkType type = LinkType.SIGNAL;
         if (block == OSBlocks.REDSTONE_IN) {
             type = LinkType.INPUT;
-            SignalBoxHandler.linkTileToPos(pos, worldPosition, level);
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
         if (type.equals(LinkType.SIGNAL)) {
             SignalConfig.reset(new SignalStateInfo(level, pos, (Signal) block));
-            SignalBoxHandler.addSignal(worldPosition, (Signal) block, pos, level);
         }
-        linkedBlocks.put(pos, type);
+        SignalBoxHandler.linkPos(worldPosition, pos, (BasicBlock) block, type, level);
         return true;
     }
 
@@ -143,26 +93,15 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             return;
         }
         grid.setTile(this);
-        final GridComponent component = SignalBoxHandler.computeIfAbsent(worldPosition, level);
-        component.read(copy == null ? new NBTWrapper() : copy.getWrapper(GUI_TAG),
+        SignalBoxHandler.computeIfAbsent(worldPosition, level);
+        SignalBoxHandler.readTileNBT(worldPosition, copy == null ? new NBTWrapper() : copy,
                 grid.getModeGrid());
     }
 
     @Override
     public boolean unlink() {
-        final Map<BlockPos, Signal> signals = SignalBoxHandler.clearSignals(worldPosition);
-        signals.forEach(
-                (pos, signal) -> SignalConfig.reset(new SignalStateInfo(level, pos, signal)));
-        linkedBlocks.entrySet().forEach(entry -> {
-            SignalBoxHandler.unlinkPosFromTile(entry.getKey(), worldPosition, level);
-        });
-        linkedBlocks.clear();
-        syncClient();
+        SignalBoxHandler.unlink(worldPosition, level);
         return true;
-    }
-
-    public Map<BlockPos, LinkType> getPositions() {
-        return ImmutableMap.copyOf(this.linkedBlocks);
     }
 
     public boolean isBlocked() {
