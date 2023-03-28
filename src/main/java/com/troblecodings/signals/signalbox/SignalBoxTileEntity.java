@@ -54,15 +54,17 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public void removeSignal(final BlockPos pos) {
         if (level.isClientSide)
             return;
-        SignalConfig.reset(
-                new SignalStateInfo(level, pos, SignalBoxHandler.removeSignal(worldPosition, pos)));
+        if (!SignalBoxHandler.containsSignal(worldPosition, pos))
+            return;
+        SignalConfig.reset(new SignalStateInfo(level, pos,
+                SignalBoxHandler.removeSignal(worldPosition, pos, level)));
     }
 
     public void removeLinkedPos(final BlockPos pos) {
         if (level.isClientSide)
             return;
         linkedBlocks.remove(pos);
-        SignalBoxHandler.unlinkInputPos(pos, worldPosition, level);
+        SignalBoxHandler.unlinkPosFromTile(pos, worldPosition, level);
     }
 
     @Override
@@ -123,13 +125,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         LinkType type = LinkType.SIGNAL;
         if (block == OSBlocks.REDSTONE_IN) {
             type = LinkType.INPUT;
-            SignalBoxHandler.linkRedstoneInput(pos, worldPosition, level);
+            SignalBoxHandler.linkTileToPos(pos, worldPosition, level);
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
         if (type.equals(LinkType.SIGNAL)) {
             SignalConfig.reset(new SignalStateInfo(level, pos, (Signal) block));
-            SignalBoxHandler.addSignal(worldPosition, (Signal) block, pos);
+            SignalBoxHandler.addSignal(worldPosition, (Signal) block, pos, level);
         }
         linkedBlocks.put(pos, type);
         return true;
@@ -151,10 +153,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         final Map<BlockPos, Signal> signals = SignalBoxHandler.clearSignals(worldPosition);
         signals.forEach(
                 (pos, signal) -> SignalConfig.reset(new SignalStateInfo(level, pos, signal)));
-        linkedBlocks.entrySet().stream().filter(entry -> !LinkType.SIGNAL.equals(entry.getValue()))
-                .forEach(entry -> {
-                    SignalBoxHandler.unlinkInputPos(entry.getKey(), worldPosition, level);
-                });
+        linkedBlocks.entrySet().forEach(entry -> {
+            SignalBoxHandler.unlinkPosFromTile(entry.getKey(), worldPosition, level);
+        });
         linkedBlocks.clear();
         syncClient();
         return true;

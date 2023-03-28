@@ -78,7 +78,6 @@ public class ClientSignalsStateHandler implements INetworkSync {
                 CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.level, pos));
             }
         });
-        System.out.println();
     }
 
     @SubscribeEvent

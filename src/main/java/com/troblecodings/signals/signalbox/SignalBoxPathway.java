@@ -20,12 +20,11 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.blocks.SignalController;
+import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
-import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
@@ -35,6 +34,7 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalBoxPathway {
 
@@ -198,9 +198,17 @@ public class SignalBoxPathway {
     public void setPathStatus(final EnumPathUsage status, final @Nullable Point point) {
         foreachEntry(option -> {
             option.getEntry(PathEntryType.OUTPUT)
-                    .ifPresent(pos -> loadOps.setPower(pos, !status.equals(EnumPathUsage.FREE)));
+                    .ifPresent(pos -> setPower(pos, !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
+    }
+
+    private void setPower(final BlockPos pos, final boolean power) {
+        if (pos == null)
+            return;
+        BlockState state = world.getBlockState(pos);
+        state = state.setValue(RedstoneIO.POWER, power);
+        world.setBlockAndUpdate(pos, state);
     }
 
     public void setPathStatus(final EnumPathUsage status) {
@@ -258,7 +266,17 @@ public class SignalBoxPathway {
     }
 
     public void compact(final Point point) {
-        // TODO Reset other signals until point
+        foreachPath((path, node) -> {
+            final Rotation rotation = SignalBoxUtil
+                    .getRotationFromDelta(node.getPoint().delta(path.point1));
+            for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
+                node.getOption(new ModeSet(mode, rotation))
+                        .ifPresent(option -> option.getEntry(PathEntryType.SIGNAL)
+                                .ifPresent(position -> SignalConfig.reset(new SignalStateInfo(world,
+                                        position, SignalBoxHandler.getSignal(tilePos, position)))));
+            }
+        }, point);
+
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
         this.initalize();
