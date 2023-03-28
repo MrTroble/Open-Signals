@@ -31,7 +31,7 @@ public final class SignalBoxHandler {
     private static final Map<BlockPos, LinkedPosHolder> ALL_LINKED_POS = new HashMap<>();
     private static final Map<BlockPos, PosUpdateComponent> POS_UPDATES = new HashMap<>();
     private static final Map<BlockPos, Boolean> OUTPUT_UPDATES = new HashMap<>();
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
+    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(3);
 
     public static void resetPathway(final BlockPos tilePos, final Point point) {
         GridComponent grid;
