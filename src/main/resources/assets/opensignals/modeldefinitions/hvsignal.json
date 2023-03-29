@@ -229,7 +229,7 @@
 		"hv/hv_zs3": {
 			"textures": [
 				{
-					"blockstate": "has(STOPSIGNAL) || has(HPHOME) || has(HPBLOCK)",
+					"blockstate": "(has(STOPSIGNAL) || has(HPHOME) || has(HPBLOCK)) && has(ZS3)",
 					"extentions": {
 						"zs32.json": {
 							"zs3": "overlay"
