@@ -11,7 +11,7 @@ public class TextureStats {
     protected float y = 0;
     protected float z = 0;
 
-    protected final boolean loadOFFstate = true;
+    protected boolean loadOFFstate = true;
     protected String blockstate;
     protected Map<String, String> retexture;
     protected Map<String, Map<String, String>> extentions;
