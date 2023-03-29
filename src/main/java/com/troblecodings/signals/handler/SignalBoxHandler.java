@@ -185,9 +185,7 @@ public final class SignalBoxHandler {
     public static void onPosRemove(final BlockPos pos) {
         SERVICE.execute(() -> {
             synchronized (ALL_LINKED_POS) {
-                ALL_LINKED_POS.forEach((_u, holder) -> {
-                    holder.removeLinkedPos(pos);
-                });
+                ALL_LINKED_POS.values().forEach(holder -> holder.removeLinkedPos(pos));
             }
         });
     }

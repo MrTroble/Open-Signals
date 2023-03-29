@@ -60,8 +60,9 @@ public class LinkedPosHolder {
     public void unlink(final BlockPos tilePos, final Level world) {
         signals.forEach(
                 (pos, signal) -> SignalConfig.reset(new SignalStateInfo(world, pos, signal)));
-        linkedBlocks.keySet()
-                .forEach(pos -> SignalBoxHandler.unlinkPosFromTile(pos, tilePos, world));
+        linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
+                .forEach(entry -> SignalBoxHandler.unlinkPosFromTile(entry.getKey(), tilePos,
+                        world));
         linkedBlocks.clear();
         signals.clear();
     }
