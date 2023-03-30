@@ -1,6 +1,5 @@
 package com.troblecodings.signals.core;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,12 +25,12 @@ public class SubsidiaryState {
         return name;
     }
 
-    public void writeNetwork(final BufferBuilder buffer) {
+    public void writeNetwork(final BufferFactory buffer) {
         buffer.putByte((byte) id);
     }
 
-    public static SubsidiaryState of(final ByteBuffer buffer) {
-        return ALL_STATES.get(Byte.toUnsignedInt(buffer.get()));
+    public static SubsidiaryState of(final BufferFactory buffer) {
+        return ALL_STATES.get(buffer.getByteAsInt());
     }
 
     @Override

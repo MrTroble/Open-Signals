@@ -1,6 +1,5 @@
 package com.troblecodings.signals.signalbox.entrys;
 
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +8,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.BufferFactory;
 
 public class PathOptionEntry implements INetworkSavable {
 
@@ -88,37 +87,28 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        final int size = Byte.toUnsignedInt(buffer.get());
+    public void readNetwork(final BufferFactory buffer) {
+        final int size = buffer.getByteAsInt();
         for (int i = 0; i < size; i++) {
-            final PathEntryType<?> type = PathEntryType.ALL_ENTRIES
-                    .get(Byte.toUnsignedInt(buffer.get()));
+            final PathEntryType<?> type = PathEntryType.ALL_ENTRIES.get(buffer.getByteAsInt());
             final IPathEntry<?> entry = pathEntrys.computeIfAbsent(type, _u -> type.newValue());
             entry.readNetwork(buffer);
             pathEntrys.put(type, entry);
         }
     }
 
-    public void writeToBuffer(final BufferBuilder buffer) {
+    @Override
+    public void writeNetwork(final BufferFactory buffer) {
         buffer.putByte((byte) pathEntrys.size());
         pathEntrys.forEach((type, entry) -> {
             buffer.putByte((byte) type.getID());
-            entry.writeToBuffer(buffer);
-        });
-    }
-
-    @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        buffer.put((byte) pathEntrys.size());
-        pathEntrys.forEach((type, entry) -> {
-            buffer.put((byte) type.getID());
             entry.writeNetwork(buffer);
         });
     }
 
-    public void writeUpdateBuffer(final BufferBuilder builder) {
+    public void writeUpdateNetwork(final BufferFactory builder) {
         builder.putByte((byte) 1);
         builder.putByte((byte) PathEntryType.PATHUSAGE.getID());
-        pathEntrys.get(PathEntryType.PATHUSAGE).writeToBuffer(builder);
+        pathEntrys.get(PathEntryType.PATHUSAGE).writeNetwork(builder);
     }
 }

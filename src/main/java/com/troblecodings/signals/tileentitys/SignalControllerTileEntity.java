@@ -31,6 +31,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         implements ISyncable, ILinkableTile {
 
     private BlockPos linkedSignalPosition = null;
+    private Signal linkedSignal = null;
     private Signal signal;
     private int lastProfile = 0;
     private NBTWrapper copy;
@@ -120,6 +121,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         } else {
             return;
         }
+        if (linkedSignal != null) {
+            final NBTWrapper signal = NBTWrapper.getBlockPosWrapper(linkedSignalPosition);
+            signal.putString(SIGNAL_NAME, linkedSignal.getSignalTypeName());
+            wrapper.putWrapper(SIGNAL_NAME, signal);
+        }
         wrapper.putInteger(LAST_PROFILE, lastProfile);
         if (lastState != null)
             wrapper.putInteger(ENUM_MODE, lastState.ordinal());
@@ -160,6 +166,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private void readFromWrapper(final NBTWrapper wrapper) {
         if (level == null || level.isClientSide || linkedSignalPosition == null)
             return;
+        if (wrapper.contains(SIGNAL_NAME)) {
+            final NBTWrapper signal = wrapper.getWrapper(SIGNAL_NAME);
+            linkedSignal = Signal.SIGNALS.get(signal.getString(SIGNAL_NAME));
+        }
         if (wrapper.contains(LAST_PROFILE)) {
             lastProfile = wrapper.getInteger(LAST_PROFILE);
         }
@@ -206,6 +216,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return linkedSignalPosition;
     }
 
+    public Signal getLinkedSignal() {
+        return linkedSignal;
+    }
+
     @Override
     public boolean hasLink() {
         return linkedSignalPosition != null;
@@ -216,10 +230,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK
                 .get(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
-        if (block == null)
-            return false;
-        if (block instanceof Signal) {
+        if (block != null && block instanceof Signal) {
             linkedSignalPosition = pos;
+            linkedSignal = (Signal) block;
             return true;
         }
         return false;

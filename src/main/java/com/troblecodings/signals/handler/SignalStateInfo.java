@@ -38,7 +38,9 @@ public class SignalStateInfo {
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
-        if ((obj == null) || (getClass() != obj.getClass()))
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
             return false;
         final SignalStateInfo other = (SignalStateInfo) obj;
         return Objects.equals(pos, other.pos) && Objects.equals(signal, other.signal)

@@ -22,6 +22,7 @@ public class FunctionParsingInfo {
         PARAMETER_PARSER.put(SEProperty.class, FunctionParsingInfo::getProperty);
         PARAMETER_PARSER.put(ValuePack.class, FunctionParsingInfo::getPredicate);
         PARAMETER_PARSER.put(StringInteger.class, FunctionParsingInfo::getStringInt);
+        PARAMETER_PARSER.put(String.class, FunctionParsingInfo::getString);
     }
 
     public String argument;
@@ -102,6 +103,10 @@ public class FunctionParsingInfo {
             return new StringInteger(parts[0], Integer.parseInt(parts[1]));
         });
         return strInt;
+    }
+
+    public Object getString() {
+        return argument;
     }
 
     public Map<String, MethodInfo> getTable() {

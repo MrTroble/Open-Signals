@@ -2,8 +2,6 @@ package com.troblecodings.signals.signalbox.entrys;
 
 import java.util.Objects;
 
-import com.troblecodings.signals.core.BufferBuilder;
-
 public abstract class IPathEntry<T> implements INetworkSavable {
 
     private String name = "defaultEntry";
@@ -35,8 +33,6 @@ public abstract class IPathEntry<T> implements INetworkSavable {
      * @param the value to set
      */
     public abstract void setValue(T value);
-
-    public abstract void writeToBuffer(final BufferBuilder buffer);
 
     @Override
     public int hashCode() {

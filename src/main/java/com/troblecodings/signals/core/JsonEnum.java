@@ -10,10 +10,11 @@ import java.util.Objects;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 
 import net.minecraftforge.client.model.data.ModelProperty;
 
-public class JsonEnum extends ModelProperty<String> {
+public class JsonEnum extends ModelProperty<String> implements IIntegerable<String> {
 
     private final String name;
     private final List<String> values;
@@ -38,7 +39,7 @@ public class JsonEnum extends ModelProperty<String> {
     }
 
     public boolean isValid(final String value) {
-        return valueToInt.containsKey(value);
+        return valueToInt.containsKey(value.toLowerCase());
     }
 
     public Class<String> getType() {
@@ -91,8 +92,16 @@ public class JsonEnum extends ModelProperty<String> {
         return name;
     }
 
-    public String getValue(final int id) {
-        return values.get(id);
+    @Override
+    public String getObjFromID(final int obj) {
+        if (obj < 0 || obj >= values.size())
+            return "";
+        return values.get(obj);
+    }
+
+    @Override
+    public int count() {
+        return values.size();
     }
 
     public static final JsonEnum BOOLEAN = new JsonEnum("boolean",

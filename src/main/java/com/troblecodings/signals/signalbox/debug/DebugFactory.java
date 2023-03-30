@@ -1,8 +1,5 @@
 package com.troblecodings.signals.signalbox.debug;
 
-import java.util.function.Consumer;
-
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -21,10 +18,10 @@ public class DebugFactory extends SignalBoxFactory {
     }
 
     @Override
-    public SignalBoxGrid getGrid(final Consumer<NBTWrapper> sendToAll) {
+    public SignalBoxGrid getGrid() {
         if (enableDebugGrid)
-            return new DebugGrid(sendToAll);
-        return super.getGrid(sendToAll);
+            return new DebugGrid();
+        return super.getGrid();
     }
 
     @Override

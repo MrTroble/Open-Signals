@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -22,31 +24,38 @@ public class ClientSignalsStateHandler implements INetworkSync {
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
+    private static final ExecutorService REMOVE_SERVICE = Executors.newFixedThreadPool(3);
 
-    public static final Map<SEProperty, String> getClientStates(final SignalStateInfo info) {
+    public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
         return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
     }
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
-        final BlockPos signalPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
-        final int propertiesSize = Byte.toUnsignedInt(buf.get());
+        final BufferFactory buffer = new BufferFactory(buf);
+        final Minecraft mc = Minecraft.getInstance();
+        final Level level = mc.level;
+        final BlockPos signalPos = buffer.getBlockPos();
+        final int propertiesSize = buffer.getByteAsInt();
+        if (propertiesSize == 255) {
+            setRemoved(signalPos);
+            return;
+        }
         final int[] propertyIDs = new int[propertiesSize];
         final int[] valueIDs = new int[propertiesSize];
         for (int i = 0; i < propertiesSize; i++) {
-            propertyIDs[i] = Byte.toUnsignedInt(buf.get());
-            valueIDs[i] = Byte.toUnsignedInt(buf.get());
+            propertyIDs[i] = buffer.getByteAsInt();
+            valueIDs[i] = buffer.getByteAsInt();
         }
         SERVICE.execute(() -> {
-            final Minecraft mc = Minecraft.getInstance();
-            final Level level = mc.level;
             if (level == null)
                 return;
             BlockEntity entity;
             while ((entity = level.getBlockEntity(signalPos)) == null)
                 continue;
-            final SignalStateInfo stateInfo = new SignalStateInfo(level, signalPos);
-            final List<SEProperty> signalProperties = stateInfo.signal.getProperties();
+            final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);
+            final List<SEProperty> signalProperties = ((SignalTileEntity) entity).getSignal()
+                    .getProperties();
             synchronized (CURRENTLY_LOADED_STATES) {
                 final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
                         .computeIfAbsent(stateInfo, _u -> new HashMap<>());
@@ -55,9 +64,19 @@ public class ClientSignalsStateHandler implements INetworkSync {
                     final String value = property.getObjFromID(valueIDs[i]);
                     properties.put(property, value);
                 }
+                CURRENTLY_LOADED_STATES.put(stateInfo, properties);
             }
             entity.requestModelDataUpdate();
             mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
+        });
+    }
+
+    private static void setRemoved(final BlockPos pos) {
+        final Minecraft mc = Minecraft.getInstance();
+        REMOVE_SERVICE.execute(() -> {
+            synchronized (CURRENTLY_LOADED_STATES) {
+                CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.level, pos));
+            }
         });
     }
 

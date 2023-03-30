@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,7 +31,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -40,11 +39,13 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
+import com.troblecodings.signals.signalbox.entrys.ZS2Entry;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -144,7 +145,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private String getSignalInfo(final BlockPos signalPos, final LinkType type) {
-        final String customName = NameHandler.getClientName(signalPos);
+        final String customName = NameHandler.getClientName(new NameStateInfo(mc.level, signalPos));
         return String.format("%s (x=%d, y=%d. z=%d)",
                 customName == null
                         ? (type.equals(LinkType.SIGNAL) ? "" : I18n.get("type." + type.name()))
@@ -192,12 +193,7 @@ public class GuiSignalBox extends GuiBase {
                         sendIntEntryToServer(speed, node, mode, rotation, PathEntryType.SPEED);
                         option.setEntry(PathEntryType.SPEED, speed);
                     }
-                });
-                final int speed = option.getEntry(PathEntryType.SPEED).filter(n -> n < 16)
-                        .orElse(127);
-                speedSelection.findRecursive(UIEnumerable.class).forEach(e -> {
-                    e.setIndex(speed);
-                });
+                }, option.getEntry(PathEntryType.SPEED).filter(n -> n < 16).orElse(127));
                 parent.add(speedSelection);
 
                 selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
@@ -206,8 +202,20 @@ public class GuiSignalBox extends GuiBase {
                         mode, rotation, ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
                         mode, rotation, ".resetting");
+
+                final String zs2 = option.getEntry(PathEntryType.ZS2).orElse("");
+
+                final UIEntity zs2Entity = GuiElements.createEnumElement(ZS2Entry.ZS32, e -> {
+                    if (e == 0) {
+                        removeEntryFromServer(node, mode, rotation, PathEntryType.ZS2);
+                    } else {
+                        sendZS2Entry(e, node, mode, rotation, PathEntryType.ZS2);
+                    }
+                }, zs2.isEmpty() ? 0 : ZS2Entry.ZS32.getIDFromValue(zs2));
+                parent.add(zs2Entity);
+
                 parent.add(GuiElements.createButton(I18n.get("button.reset"), e -> {
-                    this.lowerEntity.clear();
+                    reset();
                     initializeFieldUsage(mainButton);
                     resetPathwayOnServer(node);
                 }));
@@ -287,6 +295,7 @@ public class GuiSignalBox extends GuiBase {
             } else {
                 if (lastTile == currentTile) {
                     this.resetTileSelection();
+                    lastTile = null;
                     return;
                 }
                 sendPWRequest(currentTile.getNode());
@@ -357,7 +366,7 @@ public class GuiSignalBox extends GuiBase {
 
             layout.add(GuiElements.createButton(name));
             layout.add(GuiElements.createButton("x", 20, e -> {
-                removeBlockPos(p, t);
+                removeBlockPos(p);
                 list.remove(layout);
             }));
             list.add(layout);
@@ -523,40 +532,34 @@ public class GuiSignalBox extends GuiBase {
     private void sendPWRequest(final SignalBoxNode currentNode) {
         if (!allPacketsRecived)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(5);
-        buffer.put((byte) SignalBoxNetwork.REQUEST_PW.ordinal());
-        buffer.put((byte) lastTile.getNode().getPoint().getX());
-        buffer.put((byte) lastTile.getNode().getPoint().getY());
-        buffer.put((byte) currentNode.getPoint().getX());
-        buffer.put((byte) currentNode.getPoint().getY());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.REQUEST_PW.ordinal());
+        lastTile.getPoint().writeNetwork(buffer);
+        currentNode.getPoint().writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
     private void resetPathwayOnServer(final SignalBoxNode node) {
         if (!allPacketsRecived)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(3);
-        buffer.put((byte) SignalBoxNetwork.RESET_PW.ordinal());
-        buffer.put((byte) node.getPoint().getX());
-        buffer.put((byte) node.getPoint().getY());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.RESET_PW.ordinal());
+        node.getPoint().writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
     private void sendPosEntryToServer(final BlockPos pos, final SignalBoxNode node,
             final EnumGuiMode mode, final Rotation rotation, final PathEntryType<BlockPos> entry) {
         if (!allPacketsRecived)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(18);
-        buffer.put((byte) SignalBoxNetwork.SEND_POS_ENTRY.ordinal());
-        buffer.putInt(pos.getX());
-        buffer.putInt(pos.getY());
-        buffer.putInt(pos.getZ());
-        buffer.put((byte) node.getPoint().getX());
-        buffer.put((byte) node.getPoint().getY());
-        buffer.put((byte) mode.ordinal());
-        buffer.put((byte) rotation.ordinal());
-        buffer.put((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.SEND_POS_ENTRY.ordinal());
+        buffer.putBlockPos(pos);
+        node.getPoint().writeNetwork(buffer);
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+        buffer.putByte((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
         node.addAndSetEntry(new ModeSet(mode, rotation), entry, pos);
         container.grid.putNode(node.getPoint(), node);
     }
@@ -565,16 +568,31 @@ public class GuiSignalBox extends GuiBase {
             final EnumGuiMode mode, final Rotation rotation, final PathEntryType<Integer> entry) {
         if (speed == 127 || !allPacketsRecived)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(7);
-        buffer.put((byte) SignalBoxNetwork.SEND_INT_ENTRY.ordinal());
-        buffer.put((byte) speed);
-        buffer.put((byte) node.getPoint().getX());
-        buffer.put((byte) node.getPoint().getY());
-        buffer.put((byte) mode.ordinal());
-        buffer.put((byte) rotation.ordinal());
-        buffer.put((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.SEND_INT_ENTRY.ordinal());
+        buffer.putByte((byte) speed);
+        node.getPoint().writeNetwork(buffer);
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+        buffer.putByte((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
         node.addAndSetEntry(new ModeSet(mode, rotation), entry, speed);
+        container.grid.putNode(node.getPoint(), node);
+    }
+
+    private void sendZS2Entry(final int value, final SignalBoxNode node, final EnumGuiMode mode,
+            final Rotation rotation, final PathEntryType<String> entry) {
+        if (!allPacketsRecived)
+            return;
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.SEND_ZS2_ENTRY.ordinal());
+        buffer.putByte((byte) value);
+        node.getPoint().writeNetwork(buffer);
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+        buffer.putByte((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+        node.addAndSetEntry(new ModeSet(mode, rotation), entry, ZS2Entry.ZS32.getObjFromID(value));
         container.grid.putNode(node.getPoint(), node);
     }
 
@@ -582,60 +600,56 @@ public class GuiSignalBox extends GuiBase {
             final Rotation rotation, final PathEntryType<?> entry) {
         if (!allPacketsRecived)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(6);
-        buffer.put((byte) SignalBoxNetwork.REMOVE_ENTRY.ordinal());
-        buffer.put((byte) node.getPoint().getX());
-        buffer.put((byte) node.getPoint().getY());
-        buffer.put((byte) mode.ordinal());
-        buffer.put((byte) rotation.ordinal());
-        buffer.put((byte) entry.getID());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.REMOVE_ENTRY.ordinal());
+        node.getPoint().writeNetwork(buffer);
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+        buffer.putByte((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
         node.getOption(new ModeSet(mode, rotation)).get().removeEntry(entry);
     }
 
     private void resetAllPathways() {
         if (!allPacketsRecived)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(1);
-        buffer.put((byte) SignalBoxNetwork.RESET_ALL_PW.ordinal());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.RESET_ALL_PW.ordinal());
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
     private void sendModeChanges() {
         if (changedModes.isEmpty() || !allPacketsRecived)
             return;
-        final BufferBuilder buffer = new BufferBuilder();
+        final BufferFactory buffer = new BufferFactory();
         buffer.putByte((byte) SignalBoxNetwork.SEND_CHANGED_MODES.ordinal());
         buffer.putInt(changedModes.size());
         changedModes.forEach((point, node) -> {
-            point.writeToBuffer(buffer);
-            node.writeToBuffer(buffer);
+            point.writeNetwork(buffer);
+            node.writeNetwork(buffer);
         });
         changedModes.clear();
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void removeBlockPos(final BlockPos pos, final LinkType type) {
+    private void removeBlockPos(final BlockPos pos) {
         if (!allPacketsRecived)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(14);
-        buffer.put((byte) SignalBoxNetwork.REMOVE_POS.ordinal());
-        buffer.put((byte) type.ordinal());
-        buffer.putInt(pos.getX());
-        buffer.putInt(pos.getY());
-        buffer.putInt(pos.getZ());
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.REMOVE_POS.ordinal());
+        buffer.putBlockPos(pos);
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
     private void sendSubsidiaryRequest(final SubsidiaryEntry entry, final SignalBoxNode node,
             final ModeSet mode) {
         if (!allPacketsRecived)
             return;
-        final BufferBuilder buffer = new BufferBuilder();
+        final BufferFactory buffer = new BufferFactory();
         buffer.putByte((byte) SignalBoxNetwork.REQUEST_SUBSIDIARY.ordinal());
         entry.writeNetwork(buffer);
-        node.getPoint().writeBufferNetwork(buffer);
-        mode.writeBufferNetwork(buffer);
+        node.getPoint().writeNetwork(buffer);
+        mode.writeNetwork(buffer);
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 

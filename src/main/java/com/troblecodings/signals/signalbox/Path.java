@@ -1,12 +1,10 @@
 package com.troblecodings.signals.signalbox;
 
-import java.nio.ByteBuffer;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
-public class Path implements INetworkSavable {
+public class Path {
 
     private static final String POINT_1 = "point1";
     private static final String POINT_2 = "point2";
@@ -42,7 +40,6 @@ public class Path implements INetworkSavable {
         return new Path(this.point2, this.point1);
     }
 
-    @Override
     public void write(final NBTWrapper tag) {
         final NBTWrapper compound1 = new NBTWrapper();
         this.point1.write(compound1);
@@ -53,7 +50,6 @@ public class Path implements INetworkSavable {
         tag.putWrapper(POINT_2, compound2);
     }
 
-    @Override
     public void read(final NBTWrapper tag) {
         this.point1.read(tag.getWrapper(POINT_1));
         this.point2.read(tag.getWrapper(POINT_2));
@@ -78,17 +74,4 @@ public class Path implements INetworkSavable {
     public String toString() {
         return "Path [point1=" + point1 + ", point2=" + point2 + "]";
     }
-
-    @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        this.point1.readNetwork(buffer);
-        this.point2.readNetwork(buffer);
-    }
-
-    @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        this.point1.writeNetwork(buffer);
-        this.point2.writeNetwork(buffer);
-    }
-
 }

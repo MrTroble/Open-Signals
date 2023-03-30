@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +29,7 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
@@ -347,53 +347,53 @@ public class GuiSignalController extends GuiBase {
                 : new HashMap<>();
         map.put(state, profile);
         controller.enabledRSStates.put(facing, map);
-        final ByteBuffer buffer = ByteBuffer.allocate(4);
-        buffer.put((byte) SignalControllerNetwork.SET_PROFILE.ordinal());
-        buffer.put((byte) state.ordinal());
-        buffer.put((byte) facing.ordinal());
-        buffer.put((byte) profile);
-        OpenSignalsMain.network.sendTo(player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalControllerNetwork.SET_PROFILE.ordinal());
+        buffer.putByte((byte) state.ordinal());
+        buffer.putByte((byte) facing.ordinal());
+        buffer.putByte((byte) profile);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
     private void initializeDirection(final Direction direction) {
         if (controller.enabledRSStates.containsKey(direction)) {
             return;
         }
-        final ByteBuffer buffer = ByteBuffer.allocate(2);
-        buffer.put((byte) SignalControllerNetwork.INITIALIZE_DIRECTION.ordinal());
-        buffer.put((byte) direction.ordinal());
-        OpenSignalsMain.network.sendTo(player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalControllerNetwork.INITIALIZE_DIRECTION.ordinal());
+        buffer.putByte((byte) direction.ordinal());
+        OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
     private void sendCurrentMode() {
         if (!loaded) {
             return;
         }
-        final ByteBuffer buffer = ByteBuffer.allocate(2);
-        buffer.put((byte) SignalControllerNetwork.SEND_MODE.ordinal());
-        buffer.put((byte) currentMode.ordinal());
-        OpenSignalsMain.network.sendTo(player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalControllerNetwork.SEND_MODE.ordinal());
+        buffer.putByte((byte) currentMode.ordinal());
+        OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
     private void sendRSProfile(final int profile) {
         if (!loaded) {
             return;
         }
-        final ByteBuffer buffer = ByteBuffer.allocate(2);
-        buffer.put((byte) SignalControllerNetwork.SEND_RS_PROFILE.ordinal());
-        buffer.put((byte) profile);
-        OpenSignalsMain.network.sendTo(player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalControllerNetwork.SEND_RS_PROFILE.ordinal());
+        buffer.putByte((byte) profile);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
     private void sendPropertyToServer(final SEProperty property, final int value) {
         if (!loaded) {
             return;
         }
-        final ByteBuffer buffer = ByteBuffer.allocate(3);
-        buffer.put((byte) SignalControllerNetwork.SEND_PROPERTY.ordinal());
-        buffer.put((byte) controller.getSignal().getIDFromProperty(property));
-        buffer.put((byte) value);
-        OpenSignalsMain.network.sendTo(player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalControllerNetwork.SEND_PROPERTY.ordinal());
+        buffer.putByte((byte) controller.getSignal().getIDFromProperty(property));
+        buffer.putByte((byte) value);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
     @Override

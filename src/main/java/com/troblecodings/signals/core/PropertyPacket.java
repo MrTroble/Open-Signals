@@ -1,7 +1,5 @@
 package com.troblecodings.signals.core;
 
-import java.nio.ByteBuffer;
-
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
@@ -22,9 +20,9 @@ public interface PropertyPacket {
 
     default void sendPropertyToServer(final Player player, final int idProperty,
             final int idvalue) {
-        final ByteBuffer buffer = ByteBuffer.allocate(2);
-        buffer.put((byte) idProperty);
-        buffer.put((byte) idvalue);
-        OpenSignalsMain.network.sendTo(player, buffer);
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) idProperty);
+        buffer.putByte((byte) idvalue);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 }

@@ -16,6 +16,7 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
 
 import io.netty.buffer.Unpooled;
@@ -131,6 +132,7 @@ public final class SignalStateHandler implements INetworkSync {
             }
         }
         createToFile(info, states);
+        sendPropertiesToClient(info, states);
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
@@ -190,7 +192,8 @@ public final class SignalStateHandler implements INetworkSync {
             if (typeID <= 0)
                 continue;
             if (property.equals(Signal.CUSTOMNAME)) {
-                map.put(property, NameHandler.getName(stateInfo.pos));
+                map.put(property,
+                        NameHandler.getName(new NameStateInfo(stateInfo.world, stateInfo.pos)));
             }
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
@@ -220,7 +223,7 @@ public final class SignalStateHandler implements INetworkSync {
                 if (!(block instanceof Signal)) {
                     return;
                 }
-                final SignalStateInfo stateInfo = new SignalStateInfo(world, pos);
+                final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, (Signal) block);
                 final Map<SEProperty, String> map = readAndSerialize(stateInfo);
                 synchronized (CURRENTLY_LOADED_STATES) {
                     CURRENTLY_LOADED_STATES.put(stateInfo, map);
@@ -258,19 +261,29 @@ public final class SignalStateHandler implements INetworkSync {
                 final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
                 statesToBuffer(stateInfo.signal, properties, buffer.array());
                 file.write(pos, buffer);
-                unRenderClients(stateInfo);
             });
         });
     }
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save save) {
+        if (save.getWorld().isClientSide())
+            return;
         service.execute(() -> {
             final Map<SignalStateInfo, Map<SEProperty, String>> maps;
             synchronized (CURRENTLY_LOADED_STATES) {
                 maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
             }
             maps.forEach(SignalStateHandler::createToFile);
+        });
+    }
+
+    @SubscribeEvent
+    public static void onWorldUnload(final WorldEvent.Unload unload) {
+        if (unload.getWorld().isClientSide())
+            return;
+        service.execute(() -> {
+            ALL_LEVEL_FILES.remove(unload.getWorld());
         });
     }
 
@@ -297,41 +310,38 @@ public final class SignalStateHandler implements INetworkSync {
                 file = ALL_LEVEL_FILES.get(info.world);
             }
             file.deleteIndex(info.pos);
+            sendRemoved(info);
         });
     }
 
-    private static void unRenderClients(final SignalStateInfo stateInfo) {
-        final ByteBuffer buffer = ByteBuffer.allocate(13);
-        buffer.putInt(stateInfo.pos.getX());
-        buffer.putInt(stateInfo.pos.getY());
-        buffer.putInt(stateInfo.pos.getZ());
-        buffer.put((byte) 255);
-        stateInfo.world.players().forEach(player -> {
-            sendTo(player, buffer);
-        });
+    private static void sendRemoved(final SignalStateInfo info) {
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putInt(info.pos.getX());
+        buffer.putInt(info.pos.getY());
+        buffer.putInt(info.pos.getZ());
+        buffer.putByte((byte) 255);
+        info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
     public static ByteBuffer packToByteBuffer(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties) {
-        final ByteBuffer buffer = ByteBuffer.allocate(13 + properties.size() * 2);
-        buffer.putInt(stateInfo.pos.getX());
-        buffer.putInt(stateInfo.pos.getY());
-        buffer.putInt(stateInfo.pos.getZ());
         if (properties.size() > 254) {
             throw new IllegalStateException("Too many SEProperties!");
         }
-        buffer.put((byte) properties.size());
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putBlockPos(stateInfo.pos);
+        buffer.putByte((byte) properties.size());
         properties.forEach((property, value) -> {
             if (property.equals(Signal.CUSTOMNAME)) {
-                buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
-                buffer.put((byte) (value.isEmpty() ? 0 : 1));
-                NameHandler.setName(stateInfo.world, stateInfo.pos, value);
+                buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
+                buffer.putByte((byte) (value.isEmpty() ? 0 : 1));
+                NameHandler.setName(new NameStateInfo(stateInfo.world, stateInfo.pos), value);
                 return;
             }
-            buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
-            buffer.put((byte) property.getParent().getIDFromValue(value));
+            buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
+            buffer.putByte((byte) property.getParent().getIDFromValue(value));
         });
-        return buffer;
+        return buffer.build();
     }
 
     private static void sendPropertiesToClient(final SignalStateInfo stateInfo,
@@ -345,7 +355,7 @@ public final class SignalStateHandler implements INetworkSync {
         });
     }
 
-    public static void sendTo(final Player player, final ByteBuffer buf) {
+    private static void sendTo(final Player player, final ByteBuffer buf) {
         final FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.copiedBuffer(buf.position(0)));
         if (player instanceof ServerPlayer) {
             final ServerPlayer server = (ServerPlayer) player;
