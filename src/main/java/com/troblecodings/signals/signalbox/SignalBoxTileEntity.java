@@ -181,4 +181,5 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public SignalBoxGrid getSignalBoxGrid() {
         return grid;
     }
+
 }
