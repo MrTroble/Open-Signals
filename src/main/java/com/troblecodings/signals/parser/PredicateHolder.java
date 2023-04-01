@@ -110,7 +110,7 @@ public final class PredicateHolder {
 
     }
 
-    public static Predicate<String> ZS2Value(final String value) {
+    public static Predicate<String> zs2Value(final String value) {
         return s -> {
             return s.equalsIgnoreCase(value);
         };

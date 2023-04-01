@@ -25,9 +25,9 @@ public class SubsidiarySignalParser {
         return allStates;
     }
 
-    public static transient final Map<Signal, Map<SubsidiaryState, ConfigProperty>> SUBSIDIARY_SIGNALS = new HashMap<>();
+    public static final Map<Signal, Map<SubsidiaryState, ConfigProperty>> SUBSIDIARY_SIGNALS = new HashMap<>();
 
-    private static transient final Gson GSON = new Gson();
+    private static final Gson GSON = new Gson();
 
     private static void loadSubsidiaryStates() {
         OpenSignalsMain.contentPacks.getFiles("signalconfigs/subsidiaryenums").forEach(entry -> {

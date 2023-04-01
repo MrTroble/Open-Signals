@@ -63,13 +63,13 @@ public class ModeSet implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(BufferFactory buffer) {
+    public void readNetwork(final BufferFactory buffer) {
         this.mode = EnumGuiMode.values()[buffer.getByteAsInt()];
         this.rotation = Rotation.values()[buffer.getByteAsInt()];
     }
 
     @Override
-    public void writeNetwork(BufferFactory buffer) {
+    public void writeNetwork(final BufferFactory buffer) {
         buffer.putByte((byte) mode.ordinal());
         buffer.putByte((byte) rotation.ordinal());
     }

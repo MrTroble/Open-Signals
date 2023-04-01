@@ -47,7 +47,7 @@ public final class LogicParser {
                 objects -> PredicateHolder.speed((StringInteger) objects[0]), StringInteger.class));
 
         TRANSLATION_TABLE.put("zs2value", new MethodInfo(String.class, "zs2value",
-                obj -> PredicateHolder.ZS2Value((String) obj[0]), String.class));
+                obj -> PredicateHolder.zs2Value((String) obj[0]), String.class));
 
         TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name,
                 new MethodInfo(Map.class, name, objects -> {
