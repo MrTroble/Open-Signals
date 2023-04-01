@@ -31,7 +31,6 @@ public class LinkedPosHolder {
 
     public void addSignal(final BlockPos signalPos, final Signal signal, final Level world) {
         signals.put(signalPos, signal);
-        linkedBlocks.put(signalPos, LinkType.SIGNAL);
         SignalConfig.reset(new SignalStateInfo(world, signalPos, signal));
     }
 
