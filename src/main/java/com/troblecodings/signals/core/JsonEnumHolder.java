@@ -15,6 +15,7 @@ public final class JsonEnumHolder {
 
     private static final Gson GSON = new Gson();
     public static final Map<String, JsonEnum> PROPERTIES = JsonEnumHolder.getProperties();
+    public static final JsonEnum ZS32 = PROPERTIES.get("zs32");
 
     @SuppressWarnings("unchecked")
     public static Map<String, JsonEnum> getProperties() {

@@ -32,6 +32,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -45,7 +46,6 @@ import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
-import com.troblecodings.signals.signalbox.entrys.ZS2Entry;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
@@ -203,15 +203,13 @@ public class GuiSignalBox extends GuiBase {
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
                         mode, rotation, ".resetting");
 
-                final String zs2 = option.getEntry(PathEntryType.ZS2).orElse("");
-
-                final UIEntity zs2Entity = GuiElements.createEnumElement(ZS2Entry.ZS32, e -> {
+                final UIEntity zs2Entity = GuiElements.createEnumElement(JsonEnumHolder.ZS32, e -> {
                     if (e == 0) {
                         removeEntryFromServer(node, mode, rotation, PathEntryType.ZS2);
                     } else {
-                        sendZS2Entry(e, node, mode, rotation, PathEntryType.ZS2);
+                        sendZS2Entry((byte) e, node, mode, rotation, PathEntryType.ZS2);
                     }
-                }, zs2.isEmpty() ? 0 : ZS2Entry.ZS32.getIDFromValue(zs2));
+                }, option.getEntry(PathEntryType.ZS2).orElse((byte) 0));
                 parent.add(zs2Entity);
 
                 parent.add(GuiElements.createButton(I18n.get("button.reset"), e -> {
@@ -580,8 +578,8 @@ public class GuiSignalBox extends GuiBase {
         container.grid.putNode(node.getPoint(), node);
     }
 
-    private void sendZS2Entry(final int value, final SignalBoxNode node, final EnumGuiMode mode,
-            final Rotation rotation, final PathEntryType<String> entry) {
+    private void sendZS2Entry(final byte value, final SignalBoxNode node, final EnumGuiMode mode,
+            final Rotation rotation, final PathEntryType<Byte> entry) {
         if (!allPacketsRecived)
             return;
         final BufferFactory buffer = new BufferFactory();
@@ -592,7 +590,7 @@ public class GuiSignalBox extends GuiBase {
         buffer.putByte((byte) rotation.ordinal());
         buffer.putByte((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
-        node.addAndSetEntry(new ModeSet(mode, rotation), entry, ZS2Entry.ZS32.getObjFromID(value));
+        node.addAndSetEntry(new ModeSet(mode, rotation), entry, value);
         container.grid.putNode(node.getPoint(), node);
     }
 

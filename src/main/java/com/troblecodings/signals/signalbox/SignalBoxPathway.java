@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -76,7 +77,8 @@ public class SignalBoxPathway {
 
     private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
-        final AtomicReference<String> zs2 = new AtomicReference<>("");
+        final AtomicReference<Byte> zs2Value = new AtomicReference<>();
+        zs2Value.set((byte) -1);
         final Builder<BlockPos> distantPosBuilder = ImmutableList.builder();
         foreachEntry((optionEntry, node) -> {
             optionEntry.getEntry(PathEntryType.SPEED)
@@ -85,7 +87,7 @@ public class SignalBoxPathway {
                     .ifPresent(position -> mapOfBlockingPositions.put(position, node));
             optionEntry.getEntry(PathEntryType.RESETING)
                     .ifPresent(position -> mapOfResetPositions.put(position, node));
-            optionEntry.getEntry(PathEntryType.ZS2).ifPresent(str -> zs2.set(str));
+            optionEntry.getEntry(PathEntryType.ZS2).ifPresent(value -> zs2Value.set(value));
         });
         foreachPath((path, node) -> {
             final Rotation rotation = SignalBoxUtil
@@ -114,7 +116,7 @@ public class SignalBoxPathway {
             this.signalPositions = Optional.empty();
         }
         this.speed = atomic.get();
-        this.zs2Value = zs2.get();
+        this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
     }
 
     private BlockPos makeFromNext(final PathType type, final SignalBoxNode first,
@@ -266,7 +268,6 @@ public class SignalBoxPathway {
                                         position, SignalBoxHandler.getSignal(tilePos, position)))));
             }
         }, point);
-
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
         this.initalize();

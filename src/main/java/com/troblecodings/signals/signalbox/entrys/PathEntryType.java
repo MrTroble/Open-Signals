@@ -39,7 +39,7 @@ public final class PathEntryType<T> {
     public static final PathEntryType<Integer> SPEED = new PathEntryType<>(IntegerEntry.class,
             "speed");
 
-    public static final PathEntryType<String> ZS2 = new PathEntryType<>(ZS2Entry.class, "zs2");
+    public static final PathEntryType<Byte> ZS2 = new PathEntryType<>(ByteEntry.class, "zs2");
 
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 
