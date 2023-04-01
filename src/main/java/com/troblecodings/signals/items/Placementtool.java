@@ -113,7 +113,7 @@ public class Placementtool extends Item
             ghostPos = ghostPos.above();
         }
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
-        final SignalStateInfo info = new SignalStateInfo(worldIn, pos);
+        final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
         SignalStateHandler.createStates(info, signalProperties);
         return InteractionResult.SUCCESS;
     }

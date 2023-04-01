@@ -17,7 +17,11 @@ import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.ClientSignalsStateHandler;
+import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSItems;
@@ -121,7 +125,7 @@ public class Signal extends BasicBlock {
         final Level world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
-                ? ClientSignalsStateHandler.getClientStates(info)
+                ? ClientSignalsStateHandler.getClientStates(new ClientSignalStateInfo(info))
                 : SignalStateHandler.getStates(info);
         return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
@@ -174,6 +178,8 @@ public class Signal extends BasicBlock {
         GhostBlock.destroyUpperBlock(worldIn, pos);
         if (!worldIn.isClientSide() && worldIn instanceof Level) {
             SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos, this));
+            NameHandler.setRemoved(new NameStateInfo((Level) worldIn, pos));
+            SignalBoxHandler.onPosRemove(pos);
         }
     }
 

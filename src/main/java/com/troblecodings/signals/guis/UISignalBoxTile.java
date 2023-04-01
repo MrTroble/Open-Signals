@@ -6,6 +6,7 @@ import java.util.Map;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.UpdateEvent;
+import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -40,13 +41,12 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     private void localAdd(final ModeSet modeSet) {
         final UIEntity entity = new UIEntity();
-        entity.setX(0);
-        entity.setY(0);
         if (!modeSet.rotation.equals(Rotation.NONE)) {
             final UIRotate rotation = new UIRotate();
-            rotation.setRotateZ(modeSet.rotation.ordinal() * 90);
+            rotation.setRotateZ(modeSet.rotation.ordinal() * ((float)Math.PI/2.0f));
             entity.add(rotation);
         }
+        entity.add(new UIIndependentTranslate(0, 0, 0));
         entity.add(modeSet.mode.consumer.get());
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
@@ -55,10 +55,16 @@ public class UISignalBoxTile extends UIComponentEntity {
     @Override
     public void update() {
         super.update();
+        this.entity.setX(parent.getWidth() / 2.0);
+        this.entity.setY(parent.getHeight() / 2.0);
         setToEntity.values().forEach(e -> {
             e.setHeight(entity.getHeight());
             e.setWidth(entity.getWidth());
             e.update();
+        });
+        this.entity.findRecursive(UIIndependentTranslate.class).forEach(translate -> {
+            translate.setX(-this.entity.getX());
+            translate.setY(-this.entity.getY());
         });
     }
 

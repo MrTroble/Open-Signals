@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.linkableapi.ILinkableTile;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.TileEntityInfo;
@@ -20,13 +21,17 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.Block;
 
 public class SignalControllerTileEntity extends SyncableTileEntity
         implements ISyncable, ILinkableTile {
 
     private BlockPos linkedSignalPosition = null;
+    private Signal linkedSignal = null;
     private Signal signal;
     private int lastProfile = 0;
     private NBTWrapper copy;
@@ -41,6 +46,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public static final String ALLSTATES = "allstates";
     public static final String LAST_PROFILE = "lastprofile";
     public static final String ENUM_MODE = "enummode";
+    public static final String SIGNAL_NAME = "signalname";
 
     public SignalControllerTileEntity(final TileEntityInfo info) {
         super(info);
@@ -115,6 +121,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         } else {
             return;
         }
+        if (linkedSignal != null) {
+            final NBTWrapper signal = NBTWrapper.getBlockPosWrapper(linkedSignalPosition);
+            signal.putString(SIGNAL_NAME, linkedSignal.getSignalTypeName());
+            wrapper.putWrapper(SIGNAL_NAME, signal);
+        }
         wrapper.putInteger(LAST_PROFILE, lastProfile);
         if (lastState != null)
             wrapper.putInteger(ENUM_MODE, lastState.ordinal());
@@ -155,6 +166,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private void readFromWrapper(final NBTWrapper wrapper) {
         if (level == null || level.isClientSide || linkedSignalPosition == null)
             return;
+        if (wrapper.contains(SIGNAL_NAME)) {
+            final NBTWrapper signal = wrapper.getWrapper(SIGNAL_NAME);
+            linkedSignal = Signal.SIGNALS.get(signal.getString(SIGNAL_NAME));
+        }
         if (wrapper.contains(LAST_PROFILE)) {
             lastProfile = wrapper.getInteger(LAST_PROFILE);
         }
@@ -201,16 +216,23 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return linkedSignalPosition;
     }
 
+    public Signal getLinkedSignal() {
+        return linkedSignal;
+    }
+
     @Override
     public boolean hasLink() {
         return linkedSignalPosition != null;
     }
 
     @Override
-    public boolean link(final BlockPos pos) {
-        final BlockState state = level.getBlockState(pos);
-        if (state.getBlock() instanceof Signal) {
-            this.linkedSignalPosition = pos;
+    public boolean link(final BlockPos pos, final CompoundTag tag) {
+        @SuppressWarnings("deprecation")
+        final Block block = Registry.BLOCK
+                .get(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
+        if (block != null && block instanceof Signal) {
+            linkedSignalPosition = pos;
+            linkedSignal = (Signal) block;
             return true;
         }
         return false;
@@ -241,10 +263,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
                 continue;
             }
             final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition, signal);
-            final Map<SEProperty, String> properties = new HashMap<>(
-                    SignalStateHandler.getStates(info));
-            properties.putAll(this.allStates.get(profile));
-            SignalStateHandler.setStates(info, properties);
+            SignalStateHandler.setStates(info, allStates.get(profile));
         }
     }
 

@@ -1,6 +1,5 @@
 package com.troblecodings.signals.signalbox;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -11,7 +10,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.BufferBuilder;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -139,7 +138,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         });
         this.point.read(compound);
         this.identifier = point.getX() + "." + point.getY();
-        this.post();
+        post();
     }
 
     public Optional<PathOptionEntry> getOption(final Path path) {
@@ -234,57 +233,50 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        final int size = Byte.toUnsignedInt(buffer.get());
-        final boolean isEmpty = Byte.toUnsignedInt(buffer.get()) == 1 ? true : false;
-        if (isEmpty) {
-            possibleModes.clear();
-            possibleConnections.clear();
-            return;
-        }
+    public void readNetwork(final BufferFactory buffer) {
+        possibleModes.clear();
+        final int size = buffer.getByteAsInt();
         for (int i = 0; i < size; i++) {
-            final ModeSet mode = new ModeSet(buffer);
-            final PathOptionEntry entry = possibleModes.computeIfAbsent(mode,
-                    _u -> SignalBoxFactory.getFactory().getEntry());
+            final ModeSet mode = ModeSet.of(buffer);
+            final PathOptionEntry entry = SignalBoxFactory.getFactory().getEntry();
             entry.readNetwork(buffer);
+            possibleModes.put(mode, entry);
         }
         post();
     }
 
-    public void writeToBuffer(final BufferBuilder buffer) {
-        buffer.putByte((byte) possibleModes.size());
-        buffer.putByte((byte) (isEmpty() ? 1 : 0));
-        if (isEmpty())
-            return;
-        possibleModes.forEach((mode, entry) -> {
-            mode.writeToBuffer(buffer);
-            entry.writeToBuffer(buffer);
-        });
+    public void readUpdateNetwork(final BufferFactory buffer) {
+        final int size = buffer.getByteAsInt();
+        for (int i = 0; i < size; i++) {
+            final ModeSet mode = ModeSet.of(buffer);
+            final PathOptionEntry entry = possibleModes.computeIfAbsent(mode,
+                    _u -> SignalBoxFactory.getFactory().getEntry());
+            entry.readNetwork(buffer);
+            possibleModes.put(mode, entry);
+        }
+        post();
     }
 
     @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        buffer.put((byte) possibleModes.size());
+    public void writeNetwork(final BufferFactory buffer) {
+        buffer.putByte((byte) possibleModes.size());
         possibleModes.forEach((mode, entry) -> {
             mode.writeNetwork(buffer);
             entry.writeNetwork(buffer);
         });
     }
 
-    public void writeUpdateBuffer(final BufferBuilder buffer) {
+    public void writeUpdateNetwork(final BufferFactory buffer) {
         int size = 0;
         for (final PathOptionEntry entry : possibleModes.values()) {
             if (entry.containsEntry(PathEntryType.PATHUSAGE))
                 size++;
         }
         buffer.putByte((byte) size);
-        buffer.putByte((byte) (isEmpty() ? 1 : 0));
-        if (isEmpty())
-            return;
         possibleModes.forEach((mode, entry) -> {
             if (entry.containsEntry(PathEntryType.PATHUSAGE)) {
-                mode.writeToBuffer(buffer);
-                entry.writeUpdateBuffer(buffer);
+                mode.writeNetwork(buffer);
+                entry.writeUpdateNetwork(buffer);
             }
         });
     }

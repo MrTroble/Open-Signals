@@ -1,11 +1,11 @@
 package com.troblecodings.signals.enums;
 
-import java.nio.ByteBuffer;
 import java.util.function.Supplier;
 
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
+import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.guis.UISignalBoxTile;
 
 public enum EnumGuiMode {
@@ -34,8 +34,7 @@ public enum EnumGuiMode {
         this.consumer = consumer;
     }
 
-    public static EnumGuiMode of(final ByteBuffer buffer) {
-        return EnumGuiMode.values()[buffer.get()];
+    public static EnumGuiMode of(final BufferFactory buffer) {
+        return values()[buffer.getByteAsInt()];
     }
-
 }

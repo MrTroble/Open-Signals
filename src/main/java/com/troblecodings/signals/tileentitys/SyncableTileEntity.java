@@ -44,7 +44,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     public void syncClient(final Level world, final BlockPos pos) {
-        world.blockUpdated(pos, getBlockState().getBlock());
+        world.setBlockAndUpdate(pos, getBlockState());
     }
 
     public boolean add(final UIClientSync sync) {

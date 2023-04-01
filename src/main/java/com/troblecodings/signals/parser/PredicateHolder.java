@@ -20,17 +20,11 @@ public final class PredicateHolder {
         return ebs -> ebs.get(property) == null;
     }
 
+    @SuppressWarnings("unchecked")
     public static Predicate<ModelInfoWrapper> with(final ValuePack pack) {
-        return with(pack.property, pack.predicate);
-    }
-
-    @SuppressWarnings({
-            "unchecked", "rawtypes"
-    })
-    public static Predicate<ModelInfoWrapper> with(final SEProperty property, final Predicate t) {
         return ebs -> {
-            final Object test = ebs.get(property);
-            return test != null && t.test(test);
+            final Object test = ebs.get(pack.property);
+            return test != null && pack.predicate.test(test);
         };
     }
 
@@ -51,25 +45,13 @@ public final class PredicateHolder {
         };
     }
 
+    @SuppressWarnings("unchecked")
     public static Predicate<Map<SEProperty, String>> check(final ValuePack pack) {
-        return check(pack.property, pack.predicate);
-    }
-
-    public static Predicate<Map<SEProperty, String>> check(final SEProperty property,
-            final String type) {
-        return check(property, type::equals);
-    }
-
-    @SuppressWarnings({
-            "unchecked", "rawtypes"
-    })
-    public static Predicate<Map<SEProperty, String>> check(final SEProperty property,
-            final Predicate type) {
         return t -> {
-            final String value = t.get(property);
+            final String value = t.get(pack.property);
             if (value == null)
                 return false;
-            return type.test(value.toUpperCase());
+            return pack.predicate.test(value.toUpperCase());
         };
     }
 
@@ -84,15 +66,11 @@ public final class PredicateHolder {
     }
 
     public static Predicate<Integer> speed(final StringInteger stringInt) {
-        return speed(stringInt.string, stringInt.integer);
-    }
-
-    public static Predicate<Integer> speed(final String compare, final int speed) {
-
-        final CompareValues values = CompareValues.getValuefromString(compare);
+        final CompareValues values = CompareValues.getValuefromString(stringInt.string);
         if (values == null)
-            throw new LogicalParserException(
-                    "The given operator of the speed function [" + compare + "] is not permitted!");
+            throw new LogicalParserException("The given operator of the speed function ["
+                    + stringInt.string + "] is not permitted!");
+        final int speed = stringInt.integer;
         switch (values) {
             case GREATER:
                 return s -> {
@@ -130,5 +108,11 @@ public final class PredicateHolder {
                 };
         }
 
+    }
+
+    public static Predicate<String> zs2Value(final String value) {
+        return s -> {
+            return s.equalsIgnoreCase(value);
+        };
     }
 }

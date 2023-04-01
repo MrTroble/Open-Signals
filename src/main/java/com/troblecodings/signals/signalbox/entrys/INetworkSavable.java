@@ -1,11 +1,11 @@
 package com.troblecodings.signals.signalbox.entrys;
 
-import java.nio.ByteBuffer;
+import com.troblecodings.signals.core.BufferFactory;
 
 public interface INetworkSavable extends ISaveable {
 
-    public void readNetwork(final ByteBuffer buffer);
+    public void readNetwork(final BufferFactory buffer);
 
-    public void writeNetwork(final ByteBuffer buffer);
+    public void writeNetwork(final BufferFactory buffer);
 
 }

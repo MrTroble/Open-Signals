@@ -28,4 +28,8 @@ public class ConfigProperty {
         this.values = values;
     }
 
+    public ConfigProperty(final Map<SEProperty, String> values) {
+        this(t -> true, values);
+    }
+
 }
