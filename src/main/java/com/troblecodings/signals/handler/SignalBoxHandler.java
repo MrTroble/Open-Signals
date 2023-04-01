@@ -110,7 +110,7 @@ public final class SignalBoxHandler {
         grid.read(wrapper, modeGrid);
         LinkedPosHolder holder;
         synchronized (ALL_LINKED_POS) {
-            holder = ALL_LINKED_POS.get(tilePos);
+            holder = ALL_LINKED_POS.computeIfAbsent(tilePos, _u -> new LinkedPosHolder());
         }
         if (holder == null)
             return;
