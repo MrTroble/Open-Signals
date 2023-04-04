@@ -2,6 +2,8 @@ package com.troblecodings.signals.core;
 
 import java.util.Objects;
 
+import com.troblecodings.signals.blocks.RedstoneInput;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
@@ -10,11 +12,14 @@ public class RedstonePacket {
     public final Level world;
     public final BlockPos pos;
     public final boolean state;
+    public final RedstoneInput block;
 
-    public RedstonePacket(final Level world, final BlockPos pos, final boolean state) {
+    public RedstonePacket(final Level world, final BlockPos pos, final boolean state,
+            final RedstoneInput block) {
         this.world = world;
         this.pos = pos;
         this.state = state;
+        this.block = block;
     }
 
     @Override

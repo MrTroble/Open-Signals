@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
+import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.blocks.GhostBlock;
 import com.troblecodings.signals.blocks.Post;
 import com.troblecodings.signals.blocks.RedstoneIO;
@@ -37,6 +38,7 @@ public final class OSBlocks {
     public static final SignalBox SIGNAL_BOX = new SignalBox();
     public static final RedstoneInput REDSTONE_IN = new RedstoneInput();
     public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
+    public static final CombinedRedstoneInput COMBI_REDSTONE_INPUT = new CombinedRedstoneInput();
 
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 

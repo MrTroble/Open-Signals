@@ -8,7 +8,9 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.RedstonePacket;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -89,15 +91,31 @@ public class GridComponent {
         endsToPath.clear();
     }
 
-    public void setPowered(final BlockPos pos) {
+    public void updateInput(final RedstonePacket update) {
         final List<SignalBoxPathway> nodeCopy = ImmutableList.copyOf(startsToPath.values());
-        nodeCopy.forEach(pathway -> {
+        if (update.block instanceof CombinedRedstoneInput) {
+            if (update.state) {
+                tryBlock(nodeCopy, update.pos);
+            } else {
+                tryReset(nodeCopy, update.pos);
+            }
+        } else {
+            tryBlock(nodeCopy, update.pos);
+            tryReset(nodeCopy, update.pos);
+        }
+    }
+
+    private void tryBlock(final List<SignalBoxPathway> pathways, final BlockPos pos) {
+        pathways.forEach(pathway -> {
             if (pathway.tryBlock(pos)) {
                 updatePrevious(pathway);
                 updateToNet(pathway);
             }
         });
-        nodeCopy.forEach(pathway -> {
+    }
+
+    private void tryReset(final List<SignalBoxPathway> pathways, final BlockPos pos) {
+        pathways.forEach(pathway -> {
             final Point first = pathway.getFirstPoint();
             final Optional<Point> optPoint = pathway.tryReset(pos);
             if (optPoint.isPresent()) {

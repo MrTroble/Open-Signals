@@ -71,7 +71,7 @@ public final class SignalBoxHandler {
         }
         if (grid == null)
             return;
-        grid.setPowered(update.pos);
+        grid.updateInput(update);
     }
 
     public static GridComponent computeIfAbsent(final BlockPos tilePos, final Level world) {

@@ -3,6 +3,7 @@ package com.troblecodings.signals.tileentitys;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.RedstoneIO;
+import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.core.PosUpdateComponent;
 import com.troblecodings.signals.core.RedstonePacket;
 import com.troblecodings.signals.core.TileEntityInfo;
@@ -43,7 +44,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         if (update == null)
             return;
         update.getPosToRemove().forEach(pos -> linkedPositions.remove(pos));
-        update.getPosToAdd().forEach(pos -> linkedPositions.add(pos));
+        linkedPositions.addAll(update.getPosToAdd());
     }
 
     public void sendToAll() {
@@ -51,8 +52,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
             return;
         final boolean power = this.level.getBlockState(this.worldPosition)
                 .getValue(RedstoneIO.POWER);
-        linkedPositions.forEach(pos -> SignalBoxHandler.updateInput(pos,
-                new RedstonePacket(level, worldPosition, power)));
+        linkedPositions.forEach(pos -> SignalBoxHandler.updateInput(pos, new RedstonePacket(level,
+                worldPosition, power, (RedstoneInput) this.getBlockState().getBlock())));
     }
 
     @Override
