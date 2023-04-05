@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -34,6 +35,7 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalBoxPathway {
 
@@ -48,7 +50,6 @@ public class SignalBoxPathway {
     private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
     private Optional<BlockPos> lastSignal = Optional.empty();
     private ImmutableList<BlockPos> distantSignalPositions = ImmutableList.of();
-    private final WorldOperations loadOps = new WorldOperations();
     private Map<Point, SignalBoxNode> modeGrid = null;
     private boolean emptyOrBroken = false;
     private Level world;
@@ -77,8 +78,7 @@ public class SignalBoxPathway {
 
     private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
-        final AtomicReference<Byte> zs2Value = new AtomicReference<>();
-        zs2Value.set((byte) -1);
+        final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final Builder<BlockPos> distantPosBuilder = ImmutableList.builder();
         foreachEntry((optionEntry, node) -> {
             optionEntry.getEntry(PathEntryType.SPEED)
@@ -215,8 +215,7 @@ public class SignalBoxPathway {
                     SignalBoxHandler.getSignal(tilePos, entry.getKey()));
             final SignalStateInfo nextInfo = entry.getValue() != null ? new SignalStateInfo(world,
                     entry.getValue(), SignalBoxHandler.getSignal(tilePos, entry.getValue())) : null;
-            final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed, zs2Value);
-            info.type = this.type;
+            final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed, zs2Value, type);
             SignalConfig.change(info);
         });
         distantSignalPositions.forEach(position -> {
@@ -227,8 +226,7 @@ public class SignalBoxPathway {
             final ConfigInfo info = new ConfigInfo(
                     new SignalStateInfo(world, position,
                             SignalBoxHandler.getSignal(tilePos, position)),
-                    nextInfo, speed, zs2Value);
-            info.type = this.type;
+                    nextInfo, speed, zs2Value, type);
             SignalConfig.change(info);
         });
     }
@@ -281,7 +279,7 @@ public class SignalBoxPathway {
         final AtomicBoolean atomic = new AtomicBoolean(false);
         foreachEntry((option, cNode) -> {
             option.getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
-                if (loadOps.isPowered(pos))
+                if (isPowerd(pos))
                     atomic.set(true);
             });
         }, point);
@@ -291,10 +289,16 @@ public class SignalBoxPathway {
         return Optional.of(point);
     }
 
-    public boolean tryBlock(final BlockPos position) {
-        if (!this.mapOfBlockingPositions.containsKey(position))
+    private boolean isPowerd(final BlockPos pos) {
+        final BlockState state = world.getBlockState(pos);
+        if (state == null || !(state.getBlock() instanceof RedstoneIO))
             return false;
-        resetFirstSignal();
+        return state.getValue(RedstoneIO.POWER);
+    }
+
+    public boolean tryBlock(final BlockPos position) {
+        if (!mapOfBlockingPositions.containsKey(position))
+            resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
         return true;
     }
