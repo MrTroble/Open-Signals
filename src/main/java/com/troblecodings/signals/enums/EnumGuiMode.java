@@ -10,8 +10,13 @@ import com.troblecodings.signals.guis.UISignalBoxTile;
 
 public enum EnumGuiMode {
 
-    STRAIGHT(0, 0.5, 1, 0.5), CORNER(0, 0.5, 0.5, 1), END(1, 0.30, 1, 0.70),
-    PLATFORM(() -> new UITexture(UISignalBoxTile.ICON, 0, 0, 1, 1)),
+    STRAIGHT(new float[] {
+            0, 0.5f, 1, 0.5f
+    }), CORNER(new float[] {
+            0, 0.5f, 0.5f, 1
+    }), END(new float[] {
+            1, 0.30f, 1, 0.70f
+    }), PLATFORM(() -> new UITexture(UISignalBoxTile.ICON, 0, 0, 1, 1)),
     BUE(() -> new UITexture(UISignalBoxTile.ICON, 0, 0, 1, 1)), HP(0), VP(1), RS(2), RA10(3);
 
     /**
@@ -24,10 +29,8 @@ public enum EnumGuiMode {
         this(() -> new UITexture(UISignalBoxTile.ICON, id * 0.25, 0, id * 0.25 + 0.25, 0.5));
     }
 
-    private EnumGuiMode(final double x1, final double y1, final double x2, final double y2) {
-        this(() -> new UILines(new double[] {
-                x1, y1, x2, y2
-        }, 5));
+    private EnumGuiMode(final float[] array) {
+        this(() -> new UILines(array, 2));
     }
 
     private EnumGuiMode(final Supplier<UIComponent> consumer) {
