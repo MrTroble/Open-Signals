@@ -38,8 +38,11 @@ public class LinkedPosHolder {
         return signals.get(pos);
     }
 
-    public void addLinkedPos(final BlockPos pos, final LinkType type) {
+    public boolean addLinkedPos(final BlockPos pos, final LinkType type) {
+        if (linkedBlocks.containsKey(pos))
+            return false;
         linkedBlocks.put(pos, type);
+        return true;
     }
 
     public void removeLinkedPos(final BlockPos pos) {
@@ -60,7 +63,7 @@ public class LinkedPosHolder {
         signals.forEach(
                 (pos, signal) -> SignalConfig.reset(new SignalStateInfo(world, pos, signal)));
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
-                .forEach(entry -> SignalBoxHandler.unlinkPosFromTile(entry.getKey(), tilePos,
+                .forEach(entry -> SignalBoxHandler.unlinkTileFromPos(entry.getKey(), tilePos,
                         world));
         linkedBlocks.clear();
         signals.clear();

@@ -83,8 +83,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (type.equals(LinkType.SIGNAL)) {
             SignalConfig.reset(new SignalStateInfo(level, pos, (Signal) block));
         }
-        SignalBoxHandler.linkPos(worldPosition, pos, (BasicBlock) block, type, level);
-        return true;
+        return SignalBoxHandler.linkPos(worldPosition, pos, (BasicBlock) block, type, level);
     }
 
     @Override

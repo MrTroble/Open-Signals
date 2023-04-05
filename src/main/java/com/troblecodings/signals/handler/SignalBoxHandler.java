@@ -139,17 +139,20 @@ public final class SignalBoxHandler {
         return holder.isEmpty();
     }
 
-    public static void linkPos(final BlockPos tilePos, final BlockPos linkPos,
+    public static boolean linkPos(final BlockPos tilePos, final BlockPos linkPos,
             final BasicBlock block, final LinkType type, final Level world) {
         LinkedPosHolder holder;
         synchronized (ALL_LINKED_POS) {
             holder = ALL_LINKED_POS.computeIfAbsent(tilePos, _u -> new LinkedPosHolder());
         }
-        holder.addLinkedPos(linkPos, type);
+        final boolean linked = holder.addLinkedPos(linkPos, type);
+        if (!linked)
+            return false;
         if (block instanceof Signal)
             holder.addSignal(linkPos, (Signal) block, world);
         if (block == OSBlocks.REDSTONE_IN || block == OSBlocks.REDSTONE_OUT)
             linkTileToPos(linkPos, tilePos, world);
+        return linked;
     }
 
     public static Signal getSignal(final BlockPos tilePos, final BlockPos signalPos) {
@@ -200,7 +203,7 @@ public final class SignalBoxHandler {
         allPos.unlink(tilePos, world);
     }
 
-    public static void unlinkPosFromTile(final BlockPos pos, final BlockPos tilePos,
+    public static void unlinkTileFromPos(final BlockPos pos, final BlockPos tilePos,
             final Level world) {
         if (tryDirectUnlink(world, pos, tilePos))
             return;
