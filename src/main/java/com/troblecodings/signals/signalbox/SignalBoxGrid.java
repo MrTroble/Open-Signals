@@ -36,8 +36,8 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public final Map<Point, SignalBoxPathway> clientPathways = new HashMap<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
-    private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     protected final SignalBoxFactory factory;
+    private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     private SignalBoxTileEntity tile;
 
     public SignalBoxGrid() {

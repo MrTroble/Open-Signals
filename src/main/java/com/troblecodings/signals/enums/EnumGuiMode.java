@@ -12,7 +12,8 @@ public enum EnumGuiMode {
 
     STRAIGHT(0, 0.5, 1, 0.5), CORNER(0, 0.5, 0.5, 1), END(1, 0.30, 1, 0.70),
     PLATFORM(() -> new UITexture(UISignalBoxTile.ICON, 0, 0, 1, 1)),
-    BUE(() -> new UITexture(UISignalBoxTile.ICON, 0, 0, 1, 1)), HP(0), VP(1), RS(2), RA10(3);
+    BUE(() -> new UITexture(UISignalBoxTile.ICON, 0, 0, 1, 1)), HP(0), VP(1), RS(2), RA10(3),
+    SH2(4);
 
     /**
      * Naming
@@ -21,7 +22,7 @@ public enum EnumGuiMode {
     public final Supplier<UIComponent> consumer;
 
     private EnumGuiMode(final int id) {
-        this(() -> new UITexture(UISignalBoxTile.ICON, id * 0.25, 0, id * 0.25 + 0.25, 0.5));
+        this(() -> new UITexture(UISignalBoxTile.ICON, id * 0.2, 0, id * 0.2 + 0.2, 0.5));
     }
 
     private EnumGuiMode(final double x1, final double y1, final double x2, final double y2) {

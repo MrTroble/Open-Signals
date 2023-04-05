@@ -12,21 +12,14 @@ public class SubsidiaryEntry {
         this.enumValue = enumValue;
     }
 
-    private SubsidiaryEntry() {
-        state = false;
-        enumValue = null;
-    }
-
     public void writeNetwork(final BufferFactory buffer) {
         enumValue.writeNetwork(buffer);
         buffer.putByte((byte) (state ? 1 : 0));
     }
 
     public static SubsidiaryEntry of(final BufferFactory buffer) {
-        final SubsidiaryEntry entry = new SubsidiaryEntry();
-        entry.enumValue = SubsidiaryState.of(buffer);
-        entry.state = buffer.getByte() == 1 ? true : false;
-        return entry;
+        return new SubsidiaryEntry(SubsidiaryState.of(buffer),
+                buffer.getByte() == 1 ? true : false);
     }
 
     @Override

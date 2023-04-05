@@ -60,6 +60,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     public void post() {
         possibleConnections.clear();
         possibleModes.forEach((e, i) -> {
+            if (e.mode.equals(EnumGuiMode.SH2)) {
+                possibleConnections.clear();
+                return;
+            }
             final Point p1 = new Point(this.point);
             final Point p2 = new Point(this.point);
             switch (e.mode) {
