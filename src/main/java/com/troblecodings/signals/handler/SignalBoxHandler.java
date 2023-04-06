@@ -150,7 +150,8 @@ public final class SignalBoxHandler {
             return false;
         if (block instanceof Signal)
             holder.addSignal(linkPos, (Signal) block, world);
-        if (block == OSBlocks.REDSTONE_IN || block == OSBlocks.REDSTONE_OUT)
+        if (block == OSBlocks.REDSTONE_IN || block == OSBlocks.REDSTONE_OUT
+                || block == OSBlocks.COMBI_REDSTONE_INPUT)
             linkTileToPos(linkPos, tilePos, world);
         return linked;
     }

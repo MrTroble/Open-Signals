@@ -356,7 +356,7 @@ public class GuiSignalBox extends GuiBase {
 
             final int id = t.ordinal();
             final UIEntity icon = new UIEntity();
-            icon.add(new UITexture(UISignalBoxTile.ICON, 0.25 * id, 0.5, 0.25 * id + 0.25, 1));
+            icon.add(new UITexture(UISignalBoxTile.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1));
             icon.setHeight(20);
             icon.setWidth(20);
             icon.add(new UIToolTip(I18n.get("type." + t.name())));

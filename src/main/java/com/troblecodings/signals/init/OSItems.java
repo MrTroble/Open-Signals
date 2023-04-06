@@ -33,8 +33,9 @@ public final class OSItems {
     public static final Linkingtool LINKING_TOOL = new Linkingtool(OSTabs.TAB, (world, pos) -> {
         final BlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();
-        return block == OSBlocks.REDSTONE_IN || block == OSBlocks.REDSTONE_OUT
-                || (block instanceof Signal && ((Signal) block).canBeLinked());
+        final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
+                || block == OSBlocks.REDSTONE_OUT || block == OSBlocks.COMBI_REDSTONE_INPUT;
+        return isRedstoneBlock || (block instanceof Signal && ((Signal) block).canBeLinked());
     }, _u -> true, (level, pos, tag) -> {
         final BlockState state = level.getBlockState(pos);
         new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,

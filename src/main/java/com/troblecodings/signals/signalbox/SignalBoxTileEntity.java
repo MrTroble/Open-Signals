@@ -75,7 +75,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (block == null || block instanceof AirBlock)
             return false;
         LinkType type = LinkType.SIGNAL;
-        if (block == OSBlocks.REDSTONE_IN) {
+        if (block == OSBlocks.REDSTONE_IN || block == OSBlocks.COMBI_REDSTONE_INPUT) {
             type = LinkType.INPUT;
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;

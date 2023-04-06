@@ -298,7 +298,8 @@ public class SignalBoxPathway {
 
     public boolean tryBlock(final BlockPos position) {
         if (!mapOfBlockingPositions.containsKey(position))
-            resetFirstSignal();
+            return false;
+        resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
         return true;
     }
