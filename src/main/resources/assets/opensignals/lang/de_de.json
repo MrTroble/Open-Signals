@@ -33,6 +33,7 @@
     "block.opensignals.signalbox": "Stellwerk",
     "block.opensignals.redstonein": "Redstone Eingang",
     "block.opensignals.redstoneout": "Redstone Ausgang",
+    "block.opensignals.combiredstoneinput": "Kombinierter Redstone Eingang",
     "tile.signalbox.name": "Stellwerk",
     "lt.linkedpos": "§2Verlinkt mit: {%d, %d, %d§2}§r",
     "lt.setpos": "§2Gespeichert: {%d, %d, %d§2}§r",
