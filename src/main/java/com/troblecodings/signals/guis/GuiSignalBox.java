@@ -224,30 +224,31 @@ public class GuiSignalBox extends GuiBase {
                         mode, rotation);
                 break;
             case HP: {
-                parent.add(GuiElements.createButton(I18n.get("btn.subsidiary"), e -> {
-                    final UIEntity screen = GuiElements.createScreen(selection -> {
-                        final UIBox hbox = new UIBox(UIBox.VBOX, 3);
-                        selection.add(hbox);
-                        selection.add(GuiElements.createButton(I18n.get("btn.return"), a -> {
-                            pop();
-                        }));
-                        final ModeSet modeSet = new ModeSet(mode, rotation);
-                        SubsidiaryState.ALL_STATES.forEach(state -> {
-                            final int defaultValue = container.grid
-                                    .getSubsidiaryState(node.getPoint(), modeSet, state) ? 0 : 1;
-                            selection.add(GuiElements.createEnumElement(new SizeIntegerables<>(
-                                    state.getName(), 2, i -> i == 1 ? "false" : "true"), a -> {
-                                        final SubsidiaryEntry entry = new SubsidiaryEntry(state,
-                                                a == 0 ? true : false);
-                                        sendSubsidiaryRequest(entry, node, modeSet);
-                                        container.grid.setClientState(node.getPoint(), modeSet,
-                                                entry);
-                                        pop();
-                                    }, defaultValue));
+                if (option.containsEntry(PathEntryType.SIGNAL))
+                    parent.add(GuiElements.createButton(I18n.get("btn.subsidiary"), e -> {
+                        final UIEntity screen = GuiElements.createScreen(selection -> {
+                            final UIBox hbox = new UIBox(UIBox.VBOX, 3);
+                            selection.add(hbox);
+                            selection.add(GuiElements.createButton(I18n.get("btn.return"), a -> {
+                                pop();
+                            }));
+                            final ModeSet modeSet = new ModeSet(mode, rotation);
+                            SubsidiaryState.ALL_STATES.forEach(state -> {
+                                final int defaultValue = container.grid.getSubsidiaryState(
+                                        node.getPoint(), modeSet, state) ? 0 : 1;
+                                selection.add(GuiElements.createEnumElement(new SizeIntegerables<>(
+                                        state.getName(), 2, i -> i == 1 ? "false" : "true"), a -> {
+                                            final SubsidiaryEntry entry = new SubsidiaryEntry(state,
+                                                    a == 0 ? true : false);
+                                            sendSubsidiaryRequest(entry, node, modeSet);
+                                            container.grid.setClientState(node.getPoint(), modeSet,
+                                                    entry);
+                                            pop();
+                                        }, defaultValue));
+                            });
                         });
-                    });
-                    push(screen);
-                }));
+                        push(screen);
+                    }));
             }
             case RS: {
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
