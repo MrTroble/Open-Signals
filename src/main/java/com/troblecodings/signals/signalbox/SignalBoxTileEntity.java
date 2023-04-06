@@ -12,7 +12,6 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
-import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
@@ -81,12 +80,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
-        if (type.equals(LinkType.SIGNAL)) {
-            final SignalStateInfo info = new SignalStateInfo(level, pos, (Signal) block);
-            SignalStateHandler.loadSignal(info);
-            SignalConfig.reset(info);
-        }
         SignalBoxHandler.linkPos(worldPosition, pos, (BasicBlock) block, type, level);
+        if (type.equals(LinkType.SIGNAL)) {
+            SignalStateHandler.loadSignal(new SignalStateInfo(level, pos, (Signal) block));
+        }
         return true;
     }
 

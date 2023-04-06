@@ -91,7 +91,7 @@ public final class SignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
         createToFile(info, states);
-        sendPropertiesToClient(info, states);
+        loadSignal(info);
     }
 
     private static void statesToBuffer(final Signal signal, final Map<SEProperty, String> states,
@@ -368,9 +368,15 @@ public final class SignalStateHandler implements INetworkSync {
                     }
                     SIGNAL_COUNTER.put(info.pos, 1);
                 }
-                final Map<SEProperty, String> properties = readAndSerialize(info);
+                Map<SEProperty, String> properties;
                 synchronized (CURRENTLY_LOADED_STATES) {
-                    CURRENTLY_LOADED_STATES.put(info, properties);
+                    properties = CURRENTLY_LOADED_STATES.get(info);
+                }
+                if (properties == null) {
+                    properties = readAndSerialize(info);
+                    synchronized (CURRENTLY_LOADED_STATES) {
+                        CURRENTLY_LOADED_STATES.put(info, properties);
+                    }
                 }
                 sendPropertiesToClient(info, properties);
             });
