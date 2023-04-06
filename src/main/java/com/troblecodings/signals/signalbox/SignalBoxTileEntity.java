@@ -83,7 +83,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         }
         if (type.equals(LinkType.SIGNAL)) {
             final SignalStateInfo info = new SignalStateInfo(level, pos, (Signal) block);
-            SignalStateHandler.loadIntoCache(info);
+            SignalStateHandler.loadSignal(info);
             SignalConfig.reset(info);
         }
         SignalBoxHandler.linkPos(worldPosition, pos, (BasicBlock) block, type, level);
@@ -99,7 +99,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         SignalBoxHandler.computeIfAbsent(worldPosition, level);
         SignalBoxHandler.readTileNBT(worldPosition, copy == null ? new NBTWrapper() : copy,
                 grid.getModeGrid());
-        SignalBoxHandler.loadSignalsIntoCache(worldPosition, level);
+        SignalBoxHandler.loadSignals(worldPosition, level);
     }
 
     @Override

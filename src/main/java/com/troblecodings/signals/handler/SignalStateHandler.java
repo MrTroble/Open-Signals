@@ -17,11 +17,15 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.blocks.SignalBox;
+import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
+import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
@@ -47,6 +51,7 @@ public final class SignalStateHandler implements INetworkSync {
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<ChunkAccess, List<SignalStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
     private static final Map<Level, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<BlockPos, Integer> SIGNAL_COUNTER = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
     private static ExecutorService service;
@@ -99,6 +104,8 @@ public final class SignalStateHandler implements INetworkSync {
 
     private static void createToFile(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
+        if (states == null)
+            return;
         final SignalStateFile file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
@@ -221,17 +228,14 @@ public final class SignalStateHandler implements INetworkSync {
             final List<SignalStateInfo> states = new ArrayList<>();
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
-                if (!(block instanceof Signal)) {
-                    return;
+                if (block instanceof Signal) {
+                    states.add(new SignalStateInfo(world, pos, (Signal) block));
+                } else if (block instanceof SignalBox) {
+                    SignalBoxHandler.loadSignals(pos, world);
                 }
-                final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, (Signal) block);
-                final Map<SEProperty, String> map = readAndSerialize(stateInfo);
-                synchronized (CURRENTLY_LOADED_STATES) {
-                    CURRENTLY_LOADED_STATES.put(stateInfo, map);
-                }
-                states.add(stateInfo);
-                sendPropertiesToClient(stateInfo, map);
+
             });
+            loadSignals(states);
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 CURRENTLY_LOADED_CHUNKS.put(chunk, states);
             }
@@ -244,25 +248,20 @@ public final class SignalStateHandler implements INetworkSync {
         final Level level = (Level) chunk.getWorldForge();
         if (level.isClientSide())
             return;
-        SignalStateFile file;
-        synchronized (ALL_LEVEL_FILES) {
-            file = ALL_LEVEL_FILES.get(level);
-        }
         service.submit(() -> {
+            chunk.getBlockEntitiesPos().forEach(pos -> {
+                final Block block = chunk.getBlockState(pos).getBlock();
+                if (block instanceof SignalBox) {
+                    SignalBoxHandler.unloadSignals(pos, level);
+                } else if (block instanceof SignalController) {
+                    ((SignalControllerTileEntity) level.getBlockEntity(pos)).unloadSignal();
+                }
+            });
             List<SignalStateInfo> states;
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 states = CURRENTLY_LOADED_CHUNKS.remove(chunk);
             }
-            states.forEach(stateInfo -> {
-                Map<SEProperty, String> properties;
-                synchronized (CURRENTLY_LOADED_STATES) {
-                    properties = CURRENTLY_LOADED_STATES.remove(stateInfo);
-                }
-                final SignalStatePos pos = file.find(stateInfo.pos);
-                final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
-                statesToBuffer(stateInfo.signal, properties, buffer.array());
-                file.write(pos, buffer);
-            });
+            unloadSignals(states);
         });
     }
 
@@ -354,22 +353,50 @@ public final class SignalStateHandler implements INetworkSync {
         });
     }
 
-    public static void loadIntoCache(final List<SignalStateInfo> infos) {
+    public static void loadSignal(final SignalStateInfo info) {
+        loadSignals(ImmutableList.of(info));
+    }
+
+    public static void loadSignals(final List<SignalStateInfo> signals) {
         service.execute(() -> {
-            infos.forEach(info -> {
-                if (info.world.isClientSide)
-                    return;
-                synchronized (CURRENTLY_LOADED_STATES) {
-                    if (CURRENTLY_LOADED_STATES.containsKey(info))
+            signals.forEach(info -> {
+                synchronized (SIGNAL_COUNTER) {
+                    Integer count = SIGNAL_COUNTER.get(info.pos);
+                    if (count != null && count > 0) {
+                        SIGNAL_COUNTER.put(info.pos, ++count);
                         return;
-                    CURRENTLY_LOADED_STATES.put(info, readAndSerialize(info));
+                    }
+                    SIGNAL_COUNTER.put(info.pos, 1);
                 }
+                final Map<SEProperty, String> properties = readAndSerialize(info);
+                synchronized (CURRENTLY_LOADED_STATES) {
+                    CURRENTLY_LOADED_STATES.put(info, properties);
+                }
+                sendPropertiesToClient(info, properties);
             });
         });
     }
 
-    public static void loadIntoCache(final SignalStateInfo info) {
-        loadIntoCache(ImmutableList.of(info));
+    public static void unloadSignal(final SignalStateInfo info) {
+        unloadSignals(ImmutableList.of(info));
+    }
+
+    public static void unloadSignals(final List<SignalStateInfo> signals) {
+        service.execute(() -> {
+            signals.forEach(info -> {
+                synchronized (SIGNAL_COUNTER) {
+                    int count = SIGNAL_COUNTER.get(info.pos);
+                    if (count > 1) {
+                        SIGNAL_COUNTER.put(info.pos, --count);
+                        return;
+                    }
+                    SIGNAL_COUNTER.remove(info.pos);
+                }
+                synchronized (CURRENTLY_LOADED_STATES) {
+                    createToFile(info, CURRENTLY_LOADED_STATES.remove(info));
+                }
+            });
+        });
     }
 
     private static void sendTo(final Player player, final ByteBuffer buf) {

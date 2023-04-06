@@ -273,13 +273,22 @@ public final class SignalBoxHandler {
         return OUTPUT_UPDATES.remove(pos);
     }
 
-    public static void loadSignalsIntoCache(final BlockPos tilePos, final Level world) {
+    public static void loadSignals(final BlockPos tilePos, final Level world) {
         LinkedPosHolder holder;
         synchronized (ALL_LINKED_POS) {
             holder = ALL_LINKED_POS.get(tilePos);
         }
         if (holder == null)
             return;
-        holder.loadSignalsIntoCache(world);
+        holder.loadSignals(world);
+    }
+    
+    public static void unloadSignals(final BlockPos tilePos, final Level world) {
+        LinkedPosHolder holder;
+        synchronized (ALL_LINKED_POS) {
+            holder = ALL_LINKED_POS.get(tilePos);
+        }
+        if (holder == null)
+            return;
     }
 }

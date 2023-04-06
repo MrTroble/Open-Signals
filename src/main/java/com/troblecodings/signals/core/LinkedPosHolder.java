@@ -99,11 +99,19 @@ public class LinkedPosHolder {
         });
     }
 
-    public void loadSignalsIntoCache(final Level world) {
+    public void loadSignals(final Level world) {
         if (world.isClientSide)
             return;
         final List<SignalStateInfo> signalInfos = new ArrayList<>();
         signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
-        SignalStateHandler.loadIntoCache(signalInfos);
+        SignalStateHandler.loadSignals(signalInfos);
+    }
+
+    public void unloadSignals(final Level world) {
+        if (world.isClientSide)
+            return;
+        final List<SignalStateInfo> signalInfos = new ArrayList<>();
+        signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
+        SignalStateHandler.unloadSignals(signalInfos);
     }
 }
