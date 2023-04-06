@@ -9,9 +9,9 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
-import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
@@ -80,22 +80,23 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
-        if (type.equals(LinkType.SIGNAL)) {
-            SignalConfig.reset(new SignalStateInfo(level, pos, (Signal) block));
-        }
         SignalBoxHandler.linkPos(worldPosition, pos, (BasicBlock) block, type, level);
+        if (type.equals(LinkType.SIGNAL)) {
+            SignalStateHandler.loadSignal(new SignalStateInfo(level, pos, (Signal) block));
+        }
         return true;
     }
 
     @Override
     public void onLoad() {
+        grid.setTile(this);
         if (level.isClientSide) {
             return;
         }
-        grid.setTile(this);
         SignalBoxHandler.computeIfAbsent(worldPosition, level);
         SignalBoxHandler.readTileNBT(worldPosition, copy == null ? new NBTWrapper() : copy,
                 grid.getModeGrid());
+        SignalBoxHandler.loadSignals(worldPosition, level);
     }
 
     @Override

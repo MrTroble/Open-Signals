@@ -141,6 +141,8 @@ public final class SignalBoxHandler {
 
     public static void linkPos(final BlockPos tilePos, final BlockPos linkPos,
             final BasicBlock block, final LinkType type, final Level world) {
+        if (world.isClientSide)
+            return;
         LinkedPosHolder holder;
         synchronized (ALL_LINKED_POS) {
             holder = ALL_LINKED_POS.computeIfAbsent(tilePos, _u -> new LinkedPosHolder());
@@ -271,5 +273,25 @@ public final class SignalBoxHandler {
 
     public static boolean getNewOutputState(final BlockPos pos) {
         return OUTPUT_UPDATES.remove(pos);
+    }
+
+    public static void loadSignals(final BlockPos tilePos, final Level world) {
+        LinkedPosHolder holder;
+        synchronized (ALL_LINKED_POS) {
+            holder = ALL_LINKED_POS.get(tilePos);
+        }
+        if (holder == null)
+            return;
+        holder.loadSignals(world);
+    }
+
+    public static void unloadSignals(final BlockPos tilePos, final Level world) {
+        LinkedPosHolder holder;
+        synchronized (ALL_LINKED_POS) {
+            holder = ALL_LINKED_POS.get(tilePos);
+        }
+        if (holder == null)
+            return;
+        holder.unloadSignals(world);
     }
 }
