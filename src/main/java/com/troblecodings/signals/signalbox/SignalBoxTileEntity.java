@@ -9,6 +9,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
@@ -81,7 +82,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             type = LinkType.OUTPUT;
         }
         if (type.equals(LinkType.SIGNAL)) {
-            SignalConfig.reset(new SignalStateInfo(level, pos, (Signal) block));
+            final SignalStateInfo info = new SignalStateInfo(level, pos, (Signal) block);
+            SignalStateHandler.loadIntoCache(info);
+            SignalConfig.reset(info);
         }
         SignalBoxHandler.linkPos(worldPosition, pos, (BasicBlock) block, type, level);
         return true;
@@ -89,13 +92,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public void onLoad() {
+        grid.setTile(this);
         if (level.isClientSide) {
             return;
         }
-        grid.setTile(this);
         SignalBoxHandler.computeIfAbsent(worldPosition, level);
         SignalBoxHandler.readTileNBT(worldPosition, copy == null ? new NBTWrapper() : copy,
                 grid.getModeGrid());
+        SignalBoxHandler.loadSignalsIntoCache(worldPosition, level);
     }
 
     @Override

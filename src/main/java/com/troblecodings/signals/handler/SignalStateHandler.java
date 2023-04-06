@@ -11,6 +11,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -59,7 +60,7 @@ public final class SignalStateHandler implements INetworkSync {
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new SignalStateHandler());
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
-        service = Executors.newFixedThreadPool(3);
+        service = Executors.newFixedThreadPool(4);
     }
 
     @SubscribeEvent
@@ -70,7 +71,7 @@ public final class SignalStateHandler implements INetworkSync {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        service = Executors.newFixedThreadPool(3);
+        service = Executors.newFixedThreadPool(4);
     }
 
     public static void add(final Object object) {
@@ -316,9 +317,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     private static void sendRemoved(final SignalStateInfo info) {
         final BufferFactory buffer = new BufferFactory();
-        buffer.putInt(info.pos.getX());
-        buffer.putInt(info.pos.getY());
-        buffer.putInt(info.pos.getZ());
+        buffer.putBlockPos(info.pos);
         buffer.putByte((byte) 255);
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
@@ -353,6 +352,24 @@ public final class SignalStateHandler implements INetworkSync {
         stateInfo.world.players().forEach(player -> {
             sendTo(player, buffer);
         });
+    }
+
+    public static void loadIntoCache(final List<SignalStateInfo> infos) {
+        service.execute(() -> {
+            infos.forEach(info -> {
+                if (info.world.isClientSide)
+                    return;
+                synchronized (CURRENTLY_LOADED_STATES) {
+                    if (CURRENTLY_LOADED_STATES.containsKey(info))
+                        return;
+                    CURRENTLY_LOADED_STATES.put(info, readAndSerialize(info));
+                }
+            });
+        });
+    }
+
+    public static void loadIntoCache(final SignalStateInfo info) {
+        loadIntoCache(ImmutableList.of(info));
     }
 
     private static void sendTo(final Player player, final ByteBuffer buf) {
