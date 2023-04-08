@@ -74,14 +74,6 @@ public final class SignalBoxHandler {
         grid.updateInput(update);
     }
 
-    public static GridComponent computeIfAbsent(final BlockPos tilePos, final Level world) {
-        if (world.isClientSide)
-            return null;
-        synchronized (ALL_GRIDS) {
-            return ALL_GRIDS.computeIfAbsent(tilePos, _u -> new GridComponent(world, tilePos));
-        }
-    }
-
     public static void writeTileNBT(final BlockPos tilePos, final NBTWrapper wrapper) {
         GridComponent grid;
         synchronized (ALL_GRIDS) {
@@ -100,20 +92,16 @@ public final class SignalBoxHandler {
     }
 
     public static void readTileNBT(final BlockPos tilePos, final NBTWrapper wrapper,
-            final Map<Point, SignalBoxNode> modeGrid) {
+            final Map<Point, SignalBoxNode> modeGrid, final Level world) {
         GridComponent grid;
         synchronized (ALL_GRIDS) {
-            grid = ALL_GRIDS.get(tilePos);
+            grid = ALL_GRIDS.computeIfAbsent(tilePos, _u -> new GridComponent(world, tilePos));
         }
-        if (grid == null)
-            return;
         grid.read(wrapper, modeGrid);
         LinkedPosHolder holder;
         synchronized (ALL_LINKED_POS) {
             holder = ALL_LINKED_POS.computeIfAbsent(tilePos, _u -> new LinkedPosHolder());
         }
-        if (holder == null)
-            return;
         holder.read(wrapper);
     }
 
@@ -194,7 +182,7 @@ public final class SignalBoxHandler {
         });
     }
 
-    public static void unlink(final BlockPos tilePos, final Level world) {
+    public static void unlinkPos(final BlockPos tilePos, final Level world) {
         LinkedPosHolder allPos;
         synchronized (ALL_LINKED_POS) {
             allPos = ALL_LINKED_POS.get(tilePos);
@@ -248,6 +236,17 @@ public final class SignalBoxHandler {
             return true;
         }
         return false;
+    }
+
+    public static void removeSignalBox(final BlockPos tilePos) {
+        SERVICE.execute(() -> {
+            synchronized (ALL_GRIDS) {
+                ALL_GRIDS.remove(tilePos);
+            }
+            synchronized (ALL_LINKED_POS) {
+                ALL_LINKED_POS.remove(tilePos);
+            }
+        });
     }
 
     public static PosUpdateComponent getPosUpdates(final BlockPos pos) {

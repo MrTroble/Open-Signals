@@ -92,14 +92,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             return;
         }
         grid.setTile(this);
-        SignalBoxHandler.computeIfAbsent(worldPosition, level);
         SignalBoxHandler.readTileNBT(worldPosition, copy == null ? new NBTWrapper() : copy,
-                grid.getModeGrid());
+                grid.getModeGrid(), level);
     }
 
     @Override
     public boolean unlink() {
-        SignalBoxHandler.unlink(worldPosition, level);
+        SignalBoxHandler.unlinkPos(worldPosition, level);
         return true;
     }
 
