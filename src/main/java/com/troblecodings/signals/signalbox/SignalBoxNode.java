@@ -1,8 +1,10 @@
 package com.troblecodings.signals.signalbox;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -18,6 +20,7 @@ import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Rotation;
 
 public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
@@ -27,6 +30,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     private final HashMap<Path, ModeSet> possibleConnections = new HashMap<>();
     private final HashMap<ModeSet, PathOptionEntry> possibleModes = new HashMap<>();
+    private final List<ModeSet> manuellEnabledOutputs = new ArrayList<>();
     private final Point point;
     private String identifier;
 
@@ -51,6 +55,23 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public boolean has(final ModeSet modeSet) {
         return possibleModes.containsKey(modeSet);
+    }
+
+    public void addManuellOutput(final ModeSet mode) {
+        if (!manuellEnabledOutputs.contains(mode))
+            manuellEnabledOutputs.add(mode);
+    }
+
+    public void removeManuellOutput(final ModeSet mode) {
+        manuellEnabledOutputs.remove(mode);
+    }
+
+    public List<BlockPos> clearAllManuellOutputs() {
+        final List<BlockPos> returnList = new ArrayList<>();
+        manuellEnabledOutputs.forEach(mode -> returnList
+                .add(possibleModes.get(mode).getEntry(PathEntryType.OUTPUT).get()));
+        manuellEnabledOutputs.clear();
+        return returnList;
     }
 
     public void remove(final ModeSet modeSet) {
@@ -120,6 +141,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     private static final String POINT_LIST = "pointList";
+    private static final String ENABLED_OUTPUTS = "enabledOutputs";
 
     @Override
     public void write(final NBTWrapper compound) {
@@ -129,6 +151,13 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             entry.getValue().write(wrapper);
             return wrapper;
         })::iterator);
+        final List<NBTWrapper> enabledOutputs = new ArrayList<>();
+        manuellEnabledOutputs.forEach(mode -> {
+            final NBTWrapper wrapper = new NBTWrapper();
+            mode.write(wrapper);
+            enabledOutputs.add(wrapper);
+        });
+        compound.putList(ENABLED_OUTPUTS, enabledOutputs);
         this.point.write(compound);
     }
 
@@ -139,6 +168,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             final PathOptionEntry entry = factory.getEntry();
             entry.read(tag);
             possibleModes.put(new ModeSet(tag), entry);
+        });
+        compound.getList(ENABLED_OUTPUTS).forEach(tag -> {
+            final ModeSet modeSet = new ModeSet(tag);
+            if (!manuellEnabledOutputs.contains(modeSet))
+                manuellEnabledOutputs.add(modeSet);
         });
         this.point.read(compound);
         this.identifier = point.getX() + "." + point.getY();
@@ -187,6 +221,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 return false; // Found another signal on the path that is not the target
         }
         return true;
+    }
+
+    public boolean containsManuellOutput(final ModeSet mode) {
+        return manuellEnabledOutputs.contains(mode);
     }
 
     public boolean isEmpty() {
@@ -239,12 +277,19 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     @Override
     public void readNetwork(final BufferFactory buffer) {
         possibleModes.clear();
+        manuellEnabledOutputs.clear();
         final int size = buffer.getByteAsInt();
         for (int i = 0; i < size; i++) {
             final ModeSet mode = ModeSet.of(buffer);
             final PathOptionEntry entry = SignalBoxFactory.getFactory().getEntry();
             entry.readNetwork(buffer);
             possibleModes.put(mode, entry);
+        }
+        final int outputsSize = buffer.getByteAsInt();
+        for (int i = 0; i < outputsSize; i++) {
+            final ModeSet modeSet = ModeSet.of(buffer);
+            if (!manuellEnabledOutputs.contains(modeSet))
+                manuellEnabledOutputs.add(modeSet);
         }
         post();
     }
@@ -258,6 +303,14 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             entry.readNetwork(buffer);
             possibleModes.put(mode, entry);
         }
+        final int outputsSize = buffer.getByteAsInt();
+        if (outputsSize == 0)
+            manuellEnabledOutputs.clear();
+        for (int i = 0; i < outputsSize; i++) {
+            final ModeSet modeSet = ModeSet.of(buffer);
+            if (!manuellEnabledOutputs.contains(modeSet))
+                manuellEnabledOutputs.add(modeSet);
+        }
         post();
     }
 
@@ -268,6 +321,8 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             mode.writeNetwork(buffer);
             entry.writeNetwork(buffer);
         });
+        buffer.putByte((byte) manuellEnabledOutputs.size());
+        manuellEnabledOutputs.forEach(mode -> mode.writeNetwork(buffer));
     }
 
     public void writeUpdateNetwork(final BufferFactory buffer) {
@@ -283,5 +338,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 entry.writeUpdateNetwork(buffer);
             }
         });
+        buffer.putByte((byte) 0);
     }
 }

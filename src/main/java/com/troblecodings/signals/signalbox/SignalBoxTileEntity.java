@@ -98,7 +98,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean unlink() {
-        SignalBoxHandler.unlinkPos(worldPosition, level);
+        SignalBoxHandler.unlinkAll(worldPosition, level);
         return true;
     }
 

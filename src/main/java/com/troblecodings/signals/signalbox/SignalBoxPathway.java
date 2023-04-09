@@ -304,6 +304,13 @@ public class SignalBoxPathway {
         return true;
     }
 
+    public void disableAllOutputs() {
+        foreachPath((_u, node) -> {
+            final List<BlockPos> outputs = node.clearAllManuellOutputs();
+            outputs.forEach(pos -> SignalBoxHandler.updateRedstoneOutput(pos, world, false));
+        }, null);
+    }
+
     /**
      * Getter for the first point of this pathway
      *

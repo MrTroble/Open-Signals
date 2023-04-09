@@ -32,6 +32,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -198,6 +199,11 @@ public class GuiSignalBox extends GuiBase {
 
                 selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
                         mode, rotation);
+                if (option.getEntry(PathEntryType.OUTPUT).isPresent())
+                    parent.add(GuiElements.createEnumElement(JsonEnum.BOOLEAN, e -> {
+                        changeRedstoneOutput(node.getPoint(), new ModeSet(mode, rotation),
+                                e == 1 ? true : false);
+                    }, node.containsManuellOutput(new ModeSet(mode, rotation)) ? 1 : 0));
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
                         mode, rotation, ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
@@ -649,6 +655,17 @@ public class GuiSignalBox extends GuiBase {
         entry.writeNetwork(buffer);
         node.getPoint().writeNetwork(buffer);
         mode.writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+    }
+
+    private void changeRedstoneOutput(final Point point, final ModeSet mode, final boolean state) {
+        if (!allPacketsRecived)
+            return;
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.UPDATE_RS_OUTPUT.ordinal());
+        point.writeNetwork(buffer);
+        mode.writeNetwork(buffer);
+        buffer.putByte((byte) (state ? 1 : 0));
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 

@@ -182,7 +182,7 @@ public final class SignalBoxHandler {
         });
     }
 
-    public static void unlinkPos(final BlockPos tilePos, final Level world) {
+    public static void unlinkAll(final BlockPos tilePos, final Level world) {
         LinkedPosHolder allPos;
         synchronized (ALL_LINKED_POS) {
             allPos = ALL_LINKED_POS.get(tilePos);
