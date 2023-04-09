@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
@@ -32,7 +33,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.BufferFactory;
-import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -81,14 +81,13 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(tooltip);
         new Thread(() -> {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(4000);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
             lowerEntity.remove(tooltip);
         }).start();
         return;
-
     }
 
     private void resetTileSelection() {
@@ -200,10 +199,12 @@ public class GuiSignalBox extends GuiBase {
                 selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
                         mode, rotation);
                 if (option.getEntry(PathEntryType.OUTPUT).isPresent())
-                    parent.add(GuiElements.createEnumElement(JsonEnum.BOOLEAN, e -> {
-                        changeRedstoneOutput(node.getPoint(), new ModeSet(mode, rotation),
-                                e == 1 ? true : false);
-                    }, node.containsManuellOutput(new ModeSet(mode, rotation)) ? 1 : 0));
+                    parent.add(
+                            GuiElements.createBoolElement(BoolIntegerables.of("manuell_rs"), e -> {
+                                changeRedstoneOutput(node.getPoint(), new ModeSet(mode, rotation),
+                                        e == 1 ? true : false);
+                            }, node.containsManuellOutput(new ModeSet(mode, rotation)) ? 1 : 0));
+
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
                         mode, rotation, ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
