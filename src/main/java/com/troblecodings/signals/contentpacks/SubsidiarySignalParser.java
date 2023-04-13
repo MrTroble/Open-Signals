@@ -17,14 +17,6 @@ public class SubsidiarySignalParser {
     private String currentSignal;
     private Map<String, List<String>> allStates;
 
-    public String getCurrentSignal() {
-        return currentSignal;
-    }
-
-    public Map<String, List<String>> getAllStates() {
-        return allStates;
-    }
-
     public static final Map<Signal, Map<SubsidiaryState, ConfigProperty>> SUBSIDIARY_SIGNALS = new HashMap<>();
 
     private static final Gson GSON = new Gson();
@@ -33,7 +25,7 @@ public class SubsidiarySignalParser {
         OpenSignalsMain.contentPacks.getFiles("signalconfigs/subsidiaryenums").forEach(entry -> {
             final SubsidiaryEnumParser parser = GSON.fromJson(entry.getValue(),
                     SubsidiaryEnumParser.class);
-            parser.getSubsidiaryStates().forEach(state -> new SubsidiaryState(state));
+            parser.subsidiaryStates.forEach(state -> new SubsidiaryState(state));
         });
     }
 
@@ -42,15 +34,15 @@ public class SubsidiarySignalParser {
         OpenSignalsMain.contentPacks.getFiles("signalconfigs/subsidiary").forEach(entry -> {
             final SubsidiarySignalParser parser = GSON.fromJson(entry.getValue(),
                     SubsidiarySignalParser.class);
-            final Signal signal = Signal.SIGNALS.get(parser.getCurrentSignal().toLowerCase());
+            final Signal signal = Signal.SIGNALS.get(parser.currentSignal.toLowerCase());
             if (signal == null)
                 throw new ContentPackException("There doesn't exists a signal with the name '"
-                        + parser.getCurrentSignal() + "'!");
+                        + parser.currentSignal + "'!");
             if (SUBSIDIARY_SIGNALS.containsKey(signal))
                 throw new ContentPackException(
                         "There already exists a Subsidiary Config for " + signal + "!");
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
-            parser.getAllStates().forEach((name, properties) -> {
+            parser.allStates.forEach((name, properties) -> {
                 convertToProperites(signal, info, properties, name);
             });
         });
@@ -85,8 +77,5 @@ public class SubsidiarySignalParser {
 
         private List<String> subsidiaryStates;
 
-        public List<String> getSubsidiaryStates() {
-            return subsidiaryStates;
-        }
     }
 }

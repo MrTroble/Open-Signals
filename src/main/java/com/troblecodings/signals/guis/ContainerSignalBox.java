@@ -33,11 +33,6 @@ import net.minecraft.world.level.block.Rotation;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
-    public final static String UPDATE_SET = "update";
-    public final static String SIGNAL_ID = "signal";
-    public final static String POS_ID = "posid";
-    public final static String SIGNAL_NAME = "signalName";
-
     private final AtomicReference<Map<BlockPos, LinkType>> propertiesForType = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
@@ -152,7 +147,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         }
         if (mode.equals(SignalBoxNetwork.REMOVE_POS)) {
             final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.removeLinkedPos(tile.getBlockPos(), pos);
+            SignalBoxHandler.unlinkPosFromSignalBox(tile.getBlockPos(), pos);
             return;
         }
         if (mode.equals(SignalBoxNetwork.RESET_PW)) {
@@ -262,7 +257,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         return true;
     }
 
-    public void setConsumer(final Consumer<String> run) {
+    protected void setConsumer(final Consumer<String> run) {
         this.run = run;
     }
 }

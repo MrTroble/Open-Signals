@@ -1,7 +1,5 @@
 package com.troblecodings.signals.core;
 
-import java.util.Map;
-
 import com.troblecodings.signals.contentpacks.ContentPackException;
 import com.troblecodings.signals.contentpacks.SignalSystemParser;
 import com.troblecodings.signals.init.OSBlocks;
@@ -12,9 +10,7 @@ public final class SignalLoader {
     }
 
     public static void loadAllSignals() {
-        final Map<String, SignalSystemParser> signals = SignalSystemParser
-                .getSignalSystems("signalsystems");
-        signals.forEach((filename, properties) -> {
+        SignalSystemParser.getAllSignals().forEach((filename, properties) -> {
             try {
                 OSBlocks.loadBlock(properties.createSignalSystem(filename),
                         filename.replace(".json", "").replace("_", "").toLowerCase().trim());

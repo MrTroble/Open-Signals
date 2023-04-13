@@ -304,7 +304,7 @@ public class SignalBoxPathway {
         return true;
     }
 
-    public void disableAllOutputs() {
+    public void deactivateAllOutputsOnPathway() {
         foreachPath((_u, node) -> {
             final List<BlockPos> outputs = node.clearAllManuellOutputs();
             outputs.forEach(pos -> SignalBoxHandler.updateRedstoneOutput(pos, world, false));

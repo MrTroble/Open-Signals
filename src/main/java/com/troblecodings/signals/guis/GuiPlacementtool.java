@@ -22,7 +22,6 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.JsonEnum;
-import com.troblecodings.signals.core.PropertyPacket;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
@@ -34,7 +33,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiPlacementtool extends GuiBase implements PropertyPacket {
+public class GuiPlacementtool extends GuiBase {
 
     public static final int GUI_PLACEMENTTOOL = 0;
 
@@ -74,7 +73,7 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
                 input -> {
                     currentSelectedBlock = tool.getObjFromID(input);
                     this.list.clearChildren();
-                    if (container.getSignalID() != input) {
+                    if (container.signalID != input) {
                         sendSignalId(input);
                     }
                 });
@@ -147,7 +146,7 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
 
     @Override
     public void updateFromContainer() {
-        enumerable.setIndex(container.getSignalID());
+        enumerable.setIndex(container.signalID);
         final List<SEProperty> originalProperties = currentSelectedBlock.getProperties();
         originalProperties.forEach(property -> {
             of(property,
@@ -166,7 +165,10 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
 
     private void applyPropertyChanges(final int propertyId, final int valueId) {
         if (loaded) {
-            sendPropertyToServer(player, propertyId, valueId);
+            final BufferFactory buffer = new BufferFactory();
+            buffer.putByte((byte) propertyId);
+            buffer.putByte((byte) valueId);
+            OpenSignalsMain.network.sendTo(player, buffer.build());
         }
         applyModelChanges();
     }

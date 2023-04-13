@@ -66,7 +66,7 @@ public final class PredicateHolder {
     }
 
     public static Predicate<Integer> speed(final StringInteger stringInt) {
-        final CompareValues values = CompareValues.getValuefromString(stringInt.string);
+        final CompareValues values = CompareValues.of(stringInt.string);
         if (values == null)
             throw new LogicalParserException("The given operator of the speed function ["
                     + stringInt.string + "] is not permitted!");

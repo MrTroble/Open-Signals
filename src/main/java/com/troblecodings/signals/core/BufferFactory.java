@@ -52,15 +52,14 @@ public class BufferFactory {
 
     public void putInt(final int i) {
         for (final Byte b : ByteBuffer.allocate(4).putInt(i).array()) {
-            allBytes.add(b);
+            putByte(b);
         }
     }
 
     public void putBlockPos(final BlockPos pos) {
-        for (final Byte b : ByteBuffer.allocate(12).putInt(pos.getX()).putInt(pos.getY())
-                .putInt(pos.getZ()).array()) {
-            allBytes.add(b);
-        }
+        putInt(pos.getX());
+        putInt(pos.getY());
+        putInt(pos.getZ());
     }
 
     public void resetBuilder() {

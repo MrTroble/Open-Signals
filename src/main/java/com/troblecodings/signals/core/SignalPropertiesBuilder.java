@@ -41,12 +41,13 @@ public class SignalPropertiesBuilder {
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
-            OSItems.placementtools.forEach(item -> {
-                if (item.getRegistryName().getPath().equalsIgnoreCase(placementToolName)) {
-                    placementtool = item;
-                    return;
+            for (int i = 0; i < OSItems.placementtools.size(); i++) {
+                final Placementtool tool = OSItems.placementtools.get(i);
+                if (tool.getRegistryName().getPath().equalsIgnoreCase(placementToolName)) {
+                    placementtool = tool;
+                    break;
                 }
-            });
+            }
             if (placementtool == null)
                 throw new ContentPackException(
                         "There doesn't exists a placementtool with the name '" + placementToolName
@@ -56,16 +57,14 @@ public class SignalPropertiesBuilder {
         final List<HeightProperty> signalheights = new ArrayList<>();
         if (signalHeights != null) {
             signalHeights.forEach((property, height) -> {
-                if (info != null) {
-                    try {
-                        signalheights.add(
-                                new HeightProperty(LogicParser.predicate(property, info), height));
-                    } catch (final LogicalParserException e) {
-                        OpenSignalsMain.getLogger()
-                                .error("Something went wrong during the registry of a predicate in "
-                                        + info.signalName + "!\nWith statement:" + property);
-                        e.printStackTrace();
-                    }
+                try {
+                    signalheights
+                            .add(new HeightProperty(LogicParser.predicate(property, info), height));
+                } catch (final LogicalParserException e) {
+                    OpenSignalsMain.getLogger()
+                            .error("Something went wrong during the registry of a predicate in "
+                                    + info.signalName + "!\nWith statement:" + property);
+                    e.printStackTrace();
                 }
             });
         }
@@ -73,16 +72,14 @@ public class SignalPropertiesBuilder {
         final List<FloatProperty> renderheights = new ArrayList<>();
         if (renderHeights != null) {
             renderHeights.forEach((property, height) -> {
-                if (info != null) {
-                    try {
-                        renderheights.add(
-                                new FloatProperty(LogicParser.predicate(property, info), height));
-                    } catch (final LogicalParserException e) {
-                        OpenSignalsMain.getLogger()
-                                .error("Something went wrong during the registry of a predicate in "
-                                        + info.signalName + "!\nWith statement:" + property);
-                        e.printStackTrace();
-                    }
+                try {
+                    renderheights
+                            .add(new FloatProperty(LogicParser.predicate(property, info), height));
+                } catch (final LogicalParserException e) {
+                    OpenSignalsMain.getLogger()
+                            .error("Something went wrong during the registry of a predicate in "
+                                    + info.signalName + "!\nWith statement:" + property);
+                    e.printStackTrace();
                 }
             });
         }

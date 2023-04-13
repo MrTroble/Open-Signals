@@ -18,30 +18,14 @@ import com.troblecodings.signals.properties.SignalPair;
 
 public class ChangeConfigParser {
 
-    protected String currentSignal;
-    protected String nextSignal;
-    protected Map<String, String> savedPredicates;
-    protected Map<String, List<String>> values;
+    private String currentSignal;
+    private String nextSignal;
+    private Map<String, String> savedPredicates;
+    private Map<String, List<String>> values;
 
-    public String getCurrentSignal() {
-        return currentSignal;
-    }
+    public static final Map<SignalPair, List<ConfigProperty>> CHANGECONFIGS = new HashMap<>();
 
-    public String getNextSignal() {
-        return nextSignal;
-    }
-
-    public Map<String, String> getSavedPredicates() {
-        return savedPredicates;
-    }
-
-    public Map<String, List<String>> getValuesToChange() {
-        return values;
-    }
-
-    public static final transient Map<SignalPair, List<ConfigProperty>> CHANGECONFIGS = new HashMap<>();
-
-    private static final transient Gson GSON = new Gson();
+    private static final Gson GSON = new Gson();
 
     @SuppressWarnings("rawtypes")
     public static void loadChangeConfigs() {
@@ -51,11 +35,11 @@ public class ChangeConfigParser {
             final ChangeConfigParser parser = GSON.fromJson(files.getValue(),
                     ChangeConfigParser.class);
 
-            final Signal start = Signal.SIGNALS.get(parser.getCurrentSignal().toLowerCase());
-            final Signal end = Signal.SIGNALS.get(parser.getNextSignal().toLowerCase());
+            final Signal start = Signal.SIGNALS.get(parser.currentSignal.toLowerCase());
+            final Signal end = Signal.SIGNALS.get(parser.nextSignal.toLowerCase());
             if (start == null || end == null) {
-                OpenSignalsMain.getLogger().warn("The signal '" + parser.getCurrentSignal()
-                        + "' or the signal '" + parser.getNextSignal() + "' doen't exists! "
+                OpenSignalsMain.getLogger().warn("The signal '" + parser.nextSignal
+                        + "' or the signal '" + parser.nextSignal + "' doen't exists! "
                         + "This config with filename '" + files.getKey() + "' will be skiped!");
                 continue;
             }
@@ -71,10 +55,9 @@ public class ChangeConfigParser {
                     LogicParser.UNIVERSAL_TRANSLATION_TABLE, end);
             final List<ConfigProperty> properties = new ArrayList<>();
 
-            final Map<String, String> savedPredicates = parser.getSavedPredicates();
+            final Map<String, String> savedPredicates = parser.savedPredicates;
 
-            for (final Map.Entry<String, List<String>> entry : parser.getValuesToChange()
-                    .entrySet()) {
+            for (final Map.Entry<String, List<String>> entry : parser.values.entrySet()) {
 
                 String valueToParse = entry.getKey().toLowerCase();
                 Predicate predicate = t -> true;

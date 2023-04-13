@@ -111,9 +111,7 @@ public final class NameHandler implements INetworkSync {
     private static ByteBuffer packToBuffer(final BlockPos pos, final String name) {
         final byte[] bytes = name.getBytes();
         final BufferFactory buffer = new BufferFactory();
-        buffer.putInt(pos.getX());
-        buffer.putInt(pos.getY());
-        buffer.putInt(pos.getZ());
+        buffer.putBlockPos(pos);
         buffer.putByte((byte) name.length());
         for (final byte b : bytes) {
             buffer.putByte(b);

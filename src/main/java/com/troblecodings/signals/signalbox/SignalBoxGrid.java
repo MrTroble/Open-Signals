@@ -118,7 +118,7 @@ public class SignalBoxGrid implements INetworkSavable {
         return ImmutableList.copyOf(this.modeGrid.values());
     }
 
-    public Map<Point, SignalBoxNode> getModeGrid() {
+    protected Map<Point, SignalBoxNode> getModeGrid() {
         return modeGrid;
     }
 

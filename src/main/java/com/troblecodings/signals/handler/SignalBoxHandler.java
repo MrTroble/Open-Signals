@@ -9,12 +9,12 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.LinkedPosHolder;
-import com.troblecodings.signals.core.PosUpdateComponent;
-import com.troblecodings.signals.core.RedstonePacket;
+import com.troblecodings.signals.core.LinkedPositions;
+import com.troblecodings.signals.core.LinkingUpdates;
+import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.OSBlocks;
-import com.troblecodings.signals.signalbox.GridComponent;
+import com.troblecodings.signals.signalbox.PathwayHolder;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
@@ -27,14 +27,14 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public final class SignalBoxHandler {
 
-    private static final Map<BlockPos, GridComponent> ALL_GRIDS = new HashMap<>();
-    private static final Map<BlockPos, LinkedPosHolder> ALL_LINKED_POS = new HashMap<>();
-    private static final Map<BlockPos, PosUpdateComponent> POS_UPDATES = new HashMap<>();
+    private static final Map<BlockPos, PathwayHolder> ALL_GRIDS = new HashMap<>();
+    private static final Map<BlockPos, LinkedPositions> ALL_LINKED_POS = new HashMap<>();
+    private static final Map<BlockPos, LinkingUpdates> POS_UPDATES = new HashMap<>();
     private static final Map<BlockPos, Boolean> OUTPUT_UPDATES = new HashMap<>();
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(3);
 
     public static void resetPathway(final BlockPos tilePos, final Point point) {
-        GridComponent grid;
+        PathwayHolder grid;
         synchronized (ALL_GRIDS) {
             grid = ALL_GRIDS.get(tilePos);
         }
@@ -45,7 +45,7 @@ public final class SignalBoxHandler {
 
     public static boolean requestPathway(final BlockPos tilePos, final Point p1, final Point p2,
             final Map<Point, SignalBoxNode> modeGrid) {
-        GridComponent grid;
+        PathwayHolder grid;
         synchronized (ALL_GRIDS) {
             grid = ALL_GRIDS.get(tilePos);
         }
@@ -55,7 +55,7 @@ public final class SignalBoxHandler {
     }
 
     public static void resetAllPathways(final BlockPos tilePos) {
-        GridComponent grid;
+        PathwayHolder grid;
         synchronized (ALL_GRIDS) {
             grid = ALL_GRIDS.get(tilePos);
         }
@@ -64,8 +64,8 @@ public final class SignalBoxHandler {
         grid.resetAllPathways();
     }
 
-    public static void updateInput(final BlockPos tilePos, final RedstonePacket update) {
-        GridComponent grid;
+    public static void updateInput(final BlockPos tilePos, final RedstoneUpdatePacket update) {
+        PathwayHolder grid;
         synchronized (ALL_GRIDS) {
             grid = ALL_GRIDS.get(tilePos);
         }
@@ -75,14 +75,14 @@ public final class SignalBoxHandler {
     }
 
     public static void writeTileNBT(final BlockPos tilePos, final NBTWrapper wrapper) {
-        GridComponent grid;
+        PathwayHolder grid;
         synchronized (ALL_GRIDS) {
             grid = ALL_GRIDS.get(tilePos);
         }
         if (grid == null)
             return;
         grid.write(wrapper);
-        LinkedPosHolder holder;
+        LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
             holder = ALL_LINKED_POS.get(tilePos);
         }
@@ -93,14 +93,14 @@ public final class SignalBoxHandler {
 
     public static void readTileNBT(final BlockPos tilePos, final NBTWrapper wrapper,
             final Map<Point, SignalBoxNode> modeGrid, final Level world) {
-        GridComponent grid;
+        PathwayHolder grid;
         synchronized (ALL_GRIDS) {
-            grid = ALL_GRIDS.computeIfAbsent(tilePos, _u -> new GridComponent(world, tilePos));
+            grid = ALL_GRIDS.computeIfAbsent(tilePos, _u -> new PathwayHolder(world, tilePos));
         }
         grid.read(wrapper, modeGrid);
-        LinkedPosHolder holder;
+        LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
-            holder = ALL_LINKED_POS.computeIfAbsent(tilePos, _u -> new LinkedPosHolder());
+            holder = ALL_LINKED_POS.computeIfAbsent(tilePos, _u -> new LinkedPositions());
         }
         holder.read(wrapper);
     }
@@ -108,7 +108,7 @@ public final class SignalBoxHandler {
     public static void setWorld(final BlockPos tilePos, final Level world) {
         if (world.isClientSide)
             return;
-        GridComponent grid;
+        PathwayHolder grid;
         synchronized (ALL_GRIDS) {
             grid = ALL_GRIDS.get(tilePos);
         }
@@ -118,7 +118,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean isTileEmpty(final BlockPos tilePos) {
-        LinkedPosHolder holder;
+        LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
             holder = ALL_LINKED_POS.get(tilePos);
         }
@@ -127,11 +127,11 @@ public final class SignalBoxHandler {
         return holder.isEmpty();
     }
 
-    public static boolean linkPos(final BlockPos tilePos, final BlockPos linkPos,
+    public static boolean linkPosToSignalBox(final BlockPos tilePos, final BlockPos linkPos,
             final BasicBlock block, final LinkType type, final Level world) {
-        LinkedPosHolder holder;
+        LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
-            holder = ALL_LINKED_POS.computeIfAbsent(tilePos, _u -> new LinkedPosHolder());
+            holder = ALL_LINKED_POS.computeIfAbsent(tilePos, _u -> new LinkedPositions());
         }
         final boolean linked = holder.addLinkedPos(linkPos, type);
         if (!linked)
@@ -145,7 +145,7 @@ public final class SignalBoxHandler {
     }
 
     public static Signal getSignal(final BlockPos tilePos, final BlockPos signalPos) {
-        final LinkedPosHolder signals;
+        final LinkedPositions signals;
         synchronized (ALL_LINKED_POS) {
             signals = ALL_LINKED_POS.get(tilePos);
         }
@@ -154,8 +154,8 @@ public final class SignalBoxHandler {
         return signals.getSignal(signalPos);
     }
 
-    public static void removeLinkedPos(final BlockPos tilePos, final BlockPos pos) {
-        LinkedPosHolder holder;
+    public static void unlinkPosFromSignalBox(final BlockPos tilePos, final BlockPos pos) {
+        LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
             holder = ALL_LINKED_POS.get(tilePos);
         }
@@ -165,7 +165,7 @@ public final class SignalBoxHandler {
     }
 
     public static Map<BlockPos, LinkType> getAllLinkedPos(final BlockPos tilePos) {
-        final LinkedPosHolder holder;
+        final LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
             holder = ALL_LINKED_POS.get(tilePos);
         }
@@ -183,7 +183,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unlinkAll(final BlockPos tilePos, final Level world) {
-        LinkedPosHolder allPos;
+        LinkedPositions allPos;
         synchronized (ALL_LINKED_POS) {
             allPos = ALL_LINKED_POS.get(tilePos);
         }
@@ -197,9 +197,9 @@ public final class SignalBoxHandler {
         if (tryDirectUnlink(world, pos, tilePos))
             return;
         SERVICE.execute(() -> {
-            final PosUpdateComponent update;
+            final LinkingUpdates update;
             synchronized (POS_UPDATES) {
-                update = POS_UPDATES.computeIfAbsent(pos, _u -> new PosUpdateComponent());
+                update = POS_UPDATES.computeIfAbsent(pos, _u -> new LinkingUpdates());
             }
             update.addPosToUnlink(tilePos);
         });
@@ -210,9 +210,9 @@ public final class SignalBoxHandler {
         if (tryDirectLink(world, pos, tilePos))
             return;
         SERVICE.execute(() -> {
-            final PosUpdateComponent update;
+            final LinkingUpdates update;
             synchronized (POS_UPDATES) {
-                update = POS_UPDATES.computeIfAbsent(tilePos, _u -> new PosUpdateComponent());
+                update = POS_UPDATES.computeIfAbsent(tilePos, _u -> new LinkingUpdates());
             }
             update.addPosToLink(tilePos);
         });
@@ -249,7 +249,7 @@ public final class SignalBoxHandler {
         });
     }
 
-    public static PosUpdateComponent getPosUpdates(final BlockPos pos) {
+    public static LinkingUpdates getPosUpdates(final BlockPos pos) {
         return POS_UPDATES.remove(pos);
     }
 

@@ -83,15 +83,16 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (type.equals(LinkType.SIGNAL)) {
             SignalConfig.reset(new SignalStateInfo(level, pos, (Signal) block));
         }
-        return SignalBoxHandler.linkPos(worldPosition, pos, (BasicBlock) block, type, level);
+        return SignalBoxHandler.linkPosToSignalBox(worldPosition, pos, (BasicBlock) block, type,
+                level);
     }
 
     @Override
     public void onLoad() {
+        grid.setTile(this);
         if (level.isClientSide) {
             return;
         }
-        grid.setTile(this);
         SignalBoxHandler.readTileNBT(worldPosition, copy == null ? new NBTWrapper() : copy,
                 grid.getModeGrid(), level);
     }

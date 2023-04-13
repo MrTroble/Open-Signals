@@ -14,7 +14,7 @@ import com.troblecodings.signals.signalbox.config.SignalConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
-public class LinkedPosHolder {
+public class LinkedPositions {
 
     private static final String LINKED_POS_LIST = "linkedPos";
     private static final String LINKED_SIGNALS = "linkedSignals";
@@ -24,7 +24,7 @@ public class LinkedPosHolder {
     private final Map<BlockPos, Signal> signals;
     private final Map<BlockPos, LinkType> linkedBlocks;
 
-    public LinkedPosHolder() {
+    public LinkedPositions() {
         signals = new HashMap<>();
         linkedBlocks = new HashMap<>();
     }
