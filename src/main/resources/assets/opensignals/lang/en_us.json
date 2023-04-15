@@ -33,6 +33,7 @@
     "block.opensignals.signalbox": "Signal Box",
     "block.opensignals.redstonein": "Redstone Input",
     "block.opensignals.redstoneout": "Redstone Output",
+    "block.opensignals.combiredstoneinput": "Combined Redstone Input",
     "tile.signalbox.name": "Signalbox",
     "lt.linkedpos": "§2Linked with: {%d, %d, %d§2}§r",
     "lt.setpos": "§2Saved: {%d, %d, %d§2}§r",

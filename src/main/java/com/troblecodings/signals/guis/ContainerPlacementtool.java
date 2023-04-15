@@ -22,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class ContainerPlacementtool extends ContainerBase implements INetworkSync {
 
-    private int signalID;
+    protected int signalID;
     public final Map<SEProperty, Integer> properties = new HashMap<>();
     private final Player player;
     private Signal signal;
@@ -111,9 +111,5 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
             }
         });
         update();
-    }
-
-    public int getSignalID() {
-        return signalID;
     }
 }

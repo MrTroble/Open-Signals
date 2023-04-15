@@ -8,7 +8,9 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -16,7 +18,7 @@ import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
-public class GridComponent {
+public class PathwayHolder {
 
     private static final String PATHWAY_LIST = "pathwayList";
 
@@ -25,7 +27,7 @@ public class GridComponent {
     private Level world;
     private final BlockPos tilePos;
 
-    public GridComponent(final Level world, final BlockPos pos) {
+    public PathwayHolder(final Level world, final BlockPos pos) {
         this.world = world;
         this.tilePos = pos;
     }
@@ -48,6 +50,7 @@ public class GridComponent {
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
             way.setWorldAndPos(world, tilePos);
+            way.deactivateAllOutputsOnPathway();
             way.setPathStatus(EnumPathUsage.SELECTED);
             way.updatePathwaySignals();
             this.onWayAdd(way);
@@ -89,15 +92,31 @@ public class GridComponent {
         endsToPath.clear();
     }
 
-    public void setPowered(final BlockPos pos) {
+    public void updateInput(final RedstoneUpdatePacket update) {
         final List<SignalBoxPathway> nodeCopy = ImmutableList.copyOf(startsToPath.values());
-        nodeCopy.forEach(pathway -> {
+        if (update.block instanceof CombinedRedstoneInput) {
+            if (update.state) {
+                tryBlock(nodeCopy, update.pos);
+            } else {
+                tryReset(nodeCopy, update.pos);
+            }
+        } else {
+            tryBlock(nodeCopy, update.pos);
+            tryReset(nodeCopy, update.pos);
+        }
+    }
+
+    private void tryBlock(final List<SignalBoxPathway> pathways, final BlockPos pos) {
+        pathways.forEach(pathway -> {
             if (pathway.tryBlock(pos)) {
                 updatePrevious(pathway);
                 updateToNet(pathway);
             }
         });
-        nodeCopy.forEach(pathway -> {
+    }
+
+    private void tryReset(final List<SignalBoxPathway> pathways, final BlockPos pos) {
+        pathways.forEach(pathway -> {
             final Point first = pathway.getFirstPoint();
             final Optional<Point> optPoint = pathway.tryReset(pos);
             if (optPoint.isPresent()) {

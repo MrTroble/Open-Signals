@@ -75,16 +75,16 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (block == null || block instanceof AirBlock)
             return false;
         LinkType type = LinkType.SIGNAL;
-        if (block == OSBlocks.REDSTONE_IN) {
+        if (block == OSBlocks.REDSTONE_IN || block == OSBlocks.COMBI_REDSTONE_INPUT) {
             type = LinkType.INPUT;
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
-        SignalBoxHandler.linkPos(worldPosition, pos, (BasicBlock) block, type, level);
         if (type.equals(LinkType.SIGNAL)) {
             SignalStateHandler.loadSignal(new SignalStateInfo(level, pos, (Signal) block));
         }
-        return true;
+        return SignalBoxHandler.linkPosToSignalBox(worldPosition, pos, (BasicBlock) block, type,
+                level);
     }
 
     @Override
@@ -93,15 +93,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (level.isClientSide) {
             return;
         }
-        SignalBoxHandler.computeIfAbsent(worldPosition, level);
         SignalBoxHandler.readTileNBT(worldPosition, copy == null ? new NBTWrapper() : copy,
-                grid.getModeGrid());
+                grid.getModeGrid(), level);
         SignalBoxHandler.loadSignals(worldPosition, level);
     }
 
     @Override
     public boolean unlink() {
-        SignalBoxHandler.unlink(worldPosition, level);
+        SignalBoxHandler.unlinkAll(worldPosition, level);
         return true;
     }
 

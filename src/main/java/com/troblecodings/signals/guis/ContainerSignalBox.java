@@ -33,11 +33,6 @@ import net.minecraft.world.level.block.Rotation;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
-    public final static String UPDATE_SET = "update";
-    public final static String SIGNAL_ID = "signal";
-    public final static String POS_ID = "posid";
-    public final static String SIGNAL_NAME = "signalName";
-
     private final AtomicReference<Map<BlockPos, LinkType>> propertiesForType = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
@@ -103,9 +98,22 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             return;
         }
         if (mode.equals(SignalBoxNetwork.NO_PW_FOUND)) {
-            if (run != null) {
-                run.accept(I18n.get("error.nopathfound"));
-                return;
+            run.accept(I18n.get("error.nopathfound"));
+            return;
+        }
+        if (mode.equals(SignalBoxNetwork.NO_OUTPUT_UPDATE)) {
+            run.accept(I18n.get("error.nooputputupdate"));
+            return;
+        }
+        if (mode.equals(SignalBoxNetwork.OUTPUT_UPDATE)) {
+            final Point point = Point.of(buffer);
+            final ModeSet modeSet = ModeSet.of(buffer);
+            final boolean state = buffer.getByte() == 1 ? true : false;
+            final SignalBoxNode node = grid.getNode(point);
+            if (state) {
+                node.addManuellOutput(modeSet);
+            } else {
+                node.removeManuellOutput(modeSet);
             }
         }
     }
@@ -113,6 +121,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     @Override
     public void deserializeServer(final ByteBuffer buf) {
         final BufferFactory buffer = new BufferFactory(buf);
+        final SignalBoxGrid grid = tile.getSignalBoxGrid();
         final SignalBoxNetwork mode = SignalBoxNetwork.of(buffer);
         if (mode.equals(SignalBoxNetwork.SEND_INT_ENTRY)) {
             deserializeEntry(buffer, buffer.getByteAsInt());
@@ -124,7 +133,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             final Rotation rotation = deserializeRotation(buffer);
             final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES.get(buffer.getByteAsInt());
             final ModeSet modeSet = new ModeSet(guiMode, rotation);
-            tile.getSignalBoxGrid().getNode(point).getOption(modeSet).ifPresent(entry -> {
+            grid.getNode(point).getOption(modeSet).ifPresent(entry -> {
                 entry.removeEntry(entryType);
             });
         }
@@ -138,18 +147,18 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         }
         if (mode.equals(SignalBoxNetwork.REMOVE_POS)) {
             final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.removeLinkedPos(tile.getBlockPos(), pos);
+            SignalBoxHandler.unlinkPosFromSignalBox(tile.getBlockPos(), pos);
             return;
         }
         if (mode.equals(SignalBoxNetwork.RESET_PW)) {
             final Point point = Point.of(buffer);
-            tile.getSignalBoxGrid().resetPathway(point);
+            grid.resetPathway(point);
             return;
         }
         if (mode.equals(SignalBoxNetwork.REQUEST_PW)) {
             final Point start = Point.of(buffer);
             final Point end = Point.of(buffer);
-            if (!tile.getSignalBoxGrid().requestWay(start, end)) {
+            if (!grid.requestWay(start, end)) {
                 final BufferFactory error = new BufferFactory();
                 error.putByte((byte) SignalBoxNetwork.NO_PW_FOUND.ordinal());
                 OpenSignalsMain.network.sendTo(info.player, error.build());
@@ -157,19 +166,38 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             return;
         }
         if (mode.equals(SignalBoxNetwork.RESET_ALL_PW)) {
-            tile.getSignalBoxGrid().resetAllPathways();
+            grid.resetAllPathways();
             return;
         }
         if (mode.equals(SignalBoxNetwork.SEND_CHANGED_MODES)) {
-            tile.getSignalBoxGrid().readUpdateNetwork(buffer, true);
+            grid.readUpdateNetwork(buffer, true);
             return;
         }
         if (mode.equals(SignalBoxNetwork.REQUEST_SUBSIDIARY)) {
             final SubsidiaryEntry entry = SubsidiaryEntry.of(buffer);
             final Point point = Point.of(buffer);
             final ModeSet modeSet = ModeSet.of(buffer);
-            tile.getSignalBoxGrid().updateSubsidiarySignal(point, modeSet, entry);
+            grid.updateSubsidiarySignal(point, modeSet, entry);
             return;
+        }
+        if (mode.equals(SignalBoxNetwork.UPDATE_RS_OUTPUT)) {
+            final Point point = Point.of(buffer);
+            final ModeSet modeSet = ModeSet.of(buffer);
+            final boolean state = buffer.getByte() == 1 ? true : false;
+            final BlockPos pos = grid.updateManuellRSOutput(point, modeSet, state);
+            if (pos == null) {
+                final BufferFactory error = new BufferFactory();
+                error.putByte((byte) SignalBoxNetwork.NO_OUTPUT_UPDATE.ordinal());
+                OpenSignalsMain.network.sendTo(info.player, error.build());
+            } else {
+                SignalBoxHandler.updateRedstoneOutput(pos, info.world, state);
+                final BufferFactory sucess = new BufferFactory();
+                sucess.putByte((byte) SignalBoxNetwork.OUTPUT_UPDATE.ordinal());
+                point.writeNetwork(sucess);
+                modeSet.writeNetwork(sucess);
+                sucess.putByte((byte) (state ? 1 : 0));
+                OpenSignalsMain.network.sendTo(info.player, sucess.build());
+            }
         }
     }
 
@@ -229,7 +257,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         return true;
     }
 
-    public void setConsumer(final Consumer<String> run) {
+    protected void setConsumer(final Consumer<String> run) {
         this.run = run;
     }
 }

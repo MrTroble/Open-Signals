@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
@@ -80,14 +81,13 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(tooltip);
         new Thread(() -> {
             try {
-                Thread.sleep(2000);
+                Thread.sleep(4000);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
             lowerEntity.remove(tooltip);
         }).start();
         return;
-
     }
 
     private void resetTileSelection() {
@@ -198,6 +198,13 @@ public class GuiSignalBox extends GuiBase {
 
                 selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
                         mode, rotation);
+                if (option.getEntry(PathEntryType.OUTPUT).isPresent())
+                    parent.add(
+                            GuiElements.createBoolElement(BoolIntegerables.of("manuell_rs"), e -> {
+                                changeRedstoneOutput(node.getPoint(), new ModeSet(mode, rotation),
+                                        e == 1 ? true : false);
+                            }, node.containsManuellOutput(new ModeSet(mode, rotation)) ? 1 : 0));
+
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
                         mode, rotation, ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
@@ -224,30 +231,31 @@ public class GuiSignalBox extends GuiBase {
                         mode, rotation);
                 break;
             case HP: {
-                parent.add(GuiElements.createButton(I18n.get("btn.subsidiary"), e -> {
-                    final UIEntity screen = GuiElements.createScreen(selection -> {
-                        final UIBox hbox = new UIBox(UIBox.VBOX, 3);
-                        selection.add(hbox);
-                        selection.add(GuiElements.createButton(I18n.get("btn.return"), a -> {
-                            pop();
-                        }));
-                        final ModeSet modeSet = new ModeSet(mode, rotation);
-                        SubsidiaryState.ALL_STATES.forEach(state -> {
-                            final int defaultValue = container.grid
-                                    .getSubsidiaryState(node.getPoint(), modeSet, state) ? 0 : 1;
-                            selection.add(GuiElements.createEnumElement(new SizeIntegerables<>(
-                                    state.getName(), 2, i -> i == 1 ? "false" : "true"), a -> {
-                                        final SubsidiaryEntry entry = new SubsidiaryEntry(state,
-                                                a == 0 ? true : false);
-                                        sendSubsidiaryRequest(entry, node, modeSet);
-                                        container.grid.setClientState(node.getPoint(), modeSet,
-                                                entry);
-                                        pop();
-                                    }, defaultValue));
+                if (option.containsEntry(PathEntryType.SIGNAL))
+                    parent.add(GuiElements.createButton(I18n.get("btn.subsidiary"), e -> {
+                        final UIEntity screen = GuiElements.createScreen(selection -> {
+                            final UIBox hbox = new UIBox(UIBox.VBOX, 3);
+                            selection.add(hbox);
+                            selection.add(GuiElements.createButton(I18n.get("btn.return"), a -> {
+                                pop();
+                            }));
+                            final ModeSet modeSet = new ModeSet(mode, rotation);
+                            SubsidiaryState.ALL_STATES.forEach(state -> {
+                                final int defaultValue = container.grid.getSubsidiaryState(
+                                        node.getPoint(), modeSet, state) ? 0 : 1;
+                                selection.add(GuiElements.createEnumElement(new SizeIntegerables<>(
+                                        state.getName(), 2, i -> i == 1 ? "false" : "true"), a -> {
+                                            final SubsidiaryEntry entry = new SubsidiaryEntry(state,
+                                                    a == 0 ? true : false);
+                                            sendSubsidiaryRequest(entry, node, modeSet);
+                                            container.grid.setClientState(node.getPoint(), modeSet,
+                                                    entry);
+                                            pop();
+                                        }, defaultValue));
+                            });
                         });
-                    });
-                    push(screen);
-                }));
+                        push(screen);
+                    }));
             }
             case RS: {
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
@@ -356,7 +364,7 @@ public class GuiSignalBox extends GuiBase {
 
             final int id = t.ordinal();
             final UIEntity icon = new UIEntity();
-            icon.add(new UITexture(UISignalBoxTile.ICON, 0.25 * id, 0.5, 0.25 * id + 0.25, 1));
+            icon.add(new UITexture(UISignalBoxTile.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1));
             icon.setHeight(20);
             icon.setWidth(20);
             icon.add(new UIToolTip(I18n.get("type." + t.name())));
@@ -648,6 +656,17 @@ public class GuiSignalBox extends GuiBase {
         entry.writeNetwork(buffer);
         node.getPoint().writeNetwork(buffer);
         mode.writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+    }
+
+    private void changeRedstoneOutput(final Point point, final ModeSet mode, final boolean state) {
+        if (!allPacketsRecived)
+            return;
+        final BufferFactory buffer = new BufferFactory();
+        buffer.putByte((byte) SignalBoxNetwork.UPDATE_RS_OUTPUT.ordinal());
+        point.writeNetwork(buffer);
+        mode.writeNetwork(buffer);
+        buffer.putByte((byte) (state ? 1 : 0));
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 

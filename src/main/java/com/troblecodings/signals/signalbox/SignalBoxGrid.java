@@ -18,6 +18,7 @@ import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
+import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -27,6 +28,7 @@ import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
+import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.core.BlockPos;
 
@@ -36,8 +38,8 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public final Map<Point, SignalBoxPathway> clientPathways = new HashMap<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
-    private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     protected final SignalBoxFactory factory;
+    private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     private SignalBoxTileEntity tile;
 
     public SignalBoxGrid() {
@@ -116,7 +118,7 @@ public class SignalBoxGrid implements INetworkSavable {
         return ImmutableList.copyOf(this.modeGrid.values());
     }
 
-    public Map<Point, SignalBoxNode> getModeGrid() {
+    protected Map<Point, SignalBoxNode> getModeGrid() {
         return modeGrid;
     }
 
@@ -197,6 +199,24 @@ public class SignalBoxGrid implements INetworkSavable {
         final SignalBoxPathway pathway = new SignalBoxPathway(modeGrid, allNodesForPathway,
                 PathType.NORMAL);
         clientPathways.put(pathway.getFirstPoint(), pathway);
+    }
+
+    public BlockPos updateManuellRSOutput(final Point point, final ModeSet mode,
+            final boolean state) {
+        final SignalBoxNode node = modeGrid.get(point);
+        if (node == null)
+            return null;
+        final PathOptionEntry entry = node.getOption(mode).get();
+        final Optional<BlockPos> outputPos = entry.getEntry(PathEntryType.OUTPUT);
+        final Optional<EnumPathUsage> usage = entry.getEntry(PathEntryType.PATHUSAGE);
+        if (outputPos.isEmpty() || (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)))
+            return null;
+        if (state) {
+            node.addManuellOutput(mode);
+        } else {
+            node.removeManuellOutput(mode);
+        }
+        return outputPos.get();
     }
 
     public void updateSubsidiarySignal(final Point point, final ModeSet mode,

@@ -37,6 +37,7 @@ tile.post.name=Mast
 tile.signalbox.name=Stellwerk
 tile.redstonein.name=Redstone Eingang
 tile.redstoneout.name=Redstone Ausgang
+tile.combiredstoneinput.name=Kombinierter Redstone Eingang
 
 #Linking Tool
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r

@@ -24,7 +24,6 @@ public class ClientSignalsStateHandler implements INetworkSync {
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
-    private static final ExecutorService REMOVE_SERVICE = Executors.newFixedThreadPool(3);
 
     public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -75,7 +74,7 @@ public class ClientSignalsStateHandler implements INetworkSync {
 
     private static void setRemoved(final BlockPos pos) {
         final Minecraft mc = Minecraft.getInstance();
-        REMOVE_SERVICE.execute(() -> {
+        SERVICE.execute(() -> {
             synchronized (CURRENTLY_LOADED_STATES) {
                 CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.level, pos));
             }

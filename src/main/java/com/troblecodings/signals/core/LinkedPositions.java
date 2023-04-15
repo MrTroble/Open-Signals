@@ -17,7 +17,7 @@ import com.troblecodings.signals.signalbox.config.SignalConfig;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 
-public class LinkedPosHolder {
+public class LinkedPositions {
 
     private static final String LINKED_POS_LIST = "linkedPos";
     private static final String LINKED_SIGNALS = "linkedSignals";
@@ -27,7 +27,7 @@ public class LinkedPosHolder {
     private final Map<BlockPos, Signal> signals;
     private final Map<BlockPos, LinkType> linkedBlocks;
 
-    public LinkedPosHolder() {
+    public LinkedPositions() {
         signals = new HashMap<>();
         linkedBlocks = new HashMap<>();
     }
@@ -41,8 +41,11 @@ public class LinkedPosHolder {
         return signals.get(pos);
     }
 
-    public void addLinkedPos(final BlockPos pos, final LinkType type) {
+    public boolean addLinkedPos(final BlockPos pos, final LinkType type) {
+        if (linkedBlocks.containsKey(pos))
+            return false;
         linkedBlocks.put(pos, type);
+        return true;
     }
 
     public void removeLinkedPos(final BlockPos pos) {
@@ -63,7 +66,7 @@ public class LinkedPosHolder {
         signals.forEach(
                 (pos, signal) -> SignalConfig.reset(new SignalStateInfo(world, pos, signal)));
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
-                .forEach(entry -> SignalBoxHandler.unlinkPosFromTile(entry.getKey(), tilePos,
+                .forEach(entry -> SignalBoxHandler.unlinkTileFromPos(entry.getKey(), tilePos,
                         world));
         linkedBlocks.clear();
         signals.clear();

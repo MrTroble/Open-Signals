@@ -4,6 +4,7 @@ import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
@@ -58,8 +59,10 @@ public class SignalBox extends BasicBlock {
     @Override
     public void playerWillDestroy(final Level world, final BlockPos pos, final BlockState state,
             final Player player) {
-        if (!world.isClientSide)
+        if (!world.isClientSide) {
             ((SignalBoxTileEntity) world.getBlockEntity(pos)).unlink();
+            SignalBoxHandler.removeSignalBox(pos);
+        }
         super.playerWillDestroy(world, pos, state, player);
     }
 }

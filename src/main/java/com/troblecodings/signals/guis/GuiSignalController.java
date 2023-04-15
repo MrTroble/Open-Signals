@@ -66,7 +66,7 @@ public class GuiSignalController extends GuiBase {
         initInternal();
     }
 
-    private void initMode(final EnumMode mode, final Signal signal) {
+    private void initMode(final EnumMode mode) {
         lowerEntity.clear();
         this.currentMode = mode;
         sendCurrentMode();
@@ -255,9 +255,9 @@ public class GuiSignalController extends GuiBase {
         final UIEnumerable enumModes = new UIEnumerable(enumMode.count(), enumMode.getName());
         final UIEntity rsMode = GuiElements.createEnumElement(enumModes, enumMode, in -> {
             lowerEntity.clearChildren();
-            initMode(enumMode.getObjFromID(in), signal);
+            initMode(enumMode.getObjFromID(in));
         }, controller.currentMode.ordinal());
-        initMode(controller.currentMode, signal);
+        initMode(controller.currentMode);
         header.add(rsMode);
 
         final UIEntity middlePart = new UIEntity();

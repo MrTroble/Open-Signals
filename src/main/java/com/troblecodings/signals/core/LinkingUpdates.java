@@ -8,12 +8,12 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.core.BlockPos;
 
-public class PosUpdateComponent {
+public class LinkingUpdates {
 
     private final List<BlockPos> posToAdd;
     private final List<BlockPos> posToRemove;
 
-    public PosUpdateComponent() {
+    public LinkingUpdates() {
         this.posToAdd = new ArrayList<>();
         this.posToRemove = new ArrayList<>();
     }
@@ -55,7 +55,7 @@ public class PosUpdateComponent {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final PosUpdateComponent other = (PosUpdateComponent) obj;
+        final LinkingUpdates other = (LinkingUpdates) obj;
         return Objects.equals(posToAdd, other.posToAdd)
                 && Objects.equals(posToRemove, other.posToRemove);
     }

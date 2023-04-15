@@ -1,0 +1,1 @@
+{"variants": {"power=false": {"model": "opensignals:block/combiredstonein_off"}, "power=true": {"model": "opensignals:block/combiredstonein_on"}}}

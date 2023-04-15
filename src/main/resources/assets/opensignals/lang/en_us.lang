@@ -56,6 +56,7 @@ tile.wnsignal.name=Wn Signal
 tile.stationname.name=Stationname
 tile.redstonein.name=Redstone Input
 tile.redstoneout.name=Redstone Output
+tile.combiredstoneinput.name=Combined Redstone Input
 tile.semaphoresignal.name=Semaphore Signal
 tile.shmech.name=Shunting Signal
 tile.andreascross.name=Andreascross
