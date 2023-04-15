@@ -32,7 +32,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     private BlockPos linkedSignalPosition = null;
     private Signal linkedSignal = null;
-    private Signal signal;
     private int lastProfile = 0;
     private NBTWrapper copy;
     private EnumMode lastState;
@@ -176,7 +175,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (wrapper.contains(ENUM_MODE)) {
             lastState = EnumMode.values()[wrapper.getInteger(ENUM_MODE)];
         }
-        signal = (Signal) level.getBlockState(linkedSignalPosition).getBlock();
         for (final Direction direction : Direction.values()) {
             if (!wrapper.contains(direction.getName()))
                 return;
@@ -193,7 +191,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             final int profile = compund.getInteger(PROFILE);
             final NBTWrapper comp = compund.getWrapper(PROPERITES);
             final Map<SEProperty, String> properties = new HashMap<>();
-            signal.getProperties().forEach(property -> {
+            linkedSignal.getProperties().forEach(property -> {
                 final Optional<String> value = property.readFromNBT(comp);
                 if (value.isPresent()) {
                     properties.put(property, value.get());
@@ -209,7 +207,16 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             if (copy.contains(BLOCK_POS_ID))
                 linkedSignalPosition = copy.getBlockPos(BLOCK_POS_ID);
             readFromWrapper(copy);
+            if (linkedSignalPosition != null & linkedSignal != null)
+                SignalStateHandler
+                        .loadSignal(new SignalStateInfo(level, linkedSignalPosition, linkedSignal));
         }
+    }
+
+    public void unloadSignal() {
+        if (linkedSignalPosition != null & linkedSignal != null)
+            SignalStateHandler
+                    .unloadSignal(new SignalStateInfo(level, linkedSignalPosition, linkedSignal));
     }
 
     public BlockPos getLinkedPosition() {
@@ -241,6 +248,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     @Override
     public boolean unlink() {
         linkedSignalPosition = null;
+        linkedSignal = null;
         allStates.clear();
         enabledStates.clear();
         return true;
@@ -262,7 +270,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             if (profile == null || !allStates.containsKey(profile)) {
                 continue;
             }
-            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition, signal);
+            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
+                    linkedSignal);
             SignalStateHandler.setStates(info, allStates.get(profile));
         }
     }

@@ -26,7 +26,9 @@ public class ClientSignalsStateHandler implements INetworkSync {
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
 
     public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
-        return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
+        synchronized (CURRENTLY_LOADED_STATES) {
+            return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
+        }
     }
 
     @Override

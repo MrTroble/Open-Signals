@@ -1,6 +1,8 @@
 package com.troblecodings.signals.core;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
@@ -8,6 +10,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 
@@ -97,5 +100,21 @@ public class LinkedPositions {
             final Signal signal = Signal.SIGNALS.get(nbt.getString(SIGNAL_NAME));
             signals.put(pos, signal);
         });
+    }
+
+    public void loadSignals(final Level world) {
+        if (world.isClientSide)
+            return;
+        final List<SignalStateInfo> signalInfos = new ArrayList<>();
+        signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
+        SignalStateHandler.loadSignals(signalInfos);
+    }
+
+    public void unloadSignals(final Level world) {
+        if (world.isClientSide)
+            return;
+        final List<SignalStateInfo> signalInfos = new ArrayList<>();
+        signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
+        SignalStateHandler.unloadSignals(signalInfos);
     }
 }

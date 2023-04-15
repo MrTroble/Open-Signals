@@ -27,7 +27,6 @@ import com.troblecodings.signals.core.SignalAngel;
 
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
@@ -36,6 +35,7 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ForgeModelBakery;
@@ -60,10 +60,9 @@ public class SignalCustomModel implements UnbakedModel {
         this.dependencies = list.stream()
                 .map(info -> new ResourceLocation(OpenSignalsMain.MODID, "block/" + info.name))
                 .collect(Collectors.toUnmodifiableList());
-        list.forEach(info -> info.retexture
-                .forEach((id, texture) -> materialsFromString.computeIfAbsent(texture,
-                        _u -> Either.left(new Material(TextureAtlas.LOCATION_BLOCKS,
-                                new ResourceLocation(texture))))));
+        list.forEach(info -> info.retexture.forEach(
+                (id, texture) -> materialsFromString.computeIfAbsent(texture, _u -> Either.left(
+                        new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(texture))))));
     }
 
     private static void transform(final BakedQuad quad, final Matrix4f quaterion) {

@@ -479,7 +479,7 @@ public class GuiSignalBox extends GuiBase {
                 final UISignalBoxTile sbt = new UISignalBoxTile(node);
                 tile.add(sbt);
                 consumer.accept(tile, sbt);
-                tile.add(new UIBorder(0xFF7F7F7F, 2));
+                tile.add(new UIBorder(0xFF7F7F7F, 0.75f));
                 row.add(tile);
             }
             plane.add(row);
@@ -489,7 +489,7 @@ public class GuiSignalBox extends GuiBase {
         final UIEntity frame = new UIEntity();
         frame.setInheritHeight(true);
         frame.setInheritWidth(true);
-        frame.add(new UIBorder(0xFF000000, 6));
+        frame.add(new UIBorder(0xFF000000, 4));
         lowerEntity.add(frame);
     }
 
@@ -592,7 +592,7 @@ public class GuiSignalBox extends GuiBase {
             return;
         final BufferFactory buffer = new BufferFactory();
         buffer.putByte((byte) SignalBoxNetwork.SEND_ZS2_ENTRY.ordinal());
-        buffer.putByte((byte) value);
+        buffer.putByte(value);
         node.getPoint().writeNetwork(buffer);
         buffer.putByte((byte) mode.ordinal());
         buffer.putByte((byte) rotation.ordinal());

@@ -31,6 +31,6 @@ public final class OSSounds {
     @SubscribeEvent
     public static void soundRegistry(final RegistryEvent.Register<SoundEvent> event) {
         final IForgeRegistry<SoundEvent> registry = event.getRegistry();
-        SOUNDS.forEach((_u, sound) -> registry.register(sound));
+        SOUNDS.values().forEach(registry::register);
     }
 }
