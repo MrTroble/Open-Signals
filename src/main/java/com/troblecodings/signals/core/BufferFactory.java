@@ -1,81 +1,83 @@
 package com.troblecodings.signals.core;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import net.minecraft.core.BlockPos;
 
-public class BufferFactory {
-
-    private List<Byte> allBytes;
-    private ByteBuffer buildedBuffer;
-    private ByteBuffer readBuffer;
+public interface BufferFactory {
 
     /**
-     * This constructor is used for write to a Buffer
-     */
-
-    public BufferFactory() {
-        allBytes = new ArrayList<>();
-    }
-
-    /**
-     * This constructor is used to read from a Buffer
+     * Get and remove the next byte from ByteBuffer.
      * 
-     * @param buffer - The ByteBuffer to read from
+     * @return The next byte removed from the ByteBuffer.
+     */
+    public byte getByte();
+
+    /**
+     * Get and remove the next int from ByteBuffer.
+     * 
+     * @return The next int from the ByteBuffer.
+     */
+    public int getInt();
+
+    /**
+     * Get and remove the next byte and convert it to an int.
+     * 
+     * @return The next byte converted to an int.
      */
 
-    public BufferFactory(final ByteBuffer buffer) {
-        this.readBuffer = buffer;
-    }
+    public int getByteAsInt();
 
-    public byte getByte() {
-        return readBuffer.get();
-    }
+    /**
+     * Gets and removes the next 3 ints and convert it in to a BlockPos.
+     * 
+     * @return the BlockPos represented by the 3 ints.
+     */
 
-    public int getInt() {
-        return readBuffer.getInt();
-    }
+    public BlockPos getBlockPos();
 
-    public int getByteAsInt() {
-        return Byte.toUnsignedInt(readBuffer.get());
-    }
+    /**
+     * Puts a byte on a ByteBuffer.
+     * 
+     * @param b The byte to put.
+     */
 
-    public BlockPos getBlockPos() {
-        return new BlockPos(readBuffer.getInt(), readBuffer.getInt(), readBuffer.getInt());
-    }
+    public void putByte(final Byte b);
 
-    public void putByte(final Byte b) {
-        allBytes.add(b);
-    }
+    /**
+     * Puts an int on the ByteBuffer.
+     * 
+     * @param i The int to put.
+     */
 
-    public void putInt(final int i) {
-        for (final Byte b : ByteBuffer.allocate(4).putInt(i).array()) {
-            putByte(b);
-        }
-    }
+    public void putInt(final int i);
 
-    public void putBlockPos(final BlockPos pos) {
-        putInt(pos.getX());
-        putInt(pos.getY());
-        putInt(pos.getZ());
-    }
+    /**
+     * Takes the x, y, and z int and puts them in this order on the ByteBuffer.
+     * 
+     * @param pos The BlockPos to put.
+     */
 
-    public void resetBuilder() {
-        allBytes.clear();
-    }
+    public void putBlockPos(final BlockPos pos);
 
-    public ByteBuffer getBuildedBuffer() {
-        if (buildedBuffer == null)
-            return build();
-        return buildedBuffer;
-    }
+    /**
+     * Resets the ByteBuffer.
+     */
+    public void resetBuilder();
 
-    public ByteBuffer build() {
-        buildedBuffer = ByteBuffer.allocate(allBytes.size());
-        allBytes.forEach(b -> buildedBuffer.put(b));
-        resetBuilder();
-        return buildedBuffer;
-    }
+    /**
+     * Build and return the current ByteBuffer represented by the bytes and ints
+     * added.
+     * 
+     * @return The builed ByteBuffer.
+     */
+
+    public ByteBuffer getBuildedBuffer();
+
+    /**
+     * Build the current ByteBuffer represented by the bytes and ints added.
+     * 
+     * @return The builed ByteBuffer.
+     */
+    public ByteBuffer build();
 }

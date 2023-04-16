@@ -10,6 +10,7 @@ import java.util.concurrent.Executors;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.Minecraft;
@@ -33,7 +34,7 @@ public class ClientSignalsStateHandler implements INetworkSync {
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
-        final BufferFactory buffer = new BufferFactory(buf);
+        final BufferFactory buffer = new ReadBuffer(buf);
         final Minecraft mc = Minecraft.getInstance();
         final Level level = mc.level;
         final BlockPos signalPos = buffer.getBlockPos();
