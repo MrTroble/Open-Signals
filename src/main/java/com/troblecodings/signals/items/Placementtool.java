@@ -87,12 +87,13 @@ public class Placementtool extends Item
             final String name = property.getName();
             if (wrapper.contains(name) && !property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
                 signalProperties.put(property, wrapper.getString(name));
-            }
-            if (property.isChangabelAtStage(ChangeableStage.APISTAGE) && wrapper.contains(name)) {
+            } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)
+                    && wrapper.contains(name)) {
                 signalProperties.put(property, property.getDefault());
-            }
-            if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
+            } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
                     && property.testMap(signalProperties)) {
+                signalProperties.put(property, property.getDefault());
+            } else if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
                 signalProperties.put(property, property.getDefault());
             }
         });
