@@ -4,7 +4,8 @@ import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
-import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 
 public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boolean>, IntConsumer {
 
@@ -58,12 +59,12 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
     }
 
     @Override
-    public void readNetwork(final BufferFactory buffer) {
+    public void readNetwork(final ReadBuffer buffer) {
         value = buffer.getByte() != 0;
     }
 
     @Override
-    public void writeNetwork(final BufferFactory buffer) {
+    public void writeNetwork(final WriteBuffer buffer) {
         buffer.putByte((byte) (value ? 1 : 0));
     }
 }

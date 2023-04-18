@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
-import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.guis.UISignalBoxTile;
 
 public enum EnumGuiMode {
@@ -37,7 +37,7 @@ public enum EnumGuiMode {
         this.consumer = consumer;
     }
 
-    public static EnumGuiMode of(final BufferFactory buffer) {
+    public static EnumGuiMode of(final ReadBuffer buffer) {
         return values()[buffer.getByteAsInt()];
     }
 }

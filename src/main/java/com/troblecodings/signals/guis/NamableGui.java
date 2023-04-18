@@ -8,7 +8,6 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
@@ -93,7 +92,7 @@ public class NamableGui extends GuiBase {
                 NameHandler.getClientName(new NameStateInfo(mc.level, container.pos))))
             return;
         final byte[] bytes = input.getBytes();
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) input.length());
         for (final byte b : bytes) {
             buffer.putByte(b);

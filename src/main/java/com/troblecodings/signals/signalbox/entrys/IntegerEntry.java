@@ -3,7 +3,8 @@ package com.troblecodings.signals.signalbox.entrys;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 
 public class IntegerEntry extends IPathEntry<Integer> implements IntConsumer {
 
@@ -35,12 +36,12 @@ public class IntegerEntry extends IPathEntry<Integer> implements IntConsumer {
     }
 
     @Override
-    public void readNetwork(final BufferFactory buffer) {
+    public void readNetwork(final ReadBuffer buffer) {
         this.value = buffer.getInt();
     }
 
     @Override
-    public void writeNetwork(final BufferFactory buffer) {
+    public void writeNetwork(final WriteBuffer buffer) {
         buffer.putInt(value);
     }
 }

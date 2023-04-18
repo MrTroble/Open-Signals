@@ -8,7 +8,6 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.handler.NameHandler;
@@ -34,7 +33,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
     }
 
     private void sendSignalPos() {
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putByte((byte) tile.getLinkedPos().size());
         tile.getLinkedPos().forEach(pos -> buffer.putBlockPos(pos));
@@ -48,7 +47,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
-        final BufferFactory buffer = new ReadBuffer(buf);
+        final ReadBuffer buffer = new ReadBuffer(buf);
         pos = buffer.getBlockPos();
         final int size = buffer.getByteAsInt();
         for (int i = 0; i < size; i++)
@@ -59,7 +58,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
 
     @Override
     public void deserializeServer(final ByteBuffer buf) {
-        final BufferFactory buffer = new ReadBuffer(buf);
+        final ReadBuffer buffer = new ReadBuffer(buf);
         final int byteLength = buffer.getByteAsInt();
         final byte[] array = new byte[byteLength];
         for (int i = 0; i < byteLength; i++) {

@@ -12,7 +12,8 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -275,7 +276,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     @Override
-    public void readNetwork(final BufferFactory buffer) {
+    public void readNetwork(final ReadBuffer buffer) {
         possibleModes.clear();
         manuellEnabledOutputs.clear();
         final int size = buffer.getByteAsInt();
@@ -294,7 +295,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         post();
     }
 
-    public void readUpdateNetwork(final BufferFactory buffer) {
+    public void readUpdateNetwork(final ReadBuffer buffer) {
         final int size = buffer.getByteAsInt();
         for (int i = 0; i < size; i++) {
             final ModeSet mode = ModeSet.of(buffer);
@@ -315,7 +316,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     @Override
-    public void writeNetwork(final BufferFactory buffer) {
+    public void writeNetwork(final WriteBuffer buffer) {
         buffer.putByte((byte) possibleModes.size());
         possibleModes.forEach((mode, entry) -> {
             mode.writeNetwork(buffer);
@@ -325,7 +326,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         manuellEnabledOutputs.forEach(mode -> mode.writeNetwork(buffer));
     }
 
-    public void writeUpdateNetwork(final BufferFactory buffer) {
+    public void writeUpdateNetwork(final WriteBuffer buffer) {
         int size = 0;
         for (final PathOptionEntry entry : possibleModes.values()) {
             if (entry.containsEntry(PathEntryType.PATHUSAGE))

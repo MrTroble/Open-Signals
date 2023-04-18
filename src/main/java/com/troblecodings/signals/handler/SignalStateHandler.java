@@ -19,7 +19,6 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
@@ -317,7 +316,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static void sendRemoved(final SignalStateInfo info) {
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putByte((byte) 255);
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
@@ -328,7 +327,7 @@ public final class SignalStateHandler implements INetworkSync {
         if (properties.size() > 254) {
             throw new IllegalStateException("Too many SEProperties!");
         }
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
         buffer.putByte((byte) properties.size());
         properties.forEach((property, value) -> {

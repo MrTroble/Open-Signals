@@ -1,7 +1,8 @@
 package com.troblecodings.signals.signalbox.entrys;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 
 import net.minecraft.core.BlockPos;
 
@@ -42,12 +43,12 @@ public final class BlockposEntry extends IPathEntry<BlockPos> {
     }
 
     @Override
-    public void readNetwork(final BufferFactory buffer) {
+    public void readNetwork(final ReadBuffer buffer) {
         this.position = buffer.getBlockPos();
     }
 
     @Override
-    public void writeNetwork(final BufferFactory buffer) {
+    public void writeNetwork(final WriteBuffer buffer) {
         buffer.putBlockPos(position);
     }
 }

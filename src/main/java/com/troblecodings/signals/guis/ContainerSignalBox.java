@@ -12,7 +12,6 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.SubsidiaryEntry;
@@ -58,7 +57,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     @Override
     public void sendAllDataToRemote() {
         final SignalBoxGrid grid = tile.getSignalBoxGrid();
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) SignalBoxNetwork.SEND_GRID.ordinal());
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
@@ -74,7 +73,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
-        final BufferFactory buffer = new ReadBuffer(buf);
+        final ReadBuffer buffer = new ReadBuffer(buf);
         final SignalBoxNetwork mode = SignalBoxNetwork.of(buffer);
         if (mode.equals(SignalBoxNetwork.SEND_GRID)) {
             final BlockPos pos = buffer.getBlockPos();
@@ -123,7 +122,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     @Override
     public void deserializeServer(final ByteBuffer buf) {
-        final BufferFactory buffer = new ReadBuffer(buf);
+        final ReadBuffer buffer = new ReadBuffer(buf);
         final SignalBoxGrid grid = tile.getSignalBoxGrid();
         final SignalBoxNetwork mode = SignalBoxNetwork.of(buffer);
         if (mode.equals(SignalBoxNetwork.SEND_INT_ENTRY)) {
@@ -163,7 +162,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             final Point start = Point.of(buffer);
             final Point end = Point.of(buffer);
             if (!grid.requestWay(start, end)) {
-                final BufferFactory error = new WriteBuffer();
+                final WriteBuffer error = new WriteBuffer();
                 error.putByte((byte) SignalBoxNetwork.NO_PW_FOUND.ordinal());
                 OpenSignalsMain.network.sendTo(info.player, error.build());
             }
@@ -190,13 +189,13 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             final boolean state = buffer.getByte() == 1 ? true : false;
             final BlockPos pos = grid.updateManuellRSOutput(point, modeSet, state);
             if (pos == null) {
-                final BufferFactory error = new WriteBuffer();
+                final WriteBuffer error = new WriteBuffer();
                 error.putByte((byte) SignalBoxNetwork.NO_OUTPUT_UPDATE.ordinal());
                 OpenSignalsMain.network.sendTo(info.player, error.build());
             } else {
                 SignalBoxHandler.updateRedstoneOutput(
                         new PosIdentifier(tile.getBlockPos(), info.world), state);
-                final BufferFactory sucess = new WriteBuffer();
+                final WriteBuffer sucess = new WriteBuffer();
                 sucess.putByte((byte) SignalBoxNetwork.OUTPUT_UPDATE.ordinal());
                 point.writeNetwork(sucess);
                 modeSet.writeNetwork(sucess);
@@ -207,7 +206,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     @SuppressWarnings("unchecked")
-    private <T> void deserializeEntry(final BufferFactory buffer, final T type) {
+    private <T> void deserializeEntry(final ReadBuffer buffer, final T type) {
         final Point point = Point.of(buffer);
         final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
         final Rotation rotation = deserializeRotation(buffer);
@@ -223,7 +222,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         }
     }
 
-    private static Rotation deserializeRotation(final BufferFactory buffer) {
+    private static Rotation deserializeRotation(final ReadBuffer buffer) {
         return Rotation.values()[buffer.getByteAsInt()];
     }
 

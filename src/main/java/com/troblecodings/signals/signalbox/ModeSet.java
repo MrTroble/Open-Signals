@@ -3,7 +3,8 @@ package com.troblecodings.signals.signalbox;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
@@ -26,7 +27,7 @@ public class ModeSet implements INetworkSavable {
         this.rotation = Objects.requireNonNull(rotation);
     }
 
-    private ModeSet(final BufferFactory buffer) {
+    private ModeSet(final ReadBuffer buffer) {
         readNetwork(buffer);
     }
 
@@ -63,18 +64,18 @@ public class ModeSet implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(final BufferFactory buffer) {
+    public void readNetwork(final ReadBuffer buffer) {
         this.mode = EnumGuiMode.values()[buffer.getByteAsInt()];
         this.rotation = Rotation.values()[buffer.getByteAsInt()];
     }
 
     @Override
-    public void writeNetwork(final BufferFactory buffer) {
+    public void writeNetwork(final WriteBuffer buffer) {
         buffer.putByte((byte) mode.ordinal());
         buffer.putByte((byte) rotation.ordinal());
     }
 
-    public static ModeSet of(final BufferFactory buffer) {
+    public static ModeSet of(final ReadBuffer buffer) {
         return new ModeSet(buffer);
     }
 }

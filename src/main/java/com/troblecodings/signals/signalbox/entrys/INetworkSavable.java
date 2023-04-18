@@ -1,11 +1,12 @@
 package com.troblecodings.signals.signalbox.entrys;
 
-import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 
 public interface INetworkSavable extends ISaveable {
 
-    public void readNetwork(final BufferFactory buffer);
+    public void readNetwork(final ReadBuffer buffer);
 
-    public void writeNetwork(final BufferFactory buffer);
+    public void writeNetwork(final WriteBuffer buffer);
 
 }

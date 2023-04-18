@@ -20,7 +20,6 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangeableStage;
@@ -166,7 +165,7 @@ public class GuiPlacementtool extends GuiBase {
 
     private void applyPropertyChanges(final int propertyId, final int valueId) {
         if (loaded) {
-            final BufferFactory buffer = new WriteBuffer();
+            final WriteBuffer buffer = new WriteBuffer();
             buffer.putByte((byte) propertyId);
             buffer.putByte((byte) valueId);
             OpenSignalsMain.network.sendTo(player, buffer.build());
@@ -177,7 +176,7 @@ public class GuiPlacementtool extends GuiBase {
     private void sendSignalId(final int id) {
         if (!loaded)
             return;
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) 255);
         buffer.putInt(id);
         OpenSignalsMain.network.sendTo(player, buffer.build());

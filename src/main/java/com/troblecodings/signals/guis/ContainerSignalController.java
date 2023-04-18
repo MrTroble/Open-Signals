@@ -13,7 +13,6 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangeableStage;
@@ -93,7 +92,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         });
         final Map<Direction, Map<EnumState, Byte>> enabledStates = controllerEntity
                 .getEnabledStates();
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
         currentMode = controllerEntity.getLastMode();
         buffer.putByte((byte) currentMode.ordinal());
@@ -123,7 +122,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void packPropertyToBuffer(final BufferFactory buffer, final SignalStateInfo stateInfo,
+    private void packPropertyToBuffer(final WriteBuffer buffer, final SignalStateInfo stateInfo,
             final SEProperty property, final String value) {
         buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
         buffer.putByte((byte) property.getParent().getIDFromValue(value));
@@ -131,7 +130,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
-        final BufferFactory buffer = new ReadBuffer(buf);
+        final ReadBuffer buffer = new ReadBuffer(buf);
         linkedPos = buffer.getBlockPos();
         currentMode = EnumMode.values()[buffer.getByteAsInt()];
         final Signal signal = (Signal) info.world.getBlockState(linkedPos).getBlock();
@@ -173,7 +172,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
 
     @Override
     public void deserializeServer(final ByteBuffer buf) {
-        final BufferFactory buffer = new ReadBuffer(buf);
+        final ReadBuffer buffer = new ReadBuffer(buf);
         if (propertiesList == null) {
             propertiesList = getSignal().getProperties();
         }

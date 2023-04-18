@@ -6,29 +6,13 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 
-public class WriteBuffer implements BufferFactory {
+public class WriteBuffer {
 
     private final List<Byte> allBytes;
     private ByteBuffer buildedBuffer;
 
     public WriteBuffer() {
         this.allBytes = new ArrayList<>();
-    }
-
-    public byte getByte() {
-        return 0;
-    }
-
-    public int getInt() {
-        return 0;
-    }
-
-    public int getByteAsInt() {
-        return 0;
-    }
-
-    public BlockPos getBlockPos() {
-        return null;
     }
 
     public void putByte(final Byte b) {

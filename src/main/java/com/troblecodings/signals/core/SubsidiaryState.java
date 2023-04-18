@@ -25,11 +25,11 @@ public class SubsidiaryState {
         return name;
     }
 
-    public void writeNetwork(final BufferFactory buffer) {
+    public void writeNetwork(final WriteBuffer buffer) {
         buffer.putByte((byte) id);
     }
 
-    public static SubsidiaryState of(final BufferFactory buffer) {
+    public static SubsidiaryState of(final ReadBuffer buffer) {
         return ALL_STATES.get(buffer.getByteAsInt());
     }
 

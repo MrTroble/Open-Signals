@@ -13,7 +13,6 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangeableStage;
@@ -57,7 +56,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
                 propertiesToSend.add((byte) property.getParent().getIDFromValue(value));
             }
         }
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putInt(signalID);
         buffer.putByte((byte) propertiesToSend.size());
         propertiesToSend.forEach(obj -> {
@@ -68,7 +67,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
 
     @Override
     public void deserializeServer(final ByteBuffer buf) {
-        final BufferFactory buffer = new ReadBuffer(buf);
+        final ReadBuffer buffer = new ReadBuffer(buf);
         final int first = buffer.getByteAsInt();
         final ItemStack stack = player.getMainHandItem();
         final Placementtool tool = (Placementtool) stack.getItem();
@@ -94,7 +93,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
-        final BufferFactory buffer = new ReadBuffer(buf);
+        final ReadBuffer buffer = new ReadBuffer(buf);
         signalID = buffer.getInt();
         final int size = buffer.getByteAsInt();
         final Placementtool tool = (Placementtool) player.getMainHandItem().getItem();

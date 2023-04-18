@@ -15,10 +15,11 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
+import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
@@ -141,7 +142,7 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(final BufferFactory buffer) {
+    public void readNetwork(final ReadBuffer buffer) {
         enabledSubsidiaryTypes.clear();
         final int size = buffer.getInt();
         for (int i = 0; i < size; i++) {
@@ -164,7 +165,7 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     @Override
-    public void writeNetwork(final BufferFactory buffer) {
+    public void writeNetwork(final WriteBuffer buffer) {
         buffer.putInt(modeGrid.size());
         modeGrid.forEach((point, node) -> {
             point.writeNetwork(buffer);
@@ -183,7 +184,7 @@ public class SignalBoxGrid implements INetworkSavable {
         });
     }
 
-    public void readUpdateNetwork(final BufferFactory buffer, final boolean override) {
+    public void readUpdateNetwork(final ReadBuffer buffer, final boolean override) {
         final int size = buffer.getInt();
         final List<SignalBoxNode> allNodesForPathway = new ArrayList<>();
         for (int i = 0; i < size; i++) {

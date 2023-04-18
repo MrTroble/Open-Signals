@@ -4,7 +4,7 @@ import java.nio.ByteBuffer;
 
 import net.minecraft.core.BlockPos;
 
-public class ReadBuffer implements BufferFactory {
+public class ReadBuffer {
 
     private final ByteBuffer readBuffer;
 
@@ -26,25 +26,5 @@ public class ReadBuffer implements BufferFactory {
 
     public BlockPos getBlockPos() {
         return new BlockPos(readBuffer.getInt(), readBuffer.getInt(), readBuffer.getInt());
-    }
-
-    public void putByte(final Byte b) {
-    }
-
-    public void putInt(final int i) {
-    }
-
-    public void putBlockPos(final BlockPos pos) {
-    }
-
-    public void resetBuilder() {
-    }
-
-    public ByteBuffer getBuildedBuffer() {
-        return null;
-    }
-
-    public ByteBuffer build() {
-        return null;
     }
 }

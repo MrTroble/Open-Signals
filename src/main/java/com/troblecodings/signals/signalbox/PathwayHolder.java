@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -158,7 +157,7 @@ public class PathwayHolder {
         if (tile == null || !tile.isBlocked())
             return;
         final List<SignalBoxNode> nodes = pathway.getListOfNodes();
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) SignalBoxNetwork.SEND_PW_UPDATE.ordinal());
         buffer.putInt(nodes.size());
         nodes.forEach(node -> {

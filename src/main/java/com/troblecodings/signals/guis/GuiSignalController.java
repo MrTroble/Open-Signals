@@ -29,7 +29,6 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.BufferFactory;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
@@ -348,7 +347,7 @@ public class GuiSignalController extends GuiBase {
                 : new HashMap<>();
         map.put(state, profile);
         controller.enabledRSStates.put(facing, map);
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) SignalControllerNetwork.SET_PROFILE.ordinal());
         buffer.putByte((byte) state.ordinal());
         buffer.putByte((byte) facing.ordinal());
@@ -360,7 +359,7 @@ public class GuiSignalController extends GuiBase {
         if (controller.enabledRSStates.containsKey(direction)) {
             return;
         }
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) SignalControllerNetwork.INITIALIZE_DIRECTION.ordinal());
         buffer.putByte((byte) direction.ordinal());
         OpenSignalsMain.network.sendTo(player, buffer.build());
@@ -370,7 +369,7 @@ public class GuiSignalController extends GuiBase {
         if (!loaded) {
             return;
         }
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) SignalControllerNetwork.SEND_MODE.ordinal());
         buffer.putByte((byte) currentMode.ordinal());
         OpenSignalsMain.network.sendTo(player, buffer.build());
@@ -380,7 +379,7 @@ public class GuiSignalController extends GuiBase {
         if (!loaded) {
             return;
         }
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) SignalControllerNetwork.SEND_RS_PROFILE.ordinal());
         buffer.putByte((byte) profile);
         OpenSignalsMain.network.sendTo(player, buffer.build());
@@ -390,7 +389,7 @@ public class GuiSignalController extends GuiBase {
         if (!loaded) {
             return;
         }
-        final BufferFactory buffer = new WriteBuffer();
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) SignalControllerNetwork.SEND_PROPERTY.ordinal());
         buffer.putByte((byte) controller.getSignal().getIDFromProperty(property));
         buffer.putByte((byte) value);

@@ -8,7 +8,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 
 public class PathOptionEntry implements INetworkSavable {
 
@@ -87,7 +88,7 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(final BufferFactory buffer) {
+    public void readNetwork(final ReadBuffer buffer) {
         final int size = buffer.getByteAsInt();
         for (int i = 0; i < size; i++) {
             final PathEntryType<?> type = PathEntryType.ALL_ENTRIES.get(buffer.getByteAsInt());
@@ -98,7 +99,7 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     @Override
-    public void writeNetwork(final BufferFactory buffer) {
+    public void writeNetwork(final WriteBuffer buffer) {
         buffer.putByte((byte) pathEntrys.size());
         pathEntrys.forEach((type, entry) -> {
             buffer.putByte((byte) type.getID());
@@ -106,7 +107,7 @@ public class PathOptionEntry implements INetworkSavable {
         });
     }
 
-    public void writeUpdateNetwork(final BufferFactory builder) {
+    public void writeUpdateNetwork(final WriteBuffer builder) {
         builder.putByte((byte) 1);
         builder.putByte((byte) PathEntryType.PATHUSAGE.getID());
         pathEntrys.get(PathEntryType.PATHUSAGE).writeNetwork(builder);

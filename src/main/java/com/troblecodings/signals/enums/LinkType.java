@@ -2,7 +2,7 @@ package com.troblecodings.signals.enums;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
-import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.ReadBuffer;
 
 public enum LinkType implements NamableWrapper {
     SIGNAL("signal"), INPUT("input"), OUTPUT("output");
@@ -34,7 +34,7 @@ public enum LinkType implements NamableWrapper {
         return of(wrapper.getString(LINK_TYPE));
     }
 
-    public static LinkType of(final BufferFactory buffer) {
+    public static LinkType of(final ReadBuffer buffer) {
         return values()[buffer.getByteAsInt()];
     }
 }
