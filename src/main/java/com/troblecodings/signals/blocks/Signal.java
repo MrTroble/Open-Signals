@@ -69,7 +69,7 @@ public class Signal extends BasicBlock {
     public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
             SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
-            "false", ChangeableStage.AUTOMATICSTAGE, t -> true);
+            "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
 
     protected final SignalProperties prop;
