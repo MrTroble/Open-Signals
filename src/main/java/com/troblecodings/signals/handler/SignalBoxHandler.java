@@ -268,8 +268,7 @@ public final class SignalBoxHandler {
         final BlockEntity entity = identifier.world.getBlockEntity(posToLink);
         if (entity != null && entity instanceof BasicBlockEntity) {
             ((RedstoneIOTileEntity) entity).link(identifier.pos);
-            // TODO Set back to true
-            return false;
+            return true;
         }
         return false;
     }
@@ -281,8 +280,7 @@ public final class SignalBoxHandler {
         final BlockEntity entity = identifier.world.getBlockEntity(posToUnlink);
         if (entity != null && entity instanceof BasicBlockEntity) {
             ((RedstoneIOTileEntity) entity).unlink(identifier.pos);
-            // TODO Set back to true
-            return false;
+            return true;
         }
         return false;
     }
