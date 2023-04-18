@@ -13,6 +13,7 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.WriteBuffer;
@@ -62,7 +63,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
         final Map<BlockPos, LinkType> positions = SignalBoxHandler
-                .getAllLinkedPos(tile.getBlockPos());
+                .getAllLinkedPos(new PosIdentifier(tile.getBlockPos(), info.world));
         buffer.putInt(positions.size());
         positions.forEach((pos, type) -> {
             buffer.putBlockPos(pos);
@@ -149,7 +150,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         }
         if (mode.equals(SignalBoxNetwork.REMOVE_POS)) {
             final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.unlinkPosFromSignalBox(tile.getBlockPos(), pos);
+            SignalBoxHandler.unlinkPosFromSignalBox(
+                    new PosIdentifier(tile.getBlockPos(), tile.getLevel()), pos);
             return;
         }
         if (mode.equals(SignalBoxNetwork.RESET_PW)) {
@@ -192,7 +194,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 error.putByte((byte) SignalBoxNetwork.NO_OUTPUT_UPDATE.ordinal());
                 OpenSignalsMain.network.sendTo(info.player, error.build());
             } else {
-                SignalBoxHandler.updateRedstoneOutput(pos, info.world, state);
+                SignalBoxHandler.updateRedstoneOutput(
+                        new PosIdentifier(tile.getBlockPos(), info.world), state);
                 final BufferFactory sucess = new WriteBuffer();
                 sucess.putByte((byte) SignalBoxNetwork.OUTPUT_UPDATE.ordinal());
                 point.writeNetwork(sucess);

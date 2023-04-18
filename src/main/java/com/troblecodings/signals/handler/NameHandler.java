@@ -194,7 +194,7 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
-                        new NameHandlerFile(Paths.get("osnamefiles/"
+                        new NameHandlerFile(Paths.get("osfiles/namefiles/"
                                 + ((ServerLevel) world).getServer().getWorldData().getLevelName()
                                         .replace(":", "").replace("/", "").replace("\\", "")
                                 + "/" + world.dimension().location().toString().replace(":", ""))));

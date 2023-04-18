@@ -22,6 +22,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.core.JsonEnumHolder;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -197,8 +198,9 @@ public class SignalBoxPathway {
 
     public void setPathStatus(final EnumPathUsage status, final @Nullable Point point) {
         foreachEntry(option -> {
-            option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
-                    .updateRedstoneOutput(pos, world, !status.equals(EnumPathUsage.FREE)));
+            option.getEntry(PathEntryType.OUTPUT).ifPresent(
+                    pos -> SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(tilePos, world),
+                            !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
     }
@@ -212,20 +214,24 @@ public class SignalBoxPathway {
             return;
         this.signalPositions.ifPresent(entry -> {
             final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(),
-                    SignalBoxHandler.getSignal(tilePos, entry.getKey()));
-            final SignalStateInfo nextInfo = entry.getValue() != null ? new SignalStateInfo(world,
-                    entry.getValue(), SignalBoxHandler.getSignal(tilePos, entry.getValue())) : null;
+                    SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()));
+            final SignalStateInfo nextInfo = entry.getValue() != null
+                    ? new SignalStateInfo(world, entry.getValue(),
+                            SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+                                    entry.getValue()))
+                    : null;
             final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed, zs2Value, type);
             SignalConfig.change(info);
         });
         distantSignalPositions.forEach(position -> {
             final SignalStateInfo nextInfo = lastSignal.isPresent()
                     ? new SignalStateInfo(world, lastSignal.get(),
-                            SignalBoxHandler.getSignal(tilePos, lastSignal.get()))
+                            SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+                                    lastSignal.get()))
                     : null;
             final ConfigInfo info = new ConfigInfo(
-                    new SignalStateInfo(world, position,
-                            SignalBoxHandler.getSignal(tilePos, position)),
+                    new SignalStateInfo(world, position, SignalBoxHandler
+                            .getSignal(new PosIdentifier(tilePos, world), position)),
                     nextInfo, speed, zs2Value, type);
             SignalConfig.change(info);
         });
@@ -237,12 +243,14 @@ public class SignalBoxPathway {
 
     private void resetFirstSignal() {
         this.signalPositions.ifPresent(entry -> SignalConfig.reset(new SignalStateInfo(world,
-                entry.getKey(), SignalBoxHandler.getSignal(tilePos, entry.getKey()))));
+                entry.getKey(),
+                SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()))));
     }
 
     private void resetOther() {
-        distantSignalPositions.forEach(position -> SignalConfig.reset(new SignalStateInfo(world,
-                position, SignalBoxHandler.getSignal(tilePos, position))));
+        distantSignalPositions
+                .forEach(position -> SignalConfig.reset(new SignalStateInfo(world, position,
+                        SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), position))));
     }
 
     public void resetPathway(final @Nullable Point point) {
@@ -260,10 +268,11 @@ public class SignalBoxPathway {
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));
             for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
-                node.getOption(new ModeSet(mode, rotation))
-                        .ifPresent(option -> option.getEntry(PathEntryType.SIGNAL)
-                                .ifPresent(position -> SignalConfig.reset(new SignalStateInfo(world,
-                                        position, SignalBoxHandler.getSignal(tilePos, position)))));
+                node.getOption(new ModeSet(mode, rotation)).ifPresent(option -> option
+                        .getEntry(PathEntryType.SIGNAL)
+                        .ifPresent(position -> SignalConfig
+                                .reset(new SignalStateInfo(world, position, SignalBoxHandler
+                                        .getSignal(new PosIdentifier(tilePos, world), position)))));
             }
         }, point);
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
@@ -307,7 +316,8 @@ public class SignalBoxPathway {
     public void deactivateAllOutputsOnPathway() {
         foreachPath((_u, node) -> {
             final List<BlockPos> outputs = node.clearAllManuellOutputs();
-            outputs.forEach(pos -> SignalBoxHandler.updateRedstoneOutput(pos, world, false));
+            outputs.forEach(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(new PosIdentifier(tilePos, world), false));
         }, null);
     }
 

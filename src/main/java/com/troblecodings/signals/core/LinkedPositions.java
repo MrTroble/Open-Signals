@@ -66,8 +66,8 @@ public class LinkedPositions {
         signals.forEach(
                 (pos, signal) -> SignalConfig.reset(new SignalStateInfo(world, pos, signal)));
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
-                .forEach(entry -> SignalBoxHandler.unlinkTileFromPos(entry.getKey(), tilePos,
-                        world));
+                .forEach(entry -> SignalBoxHandler
+                        .unlinkTileFromPos(new PosIdentifier(tilePos, world), entry.getKey()));
         linkedBlocks.clear();
         signals.clear();
     }

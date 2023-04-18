@@ -20,6 +20,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
@@ -219,7 +220,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
-                        new DebugSignalStateFile(Paths.get("ossignalfiles/"
+                        new DebugSignalStateFile(Paths.get("osfiles/signalfiles/"
                                 + ((ServerLevel) world).getServer().getWorldData().getLevelName()
                                         .replace(":", "").replace("/", "").replace("\\", "")
                                 + "/" + world.dimension().location().toString().replace(":", ""))));
@@ -232,7 +233,7 @@ public final class SignalStateHandler implements INetworkSync {
                 if (block instanceof Signal) {
                     states.add(new SignalStateInfo(world, pos, (Signal) block));
                 } else if (block instanceof SignalBox) {
-                    SignalBoxHandler.loadSignals(pos, world);
+                    SignalBoxHandler.loadSignals(new PosIdentifier(pos, world));
                 }
 
             });
@@ -253,7 +254,7 @@ public final class SignalStateHandler implements INetworkSync {
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
                 if (block instanceof SignalBox) {
-                    SignalBoxHandler.unloadSignals(pos, level);
+                    SignalBoxHandler.unloadSignals(new PosIdentifier(pos, level));
                 } else if (block instanceof SignalController) {
                     ((SignalControllerTileEntity) level.getBlockEntity(pos)).unloadSignal();
                 }

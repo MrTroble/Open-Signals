@@ -6,6 +6,7 @@ import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
@@ -37,17 +38,17 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public void setLevel(final Level world) {
         super.setLevel(world);
-        grid.setTile(this);
+        grid.setPosAndWorld(worldPosition, world);
         if (world.isClientSide)
             return;
-        SignalBoxHandler.setWorld(worldPosition, world);
+        SignalBoxHandler.setWorld(new PosIdentifier(worldPosition, world));
     }
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
         final NBTWrapper gridTag = new NBTWrapper();
         this.grid.write(gridTag);
-        SignalBoxHandler.writeTileNBT(worldPosition, wrapper);
+        SignalBoxHandler.writeTileNBT(new PosIdentifier(worldPosition, level), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
     }
 
@@ -64,7 +65,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean hasLink() {
-        return SignalBoxHandler.isTileEmpty(worldPosition);
+        return SignalBoxHandler.isTileEmpty(new PosIdentifier(worldPosition, level));
     }
 
     @Override
@@ -83,24 +84,24 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (type.equals(LinkType.SIGNAL)) {
             SignalStateHandler.loadSignal(new SignalStateInfo(level, pos, (Signal) block));
         }
-        return SignalBoxHandler.linkPosToSignalBox(worldPosition, pos, (BasicBlock) block, type,
-                level);
+        return SignalBoxHandler.linkPosToSignalBox(new PosIdentifier(worldPosition, level), pos,
+                (BasicBlock) block, type);
     }
 
     @Override
     public void onLoad() {
-        grid.setTile(this);
+        grid.setPosAndWorld(worldPosition, level);
         if (level.isClientSide) {
             return;
         }
-        SignalBoxHandler.readTileNBT(worldPosition, copy == null ? new NBTWrapper() : copy,
-                grid.getModeGrid(), level);
-        SignalBoxHandler.loadSignals(worldPosition, level);
+        SignalBoxHandler.readTileNBT(new PosIdentifier(worldPosition, level),
+                copy == null ? new NBTWrapper() : copy, grid.getModeGrid());
+        SignalBoxHandler.loadSignals(new PosIdentifier(worldPosition, level));
     }
 
     @Override
     public boolean unlink() {
-        SignalBoxHandler.unlinkAll(worldPosition, level);
+        SignalBoxHandler.unlinkAll(new PosIdentifier(worldPosition, level));
         return true;
     }
 

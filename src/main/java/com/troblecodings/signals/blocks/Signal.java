@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
@@ -179,7 +180,7 @@ public class Signal extends BasicBlock {
         if (!worldIn.isClientSide() && worldIn instanceof Level) {
             SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos, this));
             NameHandler.setRemoved(new NameStateInfo((Level) worldIn, pos));
-            SignalBoxHandler.onPosRemove(pos);
+            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (Level) worldIn));
         }
     }
 

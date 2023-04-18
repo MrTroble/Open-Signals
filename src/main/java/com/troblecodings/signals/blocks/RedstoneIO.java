@@ -3,6 +3,7 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
@@ -84,7 +85,7 @@ public class RedstoneIO extends BasicBlock {
         super.destroy(acess, pos, state);
         if (!acess.isClientSide()) {
             NameHandler.setRemoved(new NameStateInfo((Level) acess, pos));
-            SignalBoxHandler.onPosRemove(pos);
+            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (Level) acess));
         }
     }
 }

@@ -16,6 +16,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.core.BufferFactory;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -31,6 +32,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class SignalBoxGrid implements INetworkSavable {
 
@@ -40,27 +42,29 @@ public class SignalBoxGrid implements INetworkSavable {
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final SignalBoxFactory factory;
     private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
-    private SignalBoxTileEntity tile;
+    private BlockPos tilePos;
+    private Level world;
 
     public SignalBoxGrid() {
         this.factory = SignalBoxFactory.getFactory();
     }
 
-    public void setTile(final SignalBoxTileEntity tile) {
-        this.tile = tile;
+    public void setPosAndWorld(final BlockPos tilePos, final Level world) {
+        this.tilePos = tilePos;
+        this.world = world;
     }
 
     public void resetPathway(final Point p1) {
-        SignalBoxHandler.resetPathway(tile.getBlockPos(), p1);
+        SignalBoxHandler.resetPathway(new PosIdentifier(tilePos, world), p1);
         enabledSubsidiaryTypes.remove(p1);
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
-        return SignalBoxHandler.requestPathway(tile.getBlockPos(), p1, p2, modeGrid);
+        return SignalBoxHandler.requestPathway(new PosIdentifier(tilePos, world), p1, p2, modeGrid);
     }
 
     public void resetAllPathways() {
-        SignalBoxHandler.resetAllPathways(tile.getBlockPos());
+        SignalBoxHandler.resetAllPathways(new PosIdentifier(tilePos, world));
     }
 
     @Override
@@ -84,7 +88,7 @@ public class SignalBoxGrid implements INetworkSavable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabledSubsidiaryTypes, modeGrid, tile);
+        return Objects.hash(enabledSubsidiaryTypes, modeGrid, tilePos);
     }
 
     @Override
@@ -97,7 +101,8 @@ public class SignalBoxGrid implements INetworkSavable {
             return false;
         final SignalBoxGrid other = (SignalBoxGrid) obj;
         return Objects.equals(enabledSubsidiaryTypes, other.enabledSubsidiaryTypes)
-                && Objects.equals(modeGrid, other.modeGrid) && Objects.equals(tile, other.tile);
+                && Objects.equals(modeGrid, other.modeGrid)
+                && Objects.equals(tilePos, other.tilePos);
     }
 
     @Override
@@ -194,7 +199,7 @@ public class SignalBoxGrid implements INetworkSavable {
             allNodesForPathway.add(node);
             modeGrid.put(point, node);
         }
-        if (tile != null && !tile.getLevel().isClientSide())
+        if (!world.isClientSide)
             return;
         final SignalBoxPathway pathway = new SignalBoxPathway(modeGrid, allNodesForPathway,
                 PathType.NORMAL);
@@ -227,11 +232,12 @@ public class SignalBoxGrid implements INetworkSavable {
         final Optional<BlockPos> pos = node.getOption(mode).get().getEntry(PathEntryType.SIGNAL);
         if (pos.isEmpty())
             return;
-        final Signal signal = SignalBoxHandler.getSignal(tile.getBlockPos(), pos.get());
+        final Signal signal = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+                pos.get());
         if (!entry.state) {
             if (!enabledSubsidiaryTypes.containsKey(point))
                 return;
-            SignalConfig.reset(new SignalStateInfo(tile.getLevel(), pos.get(), signal));
+            SignalConfig.reset(new SignalStateInfo(world, pos.get(), signal));
             final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
             states.remove(mode);
             if (states.isEmpty()) {
@@ -248,7 +254,7 @@ public class SignalBoxGrid implements INetworkSavable {
         final ConfigProperty properties = configs.get(entry.enumValue);
         if (properties == null)
             return;
-        final SignalStateInfo info = new SignalStateInfo(tile.getLevel(), pos.get(), signal);
+        final SignalStateInfo info = new SignalStateInfo(world, pos.get(), signal);
         final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(info);
         SignalStateHandler.setStates(info, properties.values.entrySet().stream()
                 .filter(propertyEntry -> oldProperties.containsKey(propertyEntry.getKey()))
