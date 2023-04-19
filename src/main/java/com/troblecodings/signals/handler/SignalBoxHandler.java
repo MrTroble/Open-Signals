@@ -368,15 +368,52 @@ public final class SignalBoxHandler {
         final Level world = (Level) event.getWorld();
         if (world.isClientSide)
             return;
-        saveUpdatesToFile((ServerLevel) world);
-    }
-
-    @SubscribeEvent
-    public static void onWorldUnload(final WorldEvent.Unload event) {
-        final Level world = (Level) event.getWorld();
-        if (world.isClientSide)
-            return;
-        saveUpdatesToFile((ServerLevel) world);
+        SERVICE.execute(() -> {
+            final NBTWrapper wrapper = new NBTWrapper();
+            final List<NBTWrapper> wrapperList = new ArrayList<>();
+            final String levelName = (((ServerLevel) world).getServer().getWorldData()
+                    .getLevelName() + "_"
+                    + world.dimension().location().toString().replace(":", "_"));
+            synchronized (POS_UPDATES) {
+                POS_UPDATES.forEach((pos, update) -> {
+                    if (!levelName.equals(
+                            ((ServerLevel) world).getServer().getWorldData().getLevelName() + "_"
+                                    + world.dimension().location().toString().replace(":", "_")))
+                        return;
+                    final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
+                    update.writeNBT(posWrapper);
+                    wrapperList.add(posWrapper);
+                });
+            }
+            wrapper.putList(LINKING_UPDATE, wrapperList);
+            wrapperList.clear();
+            synchronized (OUTPUT_UPDATES) {
+                OUTPUT_UPDATES.forEach((pos, state) -> {
+                    if (!levelName.equals(
+                            ((ServerLevel) world).getServer().getWorldData().getLevelName() + "_"
+                                    + world.dimension().location().toString().replace(":", "_")))
+                        return;
+                    final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
+                    posWrapper.putBoolean(BOOL_STATE, state);
+                    wrapperList.add(posWrapper);
+                });
+            }
+            wrapper.putList(OUTPUT_UPDATE, wrapperList);
+            try {
+                Files.createDirectories(NBT_FILES_DIRECTORY);
+                final File file = Paths
+                        .get("osfiles/signalboxhandler/",
+                                world.getServer().getWorldData().getLevelName() + "_"
+                                        + world.dimension().location().toString().replace(":", "_"))
+                        .toFile();
+                if (file.exists())
+                    file.delete();
+                Files.createFile(file.toPath());
+                NbtIo.write(wrapper.tag, file);
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @SubscribeEvent
@@ -424,54 +461,5 @@ public final class SignalBoxHandler {
             e.printStackTrace();
         }
         SERVICE = Executors.newFixedThreadPool(1);
-    }
-
-    private static void saveUpdatesToFile(final Level world) {
-        SERVICE.execute(() -> {
-            final NBTWrapper wrapper = new NBTWrapper();
-            final List<NBTWrapper> wrapperList = new ArrayList<>();
-            final String levelName = (((ServerLevel) world).getServer().getWorldData()
-                    .getLevelName() + "_"
-                    + world.dimension().location().toString().replace(":", "_"));
-            synchronized (POS_UPDATES) {
-                POS_UPDATES.forEach((pos, update) -> {
-                    if (!levelName.equals(
-                            ((ServerLevel) world).getServer().getWorldData().getLevelName() + "_"
-                                    + world.dimension().location().toString().replace(":", "_")))
-                        return;
-                    final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
-                    update.writeNBT(posWrapper);
-                    wrapperList.add(posWrapper);
-                });
-            }
-            wrapper.putList(LINKING_UPDATE, wrapperList);
-            wrapperList.clear();
-            synchronized (OUTPUT_UPDATES) {
-                OUTPUT_UPDATES.forEach((pos, state) -> {
-                    if (!levelName.equals(
-                            ((ServerLevel) world).getServer().getWorldData().getLevelName() + "_"
-                                    + world.dimension().location().toString().replace(":", "_")))
-                        return;
-                    final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
-                    posWrapper.putBoolean(BOOL_STATE, state);
-                    wrapperList.add(posWrapper);
-                });
-            }
-            wrapper.putList(OUTPUT_UPDATE, wrapperList);
-            try {
-                Files.createDirectories(NBT_FILES_DIRECTORY);
-                final File file = Paths
-                        .get("osfiles/signalboxhandler/",
-                                world.getServer().getWorldData().getLevelName() + "_"
-                                        + world.dimension().location().toString().replace(":", "_"))
-                        .toFile();
-                if (file.exists())
-                    file.delete();
-                Files.createFile(file.toPath());
-                NbtIo.write(wrapper.tag, file);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
-        });
     }
 }
