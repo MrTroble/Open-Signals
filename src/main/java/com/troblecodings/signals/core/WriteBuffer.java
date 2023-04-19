@@ -26,7 +26,7 @@ public class WriteBuffer {
     }
 
     public void putBlockPos(final BlockPos pos) {
-        for (final Byte b : ByteBuffer.allocate(4).putInt(pos.getX()).putInt(pos.getY())
+        for (final Byte b : ByteBuffer.allocate(12).putInt(pos.getX()).putInt(pos.getY())
                 .putInt(pos.getZ()).array()) {
             putByte(b);
         }
