@@ -311,6 +311,9 @@ public final class SignalStateHandler implements INetworkSync {
                 file = ALL_LEVEL_FILES.get(info.world);
             }
             file.deleteIndex(info.pos);
+            synchronized (SIGNAL_COUNTER) {
+                SIGNAL_COUNTER.remove(info.pos);
+            }
             sendRemoved(info);
         });
     }
