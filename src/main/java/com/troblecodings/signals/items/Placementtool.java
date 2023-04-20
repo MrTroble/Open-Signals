@@ -85,11 +85,13 @@ public class Placementtool extends Item
         final Map<SEProperty, String> signalProperties = new HashMap<>();
         properties.forEach(property -> {
             final String name = property.getName();
-            if (wrapper.contains(name) && !property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-                signalProperties.put(property, wrapper.getString(name));
-            } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)
-                    && wrapper.contains(name)) {
-                signalProperties.put(property, property.getDefault());
+            if (wrapper.contains(name)) {
+                // Hier kann der ItemDamage abefangen werden
+                if (!property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+                    signalProperties.put(property, wrapper.getString(name));
+                } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+                    signalProperties.put(property, property.getDefault());
+                }
             } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
                     && property.testMap(signalProperties)) {
                 signalProperties.put(property, property.getDefault());
