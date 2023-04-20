@@ -15,7 +15,6 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.WriteBuffer;
-import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.world.entity.player.Player;
@@ -82,8 +81,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
             final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
             final SEProperty property = signal.getProperties().get(first);
             final String value = property.getObjFromID(buffer.getByteAsInt());
-            if ((value.equals("false") || value.equals("OFF"))
-                    && property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+            if (property.getDefault().equals(value)) {
                 wrapper.remove(property.getName());
                 return;
             }
