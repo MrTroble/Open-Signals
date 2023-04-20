@@ -25,19 +25,20 @@ import net.minecraft.sounds.SoundEvent;
 public class SignalPropertiesBuilder {
 
     private transient Placementtool placementtool = null;
-    private String placementToolName = null;
-    private int defaultHeight = 1;
+    private final String placementToolName = null;
+    private final int defaultHeight = 1;
     private Map<String, Integer> signalHeights;
-    private float customNameRenderHeight = -1;
+    private final float customNameRenderHeight = -1;
     private Map<String, Float> renderHeights;
-    private float signWidth = 22;
-    private float offsetX = 0;
-    private float offsetY = 0;
-    private float signScale = 1;
-    private boolean canLink = true;
+    private final float signWidth = 22;
+    private final float offsetX = 0;
+    private final float offsetY = 0;
+    private final float signScale = 1;
+    private final boolean canLink = true;
     private List<Integer> colors;
     private Map<String, SoundPropertyParser> sounds;
     private Map<String, String> redstoneOutputs;
+    private final int defaultItemDamage = 1;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
@@ -122,6 +123,6 @@ public class SignalPropertiesBuilder {
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
                 ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
                 canLink, colors, ImmutableList.copyOf(renderheights),
-                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs));
+                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs), defaultItemDamage);
     }
 }

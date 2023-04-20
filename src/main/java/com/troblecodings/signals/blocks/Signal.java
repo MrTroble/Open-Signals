@@ -280,6 +280,10 @@ public class Signal extends BasicBlock {
     public Placementtool getPlacementtool() {
         return this.prop.placementtool;
     }
+    
+    public int getDefaultDamage() {
+        return this.prop.defaultItemDamage;
+    }
 
     @Override
     public InteractionResult use(final BlockState blockstate, final Level level,

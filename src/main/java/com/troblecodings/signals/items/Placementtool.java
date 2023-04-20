@@ -41,7 +41,7 @@ public class Placementtool extends Item
     public final ArrayList<Signal> signals = new ArrayList<>();
 
     public Placementtool() {
-        super(new Item.Properties().tab(OSTabs.TAB));
+        super(new Item.Properties().tab(OSTabs.TAB).durability(100).setNoRepair());
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -83,10 +83,13 @@ public class Placementtool extends Item
         final Signal signal = getObjFromID(wrapper.getInteger(BLOCK_TYPE_ID));
         final List<SEProperty> properties = signal.getProperties();
         final Map<SEProperty, String> signalProperties = new HashMap<>();
-        properties.forEach(property -> {
+        int cost = signal.getDefaultDamage();
+        
+        for (final SEProperty property : properties) {
             final String name = property.getName();
-            if (wrapper.contains(name)) {
-                // Hier kann der ItemDamage abefangen werden
+            if (wrapper.contains(name)) {               
+                cost += property.getItemDamage();
+
                 if (!property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
                     signalProperties.put(property, wrapper.getString(name));
                 } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
@@ -98,7 +101,11 @@ public class Placementtool extends Item
             } else if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
                 signalProperties.put(property, property.getDefault());
             }
-        });
+        }
+        
+        final ItemStack item = context.getItemInHand();
+        item.hurtAndBreak(cost, player, (user) -> user.broadcastBreakEvent(context.getHand()));
+        
         final int height = signal.getHeight(signalProperties);
         final BlockPos pos = context.getClickedPos().above();
         BlockPos checkPos = pos;
@@ -117,7 +124,7 @@ public class Placementtool extends Item
         }
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
-        SignalStateHandler.createStates(info, signalProperties);
+        SignalStateHandler.createStates(info, signalProperties);        
         return InteractionResult.SUCCESS;
     }
 
