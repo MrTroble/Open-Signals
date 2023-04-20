@@ -26,7 +26,6 @@ import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
@@ -52,7 +51,7 @@ public final class SignalStateHandler implements INetworkSync {
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<ChunkAccess, List<SignalStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
     private static final Map<Level, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
-    private static final Map<BlockPos, Integer> SIGNAL_COUNTER = new HashMap<>();
+    private static final Map<SignalStateInfo, Integer> SIGNAL_COUNTER = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
     private static ExecutorService service;
@@ -312,7 +311,7 @@ public final class SignalStateHandler implements INetworkSync {
             }
             file.deleteIndex(info.pos);
             synchronized (SIGNAL_COUNTER) {
-                SIGNAL_COUNTER.remove(info.pos);
+                SIGNAL_COUNTER.remove(info);
             }
             sendRemoved(info);
         });
@@ -365,12 +364,12 @@ public final class SignalStateHandler implements INetworkSync {
         service.execute(() -> {
             signals.forEach(info -> {
                 synchronized (SIGNAL_COUNTER) {
-                    Integer count = SIGNAL_COUNTER.get(info.pos);
+                    Integer count = SIGNAL_COUNTER.get(info);
                     if (count != null && count > 0) {
-                        SIGNAL_COUNTER.put(info.pos, ++count);
+                        SIGNAL_COUNTER.put(info, ++count);
                         return;
                     }
-                    SIGNAL_COUNTER.put(info.pos, 1);
+                    SIGNAL_COUNTER.put(info, 1);
                 }
                 Map<SEProperty, String> properties;
                 synchronized (CURRENTLY_LOADED_STATES) {
@@ -395,12 +394,12 @@ public final class SignalStateHandler implements INetworkSync {
         service.execute(() -> {
             signals.forEach(info -> {
                 synchronized (SIGNAL_COUNTER) {
-                    int count = SIGNAL_COUNTER.get(info.pos);
+                    int count = SIGNAL_COUNTER.get(info);
                     if (count > 1) {
-                        SIGNAL_COUNTER.put(info.pos, --count);
+                        SIGNAL_COUNTER.put(info, --count);
                         return;
                     }
-                    SIGNAL_COUNTER.remove(info.pos);
+                    SIGNAL_COUNTER.remove(info);
                 }
                 synchronized (CURRENTLY_LOADED_STATES) {
                     createToFile(info, CURRENTLY_LOADED_STATES.remove(info));
