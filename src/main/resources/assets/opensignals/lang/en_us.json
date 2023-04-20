@@ -44,6 +44,7 @@
     "lt.unlink": "§cLink reset§r",
     "lt.notset": "§cNo linked signal. Please click on a signal or valid object first.§r",
     "pt.itemnotset": "No signal configuration selected. Please set the tool first (sneak + right click on a block)",
+    "pt.blockinway": "You can't place the signal because there is a block in the way.",
     "btn.apply": "Apply",
     "btn.settings": "Linking",
     "btn.edit": "Editor",

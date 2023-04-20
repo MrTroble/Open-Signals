@@ -79,6 +79,7 @@ lt.notset=§cNo or wrong linked object. Please click on a valid object first.§r
 
 #Placementtool
 pt.itemnotset=Please set the tool before (sneak + right click on a block)
+pt.blockinway=You can't place the signal because there is a block in the way.
 
 #Signal Names
 property.signal.name=Signal
