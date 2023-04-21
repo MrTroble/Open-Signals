@@ -30,6 +30,10 @@ item.conductorhead.name=Zugführer Mütze
 item.conductorchestplate.name=Zugführer Jacke
 item.conductorpants.name=Zugführer Hose
 item.conductorshoes.name=Zugführer Schuhe
+item.signalplate.name=Signalblech
+item.signalshield.name=Signalschirm
+item.lamps.name=Lampen
+item.electricparts.name=Elektronische Teile
 
 #Blocks
 tile.hvsignalcontroller.name=Signalsteuerer

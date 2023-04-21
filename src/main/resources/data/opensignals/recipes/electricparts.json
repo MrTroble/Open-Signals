@@ -1,0 +1,25 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "YYY",
+        "XZX",
+        "WWW"
+    ],
+    "key": {
+        "Y": {
+            "item": "minecraft:redstone"
+        },
+        "X": {
+            "item": "minecraft:comparator"
+        },
+        "Z": {
+            "item": "minecraft:repeater"
+        },
+        "W": {
+            "item": "minecraft:stone"
+        }
+    },
+    "result": {
+        "item": "opensignals:electricparts"
+    }
+}

@@ -33,6 +33,10 @@ item.conductorhead.name=Conductor Cap
 item.conductorchestplate.name=Conductor Jacket
 item.conductorpants.name=Conductor Pants
 item.conductorshoes.name=Conductor Shoes
+item.signalplate.name=Signalplate
+item.signalshield.name=Signalshield
+item.lamps.name=Lamps
+item.electricparts.name=Electric Parts
 
 #Blocks
 tile.hvsignalcontroller.name=Signal-Controller

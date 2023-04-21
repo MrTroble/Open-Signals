@@ -1,0 +1,15 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "X",
+        "X"
+    ],
+    "key": {
+        "X": {
+            "item": "minecraft:iron_block"
+        }
+    },
+    "result": {
+        "item": "opensignals:signalplate"
+    }
+}
