@@ -92,9 +92,15 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         });
         final Map<Direction, Map<EnumState, Byte>> enabledStates = controllerEntity
                 .getEnabledStates();
+        currentMode = controllerEntity.getLastMode();
+
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
-        currentMode = controllerEntity.getLastMode();
+        final byte[] signalName = getSignal().getSignalTypeName().getBytes();
+        buffer.putByte((byte) signalName.length);
+        for (final byte b : signalName) {
+            buffer.putByte(b);
+        }
         buffer.putByte((byte) currentMode.ordinal());
         buffer.putByte((byte) propertiesToSend.size());
         propertiesToSend.forEach((property, value) -> {
@@ -132,9 +138,14 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     public void deserializeClient(final ByteBuffer buf) {
         final ReadBuffer buffer = new ReadBuffer(buf);
         linkedPos = buffer.getBlockPos();
-        currentMode = EnumMode.values()[buffer.getByteAsInt()];
-        final Signal signal = (Signal) info.world.getBlockState(linkedPos).getBlock();
+        final int nameSize = buffer.getByteAsInt();
+        final byte[] signalName = new byte[nameSize];
+        for (int i = 0; i < nameSize; i++) {
+            signalName[i] = buffer.getByte();
+        }
+        final Signal signal = Signal.SIGNALS.get(new String(signalName));
         referenceBlock.set(signal);
+        currentMode = EnumMode.values()[buffer.getByteAsInt()];
         final int size = buffer.getByteAsInt();
         final Map<SEProperty, String> properites = new HashMap<>();
         propertiesList = signal.getProperties();

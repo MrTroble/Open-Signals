@@ -89,6 +89,13 @@ public final class OSItems {
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.LEGS);
     public static final ItemArmorTemplate CONDUCTOR_SHOES = new ItemArmorTemplate(
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.FEET);
+    public static final Item SIGNAL_PLATE = new Item(
+            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+    public static final Item SIGNAL_SHIELD = new Item(
+            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+    public static final Item LAMPS = new Item(new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+    public static final Item ELECTRIC_PARTS = new Item(
+            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 

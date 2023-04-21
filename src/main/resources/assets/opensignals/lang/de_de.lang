@@ -30,6 +30,10 @@ item.conductorhead.name=Zugführer Mütze
 item.conductorchestplate.name=Zugführer Jacke
 item.conductorpants.name=Zugführer Hose
 item.conductorshoes.name=Zugführer Schuhe
+item.signalplate.name=Signalblech
+item.signalshield.name=Signalschirm
+item.lamps.name=Lampen
+item.electricparts.name=Elektronische Teile
 
 #Blocks
 tile.hvsignalcontroller.name=Signalsteuerer
@@ -49,6 +53,7 @@ lt.reset=§cDer Verlinker ist zurückgesetzt.§r
 lt.unlink=§cVerlinkung zurückgesetzt§r
 lt.notset=§cKein verknüpftes Signal. Bitte klicke zuerst auf ein Signal oder valides Objekt.§r
 pt.itemnotset=Keine Signalkonfiguration ausgewählt. Bitte stell das Tool vorher ein (Sneaken + Rechtsklick auf einen Block)
+pt.blockinway=Du kannst das Signal nicht platzieren, da ein Block im Weg ist.
 
 #Signalbox
 btn.apply=Anwenden

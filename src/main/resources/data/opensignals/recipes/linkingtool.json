@@ -1,0 +1,18 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "I",
+        "i"
+    ],
+    "key": {
+        "i": {
+            "item": "minecraft:lever"
+        },
+        "I": {
+            "item": "minecraft:quartz"
+        }
+    },
+    "result": {
+        "item": "opensignals:linkingtool"
+    }
+}

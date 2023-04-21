@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "I",
+        "i",
+        "X"
+    ],
+    "key": {
+        "I": {
+            "item": "opensignals:signalshield"
+        },
+        "i": {
+            "item": "opensignals:signalplate"
+        },
+        "X": {
+            "item": "opensignals:post"
+        }
+    },
+    "result": {
+        "item": "opensignals:placementtool"
+    }
+}

@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "X",
+        "Y",
+        "Z"
+    ],
+    "key": {
+        "Z": {
+            "item": "minecraft:iron_block"
+        },
+        "Y": {
+            "item": "opensignals:lamps"
+        },
+        "X": {
+            "item": "opensignals:electricparts"
+        }
+    },
+    "result": {
+        "item": "opensignals:signalshield"
+    }
+}

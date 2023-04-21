@@ -33,7 +33,6 @@ import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -42,7 +41,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -54,6 +52,7 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -137,21 +136,10 @@ public class Signal extends BasicBlock {
         return getShape(blockState, worldIn, pos, context);
     }
 
-    public static final int HOTBAR_SLOT = 9;
-
-    public static ItemStack pickBlock(final Player player, final Item item) {
-        // Compatibility issues with other mods ...
-        final Minecraft minecraft = Minecraft.getInstance();
-        if (!minecraft.options.keyPickItem.isDown())
-            return new ItemStack(item);
-        for (int k = 0; k < HOTBAR_SLOT; ++k) {
-            final ItemStack currentStack = player.inventoryMenu.getSlot(k).getItem();
-            if (currentStack.getItem().equals(item)) {
-                player.inventoryMenu.setItem(k, k, currentStack);
-                return ItemStack.EMPTY;
-            }
-        }
-        return new ItemStack(item);
+    @Override
+    public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
+            final BlockGetter level, final BlockPos pos, final Player player) {
+        return getPlacementtool().getDefaultInstance();
     }
 
     @Override
@@ -279,6 +267,10 @@ public class Signal extends BasicBlock {
 
     public Placementtool getPlacementtool() {
         return this.prop.placementtool;
+    }
+
+    public int getDefaultDamage() {
+        return this.prop.defaultItemDamage;
     }
 
     @Override

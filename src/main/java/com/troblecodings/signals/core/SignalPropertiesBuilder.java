@@ -38,6 +38,7 @@ public class SignalPropertiesBuilder {
     private List<Integer> colors;
     private Map<String, SoundPropertyParser> sounds;
     private Map<String, String> redstoneOutputs;
+    private int defaultItemDamage = 1;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
@@ -122,6 +123,6 @@ public class SignalPropertiesBuilder {
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
                 ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
                 canLink, colors, ImmutableList.copyOf(renderheights),
-                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs));
+                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs), defaultItemDamage);
     }
 }
