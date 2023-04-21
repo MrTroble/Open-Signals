@@ -135,10 +135,10 @@ public class Signal extends BasicBlock {
             final BlockPos pos, final CollisionContext context) {
         return getShape(blockState, worldIn, pos, context);
     }
-    
+
     @Override
-    public ItemStack getCloneItemStack(final BlockState state, final HitResult target, final BlockGetter level,
-            final BlockPos pos, final Player player) {
+    public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
+            final BlockGetter level, final BlockPos pos, final Player player) {
         return getPlacementtool().getDefaultInstance();
     }
 
@@ -268,7 +268,7 @@ public class Signal extends BasicBlock {
     public Placementtool getPlacementtool() {
         return this.prop.placementtool;
     }
-    
+
     public int getDefaultDamage() {
         return this.prop.defaultItemDamage;
     }

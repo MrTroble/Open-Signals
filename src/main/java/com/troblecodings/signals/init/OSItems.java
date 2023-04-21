@@ -93,11 +93,10 @@ public final class OSItems {
             new Properties().tab(CreativeModeTab.TAB_MATERIALS));
     public static final Item SIGNAL_SHIELD = new Item(
             new Properties().tab(CreativeModeTab.TAB_MATERIALS));
-    public static final Item LAMPS = new Item(
-            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+    public static final Item LAMPS = new Item(new Properties().tab(CreativeModeTab.TAB_MATERIALS));
     public static final Item ELECTRIC_PARTS = new Item(
             new Properties().tab(CreativeModeTab.TAB_MATERIALS));
-    
+
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
     public static ArrayList<Placementtool> placementtools = new ArrayList<>();
