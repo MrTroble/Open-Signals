@@ -83,6 +83,12 @@ public final class SignalStateHandler implements INetworkSync {
         channel.registerObject(object);
     }
 
+    public static boolean containsStates(final SignalStateInfo info) {
+        synchronized (CURRENTLY_LOADED_STATES) {
+            return CURRENTLY_LOADED_STATES.containsKey(info);
+        }
+    }
+
     public static void createStates(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
         if (info.world.isClientSide)
@@ -184,10 +190,12 @@ public final class SignalStateHandler implements INetworkSync {
         SignalStatePos pos = file.find(stateInfo.pos);
         if (pos == null) {
             if (stateInfo.world.isClientSide) {
-                OpenSignalsMain.getLogger().warn("Position not found on client!");
+                OpenSignalsMain.getLogger()
+                        .warn("Position [" + stateInfo + "] not found on client!");
                 return map;
             } else {
-                OpenSignalsMain.getLogger().warn("Position not found in file, recovering!");
+                OpenSignalsMain.getLogger()
+                        .warn("Position [" + stateInfo + "] not found in file, recovering!");
                 pos = file.create(stateInfo.pos);
             }
         }
