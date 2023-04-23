@@ -123,6 +123,7 @@ public class SignalPropertiesBuilder {
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
                 ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
                 canLink, colors, ImmutableList.copyOf(renderheights),
-                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs), defaultItemDamage);
+                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs),
+                defaultItemDamage);
     }
 }

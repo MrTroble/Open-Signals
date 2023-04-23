@@ -42,14 +42,6 @@ public final class SignalBoxUtil {
         }
     }
 
-    public static Point getOffset(final Rotation rotation, final Point point) {
-        final int x = Rotation.CLOCKWISE_180.equals(rotation) ? -1
-                : (Rotation.NONE.equals(rotation) ? 1 : 0);
-        final int y = Rotation.COUNTERCLOCKWISE_90.equals(rotation) ? -1
-                : (Rotation.CLOCKWISE_90.equals(rotation) ? 1 : 0);
-        return new Point(x + point.getX(), y + point.getY());
-    }
-
     public static class ConnectionChecker {
 
         public Path path;
@@ -140,5 +132,4 @@ public final class SignalBoxUtil {
         }
         return Optional.empty();
     }
-
 }

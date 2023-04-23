@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableMap;
 
 public class ModelExtention {
 
-    protected Map<String, String> extention;
+    private Map<String, String> extention;
 
     public ImmutableMap<String, String> getExtention() {
 

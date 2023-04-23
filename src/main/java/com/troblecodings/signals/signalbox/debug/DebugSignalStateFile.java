@@ -24,7 +24,7 @@ public class DebugSignalStateFile extends SignalStateFile {
 
     public DebugSignalStateFile(final Path path) {
         super(path);
-        this.logger = OpenSignalsMain.log;
+        this.logger = OpenSignalsMain.getLogger();
     }
 
     @Override

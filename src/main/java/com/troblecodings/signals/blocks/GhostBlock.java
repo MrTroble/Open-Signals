@@ -69,10 +69,10 @@ public class GhostBlock extends BasicBlock {
         }
         return super.getStateDefinition();
     }
-    
+
     @Override
-    public ItemStack getCloneItemStack(final BlockState state, final HitResult target, final BlockGetter level,
-            final BlockPos pos, final Player player) {
+    public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
+            final BlockGetter level, final BlockPos pos, final Player player) {
         return ItemStack.EMPTY;
     }
 

@@ -117,4 +117,9 @@ public class LinkedPositions {
         signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
         SignalStateHandler.unloadSignals(signalInfos);
     }
+
+    @Override
+    public String toString() {
+        return "AllSignals = " + signals + ", AllLinkedPos = " + linkedBlocks;
+    }
 }

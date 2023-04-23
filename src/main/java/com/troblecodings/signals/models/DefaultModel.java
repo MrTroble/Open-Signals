@@ -49,5 +49,4 @@ public final class DefaultModel implements UnbakedModel {
                         MissingTextureAtlasSprite.getLocation())),
                 false);
     }
-
 }

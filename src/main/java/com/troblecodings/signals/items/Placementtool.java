@@ -84,10 +84,10 @@ public class Placementtool extends Item
         final List<SEProperty> properties = signal.getProperties();
         final Map<SEProperty, String> signalProperties = new HashMap<>();
         int cost = signal.getDefaultDamage();
-        
+
         for (final SEProperty property : properties) {
             final String name = property.getName();
-            if (wrapper.contains(name)) {               
+            if (wrapper.contains(name)) {
                 cost += property.getItemDamage();
 
                 if (!property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
@@ -102,10 +102,10 @@ public class Placementtool extends Item
                 signalProperties.put(property, property.getDefault());
             }
         }
-        
+
         final ItemStack item = context.getItemInHand();
         item.hurtAndBreak(cost, player, (user) -> user.broadcastBreakEvent(context.getHand()));
-        
+
         final int height = signal.getHeight(signalProperties);
         final BlockPos pos = context.getClickedPos().above();
         BlockPos checkPos = pos;
@@ -124,7 +124,7 @@ public class Placementtool extends Item
         }
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
-        SignalStateHandler.createStates(info, signalProperties);        
+        SignalStateHandler.createStates(info, signalProperties);
         return InteractionResult.SUCCESS;
     }
 
@@ -146,5 +146,4 @@ public class Placementtool extends Item
     public void addSignal(final Signal signal) {
         this.signals.add(signal);
     }
-
 }

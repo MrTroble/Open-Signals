@@ -37,7 +37,6 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         if (hasCustomName())
             return customName;
         return getSignal().getSignalTypeName();
-
     }
 
     public Signal getSignal() {

@@ -183,6 +183,7 @@ public class GuiPlacementtool extends GuiBase {
     }
 
     public void applyModelChanges() {
+        @SuppressWarnings("unused")
         final BlockState ebs = currentSelectedBlock.defaultBlockState();
         // Just until the erros are fixed
         return;

@@ -14,14 +14,14 @@ public final class EnumHelper {
 
     private static class ImplArmorMat implements ArmorMaterial {
 
-        int[] defense;
-        int durability;
-        int enchant;
-        SoundEvent event;
-        Ingredient ingrediant;
-        String name;
-        float toughness;
-        float knock;
+        private final int[] defense;
+        private final int durability;
+        private final int enchant;
+        private final SoundEvent event;
+        private final Ingredient ingrediant;
+        private final String name;
+        private final float toughness;
+        private final float knock;
 
         public ImplArmorMat(final int[] defense, final int durability, final int enchant,
                 final SoundEvent event, final Ingredient ingrediant, final String name,

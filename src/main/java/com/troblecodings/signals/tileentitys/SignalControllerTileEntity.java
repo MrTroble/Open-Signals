@@ -39,13 +39,13 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private final Map<Byte, Map<SEProperty, String>> allStates = new HashMap<>();
     private final Map<Direction, Map<EnumState, Byte>> enabledStates = new HashMap<>();
 
-    public static final String BLOCK_POS_ID = "blockpos";
-    public static final String PROFILE = "profile";
-    public static final String PROPERITES = "properties";
-    public static final String ALLSTATES = "allstates";
-    public static final String LAST_PROFILE = "lastprofile";
-    public static final String ENUM_MODE = "enummode";
     public static final String SIGNAL_NAME = "signalname";
+    private static final String BLOCK_POS_ID = "blockpos";
+    private static final String PROFILE = "profile";
+    private static final String PROPERITES = "properties";
+    private static final String ALLSTATES = "allstates";
+    private static final String LAST_PROFILE = "lastprofile";
+    private static final String ENUM_MODE = "enummode";
 
     public SignalControllerTileEntity(final TileEntityInfo info) {
         super(info);

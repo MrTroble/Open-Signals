@@ -31,5 +31,4 @@ public class NameStateInfo {
         final NameStateInfo other = (NameStateInfo) obj;
         return Objects.equals(pos, other.pos) && Objects.equals(world, other.world);
     }
-
 }

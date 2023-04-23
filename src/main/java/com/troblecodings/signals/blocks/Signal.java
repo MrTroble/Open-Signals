@@ -399,5 +399,4 @@ public class Signal extends BasicBlock {
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
     }
-
 }

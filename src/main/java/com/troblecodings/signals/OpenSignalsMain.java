@@ -58,7 +58,7 @@ public class OpenSignalsMain {
 
     public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new,
             () -> CommonProxy::new);
-    public static Logger log = null;
+    private static Logger log = null;
     public static GuiHandler handler = null;
     public static NetworkHandler network = null;
     public static FileReader contentPacks = null;

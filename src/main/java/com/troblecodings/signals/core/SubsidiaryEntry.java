@@ -4,8 +4,8 @@ import java.util.Objects;
 
 public class SubsidiaryEntry {
 
-    public SubsidiaryState enumValue;
-    public boolean state;
+    public final SubsidiaryState enumValue;
+    public final boolean state;
 
     public SubsidiaryEntry(final SubsidiaryState enumValue, final boolean state) {
         this.state = state;
@@ -35,7 +35,7 @@ public class SubsidiaryEntry {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        SubsidiaryEntry other = (SubsidiaryEntry) obj;
+        final SubsidiaryEntry other = (SubsidiaryEntry) obj;
         return Objects.equals(enumValue, other.enumValue) && state == other.state;
     }
 }

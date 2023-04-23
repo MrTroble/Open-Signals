@@ -152,7 +152,8 @@ public class SignalBoxPathway {
             point.read(nodeNBT);
             final SignalBoxNode node = modeGrid.get(point);
             if (node == null) {
-                OpenSignalsMain.log.error("Detecting broken pathway at {}!", point.toString());
+                OpenSignalsMain.getLogger().error("Detecting broken pathway at {}!",
+                        point.toString());
                 this.emptyOrBroken = true;
                 return;
             }
@@ -161,7 +162,7 @@ public class SignalBoxPathway {
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         if (this.listOfNodes.size() < 2) {
-            OpenSignalsMain.log.error("Detecting pathway with only 2 elements!");
+            OpenSignalsMain.getLogger().error("Detecting pathway with only 2 elements!");
             this.emptyOrBroken = true;
             return;
         }

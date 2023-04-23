@@ -58,9 +58,4 @@ public class SyncableTileEntity extends BasicBlockEntity {
     public UIClientSync get(final int id) {
         return clientSyncs.get(id);
     }
-
-    public void sendToAll(final NBTWrapper compound) {
-        // TODO
-    }
-
 }

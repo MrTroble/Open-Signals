@@ -163,7 +163,7 @@ public class SignalStateFile {
                 final byte[] header = new byte[HEADER_SIZE];
                 stream.read(header);
                 if (header[0] != HEADER_VERSION) {
-                    OpenSignalsMain.log.error("Header version miss match! No write!");
+                    OpenSignalsMain.getLogger().error("Header version miss match! No write!");
                     return null;
                 }
                 final int addedElements = stream.readInt();
@@ -177,8 +177,8 @@ public class SignalStateFile {
                     if (stream.getFilePointer() >= MAX_OFFSET_OF_INDEX)
                         stream.seek(START_OFFSET); // Wrap around search
                     if (stream.getFilePointer() == offsetHash) {
-                        OpenSignalsMain.log.error("No free space in %s this should not happen",
-                                path.toString());
+                        OpenSignalsMain.getLogger().error(
+                                "No free space in %s this should not happen", path.toString());
                         return null;
                     }
                 }
@@ -221,5 +221,4 @@ public class SignalStateFile {
         public Object apply(final RandomAccessFile stream, final BlockPos pos, final long offset,
                 final int file);
     }
-
 }

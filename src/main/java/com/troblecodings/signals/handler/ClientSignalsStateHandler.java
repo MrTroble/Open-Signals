@@ -86,5 +86,4 @@ public class ClientSignalsStateHandler implements INetworkSync {
         deserializeClient(event.getPayload().nioBuffer());
         event.getSource().get().setPacketHandled(true);
     }
-
 }

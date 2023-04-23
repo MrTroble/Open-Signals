@@ -29,7 +29,8 @@ public class SignalProperties {
             final int height, final List<HeightProperty> signalHeights, final float signWidth,
             final float offsetX, final float offsetY, final float signScale, final boolean canLink,
             final List<Integer> colors, final List<FloatProperty> renderheights,
-            final List<SoundProperty> sounds, final List<ValuePack> redstoneOutputs, final int defaultItemDamage) {
+            final List<SoundProperty> sounds, final List<ValuePack> redstoneOutputs,
+            final int defaultItemDamage) {
         this.placementtool = placementtool;
         this.customNameRenderHeight = customNameRenderHeight;
         this.defaultHeight = height;
@@ -45,5 +46,4 @@ public class SignalProperties {
         this.redstoneOutputs = redstoneOutputs;
         this.defaultItemDamage = defaultItemDamage;
     }
-
 }

@@ -153,5 +153,4 @@ public class SignalCustomModel implements UnbakedModel {
                                 materialsFromString, quaternion))
                         .collect(Collectors.toUnmodifiableList()));
     }
-
 }
