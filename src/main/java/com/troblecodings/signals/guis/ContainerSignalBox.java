@@ -193,8 +193,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 error.putByte((byte) SignalBoxNetwork.NO_OUTPUT_UPDATE.ordinal());
                 OpenSignalsMain.network.sendTo(info.player, error.build());
             } else {
-                SignalBoxHandler.updateRedstoneOutput(
-                        new PosIdentifier(tile.getBlockPos(), info.world), state);
+                SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, info.world), state);
                 final WriteBuffer sucess = new WriteBuffer();
                 sucess.putByte((byte) SignalBoxNetwork.OUTPUT_UPDATE.ordinal());
                 point.writeNetwork(sucess);

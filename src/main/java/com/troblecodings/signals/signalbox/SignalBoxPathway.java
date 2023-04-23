@@ -200,7 +200,7 @@ public class SignalBoxPathway {
     public void setPathStatus(final EnumPathUsage status, final @Nullable Point point) {
         foreachEntry(option -> {
             option.getEntry(PathEntryType.OUTPUT).ifPresent(
-                    pos -> SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(tilePos, world),
+                    pos -> SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, world),
                             !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
@@ -318,7 +318,7 @@ public class SignalBoxPathway {
         foreachPath((_u, node) -> {
             final List<BlockPos> outputs = node.clearAllManuellOutputs();
             outputs.forEach(pos -> SignalBoxHandler
-                    .updateRedstoneOutput(new PosIdentifier(tilePos, world), false));
+                    .updateRedstoneOutput(new PosIdentifier(pos, world), false));
         }, null);
     }
 
