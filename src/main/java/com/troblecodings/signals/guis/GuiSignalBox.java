@@ -116,7 +116,7 @@ public class GuiSignalBox extends GuiBase {
                     SizeIntegerables.of("prop." + type.name() + suffix, positions.size(), id -> {
                         final BlockPos pos = positions.get(id);
                         if (pos == null)
-                            return "disabled";
+                            return "Disabled";
                         return getSignalInfo(pos, type);
                     }));
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {

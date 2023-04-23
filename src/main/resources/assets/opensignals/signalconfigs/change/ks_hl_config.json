@@ -56,6 +56,8 @@
         "zs2value(X)": ["zs2.X"],
         "zs2value(Y)": ["zs2.Y"],
         "zs2value(Z)": ["zs2.Z"],
+        "zs2value(ZS6)" : ["zs2.ZS6"],
+        "zs2value(ZS13)": ["zs2.ZS13"],
 
         "config(zs2.A)": ["zs2v.A"],
         "config(zs2.B)": ["zs2v.B"],

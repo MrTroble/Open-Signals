@@ -56,6 +56,8 @@
         "zs2value(W)": ["zs3.W"],
         "zs2value(X)": ["zs3.X"],
         "zs2value(Y)": ["zs3.Y"],
-        "zs2value(Z)": ["zs3.Z"]
+        "zs2value(Z)": ["zs3.Z"],
+        "zs2value(ZS6)" : ["zs3.ZS6"],
+        "zs2value(ZS13)": ["zs3.ZS13"]
     }
 }
