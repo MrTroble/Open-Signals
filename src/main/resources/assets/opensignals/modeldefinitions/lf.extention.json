@@ -20,6 +20,12 @@
         "Z18": "opensignals:blocks/zs3/z18",
         "Z19": "opensignals:blocks/zs3/z19",
         "Z20": "opensignals:blocks/zs3/z20",
+        "Z21": "opensignals:blocks/zs3/z21",
+        "Z22": "opensignals:blocks/zs3/z22",
+        "Z23": "opensignals:blocks/zs3/z23",
+        "Z24": "opensignals:blocks/zs3/z24",
+        "Z25": "opensignals:blocks/zs3/z25",
+        "Z30": "opensignals:blocks/zs3/z30",
         "A": "opensignals:blocks/zs3/a",
         "E": "opensignals:blocks/zs3/e"
     }
