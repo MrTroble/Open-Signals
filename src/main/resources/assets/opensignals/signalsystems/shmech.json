@@ -23,8 +23,7 @@
         },
         {
             "name": "sh_high",
-            "enumClass": "ShPosition",
-            "defaultState": "OFF",
+            "defaultState": false,
             "changeableStage": "GUISTAGE"
         }
     ]
