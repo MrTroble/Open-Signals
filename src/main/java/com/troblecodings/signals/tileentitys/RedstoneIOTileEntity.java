@@ -48,9 +48,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
             return;
         final boolean power = this.level.getBlockState(this.worldPosition)
                 .getValue(RedstoneIO.POWER);
-        linkedPositions.forEach(pos -> SignalBoxHandler.updateInput(
-                new PosIdentifier(pos, level), new RedstoneUpdatePacket(level,
-                        worldPosition, power, (RedstoneInput) this.getBlockState().getBlock())));
+        final RedstoneUpdatePacket update = new RedstoneUpdatePacket(level, worldPosition, power,
+                (RedstoneInput) this.getBlockState().getBlock());
+        linkedPositions.forEach(
+                pos -> SignalBoxHandler.updateInput(new PosIdentifier(pos, level), update));
     }
 
     @Override
