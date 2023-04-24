@@ -189,7 +189,7 @@ public class SignalBoxGrid implements INetworkSavable {
         final List<SignalBoxNode> allNodesForPathway = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             final Point point = Point.of(buffer);
-            final SignalBoxNode node;
+            SignalBoxNode node;
             if (override) {
                 modeGrid.remove(point);
                 node = new SignalBoxNode(point);
