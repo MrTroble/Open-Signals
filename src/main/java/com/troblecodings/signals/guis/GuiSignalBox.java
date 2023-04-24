@@ -40,7 +40,7 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
-import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -145,7 +145,8 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private String getSignalInfo(final BlockPos signalPos, final LinkType type) {
-        final String customName = NameHandler.getClientName(new NameStateInfo(mc.level, signalPos));
+        final String customName = ClientNameHandler
+                .getClientName(new NameStateInfo(mc.level, signalPos));
         return String.format("%s (x=%d, y=%d. z=%d)",
                 customName == null
                         ? (type.equals(LinkType.SIGNAL) ? "" : I18n.get("type." + type.name()))

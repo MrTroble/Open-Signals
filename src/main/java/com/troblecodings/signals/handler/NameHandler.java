@@ -36,14 +36,12 @@ import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ClientCustomPayloadEvent;
-import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.event.EventNetworkChannel;
 
 public final class NameHandler implements INetworkSync {
 
     private static final Map<NameStateInfo, String> ALL_NAMES = new HashMap<>();
-    private static final Map<NameStateInfo, String> CLIENT_NAMES = new HashMap<>();
     private static final Map<ChunkAccess, List<NameStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
     private static final Map<Level, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
     private static EventNetworkChannel channel;
@@ -55,7 +53,7 @@ public final class NameHandler implements INetworkSync {
         channel = NetworkRegistry.newEventChannel(channelName, () -> OpenSignalsMain.MODID,
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new NameHandler());
-        service = Executors.newFixedThreadPool(3);
+        service = Executors.newFixedThreadPool(2);
     }
 
     @SubscribeEvent
@@ -66,7 +64,11 @@ public final class NameHandler implements INetworkSync {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        service = Executors.newFixedThreadPool(3);
+        service = Executors.newFixedThreadPool(2);
+    }
+
+    public static void add(final Object obj) {
+        channel.registerObject(obj);
     }
 
     public static void setName(final NameStateInfo info, final String name) {
@@ -81,7 +83,7 @@ public final class NameHandler implements INetworkSync {
 
     public static String getName(final NameStateInfo info) {
         if (info.world.isClientSide)
-            return getClientName(info);
+            return "";
         synchronized (ALL_NAMES) {
             final String name = ALL_NAMES.get(info);
             if (name == null)
@@ -90,22 +92,9 @@ public final class NameHandler implements INetworkSync {
         }
     }
 
-    public static String getClientName(final NameStateInfo info) {
-        if (!info.world.isClientSide)
-            return getName(info);
-        synchronized (CLIENT_NAMES) {
-            final String name = CLIENT_NAMES.get(info);
-            if (name == null)
-                return "";
-            return name;
-        }
-    }
-
     private static void sendNameToClient(final NameStateInfo info, final String name) {
         final ByteBuffer buffer = packToBuffer(info.pos, name);
-        info.world.players().forEach(player -> {
-            sendTo(player, buffer);
-        });
+        info.world.players().forEach(player -> sendTo(player, buffer));
     }
 
     private static ByteBuffer packToBuffer(final BlockPos pos, final String name) {
@@ -129,23 +118,15 @@ public final class NameHandler implements INetworkSync {
                 file = ALL_LEVEL_FILES.get(info.world);
             }
             file.deleteIndex(info.pos);
+            sendRemoved(info);
         });
     }
 
-    @Override
-    public void deserializeClient(final ByteBuffer buf) {
-        final Minecraft mc = Minecraft.getInstance();
-        service.execute(() -> {
-            final BlockPos pos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
-            final int byteLength = Byte.toUnsignedInt(buf.get());
-            final byte[] array = new byte[byteLength];
-            for (int i = 0; i < byteLength; i++) {
-                array[i] = buf.get();
-            }
-            synchronized (CLIENT_NAMES) {
-                CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), new String(array));
-            }
-        });
+    private static void sendRemoved(final NameStateInfo info) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putBlockPos(info.pos);
+        buffer.putByte((byte) 255);
+        info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
     @SubscribeEvent
@@ -246,9 +227,11 @@ public final class NameHandler implements INetworkSync {
     @SubscribeEvent
     public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
         final Player player = event.getPlayer();
-        ALL_NAMES.forEach((info, name) -> {
-            sendTo(player, packToBuffer(info.pos, name));
-        });
+        final Map<NameStateInfo, String> names;
+        synchronized (ALL_NAMES) {
+            names = ImmutableMap.copyOf(ALL_NAMES);
+        }
+        names.forEach((info, name) -> sendTo(player, packToBuffer(info.pos, name)));
     }
 
     private static void sendTo(final Player player, final ByteBuffer buf) {
@@ -265,12 +248,6 @@ public final class NameHandler implements INetworkSync {
     @SubscribeEvent
     public void clientEvent(final ClientCustomPayloadEvent event) {
         deserializeServer(event.getPayload().nioBuffer());
-        event.getSource().get().setPacketHandled(true);
-    }
-
-    @SubscribeEvent
-    public void serverEvent(final ServerCustomPayloadEvent event) {
-        deserializeClient(event.getPayload().nioBuffer());
         event.getSource().get().setPacketHandled(true);
     }
 }

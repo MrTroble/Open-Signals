@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
-public class ClientSignalsStateHandler implements INetworkSync {
+public class ClientSignalStateHandler implements INetworkSync {
 
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
@@ -74,11 +74,9 @@ public class ClientSignalsStateHandler implements INetworkSync {
 
     private static void setRemoved(final BlockPos pos) {
         final Minecraft mc = Minecraft.getInstance();
-        SERVICE.execute(() -> {
-            synchronized (CURRENTLY_LOADED_STATES) {
-                CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.level, pos));
-            }
-        });
+        synchronized (CURRENTLY_LOADED_STATES) {
+            CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.level, pos));
+        }
     }
 
     @SubscribeEvent
