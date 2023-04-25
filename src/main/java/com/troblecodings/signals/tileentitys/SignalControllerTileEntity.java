@@ -115,15 +115,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public void saveWrapper(final NBTWrapper wrapper) {
         if (level == null || level.isClientSide)
             return;
-        if (linkedSignalPosition != null) {
+        if (linkedSignalPosition != null && linkedSignal != null) {
             wrapper.putBlockPos(BLOCK_POS_ID, linkedSignalPosition);
+            wrapper.putString(SIGNAL_NAME, linkedSignal.getSignalTypeName());
         } else {
             return;
-        }
-        if (linkedSignal != null) {
-            final NBTWrapper signal = NBTWrapper.getBlockPosWrapper(linkedSignalPosition);
-            signal.putString(SIGNAL_NAME, linkedSignal.getSignalTypeName());
-            wrapper.putWrapper(SIGNAL_NAME, signal);
         }
         wrapper.putInteger(LAST_PROFILE, lastProfile);
         if (lastState != null)
@@ -147,8 +143,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
                 property.writeToNBT(props, value);
             });
             comp.putWrapper(PROPERITES, props);
+            list.add(comp);
         });
         wrapper.putList(ALLSTATES, list);
+        System.out.println();
     }
 
     @Override
@@ -159,15 +157,14 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (level == null) {
             return;
         }
-        readFromWrapper(wrapper);
+        readFromWrapper(copy);
     }
 
     private void readFromWrapper(final NBTWrapper wrapper) {
         if (level == null || level.isClientSide || linkedSignalPosition == null)
             return;
         if (wrapper.contains(SIGNAL_NAME)) {
-            final NBTWrapper signal = wrapper.getWrapper(SIGNAL_NAME);
-            linkedSignal = Signal.SIGNALS.get(signal.getString(SIGNAL_NAME));
+            linkedSignal = Signal.SIGNALS.get(wrapper.getString(SIGNAL_NAME));
         }
         if (wrapper.contains(LAST_PROFILE)) {
             lastProfile = wrapper.getInteger(LAST_PROFILE);
@@ -177,7 +174,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         }
         for (final Direction direction : Direction.values()) {
             if (!wrapper.contains(direction.getName()))
-                return;
+                continue;
             final NBTWrapper comp = wrapper.getWrapper(direction.getName());
             final Map<EnumState, Byte> map = new HashMap<>();
             comp.keySet().stream().forEach(str -> {
@@ -187,11 +184,12 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             enabledStates.put(direction, map);
         }
         final List<NBTWrapper> list = wrapper.getList(ALLSTATES);
+        final List<SEProperty> properites = linkedSignal.getProperties();
         list.forEach(compund -> {
             final int profile = compund.getInteger(PROFILE);
             final NBTWrapper comp = compund.getWrapper(PROPERITES);
             final Map<SEProperty, String> properties = new HashMap<>();
-            linkedSignal.getProperties().forEach(property -> {
+            properites.forEach(property -> {
                 final Optional<String> value = property.readFromNBT(comp);
                 if (value.isPresent()) {
                     properties.put(property, value.get());
@@ -199,6 +197,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             });
             allStates.put((byte) profile, properties);
         });
+        System.out.println();
     }
 
     @Override
@@ -207,8 +206,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             if (copy.contains(BLOCK_POS_ID))
                 linkedSignalPosition = copy.getBlockPos(BLOCK_POS_ID);
             readFromWrapper(copy);
-            SignalStateHandler
-                    .loadSignal(new SignalStateInfo(level, linkedSignalPosition, linkedSignal));
+            if (linkedSignalPosition != null && linkedSignal != null)
+                SignalStateHandler
+                        .loadSignal(new SignalStateInfo(level, linkedSignalPosition, linkedSignal));
         }
     }
 

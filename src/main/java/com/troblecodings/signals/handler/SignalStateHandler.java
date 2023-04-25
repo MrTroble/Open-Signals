@@ -400,17 +400,21 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void unloadSignals(final List<SignalStateInfo> signals) {
         service.execute(() -> {
+            if (signals == null)
+                return;
             signals.forEach(info -> {
-                synchronized (SIGNAL_COUNTER) {
-                    int count = SIGNAL_COUNTER.get(info);
-                    if (count > 1) {
-                        SIGNAL_COUNTER.put(info, --count);
-                        return;
+                if (info.signal != null && info.pos != null && info.world != null) {
+                    synchronized (SIGNAL_COUNTER) {
+                        int count = SIGNAL_COUNTER.get(info);
+                        if (count > 1) {
+                            SIGNAL_COUNTER.put(info, --count);
+                            return;
+                        }
+                        SIGNAL_COUNTER.remove(info);
                     }
-                    SIGNAL_COUNTER.remove(info);
-                }
-                synchronized (CURRENTLY_LOADED_STATES) {
-                    createToFile(info, CURRENTLY_LOADED_STATES.remove(info));
+                    synchronized (CURRENTLY_LOADED_STATES) {
+                        createToFile(info, CURRENTLY_LOADED_STATES.remove(info));
+                    }
                 }
             });
         });
