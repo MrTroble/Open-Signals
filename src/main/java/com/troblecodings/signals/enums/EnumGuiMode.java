@@ -2,7 +2,6 @@ package com.troblecodings.signals.enums;
 
 import java.util.function.Supplier;
 
-import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.signals.core.ReadBuffer;
@@ -23,7 +22,7 @@ public enum EnumGuiMode {
      * Naming
      */
 
-    public final Supplier<UIComponent> consumer;
+    public final Supplier<Object> consumer;
 
     private EnumGuiMode(final int id) {
         this(() -> new UITexture(UISignalBoxTile.ICON, id * 0.2, 0, id * 0.2 + 0.2, 0.5));
@@ -33,7 +32,7 @@ public enum EnumGuiMode {
         this(() -> new UILines(array, 2));
     }
 
-    private EnumGuiMode(final Supplier<UIComponent> consumer) {
+    private EnumGuiMode(final Supplier<Object> consumer) {
         this.consumer = consumer;
     }
 

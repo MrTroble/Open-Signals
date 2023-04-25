@@ -3,6 +3,7 @@ package com.troblecodings.signals.guis;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.UpdateEvent;
@@ -47,7 +48,7 @@ public class UISignalBoxTile extends UIComponentEntity {
             entity.add(rotation);
         }
         entity.add(new UIIndependentTranslate(0, 0, 1));
-        entity.add(modeSet.mode.consumer.get());
+        entity.add((UIComponent) modeSet.mode.consumer.get());
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
     }
