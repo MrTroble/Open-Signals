@@ -184,7 +184,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             enabledStates.put(direction, map);
         }
         final List<NBTWrapper> list = wrapper.getList(ALLSTATES);
-        final List<SEProperty> properites = linkedSignal.getProperties();
+        final List<SEProperty> properites = linkedSignal == null ? new ArrayList<>()
+                : linkedSignal.getProperties();
         list.forEach(compund -> {
             final int profile = compund.getInteger(PROFILE);
             final NBTWrapper comp = compund.getWrapper(PROPERITES);
