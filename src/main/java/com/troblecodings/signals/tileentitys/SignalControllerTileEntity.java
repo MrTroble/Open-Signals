@@ -207,12 +207,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             if (copy.contains(BLOCK_POS_ID))
                 linkedSignalPosition = copy.getBlockPos(BLOCK_POS_ID);
             readFromWrapper(copy);
-            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
-                    linkedSignal);
-            if (!SignalStateHandler.containsStates(info)) {
-                unlink();
-                return;
-            }
             SignalStateHandler
                     .loadSignal(new SignalStateInfo(level, linkedSignalPosition, linkedSignal));
         }
