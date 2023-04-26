@@ -146,7 +146,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             list.add(comp);
         });
         wrapper.putList(ALLSTATES, list);
-        System.out.println();
     }
 
     @Override
@@ -198,7 +197,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             });
             allStates.put((byte) profile, properties);
         });
-        System.out.println();
     }
 
     @Override
