@@ -104,7 +104,7 @@ public class Placementtool extends Item
         }
 
         final ItemStack item = context.getItemInHand();
-        item.hurtAndBreak(cost, player, (user) -> user.broadcastBreakEvent(context.getHand()));
+        item.hurtAndBreak(Math.abs(cost), player, (user) -> user.broadcastBreakEvent(context.getHand()));
 
         final int height = signal.getHeight(signalProperties);
         final BlockPos pos = context.getClickedPos().above();
