@@ -189,42 +189,49 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         }
         final SignalControllerNetwork mode = SignalControllerNetwork.values()[buffer
                 .getByteAsInt()];
-        if (mode.equals(SignalControllerNetwork.SEND_MODE)) {
-            currentMode = EnumMode.values()[buffer.getByteAsInt()];
-            controllerEntity.setLastMode(currentMode);
-            return;
-        }
-        if (mode.equals(SignalControllerNetwork.SEND_RS_PROFILE)) {
-            currentRSProfile = buffer.getByteAsInt();
-            return;
-        }
-        if (mode.equals(SignalControllerNetwork.SEND_PROPERTY)) {
-            final SEProperty property = propertiesList.get(buffer.getByteAsInt());
-            final String value = property.getObjFromID(buffer.getByteAsInt());
-            if (currentMode.equals(EnumMode.MANUELL)) {
-                SignalStateHandler.setState(new SignalStateInfo(info.world, linkedPos, getSignal()),
-                        property, value);
-            } else if (currentMode.equals(EnumMode.SINGLE)) {
-                if (!controllerEntity.containsProfile((byte) currentRSProfile)) {
-                    controllerEntity.initializeProfile((byte) currentRSProfile, getReference());
-                }
-                controllerEntity.updateRedstoneProfile((byte) currentRSProfile, property, value);
+        switch (mode) {
+            case SEND_MODE: {
+                currentMode = EnumMode.values()[buffer.getByteAsInt()];
+                controllerEntity.setLastMode(currentMode);
+                break;
             }
-            return;
-        }
-        if (mode.equals(SignalControllerNetwork.SET_PROFILE)) {
-            final EnumState state = EnumState.values()[buffer.getByteAsInt()];
-            final Direction direction = Direction.values()[buffer.getByteAsInt()];
-            final int profile = buffer.getByteAsInt();
-            controllerEntity.updateEnabledStates(direction, state, profile);
-            return;
-        }
-        if (mode.equals(SignalControllerNetwork.INITIALIZE_DIRECTION)) {
-            final Direction direction = Direction.values()[buffer.getByteAsInt()];
-            final Map<EnumState, Byte> states = new HashMap<>();
-            states.put(EnumState.OFFSTATE, (byte) 0);
-            states.put(EnumState.ONSTATE, (byte) 0);
-            controllerEntity.initializeDirection(direction, states);
+            case SEND_RS_PROFILE: {
+                currentRSProfile = buffer.getByteAsInt();
+                break;
+            }
+            case SEND_PROPERTY: {
+                final SEProperty property = propertiesList.get(buffer.getByteAsInt());
+                final String value = property.getObjFromID(buffer.getByteAsInt());
+                if (currentMode.equals(EnumMode.MANUELL)) {
+                    SignalStateHandler.setState(
+                            new SignalStateInfo(info.world, linkedPos, getSignal()), property,
+                            value);
+                } else if (currentMode.equals(EnumMode.SINGLE)) {
+                    if (!controllerEntity.containsProfile((byte) currentRSProfile)) {
+                        controllerEntity.initializeProfile((byte) currentRSProfile, getReference());
+                    }
+                    controllerEntity.updateRedstoneProfile((byte) currentRSProfile, property,
+                            value);
+                }
+                break;
+            }
+            case SET_PROFILE: {
+                final EnumState state = EnumState.values()[buffer.getByteAsInt()];
+                final Direction direction = Direction.values()[buffer.getByteAsInt()];
+                final int profile = buffer.getByteAsInt();
+                controllerEntity.updateEnabledStates(direction, state, profile);
+                break;
+            }
+            case INITIALIZE_DIRECTION: {
+                final Direction direction = Direction.values()[buffer.getByteAsInt()];
+                final Map<EnumState, Byte> states = new HashMap<>();
+                states.put(EnumState.OFFSTATE, (byte) 0);
+                states.put(EnumState.ONSTATE, (byte) 0);
+                controllerEntity.initializeDirection(direction, states);
+                break;
+            }
+            default:
+                break;
         }
     }
 

@@ -75,48 +75,53 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     public void deserializeClient(final ByteBuffer buf) {
         final ReadBuffer buffer = new ReadBuffer(buf);
         final SignalBoxNetwork mode = SignalBoxNetwork.of(buffer);
-        if (mode.equals(SignalBoxNetwork.SEND_GRID)) {
-            final BlockPos pos = buffer.getBlockPos();
-            if (this.tile == null) {
-                this.tile = (SignalBoxTileEntity) info.world.getBlockEntity(pos);
+        switch (mode) {
+            case SEND_GRID: {
+                final BlockPos pos = buffer.getBlockPos();
+                if (this.tile == null) {
+                    this.tile = (SignalBoxTileEntity) info.world.getBlockEntity(pos);
+                }
+                grid = tile.getSignalBoxGrid();
+                grid.readNetwork(buffer);
+                enabledSubsidiaryTypes = grid.getAllSubsidiaries();
+                final int size = buffer.getInt();
+                final Map<BlockPos, LinkType> allPos = new HashMap<>();
+                for (int i = 0; i < size; i++) {
+                    final BlockPos blockPos = buffer.getBlockPos();
+                    final LinkType type = LinkType.of(buffer);
+                    allPos.put(blockPos, type);
+                }
+                propertiesForType.set(allPos);
+                update();
+                break;
             }
-            grid = tile.getSignalBoxGrid();
-            grid.readNetwork(buffer);
-            enabledSubsidiaryTypes = grid.getAllSubsidiaries();
-            final int size = buffer.getInt();
-            final Map<BlockPos, LinkType> allPos = new HashMap<>();
-            for (int i = 0; i < size; i++) {
-                final BlockPos blockPos = buffer.getBlockPos();
-                final LinkType type = LinkType.of(buffer);
-                allPos.put(blockPos, type);
+            case SEND_PW_UPDATE: {
+                grid.readUpdateNetwork(buffer, false);
+                update();
+                break;
             }
-            propertiesForType.set(allPos);
-            update();
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.SEND_PW_UPDATE)) {
-            grid.readUpdateNetwork(buffer, false);
-            update();
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.NO_PW_FOUND)) {
-            run.accept(I18n.get("error.nopathfound"));
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.NO_OUTPUT_UPDATE)) {
-            run.accept(I18n.get("error.nooputputupdate"));
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.OUTPUT_UPDATE)) {
-            final Point point = Point.of(buffer);
-            final ModeSet modeSet = ModeSet.of(buffer);
-            final boolean state = buffer.getByte() == 1 ? true : false;
-            final SignalBoxNode node = grid.getNode(point);
-            if (state) {
-                node.addManuellOutput(modeSet);
-            } else {
-                node.removeManuellOutput(modeSet);
+            case NO_PW_FOUND: {
+                run.accept(I18n.get("error.nopathfound"));
+                break;
             }
+            case NO_OUTPUT_UPDATE: {
+                run.accept(I18n.get("error.nooputputupdate"));
+                break;
+            }
+            case OUTPUT_UPDATE: {
+                final Point point = Point.of(buffer);
+                final ModeSet modeSet = ModeSet.of(buffer);
+                final boolean state = buffer.getByte() == 1 ? true : false;
+                final SignalBoxNode node = grid.getNode(point);
+                if (state) {
+                    node.addManuellOutput(modeSet);
+                } else {
+                    node.removeManuellOutput(modeSet);
+                }
+                break;
+            }
+            default:
+                break;
         }
     }
 
@@ -125,82 +130,90 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         final ReadBuffer buffer = new ReadBuffer(buf);
         final SignalBoxGrid grid = tile.getSignalBoxGrid();
         final SignalBoxNetwork mode = SignalBoxNetwork.of(buffer);
-        if (mode.equals(SignalBoxNetwork.SEND_INT_ENTRY)) {
-            deserializeEntry(buffer, buffer.getByteAsInt());
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.REMOVE_ENTRY)) {
-            final Point point = Point.of(buffer);
-            final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
-            final Rotation rotation = deserializeRotation(buffer);
-            final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES.get(buffer.getByteAsInt());
-            final ModeSet modeSet = new ModeSet(guiMode, rotation);
-            grid.getNode(point).getOption(modeSet).ifPresent(entry -> {
-                entry.removeEntry(entryType);
-            });
-        }
-        if (mode.equals(SignalBoxNetwork.SEND_POS_ENTRY)) {
-            deserializeEntry(buffer, buffer.getBlockPos());
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.SEND_ZS2_ENTRY)) {
-            deserializeEntry(buffer, buffer.getByte());
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.REMOVE_POS)) {
-            final BlockPos pos = buffer.getBlockPos();
-            SignalBoxHandler.unlinkPosFromSignalBox(
-                    new PosIdentifier(tile.getBlockPos(), tile.getLevel()), pos);
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.RESET_PW)) {
-            final Point point = Point.of(buffer);
-            grid.resetPathway(point);
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.REQUEST_PW)) {
-            final Point start = Point.of(buffer);
-            final Point end = Point.of(buffer);
-            if (!grid.requestWay(start, end)) {
-                final WriteBuffer error = new WriteBuffer();
-                error.putByte((byte) SignalBoxNetwork.NO_PW_FOUND.ordinal());
-                OpenSignalsMain.network.sendTo(info.player, error.build());
+        switch (mode) {
+            case SEND_INT_ENTRY: {
+                deserializeEntry(buffer, buffer.getByteAsInt());
+                break;
             }
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.RESET_ALL_PW)) {
-            grid.resetAllPathways();
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.SEND_CHANGED_MODES)) {
-            grid.readUpdateNetwork(buffer, true);
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.REQUEST_SUBSIDIARY)) {
-            final SubsidiaryEntry entry = SubsidiaryEntry.of(buffer);
-            final Point point = Point.of(buffer);
-            final ModeSet modeSet = ModeSet.of(buffer);
-            grid.updateSubsidiarySignal(point, modeSet, entry);
-            return;
-        }
-        if (mode.equals(SignalBoxNetwork.UPDATE_RS_OUTPUT)) {
-            final Point point = Point.of(buffer);
-            final ModeSet modeSet = ModeSet.of(buffer);
-            final boolean state = buffer.getByte() == 1 ? true : false;
-            final BlockPos pos = grid.updateManuellRSOutput(point, modeSet, state);
-            if (pos == null) {
-                final WriteBuffer error = new WriteBuffer();
-                error.putByte((byte) SignalBoxNetwork.NO_OUTPUT_UPDATE.ordinal());
-                OpenSignalsMain.network.sendTo(info.player, error.build());
-            } else {
-                SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, info.world), state);
-                final WriteBuffer sucess = new WriteBuffer();
-                sucess.putByte((byte) SignalBoxNetwork.OUTPUT_UPDATE.ordinal());
-                point.writeNetwork(sucess);
-                modeSet.writeNetwork(sucess);
-                sucess.putByte((byte) (state ? 1 : 0));
-                OpenSignalsMain.network.sendTo(info.player, sucess.build());
+            case REMOVE_ENTRY: {
+                final Point point = Point.of(buffer);
+                final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
+                final Rotation rotation = deserializeRotation(buffer);
+                final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES
+                        .get(buffer.getByteAsInt());
+                final ModeSet modeSet = new ModeSet(guiMode, rotation);
+                grid.getNode(point).getOption(modeSet).ifPresent(entry -> {
+                    entry.removeEntry(entryType);
+                });
+                break;
             }
+            case SEND_POS_ENTRY: {
+                deserializeEntry(buffer, buffer.getBlockPos());
+                break;
+            }
+            case SEND_ZS2_ENTRY: {
+                deserializeEntry(buffer, buffer.getBlockPos());
+                break;
+            }
+            case REMOVE_POS: {
+                final BlockPos pos = buffer.getBlockPos();
+                SignalBoxHandler.unlinkPosFromSignalBox(
+                        new PosIdentifier(tile.getBlockPos(), tile.getLevel()), pos);
+                break;
+            }
+            case RESET_PW: {
+                final Point point = Point.of(buffer);
+                grid.resetPathway(point);
+                break;
+            }
+            case REQUEST_PW: {
+                final Point start = Point.of(buffer);
+                final Point end = Point.of(buffer);
+                if (!grid.requestWay(start, end)) {
+                    final WriteBuffer error = new WriteBuffer();
+                    error.putByte((byte) SignalBoxNetwork.NO_PW_FOUND.ordinal());
+                    OpenSignalsMain.network.sendTo(info.player, error.build());
+                }
+                break;
+            }
+            case RESET_ALL_PW: {
+                grid.resetAllPathways();
+                break;
+            }
+            case SEND_CHANGED_MODES: {
+                grid.readUpdateNetwork(buffer, true);
+                break;
+            }
+            case REQUEST_SUBSIDIARY: {
+                final SubsidiaryEntry entry = SubsidiaryEntry.of(buffer);
+                final Point point = Point.of(buffer);
+                final ModeSet modeSet = ModeSet.of(buffer);
+                grid.updateSubsidiarySignal(point, modeSet, entry);
+                break;
+            }
+            case UPDATE_RS_OUTPUT: {
+                final Point point = Point.of(buffer);
+                final ModeSet modeSet = ModeSet.of(buffer);
+                final boolean state = buffer.getByte() == 1 ? true : false;
+                final BlockPos pos = grid.updateManuellRSOutput(point, modeSet, state);
+                if (pos == null) {
+                    final WriteBuffer error = new WriteBuffer();
+                    error.putByte((byte) SignalBoxNetwork.NO_OUTPUT_UPDATE.ordinal());
+                    OpenSignalsMain.network.sendTo(info.player, error.build());
+                } else {
+                    SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, info.world),
+                            state);
+                    final WriteBuffer sucess = new WriteBuffer();
+                    sucess.putByte((byte) SignalBoxNetwork.OUTPUT_UPDATE.ordinal());
+                    point.writeNetwork(sucess);
+                    modeSet.writeNetwork(sucess);
+                    sucess.putByte((byte) (state ? 1 : 0));
+                    OpenSignalsMain.network.sendTo(info.player, sucess.build());
+                }
+                break;
+            }
+            default:
+                break;
         }
     }
 
