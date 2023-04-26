@@ -9,7 +9,7 @@ import java.util.Objects;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.enums.EnumPathUsage;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public final class PathEntryType<T> {
 
