@@ -20,6 +20,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
@@ -52,6 +53,7 @@ public final class SignalStateHandler implements INetworkSync {
     private static final Map<ChunkAccess, List<SignalStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
     private static final Map<Level, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, Integer> SIGNAL_COUNTER = new HashMap<>();
+    private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
     private static ExecutorService service;
@@ -83,12 +85,6 @@ public final class SignalStateHandler implements INetworkSync {
         channel.registerObject(object);
     }
 
-    public static boolean containsStates(final SignalStateInfo info) {
-        synchronized (CURRENTLY_LOADED_STATES) {
-            return CURRENTLY_LOADED_STATES.containsKey(info);
-        }
-    }
-
     public static void createStates(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
         if (info.world.isClientSide)
@@ -98,6 +94,40 @@ public final class SignalStateHandler implements INetworkSync {
         }
         createToFile(info, states);
         loadSignal(info);
+    }
+
+    public static void addListener(final SignalStateInfo info, final SignalStateListener listener) {
+        synchronized (ALL_LISTENERS) {
+            final List<SignalStateListener> listeners = ALL_LISTENERS.computeIfAbsent(info,
+                    _u -> new ArrayList<>());
+            listeners.add(listener);
+        }
+    }
+
+    public static void removeListener(final SignalStateInfo info,
+            final SignalStateListener listener) {
+        final List<SignalStateListener> listeners;
+        synchronized (ALL_LISTENERS) {
+            listeners = ALL_LISTENERS.get(info);
+        }
+        if (listeners == null)
+            return;
+        listeners.remove(listener);
+        if (listeners.isEmpty()) {
+            synchronized (ALL_LISTENERS) {
+                ALL_LISTENERS.remove(info);
+            }
+        }
+    }
+
+    private static void updateListeners(final SignalStateInfo info, final boolean removed) {
+        final List<SignalStateListener> listeners;
+        synchronized (ALL_LISTENERS) {
+            listeners = ALL_LISTENERS.get(info);
+        }
+        if (listeners == null)
+            return;
+        listeners.forEach(listener -> listener.update(info, removed));
     }
 
     private static void statesToBuffer(final Signal signal, final Map<SEProperty, String> states,
@@ -142,11 +172,13 @@ public final class SignalStateHandler implements INetworkSync {
                 oldStates.putAll(states);
                 CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
                 sendPropertiesToClient(info, states);
+                updateListeners(info, false);
                 return;
             }
         }
         createToFile(info, states);
         sendPropertiesToClient(info, states);
+        updateListeners(info, false);
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
@@ -322,6 +354,8 @@ public final class SignalStateHandler implements INetworkSync {
                 SIGNAL_COUNTER.remove(info);
             }
             sendRemoved(info);
+            updateListeners(info, true);
+            ALL_LISTENERS.remove(info);
         });
     }
 

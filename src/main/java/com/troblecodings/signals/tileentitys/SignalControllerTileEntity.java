@@ -13,6 +13,7 @@ import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
@@ -38,6 +39,14 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private final boolean[] currentStates = new boolean[Direction.values().length];
     private final Map<Byte, Map<SEProperty, String>> allStates = new HashMap<>();
     private final Map<Direction, Map<EnumState, Byte>> enabledStates = new HashMap<>();
+    private final SignalStateListener listener = (_u, removed) -> {
+        if (removed) {
+            linkedSignalPosition = null;
+            linkedSignal = null;
+            allStates.clear();
+            enabledStates.clear();
+        }
+    };
 
     public static final String SIGNAL_NAME = "signalname";
     private static final String BLOCK_POS_ID = "blockpos";
@@ -205,9 +214,13 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             if (copy.contains(BLOCK_POS_ID))
                 linkedSignalPosition = copy.getBlockPos(BLOCK_POS_ID);
             readFromWrapper(copy);
-            if (linkedSignalPosition != null && linkedSignal != null)
-                SignalStateHandler
-                        .loadSignal(new SignalStateInfo(level, linkedSignalPosition, linkedSignal));
+            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
+                    linkedSignal);
+            if (linkedSignalPosition != null && linkedSignal != null) {
+                SignalStateHandler.loadSignal(info);
+                SignalStateHandler.addListener(info, listener);
+            }
+
         }
     }
 
@@ -218,19 +231,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     public BlockPos getLinkedPosition() {
-        if (SignalStateHandler
-                .containsStates(new SignalStateInfo(level, linkedSignalPosition, linkedSignal)))
-            return linkedSignalPosition;
-        unlink();
-        return null;
+        return linkedSignalPosition;
     }
 
     public Signal getLinkedSignal() {
-        if (SignalStateHandler
-                .containsStates(new SignalStateInfo(level, linkedSignalPosition, linkedSignal)))
-            return linkedSignal;
-        unlink();
-        return null;
+        return linkedSignal;
     }
 
     @Override
@@ -244,8 +249,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         final Block block = Registry.BLOCK
                 .get(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
         if (block != null && block instanceof Signal) {
+            unlink();
             linkedSignalPosition = pos;
             linkedSignal = (Signal) block;
+            SignalStateHandler.addListener(new SignalStateInfo(level, pos, linkedSignal), listener);
             return true;
         }
         return false;
@@ -253,6 +260,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     @Override
     public boolean unlink() {
+        SignalStateHandler.removeListener(
+                new SignalStateInfo(level, linkedSignalPosition, linkedSignal), listener);
         linkedSignalPosition = null;
         linkedSignal = null;
         allStates.clear();
