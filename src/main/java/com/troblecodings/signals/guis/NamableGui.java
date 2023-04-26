@@ -103,6 +103,8 @@ public class NamableGui extends GuiBase {
 
     @Override
     public void updateFromContainer() {
-        initOwn();
+        entity.add(new UILabel("Currently not usable! Check changelog!"));
+        return;
+        // initOwn();
     }
 }

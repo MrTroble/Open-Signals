@@ -42,11 +42,14 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class SignalBoxHandler {
 
+    private SignalBoxHandler() {
+    }
+
     private static final Map<PosIdentifier, PathwayHolder> ALL_GRIDS = new HashMap<>();
     private static final Map<PosIdentifier, LinkedPositions> ALL_LINKED_POS = new HashMap<>();
     private static final Map<PosIdentifier, LinkingUpdates> POS_UPDATES = new HashMap<>();
     private static final Map<PosIdentifier, Boolean> OUTPUT_UPDATES = new HashMap<>();
-    private static ExecutorService SERVICE = Executors.newFixedThreadPool(1);
+    private static ExecutorService service = Executors.newFixedThreadPool(1);
 
     public static void resetPathway(final PosIdentifier identifier, final Point point) {
         if (identifier.world.isClientSide)
@@ -368,7 +371,7 @@ public final class SignalBoxHandler {
         final Level world = (Level) event.getWorld();
         if (world.isClientSide)
             return;
-        SERVICE.execute(() -> {
+        service.execute(() -> {
             final NBTWrapper wrapper = new NBTWrapper();
             final List<NBTWrapper> wrapperList = new ArrayList<>();
             final String levelName = (((ServerLevel) world).getServer().getWorldData()
@@ -421,7 +424,7 @@ public final class SignalBoxHandler {
         final Level world = (Level) event.getWorld();
         if (world.isClientSide)
             return;
-        SERVICE.execute(() -> {
+        service.execute(() -> {
             try {
                 Files.createDirectories(NBT_FILES_DIRECTORY);
                 final Optional<Path> file = Files.list(NBT_FILES_DIRECTORY)
@@ -454,12 +457,12 @@ public final class SignalBoxHandler {
 
     @SubscribeEvent
     public static void shutdown(final ServerStoppingEvent event) {
-        SERVICE.shutdown();
+        service.shutdown();
         try {
-            SERVICE.awaitTermination(1, TimeUnit.DAYS);
+            service.awaitTermination(1, TimeUnit.DAYS);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        SERVICE = Executors.newFixedThreadPool(1);
+        service = Executors.newFixedThreadPool(1);
     }
 }

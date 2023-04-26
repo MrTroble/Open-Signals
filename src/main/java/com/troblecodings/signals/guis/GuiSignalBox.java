@@ -680,9 +680,11 @@ public class GuiSignalBox extends GuiBase {
         USAGE, EDIT, SETTINGS, TILE_CONFIG, CHANGE_MODE, NONE;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void updateFromContainer() {
-        if (!allPacketsRecived) {
+        entity.add(new UILabel("Currently not usable! Check changelog!"));
+        if (!allPacketsRecived && false) {
             initializeBasicUI();
             allPacketsRecived = true;
             return;
