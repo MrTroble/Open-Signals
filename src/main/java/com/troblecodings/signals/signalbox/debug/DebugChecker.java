@@ -9,8 +9,8 @@ public class DebugChecker extends ConnectionChecker {
     public boolean check() {
         final boolean flag = super.check();
         if (!flag) {
-            OpenSignalsMain.log.debug("Check failed for " + this.path);
-            OpenSignalsMain.log.debug(nextNode);
+            OpenSignalsMain.getLogger().debug("Check failed for " + this.path);
+            OpenSignalsMain.getLogger().debug(nextNode);
         }
         return flag;
     }

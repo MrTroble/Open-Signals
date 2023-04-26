@@ -1,9 +1,10 @@
 package com.troblecodings.signals.signalbox;
 
-import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -11,23 +12,26 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.Observable;
-import com.troblecodings.signals.core.Observer;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Rotation;
 
-public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observable, Observer {
+public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
             EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
 
     private final HashMap<Path, ModeSet> possibleConnections = new HashMap<>();
     private final HashMap<ModeSet, PathOptionEntry> possibleModes = new HashMap<>();
+    private final List<ModeSet> manuellEnabledOutputs = new ArrayList<>();
     private final Point point;
     private String identifier;
 
@@ -44,8 +48,31 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
         possibleModes.put(modeSet, SignalBoxFactory.getFactory().getEntry());
     }
 
+    public <T> void addAndSetEntry(final ModeSet mode, final PathEntryType<T> entry, final T type) {
+        final PathOptionEntry optionEntry = possibleModes.computeIfAbsent(mode,
+                _u -> SignalBoxFactory.getFactory().getEntry());
+        optionEntry.setEntry(entry, type);
+    }
+
     public boolean has(final ModeSet modeSet) {
         return possibleModes.containsKey(modeSet);
+    }
+
+    public void addManuellOutput(final ModeSet mode) {
+        if (!manuellEnabledOutputs.contains(mode))
+            manuellEnabledOutputs.add(mode);
+    }
+
+    public void removeManuellOutput(final ModeSet mode) {
+        manuellEnabledOutputs.remove(mode);
+    }
+
+    public List<BlockPos> clearAllManuellOutputs() {
+        final List<BlockPos> returnList = new ArrayList<>();
+        manuellEnabledOutputs.forEach(mode -> returnList
+                .add(possibleModes.get(mode).getEntry(PathEntryType.OUTPUT).get()));
+        manuellEnabledOutputs.clear();
+        return returnList;
     }
 
     public void remove(final ModeSet modeSet) {
@@ -55,6 +82,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
     public void post() {
         possibleConnections.clear();
         possibleModes.forEach((e, i) -> {
+            if (e.mode.equals(EnumGuiMode.SH2)) {
+                possibleConnections.clear();
+                return;
+            }
             final Point p1 = new Point(this.point);
             final Point p2 = new Point(this.point);
             switch (e.mode) {
@@ -111,6 +142,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
     }
 
     private static final String POINT_LIST = "pointList";
+    private static final String ENABLED_OUTPUTS = "enabledOutputs";
 
     @Override
     public void write(final NBTWrapper compound) {
@@ -120,6 +152,13 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
             entry.getValue().write(wrapper);
             return wrapper;
         })::iterator);
+        final List<NBTWrapper> enabledOutputs = new ArrayList<>();
+        manuellEnabledOutputs.forEach(mode -> {
+            final NBTWrapper wrapper = new NBTWrapper();
+            mode.write(wrapper);
+            enabledOutputs.add(wrapper);
+        });
+        compound.putList(ENABLED_OUTPUTS, enabledOutputs);
         this.point.write(compound);
     }
 
@@ -131,9 +170,14 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
             entry.read(tag);
             possibleModes.put(new ModeSet(tag), entry);
         });
+        compound.getList(ENABLED_OUTPUTS).forEach(tag -> {
+            final ModeSet modeSet = new ModeSet(tag);
+            if (!manuellEnabledOutputs.contains(modeSet))
+                manuellEnabledOutputs.add(modeSet);
+        });
         this.point.read(compound);
         this.identifier = point.getX() + "." + point.getY();
-        this.post();
+        post();
     }
 
     public Optional<PathOptionEntry> getOption(final Path path) {
@@ -178,6 +222,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
                 return false; // Found another signal on the path that is not the target
         }
         return true;
+    }
+
+    public boolean containsManuellOutput(final ModeSet mode) {
+        return manuellEnabledOutputs.contains(mode);
     }
 
     public boolean isEmpty() {
@@ -228,32 +276,69 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet>, Observ
     }
 
     @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
+    public void readNetwork(final ReadBuffer buffer) {
+        possibleModes.clear();
+        manuellEnabledOutputs.clear();
+        final int size = buffer.getByteAsInt();
+        for (int i = 0; i < size; i++) {
+            final ModeSet mode = ModeSet.of(buffer);
+            final PathOptionEntry entry = SignalBoxFactory.getFactory().getEntry();
+            entry.readNetwork(buffer);
+            possibleModes.put(mode, entry);
+        }
+        final int outputsSize = buffer.getByteAsInt();
+        for (int i = 0; i < outputsSize; i++) {
+            final ModeSet modeSet = ModeSet.of(buffer);
+            if (!manuellEnabledOutputs.contains(modeSet))
+                manuellEnabledOutputs.add(modeSet);
+        }
+        post();
+    }
 
+    public void readUpdateNetwork(final ReadBuffer buffer) {
+        final int size = buffer.getByteAsInt();
+        for (int i = 0; i < size; i++) {
+            final ModeSet mode = ModeSet.of(buffer);
+            final PathOptionEntry entry = possibleModes.computeIfAbsent(mode,
+                    _u -> SignalBoxFactory.getFactory().getEntry());
+            entry.readNetwork(buffer);
+            possibleModes.put(mode, entry);
+        }
+        final int outputsSize = buffer.getByteAsInt();
+        if (outputsSize == 0)
+            manuellEnabledOutputs.clear();
+        for (int i = 0; i < outputsSize; i++) {
+            final ModeSet modeSet = ModeSet.of(buffer);
+            if (!manuellEnabledOutputs.contains(modeSet))
+                manuellEnabledOutputs.add(modeSet);
+        }
+        post();
     }
 
     @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
+    public void writeNetwork(final WriteBuffer buffer) {
+        buffer.putByte((byte) possibleModes.size());
+        possibleModes.forEach((mode, entry) -> {
+            mode.writeNetwork(buffer);
+            entry.writeNetwork(buffer);
+        });
+        buffer.putByte((byte) manuellEnabledOutputs.size());
+        manuellEnabledOutputs.forEach(mode -> mode.writeNetwork(buffer));
     }
 
-    @Override
-    public void addListener(final Observer observer) {
-        possibleModes.values().forEach(mode -> mode.addListener(observer));
+    public void writeUpdateNetwork(final WriteBuffer buffer) {
+        int size = 0;
+        for (final PathOptionEntry entry : possibleModes.values()) {
+            if (entry.containsEntry(PathEntryType.PATHUSAGE))
+                size++;
+        }
+        buffer.putByte((byte) size);
+        possibleModes.forEach((mode, entry) -> {
+            if (entry.containsEntry(PathEntryType.PATHUSAGE)) {
+                mode.writeNetwork(buffer);
+                entry.writeUpdateNetwork(buffer);
+            }
+        });
+        buffer.putByte((byte) 0);
     }
-
-    @Override
-    public void removeListener(final Observer observer) {
-        possibleModes.values().forEach(mode -> mode.removeListener(observer));
-
-    }
-
-    @Override
-    public void update(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

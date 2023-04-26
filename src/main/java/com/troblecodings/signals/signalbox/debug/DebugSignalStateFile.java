@@ -24,7 +24,7 @@ public class DebugSignalStateFile extends SignalStateFile {
 
     public DebugSignalStateFile(final Path path) {
         super(path);
-        this.logger = OpenSignalsMain.log;
+        this.logger = OpenSignalsMain.getLogger();
     }
 
     @Override
@@ -77,5 +77,13 @@ public class DebugSignalStateFile extends SignalStateFile {
         }
         super.write(pos, buffer);
         dataCache.put(pos, Arrays.copyOf(buffer.array(), buffer.array().length));
+    }
+
+    @Override
+    public synchronized SignalStatePos deleteIndex(final BlockPos pos) {
+        final SignalStatePos statePos = super.deleteIndex(pos);
+        createdPositions.remove(pos);
+        dataCache.remove(statePos);
+        return statePos;
     }
 }

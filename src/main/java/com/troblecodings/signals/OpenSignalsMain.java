@@ -8,6 +8,7 @@ import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSItems;
@@ -51,12 +52,13 @@ public class OpenSignalsMain {
         eventBus.register(OSSounds.class);
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
         MinecraftForge.EVENT_BUS.register(NameHandler.class);
+        MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
     }
 
     public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new,
             () -> CommonProxy::new);
-    public static Logger log = null;
+    private static Logger log = null;
     public static GuiHandler handler = null;
     public static NetworkHandler network = null;
     public static FileReader contentPacks = null;
@@ -75,7 +77,7 @@ public class OpenSignalsMain {
 
     @SubscribeEvent
     public void preInit(final FMLConstructModEvent event) {
-        debug = true;
+        debug = false;
         log = LoggerContext.getContext().getLogger(MODID);
         final IModInfo modInfo = ModLoadingContext.get().getActiveContainer().getModInfo();
         file = modInfo.getOwningFile().getFile();

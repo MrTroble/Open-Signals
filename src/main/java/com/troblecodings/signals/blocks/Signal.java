@@ -12,12 +12,17 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.handler.ClientSignalsStateHandler;
+import com.troblecodings.signals.handler.ClientSignalStateInfo;
+import com.troblecodings.signals.handler.ClientSignalStateHandler;
+import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSItems;
@@ -28,7 +33,6 @@ import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -37,19 +41,18 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -65,7 +68,7 @@ public class Signal extends BasicBlock {
     public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
             SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
-            "false", ChangeableStage.AUTOMATICSTAGE, t -> true);
+            "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
 
     protected final SignalProperties prop;
@@ -122,7 +125,7 @@ public class Signal extends BasicBlock {
         final Level world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
-                ? ClientSignalsStateHandler.getClientStates(info)
+                ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
                 : SignalStateHandler.getStates(info);
         return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
@@ -133,21 +136,10 @@ public class Signal extends BasicBlock {
         return getShape(blockState, worldIn, pos, context);
     }
 
-    public static final int HOTBAR_SLOT = 9;
-
-    public static ItemStack pickBlock(final Player player, final Item item) {
-        // Compatibility issues with other mods ...
-        final Minecraft minecraft = Minecraft.getInstance();
-        if (!minecraft.options.keyPickItem.isDown())
-            return new ItemStack(item);
-        for (int k = 0; k < HOTBAR_SLOT; ++k) {
-            final ItemStack currentStack = player.inventoryMenu.getSlot(k).getItem();
-            if (currentStack.getItem().equals(item)) {
-                player.inventoryMenu.setItem(k, k, currentStack);
-                return ItemStack.EMPTY;
-            }
-        }
-        return new ItemStack(item);
+    @Override
+    public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
+            final BlockGetter level, final BlockPos pos, final Player player) {
+        return getPlacementtool().getDefaultInstance();
     }
 
     @Override
@@ -175,6 +167,8 @@ public class Signal extends BasicBlock {
         GhostBlock.destroyUpperBlock(worldIn, pos);
         if (!worldIn.isClientSide() && worldIn instanceof Level) {
             SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos, this));
+            NameHandler.setRemoved(new NameStateInfo((Level) worldIn, pos));
+            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (Level) worldIn));
         }
     }
 
@@ -275,16 +269,20 @@ public class Signal extends BasicBlock {
         return this.prop.placementtool;
     }
 
+    public int getDefaultDamage() {
+        return this.prop.defaultItemDamage;
+    }
+
     @Override
     public InteractionResult use(final BlockState blockstate, final Level level,
             final BlockPos blockPos, final Player placer, final InteractionHand hand,
             final BlockHitResult blockHit) {
-        final BlockEntity tile = level.getBlockEntity(blockPos);
-        if (!(tile instanceof SignalTileEntity)) {
+        if (!(blockstate.getBlock() instanceof Signal)) {
             return InteractionResult.FAIL;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(level, blockPos, this);
-        if (loadRedstoneOutput(level, stateInfo) && level.isClientSide) {
+        if (loadRedstoneOutput(level, stateInfo)) {
+            level.blockUpdated(blockPos, blockstate.getBlock());
             return InteractionResult.SUCCESS;
         }
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
@@ -308,14 +306,9 @@ public class Signal extends BasicBlock {
                         SignalStateHandler.setState(info, pack.property,
                                 Boolean.toString(!Boolean.valueOf(power)));
                     });
-                    break;
+                    return true;
                 }
             }
-            if (this.powerProperty == null) {
-                return false;
-            }
-            // TODO update
-            return true;
         }
         return false;
     }
@@ -323,6 +316,12 @@ public class Signal extends BasicBlock {
     @Override
     public boolean isSignalSource(final BlockState state) {
         return !this.prop.redstoneOutputs.isEmpty();
+    }
+
+    @Override
+    public int getSignal(final BlockState state, final BlockGetter getter, final BlockPos pos,
+            final Direction direction) {
+        return getDirectSignal(state, getter, pos, direction);
     }
 
     @SuppressWarnings("unchecked")
@@ -400,5 +399,4 @@ public class Signal extends BasicBlock {
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
     }
-
 }

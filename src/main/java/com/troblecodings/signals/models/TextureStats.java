@@ -7,14 +7,14 @@ import com.google.common.collect.ImmutableMap;
 
 public class TextureStats {
 
-    protected float x = 0;
-    protected float y = 0;
-    protected float z = 0;
+    private float x = 0;
+    private float y = 0;
+    private float z = 0;
 
-    protected final boolean loadOFFstate = true;
-    protected String blockstate;
-    protected Map<String, String> retexture;
-    protected Map<String, Map<String, String>> extentions;
+    private boolean loadOFFstate = true;
+    private String blockstate;
+    private Map<String, String> retexture;
+    private Map<String, Map<String, String>> extentions;
 
     public float getOffsetX() {
         return x;
@@ -58,7 +58,7 @@ public class TextureStats {
      * 1. String: Name of the file to get load 2. String: SEProperty 3. String: The
      * key of the retexture map
      */
-    public ImmutableMap<String, Map<String, String>> getExtentions() {
+    public Map<String, Map<String, String>> getExtentions() {
 
         if (extentions == null) {
             extentions = new HashMap<>();

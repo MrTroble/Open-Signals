@@ -1,76 +1,108 @@
 package com.troblecodings.signals.guis;
 
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.math.Quaternion;
-import com.troblecodings.guilib.ecs.entitys.DrawInfo;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
+import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEntity.UpdateEvent;
+import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
+import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.enums.EnumGuiMode;
-import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.AbstractTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Rotation;
-import net.minecraftforge.common.util.Lazy;
 
-public class UISignalBoxTile extends UIComponent {
+public class UISignalBoxTile extends UIComponentEntity {
 
     public static final ResourceLocation ICON = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/symbols.png");
 
-    private static final Lazy<AbstractTexture> ICON_TEXTURE = () -> Minecraft.getInstance()
-            .getTextureManager().getTexture(ICON);
-
     private SignalBoxNode node;
+    private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
 
     public UISignalBoxTile(final SignalBoxNode node) {
+        super(new UIEntity());
         this.node = node;
+        if (this.node != null)
+            this.node.forEach(this::localAdd);
     }
 
-    public UISignalBoxTile(final EnumGuiMode enumMode) {
-        this.node = new SignalBoxNode((Point) null);
-        this.node.add(new ModeSet(enumMode, Rotation.NONE));
+    public void setNode(final SignalBoxNode node) {
+        if (this.node != null)
+            this.node.forEach(this::localRemove);
+        this.node = node;
+        if (this.node != null)
+            this.node.forEach(this::localAdd);
     }
 
-    @Override
-    public synchronized void draw(final DrawInfo info) {
-        ICON_TEXTURE.get().bind();
-        RenderSystem.enableBlend();
-        info.stack.translate(0, 0, 1);
-        RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA,
-                GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE,
-                GlStateManager.DestFactor.ZERO);
-        node.forEach((modeSet) -> {
-            final EnumPathUsage usage = node.getOption(modeSet).map(
-                    entry -> entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE))
-                    .orElse(EnumPathUsage.FREE);
-            info.stack.pushPose();
-            final int offsetX = (int) parent.getWidth() / 2;
-            final int offsetY = (int) parent.getHeight() / 2;
-            info.stack.translate(offsetX, offsetY, 0);
-            info.stack.mulPose(Quaternion.fromXYZ(0, modeSet.rotation.ordinal() * 90, 0));
-            info.stack.translate(-offsetX, -offsetY, 0);
-            modeSet.mode.consumer.accept(parent, usage.getColor());
-            info.stack.popPose();
-        });
-        RenderSystem.disableBlend();
+    private void localAdd(final ModeSet modeSet) {
+        final UIEntity entity = new UIEntity();
+        if (!modeSet.rotation.equals(Rotation.NONE)) {
+            final UIRotate rotation = new UIRotate();
+            rotation.setRotateZ(modeSet.rotation.ordinal() * ((float) Math.PI / 2.0f));
+            entity.add(rotation);
+        }
+        entity.add(new UIIndependentTranslate(0, 0, 1));
+        entity.add((UIComponent) modeSet.mode.consumer.get());
+        this.entity.add(entity);
+        setToEntity.put(modeSet, entity);
     }
 
     @Override
     public void update() {
+        super.update();
+        this.entity.setX(parent.getWidth() / 2.0);
+        this.entity.setY(parent.getHeight() / 2.0);
+        setToEntity.values().forEach(e -> {
+            e.setHeight(entity.getHeight());
+            e.setWidth(entity.getWidth());
+            e.update();
+        });
+        this.entity.findRecursive(UIIndependentTranslate.class).forEach(translate -> {
+            translate.setX(-this.entity.getX());
+            translate.setY(-this.entity.getY());
+        });
+    }
+
+    @Override
+    public void updateEvent(final UpdateEvent event) {
+        super.updateEvent(event);
+        this.update();
+    }
+
+    private void localRemove(final ModeSet modeSet) {
+        this.entity.remove(setToEntity.remove(modeSet));
+    }
+
+    public void add(final ModeSet modeSet) {
+        this.node.add(modeSet);
+        localAdd(modeSet);
+        this.update();
+    }
+
+    public boolean has(final ModeSet modeSet) {
+        return this.node.has(modeSet);
+    }
+
+    public void remove(final ModeSet modeSet) {
+        this.node.remove(modeSet);
+        this.localRemove(modeSet);
+    }
+
+    public boolean isValidStart() {
+        return this.node.isValidStart();
+    }
+
+    public Point getPoint() {
+        return this.node.getPoint();
     }
 
     public SignalBoxNode getNode() {
-        return node;
-    }
-
-    public void setNode(final SignalBoxNode node) {
-        this.node = node;
+        return this.node;
     }
 }

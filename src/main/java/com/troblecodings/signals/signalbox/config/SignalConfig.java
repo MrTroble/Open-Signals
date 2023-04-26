@@ -18,8 +18,9 @@ import com.troblecodings.signals.properties.SignalPair;
 
 public final class SignalConfig {
 
-    private SignalConfig() {}
-    
+    private SignalConfig() {
+    }
+
     public static void change(final ConfigInfo info) {
         final Signal currentSignal = info.currentinfo.signal;
         if (info.type.equals(PathType.NORMAL)) {
@@ -67,30 +68,38 @@ public final class SignalConfig {
         final Map<Class, Object> object = new HashMap<>();
         final Map<SEProperty, String> oldProperties = SignalStateHandler
                 .getStates(info.currentinfo);
-        object.put(Map.class, SignalStateHandler.getStates(info.nextinfo));
+        if (info.nextinfo != null) {
+            object.put(Map.class, SignalStateHandler.getStates(info.nextinfo));
+        }
         object.put(Integer.class, info.speed);
+        object.put(String.class, info.zs2Value);
+        final Map<SEProperty, String> propertiesToSet = new HashMap<>();
         values.forEach(property -> {
             if (property.predicate.test(object)) {
-                SignalStateHandler.setStates(info.currentinfo,
-                        property.values.entrySet().stream()
-                                .filter(entry -> oldProperties.containsKey(entry.getKey()))
-                                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
-                                        Map.Entry::getValue)));
+                propertiesToSet.putAll(property.values.entrySet().stream().filter(entry -> {
+                    final String oldValue = oldProperties.get(entry.getKey());
+                    return oldValue != null && !oldValue.equals(entry.getValue());
+                }).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
             }
         });
+        if (!propertiesToSet.isEmpty())
+            SignalStateHandler.setStates(info.currentinfo, propertiesToSet);
     }
 
     private static void loadWithoutPredicate(final List<ConfigProperty> values,
             final SignalStateInfo current) {
         if (values != null) {
             final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(current);
+            final Map<SEProperty, String> propertiesToSet = new HashMap<>();
             values.forEach(property -> {
-                SignalStateHandler.setStates(current,
-                        property.values.entrySet().stream()
-                                .filter(entry -> oldProperties.containsKey(entry.getKey()))
-                                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
-                                        Map.Entry::getValue)));
+                propertiesToSet.putAll(property.values.entrySet().stream().filter(entry -> {
+                    final String oldValue = oldProperties.get(entry.getKey());
+                    return oldValue != null && !oldValue.equals(entry.getValue());
+                }).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
+
             });
+            if (!propertiesToSet.isEmpty())
+                SignalStateHandler.setStates(current, propertiesToSet);
         }
     }
 }

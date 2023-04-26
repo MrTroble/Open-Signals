@@ -51,7 +51,7 @@ public class UIMenu extends UIComponent {
                 preview.setHeight(20);
                 preview.setWidth(20);
                 if (mode.ordinal() == this.selection)
-                    preview.add(new UIBorder(0xFF00FF00, 4));
+                    preview.add(new UIBorder(0xFF00FF00, 1));
                 selection.add(preview);
             }
             selection.updateEvent(parent.getLastUpdateEvent());
@@ -89,7 +89,7 @@ public class UIMenu extends UIComponent {
     @Override
     public void keyEvent(final KeyEvent event) {
         super.keyEvent(event);
-        if (event.typedChar == 'r') {
+        if (event.typedChar == 'R' || event.typedChar == 'r') {
             this.rotation++;
             if (this.rotation >= Rotation.values().length)
                 this.rotation = 0;

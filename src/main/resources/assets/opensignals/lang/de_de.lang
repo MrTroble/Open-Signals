@@ -30,6 +30,10 @@ item.conductorhead.name=Zugführer Mütze
 item.conductorchestplate.name=Zugführer Jacke
 item.conductorpants.name=Zugführer Hose
 item.conductorshoes.name=Zugführer Schuhe
+item.signalplate.name=Signalblech
+item.signalshield.name=Signalschirm
+item.lamps.name=Lampen
+item.electricparts.name=Elektronische Teile
 
 #Blocks
 tile.hvsignalcontroller.name=Signalsteuerer
@@ -37,6 +41,7 @@ tile.post.name=Mast
 tile.signalbox.name=Stellwerk
 tile.redstonein.name=Redstone Eingang
 tile.redstoneout.name=Redstone Ausgang
+tile.combiredstoneinput.name=Kombinierter Redstone Eingang
 
 #Linking Tool
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r
@@ -48,12 +53,17 @@ lt.reset=§cDer Verlinker ist zurückgesetzt.§r
 lt.unlink=§cVerlinkung zurückgesetzt§r
 lt.notset=§cKein verknüpftes Signal. Bitte klicke zuerst auf ein Signal oder valides Objekt.§r
 pt.itemnotset=Keine Signalkonfiguration ausgewählt. Bitte stell das Tool vorher ein (Sneaken + Rechtsklick auf einen Block)
+pt.blockinway=Du kannst das Signal nicht platzieren, da ein Block im Weg ist.
 
 #Signalbox
 btn.apply=Anwenden
 btn.settings=Verlinkung
 btn.edit=Editor
 btn.main=Nutzung
+btn.yes=Ja
+btn.no=Nein
+sb.allreset=Alle Fahrstraßen werden zurückgesetzt!
+sb.editmode=In den Edit Mode wechseln?
 property.STRAIGHT=Gerade
 property.CORNER=Schräge
 property.END=Prellbock

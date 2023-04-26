@@ -1,0 +1,22 @@
+{
+    "type": "minecraft:crafting_shaped",
+    "pattern": [
+        "IXI",
+        "XYX",
+        "IXI"
+    ],
+    "key": {
+        "I": {
+            "item": "opensignals:electricparts"
+        },
+        "Y": {
+            "item": "minecraft:lever"
+        },
+        "X": {
+            "item": "minecraft:iron_block"
+        }
+    },
+    "result": {
+        "item": "opensignals:hvsignalcontroller"
+    }
+}

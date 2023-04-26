@@ -17,7 +17,6 @@ public class MapWrapper implements Map<ResourceLocation, UnbakedModel> {
     private final Set<String> whitelist;
 
     public MapWrapper(final Map<ResourceLocation, UnbakedModel> map, final Set<String> whitelist) {
-        super();
         this.map = map;
         this.whitelist = new HashSet<>(whitelist);
         this.whitelist.add("ghostblock");
@@ -94,5 +93,4 @@ public class MapWrapper implements Map<ResourceLocation, UnbakedModel> {
     public Set<Entry<ResourceLocation, UnbakedModel>> entrySet() {
         return this.map.entrySet();
     }
-
 }

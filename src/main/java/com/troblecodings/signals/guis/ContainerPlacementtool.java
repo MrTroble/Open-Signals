@@ -13,7 +13,8 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.world.entity.player.Player;
@@ -21,7 +22,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class ContainerPlacementtool extends ContainerBase implements INetworkSync {
 
-    private int signalID;
+    protected int signalID;
     public final Map<SEProperty, Integer> properties = new HashMap<>();
     private final Player player;
     private Signal signal;
@@ -54,23 +55,24 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
                 propertiesToSend.add((byte) property.getParent().getIDFromValue(value));
             }
         }
-        final ByteBuffer buffer = ByteBuffer.allocate(propertiesToSend.size() + 5);
+        final WriteBuffer buffer = new WriteBuffer();
         buffer.putInt(signalID);
-        buffer.put((byte) propertiesToSend.size());
+        buffer.putByte((byte) propertiesToSend.size());
         propertiesToSend.forEach(obj -> {
-            buffer.put(obj);
+            buffer.putByte(obj);
         });
-        OpenSignalsMain.network.sendTo(player, buffer);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
     @Override
     public void deserializeServer(final ByteBuffer buf) {
-        final int first = Byte.toUnsignedInt(buf.get());
+        final ReadBuffer buffer = new ReadBuffer(buf);
+        final int first = buffer.getByteAsInt();
         final ItemStack stack = player.getMainHandItem();
         final Placementtool tool = (Placementtool) stack.getItem();
         if (first == 255) {
             final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
-            final int id = buf.getInt();
+            final int id = buffer.getInt();
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
             properties.clear();
@@ -78,9 +80,8 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         } else {
             final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
             final SEProperty property = signal.getProperties().get(first);
-            final String value = property.getObjFromID(Byte.toUnsignedInt(buf.get()));
-            if ((value.equals("false") || value.equals("OFF"))
-                    && property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+            final String value = property.getObjFromID(buffer.getByteAsInt());
+            if (property.getDefault().equals(value)) {
                 wrapper.remove(property.getName());
                 return;
             }
@@ -90,15 +91,16 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
-        signalID = buf.getInt();
-        final int size = Byte.toUnsignedInt(buf.get());
+        final ReadBuffer buffer = new ReadBuffer(buf);
+        signalID = buffer.getInt();
+        final int size = buffer.getByteAsInt();
         final Placementtool tool = (Placementtool) player.getMainHandItem().getItem();
         final Signal signal = tool.getObjFromID(signalID);
         final List<SEProperty> signalProperties = signal.getProperties();
         properties.clear();
         for (int i = 0; i < size / 2; i++) {
-            final SEProperty property = signalProperties.get(Byte.toUnsignedInt(buf.get()));
-            final int value = Byte.toUnsignedInt(buf.get());
+            final SEProperty property = signalProperties.get(buffer.getByteAsInt());
+            final int value = buffer.getByteAsInt();
             properties.put(property, value);
         }
         signalProperties.forEach(property -> {
@@ -108,9 +110,5 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
             }
         });
         update();
-    }
-
-    public int getSignalID() {
-        return signalID;
     }
 }

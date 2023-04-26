@@ -2,9 +2,7 @@ package com.troblecodings.signals.signalbox.debug;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.Point;
@@ -41,8 +39,8 @@ public class SignalBoxFactory {
         return new SignalBoxPathway(modeGrid);
     }
 
-    public SignalBoxGrid getGrid(final Consumer<NBTWrapper> sendToAll) {
-        return new SignalBoxGrid(sendToAll);
+    public SignalBoxGrid getGrid() {
+        return new SignalBoxGrid();
     }
 
     public PathOptionEntry getEntry() {

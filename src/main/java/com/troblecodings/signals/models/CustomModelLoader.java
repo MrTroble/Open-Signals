@@ -119,6 +119,7 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void onResourceManagerReload(final ResourceManager manager) {
         registeredModels.clear();
@@ -188,9 +189,10 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
                                 try {
                                     state = LogicParser.predicate(blockstate, parsinginfo);
                                 } catch (final LogicalParserException e) {
-                                    OpenSignalsMain.log.error("There was an problem during loading "
-                                            + modelname + " with the blockstate '"
-                                            + texturestate.getBlockstate() + " '!");
+                                    OpenSignalsMain.getLogger()
+                                            .error("There was an problem during loading "
+                                                    + modelname + " with the blockstate '"
+                                                    + texturestate.getBlockstate() + " '!");
                                     e.printStackTrace();
                                     return;
                                 }
@@ -207,8 +209,8 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
                                     content.createRetexture(texturestate.getRetextures())));
                         } else if (state == null && !texturestate.isautoBlockstate()
                                 && !extentionloaded) {
-                            OpenSignalsMain.log.error("The predicate of " + modelname + " in "
-                                    + filename + " is null! This shouldn't be the case!");
+                            OpenSignalsMain.getLogger().error("The predicate of " + modelname
+                                    + " in " + filename + " is null! This shouldn't be the case!");
                             return;
                         }
                     }
@@ -217,5 +219,4 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
             }
         }
     }
-
 }

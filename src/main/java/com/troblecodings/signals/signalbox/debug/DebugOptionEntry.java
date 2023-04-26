@@ -12,8 +12,8 @@ public class DebugOptionEntry extends PathOptionEntry {
 
     @Override
     public <T> void setEntry(final PathEntryType<T> type, final T value) {
-        OpenSignalsMain.log.debug(type);
-        OpenSignalsMain.log.debug(value);
+        OpenSignalsMain.getLogger().debug(type);
+        OpenSignalsMain.getLogger().debug(value);
         super.setEntry(type, value);
     }
 
@@ -28,13 +28,13 @@ public class DebugOptionEntry extends PathOptionEntry {
 
     @Override
     public void read(final NBTWrapper tag) {
-        OpenSignalsMain.log.debug("R:" + tag);
+        OpenSignalsMain.getLogger().debug("R:" + tag);
         super.read(tag);
     }
 
     @Override
     public void write(final NBTWrapper tag) {
         super.write(tag);
-        OpenSignalsMain.log.debug("W:" + tag);
+        OpenSignalsMain.getLogger().debug("W:" + tag);
     }
 }

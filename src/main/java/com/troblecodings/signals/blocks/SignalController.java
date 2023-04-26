@@ -56,5 +56,4 @@ public class SignalController extends BasicBlock {
     public Optional<String> getSupplierWrapperName() {
         return Optional.of("controller");
     }
-
 }

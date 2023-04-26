@@ -17,8 +17,8 @@ public enum CompareValues {
         return compareValue;
     }
 
-    public static CompareValues getValuefromString(final String name) {
-        for (final CompareValues value : CompareValues.values()) {
+    public static CompareValues of(final String name) {
+        for (final CompareValues value : values()) {
             if (value.getCompareValue().equalsIgnoreCase(name))
                 return value;
         }

@@ -25,28 +25,30 @@ import net.minecraft.sounds.SoundEvent;
 public class SignalPropertiesBuilder {
 
     private transient Placementtool placementtool = null;
-    private final String placementToolName = null;
-    private final int defaultHeight = 1;
+    private String placementToolName = null;
+    private int defaultHeight = 1;
     private Map<String, Integer> signalHeights;
-    private final float customNameRenderHeight = -1;
+    private float customNameRenderHeight = -1;
     private Map<String, Float> renderHeights;
-    private final float signWidth = 22;
-    private final float offsetX = 0;
-    private final float offsetY = 0;
-    private final float signScale = 1;
-    private final boolean canLink = true;
+    private float signWidth = 22;
+    private float offsetX = 0;
+    private float offsetY = 0;
+    private float signScale = 1;
+    private boolean canLink = true;
     private List<Integer> colors;
     private Map<String, SoundPropertyParser> sounds;
     private Map<String, String> redstoneOutputs;
+    private int defaultItemDamage = 1;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
-            OSItems.placementtools.forEach(item -> {
-                if (item.getRegistryName().getPath().equalsIgnoreCase(placementToolName)) {
-                    placementtool = item;
-                    return;
+            for (int i = 0; i < OSItems.placementtools.size(); i++) {
+                final Placementtool tool = OSItems.placementtools.get(i);
+                if (tool.getRegistryName().getPath().equalsIgnoreCase(placementToolName)) {
+                    placementtool = tool;
+                    break;
                 }
-            });
+            }
             if (placementtool == null)
                 throw new ContentPackException(
                         "There doesn't exists a placementtool with the name '" + placementToolName
@@ -56,16 +58,14 @@ public class SignalPropertiesBuilder {
         final List<HeightProperty> signalheights = new ArrayList<>();
         if (signalHeights != null) {
             signalHeights.forEach((property, height) -> {
-                if (info != null) {
-                    try {
-                        signalheights.add(
-                                new HeightProperty(LogicParser.predicate(property, info), height));
-                    } catch (final LogicalParserException e) {
-                        OpenSignalsMain.getLogger()
-                                .error("Something went wrong during the registry of a predicate in "
-                                        + info.signalName + "!\nWith statement:" + property);
-                        e.printStackTrace();
-                    }
+                try {
+                    signalheights
+                            .add(new HeightProperty(LogicParser.predicate(property, info), height));
+                } catch (final LogicalParserException e) {
+                    OpenSignalsMain.getLogger()
+                            .error("Something went wrong during the registry of a predicate in "
+                                    + info.signalName + "!\nWith statement:" + property);
+                    e.printStackTrace();
                 }
             });
         }
@@ -73,16 +73,14 @@ public class SignalPropertiesBuilder {
         final List<FloatProperty> renderheights = new ArrayList<>();
         if (renderHeights != null) {
             renderHeights.forEach((property, height) -> {
-                if (info != null) {
-                    try {
-                        renderheights.add(
-                                new FloatProperty(LogicParser.predicate(property, info), height));
-                    } catch (final LogicalParserException e) {
-                        OpenSignalsMain.getLogger()
-                                .error("Something went wrong during the registry of a predicate in "
-                                        + info.signalName + "!\nWith statement:" + property);
-                        e.printStackTrace();
-                    }
+                try {
+                    renderheights
+                            .add(new FloatProperty(LogicParser.predicate(property, info), height));
+                } catch (final LogicalParserException e) {
+                    OpenSignalsMain.getLogger()
+                            .error("Something went wrong during the registry of a predicate in "
+                                    + info.signalName + "!\nWith statement:" + property);
+                    e.printStackTrace();
                 }
             });
         }
@@ -125,6 +123,7 @@ public class SignalPropertiesBuilder {
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
                 ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
                 canLink, colors, ImmutableList.copyOf(renderheights),
-                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs));
+                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs),
+                defaultItemDamage);
     }
 }

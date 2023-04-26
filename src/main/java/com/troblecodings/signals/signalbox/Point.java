@@ -1,8 +1,8 @@
 package com.troblecodings.signals.signalbox;
 
-import java.nio.ByteBuffer;
-
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 public class Point implements INetworkSavable {
@@ -51,6 +51,10 @@ public class Point implements INetworkSavable {
         return point;
     }
 
+    public static Point of(final ReadBuffer buffer) {
+        return new Point(buffer.getByteAsInt(), buffer.getByteAsInt());
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (obj == null || !(obj instanceof Point))
@@ -83,14 +87,15 @@ public class Point implements INetworkSavable {
     }
 
     @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        this.x = buffer.get();
-        this.y = buffer.get();
+    public void readNetwork(final ReadBuffer buffer) {
+        this.x = buffer.getByteAsInt();
+        this.y = buffer.getByteAsInt();
+
     }
 
     @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        buffer.put((byte) x);
-        buffer.put((byte) y);
+    public void writeNetwork(final WriteBuffer buffer) {
+        buffer.putByte((byte) x);
+        buffer.putByte((byte) y);
     }
 }

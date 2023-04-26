@@ -46,12 +46,15 @@ public final class LogicParser {
         TRANSLATION_TABLE.put("speed", new MethodInfo(Integer.class, "speed",
                 objects -> PredicateHolder.speed((StringInteger) objects[0]), StringInteger.class));
 
+        TRANSLATION_TABLE.put("zs2value", new MethodInfo(String.class, "zs2value",
+                obj -> PredicateHolder.zs2Value((String) obj[0]), String.class));
+
         TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name,
                 new MethodInfo(Map.class, name, objects -> {
-                    final Predicate<ModelInfoWrapper> original = info.blockState.apply(objects);
+                    final Predicate original = info.blockState.apply(objects);
                     return (Predicate<Map>) inMap -> {
                         final Map<Class, Object> map = inMap;
-                        final ModelInfoWrapper obj = (ModelInfoWrapper) map.get(info.getSubtype());
+                        final Object obj = map.get(info.getSubtype());
                         if (obj == null)
                             throw new IllegalArgumentException(
                                     String.format("No data for type=%s was passed to function=%s!",

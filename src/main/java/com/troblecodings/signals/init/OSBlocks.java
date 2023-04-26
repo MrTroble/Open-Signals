@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
+import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.blocks.GhostBlock;
 import com.troblecodings.signals.blocks.Post;
 import com.troblecodings.signals.blocks.RedstoneIO;
@@ -31,12 +32,13 @@ public final class OSBlocks {
     private OSBlocks() {
     }
 
-    public static final BasicBlock HV_SIGNAL_CONTROLLER = new SignalController();
-    public static final BasicBlock POST = new Post();
-    public static final BasicBlock GHOST_BLOCK = new GhostBlock();
-    public static final BasicBlock SIGNAL_BOX = new SignalBox();
-    public static final BasicBlock REDSTONE_IN = new RedstoneInput();
-    public static final BasicBlock REDSTONE_OUT = new RedstoneIO();
+    public static final SignalController HV_SIGNAL_CONTROLLER = new SignalController();
+    public static final Post POST = new Post();
+    public static final GhostBlock GHOST_BLOCK = new GhostBlock();
+    public static final SignalBox SIGNAL_BOX = new SignalBox();
+    public static final RedstoneInput REDSTONE_IN = new RedstoneInput();
+    public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
+    public static final CombinedRedstoneInput COMBI_REDSTONE_INPUT = new CombinedRedstoneInput();
 
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 
@@ -68,6 +70,10 @@ public final class OSBlocks {
         block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
         BLOCKS_TO_REGISTER.add(block);
         if (block instanceof Signal) {
+            if (Signal.SIGNALS.containsKey(name)) {
+                throw new IllegalArgumentException(
+                        "A Signal with the name '" + name + "' alredy exists!");
+            }
             Signal.SIGNALS.put(name, (Signal) block);
         }
     }

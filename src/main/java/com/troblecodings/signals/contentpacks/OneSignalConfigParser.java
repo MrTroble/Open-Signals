@@ -15,22 +15,14 @@ import com.troblecodings.signals.properties.ConfigProperty;
 
 public class OneSignalConfigParser {
 
-    protected String currentSignal;
-    protected List<String> values;
+    private String currentSignal;
+    private List<String> values;
 
-    public String getCurrentSignal() {
-        return currentSignal;
-    }
+    public static final Map<Signal, List<ConfigProperty>> SHUNTINGCONFIGS = new HashMap<>();
 
-    public List<String> getValues() {
-        return values;
-    }
+    public static final Map<Signal, List<ConfigProperty>> RESETCONFIGS = new HashMap<>();
 
-    public static final transient Map<Signal, List<ConfigProperty>> SHUNTINGCONFIGS = new HashMap<>();
-
-    public static final transient Map<Signal, List<ConfigProperty>> RESETCONFIGS = new HashMap<>();
-
-    private static final transient Gson GSON = new Gson();
+    private static final Gson GSON = new Gson();
 
     public static void loadOneSignalConfigs() {
         loadShuntigConfigs();
@@ -43,7 +35,7 @@ public class OneSignalConfigParser {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalConfigParser.class);
 
-            final Signal signal = checkSignal(parser.getCurrentSignal(), files.getKey());
+            final Signal signal = checkSignal(parser.currentSignal, files.getKey());
             if (signal == null)
                 continue;
             if (SHUNTINGCONFIGS.containsKey(signal)) {
@@ -54,7 +46,7 @@ public class OneSignalConfigParser {
 
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
             final List<ConfigProperty> propertes = new ArrayList<>();
-            for (final String property : parser.getValues()) {
+            for (final String property : parser.values) {
                 final String[] value = property.split("\\.");
                 propertes
                         .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
@@ -69,7 +61,7 @@ public class OneSignalConfigParser {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalConfigParser.class);
 
-            final Signal signal = checkSignal(parser.getCurrentSignal(), files.getKey());
+            final Signal signal = checkSignal(parser.currentSignal, files.getKey());
             if (signal == null)
                 continue;
 
@@ -81,7 +73,7 @@ public class OneSignalConfigParser {
 
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
             final List<ConfigProperty> propertes = new ArrayList<>();
-            for (final String property : parser.getValues()) {
+            for (final String property : parser.values) {
                 final String[] value = property.split("\\.");
                 propertes
                         .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));

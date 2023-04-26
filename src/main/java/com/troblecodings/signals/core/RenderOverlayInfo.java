@@ -6,12 +6,12 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import net.minecraft.client.gui.Font;
 
 public class RenderOverlayInfo {
-    public PoseStack stack;
-    public double x;
-    public double y;
-    public double z;
+    public final PoseStack stack;
+    public final double x;
+    public final double y;
+    public final double z;
     public SignalTileEntity tileEntity;
-    public Font font;
+    public final Font font;
 
     public RenderOverlayInfo(final PoseStack stack, final double x, final double y, final double z,
             final Font font) {

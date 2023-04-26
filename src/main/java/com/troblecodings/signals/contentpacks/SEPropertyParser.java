@@ -13,13 +13,14 @@ import com.troblecodings.signals.parser.LogicParser;
 
 public class SEPropertyParser {
 
-    protected String name;
-    protected String enumClass;
-    protected Object defaultState;
-    protected String changeableStage;
-    protected boolean autoname = false;
-    protected String dependencies;
-    protected transient JsonEnum parent;
+    private String name;
+    private String enumClass;
+    private Object defaultState;
+    private String changeableStage;
+    private boolean autoname = false;
+    private String dependencies;
+    private int itemDamage = 1;
+    private transient JsonEnum parent;
 
     @SuppressWarnings("unchecked")
     public SEProperty createSEProperty(final FunctionParsingInfo info) {
@@ -46,7 +47,8 @@ public class SEPropertyParser {
         }
 
         if (autoname)
-            return new SEAutoNameProp(name, parent, (String) defaultState, stage, predicate);
-        return new SEProperty(name, parent, (String) defaultState, stage, predicate);
+            return new SEAutoNameProp(name, parent, (String) defaultState, stage, predicate,
+                    itemDamage);
+        return new SEProperty(name, parent, (String) defaultState, stage, predicate, itemDamage);
     }
 }

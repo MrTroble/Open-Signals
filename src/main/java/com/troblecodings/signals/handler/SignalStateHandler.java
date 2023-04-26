@@ -11,16 +11,21 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
+import com.troblecodings.signals.blocks.SignalBox;
+import com.troblecodings.signals.blocks.SignalController;
+import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
 import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
@@ -46,9 +51,14 @@ public final class SignalStateHandler implements INetworkSync {
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<ChunkAccess, List<SignalStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
     private static final Map<Level, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<SignalStateInfo, Integer> SIGNAL_COUNTER = new HashMap<>();
+    private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
     private static ExecutorService service;
+
+    private SignalStateHandler() {
+    }
 
     public static void init() {
         channelName = new ResourceLocation(OpenSignalsMain.MODID, "signalstatehandler");
@@ -56,7 +66,7 @@ public final class SignalStateHandler implements INetworkSync {
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new SignalStateHandler());
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
-        service = Executors.newFixedThreadPool(3);
+        service = Executors.newFixedThreadPool(4);
     }
 
     @SubscribeEvent
@@ -67,7 +77,7 @@ public final class SignalStateHandler implements INetworkSync {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        service = Executors.newFixedThreadPool(3);
+        service = Executors.newFixedThreadPool(4);
     }
 
     public static void add(final Object object) {
@@ -82,7 +92,41 @@ public final class SignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
         createToFile(info, states);
-        sendPropertiesToClient(info, states);
+        loadSignal(info);
+    }
+
+    public static void addListener(final SignalStateInfo info, final SignalStateListener listener) {
+        synchronized (ALL_LISTENERS) {
+            final List<SignalStateListener> listeners = ALL_LISTENERS.computeIfAbsent(info,
+                    _u -> new ArrayList<>());
+            listeners.add(listener);
+        }
+    }
+
+    public static void removeListener(final SignalStateInfo info,
+            final SignalStateListener listener) {
+        final List<SignalStateListener> listeners;
+        synchronized (ALL_LISTENERS) {
+            listeners = ALL_LISTENERS.get(info);
+        }
+        if (listeners == null)
+            return;
+        listeners.remove(listener);
+        if (listeners.isEmpty()) {
+            synchronized (ALL_LISTENERS) {
+                ALL_LISTENERS.remove(info);
+            }
+        }
+    }
+
+    private static void updateListeners(final SignalStateInfo info, final boolean removed) {
+        final List<SignalStateListener> listeners;
+        synchronized (ALL_LISTENERS) {
+            listeners = ALL_LISTENERS.get(info);
+        }
+        if (listeners == null)
+            return;
+        listeners.forEach(listener -> listener.update(info, removed));
     }
 
     private static void statesToBuffer(final Signal signal, final Map<SEProperty, String> states,
@@ -95,6 +139,8 @@ public final class SignalStateHandler implements INetworkSync {
 
     private static void createToFile(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
+        if (states == null)
+            return;
         final SignalStateFile file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
@@ -121,12 +167,17 @@ public final class SignalStateHandler implements INetworkSync {
         }
         synchronized (CURRENTLY_LOADED_STATES) {
             if (CURRENTLY_LOADED_STATES.containsKey(info)) {
-                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
+                final Map<SEProperty, String> oldStates = new HashMap<>(getStates(info));
+                oldStates.putAll(states);
+                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
                 sendPropertiesToClient(info, states);
+                updateListeners(info, false);
                 return;
             }
         }
         createToFile(info, states);
+        sendPropertiesToClient(info, states);
+        updateListeners(info, false);
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
@@ -170,10 +221,12 @@ public final class SignalStateHandler implements INetworkSync {
         SignalStatePos pos = file.find(stateInfo.pos);
         if (pos == null) {
             if (stateInfo.world.isClientSide) {
-                OpenSignalsMain.getLogger().warn("Position not found on client!");
+                OpenSignalsMain.getLogger()
+                        .warn("Position [" + stateInfo + "] not found on client!");
                 return map;
             } else {
-                OpenSignalsMain.getLogger().warn("Position not found in file, recovering!");
+                OpenSignalsMain.getLogger()
+                        .warn("Position [" + stateInfo + "] not found in file, recovering!");
                 pos = file.create(stateInfo.pos);
             }
         }
@@ -186,7 +239,8 @@ public final class SignalStateHandler implements INetworkSync {
             if (typeID <= 0)
                 continue;
             if (property.equals(Signal.CUSTOMNAME)) {
-                map.put(property, NameHandler.getName(stateInfo.pos));
+                map.put(property,
+                        NameHandler.getName(new NameStateInfo(stateInfo.world, stateInfo.pos)));
             }
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
@@ -203,7 +257,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
-                        new DebugSignalStateFile(Paths.get("ossignalfiles/"
+                        new SignalStateFile(Paths.get("osfiles/signalfiles/"
                                 + ((ServerLevel) world).getServer().getWorldData().getLevelName()
                                         .replace(":", "").replace("/", "").replace("\\", "")
                                 + "/" + world.dimension().location().toString().replace(":", ""))));
@@ -213,17 +267,14 @@ public final class SignalStateHandler implements INetworkSync {
             final List<SignalStateInfo> states = new ArrayList<>();
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
-                if (!(block instanceof Signal)) {
-                    return;
+                if (block instanceof Signal) {
+                    states.add(new SignalStateInfo(world, pos, (Signal) block));
+                } else if (block instanceof SignalBox) {
+                    SignalBoxHandler.loadSignals(new PosIdentifier(pos, world));
                 }
-                final SignalStateInfo stateInfo = new SignalStateInfo(world, pos);
-                final Map<SEProperty, String> map = readAndSerialize(stateInfo);
-                synchronized (CURRENTLY_LOADED_STATES) {
-                    CURRENTLY_LOADED_STATES.put(stateInfo, map);
-                }
-                states.add(stateInfo);
-                sendPropertiesToClient(stateInfo, map);
+
             });
+            loadSignals(states);
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 CURRENTLY_LOADED_CHUNKS.put(chunk, states);
             }
@@ -236,37 +287,42 @@ public final class SignalStateHandler implements INetworkSync {
         final Level level = (Level) chunk.getWorldForge();
         if (level.isClientSide())
             return;
-        SignalStateFile file;
-        synchronized (ALL_LEVEL_FILES) {
-            file = ALL_LEVEL_FILES.get(level);
-        }
         service.submit(() -> {
+            chunk.getBlockEntitiesPos().forEach(pos -> {
+                final Block block = chunk.getBlockState(pos).getBlock();
+                if (block instanceof SignalBox) {
+                    SignalBoxHandler.unloadSignals(new PosIdentifier(pos, level));
+                } else if (block instanceof SignalController) {
+                    ((SignalControllerTileEntity) level.getBlockEntity(pos)).unloadSignal();
+                }
+            });
             List<SignalStateInfo> states;
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 states = CURRENTLY_LOADED_CHUNKS.remove(chunk);
             }
-            states.forEach(stateInfo -> {
-                Map<SEProperty, String> properties;
-                synchronized (CURRENTLY_LOADED_STATES) {
-                    properties = CURRENTLY_LOADED_STATES.remove(stateInfo);
-                }
-                final SignalStatePos pos = file.find(stateInfo.pos);
-                final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
-                statesToBuffer(stateInfo.signal, properties, buffer.array());
-                file.write(pos, buffer);
-                unRenderClients(stateInfo);
-            });
+            unloadSignals(states);
         });
     }
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save save) {
+        if (save.getWorld().isClientSide())
+            return;
         service.execute(() -> {
             final Map<SignalStateInfo, Map<SEProperty, String>> maps;
             synchronized (CURRENTLY_LOADED_STATES) {
                 maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
             }
             maps.forEach(SignalStateHandler::createToFile);
+        });
+    }
+
+    @SubscribeEvent
+    public static void onWorldUnload(final WorldEvent.Unload unload) {
+        if (unload.getWorld().isClientSide())
+            return;
+        service.execute(() -> {
+            ALL_LEVEL_FILES.remove(unload.getWorld());
         });
     }
 
@@ -288,44 +344,46 @@ public final class SignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.remove(info);
         }
         service.execute(() -> {
-            // TODO remove from Files
+            SignalStateFile file;
+            synchronized (ALL_LEVEL_FILES) {
+                file = ALL_LEVEL_FILES.get(info.world);
+            }
+            file.deleteIndex(info.pos);
+            synchronized (SIGNAL_COUNTER) {
+                SIGNAL_COUNTER.remove(info);
+            }
+            sendRemoved(info);
+            updateListeners(info, true);
+            ALL_LISTENERS.remove(info);
         });
     }
 
-    private static void unRenderClients(final SignalStateInfo stateInfo) {
-        final ByteBuffer buffer = ByteBuffer.allocate(13);
-        buffer.putInt(stateInfo.pos.getX());
-        buffer.putInt(stateInfo.pos.getY());
-        buffer.putInt(stateInfo.pos.getZ());
-        buffer.put((byte) 255);
-        stateInfo.world.players().forEach(player -> {
-            if (checkInRange(player.blockPosition(), stateInfo.pos)) {
-                sendTo(player, buffer);
-            }
-        });
+    private static void sendRemoved(final SignalStateInfo info) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putBlockPos(info.pos);
+        buffer.putByte((byte) 255);
+        info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
     public static ByteBuffer packToByteBuffer(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties) {
-        final ByteBuffer buffer = ByteBuffer.allocate(13 + properties.size() * 2);
-        buffer.putInt(stateInfo.pos.getX());
-        buffer.putInt(stateInfo.pos.getY());
-        buffer.putInt(stateInfo.pos.getZ());
         if (properties.size() > 254) {
             throw new IllegalStateException("Too many SEProperties!");
         }
-        buffer.put((byte) properties.size());
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putBlockPos(stateInfo.pos);
+        buffer.putByte((byte) properties.size());
         properties.forEach((property, value) -> {
             if (property.equals(Signal.CUSTOMNAME)) {
-                buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
-                buffer.put((byte) (value.isEmpty() ? 0 : 1));
-                NameHandler.setName(stateInfo.world, stateInfo.pos, value);
+                buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
+                buffer.putByte((byte) (value.isEmpty() ? 0 : 1));
+                NameHandler.setName(new NameStateInfo(stateInfo.world, stateInfo.pos), value);
                 return;
             }
-            buffer.put((byte) stateInfo.signal.getIDFromProperty(property));
-            buffer.put((byte) property.getParent().getIDFromValue(value));
+            buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
+            buffer.putByte((byte) property.getParent().getIDFromValue(value));
         });
-        return buffer;
+        return buffer.build();
     }
 
     private static void sendPropertiesToClient(final SignalStateInfo stateInfo,
@@ -335,22 +393,67 @@ public final class SignalStateHandler implements INetworkSync {
         }
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         stateInfo.world.players().forEach(player -> {
-            if (checkInRange(player.blockPosition(), stateInfo.pos)) {
-                sendTo(player, buffer);
-            }
+            sendTo(player, buffer);
         });
     }
 
-    /**
-     * This is the distance in blocks in which signals get rendered
-     */
-    private static final int RENDER_DISTANCE = 512;
-
-    private static boolean checkInRange(final BlockPos playerPos, final BlockPos signalPos) {
-        return true;
+    public static void loadSignal(final SignalStateInfo info) {
+        loadSignals(ImmutableList.of(info));
     }
 
-    public static void sendTo(final Player player, final ByteBuffer buf) {
+    public static void loadSignals(final List<SignalStateInfo> signals) {
+        service.execute(() -> {
+            signals.forEach(info -> {
+                synchronized (SIGNAL_COUNTER) {
+                    Integer count = SIGNAL_COUNTER.get(info);
+                    if (count != null && count > 0) {
+                        SIGNAL_COUNTER.put(info, ++count);
+                        return;
+                    }
+                    SIGNAL_COUNTER.put(info, 1);
+                }
+                Map<SEProperty, String> properties;
+                synchronized (CURRENTLY_LOADED_STATES) {
+                    properties = CURRENTLY_LOADED_STATES.get(info);
+                }
+                if (properties == null) {
+                    properties = readAndSerialize(info);
+                    synchronized (CURRENTLY_LOADED_STATES) {
+                        CURRENTLY_LOADED_STATES.put(info, properties);
+                    }
+                }
+                sendPropertiesToClient(info, properties);
+            });
+        });
+    }
+
+    public static void unloadSignal(final SignalStateInfo info) {
+        unloadSignals(ImmutableList.of(info));
+    }
+
+    public static void unloadSignals(final List<SignalStateInfo> signals) {
+        service.execute(() -> {
+            if (signals == null)
+                return;
+            signals.forEach(info -> {
+                if (info.signal != null && info.pos != null && info.world != null) {
+                    synchronized (SIGNAL_COUNTER) {
+                        int count = SIGNAL_COUNTER.get(info);
+                        if (count > 1) {
+                            SIGNAL_COUNTER.put(info, --count);
+                            return;
+                        }
+                        SIGNAL_COUNTER.remove(info);
+                    }
+                    synchronized (CURRENTLY_LOADED_STATES) {
+                        createToFile(info, CURRENTLY_LOADED_STATES.remove(info));
+                    }
+                }
+            });
+        });
+    }
+
+    private static void sendTo(final Player player, final ByteBuffer buf) {
         final FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.copiedBuffer(buf.position(0)));
         if (player instanceof ServerPlayer) {
             final ServerPlayer server = (ServerPlayer) player;

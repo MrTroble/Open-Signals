@@ -451,7 +451,7 @@
         "zs/zs12": {
             "textures": [
                 {
-                    "blockstate": "hasandis(ZS12)"
+                    "blockstate": "(with(SEMATYPE.MAIN) || with(SEMATYPE.MAIN_SMALL)) && hasandis(ZS12)"
                 }
             ],
             "y": 2.125,

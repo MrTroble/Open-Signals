@@ -3,7 +3,9 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
@@ -29,9 +31,8 @@ public class SignalBox extends BasicBlock {
     @Override
     public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
             final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
-        if (!playerIn.getItemInHand(hand).getItem().equals(OSItems.LINKING_TOOL)) {
-            if (!worldIn.isClientSide)
-                return InteractionResult.SUCCESS;
+        if (!playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem()
+                .equals(OSItems.LINKING_TOOL)) {
             final BlockEntity entity = worldIn.getBlockEntity(pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {
@@ -56,4 +57,13 @@ public class SignalBox extends BasicBlock {
         return Optional.of("signalbox");
     }
 
+    @Override
+    public void playerWillDestroy(final Level world, final BlockPos pos, final BlockState state,
+            final Player player) {
+        if (!world.isClientSide) {
+            ((SignalBoxTileEntity) world.getBlockEntity(pos)).unlink();
+            SignalBoxHandler.removeSignalBox(new PosIdentifier(pos, world));
+        }
+        super.playerWillDestroy(world, pos, state, player);
+    }
 }

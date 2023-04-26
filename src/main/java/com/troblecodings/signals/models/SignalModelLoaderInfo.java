@@ -9,17 +9,17 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class SignalModelLoaderInfo {
-    public String name;
-    public Predicate<ModelInfoWrapper> state;
-    public float x;
-    public float y;
-    public float z;
-    public Map<String, String> retexture;
+
+    public final String name;
+    public final Predicate<ModelInfoWrapper> state;
+    public final float x;
+    public final float y;
+    public final float z;
+    public final Map<String, String> retexture;
     public UnbakedModel model;
 
     public SignalModelLoaderInfo(final String name, final Predicate<ModelInfoWrapper> state,
             final float x, final float y, final float z, final Map<String, String> retexture) {
-        super();
         this.name = name;
         this.state = state;
         this.x = x;
@@ -32,5 +32,4 @@ public class SignalModelLoaderInfo {
         this.model = model;
         return this;
     }
-
 }

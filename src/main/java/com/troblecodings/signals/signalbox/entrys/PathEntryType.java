@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox.entrys;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,14 +14,18 @@ import net.minecraft.core.BlockPos;
 public final class PathEntryType<T> {
 
     private static final Map<String, PathEntryType<?>> NAME_TO_TYPE = new HashMap<>();
+    public static final List<PathEntryType<?>> ALL_ENTRIES = new ArrayList<>();
 
     private final Class<? extends IPathEntry<T>> entryClass;
     private final String name;
+    private final int entryID;
 
     private PathEntryType(final Class<? extends IPathEntry<T>> entryClass, final String name) {
         this.entryClass = entryClass;
         this.name = name;
+        this.entryID = ALL_ENTRIES.size();
         NAME_TO_TYPE.put(name, this);
+        ALL_ENTRIES.add(this);
     }
 
     public static final PathEntryType<BlockPos> SIGNAL = new PathEntryType<>(BlockposEntry.class,
@@ -33,6 +38,8 @@ public final class PathEntryType<T> {
             "output");
     public static final PathEntryType<Integer> SPEED = new PathEntryType<>(IntegerEntry.class,
             "speed");
+
+    public static final PathEntryType<Byte> ZS2 = new PathEntryType<>(ByteEntry.class, "zs2");
 
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 
@@ -86,6 +93,10 @@ public final class PathEntryType<T> {
 
     public static List<PathEntryType<?>> typeList() {
         return ImmutableList.copyOf(NAME_TO_TYPE.values());
+    }
+
+    public int getID() {
+        return entryID;
     }
 
     @Override

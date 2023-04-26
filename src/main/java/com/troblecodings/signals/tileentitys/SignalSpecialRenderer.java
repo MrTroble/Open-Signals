@@ -22,5 +22,4 @@ public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnti
             return;
         tile.renderOverlay(new RenderOverlayInfo(stack, 0, 0, 0, context.getFont()));
     }
-
 }

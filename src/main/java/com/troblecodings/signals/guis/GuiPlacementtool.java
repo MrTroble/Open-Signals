@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.function.IntConsumer;
 
@@ -22,7 +21,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnum;
-import com.troblecodings.signals.core.PropertyPacket;
+import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
@@ -34,7 +33,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiPlacementtool extends GuiBase implements PropertyPacket {
+public class GuiPlacementtool extends GuiBase {
 
     public static final int GUI_PLACEMENTTOOL = 0;
 
@@ -74,7 +73,7 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
                 input -> {
                     currentSelectedBlock = tool.getObjFromID(input);
                     this.list.clearChildren();
-                    if (container.getSignalID() != input) {
+                    if (container.signalID != input) {
                         sendSignalId(input);
                     }
                 });
@@ -147,7 +146,7 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
 
     @Override
     public void updateFromContainer() {
-        enumerable.setIndex(container.getSignalID());
+        enumerable.setIndex(container.signalID);
         final List<SEProperty> originalProperties = currentSelectedBlock.getProperties();
         originalProperties.forEach(property -> {
             of(property,
@@ -166,7 +165,10 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
 
     private void applyPropertyChanges(final int propertyId, final int valueId) {
         if (loaded) {
-            sendPropertyToServer(player, propertyId, valueId);
+            final WriteBuffer buffer = new WriteBuffer();
+            buffer.putByte((byte) propertyId);
+            buffer.putByte((byte) valueId);
+            OpenSignalsMain.network.sendTo(player, buffer.build());
         }
         applyModelChanges();
     }
@@ -174,13 +176,14 @@ public class GuiPlacementtool extends GuiBase implements PropertyPacket {
     private void sendSignalId(final int id) {
         if (!loaded)
             return;
-        final ByteBuffer buffer = ByteBuffer.allocate(5);
-        buffer.put((byte) 255);
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) 255);
         buffer.putInt(id);
-        OpenSignalsMain.network.sendTo(player, buffer);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
     public void applyModelChanges() {
+        @SuppressWarnings("unused")
         final BlockState ebs = currentSelectedBlock.defaultBlockState();
         // Just until the erros are fixed
         return;

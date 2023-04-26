@@ -33,6 +33,10 @@ item.conductorhead.name=Conductor Cap
 item.conductorchestplate.name=Conductor Jacket
 item.conductorpants.name=Conductor Pants
 item.conductorshoes.name=Conductor Shoes
+item.signalplate.name=Signalplate
+item.signalshield.name=Signalshield
+item.lamps.name=Lamps
+item.electricparts.name=Electric Parts
 
 #Blocks
 tile.hvsignalcontroller.name=Signal-Controller
@@ -56,6 +60,7 @@ tile.wnsignal.name=Wn Signal
 tile.stationname.name=Stationname
 tile.redstonein.name=Redstone Input
 tile.redstoneout.name=Redstone Output
+tile.combiredstoneinput.name=Combined Redstone Input
 tile.semaphoresignal.name=Semaphore Signal
 tile.shmech.name=Shunting Signal
 tile.andreascross.name=Andreascross
@@ -78,6 +83,7 @@ lt.notset=§cNo or wrong linked object. Please click on a valid object first.§r
 
 #Placementtool
 pt.itemnotset=Please set the tool before (sneak + right click on a block)
+pt.blockinway=You can't place the signal because there is a block in the way.
 
 #Signal Names
 property.signal.name=Signal
@@ -399,6 +405,10 @@ property.value.RED_YELLOW=Rot-Gelb
 btn.settings=Settings
 btn.edit=Editor
 btn.main=Use
+btn.yes=Yes
+btn.no=No
+sb.allreset=All pathways will be reset!
+sb.editmode=Change to Edit Mode?
 property.signalposition.name=Signalposition
 property.signalposition.desc=Select here the world coordinates of the connected signal.
 property.status=Status

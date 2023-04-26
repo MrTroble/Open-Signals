@@ -15,41 +15,25 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 
 public class SignalSystemParser {
 
-    protected SignalPropertiesBuilder systemProperties;
-    protected List<SEPropertyParser> seProperties;
+    private SignalPropertiesBuilder systemProperties;
+    private List<SEPropertyParser> seProperties;
 
-    private static transient final Gson GSON = new Gson();
+    private static final Gson GSON = new Gson();
 
-    public List<SEPropertyParser> getSEProperties() {
-        return seProperties;
-    }
-
-    public static Map<String, SignalSystemParser> getSignalSystems(final String directory) {
-
+    public static Map<String, SignalSystemParser> getAllSignals() {
         final List<Entry<String, String>> systems = OpenSignalsMain.contentPacks
-                .getFiles(directory);
-
+                .getFiles("signalsystems");
         final Map<String, SignalSystemParser> properties = new HashMap<>();
-
-        if (systems.isEmpty()) {
-            OpenSignalsMain.getLogger().warn("No signalsystems found at '" + directory + "'!");
-            return properties;
-        }
-
         systems.forEach(entry -> {
             properties.put(entry.getKey(),
                     GSON.fromJson(entry.getValue(), SignalSystemParser.class));
         });
-
         return properties;
     }
 
     public Signal createSignalSystem(final String fileName) {
-
         final String name = fileName.replace(".json", "").replace("_", "").toLowerCase().trim();
-
         final List<SEProperty> properties = new ArrayList<>();
-
         final FunctionParsingInfo info = new FunctionParsingInfo(name, properties);
         try {
             seProperties.forEach(prop -> {
@@ -71,7 +55,6 @@ public class SignalSystemParser {
         Signal.nextConsumer = list -> {
             list.addAll(properties);
         };
-
         return new Signal(systemProperties.build(info));
     }
 }

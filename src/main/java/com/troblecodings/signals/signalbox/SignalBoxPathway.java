@@ -1,6 +1,5 @@
 package com.troblecodings.signals.signalbox;
 
-import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -10,6 +9,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -20,18 +20,25 @@ import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.RedstoneIO;
+import com.troblecodings.signals.core.JsonEnumHolder;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
-import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
+import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.state.BlockState;
 
-public class SignalBoxPathway implements INetworkSavable {
+public class SignalBoxPathway {
 
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
     private final Map<BlockPos, SignalBoxNode> mapOfBlockingPositions = new HashMap<>();
@@ -40,15 +47,22 @@ public class SignalBoxPathway implements INetworkSavable {
     private Point firstPoint = new Point();
     private Point lastPoint = new Point();
     private int speed = -1;
+    private String zs2Value = "";
     private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
     private Optional<BlockPos> lastSignal = Optional.empty();
     private ImmutableList<BlockPos> distantSignalPositions = ImmutableList.of();
-    private final WorldOperations loadOps = new WorldOperations();
     private Map<Point, SignalBoxNode> modeGrid = null;
     private boolean emptyOrBroken = false;
+    private Level world;
+    private BlockPos tilePos;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
+    }
+
+    public void setWorldAndPos(final Level world, final BlockPos tilePos) {
+        this.world = world;
+        this.tilePos = tilePos;
     }
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid,
@@ -65,6 +79,7 @@ public class SignalBoxPathway implements INetworkSavable {
 
     private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
+        final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final Builder<BlockPos> distantPosBuilder = ImmutableList.builder();
         foreachEntry((optionEntry, node) -> {
             optionEntry.getEntry(PathEntryType.SPEED)
@@ -73,6 +88,7 @@ public class SignalBoxPathway implements INetworkSavable {
                     .ifPresent(position -> mapOfBlockingPositions.put(position, node));
             optionEntry.getEntry(PathEntryType.RESETING)
                     .ifPresent(position -> mapOfResetPositions.put(position, node));
+            optionEntry.getEntry(PathEntryType.ZS2).ifPresent(value -> zs2Value.set(value));
         });
         foreachPath((path, node) -> {
             final Rotation rotation = SignalBoxUtil
@@ -101,6 +117,7 @@ public class SignalBoxPathway implements INetworkSavable {
             this.signalPositions = Optional.empty();
         }
         this.speed = atomic.get();
+        this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
     }
 
     private BlockPos makeFromNext(final PathType type, final SignalBoxNode first,
@@ -119,7 +136,6 @@ public class SignalBoxPathway implements INetworkSavable {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
 
-    @Override
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
             final NBTWrapper entry = new NBTWrapper();
@@ -129,7 +145,6 @@ public class SignalBoxPathway implements INetworkSavable {
         tag.putString(PATH_TYPE, this.type.name());
     }
 
-    @Override
     public void read(final NBTWrapper tag) {
         final Builder<SignalBoxNode> nodeBuilder = ImmutableList.builder();
         tag.getList(LIST_OF_NODES).forEach(nodeNBT -> {
@@ -137,7 +152,8 @@ public class SignalBoxPathway implements INetworkSavable {
             point.read(nodeNBT);
             final SignalBoxNode node = modeGrid.get(point);
             if (node == null) {
-                OpenSignalsMain.log.error("Detecting broken pathway at {}!", point.toString());
+                OpenSignalsMain.getLogger().error("Detecting broken pathway at {}!",
+                        point.toString());
                 this.emptyOrBroken = true;
                 return;
             }
@@ -146,7 +162,7 @@ public class SignalBoxPathway implements INetworkSavable {
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         if (this.listOfNodes.size() < 2) {
-            OpenSignalsMain.log.error("Detecting pathway with only 2 elements!");
+            OpenSignalsMain.getLogger().error("Detecting pathway with only 2 elements!");
             this.emptyOrBroken = true;
             return;
         }
@@ -183,8 +199,9 @@ public class SignalBoxPathway implements INetworkSavable {
 
     public void setPathStatus(final EnumPathUsage status, final @Nullable Point point) {
         foreachEntry(option -> {
-            option.getEntry(PathEntryType.OUTPUT)
-                    .ifPresent(pos -> loadOps.setPower(pos, !status.equals(EnumPathUsage.FREE)));
+            option.getEntry(PathEntryType.OUTPUT).ifPresent(
+                    pos -> SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, world),
+                            !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
     }
@@ -193,16 +210,32 @@ public class SignalBoxPathway implements INetworkSavable {
         setPathStatus(status, null);
     }
 
-    private void configUpdate(final ConfigInfo info) {
-        info.type = this.type;
-    }
-
     public void updatePathwaySignals() {
+        if (world == null)
+            return;
         this.signalPositions.ifPresent(entry -> {
-            loadOps.loadAndConfig(speed, entry.getKey(), entry.getValue(), this::configUpdate);
+            final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(),
+                    SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()));
+            final SignalStateInfo nextInfo = entry.getValue() != null
+                    ? new SignalStateInfo(world, entry.getValue(),
+                            SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+                                    entry.getValue()))
+                    : null;
+            final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed, zs2Value, type);
+            SignalConfig.change(info);
         });
-        distantSignalPositions.forEach(position -> loadOps.loadAndConfig(speed, position,
-                lastSignal.orElse(null), this::configUpdate));
+        distantSignalPositions.forEach(position -> {
+            final SignalStateInfo nextInfo = lastSignal.isPresent()
+                    ? new SignalStateInfo(world, lastSignal.get(),
+                            SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+                                    lastSignal.get()))
+                    : null;
+            final ConfigInfo info = new ConfigInfo(
+                    new SignalStateInfo(world, position, SignalBoxHandler
+                            .getSignal(new PosIdentifier(tilePos, world), position)),
+                    nextInfo, speed, zs2Value, type);
+            SignalConfig.change(info);
+        });
     }
 
     public void resetPathway() {
@@ -210,11 +243,15 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     private void resetFirstSignal() {
-        this.signalPositions.ifPresent(entry -> loadOps.loadAndReset(entry.getKey()));
+        this.signalPositions.ifPresent(entry -> SignalConfig.reset(new SignalStateInfo(world,
+                entry.getKey(),
+                SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()))));
     }
 
     private void resetOther() {
-        distantSignalPositions.forEach(position -> loadOps.loadAndReset(position));
+        distantSignalPositions
+                .forEach(position -> SignalConfig.reset(new SignalStateInfo(world, position,
+                        SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), position))));
     }
 
     public void resetPathway(final @Nullable Point point) {
@@ -228,8 +265,17 @@ public class SignalBoxPathway implements INetworkSavable {
     }
 
     public void compact(final Point point) {
-        foreachEntry(entry -> entry.getEntry(PathEntryType.SIGNAL).ifPresent(loadOps::loadAndReset),
-                point);
+        foreachPath((path, node) -> {
+            final Rotation rotation = SignalBoxUtil
+                    .getRotationFromDelta(node.getPoint().delta(path.point1));
+            for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
+                node.getOption(new ModeSet(mode, rotation)).ifPresent(option -> option
+                        .getEntry(PathEntryType.SIGNAL)
+                        .ifPresent(position -> SignalConfig
+                                .reset(new SignalStateInfo(world, position, SignalBoxHandler
+                                        .getSignal(new PosIdentifier(tilePos, world), position)))));
+            }
+        }, point);
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
         this.initalize();
@@ -243,7 +289,7 @@ public class SignalBoxPathway implements INetworkSavable {
         final AtomicBoolean atomic = new AtomicBoolean(false);
         foreachEntry((option, cNode) -> {
             option.getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
-                if (loadOps.isPowered(pos))
+                if (isPowerd(pos))
                     atomic.set(true);
             });
         }, point);
@@ -253,12 +299,27 @@ public class SignalBoxPathway implements INetworkSavable {
         return Optional.of(point);
     }
 
+    private boolean isPowerd(final BlockPos pos) {
+        final BlockState state = world.getBlockState(pos);
+        if (state == null || !(state.getBlock() instanceof RedstoneIO))
+            return false;
+        return state.getValue(RedstoneIO.POWER);
+    }
+
     public boolean tryBlock(final BlockPos position) {
-        if (!this.mapOfBlockingPositions.containsKey(position))
+        if (!mapOfBlockingPositions.containsKey(position))
             return false;
         resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
         return true;
+    }
+
+    public void deactivateAllOutputsOnPathway() {
+        foreachPath((_u, node) -> {
+            final List<BlockPos> outputs = node.clearAllManuellOutputs();
+            outputs.forEach(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(new PosIdentifier(pos, world), false));
+        }, null);
     }
 
     /**
@@ -313,17 +374,4 @@ public class SignalBoxPathway implements INetworkSavable {
     public boolean isEmptyOrBroken() {
         return emptyOrBroken;
     }
-
-    @Override
-    public void readNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void writeNetwork(final ByteBuffer buffer) {
-        // TODO Auto-generated method stub
-
-    }
-
 }

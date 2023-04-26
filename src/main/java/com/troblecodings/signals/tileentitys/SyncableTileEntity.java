@@ -44,7 +44,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     public void syncClient(final Level world, final BlockPos pos) {
-        // TODO Client notification
+        world.setBlockAndUpdate(pos, getBlockState());
     }
 
     public boolean add(final UIClientSync sync) {
@@ -55,8 +55,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
         return this.clientSyncs.removeIf(s -> s.getPlayer().equals(sync.getPlayer()));
     }
 
-    public void sendToAll(final NBTWrapper compound) {
-        // TODO
+    public UIClientSync get(final int id) {
+        return clientSyncs.get(id);
     }
-
 }

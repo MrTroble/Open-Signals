@@ -68,5 +68,4 @@ public class SignalBakedModel implements IDynamicBakedModel {
         }
         return quadBuilder;
     }
-
 }

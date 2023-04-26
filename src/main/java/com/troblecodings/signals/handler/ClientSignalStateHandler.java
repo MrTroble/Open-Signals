@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -17,40 +19,44 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
-public class ClientSignalsStateHandler implements INetworkSync {
+public class ClientSignalStateHandler implements INetworkSync {
 
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
     private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
 
-    public static final Map<SEProperty, String> getClientStates(final SignalStateInfo info) {
-        return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
+    public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
+        synchronized (CURRENTLY_LOADED_STATES) {
+            return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
+        }
     }
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
-        final BlockPos signalPos = new BlockPos(buf.getInt(), buf.getInt(), buf.getInt());
-        final int propertiesSize = Byte.toUnsignedInt(buf.get());
+        final ReadBuffer buffer = new ReadBuffer(buf);
+        final Minecraft mc = Minecraft.getInstance();
+        final Level level = mc.level;
+        final BlockPos signalPos = buffer.getBlockPos();
+        final int propertiesSize = buffer.getByteAsInt();
         if (propertiesSize == 255) {
-            // TODO inform client to unrender
+            setRemoved(signalPos);
             return;
         }
         final int[] propertyIDs = new int[propertiesSize];
         final int[] valueIDs = new int[propertiesSize];
         for (int i = 0; i < propertiesSize; i++) {
-            propertyIDs[i] = Byte.toUnsignedInt(buf.get());
-            valueIDs[i] = Byte.toUnsignedInt(buf.get());
+            propertyIDs[i] = buffer.getByteAsInt();
+            valueIDs[i] = buffer.getByteAsInt();
         }
         SERVICE.execute(() -> {
-            final Minecraft mc = Minecraft.getInstance();
-            final Level level = mc.level;
             if (level == null)
                 return;
             BlockEntity entity;
             while ((entity = level.getBlockEntity(signalPos)) == null)
                 continue;
-            final SignalStateInfo stateInfo = new SignalStateInfo(level, signalPos);
-            final List<SEProperty> signalProperties = stateInfo.signal.getProperties();
+            final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);
+            final List<SEProperty> signalProperties = ((SignalTileEntity) entity).getSignal()
+                    .getProperties();
             synchronized (CURRENTLY_LOADED_STATES) {
                 final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
                         .computeIfAbsent(stateInfo, _u -> new HashMap<>());
@@ -59,10 +65,18 @@ public class ClientSignalsStateHandler implements INetworkSync {
                     final String value = property.getObjFromID(valueIDs[i]);
                     properties.put(property, value);
                 }
+                CURRENTLY_LOADED_STATES.put(stateInfo, properties);
             }
             entity.requestModelDataUpdate();
             mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
         });
+    }
+
+    private static void setRemoved(final BlockPos pos) {
+        final Minecraft mc = Minecraft.getInstance();
+        synchronized (CURRENTLY_LOADED_STATES) {
+            CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.level, pos));
+        }
     }
 
     @SubscribeEvent
@@ -70,5 +84,4 @@ public class ClientSignalsStateHandler implements INetworkSync {
         deserializeClient(event.getPayload().nioBuffer());
         event.getSource().get().setPacketHandled(true);
     }
-
 }

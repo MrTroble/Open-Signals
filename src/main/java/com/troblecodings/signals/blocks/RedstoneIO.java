@@ -3,7 +3,11 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
+import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
@@ -14,6 +18,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
@@ -73,5 +78,14 @@ public class RedstoneIO extends BasicBlock {
     @Override
     public Optional<String> getSupplierWrapperName() {
         return Optional.of("redstoneio");
+    }
+
+    @Override
+    public void destroy(final LevelAccessor acess, final BlockPos pos, final BlockState state) {
+        super.destroy(acess, pos, state);
+        if (!acess.isClientSide()) {
+            NameHandler.setRemoved(new NameStateInfo((Level) acess, pos));
+            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (Level) acess));
+        }
     }
 }

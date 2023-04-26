@@ -1,6 +1,5 @@
 package com.troblecodings.signals;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,19 +26,18 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
     private final ChangeableStage stage;
     private final Predicate<Map<SEProperty, String>> deps;
     private final List<String> allowedValues;
+    private final int itemDamage;
 
     public SEProperty(final String name, final JsonEnum parent, final String defaultValue,
-            final ChangeableStage stage, final Predicate<Map<SEProperty, String>> deps) {
+            final ChangeableStage stage, final Predicate<Map<SEProperty, String>> deps,
+            final int itemDamage) {
         this.name = name;
         this.parent = parent;
         this.defaultValue = defaultValue;
         this.stage = stage;
         this.deps = deps;
-        if (parent.getAllowedValues() == null) {
-            this.allowedValues = new ArrayList<>();
-        } else {
-            this.allowedValues = ImmutableList.copyOf(parent.getAllowedValues());
-        }
+        this.allowedValues = ImmutableList.copyOf(parent.getAllowedValues());
+        this.itemDamage = itemDamage;
     }
 
     public Object getWrapper(final Object object) {
@@ -49,6 +47,10 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
     @Override
     public String getName() {
         return name;
+    }
+
+    public int getItemDamage() {
+        return itemDamage;
     }
 
     public boolean isValid(final String value) {
@@ -67,9 +69,9 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
         return Optional.empty();
     }
 
-    public NBTWrapper writeToNBT(final NBTWrapper comp, final Object value) {
-        if (value != null && isValid((String) value))
-            comp.putInteger(getName(), this.allowedValues.indexOf(value));
+    public NBTWrapper writeToNBT(final NBTWrapper comp, final String value) {
+        if (value != null && isValid(value))
+            comp.putInteger(getName(), parent.getIDFromValue(value));
         return comp;
     }
 
@@ -135,8 +137,9 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
     public static class SEAutoNameProp extends SEProperty {
 
         public SEAutoNameProp(final String name, final JsonEnum parent, final String defaultValue,
-                final ChangeableStage stage, final Predicate<Map<SEProperty, String>> deps) {
-            super(name, parent, defaultValue, stage, deps);
+                final ChangeableStage stage, final Predicate<Map<SEProperty, String>> deps,
+                final int itemDamage) {
+            super(name, parent, defaultValue, stage, deps, itemDamage);
         }
 
         @OnlyIn(Dist.CLIENT)

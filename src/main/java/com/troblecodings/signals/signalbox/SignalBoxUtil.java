@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -23,21 +22,6 @@ public final class SignalBoxUtil {
     public static final int USED_COLOR = 0xFFFF0000;
 
     private SignalBoxUtil() {
-    }
-
-    public static final String REQUEST_WAY = "requestWay";
-    public static final String RESET_WAY = "resetWay";
-    public static final String POINT0 = "P";
-    public static final String POINT1 = "P1";
-    public static final String POINT2 = "P2";
-
-    public static Point fromNBT(final NBTWrapper comp, final String name) {
-        return new Point(comp.getInteger("x" + name), comp.getInteger("y" + name));
-    }
-
-    public static void toNBT(final NBTWrapper comp, final String name, final Point point) {
-        comp.putInteger("x" + name, point.getX());
-        comp.putInteger("y" + name, point.getY());
     }
 
     private static double calculateHeuristic(final Point p1, final Point p2) {
@@ -56,14 +40,6 @@ public final class SignalBoxUtil {
         } else {
             return Rotation.CLOCKWISE_90;
         }
-    }
-
-    public static Point getOffset(final Rotation rotation, final Point point) {
-        final int x = Rotation.CLOCKWISE_180.equals(rotation) ? -1
-                : (Rotation.NONE.equals(rotation) ? 1 : 0);
-        final int y = Rotation.COUNTERCLOCKWISE_90.equals(rotation) ? -1
-                : (Rotation.CLOCKWISE_90.equals(rotation) ? 1 : 0);
-        return new Point(x + point.getX(), y + point.getY());
     }
 
     public static class ConnectionChecker {
@@ -156,5 +132,4 @@ public final class SignalBoxUtil {
         }
         return Optional.empty();
     }
-
 }

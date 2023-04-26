@@ -5,12 +5,14 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 
 import com.google.gson.Gson;
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.linkableapi.Linkingtool;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.ItemArmorTemplate;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.items.ToolParser;
+import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -31,8 +33,13 @@ public final class OSItems {
     public static final Linkingtool LINKING_TOOL = new Linkingtool(OSTabs.TAB, (world, pos) -> {
         final BlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();
-        return block == OSBlocks.REDSTONE_IN || block == OSBlocks.REDSTONE_OUT
-                || (block instanceof Signal && ((Signal) block).canBeLinked());
+        final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
+                || block == OSBlocks.REDSTONE_OUT || block == OSBlocks.COMBI_REDSTONE_INPUT;
+        return isRedstoneBlock || (block instanceof Signal && ((Signal) block).canBeLinked());
+    }, _u -> true, (level, pos, tag) -> {
+        final BlockState state = level.getBlockState(pos);
+        new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
+                state.getBlock().getRegistryName().getPath());
     });
     public static final Item CONDUCTOR_TROWEL_GREEN = new Item(
             new Properties().tab(CreativeModeTab.TAB_COMBAT));
@@ -82,6 +89,13 @@ public final class OSItems {
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.LEGS);
     public static final ItemArmorTemplate CONDUCTOR_SHOES = new ItemArmorTemplate(
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.FEET);
+    public static final Item SIGNAL_PLATE = new Item(
+            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+    public static final Item SIGNAL_SHIELD = new Item(
+            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+    public static final Item LAMPS = new Item(new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+    public static final Item ELECTRIC_PARTS = new Item(
+            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 

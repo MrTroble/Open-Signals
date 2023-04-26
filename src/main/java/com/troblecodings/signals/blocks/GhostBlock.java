@@ -4,6 +4,8 @@ import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -11,6 +13,7 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -30,8 +33,8 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final BlockGetter getter,
-            final BlockPos pos, final CollisionContext context) {
+    public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
+            final CollisionContext context) {
         return Shapes.block();
     }
 
@@ -65,6 +68,12 @@ public class GhostBlock extends BasicBlock {
             CustomModelLoader.INSTANCE.prepare();
         }
         return super.getStateDefinition();
+    }
+
+    @Override
+    public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
+            final BlockGetter level, final BlockPos pos, final Player player) {
+        return ItemStack.EMPTY;
     }
 
 }
