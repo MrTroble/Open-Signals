@@ -22,7 +22,6 @@ import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.WriteBuffer;
-import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import io.netty.buffer.Unpooled;
@@ -258,7 +257,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
-                        new DebugSignalStateFile(Paths.get("osfiles/signalfiles/"
+                        new SignalStateFile(Paths.get("osfiles/signalfiles/"
                                 + ((ServerLevel) world).getServer().getWorldData().getLevelName()
                                         .replace(":", "").replace("/", "").replace("\\", "")
                                 + "/" + world.dimension().location().toString().replace(":", ""))));

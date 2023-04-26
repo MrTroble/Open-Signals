@@ -77,7 +77,7 @@ public class OpenSignalsMain {
 
     @SubscribeEvent
     public void preInit(final FMLConstructModEvent event) {
-        debug = true;
+        debug = false;
         log = LoggerContext.getContext().getLogger(MODID);
         final IModInfo modInfo = ModLoadingContext.get().getActiveContainer().getModInfo();
         file = modInfo.getOwningFile().getFile();
