@@ -36,15 +36,15 @@ import com.troblecodings.signals.enums.SignalControllerNetwork;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.models.SignalCustomModel;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.SeparatePerspectiveModel.BakedModel;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 @OnlyIn(Dist.CLIENT)
@@ -55,7 +55,7 @@ public class GuiSignalController extends GuiBase {
     private boolean previewMode = false;
     private final List<UIPropertyEnumHolder> holders = new ArrayList<>();
     private boolean loaded = false;
-    private final Player player;
+    private final PlayerEntity player;
     private EnumMode currentMode;
     private int currentProfile = 0;
 

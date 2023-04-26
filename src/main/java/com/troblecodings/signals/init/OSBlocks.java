@@ -17,11 +17,12 @@ import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.SignalLoader;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.block.Block;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.Item.Properties;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -87,11 +88,10 @@ public final class OSBlocks {
     }
 
     @SubscribeEvent
-    public static void registerBlockEntitys(
-            final RegistryEvent.Register<BlockEntityType<?>> event) {
+    public static void registerBlockEntitys(final RegistryEvent.Register<TileEntityType<?>> event) {
         if (POST.getRegistryName() == null)
             OSBlocks.init();
-        final IForgeRegistry<BlockEntityType<?>> registry = event.getRegistry();
+        final IForgeRegistry<TileEntityType<?>> registry = event.getRegistry();
         BasicBlock.BLOCK_ENTITYS.values().forEach(registry::register);
     }
 

@@ -8,9 +8,9 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.core.ReadBuffer;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
+import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientNameHandler implements INetworkSync {
 

@@ -33,10 +33,10 @@ import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Rotation;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class SignalBoxPathway {
 
@@ -53,14 +53,14 @@ public class SignalBoxPathway {
     private ImmutableList<BlockPos> distantSignalPositions = ImmutableList.of();
     private Map<Point, SignalBoxNode> modeGrid = null;
     private boolean emptyOrBroken = false;
-    private Level world;
+    private World world;
     private BlockPos tilePos;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
     }
 
-    public void setWorldAndPos(final Level world, final BlockPos tilePos) {
+    public void setWorldAndPos(final World world, final BlockPos tilePos) {
         this.world = world;
         this.tilePos = tilePos;
     }

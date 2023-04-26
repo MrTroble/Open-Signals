@@ -30,15 +30,18 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.block.BlockState;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.Level;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 public final class SignalBoxHandler {
 
@@ -268,7 +271,7 @@ public final class SignalBoxHandler {
     private static boolean tryDirectLink(final PosIdentifier identifier, final BlockPos posToLink) {
         if (identifier.world.isClientSide)
             return false;
-        final BlockEntity entity = identifier.world.getBlockEntity(posToLink);
+        final TileEntity entity = identifier.world.getBlockEntity(posToLink);
         if (entity != null && entity instanceof BasicBlockEntity) {
             ((RedstoneIOTileEntity) entity).link(identifier.pos);
             return true;
@@ -280,7 +283,7 @@ public final class SignalBoxHandler {
             final BlockPos posToUnlink) {
         if (identifier.world.isClientSide)
             return false;
-        final BlockEntity entity = identifier.world.getBlockEntity(posToUnlink);
+        final TileEntity entity = identifier.world.getBlockEntity(posToUnlink);
         if (entity != null && entity instanceof BasicBlockEntity) {
             ((RedstoneIOTileEntity) entity).unlink(identifier.pos);
             return true;
@@ -368,19 +371,19 @@ public final class SignalBoxHandler {
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
-        final Level world = (Level) event.getWorld();
+        final World world = (World) event.getWorld();
         if (world.isClientSide)
             return;
         service.execute(() -> {
             final NBTWrapper wrapper = new NBTWrapper();
             final List<NBTWrapper> wrapperList = new ArrayList<>();
-            final String levelName = (((ServerLevel) world).getServer().getWorldData()
+            final String levelName = (((ServerWorld) world).getServer().getWorldData()
                     .getLevelName() + "_"
                     + world.dimension().location().toString().replace(":", "_"));
             synchronized (POS_UPDATES) {
                 POS_UPDATES.forEach((pos, update) -> {
                     if (!levelName.equals(
-                            ((ServerLevel) world).getServer().getWorldData().getLevelName() + "_"
+                            ((ServerWorld) world).getServer().getWorldData().getLevelName() + "_"
                                     + world.dimension().location().toString().replace(":", "_")))
                         return;
                     final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
@@ -393,7 +396,7 @@ public final class SignalBoxHandler {
             synchronized (OUTPUT_UPDATES) {
                 OUTPUT_UPDATES.forEach((pos, state) -> {
                     if (!levelName.equals(
-                            ((ServerLevel) world).getServer().getWorldData().getLevelName() + "_"
+                            ((ServerWorld) world).getServer().getWorldData().getLevelName() + "_"
                                     + world.dimension().location().toString().replace(":", "_")))
                         return;
                     final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
@@ -421,14 +424,14 @@ public final class SignalBoxHandler {
 
     @SubscribeEvent
     public static void onWorldLoad(final WorldEvent.Load event) {
-        final Level world = (Level) event.getWorld();
+        final World world = (World) event.getWorld();
         if (world.isClientSide)
             return;
         service.execute(() -> {
             try {
                 Files.createDirectories(NBT_FILES_DIRECTORY);
                 final Optional<Path> file = Files.list(NBT_FILES_DIRECTORY)
-                        .filter(path -> path.endsWith(((ServerLevel) world).getServer()
+                        .filter(path -> path.endsWith(((ServerWorld) world).getServer()
                                 .getWorldData().getLevelName() + "_"
                                 + world.dimension().location().toString().replace(":", "_")))
                         .findFirst();
@@ -456,7 +459,7 @@ public final class SignalBoxHandler {
     }
 
     @SubscribeEvent
-    public static void shutdown(final ServerStoppingEvent event) {
+    public static void shutdown(final FMLServerStoppingEvent event) {
         service.shutdown();
         try {
             service.awaitTermination(1, TimeUnit.DAYS);

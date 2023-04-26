@@ -48,9 +48,9 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 
 public class GuiSignalBox extends GuiBase {
 

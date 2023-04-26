@@ -2,10 +2,10 @@ package com.troblecodings.signals.items;
 
 import com.troblecodings.signals.OpenSignalsMain;
 
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.SoundEvent;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.crafting.Ingredient;
 
 public final class EnumHelper {
 

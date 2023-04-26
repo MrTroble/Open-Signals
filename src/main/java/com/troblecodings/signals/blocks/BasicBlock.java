@@ -8,18 +8,17 @@ import java.util.Set;
 
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.world.IBlockReader;
 
-public class BasicBlock extends Block implements EntityBlock {
+public class BasicBlock extends Block {
 
     private static final Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
     private static final Map<TileEntitySupplierWrapper, Set<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
-    public static final Map<TileEntitySupplierWrapper, BlockEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
+    public static final Map<TileEntitySupplierWrapper, TileEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
 
     public BasicBlock(final Properties properties) {
         super(properties);
@@ -40,7 +39,7 @@ public class BasicBlock extends Block implements EntityBlock {
         return Optional.empty();
     }
 
-    public Optional<BlockEntityType<?>> getBlockEntityType() {
+    public Optional<TileEntityType<?>> getBlockEntityType() {
         return getSupplierWrapper().map(BLOCK_ENTITYS::get);
     }
 
@@ -49,14 +48,15 @@ public class BasicBlock extends Block implements EntityBlock {
     })
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> {
-            final BlockEntityType type = new BlockEntityType(wrapper, blocks, null);
+            final TileEntityType type = new TileEntityType.Builder<TileEntity>(wrapper, blocks,
+                    null);
             type.setRegistryName(BLOCK_NAMES.get(wrapper));
             BLOCK_ENTITYS.put(wrapper, type);
         });
     }
 
     @Override
-    public BlockEntity newBlockEntity(final BlockPos pos, final BlockState state) {
-        return getSupplierWrapper().map(type -> type.create(pos, state)).orElse(null);
+    public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
+        return getSupplierWrapper().map(type -> type.create(state, world)).orElse(null);
     }
 }

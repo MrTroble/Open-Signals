@@ -5,23 +5,23 @@ import java.util.List;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.math.BlockPos;
 
-public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
+public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     public static final String GUI_TAG = "guiTag";
     public static final String POS_TAG = "posTag";
     protected final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
     protected String customName = null;
 
-    public BasicBlockEntity(final TileEntityInfo info) {
-        super(info.type, info.pos, info.state);
+    public BasicBlockEntity(final TileEntityType<?> info) {
+        super(new TileEntityType<>(null, null, null));
     }
 
     public void saveWrapper(final NBTWrapper wrapper) {
@@ -31,15 +31,16 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
     }
 
     @Override
-    protected final void saveAdditional(final CompoundTag tag) {
-        super.saveAdditional(tag);
-        saveWrapper(new NBTWrapper(tag));
+    public void deserializeNBT(final CompoundNBT nbt) {
+        super.deserializeNBT(nbt);
+        saveWrapper(new NBTWrapper(nbt));
     }
 
     @Override
-    public final void load(final CompoundTag tag) {
-        this.loadWrapper(new NBTWrapper(tag));
-        super.load(tag);
+    public CompoundNBT serializeNBT() {
+        final NBTWrapper wrapper = new NBTWrapper(super.serializeNBT());
+        this.loadWrapper(wrapper);
+        return wrapper.tag;
     }
 
     public List<BlockPos> getLinkedPos() {

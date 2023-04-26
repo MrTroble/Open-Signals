@@ -14,13 +14,14 @@ import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.items.ToolParser;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.Item;
+import net.minecraft.item.Item.Properties;
+import net.minecraft.item.ItemGroup;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Item.Properties;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -42,13 +43,12 @@ public final class OSItems {
                 state.getBlock().getRegistryName().getPath());
     });
     public static final Item CONDUCTOR_TROWEL_GREEN = new Item(
-            new Properties().tab(CreativeModeTab.TAB_COMBAT));
+            new Properties().tab(ItemGroup.TAB_COMBAT));
     public static final Item CONDUCTOR_TROWEL_RED = new Item(
-            new Properties().tab(CreativeModeTab.TAB_COMBAT));
-    public static final Item WARNING_FLAG = new Item(
-            new Properties().tab(CreativeModeTab.TAB_COMBAT));
-    public static final Item K_BOARD = new Item(new Properties().tab(CreativeModeTab.TAB_COMBAT));
-    public static final Item L_BOARD = new Item(new Properties().tab(CreativeModeTab.TAB_COMBAT));
+            new Properties().tab(ItemGroup.TAB_COMBAT));
+    public static final Item WARNING_FLAG = new Item(new Properties().tab(ItemGroup.TAB_COMBAT));
+    public static final Item K_BOARD = new Item(new Properties().tab(ItemGroup.TAB_COMBAT));
+    public static final Item L_BOARD = new Item(new Properties().tab(ItemGroup.TAB_COMBAT));
     public static final ItemArmorTemplate REFLECTIVE_HEAD = new ItemArmorTemplate(
             ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlot.HEAD);
     public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE = new ItemArmorTemplate(
@@ -89,13 +89,12 @@ public final class OSItems {
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.LEGS);
     public static final ItemArmorTemplate CONDUCTOR_SHOES = new ItemArmorTemplate(
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlot.FEET);
-    public static final Item SIGNAL_PLATE = new Item(
-            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+    public static final Item SIGNAL_PLATE = new Item(new Properties().tab(ItemGroup.TAB_MATERIALS));
     public static final Item SIGNAL_SHIELD = new Item(
-            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
-    public static final Item LAMPS = new Item(new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+            new Properties().tab(ItemGroup.TAB_MATERIALS));
+    public static final Item LAMPS = new Item(new Properties().tab(ItemGroup.TAB_MATERIALS));
     public static final Item ELECTRIC_PARTS = new Item(
-            new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+            new Properties().tab(ItemGroup.TAB_MATERIALS));
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 

@@ -20,7 +20,7 @@ import com.troblecodings.signals.properties.FloatProperty;
 import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 
-import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.SoundEvent;
 
 public class SignalPropertiesBuilder {
 

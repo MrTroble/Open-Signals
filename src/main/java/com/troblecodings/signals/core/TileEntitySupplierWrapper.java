@@ -2,18 +2,16 @@ package com.troblecodings.signals.core;
 
 import com.troblecodings.signals.blocks.BasicBlock;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityType.BlockEntitySupplier;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockReader;
 
-public interface TileEntitySupplierWrapper extends BlockEntitySupplier<BlockEntity> {
+public interface TileEntitySupplierWrapper {
 
-    @Override
-    default BlockEntity create(final BlockPos pos, final BlockState state) {
+    default TileEntity create(final BlockPos pos, final IBlockReader state) {
         return supply(new TileEntityInfo(pos, state)
-                .with(((BasicBlock) state.getBlock()).getBlockEntityType().get()));
+                .with(state.getB));
     }
 
-    BlockEntity supply(final TileEntityInfo info);
+    TileEntity supply(final TileEntityInfo info);
 }

@@ -2,7 +2,7 @@ package com.troblecodings.signals.models;
 
 import java.util.function.Predicate;
 
-import net.minecraft.client.resources.model.BakedModel;
+import net.minecraftforge.client.model.SeparatePerspectiveModel.BakedModel;
 
 public class BakedModelPair {
 

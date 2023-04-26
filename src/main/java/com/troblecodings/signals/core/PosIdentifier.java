@@ -2,15 +2,15 @@ package com.troblecodings.signals.core;
 
 import java.util.Objects;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class PosIdentifier {
 
     public final BlockPos pos;
-    public final Level world;
+    public final World world;
 
-    public PosIdentifier(final BlockPos pos, final Level world) {
+    public PosIdentifier(final BlockPos pos, final World world) {
         this.pos = pos;
         this.world = world;
     }

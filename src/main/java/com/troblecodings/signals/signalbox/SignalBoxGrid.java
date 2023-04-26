@@ -32,8 +32,8 @@ import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class SignalBoxGrid implements INetworkSavable {
 
@@ -44,13 +44,13 @@ public class SignalBoxGrid implements INetworkSavable {
     protected final SignalBoxFactory factory;
     private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     private BlockPos tilePos;
-    private Level world;
+    private World world;
 
     public SignalBoxGrid() {
         this.factory = SignalBoxFactory.getFactory();
     }
 
-    public void setPosAndWorld(final BlockPos tilePos, final Level world) {
+    public void setPosAndWorld(final BlockPos tilePos, final World world) {
         this.tilePos = tilePos;
         this.world = world;
     }

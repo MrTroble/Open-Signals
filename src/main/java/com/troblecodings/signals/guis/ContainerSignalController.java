@@ -23,8 +23,8 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.util.Direction;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.entity.player.Player;
 
 public class ContainerSignalController extends ContainerBase implements UIClientSync, INetworkSync {

@@ -3,7 +3,7 @@ package com.troblecodings.signals.core;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
-import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.fonts.Font;
 
 public class RenderOverlayInfo {
     public final PoseStack stack;

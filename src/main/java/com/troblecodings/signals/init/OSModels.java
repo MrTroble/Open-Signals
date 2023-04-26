@@ -3,8 +3,8 @@ package com.troblecodings.signals.init;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.models.CustomModelLoader;
 
-import net.minecraft.client.color.block.BlockColors;
-import net.minecraft.world.item.Item;
+import net.minecraft.client.renderer.color.BlockColors;
+import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;

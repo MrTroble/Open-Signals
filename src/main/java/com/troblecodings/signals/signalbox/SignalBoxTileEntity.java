@@ -17,14 +17,14 @@ import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
+import net.minecraft.block.AirBlock;
+import net.minecraft.block.Block;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.AirBlock;
-import net.minecraft.world.level.block.Block;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
@@ -69,7 +69,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public boolean link(final BlockPos pos, final CompoundTag tag) {
+    public boolean link(final BlockPos pos, final CompoundNBT tag) {
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
                 tag.getString(SignalControllerTileEntity.SIGNAL_NAME)));

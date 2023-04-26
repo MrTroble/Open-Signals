@@ -13,7 +13,7 @@ import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.util.Rotation;
 
 public final class SignalBoxUtil {
 
