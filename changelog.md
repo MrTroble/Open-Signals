@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.18 Alpha RC2]
+* feat: added redstone mode to signal controller
+* feat: added speed-dependent default configs for signalbox
+* feat: added json-based supsidiary signals
+* feat: added zs2 via signalbox
+* feat: sh2 to signalbox to close track
+* feat: added combi redstone input for signalbox
+* feat: added system for manual redstone output
+* feat: added block and item crafting system
+* fix: sound registry
+* fix: SignalStateFile
+* fix: sync issues
+* fix: npe issues
+* fix: H/V zs3
+* fix: some signalsystem settings
+* chore: added Signalbox networking
+* chore: cleanup
+
+  **The signalbox is deactivated in this version because of UI rendering issues**
+
+  **This update is an alpha version and does not contain the whole features. We ask you to test the mod and give us feedback on functionality, bugs and features. Warning: Contains a lot of known issues that will be fixed with coming versions.**
+
 ## [1.18-Alpha]
 
 ### BREAKING CHANGES!
