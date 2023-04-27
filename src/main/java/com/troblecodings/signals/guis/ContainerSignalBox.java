@@ -29,6 +29,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -239,7 +240,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     @Override
-    public void removed(final Player playerIn) {
+    public void removed(final PlayerEntity playerIn) {
         super.removed(playerIn);
         if (this.tile != null)
             this.tile.remove(this);
@@ -263,7 +264,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     @Override
-    public boolean stillValid(final Player playerIn) {
+    public boolean stillValid(final PlayerEntity playerIn) {
         if (tile.isBlocked() && !tile.isValid(playerIn))
             return false;
         if (this.info.player == null) {

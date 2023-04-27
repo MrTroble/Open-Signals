@@ -17,13 +17,12 @@ import com.troblecodings.signals.parser.LogicalParserException;
 
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ForgeModelBakery;
 
 @OnlyIn(Dist.CLIENT)
-public final class CustomModelLoader implements ResourceManagerReloadListener {
+public final class CustomModelLoader {
 
     private static HashMap<String, List<SignalModelLoaderInfo>> registeredModels = new HashMap<>();
 

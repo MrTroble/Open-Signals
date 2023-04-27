@@ -6,13 +6,13 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.core.TileEntityInfo;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.world.level.Level;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class SyncableTileEntity extends BasicBlockEntity {
 
@@ -33,7 +33,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundNBT getUpdateTag() {
         final NBTWrapper wrapper = new NBTWrapper();
         saveWrapper(wrapper);
         return wrapper.tag;
@@ -43,7 +43,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
         syncClient(getLevel(), getBlockPos());
     }
 
-    public void syncClient(final Level world, final BlockPos pos) {
+    public void syncClient(final World world, final BlockPos pos) {
         world.setBlockAndUpdate(pos, getBlockState());
     }
 

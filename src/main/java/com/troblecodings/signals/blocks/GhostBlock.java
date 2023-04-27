@@ -3,20 +3,18 @@ package com.troblecodings.signals.blocks;
 import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
+import net.minecraft.state.StateContainer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -28,17 +26,17 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public RenderShape getRenderShape(final BlockState state) {
-        return RenderShape.INVISIBLE;
+    public BlockRenderType getRenderShape(final BlockState state) {
+        return BlockRenderType.INVISIBLE;
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
-            final CollisionContext context) {
-        return Shapes.block();
+    public VoxelShape getShape(final BlockState state, final IBlockReader getter,
+            final BlockPos pos, final ISelectionContext context) {
+        return VoxelShapes.block();
     }
 
-    public static void destroyUpperBlock(final LevelAccessor worldIn, final BlockPos pos) {
+    public static void destroyUpperBlock(final IWorld worldIn, final BlockPos pos) {
         final BlockPos posUp = pos.above();
         final BlockState state = worldIn.getBlockState(posUp);
         final Block blockUp = state.getBlock();
@@ -49,7 +47,7 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public void destroy(final LevelAccessor worldIn, final BlockPos pos, final BlockState state) {
+    public void destroy(final IWorld worldIn, final BlockPos pos, final BlockState state) {
         super.destroy(worldIn, pos, state);
         destroyUpperBlock(worldIn, pos);
 
@@ -63,7 +61,7 @@ public class GhostBlock extends BasicBlock {
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public StateDefinition<Block, BlockState> getStateDefinition() {
+    public StateContainer<Block, BlockState> getStateDefinition() {
         if (!Minecraft.getInstance().isLocalServer()) {
             CustomModelLoader.INSTANCE.prepare();
         }
@@ -71,9 +69,8 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
-            final BlockGetter level, final BlockPos pos, final Player player) {
+    public ItemStack getCloneItemStack(final IBlockReader reader, final BlockPos pos,
+            final BlockState state) {
         return ItemStack.EMPTY;
     }
-
 }

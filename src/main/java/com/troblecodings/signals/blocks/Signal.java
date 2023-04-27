@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -36,18 +37,15 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.audio.Sound;
-import net.minecraft.client.audio.SoundSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Mth;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -57,17 +55,8 @@ import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.World;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -393,7 +382,7 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public void tick(final BlockState state, final ServerLevel world, final BlockPos pos,
+    public void tick(final BlockState state, final ServerWorld world, final BlockPos pos,
             final Random rand) {
         if (this.prop.sounds.isEmpty() || !world.isClientSide) {
             return;
@@ -403,12 +392,12 @@ public class Signal extends BasicBlock {
         if (sound.duration <= 1) {
             return;
         }
-        world.playSound(null, pos, sound.sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+        world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
         world.scheduleTick(pos, this, sound.duration);
     }
 
     @Override
-    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
+    public Optional<Supplier<TileEntity>> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
     }
 }

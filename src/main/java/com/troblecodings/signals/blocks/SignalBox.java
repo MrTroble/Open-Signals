@@ -1,6 +1,7 @@
 package com.troblecodings.signals.blocks;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.PosIdentifier;
@@ -12,18 +13,13 @@ import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.BlockHitResult;
 
 public class SignalBox extends BasicBlock {
 
@@ -43,7 +39,7 @@ public class SignalBox extends BasicBlock {
                 OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos,
                         "signalbox");
             } else {
-                playerIn.sendMessage(new TranslatableComponent("msg.isblocked"),
+                playerIn.sendMessage(new TranslationTextComponent("msg.isblocked"),
                         playerIn.getUUID());
             }
             return ActionResultType.SUCCESS;
@@ -52,7 +48,7 @@ public class SignalBox extends BasicBlock {
     }
 
     @Override
-    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
+    public Optional<Supplier<TileEntity>> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
     }
 

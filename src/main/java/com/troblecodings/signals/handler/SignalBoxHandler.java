@@ -31,14 +31,11 @@ import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.block.BlockState;
-import net.minecraft.nbt.NbtIo;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
@@ -415,7 +412,7 @@ public final class SignalBoxHandler {
                 if (file.exists())
                     file.delete();
                 Files.createFile(file.toPath());
-                NbtIo.write(wrapper.tag, file);
+                CompressedStreamTools.write(wrapper.tag, file);
             } catch (final IOException e) {
                 e.printStackTrace();
             }
@@ -437,7 +434,8 @@ public final class SignalBoxHandler {
                         .findFirst();
                 if (file.isEmpty() || !file.get().toFile().exists())
                     return;
-                final NBTWrapper wrapper = new NBTWrapper(NbtIo.read(file.get().toFile()));
+                final NBTWrapper wrapper = new NBTWrapper(
+                        CompressedStreamTools.read(file.get().toFile()));
                 wrapper.getList(LINKING_UPDATE).forEach(tag -> {
                     final LinkingUpdates updates = new LinkingUpdates();
                     updates.readNBT(tag);

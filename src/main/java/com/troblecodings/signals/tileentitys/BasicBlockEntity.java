@@ -21,7 +21,7 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     protected String customName = null;
 
     public BasicBlockEntity(final TileEntityType<?> info) {
-        super(new TileEntityType<>(null, null, null));
+        super(info);
     }
 
     public void saveWrapper(final NBTWrapper wrapper) {

@@ -10,9 +10,9 @@ import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncable {
 
@@ -90,7 +90,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     @Override
-    public boolean isValid(final Player player) {
-        return true;
+    public boolean isValid(PlayerEntity player) {
+        // TODO Auto-generated method stub
+        return false;
     }
 }

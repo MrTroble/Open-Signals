@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 
@@ -43,20 +44,19 @@ public class BasicBlock extends Block {
         return getSupplierWrapper().map(BLOCK_ENTITYS::get);
     }
 
-    @SuppressWarnings({
-            "rawtypes", "unchecked"
-    })
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> {
-            final TileEntityType type = new TileEntityType.Builder<TileEntity>(wrapper, blocks,
-                    null);
-            type.setRegistryName(BLOCK_NAMES.get(wrapper));
+            final String name = BLOCK_NAMES.get(wrapper);
+            final Supplier<TileEntity> supplier = () -> wrapper.supply(null);
+            final TileEntityType<TileEntity> type = TileEntityType.Builder
+                    .of(supplier, (Block[]) blocks.toArray()).build(null);
+            type.setRegistryName(name);
             BLOCK_ENTITYS.put(wrapper, type);
         });
     }
 
     @Override
     public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
-        return getSupplierWrapper().map(type -> type.create(state, world)).orElse(null);
+        return BLOCK_ENTITYS.get(getSupplierWrapper().get()).create();
     }
 }

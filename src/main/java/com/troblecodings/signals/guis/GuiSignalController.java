@@ -39,12 +39,12 @@ import com.troblecodings.signals.models.SignalCustomModel;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.SeparatePerspectiveModel.BakedModel;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 @OnlyIn(Dist.CLIENT)
@@ -188,7 +188,7 @@ public class GuiSignalController extends GuiBase {
 
         final Minecraft mc = Minecraft.getInstance();
         final BlockState state = OSBlocks.HV_SIGNAL_CONTROLLER.defaultBlockState();
-        final BakedModel model = mc.getBlockRenderer().getBlockModel(state);
+        final IBakedModel model = mc.getBlockRenderer().getBlockModel(state);
         final UIEnumerable toggle = new UIEnumerable(Direction.values().length, "singleModeFace");
         toggle.setOnChange(e -> {
             final Direction faceing = Direction.values()[e];

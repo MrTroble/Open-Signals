@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.Item;
 import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class OSModels {
@@ -23,7 +23,7 @@ public final class OSModels {
     }
 
     @SubscribeEvent
-    public static void registerReload(final RegisterClientReloadListenersEvent event) {
+    public static void registerReload(final AddReloadListenerEvent event) {
         event.registerReloadListener(CustomModelLoader.INSTANCE);
     }
 
