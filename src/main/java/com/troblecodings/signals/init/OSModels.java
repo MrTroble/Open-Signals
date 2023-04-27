@@ -24,7 +24,7 @@ public final class OSModels {
 
     @SubscribeEvent
     public static void registerReload(final AddReloadListenerEvent event) {
-        event.registerReloadListener(CustomModelLoader.INSTANCE);
+        event.addListener(null);
     }
 
     @SubscribeEvent

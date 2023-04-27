@@ -12,11 +12,12 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncable {
 
-    public RedstoneIOTileEntity(final TileEntityInfo info) {
+    public RedstoneIOTileEntity(final TileEntityType<?> info) {
         super(info);
     }
 

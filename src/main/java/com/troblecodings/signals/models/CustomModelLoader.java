@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonObject;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.ContentPackException;
@@ -16,13 +18,16 @@ import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
 import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.resources.IResourceManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.ForgeModelBakery;
+import net.minecraftforge.client.model.CompositeModel.Geometry;
+import net.minecraftforge.client.model.IModelLoader;
+import net.minecraftforge.client.model.ModelLoader;
 
 @OnlyIn(Dist.CLIENT)
-public final class CustomModelLoader {
+public final class CustomModelLoader implements IModelLoader<Geometry> {
 
     private static HashMap<String, List<SignalModelLoaderInfo>> registeredModels = new HashMap<>();
 
@@ -94,14 +99,17 @@ public final class CustomModelLoader {
     }
 
     private void defaultModel(final MapWrapper wrapper, final String name) {
-        wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, "inventory"),
+        wrapper.putNormal(
+                new ModelResourceLocation(new ResourceLocation(OpenSignalsMain.MODID, name),
+                        "inventory"),
                 DefaultModel.INSTANCE);
-        wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, ""),
+        wrapper.putNormal(
+                new ModelResourceLocation(new ResourceLocation(OpenSignalsMain.MODID, name), ""),
                 DefaultModel.INSTANCE);
     }
 
     public void prepare() {
-        final ForgeModelBakery bakery = ForgeModelBakery.instance();
+        final ModelLoader bakery = ModelLoader.instance();
         if (!(bakery.unbakedCache instanceof MapWrapper)) {
             wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
             defaultModel(wrapper, "ghostblock");
@@ -120,7 +128,7 @@ public final class CustomModelLoader {
 
     @SuppressWarnings("unchecked")
     @Override
-    public void onResourceManagerReload(final ResourceManager manager) {
+    public void onResourceManagerReload(final IResourceManager manager) {
         registeredModels.clear();
 
         final Map<String, ModelExtention> extentions = new HashMap<>();
@@ -217,5 +225,11 @@ public final class CustomModelLoader {
                 registeredModels.put(lowercaseName, accumulator);
             }
         }
+    }
+
+    @Override
+    public Geometry read(JsonDeserializationContext deserializationContext,
+            JsonObject modelContents) {
+        return null;
     }
 }

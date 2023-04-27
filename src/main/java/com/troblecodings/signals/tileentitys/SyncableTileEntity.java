@@ -11,12 +11,13 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SyncableTileEntity extends BasicBlockEntity {
 
-    public SyncableTileEntity(final TileEntityInfo info) {
+    public SyncableTileEntity(final TileEntityType<?> info) {
         super(info);
     }
 

@@ -23,6 +23,7 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -56,7 +57,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private static final String LAST_PROFILE = "lastprofile";
     private static final String ENUM_MODE = "enummode";
 
-    public SignalControllerTileEntity(final TileEntityInfo info) {
+    public SignalControllerTileEntity(final TileEntityType<?> info) {
         super(info);
     }
 
