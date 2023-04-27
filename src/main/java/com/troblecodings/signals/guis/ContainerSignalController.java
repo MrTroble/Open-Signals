@@ -23,9 +23,9 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.entity.player.Player;
 
 public class ContainerSignalController extends ContainerBase implements UIClientSync, INetworkSync {
 
@@ -244,13 +244,13 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     }
 
     @Override
-    public Player getPlayer() {
+    public PlayerEntity getPlayer() {
         return info.player;
     }
 
     @Override
-    public boolean stillValid(final Player playerIn) {
-        if (playerIn instanceof Player) {
+    public boolean stillValid(final PlayerEntity playerIn) {
+        if (playerIn instanceof PlayerEntity) {
             this.info.player = playerIn;
         }
         return true;

@@ -5,12 +5,12 @@ import java.util.List;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
+import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 
 public class BasicBlockEntity extends TileEntity implements NamableWrapper {
@@ -20,8 +20,8 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     protected final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
     protected String customName = null;
 
-    public BasicBlockEntity(final TileEntityType<?> info) {
-        super(info);
+    public BasicBlockEntity(final TileEntityInfo info) {
+        super(info.type);
     }
 
     public void saveWrapper(final NBTWrapper wrapper) {

@@ -4,17 +4,17 @@ import java.util.ArrayList;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
+import com.troblecodings.signals.core.TileEntityInfo;
 
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SUpdateTileEntityPacket;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SyncableTileEntity extends BasicBlockEntity {
 
-    public SyncableTileEntity(final TileEntityType<?> info) {
+    public SyncableTileEntity(final TileEntityInfo info) {
         super(info);
     }
 
@@ -22,7 +22,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
 
     @Override
     public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket();
+        return new SUpdateTileEntityPacket(worldPosition, 0, getUpdateTag());
     }
 
     @Override

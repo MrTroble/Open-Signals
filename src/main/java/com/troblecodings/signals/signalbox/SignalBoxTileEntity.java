@@ -7,6 +7,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -20,7 +21,6 @@ import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
@@ -30,7 +30,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     private final SignalBoxGrid grid;
 
-    public SignalBoxTileEntity(final TileEntityType<?> info) {
+    public SignalBoxTileEntity(final TileEntityInfo info) {
         super(info);
         grid = SignalBoxFactory.getFactory().getGrid();
     }

@@ -10,9 +10,9 @@ import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 public class SignalSpecialRenderer extends TileEntityRenderer<SignalTileEntity> {
 
     private final TileEntityRendererDispatcher context;
-    
 
     public SignalSpecialRenderer(final TileEntityRendererDispatcher context) {
+        super(context);
         this.context = context;
     }
 

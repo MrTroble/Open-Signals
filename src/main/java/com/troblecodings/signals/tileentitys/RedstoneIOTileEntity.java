@@ -7,16 +7,16 @@ import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
+import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncable {
 
-    public RedstoneIOTileEntity(final TileEntityType<?> info) {
+    public RedstoneIOTileEntity(final TileEntityInfo info) {
         super(info);
     }
 

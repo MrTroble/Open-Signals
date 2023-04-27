@@ -32,7 +32,6 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.entity.player.Player;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
@@ -247,7 +246,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     @Override
-    public Player getPlayer() {
+    public PlayerEntity getPlayer() {
         return this.info.player;
     }
 

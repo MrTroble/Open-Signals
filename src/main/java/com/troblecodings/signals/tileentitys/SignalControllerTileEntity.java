@@ -14,6 +14,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -22,7 +23,6 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -56,7 +56,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private static final String LAST_PROFILE = "lastprofile";
     private static final String ENUM_MODE = "enummode";
 
-    public SignalControllerTileEntity(final TileEntityType<?> info) {
+    public SignalControllerTileEntity(final TileEntityInfo info) {
         super(info);
     }
 
