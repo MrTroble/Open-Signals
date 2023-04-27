@@ -7,7 +7,6 @@ import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 
 import net.minecraft.block.BlockState;
@@ -91,7 +90,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     @Override
-    public boolean isValid(PlayerEntity player) {
+    public boolean isValid(final PlayerEntity player) {
         // TODO Auto-generated method stub
         return false;
     }

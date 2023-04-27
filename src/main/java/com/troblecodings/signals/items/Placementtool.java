@@ -29,7 +29,6 @@ import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -53,9 +52,9 @@ public class Placementtool extends Item
     }
 
     @Override
-    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+    public ActionResult<ItemStack> use(final World world, final PlayerEntity player, final Hand hand) {
         if (!world.isClientSide) {
-            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world, player.getOnPos(),
+            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world, player.blockPosition(),
                     "placementtool");
         }
         return ActionResult.sidedSuccess(player.getItemInHand(hand), world.isClientSide);
@@ -71,7 +70,7 @@ public class Placementtool extends Item
         if (player.isShiftKeyDown()) {
             if (!worldIn.isClientSide) {
                 OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
-                        player.getPos, "placementtool");
+                        player.blockPosition(), "placementtool");
             }
             return ActionResultType.sidedSuccess(worldIn.isClientSide);
         }

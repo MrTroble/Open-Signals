@@ -25,7 +25,6 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
-import net.minecraft.world.entity.player.Player;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
@@ -37,12 +36,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public void setLevelAndPosition(World world, BlockPos pos) {
-        super.setLevelAndPosition(world, pos);
-        grid.setPosAndWorld(pos, world);
+    public void setLevelAndPosition(final World world, final BlockPos blockPos) {
+        super.setLevelAndPosition(world, blockPos);
+        grid.setPosAndWorld(worldPosition, world);
         if (world.isClientSide)
             return;
-        SignalBoxHandler.setWorld(new PosIdentifier(pos, world));
+        SignalBoxHandler.setWorld(new PosIdentifier(blockPos, world));
     }
 
     @Override
