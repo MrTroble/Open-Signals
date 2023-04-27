@@ -4,31 +4,29 @@ import java.util.ArrayList;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
-import com.troblecodings.signals.core.TileEntityInfo;
 
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.network.NetworkManager;
+import net.minecraft.network.play.server.SUpdateTileEntityPacket;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SyncableTileEntity extends BasicBlockEntity {
 
-    public SyncableTileEntity(final TileEntityInfo info) {
+    public SyncableTileEntity(final TileEntityType<?> info) {
         super(info);
     }
 
     protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();
 
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
+    public SUpdateTileEntityPacket getUpdatePacket() {
+        return SUpdateTileEntityPacket.create(this);
     }
 
     @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket pkt) {
+    public void onDataPacket(final NetworkManager net, final SUpdateTileEntityPacket pkt) {
         super.onDataPacket(net, pkt);
     }
 

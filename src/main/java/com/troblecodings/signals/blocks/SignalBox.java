@@ -1,7 +1,6 @@
 package com.troblecodings.signals.blocks;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.PosIdentifier;
@@ -48,7 +47,7 @@ public class SignalBox extends BasicBlock {
     }
 
     @Override
-    public Optional<Supplier<TileEntity>> getSupplierWrapper() {
+    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
     }
 

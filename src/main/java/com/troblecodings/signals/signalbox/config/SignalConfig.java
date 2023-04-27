@@ -79,7 +79,7 @@ public final class SignalConfig {
                 propertiesToSet.putAll(property.values.entrySet().stream().filter(entry -> {
                     final String oldValue = oldProperties.get(entry.getKey());
                     return oldValue != null && !oldValue.equals(entry.getValue());
-                }).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
+                }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             }
         });
         if (!propertiesToSet.isEmpty())
@@ -95,7 +95,7 @@ public final class SignalConfig {
                 propertiesToSet.putAll(property.values.entrySet().stream().filter(entry -> {
                     final String oldValue = oldProperties.get(entry.getKey());
                     return oldValue != null && !oldValue.equals(entry.getValue());
-                }).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
+                }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
 
             });
             if (!propertiesToSet.isEmpty())

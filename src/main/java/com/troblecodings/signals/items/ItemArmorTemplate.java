@@ -2,14 +2,13 @@ package com.troblecodings.signals.items;
 
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
 import net.minecraft.item.IArmorMaterial;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.SoundEvents;
 
 public class ItemArmorTemplate extends ArmorItem {
 
-    public ItemArmorTemplate(final ArmorMaterial materialIn,
+    public ItemArmorTemplate(final IArmorMaterial materialIn,
             final EquipmentSlotType equipmentSlotIn) {
         super(materialIn, equipmentSlotIn, new Properties().tab(ItemGroup.TAB_COMBAT));
     }

@@ -7,7 +7,6 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.PosIdentifier;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -19,25 +18,26 @@ import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.registry.Registry;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.World;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
     private final SignalBoxGrid grid;
 
-    public SignalBoxTileEntity(final TileEntityInfo info) {
+    public SignalBoxTileEntity(final TileEntityType<?> info) {
         super(info);
         grid = SignalBoxFactory.getFactory().getGrid();
     }
 
     @Override
-    public void setLevel(final Level world) {
-        super.setLevel(world);
+    public void setLevelAndPosition(final World world, final BlockPos blockPos) {
+        super.setLevelAndPosition(world, blockPos);
         grid.setPosAndWorld(worldPosition, world);
         if (world.isClientSide)
             return;
@@ -110,7 +110,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public boolean isValid(final Player player) {
+    public boolean isValid(final PlayerEntity player) {
         if (clientSyncs.isEmpty())
             return false;
         return this.clientSyncs.get(0).getPlayer().equals(player);
