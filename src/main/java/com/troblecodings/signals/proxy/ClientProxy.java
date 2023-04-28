@@ -17,8 +17,10 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.models.CustomModelLoader;
 import com.troblecodings.signals.tileentitys.SignalSpecialRenderer;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
@@ -45,7 +47,8 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void preinit(final FMLCommonSetupEvent event) {
         super.preinit(event);
-        TileEntityRendererDispatcher.register(BasicBlock.BLOCK_ENTITYS.get(Signal.SUPPLIER),
-                SignalSpecialRenderer::new);
+        TileEntityRendererDispatcher.instance.setSpecialRendererInternal(
+                (TileEntityType<SignalTileEntity>) BasicBlock.BLOCK_ENTITYS.get(Signal.SUPPLIER),
+                new SignalSpecialRenderer(TileEntityRendererDispatcher.instance));
     }
 }

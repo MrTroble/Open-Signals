@@ -22,7 +22,7 @@ import org.junit.jupiter.api.Test;
 import com.troblecodings.signals.handler.SignalStateFile;
 import com.troblecodings.signals.handler.SignalStatePos;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class StateFileTest {
 

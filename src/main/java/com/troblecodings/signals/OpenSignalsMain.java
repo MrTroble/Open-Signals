@@ -17,10 +17,7 @@ import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
 
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.model.generators.loaders.ItemLayersModelBuilder;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -81,7 +78,7 @@ public class OpenSignalsMain {
         debug = false;
         log = LoggerContext.getContext().getLogger(MODID);
         final IModInfo modInfo = ModLoadingContext.get().getActiveContainer().getModInfo();
-        file = modInfo.getOwningFile().getFile();
+        file = (IModFile) modInfo.getOwningFile();
         contentPacks = new FileReader(MODID, "assets/" + MODID, log,
                 name -> file.findResource(name));
         proxy.initModEvent(event);
@@ -89,9 +86,10 @@ public class OpenSignalsMain {
 
     @SubscribeEvent
     public void client(final FMLClientSetupEvent event) {
-        OSBlocks.BLOCKS_TO_REGISTER.forEach(block -> {
-            ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped());
-        });
+        /*
+         * OSBlocks.BLOCKS_TO_REGISTER.forEach(block -> {
+         * ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped()); });
+         */
     }
 
     @SubscribeEvent

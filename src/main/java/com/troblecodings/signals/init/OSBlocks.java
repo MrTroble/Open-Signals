@@ -53,8 +53,8 @@ public final class OSBlocks {
                     final Object object = field.get(null);
                     if (object instanceof BasicBlock)
                         loadBlock((BasicBlock) object, name);
-                } catch (final IllegalArgumentException | IllegalAccessException e) {
-                    e.printStackTrace();
+                } catch (final IllegalArgumentException | IllegalAccessException ex) {
+                    ex.printStackTrace();
                 }
             }
         }

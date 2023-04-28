@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -42,7 +41,6 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -365,7 +363,7 @@ public class Signal extends BasicBlock {
                 return;
             } else {
                 if (sound.predicate.test(properties)) {
-                    world.scheduleTick(pos, this, 1);
+                    // TODO world.scheduleTick(pos, this, 1);
                 }
             }
         }
@@ -393,11 +391,11 @@ public class Signal extends BasicBlock {
             return;
         }
         world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        world.scheduleTick(pos, this, sound.duration);
+        // TODO world.scheduleTick(pos, this, sound.duration);
     }
 
     @Override
-    public Optional<Supplier<TileEntity>> getSupplierWrapper() {
+    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
     }
 }

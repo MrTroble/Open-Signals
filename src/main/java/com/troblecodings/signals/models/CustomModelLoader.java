@@ -109,21 +109,17 @@ public final class CustomModelLoader implements IModelLoader<Geometry> {
     }
 
     public void prepare() {
-        final ModelLoader bakery = ModelLoader.instance();
-        if (!(bakery.unbakedCache instanceof MapWrapper)) {
-            wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
-            defaultModel(wrapper, "ghostblock");
-            registeredModels.forEach((name, loaderList) -> {
-                defaultModel(wrapper, name);
-                for (final SignalAngel angel : SignalAngel.values()) {
-                    wrapper.putNormal(
-                            new ModelResourceLocation(OpenSignalsMain.MODID, name,
-                                    "angel=" + angel.getNameWrapper()),
-                            new SignalCustomModel(angel, loaderList));
-                }
-            });
-            bakery.unbakedCache = wrapper;
-        }
+        // TODO Fix Acess Transformer
+        /*
+         * final ModelLoader bakery = ModelLoader.instance(); if (!(bakery.unbakedCache
+         * instanceof MapWrapper)) { wrapper = new MapWrapper(bakery.unbakedCache,
+         * registeredModels.keySet()); defaultModel(wrapper, "ghostblock");
+         * registeredModels.forEach((name, loaderList) -> { defaultModel(wrapper, name);
+         * for (final SignalAngel angel : SignalAngel.values()) { wrapper.putNormal( new
+         * ModelResourceLocation( new ResourceLocation(OpenSignalsMain.MODID, name),
+         * "angel=" + angel.getNameWrapper()), new SignalCustomModel(angel,
+         * loaderList)); } }); bakery.unbakedCache = wrapper; }
+         */
     }
 
     @SuppressWarnings("unchecked")
