@@ -39,7 +39,7 @@ public class ClientProxy extends CommonProxy {
         OpenSignalsMain.handler.addGui(RedstoneIO.class, NamableGui::new);
         OpenSignalsMain.handler.addGui(Signal.class, NamableGui::new);
         ModelLoaderRegistry.registerLoader(
-                new ResourceLocation(OpenSignalsMain.MODID, "CustomModelLoader"),
+                new ResourceLocation(OpenSignalsMain.MODID, "oscustommodelloader"),
                 CustomModelLoader.INSTANCE);
     }
 

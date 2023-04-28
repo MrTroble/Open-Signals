@@ -1,12 +1,14 @@
 package com.troblecodings.signals.blocks;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 
+import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 
 import net.minecraft.block.Block;
@@ -18,7 +20,7 @@ import net.minecraft.world.IBlockReader;
 public class BasicBlock extends Block {
 
     private static final Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
-    private static final Map<TileEntitySupplierWrapper, Set<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
+    private static final Map<TileEntitySupplierWrapper, List<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
     public static final Map<TileEntitySupplierWrapper, TileEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
 
     public BasicBlock(final Properties properties) {
@@ -26,7 +28,7 @@ public class BasicBlock extends Block {
         final Optional<TileEntitySupplierWrapper> optional = getSupplierWrapper();
         getSupplierWrapperName().ifPresent(name -> {
             optional.ifPresent(supplier -> {
-                BLOCK_SUPPLIER.computeIfAbsent(supplier, _u -> new HashSet<>()).add(this);
+                BLOCK_SUPPLIER.computeIfAbsent(supplier, _u -> new ArrayList<>()).add(this);
                 BLOCK_NAMES.computeIfAbsent(supplier, _u -> name);
             });
         });
@@ -47,11 +49,16 @@ public class BasicBlock extends Block {
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> {
             final String name = BLOCK_NAMES.get(wrapper);
-            final Supplier<TileEntity> supplier = () -> wrapper.supply(null);
-            final TileEntityType<TileEntity> type = TileEntityType.Builder
-                    .of(supplier, (Block[]) blocks.toArray()).build(null);
-            type.setRegistryName(name);
-            BLOCK_ENTITYS.put(wrapper, type);
+            final Block[] allBlocks = new Block[blocks.size()];
+            final AtomicReference<TileEntityType<TileEntity>> type = new AtomicReference<>();
+            for (int i = 0; i < blocks.size(); i++) {
+                allBlocks[i] = blocks.get(i);
+            }
+            final Supplier<TileEntity> supplier = () -> wrapper
+                    .supply(new TileEntityInfo().with(type.get()));
+            type.set(TileEntityType.Builder.of(supplier, allBlocks).build(null));
+            type.get().setRegistryName(name);
+            BLOCK_ENTITYS.put(wrapper, type.get());
         });
     }
 
