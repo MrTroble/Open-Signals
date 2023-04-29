@@ -215,7 +215,8 @@ public class SignalBoxGrid implements INetworkSavable {
         final PathOptionEntry entry = node.getOption(mode).get();
         final Optional<BlockPos> outputPos = entry.getEntry(PathEntryType.OUTPUT);
         final Optional<EnumPathUsage> usage = entry.getEntry(PathEntryType.PATHUSAGE);
-        if (!outputPos.isPresent() || (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)))
+        if (!outputPos.isPresent()
+                || (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)))
             return null;
         if (state) {
             node.addManuellOutput(mode);
@@ -257,9 +258,10 @@ public class SignalBoxGrid implements INetworkSavable {
             return;
         final SignalStateInfo info = new SignalStateInfo(world, pos.get(), signal);
         final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(info);
-        SignalStateHandler.setStates(info, properties.values.entrySet().stream()
-                .filter(propertyEntry -> oldProperties.containsKey(propertyEntry.getKey()))
-                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
+        SignalStateHandler.setStates(info,
+                properties.values.entrySet().stream()
+                        .filter(propertyEntry -> oldProperties.containsKey(propertyEntry.getKey()))
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         states.put(mode, entry);
         enabledSubsidiaryTypes.put(point, states);
     }

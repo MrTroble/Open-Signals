@@ -190,7 +190,7 @@ public final class SignalStateHandler implements INetworkSync {
             return states;
         } else {
             if (info.world.isClientSide) {
-                return Map.of();
+                return new HashMap<>();
             }
             return readAndSerialize(info);
         }

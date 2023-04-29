@@ -58,7 +58,7 @@ public class SignalCustomModel implements IUnbakedModel {
         this.list = list;
         this.dependencies = list.stream()
                 .map(info -> new ResourceLocation(OpenSignalsMain.MODID, "block/" + info.name))
-                .collect(Collectors.toUnmodifiableList());
+                .collect(Collectors.toList());
         list.forEach(info -> info.retexture
                 .forEach((id, texture) -> materialsFromString.computeIfAbsent(texture,
                         _u -> Either.left(new RenderMaterial(new ResourceLocation(texture),
@@ -146,10 +146,7 @@ public class SignalCustomModel implements IUnbakedModel {
             }
         });
         final Quaternion quaternion = angel.getQuaternion();
-        return new SignalBakedModel(
-                list.stream()
-                        .map(info -> transform(info, bakery, resource, function,
-                                materialsFromString, quaternion))
-                        .collect(Collectors.toUnmodifiableList()));
+        return new SignalBakedModel(list.stream().map(info -> transform(info, bakery, resource,
+                function, materialsFromString, quaternion)).collect(Collectors.toList()));
     }
 }

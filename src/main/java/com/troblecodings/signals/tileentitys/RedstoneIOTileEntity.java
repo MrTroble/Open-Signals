@@ -1,5 +1,7 @@
 package com.troblecodings.signals.tileentitys;
 
+import java.util.stream.Collectors;
+
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.RedstoneIO;
@@ -32,8 +34,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
-        wrapper.putList(LINKED_LIST,
-                linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper).toList());
+        wrapper.putList(LINKED_LIST, linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper)
+                .collect(Collectors.toList()));
     }
 
     @Override
