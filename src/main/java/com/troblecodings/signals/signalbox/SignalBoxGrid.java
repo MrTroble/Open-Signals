@@ -215,7 +215,7 @@ public class SignalBoxGrid implements INetworkSavable {
         final PathOptionEntry entry = node.getOption(mode).get();
         final Optional<BlockPos> outputPos = entry.getEntry(PathEntryType.OUTPUT);
         final Optional<EnumPathUsage> usage = entry.getEntry(PathEntryType.PATHUSAGE);
-        if (outputPos.isEmpty() || (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)))
+        if (!outputPos.isPresent() || (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)))
             return null;
         if (state) {
             node.addManuellOutput(mode);
@@ -231,7 +231,7 @@ public class SignalBoxGrid implements INetworkSavable {
         if (node == null)
             return;
         final Optional<BlockPos> pos = node.getOption(mode).get().getEntry(PathEntryType.SIGNAL);
-        if (pos.isEmpty())
+        if (!pos.isPresent())
             return;
         final Signal signal = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
                 pos.get());

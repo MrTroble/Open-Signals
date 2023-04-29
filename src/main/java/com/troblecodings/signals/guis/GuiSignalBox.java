@@ -122,7 +122,7 @@ public class GuiSignalBox extends GuiBase {
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
                 final BlockPos setPos = id >= 0 ? positions.get(id) : null;
                 if (setPos == null) {
-                    if (option.getEntry(entryType).isEmpty())
+                    if (!option.getEntry(entryType).isPresent())
                         return;
                     option.removeEntry(entryType);
                     removeEntryFromServer(node, mode, rotation, entryType);
@@ -190,7 +190,7 @@ public class GuiSignalBox extends GuiBase {
                         removeEntryFromServer(node, mode, rotation, PathEntryType.SPEED);
                         option.removeEntry(PathEntryType.SPEED);
                     } else if ((opt.isPresent() && opt.get() != speed)
-                            || (opt.isEmpty() && speed != 127)) {
+                            || (!opt.isPresent() && speed != 127)) {
                         sendIntEntryToServer(speed, node, mode, rotation, PathEntryType.SPEED);
                         option.setEntry(PathEntryType.SPEED, speed);
                     }

@@ -432,7 +432,7 @@ public final class SignalBoxHandler {
                                 .getWorldData().getLevelName() + "_"
                                 + world.dimension().location().toString().replace(":", "_")))
                         .findFirst();
-                if (file.isEmpty() || !file.get().toFile().exists())
+                if (!file.isPresent() || !file.get().toFile().exists())
                     return;
                 final NBTWrapper wrapper = new NBTWrapper(
                         CompressedStreamTools.read(file.get().toFile()));
