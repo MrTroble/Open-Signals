@@ -109,17 +109,23 @@ public final class CustomModelLoader implements IModelLoader<Geometry> {
     }
 
     public void prepare() {
-        // TODO Fix Acess Transformer
-        /*
-         * final ModelLoader bakery = ModelLoader.instance(); if (!(bakery.unbakedCache
-         * instanceof MapWrapper)) { wrapper = new MapWrapper(bakery.unbakedCache,
-         * registeredModels.keySet()); defaultModel(wrapper, "ghostblock");
-         * registeredModels.forEach((name, loaderList) -> { defaultModel(wrapper, name);
-         * for (final SignalAngel angel : SignalAngel.values()) { wrapper.putNormal( new
-         * ModelResourceLocation( new ResourceLocation(OpenSignalsMain.MODID, name),
-         * "angel=" + angel.getNameWrapper()), new SignalCustomModel(angel,
-         * loaderList)); } }); bakery.unbakedCache = wrapper; }
-         */
+        final ModelLoader bakery = ModelLoader.instance();
+        if (!(bakery.unbakedCache instanceof MapWrapper)) {
+            wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
+            defaultModel(wrapper, "ghostblock");
+            registeredModels.forEach((name, loaderList) -> {
+                defaultModel(wrapper, name);
+                for (final SignalAngel angel : SignalAngel.values()) {
+                    wrapper.putNormal(
+                            new ModelResourceLocation(
+                                    new ResourceLocation(OpenSignalsMain.MODID, name),
+                                    "angel=" + angel.getNameWrapper()),
+                            new SignalCustomModel(angel, loaderList));
+                }
+            });
+            bakery.unbakedCache = wrapper;
+        }
+
     }
 
     @SuppressWarnings("unchecked")
@@ -224,8 +230,8 @@ public final class CustomModelLoader implements IModelLoader<Geometry> {
     }
 
     @Override
-    public Geometry read(JsonDeserializationContext deserializationContext,
-            JsonObject modelContents) {
+    public Geometry read(final JsonDeserializationContext deserializationContext,
+            final JsonObject modelContents) {
         return null;
     }
 }
