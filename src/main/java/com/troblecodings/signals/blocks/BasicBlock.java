@@ -63,6 +63,11 @@ public class BasicBlock extends Block {
     }
 
     @Override
+    public boolean hasTileEntity(final BlockState state) {
+        return getSupplierWrapper().isPresent() && getBlockEntityType().isPresent();
+    }
+
+    @Override
     public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
         return BLOCK_ENTITYS.get(getSupplierWrapper().get()).create();
     }
