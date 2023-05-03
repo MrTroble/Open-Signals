@@ -1,6 +1,1 @@
-{
-    "parent": "minecraft:item/generated",
-    "textures": {
-        "layer0": "opensignals:items/conductor_pants"
-    }
-}
+{"parent": "minecraft:item/generated", "textures": {"layer0": "opensignals:items/conductor_pants"}, "credit": "Made with Blockbench by Mc_Jeronimo"}
