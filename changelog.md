@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.18 Alpha RC3]
+
+* fix: ra11 dwarf models
+* ref: optimized models
+* ref: optimized images
+
+  **The signalbox is deactivated in this version because of UI rendering issues**
+
+  **This update is an alpha version and does not contain the whole features. We ask you to test the mod and give us feedback on functionality, bugs and features. Warning: Contains a lot of known issues that will be fixed with coming versions.**
+
 ## [1.18 Alpha RC2]
 * feat: added redstone mode to signal controller
 * feat: added speed-dependent default configs for signalbox
