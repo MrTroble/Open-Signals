@@ -54,13 +54,9 @@ curseforge {
 
 version = ver
 group = 'com.troblecodings'
-archivesBaseName = 'OpenSignals'
+archivesBaseName = 'OpenSignals-1.18.2'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-repositories {
-    maven{ url="https://maven.cil.li/" }
-}
 
 minecraft {
 	mappings channel: 'official', version: '1.18.2'
