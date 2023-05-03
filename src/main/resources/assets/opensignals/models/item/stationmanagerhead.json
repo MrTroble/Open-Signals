@@ -1,6 +1,1 @@
-{
-    "parent": "minecraft:item/generated",
-    "textures": {
-        "layer0": "opensignals:items/station_manager_head"
-    }
-}
+{"parent": "minecraft:item/generated", "textures": {"layer0": "opensignals:items/station_manager_head"}, "credit": "Made with Blockbench by Mc_Jeronimo"}

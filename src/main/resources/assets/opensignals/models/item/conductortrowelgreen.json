@@ -1,6 +1,1 @@
-{
-    "parent": "minecraft:item/generated",
-    "textures": {
-        "layer0": "opensignals:items/conductor_trowel_green"
-    }
-}
+{"parent": "minecraft:item/generated", "textures": {"layer0": "opensignals:items/conductor_trowel_green"}, "credit": "Made with Blockbench by Mc_Jeronimo"}
