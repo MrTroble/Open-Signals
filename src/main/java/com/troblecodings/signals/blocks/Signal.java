@@ -18,8 +18,8 @@ import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
+import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
@@ -383,7 +383,7 @@ public class Signal extends BasicBlock {
     @Override
     public void tick(final BlockState state, final ServerLevel world, final BlockPos pos,
             final Random rand) {
-        if (this.prop.sounds.isEmpty() || !world.isClientSide) {
+        if (this.prop.sounds.isEmpty() || world.isClientSide) {
             return;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
