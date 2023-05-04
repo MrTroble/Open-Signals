@@ -1,7 +1,6 @@
 package com.troblecodings.signals.blocks;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.PosIdentifier;
@@ -18,7 +17,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;

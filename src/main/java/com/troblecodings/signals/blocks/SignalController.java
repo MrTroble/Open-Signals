@@ -1,7 +1,6 @@
 package com.troblecodings.signals.blocks;
 
 import java.util.Optional;
-import java.util.function.Supplier;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
