@@ -382,7 +382,7 @@ public class Signal extends BasicBlock {
     @Override
     public void tick(final BlockState state, final ServerWorld world, final BlockPos pos,
             final Random rand) {
-        if (this.prop.sounds.isEmpty() || !world.isClientSide) {
+        if (this.prop.sounds.isEmpty() || world.isClientSide) {
             return;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
