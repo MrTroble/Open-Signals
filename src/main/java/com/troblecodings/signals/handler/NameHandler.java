@@ -184,18 +184,17 @@ public final class NameHandler implements INetworkSync {
             final List<NameStateInfo> states = new ArrayList<>();
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
-                if (!(block instanceof Signal) || !(block instanceof RedstoneIO)) {
-                    return;
+                if (block instanceof Signal || block instanceof RedstoneIO) {
+                    final NameStateInfo info = new NameStateInfo(world, pos);
+                    final String name = ALL_LEVEL_FILES.get(world).getString(pos);
+                    if (name.isEmpty())
+                        return;
+                    synchronized (ALL_NAMES) {
+                        ALL_NAMES.put(info, name);
+                    }
+                    states.add(info);
+                    sendNameToClient(info, name);
                 }
-                final NameStateInfo info = new NameStateInfo(world, pos);
-                final String name = ALL_LEVEL_FILES.get(world).getString(pos);
-                if (name.isEmpty())
-                    return;
-                synchronized (ALL_NAMES) {
-                    ALL_NAMES.put(info, name);
-                }
-                states.add(info);
-                sendNameToClient(info, name);
             });
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 CURRENTLY_LOADED_CHUNKS.put(chunk, states);

@@ -59,8 +59,7 @@ public class NamableGui extends GuiBase {
         textfield.setHeight(20);
         textfield.setInheritWidth(true);
 
-        final UITextInput input = new UITextInput(""); // TODO
-        input.setText(container.tile.getNameWrapper());
+        final UITextInput input = new UITextInput(container.tile.getNameWrapper());
         textfield.add(input);
 
         hbox.add(textfield);
@@ -103,8 +102,6 @@ public class NamableGui extends GuiBase {
 
     @Override
     public void updateFromContainer() {
-        entity.add(new UILabel("Currently not usable! Check changelog!"));
-        return;
-        // initOwn();
+        initOwn();
     }
 }
