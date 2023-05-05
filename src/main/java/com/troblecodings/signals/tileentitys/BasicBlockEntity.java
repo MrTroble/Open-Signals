@@ -6,6 +6,7 @@ import java.util.List;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 
@@ -49,9 +50,11 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     @Override
     public String getNameWrapper() {
-        if (customName == null)
-            customName = NameHandler.getName(new NameStateInfo(level, worldPosition));
-        return customName;
+        final NameStateInfo info = new NameStateInfo(level, worldPosition);
+        if (customName == null || customName.isEmpty())
+            customName = level.isClientSide ? ClientNameHandler.getClientName(info)
+                    : NameHandler.getName(info);
+        return customName == null ? "" : customName;
     }
 
     @Override

@@ -27,9 +27,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
 
     @Override
     public String getNameWrapper() {
-        if (hasCustomName())
-            return customName;
-        return this.getBlockState().getBlock().getRegistryName().getPath();
+        final String name = super.getNameWrapper();
+        return name == null || name.isEmpty()
+                ? this.getBlockState().getBlock().getRegistryName().getPath()
+                : name;
     }
 
     @Override

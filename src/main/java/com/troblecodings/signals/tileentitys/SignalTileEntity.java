@@ -34,9 +34,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public String getNameWrapper() {
-        if (hasCustomName())
-            return customName;
-        return getSignal().getSignalTypeName();
+        final String name = super.getNameWrapper();
+        return name == null || name.isEmpty() ? getSignal().getSignalTypeName() : name;
     }
 
     public Signal getSignal() {
