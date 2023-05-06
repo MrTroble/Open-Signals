@@ -59,7 +59,7 @@ public class NamableGui extends GuiBase {
         textfield.setHeight(20);
         textfield.setInheritWidth(true);
 
-        final UITextInput input = new UITextInput(container.tile.getNameWrapper());
+        final UITextInput input = new UITextInput("");
         textfield.add(input);
 
         hbox.add(textfield);
