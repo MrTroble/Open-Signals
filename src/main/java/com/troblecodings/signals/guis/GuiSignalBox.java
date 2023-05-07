@@ -58,22 +58,23 @@ public class GuiSignalBox extends GuiBase {
 
     private static final int SELECTION_COLOR = 0x2900FF00;
     private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
-    
+    private static final int LINE_COLOR = 0xFF5B5B5B;
+
     private static final float[] ALL_LINES = getLines();
     private static final int TILE_WIDTH = 10;
     private static final int TILE_COUNT = 100;
-    
+
     private static float[] getLines() {
-        final float[] lines = new float[2 * (TILE_COUNT+1) * 4];
+        final float[] lines = new float[2 * (TILE_COUNT + 1) * 4];
         final float step = 1.0f / TILE_COUNT;
         for (int i = 0; i <= TILE_COUNT; i++) {
-            final int offset = i*4;
+            final int offset = i * 4;
             final float pos = i * step;
             lines[offset] = pos;
             lines[offset + 1] = 0;
             lines[offset + 2] = pos;
             lines[offset + 3] = 1;
-            
+
             final int offset2 = (i + TILE_COUNT + 1) * 4;
             lines[offset2] = 0;
             lines[offset2 + 1] = pos;
@@ -471,8 +472,8 @@ public class GuiSignalBox extends GuiBase {
 
         plane = new UIEntity();
         plane.clearChildren();
-        plane.setWidth(TILE_COUNT*TILE_WIDTH);
-        plane.setHeight(TILE_COUNT*TILE_WIDTH);
+        plane.setWidth(TILE_COUNT * TILE_WIDTH);
+        plane.setHeight(TILE_COUNT * TILE_WIDTH);
         lowerEntity.add(new UIScroll(s -> {
             final float newScale = (float) (plane.getScaleX() + s * 0.001f);
             if (newScale <= 0)
@@ -486,7 +487,9 @@ public class GuiSignalBox extends GuiBase {
             plane.setY(plane.getY() + y);
             plane.update();
         }, 2));
-        plane.add(new UILines(ALL_LINES, 1));
+        final UILines allLines = new UILines(ALL_LINES, 0.5F);
+        allLines.setColor(LINE_COLOR);
+        plane.add(allLines);
         final UIBox vbox = new UIBox(UIBox.VBOX, 0);
         vbox.setPageable(false);
         plane.add(vbox);
@@ -523,6 +526,7 @@ public class GuiSignalBox extends GuiBase {
         frame.setInheritWidth(true);
         frame.add(new UIBorder(0xFF000000, 4));
         lowerEntity.add(frame);
+        buildColors(container.grid.getNodes());
     }
 
     private void initializeBasicUI() {
@@ -719,7 +723,17 @@ public class GuiSignalBox extends GuiBase {
         }
     }
 
-    public void applyColorChanges(final List<SignalBoxNode> listOfNodes) {
+    private void buildColors(final List<SignalBoxNode> nodes) {
+        nodes.forEach(node -> {
+            final UISignalBoxTile tile = allTiles.get(node.getPoint());
+            node.forEach(mode -> {
+                tile.setColor(mode, node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
+                        .orElseGet(() -> EnumPathUsage.FREE).getColor());
+            });
+        });
+    }
+
+    private void applyColorChanges(final List<SignalBoxNode> listOfNodes) {
         for (int i = listOfNodes.size() - 2; i > 0; i--) {
             final Point oldPos = listOfNodes.get(i - 1).getPoint();
             final Point newPos = listOfNodes.get(i + 1).getPoint();

@@ -98,13 +98,15 @@ public class Placementtool extends Item
             } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
                     && property.testMap(signalProperties)) {
                 signalProperties.put(property, property.getDefault());
-            } else if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+            } else if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)
+                    || property.isChangabelAtStage(ChangeableStage.AUTOMATICSTAGE)) {
                 signalProperties.put(property, property.getDefault());
             }
         }
 
         final ItemStack item = context.getItemInHand();
-        item.hurtAndBreak(Math.abs(cost), player, (user) -> user.broadcastBreakEvent(context.getHand()));
+        item.hurtAndBreak(Math.abs(cost), player,
+                (user) -> user.broadcastBreakEvent(context.getHand()));
 
         final int height = signal.getHeight(signalProperties);
         final BlockPos pos = context.getClickedPos().above();

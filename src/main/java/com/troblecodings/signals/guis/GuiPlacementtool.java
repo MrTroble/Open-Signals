@@ -11,6 +11,7 @@ import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
+import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
@@ -154,6 +155,7 @@ public class GuiPlacementtool extends GuiBase {
                             inp),
                     container.properties.get(property));
         });
+        list.add(new UITextInput(""));
         this.entity.update();
         loaded = true;
     }
