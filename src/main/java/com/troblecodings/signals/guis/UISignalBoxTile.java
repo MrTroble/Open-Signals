@@ -52,6 +52,7 @@ public class UISignalBoxTile extends UIComponentEntity {
         entity.add((UIComponent) modeSet.mode.consumer.get());
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
+        this.entity.setVisible(!setToEntity.isEmpty());
     }
 
     @Override
@@ -78,6 +79,7 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     private void localRemove(final ModeSet modeSet) {
         this.entity.remove(setToEntity.remove(modeSet));
+        this.entity.setVisible(!setToEntity.isEmpty());
     }
 
     public void add(final ModeSet modeSet) {
@@ -109,10 +111,6 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     public void setColor(final ModeSet mode, final int color) {
         final UIEntity entity = setToEntity.get(mode);
-        entity.findRecursive(UILines.class).forEach(lines -> {
-            entity.remove(lines);
-            lines.setColor(color);
-            entity.add(lines);
-        });
+        entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
     }
 }

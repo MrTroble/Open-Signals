@@ -27,6 +27,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
@@ -57,6 +58,30 @@ public class GuiSignalBox extends GuiBase {
 
     private static final int SELECTION_COLOR = 0x2900FF00;
     private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
+    
+    private static final float[] ALL_LINES = getLines();
+    private static final int TILE_WIDTH = 10;
+    private static final int TILE_COUNT = 100;
+    
+    private static float[] getLines() {
+        final float[] lines = new float[2 * (TILE_COUNT+1) * 4];
+        final float step = 1.0f / TILE_COUNT;
+        for (int i = 0; i <= TILE_COUNT; i++) {
+            final int offset = i*4;
+            final float pos = i * step;
+            lines[offset] = pos;
+            lines[offset + 1] = 0;
+            lines[offset + 2] = pos;
+            lines[offset + 3] = 1;
+            
+            final int offset2 = (i + TILE_COUNT + 1) * 4;
+            lines[offset2] = 0;
+            lines[offset2 + 1] = pos;
+            lines[offset2 + 2] = 1;
+            lines[offset2 + 3] = pos;
+        }
+        return lines;
+    }
 
     private final UIEntity lowerEntity = new UIEntity();
     private final ContainerSignalBox container;
@@ -446,8 +471,8 @@ public class GuiSignalBox extends GuiBase {
 
         plane = new UIEntity();
         plane.clearChildren();
-        plane.setInheritWidth(true);
-        plane.setInheritHeight(true);
+        plane.setWidth(TILE_COUNT*TILE_WIDTH);
+        plane.setHeight(TILE_COUNT*TILE_WIDTH);
         lowerEntity.add(new UIScroll(s -> {
             final float newScale = (float) (plane.getScaleX() + s * 0.001f);
             if (newScale <= 0)
@@ -461,21 +486,22 @@ public class GuiSignalBox extends GuiBase {
             plane.setY(plane.getY() + y);
             plane.update();
         }, 2));
+        plane.add(new UILines(ALL_LINES, 1));
         final UIBox vbox = new UIBox(UIBox.VBOX, 0);
         vbox.setPageable(false);
         plane.add(vbox);
         allTiles.clear();
-        for (int x = 0; x < 100; x++) {
+        for (int x = 0; x < TILE_COUNT; x++) {
             final UIEntity row = new UIEntity();
             final UIBox hbox = new UIBox(UIBox.HBOX, 0);
             hbox.setPageable(false);
             row.add(hbox);
-            row.setHeight(10);
-            row.setWidth(10);
-            for (int y = 0; y < 100; y++) {
+            row.setHeight(TILE_WIDTH);
+            row.setWidth(TILE_WIDTH);
+            for (int y = 0; y < TILE_COUNT; y++) {
                 final UIEntity tile = new UIEntity();
-                tile.setHeight(10);
-                tile.setWidth(10);
+                tile.setHeight(TILE_WIDTH);
+                tile.setWidth(TILE_WIDTH);
                 final Point name = new Point(y, x);
                 SignalBoxNode node = container.grid.getNode(name);
                 if (node == null) {
@@ -486,7 +512,6 @@ public class GuiSignalBox extends GuiBase {
                     allTiles.put(name, sbt);
                 tile.add(sbt);
                 consumer.accept(tile, sbt);
-                tile.add(new UIBorder(0xFF7F7F7F, 0.75f));
                 row.add(tile);
             }
             plane.add(row);
@@ -701,10 +726,10 @@ public class GuiSignalBox extends GuiBase {
             final Path path = new Path(oldPos, newPos);
             final SignalBoxNode current = listOfNodes.get(i);
             final UISignalBoxTile uiTile = allTiles.get(current.getPoint());
-            current.getOption(path).get().getEntry(PathEntryType.PATHUSAGE).ifPresent(usage -> {
-                final ModeSet mode = current.getMode(path);
-                uiTile.setColor(mode, usage.getColor());
-            });
+            final ModeSet modeSet = current.getMode(path);
+            current.getOption(modeSet)
+                    .ifPresent(poe -> uiTile.setColor(modeSet, poe.getEntry(PathEntryType.PATHUSAGE)
+                            .orElseGet(() -> EnumPathUsage.FREE).getColor()));
         }
     }
 }
