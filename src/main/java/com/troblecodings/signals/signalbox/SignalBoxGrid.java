@@ -21,7 +21,6 @@ import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumPathUsage;
-import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -184,7 +183,7 @@ public class SignalBoxGrid implements INetworkSavable {
         });
     }
 
-    public void readUpdateNetwork(final ReadBuffer buffer, final boolean override) {
+    public List<SignalBoxNode> readUpdateNetwork(final ReadBuffer buffer, final boolean override) {
         final int size = buffer.getInt();
         final List<SignalBoxNode> allNodesForPathway = new ArrayList<>();
         for (int i = 0; i < size; i++) {
@@ -201,10 +200,8 @@ public class SignalBoxGrid implements INetworkSavable {
             modeGrid.put(point, node);
         }
         if (!world.isClientSide)
-            return;
-        final SignalBoxPathway pathway = new SignalBoxPathway(modeGrid, allNodesForPathway,
-                PathType.NORMAL);
-        clientPathways.put(pathway.getFirstPoint(), pathway);
+            return new ArrayList<>();
+        return allNodesForPathway;
     }
 
     public BlockPos updateManuellRSOutput(final Point point, final ModeSet mode,

@@ -7,6 +7,7 @@ import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.UpdateEvent;
+import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -104,5 +105,14 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     public SignalBoxNode getNode() {
         return this.node;
+    }
+
+    public void setColor(final ModeSet mode, final int color) {
+        final UIEntity entity = setToEntity.get(mode);
+        entity.findRecursive(UIColor.class).forEach(colors -> {
+            entity.remove(colors);
+            colors.setColor(color);
+            entity.add(colors);
+        });
     }
 }

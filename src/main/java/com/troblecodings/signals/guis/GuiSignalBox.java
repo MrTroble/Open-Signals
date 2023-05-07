@@ -43,6 +43,7 @@ import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
+import com.troblecodings.signals.signalbox.Path;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
@@ -66,11 +67,13 @@ public class GuiSignalBox extends GuiBase {
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
     private UIEntity plane = null;
     private boolean allPacketsRecived = false;
+    private final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
         container.setConsumer(this::update);
+        container.setColorUpdater(this::applyColorChanges);
         info.player.containerMenu = this.container;
         this.info = info;
     }
@@ -461,14 +464,15 @@ public class GuiSignalBox extends GuiBase {
         final UIBox vbox = new UIBox(UIBox.VBOX, 0);
         vbox.setPageable(false);
         plane.add(vbox);
-        for (int x = 0; x < 50; x++) {
+        allTiles.clear();
+        for (int x = 0; x < 100; x++) {
             final UIEntity row = new UIEntity();
             final UIBox hbox = new UIBox(UIBox.HBOX, 0);
             hbox.setPageable(false);
             row.add(hbox);
             row.setHeight(10);
             row.setWidth(10);
-            for (int y = 0; y < 50; y++) {
+            for (int y = 0; y < 100; y++) {
                 final UIEntity tile = new UIEntity();
                 tile.setHeight(10);
                 tile.setWidth(10);
@@ -478,6 +482,8 @@ public class GuiSignalBox extends GuiBase {
                     node = new SignalBoxNode(name);
                 }
                 final UISignalBoxTile sbt = new UISignalBoxTile(node);
+                if (!node.isEmpty())
+                    allTiles.put(name, sbt);
                 tile.add(sbt);
                 consumer.accept(tile, sbt);
                 tile.add(new UIBorder(0xFF7F7F7F, 0.75f));
@@ -680,16 +686,25 @@ public class GuiSignalBox extends GuiBase {
         USAGE, EDIT, SETTINGS, TILE_CONFIG, CHANGE_MODE, NONE;
     }
 
-    @SuppressWarnings("unused")
     @Override
     public void updateFromContainer() {
-        entity.add(new UILabel("Currently not usable! Check changelog!"));
-        if (!allPacketsRecived && false) {
+        if (!allPacketsRecived) {
             initializeBasicUI();
             allPacketsRecived = true;
-            return;
-        } else if (page.equals(Page.USAGE)) {
-            // TODO add System to update Nodes from Pathway
+        }
+    }
+
+    public void applyColorChanges(final List<SignalBoxNode> listOfNodes) {
+        for (int i = listOfNodes.size() - 2; i > 0; i--) {
+            final Point oldPos = listOfNodes.get(i - 1).getPoint();
+            final Point newPos = listOfNodes.get(i + 1).getPoint();
+            final Path path = new Path(oldPos, newPos);
+            final SignalBoxNode current = listOfNodes.get(i);
+            final UISignalBoxTile uiTile = allTiles.get(current.getPoint());
+            current.getOption(path).get().getEntry(PathEntryType.PATHUSAGE).ifPresent(usage -> {
+                final ModeSet mode = current.getMode(path);
+                uiTile.setColor(mode, usage.getColor());
+            });
         }
     }
 }

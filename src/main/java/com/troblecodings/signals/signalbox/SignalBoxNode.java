@@ -184,6 +184,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return getOption(Optional.ofNullable(possibleConnections.get(path)));
     }
 
+    public ModeSet getMode(final Path path) {
+        return possibleConnections.get(path);
+    }
+
     public Optional<PathOptionEntry> getOption(final ModeSet mode) {
         return Optional.ofNullable(possibleModes.get(mode));
     }
