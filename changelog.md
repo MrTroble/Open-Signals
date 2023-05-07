@@ -1,5 +1,24 @@
 # Changelog
 
+## [1.18 Beta 1]
+
+* feat: added text input to placementtool
+* feat: resize signalbox layout to 100x100 fields
+* fix: signal sounds
+* fix: Nameable GUI
+* fix: line renderer
+* fix: typing e dont close GUI
+* fix: signalbox symbols
+* fix: added system to set color
+* fix: render text on signals
+* fix: naming of signals
+* fix: NPEs
+* fix: issues with ClientNameHandler and ContainerSignalBox
+* fix: missing lang keys
+* ref: better performance
+
+  **This update is a beta version and may contains some bugs. We ask you to test the mod and give us feedback on functionality, bugs and features.**
+
 ## [1.18 Alpha RC3]
 
 * fix: ra11 dwarf models
