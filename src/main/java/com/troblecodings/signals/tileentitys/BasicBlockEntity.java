@@ -60,4 +60,8 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
     public boolean hasCustomName() {
         return customName != null;
     }
+
+    public void setCustomName(final String name) {
+        this.customName = name;
+    }
 }

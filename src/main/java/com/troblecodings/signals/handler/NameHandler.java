@@ -147,13 +147,20 @@ public final class NameHandler implements INetworkSync {
         if (unload.getWorld().isClientSide())
             return;
         service.execute(() -> {
-            ALL_LEVEL_FILES.remove(unload.getWorld());
+            synchronized (ALL_LEVEL_FILES) {
+                ALL_LEVEL_FILES.remove(unload.getWorld());
+            }
         });
     }
 
     private static void createToFile(final NameStateInfo info, final String name) {
         service.execute(() -> {
-            final NameHandlerFile file = ALL_LEVEL_FILES.get(info.world);
+            NameHandlerFile file;
+            synchronized (ALL_LEVEL_FILES) {
+                file = ALL_LEVEL_FILES.get(info.world);
+            }
+            if (file == null)
+                return;
             SignalStatePos posInFile = file.find(info.pos);
             if (posInFile == null) {
                 posInFile = file.createState(info.pos, name);
