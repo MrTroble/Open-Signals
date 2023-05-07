@@ -155,7 +155,6 @@ public class GuiPlacementtool extends GuiBase {
                             inp),
                     container.properties.get(property));
         });
-        list.add(new UITextInput(""));
         this.entity.update();
         loaded = true;
     }
