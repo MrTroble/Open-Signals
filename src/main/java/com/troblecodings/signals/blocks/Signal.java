@@ -233,7 +233,7 @@ public class Signal extends BasicBlock {
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
-        final String name = info.tileEntity.getNameAsStringWrapper();
+        final String name = info.tileEntity.getNameWrapper();
         final SignalAngel face = state.getValue(Signal.ANGEL);
 
         final String[] display = name.split("\\[n\\]");
