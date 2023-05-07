@@ -8,7 +8,7 @@ import java.util.concurrent.Executors;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.tileentitys.SignalTileEntity;
+import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -54,8 +54,8 @@ public class ClientNameHandler implements INetworkSync {
             synchronized (CLIENT_NAMES) {
                 CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), name);
             }
-            if (tile instanceof SignalTileEntity) {
-                ((SignalTileEntity) tile).setCustomName(name);
+            if (tile instanceof BasicBlockEntity) {
+                ((BasicBlockEntity) tile).setCustomName(name);
             }
         });
     }
