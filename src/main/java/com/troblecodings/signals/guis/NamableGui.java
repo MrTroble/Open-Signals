@@ -98,6 +98,7 @@ public class NamableGui extends GuiBase {
         }
         OpenSignalsMain.network.sendTo(player, buffer.build());
         labelComp.setText(input);
+        container.tile.setCustomName(input);
     }
 
     @Override
