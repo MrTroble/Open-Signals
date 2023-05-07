@@ -153,7 +153,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 break;
             }
             case SEND_ZS2_ENTRY: {
-                deserializeEntry(buffer, buffer.getBlockPos());
+                deserializeEntry(buffer, buffer.getByte());
                 break;
             }
             case REMOVE_POS: {
