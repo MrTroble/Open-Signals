@@ -13,6 +13,9 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.guis.ContainerPlacementtool;
+import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
@@ -123,6 +126,13 @@ public class Placementtool extends Item
         for (int i = 0; i < height; i++) {
             worldIn.setBlock(ghostPos, OSBlocks.GHOST_BLOCK.defaultBlockState(), 3);
             ghostPos = ghostPos.above();
+        }
+        final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
+        if (!(signalName == null || signalName.isEmpty())) {
+            signalProperties.put(Signal.CUSTOMNAME, "true");
+            NameHandler.setName(new NameStateInfo(worldIn, pos), signalName);
+        } else {
+            signalProperties.put(Signal.CUSTOMNAME, "false");
         }
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);

@@ -155,13 +155,15 @@ public class GuiPlacementtool extends GuiBase {
                             inp),
                     container.properties.get(property));
         });
+        final UIEntity textfield = new UIEntity();
+        textfield.setHeight(20);
+        textfield.setInheritWidth(true);
+        final UITextInput name = new UITextInput(container.signalName);
+        name.setOnTextUpdate(this::sendName);
+        textfield.add(name);
+        list.add(textfield);
         this.entity.update();
         loaded = true;
-    }
-
-    @Override
-    public void removed() {
-        super.removed();
     }
 
     private void applyPropertyChanges(final int propertyId, final int valueId) {
@@ -180,6 +182,20 @@ public class GuiPlacementtool extends GuiBase {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) 255);
         buffer.putInt(id);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
+    }
+
+    private void sendName(final String name) {
+        if (!loaded)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) 255);
+        buffer.putInt(-1);
+        final byte[] signalName = name.getBytes();
+        buffer.putByte((byte) signalName.length);
+        for (final byte b : signalName) {
+            buffer.putByte(b);
+        }
         OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 

@@ -378,7 +378,6 @@ public final class SignalStateHandler implements INetworkSync {
             if (property.equals(Signal.CUSTOMNAME)) {
                 buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
                 buffer.putByte((byte) (value.isEmpty() ? 0 : 1));
-                NameHandler.setName(new NameStateInfo(stateInfo.world, stateInfo.pos), value);
                 return;
             }
             buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
@@ -439,8 +438,8 @@ public final class SignalStateHandler implements INetworkSync {
             signals.forEach(info -> {
                 if (info.signal != null && info.pos != null && info.world != null) {
                     synchronized (SIGNAL_COUNTER) {
-                        int count = SIGNAL_COUNTER.get(info);
-                        if (count > 1) {
+                        Integer count = SIGNAL_COUNTER.get(info);
+                        if (count != null && count > 1) {
                             SIGNAL_COUNTER.put(info, --count);
                             return;
                         }
