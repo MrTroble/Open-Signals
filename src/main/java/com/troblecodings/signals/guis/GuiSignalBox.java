@@ -47,6 +47,7 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Path;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -475,7 +476,7 @@ public class GuiSignalBox extends GuiBase {
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
         plane.setHeight(TILE_COUNT * TILE_WIDTH);
         lowerEntity.add(new UIScroll(s -> {
-            final float newScale = (float) (plane.getScaleX() + s * 0.001f);
+            final float newScale = (float) (plane.getScaleX() + s * 0.05f);
             if (newScale <= 0)
                 return;
             plane.setScaleX(newScale);
@@ -658,6 +659,7 @@ public class GuiSignalBox extends GuiBase {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) SignalBoxNetwork.RESET_ALL_PW.ordinal());
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
+        resetColors(container.grid.getNodes());
     }
 
     private void sendModeChanges() {
@@ -726,9 +728,20 @@ public class GuiSignalBox extends GuiBase {
     private void buildColors(final List<SignalBoxNode> nodes) {
         nodes.forEach(node -> {
             final UISignalBoxTile tile = allTiles.get(node.getPoint());
+            node.forEach(mode -> tile.setColor(mode,
+                    node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
+                            .orElseGet(() -> EnumPathUsage.FREE).getColor()));
+        });
+    }
+
+    private void resetColors(final List<SignalBoxNode> nodes) {
+        nodes.forEach(node -> {
+            final UISignalBoxTile tile = allTiles.get(node.getPoint());
             node.forEach(mode -> {
-                tile.setColor(mode, node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
-                        .orElseGet(() -> EnumPathUsage.FREE).getColor());
+                tile.setColor(mode, SignalBoxUtil.FREE_COLOR);
+                final PathOptionEntry entry = node.getOption(mode).get();
+                entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
+                        _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));
             });
         });
     }
