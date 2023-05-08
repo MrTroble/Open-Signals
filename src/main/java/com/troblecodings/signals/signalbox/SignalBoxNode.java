@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -81,16 +82,17 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public void post() {
         possibleConnections.clear();
-        possibleModes.forEach((e, i) -> {
-            if (e.mode.equals(EnumGuiMode.SH2)) {
+        for (final Map.Entry<ModeSet, PathOptionEntry> entry : possibleModes.entrySet()) {
+            final ModeSet mode = entry.getKey();
+            if (mode.mode.equals(EnumGuiMode.SH2)) {
                 possibleConnections.clear();
                 return;
             }
             final Point p1 = new Point(this.point);
             final Point p2 = new Point(this.point);
-            switch (e.mode) {
+            switch (mode.mode) {
                 case CORNER:
-                    switch (e.rotation) {
+                    switch (mode.rotation) {
                         case NONE:
                             p1.translate(0, 1);
                             p2.translate(-1, 0);
@@ -113,7 +115,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                     break;
                 case STRAIGHT:
                 case END:
-                    switch (e.rotation) {
+                    switch (mode.rotation) {
                         case NONE:
                         case CLOCKWISE_180:
                             p1.translate(1, 0);
@@ -132,9 +134,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                     return;
             }
             final Path path = new Path(p1, p2);
-            possibleConnections.put(path, e);
-            possibleConnections.put(path.getInverse(), e);
-        });
+            possibleConnections.put(path, mode);
+            possibleConnections.put(path.getInverse(), mode);
+        }
     }
 
     public Point getPoint() {
