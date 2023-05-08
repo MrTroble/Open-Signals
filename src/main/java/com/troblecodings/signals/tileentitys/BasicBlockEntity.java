@@ -13,6 +13,7 @@ import com.troblecodings.signals.handler.NameStateInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
@@ -63,6 +64,7 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
     public void setCustomName(final String name) {
         this.customName = name;
-        this.level.setBlocksDirty(worldPosition, getBlockState(), getBlockState());
+        final BlockState state = this.getBlockState();
+        this.level.setBlocksDirty(worldPosition, state, state);
     }
 }
