@@ -88,6 +88,7 @@ public class GuiSignalBox extends GuiBase {
     private final UIEntity lowerEntity = new UIEntity();
     private final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
+    @SuppressWarnings("unused")
     private Page page = Page.USAGE;
     private UIEntity mainButton;
     private final GuiInfo info;
