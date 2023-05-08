@@ -16,6 +16,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
@@ -67,6 +68,8 @@ public class ClientSignalStateHandler implements INetworkSync {
                 }
                 CURRENTLY_LOADED_STATES.put(stateInfo, properties);
             }
+            final BlockState state = entity.getBlockState();
+            mc.level.setBlocksDirty(signalPos, state, state);
             entity.requestModelDataUpdate();
             mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
         });
