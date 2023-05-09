@@ -239,10 +239,6 @@ public final class SignalStateHandler implements INetworkSync {
             final int typeID = Byte.toUnsignedInt(byteArray[i]);
             if (typeID <= 0)
                 continue;
-            if (property.equals(Signal.CUSTOMNAME)) {
-                map.put(property,
-                        NameHandler.getName(new NameStateInfo(stateInfo.world, stateInfo.pos)));
-            }
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
         }
@@ -375,11 +371,6 @@ public final class SignalStateHandler implements INetworkSync {
         buffer.putBlockPos(stateInfo.pos);
         buffer.putByte((byte) properties.size());
         properties.forEach((property, value) -> {
-            if (property.equals(Signal.CUSTOMNAME)) {
-                buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
-                buffer.putByte((byte) (value.isEmpty() ? 0 : 1));
-                return;
-            }
             buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
             buffer.putByte((byte) property.getParent().getIDFromValue(value));
         });

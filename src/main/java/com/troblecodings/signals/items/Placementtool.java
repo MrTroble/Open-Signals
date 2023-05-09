@@ -128,11 +128,13 @@ public class Placementtool extends Item
             ghostPos = ghostPos.above();
         }
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
+        final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
         if (!(signalName == null || signalName.isEmpty())) {
-            signalProperties.put(Signal.CUSTOMNAME, "true");
-            NameHandler.setName(new NameStateInfo(worldIn, pos), signalName);
+            signalProperties.put(Signal.CUSTOMNAME, "TRUE");
+            NameHandler.setName(nameInfo, signalName);
         } else {
-            signalProperties.put(Signal.CUSTOMNAME, "false");
+            signalProperties.put(Signal.CUSTOMNAME, "FALSE");
+            NameHandler.setName(nameInfo, signal.getSignalTypeName());
         }
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
