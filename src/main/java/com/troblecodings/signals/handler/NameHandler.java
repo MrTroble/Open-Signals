@@ -16,6 +16,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -29,6 +30,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
@@ -79,6 +81,11 @@ public final class NameHandler implements INetworkSync {
         }
         sendNameToClient(info, name);
         createToFile(info, name);
+        final Block block = info.world.getBlockState(info.pos).getBlock();
+        if (block instanceof Signal) {
+            SignalStateHandler.setState(new SignalStateInfo(info.world, info.pos, (Signal) block),
+                    Signal.CUSTOMNAME, "TRUE");
+        }
     }
 
     public static String getName(final NameStateInfo info) {
@@ -154,6 +161,9 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static void createToFile(final NameStateInfo info, final String name) {
+        if (name == null) {
+            System.out.println();
+        }
         service.execute(() -> {
             NameHandlerFile file;
             synchronized (ALL_LEVEL_FILES) {

@@ -218,8 +218,12 @@ public class Signal extends BasicBlock {
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        final Map<SEProperty, String> map = SignalStateHandler.getStates(new SignalStateInfo(
-                info.tileEntity.getLevel(), info.tileEntity.getBlockPos(), this));
+        final Map<SEProperty, String> map = ClientSignalStateHandler
+                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
+                        info.tileEntity.getBlockPos()));
+        final String customNameState = map.get(CUSTOMNAME);
+        if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
+            return;
         for (final FloatProperty property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
                 customRenderHeight = property.height;
