@@ -436,9 +436,13 @@ public final class SignalStateHandler implements INetworkSync {
                         }
                         SIGNAL_COUNTER.remove(info);
                     }
+                    Map<SEProperty, String> properties;
                     synchronized (CURRENTLY_LOADED_STATES) {
-                        createToFile(info, CURRENTLY_LOADED_STATES.remove(info));
+                        properties = CURRENTLY_LOADED_STATES.remove(info);
                     }
+                    if (properties == null)
+                        return;
+                    createToFile(info, properties);
                 }
             });
         });
