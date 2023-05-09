@@ -106,7 +106,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 break;
             }
             case NO_OUTPUT_UPDATE: {
-                run.accept(I18n.get("error.nooputputupdate"));
+                run.accept(I18n.get("error.nooutputupdate"));
                 break;
             }
             case OUTPUT_UPDATE: {
