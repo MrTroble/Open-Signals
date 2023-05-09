@@ -35,8 +35,10 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -239,7 +241,7 @@ public class Signal extends BasicBlock {
         }
         final String name = info.tileEntity.getNameWrapper();
         final SignalAngel face = state.getValue(Signal.ANGEL);
-
+        
         final String[] display = name.split("\\[n\\]");
 
         final float scale = this.prop.signScale;
@@ -263,8 +265,13 @@ public class Signal extends BasicBlock {
         info.stack.pushPose();
         info.stack.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         info.stack.scale(-1f, 1f, 1f);
+        
         for (int i = 0; i < display.length; i++) {
-            info.font.draw(info.stack, display[i], (i * scale * 2.8f), width, 0);
+            final List<FormattedCharSequence> splittedList = info.font.split(FormattedText.of(display[i]), (int) width);
+            
+            for (int j = 0;  j < splittedList.size(); j++) {
+                info.font.draw(info.stack, splittedList.get(j), 0, (j * scale * 10), 0);
+            }
         }
         info.stack.popPose();
     }
