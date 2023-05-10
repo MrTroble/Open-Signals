@@ -1,11 +1,23 @@
 {
 	"systemProperties": {
 		"placementToolName": "signplacementtool",
-		"height": 0,
-		"offsetY": 2,
+		"defaultHeight": 0,
+		"offsetY": -2,
 		"customNameRenderHeight": 0.5,
+		"signWidth": 180,
+		"autoscale": true,
+		"textColor": 16777215,
+		"doubleSidedText": {
+			"config(DOUBLESIDED.TRUE)": true
+		},
 		"canLink": false
 	},
 	"seProperties": [
+		{
+            "name": "doublesided",
+            "defaultState": false,
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        }
 	]
 }

@@ -9,7 +9,6 @@ import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
-import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSModels;
@@ -50,7 +49,6 @@ public class OpenSignalsMain {
         eventBus.register(OSBlocks.class);
         eventBus.register(OSItems.class);
         eventBus.register(OSSounds.class);
-        MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
         MinecraftForge.EVENT_BUS.register(NameHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));

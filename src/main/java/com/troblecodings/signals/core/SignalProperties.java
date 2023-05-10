@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.parser.ValuePack;
+import com.troblecodings.signals.properties.BooleanProperty;
 import com.troblecodings.signals.properties.FloatProperty;
 import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
@@ -19,6 +20,9 @@ public class SignalProperties {
     public final float offsetX;
     public final float offsetY;
     public final float signScale;
+    public final boolean autoscale;
+    public final List<BooleanProperty> doubleSidedText;
+    public final int textColor;
     public final boolean canLink;
     public final List<Integer> colors;
     public final List<SoundProperty> sounds;
@@ -27,7 +31,8 @@ public class SignalProperties {
 
     public SignalProperties(final Placementtool placementtool, final float customNameRenderHeight,
             final int height, final List<HeightProperty> signalHeights, final float signWidth,
-            final float offsetX, final float offsetY, final float signScale, final boolean canLink,
+            final float offsetX, final float offsetY, final float signScale, final boolean autoscale, 
+            final List<BooleanProperty> doubleSidedText, final int textColor, final boolean canLink,
             final List<Integer> colors, final List<FloatProperty> renderheights,
             final List<SoundProperty> sounds, final List<ValuePack> redstoneOutputs,
             final int defaultItemDamage) {
@@ -38,6 +43,9 @@ public class SignalProperties {
         this.offsetX = offsetX;
         this.offsetY = offsetY;
         this.signScale = signScale;
+        this.autoscale = autoscale;
+        this.doubleSidedText = doubleSidedText;
+        this.textColor = textColor;
         this.canLink = canLink;
         this.colors = colors;
         this.signalHeights = signalHeights;

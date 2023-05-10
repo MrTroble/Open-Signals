@@ -16,6 +16,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -39,6 +40,16 @@ public class RedstoneIO extends BasicBlock {
     @Override
     protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
         builder.add(POWER);
+    }
+
+    @Override
+    public BlockState getStateForPlacement(final BlockPlaceContext context) {
+        final Level world = context.getLevel();
+        if (!world.isClientSide) {
+            NameHandler.setName(new NameStateInfo(world, context.getClickedPos()),
+                    this.getRegistryName().getPath());
+        }
+        return this.defaultBlockState();
     }
 
     @Override

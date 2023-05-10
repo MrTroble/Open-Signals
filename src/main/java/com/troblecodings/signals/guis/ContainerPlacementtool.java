@@ -22,8 +22,11 @@ import net.minecraft.world.item.ItemStack;
 
 public class ContainerPlacementtool extends ContainerBase implements INetworkSync {
 
-    protected int signalID;
+    public static final String SIGNAL_NAME = "signalName";
+
     public final Map<SEProperty, Integer> properties = new HashMap<>();
+    protected int signalID;
+    protected String signalName = "";
     private final Player player;
     private Signal signal;
 
@@ -61,6 +64,12 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         propertiesToSend.forEach(obj -> {
             buffer.putByte(obj);
         });
+        final String signalName = wrapper.getString(SIGNAL_NAME);
+        final byte[] allBytes = signalName.getBytes();
+        buffer.putByte((byte) allBytes.length);
+        for (final byte b : allBytes) {
+            buffer.putByte(b);
+        }
         OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
@@ -71,8 +80,17 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final ItemStack stack = player.getMainHandItem();
         final Placementtool tool = (Placementtool) stack.getItem();
         if (first == 255) {
-            final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
+            final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
             final int id = buffer.getInt();
+            if (id == -1) {
+                final int nameSize = buffer.getByteAsInt();
+                final byte[] name = new byte[nameSize];
+                for (int i = 0; i < nameSize; i++) {
+                    name[i] = buffer.getByte();
+                }
+                wrapper.putString(SIGNAL_NAME, new String(name));
+                return;
+            }
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
             properties.clear();
@@ -103,6 +121,12 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
             final int value = buffer.getByteAsInt();
             properties.put(property, value);
         }
+        final int nameSize = buffer.getByteAsInt();
+        final byte[] name = new byte[nameSize];
+        for (int i = 0; i < nameSize; i++) {
+            name[i] = buffer.getByte();
+        }
+        signalName = new String(name);
         signalProperties.forEach(property -> {
             if (!properties.containsKey(property)) {
                 properties.put(property,

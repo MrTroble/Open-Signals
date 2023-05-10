@@ -13,10 +13,12 @@ public enum EnumGuiMode {
     }), CORNER(new float[] {
             0, 0.5f, 0.5f, 1
     }), END(new float[] {
-            1, 0.30f, 1, 0.70f
-    }), PLATFORM(() -> new UITexture(UISignalBoxTile.ICON, 0, 0, 1, 1)),
-    BUE(() -> new UITexture(UISignalBoxTile.ICON, 0, 0, 1, 1)), HP(0), VP(1), RS(2), RA10(3),
-    SH2(4);
+            0.9f, 0.2f, 0.9f, 0.8f
+    }), PLATFORM(new float[] {
+            0, 0.1f, 1, 0.1f, 0, 0.2f, 1, 0.2f
+    }), BUE(new float[] {
+            0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
+    }), HP(0), VP(1), RS(2), RA10(3), SH2(4);
 
     /**
      * Naming

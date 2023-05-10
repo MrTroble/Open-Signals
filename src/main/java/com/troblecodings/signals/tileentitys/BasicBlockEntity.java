@@ -6,12 +6,14 @@ import java.util.List;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
@@ -48,13 +50,21 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
     @Override
     public String getNameWrapper() {
-        if (customName == null)
-            customName = NameHandler.getName(new NameStateInfo(level, worldPosition));
-        return customName;
+        final NameStateInfo info = new NameStateInfo(level, worldPosition);
+        if (customName == null || customName.isEmpty())
+            customName = level.isClientSide ? ClientNameHandler.getClientName(info)
+                    : NameHandler.getName(info);
+        return customName == null ? "" : customName;
     }
 
     @Override
     public boolean hasCustomName() {
         return customName != null;
+    }
+
+    public void setCustomName(final String name) {
+        this.customName = name;
+        final BlockState state = this.getBlockState();
+        this.level.setBlocksDirty(worldPosition, state, state);
     }
 }

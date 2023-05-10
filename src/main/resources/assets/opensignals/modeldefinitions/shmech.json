@@ -4,10 +4,10 @@
 		"sh/sh_mast": {
 			"textures": [
 				{
-					"blockstate": "with(sh_high.HIGH)"
+					"blockstate": "hasandis(sh_high)"
 				},
 				{
-					"blockstate": "with(sh_high.HIGH)",
+					"blockstate": "hasandis(sh_high)",
 					"y": 1
 				}
 			],
@@ -16,10 +16,10 @@
 		"sh/sh0_mech": {
 			"textures": [
 				{
-					"blockstate": "with(SH_MECH.SH0) && with(sh_high.LOW)"
+					"blockstate": "with(SH_MECH.SH0) && hasandisnot(sh_high)"
 				},
 				{
-					"blockstate": "with(SH_MECH.SH0) && with(sh_high.HIGH)",
+					"blockstate": "with(SH_MECH.SH0) && hasandis(sh_high)",
 					"y": 2
 				}
 			],
@@ -28,10 +28,10 @@
 		"sh/sh1_mech": {
 			"textures": [
 				{
-					"blockstate": "with(SH_MECH.SH1) && with(sh_high.LOW)"
+					"blockstate": "with(SH_MECH.SH1) && hasandisnot(sh_high)"
 				},
 				{
-					"blockstate": "with(SH_MECH.SH1) && with(sh_high.HIGH)",
+					"blockstate": "with(SH_MECH.SH1) && hasandis(sh_high)",
 					"y": 2
 				}
 			],
@@ -40,10 +40,10 @@
 		"sh/sh1_gsp2_mech": {
 			"textures": [
 				{
-					"blockstate": "with(SH_MECH.SH1_GSP2) && with(sh_high.LOW)"
+					"blockstate": "with(SH_MECH.SH1_GSP2) && hasandisnot(sh_high)"
 				},
 				{
-					"blockstate": "with(SH_MECH.SH1_GSP2) && with(sh_high.HIGH)",
+					"blockstate": "with(SH_MECH.SH1_GSP2) && hasandis(sh_high)",
 					"y": 2
 				}
 			],
@@ -52,10 +52,10 @@
 		"sh/sh_mech_number": {
 			"textures": [
 				{
-					"blockstate": "hasandis(CUSTOMNAME) && with(sh_high.LOW)"
+					"blockstate": "hasandis(CUSTOMNAME) && hasandisnot(sh_high)"
 				},
 				{
-					"blockstate": "hasandis(CUSTOMNAME) && with(sh_high.HIGH)",
+					"blockstate": "hasandis(CUSTOMNAME) && hasandis(sh_high)",
 					"y": 2
 				}
 			],

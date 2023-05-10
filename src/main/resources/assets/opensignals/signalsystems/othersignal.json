@@ -1,12 +1,14 @@
 {
 	"systemProperties": {
 		"placementToolName": "signplacementtool",
-		"signalTypeName": "othersignal",
 		"canLink": false,
 		"defaultHeight": 1,
 		"signScale": 3.5,
 		"offsetX": -5,
 		"offsetY": 1.8,
+		"doubleSidedText": {
+			"config(OTHERTYPE.HM2)": true
+		},
 		"renderHeights": {
 			"config(OTHERTYPE.HM)": 2.1,
 			"config(OTHERTYPE.HM2)": 2.1
