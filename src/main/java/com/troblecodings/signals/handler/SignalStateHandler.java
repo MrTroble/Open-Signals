@@ -91,6 +91,12 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
+        synchronized (CURRENTLY_LOADED_CHUNKS) {
+            final List<SignalStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
+                    .get(info.world.getChunk(info.pos));
+            if (!allSignals.contains(info))
+                allSignals.add(info);
+        }
         createToFile(info, states);
         loadSignal(info);
     }
@@ -178,6 +184,7 @@ public final class SignalStateHandler implements INetworkSync {
         createToFile(info, states);
         sendPropertiesToClient(info, states);
         updateListeners(info, false);
+        info.signal.getUpdate(info.world, info.pos);
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
@@ -205,7 +212,6 @@ public final class SignalStateHandler implements INetworkSync {
         }
         map.put(property, value);
         setStates(info, map);
-        info.signal.getUpdate(info.world, info.pos);
     }
 
     public static Optional<String> getState(final SignalStateInfo info, final SEProperty property) {
@@ -310,7 +316,8 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (CURRENTLY_LOADED_STATES) {
                 maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
             }
-            maps.forEach(SignalStateHandler::createToFile);
+            maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(save.getWorld()))
+                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
         });
     }
 
@@ -352,6 +359,12 @@ public final class SignalStateHandler implements INetworkSync {
             sendRemoved(info);
             updateListeners(info, true);
             ALL_LISTENERS.remove(info);
+            final ChunkAccess chunk = info.world.getChunk(info.pos);
+            if (chunk == null)
+                return;
+            synchronized (CURRENTLY_LOADED_CHUNKS) {
+                CURRENTLY_LOADED_CHUNKS.get(chunk).remove(info);
+            }
         });
     }
 

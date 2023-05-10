@@ -84,6 +84,12 @@ public final class NameHandler implements INetworkSync {
             SignalStateHandler.setState(new SignalStateInfo(info.world, info.pos, (Signal) block),
                     Signal.CUSTOMNAME, "TRUE");
         }
+        synchronized (CURRENTLY_LOADED_CHUNKS) {
+            final List<NameStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
+                    .get(info.world.getChunk(info.pos));
+            if (!allSignals.contains(info))
+                allSignals.add(info);
+        }
     }
 
     public static String getName(final NameStateInfo info) {
@@ -124,6 +130,12 @@ public final class NameHandler implements INetworkSync {
             }
             file.deleteIndex(info.pos);
             sendRemoved(info);
+            final ChunkAccess chunk = info.world.getChunk(info.pos);
+            if (chunk == null)
+                return;
+            synchronized (CURRENTLY_LOADED_CHUNKS) {
+                CURRENTLY_LOADED_CHUNKS.get(chunk).remove(info);
+            }
         });
     }
 
@@ -159,9 +171,6 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static void createToFile(final NameStateInfo info, final String name) {
-        if (name == null) {
-            System.out.println();
-        }
         service.execute(() -> {
             NameHandlerFile file;
             synchronized (ALL_LEVEL_FILES) {

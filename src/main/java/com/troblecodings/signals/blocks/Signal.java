@@ -257,7 +257,7 @@ public class Signal extends BasicBlock {
         if (this.prop.autoscale) {
             int textWidth = 0;
             textWidth = info.font.width(name);
-        //    scale = Math.max(this.prop.signWidth / textWidth, scale);
+            // scale = Math.max(this.prop.signWidth / textWidth, scale);
         }
 
         info.stack.pushPose();
@@ -266,7 +266,7 @@ public class Signal extends BasicBlock {
         info.stack.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
 
         if (this.prop.autoscale) {
-        //    info.stack.translate(- 66.6f, -scale / 2, 0);
+            // info.stack.translate(- 66.6f, -scale / 2, 0);
         }
 
         renderSingleOverlay(info, display);
@@ -373,7 +373,7 @@ public class Signal extends BasicBlock {
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
         if (SignalStateHandler.getState(stateInfo, powerProperty)
-                .filter(power -> power.equals("false")).isPresent()) {
+                .filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
             return 0;
         }
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
