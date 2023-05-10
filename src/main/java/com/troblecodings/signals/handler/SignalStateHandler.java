@@ -91,6 +91,12 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
+        synchronized (CURRENTLY_LOADED_CHUNKS) {
+            final List<SignalStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
+                    .get(info.world.getChunk(info.pos));
+            if (!allSignals.contains(info))
+                allSignals.add(info);
+        }
         createToFile(info, states);
         loadSignal(info);
     }
@@ -178,6 +184,7 @@ public final class SignalStateHandler implements INetworkSync {
         createToFile(info, states);
         sendPropertiesToClient(info, states);
         updateListeners(info, false);
+        info.signal.getUpdate(info.world, info.pos);
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
@@ -239,10 +246,6 @@ public final class SignalStateHandler implements INetworkSync {
             final int typeID = Byte.toUnsignedInt(byteArray[i]);
             if (typeID <= 0)
                 continue;
-            if (property.equals(Signal.CUSTOMNAME)) {
-                map.put(property,
-                        NameHandler.getName(new NameStateInfo(stateInfo.world, stateInfo.pos)));
-            }
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
         }
@@ -314,7 +317,8 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (CURRENTLY_LOADED_STATES) {
                 maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
             }
-            maps.forEach(SignalStateHandler::createToFile);
+            maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(save.getWorld()))
+                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
         });
     }
 
@@ -323,7 +327,9 @@ public final class SignalStateHandler implements INetworkSync {
         if (unload.getWorld().isClientSide())
             return;
         service.execute(() -> {
-            ALL_LEVEL_FILES.remove(unload.getWorld());
+            synchronized (ALL_LEVEL_FILES) {
+                ALL_LEVEL_FILES.remove(unload.getWorld());
+            }
         });
     }
 
@@ -334,10 +340,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             map = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
-        map.forEach((state, properites) -> {
-            final ByteBuffer buffer = packToByteBuffer(state, properites);
-            sendTo(player, buffer);
-        });
+        map.forEach((state, properites) -> sendTo(player, packToByteBuffer(state, properites)));
     }
 
     public static void setRemoved(final SignalStateInfo info) {
@@ -355,7 +358,15 @@ public final class SignalStateHandler implements INetworkSync {
             }
             sendRemoved(info);
             updateListeners(info, true);
-            ALL_LISTENERS.remove(info);
+            synchronized (ALL_LISTENERS) {
+                ALL_LISTENERS.remove(info);
+            }
+            final ChunkAccess chunk = info.world.getChunk(info.pos);
+            if (chunk == null)
+                return;
+            synchronized (CURRENTLY_LOADED_CHUNKS) {
+                CURRENTLY_LOADED_CHUNKS.get(chunk).remove(info);
+            }
         });
     }
 
@@ -375,12 +386,6 @@ public final class SignalStateHandler implements INetworkSync {
         buffer.putBlockPos(stateInfo.pos);
         buffer.putByte((byte) properties.size());
         properties.forEach((property, value) -> {
-            if (property.equals(Signal.CUSTOMNAME)) {
-                buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
-                buffer.putByte((byte) (value.isEmpty() ? 0 : 1));
-                NameHandler.setName(new NameStateInfo(stateInfo.world, stateInfo.pos), value);
-                return;
-            }
             buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
             buffer.putByte((byte) property.getParent().getIDFromValue(value));
         });
@@ -439,16 +444,20 @@ public final class SignalStateHandler implements INetworkSync {
             signals.forEach(info -> {
                 if (info.signal != null && info.pos != null && info.world != null) {
                     synchronized (SIGNAL_COUNTER) {
-                        int count = SIGNAL_COUNTER.get(info);
-                        if (count > 1) {
+                        Integer count = SIGNAL_COUNTER.get(info);
+                        if (count != null && count > 1) {
                             SIGNAL_COUNTER.put(info, --count);
                             return;
                         }
                         SIGNAL_COUNTER.remove(info);
                     }
+                    Map<SEProperty, String> properties;
                     synchronized (CURRENTLY_LOADED_STATES) {
-                        createToFile(info, CURRENTLY_LOADED_STATES.remove(info));
+                        properties = CURRENTLY_LOADED_STATES.remove(info);
                     }
+                    if (properties == null)
+                        return;
+                    createToFile(info, properties);
                 }
             });
         });

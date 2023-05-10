@@ -62,14 +62,19 @@ public class LinkedPositions {
         return ImmutableMap.copyOf(linkedBlocks);
     }
 
-    public void unlink(final BlockPos tilePos, final World world) {
-        signals.forEach(
-                (pos, signal) -> SignalConfig.reset(new SignalStateInfo(world, pos, signal)));
+    public void unlink(final BlockPos tilePos, final Level world) {
+        final List<SignalStateInfo> signalsToUnload = new ArrayList<>();
+        signals.forEach((pos, signal) -> {
+            final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
+            SignalConfig.reset(info);
+            signalsToUnload.add(info);
+        });
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
                 .forEach(entry -> SignalBoxHandler
                         .unlinkTileFromPos(new PosIdentifier(tilePos, world), entry.getKey()));
         linkedBlocks.clear();
         signals.clear();
+        SignalStateHandler.unloadSignals(signalsToUnload);
     }
 
     public void write(final NBTWrapper wrapper) {

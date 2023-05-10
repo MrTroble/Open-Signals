@@ -17,7 +17,7 @@ jobs:
     - name: Set up JDK 8
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
+        java-version: '8'
         distribution: 'adopt'
     - name: Change wrapper permissions
       run: chmod +x ./gradlew
@@ -30,7 +30,7 @@ jobs:
     if: endswith(github.ref_name, 'master') && github.ref_protected && github.ref_type == 'branch'
     runs-on: ubuntu-latest
     env:
-      APPVEYOR_BUILD_VERSION: '3.0.0-b2'
+      APPVEYOR_BUILD_VERSION: '3.0.0-Beta 1'
       CURSETOKEN: ${{ secrets.CURSETOKEN }}
     steps:
     - uses: actions/checkout@v3
@@ -39,7 +39,7 @@ jobs:
     - name: Set up JDK 8
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
+        java-version: '8'
         distribution: 'adopt'
     - name: Change wrapper permissions
       run: chmod +x ./gradlew

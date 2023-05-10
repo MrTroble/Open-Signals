@@ -13,6 +13,9 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.guis.ContainerPlacementtool;
+import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
@@ -96,7 +99,8 @@ public class Placementtool extends Item
             } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
                     && property.testMap(signalProperties)) {
                 signalProperties.put(property, property.getDefault());
-            } else if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+            } else if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)
+                    || property.isChangabelAtStage(ChangeableStage.AUTOMATICSTAGE)) {
                 signalProperties.put(property, property.getDefault());
             }
         }
@@ -121,7 +125,16 @@ public class Placementtool extends Item
             worldIn.setBlock(ghostPos, OSBlocks.GHOST_BLOCK.defaultBlockState(), 3);
             ghostPos = ghostPos.above();
         }
-        worldIn.setBlock(pos, signal.getStateForPlacement(new BlockItemUseContext(context)), 3);
+        final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
+        final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
+        if (!(signalName == null || signalName.isEmpty())) {
+            signalProperties.put(Signal.CUSTOMNAME, "TRUE");
+            NameHandler.setName(nameInfo, signalName);
+        } else {
+            signalProperties.put(Signal.CUSTOMNAME, "FALSE");
+            NameHandler.setName(nameInfo, signal.getSignalTypeName());
+        }
+        worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
         SignalStateHandler.createStates(info, signalProperties);
         return ActionResultType.SUCCESS;
