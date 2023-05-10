@@ -1,7 +1,8 @@
 package com.troblecodings.signals.core;
 
-import com.mojang.math.Quaternion;
 import com.troblecodings.core.interfaces.NamableWrapper;
+
+import net.minecraft.util.math.vector.Quaternion;
 
 public enum SignalAngel implements NamableWrapper {
 
@@ -11,7 +12,7 @@ public enum SignalAngel implements NamableWrapper {
     private Quaternion quaternion;
 
     private SignalAngel() {
-        quaternion = Quaternion.fromXYZ(0, (float) getRadians(), 0);
+        quaternion = new Quaternion(0, (float) getRadians(), 0, false);
     }
 
     public double getRadians() {

@@ -25,32 +25,32 @@ import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import io.netty.buffer.Unpooled;
+import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.game.ClientboundCustomPayloadPacket;
-import net.minecraft.network.protocol.game.ServerboundCustomPayloadPacket;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.network.play.client.CCustomPayloadPacket;
+import net.minecraft.network.play.server.SCustomPayloadPlayPacket;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.World;
+import net.minecraft.world.chunk.IChunk;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkEvent.ClientCustomPayloadEvent;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.event.EventNetworkChannel;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
+import net.minecraftforge.fml.network.NetworkEvent.ClientCustomPayloadEvent;
+import net.minecraftforge.fml.network.NetworkRegistry;
+import net.minecraftforge.fml.network.event.EventNetworkChannel;
 
 public final class SignalStateHandler implements INetworkSync {
 
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
-    private static final Map<ChunkAccess, List<SignalStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
-    private static final Map<Level, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<IChunk, List<SignalStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
+    private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, Integer> SIGNAL_COUNTER = new HashMap<>();
     private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
     private static EventNetworkChannel channel;
@@ -70,7 +70,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     @SubscribeEvent
-    public static void shutdown(final ServerStoppingEvent event) {
+    public static void shutdown(final FMLServerStoppingEvent event) {
         service.shutdown();
         try {
             service.awaitTermination(1, TimeUnit.DAYS);
@@ -197,7 +197,7 @@ public final class SignalStateHandler implements INetworkSync {
             return states;
         } else {
             if (info.world.isClientSide) {
-                return Map.of();
+                return new HashMap<>();
             }
             return readAndSerialize(info);
         }
@@ -212,6 +212,7 @@ public final class SignalStateHandler implements INetworkSync {
         }
         map.put(property, value);
         setStates(info, map);
+        info.signal.getUpdate(info.world, info.pos);
     }
 
     public static Optional<String> getState(final SignalStateInfo info, final SEProperty property) {
@@ -253,15 +254,15 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onChunkLoad(final ChunkEvent.Load event) {
-        final ChunkAccess chunk = event.getChunk();
-        final Level world = (Level) chunk.getWorldForge();
+        final IChunk chunk = event.getChunk();
+        final World world = (World) chunk.getWorldForge();
         if (world.isClientSide())
             return;
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
                         new SignalStateFile(Paths.get("osfiles/signalfiles/"
-                                + ((ServerLevel) world).getServer().getWorldData().getLevelName()
+                                + ((ServerWorld) world).getServer().getWorldData().getLevelName()
                                         .replace(":", "").replace("/", "").replace("\\", "")
                                 + "/" + world.dimension().location().toString().replace(":", ""))));
             }
@@ -286,8 +287,8 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onChunkUnload(final ChunkEvent.Unload event) {
-        final ChunkAccess chunk = event.getChunk();
-        final Level level = (Level) chunk.getWorldForge();
+        final IChunk chunk = event.getChunk();
+        final World level = (World) chunk.getWorldForge();
         if (level.isClientSide())
             return;
         service.submit(() -> {
@@ -334,7 +335,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
-        final Player player = event.getPlayer();
+        final PlayerEntity player = event.getPlayer();
         Map<SignalStateInfo, Map<SEProperty, String>> map;
         synchronized (CURRENTLY_LOADED_STATES) {
             map = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
@@ -462,14 +463,14 @@ public final class SignalStateHandler implements INetworkSync {
         });
     }
 
-    private static void sendTo(final Player player, final ByteBuffer buf) {
-        final FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.copiedBuffer(buf.position(0)));
-        if (player instanceof ServerPlayer) {
-            final ServerPlayer server = (ServerPlayer) player;
-            server.connection.send(new ClientboundCustomPayloadPacket(channelName, buffer));
+    private static void sendTo(final PlayerEntity player, final ByteBuffer buf) {
+        final PacketBuffer buffer = new PacketBuffer(Unpooled.copiedBuffer(buf.array()));
+        if (player instanceof ServerPlayerEntity) {
+            final ServerPlayerEntity server = (ServerPlayerEntity) player;
+            server.connection.send(new SCustomPayloadPlayPacket(channelName, buffer));
         } else {
             final Minecraft mc = Minecraft.getInstance();
-            mc.getConnection().send(new ServerboundCustomPayloadPacket(channelName, buffer));
+            mc.getConnection().send(new CCustomPayloadPacket(channelName, buffer));
         }
     }
 

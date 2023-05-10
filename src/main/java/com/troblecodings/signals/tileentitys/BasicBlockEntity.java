@@ -10,12 +10,7 @@ import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-
-public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
+public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     public static final String GUI_TAG = "guiTag";
     public static final String POS_TAG = "posTag";
@@ -23,7 +18,7 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
     protected String customName = null;
 
     public BasicBlockEntity(final TileEntityInfo info) {
-        super(info.type, info.pos, info.state);
+        super(info.type);
     }
 
     public void saveWrapper(final NBTWrapper wrapper) {
@@ -33,15 +28,16 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
     }
 
     @Override
-    protected final void saveAdditional(final CompoundTag tag) {
-        super.saveAdditional(tag);
-        saveWrapper(new NBTWrapper(tag));
+    public void deserializeNBT(final CompoundNBT nbt) {
+        super.deserializeNBT(nbt);
+        saveWrapper(new NBTWrapper(nbt));
     }
 
     @Override
-    public final void load(final CompoundTag tag) {
-        this.loadWrapper(new NBTWrapper(tag));
-        super.load(tag);
+    public CompoundNBT serializeNBT() {
+        final NBTWrapper wrapper = new NBTWrapper(super.serializeNBT());
+        this.loadWrapper(wrapper);
+        return wrapper.tag;
     }
 
     public List<BlockPos> getLinkedPos() {

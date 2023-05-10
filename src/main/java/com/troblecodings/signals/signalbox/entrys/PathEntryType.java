@@ -9,7 +9,7 @@ import java.util.Objects;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.enums.EnumPathUsage;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public final class PathEntryType<T> {
 
@@ -58,7 +58,6 @@ public final class PathEntryType<T> {
      */
     public IPathEntry<T> newValue() {
         try {
-            @SuppressWarnings("deprecation")
             final IPathEntry<T> t = this.entryClass.newInstance();
             t.setName(name);
             return t;

@@ -11,11 +11,8 @@ import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
+import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientNameHandler implements INetworkSync {
 

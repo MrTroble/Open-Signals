@@ -8,7 +8,7 @@ import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.util.Rotation;
 
 public class ModeSet implements INetworkSavable {
 

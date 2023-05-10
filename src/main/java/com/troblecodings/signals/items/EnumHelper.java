@@ -2,17 +2,17 @@ package com.troblecodings.signals.items;
 
 import com.troblecodings.signals.OpenSignalsMain;
 
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.IArmorMaterial;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.SoundEvent;
 
 public final class EnumHelper {
 
     private EnumHelper() {
     }
 
-    private static class ImplArmorMat implements ArmorMaterial {
+    private static class ImplArmorMat implements IArmorMaterial {
 
         private final int[] defense;
         private final int durability;
@@ -38,12 +38,12 @@ public final class EnumHelper {
         }
 
         @Override
-        public int getDurabilityForSlot(final EquipmentSlot slot) {
+        public int getDurabilityForSlot(final EquipmentSlotType slot) {
             return durability;
         }
 
         @Override
-        public int getDefenseForSlot(final EquipmentSlot slot) {
+        public int getDefenseForSlot(final EquipmentSlotType slot) {
             return this.defense[slot.getIndex()];
         }
 
@@ -76,10 +76,9 @@ public final class EnumHelper {
         public float getKnockbackResistance() {
             return this.knock;
         }
-
     }
 
-    public static ArmorMaterial addArmorMaterial(final String name, final int durability,
+    public static IArmorMaterial addArmorMaterial(final String name, final int durability,
             final int[] defense, final int enchant, final SoundEvent event, final float toughness) {
         return new ImplArmorMat(defense, durability, enchant, event, Ingredient.EMPTY, name,
                 toughness, toughness);

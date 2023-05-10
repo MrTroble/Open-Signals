@@ -35,31 +35,28 @@ import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition.Builder;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.material.Material;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.state.EnumProperty;
+import net.minecraft.state.StateContainer.Builder;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.BlockRayTraceResult;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IWorld;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -92,27 +89,27 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public boolean propagatesSkylightDown(final BlockState state, final BlockGetter getter,
+    public boolean propagatesSkylightDown(final BlockState state, final IBlockReader getter,
             final BlockPos pos) {
         return true;
     }
 
     @Override
-    public float getShadeBrightness(final BlockState state, final BlockGetter getter,
+    public float getShadeBrightness(final BlockState state, final IBlockReader getter,
             final BlockPos pos) {
         return 1.0F;
     }
 
     @Override
-    public VoxelShape getBlockSupportShape(final BlockState stat, final BlockGetter getter,
+    public VoxelShape getBlockSupportShape(final BlockState stat, final IBlockReader getter,
             final BlockPos pos) {
-        return Shapes.empty();
+        return VoxelShapes.block();
     }
 
     @Override
-    public BlockState getStateForPlacement(final BlockPlaceContext context) {
+    public BlockState getStateForPlacement(final BlockItemUseContext context) {
         final int angel = Integer
-                .valueOf(Mth.floor(context.getRotation() * 16.0F / 360.0F + 0.5D) & 15);
+                .valueOf(MathHelper.floor(context.getRotation() * 16.0F / 360.0F + 0.5D) & 15);
         return defaultBlockState().setValue(ANGEL, SignalAngel.values()[angel]);
     }
 
@@ -121,33 +118,34 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final BlockGetter source, final BlockPos pos,
-            final CollisionContext context) {
+    public VoxelShape getShape(final BlockState state, final IBlockReader source,
+            final BlockPos pos, final ISelectionContext context) {
         final SignalTileEntity te = (SignalTileEntity) source.getBlockEntity(pos);
         if (te == null)
-            return Shapes.block();
-        final Level world = te.getLevel();
+            return VoxelShapes.block();
+        final World world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
                 ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
                 : SignalStateHandler.getStates(info);
-        return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(properties), 0));
+        return VoxelShapes
+                .create(VoxelShapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
 
     @Override
-    public VoxelShape getCollisionShape(final BlockState blockState, final BlockGetter worldIn,
-            final BlockPos pos, final CollisionContext context) {
+    public VoxelShape getCollisionShape(final BlockState blockState, final IBlockReader worldIn,
+            final BlockPos pos, final ISelectionContext context) {
         return getShape(blockState, worldIn, pos, context);
     }
 
     @Override
-    public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
-            final BlockGetter level, final BlockPos pos, final Player player) {
+    public ItemStack getCloneItemStack(final IBlockReader getter, final BlockPos pos,
+            final BlockState state) {
         return getPlacementtool().getDefaultInstance();
     }
 
     @Override
-    protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
         final List<SEProperty> properties = new ArrayList<>();
         nextConsumer.accept(properties);
         nextConsumer = _u -> {
@@ -166,13 +164,13 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public void destroy(final LevelAccessor worldIn, final BlockPos pos, final BlockState state) {
+    public void destroy(final IWorld worldIn, final BlockPos pos, final BlockState state) {
         super.destroy(worldIn, pos, state);
         GhostBlock.destroyUpperBlock(worldIn, pos);
-        if (!worldIn.isClientSide() && worldIn instanceof Level) {
-            SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos, this));
-            NameHandler.setRemoved(new NameStateInfo((Level) worldIn, pos));
-            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (Level) worldIn));
+        if (!worldIn.isClientSide() && worldIn instanceof World) {
+            SignalStateHandler.setRemoved(new SignalStateInfo((World) worldIn, pos, this));
+            NameHandler.setRemoved(new NameStateInfo((World) worldIn, pos));
+            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (World) worldIn));
         }
     }
 
@@ -294,7 +292,7 @@ public class Signal extends BasicBlock {
         }
         if (customRenderHeight == -1)
             return;
-        final Level world = info.tileEntity.getLevel();
+        final World world = info.tileEntity.getLevel();
         final BlockPos pos = info.tileEntity.getBlockPos();
         final BlockState state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof Signal)) {
@@ -356,28 +354,27 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public InteractionResult use(final BlockState blockstate, final Level level,
-            final BlockPos blockPos, final Player placer, final InteractionHand hand,
-            final BlockHitResult blockHit) {
-        if (!(blockstate.getBlock() instanceof Signal)) {
-            return InteractionResult.FAIL;
+    public ActionResultType use(final BlockState state, final World world, final BlockPos pos,
+            final PlayerEntity player, final Hand hand, final BlockRayTraceResult result) {
+        if (!(state.getBlock() instanceof Signal)) {
+            return ActionResultType.FAIL;
         }
-        final SignalStateInfo stateInfo = new SignalStateInfo(level, blockPos, this);
-        if (loadRedstoneOutput(level, stateInfo)) {
-            level.blockUpdated(blockPos, blockstate.getBlock());
-            return InteractionResult.SUCCESS;
+        final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
+        if (loadRedstoneOutput(world, stateInfo)) {
+            world.blockUpdated(pos, state.getBlock());
+            return ActionResultType.SUCCESS;
         }
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
-        if (!placer.getItemInHand(InteractionHand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)
+        if (!player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)
                 && (canBeLinked() || customname)) {
-            OpenSignalsMain.handler.invokeGui(Signal.class, placer, level, blockPos, "signal");
-            return InteractionResult.SUCCESS;
+            OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
+            return ActionResultType.SUCCESS;
         }
-        return InteractionResult.FAIL;
+        return ActionResultType.FAIL;
     }
 
     @SuppressWarnings("unchecked")
-    private boolean loadRedstoneOutput(final Level worldIn, final SignalStateInfo info) {
+    private boolean loadRedstoneOutput(final World worldIn, final SignalStateInfo info) {
         if (!this.prop.redstoneOutputs.isEmpty()) {
             final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
             this.powerProperty = null;
@@ -401,20 +398,20 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public int getSignal(final BlockState state, final BlockGetter getter, final BlockPos pos,
+    public int getSignal(final BlockState state, final IBlockReader getter, final BlockPos pos,
             final Direction direction) {
         return getDirectSignal(state, getter, pos, direction);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int getDirectSignal(final BlockState blockState, final BlockGetter blockAccess,
+    public int getDirectSignal(final BlockState blockState, final IBlockReader blockAccess,
             final BlockPos pos, final Direction side) {
         if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null
-                || !(blockAccess instanceof Level)) {
+                || !(blockAccess instanceof World)) {
             return 0;
         }
-        final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
+        final SignalStateInfo stateInfo = new SignalStateInfo((World) blockAccess, pos, this);
         if (SignalStateHandler.getState(stateInfo, powerProperty)
                 .filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
             return 0;
@@ -429,7 +426,7 @@ public class Signal extends BasicBlock {
     }
 
     @SuppressWarnings("unchecked")
-    public void getUpdate(final Level world, final BlockPos pos) {
+    public void getUpdate(final World world, final BlockPos pos) {
         if (this.prop.sounds.isEmpty())
             return;
 
@@ -440,13 +437,13 @@ public class Signal extends BasicBlock {
             return;
 
         if (sound.duration == 1) {
-            world.playSound(null, pos, sound.sound, SoundSource.BLOCKS, 1.0F, 1.0F);
+            world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
         } else {
             if (world.getBlockTicks().hasScheduledTick(pos, this)) {
                 return;
             } else {
                 if (sound.predicate.test(properties)) {
-                    world.scheduleTick(pos, this, 1);
+                    // TODO world.scheduleTick(pos, this, 1);
                 }
             }
         }
@@ -463,7 +460,7 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public void tick(final BlockState state, final ServerLevel world, final BlockPos pos,
+    public void tick(final BlockState state, final ServerWorld world, final BlockPos pos,
             final Random rand) {
         if (this.prop.sounds.isEmpty() || world.isClientSide) {
             return;
@@ -473,8 +470,8 @@ public class Signal extends BasicBlock {
         if (sound.duration <= 1) {
             return;
         }
-        world.playSound(null, pos, sound.sound, SoundSource.BLOCKS, 1.0F, 1.0F);
-        world.scheduleTick(pos, this, sound.duration);
+        world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        // TODO world.scheduleTick(pos, this, sound.duration);
     }
 
     @Override

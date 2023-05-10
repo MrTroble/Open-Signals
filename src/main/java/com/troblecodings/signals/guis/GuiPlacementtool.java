@@ -26,10 +26,10 @@ import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -42,7 +42,7 @@ public class GuiPlacementtool extends GuiBase {
     private final UIBlockRender blockRender = new UIBlockRender();
     private Signal currentSelectedBlock;
     private final Placementtool tool;
-    private final Player player;
+    private final PlayerEntity player;
     private final ContainerPlacementtool container;
     private UIEnumerable enumerable;
     private boolean loaded = false;

@@ -17,14 +17,14 @@ import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Registry;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.AirBlock;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.block.AirBlock;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
+import net.minecraft.world.World;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
@@ -36,12 +36,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public void setLevel(final Level world) {
-        super.setLevel(world);
+    public void setLevelAndPosition(final World world, final BlockPos blockPos) {
+        super.setLevelAndPosition(world, blockPos);
         grid.setPosAndWorld(worldPosition, world);
         if (world.isClientSide)
             return;
-        SignalBoxHandler.setWorld(new PosIdentifier(worldPosition, world));
+        SignalBoxHandler.setWorld(new PosIdentifier(blockPos, world));
     }
 
     @Override
@@ -69,7 +69,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public boolean link(final BlockPos pos, final CompoundTag tag) {
+    public boolean link(final BlockPos pos, final CompoundNBT tag) {
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
                 tag.getString(SignalControllerTileEntity.SIGNAL_NAME)));
@@ -110,7 +110,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public boolean isValid(final Player player) {
+    public boolean isValid(final PlayerEntity player) {
         if (clientSyncs.isEmpty())
             return false;
         return this.clientSyncs.get(0).getPlayer().equals(player);

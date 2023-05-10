@@ -4,17 +4,17 @@ import java.util.Objects;
 
 import com.troblecodings.signals.blocks.RedstoneInput;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class RedstoneUpdatePacket {
 
-    public final Level world;
+    public final World world;
     public final BlockPos pos;
     public final boolean state;
     public final RedstoneInput block;
 
-    public RedstoneUpdatePacket(final Level world, final BlockPos pos, final boolean state,
+    public RedstoneUpdatePacket(final World world, final BlockPos pos, final boolean state,
             final RedstoneInput block) {
         this.world = world;
         this.pos = pos;

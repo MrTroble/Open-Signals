@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.renderer.model.BakedQuad;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.core.Direction;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.util.Direction;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IDynamicBakedModel;
@@ -18,7 +18,7 @@ import net.minecraftforge.client.model.data.IModelData;
 @OnlyIn(Dist.CLIENT)
 public class SignalBakedModel implements IDynamicBakedModel {
 
-    private final BakedModel baseGetter;
+    private final IBakedModel baseGetter;
     private final List<BakedModelPair> bakedCache;
 
     public SignalBakedModel(final List<BakedModelPair> bakedCache) {
@@ -53,7 +53,7 @@ public class SignalBakedModel implements IDynamicBakedModel {
     }
 
     @Override
-    public ItemOverrides getOverrides() {
+    public ItemOverrideList getOverrides() {
         return baseGetter.getOverrides();
     }
 

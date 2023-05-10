@@ -2,12 +2,12 @@ package com.troblecodings.signals.handler;
 
 import java.util.Objects;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class ClientSignalStateInfo extends SignalStateInfo {
 
-    public ClientSignalStateInfo(final Level world, final BlockPos pos) {
+    public ClientSignalStateInfo(final World world, final BlockPos pos) {
         super(world, pos, null);
     }
 
