@@ -83,7 +83,7 @@ public class OpenSignalsMain {
         debug = false;
         log = LoggerContext.getContext().getLogger(MODID);
         contentPacks = new FileReader(MODID, "assets/" + MODID, log,
-                name -> getRessourceLocation(name), OSBlocks.class);
+                name -> getRessourceLocation(name));
         proxy.initModEvent(event);
     }
 
