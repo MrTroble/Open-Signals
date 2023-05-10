@@ -467,5 +467,7 @@
     "property.value.ZS13": "Zs13",
     "property.value.ZP8": "Zp8",
     "property.value.ZP9": "Zp9",
-    "error.nooutputupdate": "No Output Update"
+    "error.nooutputupdate": "No Output Update",
+    "property.doublesided.name": "Double Sided Text",
+    "property.doublesided.desc": "Change, if the text should displayed doublesided."
 }

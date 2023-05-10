@@ -484,3 +484,5 @@ property.value.ZS13=Zs13
 property.value.ZP8=Zp8
 property.value.ZP9=Zp9
 error.nooutputupdate=Kein Output Update
+property.doublesided.name=Doppelseitiger Text
+property.doublesided.desc=Ändert, ob der Text auf beiden Seiten angezeigt werden soll.

@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.math.Quaternion;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
@@ -28,6 +29,7 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.parser.ValuePack;
+import com.troblecodings.signals.properties.BooleanProperty;
 import com.troblecodings.signals.properties.FloatProperty;
 import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
@@ -220,6 +222,7 @@ public class Signal extends BasicBlock {
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
+        boolean doubleSidedText = false;
         final Map<SEProperty, String> map = ClientSignalStateHandler
                 .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
                         info.tileEntity.getBlockPos()));
@@ -229,6 +232,11 @@ public class Signal extends BasicBlock {
         for (final FloatProperty property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
                 customRenderHeight = property.height;
+            }
+        }
+        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+            if (boolProp.predicate.test(map)) {
+                doubleSidedText = boolProp.doubleSided;
             }
         }
         if (customRenderHeight == -1)
@@ -246,12 +254,31 @@ public class Signal extends BasicBlock {
 
         final float scale = this.prop.signScale;
 
+        if (this.prop.autoscale) {
+            int textWidth = 0;
+            textWidth = info.font.width(name);
+        //    scale = Math.max(this.prop.signWidth / textWidth, scale);
+        }
+
         info.stack.pushPose();
         info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
-        info.stack.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
         info.stack.mulPose(face.getQuaternion());
+        info.stack.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
+
+        if (this.prop.autoscale) {
+        //    info.stack.translate(- 66.6f, -scale / 2, 0);
+        }
 
         renderSingleOverlay(info, display);
+
+        if (doubleSidedText) {
+            final Quaternion quad = new Quaternion(
+                    Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+            info.stack.mulPose(quad);
+            info.stack.mulPose(face.getQuaternion());
+            info.stack.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
+            renderSingleOverlay(info, display);
+        }
 
         info.stack.popPose();
     }
@@ -261,17 +288,17 @@ public class Signal extends BasicBlock {
         final float width = this.prop.signWidth;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
-        final float scale = this.prop.signScale;
         info.stack.pushPose();
         info.stack.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         info.stack.scale(-1f, 1f, 1f);
 
+        int k = 0;
         for (int i = 0; i < display.length; i++) {
             final List<FormattedCharSequence> splittedList = info.font
                     .split(FormattedText.of(display[i]), (int) width);
-
             for (int j = 0; j < splittedList.size(); j++) {
-                info.font.draw(info.stack, splittedList.get(j), 0, (j * scale * 10), 0);
+                info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
+                k++;
             }
         }
         info.stack.popPose();
