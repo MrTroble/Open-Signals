@@ -215,7 +215,60 @@ public class Signal extends BasicBlock {
 
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
+        if (this.prop.autoscale) {
+            renderScaleOverlay(info, this.prop.customNameRenderHeight);
+            return;
+        }
         this.renderOverlay(info, this.prop.customNameRenderHeight);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @OnlyIn(Dist.CLIENT)
+    public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
+        float customRenderHeight = renderHeight;
+        final Map<SEProperty, String> map = ClientSignalStateHandler
+                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
+                        info.tileEntity.getBlockPos()));
+        final String customNameState = map.get(CUSTOMNAME);
+        if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
+            return;
+        for (final FloatProperty property : this.prop.customRenderHeights) {
+            if (property.predicate.test(map)) {
+                customRenderHeight = property.height;
+            }
+            if (customRenderHeight == -1)
+                return;
+        }
+        final Level world = info.tileEntity.getLevel();
+        final BlockPos pos = info.tileEntity.getBlockPos();
+        final BlockState state = world.getBlockState(pos);
+        if (!(state.getBlock() instanceof Signal)) {
+            return;
+        }
+        final String name = info.tileEntity.getNameWrapper();
+        final SignalAngel face = state.getValue(Signal.ANGEL);
+
+        final String[] display = name.split("\\[n\\]");
+        
+        final float width = info.font.width(name);
+        final float scale = Math.min(1 / (22 * (width / 56)), 0.1f);
+        
+        info.stack.pushPose();
+        info.stack.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
+        info.stack.mulPose(face.getQuaternion());
+        info.stack.scale(- scale, - scale, 1);
+        info.stack.translate(-1.3f / scale, 0, -0.32f);
+        
+        int k = 0;
+        for (int i = 0; i < display.length; i++) {
+            final List<FormattedCharSequence> splittedList = info.font
+                    .split(FormattedText.of(display[i]), (int) this.prop.signWidth);
+            for (int j = 0; j < splittedList.size(); j++) {
+                info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
+                k++;
+            }
+        }
+        info.stack.popPose();
     }
 
     @SuppressWarnings("unchecked")
@@ -254,20 +307,10 @@ public class Signal extends BasicBlock {
 
         final float scale = this.prop.signScale;
 
-        if (this.prop.autoscale) {
-            int textWidth = 0;
-            textWidth = info.font.width(name);
-            // scale = Math.max(this.prop.signWidth / textWidth, scale);
-        }
-
         info.stack.pushPose();
         info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
         info.stack.mulPose(face.getQuaternion());
         info.stack.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
-
-        if (this.prop.autoscale) {
-            // info.stack.translate(- 66.6f, -scale / 2, 0);
-        }
 
         renderSingleOverlay(info, display);
 
