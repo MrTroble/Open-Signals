@@ -221,7 +221,7 @@ public class Signal extends BasicBlock {
         }
         this.renderOverlay(info, this.prop.customNameRenderHeight);
     }
-    
+
     @SuppressWarnings("unchecked")
     @OnlyIn(Dist.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
@@ -249,16 +249,16 @@ public class Signal extends BasicBlock {
         final SignalAngel face = state.getValue(Signal.ANGEL);
 
         final String[] display = name.split("\\[n\\]");
-        
+
         final float width = info.font.width(name);
         final float scale = Math.min(1 / (22 * (width / 56)), 0.1f);
-        
+
         info.stack.pushPose();
         info.stack.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
         info.stack.mulPose(face.getQuaternion());
-        info.stack.scale(- scale, - scale, 1);
+        info.stack.scale(-scale, -scale, 1);
         info.stack.translate(-1.3f / scale, 0, -0.32f);
-        
+
         int k = 0;
         for (int i = 0; i < display.length; i++) {
             final List<FormattedCharSequence> splittedList = info.font
