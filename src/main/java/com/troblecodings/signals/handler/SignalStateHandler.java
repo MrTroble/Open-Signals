@@ -326,7 +326,9 @@ public final class SignalStateHandler implements INetworkSync {
         if (unload.getWorld().isClientSide())
             return;
         service.execute(() -> {
-            ALL_LEVEL_FILES.remove(unload.getWorld());
+            synchronized (ALL_LEVEL_FILES) {
+                ALL_LEVEL_FILES.remove(unload.getWorld());
+            }
         });
     }
 
@@ -337,10 +339,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             map = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
-        map.forEach((state, properites) -> {
-            final ByteBuffer buffer = packToByteBuffer(state, properites);
-            sendTo(player, buffer);
-        });
+        map.forEach((state, properites) -> sendTo(player, packToByteBuffer(state, properites)));
     }
 
     public static void setRemoved(final SignalStateInfo info) {
@@ -358,7 +357,9 @@ public final class SignalStateHandler implements INetworkSync {
             }
             sendRemoved(info);
             updateListeners(info, true);
-            ALL_LISTENERS.remove(info);
+            synchronized (ALL_LISTENERS) {
+                ALL_LISTENERS.remove(info);
+            }
             final ChunkAccess chunk = info.world.getChunk(info.pos);
             if (chunk == null)
                 return;
