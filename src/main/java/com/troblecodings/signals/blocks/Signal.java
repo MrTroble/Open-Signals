@@ -9,6 +9,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
+import com.mojang.math.Quaternion;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
@@ -28,6 +29,7 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.parser.ValuePack;
+import com.troblecodings.signals.properties.BooleanProperty;
 import com.troblecodings.signals.properties.FloatProperty;
 import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
@@ -211,18 +213,81 @@ public class Signal extends BasicBlock {
 
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
+        if (this.prop.autoscale) {
+            renderScaleOverlay(info, this.prop.customNameRenderHeight);
+            return;
+        }
         this.renderOverlay(info, this.prop.customNameRenderHeight);
+    }
+
+    @SuppressWarnings("unchecked")
+    @OnlyIn(Dist.CLIENT)
+    public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
+        float customRenderHeight = renderHeight;
+        final Map<SEProperty, String> map = ClientSignalStateHandler
+                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
+                        info.tileEntity.getBlockPos()));
+        final String customNameState = map.get(CUSTOMNAME);
+        if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
+            return;
+        for (final FloatProperty property : this.prop.customRenderHeights) {
+            if (property.predicate.test(map)) {
+                customRenderHeight = property.height;
+            }
+            if (customRenderHeight == -1)
+                return;
+        }
+        final Level world = info.tileEntity.getLevel();
+        final BlockPos pos = info.tileEntity.getBlockPos();
+        final BlockState state = world.getBlockState(pos);
+        if (!(state.getBlock() instanceof Signal)) {
+            return;
+        }
+        final String name = info.tileEntity.getNameWrapper();
+        final SignalAngel face = state.getValue(Signal.ANGEL);
+
+        final String[] display = name.split("\\[n\\]");
+
+        final float width = info.font.width(name);
+        final float scale = Math.min(1 / (22 * (width / 56)), 0.1f);
+
+        info.stack.pushPose();
+        info.stack.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
+        info.stack.mulPose(face.getQuaternion());
+        info.stack.scale(-scale, -scale, 1);
+        info.stack.translate(-1.3f / scale, 0, -0.32f);
+
+        int k = 0;
+        for (int i = 0; i < display.length; i++) {
+            final List<FormattedCharSequence> splittedList = info.font
+                    .split(FormattedText.of(display[i]), (int) this.prop.signWidth);
+            for (int j = 0; j < splittedList.size(); j++) {
+                info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
+                k++;
+            }
+        }
+        info.stack.popPose();
     }
 
     @SuppressWarnings("unchecked")
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        final Map<SEProperty, String> map = SignalStateHandler.getStates(new SignalStateInfo(
-                info.tileEntity.getLevel(), info.tileEntity.getBlockPos(), this));
+        boolean doubleSidedText = false;
+        final Map<SEProperty, String> map = ClientSignalStateHandler
+                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
+                        info.tileEntity.getBlockPos()));
+        final String customNameState = map.get(CUSTOMNAME);
+        if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
+            return;
         for (final FloatProperty property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
                 customRenderHeight = property.height;
+            }
+        }
+        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+            if (boolProp.predicate.test(map)) {
+                doubleSidedText = boolProp.doubleSided;
             }
         }
         if (customRenderHeight == -1)
@@ -233,7 +298,7 @@ public class Signal extends BasicBlock {
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
-        final String name = info.tileEntity.getNameAsStringWrapper();
+        final String name = info.tileEntity.getNameWrapper();
         final SignalAngel face = state.getValue(Signal.ANGEL);
 
         final String[] display = name.split("\\[n\\]");
@@ -242,10 +307,19 @@ public class Signal extends BasicBlock {
 
         info.stack.pushPose();
         info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
-        info.stack.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
         info.stack.mulPose(face.getQuaternion());
+        info.stack.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
 
         renderSingleOverlay(info, display);
+
+        if (doubleSidedText) {
+            final Quaternion quad = new Quaternion(
+                    Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+            info.stack.mulPose(quad);
+            info.stack.mulPose(face.getQuaternion());
+            info.stack.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
+            renderSingleOverlay(info, display);
+        }
 
         info.stack.popPose();
     }
@@ -255,12 +329,18 @@ public class Signal extends BasicBlock {
         final float width = this.prop.signWidth;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
-        final float scale = this.prop.signScale;
         info.stack.pushPose();
         info.stack.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         info.stack.scale(-1f, 1f, 1f);
+
+        int k = 0;
         for (int i = 0; i < display.length; i++) {
-            info.font.draw(info.stack, display[i], (i * scale * 2.8f), width, 0);
+            final List<FormattedCharSequence> splittedList = info.font
+                    .split(FormattedText.of(display[i]), (int) width);
+            for (int j = 0; j < splittedList.size(); j++) {
+                info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
+                k++;
+            }
         }
         info.stack.popPose();
     }
@@ -333,7 +413,7 @@ public class Signal extends BasicBlock {
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((World) blockAccess, pos, this);
         if (SignalStateHandler.getState(stateInfo, powerProperty)
-                .filter(power -> power.equals("false")).isPresent()) {
+                .filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
             return 0;
         }
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);

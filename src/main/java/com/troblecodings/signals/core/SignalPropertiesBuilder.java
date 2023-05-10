@@ -16,6 +16,7 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 import com.troblecodings.signals.parser.ValuePack;
+import com.troblecodings.signals.properties.BooleanProperty;
 import com.troblecodings.signals.properties.FloatProperty;
 import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
@@ -31,9 +32,12 @@ public class SignalPropertiesBuilder {
     private float customNameRenderHeight = -1;
     private Map<String, Float> renderHeights;
     private float signWidth = 22;
+    private boolean autoscale = false;
     private float offsetX = 0;
     private float offsetY = 0;
     private float signScale = 1;
+    private Map<String, Boolean> doubleSidedText;
+    private int textColor = 0;
     private boolean canLink = true;
     private List<Integer> colors;
     private Map<String, SoundPropertyParser> sounds;
@@ -117,12 +121,27 @@ public class SignalPropertiesBuilder {
                         new ValuePack(property, LogicParser.predicate(outputs.getKey(), info)));
             }
         }
+        
+        final List<BooleanProperty> doubleText = new ArrayList<>();
+        if (doubleSidedText != null) {
+            doubleSidedText.forEach((property, bool) -> {
+                try {
+                    doubleText
+                            .add(new BooleanProperty(LogicParser.predicate(property, info), bool));
+                } catch (final LogicalParserException e) {
+                    OpenSignalsMain.getLogger()
+                            .error("Something went wrong during the registry of a predicate in "
+                                    + info.signalName + "!\nWith statement:" + property);
+                    e.printStackTrace();
+                }
+            });
+        }
 
         this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
-                ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
-                canLink, colors, ImmutableList.copyOf(renderheights),
+                ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale, autoscale,
+                ImmutableList.copyOf(doubleText), textColor, canLink, colors, ImmutableList.copyOf(renderheights),
                 ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs),
                 defaultItemDamage);
     }

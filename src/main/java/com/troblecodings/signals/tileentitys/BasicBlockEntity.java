@@ -10,10 +10,6 @@ import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-
 public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     public static final String GUI_TAG = "guiTag";
@@ -60,5 +56,11 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     @Override
     public boolean hasCustomName() {
         return customName != null;
+    }
+
+    public void setCustomName(final String name) {
+        this.customName = name;
+        final BlockState state = this.getBlockState();
+        this.level.setBlocksDirty(worldPosition, state, state);
     }
 }

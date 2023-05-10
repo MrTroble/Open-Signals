@@ -13,9 +13,6 @@ import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
 
@@ -67,6 +64,8 @@ public class ClientSignalStateHandler implements INetworkSync {
                 }
                 CURRENTLY_LOADED_STATES.put(stateInfo, properties);
             }
+            final BlockState state = entity.getBlockState();
+            mc.level.setBlocksDirty(signalPos, state, state);
             entity.requestModelDataUpdate();
             mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
         });

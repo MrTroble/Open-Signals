@@ -2,6 +2,7 @@ package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -42,6 +43,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private final GuiInfo info;
     protected SignalBoxGrid grid;
     private Consumer<String> run;
+    private Consumer<List<SignalBoxNode>> colorUpdates;
     protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
 
     public ContainerSignalBox(final GuiInfo info) {
@@ -96,8 +98,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 break;
             }
             case SEND_PW_UPDATE: {
-                grid.readUpdateNetwork(buffer, false);
-                update();
+                colorUpdates.accept(grid.readUpdateNetwork(buffer, false));
                 break;
             }
             case NO_PW_FOUND: {
@@ -105,7 +106,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 break;
             }
             case NO_OUTPUT_UPDATE: {
-                run.accept(I18n.get("error.nooputputupdate"));
+                run.accept(I18n.get("error.nooutputupdate"));
                 break;
             }
             case OUTPUT_UPDATE: {
@@ -152,7 +153,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 break;
             }
             case SEND_ZS2_ENTRY: {
-                deserializeEntry(buffer, buffer.getBlockPos());
+                deserializeEntry(buffer, buffer.getByte());
                 break;
             }
             case REMOVE_POS: {
@@ -275,5 +276,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     protected void setConsumer(final Consumer<String> run) {
         this.run = run;
+    }
+
+    protected void setColorUpdater(final Consumer<List<SignalBoxNode>> updater) {
+        this.colorUpdates = updater;
     }
 }

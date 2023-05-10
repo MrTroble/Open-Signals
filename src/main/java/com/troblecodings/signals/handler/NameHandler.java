@@ -79,6 +79,17 @@ public final class NameHandler implements INetworkSync {
         }
         sendNameToClient(info, name);
         createToFile(info, name);
+        final Block block = info.world.getBlockState(info.pos).getBlock();
+        if (block instanceof Signal) {
+            SignalStateHandler.setState(new SignalStateInfo(info.world, info.pos, (Signal) block),
+                    Signal.CUSTOMNAME, "TRUE");
+        }
+        synchronized (CURRENTLY_LOADED_CHUNKS) {
+            final List<NameStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
+                    .get(info.world.getChunk(info.pos));
+            if (!allSignals.contains(info))
+                allSignals.add(info);
+        }
     }
 
     public static String getName(final NameStateInfo info) {
@@ -119,6 +130,12 @@ public final class NameHandler implements INetworkSync {
             }
             file.deleteIndex(info.pos);
             sendRemoved(info);
+            final ChunkAccess chunk = info.world.getChunk(info.pos);
+            if (chunk == null)
+                return;
+            synchronized (CURRENTLY_LOADED_CHUNKS) {
+                CURRENTLY_LOADED_CHUNKS.get(chunk).remove(info);
+            }
         });
     }
 
@@ -147,13 +164,20 @@ public final class NameHandler implements INetworkSync {
         if (unload.getWorld().isClientSide())
             return;
         service.execute(() -> {
-            ALL_LEVEL_FILES.remove(unload.getWorld());
+            synchronized (ALL_LEVEL_FILES) {
+                ALL_LEVEL_FILES.remove(unload.getWorld());
+            }
         });
     }
 
     private static void createToFile(final NameStateInfo info, final String name) {
         service.execute(() -> {
-            final NameHandlerFile file = ALL_LEVEL_FILES.get(info.world);
+            NameHandlerFile file;
+            synchronized (ALL_LEVEL_FILES) {
+                file = ALL_LEVEL_FILES.get(info.world);
+            }
+            if (file == null)
+                return;
             SignalStatePos posInFile = file.find(info.pos);
             if (posInFile == null) {
                 posInFile = file.createState(info.pos, name);
@@ -218,6 +242,8 @@ public final class NameHandler implements INetworkSync {
                 synchronized (ALL_NAMES) {
                     name = ALL_NAMES.remove(stateInfo);
                 }
+                if (name == null)
+                    return;
                 createToFile(stateInfo, name);
             });
         });

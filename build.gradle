@@ -43,7 +43,7 @@ curseforge {
   project {
     id = '440990'
     changelog = file('changelog.md')
-    releaseType = 'alpha'
+    releaseType = 'beta'
     changelogType = 'markdown'
     addGameVersion '1.16.5'
   }
@@ -54,7 +54,7 @@ curseforge {
 
 version = ver
 group = 'com.troblecodings'
-archivesBaseName = 'OpenSignals'
+archivesBaseName = 'OpenSignals-1.18.2'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
