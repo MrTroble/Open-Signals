@@ -30,7 +30,6 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void initModEvent(final FMLConstructModEvent event) {
-        OpenSignalsMain.contentPacks.loadasResourcePacks();
         super.initModEvent(event);
         SignalStateHandler.add(new ClientSignalStateHandler());
         NameHandler.add(new ClientNameHandler());
