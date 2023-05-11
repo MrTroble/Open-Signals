@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
+import com.troblecodings.signals.core.OSQuaternion;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
@@ -45,6 +46,7 @@ import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -53,6 +55,7 @@ import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.util.text.ITextProperties;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -259,8 +262,8 @@ public class Signal extends BasicBlock {
 
         int k = 0;
         for (int i = 0; i < display.length; i++) {
-            final List<FormattedCharSequence> splittedList = info.font
-                    .split(FormattedText.of(display[i]), (int) this.prop.signWidth);
+            final List<IReorderingProcessor> splittedList = info.font
+                    .split(ITextProperties.of(display[i]), (int) this.prop.signWidth);
             for (int j = 0; j < splittedList.size(); j++) {
                 info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
                 k++;
@@ -314,7 +317,7 @@ public class Signal extends BasicBlock {
 
         if (doubleSidedText) {
             final Quaternion quad = new Quaternion(
-                    Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+                    OSQuaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
             info.stack.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
@@ -335,8 +338,8 @@ public class Signal extends BasicBlock {
 
         int k = 0;
         for (int i = 0; i < display.length; i++) {
-            final List<FormattedCharSequence> splittedList = info.font
-                    .split(FormattedText.of(display[i]), (int) width);
+            final List<IReorderingProcessor> splittedList = info.font
+                    .split(ITextProperties.of(display[i]), (int) width);
             for (int j = 0; j < splittedList.size(); j++) {
                 info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
                 k++;
