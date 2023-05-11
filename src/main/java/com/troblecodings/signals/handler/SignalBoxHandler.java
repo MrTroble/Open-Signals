@@ -404,10 +404,9 @@ public final class SignalBoxHandler {
             wrapper.putList(OUTPUT_UPDATE, wrapperList);
             try {
                 Files.createDirectories(NBT_FILES_DIRECTORY);
-                final File file = Paths
-                        .get("osfiles/signalboxhandler/",
-                                world.getServer().getWorldData().getLevelName() + "_"
-                                        + world.dimension().location().toString().replace(":", "_"))
+                final File file = Paths.get("osfiles/signalboxhandler/",
+                        world.getServer().getWorldData().getLevelName() + "_" + world.dimension()
+                                .location().toString().replace(":", "_").replace("/", ""))
                         .toFile();
                 if (file.exists())
                     file.delete();
