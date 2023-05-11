@@ -405,8 +405,8 @@ public final class SignalBoxHandler {
             try {
                 Files.createDirectories(NBT_FILES_DIRECTORY);
                 final File file = Paths.get("osfiles/signalboxhandler/",
-                        world.getServer().getWorldData().getLevelName() + "_" + world.dimension()
-                                .location().toString().replace(":", "_").replace("/", ""))
+                        world.getServer().getWorldData().getLevelName().replace("/", "") + "_"
+                                + world.dimension().location().toString().replace(":", "_"))
                         .toFile();
                 if (file.exists())
                     file.delete();
