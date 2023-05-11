@@ -9,10 +9,10 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
-import com.troblecodings.signals.core.OSQuaternion;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
@@ -317,7 +317,7 @@ public class Signal extends BasicBlock {
 
         if (doubleSidedText) {
             final Quaternion quad = new Quaternion(
-                    OSQuaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+                    UIRotate.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
             info.stack.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
