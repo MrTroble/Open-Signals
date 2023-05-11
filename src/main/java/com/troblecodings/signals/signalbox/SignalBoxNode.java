@@ -110,7 +110,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                             p2.translate(1, 0);
                             break;
                         default:
-                            return;
+                            break;
                     }
                     break;
                 case STRAIGHT:
@@ -127,11 +127,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                             p2.translate(0, -1);
                             break;
                         default:
-                            return;
+                            break;
                     }
                     break;
                 default:
-                    return;
+                    continue;
             }
             final Path path = new Path(p1, p2);
             possibleConnections.put(path, mode);
