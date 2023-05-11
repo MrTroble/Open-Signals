@@ -31,11 +31,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 
 @Mod(OpenSignalsMain.MODID)
 public class OpenSignalsMain {
@@ -76,12 +78,15 @@ public class OpenSignalsMain {
 
     public static final int GUI_SIGNAL_CONTROLLER = 1;
 
+    public ModFile file;
+
     @SubscribeEvent
     public void preInit(final FMLConstructModEvent event) {
         debug = false;
         log = LoggerContext.getContext().getLogger(MODID);
+        file = ModList.get().getModFileById(MODID).getFile();
         contentPacks = new FileReader(MODID, "assets/" + MODID, log,
-                name -> getRessourceLocation(name));
+                name -> file.findResource(name));
         proxy.initModEvent(event);
     }
 
