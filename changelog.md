@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.18 Beta 2]
+* fix: pathway can't be set
+* fix: Issue in SignalStateHandler
+
 ## [1.18 Beta 1]
 
 * feat: added text input to placementtool
