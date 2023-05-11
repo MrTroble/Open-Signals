@@ -131,7 +131,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                     }
                     break;
                 default:
-                    break;
+                    continue;
             }
             final Path path = new Path(p1, p2);
             possibleConnections.put(path, mode);
