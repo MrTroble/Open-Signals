@@ -11,26 +11,11 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-<<<<<<<HEAD
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition.Builder;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.phys.BlockHitResult;=======
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer.Builder;
 import net.minecraft.util.ActionResultType;
@@ -40,7 +25,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.World;>>>>>>>e2d5c813362303efd062cfa5ad40f8725db2754d
+import net.minecraft.world.World;
 
 public class RedstoneIO extends BasicBlock {
 
@@ -53,13 +38,13 @@ public class RedstoneIO extends BasicBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
         builder.add(POWER);
     }
 
     @Override
-    public BlockState getStateForPlacement(final BlockPlaceContext context) {
-        final Level world = context.getLevel();
+    public BlockState getStateForPlacement(final BlockItemUseContext context) {
+        final World world = context.getLevel();
         if (!world.isClientSide) {
             NameHandler.setName(new NameStateInfo(world, context.getClickedPos()),
                     this.getRegistryName().getPath());
@@ -68,7 +53,7 @@ public class RedstoneIO extends BasicBlock {
     }
 
     @Override
-    public int getSignal(final BlockState blockState, final BlockGetter world, final BlockPos pos,
+    public int getSignal(final BlockState blockState, final IBlockReader world, final BlockPos pos,
             final Direction direction) {
         return this.getDirectSignal(blockState, world, pos, direction);
     }
@@ -85,8 +70,8 @@ public class RedstoneIO extends BasicBlock {
     }
 
     @Override
-    public ActionResultType use(BlockState state, World world, BlockPos pos, PlayerEntity player,
-            Hand hand, BlockRayTraceResult result) {
+    public ActionResultType use(final BlockState state, final World world, final BlockPos pos, final PlayerEntity player,
+            final Hand hand, final BlockRayTraceResult result) {
         if (!player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
             OpenSignalsMain.handler.invokeGui(RedstoneIO.class, player, world, pos, "redstoneio");
             return ActionResultType.SUCCESS;

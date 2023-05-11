@@ -130,7 +130,7 @@ public final class NameHandler implements INetworkSync {
             }
             file.deleteIndex(info.pos);
             sendRemoved(info);
-            final ChunkAccess chunk = info.world.getChunk(info.pos);
+            final IChunk chunk = info.world.getChunk(info.pos);
             if (chunk == null)
                 return;
             synchronized (CURRENTLY_LOADED_CHUNKS) {

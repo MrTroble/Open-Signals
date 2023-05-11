@@ -361,7 +361,7 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (ALL_LISTENERS) {
                 ALL_LISTENERS.remove(info);
             }
-            final ChunkAccess chunk = info.world.getChunk(info.pos);
+            final IChunk chunk = info.world.getChunk(info.pos);
             if (chunk == null)
                 return;
             synchronized (CURRENTLY_LOADED_CHUNKS) {

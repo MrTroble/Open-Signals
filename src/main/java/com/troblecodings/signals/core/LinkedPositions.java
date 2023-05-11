@@ -62,7 +62,7 @@ public class LinkedPositions {
         return ImmutableMap.copyOf(linkedBlocks);
     }
 
-    public void unlink(final BlockPos tilePos, final Level world) {
+    public void unlink(final BlockPos tilePos, final World world) {
         final List<SignalStateInfo> signalsToUnload = new ArrayList<>();
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);

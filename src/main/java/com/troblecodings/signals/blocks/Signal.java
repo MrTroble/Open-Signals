@@ -9,7 +9,6 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.math.Quaternion;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
@@ -53,6 +52,7 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -145,7 +145,7 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
         final List<SEProperty> properties = new ArrayList<>();
         nextConsumer.accept(properties);
         nextConsumer = _u -> {
@@ -237,7 +237,7 @@ public class Signal extends BasicBlock {
             if (customRenderHeight == -1)
                 return;
         }
-        final Level world = info.tileEntity.getLevel();
+        final World world = info.tileEntity.getLevel();
         final BlockPos pos = info.tileEntity.getBlockPos();
         final BlockState state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof Signal)) {

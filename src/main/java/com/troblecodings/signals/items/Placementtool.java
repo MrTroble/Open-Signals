@@ -134,7 +134,7 @@ public class Placementtool extends Item
             signalProperties.put(Signal.CUSTOMNAME, "FALSE");
             NameHandler.setName(nameInfo, signal.getSignalTypeName());
         }
-        worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
+        worldIn.setBlock(pos, signal.getStateForPlacement(new BlockItemUseContext(context)), 3);
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
         SignalStateHandler.createStates(info, signalProperties);
         return ActionResultType.SUCCESS;

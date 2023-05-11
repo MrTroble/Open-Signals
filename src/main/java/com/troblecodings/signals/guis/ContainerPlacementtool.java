@@ -27,7 +27,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
     public final Map<SEProperty, Integer> properties = new HashMap<>();
     protected int signalID;
     protected String signalName = "";
-    private final Player player;
+    private final PlayerEntity player;
     private Signal signal;
 
     public ContainerPlacementtool(final GuiInfo info) {
