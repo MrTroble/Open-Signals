@@ -26,6 +26,8 @@ import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
 
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.RenderTypeLookup;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -92,10 +94,10 @@ public class OpenSignalsMain {
 
     @SubscribeEvent
     public void client(final FMLClientSetupEvent event) {
-        /*
-         * OSBlocks.BLOCKS_TO_REGISTER.forEach(block -> {
-         * ItemBlockRenderTypes.setRenderLayer(block, RenderType.cutoutMipped()); });
-         */
+        OSBlocks.BLOCKS_TO_REGISTER.forEach(block -> {
+            RenderTypeLookup.setRenderLayer(block, RenderType.cutoutMipped());
+        });
+
     }
 
     @SubscribeEvent
