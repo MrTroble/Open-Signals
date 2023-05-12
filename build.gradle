@@ -54,7 +54,7 @@ curseforge {
 
 version = ver
 group = 'com.troblecodings'
-archivesBaseName = 'OpenSignals-1.18.2'
+archivesBaseName = 'OpenSignals-1.16.5'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
 
