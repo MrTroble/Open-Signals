@@ -23,7 +23,7 @@ public class OSMapEntry<K, V> implements Entry<K, V> {
     }
 
     @Override
-    public V setValue(V value) {
+    public V setValue(final V value) {
         this.value = value;
         return value;
     }

@@ -34,8 +34,8 @@ public final class DefaultModel implements IUnbakedModel {
 
     @Override
     public Collection<RenderMaterial> getMaterials(
-            final Function<ResourceLocation, IUnbakedModel> p_225614_1_,
-            final Set<Pair<String, String>> p_225614_2_) {
+            final Function<ResourceLocation, IUnbakedModel> function,
+            final Set<Pair<String, String>> set) {
         return new ArrayList<>();
     }
 
