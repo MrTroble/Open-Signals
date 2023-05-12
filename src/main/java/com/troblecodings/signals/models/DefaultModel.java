@@ -15,7 +15,9 @@ import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 
 public final class DefaultModel implements IUnbakedModel {
@@ -32,8 +34,8 @@ public final class DefaultModel implements IUnbakedModel {
 
     @Override
     public Collection<RenderMaterial> getMaterials(
-            Function<ResourceLocation, IUnbakedModel> p_225614_1_,
-            Set<Pair<String, String>> p_225614_2_) {
+            final Function<ResourceLocation, IUnbakedModel> p_225614_1_,
+            final Set<Pair<String, String>> p_225614_2_) {
         return new ArrayList<>();
     }
 
@@ -42,7 +44,9 @@ public final class DefaultModel implements IUnbakedModel {
             final Function<RenderMaterial, TextureAtlasSprite> function,
             final IModelTransform transform, final ResourceLocation location) {
         return new BuiltInModel(ItemCameraTransforms.NO_TRANSFORMS, ItemOverrideList.EMPTY,
-                function.apply(new RenderMaterial(location, location)), false);
+                function.apply(new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
+                        MissingTextureSprite.getLocation())),
+                false);
     }
 
 }

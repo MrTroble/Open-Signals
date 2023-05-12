@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.model.RenderMaterial;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Matrix4f;
@@ -61,7 +62,7 @@ public class SignalCustomModel implements IUnbakedModel {
                 .collect(Collectors.toList());
         list.forEach(info -> info.retexture
                 .forEach((id, texture) -> materialsFromString.computeIfAbsent(texture,
-                        _u -> Either.left(new RenderMaterial(new ResourceLocation(texture),
+                        _u -> Either.left(new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
                                 new ResourceLocation(texture))))));
     }
 
@@ -119,8 +120,8 @@ public class SignalCustomModel implements IUnbakedModel {
 
     @Override
     public Collection<RenderMaterial> getMaterials(
-            Function<ResourceLocation, IUnbakedModel> function,
-            Set<Pair<String, String>> modelState) {
+            final Function<ResourceLocation, IUnbakedModel> function,
+            final Set<Pair<String, String>> modelState) {
         final Collection<RenderMaterial> material = new ArrayList<>();
         this.dependencies.forEach(location -> material
                 .addAll(function.apply(location).getMaterials(function, modelState)));
@@ -130,9 +131,9 @@ public class SignalCustomModel implements IUnbakedModel {
     }
 
     @Override
-    public IBakedModel bake(ModelBakery bakery,
-            Function<RenderMaterial, TextureAtlasSprite> function, IModelTransform modelTransform,
-            ResourceLocation resource) {
+    public IBakedModel bake(final ModelBakery bakery,
+            final Function<RenderMaterial, TextureAtlasSprite> function, final IModelTransform modelTransform,
+            final ResourceLocation resource) {
         list.forEach(info -> {
             if (info.model == null) {
                 final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,

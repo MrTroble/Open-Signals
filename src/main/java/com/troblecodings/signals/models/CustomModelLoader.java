@@ -112,7 +112,7 @@ public final class CustomModelLoader implements IModelLoader<Geometry> {
         final ModelLoader bakery = ModelLoader.instance();
         if (!(bakery.unbakedCache instanceof MapWrapper)) {
             wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
-            // defaultModel(wrapper, "ghostblock");
+            defaultModel(wrapper, "ghostblock");
             registeredModels.forEach((name, loaderList) -> {
                 defaultModel(wrapper, name);
                 for (final SignalAngel angel : SignalAngel.values()) {
