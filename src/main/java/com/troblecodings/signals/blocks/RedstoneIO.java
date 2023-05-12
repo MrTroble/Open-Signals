@@ -70,8 +70,8 @@ public class RedstoneIO extends BasicBlock {
     }
 
     @Override
-    public ActionResultType use(final BlockState state, final World world, final BlockPos pos, final PlayerEntity player,
-            final Hand hand, final BlockRayTraceResult result) {
+    public ActionResultType use(final BlockState state, final World world, final BlockPos pos,
+            final PlayerEntity player, final Hand hand, final BlockRayTraceResult result) {
         if (!player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
             OpenSignalsMain.handler.invokeGui(RedstoneIO.class, player, world, pos, "redstoneio");
             return ActionResultType.SUCCESS;
