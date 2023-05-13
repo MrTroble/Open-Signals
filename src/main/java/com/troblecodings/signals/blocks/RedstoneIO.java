@@ -18,7 +18,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.state.BooleanProperty;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -70,13 +69,13 @@ public class RedstoneIO extends BasicBlock {
     }
 
     @Override
-    public ActionResultType use(final BlockState state, final World world, final BlockPos pos,
+    public boolean use(final BlockState state, final World world, final BlockPos pos,
             final PlayerEntity player, final Hand hand, final BlockRayTraceResult result) {
         if (!player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
             OpenSignalsMain.handler.invokeGui(RedstoneIO.class, player, world, pos, "redstoneio");
-            return ActionResultType.SUCCESS;
+            return true;
         }
-        return ActionResultType.FAIL;
+        return false;
     }
 
     @Override

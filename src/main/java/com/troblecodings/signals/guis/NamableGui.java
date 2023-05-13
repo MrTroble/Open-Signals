@@ -17,7 +17,7 @@ import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 
-public class NamableGui extends GuiBase {
+public abstract class NamableGui extends GuiBase {
 
     private UILabel labelComp;
     private final NamableContainer container;

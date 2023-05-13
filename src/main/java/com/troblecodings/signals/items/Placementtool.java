@@ -57,7 +57,7 @@ public class Placementtool extends Item
     @Override
     public ActionResult<ItemStack> use(final World world, final PlayerEntity player, final Hand hand) {
         if (!world.isClientSide) {
-            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world, player.blockPosition(),
+            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world, player.position(),
                     "placementtool");
         }
         return ActionResult.sidedSuccess(player.getItemInHand(hand), world.isClientSide);
@@ -70,10 +70,10 @@ public class Placementtool extends Item
         if (worldIn.isEmptyBlock(context.getClickedPos())) {
             return ActionResultType.FAIL;
         }
-        if (player.isShiftKeyDown()) {
+        if (player.isSneaking()) {
             if (!worldIn.isClientSide) {
                 OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
-                        player.blockPosition(), "placementtool");
+                        player.position(), "placementtool");
             }
             return ActionResultType.sidedSuccess(worldIn.isClientSide);
         }

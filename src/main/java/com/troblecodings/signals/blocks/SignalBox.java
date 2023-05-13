@@ -13,7 +13,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -29,7 +28,7 @@ public class SignalBox extends BasicBlock {
     }
 
     @Override
-    public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos,
+    public boolean use(final BlockState state, final World worldIn, final BlockPos pos,
             final PlayerEntity playerIn, final Hand hand, final BlockRayTraceResult hit) {
         if (!playerIn.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
             final TileEntity entity = worldIn.getBlockEntity(pos);
@@ -38,12 +37,11 @@ public class SignalBox extends BasicBlock {
                 OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos,
                         "signalbox");
             } else {
-                playerIn.sendMessage(new TranslationTextComponent("msg.isblocked"),
-                        playerIn.getUUID());
+                playerIn.sendMessage(new TranslationTextComponent("msg.isblocked"));
             }
-            return ActionResultType.SUCCESS;
+            return true;
         }
-        return ActionResultType.FAIL;
+        return false;
     }
 
     @Override

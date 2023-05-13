@@ -19,6 +19,9 @@ import com.mojang.datafixers.util.Pair;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.SignalAngel;
 
+import net.minecraft.client.renderer.Matrix4f;
+import net.minecraft.client.renderer.Quaternion;
+import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
@@ -31,11 +34,7 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Matrix4f;
-import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.math.vector.TransformationMatrix;
-import net.minecraft.util.math.vector.Vector3f;
-import net.minecraft.util.math.vector.Vector4f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ModelLoader;
@@ -66,7 +65,7 @@ public class SignalCustomModel implements IUnbakedModel {
                                 new ResourceLocation(texture))))));
     }
 
-    private static void transform(final BakedQuad quad, final Matrix4f quaterion) {
+    private static void transform(final BakedQuad quad, final Quaternion quaterion) {
         final int[] oldVertex = quad.getVertices();
         final int size = DefaultVertexFormats.BLOCK.getIntegerSize();
         for (int i = 0; i < oldVertex.length; i += size) {

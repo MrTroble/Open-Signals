@@ -201,7 +201,7 @@ public final class NameHandler implements INetworkSync {
                         new NameHandlerFile(Paths.get("osfiles/namefiles/"
                                 + ((ServerWorld) world).getServer().getWorldData().getLevelName()
                                         .replace(":", "").replace("/", "").replace("\\", "")
-                                + "/" + world.dimension().location().toString().replace(":", ""))));
+                                + "/" + world.getDimension().location().toString().replace(":", ""))));
             }
         }
         service.submit(() -> {

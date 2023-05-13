@@ -48,7 +48,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiSignalController extends GuiBase {
+public abstract class GuiSignalController extends GuiBase {
 
     private final ContainerSignalController controller;
     private final UIEntity lowerEntity = new UIEntity();

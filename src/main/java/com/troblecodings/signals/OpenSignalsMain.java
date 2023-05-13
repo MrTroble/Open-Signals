@@ -26,8 +26,8 @@ import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
 
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.RenderTypeLookup;
+import net.minecraft.scoreboard.ScoreCriteria.RenderType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -60,10 +60,10 @@ public class OpenSignalsMain {
         eventBus.register(OSSounds.class);
         MinecraftForge.EVENT_BUS.register(NameHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
-        DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
     }
 
-    public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new,
+    public static CommonProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new,
             () -> CommonProxy::new);
     private static Logger log = null;
     public static GuiHandler handler = null;

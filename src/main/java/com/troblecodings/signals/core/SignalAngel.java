@@ -2,7 +2,8 @@ package com.troblecodings.signals.core;
 
 import com.troblecodings.core.interfaces.NamableWrapper;
 
-import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.client.renderer.Quaternion;
+
 
 public enum SignalAngel implements NamableWrapper {
 

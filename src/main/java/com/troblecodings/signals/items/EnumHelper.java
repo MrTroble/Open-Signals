@@ -71,7 +71,7 @@ public final class EnumHelper {
         public float getToughness() {
             return this.toughness;
         }
-
+        
         @Override
         public float getKnockbackResistance() {
             return this.knock;

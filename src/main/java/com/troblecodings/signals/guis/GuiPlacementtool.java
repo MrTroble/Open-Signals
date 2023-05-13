@@ -34,7 +34,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiPlacementtool extends GuiBase {
+public abstract class GuiPlacementtool extends GuiBase {
 
     public static final int GUI_PLACEMENTTOOL = 0;
 

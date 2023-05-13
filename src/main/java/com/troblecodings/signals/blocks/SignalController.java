@@ -12,7 +12,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -27,14 +26,14 @@ public class SignalController extends BasicBlock {
     }
 
     @Override
-    public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos,
+    public boolean use(final BlockState state, final World worldIn, final BlockPos pos,
             final PlayerEntity playerIn, final Hand hand, final BlockRayTraceResult hit) {
         if (!playerIn.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
             OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
                     "signalcontroller");
-            return ActionResultType.SUCCESS;
+            return true;
         }
-        return ActionResultType.FAIL;
+        return false;
     }
 
     @Override
