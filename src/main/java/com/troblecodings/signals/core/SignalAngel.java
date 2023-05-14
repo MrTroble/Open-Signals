@@ -12,7 +12,7 @@ public enum SignalAngel implements NamableWrapper {
     private Quaternion quaternion;
 
     private SignalAngel() {
-        quaternion = new Quaternion(0, (float) getRadians(), 0, false);
+        quaternion = new Quaternion(0, (float) getRadians(), 0, 1.0F);
     }
 
     public double getRadians() {
