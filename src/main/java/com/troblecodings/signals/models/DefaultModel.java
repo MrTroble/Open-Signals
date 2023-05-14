@@ -5,21 +5,20 @@ import java.util.Collection;
 import java.util.Set;
 import java.util.function.Function;
 
-import com.mojang.datafixers.util.Pair;
+import com.troblecodings.signals.OpenSignalsMain;
 
 import net.minecraft.client.renderer.model.BuiltInModel;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.model.ItemOverrideList;
 import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.model.RenderMaterial;
-import net.minecraft.client.renderer.texture.MissingTextureSprite;
+import net.minecraft.client.renderer.texture.ISprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.util.ResourceLocation;
 
+@SuppressWarnings("deprecation")
 public final class DefaultModel implements IUnbakedModel {
 
     public static final DefaultModel INSTANCE = new DefaultModel();
@@ -33,20 +32,16 @@ public final class DefaultModel implements IUnbakedModel {
     }
 
     @Override
-    public Collection<RenderMaterial> getMaterials(
-            final Function<ResourceLocation, IUnbakedModel> function,
-            final Set<Pair<String, String>> set) {
-        return new ArrayList<>();
+    public IBakedModel bake(ModelBakery bakery,
+            Function<ResourceLocation, TextureAtlasSprite> function, ISprite sprite,
+            VertexFormat format) {
+        return new BuiltInModel(ItemCameraTransforms.NO_TRANSFORMS, ItemOverrideList.EMPTY,
+                function.apply(new ResourceLocation(OpenSignalsMain.MODID, "")));
     }
 
     @Override
-    public IBakedModel bake(final ModelBakery bakery,
-            final Function<RenderMaterial, TextureAtlasSprite> function,
-            final IModelTransform transform, final ResourceLocation location) {
-        return new BuiltInModel(ItemCameraTransforms.NO_TRANSFORMS, ItemOverrideList.EMPTY,
-                function.apply(new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
-                        MissingTextureSprite.getLocation())),
-                false);
+    public Collection<ResourceLocation> getTextures(
+            Function<ResourceLocation, IUnbakedModel> p_209559_1_, Set<String> p_209559_2_) {
+        return new ArrayList<>();
     }
-
 }

@@ -37,11 +37,6 @@ public class SignalBakedModel implements IDynamicBakedModel {
     }
 
     @Override
-    public boolean usesBlockLight() {
-        return baseGetter.usesBlockLight();
-    }
-
-    @Override
     public boolean isCustomRenderer() {
         return baseGetter.isCustomRenderer();
     }

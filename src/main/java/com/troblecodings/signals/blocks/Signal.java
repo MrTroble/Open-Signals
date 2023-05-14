@@ -38,6 +38,7 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
+import net.minecraft.client.renderer.Quaternion;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
@@ -54,12 +55,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.util.text.ITextProperties;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -463,7 +462,7 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public void tick(final BlockState state, final ServerWorld world, final BlockPos pos,
+    public void tick(final BlockState state, final World world, final BlockPos pos,
             final Random rand) {
         if (this.prop.sounds.isEmpty() || world.isClientSide) {
             return;

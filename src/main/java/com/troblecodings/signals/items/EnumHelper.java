@@ -21,11 +21,10 @@ public final class EnumHelper {
         private final Ingredient ingrediant;
         private final String name;
         private final float toughness;
-        private final float knock;
 
         public ImplArmorMat(final int[] defense, final int durability, final int enchant,
                 final SoundEvent event, final Ingredient ingrediant, final String name,
-                final float toughness, final float knock) {
+                final float toughness) {
             super();
             this.defense = defense;
             this.durability = durability;
@@ -34,7 +33,6 @@ public final class EnumHelper {
             this.ingrediant = ingrediant;
             this.name = name;
             this.toughness = toughness;
-            this.knock = knock;
         }
 
         @Override
@@ -71,16 +69,11 @@ public final class EnumHelper {
         public float getToughness() {
             return this.toughness;
         }
-        
-        @Override
-        public float getKnockbackResistance() {
-            return this.knock;
-        }
     }
 
     public static IArmorMaterial addArmorMaterial(final String name, final int durability,
             final int[] defense, final int enchant, final SoundEvent event, final float toughness) {
         return new ImplArmorMat(defense, durability, enchant, event, Ingredient.EMPTY, name,
-                toughness, toughness);
+                toughness);
     }
 }

@@ -13,8 +13,8 @@ public class RenderOverlayInfo {
     public SignalTileEntity tileEntity;
     public final FontRenderer font;
 
-    public RenderOverlayInfo(final MatrixStack stack, final double x, final double y, final double z,
-            final FontRenderer fontRenderer) {
+    public RenderOverlayInfo(final MatrixStack stack, final double x, final double y,
+            final double z, final FontRenderer fontRenderer) {
         super();
         this.stack = stack;
         this.x = x;

@@ -55,12 +55,15 @@ public class Placementtool extends Item
     }
 
     @Override
-    public ActionResult<ItemStack> use(final World world, final PlayerEntity player, final Hand hand) {
+    public ActionResult<ItemStack> use(final World world, final PlayerEntity player,
+            final Hand hand) {
         if (!world.isClientSide) {
             OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world, player.position(),
                     "placementtool");
         }
-        return ActionResult.sidedSuccess(player.getItemInHand(hand), world.isClientSide);
+        if (world.isClientSide)
+            return ActionResult.newResult(ActionResultType.SUCCESS, player.getItemInHand(hand));
+        return ActionResult.newResult(ActionResultType.FAIL, player.getItemInHand(hand));
     }
 
     @Override
@@ -74,8 +77,9 @@ public class Placementtool extends Item
             if (!worldIn.isClientSide) {
                 OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
                         player.position(), "placementtool");
+                return ActionResultType.SUCCESS;
             }
-            return ActionResultType.sidedSuccess(worldIn.isClientSide);
+            return ActionResultType.SUCCESS;
         }
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(player.getMainHandItem());
         if (!wrapper.contains(BLOCK_TYPE_ID)) {

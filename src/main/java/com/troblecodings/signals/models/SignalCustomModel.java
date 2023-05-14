@@ -21,6 +21,7 @@ import com.troblecodings.signals.core.SignalAngel;
 
 import net.minecraft.client.renderer.Matrix4f;
 import net.minecraft.client.renderer.Quaternion;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.BlockModel;
@@ -131,8 +132,8 @@ public class SignalCustomModel implements IUnbakedModel {
 
     @Override
     public IBakedModel bake(final ModelBakery bakery,
-            final Function<RenderMaterial, TextureAtlasSprite> function, final IModelTransform modelTransform,
-            final ResourceLocation resource) {
+            final Function<ResourceLocation, TextureAtlasSprite> function,
+            final IModelTransform modelTransform, final ResourceLocation resource) {
         list.forEach(info -> {
             if (info.model == null) {
                 final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,

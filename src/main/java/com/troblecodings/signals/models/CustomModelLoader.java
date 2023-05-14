@@ -17,6 +17,7 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
+import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -109,7 +110,7 @@ public final class CustomModelLoader implements IModelLoader<Geometry> {
     }
 
     public void prepare() {
-        final ModelLoader bakery = ModelLoader.instance();
+        final ModelBakery bakery = ModelBakery.instance();
         if (!(bakery.unbakedCache instanceof MapWrapper)) {
             wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
             defaultModel(wrapper, "ghostblock");

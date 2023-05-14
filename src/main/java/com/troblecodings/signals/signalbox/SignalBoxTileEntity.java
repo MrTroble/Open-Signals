@@ -36,12 +36,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public void setLevelAndPosition(final World world, final BlockPos blockPos) {
-        super.setLevelAndPosition(world, blockPos);
+    public void setLevel(final World world) {
+        super.setLevel(world);
         grid.setPosAndWorld(worldPosition, world);
         if (world.isClientSide)
             return;
-        SignalBoxHandler.setWorld(new PosIdentifier(blockPos, world));
+        SignalBoxHandler.setWorld(new PosIdentifier(worldPosition, world));
     }
 
     @Override

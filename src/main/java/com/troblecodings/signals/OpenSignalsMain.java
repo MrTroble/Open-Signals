@@ -39,7 +39,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.moddiscovery.ModFile;
+import net.minecraftforge.forgespi.locating.IModFile;
 
 @Mod(OpenSignalsMain.MODID)
 public class OpenSignalsMain {
@@ -51,6 +51,7 @@ public class OpenSignalsMain {
         return instance;
     }
 
+    @SuppressWarnings("deprecation")
     public OpenSignalsMain() {
         instance = this;
         final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -63,6 +64,7 @@ public class OpenSignalsMain {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
     }
 
+    @SuppressWarnings("deprecation")
     public static CommonProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new,
             () -> CommonProxy::new);
     private static Logger log = null;
@@ -80,7 +82,7 @@ public class OpenSignalsMain {
 
     public static final int GUI_SIGNAL_CONTROLLER = 1;
 
-    public ModFile file;
+    public IModFile file;
 
     @SubscribeEvent
     public void preInit(final FMLConstructModEvent event) {
@@ -109,36 +111,5 @@ public class OpenSignalsMain {
         if (log == null)
             log = LogManager.getLogger(MODID);
         return log;
-    }
-
-    private static FileSystem fileSystemCache;
-
-    public static Path getRessourceLocation(final String location) {
-        String filelocation = location;
-        final URL url = OSBlocks.class.getResource("/assets/opensignals");
-        try {
-            if (url != null) {
-                final URI uri = url.toURI();
-                if ("file".equals(uri.getScheme())) {
-                    if (!location.startsWith("/"))
-                        filelocation = "/" + filelocation;
-                    final URL resource = OSBlocks.class.getResource(filelocation);
-                    if (resource == null)
-                        return null;
-                    return Paths.get(resource.toURI());
-                } else {
-                    if (!"jar".equals(uri.getScheme())) {
-                        return null;
-                    }
-                    if (fileSystemCache == null) {
-                        fileSystemCache = FileSystems.newFileSystem(uri, Collections.emptyMap());
-                    }
-                    return fileSystemCache.getPath(filelocation);
-                }
-            }
-        } catch (final IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 }
