@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -70,11 +71,13 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void shutdown(final FMLServerStoppingEvent event) {
-        /*
-         * service.shutdown(); try { service.awaitTermination(1, TimeUnit.DAYS); } catch
-         * (final InterruptedException e) { e.printStackTrace(); } service =
-         * Executors.newFixedThreadPool(4);
-         */
+        service.shutdown();
+        try {
+            service.awaitTermination(1, TimeUnit.DAYS);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+        service = Executors.newFixedThreadPool(4);
     }
 
     public static void add(final Object object) {
