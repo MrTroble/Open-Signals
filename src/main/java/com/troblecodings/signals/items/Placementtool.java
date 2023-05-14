@@ -27,9 +27,7 @@ import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -54,17 +52,16 @@ public class Placementtool extends Item
                 + I18n.get(this.getObjFromID(obj).toString());
     }
 
-    @Override
-    public ActionResult<ItemStack> use(final World world, final PlayerEntity player,
-            final Hand hand) {
-        if (!world.isClientSide) {
-            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world, player.position(),
-                    "placementtool");
-        }
-        if (world.isClientSide)
-            return ActionResult.newResult(ActionResultType.SUCCESS, player.getItemInHand(hand));
-        return ActionResult.newResult(ActionResultType.FAIL, player.getItemInHand(hand));
-    }
+    /* TODO braucht man das hier?
+     * 
+     * @Override public ActionResult<ItemStack> use(final World world, final
+     * PlayerEntity player, final Hand hand) { if (!world.isClientSide) {
+     * OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world,
+     * player.position(), "placementtool"); } if (world.isClientSide) return
+     * ActionResult.newResult(ActionResultType.SUCCESS, player.getItemInHand(hand));
+     * return ActionResult.newResult(ActionResultType.FAIL,
+     * player.getItemInHand(hand)); }
+     */
 
     @Override
     public ActionResultType onItemUseFirst(final ItemStack stack, final ItemUseContext context) {
@@ -76,7 +73,7 @@ public class Placementtool extends Item
         if (player.isSneaking()) {
             if (!worldIn.isClientSide) {
                 OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
-                        player.position(), "placementtool");
+                        context.getClickedPos(), "placementtool");
                 return ActionResultType.SUCCESS;
             }
             return ActionResultType.SUCCESS;

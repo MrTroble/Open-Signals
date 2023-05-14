@@ -15,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.world.IBlockReader;
 
 public class BasicBlock extends Block {
@@ -32,6 +33,11 @@ public class BasicBlock extends Block {
                 BLOCK_NAMES.computeIfAbsent(supplier, _u -> name);
             });
         });
+    }
+    
+    @Override
+    public BlockRenderLayer getRenderLayer() {
+        return BlockRenderLayer.CUTOUT_MIPPED;
     }
 
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {

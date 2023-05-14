@@ -1,15 +1,5 @@
 package com.troblecodings.signals;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -26,8 +16,6 @@ import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.proxy.ClientProxy;
 import com.troblecodings.signals.proxy.CommonProxy;
 
-import net.minecraft.client.renderer.RenderTypeLookup;
-import net.minecraft.scoreboard.ScoreCriteria.RenderType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -35,7 +23,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -92,14 +79,6 @@ public class OpenSignalsMain {
         contentPacks = new FileReader(MODID, "assets/" + MODID, log,
                 name -> file.findResource(name));
         proxy.initModEvent(event);
-    }
-
-    @SubscribeEvent
-    public void client(final FMLClientSetupEvent event) {
-        OSBlocks.BLOCKS_TO_REGISTER.forEach(block -> {
-            RenderTypeLookup.setRenderLayer(block, RenderType.cutoutMipped());
-        });
-
     }
 
     @SubscribeEvent
