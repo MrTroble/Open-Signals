@@ -9,7 +9,7 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
-import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
@@ -38,16 +38,13 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.Quaternion;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
-import net.minecraft.util.IReorderingProcessor;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
@@ -55,8 +52,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.util.text.ITextProperties;
 import net.minecraft.world.IBlockReader;
+import net.minecraft.world.ITickList;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -80,7 +77,7 @@ public class Signal extends BasicBlock {
     private SEProperty powerProperty = null;
 
     public Signal(final SignalProperties prop) {
-        super(Properties.of(Material.STONE).noOcclusion().lightLevel(u -> 1));
+        super(Properties.of(Material.STONE));
         this.prop = prop;
         registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
@@ -88,6 +85,16 @@ public class Signal extends BasicBlock {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
+    }
+    
+    @Override
+    public int getLightEmission(final BlockState state) {
+        return 1;
+    }
+    
+    @Override
+    public boolean canOcclude(final BlockState state) {
+        return false;
     }
 
     @Override
@@ -100,12 +107,6 @@ public class Signal extends BasicBlock {
     public float getShadeBrightness(final BlockState state, final IBlockReader getter,
             final BlockPos pos) {
         return 1.0F;
-    }
-
-    @Override
-    public VoxelShape getBlockSupportShape(final BlockState stat, final IBlockReader getter,
-            final BlockPos pos) {
-        return VoxelShapes.block();
     }
 
     @Override
@@ -253,22 +254,22 @@ public class Signal extends BasicBlock {
         final float width = info.font.width(name);
         final float scale = Math.min(1 / (22 * (width / 56)), 0.1f);
 
-        info.stack.pushPose();
-        info.stack.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
-        info.stack.mulPose(face.getQuaternion());
-        info.stack.scale(-scale, -scale, 1);
-        info.stack.translate(-1.3f / scale, 0, -0.32f);
+        GlStateManager.pushMatrix();
+        GlStateManager.translated(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
+        GlStateManager.rotatef(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
+        GlStateManager.scalef(-scale, -scale, 1);
+        GlStateManager.translatef(-1.3f / scale, 0, -0.32f);
 
         int k = 0;
         for (int i = 0; i < display.length; i++) {
-            final List<IReorderingProcessor> splittedList = info.font
-                    .split(ITextProperties.of(display[i]), (int) this.prop.signWidth);
+            final List<String> splittedList = info.font
+                    .split(display[i], (int) this.prop.signWidth);
             for (int j = 0; j < splittedList.size(); j++) {
-                info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
+                info.font.draw(splittedList.get(j), 0, (k * 10), this.prop.textColor);
                 k++;
             }
         }
-        info.stack.popPose();
+        GlStateManager.popMatrix();
     }
 
     @SuppressWarnings("unchecked")
@@ -307,23 +308,22 @@ public class Signal extends BasicBlock {
 
         final float scale = this.prop.signScale;
 
-        info.stack.pushPose();
-        info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
-        info.stack.mulPose(face.getQuaternion());
-        info.stack.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
+        GlStateManager.pushMatrix();
+        GlStateManager.translated(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
+        GlStateManager.rotatef(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
+        GlStateManager.scalef(0.015f * scale, -0.015f * scale, 0.015f * scale);
 
         renderSingleOverlay(info, display);
 
         if (doubleSidedText) {
-            final Quaternion quad = new Quaternion(
-                    UIRotate.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
-            info.stack.mulPose(quad);
-            info.stack.mulPose(face.getQuaternion());
-            info.stack.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
+                    // UIRotate.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+            GlStateManager.rotated(-face.getRadians() + Math.PI, 0, 1, 0);
+            GlStateManager.rotatef(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
+            GlStateManager.translated(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
             renderSingleOverlay(info, display);
         }
 
-        info.stack.popPose();
+        GlStateManager.popMatrix();
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -331,20 +331,20 @@ public class Signal extends BasicBlock {
         final float width = this.prop.signWidth;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
-        info.stack.pushPose();
-        info.stack.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
-        info.stack.scale(-1f, 1f, 1f);
+        GlStateManager.pushMatrix();
+        GlStateManager.translatef(width / 2 + offsetX, 0, -4.2f + offsetZ);
+        GlStateManager.scalef(-1f, 1f, 1f);
 
         int k = 0;
         for (int i = 0; i < display.length; i++) {
-            final List<IReorderingProcessor> splittedList = info.font
-                    .split(ITextProperties.of(display[i]), (int) width);
+            final List<String> splittedList = info.font
+                    .split(display[i], (int) width);
             for (int j = 0; j < splittedList.size(); j++) {
-                info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
+                info.font.draw(splittedList.get(j), 0, (k * 10), this.prop.textColor);
                 k++;
             }
         }
-        info.stack.popPose();
+        GlStateManager.popMatrix();
     }
 
     public Placementtool getPlacementtool() {
@@ -356,23 +356,23 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public ActionResultType use(final BlockState state, final World world, final BlockPos pos,
+    public boolean use(final BlockState state, final World world, final BlockPos pos,
             final PlayerEntity player, final Hand hand, final BlockRayTraceResult result) {
         if (!(state.getBlock() instanceof Signal)) {
-            return ActionResultType.FAIL;
+            return false;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
         if (loadRedstoneOutput(world, stateInfo)) {
             world.blockUpdated(pos, state.getBlock());
-            return ActionResultType.SUCCESS;
+            return true;
         }
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
         if (!player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)
                 && (canBeLinked() || customname)) {
             OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
-            return ActionResultType.SUCCESS;
+            return true;
         }
-        return ActionResultType.FAIL;
+        return false;
     }
 
     @SuppressWarnings("unchecked")
@@ -445,7 +445,7 @@ public class Signal extends BasicBlock {
                 return;
             } else {
                 if (sound.predicate.test(properties)) {
-                    // TODO world.scheduleTick(pos, this, 1);
+                    ((ITickList<Block>) world).scheduleTick(pos, this, 1);
                 }
             }
         }
@@ -461,6 +461,7 @@ public class Signal extends BasicBlock {
         return new SoundProperty();
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void tick(final BlockState state, final World world, final BlockPos pos,
             final Random rand) {
@@ -473,7 +474,7 @@ public class Signal extends BasicBlock {
             return;
         }
         world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        // TODO world.scheduleTick(pos, this, sound.duration);
+        ((ITickList<Block>) world).scheduleTick(pos, this, sound.duration);
     }
 
     @Override

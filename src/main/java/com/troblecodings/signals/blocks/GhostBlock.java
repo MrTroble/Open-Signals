@@ -21,8 +21,18 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class GhostBlock extends BasicBlock {
 
     public GhostBlock() {
-        super(Properties.of(Material.GLASS).noOcclusion().lightLevel(u -> 1));
+        super(Properties.of(Material.GLASS));
         registerDefaultState(defaultBlockState());
+    }
+    
+    @Override
+    public int getLightEmission(final BlockState state) {
+        return 1;
+    }
+    
+    @Override
+    public boolean canOcclude(final BlockState state) {
+        return false;
     }
 
     @Override

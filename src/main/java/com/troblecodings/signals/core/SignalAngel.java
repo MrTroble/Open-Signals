@@ -23,6 +23,10 @@ public enum SignalAngel implements NamableWrapper {
     public Quaternion getQuaternion() {
         return this.quaternion;
     }
+    
+    public float getDregree() {
+        return this.ordinal() * 22.5f;
+    }
 
     @Override
     public String getNameWrapper() {

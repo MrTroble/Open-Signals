@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
@@ -33,8 +34,8 @@ public class UIMenu extends UIComponent {
     @Override
     public void postDraw(final DrawInfo info) {
         if (this.isVisible()) {
-            info.stack.pushPose();
-            info.stack.translate(0, 0, 5);
+            GlStateManager.pushMatrix();
+            GlStateManager.translatef(0, 0, 5);
             final UIEntity selection = new UIEntity();
             selection.setX(mX);
             selection.setY(mY);
@@ -56,7 +57,7 @@ public class UIMenu extends UIComponent {
             }
             selection.updateEvent(parent.getLastUpdateEvent());
             selection.draw(info);
-            info.stack.popPose();
+            GlStateManager.popMatrix();;
         }
     }
 
