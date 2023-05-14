@@ -246,6 +246,8 @@ public class SignalBoxPathway {
         this.signalPositions.ifPresent(entry -> SignalConfig.reset(new SignalStateInfo(world,
                 entry.getKey(),
                 SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()))));
+        final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(tilePos);
+        tile.getSignalBoxGrid().resetSubsidiary(firstPoint, tile);
     }
 
     private void resetOther() {
