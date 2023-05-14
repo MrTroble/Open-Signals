@@ -39,10 +39,22 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     }
 
     @Override
+    public CompoundNBT save(final CompoundNBT nbt) {
+        saveWrapper(new NBTWrapper(nbt));
+        return super.save(nbt);
+    }
+
+    @Override
     public CompoundNBT serializeNBT() {
         final NBTWrapper wrapper = new NBTWrapper(super.serializeNBT());
         this.loadWrapper(wrapper);
         return wrapper.tag;
+    }
+
+    @Override
+    public void load(final BlockState stae, final CompoundNBT nbt) {
+        super.load(stae, nbt);
+        loadWrapper(new NBTWrapper(nbt));
     }
 
     public List<BlockPos> getLinkedPos() {

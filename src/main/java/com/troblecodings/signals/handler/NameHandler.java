@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
@@ -58,13 +57,11 @@ public final class NameHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void shutdown(final FMLServerStoppingEvent event) {
-        service.shutdown();
-        try {
-            service.awaitTermination(1, TimeUnit.DAYS);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
-        service = Executors.newFixedThreadPool(2);
+        /*
+         * service.shutdown(); try { service.awaitTermination(1, TimeUnit.DAYS); } catch
+         * (final InterruptedException e) { e.printStackTrace(); } service =
+         * Executors.newFixedThreadPool(2);
+         */
     }
 
     public static void add(final Object obj) {

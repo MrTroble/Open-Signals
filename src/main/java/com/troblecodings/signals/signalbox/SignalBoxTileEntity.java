@@ -50,6 +50,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         this.grid.write(gridTag);
         SignalBoxHandler.writeTileNBT(new PosIdentifier(worldPosition, level), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
+        System.out.println();
     }
 
     private NBTWrapper copy = null;
