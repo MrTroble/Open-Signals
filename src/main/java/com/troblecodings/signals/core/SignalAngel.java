@@ -12,7 +12,7 @@ public enum SignalAngel implements NamableWrapper {
     private Quaternion quaternion;
 
     private SignalAngel() {
-        quaternion = new Quaternion(0, (float) getRadians(), 0, 1.0F);
+        quaternion = fromXYZ(0, (float) getRadians(), 0);
     }
 
     public double getRadians() {
@@ -26,5 +26,15 @@ public enum SignalAngel implements NamableWrapper {
     @Override
     public String getNameWrapper() {
         return "angel" + this.ordinal();
+    }
+    
+    public static Quaternion fromXYZ(final float rotateX, final float rotateY, final float rotateZ) {
+        final Quaternion quaternion = Quaternion.ONE;
+        final Quaternion quad = new Quaternion(quaternion);
+        quad.mul(new Quaternion((float)Math.sin(rotateX / 2.0F), 0.0F, 0.0F, (float)Math.cos(rotateX / 2.0F)));
+        quad.mul(new Quaternion(0.0F, (float)Math.sin(rotateY / 2.0F), 0.0F, (float)Math.cos(rotateY / 2.0F)));
+        quad.mul(new Quaternion(0.0F, 0.0F, (float) Math.sin(rotateZ / 2.0F),
+                (float) Math.cos(rotateZ / 2.0F)));
+        return quad;
     }
 }
