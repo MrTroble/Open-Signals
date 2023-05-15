@@ -47,9 +47,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         final Map<SEProperty, String> states = ClientSignalStateHandler
                 .getClientStates(new ClientSignalStateInfo(level, worldPosition));
         final Builder builder = new ModelDataMap.Builder();
-        states.forEach((property, value) -> {
-            builder.withInitial(property, value);
-        });
+        states.forEach((property, value) -> builder.withInitial(property, value));
         return new ModelInfoWrapper(builder.build());
     }
 }

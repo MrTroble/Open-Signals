@@ -18,11 +18,9 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
-import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.WriteBuffer;
-import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
@@ -276,7 +274,6 @@ public final class SignalStateHandler implements INetworkSync {
                 } else if (block instanceof SignalBox) {
                     SignalBoxHandler.loadSignals(new PosIdentifier(pos, world));
                 }
-
             });
             loadSignals(states);
             synchronized (CURRENTLY_LOADED_CHUNKS) {
@@ -296,8 +293,6 @@ public final class SignalStateHandler implements INetworkSync {
                 final Block block = chunk.getBlockState(pos).getBlock();
                 if (block instanceof SignalBox) {
                     SignalBoxHandler.unloadSignals(new PosIdentifier(pos, level));
-                } else if (block instanceof SignalController) {
-                    ((SignalControllerTileEntity) level.getBlockEntity(pos)).unloadSignal();
                 }
             });
             List<SignalStateInfo> states;
@@ -398,9 +393,7 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         }
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
-        stateInfo.world.players().forEach(player -> {
-            sendTo(player, buffer);
-        });
+        stateInfo.world.players().forEach(player -> sendTo(player, buffer));
     }
 
     public static void loadSignal(final SignalStateInfo info) {

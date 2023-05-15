@@ -295,4 +295,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public boolean isValid(final PlayerEntity player) {
         return true;
     }
+
+    @Override
+    public void onChunkUnloaded() {
+        unloadSignal();
+    }
 }

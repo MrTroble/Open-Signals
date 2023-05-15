@@ -72,6 +72,8 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     @Override
     public boolean hasCustomName() {
+        if (customName == null)
+            getNameWrapper();
         return customName != null;
     }
 
