@@ -55,10 +55,11 @@ public class Placementtool extends Item
     }
 
     @Override
-    public ActionResult<ItemStack> use(final World world, final PlayerEntity player, final Hand hand) {
+    public ActionResult<ItemStack> use(final World world, final PlayerEntity player,
+            final Hand hand) {
         if (!world.isClientSide) {
-            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world, player.blockPosition(),
-                    "placementtool");
+            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world,
+                    player.blockPosition(), "placementtool");
         }
         return ActionResult.sidedSuccess(player.getItemInHand(hand), world.isClientSide);
     }
@@ -125,6 +126,8 @@ public class Placementtool extends Item
             worldIn.setBlock(ghostPos, OSBlocks.GHOST_BLOCK.defaultBlockState(), 3);
             ghostPos = ghostPos.above();
         }
+        final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
+        SignalStateHandler.createStates(info, signalProperties);
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
         final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
         if (!(signalName == null || signalName.isEmpty())) {
@@ -132,11 +135,8 @@ public class Placementtool extends Item
             NameHandler.setName(nameInfo, signalName);
         } else {
             signalProperties.put(Signal.CUSTOMNAME, "FALSE");
-            NameHandler.setName(nameInfo, signal.getSignalTypeName());
         }
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockItemUseContext(context)), 3);
-        final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
-        SignalStateHandler.createStates(info, signalProperties);
         return ActionResultType.SUCCESS;
     }
 
