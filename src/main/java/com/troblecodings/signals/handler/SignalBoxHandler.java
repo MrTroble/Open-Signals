@@ -366,49 +366,49 @@ public final class SignalBoxHandler {
         final World world = (World) event.getWorld();
         if (world.isClientSide)
             return;
-            final NBTWrapper wrapper = new NBTWrapper();
-            final List<NBTWrapper> wrapperList = new ArrayList<>();
-            final String levelName = (((ServerWorld) world).getServer().getWorldData()
-                    .getLevelName() + "_"
-                    + world.dimension().location().toString().replace(":", "_"));
-            synchronized (POS_UPDATES) {
-                POS_UPDATES.forEach((pos, update) -> {
-                    if (!levelName.equals(
-                            ((ServerWorld) world).getServer().getWorldData().getLevelName() + "_"
-                                    + world.dimension().location().toString().replace(":", "_")))
-                        return;
-                    final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
-                    update.writeNBT(posWrapper);
-                    wrapperList.add(posWrapper);
-                });
-            }
-            wrapper.putList(LINKING_UPDATE, wrapperList);
-            wrapperList.clear();
-            synchronized (OUTPUT_UPDATES) {
-                OUTPUT_UPDATES.forEach((pos, state) -> {
-                    if (!levelName.equals(
-                            ((ServerWorld) world).getServer().getWorldData().getLevelName() + "_"
-                                    + world.dimension().location().toString().replace(":", "_")))
-                        return;
-                    final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
-                    posWrapper.putBoolean(BOOL_STATE, state);
-                    wrapperList.add(posWrapper);
-                });
-            }
-            wrapper.putList(OUTPUT_UPDATE, wrapperList);
-            try {
-                Files.createDirectories(NBT_FILES_DIRECTORY);
-                final File file = Paths.get("osfiles/signalboxhandler/",
-                        world.getServer().getWorldData().getLevelName().replace("/", "") + "_"
-                                + world.dimension().location().toString().replace(":", "_"))
-                        .toFile();
-                if (file.exists())
-                    file.delete();
-                Files.createFile(file.toPath());
-                CompressedStreamTools.write(wrapper.tag, file);
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
+        final NBTWrapper wrapper = new NBTWrapper();
+        final List<NBTWrapper> wrapperList = new ArrayList<>();
+        final String levelName = (((ServerWorld) world).getServer().getWorldData().getLevelName()
+                + "_" + world.dimension().location().toString().replace(":", "_"));
+        synchronized (POS_UPDATES) {
+            POS_UPDATES.forEach((pos, update) -> {
+                if (!levelName
+                        .equals(((ServerWorld) world).getServer().getWorldData().getLevelName()
+                                + "_" + world.dimension().location().toString().replace(":", "_")))
+                    return;
+                final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
+                update.writeNBT(posWrapper);
+                wrapperList.add(posWrapper);
+            });
+        }
+        wrapper.putList(LINKING_UPDATE, wrapperList);
+        wrapperList.clear();
+        synchronized (OUTPUT_UPDATES) {
+            OUTPUT_UPDATES.forEach((pos, state) -> {
+                if (!levelName
+                        .equals(((ServerWorld) world).getServer().getWorldData().getLevelName()
+                                + "_" + world.dimension().location().toString().replace(":", "_")))
+                    return;
+                final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
+                posWrapper.putBoolean(BOOL_STATE, state);
+                wrapperList.add(posWrapper);
+            });
+        }
+        wrapper.putList(OUTPUT_UPDATE, wrapperList);
+        try {
+            Files.createDirectories(NBT_FILES_DIRECTORY);
+            final File file = Paths
+                    .get("osfiles/signalboxhandler/",
+                            world.getServer().getWorldData().getLevelName().replace("/", "") + "_"
+                                    + world.dimension().location().toString().replace(":", "_"))
+                    .toFile();
+            if (file.exists())
+                file.delete();
+            Files.createFile(file.toPath());
+            CompressedStreamTools.write(wrapper.tag, file);
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @SubscribeEvent
@@ -416,33 +416,33 @@ public final class SignalBoxHandler {
         final World world = (World) event.getWorld();
         if (world.isClientSide)
             return;
-            try {
-                Files.createDirectories(NBT_FILES_DIRECTORY);
-                final Optional<Path> file = Files.list(NBT_FILES_DIRECTORY)
-                        .filter(path -> path.endsWith(((ServerWorld) world).getServer()
-                                .getWorldData().getLevelName() + "_"
-                                + world.dimension().location().toString().replace(":", "_")))
-                        .findFirst();
-                if (!file.isPresent() || !file.get().toFile().exists())
-                    return;
-                final NBTWrapper wrapper = new NBTWrapper(
-                        CompressedStreamTools.read(file.get().toFile()));
-                wrapper.getList(LINKING_UPDATE).forEach(tag -> {
-                    final LinkingUpdates updates = new LinkingUpdates();
-                    updates.readNBT(tag);
-                    synchronized (POS_UPDATES) {
-                        final PosIdentifier identifier = new PosIdentifier(tag.getAsPos(), world);
-                        POS_UPDATES.put(identifier, updates);
-                    }
-                });
-                wrapper.getList(OUTPUT_UPDATE).forEach(tag -> {
-                    synchronized (OUTPUT_UPDATES) {
-                        OUTPUT_UPDATES.put(new PosIdentifier(tag.getAsPos(), world),
-                                tag.getBoolean(BOOL_STATE));
-                    }
-                });
-            } catch (final IOException e) {
-                e.printStackTrace();
-            }
+        try {
+            Files.createDirectories(NBT_FILES_DIRECTORY);
+            final Optional<Path> file = Files.list(NBT_FILES_DIRECTORY)
+                    .filter(path -> path.endsWith(
+                            ((ServerWorld) world).getServer().getWorldData().getLevelName() + "_"
+                                    + world.dimension().location().toString().replace(":", "_")))
+                    .findFirst();
+            if (!file.isPresent() || !file.get().toFile().exists())
+                return;
+            final NBTWrapper wrapper = new NBTWrapper(
+                    CompressedStreamTools.read(file.get().toFile()));
+            wrapper.getList(LINKING_UPDATE).forEach(tag -> {
+                final LinkingUpdates updates = new LinkingUpdates();
+                updates.readNBT(tag);
+                synchronized (POS_UPDATES) {
+                    final PosIdentifier identifier = new PosIdentifier(tag.getAsPos(), world);
+                    POS_UPDATES.put(identifier, updates);
+                }
+            });
+            wrapper.getList(OUTPUT_UPDATE).forEach(tag -> {
+                synchronized (OUTPUT_UPDATES) {
+                    OUTPUT_UPDATES.put(new PosIdentifier(tag.getAsPos(), world),
+                            tag.getBoolean(BOOL_STATE));
+                }
+            });
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
     }
 }
