@@ -55,6 +55,7 @@ public class SignalBoxPathway {
     private boolean emptyOrBroken = false;
     private Level world;
     private BlockPos tilePos;
+    private boolean isBlocked;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
@@ -135,6 +136,7 @@ public class SignalBoxPathway {
 
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
+    private static final String IS_BLOCKED = "isBlocked";
 
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
@@ -143,6 +145,7 @@ public class SignalBoxPathway {
             return entry;
         })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
+        tag.putBoolean(IS_BLOCKED, isBlocked);
     }
 
     public void read(final NBTWrapper tag) {
@@ -161,6 +164,7 @@ public class SignalBoxPathway {
         });
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
+        this.isBlocked = tag.getBoolean(IS_BLOCKED);
         if (this.listOfNodes.size() < 2) {
             OpenSignalsMain.getLogger().error("Detecting pathway with only 2 elements!");
             this.emptyOrBroken = true;
@@ -214,6 +218,8 @@ public class SignalBoxPathway {
         if (world == null)
             return;
         this.signalPositions.ifPresent(entry -> {
+            if (isBlocked)
+                return;
             final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(),
                     SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()));
             final SignalStateInfo nextInfo = entry.getValue() != null
@@ -262,6 +268,7 @@ public class SignalBoxPathway {
         if (point == null || point.equals(this.getLastPoint())
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
             this.emptyOrBroken = true;
+            this.isBlocked = false;
             resetOther();
         }
     }
@@ -313,6 +320,7 @@ public class SignalBoxPathway {
             return false;
         resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
+        isBlocked = true;
         return true;
     }
 

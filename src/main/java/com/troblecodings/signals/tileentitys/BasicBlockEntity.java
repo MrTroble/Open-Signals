@@ -59,6 +59,8 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
     @Override
     public boolean hasCustomName() {
+        if (customName == null)
+            getNameWrapper();
         return customName != null;
     }
 

@@ -122,6 +122,8 @@ public class Placementtool extends Item
             }
             checkPos = checkPos.above();
         }
+        final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
+        SignalStateHandler.createStates(info, signalProperties);
         BlockPos ghostPos = pos.above();
         for (int i = 0; i < height; i++) {
             worldIn.setBlock(ghostPos, OSBlocks.GHOST_BLOCK.defaultBlockState(), 3);
@@ -131,14 +133,12 @@ public class Placementtool extends Item
         final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
         if (!(signalName == null || signalName.isEmpty())) {
             signalProperties.put(Signal.CUSTOMNAME, "TRUE");
-            NameHandler.setName(nameInfo, signalName);
+            NameHandler.setNameForNonSignals(nameInfo, signalName);
         } else {
             signalProperties.put(Signal.CUSTOMNAME, "FALSE");
-            NameHandler.setName(nameInfo, signal.getSignalTypeName());
+            NameHandler.setNameForNonSignals(nameInfo, signal.getSignalTypeName());
         }
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
-        final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
-        SignalStateHandler.createStates(info, signalProperties);
         return InteractionResult.SUCCESS;
     }
 
