@@ -34,6 +34,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkEvent.ClientCustomPayloadEvent;
@@ -212,6 +213,8 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(stateInfo.world);
         }
+        if (file == null)
+            return new HashMap<>();
         SignalStatePos pos = file.find(stateInfo.pos);
         if (pos == null) {
             if (stateInfo.world.isClientSide) {
@@ -374,11 +377,33 @@ public final class SignalStateHandler implements INetworkSync {
         stateInfo.world.players().forEach(player -> sendTo(player, buffer));
     }
 
+    @SubscribeEvent
+    public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
+        new Thread(() -> {
+            final ServerWorld world = event.getWorld();
+            final IChunk chunk = world.getChunk(event.getPos().getWorldPosition());
+            final PlayerEntity player = event.getPlayer();
+            final List<ByteBuffer> toUpdate = new ArrayList<>();
+            chunk.getBlockEntitiesPos().forEach(pos -> {
+                final Block block = world.getBlockState(pos).getBlock();
+                if (block instanceof Signal) {
+                    final WriteBuffer buffer = new WriteBuffer();
+                    buffer.putBlockPos(pos);
+                    buffer.putByte((byte) 0);
+                    toUpdate.add(buffer.build());
+                }
+            });
+            toUpdate.forEach(buffer -> sendTo(player, buffer));
+        }).start();
+    }
+
     public static void loadSignal(final SignalStateInfo info) {
         loadSignals(ImmutableList.of(info));
     }
 
     public static void loadSignals(final List<SignalStateInfo> signals) {
+        if (signals == null || signals.isEmpty())
+            return;
         new Thread(() -> {
             signals.forEach(info -> {
                 synchronized (SIGNAL_COUNTER) {
@@ -409,7 +434,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void unloadSignals(final List<SignalStateInfo> signals) {
-        if (signals == null)
+        if (signals == null || signals.isEmpty())
             return;
         new Thread(() -> {
             signals.forEach(info -> {
