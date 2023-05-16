@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
 
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonObject;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.ContentPackException;
@@ -17,18 +15,18 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
+import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.CompositeModel.Geometry;
-import net.minecraftforge.client.model.IModelLoader;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.ICustomModelLoader;
 
+@SuppressWarnings("deprecation")
 @OnlyIn(Dist.CLIENT)
-public final class CustomModelLoader implements IModelLoader<Geometry> {
+public final class CustomModelLoader implements ICustomModelLoader {
 
     private static HashMap<String, List<SignalModelLoaderInfo>> registeredModels = new HashMap<>();
 
@@ -231,8 +229,14 @@ public final class CustomModelLoader implements IModelLoader<Geometry> {
     }
 
     @Override
-    public Geometry read(final JsonDeserializationContext deserializationContext,
-            final JsonObject modelContents) {
+    public boolean accepts(final ResourceLocation modelLocation) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public IUnbakedModel loadModel(final ResourceLocation modelLocation) throws Exception {
+        // TODO Auto-generated method stub
         return null;
     }
 }

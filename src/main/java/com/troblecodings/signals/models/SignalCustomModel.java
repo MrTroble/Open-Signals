@@ -26,12 +26,13 @@ import net.minecraft.client.renderer.Vector4f;
 import net.minecraft.client.renderer.model.BakedQuad;
 import net.minecraft.client.renderer.model.BlockModel;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IModelTransform;
 import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.renderer.texture.ISprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.renderer.vertex.VertexFormat;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
@@ -132,8 +133,8 @@ public class SignalCustomModel implements IUnbakedModel {
 
     @Override
     public IBakedModel bake(final ModelBakery bakery,
-            final Function<ResourceLocation, TextureAtlasSprite> function,
-            final IModelTransform modelTransform, final ResourceLocation resource) {
+            final Function<ResourceLocation, TextureAtlasSprite> function, final ISprite sprite,
+            final VertexFormat format) {
         list.forEach(info -> {
             if (info.model == null) {
                 final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
@@ -149,5 +150,12 @@ public class SignalCustomModel implements IUnbakedModel {
         final Quaternion quaternion = angel.getQuaternion();
         return new SignalBakedModel(list.stream().map(info -> transform(info, bakery, resource,
                 function, materialsFromString, quaternion)).collect(Collectors.toList()));
+    }
+
+    @Override
+    public Collection<ResourceLocation> getTextures(
+            final Function<ResourceLocation, IUnbakedModel> p_209559_1_, final Set<String> p_209559_2_) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

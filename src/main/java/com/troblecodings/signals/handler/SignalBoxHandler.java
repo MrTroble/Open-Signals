@@ -374,14 +374,14 @@ public final class SignalBoxHandler {
         service.execute(() -> {
             final NBTWrapper wrapper = new NBTWrapper();
             final List<NBTWrapper> wrapperList = new ArrayList<>();
-            final String levelName = (((ServerWorld) world).getServer().getWorldData()
+            final String levelName = (((ServerWorld) world).getServer()
                     .getLevelName() + "_"
-                    + world.dimension().location().toString().replace(":", "_"));
+                    + world.getDimension().toString().replace(":", "_"));
             synchronized (POS_UPDATES) {
                 POS_UPDATES.forEach((pos, update) -> {
                     if (!levelName.equals(
-                            ((ServerWorld) world).getServer().getWorldData().getLevelName() + "_"
-                                    + world.dimension().location().toString().replace(":", "_")))
+                            ((ServerWorld) world).getServer().getLevelName() + "_"
+                                    + world.getDimension().toString().replace(":", "_")))
                         return;
                     final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
                     update.writeNBT(posWrapper);
@@ -393,8 +393,8 @@ public final class SignalBoxHandler {
             synchronized (OUTPUT_UPDATES) {
                 OUTPUT_UPDATES.forEach((pos, state) -> {
                     if (!levelName.equals(
-                            ((ServerWorld) world).getServer().getWorldData().getLevelName() + "_"
-                                    + world.dimension().location().toString().replace(":", "_")))
+                            ((ServerWorld) world).getServer().getLevelName() + "_"
+                                    + world.getDimension().toString().replace(":", "_")))
                         return;
                     final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
                     posWrapper.putBoolean(BOOL_STATE, state);
@@ -405,8 +405,8 @@ public final class SignalBoxHandler {
             try {
                 Files.createDirectories(NBT_FILES_DIRECTORY);
                 final File file = Paths.get("osfiles/signalboxhandler/",
-                        world.getServer().getWorldData().getLevelName().replace("/", "") + "_"
-                                + world.dimension().location().toString().replace(":", "_"))
+                        world.getServer().getLevelName().replace("/", "") + "_"
+                                + world.getDimension().toString().replace(":", "_"))
                         .toFile();
                 if (file.exists())
                     file.delete();
@@ -427,9 +427,8 @@ public final class SignalBoxHandler {
             try {
                 Files.createDirectories(NBT_FILES_DIRECTORY);
                 final Optional<Path> file = Files.list(NBT_FILES_DIRECTORY)
-                        .filter(path -> path.endsWith(((ServerWorld) world).getServer()
-                                .getWorldData().getLevelName() + "_"
-                                + world.dimension().location().toString().replace(":", "_")))
+                        .filter(path -> path.endsWith(((ServerWorld) world).getServer().getLevelName() + "_"
+                                + world.getDimension().toString().replace(":", "_")))
                         .findFirst();
                 if (!file.isPresent() || !file.get().toFile().exists())
                     return;

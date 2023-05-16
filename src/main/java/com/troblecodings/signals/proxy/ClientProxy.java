@@ -1,7 +1,6 @@
 package com.troblecodings.signals.proxy;
 
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
@@ -20,16 +19,15 @@ import com.troblecodings.signals.tileentitys.SignalSpecialRenderer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 
+@SuppressWarnings("deprecation")
 public class ClientProxy extends CommonProxy {
 
     @Override
-    public void initModEvent(final FMLConstructModEvent event) {
+    public void initModEvent(final FMLClientSetupEvent event) {
         super.initModEvent(event);
         SignalStateHandler.add(new ClientSignalStateHandler());
         NameHandler.add(new ClientNameHandler());
@@ -39,16 +37,14 @@ public class ClientProxy extends CommonProxy {
         OpenSignalsMain.handler.addGui(RedstoneIO.class, NamableGui::new);
         OpenSignalsMain.handler.addGui(Signal.class, NamableGui::new);
         ModelLoaderRegistry.registerLoader(
-                new ResourceLocation(OpenSignalsMain.MODID, "oscustommodelloader"),
                 CustomModelLoader.INSTANCE);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void preinit(final FMLCommonSetupEvent event) {
         super.preinit(event);
-        TileEntityRendererDispatcher.instance.setSpecialRendererInternal(
-                (TileEntityType<SignalTileEntity>) BasicBlock.BLOCK_ENTITYS.get(Signal.SUPPLIER),
+        TileEntityRendererDispatcher.instance.setSpecialRenderer(
+                SignalTileEntity.class,
                 new SignalSpecialRenderer(TileEntityRendererDispatcher.instance));
     }
 }

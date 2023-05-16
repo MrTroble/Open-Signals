@@ -23,8 +23,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forgespi.locating.IModFile;
 
@@ -38,7 +38,6 @@ public class OpenSignalsMain {
         return instance;
     }
 
-    @SuppressWarnings("deprecation")
     public OpenSignalsMain() {
         instance = this;
         final IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -51,7 +50,6 @@ public class OpenSignalsMain {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
     }
 
-    @SuppressWarnings("deprecation")
     public static CommonProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new,
             () -> CommonProxy::new);
     private static Logger log = null;
@@ -72,7 +70,7 @@ public class OpenSignalsMain {
     public IModFile file;
 
     @SubscribeEvent
-    public void preInit(final FMLConstructModEvent event) {
+    public void preInit(final FMLClientSetupEvent event) {
         debug = false;
         log = LoggerContext.getContext().getLogger(MODID);
         file = ModList.get().getModFileById(MODID).getFile();

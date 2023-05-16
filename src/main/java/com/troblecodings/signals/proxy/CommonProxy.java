@@ -24,12 +24,12 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
 
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
 
 public class CommonProxy {
 
-    public void initModEvent(final FMLConstructModEvent event) {
+    public void initModEvent(final FMLClientSetupEvent event) {
         SignalStateHandler.init();
         NameHandler.init();
         OSSounds.init();

@@ -55,7 +55,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
-public abstract class GuiSignalBox extends GuiBase {
+public class GuiSignalBox extends GuiBase {
 
     private static final int SELECTION_COLOR = 0x2900FF00;
     private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
