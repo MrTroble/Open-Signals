@@ -55,6 +55,7 @@ public class SignalBoxPathway {
     private boolean emptyOrBroken = false;
     private World world;
     private BlockPos tilePos;
+    private boolean isBlocked = false;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
@@ -214,6 +215,8 @@ public class SignalBoxPathway {
         if (world == null)
             return;
         this.signalPositions.ifPresent(entry -> {
+            if (isBlocked)
+                return;
             final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(),
                     SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()));
             final SignalStateInfo nextInfo = entry.getValue() != null
@@ -262,6 +265,7 @@ public class SignalBoxPathway {
         if (point == null || point.equals(this.getLastPoint())
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
             this.emptyOrBroken = true;
+            this.isBlocked = false;
             resetOther();
         }
     }
@@ -313,6 +317,7 @@ public class SignalBoxPathway {
             return false;
         resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
+        isBlocked = true;
         return true;
     }
 
