@@ -7,9 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -39,7 +36,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.network.NetworkEvent.ClientCustomPayloadEvent;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.event.EventNetworkChannel;
@@ -53,7 +49,6 @@ public final class SignalStateHandler implements INetworkSync {
     private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
-    private static ExecutorService service;
 
     private SignalStateHandler() {
     }
@@ -64,18 +59,6 @@ public final class SignalStateHandler implements INetworkSync {
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new SignalStateHandler());
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
-        service = Executors.newFixedThreadPool(4);
-    }
-
-    @SubscribeEvent
-    public static void shutdown(final FMLServerStoppingEvent event) {
-        service.shutdown();
-        try {
-            service.awaitTermination(1, TimeUnit.DAYS);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
-        service = Executors.newFixedThreadPool(4);
     }
 
     public static void add(final Object object) {
@@ -152,7 +135,6 @@ public final class SignalStateHandler implements INetworkSync {
                 return;
             }
         }
-        service.submit(() -> {
             SignalStatePos pos = file.find(info.pos);
             if (pos == null) {
                 pos = file.create(info.pos);
@@ -162,7 +144,6 @@ public final class SignalStateHandler implements INetworkSync {
                 statesToBuffer(info.signal, states, buffer.array());
                 file.write(pos, buffer);
             }
-        });
     }
 
     public static void setStates(final SignalStateInfo info, final Map<SEProperty, String> states) {
@@ -265,7 +246,6 @@ public final class SignalStateHandler implements INetworkSync {
                                 + "/" + world.dimension().location().toString().replace(":", ""))));
             }
         }
-        service.submit(() -> {
             final List<SignalStateInfo> states = new ArrayList<>();
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
@@ -279,7 +259,6 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 CURRENTLY_LOADED_CHUNKS.put(chunk, states);
             }
-        });
     }
 
     @SubscribeEvent
@@ -288,7 +267,6 @@ public final class SignalStateHandler implements INetworkSync {
         final World level = (World) chunk.getWorldForge();
         if (level.isClientSide())
             return;
-        service.submit(() -> {
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
                 if (block instanceof SignalBox) {
@@ -300,32 +278,27 @@ public final class SignalStateHandler implements INetworkSync {
                 states = CURRENTLY_LOADED_CHUNKS.remove(chunk);
             }
             unloadSignals(states);
-        });
     }
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save save) {
         if (save.getWorld().isClientSide())
             return;
-        service.execute(() -> {
             final Map<SignalStateInfo, Map<SEProperty, String>> maps;
             synchronized (CURRENTLY_LOADED_STATES) {
                 maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
             }
             maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(save.getWorld()))
                     .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
-        });
     }
 
     @SubscribeEvent
     public static void onWorldUnload(final WorldEvent.Unload unload) {
         if (unload.getWorld().isClientSide())
             return;
-        service.execute(() -> {
             synchronized (ALL_LEVEL_FILES) {
                 ALL_LEVEL_FILES.remove(unload.getWorld());
             }
-        });
     }
 
     @SubscribeEvent
@@ -342,7 +315,6 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             CURRENTLY_LOADED_STATES.remove(info);
         }
-        service.execute(() -> {
             SignalStateFile file;
             synchronized (ALL_LEVEL_FILES) {
                 file = ALL_LEVEL_FILES.get(info.world);
@@ -362,7 +334,6 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 CURRENTLY_LOADED_CHUNKS.get(chunk).remove(info);
             }
-        });
     }
 
     private static void sendRemoved(final SignalStateInfo info) {
@@ -401,7 +372,6 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void loadSignals(final List<SignalStateInfo> signals) {
-        service.execute(() -> {
             signals.forEach(info -> {
                 synchronized (SIGNAL_COUNTER) {
                     Integer count = SIGNAL_COUNTER.get(info);
@@ -423,7 +393,6 @@ public final class SignalStateHandler implements INetworkSync {
                 }
                 sendPropertiesToClient(info, properties);
             });
-        });
     }
 
     public static void unloadSignal(final SignalStateInfo info) {
@@ -431,7 +400,6 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void unloadSignals(final List<SignalStateInfo> signals) {
-        service.execute(() -> {
             if (signals == null)
                 return;
             signals.forEach(info -> {
@@ -453,7 +421,6 @@ public final class SignalStateHandler implements INetworkSync {
                     createToFile(info, properties);
                 }
             });
-        });
     }
 
     private static void sendTo(final PlayerEntity player, final ByteBuffer buf) {

@@ -10,9 +10,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.BasicBlock;
@@ -38,7 +35,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 
 public final class SignalBoxHandler {
 
@@ -49,7 +45,6 @@ public final class SignalBoxHandler {
     private static final Map<PosIdentifier, LinkedPositions> ALL_LINKED_POS = new HashMap<>();
     private static final Map<PosIdentifier, LinkingUpdates> POS_UPDATES = new HashMap<>();
     private static final Map<PosIdentifier, Boolean> OUTPUT_UPDATES = new HashMap<>();
-    private static ExecutorService service = Executors.newFixedThreadPool(1);
 
     public static void resetPathway(final PosIdentifier identifier, final Point point) {
         if (identifier.world.isClientSide)
@@ -371,7 +366,6 @@ public final class SignalBoxHandler {
         final World world = (World) event.getWorld();
         if (world.isClientSide)
             return;
-        service.execute(() -> {
             final NBTWrapper wrapper = new NBTWrapper();
             final List<NBTWrapper> wrapperList = new ArrayList<>();
             final String levelName = (((ServerWorld) world).getServer().getWorldData()
@@ -415,7 +409,6 @@ public final class SignalBoxHandler {
             } catch (final IOException e) {
                 e.printStackTrace();
             }
-        });
     }
 
     @SubscribeEvent
@@ -423,7 +416,6 @@ public final class SignalBoxHandler {
         final World world = (World) event.getWorld();
         if (world.isClientSide)
             return;
-        service.execute(() -> {
             try {
                 Files.createDirectories(NBT_FILES_DIRECTORY);
                 final Optional<Path> file = Files.list(NBT_FILES_DIRECTORY)
@@ -452,17 +444,5 @@ public final class SignalBoxHandler {
             } catch (final IOException e) {
                 e.printStackTrace();
             }
-        });
-    }
-
-    @SubscribeEvent
-    public static void shutdown(final FMLServerStoppingEvent event) {
-        service.shutdown();
-        try {
-            service.awaitTermination(1, TimeUnit.DAYS);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
-        service = Executors.newFixedThreadPool(1);
     }
 }
