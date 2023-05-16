@@ -9,16 +9,16 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class SignalBox extends BasicBlock {
 
@@ -29,21 +29,22 @@ public class SignalBox extends BasicBlock {
     }
 
     @Override
-    public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos,
-            final PlayerEntity playerIn, final Hand hand, final BlockRayTraceResult hit) {
-        if (!playerIn.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
-            final TileEntity entity = worldIn.getBlockEntity(pos);
+    public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
+            final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
+        if (!playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem()
+                .equals(OSItems.LINKING_TOOL)) {
+            final BlockEntity entity = worldIn.getBlockEntity(pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {
                 OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos,
                         "signalbox");
             } else {
-                playerIn.sendMessage(new TranslationTextComponent("msg.isblocked"),
+                playerIn.sendMessage(new TranslatableComponent("msg.isblocked"),
                         playerIn.getUUID());
             }
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ActionResultType.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override
@@ -57,8 +58,8 @@ public class SignalBox extends BasicBlock {
     }
 
     @Override
-    public void playerWillDestroy(final World world, final BlockPos pos, final BlockState state,
-            final PlayerEntity player) {
+    public void playerWillDestroy(final Level world, final BlockPos pos, final BlockState state,
+            final Player player) {
         if (!world.isClientSide) {
             ((SignalBoxTileEntity) world.getBlockEntity(pos)).unlink();
             SignalBoxHandler.removeSignalBox(new PosIdentifier(pos, world));

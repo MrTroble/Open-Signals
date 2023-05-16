@@ -1,24 +1,23 @@
 package com.troblecodings.signals.tileentitys;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 
-import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.tileentity.TileEntityRenderer;
-import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
-public class SignalSpecialRenderer extends TileEntityRenderer<SignalTileEntity> {
+public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEntity> {
 
-    private final TileEntityRendererDispatcher context;
+    private final BlockEntityRendererProvider.Context context;
 
-    public SignalSpecialRenderer(final TileEntityRendererDispatcher context) {
-        super(context);
+    public SignalSpecialRenderer(final BlockEntityRendererProvider.Context context) {
         this.context = context;
     }
 
     @Override
-    public void render(final SignalTileEntity tile, final float tick, final MatrixStack stack,
-            final IRenderTypeBuffer source, final int rand1, final int rand2) {
+    public void render(final SignalTileEntity tile, final float tick, final PoseStack stack,
+            final MultiBufferSource source, final int rand1, final int rand2) {
         if (!tile.hasCustomName())
             return;
         tile.renderOverlay(new RenderOverlayInfo(stack, 0, 0, 0, context.getFont()));

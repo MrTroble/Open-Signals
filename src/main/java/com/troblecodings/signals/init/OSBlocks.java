@@ -17,12 +17,12 @@ import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.SignalLoader;
 
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.Item.Properties;
-import net.minecraft.tileentity.TileEntityType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Item.Properties;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -53,8 +53,8 @@ public final class OSBlocks {
                     final Object object = field.get(null);
                     if (object instanceof BasicBlock)
                         loadBlock((BasicBlock) object, name);
-                } catch (final IllegalArgumentException | IllegalAccessException ex) {
-                    ex.printStackTrace();
+                } catch (final IllegalArgumentException | IllegalAccessException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -87,10 +87,11 @@ public final class OSBlocks {
     }
 
     @SubscribeEvent
-    public static void registerBlockEntitys(final RegistryEvent.Register<TileEntityType<?>> event) {
+    public static void registerBlockEntitys(
+            final RegistryEvent.Register<BlockEntityType<?>> event) {
         if (POST.getRegistryName() == null)
             OSBlocks.init();
-        final IForgeRegistry<TileEntityType<?>> registry = event.getRegistry();
+        final IForgeRegistry<BlockEntityType<?>> registry = event.getRegistry();
         BasicBlock.BLOCK_ENTITYS.values().forEach(registry::register);
     }
 

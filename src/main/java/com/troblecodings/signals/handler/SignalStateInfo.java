@@ -4,16 +4,16 @@ import java.util.Objects;
 
 import com.troblecodings.signals.blocks.Signal;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class SignalStateInfo {
 
-    public final World world;
+    public final Level world;
     public final BlockPos pos;
     public final Signal signal;
 
-    public SignalStateInfo(final World world, final BlockPos pos, final Signal signal) {
+    public SignalStateInfo(final Level world, final BlockPos pos, final Signal signal) {
         this.world = world;
         this.pos = pos;
         this.signal = signal;

@@ -13,7 +13,7 @@ import javax.annotation.Nullable;
 
 import com.troblecodings.signals.OpenSignalsMain;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public class SignalStateFile {
 

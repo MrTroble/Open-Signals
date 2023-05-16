@@ -15,8 +15,8 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Rotation;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Rotation;
 
 public class UISignalBoxTile extends UIComponentEntity {
 

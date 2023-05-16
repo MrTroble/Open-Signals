@@ -7,16 +7,16 @@ import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class SignalController extends BasicBlock {
 
@@ -27,20 +27,21 @@ public class SignalController extends BasicBlock {
     }
 
     @Override
-    public ActionResultType use(final BlockState state, final World worldIn, final BlockPos pos,
-            final PlayerEntity playerIn, final Hand hand, final BlockRayTraceResult hit) {
-        if (!playerIn.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
+    public InteractionResult use(final BlockState state, final Level worldIn, final BlockPos pos,
+            final Player playerIn, final InteractionHand hand, final BlockHitResult hit) {
+        if (!playerIn.getItemInHand(InteractionHand.MAIN_HAND).getItem()
+                .equals(OSItems.LINKING_TOOL)) {
             OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
                     "signalcontroller");
-            return ActionResultType.SUCCESS;
+            return InteractionResult.SUCCESS;
         }
-        return ActionResultType.FAIL;
+        return InteractionResult.FAIL;
     }
 
     @Override
-    public void neighborChanged(final BlockState state, final World world, final BlockPos pos,
+    public void neighborChanged(final BlockState state, final Level world, final BlockPos pos,
             final Block blockIn, final BlockPos fromPos, final boolean isMoving) {
-        final TileEntity tile = world.getBlockEntity(pos);
+        final BlockEntity tile = world.getBlockEntity(pos);
         if (tile instanceof SignalControllerTileEntity) {
             ((SignalControllerTileEntity) tile).redstoneUpdate();
         }

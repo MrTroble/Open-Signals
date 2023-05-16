@@ -1,7 +1,5 @@
 package com.troblecodings.signals.tileentitys;
 
-import java.util.stream.Collectors;
-
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.RedstoneIO;
@@ -12,9 +10,9 @@ import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncable {
 
@@ -35,8 +33,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
-        wrapper.putList(LINKED_LIST, linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper)
-                .collect(Collectors.toList()));
+        wrapper.putList(LINKED_LIST,
+                linkedPositions.stream().map(NBTWrapper::getBlockPosWrapper).toList());
     }
 
     @Override
@@ -93,8 +91,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     @Override
-    public boolean isValid(final PlayerEntity player) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isValid(final Player player) {
+        return true;
     }
 }

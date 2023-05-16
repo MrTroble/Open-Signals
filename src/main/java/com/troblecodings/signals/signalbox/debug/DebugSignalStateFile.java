@@ -13,7 +13,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.handler.SignalStateFile;
 import com.troblecodings.signals.handler.SignalStatePos;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public class DebugSignalStateFile extends SignalStateFile {
 

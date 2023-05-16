@@ -15,8 +15,8 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class PathwayHolder {
 
@@ -24,15 +24,15 @@ public class PathwayHolder {
 
     private final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
     private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
-    private World world;
+    private Level world;
     private final BlockPos tilePos;
 
-    public PathwayHolder(final World world, final BlockPos pos) {
+    public PathwayHolder(final Level world, final BlockPos pos) {
         this.world = world;
         this.tilePos = pos;
     }
 
-    public void setWorld(final World world) {
+    public void setWorld(final Level world) {
         this.world = world;
         startsToPath.values().forEach(pw -> pw.setWorldAndPos(world, tilePos));
     }

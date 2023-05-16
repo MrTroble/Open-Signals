@@ -8,11 +8,11 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
-import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.ClientSignalStateInfo;
+import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelDataMap.Builder;
@@ -24,7 +24,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     }
 
     @Override
-    public boolean isValid(final PlayerEntity player) {
+    public boolean isValid(final Player player) {
         return true;
     }
 
@@ -47,7 +47,9 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         final Map<SEProperty, String> states = ClientSignalStateHandler
                 .getClientStates(new ClientSignalStateInfo(level, worldPosition));
         final Builder builder = new ModelDataMap.Builder();
-        states.forEach((property, value) -> builder.withInitial(property, value));
+        states.forEach((property, value) -> {
+            builder.withInitial(property, value);
+        });
         return new ModelInfoWrapper(builder.build());
     }
 }

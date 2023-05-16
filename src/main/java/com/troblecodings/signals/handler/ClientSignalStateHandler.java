@@ -12,13 +12,13 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
+import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientSignalStateHandler implements INetworkSync {
 
@@ -36,7 +36,7 @@ public class ClientSignalStateHandler implements INetworkSync {
     public void deserializeClient(final ByteBuffer buf) {
         final ReadBuffer buffer = new ReadBuffer(buf);
         final Minecraft mc = Minecraft.getInstance();
-        final World level = mc.level;
+        final Level level = mc.level;
         final BlockPos signalPos = buffer.getBlockPos();
         final int propertiesSize = buffer.getByteAsInt();
         if (propertiesSize == 255) {
@@ -52,7 +52,7 @@ public class ClientSignalStateHandler implements INetworkSync {
         SERVICE.execute(() -> {
             if (level == null)
                 return;
-            TileEntity entity;
+            BlockEntity entity;
             while ((entity = level.getBlockEntity(signalPos)) == null)
                 continue;
             final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);

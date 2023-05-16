@@ -22,8 +22,8 @@ import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.util.Rotation;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Rotation;
 
 public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 

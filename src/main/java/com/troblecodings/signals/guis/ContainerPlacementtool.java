@@ -17,8 +17,8 @@ import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.items.Placementtool;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
 public class ContainerPlacementtool extends ContainerBase implements INetworkSync {
 
@@ -27,7 +27,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
     public final Map<SEProperty, Integer> properties = new HashMap<>();
     protected int signalID;
     protected String signalName = "";
-    private final PlayerEntity player;
+    private final Player player;
     private Signal signal;
 
     public ContainerPlacementtool(final GuiInfo info) {
@@ -42,7 +42,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         sendItemProperties(player);
     }
 
-    private void sendItemProperties(final PlayerEntity player) {
+    private void sendItemProperties(final Player player) {
         final ItemStack stack = player.getMainHandItem();
         final Placementtool tool = (Placementtool) stack.getItem();
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);

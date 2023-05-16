@@ -14,8 +14,8 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
 public class LinkedPositions {
 
@@ -32,7 +32,7 @@ public class LinkedPositions {
         linkedBlocks = new HashMap<>();
     }
 
-    public void addSignal(final BlockPos signalPos, final Signal signal, final World world) {
+    public void addSignal(final BlockPos signalPos, final Signal signal, final Level world) {
         signals.put(signalPos, signal);
         SignalConfig.reset(new SignalStateInfo(world, signalPos, signal));
     }
@@ -62,7 +62,7 @@ public class LinkedPositions {
         return ImmutableMap.copyOf(linkedBlocks);
     }
 
-    public void unlink(final BlockPos tilePos, final World world) {
+    public void unlink(final BlockPos tilePos, final Level world) {
         final List<SignalStateInfo> signalsToUnload = new ArrayList<>();
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
@@ -107,7 +107,7 @@ public class LinkedPositions {
         });
     }
 
-    public void loadSignals(final World world) {
+    public void loadSignals(final Level world) {
         if (world.isClientSide)
             return;
         final List<SignalStateInfo> signalInfos = new ArrayList<>();
@@ -115,7 +115,7 @@ public class LinkedPositions {
         SignalStateHandler.loadSignals(signalInfos);
     }
 
-    public void unloadSignals(final World world) {
+    public void unloadSignals(final Level world) {
         if (world.isClientSide)
             return;
         final List<SignalStateInfo> signalInfos = new ArrayList<>();

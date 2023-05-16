@@ -8,15 +8,15 @@ import java.util.Set;
 
 import com.troblecodings.signals.OpenSignalsMain;
 
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.resources.ResourceLocation;
 
-public class MapWrapper implements Map<ResourceLocation, IUnbakedModel> {
+public class MapWrapper implements Map<ResourceLocation, UnbakedModel> {
 
-    private final Map<ResourceLocation, IUnbakedModel> map;
+    private final Map<ResourceLocation, UnbakedModel> map;
     private final Set<String> whitelist;
 
-    public MapWrapper(final Map<ResourceLocation, IUnbakedModel> map, final Set<String> whitelist) {
+    public MapWrapper(final Map<ResourceLocation, UnbakedModel> map, final Set<String> whitelist) {
         this.map = map;
         this.whitelist = new HashSet<>(whitelist);
         this.whitelist.add("ghostblock");
@@ -46,30 +46,30 @@ public class MapWrapper implements Map<ResourceLocation, IUnbakedModel> {
     }
 
     @Override
-    public IUnbakedModel get(final Object key) {
+    public UnbakedModel get(final Object key) {
         return this.map.get(key);
     }
 
     @Override
-    public IUnbakedModel put(final ResourceLocation key, final IUnbakedModel value) {
+    public UnbakedModel put(final ResourceLocation key, final UnbakedModel value) {
         if (!key.getNamespace().equalsIgnoreCase(OpenSignalsMain.MODID)
                 || !whitelist.contains(key.getPath()))
             return this.map.put(key, value);
         return value;
     }
 
-    public IUnbakedModel putNormal(final ResourceLocation key, final IUnbakedModel value) {
+    public UnbakedModel putNormal(final ResourceLocation key, final UnbakedModel value) {
         return this.map.put(key, value);
     }
 
     @Override
-    public IUnbakedModel remove(final Object key) {
+    public UnbakedModel remove(final Object key) {
         return this.map.remove(key);
     }
 
     @Override
-    public void putAll(final Map<? extends ResourceLocation, ? extends IUnbakedModel> m) {
-        final HashMap<? extends ResourceLocation, ? extends IUnbakedModel> map = new HashMap<>(m);
+    public void putAll(final Map<? extends ResourceLocation, ? extends UnbakedModel> m) {
+        final HashMap<? extends ResourceLocation, ? extends UnbakedModel> map = new HashMap<>(m);
         map.keySet().removeIf(loc -> loc.getNamespace().equalsIgnoreCase(OpenSignalsMain.MODID));
         this.map.putAll(map);
     }
@@ -85,12 +85,12 @@ public class MapWrapper implements Map<ResourceLocation, IUnbakedModel> {
     }
 
     @Override
-    public Collection<IUnbakedModel> values() {
+    public Collection<UnbakedModel> values() {
         return this.map.values();
     }
 
     @Override
-    public Set<Entry<ResourceLocation, IUnbakedModel>> entrySet() {
+    public Set<Entry<ResourceLocation, UnbakedModel>> entrySet() {
         return this.map.entrySet();
     }
 }

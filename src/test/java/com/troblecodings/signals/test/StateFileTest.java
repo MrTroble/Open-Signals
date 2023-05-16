@@ -19,11 +19,10 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.core.OSMapEntry;
 import com.troblecodings.signals.handler.SignalStateFile;
 import com.troblecodings.signals.handler.SignalStatePos;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public class StateFileTest {
 
@@ -95,7 +94,7 @@ public class StateFileTest {
         final List<Map.Entry<BlockPos, SignalStatePos>> listOfPos = new ArrayList<>();
         for (int i = 0; i < SignalStateFile.MAX_ELEMENTS_PER_FILE + 10; i++) {
             final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
-            listOfPos.add(new OSMapEntry<>(firstcreate, file.create(firstcreate)));
+            listOfPos.add(Map.entry(firstcreate, file.create(firstcreate)));
         }
         for (int i = 0; i < listOfPos.size() / 1000; i++) {
             final Map.Entry<BlockPos, SignalStatePos> entry = listOfPos.get(i);

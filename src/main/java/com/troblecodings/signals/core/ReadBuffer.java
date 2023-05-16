@@ -2,7 +2,7 @@ package com.troblecodings.signals.core;
 
 import java.nio.ByteBuffer;
 
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 public class ReadBuffer {
 

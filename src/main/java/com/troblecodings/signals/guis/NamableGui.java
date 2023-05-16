@@ -14,14 +14,14 @@ import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.world.entity.player.Player;
 
 public class NamableGui extends GuiBase {
 
     private UILabel labelComp;
     private final NamableContainer container;
-    private final PlayerEntity player;
+    private final Player player;
 
     public NamableGui(final GuiInfo info) {
         super(info);
