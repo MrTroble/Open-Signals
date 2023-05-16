@@ -124,17 +124,17 @@ public final class SignalBoxHandler {
             final Map<Point, SignalBoxNode> modeGrid) {
         if (identifier.world.isClientSide)
             return;
+        LinkedPositions holder;
+        synchronized (ALL_LINKED_POS) {
+            holder = ALL_LINKED_POS.computeIfAbsent(identifier, _u -> new LinkedPositions());
+        }
+        holder.read(wrapper);
         PathwayHolder grid;
         synchronized (ALL_GRIDS) {
             grid = ALL_GRIDS.computeIfAbsent(identifier,
                     _u -> new PathwayHolder(identifier.world, identifier.pos));
         }
         grid.read(wrapper, modeGrid);
-        LinkedPositions holder;
-        synchronized (ALL_LINKED_POS) {
-            holder = ALL_LINKED_POS.computeIfAbsent(identifier, _u -> new LinkedPositions());
-        }
-        holder.read(wrapper);
     }
 
     public static void setWorld(final PosIdentifier identifier) {
