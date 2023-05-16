@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -156,21 +157,22 @@ public final class SignalStateHandler implements INetworkSync {
         if (info.world.isClientSide || states == null || states.isEmpty()) {
             return;
         }
-        new Thread(() -> {
-            synchronized (CURRENTLY_LOADED_STATES) {
-                if (CURRENTLY_LOADED_STATES.containsKey(info)) {
-                    final Map<SEProperty, String> oldStates = new HashMap<>(getStates(info));
-                    oldStates.putAll(states);
-                    CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
-                    sendPropertiesToClient(info, states);
-                    updateListeners(info, false);
-                    return;
-                }
+        final AtomicBoolean contains = new AtomicBoolean(false);
+        synchronized (CURRENTLY_LOADED_STATES) {
+            if (CURRENTLY_LOADED_STATES.containsKey(info)) {
+                contains.set(true);
+                final Map<SEProperty, String> oldStates = new HashMap<>(
+                        CURRENTLY_LOADED_STATES.get(info));
+                oldStates.putAll(states);
+                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
             }
-            info.signal.getUpdate(info.world, info.pos);
-            createToFile(info, states);
+        }
+        new Thread(() -> {
             sendPropertiesToClient(info, states);
             updateListeners(info, false);
+            info.signal.getUpdate(info.world, info.pos);
+            if (!contains.get())
+                createToFile(info, states);
         }).start();
     }
 
