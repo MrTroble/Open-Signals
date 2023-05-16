@@ -54,7 +54,20 @@ public final class NameHandler implements INetworkSync {
         channel.registerObject(obj);
     }
 
-    public static void setName(final NameStateInfo info, final String name) {
+    public static void setNameForSignals(final NameStateInfo info, final String name) {
+        setNameForNonSignals(info, name);
+        if (name == null)
+            return;
+        final Block block = info.world.getBlockState(info.pos).getBlock();
+        if (block instanceof Signal) {
+            SignalStateHandler.setState(new SignalStateInfo(info.world, info.pos, (Signal) block),
+                    Signal.CUSTOMNAME, "TRUE");
+        }
+    }
+
+    public static void setNameForNonSignals(final NameStateInfo info, final String name) {
+        if (name == null)
+            return;
         new Thread(() -> {
             if (info.world.isClientSide)
                 return;
@@ -63,12 +76,6 @@ public final class NameHandler implements INetworkSync {
                 ALL_NAMES.put(info, name);
             }
             createToFile(info, name);
-            final Block block = info.world.getBlockState(info.pos).getBlock();
-            if (block instanceof Signal) {
-                SignalStateHandler.setState(
-                        new SignalStateInfo(info.world, info.pos, (Signal) block),
-                        Signal.CUSTOMNAME, "TRUE");
-            }
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 final List<NameStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
                         .get(info.world.getChunk(info.pos));
