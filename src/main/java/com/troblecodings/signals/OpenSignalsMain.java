@@ -23,7 +23,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.forgespi.locating.IModFile;
@@ -48,6 +47,12 @@ public class OpenSignalsMain {
         MinecraftForge.EVENT_BUS.register(NameHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
         DistExecutor.runWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
+        debug = true;
+        log = LoggerContext.getContext().getLogger(MODID);
+        file = ModList.get().getModFileById(MODID).getFile();
+        contentPacks = new FileReader(MODID, "assets/" + MODID, log,
+                name -> file.findResource(name));
+        proxy.initModEvent();
     }
 
     public static CommonProxy proxy = DistExecutor.runForDist(() -> ClientProxy::new,
@@ -57,26 +62,13 @@ public class OpenSignalsMain {
     public static NetworkHandler network = null;
     public static FileReader contentPacks = null;
     private static boolean debug;
+    public IModFile file;
 
     /**
      * @return the debug
      */
     public static boolean isDebug() {
         return debug;
-    }
-
-    public static final int GUI_SIGNAL_CONTROLLER = 1;
-
-    public IModFile file;
-
-    @SubscribeEvent
-    public void preInit(final FMLClientSetupEvent event) {
-        debug = false;
-        log = LoggerContext.getContext().getLogger(MODID);
-        file = ModList.get().getModFileById(MODID).getFile();
-        contentPacks = new FileReader(MODID, "assets/" + MODID, log,
-                name -> file.findResource(name));
-        proxy.initModEvent(event);
     }
 
     @SubscribeEvent

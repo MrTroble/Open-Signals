@@ -20,15 +20,14 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.renderer.tileentity.TileEntityRendererDispatcher;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 
 @SuppressWarnings("deprecation")
 public class ClientProxy extends CommonProxy {
 
     @Override
-    public void initModEvent(final FMLClientSetupEvent event) {
-        super.initModEvent(event);
+    public void initModEvent() {
+        super.initModEvent();
         SignalStateHandler.add(new ClientSignalStateHandler());
         NameHandler.add(new ClientNameHandler());
         OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);
@@ -36,15 +35,13 @@ public class ClientProxy extends CommonProxy {
         OpenSignalsMain.handler.addGui(SignalBox.class, GuiSignalBox::new);
         OpenSignalsMain.handler.addGui(RedstoneIO.class, NamableGui::new);
         OpenSignalsMain.handler.addGui(Signal.class, NamableGui::new);
-        ModelLoaderRegistry.registerLoader(
-                CustomModelLoader.INSTANCE);
+        ModelLoaderRegistry.registerLoader(CustomModelLoader.INSTANCE);
     }
 
     @Override
     public void preinit(final FMLCommonSetupEvent event) {
         super.preinit(event);
-        TileEntityRendererDispatcher.instance.setSpecialRenderer(
-                SignalTileEntity.class,
+        TileEntityRendererDispatcher.instance.setSpecialRenderer(SignalTileEntity.class,
                 new SignalSpecialRenderer(TileEntityRendererDispatcher.instance));
     }
 }
