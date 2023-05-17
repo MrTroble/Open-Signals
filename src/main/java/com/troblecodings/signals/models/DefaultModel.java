@@ -7,20 +7,20 @@ import java.util.function.Function;
 
 import com.mojang.datafixers.util.Pair;
 
-import net.minecraft.client.renderer.block.model.ItemOverrides;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.model.BuiltInModel;
+import net.minecraft.client.renderer.model.IBakedModel;
+import net.minecraft.client.renderer.model.IModelTransform;
+import net.minecraft.client.renderer.model.IUnbakedModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.model.ItemOverrideList;
+import net.minecraft.client.renderer.model.ModelBakery;
+import net.minecraft.client.renderer.model.RenderMaterial;
+import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.BuiltInModel;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.UnbakedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.inventory.container.PlayerContainer;
+import net.minecraft.util.ResourceLocation;
 
-public final class DefaultModel implements UnbakedModel {
+public final class DefaultModel implements IUnbakedModel {
 
     public static final DefaultModel INSTANCE = new DefaultModel();
 
@@ -33,20 +33,20 @@ public final class DefaultModel implements UnbakedModel {
     }
 
     @Override
-    public Collection<Material> getMaterials(
-            final Function<ResourceLocation, UnbakedModel> function,
+    public Collection<RenderMaterial> getMaterials(
+            final Function<ResourceLocation, IUnbakedModel> function,
             final Set<Pair<String, String>> set) {
         return new ArrayList<>();
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public BakedModel bake(final ModelBakery bakery,
-            final Function<Material, TextureAtlasSprite> function, final ModelState stat,
-            final ResourceLocation location) {
-        return new BuiltInModel(ItemTransforms.NO_TRANSFORMS, ItemOverrides.EMPTY,
-                function.apply(new Material(TextureAtlas.LOCATION_BLOCKS,
-                        MissingTextureAtlasSprite.getLocation())),
+    public IBakedModel bake(final ModelBakery bakery,
+            final Function<RenderMaterial, TextureAtlasSprite> function,
+            final IModelTransform transform, final ResourceLocation location) {
+        return new BuiltInModel(ItemCameraTransforms.NO_TRANSFORMS, ItemOverrideList.EMPTY,
+                function.apply(new RenderMaterial(PlayerContainer.BLOCK_ATLAS,
+                        MissingTextureSprite.getLocation())),
                 false);
     }
+
 }

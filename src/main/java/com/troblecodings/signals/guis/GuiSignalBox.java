@@ -51,9 +51,9 @@ import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.client.resources.language.I18n;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.Rotation;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.Rotation;
+import net.minecraft.util.math.BlockPos;
 
 public class GuiSignalBox extends GuiBase {
 
@@ -153,7 +153,7 @@ public class GuiSignalBox extends GuiBase {
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
                 final BlockPos setPos = id >= 0 ? positions.get(id) : null;
                 if (setPos == null) {
-                    if (option.getEntry(entryType).isEmpty())
+                    if (!option.getEntry(entryType).isPresent())
                         return;
                     option.removeEntry(entryType);
                     removeEntryFromServer(node, mode, rotation, entryType);
@@ -221,7 +221,7 @@ public class GuiSignalBox extends GuiBase {
                         removeEntryFromServer(node, mode, rotation, PathEntryType.SPEED);
                         option.removeEntry(PathEntryType.SPEED);
                     } else if ((opt.isPresent() && opt.get() != speed)
-                            || (opt.isEmpty() && speed != 127)) {
+                            || (!opt.isPresent() && speed != 127)) {
                         sendIntEntryToServer(speed, node, mode, rotation, PathEntryType.SPEED);
                         option.setEntry(PathEntryType.SPEED, speed);
                     }

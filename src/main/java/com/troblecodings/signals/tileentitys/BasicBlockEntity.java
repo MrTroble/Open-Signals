@@ -10,12 +10,12 @@ import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 
-public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
+public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     public static final String GUI_TAG = "guiTag";
     public static final String POS_TAG = "posTag";
@@ -23,7 +23,7 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
     protected String customName = null;
 
     public BasicBlockEntity(final TileEntityInfo info) {
-        super(info.type, info.pos, info.state);
+        super(info.type);
     }
 
     public void saveWrapper(final NBTWrapper wrapper) {
@@ -33,15 +33,28 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
     }
 
     @Override
-    protected final void saveAdditional(final CompoundTag tag) {
-        super.saveAdditional(tag);
-        saveWrapper(new NBTWrapper(tag));
+    public void deserializeNBT(final CompoundNBT nbt) {
+        super.deserializeNBT(nbt);
+        saveWrapper(new NBTWrapper(nbt));
     }
 
     @Override
-    public final void load(final CompoundTag tag) {
-        this.loadWrapper(new NBTWrapper(tag));
-        super.load(tag);
+    public CompoundNBT save(final CompoundNBT nbt) {
+        saveWrapper(new NBTWrapper(nbt));
+        return super.save(nbt);
+    }
+
+    @Override
+    public CompoundNBT serializeNBT() {
+        final NBTWrapper wrapper = new NBTWrapper(super.serializeNBT());
+        this.loadWrapper(wrapper);
+        return wrapper.tag;
+    }
+
+    @Override
+    public void load(final BlockState stae, final CompoundNBT nbt) {
+        super.load(stae, nbt);
+        loadWrapper(new NBTWrapper(nbt));
     }
 
     public List<BlockPos> getLinkedPos() {
@@ -59,6 +72,8 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
     @Override
     public boolean hasCustomName() {
+        if (customName == null)
+            getNameWrapper();
         return customName != null;
     }
 

@@ -1,21 +1,12 @@
 package com.troblecodings.signals.core;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.tileentity.TileEntityType;
 
 public class TileEntityInfo {
 
-    public BlockEntityType<?> type;
-    public final BlockPos pos;
-    public final BlockState state;
+    public TileEntityType<?> type;
 
-    public TileEntityInfo(final BlockPos pos, final BlockState state) {
-        this.pos = pos;
-        this.state = state;
-    }
-
-    public TileEntityInfo with(final BlockEntityType<?> type) {
+    public TileEntityInfo with(final TileEntityType<?> type) {
         this.type = type;
         return this;
     }

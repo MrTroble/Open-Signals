@@ -2,15 +2,15 @@ package com.troblecodings.signals.handler;
 
 import java.util.Objects;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class NameStateInfo {
 
-    public final Level world;
+    public final World world;
     public final BlockPos pos;
 
-    public NameStateInfo(final Level world, final BlockPos pos) {
+    public NameStateInfo(final World world, final BlockPos pos) {
         this.world = world;
         this.pos = pos;
     }

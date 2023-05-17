@@ -2,7 +2,7 @@ package com.troblecodings.signals.test;
 
 import java.util.Random;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public final class GIRSyncEntryTests {
 

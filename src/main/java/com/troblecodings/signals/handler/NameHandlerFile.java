@@ -3,7 +3,7 @@ package com.troblecodings.signals.handler;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class NameHandlerFile extends SignalStateFile {
 
@@ -28,6 +28,8 @@ public class NameHandlerFile extends SignalStateFile {
     }
 
     public synchronized String getString(final SignalStatePos pos) {
+        if (pos == null)
+            return "";
         return new String(read(pos).array()).trim();
     }
 }

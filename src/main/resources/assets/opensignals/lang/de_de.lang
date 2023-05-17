@@ -486,3 +486,5 @@ property.value.ZP9=Zp9
 error.nooutputupdate=Kein Output Update
 property.doublesided.name=Doppelseitiger Text
 property.doublesided.desc=Ändert, ob der Text auf beiden Seiten angezeigt werden soll.
+property.manuell_rs.name=Manueller Redstone Output
+property.manuell_rs.desc=Ändert den manuellen Redstone Output, z.B. für manuelle Weichensteuerung.

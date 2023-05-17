@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.16.5 Beta 3]
+
+* ported mod down to 1.16.5
+* fix: minor bugs
+
+  **This update is a beta version and may contains some bugs. We ask you to test the mod and give us feedback on functionality, bugs and features.**
+
 ## [1.18 Beta 2]
 * fix: pathway can't be set
 * fix: Issue in SignalStateHandler

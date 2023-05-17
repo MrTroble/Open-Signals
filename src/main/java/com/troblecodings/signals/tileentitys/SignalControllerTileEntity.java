@@ -20,13 +20,13 @@ import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.block.Block;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.registry.Registry;
 
 public class SignalControllerTileEntity extends SyncableTileEntity
         implements ISyncable, ILinkableTile {
@@ -244,7 +244,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean link(final BlockPos pos, final CompoundTag tag) {
+    public boolean link(final BlockPos pos, final CompoundNBT tag) {
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK
                 .get(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
@@ -292,7 +292,12 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean isValid(final Player player) {
+    public boolean isValid(final PlayerEntity player) {
         return true;
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        unloadSignal();
     }
 }

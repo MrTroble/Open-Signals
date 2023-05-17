@@ -4,7 +4,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.WriteBuffer;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public final class BlockposEntry extends IPathEntry<BlockPos> {
 

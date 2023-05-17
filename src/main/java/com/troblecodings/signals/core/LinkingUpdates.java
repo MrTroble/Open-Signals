@@ -7,7 +7,7 @@ import java.util.Objects;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 
-import net.minecraft.core.BlockPos;
+import net.minecraft.util.math.BlockPos;
 
 public class LinkingUpdates {
 

@@ -3,7 +3,7 @@ package com.troblecodings.signals.models;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import net.minecraft.client.resources.model.UnbakedModel;
+import net.minecraft.client.renderer.model.IUnbakedModel;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -16,7 +16,7 @@ public class SignalModelLoaderInfo {
     public final float y;
     public final float z;
     public final Map<String, String> retexture;
-    public UnbakedModel model;
+    public IUnbakedModel model;
 
     public SignalModelLoaderInfo(final String name, final Predicate<ModelInfoWrapper> state,
             final float x, final float y, final float z, final Map<String, String> retexture) {
@@ -28,7 +28,7 @@ public class SignalModelLoaderInfo {
         this.retexture = retexture;
     }
 
-    public SignalModelLoaderInfo with(final UnbakedModel model) {
+    public SignalModelLoaderInfo with(final IUnbakedModel model) {
         this.model = model;
         return this;
     }

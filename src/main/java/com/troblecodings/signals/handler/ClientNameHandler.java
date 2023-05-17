@@ -11,11 +11,11 @@ import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
+import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientNameHandler implements INetworkSync {
 
@@ -45,10 +45,10 @@ public class ClientNameHandler implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buffer.getByte();
         }
-        final Level world = mc.level;
+        final World world = mc.level;
         final String name = new String(array);
         SERVICE.execute(() -> {
-            BlockEntity tile;
+            TileEntity tile;
             while ((tile = world.getBlockEntity(pos)) == null)
                 continue;
             synchronized (CLIENT_NAMES) {
@@ -72,5 +72,4 @@ public class ClientNameHandler implements INetworkSync {
         deserializeClient(event.getPayload().nioBuffer());
         event.getSource().get().setPacketHandled(true);
     }
-
 }
