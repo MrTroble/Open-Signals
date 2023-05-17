@@ -16,7 +16,6 @@ import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
 import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ModelBakery;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -108,22 +107,16 @@ public final class CustomModelLoader implements ICustomModelLoader {
     }
 
     public void prepare() {
-        final ModelBakery bakery = ModelBakery.instance();
-        if (!(bakery.unbakedCache instanceof MapWrapper)) {
-            wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
-            defaultModel(wrapper, "ghostblock");
-            registeredModels.forEach((name, loaderList) -> {
-                defaultModel(wrapper, name);
-                for (final SignalAngel angel : SignalAngel.values()) {
-                    wrapper.putNormal(
-                            new ModelResourceLocation(
-                                    new ResourceLocation(OpenSignalsMain.MODID, name),
-                                    "angel=" + angel.getNameWrapper()),
-                            new SignalCustomModel(angel, loaderList));
-                }
-            });
-            bakery.unbakedCache = wrapper;
-        }
+        /*
+         * final ModelBakery bakery = ModelBakery.instance(); if (!(bakery.unbakedCache
+         * instanceof MapWrapper)) { wrapper = new MapWrapper(bakery.unbakedCache,
+         * registeredModels.keySet()); defaultModel(wrapper, "ghostblock");
+         * registeredModels.forEach((name, loaderList) -> { defaultModel(wrapper, name);
+         * for (final SignalAngel angel : SignalAngel.values()) { wrapper.putNormal( new
+         * ModelResourceLocation( new ResourceLocation(OpenSignalsMain.MODID, name),
+         * "angel=" + angel.getNameWrapper()), new SignalCustomModel(angel,
+         * loaderList)); } }); bakery.unbakedCache = wrapper; }
+         */
 
     }
 
@@ -230,13 +223,22 @@ public final class CustomModelLoader implements ICustomModelLoader {
 
     @Override
     public boolean accepts(final ResourceLocation modelLocation) {
-        // TODO Auto-generated method stub
-        return false;
+        if (!modelLocation.getNamespace().equals(OpenSignalsMain.MODID))
+            return false;
+        return registeredModels.containsKey(modelLocation.getPath())
+                || modelLocation.getPath().equals("ghostblock");
     }
 
     @Override
     public IUnbakedModel loadModel(final ResourceLocation modelLocation) throws Exception {
-        // TODO Auto-generated method stub
-        return null;
+        if (modelLocation.getPath().equals("ghostblock"))
+            return DefaultModel.INSTANCE;
+        final ModelResourceLocation mrl = (ModelResourceLocation) modelLocation;
+        final String[] strs = mrl.getVariant().split("=");
+        if (strs.length < 2)
+            return new SignalCustomModel(SignalAngel.ANGEL0,
+                    registeredModels.get(modelLocation.getPath()));
+        return new SignalCustomModel(SignalAngel.valueOf(strs[1].toUpperCase()),
+                registeredModels.get(modelLocation.getPath()));
     }
 }
