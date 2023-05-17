@@ -119,12 +119,9 @@ public class SignalCustomModel implements IUnbakedModel {
             if (info.model == null) {
                 final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
                         "block/" + info.name);
-                if (bakery instanceof ModelLoader) {
-                    info.model = ModelLoaderRegistry.getModelOrLogError(location,
-                            String.format("Could not find %s!", location));
-                } else {
-                    info.model = bakery.getModel(location);
-                }
+                info.model = ModelLoaderRegistry.getModelOrLogError(location,
+                        String.format("Could not find %s!", location));
+                // info.model = bakery.getModel(location);
             }
         });
         final Quaternion quaternion = angel.getQuaternion();

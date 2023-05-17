@@ -17,7 +17,6 @@ public final class OSModels {
     @SubscribeEvent
     public static void register(final ModelRegistryEvent event) {
         OSItems.registeredItems.forEach(OSModels::registerModel);
-        CustomModelLoader.INSTANCE.onResourceManagerReload(null);
         return;
     }
 

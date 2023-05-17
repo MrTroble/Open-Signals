@@ -124,15 +124,11 @@ public final class CustomModelLoader implements ICustomModelLoader {
     @Override
     public void onResourceManagerReload(final IResourceManager manager) {
         registeredModels.clear();
-
         final Map<String, ModelExtention> extentions = new HashMap<>();
-
         final Map<String, Object> modelmap = ModelStats.getfromJson("modeldefinitions");
 
         modelmap.forEach((filename, content) -> {
-
             if (filename.endsWith(".extention.json")) {
-
                 final ModelExtention ext = (ModelExtention) content;
                 extentions.put(filename.replace(".extention", ""), ext);
             }

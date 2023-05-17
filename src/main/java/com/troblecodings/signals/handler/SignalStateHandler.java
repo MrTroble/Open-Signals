@@ -256,14 +256,14 @@ public final class SignalStateHandler implements INetworkSync {
     public static void onChunkLoad(final ChunkEvent.Load event) {
         final IChunk chunk = event.getChunk();
         final World world = (World) chunk.getWorldForge();
-        if (world.isClientSide())
+        if (world == null || world.isClientSide())
             return;
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
                         new SignalStateFile(Paths.get("osfiles/signalfiles/"
-                                + ((ServerWorld) world).getServer().getLevelName()
-                                        .replace(":", "").replace("/", "").replace("\\", "")
+                                + ((ServerWorld) world).getServer().getLevelName().replace(":", "")
+                                        .replace("/", "").replace("\\", "")
                                 + "/" + world.getDimension().toString().replace(":", ""))));
             }
         }
