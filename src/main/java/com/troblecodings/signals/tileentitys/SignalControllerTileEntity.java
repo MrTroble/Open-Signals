@@ -259,6 +259,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
+    public void onChunkUnloaded() {
+        unloadSignal();
+    }
+
+    @Override
     public boolean unlink() {
         SignalStateHandler.removeListener(
                 new SignalStateInfo(level, linkedSignalPosition, linkedSignal), listener);

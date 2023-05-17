@@ -6,9 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
@@ -34,7 +31,6 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.network.NetworkEvent.ClientCustomPayloadEvent;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.event.EventNetworkChannel;
@@ -46,50 +42,45 @@ public final class NameHandler implements INetworkSync {
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
-    private static ExecutorService service;
 
     public static void init() {
         channelName = new ResourceLocation(OpenSignalsMain.MODID, "namehandler");
         channel = NetworkRegistry.newEventChannel(channelName, () -> OpenSignalsMain.MODID,
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new NameHandler());
-        service = Executors.newFixedThreadPool(2);
-    }
-
-    @SubscribeEvent
-    public static void shutdown(final FMLServerStoppingEvent event) {
-        service.shutdown();
-        try {
-            service.awaitTermination(1, TimeUnit.DAYS);
-        } catch (final InterruptedException e) {
-            e.printStackTrace();
-        }
-        service = Executors.newFixedThreadPool(2);
     }
 
     public static void add(final Object obj) {
         channel.registerObject(obj);
     }
 
-    public static void setName(final NameStateInfo info, final String name) {
-        if (info.world.isClientSide)
+    public static void setNameForSignals(final NameStateInfo info, final String name) {
+        setNameForNonSignals(info, name);
+        if (name == null)
             return;
-        synchronized (ALL_NAMES) {
-            ALL_NAMES.put(info, name);
-        }
-        sendNameToClient(info, name);
-        createToFile(info, name);
         final Block block = info.world.getBlockState(info.pos).getBlock();
         if (block instanceof Signal) {
             SignalStateHandler.setState(new SignalStateInfo(info.world, info.pos, (Signal) block),
                     Signal.CUSTOMNAME, "TRUE");
         }
-        synchronized (CURRENTLY_LOADED_CHUNKS) {
-            final List<NameStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
-                    .get(info.world.getChunk(info.pos));
-            if (!allSignals.contains(info))
-                allSignals.add(info);
-        }
+    }
+
+    public static void setNameForNonSignals(final NameStateInfo info, final String name) {
+        if (info.world.isClientSide || name == null)
+            return;
+        new Thread(() -> {
+            synchronized (ALL_NAMES) {
+                ALL_NAMES.put(info, name);
+            }
+            sendNameToClient(info, name);
+            createToFile(info, name);
+            synchronized (CURRENTLY_LOADED_CHUNKS) {
+                final List<NameStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
+                        .get(info.world.getChunk(info.pos));
+                if (!allSignals.contains(info))
+                    allSignals.add(info);
+            }
+        }).start();
     }
 
     public static String getName(final NameStateInfo info) {
@@ -120,23 +111,21 @@ public final class NameHandler implements INetworkSync {
     }
 
     public static void setRemoved(final NameStateInfo info) {
-        service.execute(() -> {
-            synchronized (ALL_NAMES) {
-                ALL_NAMES.remove(info);
-            }
-            NameHandlerFile file;
-            synchronized (ALL_LEVEL_FILES) {
-                file = ALL_LEVEL_FILES.get(info.world);
-            }
-            file.deleteIndex(info.pos);
-            sendRemoved(info);
-            final IChunk chunk = info.world.getChunk(info.pos);
-            if (chunk == null)
-                return;
-            synchronized (CURRENTLY_LOADED_CHUNKS) {
-                CURRENTLY_LOADED_CHUNKS.get(chunk).remove(info);
-            }
-        });
+        synchronized (ALL_NAMES) {
+            ALL_NAMES.remove(info);
+        }
+        NameHandlerFile file;
+        synchronized (ALL_LEVEL_FILES) {
+            file = ALL_LEVEL_FILES.get(info.world);
+        }
+        file.deleteIndex(info.pos);
+        sendRemoved(info);
+        final IChunk chunk = info.world.getChunk(info.pos);
+        if (chunk == null)
+            return;
+        synchronized (CURRENTLY_LOADED_CHUNKS) {
+            CURRENTLY_LOADED_CHUNKS.get(chunk).remove(info);
+        }
     }
 
     private static void sendRemoved(final NameStateInfo info) {
@@ -150,43 +139,37 @@ public final class NameHandler implements INetworkSync {
     public static void onWorldSave(final WorldEvent.Save event) {
         if (event.getWorld().isClientSide())
             return;
-        service.execute(() -> {
-            Map<NameStateInfo, String> map;
-            synchronized (ALL_NAMES) {
-                map = ImmutableMap.copyOf(ALL_NAMES);
-            }
-            map.forEach(NameHandler::createToFile);
-        });
+        Map<NameStateInfo, String> map;
+        synchronized (ALL_NAMES) {
+            map = ImmutableMap.copyOf(ALL_NAMES);
+        }
+        map.forEach(NameHandler::createToFile);
     }
 
     @SubscribeEvent
     public static void onWorldUnload(final WorldEvent.Unload unload) {
         if (unload.getWorld().isClientSide())
             return;
-        service.execute(() -> {
-            synchronized (ALL_LEVEL_FILES) {
-                ALL_LEVEL_FILES.remove(unload.getWorld());
-            }
-        });
+        synchronized (ALL_LEVEL_FILES) {
+            ALL_LEVEL_FILES.remove(unload.getWorld());
+        }
     }
 
     private static void createToFile(final NameStateInfo info, final String name) {
-        service.execute(() -> {
-            NameHandlerFile file;
-            synchronized (ALL_LEVEL_FILES) {
-                file = ALL_LEVEL_FILES.get(info.world);
-            }
-            if (file == null)
-                return;
-            SignalStatePos posInFile = file.find(info.pos);
-            if (posInFile == null) {
-                posInFile = file.createState(info.pos, name);
-                return;
-            }
-            synchronized (posInFile) {
-                file.writeString(posInFile, name);
-            }
-        });
+        NameHandlerFile file;
+        synchronized (ALL_LEVEL_FILES) {
+            file = ALL_LEVEL_FILES.get(info.world);
+        }
+        if (file == null)
+            return;
+        SignalStatePos posInFile = file.find(info.pos);
+        if (posInFile == null) {
+            posInFile = file.createState(info.pos, name);
+            return;
+        }
+        synchronized (posInFile) {
+            file.writeString(posInFile, name);
+        }
     }
 
     @SubscribeEvent
@@ -204,26 +187,24 @@ public final class NameHandler implements INetworkSync {
                                 + "/" + world.getDimension().toString().replace(":", ""))));
             }
         }
-        service.submit(() -> {
-            final List<NameStateInfo> states = new ArrayList<>();
-            chunk.getBlockEntitiesPos().forEach(pos -> {
-                final Block block = chunk.getBlockState(pos).getBlock();
-                if (block instanceof Signal || block instanceof RedstoneIO) {
-                    final NameStateInfo info = new NameStateInfo(world, pos);
-                    final String name = ALL_LEVEL_FILES.get(world).getString(pos);
-                    if (name.isEmpty())
-                        return;
-                    synchronized (ALL_NAMES) {
-                        ALL_NAMES.put(info, name);
-                    }
-                    states.add(info);
-                    sendNameToClient(info, name);
+        final List<NameStateInfo> states = new ArrayList<>();
+        chunk.getBlockEntitiesPos().forEach(pos -> {
+            final Block block = chunk.getBlockState(pos).getBlock();
+            if (block instanceof Signal || block instanceof RedstoneIO) {
+                final NameStateInfo info = new NameStateInfo(world, pos);
+                final String name = ALL_LEVEL_FILES.get(world).getString(pos);
+                if (name.isEmpty())
+                    return;
+                synchronized (ALL_NAMES) {
+                    ALL_NAMES.put(info, name);
                 }
-            });
-            synchronized (CURRENTLY_LOADED_CHUNKS) {
-                CURRENTLY_LOADED_CHUNKS.put(chunk, states);
+                states.add(info);
+                sendNameToClient(info, name);
             }
         });
+        synchronized (CURRENTLY_LOADED_CHUNKS) {
+            CURRENTLY_LOADED_CHUNKS.put(chunk, states);
+        }
     }
 
     @SubscribeEvent
@@ -232,20 +213,18 @@ public final class NameHandler implements INetworkSync {
         final World level = (World) chunk.getWorldForge();
         if (level.isClientSide())
             return;
-        service.submit(() -> {
-            List<NameStateInfo> states;
-            synchronized (CURRENTLY_LOADED_CHUNKS) {
-                states = CURRENTLY_LOADED_CHUNKS.remove(chunk);
+        List<NameStateInfo> states;
+        synchronized (CURRENTLY_LOADED_CHUNKS) {
+            states = CURRENTLY_LOADED_CHUNKS.remove(chunk);
+        }
+        states.forEach(stateInfo -> {
+            String name;
+            synchronized (ALL_NAMES) {
+                name = ALL_NAMES.remove(stateInfo);
             }
-            states.forEach(stateInfo -> {
-                String name;
-                synchronized (ALL_NAMES) {
-                    name = ALL_NAMES.remove(stateInfo);
-                }
-                if (name == null)
-                    return;
-                createToFile(stateInfo, name);
-            });
+            if (name == null)
+                return;
+            createToFile(stateInfo, name);
         });
     }
 

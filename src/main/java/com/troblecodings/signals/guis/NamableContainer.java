@@ -64,6 +64,8 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buffer.getByte();
         }
-        NameHandler.setName(new NameStateInfo(info.world, info.pos), new String(array));
+        final NameStateInfo info = new NameStateInfo(this.info.world, this.info.pos);
+        final String name = new String(array);
+        NameHandler.setNameForNonSignals(new NameStateInfo(info.world, info.pos), new String(array));
     }
 }
