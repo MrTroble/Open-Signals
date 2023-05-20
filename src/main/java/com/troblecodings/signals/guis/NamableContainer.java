@@ -13,6 +13,7 @@ import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.util.math.BlockPos;
 
@@ -66,6 +67,10 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         }
         final NameStateInfo info = new NameStateInfo(this.info.world, this.info.pos);
         final String name = new String(array);
-        NameHandler.setNameForNonSignals(new NameStateInfo(info.world, info.pos), new String(array));
+        if (tile instanceof SignalTileEntity) {
+            NameHandler.setNameForSignals(info, name);
+        } else {
+            NameHandler.setNameForNonSignals(info, name);
+        }
     }
 }
