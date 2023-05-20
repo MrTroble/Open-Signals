@@ -74,12 +74,6 @@ public final class NameHandler implements INetworkSync {
             }
             sendNameToClient(info, name);
             createToFile(info, name);
-            synchronized (CURRENTLY_LOADED_CHUNKS) {
-                final List<NameStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
-                        .get(info.world.getChunk(info.pos));
-                if (!allSignals.contains(info))
-                    allSignals.add(info);
-            }
         }).start();
     }
 

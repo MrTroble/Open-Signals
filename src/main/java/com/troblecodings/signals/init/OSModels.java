@@ -1,7 +1,6 @@
 package com.troblecodings.signals.init;
 
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.item.Item;
