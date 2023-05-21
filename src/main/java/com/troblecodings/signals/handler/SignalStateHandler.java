@@ -291,14 +291,20 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save save) {
-        if (save.getWorld().isClientSide())
+        final Level world = (Level) save.getWorld();
+        if (world.isClientSide)
             return;
+
         final Map<SignalStateInfo, Map<SEProperty, String>> maps;
         synchronized (CURRENTLY_LOADED_STATES) {
             maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
-        maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(save.getWorld()))
-                .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
+        new Thread(() -> {
+            synchronized (ALL_LEVEL_FILES) {
+                maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
+                        .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
+            }
+        }).start();
     }
 
     @SubscribeEvent

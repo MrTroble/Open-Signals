@@ -54,25 +54,11 @@ public final class NameHandler implements INetworkSync {
         channel.registerObject(obj);
     }
 
-    public static void setNameForSignals(final NameStateInfo info, final String name) {
-        setNameForNonSignals(info, name);
-        if (name == null)
-            return;
-        final Block block = info.world.getBlockState(info.pos).getBlock();
-        if (block instanceof Signal) {
-            SignalStateHandler.setState(new SignalStateInfo(info.world, info.pos, (Signal) block),
-                    Signal.CUSTOMNAME, "TRUE");
-        }
-    }
-
-    public static void setNameForNonSignals(final NameStateInfo info, final String name) {
+    public static void createName(final NameStateInfo info, final String name) {
         if (info.world.isClientSide || name == null)
             return;
         new Thread(() -> {
-            synchronized (ALL_NAMES) {
-                ALL_NAMES.put(info, name);
-            }
-            sendNameToClient(info, name);
+            setNameForSignal(info, name);
             createToFile(info, name);
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 final List<NameStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
@@ -80,6 +66,28 @@ public final class NameHandler implements INetworkSync {
                 if (!allSignals.contains(info))
                     allSignals.add(info);
             }
+        }).start();
+    }
+
+    public static void setNameForSignal(final NameStateInfo info, final String name) {
+        if (info.world.isClientSide || name == null)
+            return;
+        setNameForNonSignal(info, name);
+        final Block block = info.world.getBlockState(info.pos).getBlock();
+        if (block instanceof Signal) {
+            SignalStateHandler.setState(new SignalStateInfo(info.world, info.pos, (Signal) block),
+                    Signal.CUSTOMNAME, "TRUE");
+        }
+    }
+
+    public static void setNameForNonSignal(final NameStateInfo info, final String name) {
+        if (info.world.isClientSide || name == null)
+            return;
+        new Thread(() -> {
+            synchronized (ALL_NAMES) {
+                ALL_NAMES.put(info, name);
+            }
+            sendNameToClient(info, name);
         }).start();
     }
 
@@ -137,13 +145,19 @@ public final class NameHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
-        if (event.getWorld().isClientSide())
+        final Level world = (Level) event.getWorld();
+        if (world.isClientSide)
             return;
         Map<NameStateInfo, String> map;
         synchronized (ALL_NAMES) {
             map = ImmutableMap.copyOf(ALL_NAMES);
         }
-        map.forEach(NameHandler::createToFile);
+        new Thread(() -> {
+            synchronized (ALL_LEVEL_FILES) {
+                map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
+                        .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
+            }
+        }).start();
     }
 
     @SubscribeEvent
