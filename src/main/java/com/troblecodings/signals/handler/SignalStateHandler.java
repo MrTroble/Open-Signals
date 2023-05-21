@@ -83,7 +83,7 @@ public final class SignalStateHandler implements INetworkSync {
             }
             createToFile(info, states);
             loadSignal(info);
-        }).start();
+        }, "OSSignalStateHandler:createStates").start();
     }
 
     public static void addListener(final SignalStateInfo info, final SignalStateListener listener) {
@@ -170,7 +170,7 @@ public final class SignalStateHandler implements INetworkSync {
             info.signal.getUpdate(info.world, info.pos);
             if (!contains.get())
                 createToFile(info, states);
-        }).start();
+        }, "OSSignalStateHandler:setStates").start();
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
@@ -304,7 +304,7 @@ public final class SignalStateHandler implements INetworkSync {
                 maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
                         .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
             }
-        }).start();
+        }, "OSSignalStateHandler:save").start();
     }
 
     @SubscribeEvent
@@ -384,22 +384,20 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
-        new Thread(() -> {
-            final ServerLevel world = event.getWorld();
-            final ChunkAccess chunk = world.getChunk(event.getPos().getWorldPosition());
-            final Player player = event.getPlayer();
-            final List<ByteBuffer> toUpdate = new ArrayList<>();
-            chunk.getBlockEntitiesPos().forEach(pos -> {
-                final Block block = world.getBlockState(pos).getBlock();
-                if (block instanceof Signal) {
-                    final WriteBuffer buffer = new WriteBuffer();
-                    buffer.putBlockPos(pos);
-                    buffer.putByte((byte) 0);
-                    toUpdate.add(buffer.build());
-                }
-            });
-            toUpdate.forEach(buffer -> sendTo(player, buffer));
-        }).start();
+        final ServerLevel world = event.getWorld();
+        final ChunkAccess chunk = world.getChunk(event.getPos().getWorldPosition());
+        final Player player = event.getPlayer();
+        final List<ByteBuffer> toUpdate = new ArrayList<>();
+        chunk.getBlockEntitiesPos().forEach(pos -> {
+            final Block block = world.getBlockState(pos).getBlock();
+            if (block instanceof Signal) {
+                final WriteBuffer buffer = new WriteBuffer();
+                buffer.putBlockPos(pos);
+                buffer.putByte((byte) 0);
+                toUpdate.add(buffer.build());
+            }
+        });
+        toUpdate.forEach(buffer -> sendTo(player, buffer));
     }
 
     public static void loadSignal(final SignalStateInfo info) {
@@ -431,7 +429,7 @@ public final class SignalStateHandler implements INetworkSync {
                 }
                 sendPropertiesToClient(info, properties);
             });
-        }).start();
+        }, "OSSignalStateHandler:loadSignals").start();
     }
 
     public static void unloadSignal(final SignalStateInfo info) {
@@ -461,7 +459,7 @@ public final class SignalStateHandler implements INetworkSync {
                     createToFile(info, properties);
                 }
             });
-        }).start();
+        }, "OSSignalStateHandler:unloadSignals").start();
     }
 
     private static void sendTo(final Player player, final ByteBuffer buf) {

@@ -66,7 +66,7 @@ public final class NameHandler implements INetworkSync {
                 if (!allSignals.contains(info))
                     allSignals.add(info);
             }
-        }).start();
+        }, "OSNameHandler:createName").start();
     }
 
     public static void setNameForSignal(final NameStateInfo info, final String name) {
@@ -88,7 +88,7 @@ public final class NameHandler implements INetworkSync {
                 ALL_NAMES.put(info, name);
             }
             sendNameToClient(info, name);
-        }).start();
+        }, "OSNameHandler:setName").start();
     }
 
     public static String getName(final NameStateInfo info) {
@@ -157,7 +157,7 @@ public final class NameHandler implements INetworkSync {
                 map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
                         .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
             }
-        }).start();
+        }, "OSNameHandler:Save").start();
     }
 
     @SubscribeEvent

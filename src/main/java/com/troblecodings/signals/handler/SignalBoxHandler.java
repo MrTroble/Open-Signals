@@ -24,7 +24,6 @@ import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.PathwayHolder;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -264,7 +263,7 @@ public final class SignalBoxHandler {
         if (identifier.world.isClientSide)
             return false;
         final BlockEntity entity = identifier.world.getBlockEntity(posToLink);
-        if (entity != null && entity instanceof BasicBlockEntity) {
+        if (entity != null && entity instanceof RedstoneIOTileEntity) {
             ((RedstoneIOTileEntity) entity).link(identifier.pos);
             return true;
         }
@@ -276,7 +275,7 @@ public final class SignalBoxHandler {
         if (identifier.world.isClientSide)
             return false;
         final BlockEntity entity = identifier.world.getBlockEntity(posToUnlink);
-        if (entity != null && entity instanceof BasicBlockEntity) {
+        if (entity != null && entity instanceof RedstoneIOTileEntity) {
             ((RedstoneIOTileEntity) entity).unlink(identifier.pos);
             return true;
         }
