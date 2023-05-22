@@ -471,5 +471,7 @@
     "property.doublesided.name": "Double Sided Text",
     "property.doublesided.desc": "Change, if the text should displayed doublesided.",
     "property.manuell_rs.name": "Manual Redstone Output",
-    "property.manuell_rs.desc": "Change the manual redstone output, e.g. for manual switch control."
+    "property.manuell_rs.desc": "Change the manual redstone output, e.g. for manual switch control.",
+    "property.zp9.name": "Zp9",
+    "property.zp9.desc": "Zp9 Departure: The signal is given by the train conductor and the driver of the multiple unit is to depart."
 }
