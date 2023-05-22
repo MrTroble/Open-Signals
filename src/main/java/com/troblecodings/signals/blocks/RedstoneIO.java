@@ -1,99 +1,75 @@
 package com.troblecodings.signals.blocks;
 
-import java.util.Optional;
-
-import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
-import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
-import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
-import net.minecraft.state.BooleanProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class RedstoneIO extends BasicBlock {
 
-    public static final BooleanProperty POWER = BooleanProperty.create("power");
+    public static final PropertyBool POWER = PropertyBool.create("power");
     public static final TileEntitySupplierWrapper SUPPLIER = RedstoneIOTileEntity::new;
 
     public RedstoneIO() {
-        super(Properties.of(Material.METAL));
-        this.registerDefaultState(stateDefinition.any().setValue(POWER, false));
+        super(Material.ROCK);
+        this.setDefaultState(getDefaultState().withProperty(POWER, false));
     }
 
     @Override
-    protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
-        builder.add(POWER);
+    public int getMetaFromState(final IBlockState state) {
+        return state.getValue(POWER) ? 0 : 1;
     }
 
     @Override
-    public BlockState getStateForPlacement(final BlockItemUseContext context) {
-        final World world = context.getLevel();
-        if (!world.isClientSide) {
-            NameHandler.createName(new NameStateInfo(world, context.getClickedPos()),
-                    this.getRegistryName().getPath());
-        }
-        return super.getStateForPlacement(context);
+    public IBlockState getStateFromMeta(final int meta) {
+        return this.getDefaultState().withProperty(POWER, meta == 1);
     }
 
     @Override
-    public int getSignal(final BlockState blockState, final IBlockReader world, final BlockPos pos,
-            final Direction direction) {
-        return this.getDirectSignal(blockState, world, pos, direction);
+    protected BlockStateContainer createBlockState() {
+        return new BlockStateContainer(this, new IProperty[] {
+                POWER
+        });
     }
 
     @Override
-    public int getDirectSignal(final BlockState state, final IBlockReader getter,
-            final BlockPos pos, final Direction direction) {
-        return state.getValue(POWER) ? 15 : 0;
+    public int getStrongPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
+        return getWeakPower(blockState, blockAccess, pos, side);
     }
 
     @Override
-    public boolean isSignalSource(final BlockState blockState) {
+    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
+        return blockState.getValue(POWER) ? 15 : 0;
+    }
+
+    @Override
+    public boolean canProvidePower(final IBlockState state) {
         return true;
     }
 
     @Override
-    public boolean use(final BlockState state, final World world, final BlockPos pos,
-            final PlayerEntity player, final Hand hand, final BlockRayTraceResult result) {
-        if (!player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
-            OpenSignalsMain.handler.invokeGui(RedstoneIO.class, player, world, pos, "redstoneio");
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
+            if (worldIn.isRemote)
+                GuiHandler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
             return true;
         }
         return false;
-    }
-
-    @Override
-    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
-        return Optional.of(SUPPLIER);
-    }
-
-    @Override
-    public Optional<String> getSupplierWrapperName() {
-        return Optional.of("redstoneio");
-    }
-
-    @Override
-    public void destroy(final IWorld acess, final BlockPos pos, final BlockState state) {
-        super.destroy(acess, pos, state);
-        if (!acess.isClientSide()) {
-            NameHandler.setRemoved(new NameStateInfo((World) acess, pos));
-            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (World) acess));
-        }
     }
 }

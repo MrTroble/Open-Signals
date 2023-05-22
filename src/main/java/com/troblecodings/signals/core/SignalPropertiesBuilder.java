@@ -48,7 +48,7 @@ public class SignalPropertiesBuilder {
         if (placementToolName != null) {
             for (int i = 0; i < OSItems.placementtools.size(); i++) {
                 final Placementtool tool = OSItems.placementtools.get(i);
-                if (tool.getRegistryName().getPath().equalsIgnoreCase(placementToolName)) {
+                if (tool.getRegistryName().getResourcePath().equalsIgnoreCase(placementToolName)) {
                     placementtool = tool;
                     break;
                 }
@@ -121,7 +121,7 @@ public class SignalPropertiesBuilder {
                         new ValuePack(property, LogicParser.predicate(outputs.getKey(), info)));
             }
         }
-        
+
         final List<BooleanProperty> doubleText = new ArrayList<>();
         if (doubleSidedText != null) {
             doubleSidedText.forEach((property, bool) -> {
@@ -140,9 +140,9 @@ public class SignalPropertiesBuilder {
         this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
-                ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale, autoscale,
-                ImmutableList.copyOf(doubleText), textColor, canLink, colors, ImmutableList.copyOf(renderheights),
-                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs),
-                defaultItemDamage);
+                ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
+                autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
+                ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
+                ImmutableList.copyOf(rsOutputs), defaultItemDamage);
     }
 }

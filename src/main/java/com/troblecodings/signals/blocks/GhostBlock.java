@@ -1,86 +1,77 @@
 package com.troblecodings.signals.blocks;
 
-import com.troblecodings.signals.models.CustomModelLoader;
-
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.Minecraft;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateContainer;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.IWorld;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
 
 public class GhostBlock extends BasicBlock {
 
     public GhostBlock() {
-        super(Properties.of(Material.GLASS));
-        registerDefaultState(defaultBlockState());
+        super(Material.GLASS);
     }
-    
+
     @Override
-    public int getLightEmission(final BlockState state) {
-        return 1;
+    public boolean isTranslucent(IBlockState state) {
+        return true;
     }
-    
+
     @Override
-    public boolean canOcclude(final BlockState state) {
+    public float getAmbientOcclusionLightValue(IBlockState state) {
+        return 1.0F;
+    }
+
+    @Override
+    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world,
+            BlockPos pos, EntityPlayer player) {
+        final BlockPos downPos = pos.down();
+        final Block lowerBlock = world.getBlockState(downPos).getBlock();
+        return lowerBlock.getPickBlock(state, target, world, downPos, player);
+    }
+
+    @Override
+    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess,
+            BlockPos pos, EnumFacing side) {
         return false;
     }
 
     @Override
-    public BlockRenderType getRenderShape(final BlockState state) {
-        return BlockRenderType.INVISIBLE;
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.INVISIBLE;
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final IBlockReader getter,
-            final BlockPos pos, final ISelectionContext context) {
-        return VoxelShapes.block();
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+        return Block.FULL_BLOCK_AABB;
     }
 
-    public static void destroyUpperBlock(final IWorld worldIn, final BlockPos pos) {
-        final BlockPos posUp = pos.above();
-        final BlockState state = worldIn.getBlockState(posUp);
+    public static void destroyUpperBlock(final World worldIn, final BlockPos pos) {
+        final BlockPos posUp = pos.up();
+        final IBlockState state = worldIn.getBlockState(posUp);
         final Block blockUp = state.getBlock();
         if (blockUp instanceof GhostBlock) {
             worldIn.destroyBlock(posUp, false);
-            blockUp.destroy(worldIn, posUp, state);
         }
     }
 
     @Override
-    public void destroy(final IWorld worldIn, final BlockPos pos, final BlockState state) {
-        super.destroy(worldIn, pos, state);
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        super.breakBlock(worldIn, pos, state);
         destroyUpperBlock(worldIn, pos);
 
-        final BlockPos posdown = pos.below();
+        final BlockPos posdown = pos.down();
         final Block lowerBlock = worldIn.getBlockState(posdown).getBlock();
         if (lowerBlock instanceof GhostBlock || lowerBlock instanceof Signal) {
             worldIn.destroyBlock(posdown, false);
-            lowerBlock.destroy(worldIn, posdown, state);
+            lowerBlock.breakBlock(worldIn, posdown, state);
         }
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    @Override
-    public StateContainer<Block, BlockState> getStateDefinition() {
-        if (!Minecraft.getInstance().isLocalServer()) {
-            CustomModelLoader.INSTANCE.prepare();
-        }
-        return super.getStateDefinition();
-    }
-
-    @Override
-    public ItemStack getCloneItemStack(final IBlockReader reader, final BlockPos pos,
-            final BlockState state) {
-        return ItemStack.EMPTY;
     }
 }

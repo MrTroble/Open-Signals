@@ -4,5 +4,5 @@ import net.minecraft.tileentity.TileEntity;
 
 public interface TileEntitySupplierWrapper {
 
-    TileEntity supply(final TileEntityInfo info);
+    TileEntity supply();
 }
