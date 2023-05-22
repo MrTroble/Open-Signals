@@ -385,26 +385,6 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
-        new Thread(() -> {
-            final ServerWorld world = event.getWorld();
-            final IChunk chunk = world.getChunk(event.getPos().getWorldPosition());
-            final PlayerEntity player = event.getPlayer();
-            final List<ByteBuffer> toUpdate = new ArrayList<>();
-            chunk.getBlockEntitiesPos().forEach(pos -> {
-                final Block block = world.getBlockState(pos).getBlock();
-                if (block instanceof Signal) {
-                    final WriteBuffer buffer = new WriteBuffer();
-                    buffer.putBlockPos(pos);
-                    buffer.putByte((byte) 0);
-                    toUpdate.add(buffer.build());
-                }
-            });
-            toUpdate.forEach(buffer -> sendTo(player, buffer));
-        }).start();
-    }
-
-    @SubscribeEvent
-    public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
         final ServerWorld world = event.getWorld();
         final IChunk chunk = world.getChunk(event.getPos().getWorldPosition());
         final ServerPlayerEntity player = event.getPlayer();
