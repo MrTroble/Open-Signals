@@ -62,7 +62,7 @@ public class OpenSignalsMain {
         });
     }
 
-    @SidedProxy(serverSide = "eu.gir.girsignals.proxy.CommonProxy", clientSide = "eu.gir.girsignals.proxy.ClientProxy")
+    @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy", clientSide = "com.troblecodings.signals.proxy.ClientProxy")
     public static CommonProxy proxy;
     private static Logger log = null;
     public static GuiHandler handler = null;
