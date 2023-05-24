@@ -87,8 +87,9 @@ public class Placementtool extends Item
         }
 
         final ItemStack item = player.getHeldItemMainhand();
-        item.hurtAndBreak(Math.abs(cost), player,
-                (user) -> user.broadcastBreakEvent(context.getHand()));
+        // TODO Destry when used
+        // item.hurtAndBreak(Math.abs(cost), player,
+        // (user) -> user.broadcastBreakEvent(context.getHand()));
 
         final int height = signal.getHeight(signalProperties);
         final BlockPos placePos = pos.up();

@@ -3,22 +3,21 @@ package com.troblecodings.signals.models;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-@OnlyIn(Dist.CLIENT)
+@SideOnly(Side.CLIENT)
 public class SignalModelLoaderInfo {
 
     public final String name;
-    public final Predicate<ModelInfoWrapper> state;
+    public final Predicate<IExtendedBlockState> state;
     public final float x;
     public final float y;
     public final float z;
     public final Map<String, String> retexture;
-    public IUnbakedModel model;
 
-    public SignalModelLoaderInfo(final String name, final Predicate<ModelInfoWrapper> state,
+    public SignalModelLoaderInfo(final String name, final Predicate<IExtendedBlockState> state,
             final float x, final float y, final float z, final Map<String, String> retexture) {
         this.name = name;
         this.state = state;
@@ -26,10 +25,5 @@ public class SignalModelLoaderInfo {
         this.y = y;
         this.z = z;
         this.retexture = retexture;
-    }
-
-    public SignalModelLoaderInfo with(final IUnbakedModel model) {
-        this.model = model;
-        return this;
     }
 }

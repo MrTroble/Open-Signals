@@ -35,9 +35,6 @@ import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
-import io.netty.handler.codec.http2.Http2FrameLogger.Direction;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyEnum;
@@ -48,32 +45,20 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
-import net.minecraft.util.Hand;
 import net.minecraft.util.Mirror;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.ITickList;
-import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
@@ -111,7 +96,7 @@ public class Signal extends BasicBlock {
     @Override
     public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
             final BlockPos pos) {
-        final SignalTileEnity te = (SignalTileEnity) source.getTileEntity(pos);
+        final SignalTileEntity te = (SignalTileEntity) source.getTileEntity(pos);
         if (te == null)
             return FULL_BLOCK_AABB;
         final SignalStateInfo info = new SignalStateInfo((World) source, pos, this);
@@ -180,9 +165,6 @@ public class Signal extends BasicBlock {
         return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
     }
 
-    @SuppressWarnings({
-            "unchecked", "rawtypes"
-    })
     @Override
     public IBlockState getExtendedState(final IBlockState state, final IBlockAccess world,
             final BlockPos pos) {
@@ -276,7 +258,8 @@ public class Signal extends BasicBlock {
     }
 
     @SideOnly(Side.CLIENT)
-    public int colorMultiplier(final int tintIndex) {
+    public int colorMultiplier(final IBlockState state, final IBlockAccess worldIn,
+            final BlockPos pos, final int tintIndex) {
         return this.prop.colors.get(tintIndex);
     }
 
@@ -321,23 +304,17 @@ public class Signal extends BasicBlock {
 
         final String[] display = name.split("\\[n\\]");
 
-        final float width = info.font.width(name);
+        final float width = info.font.getStringWidth(name);
         final float scale = Math.min(1 / (22 * (width / 56)), 0.1f);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translated(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
-        GlStateManager.rotatef(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
-        GlStateManager.scalef(-scale, -scale, 1);
-        GlStateManager.translatef(-1.3f / scale, 0, -0.32f);
-
-        int k = 0;
-        for (int i = 0; i < display.length; i++) {
-            final List<String> splittedList = info.font.split(display[i],
-                    (int) this.prop.signWidth);
-            for (int j = 0; j < splittedList.size(); j++) {
-                info.font.draw(splittedList.get(j), 0, (k * 10), this.prop.textColor);
-                k++;
-            }
+        GlStateManager.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
+        GlStateManager.rotate(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
+        GlStateManager.scale(-scale, -scale, 1);
+        GlStateManager.translate(-1.3f / scale, 0, -0.32f);
+        for (int j = 0; j < display.length; j++) {
+            info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale * 2.8F),
+                    this.prop.textColor, 0);
         }
         GlStateManager.popMatrix();
     }
@@ -378,18 +355,16 @@ public class Signal extends BasicBlock {
         final float scale = this.prop.signScale;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translated(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
-        GlStateManager.rotatef(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
-        GlStateManager.scalef(0.015f * scale, -0.015f * scale, 0.015f * scale);
+        GlStateManager.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
+        GlStateManager.rotate(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
+        GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
 
         renderSingleOverlay(info, display);
 
         if (doubleSidedText) {
-            // UIRotate.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
-            GlStateManager.rotated(-face.getRadians() + Math.PI, 0, 1, 0);
-            GlStateManager.rotatef(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
-            GlStateManager.translated(info.x - 0.5f, info.y + customRenderHeight - 2,
-                    info.z - 0.5f);
+            GlStateManager.rotate((float) (-face.getRadians() + Math.PI), 0, 1, 0);
+            GlStateManager.rotate(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
+            GlStateManager.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
             renderSingleOverlay(info, display);
         }
 
@@ -402,16 +377,11 @@ public class Signal extends BasicBlock {
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
         GlStateManager.pushMatrix();
-        GlStateManager.translatef(width / 2 + offsetX, 0, -4.2f + offsetZ);
-        GlStateManager.scalef(-1f, 1f, 1f);
-
-        int k = 0;
-        for (int i = 0; i < display.length; i++) {
-            final List<String> splittedList = info.font.split(display[i], (int) width);
-            for (int j = 0; j < splittedList.size(); j++) {
-                info.font.draw(splittedList.get(j), 0, (k * 10), this.prop.textColor);
-                k++;
-            }
+        GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
+        GlStateManager.scale(-1f, 1f, 1f);
+        for (int j = 0; j < display.length; j++) {
+            info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale * 2.8F),
+                    this.prop.textColor, 0);
         }
         GlStateManager.popMatrix();
     }
@@ -473,8 +443,7 @@ public class Signal extends BasicBlock {
     @Override
     public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,
             EnumFacing side) {
-        // TODO Auto-generated method stub
-        return super.getStrongPower(blockState, blockAccess, pos, side);
+        return getWeakPower(blockState, blockAccess, pos, side);
     }
 
     @SuppressWarnings("unchecked")
@@ -513,12 +482,10 @@ public class Signal extends BasicBlock {
         if (sound.duration == 1) {
             world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
         } else {
-            if (world.getBlockTicks().hasScheduledTick(pos, this)) {
+            if (world.isUpdateScheduled(pos, this)) {
                 return;
-            } else {
-                if (sound.predicate.test(properties)) {
-                    ((ITickList<Block>) world).scheduleTick(pos, this, 1);
-                }
+            } else if (sound.predicate.test(properties)) {
+                world.scheduleUpdate(pos, this, 1);
             }
         }
     }
@@ -533,20 +500,18 @@ public class Signal extends BasicBlock {
         return new SoundProperty();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void tick(final BlockState state, final World world, final BlockPos pos,
-            final Random rand) {
-        if (this.prop.sounds.isEmpty() || world.isClientSide) {
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+        if (this.prop.sounds.isEmpty() || worldIn.isRemote) {
             return;
         }
-        final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
+        final SignalStateInfo stateInfo = new SignalStateInfo(worldIn, pos, this);
         final SoundProperty sound = getSound(SignalStateHandler.getStates(stateInfo));
         if (sound.duration <= 1) {
             return;
         }
-        world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        ((ITickList<Block>) world).scheduleTick(pos, this, sound.duration);
+        worldIn.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        worldIn.scheduleUpdate(pos, this, sound.duration);
     }
 
     @Override

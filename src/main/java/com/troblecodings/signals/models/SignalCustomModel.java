@@ -5,139 +5,146 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
+import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
+import javax.vecmath.AxisAngle4f;
+import javax.vecmath.Matrix4f;
+import javax.vecmath.Vector3f;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
+import com.mojang.realmsclient.util.Pair;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.SignalAngel;
 
-import net.minecraft.client.renderer.Matrix4f;
-import net.minecraft.client.renderer.Quaternion;
-import net.minecraft.client.renderer.Vector4f;
-import net.minecraft.client.renderer.model.BakedQuad;
-import net.minecraft.client.renderer.model.BlockModel;
-import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ModelBakery;
-import net.minecraft.client.renderer.texture.ISprite;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.renderer.block.model.IBakedModel;
+import net.minecraft.client.renderer.block.model.MultipartBakedModel;
+import net.minecraft.client.renderer.block.model.SimpleBakedModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.renderer.vertex.VertexFormat;
-import net.minecraft.util.Direction;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.client.model.IModel;
 import net.minecraftforge.client.model.ModelLoaderRegistry;
-import net.minecraftforge.client.model.data.EmptyModelData;
+import net.minecraftforge.common.model.IModelState;
 import net.minecraftforge.common.model.TRSRTransformation;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-@OnlyIn(Dist.CLIENT)
-public class SignalCustomModel implements IUnbakedModel {
+@SideOnly(Side.CLIENT)
+public class SignalCustomModel implements IModel {
 
-    @Nonnull
-    public static final Random RANDOM = new Random();
+    private final HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
+    private List<ResourceLocation> textures = new ArrayList<>();
+    private IBakedModel cachedModel = null;
+    private SignalAngel angel = SignalAngel.ANGEL0;
+    private final Matrix4f rotation;
 
-    private final SignalAngel angel;
-    private final List<SignalModelLoaderInfo> list;
-    private final List<ResourceLocation> dependencies;
-    private final Map<String, ResourceLocation> materialsFromString = new HashMap<>();
-
-    public SignalCustomModel(final SignalAngel angel, final List<SignalModelLoaderInfo> list) {
-        super();
-        this.angel = angel;
-        this.list = list;
-        this.dependencies = list.stream()
-                .map(info -> new ResourceLocation(OpenSignalsMain.MODID, "block/" + info.name))
-                .collect(Collectors.toList());
-        list.forEach(info -> info.retexture
-                .forEach((id, texture) -> materialsFromString.computeIfAbsent(texture,
-                        _u -> new ResourceLocation(OpenSignalsMain.MODID, texture))));
+    public SignalCustomModel(final List<SignalModelLoaderInfo> infos, final SignalAngel facing) {
+        infos.forEach(
+                info -> register(info.name, info.state, info.x, info.y, info.z, info.retexture));
+        this.textures = ImmutableList.copyOf(textures);
+        this.angel = facing;
+        final Matrix4f mat = new Matrix4f();
+        mat.setIdentity();
+        mat.setRotation(new AxisAngle4f(0, 1, 0, (float) angel.getRadians()));
+        rotation = mat;
     }
 
-    private static void transform(final BakedQuad quad, final Quaternion quaterion) {
-        final int[] oldVertex = quad.getVertices();
-        final int size = DefaultVertexFormats.BLOCK.getIntegerSize();
-        for (int i = 0; i < oldVertex.length; i += size) {
-            final float x = Float.intBitsToFloat(oldVertex[i]);
-            final float y = Float.intBitsToFloat(oldVertex[i + 1]);
-            final float z = Float.intBitsToFloat(oldVertex[i + 2]);
-            final Vector4f vector = new Vector4f(x, y, z, 1);
-            vector.transform(quaterion);
-            oldVertex[i + 0] = Float.floatToIntBits(vector.x());
-            oldVertex[i + 1] = Float.floatToIntBits(vector.y());
-            oldVertex[i + 2] = Float.floatToIntBits(vector.z());
+    private Vector3f multiply(final Vector3f vec, final Matrix4f mat) {
+        return new Vector3f(
+                vec.getX() * mat.getM00() + vec.getY() * mat.getM01() + vec.getZ() * mat.getM02()
+                        + mat.getM03(), //
+                vec.getX() * mat.getM10() + vec.getY() * mat.getM11() + vec.getZ() * mat.getM12()
+                        + mat.getM13(), //
+                vec.getX() * mat.getM20() + vec.getY() * mat.getM21() + vec.getZ() * mat.getM22()
+                        + mat.getM23());
+    }
+
+    private BakedQuad transform(final BakedQuad quad) {
+        final int[] data = quad.getVertexData();
+        final VertexFormat format = quad.getFormat();
+        for (int i = 0; i < data.length - 3; i += format.getIntegerSize()) {
+            final Vector3f vector = new Vector3f(Float.intBitsToFloat(data[i]) - 0.5f,
+                    Float.intBitsToFloat(data[i + 1]), Float.intBitsToFloat(data[i + 2]) - 0.5f);
+            final Vector3f out = multiply(vector, rotation);
+            data[i] = Float.floatToRawIntBits(out.x + 0.5f);
+            data[i + 1] = Float.floatToRawIntBits(out.y);
+            data[i + 2] = Float.floatToRawIntBits(out.z + 0.5f);
         }
-    }
-
-    private static BakedModelPair transform(final SignalModelLoaderInfo info,
-            final ModelBakery bakery, final Function<ResourceLocation, TextureAtlasSprite> function,
-            final Map<String, ResourceLocation> material, final Quaternion rotation,
-            final ISprite sprite) {
-        final TRSRTransformation transformation = new TRSRTransformation(null);
-        final BlockModel blockModel = (BlockModel) info.model;
-        final Map<String, String> defaultMap = ImmutableMap.copyOf(blockModel.textureMap);
-        info.retexture.forEach((id, texture) -> blockModel.textureMap.computeIfPresent(id,
-                (_u, old) -> material.get(texture).getPath()));
-        @SuppressWarnings("deprecation")
-        final IBakedModel model = info.model.bake(bakery, function, sprite);
-        blockModel.textureMap.putAll(defaultMap);
-        final Matrix4f reverse = new Matrix4f();
-        /*
-         * reverse.setIdentity(); reverse.setTranslation(-0.5f, 0, -0.5f);
-         * 
-         * final Matrix4f matrix = Matrix4f.createScaleMatrix(1, 1, 1);
-         * matrix.setTranslation(0.5f, 0, 0.5f); matrix.multiply(rotation);
-         * matrix.multiply(reverse);
-         */
-
-        model.getQuads(null, null, RANDOM, EmptyModelData.INSTANCE)
-                .forEach(quad -> transform(quad, rotation));
-        for (final Direction direction : Direction.values()) {
-            model.getQuads(null, direction, RANDOM, EmptyModelData.INSTANCE)
-                    .forEach(quad -> transform(quad, rotation));
-        }
-        return new BakedModelPair(info.state, model);
-    }
-
-    @Override
-    public Collection<ResourceLocation> getDependencies() {
-        return this.dependencies;
+        return quad;
     }
 
     @SuppressWarnings("deprecation")
-    @Override
-    public IBakedModel bake(final ModelBakery bakery,
-            final Function<ResourceLocation, TextureAtlasSprite> function, final ISprite sprite,
-            final VertexFormat format) {
-        list.forEach(info -> {
-            if (info.model == null) {
-                final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
-                        "block/" + info.name);
-                info.model = ModelLoaderRegistry.getModelOrLogError(location,
-                        String.format("Could not find %s!", location));
-                // info.model = bakery.getModel(location);
+    private IBakedModel transform(final IBakedModel model) {
+        final com.google.common.collect.ImmutableList.Builder<BakedQuad> outgoing = ImmutableList
+                .builder();
+        for (final BakedQuad quad : model.getQuads(null, null, 0)) {
+            outgoing.add(transform(quad));
+        }
+        final com.google.common.collect.ImmutableMap.Builder<EnumFacing, List<BakedQuad>> faceOutgoing = ImmutableMap
+                .builder();
+        for (final EnumFacing face : EnumFacing.VALUES) {
+            final com.google.common.collect.ImmutableList.Builder<BakedQuad> current = ImmutableList
+                    .builder();
+            for (final BakedQuad quad : model.getQuads(null, face, 0)) {
+                current.add(transform(quad));
             }
-        });
-        final Quaternion quaternion = angel.getQuaternion();
-        return new SignalBakedModel(list.stream().map(
-                info -> transform(info, bakery, function, materialsFromString, quaternion, sprite))
-                .collect(Collectors.toList()));
+            faceOutgoing.put(face, current.build());
+        }
+        return new SimpleBakedModel(outgoing.build(), faceOutgoing.build(),
+                model.isAmbientOcclusion(), model.isGui3d(), model.getParticleTexture(),
+                model.getItemCameraTransforms(), model.getOverrides());
     }
 
     @Override
-    public Collection<ResourceLocation> getTextures(
-            final Function<ResourceLocation, IUnbakedModel> function,
-            final Set<String> modelState) {
-        final Collection<ResourceLocation> material = new ArrayList<>();
-        this.dependencies.forEach(location -> material
-                .addAll(function.apply(location).getTextures(function, modelState)));
-        materialsFromString.values().forEach(opt -> material.add(opt));
-        return material;
+    public IBakedModel bake(final IModelState state, final VertexFormat format,
+            final Function<ResourceLocation, TextureAtlasSprite> bakedTextureGetter) {
+        if (cachedModel == null) {
+            final MultipartBakedModel.Builder build = new MultipartBakedModel.Builder();
+            modelCache.forEach((pr, m) -> {
+                final IModel model = m.first();
+                final Vector3f f = m.second();
+                final TRSRTransformation baseState = new TRSRTransformation(f, null, null, null);
+                build.putModel(blockstate -> pr.test((IExtendedBlockState) blockstate),
+                        transform(model.bake(baseState, format, bakedTextureGetter)));
+            });
+            return cachedModel = build.makeMultipartModel();
+        }
+        return cachedModel;
+    }
+
+    @Override
+    public IModelState getDefaultState() {
+        return TRSRTransformation.identity();
+    }
+
+    @Override
+    public Collection<ResourceLocation> getTextures() {
+        return textures;
+    }
+
+    protected void register(final String name, final Predicate<IExtendedBlockState> state,
+            final float x, final float y, final float z, final Map<String, String> map) {
+
+        IModel m = ModelLoaderRegistry.getModelOrLogError(
+                new ResourceLocation(OpenSignalsMain.MODID, "block/" + name),
+                "Couldn't find " + name);
+        m = m.smoothLighting(false);
+
+        if (map != null && !map.isEmpty()) {
+            final Builder<String, String> build = ImmutableMap.builder();
+            for (final Map.Entry<String, String> entry : map.entrySet())
+                build.put(entry.getKey(), entry.getValue());
+
+            m = m.retexture(build.build());
+        }
+
+        m.getTextures().stream().filter(rs -> !textures.contains(rs)).forEach(textures::add);
+        modelCache.put(state, Pair.of(m, new Vector3f(x, y, z)));
     }
 }

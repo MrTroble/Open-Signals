@@ -17,7 +17,7 @@ import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
@@ -46,45 +46,45 @@ public final class OSItems {
     public static final Item K_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item L_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final ItemArmorTemplate REFLECTIVE_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlotType.HEAD);
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlotType.CHEST);
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate REFLECTIVE_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlotType.LEGS);
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate REFLECTIVE_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlotType.FEET);
+            ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final ItemArmorTemplate DISPATCHER_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, EquipmentSlotType.HEAD);
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate DISPATCHER_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, EquipmentSlotType.CHEST);
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate DISPATCHER_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, EquipmentSlotType.LEGS);
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate DISPATCHER_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, EquipmentSlotType.FEET);
+            ItemArmorTemplate.DISPATCHER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final ItemArmorTemplate STATION_MANAGER_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, EquipmentSlotType.HEAD);
+            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate STATION_MANAGER_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, EquipmentSlotType.CHEST);
+            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate STATION_MANAGER_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, EquipmentSlotType.LEGS);
+            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate STATION_MANAGER_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, EquipmentSlotType.FEET);
+            ItemArmorTemplate.STATIONMANAGER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final ItemArmorTemplate TRAIN_DRIVER_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, EquipmentSlotType.HEAD);
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate TRAIN_DRIVER_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, EquipmentSlotType.CHEST);
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate TRAIN_DRIVER_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, EquipmentSlotType.LEGS);
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate TRAIN_DRIVER_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, EquipmentSlotType.FEET);
+            ItemArmorTemplate.TRAINDRIVER_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final ItemArmorTemplate CONDUCTOR_HEAD = new ItemArmorTemplate(
-            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlotType.HEAD);
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.HEAD);
     public static final ItemArmorTemplate CONDUCTOR_CHESTPLATE = new ItemArmorTemplate(
-            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlotType.CHEST);
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.CHEST);
     public static final ItemArmorTemplate CONDUCTOR_PANTS = new ItemArmorTemplate(
-            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlotType.LEGS);
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate CONDUCTOR_SHOES = new ItemArmorTemplate(
-            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlotType.FEET);
+            ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
     public static final Item SIGNAL_PLATE = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item SIGNAL_SHIELD = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item LAMPS = new Item().setCreativeTab(CreativeTabs.COMBAT);

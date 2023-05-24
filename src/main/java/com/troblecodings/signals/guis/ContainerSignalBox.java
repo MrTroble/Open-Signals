@@ -264,7 +264,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     @Override
-    public boolean stillValid(final EntityPlayer playerIn) {
+    public boolean canInteractWith(final EntityPlayer playerIn) {
         if (tile.isBlocked() && !tile.isValid(playerIn))
             return false;
         if (this.info.player == null) {

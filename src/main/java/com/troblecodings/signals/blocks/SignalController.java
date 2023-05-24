@@ -2,7 +2,7 @@ package com.troblecodings.signals.blocks;
 
 import java.util.Optional;
 
-import com.troblecodings.guilib.ecs.GuiHandler;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
@@ -32,7 +32,8 @@ public class SignalController extends BasicBlock {
         if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
                 return true;
-            GuiHandler.invokeGui(SignalController.class, playerIn, worldIn, pos);
+            OpenSignalsMain.handler.invokeGui(SignalController.class, playerIn, worldIn, pos,
+                    "signalcontroller");
             return true;
         }
         return false;

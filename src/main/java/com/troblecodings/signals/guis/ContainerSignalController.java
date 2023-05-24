@@ -24,6 +24,7 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
@@ -249,8 +250,8 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     }
 
     @Override
-    public boolean stillValid(final EntityPlayer playerIn) {
-        if (playerIn instanceof EntityPlayer) {
+    public boolean canInteractWith(final EntityPlayer playerIn) {
+        if (playerIn instanceof EntityPlayerMP) {
             this.info.player = playerIn;
         }
         return true;

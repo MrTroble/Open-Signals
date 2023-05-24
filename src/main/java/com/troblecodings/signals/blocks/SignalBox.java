@@ -2,10 +2,11 @@ package com.troblecodings.signals.blocks;
 
 import java.util.Optional;
 
-import com.troblecodings.guilib.ecs.GuiHandler;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.block.material.Material;
@@ -30,13 +31,14 @@ public class SignalBox extends BasicBlock {
     public boolean onBlockActivated(final World worldIn, final BlockPos pos,
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
-        if (!playerIn.getHeldItemMainhand().getItem().equals(GIRItems.LINKING_TOOL)) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
                 return true;
             final TileEntity entity = worldIn.getTileEntity(pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {
-                GuiHandler.invokeGui(SignalBox.class, playerIn, worldIn, pos);
+                OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos,
+                        "signalbox");
             } else {
                 playerIn.sendStatusMessage(new TextComponentTranslation("msg.isblocked"), true);
             }
@@ -56,12 +58,11 @@ public class SignalBox extends BasicBlock {
     }
 
     @Override
-    public void playerWillDestroy(final World world, final BlockPos pos, final IBlockState state,
-            final EntityPlayer player) {
-        if (!world.isRemote) {
-            ((SignalBoxTileEntity) world.getTileEntity(pos)).unlink();
-            SignalBoxHandler.removeSignalBox(new PosIdentifier(pos, world));
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        if (!worldIn.isRemote) {
+            ((SignalBoxTileEntity) worldIn.getTileEntity(pos)).unlink();
+            SignalBoxHandler.removeSignalBox(new PosIdentifier(pos, worldIn));
         }
-        super.playerWillDestroy(world, pos, state, player);
+        super.breakBlock(worldIn, pos, state);
     }
 }

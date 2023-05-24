@@ -15,22 +15,24 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
-import net.minecraft.client.renderer.model.IUnbakedModel;
-import net.minecraft.client.renderer.model.ModelResourceLocation;
-import net.minecraft.resources.IResourceManager;
+import net.minecraft.client.renderer.block.model.BuiltInModel;
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
+import net.minecraft.client.renderer.block.model.ItemOverrideList;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.ICustomModelLoader;
+import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-@SuppressWarnings("deprecation")
-@OnlyIn(Dist.CLIENT)
+@SideOnly(Side.CLIENT)
 public final class CustomModelLoader implements ICustomModelLoader {
 
     private static HashMap<String, List<SignalModelLoaderInfo>> registeredModels = new HashMap<>();
 
     public static final CustomModelLoader INSTANCE = new CustomModelLoader();
-    private MapWrapper wrapper;
 
     private CustomModelLoader() {
     }
@@ -96,30 +98,6 @@ public final class CustomModelLoader implements ICustomModelLoader {
         }
     }
 
-    private void defaultModel(final MapWrapper wrapper, final String name) {
-        wrapper.putNormal(
-                new ModelResourceLocation(new ResourceLocation(OpenSignalsMain.MODID, name),
-                        "inventory"),
-                DefaultModel.INSTANCE);
-        wrapper.putNormal(
-                new ModelResourceLocation(new ResourceLocation(OpenSignalsMain.MODID, name), ""),
-                DefaultModel.INSTANCE);
-    }
-
-    public void prepare() {
-        /*
-         * final ModelBakery bakery = ModelBakery.instance(); if (!(bakery.unbakedCache
-         * instanceof MapWrapper)) { wrapper = new MapWrapper(bakery.unbakedCache,
-         * registeredModels.keySet()); defaultModel(wrapper, "ghostblock");
-         * registeredModels.forEach((name, loaderList) -> { defaultModel(wrapper, name);
-         * for (final SignalAngel angel : SignalAngel.values()) { wrapper.putNormal( new
-         * ModelResourceLocation( new ResourceLocation(OpenSignalsMain.MODID, name),
-         * "angel=" + angel.getNameWrapper()), new SignalCustomModel(angel,
-         * loaderList)); } }); bakery.unbakedCache = wrapper; }
-         */
-
-    }
-
     @SuppressWarnings("unchecked")
     @Override
     public void onResourceManagerReload(final IResourceManager manager) {
@@ -164,7 +142,7 @@ public final class CustomModelLoader implements ICustomModelLoader {
 
                         final String blockstate = texturestate.getBlockstate();
 
-                        Predicate<ModelInfoWrapper> state = null;
+                        Predicate<IExtendedBlockState> state = null;
 
                         boolean extentionloaded = false;
 
@@ -219,22 +197,23 @@ public final class CustomModelLoader implements ICustomModelLoader {
 
     @Override
     public boolean accepts(final ResourceLocation modelLocation) {
-        if (!modelLocation.getNamespace().equals(OpenSignalsMain.MODID))
+        if (!modelLocation.getResourceDomain().equals(OpenSignalsMain.MODID))
             return false;
-        return registeredModels.containsKey(modelLocation.getPath())
-                || modelLocation.getPath().equals("ghostblock");
+        return registeredModels.containsKey(modelLocation.getResourcePath())
+                || modelLocation.getResourcePath().equals("ghostblock");
     }
 
     @Override
-    public IUnbakedModel loadModel(final ResourceLocation modelLocation) throws Exception {
-        if (modelLocation.getPath().equals("ghostblock"))
-            return DefaultModel.INSTANCE;
+    public IModel loadModel(final ResourceLocation modelLocation) throws Exception {
+        if (modelLocation.getResourcePath().equals("ghostblock"))
+            return (state, format, bak) -> new BuiltInModel(ItemCameraTransforms.DEFAULT,
+                    ItemOverrideList.NONE);
         final ModelResourceLocation mrl = (ModelResourceLocation) modelLocation;
         final String[] strs = mrl.getVariant().split("=");
         if (strs.length < 2)
-            return new SignalCustomModel(SignalAngel.ANGEL0,
-                    registeredModels.get(modelLocation.getPath()));
-        return new SignalCustomModel(SignalAngel.valueOf(strs[1].toUpperCase()),
-                registeredModels.get(modelLocation.getPath()));
+            return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
+                    SignalAngel.ANGEL0);
+        return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
+                SignalAngel.valueOf(strs[1].toUpperCase()));
     }
 }

@@ -13,7 +13,6 @@ import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.enums.ChangeableStage;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -38,10 +37,6 @@ public class SEProperty implements IIntegerable<String>, IUnlistedProperty<Strin
         this.deps = deps;
         this.allowedValues = ImmutableList.copyOf(parent.getAllowedValues());
         this.itemDamage = itemDamage;
-    }
-
-    public Object getWrapper(final Object object) {
-        return ((IExtendedBlockState) object).getData(this);
     }
 
     @Override

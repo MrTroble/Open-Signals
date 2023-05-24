@@ -1,6 +1,6 @@
 package com.troblecodings.signals.blocks;
 
-import com.troblecodings.guilib.ecs.GuiHandler;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
@@ -67,7 +67,8 @@ public class RedstoneIO extends BasicBlock {
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
             if (worldIn.isRemote)
-                GuiHandler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos);
+                OpenSignalsMain.handler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos,
+                        "redstoneio");
             return true;
         }
         return false;

@@ -67,8 +67,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean link(final BlockPos pos, final NBTTagCompound tag) {
-        @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
+        final Block block = Block.REGISTRY.getObject(new ResourceLocation(OpenSignalsMain.MODID,
                 tag.getString(SignalControllerTileEntity.SIGNAL_NAME)));
         if (block == null || block instanceof BlockAir)
             return false;

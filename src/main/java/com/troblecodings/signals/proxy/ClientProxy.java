@@ -36,6 +36,6 @@ public class ClientProxy extends CommonProxy {
         OpenSignalsMain.handler.addGui(Signal.class, NamableGui::new);
         ModelLoaderRegistry.registerLoader(CustomModelLoader.INSTANCE);
         ClientRegistry.bindTileEntitySpecialRenderer(SignalTileEntity.class,
-                new SignalSpecialRenderer(null));
+                new SignalSpecialRenderer());
     }
 }

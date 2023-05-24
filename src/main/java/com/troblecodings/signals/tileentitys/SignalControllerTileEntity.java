@@ -243,9 +243,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     @Override
     public boolean link(final BlockPos pos, final NBTTagCompound tag) {
-        @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK
-                .get(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
+        final Block block = Block.REGISTRY
+                .getObject(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
         if (block != null && block instanceof Signal) {
             unlink();
             linkedSignalPosition = pos;
@@ -257,7 +256,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void onChunkUnloaded() {
+    public void onChunkUnload() {
         unloadSignal();
     }
 
