@@ -18,13 +18,11 @@ import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.SignalLoader;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
 import net.minecraft.item.Item;
-import net.minecraft.item.Item.Properties;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public final class OSBlocks {
@@ -87,14 +85,6 @@ public final class OSBlocks {
     }
 
     @SubscribeEvent
-    public static void registerBlockEntitys(final RegistryEvent.Register<TileEntityType<?>> event) {
-        if (POST.getRegistryName() == null)
-            OSBlocks.init();
-        final IForgeRegistry<TileEntityType<?>> registry = event.getRegistry();
-        BasicBlock.BLOCK_ENTITYS.values().forEach(registry::register);
-    }
-
-    @SubscribeEvent
     public static void registerItem(final RegistryEvent.Register<Item> event) {
         if (POST.getRegistryName() == null)
             OSBlocks.init();
@@ -102,8 +92,7 @@ public final class OSBlocks {
         BLOCKS_TO_REGISTER.forEach(block -> {
             if (block instanceof Signal || block instanceof GhostBlock)
                 return;
-            registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
-                    .setRegistryName(block.getRegistryName()));
+            registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
         });
 
     }

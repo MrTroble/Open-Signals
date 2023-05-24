@@ -24,14 +24,20 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
 
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class CommonProxy {
 
-    public void initModEvent() {
+    public void initModEvent(FMLPreInitializationEvent event) {
         SignalStateHandler.init();
         NameHandler.init();
         OSSounds.init();
+        OSItems.init();
+        OneSignalConfigParser.loadOneSignalConfigs();
+        ChangeConfigParser.loadChangeConfigs();
+        DefaultConfigParser.loadDefaultConfigs();
+        SubsidiarySignalParser.loadAllSubsidiarySignals();
 
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
@@ -44,12 +50,6 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(RedstoneIO.class, NamableContainer::new);
     }
 
-    public void preinit(final FMLCommonSetupEvent event) {
-        OSItems.init();
-
-        OneSignalConfigParser.loadOneSignalConfigs();
-        ChangeConfigParser.loadChangeConfigs();
-        DefaultConfigParser.loadDefaultConfigs();
-        SubsidiarySignalParser.loadAllSubsidiarySignals();
+    public void preinit(final FMLInitializationEvent event) {
     }
 }

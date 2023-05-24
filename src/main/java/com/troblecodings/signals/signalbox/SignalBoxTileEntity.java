@@ -7,7 +7,6 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.PosIdentifier;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -17,38 +16,36 @@ import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
-import net.minecraft.block.AirBlock;
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.block.BlockAir;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 import net.minecraft.world.World;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
     private final SignalBoxGrid grid;
 
-    public SignalBoxTileEntity(final TileEntityInfo info) {
-        super(info);
+    public SignalBoxTileEntity() {
         grid = SignalBoxFactory.getFactory().getGrid();
     }
 
     @Override
-    public void setLevel(final World world) {
-        super.setLevel(world);
-        grid.setPosAndWorld(worldPosition, world);
-        if (world.isClientSide)
+    public void setWorld(World worldIn) {
+        super.setWorld(world);
+        grid.setPosAndWorld(pos, world);
+        if (world.isRemote)
             return;
-        SignalBoxHandler.setWorld(new PosIdentifier(worldPosition, world));
+        SignalBoxHandler.setWorld(new PosIdentifier(pos, world));
     }
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
         final NBTWrapper gridTag = new NBTWrapper();
         this.grid.write(gridTag);
-        SignalBoxHandler.writeTileNBT(new PosIdentifier(worldPosition, level), wrapper);
+        SignalBoxHandler.writeTileNBT(new PosIdentifier(pos, world), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
     }
 
@@ -58,22 +55,22 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public void loadWrapper(final NBTWrapper wrapper) {
         grid.read(wrapper.getWrapper(GUI_TAG));
         copy = wrapper.copy();
-        if (level != null) {
+        if (world != null) {
             onLoad();
         }
     }
 
     @Override
     public boolean hasLink() {
-        return SignalBoxHandler.isTileEmpty(new PosIdentifier(worldPosition, level));
+        return SignalBoxHandler.isTileEmpty(new PosIdentifier(pos, world));
     }
 
     @Override
-    public boolean link(final BlockPos pos, final CompoundNBT tag) {
+    public boolean link(final BlockPos pos, final NBTTagCompound tag) {
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
                 tag.getString(SignalControllerTileEntity.SIGNAL_NAME)));
-        if (block == null || block instanceof AirBlock)
+        if (block == null || block instanceof BlockAir)
             return false;
         LinkType type = LinkType.SIGNAL;
         if (block == OSBlocks.REDSTONE_IN || block == OSBlocks.COMBI_REDSTONE_INPUT) {
@@ -82,26 +79,26 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             type = LinkType.OUTPUT;
         }
         if (type.equals(LinkType.SIGNAL)) {
-            SignalStateHandler.loadSignal(new SignalStateInfo(level, pos, (Signal) block));
+            SignalStateHandler.loadSignal(new SignalStateInfo(world, pos, (Signal) block));
         }
-        return SignalBoxHandler.linkPosToSignalBox(new PosIdentifier(worldPosition, level), pos,
+        return SignalBoxHandler.linkPosToSignalBox(new PosIdentifier(pos, world), pos,
                 (BasicBlock) block, type);
     }
 
     @Override
     public void onLoad() {
-        grid.setPosAndWorld(worldPosition, level);
-        if (level.isClientSide) {
+        grid.setPosAndWorld(pos, world);
+        if (world.isRemote) {
             return;
         }
-        SignalBoxHandler.readTileNBT(new PosIdentifier(worldPosition, level),
+        SignalBoxHandler.readTileNBT(new PosIdentifier(pos, world),
                 copy == null ? new NBTWrapper() : copy, grid.getModeGrid());
-        SignalBoxHandler.loadSignals(new PosIdentifier(worldPosition, level));
+        SignalBoxHandler.loadSignals(new PosIdentifier(pos, world));
     }
 
     @Override
     public boolean unlink() {
-        SignalBoxHandler.unlinkAll(new PosIdentifier(worldPosition, level));
+        SignalBoxHandler.unlinkAll(new PosIdentifier(pos, world));
         return true;
     }
 
@@ -110,7 +107,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public boolean isValid(final PlayerEntity player) {
+    public boolean isValid(final EntityPlayer player) {
         if (clientSyncs.isEmpty())
             return false;
         return this.clientSyncs.get(0).getPlayer().equals(player);

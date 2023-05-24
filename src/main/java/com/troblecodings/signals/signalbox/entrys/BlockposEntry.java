@@ -8,7 +8,7 @@ import net.minecraft.util.math.BlockPos;
 
 public final class BlockposEntry extends IPathEntry<BlockPos> {
 
-    private BlockPos position = BlockPos.ZERO;
+    private BlockPos position = BlockPos.ORIGIN;
 
     /**
      * {@inheritDoc}

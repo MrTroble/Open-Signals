@@ -27,7 +27,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
     public NamableContainer(final GuiInfo info) {
         super(info);
         info.base = this;
-        info.player.containerMenu = this;
+        info.player.openContainer = this;
         if (info.pos != null)
             this.tile = info.getTile();
         this.info = info;
@@ -53,7 +53,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         final int size = buffer.getByteAsInt();
         for (int i = 0; i < size; i++)
             linkedPos.add(buffer.getBlockPos());
-        tile = (BasicBlockEntity) info.world.getBlockEntity(pos);
+        tile = (BasicBlockEntity) info.world.getTileEntity(pos);
         update();
     }
 

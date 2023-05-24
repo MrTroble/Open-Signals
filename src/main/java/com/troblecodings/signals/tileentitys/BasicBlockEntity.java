@@ -5,13 +5,11 @@ import java.util.List;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
@@ -22,8 +20,8 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     protected final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
     protected String customName = null;
 
-    public BasicBlockEntity(final TileEntityInfo info) {
-        super(info.type);
+    public BasicBlockEntity() {
+        super();
     }
 
     public void saveWrapper(final NBTWrapper wrapper) {
@@ -33,16 +31,28 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     }
 
     @Override
-    public void deserializeNBT(final CompoundNBT nbt) {
+    public void deserializeNBT(final NBTTagCompound nbt) {
         super.deserializeNBT(nbt);
         saveWrapper(new NBTWrapper(nbt));
     }
 
     @Override
-    public CompoundNBT serializeNBT() {
+    public NBTTagCompound serializeNBT() {
         final NBTWrapper wrapper = new NBTWrapper(super.serializeNBT());
         this.loadWrapper(wrapper);
         return wrapper.tag;
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound compound) {
+        super.readFromNBT(compound);
+        loadWrapper(new NBTWrapper(compound));
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+        saveWrapper(new NBTWrapper(compound));
+        return super.writeToNBT(compound);
     }
 
     public List<BlockPos> getLinkedPos() {
@@ -51,9 +61,9 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     @Override
     public String getNameWrapper() {
-        final NameStateInfo info = new NameStateInfo(level, worldPosition);
+        final NameStateInfo info = new NameStateInfo(world, pos);
         if (customName == null || customName.isEmpty())
-            customName = level.isClientSide ? ClientNameHandler.getClientName(info)
+            customName = world.isRemote ? ClientNameHandler.getClientName(info)
                     : NameHandler.getName(info);
         return customName == null ? "" : customName;
     }
@@ -67,7 +77,6 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     public void setCustomName(final String name) {
         this.customName = name;
-        final BlockState state = this.getBlockState();
-        this.level.setBlocksDirty(worldPosition, state, state);
+        markDirty();
     }
 }

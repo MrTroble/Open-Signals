@@ -153,7 +153,7 @@ public class PathwayHolder {
     }
 
     private void updateToNet(final SignalBoxPathway pathway) {
-        final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(tilePos);
+        final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getTileEntity(tilePos);
         if (tile == null || !tile.isBlocked())
             return;
         final List<SignalBoxNode> nodes = pathway.getListOfNodes();

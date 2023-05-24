@@ -9,17 +9,16 @@ import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncable {
 
-    public RedstoneIOTileEntity(final TileEntityInfo info) {
-        super(info);
+    public RedstoneIOTileEntity() {
+        super();
     }
 
     public static final String NAME_NBT = "name";
@@ -29,7 +28,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     public String getNameWrapper() {
         final String name = super.getNameWrapper();
         return name == null || name.isEmpty()
-                ? this.getBlockState().getBlock().getRegistryName().getPath()
+                ? this.getBlockType().getRegistryName().getResourcePath()
                 : name;
     }
 
@@ -47,37 +46,35 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     public void sendToAll() {
-        if (level.isClientSide)
+        if (world.isRemote)
             return;
-        final boolean power = this.level.getBlockState(this.worldPosition)
-                .getValue(RedstoneIO.POWER);
-        final RedstoneUpdatePacket update = new RedstoneUpdatePacket(level, worldPosition, power,
-                (RedstoneInput) this.getBlockState().getBlock());
+        final boolean power = this.world.getBlockState(this.pos).getValue(RedstoneIO.POWER);
+        final RedstoneUpdatePacket update = new RedstoneUpdatePacket(world, pos, power,
+                (RedstoneInput) getBlockType());
         linkedPositions.forEach(
-                pos -> SignalBoxHandler.updateInput(new PosIdentifier(pos, level), update));
+                pos -> SignalBoxHandler.updateInput(new PosIdentifier(pos, world), update));
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
-        if (level == null || level.isClientSide)
+        if (world == null || world.isRemote)
             return;
-        final LinkingUpdates update = SignalBoxHandler
-                .getPosUpdates(new PosIdentifier(worldPosition, level));
+        final LinkingUpdates update = SignalBoxHandler.getPosUpdates(new PosIdentifier(pos, world));
         if (update == null)
             return;
         update.getPosToRemove().forEach(pos -> unlink(pos));
         update.getPosToAdd().forEach(pos -> link(pos));
-        if (SignalBoxHandler.containsOutputUpdates(new PosIdentifier(worldPosition, level))) {
-            BlockState state = level.getBlockState(worldPosition);
-            state = state.setValue(RedstoneIO.POWER,
-                    SignalBoxHandler.getNewOutputState(new PosIdentifier(worldPosition, level)));
-            level.setBlockAndUpdate(worldPosition, state);
+        if (SignalBoxHandler.containsOutputUpdates(new PosIdentifier(pos, world))) {
+            IBlockState state = world.getBlockState(pos);
+            state = state.withProperty(RedstoneIO.POWER,
+                    SignalBoxHandler.getNewOutputState(new PosIdentifier(pos, world)));
+            world.notifyBlockUpdate(pos, state, state, 3);
         }
     }
 
     public void link(final BlockPos pos) {
-        if (level.isClientSide)
+        if (world.isRemote)
             return;
         if (!linkedPositions.contains(pos))
             linkedPositions.add(pos);
@@ -85,7 +82,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     public void unlink(final BlockPos pos) {
-        if (level.isClientSide)
+        if (world.isRemote)
             return;
         if (linkedPositions.contains(pos))
             linkedPositions.remove(pos);
@@ -93,8 +90,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     @Override
-    public boolean isValid(final PlayerEntity player) {
-        // TODO Auto-generated method stub
-        return false;
+    public boolean isValid(EntityPlayer player) {
+        return true;
     }
 }

@@ -33,7 +33,7 @@ import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -124,7 +124,7 @@ public class SignalBoxPathway {
     private BlockPos makeFromNext(final PathType type, final SignalBoxNode first,
             final SignalBoxNode next, final Rotation pRotation) {
         final Point delta = first.getPoint().delta(next.getPoint());
-        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta).getRotated(pRotation);
+        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta).add(pRotation);
         for (final EnumGuiMode mode : type.getModes()) {
             final BlockPos possiblePosition = first.getOption(new ModeSet(mode, rotation))
                     .flatMap(option -> option.getEntry(PathEntryType.SIGNAL)).orElse(null);
@@ -307,7 +307,7 @@ public class SignalBoxPathway {
     }
 
     private boolean isPowerd(final BlockPos pos) {
-        final BlockState state = world.getBlockState(pos);
+        final IBlockState state = world.getBlockState(pos);
         if (state == null || !(state.getBlock() instanceof RedstoneIO))
             return false;
         return state.getValue(RedstoneIO.POWER);

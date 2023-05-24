@@ -15,14 +15,13 @@ import com.troblecodings.signals.items.ToolParser;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.Item;
-import net.minecraft.item.Item.Properties;
-import net.minecraft.item.ItemGroup;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public final class OSItems {
@@ -31,23 +30,21 @@ public final class OSItems {
     }
 
     public static final Linkingtool LINKING_TOOL = new Linkingtool(OSTabs.TAB, (world, pos) -> {
-        final BlockState state = world.getBlockState(pos);
+        final IBlockState state = world.getBlockState(pos);
         final Block block = state.getBlock();
         final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
                 || block == OSBlocks.REDSTONE_OUT || block == OSBlocks.COMBI_REDSTONE_INPUT;
         return isRedstoneBlock || (block instanceof Signal && ((Signal) block).canBeLinked());
     }, _u -> true, (level, pos, tag) -> {
-        final BlockState state = level.getBlockState(pos);
+        final IBlockState state = level.getBlockState(pos);
         new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
-                state.getBlock().getRegistryName().getPath());
+                state.getBlock().getRegistryName().getResourcePath());
     });
-    public static final Item CONDUCTOR_TROWEL_GREEN = new Item(
-            new Properties().tab(ItemGroup.TAB_COMBAT));
-    public static final Item CONDUCTOR_TROWEL_RED = new Item(
-            new Properties().tab(ItemGroup.TAB_COMBAT));
-    public static final Item WARNING_FLAG = new Item(new Properties().tab(ItemGroup.TAB_COMBAT));
-    public static final Item K_BOARD = new Item(new Properties().tab(ItemGroup.TAB_COMBAT));
-    public static final Item L_BOARD = new Item(new Properties().tab(ItemGroup.TAB_COMBAT));
+    public static final Item CONDUCTOR_TROWEL_GREEN = new Item();
+    public static final Item CONDUCTOR_TROWEL_RED = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item WARNING_FLAG = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item K_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item L_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final ItemArmorTemplate REFLECTIVE_HEAD = new ItemArmorTemplate(
             ItemArmorTemplate.REFLECTIVE_ARMOR_MATERIAL, EquipmentSlotType.HEAD);
     public static final ItemArmorTemplate REFLECTIVE_CHESTPLATE = new ItemArmorTemplate(
@@ -88,12 +85,10 @@ public final class OSItems {
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlotType.LEGS);
     public static final ItemArmorTemplate CONDUCTOR_SHOES = new ItemArmorTemplate(
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, EquipmentSlotType.FEET);
-    public static final Item SIGNAL_PLATE = new Item(new Properties().tab(ItemGroup.TAB_MATERIALS));
-    public static final Item SIGNAL_SHIELD = new Item(
-            new Properties().tab(ItemGroup.TAB_MATERIALS));
-    public static final Item LAMPS = new Item(new Properties().tab(ItemGroup.TAB_MATERIALS));
-    public static final Item ELECTRIC_PARTS = new Item(
-            new Properties().tab(ItemGroup.TAB_MATERIALS));
+    public static final Item SIGNAL_PLATE = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item SIGNAL_SHIELD = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item LAMPS = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item ELECTRIC_PARTS = new Item().setCreativeTab(CreativeTabs.COMBAT);
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 

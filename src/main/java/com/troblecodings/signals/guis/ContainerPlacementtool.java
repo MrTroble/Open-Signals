@@ -18,7 +18,6 @@ import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 
 public class ContainerPlacementtool extends ContainerBase implements INetworkSync {

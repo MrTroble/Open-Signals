@@ -12,13 +12,12 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
 
 public class ClientSignalStateHandler implements INetworkSync {
 
@@ -35,8 +34,8 @@ public class ClientSignalStateHandler implements INetworkSync {
     @Override
     public void deserializeClient(final ByteBuffer buf) {
         final ReadBuffer buffer = new ReadBuffer(buf);
-        final Minecraft mc = Minecraft.getInstance();
-        final World level = mc.level;
+        final Minecraft mc = Minecraft.getMinecraft();
+        final World level = mc.world;
         final BlockPos signalPos = buffer.getBlockPos();
         final int propertiesSize = buffer.getByteAsInt();
         if (propertiesSize == 255) {
@@ -53,7 +52,7 @@ public class ClientSignalStateHandler implements INetworkSync {
             if (level == null)
                 return;
             TileEntity entity;
-            while ((entity = level.getBlockEntity(signalPos)) == null)
+            while ((entity = level.getTileEntity(signalPos)) == null)
                 continue;
             final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);
             final List<SEProperty> signalProperties = ((SignalTileEntity) entity).getSignal()
@@ -68,23 +67,19 @@ public class ClientSignalStateHandler implements INetworkSync {
                 }
                 CURRENTLY_LOADED_STATES.put(stateInfo, properties);
             }
-            final BlockState state = entity.getBlockState();
-            mc.level.setBlocksDirty(signalPos, state, state);
-            entity.requestModelDataUpdate();
-            mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
+            entity.markDirty();
         });
     }
 
     private static void setRemoved(final BlockPos pos) {
-        final Minecraft mc = Minecraft.getInstance();
+        final Minecraft mc = Minecraft.getMinecraft();
         synchronized (CURRENTLY_LOADED_STATES) {
-            CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.level, pos));
+            CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.world, pos));
         }
     }
 
     @SubscribeEvent
-    public void serverEvent(final ServerCustomPayloadEvent event) {
-        deserializeClient(event.getPayload().nioBuffer());
-        event.getSource().get().setPacketHandled(true);
+    public void serverEvent(final ServerCustomPacketEvent event) {
+        deserializeClient(event.getPacket().payload().nioBuffer());
     }
 }

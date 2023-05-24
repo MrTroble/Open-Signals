@@ -56,8 +56,7 @@ public class BasicBlock extends Block {
     }
 
     public static void prepare() {
-        BLOCK_SUPPLIER
-                .forEach((wrapper, blocks) -> BLOCK_ENTITYS.put(wrapper, wrapper.supply(null)));
+        BLOCK_SUPPLIER.forEach((wrapper, blocks) -> BLOCK_ENTITYS.put(wrapper, wrapper.supply()));
     }
 
     @Override

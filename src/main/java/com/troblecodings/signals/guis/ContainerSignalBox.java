@@ -30,7 +30,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
@@ -48,11 +48,11 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
-        if (!info.world.isClientSide) {
+        if (!info.world.isRemote) {
             this.tile = info.getTile();
             tile.add(this);
         }
-        info.player.containerMenu = this;
+        info.player.openContainer = this;
         this.info = info;
     }
 
@@ -64,7 +64,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
         final Map<BlockPos, LinkType> positions = SignalBoxHandler
-                .getAllLinkedPos(new PosIdentifier(tile.getBlockPos(), info.world));
+                .getAllLinkedPos(new PosIdentifier(tile.getPos(), info.world));
         buffer.putInt(positions.size());
         positions.forEach((pos, type) -> {
             buffer.putBlockPos(pos);
@@ -81,7 +81,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             case SEND_GRID: {
                 final BlockPos pos = buffer.getBlockPos();
                 if (this.tile == null) {
-                    this.tile = (SignalBoxTileEntity) info.world.getBlockEntity(pos);
+                    this.tile = (SignalBoxTileEntity) info.world.getTileEntity(pos);
                 }
                 grid = tile.getSignalBoxGrid();
                 grid.readNetwork(buffer);
@@ -102,11 +102,11 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 break;
             }
             case NO_PW_FOUND: {
-                run.accept(I18n.get("error.nopathfound"));
+                run.accept(I18n.format("error.nopathfound"));
                 break;
             }
             case NO_OUTPUT_UPDATE: {
-                run.accept(I18n.get("error.nooutputupdate"));
+                run.accept(I18n.format("error.nooutputupdate"));
                 break;
             }
             case OUTPUT_UPDATE: {
@@ -159,7 +159,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             case REMOVE_POS: {
                 final BlockPos pos = buffer.getBlockPos();
                 SignalBoxHandler.unlinkPosFromSignalBox(
-                        new PosIdentifier(tile.getBlockPos(), tile.getLevel()), pos);
+                        new PosIdentifier(tile.getPos(), tile.getWorld()), pos);
                 break;
             }
             case RESET_PW: {
@@ -240,14 +240,14 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     @Override
-    public void removed(final PlayerEntity playerIn) {
-        super.removed(playerIn);
+    public void onContainerClosed(EntityPlayer playerIn) {
+        super.onContainerClosed(playerIn);
         if (this.tile != null)
             this.tile.remove(this);
     }
 
     @Override
-    public PlayerEntity getPlayer() {
+    public EntityPlayer getPlayer() {
         return this.info.player;
     }
 
@@ -264,7 +264,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     @Override
-    public boolean stillValid(final PlayerEntity playerIn) {
+    public boolean stillValid(final EntityPlayer playerIn) {
         if (tile.isBlocked() && !tile.isValid(playerIn))
             return false;
         if (this.info.player == null) {

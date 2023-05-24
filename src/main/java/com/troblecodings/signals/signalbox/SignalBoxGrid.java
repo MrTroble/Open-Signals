@@ -199,7 +199,7 @@ public class SignalBoxGrid implements INetworkSavable {
             allNodesForPathway.add(node);
             modeGrid.put(point, node);
         }
-        if (!world.isClientSide)
+        if (!world.isRemote)
             return new ArrayList<>();
         return allNodesForPathway;
     }

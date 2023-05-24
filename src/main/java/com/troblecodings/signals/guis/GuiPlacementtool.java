@@ -26,14 +26,14 @@ import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
-import net.minecraft.block.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-@OnlyIn(Dist.CLIENT)
+@SideOnly(Side.CLIENT)
 public class GuiPlacementtool extends GuiBase {
 
     public static final int GUI_PLACEMENTTOOL = 0;
@@ -42,7 +42,7 @@ public class GuiPlacementtool extends GuiBase {
     private final UIBlockRender blockRender = new UIBlockRender();
     private Signal currentSelectedBlock;
     private final Placementtool tool;
-    private final PlayerEntity player;
+    private final EntityPlayer player;
     private final ContainerPlacementtool container;
     private UIEnumerable enumerable;
     private boolean loaded = false;
@@ -51,7 +51,7 @@ public class GuiPlacementtool extends GuiBase {
         super(info);
         this.player = info.player;
         this.container = (ContainerPlacementtool) info.base;
-        final ItemStack stack = info.player.getMainHandItem();
+        final ItemStack stack = info.player.getHeldItemMainhand();
         tool = (Placementtool) stack.getItem();
         final int usedBlock = NBTWrapper.getOrCreateWrapper(stack)
                 .getInteger(Placementtool.BLOCK_TYPE_ID);
@@ -110,7 +110,7 @@ public class GuiPlacementtool extends GuiBase {
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
 
-        final UILabel titlelabel = new UILabel(I18n.get("property.signal.name"));
+        final UILabel titlelabel = new UILabel(I18n.format("property.signal.name"));
         titlelabel.setCenterX(false);
 
         final UIEntity titel = new UIEntity();
@@ -201,9 +201,7 @@ public class GuiPlacementtool extends GuiBase {
 
     public void applyModelChanges() {
         @SuppressWarnings("unused")
-        final BlockState ebs = currentSelectedBlock.defaultBlockState();
-        // Just until the erros are fixed
-        return;
+        final IBlockState ebs = currentSelectedBlock.getDefaultState();
         /*
          * final List<UIEnumerable> enumerables =
          * this.list.findRecursive(UIEnumerable.class); for (final UIEnumerable

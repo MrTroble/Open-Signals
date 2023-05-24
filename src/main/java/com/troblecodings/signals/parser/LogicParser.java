@@ -11,7 +11,7 @@ import com.troblecodings.signals.parser.interm.EvaluationLevel;
 import com.troblecodings.signals.parser.interm.IntermidiateNode;
 import com.troblecodings.signals.parser.interm.LogicalSymbols;
 
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
 @SuppressWarnings({
         "rawtypes", "unchecked"
@@ -25,16 +25,16 @@ public final class LogicParser {
     }
 
     static {
-        TRANSLATION_TABLE.put("with", new MethodInfo(IModelData.class, "with",
+        TRANSLATION_TABLE.put("with", new MethodInfo(IUnlistedProperty.class, "with",
                 objects -> PredicateHolder.with((ValuePack) objects[0]), ValuePack.class));
 
-        TRANSLATION_TABLE.put("has", new MethodInfo(IModelData.class, "has",
+        TRANSLATION_TABLE.put("has", new MethodInfo(IUnlistedProperty.class, "has",
                 objects -> PredicateHolder.has((SEProperty) objects[0]), SEProperty.class));
 
-        TRANSLATION_TABLE.put("hasandis", new MethodInfo(IModelData.class, "hasandis",
+        TRANSLATION_TABLE.put("hasandis", new MethodInfo(IUnlistedProperty.class, "hasandis",
                 objects -> PredicateHolder.hasAndIs((SEProperty) objects[0]), SEProperty.class));
 
-        TRANSLATION_TABLE.put("hasandisnot", new MethodInfo(IModelData.class, "hasandisnot",
+        TRANSLATION_TABLE.put("hasandisnot", new MethodInfo(IUnlistedProperty.class, "hasandisnot",
                 objects -> PredicateHolder.hasAndIsNot((SEProperty) objects[0]), SEProperty.class));
 
         TRANSLATION_TABLE.put("check", new MethodInfo(Map.class, "check",
