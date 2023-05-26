@@ -20,7 +20,7 @@ import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.guis.NamableContainer;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
-import com.troblecodings.signals.init.OSItems;
+import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
 
@@ -33,11 +33,7 @@ public class CommonProxy {
         SignalStateHandler.init();
         NameHandler.init();
         OSSounds.init();
-        OSItems.init();
-        OneSignalConfigParser.loadOneSignalConfigs();
-        ChangeConfigParser.loadChangeConfigs();
-        DefaultConfigParser.loadDefaultConfigs();
-        SubsidiarySignalParser.loadAllSubsidiarySignals();
+        OSBlocks.init();
 
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
@@ -50,6 +46,10 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(RedstoneIO.class, NamableContainer::new);
     }
 
-    public void preinit(final FMLInitializationEvent event) {
+    public void init(final FMLInitializationEvent event) {
+        OneSignalConfigParser.loadOneSignalConfigs();
+        ChangeConfigParser.loadChangeConfigs();
+        DefaultConfigParser.loadDefaultConfigs();
+        SubsidiarySignalParser.loadAllSubsidiarySignals();
     }
 }

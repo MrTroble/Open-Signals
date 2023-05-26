@@ -214,6 +214,6 @@ public final class CustomModelLoader implements ICustomModelLoader {
             return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
                     SignalAngel.ANGEL0);
         return new SignalCustomModel(registeredModels.get(modelLocation.getResourcePath()),
-                SignalAngel.valueOf(strs[1].toUpperCase()));
+                Enum.valueOf(SignalAngel.class, strs[1].toUpperCase()));
     }
 }

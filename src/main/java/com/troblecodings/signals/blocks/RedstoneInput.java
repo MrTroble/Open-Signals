@@ -1,5 +1,7 @@
 package com.troblecodings.signals.blocks;
 
+import java.util.Optional;
+
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.block.Block;
@@ -38,5 +40,10 @@ public class RedstoneInput extends RedstoneIO {
     @Override
     public boolean canProvidePower(final IBlockState state) {
         return true;
+    }
+
+    @Override
+    public Optional<String> getSupplierWrapperName() {
+        return Optional.of("redstonein");
     }
 }

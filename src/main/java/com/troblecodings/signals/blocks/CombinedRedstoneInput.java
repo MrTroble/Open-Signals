@@ -1,5 +1,7 @@
 package com.troblecodings.signals.blocks;
 
+import java.util.Optional;
+
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.block.Block;
@@ -26,5 +28,10 @@ public class CombinedRedstoneInput extends RedstoneInput {
         } else if (!hasNeighborSignal) {
             worldIn.notifyBlockUpdate(pos, state, state.withProperty(POWER, false), 3);
         }
+    }
+
+    @Override
+    public Optional<String> getSupplierWrapperName() {
+        return Optional.of("combiredstoneinput");
     }
 }

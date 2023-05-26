@@ -29,6 +29,6 @@ public enum SignalAngel implements NamableWrapper {
 
     @Override
     public String getNameWrapper() {
-        return "angel" + this.ordinal();
+        return this.name().toLowerCase();
     }
 }

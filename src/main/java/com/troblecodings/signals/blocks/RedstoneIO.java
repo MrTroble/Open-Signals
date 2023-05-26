@@ -1,5 +1,7 @@
 package com.troblecodings.signals.blocks;
 
+import java.util.Optional;
+
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.init.OSItems;
@@ -72,5 +74,15 @@ public class RedstoneIO extends BasicBlock {
             return true;
         }
         return false;
+    }
+
+    @Override
+    public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
+        return Optional.of(SUPPLIER);
+    }
+
+    @Override
+    public Optional<String> getSupplierWrapperName() {
+        return Optional.of("redstoneio");
     }
 }

@@ -130,7 +130,6 @@ public class SignalCustomModel implements IModel {
 
     protected void register(final String name, final Predicate<IExtendedBlockState> state,
             final float x, final float y, final float z, final Map<String, String> map) {
-
         IModel m = ModelLoaderRegistry.getModelOrLogError(
                 new ResourceLocation(OpenSignalsMain.MODID, "block/" + name),
                 "Couldn't find " + name);

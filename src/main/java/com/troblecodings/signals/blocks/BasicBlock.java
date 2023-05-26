@@ -7,8 +7,10 @@ import java.util.Map;
 import java.util.Optional;
 
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
+import com.troblecodings.signals.init.OSTabs;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
@@ -16,7 +18,7 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BasicBlock extends Block {
+public class BasicBlock extends Block implements ITileEntityProvider {
 
     private static final Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
     private static final Map<TileEntitySupplierWrapper, List<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
@@ -24,6 +26,7 @@ public class BasicBlock extends Block {
 
     public BasicBlock(final Material material) {
         super(material);
+        setCreativeTab(OSTabs.TAB);
         final Optional<TileEntitySupplierWrapper> optional = getSupplierWrapper();
         getSupplierWrapperName().ifPresent(name -> {
             optional.ifPresent(supplier -> {
@@ -69,13 +72,12 @@ public class BasicBlock extends Block {
         return false;
     }
 
-    @Override
-    public TileEntity createTileEntity(World world, IBlockState state) {
-        return BLOCK_ENTITYS.get(getSupplierWrapper().get());
+    public boolean hasTileEntity() {
+        return getSupplierWrapper().isPresent() && getBlockEntityType().isPresent();
     }
 
     @Override
-    public boolean hasTileEntity(final IBlockState state) {
-        return getSupplierWrapper().isPresent() && getBlockEntityType().isPresent();
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
+        return BLOCK_ENTITYS.get(getSupplierWrapper().get());
     }
 }

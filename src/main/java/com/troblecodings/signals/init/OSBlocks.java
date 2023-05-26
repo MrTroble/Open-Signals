@@ -18,8 +18,10 @@ import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.SignalLoader;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -66,7 +68,21 @@ public final class OSBlocks {
             return;
         final String name = pName.toLowerCase().trim();
         block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
+        block.setUnlocalizedName(name);
         BLOCKS_TO_REGISTER.add(block);
+        if (block instanceof ITileEntityProvider && block.hasTileEntity()) {
+            final ITileEntityProvider provider = (ITileEntityProvider) block;
+            try {
+                final Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0)
+                        .getClass();
+                if (TileEntity.getKey(tileclass) == null)
+                    TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
+            } catch (final NullPointerException ex) {
+                OpenSignalsMain.getLogger().trace(
+                        "All tileentity provide need to call back a default entity if the world is null!",
+                        ex);
+            }
+        }
         if (block instanceof Signal) {
             if (Signal.SIGNALS.containsKey(name)) {
                 throw new IllegalArgumentException(
