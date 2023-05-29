@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -102,5 +103,10 @@ public class NamableGui extends GuiBase {
     @Override
     public void updateFromContainer() {
         initOwn();
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(GuiInfo info) {
+        return new NamableContainer(info);
     }
 }

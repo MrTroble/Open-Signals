@@ -43,6 +43,7 @@ public final class OSBlocks {
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 
     public static void init() {
+        BasicBlock.prepare();
         final Field[] fields = OSBlocks.class.getFields();
         for (final Field field : fields) {
             final int modifiers = field.getModifiers();
@@ -60,9 +61,9 @@ public final class OSBlocks {
         }
         OSItems.init();
         SignalLoader.loadAllSignals();
-        BasicBlock.prepare();
     }
 
+    @SuppressWarnings("deprecation")
     public static void loadBlock(final BasicBlock block, final String pName) {
         if (BLOCKS_TO_REGISTER.contains(block))
             return;
@@ -103,6 +104,8 @@ public final class OSBlocks {
     public static void registerItem(final RegistryEvent.Register<Item> event) {
         final IForgeRegistry<Item> registry = event.getRegistry();
         BLOCKS_TO_REGISTER.forEach(block -> {
+            if (block instanceof GhostBlock || block instanceof Signal)
+                return;
             registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
         });
 

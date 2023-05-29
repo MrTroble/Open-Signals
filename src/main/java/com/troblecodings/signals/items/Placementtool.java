@@ -19,6 +19,7 @@ import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.init.OSTabs;
 
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -40,11 +41,21 @@ public class Placementtool extends Item
 
     public final ArrayList<Signal> signals = new ArrayList<>();
 
+    public Placementtool() {
+        setCreativeTab(OSTabs.TAB);
+    }
+
     @SideOnly(Side.CLIENT)
     @Override
     public String getNamedObj(final int obj) {
         return I18n.format("property." + this.getName() + ".name") + ": "
                 + I18n.format(this.getObjFromID(obj).toString());
+    }
+
+    @Override
+    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos,
+            EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+        return onItemUse(player, world, pos, hand, side, hitX, hitY, hitZ);
     }
 
     @Override

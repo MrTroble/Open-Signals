@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -759,5 +760,10 @@ public class GuiSignalBox extends GuiBase {
                     .ifPresent(poe -> uiTile.setColor(modeSet, poe.getEntry(PathEntryType.PATHUSAGE)
                             .orElseGet(() -> EnumPathUsage.FREE).getColor()));
         }
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(GuiInfo info) {
+        return new ContainerSignalBox(info);
     }
 }

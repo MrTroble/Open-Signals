@@ -21,11 +21,6 @@ public class SyncableTileEntity extends BasicBlockEntity {
     protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();
 
     @Override
-    public SPacketUpdateTileEntity getUpdatePacket() {
-        return new SPacketUpdateTileEntity(getPos(), 0, getUpdateTag());
-    }
-
-    @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         super.onDataPacket(net, pkt);
     }

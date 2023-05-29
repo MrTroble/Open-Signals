@@ -72,8 +72,9 @@ public class BasicBlock extends Block implements ITileEntityProvider {
         return false;
     }
 
-    public boolean hasTileEntity() {
-        return getSupplierWrapper().isPresent() && getBlockEntityType().isPresent();
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return getSupplierWrapper().isPresent();
     }
 
     @Override

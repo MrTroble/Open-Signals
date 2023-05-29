@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -57,6 +58,11 @@ public class GuiPlacementtool extends GuiBase {
                 .getInteger(Placementtool.BLOCK_TYPE_ID);
         currentSelectedBlock = tool.getObjFromID(usedBlock);
         initInternal();
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new ContainerPlacementtool(info);
     }
 
     private void initInternal() {

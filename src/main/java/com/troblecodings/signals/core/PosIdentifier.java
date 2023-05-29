@@ -15,6 +15,10 @@ public class PosIdentifier {
         this.world = world;
     }
 
+    public boolean checkNotNullOrClientSide() {
+        return world == null || world.isRemote;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(pos, world);

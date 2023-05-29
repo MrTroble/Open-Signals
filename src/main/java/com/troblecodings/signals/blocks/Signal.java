@@ -170,6 +170,8 @@ public class Signal extends BasicBlock {
             final BlockPos pos) {
         final AtomicReference<IExtendedBlockState> blockState = new AtomicReference<>(
                 (IExtendedBlockState) super.getExtendedState(state, world, pos));
+        if (!(world instanceof World))
+            return blockState.get();
         final SignalStateInfo info = new SignalStateInfo((World) world, pos, this);
         final Map<SEProperty, String> properties = ((World) world).isRemote
                 ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))

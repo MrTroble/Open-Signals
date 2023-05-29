@@ -30,15 +30,16 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class CommonProxy {
 
     public void initModEvent(FMLPreInitializationEvent event) {
+        final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
+                OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
+        OpenSignalsMain.handler = init.getKey();
+        OpenSignalsMain.network = init.getValue();
+
         SignalStateHandler.init();
         NameHandler.init();
         OSSounds.init();
         OSBlocks.init();
 
-        final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
-                OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
-        OpenSignalsMain.handler = init.getKey();
-        OpenSignalsMain.network = init.getValue();
         OpenSignalsMain.handler.addServer(Placementtool.class, ContainerPlacementtool::new);
         OpenSignalsMain.handler.addServer(SignalController.class, ContainerSignalController::new);
         OpenSignalsMain.handler.addServer(SignalBox.class, ContainerSignalBox::new);

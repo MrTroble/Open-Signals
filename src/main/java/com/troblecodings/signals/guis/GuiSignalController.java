@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -397,6 +398,11 @@ public class GuiSignalController extends GuiBase {
 
     private void applyModelChange(final UIBlockRender blockRender) {
         // TODO new model system
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(GuiInfo info) {
+        return new ContainerSignalController(info);
     }
 
 }
