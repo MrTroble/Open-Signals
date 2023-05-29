@@ -1,49 +1,43 @@
-#Creative Tab
 itemGroup.Open Signals=Open Signals
-
-#Items
-item.linkingtool.name=Signal Verlinker
-item.placementtool.name=Signal Platzierer
-item.signplacementtool.name=Schild Platzierer
-item.conductortrowelgreen.name=Handkelle Grün
-item.conductortrowelred.name=Handkelle Rot
-item.warningflag.name=Warnflagge
-item.kboard.name=K-Tafel
-item.lboard.name=L-Tafel
-item.reflectivehead.name=Rangierer Sicherheitshelm
-item.reflectivechestplate.name=Rangierer Weste
-item.reflectivepants.name=Rangierer Latzhose
-item.reflectiveshoes.name=Rangierer Sicherheitsschuhe
-item.traindriverhead.name=Lokführer Mütze
-item.traindriverchestplate.name=Lokführer Jacke
-item.traindriverpants.name=Lokführer Hose
-item.traindrivershoes.name=Lokführer Schuhe
-item.dispatcherhead.name=Fahrdienstleiter Mütze
-item.dispatcherchestplate.name=Fahrdienstleiter Jacke
-item.dispatcherpants.name=Fahrdienstleiter Hose
-item.dispatchershoes.name=Fahrdienstleiter Schuhe
-item.stationmanagerhead.name=Bahnhofsaufsicht Mütze
-item.stationmanagerchestplate.name=Bahnhofsaufsicht Jacke
-item.stationmanagerpants.name=Bahnhofsaufsicht Hose
-item.stationmanagershoes.name=Bahnhofsaufsicht Schuhe
-item.conductorhead.name=Zugführer Mütze
-item.conductorchestplate.name=Zugführer Jacke
-item.conductorpants.name=Zugführer Hose
-item.conductorshoes.name=Zugführer Schuhe
-item.signalplate.name=Signalblech
-item.signalshield.name=Signalschirm
-item.lamps.name=Lampen
-item.electricparts.name=Elektronische Teile
-
-#Blocks
-tile.hvsignalcontroller.name=Signalsteuerer
-tile.post.name=Mast
+item.opensignals.linkingtool=Signal Verlinker
+item.opensignals.placementtool=Signal Platzierer
+item.opensignals.signplacementtool=Schild Platzierer
+item.opensignals.conductortrowelgreen=Handkelle Grün
+item.opensignals.conductortrowelred=Handkelle Rot
+item.opensignals.warningflag=Warnflagge
+item.opensignals.kboard=K-Tafel
+item.opensignals.lboard=L-Tafel
+item.opensignals.reflectivehead=Rangierer Sicherheitshelm
+item.opensignals.reflectivechestplate=Rangierer Weste
+item.opensignals.reflectivepants=Rangierer Latzhose
+item.opensignals.reflectiveshoes=Rangierer Sicherheitsschuhe
+item.opensignals.traindriverhead=Lokführer Mütze
+item.opensignals.traindriverchestplate=Lokführer Jacke
+item.opensignals.traindriverpants=Lokführer Hose
+item.opensignals.traindrivershoes=Lokführer Schuhe
+item.opensignals.dispatcherhead=Fahrdienstleiter Mütze
+item.opensignals.dispatcherchestplate=Fahrdienstleiter Jacke
+item.opensignals.dispatcherpants=Fahrdienstleiter Hose
+item.opensignals.dispatchershoes=Fahrdienstleiter Schuhe
+item.opensignals.stationmanagerhead=Bahnhofsaufsicht Mütze
+item.opensignals.stationmanagerchestplate=Bahnhofsaufsicht Jacke
+item.opensignals.stationmanagerpants=Bahnhofsaufsicht Hose
+item.opensignals.stationmanagershoes=Bahnhofsaufsicht Schuhe
+item.opensignals.conductorhead=Zugführer Mütze
+item.opensignals.conductorchestplate=Zugführer Jacke
+item.opensignals.conductorpants=Zugführer Hose
+item.opensignals.conductorshoes=Zugführer Schuhe
+item.opensignals.signalplate=Signalblech
+item.opensignals.signalshield=Signalschirm
+item.opensignals.lamps=Lampen
+item.opensignals.electricparts=Elektronische Teile
+block.opensignals.hvsignalcontroller=Signalsteuerer
+block.opensignals.post=Mast
+block.opensignals.signalbox=Stellwerk
+block.opensignals.redstonein=Redstone Eingang
+block.opensignals.redstoneout=Redstone Ausgang
+block.opensignals.combiredstoneinput=Kombinierter Redstone Eingang
 tile.signalbox.name=Stellwerk
-tile.redstonein.name=Redstone Eingang
-tile.redstoneout.name=Redstone Ausgang
-tile.combiredstoneinput.name=Kombinierter Redstone Eingang
-
-#Linking Tool
 lt.linkedpos=§2Verlinkt mit: {%d, %d, %d§2}§r
 lt.setpos=§2Gespeichert: {%d, %d, %d§2}§r
 lt.setpos.msg=§l§9Bitte klicke auf einen Steuerungsblock (z.B. Signalsteuerer oder Stellwerk) um die Verknüpfung herzustellen.§r
@@ -54,14 +48,14 @@ lt.unlink=§cVerlinkung zurückgesetzt§r
 lt.notset=§cKein verknüpftes Signal. Bitte klicke zuerst auf ein Signal oder valides Objekt.§r
 pt.itemnotset=Keine Signalkonfiguration ausgewählt. Bitte stell das Tool vorher ein (Sneaken + Rechtsklick auf einen Block)
 pt.blockinway=Du kannst das Signal nicht platzieren, da ein Block im Weg ist.
-
-#Signalbox
 btn.apply=Anwenden
 btn.settings=Verlinkung
 btn.edit=Editor
 btn.main=Nutzung
 btn.yes=Ja
 btn.no=Nein
+btn.return=Zurück
+btn.subsidiary=Zusatzsignale
 sb.allreset=Alle Fahrstraßen werden zurückgesetzt!
 sb.editmode=In den Edit Mode wechseln?
 property.STRAIGHT=Gerade
@@ -100,8 +94,6 @@ property.prop.INPUT.resetting.name=Zurücksetzen
 property.prop.INPUT.resetting.desc=Setzt eine Fahrstraße zurück. Fahrstraßen werden direkt vor einem Signal zurückgesetzt oder auf einem freien Stück (z.B. für eine Teilfahrstraßenauflösung)
 msg.isblocked=Das Stellwerk wird bereits verwendet.
 label.linkedto=Verlinkt mit
-
-#Signal Controller
 gui.keyprompt=Drücke [LSHIFT] für mehr Informationen!
 property.enummode.name=Modus
 property.enummode.desc=Hier kannst du zwischen Manuellen Modus und Redstone Modus und MUX-Modus umschalten. im Manuellen Modus kannst du das Signal über die GUI ändern, im Redstone Modus kannst du an den Signalsteuerer Redstone anschließen, um darüber das Signal steuern.
@@ -135,40 +127,34 @@ property.profileOff.west.desc=Lädt das eingestellte Profil, wenn der Redstone I
 property.profileOn.west.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lWesten§r auf §lAn§r gestellt wird.
 property.profileOff.east.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOsten§r auf §lAus§r gestellt wird.
 property.profileOn.east.desc=Lädt das eingestellte Profil, wenn der Redstone Input von §lOsten§r auf §lAn§r gestellt wird.
-
-#Placementtool
 property.signal.name=Signal
 property.signaltype.name=Signalsystem
 property.signaltype.desc=Hier kannst du zwischen den verschiedenen Signalsystemen wechseln.
-
-#Signalsystems
-tile.shmech.name=Sh - Schutzhalt (Mechanisch)
-tile.shlight.name=Sh - Schutzhalt (Elektrisch)
-tile.wnsignal.name=Wn - Weichensignal
-tile.buelight.name=Bü - Überwachungssignal
-tile.hvsignal.name=HV - Haupt-/Vorsignal
-tile.tramsignal.name=Verkehrs- und Tramsignal
-tile.semaphoresignal.name=HV Formsignal
-tile.hlsignal.name=Hl - Lichthauptsignal
-tile.kssignal.name=Ks - Kombinationssignal
-tile.stationnumberplate.name=Bahnsteignummer
-tile.lfsignal.name=Lf - Langsamfahrsignal
-tile.switchhandle.name=Weichenhebel- und signal
-tile.tramsignsignal.name=Straßenbahnschilder
-tile.railroadgate.name=Bahnschranke
-tile.rasignal.name=Ra - Rangiersignal
-tile.signname.name=Bahnhofsschild
-tile.rosignal.name=Ro - Rottenwarnsignal
-tile.shsignal.name=Sh - Schutzhaltsignal
-tile.tssignal.name=Ts - Schiebelokomotivensignal
-tile.nesignal.name=Ne - Nebensignal
-tile.etcssignal.name=ETCS Signal
-tile.othersignal.name=Sonstige Signale
-tile.elsignal.name=El - Fahrleitungssignal
-tile.andreascross.name=Andreaskreuz
-tile.buesignal.name=Bü - Bahnübergangssignal
-
-#Signalproperties
+block.opensignals.shmech=Sh - Schutzhalt (Mechanisch)
+block.opensignals.shlight=Sh - Schutzhalt (Elektrisch)
+block.opensignals.wnsignal=Wn - Weichensignal
+block.opensignals.buelight=Bü - Überwachungssignal
+block.opensignals.hvsignal=HV - Haupt-/Vorsignal
+block.opensignals.tramsignal=Verkehrs- und Tramsignal
+block.opensignals.semaphoresignal=HV Formsignal
+block.opensignals.hlsignal=Hl - Lichthauptsignal
+block.opensignals.kssignal=Ks - Kombinationssignal
+block.opensignals.stationnumberplate=Bahnsteignummer
+block.opensignals.lfsignal=Lf - Langsamfahrsignal
+block.opensignals.switchhandle=Weichenhebel- und signal
+block.opensignals.tramsignsignal=Straßenbahnschilder
+block.opensignals.railroadgate=Bahnschranke
+block.opensignals.rasignal=Ra - Rangiersignal
+block.opensignals.signname=Bahnhofsschild
+block.opensignals.rosignal=Ro - Rottenwarnsignal
+block.opensignals.shsignal=Sh - Schutzhaltsignal
+block.opensignals.tssignal=Ts - Schiebelokomotivensignal
+block.opensignals.nesignal=Ne - Nebensignal
+block.opensignals.etcssignal=ETCS Signal
+block.opensignals.othersignal=Sonstige Signale
+block.opensignals.elsignal=El - Fahrleitungssignal
+block.opensignals.andreascross=Andreaskreuz
+block.opensignals.buesignal=Bü - Bahnübergangssignal
 property.sh_high.name=Höhe des Signals ändern
 property.sh_mech.name=Schutzhaltsignal
 property.sh_light_bottom.name=Schutzhaltsignal
@@ -185,6 +171,7 @@ property.zs3.name=Zs3
 property.zs3v.name=Zs3v
 property.zs1.name=Zs1
 property.zs7.name=Zs7
+property.zs8.name=Zs8
 property.zs3plate.name=Zs2/Zs3 Schild
 property.zs3vplate.name=Zs2v/Zs3v Schild
 property.signaltramtype.name=Signaltyp
@@ -260,8 +247,6 @@ property.ac_car.name=Ampel
 property.buetype.name=Bü Signale
 property.bueadd.name=Bü4 & Bü5 Zusatz
 property.bueshort.name=Bü2 Verkürzter Bremsweg
-
-#Signaldescription
 property.customname.desc=Hier kann du eine Signalbezeichnung/-beschriftung eintragen. Mit §l'[n]'§r wechselst du in die nächste Zeile.
 property.sh_high.desc=Schutzhaltsignale erteilen ein Fahrverbot oder heben dieses auf.
 property.sh_mech.desc=§nSH0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben%n§nGsp2§r: Gleissperre abgelegt
@@ -279,6 +264,7 @@ property.zs3.desc=§nZs2 Richtungsanzeiger§r: Das Zs2 gibt durch einen Kennbuch
 property.zs3v.desc=§nZs2v Richtungsvoranzeiger§r:Ein Richtungsanzeiger (Zs2) mit dem gleichen Buchstaben ist zu erwarten.%n§nZs3v Geschwindigkeitsvorzeiger§r: Ein Geschwindigkeitsanzeiger (Zs3) mit gleicher Ziffer ist zu erwarten
 property.zs1.desc=§nZs1 Ersatzsignal§r - Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren.
 property.zs7.desc=§nZs7 Vorsichtsignal§r - Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren. Weiterfahrt auf Sicht.
+property.zs8.desc=§nZs8 Gegengleisfahrt-Ersatzsignal§r - Am Signal Hp0 oder am gestörten Lichthauptsignal ohne schriftlichen Befehl vorbeifahren. Die Fahrt führt ins Gegengleis.
 property.zs3plate.desc=§nZs2 Richtungsanzeiger§r: Das Zs2 gibt durch einen Kennbuchstaben an, in welche Richtung der Fahrweg führt.%n§nZs3 Geschwindigkeitsanzeiger§r: Das Zs3 gibt durch eine Kennziffer an, welche Geschwindigkeit ab dem Signal für den anschließenden Weichenbereich oder bis zum nächsten Hauptsignal nicht überschritten werden darf.%n§nZs6 Gleiswechselanzeiger§r: Der Fahrweg führt ins Gegengleis.%n§nZs13 Stumpfgleis- und Frühhaltanzeiger§r: Fahrt in ein Gleis mit verkürztem Einfahrweg oder in ein Stumpfgleis.
 property.zs3vplate.desc=§nZs2v Richtungsvoranzeiger§r:Ein Richtungsanzeiger (Zs2) mit dem gleichen Buchstaben ist zu erwarten.%n§nZs3v Geschwindigkeitsvorzeiger§r: Ein Geschwindigkeitsanzeiger (Zs3) mit gleicher Ziffer ist zu erwarten
 property.signaltramtype.desc=Hier kannst du zwischen TRAM Signalen und Verkehrsampeln wechseln.
@@ -354,8 +340,6 @@ property.ac_car.desc=Ampel
 property.buetype.desc=§nBü Bahnübergangssignale§r%n§nBü2 Überwachungssignal erwarten§r: Ein Überwachungssignal ist zu erwarten.%n§nBü3 Einschaltkontakt der Bü-Anlage§r: Hier liegt der Einschaltkontakt der Bü-Anlage. Auf die Rautentafel mit 4 Rauten können 3 weitere Rautentafeln zur besseren Erkennung des Überwachungssignal folgen.%n§nBü4 Pfeiftafel§r: Pfeifen%n§nBü5 Läutetafel§r: Läuten%n§nHET§r: Kennzeichnung der Stelle zur Sicherung an Bahnübergängen
 property.bueadd.desc=Zusatz für Bü4/5 Signal.%nZwei senkrechte schwarze Streifen: Liegt zwischen dem Bü4/5 Signal und dem BÜ ein Halteplatz, steht direkt am Halteplatz ein wiederholendes Bü4/5 Signal und das Signal vor dem Halteplatz erhält das Zusatzschild.%nZweites Bü4: Wenn zwei Bü4 Signale angebracht sind, ist an der Tafel und kurz vor dem Bü zu pfeifen.
 property.bueshort.desc=Das Signal steht im verkürztem Bremswegabstand
-
-#Signal Values
 property.value.OFF=Aus
 property.value.STOPSIGNAL=Ausfahrsignal
 property.value.HPHOME=Einfahrtsignal
@@ -381,7 +365,6 @@ property.value.KS_STOPSIGNAL=Mehrabschnittssignal
 property.value.KS_MAIN=Ausfahrsignal
 property.value.WHITE_BLACK=Weiß-Schwarz
 property.value.WHITE_BLACK_W=Weiß-Schwarz W
-property.value.YELLOW=Gelb
 property.value.YELLOW_BLACK=Gelb-Schwarz
 property.value.RED_YELLOW=Rot-Gelb
 property.value.PRE1=Verkürzter Abstand
