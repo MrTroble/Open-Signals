@@ -67,7 +67,8 @@ public final class OSBlocks {
         if (BLOCKS_TO_REGISTER.contains(block))
             return;
         final String name = pName.toLowerCase().trim();
-        block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
+        final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID, name);
+        block.setRegistryName(location);
         block.setUnlocalizedName(name);
         BLOCKS_TO_REGISTER.add(block);
         if (block instanceof ITileEntityProvider && block.hasTileEntity()) {
@@ -94,20 +95,14 @@ public final class OSBlocks {
 
     @SubscribeEvent
     public static void registerBlock(final RegistryEvent.Register<Block> event) {
-        if (POST.getRegistryName() == null)
-            OSBlocks.init();
         final IForgeRegistry<Block> registry = event.getRegistry();
         BLOCKS_TO_REGISTER.forEach(registry::register);
     }
 
     @SubscribeEvent
     public static void registerItem(final RegistryEvent.Register<Item> event) {
-        if (POST.getRegistryName() == null)
-            OSBlocks.init();
         final IForgeRegistry<Item> registry = event.getRegistry();
         BLOCKS_TO_REGISTER.forEach(block -> {
-            if (block instanceof Signal || block instanceof GhostBlock)
-                return;
             registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
         });
 

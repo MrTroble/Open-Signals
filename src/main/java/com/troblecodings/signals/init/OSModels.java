@@ -18,7 +18,11 @@ public final class OSModels {
     @SubscribeEvent
     public static void register(final ModelRegistryEvent event) {
         OSItems.registeredItems.forEach(OSModels::registerModel);
-        return;
+        registerModel(Item.getItemFromBlock(OSBlocks.HV_SIGNAL_CONTROLLER));
+        registerModel(Item.getItemFromBlock(OSBlocks.POST));
+        registerModel(Item.getItemFromBlock(OSBlocks.SIGNAL_BOX));
+        registerModel(Item.getItemFromBlock(OSBlocks.REDSTONE_IN));
+        registerModel(Item.getItemFromBlock(OSBlocks.REDSTONE_OUT));
     }
 
     @SubscribeEvent

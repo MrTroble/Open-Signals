@@ -107,6 +107,7 @@ public final class OSItems {
                     try {
                         final Item item = (Item) field.get(null);
                         item.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
+                        item.setUnlocalizedName(name);
                         registeredItems.add(item);
                     } catch (final IllegalArgumentException | IllegalAccessException e) {
                         e.printStackTrace();
@@ -126,6 +127,7 @@ public final class OSItems {
                 final Placementtool tool = new Placementtool();
                 final String name = placementtool.toLowerCase().replace("_", "").trim();
                 tool.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
+                tool.setUnlocalizedName(name);
                 placementtools.add(tool);
                 registeredItems.add(tool);
             });
@@ -134,9 +136,7 @@ public final class OSItems {
 
     @SubscribeEvent
     public static void registerItem(final RegistryEvent.Register<Item> event) {
-        OSItems.init();
         final IForgeRegistry<Item> registry = event.getRegistry();
         registeredItems.forEach(registry::register);
     }
-
 }

@@ -33,13 +33,15 @@ import com.troblecodings.signals.proxy.CommonProxy;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = OpenSignalsMain.MODID)
+@Mod(modid = OpenSignalsMain.MODID, acceptedMinecraftVersions = "[1.12.2]")
 public class OpenSignalsMain {
 
+    @Instance
     private static OpenSignalsMain instance;
     public static final String MODID = "opensignals";
 

@@ -13,12 +13,14 @@ import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
+import com.troblecodings.signals.init.OSModels;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.models.CustomModelLoader;
 import com.troblecodings.signals.tileentitys.SignalSpecialRenderer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraftforge.client.model.ModelLoaderRegistry;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
@@ -37,5 +39,6 @@ public class ClientProxy extends CommonProxy {
         ModelLoaderRegistry.registerLoader(CustomModelLoader.INSTANCE);
         ClientRegistry.bindTileEntitySpecialRenderer(SignalTileEntity.class,
                 new SignalSpecialRenderer());
+        MinecraftForge.EVENT_BUS.register(OSModels.class);
     }
 }
