@@ -28,13 +28,14 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         super(info);
         info.base = this;
         info.player.openContainer = this;
-        if (info.pos != null)
-            this.tile = info.getTile();
+        this.tile = info.getTile();
         this.info = info;
     }
 
     private void sendSignalPos() {
         final WriteBuffer buffer = new WriteBuffer();
+        if (tile == null)
+            tile = info.getTile();
         buffer.putBlockPos(info.pos);
         buffer.putByte((byte) tile.getLinkedPos().size());
         tile.getLinkedPos().forEach(pos -> buffer.putBlockPos(pos));

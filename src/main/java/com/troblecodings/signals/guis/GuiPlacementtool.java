@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.function.IntConsumer;
 
@@ -153,6 +154,7 @@ public class GuiPlacementtool extends GuiBase {
 
     @Override
     public void updateFromContainer() {
+        this.list.clearChildren();
         enumerable.setIndex(container.signalID);
         final List<SEProperty> originalProperties = currentSelectedBlock.getProperties();
         originalProperties.forEach(property -> {
@@ -164,11 +166,12 @@ public class GuiPlacementtool extends GuiBase {
         final UIEntity textfield = new UIEntity();
         textfield.setHeight(20);
         textfield.setInheritWidth(true);
-        final UITextInput name = new UITextInput(container.signalName);
-        name.setOnTextUpdate(this::sendName);
-        textfield.add(name);
-        list.add(textfield);
-        this.entity.update();
+        if (currentSelectedBlock.canHaveCustomname(new HashMap<>())) {
+            final UITextInput name = new UITextInput(container.signalName);
+            name.setOnTextUpdate(this::sendName);
+            textfield.add(name);
+            list.add(textfield);
+        }
         loaded = true;
     }
 

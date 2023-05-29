@@ -74,11 +74,11 @@ public class BasicBlock extends Block implements ITileEntityProvider {
 
     @Override
     public boolean hasTileEntity(IBlockState state) {
-        return getSupplierWrapper().isPresent();
+        return createNewTileEntity(null, 0) != null;
     }
 
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
-        return BLOCK_ENTITYS.get(getSupplierWrapper().get());
+        return null;
     }
 }

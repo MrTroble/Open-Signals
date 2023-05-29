@@ -65,4 +65,9 @@ public class SignalBox extends BasicBlock {
         }
         super.breakBlock(worldIn, pos, state);
     }
+
+    @Override
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
+        return new SignalBoxTileEntity();
+    }
 }

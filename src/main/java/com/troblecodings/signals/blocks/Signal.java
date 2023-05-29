@@ -47,6 +47,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -400,7 +401,8 @@ public class Signal extends BasicBlock {
     public boolean onBlockActivated(World world, BlockPos pos, IBlockState state,
             EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY,
             float hitZ) {
-        if (!(state.getBlock() instanceof Signal)) {
+        if (!(state.getBlock() instanceof Signal)
+                || player.getHeldItem(hand).getItem().equals(OSItems.LINKING_TOOL)) {
             return false;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
@@ -410,8 +412,7 @@ public class Signal extends BasicBlock {
             return true;
         }
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
-        if (!player.getHeldItem(hand).getItem().equals(OSItems.LINKING_TOOL)
-                && (canBeLinked() || customname)) {
+        if ((canBeLinked() || customname)) {
             OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
             return true;
         }
@@ -519,5 +520,10 @@ public class Signal extends BasicBlock {
     @Override
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
+        return new SignalTileEntity();
     }
 }
