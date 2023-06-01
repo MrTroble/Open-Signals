@@ -413,6 +413,8 @@ public class Signal extends BasicBlock {
         }
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
         if ((canBeLinked() || customname)) {
+            if (world.isRemote)
+                return true;
             OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
             return true;
         }

@@ -2,6 +2,7 @@ package com.troblecodings.signals.guis;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
@@ -154,14 +155,14 @@ public class GuiPlacementtool extends GuiBase {
 
     @Override
     public void updateFromContainer() {
-        this.list.clearChildren();
         enumerable.setIndex(container.signalID);
         final List<SEProperty> originalProperties = currentSelectedBlock.getProperties();
+        final Map<SEProperty, Integer> savedProperties = container.properties;
         originalProperties.forEach(property -> {
             of(property,
                     inp -> applyPropertyChanges(currentSelectedBlock.getIDFromProperty(property),
                             inp),
-                    container.properties.get(property));
+                    savedProperties.get(property));
         });
         final UIEntity textfield = new UIEntity();
         textfield.setHeight(20);
@@ -171,7 +172,6 @@ public class GuiPlacementtool extends GuiBase {
             name.setOnTextUpdate(this::sendName);
             textfield.add(name);
             list.add(textfield);
-            this.entity.update();
         }
         loaded = true;
     }

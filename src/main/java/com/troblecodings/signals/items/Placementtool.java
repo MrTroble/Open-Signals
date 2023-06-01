@@ -65,6 +65,8 @@ public class Placementtool extends Item
             return EnumActionResult.FAIL;
         }
         if (player.isSneaking()) {
+            if (worldIn.isRemote)
+                return EnumActionResult.SUCCESS;
             OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, pos,
                     "placementtool");
             return EnumActionResult.SUCCESS;
