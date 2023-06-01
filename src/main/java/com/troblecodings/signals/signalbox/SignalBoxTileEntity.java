@@ -34,10 +34,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public void setWorld(World worldIn) {
-        super.setWorld(world);
+        super.setWorld(worldIn);
         grid.setPosAndWorld(pos, world);
-        if (world == null || world.isRemote)
-            return;
         SignalBoxHandler.setWorld(new PosIdentifier(pos, world));
     }
 
@@ -87,9 +85,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public void onLoad() {
         grid.setPosAndWorld(pos, world);
-        if (world == null || world.isRemote) {
+        if (world.isRemote)
             return;
-        }
         SignalBoxHandler.readTileNBT(new PosIdentifier(pos, world),
                 copy == null ? new NBTWrapper() : copy, grid.getModeGrid());
         SignalBoxHandler.loadSignals(new PosIdentifier(pos, world));
