@@ -171,6 +171,7 @@ public class GuiPlacementtool extends GuiBase {
             name.setOnTextUpdate(this::sendName);
             textfield.add(name);
             list.add(textfield);
+            this.entity.update();
         }
         loaded = true;
     }
