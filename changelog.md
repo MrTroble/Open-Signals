@@ -2,6 +2,7 @@
 
 ## [1.16.5 Beta 4]
 
+* fix: missing lang keys
 * fix: thread issues and minor bugs
 
   **This update is a beta version and may contains some bugs. We ask you to test the mod and give us feedback on functionality, bugs and features.**
