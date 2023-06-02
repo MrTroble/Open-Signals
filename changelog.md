@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.16.5 Beta 4]
+
+* fix: thread issues and minor bugs
+
+  **This update is a beta version and may contains some bugs. We ask you to test the mod and give us feedback on functionality, bugs and features.**
+
 ## [1.16.5 Beta 3]
 
 * ported mod down to 1.16.5

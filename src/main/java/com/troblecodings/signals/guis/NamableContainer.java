@@ -68,9 +68,9 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         final NameStateInfo info = new NameStateInfo(this.info.world, this.info.pos);
         final String name = new String(array);
         if (tile instanceof SignalTileEntity) {
-            NameHandler.setNameForSignals(info, name);
+            NameHandler.setNameForSignal(info, name);
         } else {
-            NameHandler.setNameForNonSignals(info, name);
+            NameHandler.setNameForNonSignal(info, name);
         }
     }
 }
