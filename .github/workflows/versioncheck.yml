@@ -10,10 +10,10 @@ jobs:
     env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
-      - name: changed
+      - name: Get Changed Files
         id: changed
-        - uses: actions/checkout@v3
-        - uses: foodee/pr-includes-file-change@master
+          uses: actions/checkout@v3
+          uses: foodee/pr-includes-file-change@master
           with:
             paths: '.github\workflows\gradle.yml'
 
