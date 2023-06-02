@@ -1,0 +1,14 @@
+name: "Check version!"
+on:
+  pull_request:
+      types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+
+jobs:
+  # Enforces the update of the gradle file on every pull request 
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: foodee/pr-includes-file-change@master
+      with:
+        paths: '/.github/workflows/gradle.yml'
