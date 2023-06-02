@@ -1,22 +1,32 @@
-name: "Check version!"
+name: Pull Request Workflow
+
 on:
   pull_request:
-      types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
 
 jobs:
-  # Enforces the update of the gradle file on every pull request 
-  test:
+  check_file_changes:
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
-    steps:
-      - name: Get Changed Files
-        id: changed
-          uses: actions/checkout@v3
-          uses: foodee/pr-includes-file-change@master
-          with:
-            paths: '.github\workflows\gradle.yml'
 
-      - name: Echo Match
-        if: steps.changed.outputs.matched == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check if file changed
+        id: check_file
+        uses: actions/github-script@v4
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const files = context.payload.pull_request.changed_files;
+            const targetFile = '.github/workflows/gradle.yml';
+
+            const fileChanged = files.some(file => file.filename === targetFile);
+
+            console.log(`File '${targetFile}' changed: ${fileChanged}`);
+
+            return fileChanged
+
+      - name: Run action if file changed
+        if: steps.check_file.outputs.fileChanged == 'true'
         run: echo Matched
