@@ -10,7 +10,13 @@ jobs:
     env:
       GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
     steps:
-    - uses: actions/checkout@v3
-    - uses: foodee/pr-includes-file-change@master
-      with:
-        paths: '.github\workflows\gradle.yml'
+      - name: changed
+        id: changed
+        - uses: actions/checkout@v3
+        - uses: foodee/pr-includes-file-change@master
+          with:
+            paths: '.github\workflows\gradle.yml'
+
+      - name: Echo Match
+        if: steps.changed.outputs.matched == 'true'
+        run: echo Matched
