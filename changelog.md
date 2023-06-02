@@ -1,8 +1,17 @@
 # Changelog
 
+## [1.18 Beta 3]
+
+* fix: bugs and NPEs
+
+  **This update is a beta version and may contains some bugs. We ask you to test the mod and give us feedback on functionality, bugs and features.**
+
 ## [1.18 Beta 2]
+
 * fix: pathway can't be set
 * fix: Issue in SignalStateHandler
+
+  **This update is a beta version and may contains some bugs. We ask you to test the mod and give us feedback on functionality, bugs and features.**
 
 ## [1.18 Beta 1]
 

@@ -85,7 +85,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 }
                 grid = tile.getSignalBoxGrid();
                 grid.readNetwork(buffer);
-                enabledSubsidiaryTypes = grid.getAllSubsidiaries();
+                enabledSubsidiaryTypes = new HashMap<>(grid.getAllSubsidiaries());
                 final int size = buffer.getInt();
                 final Map<BlockPos, LinkType> allPos = new HashMap<>();
                 for (int i = 0; i < size; i++) {
@@ -119,6 +119,11 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 } else {
                     node.removeManuellOutput(modeSet);
                 }
+                break;
+            }
+            case RESET_SUBSIDIARY: {
+                final Point point = Point.of(buffer);
+                enabledSubsidiaryTypes.remove(point);
                 break;
             }
             default:

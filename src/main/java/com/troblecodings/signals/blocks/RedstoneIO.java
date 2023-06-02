@@ -46,10 +46,10 @@ public class RedstoneIO extends BasicBlock {
     public BlockState getStateForPlacement(final BlockPlaceContext context) {
         final Level world = context.getLevel();
         if (!world.isClientSide) {
-            NameHandler.setName(new NameStateInfo(world, context.getClickedPos()),
+            NameHandler.createName(new NameStateInfo(world, context.getClickedPos()),
                     this.getRegistryName().getPath());
         }
-        return this.defaultBlockState();
+        return super.getStateForPlacement(context);
     }
 
     @Override
