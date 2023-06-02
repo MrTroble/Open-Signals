@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.18.2 Beta 4]
+
+* add: missing lang keys
+* fix: reset subsidiary signals
+* fix: NPEs
+* fix: NBT issues
+* fix: performance issues and deadlock
+* fix: thread issues
+* fix: minor bugs
+
 ## [1.18 Beta 3]
 
 * fix: bugs and NPEs
