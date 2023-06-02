@@ -8,12 +8,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - name: Get Changed Files
-      id: changed
-      - uses: foodee/pr-includes-file-change@master
-        with:
-          paths: ^.github/workflows/gradle.yml
-    
-    - name: Echo Match
-      if: steps.changed.outputs.matched == 'true'
-      run: echo Matched
+    - uses: actions/checkout@v3
+    - uses: foodee/pr-includes-file-change@master
+      with:
+        paths: '.github/workflows/gradle.yml'
