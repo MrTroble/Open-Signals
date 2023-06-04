@@ -2,7 +2,7 @@ name: Check Version!
 
 on:
   pull_request:
-    types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+    types: [opened, synchronize, reopened]
 
 jobs:
   check_file_changes:
@@ -12,21 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Check if file changed
-        id: check_file
-        uses: actions/github-script@v4
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const files = context.payload.pull_request.changed_files;
-            const targetFile = '.github/workflows/gradle.yml';
-
-            const fileChanged = files.some(file => file.filename === targetFile);
-
-            console.log(`File '${targetFile}' changed: ${fileChanged}`);
-
-            return fileChanged
-
-      - name: Run action if file changed
-        if: steps.check_file.outputs.fileChanged == 'true'
-        run: echo Matched
+      - name: Check change
+        run: |
+          if [[ $(git diff --name-only ${{ github.base_ref }}...${{ github.head_ref }}) == '.github/workflows/gradle.yml' ]]; then
+            echo "Version has been changed."
+          else
+            echo "Version has not been changed."
+          fi
