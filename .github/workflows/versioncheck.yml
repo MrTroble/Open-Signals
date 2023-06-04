@@ -18,4 +18,5 @@ jobs:
             echo "Version has been changed."
           else
             echo "Version has not been changed."
+            exit 1
           fi
