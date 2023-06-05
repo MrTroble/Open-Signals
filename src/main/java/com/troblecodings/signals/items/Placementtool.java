@@ -43,6 +43,9 @@ public class Placementtool extends Item
 
     public Placementtool() {
         setCreativeTab(OSTabs.TAB);
+        setMaxDamage(100);
+        setNoRepair();
+        setMaxStackSize(1);
     }
 
     @SideOnly(Side.CLIENT)
@@ -53,14 +56,14 @@ public class Placementtool extends Item
     }
 
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos,
-            EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+    public EnumActionResult onItemUseFirst(final EntityPlayer player, final World world, final BlockPos pos,
+            final EnumFacing side, final float hitX, final float hitY, final float hitZ, final EnumHand hand) {
         return onItemUse(player, world, pos, hand, side, hitX, hitY, hitZ);
     }
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos,
-            EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn, final BlockPos pos,
+            final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         if (worldIn.isAirBlock(pos)) {
             return EnumActionResult.FAIL;
         }
@@ -100,9 +103,7 @@ public class Placementtool extends Item
         }
 
         final ItemStack item = player.getHeldItemMainhand();
-        // TODO Destry when used
-        // item.hurtAndBreak(Math.abs(cost), player,
-        // (user) -> user.broadcastBreakEvent(context.getHand()));
+        item.damageItem(Math.abs(cost), player);
 
         final int height = signal.getHeight(signalProperties);
         final BlockPos placePos = pos.up();
