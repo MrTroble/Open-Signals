@@ -8,7 +8,7 @@
 * fix: NBT issues
 * fix: performance issues and deadlock
 * fix: thread issues
-* fix: minor bugs
+* fix: minor bugs 
 
 ## [1.18 Beta 3]
 
