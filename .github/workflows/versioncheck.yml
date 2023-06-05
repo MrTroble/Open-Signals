@@ -1,14 +1,22 @@
-name: "Check version!"
+name: Check Version!
+
 on:
   pull_request:
-      types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled]
+    types: [opened, synchronize, reopened]
 
 jobs:
-  # Enforces the update of the gradle file on every pull request 
-  test:
+  check_file_changes:
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v2
-    - uses: foodee/pr-includes-file-change@master
-      with:
-        paths: '/.github/workflows/gradle.yml'
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check change
+        run: |
+          if [[ $(git diff --name-only ${{ github.base_ref }}...${{ github.head_ref }}) == *\.github/workflows/gradle.yml* ]]; then
+            echo "Version has been changed."
+          else
+            echo "Version has not been changed."
+            exit 1
+          fi
