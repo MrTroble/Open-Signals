@@ -85,10 +85,10 @@ public final class OSItems {
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.LEGS);
     public static final ItemArmorTemplate CONDUCTOR_SHOES = new ItemArmorTemplate(
             ItemArmorTemplate.CONDUCTOR_ARMOR_MATERIAL, 1, EntityEquipmentSlot.FEET);
-    public static final Item SIGNAL_PLATE = new Item().setCreativeTab(CreativeTabs.COMBAT);
-    public static final Item SIGNAL_SHIELD = new Item().setCreativeTab(CreativeTabs.COMBAT);
-    public static final Item LAMPS = new Item().setCreativeTab(CreativeTabs.COMBAT);
-    public static final Item ELECTRIC_PARTS = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final Item SIGNAL_PLATE = new Item().setCreativeTab(CreativeTabs.MISC);
+    public static final Item SIGNAL_SHIELD = new Item().setCreativeTab(CreativeTabs.MISC);
+    public static final Item LAMPS = new Item().setCreativeTab(CreativeTabs.MISC);
+    public static final Item ELECTRIC_PARTS = new Item().setCreativeTab(CreativeTabs.MISC);
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
