@@ -100,8 +100,9 @@ public class Signal extends BasicBlock {
         final SignalTileEntity te = (SignalTileEntity) source.getTileEntity(pos);
         if (te == null)
             return FULL_BLOCK_AABB;
-        final SignalStateInfo info = new SignalStateInfo((World) source, pos, this);
-        final Map<SEProperty, String> properties = ((World) source).isRemote
+        final World world = te.getWorld();
+        final SignalStateInfo info = new SignalStateInfo(world, pos, this);
+        final Map<SEProperty, String> properties = world.isRemote
                 ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
                 : SignalStateHandler.getStates(info);
         return FULL_BLOCK_AABB.expand(0, getHeight(properties), 0);
@@ -167,14 +168,16 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public IBlockState getExtendedState(final IBlockState state, final IBlockAccess world,
+    public IBlockState getExtendedState(final IBlockState state, final IBlockAccess acess,
             final BlockPos pos) {
         final AtomicReference<IExtendedBlockState> blockState = new AtomicReference<>(
-                (IExtendedBlockState) super.getExtendedState(state, world, pos));
-        if (!(world instanceof World))
+                (IExtendedBlockState) super.getExtendedState(state, acess, pos));
+        final SignalTileEntity tile = (SignalTileEntity) acess.getTileEntity(pos);
+        if (tile == null)
             return blockState.get();
-        final SignalStateInfo info = new SignalStateInfo((World) world, pos, this);
-        final Map<SEProperty, String> properties = ((World) world).isRemote
+        final World world = tile.getWorld();
+        final SignalStateInfo info = new SignalStateInfo(world, pos, this);
+        final Map<SEProperty, String> properties = world.isRemote
                 ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
                 : SignalStateHandler.getStates(info);
         properties.forEach((property, value) -> blockState
@@ -402,7 +405,7 @@ public class Signal extends BasicBlock {
             EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY,
             float hitZ) {
         if (!(state.getBlock() instanceof Signal)
-                || player.getHeldItem(hand).getItem().equals(OSItems.LINKING_TOOL)) {
+                || player.getHeldItem(EnumHand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
             return false;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);

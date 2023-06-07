@@ -177,7 +177,9 @@ public final class CustomModelLoader implements ICustomModelLoader {
                         if ((state != null || texturestate.isautoBlockstate())
                                 && !extentionloaded) {
                             accumulator.add(new SignalModelLoaderInfo(modelname,
-                                    texturestate.isautoBlockstate() ? (_u -> true) : state,
+                                    texturestate.isautoBlockstate()
+                                            ? new ImplAutoBlockStatePredicate()
+                                            : state,
                                     modelstats.getX(texturestate.getOffsetX()),
                                     modelstats.getY(texturestate.getOffsetY()),
                                     modelstats.getZ(texturestate.getOffsetZ()),

@@ -30,6 +30,7 @@ import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.property.ExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -66,9 +67,6 @@ public class Placementtool extends Item
     public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
             final BlockPos pos, final EnumHand hand, final EnumFacing facing, final float hitX,
             final float hitY, final float hitZ) {
-        if (worldIn.isAirBlock(pos)) {
-            return EnumActionResult.FAIL;
-        }
         if (player.isSneaking()) {
             if (worldIn.isRemote)
                 return EnumActionResult.SUCCESS;
@@ -80,7 +78,9 @@ public class Placementtool extends Item
         if (!wrapper.contains(BLOCK_TYPE_ID)) {
             wrapper.putInteger(BLOCK_TYPE_ID, 0);
         }
+        final BlockPos placePos = pos.offset(facing);
         final Signal signal = getObjFromID(wrapper.getInteger(BLOCK_TYPE_ID));
+
         final List<SEProperty> properties = signal.getProperties();
         final Map<SEProperty, String> signalProperties = new HashMap<>();
         int cost = signal.getDefaultDamage();
@@ -103,28 +103,9 @@ public class Placementtool extends Item
                 signalProperties.put(property, property.getDefault());
             }
         }
-
-        final ItemStack item = player.getHeldItemMainhand();
-        item.damageItem(Math.abs(cost), player);
-
-        final int height = signal.getHeight(signalProperties);
-        final BlockPos placePos = pos.up();
-        BlockPos checkPos = placePos;
-        for (int i = 0; i < height; i++) {
-            if (!worldIn.isAirBlock(checkPos)) {
-                if (!worldIn.isRemote)
-                    translateMessageWrapper(player, "pt.blockinway");
-                return EnumActionResult.FAIL;
-            }
-            checkPos = checkPos.up();
-        }
-        final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
+        final SignalStateInfo info = new SignalStateInfo(worldIn, placePos, signal);
         SignalStateHandler.createStates(info, signalProperties);
-        BlockPos ghostPos = pos.up();
-        for (int i = 0; i < height; i++) {
-            worldIn.setBlockState(ghostPos, OSBlocks.GHOST_BLOCK.getDefaultState(), 3);
-            ghostPos = ghostPos.up();
-        }
+
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
         final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
         if (!(signalName == null || signalName.isEmpty())) {
@@ -134,8 +115,31 @@ public class Placementtool extends Item
             signalProperties.put(Signal.CUSTOMNAME, "false");
             NameHandler.createName(nameInfo, signal.getSignalTypeName());
         }
+
         worldIn.setBlockState(placePos, signal.getStateForPlacement(worldIn, placePos, facing, hitX,
                 hitY, hitZ, 0, player, hand), 3);
+
+        final ItemStack item = player.getHeldItemMainhand();
+        item.damageItem(Math.abs(cost), player);
+
+        final int height = signal.getHeight(signalProperties);
+        BlockPos checkPos = placePos.up();
+        for (int i = 0; i < height; i++) {
+            if (!worldIn.isAirBlock(checkPos)) {
+                if (!worldIn.isRemote)
+                    translateMessageWrapper(player, "pt.blockinway");
+                return EnumActionResult.FAIL;
+            }
+            checkPos = checkPos.up();
+        }
+
+        BlockPos ghostPos = placePos.up();
+        for (int i = 0; i < height; i++) {
+            worldIn.setBlockState(ghostPos, OSBlocks.GHOST_BLOCK.getDefaultState(), 3);
+            ghostPos = ghostPos.up();
+        }
+        final ExtendedBlockState ebs = (ExtendedBlockState) signal.getBlockState();
+        worldIn.notifyBlockUpdate(placePos, ebs.getBaseState(), ebs.getBaseState(), 3);
         return EnumActionResult.SUCCESS;
     }
 

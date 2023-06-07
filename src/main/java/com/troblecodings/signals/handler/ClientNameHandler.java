@@ -15,7 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 
 public class ClientNameHandler implements INetworkSync {
 
@@ -68,7 +68,7 @@ public class ClientNameHandler implements INetworkSync {
     }
 
     @SubscribeEvent
-    public void serverEvent(final ServerCustomPacketEvent event) {
+    public void serverEvent(final ClientCustomPacketEvent event) {
         deserializeClient(event.getPacket().payload().nioBuffer());
     }
 }

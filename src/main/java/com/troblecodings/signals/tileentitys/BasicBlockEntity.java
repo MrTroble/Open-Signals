@@ -9,9 +9,11 @@ import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
@@ -57,6 +59,16 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     public List<BlockPos> getLinkedPos() {
         return linkedPositions;
+    }
+    
+    public void syncClient() {
+        syncClient(getWorld(), getPos());
+    }
+
+    public void syncClient(final World world, final BlockPos pos) {
+        final IBlockState state = world.getBlockState(pos);
+        world.notifyBlockUpdate(pos, state, state, 3);
+        world.markBlockRangeForRenderUpdate(pos, pos);
     }
 
     @Override

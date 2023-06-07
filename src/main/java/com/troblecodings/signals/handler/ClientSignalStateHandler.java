@@ -10,14 +10,14 @@ import java.util.concurrent.Executors;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.network.FMLNetworkEvent.ServerCustomPacketEvent;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 
 public class ClientSignalStateHandler implements INetworkSync {
 
@@ -51,8 +51,8 @@ public class ClientSignalStateHandler implements INetworkSync {
         SERVICE.execute(() -> {
             if (level == null)
                 return;
-            TileEntity entity;
-            while ((entity = level.getTileEntity(signalPos)) == null)
+            BasicBlockEntity entity;
+            while ((entity = (BasicBlockEntity) level.getTileEntity(signalPos)) == null)
                 continue;
             final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);
             final List<SEProperty> signalProperties = ((SignalTileEntity) entity).getSignal()
@@ -68,6 +68,7 @@ public class ClientSignalStateHandler implements INetworkSync {
                 CURRENTLY_LOADED_STATES.put(stateInfo, properties);
             }
             entity.markDirty();
+            entity.syncClient();
         });
     }
 
@@ -79,7 +80,7 @@ public class ClientSignalStateHandler implements INetworkSync {
     }
 
     @SubscribeEvent
-    public void serverEvent(final ServerCustomPacketEvent event) {
+    public void serverEvent(final ClientCustomPacketEvent event) {
         deserializeClient(event.getPacket().payload().nioBuffer());
     }
 }
