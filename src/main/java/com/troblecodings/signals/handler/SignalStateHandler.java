@@ -67,12 +67,13 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void createStates(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
-        if (info.world.isRemote)
-            return;
-        synchronized (CURRENTLY_LOADED_STATES) {
-            CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
-        }
         new Thread(() -> {
+            if (info.world.isRemote)
+                return;
+            synchronized (CURRENTLY_LOADED_STATES) {
+                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
+            }
+            loadSignal(info);
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 final List<SignalStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
                         .get(info.world.getChunkFromBlockCoords(info.pos));
@@ -80,7 +81,7 @@ public final class SignalStateHandler implements INetworkSync {
                     allSignals.add(info);
             }
             createToFile(info, states);
-            loadSignal(info);
+
         }, "OSSignalStateHandler:createStates").start();
     }
 

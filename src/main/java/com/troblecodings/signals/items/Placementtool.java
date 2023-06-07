@@ -56,14 +56,16 @@ public class Placementtool extends Item
     }
 
     @Override
-    public EnumActionResult onItemUseFirst(final EntityPlayer player, final World world, final BlockPos pos,
-            final EnumFacing side, final float hitX, final float hitY, final float hitZ, final EnumHand hand) {
+    public EnumActionResult onItemUseFirst(final EntityPlayer player, final World world,
+            final BlockPos pos, final EnumFacing side, final float hitX, final float hitY,
+            final float hitZ, final EnumHand hand) {
         return onItemUse(player, world, pos, hand, side, hitX, hitY, hitZ);
     }
 
     @Override
-    public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn, final BlockPos pos,
-            final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+    public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
+            final BlockPos pos, final EnumHand hand, final EnumFacing facing, final float hitX,
+            final float hitY, final float hitZ) {
         if (worldIn.isAirBlock(pos)) {
             return EnumActionResult.FAIL;
         }
@@ -126,10 +128,10 @@ public class Placementtool extends Item
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
         final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
         if (!(signalName == null || signalName.isEmpty())) {
-            signalProperties.put(Signal.CUSTOMNAME, "TRUE");
+            signalProperties.put(Signal.CUSTOMNAME, "true");
             NameHandler.createName(nameInfo, signalName);
         } else {
-            signalProperties.put(Signal.CUSTOMNAME, "FALSE");
+            signalProperties.put(Signal.CUSTOMNAME, "false");
             NameHandler.createName(nameInfo, signal.getSignalTypeName());
         }
         worldIn.setBlockState(placePos, signal.getStateForPlacement(worldIn, placePos, facing, hitX,
