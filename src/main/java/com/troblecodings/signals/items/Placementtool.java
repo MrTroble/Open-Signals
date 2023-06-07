@@ -107,7 +107,7 @@ public class Placementtool extends Item
         SignalStateHandler.createStates(info, signalProperties);
 
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
-        final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
+        final NameStateInfo nameInfo = new NameStateInfo(worldIn, placePos);
         if (!(signalName == null || signalName.isEmpty())) {
             signalProperties.put(Signal.CUSTOMNAME, "true");
             NameHandler.createName(nameInfo, signalName);
