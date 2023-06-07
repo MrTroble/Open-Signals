@@ -58,7 +58,7 @@ public final class NameHandler implements INetworkSync {
         if (info.world.isClientSide || name == null)
             return;
         new Thread(() -> {
-            setNameForSignal(info, name);
+            setNameForNonSignal(info, name);
             createToFile(info, name);
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 final List<NameStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
@@ -76,7 +76,7 @@ public final class NameHandler implements INetworkSync {
         final Block block = info.world.getBlockState(info.pos).getBlock();
         if (block instanceof Signal) {
             SignalStateHandler.setState(new SignalStateInfo(info.world, info.pos, (Signal) block),
-                    Signal.CUSTOMNAME, "TRUE");
+                    Signal.CUSTOMNAME, "true");
         }
     }
 
