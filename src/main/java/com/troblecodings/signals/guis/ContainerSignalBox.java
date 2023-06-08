@@ -42,16 +42,14 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private SignalBoxTileEntity tile;
     private final GuiInfo info;
     protected SignalBoxGrid grid;
+    private EntityPlayer player;
     private Consumer<String> run;
     private Consumer<List<SignalBoxNode>> colorUpdates;
     protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
-        if (!info.world.isRemote) {
-            this.tile = info.getTile();
-            tile.add(this);
-        }
+        this.tile = info.getTile();
         info.player.openContainer = this;
         this.info = info;
     }
@@ -248,7 +246,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     @Override
     public EntityPlayer getPlayer() {
-        return this.info.player;
+        return this.player;
     }
 
     public Map<BlockPos, Signal> getProperties() {
@@ -267,8 +265,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     public boolean canInteractWith(final EntityPlayer playerIn) {
         if (tile.isBlocked() && !tile.isValid(playerIn))
             return false;
-        if (this.info.player == null) {
-            this.info.player = playerIn;
+        if (this.player == null) {
+            this.player = playerIn;
             this.tile.add(this);
         }
         return true;
