@@ -226,7 +226,7 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
         GhostBlock.destroyUpperBlock(worldIn, pos);
         if (!worldIn.isRemote) {
@@ -317,12 +317,12 @@ public class Signal extends BasicBlock {
 
         GlStateManager.pushMatrix();
         GlStateManager.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
-        GlStateManager.rotate(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
+        GlStateManager.rotate(face.getDregree(), 0, 1, 0);
         GlStateManager.scale(-scale, -scale, 1);
         GlStateManager.translate(-1.3f / scale, 0, -0.32f);
         for (int j = 0; j < display.length; j++) {
             info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale * 2.8F),
-                    this.prop.textColor, 0);
+                    (int) this.prop.signWidth, this.prop.textColor);
         }
         GlStateManager.popMatrix();
     }
@@ -362,17 +362,16 @@ public class Signal extends BasicBlock {
 
         final float scale = this.prop.signScale;
 
+        GlStateManager.enableAlpha();
         GlStateManager.pushMatrix();
         GlStateManager.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
-        GlStateManager.rotate(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
+        GlStateManager.rotate(face.getDregree(), 0, 1, 0);
         GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
 
         renderSingleOverlay(info, display);
 
         if (doubleSidedText) {
-            GlStateManager.rotate((float) (-face.getRadians() + Math.PI), 0, 1, 0);
-            GlStateManager.rotate(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
-            GlStateManager.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
+            GlStateManager.rotate(180, 0, 1, 0);
             renderSingleOverlay(info, display);
         }
 
@@ -388,10 +387,8 @@ public class Signal extends BasicBlock {
         GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         GlStateManager.scale(-1f, 1f, 1f);
         for (int j = 0; j < display.length; j++) {
-            // TODO
-            // info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale *
-            // 2.8F),
-            // this.prop.textColor, 0);
+             info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale *
+             2.8F), (int) width, this.prop.textColor);
         }
         GlStateManager.popMatrix();
     }
@@ -405,9 +402,9 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state,
-            EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY,
-            float hitZ) {
+    public boolean onBlockActivated(final World world, final BlockPos pos, final IBlockState state,
+            final EntityPlayer player, final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY,
+            final float hitZ) {
         if (!(state.getBlock() instanceof Signal)
                 || player.getHeldItem(EnumHand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
             return false;
@@ -448,20 +445,20 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public boolean canProvidePower(IBlockState state) {
+    public boolean canProvidePower(final IBlockState state) {
         return !this.prop.redstoneOutputs.isEmpty();
     }
 
     @Override
-    public int getStrongPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,
-            EnumFacing side) {
+    public int getStrongPower(final IBlockState blockState, final IBlockAccess blockAccess, final BlockPos pos,
+            final EnumFacing side) {
         return getWeakPower(blockState, blockAccess, pos, side);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int getWeakPower(IBlockState blockState, IBlockAccess blockAccess, BlockPos pos,
-            EnumFacing side) {
+    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess, final BlockPos pos,
+            final EnumFacing side) {
         if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null
                 || !(blockAccess instanceof World)) {
             return 0;
@@ -513,7 +510,7 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+    public void updateTick(final World worldIn, final BlockPos pos, final IBlockState state, final Random rand) {
         if (this.prop.sounds.isEmpty() || worldIn.isRemote) {
             return;
         }
@@ -532,7 +529,7 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
         return new SignalTileEntity();
     }
 }

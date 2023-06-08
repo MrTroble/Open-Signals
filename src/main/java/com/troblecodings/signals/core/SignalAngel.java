@@ -16,7 +16,7 @@ public enum SignalAngel implements NamableWrapper {
     }
 
     public double getRadians() {
-        return Math.PI * 2.0 - (this.ordinal() / 16.0) * Math.PI * 2.0;
+        return (this.ordinal() / 16.0) * Math.PI * 2.0;
     }
 
     public Quaternion getQuaternion() {
