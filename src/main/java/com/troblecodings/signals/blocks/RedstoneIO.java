@@ -16,6 +16,7 @@ import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
@@ -32,6 +33,14 @@ public class RedstoneIO extends BasicBlock {
     public RedstoneIO() {
         super(Material.ROCK);
         this.setDefaultState(getDefaultState().withProperty(POWER, false));
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
+            float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+        if (!world.isRemote)
+            NameHandler.createName(new NameStateInfo(world, pos), getLocalizedName());
+        return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer, hand);
     }
 
     @Override

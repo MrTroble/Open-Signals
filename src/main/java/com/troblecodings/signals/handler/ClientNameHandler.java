@@ -55,7 +55,7 @@ public class ClientNameHandler implements INetworkSync {
                 CLIENT_NAMES.put(new NameStateInfo(mc.world, pos), name);
             }
             if (tile instanceof BasicBlockEntity) {
-                // ((BasicBlockEntity) tile).setCustomName(name);
+                ((BasicBlockEntity) tile).setCustomName(name);
             }
         });
     }
