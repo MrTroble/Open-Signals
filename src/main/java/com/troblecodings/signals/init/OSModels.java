@@ -23,6 +23,7 @@ public final class OSModels {
         registerModel(Item.getItemFromBlock(OSBlocks.SIGNAL_BOX));
         registerModel(Item.getItemFromBlock(OSBlocks.REDSTONE_IN));
         registerModel(Item.getItemFromBlock(OSBlocks.REDSTONE_OUT));
+        registerModel(Item.getItemFromBlock(OSBlocks.COMBI_REDSTONE_INPUT));
     }
 
     @SubscribeEvent
