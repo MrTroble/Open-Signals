@@ -388,6 +388,7 @@ public class Signal extends BasicBlock {
         GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         GlStateManager.scale(-1f, 1f, 1f);
         for (int j = 0; j < display.length; j++) {
+            // TODO
             // info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale *
             // 2.8F),
             // this.prop.textColor, 0);
