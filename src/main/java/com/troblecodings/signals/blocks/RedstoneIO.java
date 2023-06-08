@@ -3,7 +3,11 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
+import com.troblecodings.signals.handler.NameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
@@ -90,5 +94,16 @@ public class RedstoneIO extends BasicBlock {
     @Override
     public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new RedstoneIOTileEntity();
+    }
+
+    @Override
+    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+        if (!worldIn.isRemote) {
+            new Thread(() -> {
+                NameHandler.setRemoved(new NameStateInfo(worldIn, pos));
+                SignalBoxHandler.onPosRemove(new PosIdentifier(pos, worldIn));
+            }, "RedstoneIO:breakBlock").start();
+        }
+        super.breakBlock(worldIn, pos, state);
     }
 }

@@ -229,10 +229,12 @@ public class Signal extends BasicBlock {
     public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
         super.breakBlock(worldIn, pos, state);
         GhostBlock.destroyUpperBlock(worldIn, pos);
-        if (!worldIn.isRemote && worldIn instanceof World) {
-            SignalStateHandler.setRemoved(new SignalStateInfo((World) worldIn, pos, this));
-            NameHandler.setRemoved(new NameStateInfo((World) worldIn, pos));
-            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (World) worldIn));
+        if (!worldIn.isRemote) {
+            new Thread(() -> {
+                SignalStateHandler.setRemoved(new SignalStateInfo(worldIn, pos, this));
+                NameHandler.setRemoved(new NameStateInfo(worldIn, pos));
+                SignalBoxHandler.onPosRemove(new PosIdentifier(pos, worldIn));
+            }, "Signal:breakBlock").start();
         }
     }
 
