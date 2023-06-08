@@ -73,9 +73,8 @@ public class RedstoneIO extends BasicBlock {
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
-            if (worldIn.isRemote)
-                OpenSignalsMain.handler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos,
-                        "redstoneio");
+            OpenSignalsMain.handler.invokeGui(RedstoneIO.class, playerIn, worldIn, pos,
+                    "redstoneio");
             return true;
         }
         return false;

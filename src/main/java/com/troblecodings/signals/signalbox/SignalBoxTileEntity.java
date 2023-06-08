@@ -78,7 +78,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (type.equals(LinkType.SIGNAL)) {
             SignalStateHandler.loadSignal(new SignalStateInfo(world, pos, (Signal) block));
         }
-        return SignalBoxHandler.linkPosToSignalBox(new PosIdentifier(pos, world), pos,
+        return SignalBoxHandler.linkPosToSignalBox(new PosIdentifier(this.pos, world), pos,
                 (BasicBlock) block, type);
     }
 
@@ -94,8 +94,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean unlink() {
-        if (world != null)
-            SignalBoxHandler.unlinkAll(new PosIdentifier(pos, world));
+        SignalBoxHandler.unlinkAll(new PosIdentifier(pos, world));
         return true;
     }
 
