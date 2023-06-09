@@ -56,7 +56,7 @@ public final class NameHandler implements INetworkSync {
         if (info.world.isRemote || name == null)
             return;
         new Thread(() -> {
-            setNameForSignal(info, name);
+            setNameForNonSignal(info, name);
             createToFile(info, name);
         }, "OSNameHandler:createName").start();
     }
@@ -138,7 +138,7 @@ public final class NameHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
-        final World world = (World) event.getWorld();
+        final World world = event.getWorld();
         if (world.isRemote)
             return;
         Map<NameStateInfo, String> map;

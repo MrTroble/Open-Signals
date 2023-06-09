@@ -173,6 +173,7 @@ public class GuiPlacementtool extends GuiBase {
             textfield.add(name);
             list.add(textfield);
         }
+        this.entity.update();
         loaded = true;
     }
 
