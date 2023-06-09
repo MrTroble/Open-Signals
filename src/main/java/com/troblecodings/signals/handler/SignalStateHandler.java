@@ -76,6 +76,7 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (CURRENTLY_LOADED_STATES) {
                 CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
             }
+            loadSignal(info);
             synchronized (CURRENTLY_LOADED_CHUNKS) {
                 final List<SignalStateInfo> allSignals = CURRENTLY_LOADED_CHUNKS
                         .get(info.world.getChunk(info.pos));
@@ -83,7 +84,6 @@ public final class SignalStateHandler implements INetworkSync {
                     allSignals.add(info);
             }
             createToFile(info, states);
-            loadSignal(info);
         }, "OSSignalStateHandler:createStates").start();
     }
 
