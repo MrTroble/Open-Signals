@@ -493,8 +493,10 @@ public class Signal extends BasicBlock {
         } else {
             if (world.isUpdateScheduled(pos, this)) {
                 return;
-            } else if (sound.predicate.test(properties)) {
-                world.scheduleUpdate(pos, this, 1);
+            } else {
+                if (sound.predicate.test(properties)) {
+                    world.scheduleUpdate(pos, this, 1);
+                }
             }
         }
     }

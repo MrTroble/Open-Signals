@@ -20,6 +20,7 @@ import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
+import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
@@ -33,9 +34,9 @@ import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
 
-import io.netty.handler.codec.http2.Http2FrameLogger.Direction;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.IBakedModel;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
@@ -199,18 +200,19 @@ public class GuiSignalController extends GuiBase {
         });
         rightSide.add(toggle);
 
-        for (final Direction face : Direction.values()) {
-            /*
-             * final List<BakedQuad> quad = model.getQuads(state, face,
-             * SignalCustomModel.RANDOM, EmptyModelData.INSTANCE); final UIEntity faceEntity
-             * = new UIEntity(); faceEntity.setWidth(20); faceEntity.setHeight(20);
-             * faceEntity.add(new UITexture(quad.get(0).getSprite())); final UIColor color =
-             * new UIColor(0x70000000); faceEntity.add(color); faceEntity.add(new
-             * UIClickable(e -> toggle.setIndex(face.ordinal()))); final UILabel label = new
-             * UILabel(face.getName().substring(0, 1).toUpperCase());
-             * label.setTextColor(0xFFFFFFFF); faceEntity.add(label);
-             * rightSide.add(faceEntity);
-             */
+        for (final EnumFacing face : EnumFacing.VALUES) {
+            final List<BakedQuad> quad = model.getQuads(state, face, 0);
+            final UIEntity faceEntity = new UIEntity();
+            faceEntity.setWidth(20);
+            faceEntity.setHeight(20);
+            faceEntity.add(new UITexture(quad.get(0).getSprite()));
+            final UIColor color = new UIColor(0x70000000);
+            faceEntity.add(color);
+            faceEntity.add(new UIClickable(e -> toggle.setIndex(face.ordinal())));
+            final UILabel label = new UILabel(face.getName().substring(0, 1).toUpperCase());
+            label.setTextColor(0xFFFFFFFF);
+            faceEntity.add(label);
+            rightSide.add(faceEntity);
         }
 
         this.lowerEntity.add(rightSide);
@@ -401,7 +403,7 @@ public class GuiSignalController extends GuiBase {
     }
 
     @Override
-    public ContainerBase getNewGuiContainer(GuiInfo info) {
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
         return new ContainerSignalController(info);
     }
 

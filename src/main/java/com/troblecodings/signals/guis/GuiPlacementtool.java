@@ -213,6 +213,7 @@ public class GuiPlacementtool extends GuiBase {
     public void applyModelChanges() {
         @SuppressWarnings("unused")
         final IBlockState ebs = currentSelectedBlock.getDefaultState();
+        return;
         /*
          * final List<UIEnumerable> enumerables =
          * this.list.findRecursive(UIEnumerable.class); for (final UIEnumerable
