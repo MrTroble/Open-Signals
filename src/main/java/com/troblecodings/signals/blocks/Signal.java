@@ -258,7 +258,7 @@ public class Signal extends BasicBlock {
 
     @Override
     public String toString() {
-        return getSignalTypeName();
+        return this.getUnlocalizedName();
     }
 
     public final boolean canBeLinked() {

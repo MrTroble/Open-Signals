@@ -53,7 +53,7 @@ public class Placementtool extends Item
     @Override
     public String getNamedObj(final int obj) {
         return I18n.format("property." + this.getName() + ".name") + ": "
-                + I18n.format(this.getObjFromID(obj).toString());
+                + this.getObjFromID(obj).getLocalizedName();
     }
 
     @Override
