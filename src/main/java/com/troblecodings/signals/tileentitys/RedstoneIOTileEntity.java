@@ -14,6 +14,7 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncable {
 
@@ -69,7 +70,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
             IBlockState state = world.getBlockState(pos);
             state = state.withProperty(RedstoneIO.POWER,
                     SignalBoxHandler.getNewOutputState(new PosIdentifier(pos, world)));
-            world.notifyBlockUpdate(pos, state, state, 3);
+            world.setBlockState(pos, state);
         }
     }
 
@@ -92,5 +93,11 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     @Override
     public boolean isValid(EntityPlayer player) {
         return true;
+    }
+    
+    @Override
+    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState,
+            IBlockState newSate) {
+        return false;
     }
 }
