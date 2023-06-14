@@ -96,11 +96,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
 
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
-        final byte[] signalName = getSignal().getSignalTypeName().getBytes();
-        buffer.putByte((byte) signalName.length);
-        for (final byte b : signalName) {
-            buffer.putByte(b);
-        }
+        buffer.putInt(getSignal().getID());
         buffer.putByte((byte) currentMode.ordinal());
         buffer.putByte((byte) propertiesToSend.size());
         propertiesToSend.forEach((property, value) -> {
@@ -138,12 +134,8 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     public void deserializeClient(final ByteBuffer buf) {
         final ReadBuffer buffer = new ReadBuffer(buf);
         linkedPos = buffer.getBlockPos();
-        final int nameSize = buffer.getByteAsInt();
-        final byte[] signalName = new byte[nameSize];
-        for (int i = 0; i < nameSize; i++) {
-            signalName[i] = buffer.getByte();
-        }
-        final Signal signal = Signal.SIGNALS.get(new String(signalName));
+        final int signalID = buffer.getInt();
+        final Signal signal = Signal.SIGNAL_IDS.get(signalID);
         referenceBlock.set(signal);
         currentMode = EnumMode.values()[buffer.getByteAsInt()];
         final int size = buffer.getByteAsInt();

@@ -92,10 +92,10 @@ public final class SignalConfig {
             final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(current);
             final Map<SEProperty, String> propertiesToSet = new HashMap<>();
             values.forEach(property -> {
-                propertiesToSet.putAll(property.values.entrySet().stream().filter(entry -> {
-                    final String oldValue = oldProperties.get(entry.getKey());
-                    return oldValue != null && !oldValue.equals(entry.getValue());
-                }).collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
+                propertiesToSet.putAll(property.values.entrySet().stream()
+                        .filter(entry -> oldProperties.containsKey(entry.getKey()))
+                        .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                                Map.Entry::getValue)));
 
             });
             if (!propertiesToSet.isEmpty())

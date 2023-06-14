@@ -1,6 +1,7 @@
 package com.troblecodings.signals.handler;
 
 import java.nio.ByteBuffer;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,12 +10,12 @@ import java.util.concurrent.Executors;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,7 +25,7 @@ public class ClientSignalStateHandler implements INetworkSync {
 
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
+    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
 
     public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -36,8 +37,9 @@ public class ClientSignalStateHandler implements INetworkSync {
     public void deserializeClient(final ByteBuffer buf) {
         final ReadBuffer buffer = new ReadBuffer(buf);
         final Minecraft mc = Minecraft.getInstance();
-        final Level level = mc.level;
+        final ClientLevel level = mc.level;
         final BlockPos signalPos = buffer.getBlockPos();
+        final int signalID = buffer.getInt();
         final int propertiesSize = buffer.getByteAsInt();
         if (propertiesSize == 255) {
             setRemoved(signalPos);
@@ -49,15 +51,18 @@ public class ClientSignalStateHandler implements INetworkSync {
             propertyIDs[i] = buffer.getByteAsInt();
             valueIDs[i] = buffer.getByteAsInt();
         }
+        final List<SEProperty> signalProperties = Signal.SIGNAL_IDS.get(signalID).getProperties();
+        final long startTime = Calendar.getInstance().getTimeInMillis();
         SERVICE.execute(() -> {
-            if (level == null)
-                return;
             BlockEntity entity;
-            while ((entity = level.getBlockEntity(signalPos)) == null)
+            while ((entity = level.getBlockEntity(signalPos)) == null) {
+                final long currentTime = Calendar.getInstance().getTimeInMillis();
+                if (currentTime - startTime >= 5000) {
+                    return;
+                }
                 continue;
+            }
             final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);
-            final List<SEProperty> signalProperties = ((SignalTileEntity) entity).getSignal()
-                    .getProperties();
             synchronized (CURRENTLY_LOADED_STATES) {
                 final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
                         .computeIfAbsent(stateInfo, _u -> new HashMap<>());
