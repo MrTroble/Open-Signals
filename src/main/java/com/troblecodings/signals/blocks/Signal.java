@@ -387,8 +387,8 @@ public class Signal extends BasicBlock {
         GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
         GlStateManager.scale(-1f, 1f, 1f);
         for (int j = 0; j < display.length; j++) {
-             info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale *
-             2.8F), (int) width, this.prop.textColor);
+            info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale * 2.8F),
+                    (int) width, this.prop.textColor);
         }
         GlStateManager.popMatrix();
     }
@@ -403,16 +403,17 @@ public class Signal extends BasicBlock {
 
     @Override
     public boolean onBlockActivated(final World world, final BlockPos pos, final IBlockState state,
-            final EntityPlayer player, final EnumHand hand, final EnumFacing facing, final float hitX, final float hitY,
-            final float hitZ) {
+            final EntityPlayer player, final EnumHand hand, final EnumFacing facing,
+            final float hitX, final float hitY, final float hitZ) {
         if (!(state.getBlock() instanceof Signal)
                 || player.getHeldItem(EnumHand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
             return false;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
         if (loadRedstoneOutput(world, stateInfo)) {
-            // TODO Maby other method?
-            world.notifyBlockUpdate(pos, state, state, 8);
+            world.setBlockState(pos, state, 3);
+            world.notifyNeighborsOfStateChange(pos, this, false);
+            world.markAndNotifyBlock(pos, null, state, state, 3);
             return true;
         }
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
@@ -450,15 +451,15 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public int getStrongPower(final IBlockState blockState, final IBlockAccess blockAccess, final BlockPos pos,
-            final EnumFacing side) {
+    public int getStrongPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
         return getWeakPower(blockState, blockAccess, pos, side);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess, final BlockPos pos,
-            final EnumFacing side) {
+    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
         if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null
                 || !(blockAccess instanceof World)) {
             return 0;
@@ -512,7 +513,8 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public void updateTick(final World worldIn, final BlockPos pos, final IBlockState state, final Random rand) {
+    public void updateTick(final World worldIn, final BlockPos pos, final IBlockState state,
+            final Random rand) {
         if (this.prop.sounds.isEmpty() || worldIn.isRemote) {
             return;
         }
