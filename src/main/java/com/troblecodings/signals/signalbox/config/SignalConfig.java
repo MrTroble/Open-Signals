@@ -96,7 +96,6 @@ public final class SignalConfig {
                         .filter(entry -> oldProperties.containsKey(entry.getKey()))
                         .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
                                 Map.Entry::getValue)));
-
             });
             if (!propertiesToSet.isEmpty())
                 SignalStateHandler.setStates(current, propertiesToSet);

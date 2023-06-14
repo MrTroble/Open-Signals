@@ -435,7 +435,6 @@ public final class SignalStateHandler implements INetworkSync {
 
     private static void sendTo(final Player player, final ByteBuffer buf) {
         final FriendlyByteBuf buffer = new FriendlyByteBuf(Unpooled.copiedBuffer(buf.position(0)));
-        System.out.println("Sending " + buffer + "to" + player);
         if (player instanceof ServerPlayer) {
             final ServerPlayer server = (ServerPlayer) player;
             server.connection.send(new ClientboundCustomPayloadPacket(channelName, buffer));
