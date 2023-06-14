@@ -392,10 +392,10 @@ public class Signal extends BasicBlock {
             for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (pack.predicate.test(properties)) {
                     this.powerProperty = pack.property;
-                    SignalStateHandler.getState(info, pack.property).ifPresent(power -> {
-                        SignalStateHandler.setState(info, pack.property,
-                                Boolean.toString(!Boolean.valueOf(power)));
-                    });
+                    if (properties.containsKey(pack.property)) {
+                        SignalStateHandler.setState(info, powerProperty,
+                                Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));
+                    }
                     return true;
                 }
             }
