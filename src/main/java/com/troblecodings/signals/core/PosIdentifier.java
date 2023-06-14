@@ -15,7 +15,7 @@ public class PosIdentifier {
         this.world = world;
     }
 
-    public boolean checkNotNullOrClientSide() {
+    public boolean worldNullOrClientSide() {
         return world == null || world.isRemote;
     }
 

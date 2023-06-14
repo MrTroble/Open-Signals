@@ -46,7 +46,7 @@ public final class SignalBoxHandler {
     private static final Map<PosIdentifier, Boolean> OUTPUT_UPDATES = new HashMap<>();
 
     public static void resetPathway(final PosIdentifier identifier, final Point point) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         PathwayHolder grid;
         synchronized (ALL_GRIDS) {
@@ -59,7 +59,7 @@ public final class SignalBoxHandler {
 
     public static boolean requestPathway(final PosIdentifier identifier, final Point p1,
             final Point p2, final Map<Point, SignalBoxNode> modeGrid) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return false;
         PathwayHolder grid;
         synchronized (ALL_GRIDS) {
@@ -71,7 +71,7 @@ public final class SignalBoxHandler {
     }
 
     public static void resetAllPathways(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         PathwayHolder grid;
         synchronized (ALL_GRIDS) {
@@ -84,7 +84,7 @@ public final class SignalBoxHandler {
 
     public static void updateInput(final PosIdentifier identifier,
             final RedstoneUpdatePacket update) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         PathwayHolder grid;
         synchronized (ALL_GRIDS) {
@@ -96,7 +96,7 @@ public final class SignalBoxHandler {
     }
 
     public static void writeTileNBT(final PosIdentifier identifier, final NBTWrapper wrapper) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         PathwayHolder grid;
         synchronized (ALL_GRIDS) {
@@ -116,7 +116,7 @@ public final class SignalBoxHandler {
 
     public static void readTileNBT(final PosIdentifier identifier, final NBTWrapper wrapper,
             final Map<Point, SignalBoxNode> modeGrid) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -132,7 +132,7 @@ public final class SignalBoxHandler {
     }
 
     public static void setWorld(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         PathwayHolder grid;
         synchronized (ALL_GRIDS) {
@@ -144,7 +144,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean isTileEmpty(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return true;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -157,7 +157,7 @@ public final class SignalBoxHandler {
 
     public static boolean linkPosToSignalBox(final PosIdentifier identifier, final BlockPos linkPos,
             final BasicBlock block, final LinkType type) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return false;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -175,7 +175,7 @@ public final class SignalBoxHandler {
     }
 
     public static Signal getSignal(final PosIdentifier identifier, final BlockPos signalPos) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return null;
         final LinkedPositions signals;
         synchronized (ALL_LINKED_POS) {
@@ -187,7 +187,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unlinkPosFromSignalBox(final PosIdentifier identifier, final BlockPos pos) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -199,7 +199,7 @@ public final class SignalBoxHandler {
     }
 
     public static Map<BlockPos, LinkType> getAllLinkedPos(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return new HashMap<>();
         final LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -211,7 +211,7 @@ public final class SignalBoxHandler {
     }
 
     public static void onPosRemove(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         synchronized (ALL_LINKED_POS) {
             ALL_LINKED_POS.forEach((pos, holder) -> {
@@ -225,7 +225,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unlinkAll(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         LinkedPositions allPos;
         synchronized (ALL_LINKED_POS) {
@@ -238,7 +238,7 @@ public final class SignalBoxHandler {
 
     public static void unlinkTileFromPos(final PosIdentifier identifier,
             final BlockPos posToUnlink) {
-        if (identifier.checkNotNullOrClientSide() || tryDirectUnlink(identifier, posToUnlink))
+        if (identifier.worldNullOrClientSide() || tryDirectUnlink(identifier, posToUnlink))
             return;
         final LinkingUpdates update;
         synchronized (POS_UPDATES) {
@@ -249,7 +249,7 @@ public final class SignalBoxHandler {
     }
 
     public static void linkTileToPos(final PosIdentifier identifier, final BlockPos posToLink) {
-        if (identifier.checkNotNullOrClientSide() || tryDirectLink(identifier, posToLink))
+        if (identifier.worldNullOrClientSide() || tryDirectLink(identifier, posToLink))
             return;
         final LinkingUpdates update;
         synchronized (POS_UPDATES) {
@@ -260,7 +260,7 @@ public final class SignalBoxHandler {
     }
 
     private static boolean tryDirectLink(final PosIdentifier identifier, final BlockPos posToLink) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return false;
         final TileEntity entity = identifier.world.getTileEntity(posToLink);
         if (entity != null && entity instanceof RedstoneIOTileEntity) {
@@ -272,7 +272,7 @@ public final class SignalBoxHandler {
 
     private static boolean tryDirectUnlink(final PosIdentifier identifier,
             final BlockPos posToUnlink) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return false;
         final TileEntity entity = identifier.world.getTileEntity(posToUnlink);
         if (entity != null && entity instanceof RedstoneIOTileEntity) {
@@ -283,7 +283,7 @@ public final class SignalBoxHandler {
     }
 
     public static void removeSignalBox(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         synchronized (ALL_GRIDS) {
             ALL_GRIDS.remove(identifier);
@@ -294,7 +294,7 @@ public final class SignalBoxHandler {
     }
 
     public static LinkingUpdates getPosUpdates(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return null;
         synchronized (POS_UPDATES) {
             return POS_UPDATES.remove(identifier);
@@ -302,12 +302,12 @@ public final class SignalBoxHandler {
     }
 
     public static void updateRedstoneOutput(final PosIdentifier identifier, final boolean state) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         IBlockState blockState = identifier.world.getBlockState(identifier.pos);
         if (blockState != null) {
             blockState = blockState.withProperty(RedstoneIO.POWER, state);
-            identifier.world.notifyBlockUpdate(identifier.pos, blockState, blockState, 3);
+            identifier.world.setBlockState(identifier.pos, blockState);
             return;
         }
         synchronized (OUTPUT_UPDATES) {
@@ -316,7 +316,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean containsOutputUpdates(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return false;
         synchronized (OUTPUT_UPDATES) {
             return OUTPUT_UPDATES.containsKey(identifier);
@@ -324,7 +324,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean getNewOutputState(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return false;
         synchronized (OUTPUT_UPDATES) {
             return OUTPUT_UPDATES.remove(identifier);
@@ -332,7 +332,7 @@ public final class SignalBoxHandler {
     }
 
     public static void loadSignals(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -344,7 +344,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unloadSignals(final PosIdentifier identifier) {
-        if (identifier.checkNotNullOrClientSide())
+        if (identifier.worldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
