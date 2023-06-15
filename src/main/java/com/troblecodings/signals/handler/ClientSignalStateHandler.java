@@ -52,6 +52,17 @@ public class ClientSignalStateHandler implements INetworkSync {
             valueIDs[i] = buffer.getByteAsInt();
         }
         final List<SEProperty> signalProperties = Signal.SIGNAL_IDS.get(signalID).getProperties();
+        final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);
+        synchronized (CURRENTLY_LOADED_STATES) {
+            final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
+                    .computeIfAbsent(stateInfo, _u -> new HashMap<>());
+            for (int i = 0; i < propertiesSize; i++) {
+                final SEProperty property = signalProperties.get(propertyIDs[i]);
+                final String value = property.getObjFromID(valueIDs[i]);
+                properties.put(property, value);
+            }
+            CURRENTLY_LOADED_STATES.put(stateInfo, properties);
+        }
         final long startTime = Calendar.getInstance().getTimeInMillis();
         SERVICE.execute(() -> {
             BlockEntity entity;
@@ -61,17 +72,6 @@ public class ClientSignalStateHandler implements INetworkSync {
                     return;
                 }
                 continue;
-            }
-            final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);
-            synchronized (CURRENTLY_LOADED_STATES) {
-                final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
-                        .computeIfAbsent(stateInfo, _u -> new HashMap<>());
-                for (int i = 0; i < propertiesSize; i++) {
-                    final SEProperty property = signalProperties.get(propertyIDs[i]);
-                    final String value = property.getObjFromID(valueIDs[i]);
-                    properties.put(property, value);
-                }
-                CURRENTLY_LOADED_STATES.put(stateInfo, properties);
             }
             final BlockState state = entity.getBlockState();
             mc.level.setBlocksDirty(signalPos, state, state);
