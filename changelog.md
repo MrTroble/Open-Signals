@@ -1,5 +1,10 @@
 # Changelog
 
+## [Beta 5]
+
+* feat: better network system
+* fix: issue with signal config
+
 ## [1.18.2 Beta 4]
 
 * add: missing lang keys
