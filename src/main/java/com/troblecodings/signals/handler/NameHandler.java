@@ -232,7 +232,10 @@ public final class NameHandler implements INetworkSync {
                         return;
                     }
                     LOAD_COUNTER.put(info, 1);
-                    final String name = ALL_LEVEL_FILES.get(info.world).getString(info.pos);
+                    String name;
+                    synchronized(ALL_LEVEL_FILES) {
+                       name = ALL_LEVEL_FILES.get(info.world).getString(info.pos);
+                    }
                     synchronized (ALL_NAMES) {
                         ALL_NAMES.put(info, name);
                     }
