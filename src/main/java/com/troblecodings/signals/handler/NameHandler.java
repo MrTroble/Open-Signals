@@ -244,8 +244,8 @@ public final class NameHandler implements INetworkSync {
                     }
                     LOAD_COUNTER.put(info, 1);
                     String name;
-                    synchronized(ALL_LEVEL_FILES) {
-                       name = ALL_LEVEL_FILES.get(info.world).getString(info.pos);
+                    synchronized (ALL_LEVEL_FILES) {
+                        name = ALL_LEVEL_FILES.get(info.world).getString(info.pos);
                     }
                     synchronized (ALL_NAMES) {
                         ALL_NAMES.put(info, name);
