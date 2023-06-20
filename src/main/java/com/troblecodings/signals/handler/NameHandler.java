@@ -7,12 +7,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
@@ -25,7 +28,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
@@ -37,8 +40,8 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 public final class NameHandler implements INetworkSync {
 
     private static final Map<NameStateInfo, String> ALL_NAMES = new HashMap<>();
-    private static final Map<Chunk, List<NameStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<NameStateInfo, Integer> LOAD_COUNTER = new HashMap<>();
     private static FMLEventChannel channel;
     private static String channelName;
 
@@ -79,8 +82,7 @@ public final class NameHandler implements INetworkSync {
             synchronized (ALL_NAMES) {
                 ALL_NAMES.put(info, name);
             }
-            sendNameToClient(info, name);
-            createToFile(info, name);
+            sendToAll(info, name);
         }, "OSNameHandler:setName").start();
     }
 
@@ -95,7 +97,7 @@ public final class NameHandler implements INetworkSync {
         }
     }
 
-    private static void sendNameToClient(final NameStateInfo info, final String name) {
+    private static void sendToAll(final NameStateInfo info, final String name) {
         final ByteBuffer buffer = packToBuffer(info.pos, name);
         info.world.playerEntities.forEach(player -> sendTo(player, buffer));
     }
@@ -121,12 +123,6 @@ public final class NameHandler implements INetworkSync {
         }
         file.deleteIndex(info.pos);
         sendRemoved(info);
-        final Chunk chunk = info.world.getChunkFromBlockCoords(info.pos);
-        if (chunk == null)
-            return;
-        synchronized (CURRENTLY_LOADED_CHUNKS) {
-            CURRENTLY_LOADED_CHUNKS.get(chunk).remove(info);
-        }
     }
 
     private static void sendRemoved(final NameStateInfo info) {
@@ -170,21 +166,23 @@ public final class NameHandler implements INetworkSync {
         if (file == null)
             return;
         SignalStatePos posInFile = file.find(info.pos);
-        if (posInFile == null) {
-            posInFile = file.createState(info.pos, name);
-            return;
-        }
-        synchronized (posInFile) {
+        synchronized (file) {
+            if (posInFile == null) {
+                posInFile = file.createState(info.pos, name);
+                return;
+            }
             file.writeString(posInFile, name);
         }
     }
 
     @SubscribeEvent
-    public static void onChunkLoad(final ChunkEvent.Load event) {
-        final Chunk chunk = event.getChunk();
+    public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
+        final Chunk chunk = event.getChunkInstance();
         final World world = chunk.getWorld();
         if (world == null || world.isRemote)
             return;
+        final EntityPlayer player = event.getPlayer();
+        final List<NameStateInfo> states = new ArrayList<>();
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
@@ -195,45 +193,25 @@ public final class NameHandler implements INetworkSync {
                                         .replace(":", ""))));
             }
         }
-        final List<NameStateInfo> states = new ArrayList<>();
-        chunk.getTileEntityMap().keySet().forEach(pos -> {
-            final Block block = chunk.getBlockState(pos).getBlock();
-            if (block instanceof Signal || block instanceof RedstoneIO) {
-                final NameStateInfo info = new NameStateInfo(world, pos);
-                final String name = ALL_LEVEL_FILES.get(world).getString(pos);
-                if (name.isEmpty())
-                    return;
-                synchronized (ALL_NAMES) {
-                    ALL_NAMES.put(info, name);
-                }
-                states.add(info);
-                sendNameToClient(info, name);
+        chunk.getTileEntityMap().forEach((pos, tile) -> {
+            if (tile instanceof SignalTileEntity || tile instanceof RedstoneIOTileEntity) {
+                states.add(new NameStateInfo(world, pos));
             }
         });
-        synchronized (CURRENTLY_LOADED_CHUNKS) {
-            CURRENTLY_LOADED_CHUNKS.put(chunk, states);
-        }
+        loadNames(states, player);
     }
 
     @SubscribeEvent
-    public static void onChunkUnload(final ChunkEvent.Unload event) {
-        final Chunk chunk = event.getChunk();
-        final World level = chunk.getWorld();
-        if (level.isRemote)
-            return;
-        List<NameStateInfo> states;
-        synchronized (CURRENTLY_LOADED_CHUNKS) {
-            states = CURRENTLY_LOADED_CHUNKS.remove(chunk);
-        }
-        states.forEach(stateInfo -> {
-            String name;
-            synchronized (ALL_NAMES) {
-                name = ALL_NAMES.remove(stateInfo);
+    public static void onChunkUnWatch(final ChunkWatchEvent.UnWatch event) {
+        final Chunk chunk = event.getChunkInstance();
+        final World world = chunk.getWorld();
+        final List<NameStateInfo> states = new ArrayList<>();
+        chunk.getTileEntityMap().forEach((pos, tile) -> {
+            if (tile instanceof SignalTileEntity || tile instanceof RedstoneIOTileEntity) {
+                states.add(new NameStateInfo(world, pos));
             }
-            if (name == null)
-                return;
-            createToFile(stateInfo, name);
         });
+        unloadNames(states);
     }
 
     @SubscribeEvent
@@ -244,6 +222,58 @@ public final class NameHandler implements INetworkSync {
             names = ImmutableMap.copyOf(ALL_NAMES);
         }
         names.forEach((info, name) -> sendTo(player, packToBuffer(info.pos, name)));
+    }
+
+    private static void loadNames(final List<NameStateInfo> infos,
+            final @Nullable EntityPlayer player) {
+        if (infos == null || infos.isEmpty())
+            return;
+        new Thread(() -> {
+            infos.forEach(info -> {
+                synchronized (LOAD_COUNTER) {
+                    Integer count = LOAD_COUNTER.get(info);
+                    if (count != null && count > 0) {
+                        LOAD_COUNTER.put(info, ++count);
+                        return;
+                    }
+                    LOAD_COUNTER.put(info, 1);
+                    String name;
+                    synchronized (ALL_LEVEL_FILES) {
+                        name = ALL_LEVEL_FILES.get(info.world).getString(info.pos);
+                    }
+                    synchronized (ALL_NAMES) {
+                        ALL_NAMES.put(info, name);
+                    }
+                    if (player == null) {
+                        sendToAll(info, name);
+                    } else {
+                        sendTo(player, packToBuffer(info.pos, name));
+                    }
+                }
+            });
+        }, "OSNameHandler:loadNames").start();
+    }
+
+    private static void unloadNames(final List<NameStateInfo> infos) {
+        if (infos == null || infos.isEmpty())
+            return;
+        new Thread(() -> {
+            infos.forEach(info -> {
+                synchronized (LOAD_COUNTER) {
+                    Integer count = LOAD_COUNTER.get(info);
+                    if (count != null && count > 1) {
+                        LOAD_COUNTER.put(info, --count);
+                        return;
+                    }
+                    LOAD_COUNTER.remove(info);
+                    String name;
+                    synchronized (ALL_NAMES) {
+                        name = ALL_NAMES.remove(info);
+                    }
+                    createToFile(info, name);
+                }
+            });
+        }, "OSNameHandler:unloadNames").start();
     }
 
     private static void sendTo(final EntityPlayer player, final ByteBuffer buf) {

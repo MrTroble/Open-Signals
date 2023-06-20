@@ -1,6 +1,7 @@
 package com.troblecodings.signals.handler;
 
 import java.nio.ByteBuffer;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -47,12 +48,18 @@ public class ClientNameHandler implements INetworkSync {
         }
         final World world = mc.world;
         final String name = new String(array);
+        final long startTime = Calendar.getInstance().getTimeInMillis();
+        synchronized (CLIENT_NAMES) {
+            CLIENT_NAMES.put(new NameStateInfo(mc.world, pos), name);
+        }
         SERVICE.execute(() -> {
             TileEntity tile;
-            while ((tile = world.getTileEntity(pos)) == null)
+            while ((tile = world.getTileEntity(pos)) == null) {
+                final long currentTime = Calendar.getInstance().getTimeInMillis();
+                if (currentTime - startTime >= 10000) {
+                    return;
+                }
                 continue;
-            synchronized (CLIENT_NAMES) {
-                CLIENT_NAMES.put(new NameStateInfo(mc.world, pos), name);
             }
             if (tile instanceof BasicBlockEntity) {
                 ((BasicBlockEntity) tile).setCustomName(name);

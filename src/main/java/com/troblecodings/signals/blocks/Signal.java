@@ -72,6 +72,7 @@ public class Signal extends BasicBlock {
     };
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
+    public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
     public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel",
             SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
@@ -79,6 +80,7 @@ public class Signal extends BasicBlock {
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
 
     protected final SignalProperties prop;
+    private final int id;
     private List<SEProperty> signalProperties;
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
     private SEProperty powerProperty = null;
@@ -86,12 +88,18 @@ public class Signal extends BasicBlock {
     public Signal(final SignalProperties prop) {
         super(Material.ROCK);
         this.prop = prop;
+        this.id = SIGNAL_IDS.size();
+        SIGNAL_IDS.add(this);
         this.setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
         for (int i = 0; i < signalProperties.size(); i++) {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
+    }
+
+    public int getID() {
+        return id;
     }
 
     @Override
