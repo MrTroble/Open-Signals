@@ -309,7 +309,7 @@ public final class SignalStateHandler implements INetworkSync {
         }
         sendTo(player, packToByteBuffer(stateInfo, properties));
     }
-    
+
     private static void sendToAll(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties) {
         if (properties == null || properties.isEmpty()) {
@@ -318,7 +318,7 @@ public final class SignalStateHandler implements INetworkSync {
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         stateInfo.world.players().forEach(playerEntity -> sendTo(playerEntity, buffer));
     }
-   
+
     @SubscribeEvent
     public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
         final ServerWorld world = event.getWorld();
@@ -335,16 +335,16 @@ public final class SignalStateHandler implements INetworkSync {
                                         .replace("/", "").replace("\\", "")
                                 + "/" + world.dimension().location().toString().replace(":", ""))));
             }
-        chunk.getBlockEntitiesPos().forEach(pos -> {
-            final Block block = chunk.getBlockState(pos).getBlock();
-            if (block instanceof Signal) {
-                states.add(new SignalStateInfo(world, pos, (Signal) block));
-            }
-        });
-        loadSignals(states, player);
+            chunk.getBlockEntitiesPos().forEach(pos -> {
+                final Block block = chunk.getBlockState(pos).getBlock();
+                if (block instanceof Signal) {
+                    states.add(new SignalStateInfo(world, pos, (Signal) block));
+                }
+            });
+            loadSignals(states, player);
         }
     }
-    
+
     @SubscribeEvent
     public static void onChunkUnWatch(final ChunkWatchEvent.UnWatch event) {
         final ServerWorld world = event.getWorld();
@@ -364,15 +364,15 @@ public final class SignalStateHandler implements INetworkSync {
     public static void loadSignal(final SignalStateInfo info) {
         loadSignal(info, null);
     }
-    
+
     public static void loadSignals(final List<SignalStateInfo> signals) {
         loadSignals(signals, null);
     }
-    
+
     public static void loadSignal(final SignalStateInfo info, final @Nullable PlayerEntity player) {
         loadSignals(ImmutableList.of(info), player);
     }
-    
+
     public static void loadSignals(final List<SignalStateInfo> signals,
             final @Nullable PlayerEntity player) {
         if (signals == null || signals.isEmpty())
