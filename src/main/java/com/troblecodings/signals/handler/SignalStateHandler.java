@@ -73,7 +73,6 @@ public final class SignalStateHandler implements INetworkSync {
             }
             sendToAll(info, states);
             createToFile(info, states);
-
         }, "OSSignalStateHandler:createStates").start();
     }
 
