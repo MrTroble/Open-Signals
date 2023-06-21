@@ -256,9 +256,6 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             ALL_LEVEL_FILES.remove(unload.getWorld());
         }
-        synchronized (SIGNAL_COUNTER) {
-            SIGNAL_COUNTER.clear();
-        }
     }
 
     public static void setRemoved(final SignalStateInfo info) {
