@@ -33,7 +33,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -340,7 +339,14 @@ public final class SignalStateHandler implements INetworkSync {
         chunk.getTileEntityMap().forEach((pos, tile) -> {
             if (tile instanceof SignalTileEntity) {
                 final SignalTileEntity signalTile = (SignalTileEntity) tile;
-                states.add(new SignalStateInfo(world, pos, signalTile.getSignal()));
+                final SignalStateInfo info = new SignalStateInfo(world, pos,
+                        signalTile.getSignal());
+                states.add(info);
+                synchronized (CURRENTLY_LOADED_STATES) {
+                    if (CURRENTLY_LOADED_STATES.containsKey(info)) {
+                        sendToPlayer(info, CURRENTLY_LOADED_STATES.get(info), player);
+                    }
+                }
             }
         });
         loadSignals(states, player);
@@ -360,16 +366,6 @@ public final class SignalStateHandler implements INetworkSync {
             }
         });
         unloadSignals(states);
-    }
-
-    @SubscribeEvent
-    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
-        final EntityPlayer player = event.player;
-        Map<SignalStateInfo, Map<SEProperty, String>> map;
-        synchronized (CURRENTLY_LOADED_STATES) {
-            map = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
-        }
-        map.forEach((state, properties) -> sendTo(player, packToByteBuffer(state, properties)));
     }
 
     public static void loadSignal(final SignalStateInfo info) {
