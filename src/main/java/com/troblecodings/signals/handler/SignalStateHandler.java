@@ -44,14 +44,14 @@ public final class SignalStateHandler implements INetworkSync {
     private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, Integer> SIGNAL_COUNTER = new HashMap<>();
     private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
-    private static final String channelName = "statehandlernet";
+    private static final String CHANNELNAME = "statehandlernet";
     private static FMLEventChannel channel;
 
     private SignalStateHandler() {
     }
 
     public static void init() {
-        channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
+        channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNELNAME);
         channel.register(new SignalStateHandler());
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
     }
@@ -450,9 +450,9 @@ public final class SignalStateHandler implements INetworkSync {
                 Unpooled.copiedBuffer((ByteBuffer) buf.position(0)));
         if (player instanceof EntityPlayerMP) {
             final EntityPlayerMP server = (EntityPlayerMP) player;
-            channel.sendTo(new FMLProxyPacket(buffer, channelName), server);
+            channel.sendTo(new FMLProxyPacket(buffer, CHANNELNAME), server);
         } else {
-            channel.sendToServer(new FMLProxyPacket(new CPacketCustomPayload(channelName, buffer)));
+            channel.sendToServer(new FMLProxyPacket(new CPacketCustomPayload(CHANNELNAME, buffer)));
         }
     }
 

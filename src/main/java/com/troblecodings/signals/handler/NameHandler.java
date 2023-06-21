@@ -40,11 +40,11 @@ public final class NameHandler implements INetworkSync {
     private static final Map<NameStateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<NameStateInfo, Integer> LOAD_COUNTER = new HashMap<>();
-    private static final String channelName = "namehandlernet";
+    private static final String CHANNELNAME = "namehandlernet";
     private static FMLEventChannel channel;
 
     public static void init() {
-        channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
+        channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNELNAME);
         channel.register(new NameHandler());
     }
 
@@ -281,9 +281,9 @@ public final class NameHandler implements INetworkSync {
                 Unpooled.copiedBuffer((ByteBuffer) buf.position(0)));
         if (player instanceof EntityPlayerMP) {
             final EntityPlayerMP server = (EntityPlayerMP) player;
-            channel.sendTo(new FMLProxyPacket(buffer, channelName), server);
+            channel.sendTo(new FMLProxyPacket(buffer, CHANNELNAME), server);
         } else {
-            channel.sendToServer(new FMLProxyPacket(new CPacketCustomPayload(channelName, buffer)));
+            channel.sendToServer(new FMLProxyPacket(new CPacketCustomPayload(CHANNELNAME, buffer)));
         }
     }
 

@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 public class ClientProxy extends CommonProxy {
 
     @Override
-    public void initModEvent(FMLPreInitializationEvent event) {
+    public void initModEvent(final FMLPreInitializationEvent event) {
         super.initModEvent(event);
         SignalStateHandler.add(new ClientSignalStateHandler());
         NameHandler.add(new ClientNameHandler());

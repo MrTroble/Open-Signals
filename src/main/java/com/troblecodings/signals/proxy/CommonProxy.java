@@ -29,7 +29,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class CommonProxy {
 
-    public void initModEvent(FMLPreInitializationEvent event) {
+    public void initModEvent(final FMLPreInitializationEvent event) {
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
         OpenSignalsMain.handler = init.getKey();
