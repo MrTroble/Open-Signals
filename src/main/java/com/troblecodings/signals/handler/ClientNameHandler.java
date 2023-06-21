@@ -21,7 +21,7 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 public class ClientNameHandler implements INetworkSync {
 
     private static final Map<NameStateInfo, String> CLIENT_NAMES = new HashMap<>();
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
+    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
 
     public static String getClientName(final NameStateInfo info) {
         synchronized (CLIENT_NAMES) {

@@ -19,9 +19,14 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();
+    
+    @Override
+    public SPacketUpdateTileEntity getUpdatePacket() {
+        return new SPacketUpdateTileEntity(getPos(), 0, getUpdateTag());
+    }
 
     @Override
-    public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
+    public void onDataPacket(final NetworkManager net, final SPacketUpdateTileEntity pkt) {
         super.onDataPacket(net, pkt);
     }
 
@@ -32,10 +37,12 @@ public class SyncableTileEntity extends BasicBlockEntity {
         return wrapper.tag;
     }
 
+    @Override
     public void syncClient() {
         syncClient(getWorld(), getPos());
     }
 
+    @Override
     public void syncClient(final World world, final BlockPos pos) {
         final IBlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);

@@ -25,7 +25,7 @@ public class ClientSignalStateHandler implements INetworkSync {
 
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
+    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
 
     public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -39,6 +39,7 @@ public class ClientSignalStateHandler implements INetworkSync {
         final Minecraft mc = Minecraft.getMinecraft();
         final WorldClient level = mc.world;
         final BlockPos signalPos = buffer.getBlockPos();
+        
         final int signalID = buffer.getInt();
         final int propertiesSize = buffer.getByteAsInt();
         if (propertiesSize == 255) {
@@ -56,6 +57,7 @@ public class ClientSignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
                     .computeIfAbsent(stateInfo, _u -> new HashMap<>());
+            
             for (int i = 0; i < propertiesSize; i++) {
                 final SEProperty property = signalProperties.get(propertyIDs[i]);
                 final String value = property.getObjFromID(valueIDs[i]);

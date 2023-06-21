@@ -263,12 +263,15 @@ public final class NameHandler implements INetworkSync {
                         return;
                     }
                     LOAD_COUNTER.remove(info);
-                    String name;
-                    synchronized (ALL_NAMES) {
-                        name = ALL_NAMES.remove(info);
-                    }
-                    createToFile(info, name);
                 }
+                String name;
+                synchronized (ALL_NAMES) {
+                    name = ALL_NAMES.remove(info);
+                }
+                if (name == null)
+                    return;
+                createToFile(info, name);
+
             });
         }, "OSNameHandler:unloadNames").start();
     }
