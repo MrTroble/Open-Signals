@@ -33,6 +33,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -361,6 +362,16 @@ public final class SignalStateHandler implements INetworkSync {
         unloadSignals(states);
     }
 
+    @SubscribeEvent
+    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
+        final EntityPlayer player = event.player;
+        Map<SignalStateInfo, Map<SEProperty, String>> map;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            map = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
+        }
+        map.forEach((state, properties) -> sendTo(player, packToByteBuffer(state, properties)));
+    }
+
     public static void loadSignal(final SignalStateInfo info) {
         loadSignal(info, null);
     }
@@ -379,6 +390,16 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         new Thread(() -> {
             signals.forEach(info -> {
+                synchronized (ALL_LEVEL_FILES) {
+                    if (!ALL_LEVEL_FILES.containsKey(info.world)) {
+                        ALL_LEVEL_FILES.put(info.world,
+                                new SignalStateFile(Paths.get("osfiles/signalfiles/"
+                                        + ((WorldServer) info.world).getMinecraftServer().getName()
+                                                .replace(":", "").replace("/", "").replace("\\", "")
+                                        + "/" + ((WorldServer) info.world).provider
+                                                .getDimensionType().getName().replace(":", ""))));
+                    }
+                }
                 synchronized (SIGNAL_COUNTER) {
                     Integer count = SIGNAL_COUNTER.get(info);
                     if (count != null && count > 0) {
