@@ -36,8 +36,9 @@ public class RedstoneIO extends BasicBlock {
     }
 
     @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing,
-            float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+    public IBlockState getStateForPlacement(final World world, final BlockPos pos,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ,
+            final int meta, final EntityLivingBase placer, final EnumHand hand) {
         if (!world.isRemote)
             NameHandler.createName(new NameStateInfo(world, pos), getLocalizedName());
         return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer, hand);
@@ -100,12 +101,12 @@ public class RedstoneIO extends BasicBlock {
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
         return new RedstoneIOTileEntity();
     }
 
     @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         if (!worldIn.isRemote) {
             new Thread(() -> {
                 NameHandler.setRemoved(new NameStateInfo(worldIn, pos));

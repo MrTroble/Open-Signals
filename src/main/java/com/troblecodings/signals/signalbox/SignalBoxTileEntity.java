@@ -33,7 +33,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     }
 
     @Override
-    public void setWorld(World worldIn) {
+    public void setWorld(final World worldIn) {
         super.setWorld(worldIn);
         grid.setPosAndWorld(pos, world);
         SignalBoxHandler.setWorld(new PosIdentifier(pos, world));

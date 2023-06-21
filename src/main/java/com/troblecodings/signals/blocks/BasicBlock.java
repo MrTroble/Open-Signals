@@ -42,7 +42,7 @@ public class BasicBlock extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public boolean canRenderInLayer(IBlockState state, BlockRenderLayer layer) {
+    public boolean canRenderInLayer(final IBlockState state, final BlockRenderLayer layer) {
         return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
     }
 
@@ -73,12 +73,12 @@ public class BasicBlock extends Block implements ITileEntityProvider {
     }
 
     @Override
-    public boolean hasTileEntity(IBlockState state) {
+    public boolean hasTileEntity(final IBlockState state) {
         return createNewTileEntity(null, 0) != null;
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
         return null;
     }
 }

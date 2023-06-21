@@ -15,8 +15,8 @@ import net.minecraft.world.World;
 public class RedstoneInput extends RedstoneIO {
 
     @Override
-    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn,
-            BlockPos fromPos) {
+    public void neighborChanged(final IBlockState state, final World worldIn, final BlockPos pos,
+            final Block blockIn, final BlockPos fromPos) {
         if (worldIn.isRemote)
             return;
         if (worldIn.isBlockPowered(pos)) {
