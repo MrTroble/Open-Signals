@@ -26,7 +26,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -45,14 +44,13 @@ public final class SignalStateHandler implements INetworkSync {
     private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, Integer> SIGNAL_COUNTER = new HashMap<>();
     private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
+    private static final String channelName = "statehandlernet";
     private static FMLEventChannel channel;
-    private static String channelName;
 
     private SignalStateHandler() {
     }
 
     public static void init() {
-        channelName = new ResourceLocation(OpenSignalsMain.MODID, "signalstatehandler").toString();
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
         channel.register(new SignalStateHandler());
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);

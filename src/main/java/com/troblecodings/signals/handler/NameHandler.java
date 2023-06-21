@@ -11,7 +11,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
@@ -23,7 +22,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
-import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -42,11 +40,10 @@ public final class NameHandler implements INetworkSync {
     private static final Map<NameStateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<NameStateInfo, Integer> LOAD_COUNTER = new HashMap<>();
+    private static final String channelName = "namehandlernet";
     private static FMLEventChannel channel;
-    private static String channelName;
 
     public static void init() {
-        channelName = new ResourceLocation(OpenSignalsMain.MODID, "namehandler").toString();
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(channelName);
         channel.register(new NameHandler());
     }
