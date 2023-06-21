@@ -91,13 +91,13 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     }
 
     @Override
-    public boolean isValid(EntityPlayer player) {
+    public boolean isValid(final EntityPlayer player) {
         return true;
     }
     
     @Override
-    public boolean shouldRefresh(World world, BlockPos pos, IBlockState oldState,
-            IBlockState newSate) {
+    public boolean shouldRefresh(final World world, final BlockPos pos, final IBlockState oldState,
+            final IBlockState newSate) {
         return false;
     }
 }

@@ -46,13 +46,13 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     }
 
     @Override
-    public void readFromNBT(NBTTagCompound compound) {
+    public void readFromNBT(final NBTTagCompound compound) {
         super.readFromNBT(compound);
         loadWrapper(new NBTWrapper(compound));
     }
 
     @Override
-    public NBTTagCompound writeToNBT(NBTTagCompound compound) {
+    public NBTTagCompound writeToNBT(final NBTTagCompound compound) {
         saveWrapper(new NBTWrapper(compound));
         return super.writeToNBT(compound);
     }

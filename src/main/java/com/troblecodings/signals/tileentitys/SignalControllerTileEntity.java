@@ -294,7 +294,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean isValid(EntityPlayer player) {
+    public boolean isValid(final EntityPlayer player) {
         return true;
     }
 }

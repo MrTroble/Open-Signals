@@ -106,7 +106,7 @@ public class NamableGui extends GuiBase {
     }
 
     @Override
-    public ContainerBase getNewGuiContainer(GuiInfo info) {
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
         return new NamableContainer(info);
     }
 }

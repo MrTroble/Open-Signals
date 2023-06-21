@@ -20,36 +20,36 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public boolean isTranslucent(IBlockState state) {
+    public boolean isTranslucent(final IBlockState state) {
         return true;
     }
 
     @Override
-    public float getAmbientOcclusionLightValue(IBlockState state) {
+    public float getAmbientOcclusionLightValue(final IBlockState state) {
         return 1.0F;
     }
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world,
-            BlockPos pos, EntityPlayer player) {
+    public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target, final World world,
+            final BlockPos pos, final EntityPlayer player) {
         final BlockPos downPos = pos.down();
         final Block lowerBlock = world.getBlockState(downPos).getBlock();
         return lowerBlock.getPickBlock(state, target, world, downPos, player);
     }
 
     @Override
-    public boolean shouldSideBeRendered(IBlockState blockState, IBlockAccess blockAccess,
-            BlockPos pos, EnumFacing side) {
+    public boolean shouldSideBeRendered(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
         return false;
     }
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) {
+    public EnumBlockRenderType getRenderType(final IBlockState state) {
         return EnumBlockRenderType.INVISIBLE;
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source, final BlockPos pos) {
         return Block.FULL_BLOCK_AABB;
     }
 
@@ -63,7 +63,7 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
+    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
         destroyUpperBlock(worldIn, pos);
 

@@ -16,7 +16,7 @@ public class ImplAutoBlockStatePredicate implements Predicate<IExtendedBlockStat
     }
 
     @Override
-    public boolean test(IExtendedBlockState t) {
+    public boolean test(final IExtendedBlockState t) {
         return true;
     }
 
@@ -26,14 +26,14 @@ public class ImplAutoBlockStatePredicate implements Predicate<IExtendedBlockStat
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        ImplAutoBlockStatePredicate other = (ImplAutoBlockStatePredicate) obj;
+        final ImplAutoBlockStatePredicate other = (ImplAutoBlockStatePredicate) obj;
         return id == other.id;
     }
 }

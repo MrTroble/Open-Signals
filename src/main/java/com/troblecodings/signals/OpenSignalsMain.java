@@ -68,7 +68,8 @@ public class OpenSignalsMain {
         });
     }
 
-    @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy", clientSide = "com.troblecodings.signals.proxy.ClientProxy")
+    @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy",
+            clientSide = "com.troblecodings.signals.proxy.ClientProxy")
     public static CommonProxy proxy;
     private static Logger log = null;
     public static GuiHandler handler = null;
@@ -156,7 +157,7 @@ public class OpenSignalsMain {
                 @Override
                 public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
                         throws IOException {
-                    Path nextPath = finalPath.resolve(file.getFileName().toString());
+                    final Path nextPath = finalPath.resolve(file.getFileName().toString());
                     ByteStreams.copy(Files.newInputStream(file), Files.newOutputStream(nextPath));
                     return FileVisitResult.CONTINUE;
                 }

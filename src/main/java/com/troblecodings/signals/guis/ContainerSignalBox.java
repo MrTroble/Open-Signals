@@ -238,7 +238,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     @Override
-    public void onContainerClosed(EntityPlayer playerIn) {
+    public void onContainerClosed(final EntityPlayer playerIn) {
         super.onContainerClosed(playerIn);
         if (this.tile != null)
             this.tile.remove(this);
