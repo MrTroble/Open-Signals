@@ -33,6 +33,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -356,6 +357,16 @@ public final class SignalStateHandler implements INetworkSync {
             }
         });
         unloadSignals(states);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
+        final PlayerEntity player = event.getPlayer();
+        Map<SignalStateInfo, Map<SEProperty, String>> map;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            map = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
+        }
+        map.forEach((state, properties) -> sendToPlayer(state, properties, player));
     }
 
     public static void loadSignal(final SignalStateInfo info) {
