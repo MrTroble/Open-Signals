@@ -281,6 +281,7 @@ public final class SignalStateHandler implements INetworkSync {
     private static void sendRemoved(final SignalStateInfo info) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
+        buffer.putInt(info.signal.getID());
         buffer.putByte((byte) 255);
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
@@ -292,6 +293,7 @@ public final class SignalStateHandler implements INetworkSync {
         }
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(stateInfo.pos);
+        buffer.putInt(stateInfo.signal.getID());
         buffer.putByte((byte) properties.size());
         properties.forEach((property, value) -> {
             buffer.putByte((byte) stateInfo.signal.getIDFromProperty(property));
