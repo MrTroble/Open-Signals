@@ -9,14 +9,14 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
-import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Hand;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class SignalBox extends BasicBlock {
@@ -24,20 +24,23 @@ public class SignalBox extends BasicBlock {
     public static final TileEntitySupplierWrapper SUPPLIER = SignalBoxTileEntity::new;
 
     public SignalBox() {
-        super(Properties.of(Material.STONE));
+        super(Material.ROCK);
     }
 
     @Override
-    public boolean use(final BlockState state, final World worldIn, final BlockPos pos,
-            final PlayerEntity playerIn, final Hand hand, final BlockRayTraceResult hit) {
-        if (!playerIn.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
-            final TileEntity entity = worldIn.getBlockEntity(pos);
+    public boolean onBlockActivated(final World worldIn, final BlockPos pos,
+            final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+        if (!playerIn.getHeldItemMainhand().getItem().equals(OSItems.LINKING_TOOL)) {
+            if (worldIn.isRemote)
+                return true;
+            final TileEntity entity = worldIn.getTileEntity(pos);
             if ((entity instanceof SignalBoxTileEntity)
                     && !((SignalBoxTileEntity) entity).isBlocked()) {
                 OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos,
                         "signalbox");
             } else {
-                playerIn.sendMessage(new TranslationTextComponent("msg.isblocked"));
+                playerIn.sendStatusMessage(new TextComponentTranslation("msg.isblocked"), true);
             }
             return true;
         }
@@ -55,12 +58,16 @@ public class SignalBox extends BasicBlock {
     }
 
     @Override
-    public void playerWillDestroy(final World world, final BlockPos pos, final BlockState state,
-            final PlayerEntity player) {
-        if (!world.isClientSide) {
-            ((SignalBoxTileEntity) world.getBlockEntity(pos)).unlink();
-            SignalBoxHandler.removeSignalBox(new PosIdentifier(pos, world));
+    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
+        if (!worldIn.isRemote) {
+            ((SignalBoxTileEntity) worldIn.getTileEntity(pos)).unlink();
+            SignalBoxHandler.removeSignalBox(new PosIdentifier(pos, worldIn));
         }
-        super.playerWillDestroy(world, pos, state, player);
+        super.breakBlock(worldIn, pos, state);
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
+        return new SignalBoxTileEntity();
     }
 }

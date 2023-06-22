@@ -13,12 +13,11 @@ import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.enums.ChangeableStage;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class SEProperty extends ModelProperty<String> implements IIntegerable<String> {
+public class SEProperty implements IIntegerable<String>, IUnlistedProperty<String> {
 
     private final String name;
     private final JsonEnum parent;
@@ -38,10 +37,6 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
         this.deps = deps;
         this.allowedValues = ImmutableList.copyOf(parent.getAllowedValues());
         this.itemDamage = itemDamage;
-    }
-
-    public Object getWrapper(final Object object) {
-        return ((IModelData) object).getData(this);
     }
 
     @Override
@@ -122,6 +117,11 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
     }
 
     @Override
+    public Class<String> getType() {
+        return String.class;
+    }
+
+    @Override
     public boolean equals(final Object obj) {
         if (this == obj)
             return true;
@@ -142,11 +142,10 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
             super(name, parent, defaultValue, stage, deps, itemDamage);
         }
 
-        @OnlyIn(Dist.CLIENT)
+        @SideOnly(Side.CLIENT)
         @Override
         public String getNamedObj(final int obj) {
-            return I18n.get("property." + this.getName() + ".name") + ": " + getObjFromID(obj);
+            return I18n.format("property." + this.getName() + ".name") + ": " + getObjFromID(obj);
         }
     }
-
 }

@@ -5,27 +5,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
+import com.troblecodings.signals.init.OSTabs;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.ITileEntityProvider;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
-public class BasicBlock extends Block {
+public class BasicBlock extends Block implements ITileEntityProvider {
 
     private static final Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
     private static final Map<TileEntitySupplierWrapper, List<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
-    public static final Map<TileEntitySupplierWrapper, TileEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
+    public static final Map<TileEntitySupplierWrapper, TileEntity> BLOCK_ENTITYS = new HashMap<>();
 
-    public BasicBlock(final Properties properties) {
-        super(properties);
+    public BasicBlock(final Material material) {
+        super(material);
+        setCreativeTab(OSTabs.TAB);
         final Optional<TileEntitySupplierWrapper> optional = getSupplierWrapper();
         getSupplierWrapperName().ifPresent(name -> {
             optional.ifPresent(supplier -> {
@@ -34,10 +35,15 @@ public class BasicBlock extends Block {
             });
         });
     }
-    
+
     @Override
-    public BlockRenderLayer getRenderLayer() {
-        return BlockRenderLayer.CUTOUT_MIPPED;
+    public void dropBlockAsItemWithChance(final World worldIn, final BlockPos pos,
+            final IBlockState state, final float chance, final int fortune) {
+    }
+
+    @Override
+    public boolean canRenderInLayer(final IBlockState state, final BlockRenderLayer layer) {
+        return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
     }
 
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
@@ -48,33 +54,31 @@ public class BasicBlock extends Block {
         return Optional.empty();
     }
 
-    public Optional<TileEntityType<?>> getBlockEntityType() {
+    public Optional<TileEntity> getBlockEntityType() {
         return getSupplierWrapper().map(BLOCK_ENTITYS::get);
     }
 
     public static void prepare() {
-        BLOCK_SUPPLIER.forEach((wrapper, blocks) -> {
-            final String name = BLOCK_NAMES.get(wrapper);
-            final Block[] allBlocks = new Block[blocks.size()];
-            final AtomicReference<TileEntityType<TileEntity>> type = new AtomicReference<>();
-            for (int i = 0; i < blocks.size(); i++) {
-                allBlocks[i] = blocks.get(i);
-            }
-            final Supplier<TileEntity> supplier = () -> wrapper
-                    .supply(new TileEntityInfo().with(type.get()));
-            type.set(TileEntityType.Builder.of(supplier, allBlocks).build(null));
-            type.get().setRegistryName(name);
-            BLOCK_ENTITYS.put(wrapper, type.get());
-        });
+        BLOCK_SUPPLIER.forEach((wrapper, blocks) -> BLOCK_ENTITYS.put(wrapper, wrapper.supply()));
     }
 
     @Override
-    public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
-        return BLOCK_ENTITYS.get(getSupplierWrapper().get()).create();
+    public boolean isOpaqueCube(final IBlockState state) {
+        return false;
     }
 
     @Override
-    public boolean hasTileEntity(final BlockState state) {
-        return getSupplierWrapper().isPresent() && getBlockEntityType().isPresent();
+    public boolean isFullCube(final IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public boolean hasTileEntity(final IBlockState state) {
+        return createNewTileEntity(null, 0) != null;
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
+        return null;
     }
 }

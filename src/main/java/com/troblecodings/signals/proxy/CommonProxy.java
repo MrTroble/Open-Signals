@@ -20,23 +20,26 @@ import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.guis.NamableContainer;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
-import com.troblecodings.signals.init.OSItems;
+import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
 
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
 public class CommonProxy {
 
-    public void initModEvent() {
-        SignalStateHandler.init();
-        NameHandler.init();
-        OSSounds.init();
-
+    public void initModEvent(final FMLPreInitializationEvent event) {
         final Map.Entry<GuiHandler, NetworkHandler> init = UIInit.initCommon(OpenSignalsMain.MODID,
                 OpenSignalsMain.getLogger(), OpenSignalsMain.isDebug());
         OpenSignalsMain.handler = init.getKey();
         OpenSignalsMain.network = init.getValue();
+
+        SignalStateHandler.init();
+        NameHandler.init();
+        OSSounds.init();
+        OSBlocks.init();
+
         OpenSignalsMain.handler.addServer(Placementtool.class, ContainerPlacementtool::new);
         OpenSignalsMain.handler.addServer(SignalController.class, ContainerSignalController::new);
         OpenSignalsMain.handler.addServer(SignalBox.class, ContainerSignalBox::new);
@@ -44,9 +47,7 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(RedstoneIO.class, NamableContainer::new);
     }
 
-    public void preinit(final FMLCommonSetupEvent event) {
-        OSItems.init();
-
+    public void init(final FMLInitializationEvent event) {
         OneSignalConfigParser.loadOneSignalConfigs();
         ChangeConfigParser.loadChangeConfigs();
         DefaultConfigParser.loadDefaultConfigs();

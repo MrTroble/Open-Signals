@@ -1,1 +1,1 @@
-{"variants": {"": {"model": "opensignals:block/hvsignalcontroller"}}}
+{"variants": {"normal": {"model": "opensignals:hvsignalcontroller"}}}

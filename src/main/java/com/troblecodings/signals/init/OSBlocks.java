@@ -18,13 +18,13 @@ import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.core.SignalLoader;
 
 import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
+import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.item.Item;
-import net.minecraft.item.Item.Properties;
-import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
 
 public final class OSBlocks {
@@ -43,6 +43,7 @@ public final class OSBlocks {
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 
     public static void init() {
+        BasicBlock.prepare();
         final Field[] fields = OSBlocks.class.getFields();
         for (final Field field : fields) {
             final int modifiers = field.getModifiers();
@@ -60,15 +61,30 @@ public final class OSBlocks {
         }
         OSItems.init();
         SignalLoader.loadAllSignals();
-        BasicBlock.prepare();
     }
 
+    @SuppressWarnings("deprecation")
     public static void loadBlock(final BasicBlock block, final String pName) {
         if (BLOCKS_TO_REGISTER.contains(block))
             return;
         final String name = pName.toLowerCase().trim();
-        block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
+        final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID, name);
+        block.setRegistryName(location);
+        block.setUnlocalizedName(name);
         BLOCKS_TO_REGISTER.add(block);
+        if (block instanceof ITileEntityProvider && block.hasTileEntity()) {
+            final ITileEntityProvider provider = (ITileEntityProvider) block;
+            try {
+                final Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0)
+                        .getClass();
+                if (TileEntity.getKey(tileclass) == null)
+                    TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
+            } catch (final NullPointerException ex) {
+                OpenSignalsMain.getLogger().trace(
+                        "All tileentity provide need to call back a default entity if the world is null!",
+                        ex);
+            }
+        }
         if (block instanceof Signal) {
             if (Signal.SIGNALS.containsKey(name)) {
                 throw new IllegalArgumentException(
@@ -80,30 +96,17 @@ public final class OSBlocks {
 
     @SubscribeEvent
     public static void registerBlock(final RegistryEvent.Register<Block> event) {
-        if (POST.getRegistryName() == null)
-            OSBlocks.init();
         final IForgeRegistry<Block> registry = event.getRegistry();
         BLOCKS_TO_REGISTER.forEach(registry::register);
     }
 
     @SubscribeEvent
-    public static void registerBlockEntitys(final RegistryEvent.Register<TileEntityType<?>> event) {
-        if (POST.getRegistryName() == null)
-            OSBlocks.init();
-        final IForgeRegistry<TileEntityType<?>> registry = event.getRegistry();
-        BasicBlock.BLOCK_ENTITYS.values().forEach(registry::register);
-    }
-
-    @SubscribeEvent
     public static void registerItem(final RegistryEvent.Register<Item> event) {
-        if (POST.getRegistryName() == null)
-            OSBlocks.init();
         final IForgeRegistry<Item> registry = event.getRegistry();
         BLOCKS_TO_REGISTER.forEach(block -> {
-            if (block instanceof Signal || block instanceof GhostBlock)
+            if (block instanceof GhostBlock || block instanceof Signal)
                 return;
-            registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
-                    .setRegistryName(block.getRegistryName()));
+            registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
         });
 
     }

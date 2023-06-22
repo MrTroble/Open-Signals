@@ -5,42 +5,43 @@ import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.enums.CompareValues;
-import com.troblecodings.signals.models.ModelInfoWrapper;
+
+import net.minecraftforge.common.property.IExtendedBlockState;
 
 public final class PredicateHolder {
 
     private PredicateHolder() {
     }
 
-    public static Predicate<ModelInfoWrapper> has(final SEProperty property) {
-        return ebs -> ebs.get(property) != null;
+    public static Predicate<IExtendedBlockState> has(final SEProperty property) {
+        return ebs -> ebs.getValue(property) != null;
     }
 
-    public static Predicate<ModelInfoWrapper> hasNot(final SEProperty property) {
-        return ebs -> ebs.get(property) == null;
+    public static Predicate<IExtendedBlockState> hasNot(final SEProperty property) {
+        return ebs -> ebs.getValue(property) == null;
     }
 
     @SuppressWarnings("unchecked")
-    public static Predicate<ModelInfoWrapper> with(final ValuePack pack) {
+    public static Predicate<IExtendedBlockState> with(final ValuePack pack) {
         return ebs -> {
-            final Object test = ebs.get(pack.property);
+            final Object test = ebs.getValue(pack.property);
             return test != null && pack.predicate.test(test);
         };
     }
 
-    public static Predicate<ModelInfoWrapper> hasAndIs(final SEProperty property) {
+    public static Predicate<IExtendedBlockState> hasAndIs(final SEProperty property) {
         return ebs -> {
-            final Boolean bool = "TRUE".equalsIgnoreCase(ebs.get(property));
+            final Boolean bool = "TRUE".equalsIgnoreCase(ebs.getValue(property));
             return bool.booleanValue();
         };
     }
 
-    public static Predicate<ModelInfoWrapper> hasAndIsNot(final SEProperty property) {
+    public static Predicate<IExtendedBlockState> hasAndIsNot(final SEProperty property) {
         return ebs -> {
-            final String cacheString = ebs.get(property);
+            final String cacheString = ebs.getValue(property);
             if (cacheString == null)
                 return false;
-            final Boolean bool = "TRUE".equalsIgnoreCase(ebs.get(property));
+            final Boolean bool = "TRUE".equalsIgnoreCase(ebs.getValue(property));
             return !bool.booleanValue();
         };
     }

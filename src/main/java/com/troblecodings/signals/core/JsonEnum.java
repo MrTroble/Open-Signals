@@ -12,9 +12,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
-public class JsonEnum extends ModelProperty<String> implements IIntegerable<String> {
+public class JsonEnum implements IIntegerable<String>, IUnlistedProperty<String> {
 
     private final String name;
     private final List<String> values;

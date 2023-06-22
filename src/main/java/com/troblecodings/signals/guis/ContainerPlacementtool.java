@@ -17,7 +17,7 @@ import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.items.Placementtool;
 
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
 public class ContainerPlacementtool extends ContainerBase implements INetworkSync {
@@ -27,14 +27,14 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
     public final Map<SEProperty, Integer> properties = new HashMap<>();
     protected int signalID;
     protected String signalName = "";
-    private final PlayerEntity player;
+    private final EntityPlayer player;
     private Signal signal;
 
     public ContainerPlacementtool(final GuiInfo info) {
         super(info);
         info.base = this;
         this.player = info.player;
-        info.player.containerMenu = this;
+        info.player.openContainer = this;
     }
 
     @Override
@@ -42,8 +42,8 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         sendItemProperties(player);
     }
 
-    private void sendItemProperties(final PlayerEntity player) {
-        final ItemStack stack = player.getMainHandItem();
+    private void sendItemProperties(final EntityPlayer player) {
+        final ItemStack stack = player.getHeldItemMainhand();
         final Placementtool tool = (Placementtool) stack.getItem();
         final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
         final int signalID = wrapper.getInteger(Placementtool.BLOCK_TYPE_ID);
@@ -77,7 +77,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
     public void deserializeServer(final ByteBuffer buf) {
         final ReadBuffer buffer = new ReadBuffer(buf);
         final int first = buffer.getByteAsInt();
-        final ItemStack stack = player.getMainHandItem();
+        final ItemStack stack = player.getHeldItemMainhand();
         final Placementtool tool = (Placementtool) stack.getItem();
         if (first == 255) {
             final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
@@ -112,7 +112,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final ReadBuffer buffer = new ReadBuffer(buf);
         signalID = buffer.getInt();
         final int size = buffer.getByteAsInt();
-        final Placementtool tool = (Placementtool) player.getMainHandItem().getItem();
+        final Placementtool tool = (Placementtool) player.getHeldItemMainhand().getItem();
         final Signal signal = tool.getObjFromID(signalID);
         final List<SEProperty> signalProperties = signal.getProperties();
         properties.clear();

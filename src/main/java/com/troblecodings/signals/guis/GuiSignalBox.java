@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -102,7 +103,7 @@ public class GuiSignalBox extends GuiBase {
         this.container = (ContainerSignalBox) info.base;
         container.setConsumer(this::update);
         container.setColorUpdater(this::applyColorChanges);
-        info.player.containerMenu = this.container;
+        info.player.openContainer = this.container;
         this.info = info;
     }
 
@@ -177,18 +178,18 @@ public class GuiSignalBox extends GuiBase {
 
     private String getSignalInfo(final BlockPos signalPos, final LinkType type) {
         final String customName = ClientNameHandler
-                .getClientName(new NameStateInfo(mc.level, signalPos));
+                .getClientName(new NameStateInfo(mc.world, signalPos));
         return String.format("%s (x=%d, y=%d. z=%d)",
                 customName == null
-                        ? (type.equals(LinkType.SIGNAL) ? "" : I18n.get("type." + type.name()))
+                        ? (type.equals(LinkType.SIGNAL) ? "" : I18n.format("type." + type.name()))
                         : customName,
                 signalPos.getX(), signalPos.getY(), signalPos.getZ());
     }
 
     private void setupModeSettings(final UIEntity parent, final EnumGuiMode mode,
             final Rotation rotation, final SignalBoxNode node, final PathOptionEntry option) {
-        final String modeName = I18n.get("property." + mode.name());
-        final String rotationName = I18n.get("property." + rotation.name() + ".rotation");
+        final String modeName = I18n.format("property." + mode.name());
+        final String rotationName = I18n.format("property." + rotation.name() + ".rotation");
         final UIEntity entity = new UIEntity();
         entity.setInheritWidth(true);
         entity.setHeight(20);
@@ -208,8 +209,8 @@ public class GuiSignalBox extends GuiBase {
                 final UIEntity stateEntity = new UIEntity();
                 stateEntity.setInheritWidth(true);
                 stateEntity.setHeight(15);
-                final String pathUsageName = I18n.get("property.status") + ": ";
-                final String pathUsage = I18n.get("property." + path);
+                final String pathUsageName = I18n.format("property.status") + ": ";
+                final String pathUsage = I18n.format("property." + path);
                 stateEntity.add(new UILabel(pathUsageName + pathUsage));
                 parent.add(stateEntity);
 
@@ -251,7 +252,7 @@ public class GuiSignalBox extends GuiBase {
                 }, option.getEntry(PathEntryType.ZS2).orElse((byte) 0));
                 parent.add(zs2Entity);
 
-                parent.add(GuiElements.createButton(I18n.get("button.reset"), e -> {
+                parent.add(GuiElements.createButton(I18n.format("button.reset"), e -> {
                     reset();
                     initializeFieldUsage(mainButton);
                     resetPathwayOnServer(node);
@@ -264,11 +265,11 @@ public class GuiSignalBox extends GuiBase {
                 break;
             case HP: {
                 if (option.containsEntry(PathEntryType.SIGNAL))
-                    parent.add(GuiElements.createButton(I18n.get("btn.subsidiary"), e -> {
+                    parent.add(GuiElements.createButton(I18n.format("btn.subsidiary"), e -> {
                         final UIEntity screen = GuiElements.createScreen(selection -> {
                             final UIBox hbox = new UIBox(UIBox.VBOX, 3);
                             selection.add(hbox);
-                            selection.add(GuiElements.createButton(I18n.get("btn.return"), a -> {
+                            selection.add(GuiElements.createButton(I18n.format("btn.return"), a -> {
                                 pop();
                             }));
                             final ModeSet modeSet = new ModeSet(mode, rotation);
@@ -399,7 +400,7 @@ public class GuiSignalBox extends GuiBase {
             icon.add(new UITexture(UISignalBoxTile.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1));
             icon.setHeight(20);
             icon.setWidth(20);
-            icon.add(new UIToolTip(I18n.get("type." + t.name())));
+            icon.add(new UIToolTip(I18n.format("type." + t.name())));
             layout.add(icon);
 
             layout.add(GuiElements.createButton(name));
@@ -427,13 +428,13 @@ public class GuiSignalBox extends GuiBase {
             final UIBox hbox = new UIBox(UIBox.VBOX, 3);
             selectionEntity.add(hbox);
             final UIEntity question = new UIEntity();
-            final UILabel label = new UILabel(I18n.get("sb.editmode"));
+            final UILabel label = new UILabel(I18n.format("sb.editmode"));
             label.setTextColor(0xFFFFFFFF);
             question.setScaleX(1.1f);
             question.setScaleY(1.1f);
             question.add(label);
             question.setInherits(true);
-            final UILabel info = new UILabel(I18n.get("sb.allreset"));
+            final UILabel info = new UILabel(I18n.format("sb.allreset"));
             info.setTextColor(0xFFFFFFFF);
             final UIEntity infoEntity = new UIEntity();
             infoEntity.add(info);
@@ -441,7 +442,7 @@ public class GuiSignalBox extends GuiBase {
             selectionEntity.add(question);
             selectionEntity.add(infoEntity);
             final UIEntity buttons = new UIEntity();
-            final UIEntity buttonYes = GuiElements.createButton(I18n.get("btn.yes"), e -> {
+            final UIEntity buttonYes = GuiElements.createButton(I18n.format("btn.yes"), e -> {
                 pop();
                 reset();
                 final UIMenu menu = new UIMenu();
@@ -453,7 +454,7 @@ public class GuiSignalBox extends GuiBase {
                 this.pageCheck(Page.EDIT);
                 resetAllPathways();
             });
-            final UIEntity buttonNo = GuiElements.createButton(I18n.get("btn.no"), e -> {
+            final UIEntity buttonNo = GuiElements.createButton(I18n.format("btn.no"), e -> {
                 pop();
             });
             buttons.setInherits(true);
@@ -532,7 +533,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void initializeBasicUI() {
-        final String name = I18n.get("tile.signalbox.name");
+        final String name = I18n.format("tile.signalbox.name");
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);
@@ -549,10 +550,10 @@ public class GuiSignalBox extends GuiBase {
         header.add(new UIBox(UIBox.HBOX, 4));
         header.add(titel);
         header.add(GuiElements.createSpacerH(80));
-        header.add(
-                GuiElements.createButton(I18n.get("btn.settings"), this::initializePageSettings));
-        header.add(GuiElements.createButton(I18n.get("btn.edit"), this::initializeFieldEdit));
-        mainButton = GuiElements.createButton(I18n.get("btn.main"), this::initializeFieldUsage);
+        header.add(GuiElements.createButton(I18n.format("btn.settings"),
+                this::initializePageSettings));
+        header.add(GuiElements.createButton(I18n.format("btn.edit"), this::initializeFieldEdit));
+        mainButton = GuiElements.createButton(I18n.format("btn.main"), this::initializeFieldUsage);
         header.add(mainButton);
         resetSelection(mainButton);
 
@@ -759,5 +760,10 @@ public class GuiSignalBox extends GuiBase {
                     .ifPresent(poe -> uiTile.setColor(modeSet, poe.getEntry(PathEntryType.PATHUSAGE)
                             .orElseGet(() -> EnumPathUsage.FREE).getColor()));
         }
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new ContainerSignalBox(info);
     }
 }

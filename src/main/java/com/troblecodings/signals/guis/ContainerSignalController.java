@@ -23,8 +23,9 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 public class ContainerSignalController extends ContainerBase implements UIClientSync, INetworkSync {
@@ -32,7 +33,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     private final AtomicReference<Map<SEProperty, String>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
     protected final Map<Integer, Map<SEProperty, String>> allRSStates = new HashMap<>();
-    protected final Map<Direction, Map<EnumState, Integer>> enabledRSStates = new HashMap<>();
+    protected final Map<EnumFacing, Map<EnumState, Integer>> enabledRSStates = new HashMap<>();
     private List<SEProperty> propertiesList;
     private final GuiInfo info;
     private BlockPos linkedPos;
@@ -44,7 +45,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     public ContainerSignalController(final GuiInfo info) {
         super(info);
         info.base = this;
-        info.player.containerMenu = this;
+        info.player.openContainer = this;
         this.info = info;
     }
 
@@ -57,7 +58,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         if (info.pos == null) {
             return;
         }
-        controllerEntity = (SignalControllerTileEntity) info.world.getBlockEntity(info.pos);
+        controllerEntity = (SignalControllerTileEntity) info.world.getTileEntity(info.pos);
         linkedPos = controllerEntity.getLinkedPosition();
         if (linkedPos == null) {
             return;
@@ -90,7 +91,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
             });
             allStatesToSend.put(profile, propsForProfile);
         });
-        final Map<Direction, Map<EnumState, Byte>> enabledStates = controllerEntity
+        final Map<EnumFacing, Map<EnumState, Byte>> enabledStates = controllerEntity
                 .getEnabledStates();
         currentMode = controllerEntity.getLastMode();
 
@@ -169,7 +170,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         }
         final int enabledStatesSize = buffer.getByteAsInt();
         for (int i = 0; i < enabledStatesSize; i++) {
-            final Direction direction = Direction.values()[buffer.getByteAsInt()];
+            final EnumFacing direction = EnumFacing.values()[buffer.getByteAsInt()];
             final int propSize = buffer.getByteAsInt();
             final Map<EnumState, Integer> states = new HashMap<>();
             for (int j = 0; j < propSize; j++) {
@@ -217,13 +218,13 @@ public class ContainerSignalController extends ContainerBase implements UIClient
             }
             case SET_PROFILE: {
                 final EnumState state = EnumState.values()[buffer.getByteAsInt()];
-                final Direction direction = Direction.values()[buffer.getByteAsInt()];
+                final EnumFacing direction = EnumFacing.values()[buffer.getByteAsInt()];
                 final int profile = buffer.getByteAsInt();
                 controllerEntity.updateEnabledStates(direction, state, profile);
                 break;
             }
             case INITIALIZE_DIRECTION: {
-                final Direction direction = Direction.values()[buffer.getByteAsInt()];
+                final EnumFacing direction = EnumFacing.values()[buffer.getByteAsInt()];
                 final Map<EnumState, Byte> states = new HashMap<>();
                 states.put(EnumState.OFFSTATE, (byte) 0);
                 states.put(EnumState.ONSTATE, (byte) 0);
@@ -244,13 +245,13 @@ public class ContainerSignalController extends ContainerBase implements UIClient
     }
 
     @Override
-    public PlayerEntity getPlayer() {
+    public EntityPlayer getPlayer() {
         return info.player;
     }
 
     @Override
-    public boolean stillValid(final PlayerEntity playerIn) {
-        if (playerIn instanceof PlayerEntity) {
+    public boolean canInteractWith(final EntityPlayer playerIn) {
+        if (playerIn instanceof EntityPlayerMP) {
             this.info.player = playerIn;
         }
         return true;

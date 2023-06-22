@@ -1,42 +1,49 @@
 package com.troblecodings.signals.blocks;
 
+import java.util.Optional;
+
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Direction;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class RedstoneInput extends RedstoneIO {
 
     @Override
-    public void neighborChanged(final BlockState state, final World worldIn, final BlockPos pos,
-            final Block blockIn, final BlockPos fromPos, final boolean isMoving) {
-        if (worldIn.isClientSide)
+    public void neighborChanged(final IBlockState state, final World worldIn, final BlockPos pos,
+            final Block blockIn, final BlockPos fromPos) {
+        if (worldIn.isRemote)
             return;
-        if (worldIn.hasNeighborSignal(pos)) {
-            if (!state.getValue(RedstoneIO.POWER)) {
-                worldIn.setBlockAndUpdate(pos, state.setValue(RedstoneIO.POWER, true));
-                final TileEntity entity = worldIn.getBlockEntity(pos);
+        if (worldIn.isBlockPowered(pos)) {
+            if (state.getValue(RedstoneIO.POWER) != true) {
+                worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, true));
+                final TileEntity entity = worldIn.getTileEntity(pos);
                 if (entity instanceof RedstoneIOTileEntity)
                     ((RedstoneIOTileEntity) entity).sendToAll();
             }
         } else {
-            worldIn.setBlockAndUpdate(pos, state.setValue(RedstoneIO.POWER, false));
+            worldIn.setBlockState(pos, state.withProperty(RedstoneIO.POWER, false));
         }
     }
 
     @Override
-    public int getDirectSignal(final BlockState blockState, final IBlockReader world,
-            final BlockPos pos, final Direction direction) {
+    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
         return 0;
     }
 
     @Override
-    public boolean isSignalSource(final BlockState blockState) {
+    public boolean canProvidePower(final IBlockState state) {
         return true;
+    }
+
+    @Override
+    public Optional<String> getSupplierWrapperName() {
+        return Optional.of("redstonein");
     }
 }

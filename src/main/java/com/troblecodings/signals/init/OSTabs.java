@@ -1,6 +1,6 @@
 package com.troblecodings.signals.init;
 
-import net.minecraft.item.ItemGroup;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 
 public final class OSTabs {
@@ -8,10 +8,10 @@ public final class OSTabs {
     private OSTabs() {
     }
 
-    public static final ItemGroup TAB = new ItemGroup("Open Signals") {
+    public static final CreativeTabs TAB = new CreativeTabs("Open Signals") {
 
         @Override
-        public ItemStack makeIcon() {
+        public ItemStack getTabIconItem() {
             return new ItemStack(OSItems.LINKING_TOOL);
         }
     };

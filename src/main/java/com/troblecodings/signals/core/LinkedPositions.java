@@ -108,7 +108,7 @@ public class LinkedPositions {
     }
 
     public void loadSignals(final World world) {
-        if (world.isClientSide)
+        if (world.isRemote)
             return;
         final List<SignalStateInfo> signalInfos = new ArrayList<>();
         signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
@@ -116,7 +116,7 @@ public class LinkedPositions {
     }
 
     public void unloadSignals(final World world) {
-        if (world.isClientSide)
+        if (world.isRemote)
             return;
         final List<SignalStateInfo> signalInfos = new ArrayList<>();
         signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));

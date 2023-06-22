@@ -14,19 +14,17 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.SignalStateListener;
-import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.Direction;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.registry.Registry;
 
 public class SignalControllerTileEntity extends SyncableTileEntity
         implements ISyncable, ILinkableTile {
@@ -36,9 +34,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private int lastProfile = 0;
     private NBTWrapper copy;
     private EnumMode lastState;
-    private final boolean[] currentStates = new boolean[Direction.values().length];
+    private final boolean[] currentStates = new boolean[EnumFacing.values().length];
     private final Map<Byte, Map<SEProperty, String>> allStates = new HashMap<>();
-    private final Map<Direction, Map<EnumState, Byte>> enabledStates = new HashMap<>();
+    private final Map<EnumFacing, Map<EnumState, Byte>> enabledStates = new HashMap<>();
     private final SignalStateListener listener = (_u, removed) -> {
         if (removed) {
             linkedSignalPosition = null;
@@ -56,8 +54,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private static final String LAST_PROFILE = "lastprofile";
     private static final String ENUM_MODE = "enummode";
 
-    public SignalControllerTileEntity(final TileEntityInfo info) {
-        super(info);
+    public SignalControllerTileEntity() {
+        super();
     }
 
     public void setLastMode(final EnumMode state) {
@@ -70,7 +68,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return lastState;
     }
 
-    public void initializeDirection(final Direction direction, final Map<EnumState, Byte> states) {
+    public void initializeDirection(final EnumFacing direction, final Map<EnumState, Byte> states) {
         enabledStates.put(direction, states);
     }
 
@@ -101,7 +99,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         allStates.put((byte) profile, ImmutableMap.copyOf(setProperties));
     }
 
-    public void updateEnabledStates(final Direction direction, final EnumState state,
+    public void updateEnabledStates(final EnumFacing direction, final EnumState state,
             final int profile) {
         final Map<EnumState, Byte> states = enabledStates.containsKey(direction)
                 ? enabledStates.get(direction)
@@ -116,13 +114,13 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return ImmutableMap.copyOf(allStates);
     }
 
-    public Map<Direction, Map<EnumState, Byte>> getEnabledStates() {
+    public Map<EnumFacing, Map<EnumState, Byte>> getEnabledStates() {
         return ImmutableMap.copyOf(enabledStates);
     }
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
-        if (level == null || level.isClientSide)
+        if (world == null || world.isRemote)
             return;
         if (linkedSignalPosition != null && linkedSignal != null) {
             wrapper.putBlockPos(BLOCK_POS_ID, linkedSignalPosition);
@@ -133,7 +131,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         wrapper.putInteger(LAST_PROFILE, lastProfile);
         if (lastState != null)
             wrapper.putInteger(ENUM_MODE, lastState.ordinal());
-        for (final Direction direction : Direction.values()) {
+        for (final EnumFacing direction : EnumFacing.values()) {
             if (!enabledStates.containsKey(direction))
                 continue;
 
@@ -162,14 +160,14 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (wrapper.contains(BLOCK_POS_ID))
             linkedSignalPosition = wrapper.getBlockPos(BLOCK_POS_ID);
         copy = wrapper.copy();
-        if (level == null) {
+        if (world == null) {
             return;
         }
         readFromWrapper(copy);
     }
 
     private void readFromWrapper(final NBTWrapper wrapper) {
-        if (level == null || level.isClientSide || linkedSignalPosition == null)
+        if (world == null || world.isRemote || linkedSignalPosition == null)
             return;
         if (wrapper.contains(SIGNAL_NAME)) {
             linkedSignal = Signal.SIGNALS.get(wrapper.getString(SIGNAL_NAME));
@@ -180,7 +178,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (wrapper.contains(ENUM_MODE)) {
             lastState = EnumMode.values()[wrapper.getInteger(ENUM_MODE)];
         }
-        for (final Direction direction : Direction.values()) {
+        for (final EnumFacing direction : EnumFacing.values()) {
             if (!wrapper.contains(direction.getName()))
                 continue;
             final NBTWrapper comp = wrapper.getWrapper(direction.getName());
@@ -210,11 +208,11 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     @Override
     public void onLoad() {
-        if (!level.isClientSide && copy != null) {
+        if (!world.isRemote && copy != null) {
             if (copy.contains(BLOCK_POS_ID))
                 linkedSignalPosition = copy.getBlockPos(BLOCK_POS_ID);
             readFromWrapper(copy);
-            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
+            final SignalStateInfo info = new SignalStateInfo(world, linkedSignalPosition,
                     linkedSignal);
             if (linkedSignalPosition != null && linkedSignal != null) {
                 SignalStateHandler.loadSignal(info);
@@ -227,7 +225,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public void unloadSignal() {
         if (linkedSignalPosition != null & linkedSignal != null)
             SignalStateHandler
-                    .unloadSignal(new SignalStateInfo(level, linkedSignalPosition, linkedSignal));
+                    .unloadSignal(new SignalStateInfo(world, linkedSignalPosition, linkedSignal));
     }
 
     public BlockPos getLinkedPosition() {
@@ -244,29 +242,28 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean link(final BlockPos pos, final CompoundNBT tag) {
-        @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK
-                .get(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
+    public boolean link(final BlockPos pos, final NBTTagCompound tag) {
+        final Block block = Block.REGISTRY
+                .getObject(new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNAL_NAME)));
         if (block != null && block instanceof Signal) {
             unlink();
             linkedSignalPosition = pos;
             linkedSignal = (Signal) block;
-            SignalStateHandler.addListener(new SignalStateInfo(level, pos, linkedSignal), listener);
+            SignalStateHandler.addListener(new SignalStateInfo(world, pos, linkedSignal), listener);
             return true;
         }
         return false;
     }
 
     @Override
-    public void onChunkUnloaded() {
+    public void onChunkUnload() {
         unloadSignal();
     }
 
     @Override
     public boolean unlink() {
         SignalStateHandler.removeListener(
-                new SignalStateInfo(level, linkedSignalPosition, linkedSignal), listener);
+                new SignalStateInfo(world, linkedSignalPosition, linkedSignal), listener);
         linkedSignalPosition = null;
         linkedSignal = null;
         allStates.clear();
@@ -275,12 +272,12 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     public void redstoneUpdate() {
-        if (level.isClientSide || linkedSignalPosition == null)
+        if (world.isRemote || linkedSignalPosition == null)
             return;
-        for (final Direction face : Direction.values()) {
+        for (final EnumFacing face : EnumFacing.values()) {
             if (!this.enabledStates.containsKey(face))
                 continue;
-            final boolean state = this.level.hasSignal(worldPosition.relative(face), face);
+            final boolean state = this.world.isSidePowered(pos.offset(face), face);
             final boolean old = this.currentStates[face.ordinal()];
             if (state == old)
                 continue;
@@ -290,14 +287,14 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             if (profile == null || !allStates.containsKey(profile)) {
                 continue;
             }
-            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
+            final SignalStateInfo info = new SignalStateInfo(world, linkedSignalPosition,
                     linkedSignal);
             SignalStateHandler.setStates(info, allStates.get(profile));
         }
     }
 
     @Override
-    public boolean isValid(final PlayerEntity player) {
+    public boolean isValid(final EntityPlayer player) {
         return true;
     }
 }

@@ -22,18 +22,17 @@ import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.Hand;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Placementtool extends Item
         implements IIntegerable<Signal>, ITagableItem, MessageWrapper {
@@ -44,45 +43,44 @@ public class Placementtool extends Item
     public final ArrayList<Signal> signals = new ArrayList<>();
 
     public Placementtool() {
-        super(new Item.Properties().tab(OSTabs.TAB).durability(100).setNoRepair());
+        setCreativeTab(OSTabs.TAB);
+        setMaxDamage(100);
+        setNoRepair();
+        setMaxStackSize(1);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @SideOnly(Side.CLIENT)
     @Override
     public String getNamedObj(final int obj) {
-        return I18n.get("property." + this.getName() + ".name") + ": "
-                + I18n.get(this.getObjFromID(obj).toString());
+        return I18n.format("property." + this.getName() + ".name") + ": "
+                + this.getObjFromID(obj).getLocalizedName();
     }
 
     @Override
-    public ActionResult<ItemStack> use(final World world, final PlayerEntity player,
-            final Hand hand) {
-        if (!world.isClientSide) {
-            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, world,
-                    player.getCommandSenderBlockPosition(), "placementtool");
-        }
-        if (world.isClientSide)
-            return ActionResult.newResult(ActionResultType.SUCCESS, player.getItemInHand(hand));
-        return ActionResult.newResult(ActionResultType.FAIL, player.getItemInHand(hand));
+    public EnumActionResult onItemUseFirst(final EntityPlayer player, final World world,
+            final BlockPos pos, final EnumFacing side, final float hitX, final float hitY,
+            final float hitZ, final EnumHand hand) {
+        return onItemUse(player, world, pos, hand, side, hitX, hitY, hitZ);
     }
 
     @Override
-    public ActionResultType onItemUseFirst(final ItemStack stack, final ItemUseContext context) {
-        final PlayerEntity player = context.getPlayer();
-        final World worldIn = context.getLevel();
-        if (worldIn.isEmptyBlock(context.getClickedPos())) {
-            return ActionResultType.FAIL;
-        }
+    public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
+            final BlockPos pos, final EnumHand hand, final EnumFacing facing, final float hitX,
+            final float hitY, final float hitZ) {
         if (player.isSneaking()) {
-            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn,
-                    context.getClickedPos(), "placementtool");
-            return ActionResultType.SUCCESS;
+            if (worldIn.isRemote)
+                return EnumActionResult.SUCCESS;
+            OpenSignalsMain.handler.invokeGui(Placementtool.class, player, worldIn, pos,
+                    "placementtool");
+            return EnumActionResult.SUCCESS;
         }
-        final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(player.getMainHandItem());
+        final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(player.getHeldItemMainhand());
         if (!wrapper.contains(BLOCK_TYPE_ID)) {
             wrapper.putInteger(BLOCK_TYPE_ID, 0);
         }
+        final BlockPos placePos = pos.offset(facing);
         final Signal signal = getObjFromID(wrapper.getInteger(BLOCK_TYPE_ID));
+
         final List<SEProperty> properties = signal.getProperties();
         final Map<SEProperty, String> signalProperties = new HashMap<>();
         int cost = signal.getDefaultDamage();
@@ -105,31 +103,11 @@ public class Placementtool extends Item
                 signalProperties.put(property, property.getDefault());
             }
         }
-
-        final ItemStack item = context.getItemInHand();
-        item.hurtAndBreak(Math.abs(cost), player,
-                (user) -> user.broadcastBreakEvent(context.getHand()));
-
-        final int height = signal.getHeight(signalProperties);
-        final BlockPos pos = context.getClickedPos().above();
-        BlockPos checkPos = pos;
-        for (int i = 0; i < height; i++) {
-            if (!worldIn.isEmptyBlock(checkPos)) {
-                if (!worldIn.isClientSide)
-                    translateMessageWrapper(player, "pt.blockinway");
-                return ActionResultType.FAIL;
-            }
-            checkPos = checkPos.above();
-        }
-        final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
+        final SignalStateInfo info = new SignalStateInfo(worldIn, placePos, signal);
         SignalStateHandler.createStates(info, signalProperties);
-        BlockPos ghostPos = pos.above();
-        for (int i = 0; i < height; i++) {
-            worldIn.setBlock(ghostPos, OSBlocks.GHOST_BLOCK.defaultBlockState(), 3);
-            ghostPos = ghostPos.above();
-        }
+
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
-        final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
+        final NameStateInfo nameInfo = new NameStateInfo(worldIn, placePos);
         if (!(signalName == null || signalName.isEmpty())) {
             signalProperties.put(Signal.CUSTOMNAME, "true");
             NameHandler.createName(nameInfo, signalName);
@@ -137,13 +115,32 @@ public class Placementtool extends Item
             signalProperties.put(Signal.CUSTOMNAME, "false");
             NameHandler.createName(nameInfo, signal.getSignalTypeName());
         }
-        worldIn.setBlock(pos, signal.getStateForPlacement(new BlockItemUseContext(context)), 3);
-        return ActionResultType.SUCCESS;
-    }
 
-    @Override
-    public ActionResultType useOn(final ItemUseContext context) {
-        return onItemUseFirst(getDefaultInstance(), context);
+        worldIn.setBlockState(placePos, signal.getStateForPlacement(worldIn, placePos, facing, hitX,
+                hitY, hitZ, 0, player, hand), 3);
+
+        final ItemStack item = player.getHeldItemMainhand();
+        item.damageItem(Math.abs(cost), player);
+
+        final int height = signal.getHeight(signalProperties);
+        BlockPos checkPos = placePos.up();
+        for (int i = 0; i < height; i++) {
+            if (!worldIn.isAirBlock(checkPos)) {
+                if (!worldIn.isRemote)
+                    translateMessageWrapper(player, "pt.blockinway");
+                return EnumActionResult.FAIL;
+            }
+            checkPos = checkPos.up();
+        }
+
+        BlockPos ghostPos = placePos.up();
+        for (int i = 0; i < height; i++) {
+            worldIn.setBlockState(ghostPos, OSBlocks.GHOST_BLOCK.getDefaultState(), 3);
+            ghostPos = ghostPos.up();
+        }
+        final ExtendedBlockState ebs = (ExtendedBlockState) signal.getBlockState();
+        worldIn.notifyBlockUpdate(placePos, ebs.getBaseState(), ebs.getBaseState(), 3);
+        return EnumActionResult.SUCCESS;
     }
 
     @Override

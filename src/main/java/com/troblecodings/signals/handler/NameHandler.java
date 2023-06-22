@@ -7,55 +7,53 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Nullable;
+
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
-import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
+import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.client.CCustomPayloadPacket;
-import net.minecraft.network.play.server.SCustomPayloadPlayPacket;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.chunk.IChunk;
-import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.world.ChunkEvent;
+import net.minecraft.world.WorldServer;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.network.NetworkEvent.ClientCustomPayloadEvent;
-import net.minecraftforge.fml.network.NetworkRegistry;
-import net.minecraftforge.fml.network.event.EventNetworkChannel;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent;
+import net.minecraftforge.fml.common.network.FMLEventChannel;
+import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public final class NameHandler implements INetworkSync {
 
     private static final Map<NameStateInfo, String> ALL_NAMES = new HashMap<>();
-    private static final Map<IChunk, List<NameStateInfo>> CURRENTLY_LOADED_CHUNKS = new HashMap<>();
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
-    private static EventNetworkChannel channel;
-    private static ResourceLocation channelName;
+    private static final Map<NameStateInfo, Integer> LOAD_COUNTER = new HashMap<>();
+    private static final String CHANNELNAME = "namehandlernet";
+    private static FMLEventChannel channel;
 
     public static void init() {
-        channelName = new ResourceLocation(OpenSignalsMain.MODID, "namehandler");
-        channel = NetworkRegistry.newEventChannel(channelName, () -> OpenSignalsMain.MODID,
-                OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
-        channel.registerObject(new NameHandler());
+        channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNELNAME);
+        channel.register(new NameHandler());
     }
 
     public static void add(final Object obj) {
-        channel.registerObject(obj);
+        channel.register(obj);
     }
 
     public static void createName(final NameStateInfo info, final String name) {
-        if (info.world.isClientSide || name == null)
+        if (info.world.isRemote || name == null)
             return;
         new Thread(() -> {
             setNameForNonSignal(info, name);
@@ -64,7 +62,7 @@ public final class NameHandler implements INetworkSync {
     }
 
     public static void setNameForSignal(final NameStateInfo info, final String name) {
-        if (info.world.isClientSide || name == null)
+        if (info.world.isRemote || name == null)
             return;
         setNameForNonSignal(info, name);
         final Block block = info.world.getBlockState(info.pos).getBlock();
@@ -75,19 +73,18 @@ public final class NameHandler implements INetworkSync {
     }
 
     public static void setNameForNonSignal(final NameStateInfo info, final String name) {
-        if (info.world.isClientSide || name == null)
+        if (info.world.isRemote || name == null)
             return;
         new Thread(() -> {
             synchronized (ALL_NAMES) {
                 ALL_NAMES.put(info, name);
             }
-            sendNameToClient(info, name);
-            createToFile(info, name);
+            sendToAll(info, name);
         }, "OSNameHandler:setName").start();
     }
 
     public static String getName(final NameStateInfo info) {
-        if (info.world.isClientSide)
+        if (info.world.isRemote)
             return "";
         synchronized (ALL_NAMES) {
             final String name = ALL_NAMES.get(info);
@@ -97,9 +94,9 @@ public final class NameHandler implements INetworkSync {
         }
     }
 
-    private static void sendNameToClient(final NameStateInfo info, final String name) {
+    private static void sendToAll(final NameStateInfo info, final String name) {
         final ByteBuffer buffer = packToBuffer(info.pos, name);
-        info.world.players().forEach(player -> sendTo(player, buffer));
+        info.world.playerEntities.forEach(player -> sendTo(player, buffer));
     }
 
     private static ByteBuffer packToBuffer(final BlockPos pos, final String name) {
@@ -123,25 +120,19 @@ public final class NameHandler implements INetworkSync {
         }
         file.deleteIndex(info.pos);
         sendRemoved(info);
-        final IChunk chunk = info.world.getChunk(info.pos);
-        if (chunk == null)
-            return;
-        synchronized (CURRENTLY_LOADED_CHUNKS) {
-            CURRENTLY_LOADED_CHUNKS.get(chunk).remove(info);
-        }
     }
 
     private static void sendRemoved(final NameStateInfo info) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putByte((byte) 255);
-        info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
+        info.world.playerEntities.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
-        final World world = (World) event.getWorld();
-        if (world.isClientSide)
+        final World world = event.getWorld();
+        if (world.isRemote)
             return;
         Map<NameStateInfo, String> map;
         synchronized (ALL_NAMES) {
@@ -157,7 +148,7 @@ public final class NameHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onWorldUnload(final WorldEvent.Unload unload) {
-        if (unload.getWorld().isClientSide())
+        if (unload.getWorld().isRemote)
             return;
         synchronized (ALL_LEVEL_FILES) {
             ALL_LEVEL_FILES.remove(unload.getWorld());
@@ -172,74 +163,57 @@ public final class NameHandler implements INetworkSync {
         if (file == null)
             return;
         SignalStatePos posInFile = file.find(info.pos);
-        if (posInFile == null) {
-            posInFile = file.createState(info.pos, name);
-            return;
-        }
-        synchronized (posInFile) {
+        synchronized (file) {
+            if (posInFile == null) {
+                posInFile = file.createState(info.pos, name);
+                return;
+            }
             file.writeString(posInFile, name);
         }
     }
 
     @SubscribeEvent
-    public static void onChunkLoad(final ChunkEvent.Load event) {
-        final IChunk chunk = event.getChunk();
-        final World world = (World) chunk.getWorldForge();
-        if (world == null || world.isClientSide())
+    public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
+        final Chunk chunk = event.getChunkInstance();
+        final World world = chunk.getWorld();
+        if (world == null || world.isRemote)
             return;
+        final EntityPlayer player = event.getPlayer();
+        final List<NameStateInfo> states = new ArrayList<>();
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
                         new NameHandlerFile(Paths.get("osfiles/namefiles/"
-                                + ((ServerWorld) world).getServer().getLevelName().replace(":", "")
-                                        .replace("/", "").replace("\\", "")
-                                + "/" + world.getDimension().toString().replace(":", ""))));
+                                + ((WorldServer) world).getMinecraftServer().getName()
+                                        .replace(":", "").replace("/", "").replace("\\", "")
+                                + "/" + ((WorldServer) world).provider.getDimensionType().getName()
+                                        .replace(":", ""))));
             }
         }
-        final List<NameStateInfo> states = new ArrayList<>();
-        chunk.getBlockEntitiesPos().forEach(pos -> {
-            final Block block = chunk.getBlockState(pos).getBlock();
-            if (block instanceof Signal || block instanceof RedstoneIO) {
-                final NameStateInfo info = new NameStateInfo(world, pos);
-                final String name = ALL_LEVEL_FILES.get(world).getString(pos);
-                if (name.isEmpty())
-                    return;
-                synchronized (ALL_NAMES) {
-                    ALL_NAMES.put(info, name);
-                }
-                states.add(info);
-                sendNameToClient(info, name);
+        chunk.getTileEntityMap().forEach((pos, tile) -> {
+            if (tile instanceof SignalTileEntity || tile instanceof RedstoneIOTileEntity) {
+                states.add(new NameStateInfo(world, pos));
             }
         });
-        synchronized (CURRENTLY_LOADED_CHUNKS) {
-            CURRENTLY_LOADED_CHUNKS.put(chunk, states);
-        }
+        loadNames(states, player);
     }
 
     @SubscribeEvent
-    public static void onChunkUnload(final ChunkEvent.Unload event) {
-        final IChunk chunk = event.getChunk();
-        final World level = (World) chunk.getWorldForge();
-        if (level.isClientSide())
-            return;
-        List<NameStateInfo> states;
-        synchronized (CURRENTLY_LOADED_CHUNKS) {
-            states = CURRENTLY_LOADED_CHUNKS.remove(chunk);
-        }
-        states.forEach(stateInfo -> {
-            String name;
-            synchronized (ALL_NAMES) {
-                name = ALL_NAMES.remove(stateInfo);
+    public static void onChunkUnWatch(final ChunkWatchEvent.UnWatch event) {
+        final Chunk chunk = event.getChunkInstance();
+        final World world = chunk.getWorld();
+        final List<NameStateInfo> states = new ArrayList<>();
+        chunk.getTileEntityMap().forEach((pos, tile) -> {
+            if (tile instanceof SignalTileEntity || tile instanceof RedstoneIOTileEntity) {
+                states.add(new NameStateInfo(world, pos));
             }
-            if (name == null)
-                return;
-            createToFile(stateInfo, name);
         });
+        unloadNames(states);
     }
 
     @SubscribeEvent
     public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
-        final PlayerEntity player = event.getPlayer();
+        final EntityPlayer player = event.player;
         final Map<NameStateInfo, String> names;
         synchronized (ALL_NAMES) {
             names = ImmutableMap.copyOf(ALL_NAMES);
@@ -247,20 +221,74 @@ public final class NameHandler implements INetworkSync {
         names.forEach((info, name) -> sendTo(player, packToBuffer(info.pos, name)));
     }
 
-    private static void sendTo(final PlayerEntity player, final ByteBuffer buf) {
-        final PacketBuffer buffer = new PacketBuffer(Unpooled.copiedBuffer(buf.array()));
-        if (player instanceof ServerPlayerEntity) {
-            final ServerPlayerEntity server = (ServerPlayerEntity) player;
-            server.connection.send(new SCustomPayloadPlayPacket(channelName, buffer));
+    private static void loadNames(final List<NameStateInfo> infos,
+            final @Nullable EntityPlayer player) {
+        if (infos == null || infos.isEmpty())
+            return;
+        new Thread(() -> {
+            infos.forEach(info -> {
+                synchronized (LOAD_COUNTER) {
+                    Integer count = LOAD_COUNTER.get(info);
+                    if (count != null && count > 0) {
+                        LOAD_COUNTER.put(info, ++count);
+                        return;
+                    }
+                    LOAD_COUNTER.put(info, 1);
+                    String name;
+                    synchronized (ALL_LEVEL_FILES) {
+                        name = ALL_LEVEL_FILES.get(info.world).getString(info.pos);
+                    }
+                    synchronized (ALL_NAMES) {
+                        ALL_NAMES.put(info, name);
+                    }
+                    if (player == null) {
+                        sendToAll(info, name);
+                    } else {
+                        sendTo(player, packToBuffer(info.pos, name));
+                    }
+                }
+            });
+        }, "OSNameHandler:loadNames").start();
+    }
+
+    private static void unloadNames(final List<NameStateInfo> infos) {
+        if (infos == null || infos.isEmpty())
+            return;
+        new Thread(() -> {
+            infos.forEach(info -> {
+                synchronized (LOAD_COUNTER) {
+                    Integer count = LOAD_COUNTER.get(info);
+                    if (count != null && count > 1) {
+                        LOAD_COUNTER.put(info, --count);
+                        return;
+                    }
+                    LOAD_COUNTER.remove(info);
+                }
+                String name;
+                synchronized (ALL_NAMES) {
+                    name = ALL_NAMES.remove(info);
+                }
+                if (name == null)
+                    return;
+                createToFile(info, name);
+
+            });
+        }, "OSNameHandler:unloadNames").start();
+    }
+
+    private static void sendTo(final EntityPlayer player, final ByteBuffer buf) {
+        final PacketBuffer buffer = new PacketBuffer(
+                Unpooled.copiedBuffer((ByteBuffer) buf.position(0)));
+        if (player instanceof EntityPlayerMP) {
+            final EntityPlayerMP server = (EntityPlayerMP) player;
+            channel.sendTo(new FMLProxyPacket(buffer, CHANNELNAME), server);
         } else {
-            final Minecraft mc = Minecraft.getInstance();
-            mc.getConnection().send(new CCustomPayloadPacket(channelName, buffer));
+            channel.sendToServer(new FMLProxyPacket(new CPacketCustomPayload(CHANNELNAME, buffer)));
         }
     }
 
     @SubscribeEvent
-    public void clientEvent(final ClientCustomPayloadEvent event) {
-        deserializeServer(event.getPayload().nioBuffer());
-        event.getSource().get().setPacketHandled(true);
+    public void clientEvent(final ClientCustomPacketEvent event) {
+        deserializeServer(event.getPacket().payload().nioBuffer());
     }
 }

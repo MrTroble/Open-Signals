@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.12.2 Beta 6]
+
+* port to 1.12.2
+* fix: version specific fixes
+* Known issues: ContentPackLoader doesn't work.
+
+  **This update is a beta version and may contains some bugs. We ask you to test the mod and give us feedback on functionality, bugs and features.**
+
+  **BREAKING CHANGES:**
+  **This version is NOT compatible with the old versions of the GIR-Signals mod. Please backup your world!**
+
 ## [1.16.5 Beta 3]
 
 * ported mod down to 1.16.5

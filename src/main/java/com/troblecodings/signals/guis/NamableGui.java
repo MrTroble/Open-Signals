@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -15,13 +16,13 @@ import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.EntityPlayer;
 
 public class NamableGui extends GuiBase {
 
     private UILabel labelComp;
     private final NamableContainer container;
-    private final PlayerEntity player;
+    private final EntityPlayer player;
 
     public NamableGui(final GuiInfo info) {
         super(info);
@@ -63,7 +64,7 @@ public class NamableGui extends GuiBase {
         textfield.add(input);
 
         hbox.add(textfield);
-        final UIEntity apply = GuiElements.createButton(I18n.get("btn.apply"),
+        final UIEntity apply = GuiElements.createButton(I18n.format("btn.apply"),
                 _u -> this.updateText(input.getText()));
         apply.setInheritWidth(false);
         apply.setWidth(60);
@@ -72,23 +73,22 @@ public class NamableGui extends GuiBase {
         if (!(container.tile instanceof RedstoneIOTileEntity)) {
             return;
         }
-        inner.add(GuiElements.createLabel(I18n.get("label.linkedto")));
+        inner.add(GuiElements.createLabel(I18n.format("label.linkedto")));
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
         list.setInheritWidth(true);
         final UIBox layout = new UIBox(UIBox.VBOX, 5);
         list.add(layout);
-        this.container.linkedPos.forEach(
-                pos -> list.add(GuiElements.createLabel(String.format("%s: x = %d, y = %d, z = %d",
-                        OSBlocks.SIGNAL_BOX.getName().getString(), pos.getX(), pos.getY(),
-                        pos.getZ()))));
+        this.container.linkedPos.forEach(pos -> list.add(GuiElements.createLabel(
+                String.format("%s: x = %d, y = %d, z = %d", OSBlocks.SIGNAL_BOX.getLocalizedName(),
+                        pos.getX(), pos.getY(), pos.getZ()))));
         inner.add(list);
         inner.add(GuiElements.createPageSelect(layout));
     }
 
     private void updateText(final String input) {
         if (input.isEmpty() || input.equalsIgnoreCase(
-                ClientNameHandler.getClientName(new NameStateInfo(mc.level, container.pos))))
+                ClientNameHandler.getClientName(new NameStateInfo(mc.world, container.pos))))
             return;
         final byte[] bytes = input.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
@@ -103,5 +103,10 @@ public class NamableGui extends GuiBase {
     @Override
     public void updateFromContainer() {
         initOwn();
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new NamableContainer(info);
     }
 }

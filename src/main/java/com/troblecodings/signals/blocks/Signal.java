@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
-import com.mojang.blaze3d.platform.GlStateManager;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.core.JsonEnum;
@@ -35,29 +35,36 @@ import com.troblecodings.signals.properties.HeightProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.block.properties.IProperty;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.EnumProperty;
-import net.minecraft.state.StateContainer.Builder;
-import net.minecraft.util.Direction;
-import net.minecraft.util.Hand;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockRenderLayer;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.Mirror;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
-import net.minecraft.world.IBlockReader;
-import net.minecraft.world.ITickList;
-import net.minecraft.world.IWorld;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.common.property.ExtendedBlockState;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class Signal extends BasicBlock {
 
@@ -65,55 +72,140 @@ public class Signal extends BasicBlock {
     };
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
-    public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
+    public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
+    public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel",
             SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
 
     protected final SignalProperties prop;
+    private final int id;
     private List<SEProperty> signalProperties;
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
     private SEProperty powerProperty = null;
 
     public Signal(final SignalProperties prop) {
-        super(Properties.of(Material.STONE));
+        super(Material.ROCK);
         this.prop = prop;
-        registerDefaultState(defaultBlockState().setValue(ANGEL, SignalAngel.ANGEL0));
+        this.id = SIGNAL_IDS.size();
+        SIGNAL_IDS.add(this);
+        this.setDefaultState(getDefaultState().withProperty(ANGEL, SignalAngel.ANGEL0));
         prop.placementtool.addSignal(this);
         for (int i = 0; i < signalProperties.size(); i++) {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
     }
-    
-    @Override
-    public int getLightEmission(final BlockState state) {
-        return 1;
-    }
-    
-    @Override
-    public boolean canOcclude(final BlockState state) {
-        return false;
+
+    public int getID() {
+        return id;
     }
 
     @Override
-    public boolean propagatesSkylightDown(final BlockState state, final IBlockReader getter,
+    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
             final BlockPos pos) {
+        final SignalTileEntity te = (SignalTileEntity) source.getTileEntity(pos);
+        if (te == null)
+            return FULL_BLOCK_AABB;
+        final World world = te.getWorld();
+        final SignalStateInfo info = new SignalStateInfo(world, pos, this);
+        final Map<SEProperty, String> properties = world.isRemote
+                ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
+                : SignalStateHandler.getStates(info);
+        return FULL_BLOCK_AABB.expand(0, getHeight(properties), 0);
+    }
+
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(final IBlockState blockState,
+            final IBlockAccess worldIn, final BlockPos pos) {
+        return getBoundingBox(blockState, worldIn, pos);
+    }
+
+    public static ItemStack pickBlock(final EntityPlayer player, final Item item) {
+        // Compatibility issues with other mods ...
+        if (!Minecraft.getMinecraft().gameSettings.keyBindPickBlock.isKeyDown())
+            return new ItemStack(item);
+        for (int k = 0; k < InventoryPlayer.getHotbarSize(); ++k) {
+            if (player.inventory.getStackInSlot(k).getItem().equals(item)) {
+                player.inventory.currentItem = k;
+                return ItemStack.EMPTY;
+            }
+        }
+        return new ItemStack(item);
+    }
+
+    @Override
+    public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target,
+            final World world, final BlockPos pos, final EntityPlayer player) {
+        return pickBlock(player, prop.placementtool);
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(final World world, final BlockPos pos,
+            final EnumFacing facing, final float hitX, final float hitY, final float hitZ,
+            final int meta, final EntityLivingBase placer, final EnumHand hand) {
+        final int index = 15
+                - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
+        return getDefaultState().withProperty(ANGEL, SignalAngel.values()[index]);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(final int meta) {
+        return getDefaultState().withProperty(ANGEL, SignalAngel.values()[meta]);
+    }
+
+    @Override
+    public int getMetaFromState(final IBlockState state) {
+        return state.getValue(ANGEL).ordinal();
+    }
+
+    @Override
+    public IBlockState withRotation(final IBlockState state, final Rotation rot) {
+        return state.withRotation(rot);
+    }
+
+    @Override
+    public IBlockState withMirror(final IBlockState state, final Mirror mirrorIn) {
+        return state.withMirror(mirrorIn);
+    }
+
+    @Override
+    public boolean canRenderInLayer(final IBlockState state, final BlockRenderLayer layer) {
+        return layer.equals(BlockRenderLayer.CUTOUT_MIPPED);
+    }
+
+    @Override
+    public IBlockState getExtendedState(final IBlockState state, final IBlockAccess acess,
+            final BlockPos pos) {
+        final AtomicReference<IExtendedBlockState> blockState = new AtomicReference<>(
+                (IExtendedBlockState) super.getExtendedState(state, acess, pos));
+        final SignalTileEntity tile = (SignalTileEntity) acess.getTileEntity(pos);
+        if (tile == null)
+            return blockState.get();
+        final World world = tile.getWorld();
+        final SignalStateInfo info = new SignalStateInfo(world, pos, this);
+        final Map<SEProperty, String> properties = world.isRemote
+                ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
+                : SignalStateHandler.getStates(info);
+        properties.forEach((property, value) -> blockState
+                .getAndUpdate(oldState -> oldState.withProperty(property, value)));
+        return blockState.get();
+    }
+
+    @Override
+    public boolean isTranslucent(final IBlockState state) {
         return true;
     }
 
     @Override
-    public float getShadeBrightness(final BlockState state, final IBlockReader getter,
-            final BlockPos pos) {
-        return 1.0F;
+    public boolean isOpaqueCube(final IBlockState state) {
+        return false;
     }
 
     @Override
-    public BlockState getStateForPlacement(final BlockItemUseContext context) {
-        final int angel = Integer
-                .valueOf(MathHelper.floor(context.getRotation() * 16.0F / 360.0F + 0.5D) & 15);
-        return defaultBlockState().setValue(ANGEL, SignalAngel.values()[angel]);
+    public boolean isFullCube(final IBlockState state) {
+        return false;
     }
 
     public int getIDFromProperty(final SEProperty property) {
@@ -121,41 +213,16 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final IBlockReader source,
-            final BlockPos pos, final ISelectionContext context) {
-        final SignalTileEntity te = (SignalTileEntity) source.getBlockEntity(pos);
-        if (te == null)
-            return VoxelShapes.block();
-        final World world = te.getLevel();
-        final SignalStateInfo info = new SignalStateInfo(world, pos, this);
-        final Map<SEProperty, String> properties = world.isClientSide
-                ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
-                : SignalStateHandler.getStates(info);
-        return VoxelShapes
-                .create(VoxelShapes.block().bounds().expandTowards(0, getHeight(properties), 0));
-    }
-
-    @Override
-    public VoxelShape getCollisionShape(final BlockState blockState, final IBlockReader worldIn,
-            final BlockPos pos, final ISelectionContext context) {
-        return getShape(blockState, worldIn, pos, context);
-    }
-
-    @Override
-    public ItemStack getCloneItemStack(final IBlockReader getter, final BlockPos pos,
-            final BlockState state) {
-        return getPlacementtool().getDefaultInstance();
-    }
-
-    @Override
-    protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
+    protected BlockStateContainer createBlockState() {
         final List<SEProperty> properties = new ArrayList<>();
         nextConsumer.accept(properties);
         nextConsumer = _u -> {
         };
         properties.add(CUSTOMNAME);
         this.signalProperties = ImmutableList.copyOf(properties);
-        builder.add(ANGEL);
+        return new ExtendedBlockState(this, new IProperty<?>[] {
+                ANGEL
+        }, this.signalProperties.toArray(new IUnlistedProperty[signalProperties.size()]));
     }
 
     public List<SEProperty> getProperties() {
@@ -163,17 +230,19 @@ public class Signal extends BasicBlock {
     }
 
     public String getSignalTypeName() {
-        return this.getRegistryName().getPath();
+        return this.getRegistryName().getResourcePath();
     }
 
     @Override
-    public void destroy(final IWorld worldIn, final BlockPos pos, final BlockState state) {
-        super.destroy(worldIn, pos, state);
+    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
+        super.breakBlock(worldIn, pos, state);
         GhostBlock.destroyUpperBlock(worldIn, pos);
-        if (!worldIn.isClientSide() && worldIn instanceof World) {
-            SignalStateHandler.setRemoved(new SignalStateInfo((World) worldIn, pos, this));
-            NameHandler.setRemoved(new NameStateInfo((World) worldIn, pos));
-            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (World) worldIn));
+        if (!worldIn.isRemote) {
+            new Thread(() -> {
+                SignalStateHandler.setRemoved(new SignalStateInfo(worldIn, pos, this));
+                NameHandler.setRemoved(new NameStateInfo(worldIn, pos));
+                SignalBoxHandler.onPosRemove(new PosIdentifier(pos, worldIn));
+            }, "Signal:breakBlock").start();
         }
     }
 
@@ -197,24 +266,25 @@ public class Signal extends BasicBlock {
 
     @Override
     public String toString() {
-        return this.getDescriptionId();
+        return this.getUnlocalizedName();
     }
 
     public final boolean canBeLinked() {
         return this.prop.canLink;
     }
 
-    @OnlyIn(Dist.CLIENT)
-    public int colorMultiplier(final int tintIndex) {
+    @SideOnly(Side.CLIENT)
+    public int colorMultiplier(final IBlockState state, final IBlockAccess worldIn,
+            final BlockPos pos, final int tintIndex) {
         return this.prop.colors.get(tintIndex);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @SideOnly(Side.CLIENT)
     public boolean hasCostumColor() {
         return !this.prop.colors.isEmpty();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @SideOnly(Side.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
         if (this.prop.autoscale) {
             renderScaleOverlay(info, this.prop.customNameRenderHeight);
@@ -224,12 +294,11 @@ public class Signal extends BasicBlock {
     }
 
     @SuppressWarnings("unchecked")
-    @OnlyIn(Dist.CLIENT)
+    @SideOnly(Side.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
-                        info.tileEntity.getBlockPos()));
+        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
+                new ClientSignalStateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
@@ -240,9 +309,9 @@ public class Signal extends BasicBlock {
             if (customRenderHeight == -1)
                 return;
         }
-        final World world = info.tileEntity.getLevel();
-        final BlockPos pos = info.tileEntity.getBlockPos();
-        final BlockState state = world.getBlockState(pos);
+        final World world = info.tileEntity.getWorld();
+        final BlockPos pos = info.tileEntity.getPos();
+        final IBlockState state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
@@ -251,35 +320,28 @@ public class Signal extends BasicBlock {
 
         final String[] display = name.split("\\[n\\]");
 
-        final float width = info.font.width(name);
+        final float width = info.font.getStringWidth(name);
         final float scale = Math.min(1 / (22 * (width / 56)), 0.1f);
 
         GlStateManager.pushMatrix();
-        GlStateManager.translated(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
-        GlStateManager.rotatef(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
-        GlStateManager.scalef(-scale, -scale, 1);
-        GlStateManager.translatef(-1.3f / scale, 0, -0.32f);
-
-        int k = 0;
-        for (int i = 0; i < display.length; i++) {
-            final List<String> splittedList = info.font
-                    .split(display[i], (int) this.prop.signWidth);
-            for (int j = 0; j < splittedList.size(); j++) {
-                info.font.draw(splittedList.get(j), 0, (k * 10), this.prop.textColor);
-                k++;
-            }
+        GlStateManager.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
+        GlStateManager.rotate(face.getDregree(), 0, 1, 0);
+        GlStateManager.scale(-scale, -scale, 1);
+        GlStateManager.translate(-1.3f / scale, 0, -0.32f);
+        for (int j = 0; j < display.length; j++) {
+            info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale * 2.8F),
+                    (int) this.prop.signWidth, this.prop.textColor);
         }
         GlStateManager.popMatrix();
     }
 
     @SuppressWarnings("unchecked")
-    @OnlyIn(Dist.CLIENT)
+    @SideOnly(Side.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
         boolean doubleSidedText = false;
-        final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
-                        info.tileEntity.getBlockPos()));
+        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
+                new ClientSignalStateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
@@ -295,9 +357,9 @@ public class Signal extends BasicBlock {
         }
         if (customRenderHeight == -1)
             return;
-        final World world = info.tileEntity.getLevel();
-        final BlockPos pos = info.tileEntity.getBlockPos();
-        final BlockState state = world.getBlockState(pos);
+        final World world = info.tileEntity.getWorld();
+        final BlockPos pos = info.tileEntity.getPos();
+        final IBlockState state = world.getBlockState(pos);
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
@@ -308,41 +370,33 @@ public class Signal extends BasicBlock {
 
         final float scale = this.prop.signScale;
 
+        GlStateManager.enableAlpha();
         GlStateManager.pushMatrix();
-        GlStateManager.translated(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
-        GlStateManager.rotatef(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
-        GlStateManager.scalef(0.015f * scale, -0.015f * scale, 0.015f * scale);
+        GlStateManager.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
+        GlStateManager.rotate(face.getDregree(), 0, 1, 0);
+        GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
 
         renderSingleOverlay(info, display);
 
         if (doubleSidedText) {
-                    // UIRotate.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
-            GlStateManager.rotated(-face.getRadians() + Math.PI, 0, 1, 0);
-            GlStateManager.rotatef(face.getDregree(), 1, 1, 1); // TODO 0, 1, 0
-            GlStateManager.translated(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
+            GlStateManager.rotate(180, 0, 1, 0);
             renderSingleOverlay(info, display);
         }
 
         GlStateManager.popMatrix();
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @SideOnly(Side.CLIENT)
     public void renderSingleOverlay(final RenderOverlayInfo info, final String[] display) {
         final float width = this.prop.signWidth;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
         GlStateManager.pushMatrix();
-        GlStateManager.translatef(width / 2 + offsetX, 0, -4.2f + offsetZ);
-        GlStateManager.scalef(-1f, 1f, 1f);
-
-        int k = 0;
-        for (int i = 0; i < display.length; i++) {
-            final List<String> splittedList = info.font
-                    .split(display[i], (int) width);
-            for (int j = 0; j < splittedList.size(); j++) {
-                info.font.draw(splittedList.get(j), 0, (k * 10), this.prop.textColor);
-                k++;
-            }
+        GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
+        GlStateManager.scale(-1f, 1f, 1f);
+        for (int j = 0; j < display.length; j++) {
+            info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale * 2.8F),
+                    (int) width, this.prop.textColor);
         }
         GlStateManager.popMatrix();
     }
@@ -356,19 +410,24 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public boolean use(final BlockState state, final World world, final BlockPos pos,
-            final PlayerEntity player, final Hand hand, final BlockRayTraceResult result) {
-        if (!(state.getBlock() instanceof Signal)) {
+    public boolean onBlockActivated(final World world, final BlockPos pos, final IBlockState state,
+            final EntityPlayer player, final EnumHand hand, final EnumFacing facing,
+            final float hitX, final float hitY, final float hitZ) {
+        if (!(state.getBlock() instanceof Signal)
+                || player.getHeldItem(EnumHand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
             return false;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
         if (loadRedstoneOutput(world, stateInfo)) {
-            world.blockUpdated(pos, state.getBlock());
+            world.setBlockState(pos, state, 3);
+            world.notifyNeighborsOfStateChange(pos, this, false);
+            world.markAndNotifyBlock(pos, null, state, state, 3);
             return true;
         }
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
-        if (!player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)
-                && (canBeLinked() || customname)) {
+        if ((canBeLinked() || customname)) {
+            if (world.isRemote)
+                return true;
             OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
             return true;
         }
@@ -395,20 +454,20 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public boolean isSignalSource(final BlockState state) {
+    public boolean canProvidePower(final IBlockState state) {
         return !this.prop.redstoneOutputs.isEmpty();
     }
 
     @Override
-    public int getSignal(final BlockState state, final IBlockReader getter, final BlockPos pos,
-            final Direction direction) {
-        return getDirectSignal(state, getter, pos, direction);
+    public int getStrongPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
+        return getWeakPower(blockState, blockAccess, pos, side);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public int getDirectSignal(final BlockState blockState, final IBlockReader blockAccess,
-            final BlockPos pos, final Direction side) {
+    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
+            final BlockPos pos, final EnumFacing side) {
         if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null
                 || !(blockAccess instanceof World)) {
             return 0;
@@ -441,11 +500,11 @@ public class Signal extends BasicBlock {
         if (sound.duration == 1) {
             world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
         } else {
-            if (world.getBlockTicks().hasScheduledTick(pos, this)) {
+            if (world.isUpdateScheduled(pos, this)) {
                 return;
             } else {
                 if (sound.predicate.test(properties)) {
-                    ((ITickList<Block>) world).scheduleTick(pos, this, 1);
+                    world.scheduleUpdate(pos, this, 1);
                 }
             }
         }
@@ -461,24 +520,28 @@ public class Signal extends BasicBlock {
         return new SoundProperty();
     }
 
-    @SuppressWarnings("unchecked")
     @Override
-    public void tick(final BlockState state, final World world, final BlockPos pos,
+    public void updateTick(final World worldIn, final BlockPos pos, final IBlockState state,
             final Random rand) {
-        if (this.prop.sounds.isEmpty() || world.isClientSide) {
+        if (this.prop.sounds.isEmpty() || worldIn.isRemote) {
             return;
         }
-        final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
+        final SignalStateInfo stateInfo = new SignalStateInfo(worldIn, pos, this);
         final SoundProperty sound = getSound(SignalStateHandler.getStates(stateInfo));
         if (sound.duration <= 1) {
             return;
         }
-        world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        ((ITickList<Block>) world).scheduleTick(pos, this, sound.duration);
+        worldIn.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        worldIn.scheduleUpdate(pos, this, sound.duration);
     }
 
     @Override
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
+    }
+
+    @Override
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
+        return new SignalTileEntity();
     }
 }
