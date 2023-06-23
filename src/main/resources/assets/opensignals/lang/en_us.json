@@ -473,5 +473,7 @@
     "property.manuell_rs.name": "Manual Redstone Output",
     "property.manuell_rs.desc": "Change the manual redstone output, e.g. for manual switch control.",
     "property.zp9.name": "Zp9",
-    "property.zp9.desc": "Zp9 Departure: The signal is given by the train conductor and the driver of the multiple unit is to depart."
+    "property.zp9.desc": "Zp9 Departure: The signal is given by the train conductor and the driver of the multiple unit is to depart.",
+    "property.semavr.name": "Semaphore distant signal",
+    "property.semavr.desc": "Distant signals announce what the next main signal will show.%n§nVr0§r: Expect stop%n§nVr1§r: Expect go%n§nVr2§r: Expect slow"
 }
