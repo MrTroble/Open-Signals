@@ -103,6 +103,8 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
                 wrapper.remove(property.getName());
                 return;
             }
+            if (!property.isValid(value))
+                return;
             wrapper.putString(property.getName(), value);
         }
     }
