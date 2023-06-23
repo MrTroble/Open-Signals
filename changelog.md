@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.12.2 Beta 7]
+
+* fix: startup issue
+* Known issues: ContentPackLoader doesn't work, customnameplate disapears.
+
+  **This update is a beta version and may contains some bugs. We ask you to test the mod and give us feedback on functionality, bugs and features.**
+
+  **BREAKING CHANGES:**
+  **This version is NOT compatible with the old versions of the GIR-Signals mod. Please backup your world!**
+
 ## [1.12.2 Beta 6]
 
 * port to 1.12.2
