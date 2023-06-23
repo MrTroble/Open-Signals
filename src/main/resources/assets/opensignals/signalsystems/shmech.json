@@ -19,8 +19,7 @@
             "name": "sh_mech",
             "enumClass": "SHMech",
             "defaultState": "SH0",
-            "changeableStage": "APISTAGE_NONE_CONFIG",
-            "autoname": true
+            "changeableStage": "APISTAGE_NONE_CONFIG"
         },
         {
             "name": "sh_high",
