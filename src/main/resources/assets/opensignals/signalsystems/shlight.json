@@ -18,8 +18,7 @@
             "name": "sh_light_bottom",
             "enumClass": "SHLight",
             "defaultState": "OFF",
-            "changeableStage": "APISTAGE_NONE_CONFIG",
-            "autoname": true
+            "changeableStage": "APISTAGE_NONE_CONFIG"
         },
         {
             "name": "sh_high",
