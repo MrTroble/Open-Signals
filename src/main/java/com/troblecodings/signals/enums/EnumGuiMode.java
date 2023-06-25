@@ -25,6 +25,7 @@ public enum EnumGuiMode {
      */
 
     public final Supplier<Object> consumer;
+    public final float depth;
 
     private EnumGuiMode(final int id) {
         this(() -> new UITexture(UISignalBoxTile.ICON, id * 0.2, 0, id * 0.2 + 0.2, 0.5));
@@ -36,6 +37,7 @@ public enum EnumGuiMode {
 
     private EnumGuiMode(final Supplier<Object> consumer) {
         this.consumer = consumer;
+        this.depth = this.ordinal() * 0.0001f;
     }
 
     public static EnumGuiMode of(final ReadBuffer buffer) {
