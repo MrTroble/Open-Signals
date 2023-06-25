@@ -30,7 +30,6 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.proxy.CommonProxy;
 
-import net.minecraft.client.resources.FileResourcePack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -68,8 +67,7 @@ public class OpenSignalsMain {
         });
     }
 
-    @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy",
-            clientSide = "com.troblecodings.signals.proxy.ClientProxy")
+    @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy", clientSide = "com.troblecodings.signals.proxy.ClientProxy")
     public static CommonProxy proxy;
     private static Logger log = null;
     public static GuiHandler handler = null;

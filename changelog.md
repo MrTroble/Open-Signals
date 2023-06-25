@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.12.2 Beta 8]
+
+* fix: lang keys
+* fix: null list
+* fix: invalid values
+* fix: signalbox scrolling
+* fix: depth for each element
+* fix: crash on sound queue
+
 ## [1.12.2 Beta 7]
 
 * fix: startup issue
