@@ -157,7 +157,8 @@ public final class SignalStateHandler implements INetworkSync {
         new Thread(() -> {
             sendToAll(info, states);
             updateListeners(info, false);
-            info.signal.getUpdate(info.world, info.pos);
+            info.world.getMinecraftServer()
+                    .addScheduledTask(() -> info.signal.getUpdate(info.world, info.pos));
             if (!contains.get())
                 createToFile(info, states);
         }, "OSSignalStateHandler:setStates").start();

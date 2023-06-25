@@ -38,7 +38,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = OpenSignalsMain.MODID, acceptedMinecraftVersions = "[1.12.2]")
+@Mod(modid = OpenSignalsMain.MODID,acceptedMinecraftVersions = "[1.12.2]")
 public class OpenSignalsMain {
 
     @Instance
@@ -59,7 +59,6 @@ public class OpenSignalsMain {
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
         debug = true;
         log = LoggerContext.getContext().getLogger(MODID);
-        // TODO look if it works
         contentPacks = new FileReader(MODID, "assets/" + MODID, log, name -> {
             final Optional<Path> path = getRessourceLocation(name);
             if (path.isPresent())
