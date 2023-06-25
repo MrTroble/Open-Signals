@@ -30,6 +30,7 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.proxy.CommonProxy;
 
+import net.minecraft.client.resources.FileResourcePack;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -59,7 +60,6 @@ public class OpenSignalsMain {
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
         debug = true;
         log = LoggerContext.getContext().getLogger(MODID);
-        // TODO look if it works
         contentPacks = new FileReader(MODID, "assets/" + MODID, log, name -> {
             final Optional<Path> path = getRessourceLocation(name);
             if (path.isPresent())
