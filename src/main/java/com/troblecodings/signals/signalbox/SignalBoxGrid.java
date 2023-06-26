@@ -139,6 +139,10 @@ public class SignalBoxGrid implements INetworkSavable {
             final Function<? super Point, ? extends SignalBoxNode> funtion) {
         return modeGrid.computeIfAbsent(point, funtion);
     }
+    
+    public void putAllNodes(final Map<Point, SignalBoxNode> nodes) {
+        modeGrid.putAll(nodes);
+    }
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {

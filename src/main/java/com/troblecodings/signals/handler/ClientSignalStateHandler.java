@@ -39,7 +39,7 @@ public class ClientSignalStateHandler implements INetworkSync {
         final Minecraft mc = Minecraft.getMinecraft();
         final WorldClient level = mc.world;
         final BlockPos signalPos = buffer.getBlockPos();
-        
+
         final int signalID = buffer.getInt();
         final int propertiesSize = buffer.getByteAsInt();
         if (propertiesSize == 255) {
@@ -57,7 +57,7 @@ public class ClientSignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
                     .computeIfAbsent(stateInfo, _u -> new HashMap<>());
-            
+
             for (int i = 0; i < propertiesSize; i++) {
                 final SEProperty property = signalProperties.get(propertyIDs[i]);
                 final String value = property.getObjFromID(valueIDs[i]);
@@ -72,7 +72,7 @@ public class ClientSignalStateHandler implements INetworkSync {
             TileEntity entity;
             while ((entity = level.getTileEntity(signalPos)) == null) {
                 final long currentTime = Calendar.getInstance().getTimeInMillis();
-                if (currentTime - startTime >= 5000) {
+                if (currentTime - startTime >= 10000) {
                     return;
                 }
                 continue;
