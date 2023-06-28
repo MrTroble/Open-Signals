@@ -164,6 +164,7 @@ public class SignalBoxGrid implements INetworkSavable {
                 }
             }
             node.readNetwork(buffer);
+            modeGrid.put(point, node);
         }
     }
 
