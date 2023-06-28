@@ -63,6 +63,8 @@ public class ClientSignalStateHandler implements INetworkSync {
                 final String value = property.getObjFromID(valueIDs[i]);
                 properties.put(property, value);
             }
+            System.out.println(
+                    "OS Debug: Adding [" + stateInfo + "] with " + properties + " to cache.");
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
         if (level == null)
@@ -80,6 +82,7 @@ public class ClientSignalStateHandler implements INetworkSync {
             entity.markDirty();
             if (entity instanceof BasicBlockEntity)
                 ((BasicBlockEntity) entity).syncClient();
+            System.out.println("OS Debug: Syncronised SignalTile at " + signalPos + "!");
         });
     }
 
