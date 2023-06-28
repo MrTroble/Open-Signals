@@ -22,7 +22,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(HLTYPE.HL_MAIN)"
+            "dependencies": "config(HLTYPE.HL_MAIN)"
         },
         {
             "name": "mainlightsignal_distant",
@@ -30,7 +30,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(HLTYPE.DISTANT)"
+            "dependencies": "config(HLTYPE.DISTANT)"
         },
         {
             "name": "exitsignal",
@@ -38,7 +38,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(HLTYPE.EXIT)"
+            "dependencies": "config(HLTYPE.EXIT)"
         },
         {
             "name": "mainlightsignallightbar",
@@ -111,7 +111,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(HLTYPE.BLOCK)"
+            "dependencies": "config(HLTYPE.BLOCK)"
         },
         {
             "name": "blockexitsignal",
@@ -119,7 +119,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(HLTYPE.BLOCK_EXIT)"
+            "dependencies": "config(HLTYPE.BLOCK_EXIT)"
         }
     ]
 }

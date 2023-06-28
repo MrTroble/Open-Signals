@@ -46,6 +46,7 @@ public final class PredicateHolder {
         };
     }
 
+    @Deprecated
     @SuppressWarnings("unchecked")
     public static Predicate<Map<SEProperty, String>> check(final ValuePack pack) {
         return t -> {
