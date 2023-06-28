@@ -38,7 +38,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = OpenSignalsMain.MODID,acceptedMinecraftVersions = "[1.12.2]")
+@Mod(modid = OpenSignalsMain.MODID, acceptedMinecraftVersions = "[1.12.2]")
 public class OpenSignalsMain {
 
     @Instance
@@ -67,8 +67,7 @@ public class OpenSignalsMain {
         });
     }
 
-    @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy",
-            clientSide = "com.troblecodings.signals.proxy.ClientProxy")
+    @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy", clientSide = "com.troblecodings.signals.proxy.ClientProxy")
     public static CommonProxy proxy;
     private static Logger log = null;
     public static GuiHandler handler = null;
@@ -85,7 +84,9 @@ public class OpenSignalsMain {
 
     @EventHandler
     public void preinit(final FMLPreInitializationEvent event) {
-        debug = Files.isDirectory(event.getSourceFile().toPath());
+        // TODO Change back after finishing debuging
+        // debug = Files.isDirectory(event.getSourceFile().toPath());
+        debug = true;
         log = event.getModLog();
         proxy.initModEvent(event);
     }

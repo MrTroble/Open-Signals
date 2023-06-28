@@ -60,10 +60,11 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
                 if (json.isValid(value)) {
                     propertiesToSend.add((byte) json.getIDFromValue(value));
                 } else {
-                    OpenSignalsMain.getLogger().error("Container from " + player
-                            + "tries to send a invalid value in the Placementtool! NBTWrapper: "
-                            + wrapper + " Value: " + value + "Current Signal: " + signal
-                            + " Current Property: " + property);
+                    if (OpenSignalsMain.isDebug())
+                        OpenSignalsMain.getLogger().error("Container from " + player
+                                + "tries to send a invalid value in the Placementtool! NBTWrapper: "
+                                + wrapper + " Value: " + value + "Current Signal: " + signal
+                                + " Current Property: " + property);
                 }
             }
         }
@@ -113,9 +114,11 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
                 return;
             }
             if (!property.isValid(value)) {
-                OpenSignalsMain.getLogger()
-                        .error("ServerContainer from " + player + " recived an invalid value: "
-                                + value + "! NBTWraper: " + wrapper + " SEProperty: " + property);
+                if (OpenSignalsMain.isDebug())
+                    OpenSignalsMain.getLogger()
+                            .error("ServerContainer from " + player + " recived an invalid value: "
+                                    + value + "! NBTWraper: " + wrapper + " SEProperty: "
+                                    + property);
                 return;
             }
             wrapper.putString(property.getName(), value);

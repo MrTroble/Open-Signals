@@ -293,7 +293,7 @@ public class SignalBoxPathway {
             }
         }, point);
         final SignalBoxNode node = modeGrid.get(point);
-        if (node == null) {
+        if (node == null && OpenSignalsMain.isDebug()) {
             OpenSignalsMain.getLogger().error("Node to compact is null on [" + point
                     + "] with the grid " + modeGrid + "! This is a bug!");
             this.resetPathway();
