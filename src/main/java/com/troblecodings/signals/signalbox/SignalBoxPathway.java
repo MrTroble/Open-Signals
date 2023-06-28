@@ -263,6 +263,15 @@ public class SignalBoxPathway {
     public void resetPathway(final @Nullable Point point) {
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
+        if (listOfNodes == null || listOfNodes.isEmpty()) {
+            OpenSignalsMain.getLogger()
+                    .error("List of Nodes is null or Empty! This shouldn't be the case! Point: "
+                            + point + " ModGrid: " + modeGrid);
+            this.setPathStatus(EnumPathUsage.FREE);
+            this.emptyOrBroken = true;
+            this.isBlocked = false;
+            resetOther();
+        }
         if (point == null || point.equals(this.getLastPoint())
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
             this.emptyOrBroken = true;
@@ -283,6 +292,12 @@ public class SignalBoxPathway {
                                         .getSignal(new PosIdentifier(tilePos, world), position)))));
             }
         }, point);
+        final SignalBoxNode node = modeGrid.get(point);
+        if (node == null) {
+            OpenSignalsMain.getLogger().error("Node to compact is null on [" + point
+                    + "] with the grid " + modeGrid + "! This is a bug!");
+            this.resetPathway();
+        }
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
         this.initalize();
