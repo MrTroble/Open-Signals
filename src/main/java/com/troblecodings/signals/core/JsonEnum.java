@@ -31,7 +31,12 @@ public class JsonEnum implements IIntegerable<String>, IUnlistedProperty<String>
     }
 
     public int getIDFromValue(final String value) {
-        return this.valueToInt.get(value.toLowerCase());
+        try {
+            return this.valueToInt.get(value.toLowerCase());
+        } catch (NullPointerException e) {
+            throw new NullPointerException(value + " in " + name + " not valid!");
+        }
+
     }
 
     public String getName() {

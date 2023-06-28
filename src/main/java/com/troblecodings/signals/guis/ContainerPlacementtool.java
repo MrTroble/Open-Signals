@@ -13,6 +13,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.items.Placementtool;
@@ -55,7 +56,9 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
             if (wrapper.contains(property.getName())) {
                 propertiesToSend.add((byte) i);
                 final String value = wrapper.getString(property.getName());
-                propertiesToSend.add((byte) property.getParent().getIDFromValue(value));
+                final JsonEnum json = property.getParent();
+                if (json.isValid(value))
+                    propertiesToSend.add((byte) json.getIDFromValue(value));
             }
         }
         final WriteBuffer buffer = new WriteBuffer();
