@@ -13,7 +13,6 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.items.Placementtool;
@@ -56,16 +55,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
             if (wrapper.contains(property.getName())) {
                 propertiesToSend.add((byte) i);
                 final String value = wrapper.getString(property.getName());
-                final JsonEnum json = property.getParent();
-                if (json.isValid(value)) {
-                    propertiesToSend.add((byte) json.getIDFromValue(value));
-                } else {
-                    if (OpenSignalsMain.isDebug())
-                        OpenSignalsMain.getLogger().error("Container from " + player
-                                + "tries to send a invalid value in the Placementtool! NBTWrapper: "
-                                + wrapper + " Value: " + value + "Current Signal: " + signal
-                                + " Current Property: " + property);
-                }
+                propertiesToSend.add((byte) property.getParent().getIDFromValue(value));
             }
         }
         final WriteBuffer buffer = new WriteBuffer();
@@ -90,9 +80,10 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final ItemStack stack = player.getHeldItemMainhand();
         final Placementtool tool = (Placementtool) stack.getItem();
         if (first == 255) {
-            final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
+
             final int id = buffer.getInt();
             if (id == -1) {
+                final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
                 final int nameSize = buffer.getByteAsInt();
                 final byte[] name = new byte[nameSize];
                 for (int i = 0; i < nameSize; i++) {
@@ -101,6 +92,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
                 wrapper.putString(SIGNAL_NAME, new String(name));
                 return;
             }
+            final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
             properties.clear();
@@ -111,14 +103,6 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
             final String value = property.getObjFromID(buffer.getByteAsInt());
             if (property.getDefault().equals(value)) {
                 wrapper.remove(property.getName());
-                return;
-            }
-            if (!property.isValid(value)) {
-                if (OpenSignalsMain.isDebug())
-                    OpenSignalsMain.getLogger()
-                            .error("ServerContainer from " + player + " recived an invalid value: "
-                                    + value + "! NBTWraper: " + wrapper + " SEProperty: "
-                                    + property);
                 return;
             }
             wrapper.putString(property.getName(), value);
