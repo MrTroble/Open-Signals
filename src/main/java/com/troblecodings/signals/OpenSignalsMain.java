@@ -102,7 +102,7 @@ public class OpenSignalsMain {
 
     private static FileSystem fileSystemCache;
 
-    public static Optional<Path> getRessourceLocation(final String location) {
+    private static Optional<Path> getRessourceLocation(final String location) {
         String filelocation = location;
         final URL url = OSBlocks.class.getResource("/assets/" + MODID);
         try {
@@ -129,39 +129,5 @@ public class OpenSignalsMain {
             e.printStackTrace();
         }
         return Optional.empty();
-    }
-
-    public static void addToFileSystem(final FileSystem system) {
-        if (fileSystemCache == null)
-            getRessourceLocation("");
-
-        final URL url = OSBlocks.class.getResource("/assets/opensignals");
-        try {
-            final URI uri = url.toURI();
-            final String scheme = uri.getScheme();
-            Path path = null;
-            if (scheme.equals("file")) {
-                path = fileSystemCache.provider().getPath(uri);
-            } else if (scheme.equals("jar")) {
-                path = fileSystemCache.getPath("/");
-            }
-            if (path == null) {
-                OpenSignalsMain.getLogger()
-                        .error("[Error]: Could not get path to add to file system!");
-                return;
-            }
-            final Path finalPath = path;
-            Files.walkFileTree(system.getPath("/"), new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
-                        throws IOException {
-                    final Path nextPath = finalPath.resolve(file.getFileName().toString());
-                    ByteStreams.copy(Files.newInputStream(file), Files.newOutputStream(nextPath));
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (final URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
     }
 }
