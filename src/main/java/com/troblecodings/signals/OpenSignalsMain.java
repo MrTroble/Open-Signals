@@ -84,9 +84,7 @@ public class OpenSignalsMain {
 
     @EventHandler
     public void preinit(final FMLPreInitializationEvent event) {
-        // TODO Change back after finishing debuging
-        // debug = Files.isDirectory(event.getSourceFile().toPath());
-        debug = true;
+        debug = Files.isDirectory(event.getSourceFile().toPath());
         log = event.getModLog();
         proxy.initModEvent(event);
     }

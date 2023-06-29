@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.troblecodings.core.interfaces.INetworkSync;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.ReadBuffer;
@@ -64,9 +63,6 @@ public class ClientSignalStateHandler implements INetworkSync {
                 final String value = property.getObjFromID(valueIDs[i]);
                 properties.put(property, value);
             }
-            if (OpenSignalsMain.isDebug())
-                OpenSignalsMain.getLogger().error(
-                        "Adding [" + stateInfo + "] with " + properties + " to ClientCache.");
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
         if (level == null)
@@ -84,7 +80,6 @@ public class ClientSignalStateHandler implements INetworkSync {
             entity.markDirty();
             if (entity instanceof BasicBlockEntity)
                 ((BasicBlockEntity) entity).syncClient();
-            System.out.println("OS Debug: Syncronised SignalTile at " + signalPos + "!");
         });
     }
 
