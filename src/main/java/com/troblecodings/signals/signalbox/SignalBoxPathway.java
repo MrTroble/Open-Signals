@@ -82,6 +82,8 @@ public class SignalBoxPathway {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final Builder<BlockPos> distantPosBuilder = ImmutableList.builder();
+        mapOfBlockingPositions.clear();
+        mapOfResetPositions.clear();
         foreachEntry((optionEntry, node) -> {
             optionEntry.getEntry(PathEntryType.SPEED)
                     .ifPresent(value -> atomic.updateAndGet(in -> Math.min(in, value)));
@@ -263,15 +265,6 @@ public class SignalBoxPathway {
     public void resetPathway(final @Nullable Point point) {
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
-        if (listOfNodes == null || listOfNodes.isEmpty()) {
-            OpenSignalsMain.getLogger()
-                    .error("List of Nodes is null or Empty! This shouldn't be the case! Point: "
-                            + point + " ModGrid: " + modeGrid);
-            this.setPathStatus(EnumPathUsage.FREE);
-            this.emptyOrBroken = true;
-            this.isBlocked = false;
-            resetOther();
-        }
         if (point == null || point.equals(this.getLastPoint())
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
             this.emptyOrBroken = true;

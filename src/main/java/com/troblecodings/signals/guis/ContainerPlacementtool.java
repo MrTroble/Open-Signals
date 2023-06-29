@@ -80,7 +80,6 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final ItemStack stack = player.getHeldItemMainhand();
         final Placementtool tool = (Placementtool) stack.getItem();
         if (first == 255) {
-
             final int id = buffer.getInt();
             if (id == -1) {
                 final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
