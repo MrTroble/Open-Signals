@@ -285,12 +285,6 @@ public class SignalBoxPathway {
                                         .getSignal(new PosIdentifier(tilePos, world), position)))));
             }
         }, point);
-        final SignalBoxNode node = modeGrid.get(point);
-        if (node == null && OpenSignalsMain.isDebug()) {
-            OpenSignalsMain.getLogger().error("Node to compact is null on [" + point
-                    + "] with the grid " + modeGrid + "! This is a bug!");
-            this.resetPathway();
-        }
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
         this.initalize();
