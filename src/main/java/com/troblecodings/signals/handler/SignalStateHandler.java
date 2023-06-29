@@ -189,7 +189,6 @@ public final class SignalStateHandler implements INetworkSync {
         }
         map.put(property, value);
         setStates(info, map);
-        info.signal.getUpdate(info.world, info.pos);
     }
 
     public static Optional<String> getState(final SignalStateInfo info, final SEProperty property) {
