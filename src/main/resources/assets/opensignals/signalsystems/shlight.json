@@ -4,7 +4,7 @@
         "canLink": true,
         "defaultHeight": 0,
         "customNameRenderHeight": 0.373,
-        "offsetX": -7.5,
+        "offsetX": 4,
         "offsetY": -6.3,
         "renderHeights": {
             "config(SH_HIGH.TRUE)": 2.373

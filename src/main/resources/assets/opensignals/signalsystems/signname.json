@@ -4,7 +4,7 @@
 		"defaultHeight": 0,
 		"offsetY": -2,
 		"customNameRenderHeight": 0.5,
-		"signWidth": 180,
+		"signWidth": 56,
 		"autoscale": true,
 		"textColor": 16777215,
 		"doubleSidedText": {

@@ -287,7 +287,7 @@ public class Signal extends BasicBlock {
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
         if (this.prop.autoscale) {
-            renderScaleOverlay(info, this.prop.customNameRenderHeight);
+            this.renderScaleOverlay(info, this.prop.customNameRenderHeight);
             return;
         }
         this.renderOverlay(info, this.prop.customNameRenderHeight);
@@ -296,12 +296,12 @@ public class Signal extends BasicBlock {
     @SuppressWarnings("unchecked")
     @SideOnly(Side.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
-        float customRenderHeight = renderHeight;
         final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
                 new ClientSignalStateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
+        float customRenderHeight = renderHeight;
         for (final FloatProperty property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
                 customRenderHeight = property.height;
@@ -315,23 +315,42 @@ public class Signal extends BasicBlock {
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
-        final String name = info.tileEntity.getNameWrapper();
+        boolean doubleSidedText = false;
+        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+            if (boolProp.predicate.test(map)) {
+                doubleSidedText = boolProp.doubleSided;
+            }
+        }
         final SignalAngel face = state.getValue(Signal.ANGEL);
-
-        final String[] display = name.split("\\[n\\]");
-
-        final float width = info.font.getStringWidth(name);
-        final float scale = Math.min(1 / (22 * (width / 56)), 0.1f);
-
+        final float angel = face.getDregree();
+        
+        GlStateManager.enableAlpha();
+        GlStateManager.disableLighting();
         GlStateManager.pushMatrix();
         GlStateManager.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
-        GlStateManager.rotate(face.getDregree(), 0, 1, 0);
-        GlStateManager.scale(-scale, -scale, 1);
-        GlStateManager.translate(-1.3f / scale, 0, -0.32f);
-        for (int j = 0; j < display.length; j++) {
-            info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale * 2.8F),
-                    (int) this.prop.signWidth, this.prop.textColor);
+        GlStateManager.rotate(angel, 0, 1, 0);
+        
+        renderSingleScaleOverlay(info);
+        
+        if (doubleSidedText) {
+            GlStateManager.rotate(180, 0, 1, 0);
+            renderSingleScaleOverlay(info);
         }
+        
+        GlStateManager.popMatrix();
+        GlStateManager.enableLighting();
+    }
+    
+    @SideOnly(Side.CLIENT)
+    public void renderSingleScaleOverlay(final RenderOverlayInfo info){
+        final String name = info.tileEntity.getNameWrapper();
+        final float nameWidth = info.font.getStringWidth(name);
+        final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
+        
+        GlStateManager.pushMatrix();
+        GlStateManager.scale(-scale, -scale, 1);
+        GlStateManager.translate(-nameWidth / 2, 0, -0.32f);
+        info.font.drawString(name, 0, 0, this.prop.textColor);
         GlStateManager.popMatrix();
     }
 
@@ -339,7 +358,6 @@ public class Signal extends BasicBlock {
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        boolean doubleSidedText = false;
         final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
                 new ClientSignalStateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
         final String customNameState = map.get(CUSTOMNAME);
@@ -350,11 +368,6 @@ public class Signal extends BasicBlock {
                 customRenderHeight = property.height;
             }
         }
-        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
-            if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.doubleSided;
-            }
-        }
         if (customRenderHeight == -1)
             return;
         final World world = info.tileEntity.getWorld();
@@ -363,40 +376,49 @@ public class Signal extends BasicBlock {
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
+        boolean doubleSidedText = false;
+        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+            if (boolProp.predicate.test(map)) {
+                doubleSidedText = boolProp.doubleSided;
+            }
+        }
+        
         final String name = info.tileEntity.getNameWrapper();
-        final SignalAngel face = state.getValue(Signal.ANGEL);
-
-        final String[] display = name.split("\\[n\\]");
-
+        final String[] splitNames = name.split("\\[n\\]");
+        final SignalAngel angle = state.getValue(Signal.ANGEL);
         final float scale = this.prop.signScale;
+        
+
 
         GlStateManager.enableAlpha();
         GlStateManager.pushMatrix();
         GlStateManager.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
-        GlStateManager.rotate(face.getDregree(), 0, 1, 0);
-        GlStateManager.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
+        GlStateManager.rotate(angle.getDregree(), 0, 1, 0);
+        GlStateManager.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
 
-        renderSingleOverlay(info, display);
+        renderSingleOverlay(info, splitNames);
 
         if (doubleSidedText) {
             GlStateManager.rotate(180, 0, 1, 0);
-            renderSingleOverlay(info, display);
+            renderSingleOverlay(info, splitNames);
         }
-
         GlStateManager.popMatrix();
     }
 
     @SideOnly(Side.CLIENT)
-    public void renderSingleOverlay(final RenderOverlayInfo info, final String[] display) {
-        final float width = this.prop.signWidth;
+    public void renderSingleOverlay(final RenderOverlayInfo info, final String[] splitNames){
+        final float signWidth = this.prop.signWidth;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
+        
         GlStateManager.pushMatrix();
-        GlStateManager.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
-        GlStateManager.scale(-1f, 1f, 1f);
-        for (int j = 0; j < display.length; j++) {
-            info.font.drawSplitString(display[j], 0, (int) (j * this.prop.signScale * 2.8F),
-                    (int) width, this.prop.textColor);
+        GlStateManager.translate(offsetX, 0, -4.2f + offsetZ);
+        for (int j = 0; j < splitNames.length; j++) {
+            final String name = splitNames[j];
+            final float nameWidth = info.font.getStringWidth(name);
+            final float center = (signWidth - nameWidth) / 2;
+            info.font.drawSplitString(name, (int) center - 10, j * 10,
+                    (int) signWidth, this.prop.textColor);
         }
         GlStateManager.popMatrix();
     }
