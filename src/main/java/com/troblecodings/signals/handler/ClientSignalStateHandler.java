@@ -1,22 +1,17 @@
 package com.troblecodings.signals.handler;
 
 import java.nio.ByteBuffer;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -24,8 +19,6 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 public class ClientSignalStateHandler implements INetworkSync {
 
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
-
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
 
     public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -67,20 +60,7 @@ public class ClientSignalStateHandler implements INetworkSync {
         }
         if (level == null)
             return;
-        final long startTime = Calendar.getInstance().getTimeInMillis();
-        SERVICE.execute(() -> {
-            TileEntity entity;
-            while ((entity = level.getTileEntity(signalPos)) == null) {
-                final long currentTime = Calendar.getInstance().getTimeInMillis();
-                if (currentTime - startTime >= 10000) {
-                    return;
-                }
-                continue;
-            }
-            entity.markDirty();
-            if (entity instanceof BasicBlockEntity)
-                ((BasicBlockEntity) entity).syncClient();
-        });
+        level.markBlockRangeForRenderUpdate(signalPos, signalPos);
     }
 
     private static void setRemoved(final BlockPos pos) {
