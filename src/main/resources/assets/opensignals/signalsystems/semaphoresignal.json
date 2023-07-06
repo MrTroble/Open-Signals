@@ -3,7 +3,7 @@
         "placementToolName": "placementtool",
         "canLink": true,
         "defaultHeight": 3,
-        "offsetX": 10,
+        "offsetX": -12,
         "offsetY": -11,
         "customNameRenderHeight": 1.47,
         "colors": [
