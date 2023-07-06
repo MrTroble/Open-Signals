@@ -69,6 +69,7 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
         final IBlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);
         world.markBlockRangeForRenderUpdate(pos, pos);
+        markDirty();
     }
 
     @Override

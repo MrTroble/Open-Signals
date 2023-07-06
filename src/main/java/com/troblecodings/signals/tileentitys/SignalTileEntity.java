@@ -34,6 +34,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         if (!world.isRemote) {
             final IBlockState state = world.getBlockState(pos);
             world.notifyBlockUpdate(pos, state, state, 3);
+            world.markBlockRangeForRenderUpdate(pos, pos);
+            markDirty();
         }
     }
 }

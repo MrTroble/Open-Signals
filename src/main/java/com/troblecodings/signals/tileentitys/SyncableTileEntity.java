@@ -35,6 +35,7 @@ public class SyncableTileEntity extends BasicBlockEntity {
         final IBlockState state = world.getBlockState(pos);
         world.notifyBlockUpdate(pos, state, state, 3);
         world.markBlockRangeForRenderUpdate(pos, pos);
+        markDirty();
     }
 
     public boolean add(final UIClientSync sync) {
