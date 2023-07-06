@@ -31,21 +31,30 @@ public class JsonEnum implements IIntegerable<String>, IUnlistedProperty<String>
     }
 
     public int getIDFromValue(final String value) {
-        return this.valueToInt.get(value.toLowerCase());
+        try {
+            return this.valueToInt.get(value.toLowerCase());
+        } catch (final NullPointerException e) {
+            throw new NullPointerException(value + " in " + name + " not valid!");
+        }
+
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public boolean isValid(final String value) {
         return valueToInt.containsKey(value.toLowerCase());
     }
 
+    @Override
     public Class<String> getType() {
         return String.class;
     }
 
+    @Override
     public String valueToString(final String value) {
         return value;
     }

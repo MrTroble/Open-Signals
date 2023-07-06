@@ -192,7 +192,13 @@ public final class NameHandler implements INetworkSync {
         }
         chunk.getTileEntityMap().forEach((pos, tile) -> {
             if (tile instanceof SignalTileEntity || tile instanceof RedstoneIOTileEntity) {
-                states.add(new NameStateInfo(world, pos));
+                final NameStateInfo info = new NameStateInfo(world, pos);
+                states.add(info);
+                synchronized (ALL_NAMES) {
+                    if (ALL_NAMES.containsKey(info)) {
+                        sendTo(player, packToBuffer(pos, ALL_NAMES.get(info)));
+                    }
+                }
             }
         });
         loadNames(states, player);

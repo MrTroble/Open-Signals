@@ -6,12 +6,9 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -19,7 +16,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 
-import com.google.common.io.ByteStreams;
 import com.troblecodings.contentpacklib.FileReader;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
@@ -38,7 +34,7 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 
-@Mod(modid = OpenSignalsMain.MODID,acceptedMinecraftVersions = "[1.12.2]")
+@Mod(modid = OpenSignalsMain.MODID, acceptedMinecraftVersions = "[1.12.2]")
 public class OpenSignalsMain {
 
     @Instance
@@ -103,7 +99,7 @@ public class OpenSignalsMain {
 
     private static FileSystem fileSystemCache;
 
-    public static Optional<Path> getRessourceLocation(final String location) {
+    private static Optional<Path> getRessourceLocation(final String location) {
         String filelocation = location;
         final URL url = OSBlocks.class.getResource("/assets/" + MODID);
         try {
@@ -130,39 +126,5 @@ public class OpenSignalsMain {
             e.printStackTrace();
         }
         return Optional.empty();
-    }
-
-    public static void addToFileSystem(final FileSystem system) {
-        if (fileSystemCache == null)
-            getRessourceLocation("");
-
-        final URL url = OSBlocks.class.getResource("/assets/opensignals");
-        try {
-            final URI uri = url.toURI();
-            final String scheme = uri.getScheme();
-            Path path = null;
-            if (scheme.equals("file")) {
-                path = fileSystemCache.provider().getPath(uri);
-            } else if (scheme.equals("jar")) {
-                path = fileSystemCache.getPath("/");
-            }
-            if (path == null) {
-                OpenSignalsMain.getLogger()
-                        .error("[Error]: Could not get path to add to file system!");
-                return;
-            }
-            final Path finalPath = path;
-            Files.walkFileTree(system.getPath("/"), new SimpleFileVisitor<Path>() {
-                @Override
-                public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs)
-                        throws IOException {
-                    final Path nextPath = finalPath.resolve(file.getFileName().toString());
-                    ByteStreams.copy(Files.newInputStream(file), Files.newOutputStream(nextPath));
-                    return FileVisitResult.CONTINUE;
-                }
-            });
-        } catch (final URISyntaxException | IOException e) {
-            e.printStackTrace();
-        }
     }
 }

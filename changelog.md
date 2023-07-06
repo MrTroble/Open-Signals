@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.12.2 Beta 9]
+
+* fix: desync in NameHandler
+* fix: desync in signalbox
+* fix: hl config
+* fix: npe
+* depricate check method (do not use the check method for cps)
+* fix: centering text renderer
+
+known bugs: 
+* randomly vanishing signals
+
 ## [1.12.2 Beta 8]
 
 * fix: lang keys

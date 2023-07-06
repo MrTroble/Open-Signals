@@ -5,6 +5,7 @@ import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
@@ -26,5 +27,15 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     public Signal getSignal() {
         return (Signal) getBlockType();
+    }
+
+    @Override
+    public void onLoad() {
+        if (!world.isRemote) {
+            final IBlockState state = world.getBlockState(pos);
+            world.notifyBlockUpdate(pos, state, state, 3);
+            world.markBlockRangeForRenderUpdate(pos, pos);
+            markDirty();
+        }
     }
 }
