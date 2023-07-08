@@ -56,6 +56,7 @@ public class SignalBoxPathway {
     private Level world;
     private BlockPos tilePos;
     private boolean isBlocked;
+    private boolean isAutoPathway = false;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
@@ -137,6 +138,7 @@ public class SignalBoxPathway {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
     private static final String IS_BLOCKED = "isBlocked";
+    private static final String IS_AUTO_PATHWAY = "isAutoPathway";
 
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
@@ -146,6 +148,7 @@ public class SignalBoxPathway {
         })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
         tag.putBoolean(IS_BLOCKED, isBlocked);
+        tag.putBoolean(IS_AUTO_PATHWAY, isAutoPathway);
     }
 
     public void read(final NBTWrapper tag) {
@@ -165,6 +168,7 @@ public class SignalBoxPathway {
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         this.isBlocked = tag.getBoolean(IS_BLOCKED);
+        this.isAutoPathway = tag.getBoolean(IS_AUTO_PATHWAY);
         if (this.listOfNodes.size() < 2) {
             OpenSignalsMain.getLogger().error("Detecting pathway with only 2 elements!");
             this.emptyOrBroken = true;
@@ -330,6 +334,23 @@ public class SignalBoxPathway {
             outputs.forEach(pos -> SignalBoxHandler
                     .updateRedstoneOutput(new PosIdentifier(pos, world), false));
         }, null);
+    }
+
+    public void setAutomaticPathway(final boolean isAutoPathway) {
+        this.isAutoPathway = isAutoPathway;
+    }
+
+    public boolean isAutomaticPathway() {
+        return isAutoPathway;
+    }
+
+    public void checkReRequest() {
+        if (isAutoPathway) {
+            final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+            if (SignalBoxHandler.requestPathway(identifier, getFirstPoint(), getLastPoint(),
+                    modeGrid))
+                SignalBoxHandler.setAutomaticPathway(identifier, firstPoint, isAutoPathway);
+        }
     }
 
     /**

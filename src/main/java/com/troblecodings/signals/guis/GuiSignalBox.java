@@ -262,7 +262,11 @@ public class GuiSignalBox extends GuiBase {
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
                         mode, rotation);
                 break;
-            case HP:
+            case HP: {
+                parent.add(GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
+                    requestAutoPathway(node.getPoint(), (byte) e);
+                }, container.autoPoints.contains(node.getPoint()) ? 1 : 0));
+            }
             case RS: {
                 if (option.containsEntry(PathEntryType.SIGNAL))
                     parent.add(GuiElements.createButton(I18n.get("btn.subsidiary"), e -> {
@@ -706,6 +710,19 @@ public class GuiSignalBox extends GuiBase {
         mode.writeNetwork(buffer);
         buffer.putByte((byte) (state ? 1 : 0));
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
+    }
+
+    private void requestAutoPathway(final Point point, final byte state) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) SignalBoxNetwork.REQUEST_AUTOPATHWAY.ordinal());
+        point.writeNetwork(buffer);
+        buffer.putByte(state);
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+        if (state == 0) {
+            container.autoPoints.remove(point);
+        }
     }
 
     private void reset() {

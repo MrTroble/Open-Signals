@@ -40,7 +40,6 @@ public class SignalBoxGrid implements INetworkSavable {
 
     private static final String NODE_LIST = "nodeList";
 
-    public final Map<Point, SignalBoxPathway> clientPathways = new HashMap<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final SignalBoxFactory factory;
     private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
@@ -59,6 +58,13 @@ public class SignalBoxGrid implements INetworkSavable {
     public void resetPathway(final Point p1) {
         SignalBoxHandler.resetPathway(new PosIdentifier(tilePos, world), p1);
         enabledSubsidiaryTypes.remove(p1);
+        final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(tilePos);
+        if (tile == null || !tile.isBlocked())
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) SignalBoxNetwork.RESET_AUTOPATHWAY.ordinal());
+        p1.writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer.build());
     }
 
     public boolean requestWay(final Point p1, final Point p2) {

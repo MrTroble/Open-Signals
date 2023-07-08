@@ -1,6 +1,7 @@
 package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,15 +37,16 @@ import net.minecraft.world.level.block.Rotation;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
+    protected final List<Point> autoPoints = new ArrayList<>();
+    protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
+    protected SignalBoxGrid grid;
     private final AtomicReference<Map<BlockPos, LinkType>> propertiesForType = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
-    private SignalBoxTileEntity tile;
     private final GuiInfo info;
-    protected SignalBoxGrid grid;
+    private SignalBoxTileEntity tile;
     private Consumer<String> run;
     private Consumer<List<SignalBoxNode>> colorUpdates;
-    protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -63,13 +65,16 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         buffer.putByte((byte) SignalBoxNetwork.SEND_GRID.ordinal());
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
-        final Map<BlockPos, LinkType> positions = SignalBoxHandler
-                .getAllLinkedPos(new PosIdentifier(tile.getBlockPos(), info.world));
+        final PosIdentifier identifier = new PosIdentifier(tile.getBlockPos(), info.world);
+        final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
         buffer.putInt(positions.size());
         positions.forEach((pos, type) -> {
             buffer.putBlockPos(pos);
             buffer.putByte((byte) type.ordinal());
         });
+        final List<Point> autoPoints = SignalBoxHandler.getAllAutomaticPathways(identifier);
+        buffer.putInt(autoPoints.size());
+        autoPoints.forEach(point -> point.writeNetwork(buffer));
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
@@ -94,6 +99,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     allPos.put(blockPos, type);
                 }
                 propertiesForType.set(allPos);
+                autoPoints.clear();
+                final int autoPointSize = buffer.getInt();
+                for (int i = 0; i < autoPointSize; i++)
+                    autoPoints.add(Point.of(buffer));
                 update();
                 break;
             }
@@ -124,6 +133,16 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             case RESET_SUBSIDIARY: {
                 final Point point = Point.of(buffer);
                 enabledSubsidiaryTypes.remove(point);
+                break;
+            }
+            case RESET_AUTOPATHWAY: {
+                final Point point = Point.of(buffer);
+                autoPoints.remove(point);
+                break;
+            }
+            case SET_AUTOPATHWAY: {
+                final Point point = Point.of(buffer);
+                autoPoints.add(point);
                 break;
             }
             default:
@@ -215,6 +234,18 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     modeSet.writeNetwork(sucess);
                     sucess.putByte((byte) (state ? 1 : 0));
                     OpenSignalsMain.network.sendTo(info.player, sucess.build());
+                }
+                break;
+            }
+            case REQUEST_AUTOPATHWAY: {
+                final Point point = Point.of(buffer);
+                final boolean state = buffer.getByte() == 1 ? true : false;
+                if (SignalBoxHandler.setAutomaticPathway(
+                        new PosIdentifier(tile.getBlockPos(), info.world), point, state) && state) {
+                    final WriteBuffer reponse = new WriteBuffer();
+                    reponse.putByte((byte) SignalBoxNetwork.SET_AUTOPATHWAY.ordinal());
+                    point.writeNetwork(reponse);
+                    OpenSignalsMain.network.sendTo(info.player, reponse.build());
                 }
                 break;
             }

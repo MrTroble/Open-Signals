@@ -355,6 +355,31 @@ public final class SignalBoxHandler {
         holder.unloadSignals(identifier.world);
     }
 
+    public static List<Point> getAllAutomaticPathways(final PosIdentifier identifier) {
+        if (identifier.world.isClientSide)
+            return new ArrayList<>();
+        PathwayHolder holder;
+        synchronized (ALL_GRIDS) {
+            holder = ALL_GRIDS.get(identifier);
+        }
+        if (holder == null)
+            return new ArrayList<>();
+        return holder.getAutomaticPathways();
+    }
+
+    public static boolean setAutomaticPathway(final PosIdentifier identifier, final Point point,
+            final boolean isAutomatic) {
+        if (identifier.world.isClientSide)
+            return false;
+        PathwayHolder holder;
+        synchronized (ALL_GRIDS) {
+            holder = ALL_GRIDS.get(identifier);
+        }
+        if (holder == null)
+            return false;
+        return holder.setAutomaticPathway(point, isAutomatic);
+    }
+
     private static final String LINKING_UPDATE = "linkingUpdates";
     private static final String OUTPUT_UPDATE = "ouputUpdates";
     private static final String BOOL_STATE = "boolState";

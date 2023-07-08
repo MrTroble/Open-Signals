@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,23 @@ public class PathwayHolder {
     public void setWorld(final Level world) {
         this.world = world;
         startsToPath.values().forEach(pw -> pw.setWorldAndPos(world, tilePos));
+    }
+
+    public boolean setAutomaticPathway(final Point point, final boolean isAutomatic) {
+        final SignalBoxPathway pathway = startsToPath.get(point);
+        if (pathway == null) {
+            OpenSignalsMain.getLogger().warn("No pathway to set automatic at [" + point + "]!");
+            return false;
+        }
+        pathway.setAutomaticPathway(isAutomatic);
+        return true;
+    }
+
+    public List<Point> getAutomaticPathways() {
+        final List<Point> autoPoints = new ArrayList<>();
+        startsToPath.values().stream().filter(SignalBoxPathway::isAutomaticPathway)
+                .forEach(pw -> autoPoints.add(pw.getFirstPoint()));
+        return autoPoints;
     }
 
     private void onWayAdd(final SignalBoxPathway pathway) {
@@ -81,9 +99,7 @@ public class PathwayHolder {
     }
 
     public void resetAllPathways() {
-        this.startsToPath.values().forEach(pathway -> {
-            pathway.resetPathway();
-        });
+        this.startsToPath.values().forEach(pathway -> pathway.resetPathway());
         clearPaths();
     }
 
@@ -123,6 +139,7 @@ public class PathwayHolder {
                 if (pathway.isEmptyOrBroken()) {
                     resetPathway(pathway);
                     updateToNet(pathway);
+                    pathway.checkReRequest();
                 } else {
                     updateToNet(pathway);
                     pathway.compact(optPoint.get());
