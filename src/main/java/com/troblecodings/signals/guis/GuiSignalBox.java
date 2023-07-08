@@ -262,7 +262,8 @@ public class GuiSignalBox extends GuiBase {
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
                         mode, rotation);
                 break;
-            case HP: {
+            case HP:
+            case RS: {
                 if (option.containsEntry(PathEntryType.SIGNAL))
                     parent.add(GuiElements.createButton(I18n.get("btn.subsidiary"), e -> {
                         final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -288,8 +289,6 @@ public class GuiSignalBox extends GuiBase {
                         });
                         push(screen);
                     }));
-            }
-            case RS: {
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
                         mode, rotation);
             }
