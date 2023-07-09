@@ -66,7 +66,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void createStates(final SignalStateInfo info,
             final Map<SEProperty, String> states) {
-        if (info.world.isRemote)
+        if (info.world.isClientSide)
             return;
         synchronized (CURRENTLY_LOADED_STATES) {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
@@ -161,7 +161,7 @@ public final class SignalStateHandler implements INetworkSync {
         new Thread(() -> {
             sendToAll(info, states);
             updateListeners(info, false);
-            info.world.getMinecraftServer().addScheduledTask(() -> info.signal.getUpdate(info.world, info.pos));
+            info.signal.getUpdate(info.world, info.pos);
             if (!contains.get())
                 createToFile(info, states);
         }, "OSSignalStateHandler:setStates").start();
@@ -339,7 +339,7 @@ public final class SignalStateHandler implements INetworkSync {
         }
         chunk.getBlockEntitiesPos().forEach(pos -> {
             final Block block = chunk.getBlockState(pos).getBlock();
-            if (tile instanceof Signal) {
+            if (block instanceof Signal) {
                 final SignalStateInfo info = new SignalStateInfo(world, pos, (Signal) block);
                 states.add(info);
                 synchronized (CURRENTLY_LOADED_STATES) {

@@ -37,10 +37,8 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -279,10 +277,10 @@ public class Signal extends BasicBlock {
         info.stack.popPose();
     }
 
-    @SideOnly(Dist.CLIENT)
+    @OnlyIn(Dist.CLIENT)
     public void renderSingleScaleOverlay(final RenderOverlayInfo info){
         final String name = info.tileEntity.getNameWrapper();
-        final float nameWidth = info.font.getStringWidth(name);
+        final float nameWidth = info.font.width(name);
         final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
         
         info.stack.pushPose();
@@ -358,7 +356,7 @@ public class Signal extends BasicBlock {
 
         for (int j = 0; j < splitNames.length; j++) {
             final String name = splitNames[j];
-            final float nameWidth = info.font.getStringWidth(name);
+            final float nameWidth = info.font.width(name);
             final float center = (signWidth - nameWidth) / 2;
             info.font.draw(info.stack, name, (int) center -10, j * 10,
                     this.prop.textColor);

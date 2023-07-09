@@ -8,11 +8,12 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
+import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelDataMap.Builder;
@@ -56,7 +57,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     // TODO maybe wrong I cant check
     @Override
     public void onLoad() {
-        if (!evel.isClientSide) {
+        if (!level.isClientSide) {
             final BlockState state = this.getBlockState();
             this.level.setBlocksDirty(worldPosition, state, state);
         }

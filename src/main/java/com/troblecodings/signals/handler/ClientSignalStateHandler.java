@@ -1,12 +1,9 @@
 package com.troblecodings.signals.handler;
 
 import java.nio.ByteBuffer;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
@@ -16,8 +13,6 @@ import com.troblecodings.signals.core.ReadBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
@@ -61,9 +56,8 @@ public class ClientSignalStateHandler implements INetworkSync {
             }
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
-        final BlockState state = entity.getBlockState();
-        mc.level.setBlocksDirty(signalPos, state, state);
-        entity.requestModelDataUpdate();
+        if (level == null)
+            return;
         mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
     }
 

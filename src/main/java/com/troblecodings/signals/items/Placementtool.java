@@ -106,9 +106,10 @@ public class Placementtool extends Item
                 signalProperties.put(property, property.getDefault());
             }
         }
-        final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
+        final BlockPos placePos = context.getClickedPos();
+        final SignalStateInfo info = new SignalStateInfo(worldIn, placePos, signal);
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
-        final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
+        final NameStateInfo nameInfo = new NameStateInfo(worldIn, placePos);
         String nametoSet = "";
         if (!(signalName == null || signalName.isEmpty())) {
             signalProperties.put(Signal.CUSTOMNAME, "true");
@@ -120,7 +121,7 @@ public class Placementtool extends Item
         SignalStateHandler.createStates(info, signalProperties);
         NameHandler.createName(nameInfo, nametoSet);
 
-        worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
+        worldIn.setBlock(placePos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
 
         final ItemStack item = context.getItemInHand();
         item.hurtAndBreak(Math.abs(cost), player,
