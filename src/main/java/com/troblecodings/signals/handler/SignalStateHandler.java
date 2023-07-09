@@ -343,10 +343,10 @@ public final class SignalStateHandler implements INetworkSync {
                 final SignalStateInfo info = new SignalStateInfo(world, pos, (Signal) block);
                 states.add(info);
                 synchronized (CURRENTLY_LOADED_STATES) {
-					if (CURRENTLY_LOADED_STATES.containsKey(info)) {
-						sendToPlayer(info, CURRENTLY_LOADED_STATES.get(info), player);
-					}
-				}
+                    if (CURRENTLY_LOADED_STATES.containsKey(info)) {
+                        sendToPlayer(info, CURRENTLY_LOADED_STATES.get(info), player);
+                    }
+                }
             }
         });
         loadSignals(states, player);
@@ -386,7 +386,17 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         new Thread(() -> {
             signals.forEach(info -> {
-                synchronized (SIGNAL_COUNTER) { //TODO different code
+                synchronized (ALL_LEVEL_FILES) {
+                    if (!ALL_LEVEL_FILES.containsKey(info.world)) {
+                        ALL_LEVEL_FILES.put(info.world,
+                                new SignalStateFile(Paths.get("osfiles/signalfiles/"
+                                        + info.world.getServer().getWorldData().getLevelName()
+                                                .replace(":", "").replace("/", "").replace("\\", "")
+                                        + "/" + info.world.dimension().location().toString()
+                                                .replace(":", ""))));
+                    }
+                }
+                synchronized (SIGNAL_COUNTER) {
                     Integer count = SIGNAL_COUNTER.get(info);
                     if (count != null && count > 0) {
                         SIGNAL_COUNTER.put(info, ++count);
@@ -394,14 +404,9 @@ public final class SignalStateHandler implements INetworkSync {
                     }
                     SIGNAL_COUNTER.put(info, 1);
                 }
-                final Map<SEProperty, String> properties;
+                final Map<SEProperty, String> properties = readAndSerialize(info);
                 synchronized (CURRENTLY_LOADED_STATES) {
-                    if (CURRENTLY_LOADED_STATES.containsKey(info)) {
-                        properties = CURRENTLY_LOADED_STATES.get(info);
-                    } else {
-                        properties = readAndSerialize(info);
-                        CURRENTLY_LOADED_STATES.put(info, properties);
-                    }
+                    CURRENTLY_LOADED_STATES.put(info, properties);
                 }
                 if (player == null) {
                     sendToAll(info, properties);
