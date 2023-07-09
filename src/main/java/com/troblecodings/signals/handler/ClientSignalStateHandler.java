@@ -5,11 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.ReadBuffer;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.BlockPos;
@@ -22,7 +24,8 @@ public class ClientSignalStateHandler implements INetworkSync {
 
     public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
-            return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
+            return ImmutableMap
+                    .copyOf(CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>()));
         }
     }
 
@@ -58,9 +61,13 @@ public class ClientSignalStateHandler implements INetworkSync {
             }
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
-        if (level == null)
-            return;
-        level.markBlockRangeForRenderUpdate(signalPos, signalPos);
+        mc.addScheduledTask(() -> {
+            level.getChunkFromBlockCoords(signalPos).markDirty();
+            final IBlockState state = level.getBlockState(signalPos);
+            mc.renderGlobal.notifyLightSet(signalPos);
+            mc.renderGlobal.notifyBlockUpdate(level, signalPos, state, state, 8);
+            level.notifyBlockUpdate(signalPos, state, state, 3);
+        });
     }
 
     private static void setRemoved(final BlockPos pos) {

@@ -87,9 +87,4 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
             getNameWrapper();
         return customName != null;
     }
-
-    public void setCustomName(final String name) {
-        this.customName = name;
-        markDirty();
-    }
 }
