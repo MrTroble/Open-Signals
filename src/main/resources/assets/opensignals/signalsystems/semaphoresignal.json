@@ -3,7 +3,7 @@
         "placementToolName": "placementtool",
         "canLink": true,
         "defaultHeight": 3,
-        "offsetX": 10,
+        "offsetX": -12,
         "offsetY": -11,
         "customNameRenderHeight": 1.47,
         "colors": [
@@ -35,14 +35,14 @@
             "defaultState": false,
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(SEMATYPE.MAIN) || check(SEMATYPE.MAIN_SMALL)"
+            "dependencies": "config(SEMATYPE.MAIN) || config(SEMATYPE.MAIN_SMALL)"
         },
         {
             "name": "wing2",
             "defaultState": false,
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "(check(SEMATYPE.MAIN) || check(SEMATYPE.MAIN_SMALL)) && check(HP2.TRUE)"
+            "dependencies": "(config(SEMATYPE.MAIN) || config(SEMATYPE.MAIN_SMALL)) && config(HP2.TRUE)"
         },
         {
             "name": "zs3",
@@ -82,7 +82,7 @@
             "defaultState": "VR0",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(SEMATYPE.DIST)"
+            "dependencies": "config(SEMATYPE.DIST)"
         },
         {
             "name": "ne2_2",

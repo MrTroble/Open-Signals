@@ -25,8 +25,6 @@ public class ClientSignalStateHandler implements INetworkSync {
 
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
-
     public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
             return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
@@ -63,21 +61,10 @@ public class ClientSignalStateHandler implements INetworkSync {
             }
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
-        final long startTime = Calendar.getInstance().getTimeInMillis();
-        SERVICE.execute(() -> {
-            BlockEntity entity;
-            while ((entity = level.getBlockEntity(signalPos)) == null) {
-                final long currentTime = Calendar.getInstance().getTimeInMillis();
-                if (currentTime - startTime >= 5000) {
-                    return;
-                }
-                continue;
-            }
-            final BlockState state = entity.getBlockState();
-            mc.level.setBlocksDirty(signalPos, state, state);
-            entity.requestModelDataUpdate();
-            mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
-        });
+        final BlockState state = entity.getBlockState();
+        mc.level.setBlocksDirty(signalPos, state, state);
+        entity.requestModelDataUpdate();
+        mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
     }
 
     private static void setRemoved(final BlockPos pos) {

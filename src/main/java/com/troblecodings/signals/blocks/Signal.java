@@ -224,7 +224,7 @@ public class Signal extends BasicBlock {
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
         if (this.prop.autoscale) {
-            renderScaleOverlay(info, this.prop.customNameRenderHeight);
+            this.renderScaleOverlay(info, this.prop.customNameRenderHeight);
             return;
         }
         this.renderOverlay(info, this.prop.customNameRenderHeight);
@@ -233,13 +233,13 @@ public class Signal extends BasicBlock {
     @SuppressWarnings("unchecked")
     @OnlyIn(Dist.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
-        float customRenderHeight = renderHeight;
         final Map<SEProperty, String> map = ClientSignalStateHandler
                 .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
                         info.tileEntity.getBlockPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
+        float customRenderHeight = renderHeight;
         for (final FloatProperty property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
                 customRenderHeight = property.height;
@@ -253,29 +253,42 @@ public class Signal extends BasicBlock {
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
-        final String name = info.tileEntity.getNameWrapper();
+        boolean doubleSidedText = false;
+        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+            if (boolProp.predicate.test(map)) {
+                doubleSidedText = boolProp.doubleSided;
+            }
+        }
         final SignalAngel face = state.getValue(Signal.ANGEL);
-
-        final String[] display = name.split("\\[n\\]");
-
-        final float width = info.font.width(name);
-        final float scale = Math.min(1 / (22 * (width / 56)), 0.1f);
+        final Quaternion angle = face.getQuaternion();
 
         info.stack.pushPose();
         info.stack.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
-        info.stack.mulPose(face.getQuaternion());
-        info.stack.scale(-scale, -scale, 1);
-        info.stack.translate(-1.3f / scale, 0, -0.32f);
+        info.stack.mulPose(angle);
 
-        int k = 0;
-        for (int i = 0; i < display.length; i++) {
-            final List<FormattedCharSequence> splittedList = info.font
-                    .split(FormattedText.of(display[i]), (int) this.prop.signWidth);
-            for (int j = 0; j < splittedList.size(); j++) {
-                info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
-                k++;
-            }
+        renderSingleScaleOverlay(info);
+
+        if (doubleSidedText) {
+            final Quaternion quad = new Quaternion(
+                    Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+            info.stack.mulPose(quad);
+            info.stack.mulPose(face.getQuaternion());
+            info.stack.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
+            renderSingleScaleOverlay(info);
         }
+        info.stack.popPose();
+    }
+
+    @SideOnly(Dist.CLIENT)
+    public void renderSingleScaleOverlay(final RenderOverlayInfo info){
+        final String name = info.tileEntity.getNameWrapper();
+        final float nameWidth = info.font.getStringWidth(name);
+        final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
+        
+        info.stack.pushPose();
+        info.stack.scale(-scale, -scale, 1);
+        info.stack.translate(-nameWidth / 2, 0, -0.32f);
+        info.font.draw(info.stack, name, 0, 0, this.prop.textColor);
         info.stack.popPose();
     }
 
@@ -283,7 +296,7 @@ public class Signal extends BasicBlock {
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        boolean doubleSidedText = false;
+        
         final Map<SEProperty, String> map = ClientSignalStateHandler
                 .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
                         info.tileEntity.getBlockPos()));
@@ -295,11 +308,6 @@ public class Signal extends BasicBlock {
                 customRenderHeight = property.height;
             }
         }
-        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
-            if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.doubleSided;
-            }
-        }
         if (customRenderHeight == -1)
             return;
         final Level world = info.tileEntity.getLevel();
@@ -308,19 +316,25 @@ public class Signal extends BasicBlock {
         if (!(state.getBlock() instanceof Signal)) {
             return;
         }
+        boolean doubleSidedText = false;
+        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+            if (boolProp.predicate.test(map)) {
+                doubleSidedText = boolProp.doubleSided;
+            }
+        }
+
         final String name = info.tileEntity.getNameWrapper();
+        final String[] splitNames = name.split("\\[n\\]");
         final SignalAngel face = state.getValue(Signal.ANGEL);
-
-        final String[] display = name.split("\\[n\\]");
-
+        final Quaternion angle = face.getQuaternion();
         final float scale = this.prop.signScale;
 
         info.stack.pushPose();
         info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
-        info.stack.mulPose(face.getQuaternion());
-        info.stack.scale(0.015f * scale, -0.015f * scale, 0.015f * scale);
+        info.stack.mulPose(angle);
+        info.stack.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
 
-        renderSingleOverlay(info, display);
+        renderSingleOverlay(info, splitNames);
 
         if (doubleSidedText) {
             final Quaternion quad = new Quaternion(
@@ -328,29 +342,26 @@ public class Signal extends BasicBlock {
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
             info.stack.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
-            renderSingleOverlay(info, display);
+            renderSingleOverlay(info, splitNames);
         }
-
         info.stack.popPose();
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void renderSingleOverlay(final RenderOverlayInfo info, final String[] display) {
-        final float width = this.prop.signWidth;
+    public void renderSingleOverlay(final RenderOverlayInfo info, final String[] splitNames) {
+        final float signWidth = this.prop.signWidth;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
         info.stack.pushPose();
-        info.stack.translate(width / 2 + offsetX, 0, -4.2f + offsetZ);
+        info.stack.translate(offsetX, 0, -4.2f + offsetZ);
         info.stack.scale(-1f, 1f, 1f);
 
-        int k = 0;
-        for (int i = 0; i < display.length; i++) {
-            final List<FormattedCharSequence> splittedList = info.font
-                    .split(FormattedText.of(display[i]), (int) width);
-            for (int j = 0; j < splittedList.size(); j++) {
-                info.font.draw(info.stack, splittedList.get(j), 0, (k * 10), this.prop.textColor);
-                k++;
-            }
+        for (int j = 0; j < splitNames.length; j++) {
+            final String name = splitNames[j];
+            final float nameWidth = info.font.getStringWidth(name);
+            final float center = (signWidth - nameWidth) / 2;
+            info.font.draw(info.stack, name, (int) center -10, j * 10,
+                    this.prop.textColor);
         }
         info.stack.popPose();
     }

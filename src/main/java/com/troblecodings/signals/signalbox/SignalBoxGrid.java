@@ -142,14 +142,18 @@ public class SignalBoxGrid implements INetworkSavable {
         return modeGrid.computeIfAbsent(point, funtion);
     }
 
+    public void putAllNodes(final Map<Point, SignalBoxNode> nodes) {
+        modeGrid.putAll(nodes);
+    }
+
     @Override
     public void readNetwork(final ReadBuffer buffer) {
+        modeGrid.clear();
         enabledSubsidiaryTypes.clear();
         final int size = buffer.getInt();
         for (int i = 0; i < size; i++) {
             final Point point = Point.of(buffer);
-            final SignalBoxNode node = modeGrid.computeIfAbsent(point,
-                    _u -> new SignalBoxNode(point));
+            final SignalBoxNode node = new SignalBoxNode(point);
             final int enabledSubsidariesSize = buffer.getByteAsInt();
             if (enabledSubsidariesSize != 0) {
                 for (int j = 0; j < enabledSubsidariesSize; j++) {
@@ -162,6 +166,7 @@ public class SignalBoxGrid implements INetworkSavable {
                 }
             }
             node.readNetwork(buffer);
+            modeGrid.put(point, node);
         }
     }
 
