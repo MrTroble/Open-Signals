@@ -40,7 +40,7 @@ public final class OSItems {
         new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
                 state.getBlock().getRegistryName().getResourcePath());
     });
-    public static final Item CONDUCTOR_TROWEL_GREEN = new Item();
+    public static final Item CONDUCTOR_TROWEL_GREEN = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item CONDUCTOR_TROWEL_RED = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item WARNING_FLAG = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item K_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
