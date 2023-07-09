@@ -106,23 +106,7 @@ public class Placementtool extends Item
                 signalProperties.put(property, property.getDefault());
             }
         }
-        final BlockPos placePos = context.getClickedPos();
-        final SignalStateInfo info = new SignalStateInfo(worldIn, placePos, signal);
-        final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
-        final NameStateInfo nameInfo = new NameStateInfo(worldIn, placePos);
-        String nametoSet = "";
-        if (!(signalName == null || signalName.isEmpty())) {
-            signalProperties.put(Signal.CUSTOMNAME, "true");
-            nametoSet = signalName;
-        } else {
-            signalProperties.put(Signal.CUSTOMNAME, "false");
-            nametoSet = signal.getSignalTypeName();
-        }
-        SignalStateHandler.createStates(info, signalProperties);
-        NameHandler.createName(nameInfo, nametoSet);
-
-        worldIn.setBlock(placePos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
-
+        
         final ItemStack item = context.getItemInHand();
         item.hurtAndBreak(Math.abs(cost), player,
                 (user) -> user.broadcastBreakEvent(context.getHand()));
@@ -138,11 +122,27 @@ public class Placementtool extends Item
             }
             checkPos = checkPos.above();
         }
+        
+
+        final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
+        SignalStateHandler.createStates(info, signalProperties);
         BlockPos ghostPos = pos.above();
         for (int i = 0; i < height; i++) {
             worldIn.setBlock(ghostPos, OSBlocks.GHOST_BLOCK.defaultBlockState(), 3);
             ghostPos = ghostPos.above();
         }
+        final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
+        final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
+        String nametoSet = "";
+        if (!(signalName == null || signalName.isEmpty())) {
+            signalProperties.put(Signal.CUSTOMNAME, "true");
+            nametoSet = signalName;
+        } else {
+            signalProperties.put(Signal.CUSTOMNAME, "false");
+            nametoSet = signal.getSignalTypeName();
+        }
+        NameHandler.createName(nameInfo, nametoSet);
+        worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
         return InteractionResult.SUCCESS;
     }
 
