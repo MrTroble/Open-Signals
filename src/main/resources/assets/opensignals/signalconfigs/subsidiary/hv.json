@@ -12,6 +12,17 @@
         ],
         "ZP9": [
             "zs3.ZP9"
+        ],
+        "SH1": [
+            "stopsignal.SHUNTING"
+        ],
+        "STATUSLIGHT": [
+            "stopsignal.OFF",
+            "hphome.OFF",
+            "hpblock.OFF",
+            "identifier.TRUE",
+            "vrlight.TRUE",
+            "distantsignal.OFF"
         ]
     }
     

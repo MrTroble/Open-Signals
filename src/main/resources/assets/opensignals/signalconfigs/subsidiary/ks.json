@@ -12,6 +12,15 @@
         ],
         "ZP9": [
             "zs2.ZP9"
+        ],
+        "SH1": [
+            "kombisignal.KS_SHUNTING",
+            "kombisignal_main.KS_SHUNTING"
+        ],
+        "STATUSLIGHT": [
+            "kombisignal.KS_STATUS_LIGHT",
+            "kombisignal_main.KS_STATUS_LIGHT",
+            "kombisignal_distant.KS_STATUS_LIGHT"
         ]
     }
 }
