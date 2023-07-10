@@ -271,7 +271,6 @@ public class Signal extends BasicBlock {
                     Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
-            info.stack.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
             renderSingleScaleOverlay(info);
         }
         info.stack.popPose();
@@ -331,6 +330,7 @@ public class Signal extends BasicBlock {
         info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
         info.stack.mulPose(angle);
         info.stack.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
+        
 
         renderSingleOverlay(info, splitNames);
 
@@ -339,7 +339,6 @@ public class Signal extends BasicBlock {
                     Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
-            info.stack.translate(info.x - 0.5f, info.y + customRenderHeight - 2, info.z - 0.5f);
             renderSingleOverlay(info, splitNames);
         }
         info.stack.popPose();
@@ -352,7 +351,6 @@ public class Signal extends BasicBlock {
         final float offsetZ = this.prop.offsetY;
         info.stack.pushPose();
         info.stack.translate(offsetX, 0, -4.2f + offsetZ);
-        info.stack.scale(-1f, 1f, 1f);
 
         for (int j = 0; j < splitNames.length; j++) {
             final String name = splitNames[j];
