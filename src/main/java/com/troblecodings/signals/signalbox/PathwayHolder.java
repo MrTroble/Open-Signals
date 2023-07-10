@@ -1,6 +1,5 @@
 package com.troblecodings.signals.signalbox;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,21 +37,13 @@ public class PathwayHolder {
         startsToPath.values().forEach(pw -> pw.setWorldAndPos(world, tilePos));
     }
 
-    public boolean setAutomaticPathway(final Point point, final boolean isAutomatic) {
+    public void updatePathwayToAutomatic(final Point point) {
         final SignalBoxPathway pathway = startsToPath.get(point);
         if (pathway == null) {
-            OpenSignalsMain.getLogger().warn("No pathway to set automatic at [" + point + "]!");
-            return false;
+            OpenSignalsMain.getLogger().warn("No pathway to update automatic at [" + point + "]!");
+            return;
         }
-        pathway.setAutomaticPathway(isAutomatic);
-        return true;
-    }
-
-    public List<Point> getAutomaticPathways() {
-        final List<Point> autoPoints = new ArrayList<>();
-        startsToPath.values().stream().filter(SignalBoxPathway::isAutomaticPathway)
-                .forEach(pw -> autoPoints.add(pw.getFirstPoint()));
-        return autoPoints;
+        pathway.updatePathwayToAutomatic();
     }
 
     private void onWayAdd(final SignalBoxPathway pathway) {

@@ -120,6 +120,7 @@ public class SignalBoxPathway {
         }
         this.speed = atomic.get();
         this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
+        this.isAutoPathway = firstNode.isAutoPoint();
     }
 
     private BlockPos makeFromNext(final PathType type, final SignalBoxNode first,
@@ -138,7 +139,6 @@ public class SignalBoxPathway {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
     private static final String IS_BLOCKED = "isBlocked";
-    private static final String IS_AUTO_PATHWAY = "isAutoPathway";
 
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
@@ -148,7 +148,6 @@ public class SignalBoxPathway {
         })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
         tag.putBoolean(IS_BLOCKED, isBlocked);
-        tag.putBoolean(IS_AUTO_PATHWAY, isAutoPathway);
     }
 
     public void read(final NBTWrapper tag) {
@@ -168,7 +167,6 @@ public class SignalBoxPathway {
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         this.isBlocked = tag.getBoolean(IS_BLOCKED);
-        this.isAutoPathway = tag.getBoolean(IS_AUTO_PATHWAY);
         if (this.listOfNodes.size() < 2) {
             OpenSignalsMain.getLogger().error("Detecting pathway with only 2 elements!");
             this.emptyOrBroken = true;
@@ -336,20 +334,15 @@ public class SignalBoxPathway {
         }, null);
     }
 
-    public void setAutomaticPathway(final boolean isAutoPathway) {
-        this.isAutoPathway = isAutoPathway;
-    }
-
-    public boolean isAutomaticPathway() {
-        return isAutoPathway;
+    public void updatePathwayToAutomatic() {
+        final SignalBoxNode first = modeGrid.get(firstPoint);
+        this.isAutoPathway = first.isAutoPoint();
     }
 
     public void checkReRequest() {
         if (isAutoPathway) {
             final PosIdentifier identifier = new PosIdentifier(tilePos, world);
-            if (SignalBoxHandler.requestPathway(identifier, getFirstPoint(), getLastPoint(),
-                    modeGrid))
-                SignalBoxHandler.setAutomaticPathway(identifier, firstPoint, isAutoPathway);
+            SignalBoxHandler.requestPathway(identifier, getFirstPoint(), getLastPoint(), modeGrid);
         }
     }
 

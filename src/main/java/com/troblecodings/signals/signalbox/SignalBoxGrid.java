@@ -58,13 +58,6 @@ public class SignalBoxGrid implements INetworkSavable {
     public void resetPathway(final Point p1) {
         SignalBoxHandler.resetPathway(new PosIdentifier(tilePos, world), p1);
         enabledSubsidiaryTypes.remove(p1);
-        final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(tilePos);
-        if (tile == null || !tile.isBlocked())
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalBoxNetwork.RESET_AUTOPATHWAY.ordinal());
-        p1.writeNetwork(buffer);
-        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer.build());
     }
 
     public boolean requestWay(final Point p1, final Point p2) {

@@ -264,8 +264,9 @@ public class GuiSignalBox extends GuiBase {
                 break;
             case HP: {
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
-                    requestAutoPathway(node.getPoint(), (byte) e);
-                }, container.autoPoints.contains(node.getPoint()) ? 1 : 0));
+                    setAutoPoint(node.getPoint(), (byte) e);
+                    node.setAutoPoint(e == 1 ? true : false);
+                }, node.isAutoPoint() ? 1 : 0));
             }
             case RS: {
                 if (option.containsEntry(PathEntryType.SIGNAL))
@@ -712,17 +713,14 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void requestAutoPathway(final Point point, final byte state) {
+    private void setAutoPoint(final Point point, final byte state) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalBoxNetwork.REQUEST_AUTOPATHWAY.ordinal());
+        buffer.putByte((byte) SignalBoxNetwork.SET_AUTO_POINT.ordinal());
         point.writeNetwork(buffer);
         buffer.putByte(state);
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
-        if (state == 0) {
-            container.autoPoints.remove(point);
-        }
     }
 
     private void reset() {
