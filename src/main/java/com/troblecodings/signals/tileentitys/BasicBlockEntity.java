@@ -66,4 +66,9 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
             getNameWrapper();
         return customName != null;
     }
+
+    public void setCustomName(final String name) {
+        this.customName = name;
+        level.setBlocksDirty(worldPosition, getBlockState(), getBlockState());
+    }
 }
