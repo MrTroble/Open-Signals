@@ -50,12 +50,13 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
     @Override
     public String getNameWrapper() {
-        final NameStateInfo info = new NameStateInfo(level, worldPosition);
-        if (customName == null || customName.isEmpty())
+        if (customName == null || customName.isEmpty()) {
+            final NameStateInfo info = new NameStateInfo(level, worldPosition);
             customName = level.isClientSide ? ClientNameHandler.getClientName(info)
                     : NameHandler.getName(info);
-        final BlockState state = this.getBlockState();
-        this.level.setBlocksDirty(worldPosition, state, state);
+            final BlockState state = this.getBlockState();
+            this.level.setBlocksDirty(worldPosition, state, state);
+        }
         return customName == null ? "" : customName;
     }
 
