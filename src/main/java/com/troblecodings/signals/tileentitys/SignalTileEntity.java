@@ -13,7 +13,6 @@ import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelDataMap;
 import net.minecraftforge.client.model.data.ModelDataMap.Builder;
