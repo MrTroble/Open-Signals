@@ -53,12 +53,4 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         });
         return new ModelInfoWrapper(builder.build());
     }
-
-    @Override
-    public void onLoad() {
-        if (!level.isClientSide) {
-            final BlockState state = this.getBlockState();
-            this.level.setBlocksDirty(worldPosition, state, state);
-        }
-    }
 }
