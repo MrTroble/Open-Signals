@@ -477,5 +477,7 @@
     "property.auto_pathway.name": "Selbststellbetrieb",
     "property.auto_pathway.desc": "WIP",
     "property.sh1.name": "Sh1",
-    "property.sh1.desc": "§nSh1§r: Fahrtverbot aufgehoben"
+    "property.sh1.desc": "§nSh1§r: Fahrtverbot aufgehoben",
+    "property.statuslight.name": "Kennlicht",
+    "property.statuslight.desc": "§nKennlicht§r: Das Signal ist betrieblich abgeschaltet"
 }
