@@ -18,7 +18,7 @@
 			"defaultState": "OFF",
 			"changeableStage": "APISTAGE_NONE_CONFIG",
 			"autoname": true,
-			"dependencies": "check(SIGNALTRAMTYPE.TRAM)"
+			"dependencies": "config(SIGNALTRAMTYPE.TRAM)"
 		},
 		{
 			"name": "signaltramadd",
@@ -26,7 +26,7 @@
 			"defaultState": "OFF",
 			"changeableStage": "GUISTAGE",
 			"autoname": true,
-			"dependencies": "check(SIGNALTRAMTYPE.TRAM)"
+			"dependencies": "config(SIGNALTRAMTYPE.TRAM)"
 		},
 		{
 			"name": "signalcar",
@@ -34,21 +34,21 @@
 			"defaultState": "OFF",
 			"changeableStage": "APISTAGE_NONE_CONFIG",
 			"autoname": true,
-			"dependencies": "check(SIGNALTRAMTYPE.CAR)"
+			"dependencies": "config(SIGNALTRAMTYPE.CAR)"
 		},
 		{
 			"name": "signaltrama",
 			"defaultState": false,
 			"changeableStage": "APISTAGE_NONE_CONFIG",
 			"autoname": true,
-			"dependencies": "check(SIGNALTRAMTYPE.TRAM) && (check(SIGNALTRAMADD.A) || check(SIGNALTRAMADD.AT))"
+			"dependencies": "config(SIGNALTRAMTYPE.TRAM) && (config(SIGNALTRAMADD.A) || config(SIGNALTRAMADD.AT))"
 		},
 		{
 			"name": "signaltramt",
 			"defaultState": false,
 			"changeableStage": "APISTAGE_NONE_CONFIG",
 			"autoname": true,
-			"dependencies": "check(SIGNALTRAMTYPE.TRAM) && (check(SIGNALTRAMADD.T) || check(SIGNALTRAMADD.AT))"
+			"dependencies": "config(SIGNALTRAMTYPE.TRAM) && (config(SIGNALTRAMADD.T) || config(SIGNALTRAMADD.AT))"
 		},
 		{
 			"name": "signaltramswitch",
@@ -56,7 +56,7 @@
 			"defaultState": "OFF",
 			"changeableStage": "APISTAGE_NONE_CONFIG",
 			"autoname": true,
-			"dependencies": "check(SIGNALTRAMTYPE.SWITCH)"
+			"dependencies": "config(SIGNALTRAMTYPE.SWITCH)"
 		},
 		{
 			"name": "signalped",
@@ -64,7 +64,7 @@
 			"defaultState": "OFF",
 			"changeableStage": "APISTAGE_NONE_CONFIG",
 			"autoname": true,
-			"dependencies": "check(SIGNALTRAMTYPE.PEDESTRIAN)"
+			"dependencies": "config(SIGNALTRAMTYPE.PEDESTRIAN)"
 		}
 	]
 }

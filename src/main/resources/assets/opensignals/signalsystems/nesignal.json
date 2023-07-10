@@ -49,7 +49,7 @@
             "defaultState": false,
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(NETYPE.NE13)"
+            "dependencies": "config(NETYPE.NE13)"
         }
     ]
 }

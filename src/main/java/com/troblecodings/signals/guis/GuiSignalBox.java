@@ -305,21 +305,13 @@ public class GuiSignalBox extends GuiBase {
             final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
             final Rotation rotation = Rotation.values()[menu.getRotation()];
             final ModeSet modeSet = new ModeSet(mode, rotation);
+            final SignalBoxNode node = sbt.getNode();
             if (sbt.has(modeSet)) {
                 sbt.remove(modeSet);
-                final SignalBoxNode node = container.grid.computeIfAbsent(sbt.getPoint(),
-                        _u -> new SignalBoxNode(sbt.getPoint()));
-                node.remove(modeSet);
-                if (node.isEmpty())
-                    container.grid.removeNode(sbt.getPoint());
-                changedModes.put(sbt.getPoint(), node);
             } else {
                 sbt.add(modeSet);
-                final SignalBoxNode node = container.grid.computeIfAbsent(sbt.getPoint(),
-                        _u -> new SignalBoxNode(sbt.getPoint()));
-                node.add(modeSet);
-                changedModes.put(sbt.getPoint(), node);
             }
+            changedModes.put(sbt.getPoint(), node);
         }));
     }
 
@@ -673,6 +665,7 @@ public class GuiSignalBox extends GuiBase {
             point.writeNetwork(buffer);
             node.writeNetwork(buffer);
         });
+        container.grid.putAllNodes(changedModes);
         changedModes.clear();
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }

@@ -69,10 +69,10 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> states) {
         if (info.world.isClientSide)
             return;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
+        }
         new Thread(() -> {
-            synchronized (CURRENTLY_LOADED_STATES) {
-                CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
-            }
             synchronized (SIGNAL_COUNTER) {
                 SIGNAL_COUNTER.put(info, 1);
             }
@@ -91,12 +91,15 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void removeListener(final SignalStateInfo info,
             final SignalStateListener listener) {
+        final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
-            final List<SignalStateListener> listeners = ALL_LISTENERS.get(info);
-            if (listeners == null)
-                return;
-            listeners.remove(listener);
-            if (listeners.isEmpty()) {
+            listeners = ALL_LISTENERS.get(info);
+        }
+        if (listeners == null)
+            return;
+        listeners.remove(listener);
+        if (listeners.isEmpty()) {
+            synchronized (ALL_LISTENERS) {
                 ALL_LISTENERS.remove(info);
             }
         }
@@ -162,7 +165,6 @@ public final class SignalStateHandler implements INetworkSync {
             info.signal.getUpdate(info.world, info.pos);
             if (!contains.get())
                 createToFile(info, states);
-            info.signal.getUpdate(info.world, info.pos);
         }, "OSSignalStateHandler:setStates").start();
     }
 
@@ -338,7 +340,14 @@ public final class SignalStateHandler implements INetworkSync {
             chunk.getBlockEntitiesPos().forEach(pos -> {
                 final Block block = chunk.getBlockState(pos).getBlock();
                 if (block instanceof Signal) {
-                    states.add(new SignalStateInfo(world, pos, (Signal) block));
+                    final SignalStateInfo info = new SignalStateInfo(world, pos, (Signal) block);
+                    states.add(info);
+                    synchronized (CURRENTLY_LOADED_STATES) {
+                        if (CURRENTLY_LOADED_STATES.containsKey(info)) {
+                            sendToPlayer(info, CURRENTLY_LOADED_STATES.get(info), player);
+
+                        }
+                    }
                 }
             });
             loadSignals(states, player);
@@ -389,6 +398,16 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         new Thread(() -> {
             signals.forEach(info -> {
+                synchronized (ALL_LEVEL_FILES) {
+                    if (!ALL_LEVEL_FILES.containsKey(info.world)) {
+                        ALL_LEVEL_FILES.put(info.world,
+                                new SignalStateFile(Paths.get("osfiles/signalfiles/"
+                                        + info.world.getServer().getWorldData().getLevelName()
+                                                .replace(":", "").replace("/", "").replace("\\", "")
+                                        + "/" + info.world.dimension().location().toString()
+                                                .replace(":", ""))));
+                    }
+                }
                 synchronized (SIGNAL_COUNTER) {
                     Integer count = SIGNAL_COUNTER.get(info);
                     if (count != null && count > 0) {
@@ -400,11 +419,6 @@ public final class SignalStateHandler implements INetworkSync {
                 final Map<SEProperty, String> properties = readAndSerialize(info);
                 synchronized (CURRENTLY_LOADED_STATES) {
                     CURRENTLY_LOADED_STATES.put(info, properties);
-                }
-                if (player == null) {
-                    sendToAll(info, properties);
-                } else {
-                    sendToPlayer(info, properties, player);
                 }
             });
         }, "OSSignalStateHandler:loadSignals").start();

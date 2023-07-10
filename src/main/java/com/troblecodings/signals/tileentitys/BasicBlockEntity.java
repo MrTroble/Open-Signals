@@ -63,10 +63,13 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
 
     @Override
     public String getNameWrapper() {
-        final NameStateInfo info = new NameStateInfo(level, worldPosition);
-        if (customName == null || customName.isEmpty())
+        if (customName == null || customName.isEmpty()) {
+            final NameStateInfo info = new NameStateInfo(level, worldPosition);
             customName = level.isClientSide ? ClientNameHandler.getClientName(info)
                     : NameHandler.getName(info);
+            final BlockState state = this.getBlockState();
+            this.level.setBlocksDirty(worldPosition, state, state);
+        }
         return customName == null ? "" : customName;
     }
 
@@ -75,11 +78,5 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
         if (customName == null)
             getNameWrapper();
         return customName != null;
-    }
-
-    public void setCustomName(final String name) {
-        this.customName = name;
-        final BlockState state = this.getBlockState();
-        this.level.setBlocksDirty(worldPosition, state, state);
     }
 }

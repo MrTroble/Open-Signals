@@ -5,7 +5,7 @@
         "stop": "config(mainlightsignal.HP0) || config(mainlightsignal.HP0_ALTERNATE_RED) || config(mainlightsignal.HL_ZS1) || config(mainlightsignal.HL_SHUNTING) || config(exitsignal.HP0) || config(exitsignal.HP0_ALTERNATE_RED) || config(exitsignal.HL_ZS1) || config(exitsignal.HL_SHUNTING) || config(blocksignal.HP0) || config(blocksignal.HP0_ALTERNATE_RED) || config(blocksignal.HL_ZS1) || config(blockexitsignal.HP0) || config(blockexitsignal.HL_ZS1) || config(blockexitsignal.HL_SHUNTING)",
         "drive": "config(mainlightsignal.HL1) || config(mainlightsignal.HL4) || config(mainlightsignal.HL7) || config(mainlightsignal.HL10) || config(exitsignal.HL1) || config(blocksignal.HL1) || config(blocksignal.HL10) || config(blockexitsignal.HL1)",
         "slow": "config(mainlightsignal.HL2_3) || config(mainlightsignal.HL5_6) || config(mainlightsignal.HL8_9) || config(mainlightsignal.HL11_12) || config(exitsignal.HL2_3)",
-        "40_60": "config(mainlightsignallightbar.OFF) || config(mainlightsignallightbar.YELLOW)",
+        "40_60": "config(mainlightsignallightbar.OFF) || config(mainlightsignallightbar.YELLOW)  || !(config(mainlightsignallightbar.OFF) || config(mainlightsignallightbar.YELLOW) || config(mainlightsignallightbar.GREEN))",
         "100": "config(mainlightsignallightbar.GREEN)"
     },
     "values": {

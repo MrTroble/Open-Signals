@@ -31,9 +31,14 @@ public class JsonEnum extends ModelProperty<String> implements IIntegerable<Stri
     }
 
     public int getIDFromValue(final String value) {
-        return this.valueToInt.get(value.toLowerCase());
+        try {
+            return this.valueToInt.get(value.toLowerCase());
+        } catch (final NullPointerException e) {
+            throw new NullPointerException(value + " in " + name + " not valid!");
+        }
     }
 
+    @Override
     public String getName() {
         return name;
     }
