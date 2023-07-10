@@ -4,7 +4,7 @@
     "savedPredicates": {
         "stop": "config(kombisignal.HP0) || config(kombisignal.KS_ZS1) || config(kombisignal.KS_ZS7) || config(kombisignal.KS_SHUNTING) || config(kombisignal_main.HP0) || config(kombisignal_main.KS_ZS1) || config(kombisignal_main.KS_ZS7) || config(kombisignal_main.KS_SHUNTING)",
         "drive": "config(kombisignal.KS1) || config(kombisignal_main.KS1) || config(kombisignal.KS1_BLINK) || config(kombisignal.KS1_BLINK_LIGHT) || config(kombisignal.KS2) || config(kombisignal.KS2_LIGHT)",
-        "zs3": "!config(zs3.OFF) || !config(zs3plate.OFF)"
+        "zs3": "config(zs3.Z1) || config(zs3.Z2) || config(zs3.Z3) || config(zs3.Z4) || config(zs3.Z5) || config(zs3.Z6) || config(zs3.Z7) || config(zs3.Z8) || config(zs3.Z9) || config(zs3.Z10) || config(zs3.Z11) || config(zs3.Z12) || config(zs3.Z13) || config(zs3.Z14) || config(zs3.Z15) || config(zs3plate.Z1) || config(zs3plate.Z2) || config(zs3plate.Z3) || config(zs3plate.Z4) || config(zs3plate.Z5) || config(zs3plate.Z6) || config(zs3plate.Z7) || config(zs3plate.Z8) || config(zs3plate.Z9) || config(zs3plate.Z10) || config(zs3plate.Z11) || config(zs3plate.Z12) || config(zs3plate.Z13) || config(zs3plate.Z14) || config(zs3plate.Z15)"
     },
     "values": {
         "map(stop)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF"],
