@@ -39,6 +39,7 @@ import net.minecraft.world.level.Level;
 public class SignalBoxGrid implements INetworkSavable {
 
     private static final String NODE_LIST = "nodeList";
+    private static final String SUBSIDIARY_LIST = "subsidiaryList";
 
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final SignalBoxFactory factory;
@@ -73,6 +74,16 @@ public class SignalBoxGrid implements INetworkSavable {
         tag.putList(NODE_LIST, modeGrid.values().stream().map(node -> {
             final NBTWrapper nodeTag = new NBTWrapper();
             node.write(nodeTag);
+            final Map<ModeSet, SubsidiaryEntry> subsidiaries = enabledSubsidiaryTypes
+                    .get(node.getPoint());
+            if (subsidiaries == null)
+                return nodeTag;
+            nodeTag.putList(SUBSIDIARY_LIST, subsidiaries.entrySet().stream().map(entry -> {
+                final NBTWrapper subsidiaryTag = new NBTWrapper();
+                entry.getKey().write(subsidiaryTag);
+                entry.getValue().writeNBT(tag);
+                return subsidiaryTag;
+            })::iterator);
             return nodeTag;
         })::iterator);
     }
@@ -80,10 +91,20 @@ public class SignalBoxGrid implements INetworkSavable {
     @Override
     public void read(final NBTWrapper tag) {
         modeGrid.clear();
+        enabledSubsidiaryTypes.clear();
         tag.getList(NODE_LIST).forEach(comp -> {
             final SignalBoxNode node = new SignalBoxNode();
             node.read(comp);
             modeGrid.put(node.getPoint(), node);
+            final List<NBTWrapper> subsidiaryTags = comp.getList(SUBSIDIARY_LIST);
+            if (subsidiaryTags == null)
+                return;
+            final Map<ModeSet, SubsidiaryEntry> states = new HashMap<>();
+            subsidiaryTags.forEach(subsidiaryTag -> {
+                final ModeSet mode = new ModeSet(subsidiaryTag);
+                states.put(mode, SubsidiaryEntry.of(tag));
+            });
+            enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
     }
 
