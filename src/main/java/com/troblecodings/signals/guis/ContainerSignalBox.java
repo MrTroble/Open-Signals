@@ -121,11 +121,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 }
                 break;
             }
-            case RESET_SUBSIDIARY: {
-                final Point point = Point.of(buffer);
-                enabledSubsidiaryTypes.remove(point);
-                break;
-            }
             default:
                 break;
         }

@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
@@ -22,7 +21,6 @@ import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumPathUsage;
-import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -309,17 +307,5 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public Map<Point, Map<ModeSet, SubsidiaryEntry>> getAllSubsidiaries() {
         return ImmutableMap.copyOf(enabledSubsidiaryTypes);
-    }
-
-    public void resetSubsidiary(final Point point, final SignalBoxTileEntity tile) {
-        if (!enabledSubsidiaryTypes.containsKey(point))
-            return;
-        enabledSubsidiaryTypes.remove(point);
-        if (!tile.isBlocked())
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalBoxNetwork.RESET_SUBSIDIARY.ordinal());
-        point.writeNetwork(buffer);
-        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer.build());
     }
 }
