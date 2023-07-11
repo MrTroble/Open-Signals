@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.troblecodings.core.NBTWrapper;
+
 public class SubsidiaryState {
 
     public static final List<SubsidiaryState> ALL_STATES = new ArrayList<>();
@@ -31,6 +33,16 @@ public class SubsidiaryState {
 
     public static SubsidiaryState of(final ReadBuffer buffer) {
         return ALL_STATES.get(buffer.getByteAsInt());
+    }
+
+    private static final String STATE_ID = "stateID";
+
+    public void writeNBT(final NBTWrapper tag) {
+        tag.putInteger(STATE_ID, id);
+    }
+
+    public static SubsidiaryState of(final NBTWrapper tag) {
+        return ALL_STATES.get(tag.getInteger(STATE_ID));
     }
 
     @Override

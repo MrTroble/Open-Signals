@@ -60,7 +60,7 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     public List<BlockPos> getLinkedPos() {
         return linkedPositions;
     }
-    
+
     public void syncClient() {
         syncClient(getWorld(), getPos());
     }
@@ -86,5 +86,10 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
         if (customName == null)
             getNameWrapper();
         return customName != null;
+    }
+
+    public void setCustomName(final String name) {
+        this.customName = name;
+        markDirty();
     }
 }

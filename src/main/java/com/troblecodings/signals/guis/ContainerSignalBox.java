@@ -36,16 +36,16 @@ import net.minecraft.util.math.BlockPos;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
+    protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
+    protected SignalBoxGrid grid;
     private final AtomicReference<Map<BlockPos, LinkType>> propertiesForType = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
-    private SignalBoxTileEntity tile;
     private final GuiInfo info;
-    protected SignalBoxGrid grid;
+    private SignalBoxTileEntity tile;
     private EntityPlayer player;
     private Consumer<String> run;
     private Consumer<List<SignalBoxNode>> colorUpdates;
-    protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -117,6 +117,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 } else {
                     node.removeManuellOutput(modeSet);
                 }
+                break;
+            }
+            case SET_AUTO_POINT: {
+                final Point point = Point.of(buffer);
+                final boolean state = buffer.getByte() == 1 ? true : false;
+                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
+                node.setAutoPoint(state);
+                SignalBoxHandler.updatePathwayToAutomatic(
+                        new PosIdentifier(tile.getPos(), info.world), point);
                 break;
             }
             default:

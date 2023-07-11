@@ -6,8 +6,10 @@ import java.util.Map;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -42,6 +44,10 @@ public class ClientNameHandler implements INetworkSync {
         final String name = new String(array);
         synchronized (CLIENT_NAMES) {
             CLIENT_NAMES.put(new NameStateInfo(mc.world, pos), name);
+        }
+        final TileEntity tile = mc.world.getTileEntity(pos);
+        if (tile instanceof BasicBlockEntity) {
+            ((BasicBlockEntity) tile).setCustomName(name);
         }
     }
 

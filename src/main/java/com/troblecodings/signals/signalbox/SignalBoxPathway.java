@@ -56,6 +56,8 @@ public class SignalBoxPathway {
     private World world;
     private BlockPos tilePos;
     private boolean isBlocked;
+    private boolean isAutoPathway = false;
+    private Point originalFirstPoint = null;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
@@ -76,6 +78,7 @@ public class SignalBoxPathway {
         if (this.type.equals(PathType.NONE))
             throw new IllegalArgumentException();
         initalize();
+        updatePathwayToAutomatic();
     }
 
     private void initalize() {
@@ -139,6 +142,7 @@ public class SignalBoxPathway {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
     private static final String IS_BLOCKED = "isBlocked";
+    private static final String IS_AUTOMATIC = "isAutomatic";
 
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
@@ -148,6 +152,7 @@ public class SignalBoxPathway {
         })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
         tag.putBoolean(IS_BLOCKED, isBlocked);
+        tag.putBoolean(IS_AUTOMATIC, isAutoPathway);
     }
 
     public void read(final NBTWrapper tag) {
@@ -167,6 +172,7 @@ public class SignalBoxPathway {
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         this.isBlocked = tag.getBoolean(IS_BLOCKED);
+        this.isAutoPathway = tag.getBoolean(IS_AUTOMATIC);
         if (this.listOfNodes.size() < 2) {
             OpenSignalsMain.getLogger().error("Detecting pathway with only 2 elements!");
             this.emptyOrBroken = true;
@@ -330,6 +336,20 @@ public class SignalBoxPathway {
             outputs.forEach(pos -> SignalBoxHandler
                     .updateRedstoneOutput(new PosIdentifier(pos, world), false));
         }, null);
+    }
+
+    public void updatePathwayToAutomatic() {
+        final SignalBoxNode first = modeGrid.get(firstPoint);
+        this.isAutoPathway = first.isAutoPoint();
+        this.originalFirstPoint = new Point(firstPoint);
+    }
+
+    public void checkReRequest() {
+        if (isAutoPathway) {
+            final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+            SignalBoxHandler.requestPathway(identifier, originalFirstPoint, getLastPoint(),
+                    modeGrid);
+        }
     }
 
     /**
