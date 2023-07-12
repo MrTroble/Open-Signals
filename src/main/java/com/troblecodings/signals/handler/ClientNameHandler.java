@@ -8,7 +8,9 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -20,10 +22,7 @@ public class ClientNameHandler implements INetworkSync {
 
     public static String getClientName(final NameStateInfo info) {
         synchronized (CLIENT_NAMES) {
-            final String name = CLIENT_NAMES.get(info);
-            if (name == null)
-                return "";
-            return name;
+            return CLIENT_NAMES.getOrDefault(info, "");
         }
     }
 
@@ -45,10 +44,14 @@ public class ClientNameHandler implements INetworkSync {
         synchronized (CLIENT_NAMES) {
             CLIENT_NAMES.put(new NameStateInfo(mc.world, pos), name);
         }
-        final TileEntity tile = mc.world.getTileEntity(pos);
-        if (tile instanceof BasicBlockEntity) {
-            ((BasicBlockEntity) tile).setCustomName(name);
-        }
+        final WorldClient level = mc.world;
+        mc.addScheduledTask(() -> {
+            level.getChunkFromBlockCoords(pos).markDirty();
+            final IBlockState state = level.getBlockState(pos);
+            mc.renderGlobal.notifyLightSet(pos);
+            mc.renderGlobal.notifyBlockUpdate(level, pos, state, state, 8);
+            level.notifyBlockUpdate(pos, state, state, 3);
+        });
     }
 
     private static void setRemoved(final BlockPos pos) {
