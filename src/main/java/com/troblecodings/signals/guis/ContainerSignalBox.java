@@ -119,15 +119,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 }
                 break;
             }
-            case SET_AUTO_POINT: {
-                final Point point = Point.of(buffer);
-                final boolean state = buffer.getByte() == 1 ? true : false;
-                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
-                node.setAutoPoint(state);
-                SignalBoxHandler.updatePathwayToAutomatic(
-                        new PosIdentifier(tile.getPos(), info.world), point);
-                break;
-            }
             default:
                 break;
         }
@@ -218,6 +209,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     sucess.putByte((byte) (state ? 1 : 0));
                     OpenSignalsMain.network.sendTo(info.player, sucess.build());
                 }
+                break;
+            }
+            case SET_AUTO_POINT: {
+                final Point point = Point.of(buffer);
+                final boolean state = buffer.getByte() == 1 ? true : false;
+                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
+                node.setAutoPoint(state);
+                SignalBoxHandler.updatePathwayToAutomatic(
+                        new PosIdentifier(tile.getPos(), info.world), point);
                 break;
             }
             default:
