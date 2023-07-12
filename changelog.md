@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.12.2 Beta 10]
+
+* feat: added sh1 and statuslight to subsidiary systems
+* feat: added autopathways
+* fix: vanishing signals
+* fix: autoname
+* fix: issue with naming in placementtool
+* fix: ks config
+* cleanup some code
+
 ## [1.12.2 Beta 9]
 
 * fix: desync in NameHandler
