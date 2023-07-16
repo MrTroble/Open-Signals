@@ -257,15 +257,23 @@ public class SignalBoxPathway {
     }
 
     private void resetFirstSignal() {
-        this.signalPositions.ifPresent(entry -> SignalConfig.reset(new SignalStateInfo(world,
-                entry.getKey(),
-                SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()))));
+        this.signalPositions.ifPresent(entry -> {
+            final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+                    entry.getKey());
+            if (current == null)
+                return;
+            SignalConfig.reset(new SignalStateInfo(world, entry.getKey(), current));
+        });
     }
 
     private void resetOther() {
-        distantSignalPositions
-                .forEach(position -> SignalConfig.reset(new SignalStateInfo(world, position,
-                        SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), position))));
+        distantSignalPositions.forEach(position -> {
+            final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+                    position);
+            if (current == null)
+                return;
+            SignalConfig.reset(new SignalStateInfo(world, position, current));
+        });
     }
 
     public void resetPathway(final @Nullable Point point) {
@@ -284,11 +292,14 @@ public class SignalBoxPathway {
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));
             for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
-                node.getOption(new ModeSet(mode, rotation)).ifPresent(option -> option
-                        .getEntry(PathEntryType.SIGNAL)
-                        .ifPresent(position -> SignalConfig
-                                .reset(new SignalStateInfo(world, position, SignalBoxHandler
-                                        .getSignal(new PosIdentifier(tilePos, world), position)))));
+                node.getOption(new ModeSet(mode, rotation)).ifPresent(
+                        option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
+                            final Signal current = SignalBoxHandler
+                                    .getSignal(new PosIdentifier(tilePos, world), position);
+                            if (current == null)
+                                return;
+                            SignalConfig.reset(new SignalStateInfo(world, position, current));
+                        }));
             }
         }, point);
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
