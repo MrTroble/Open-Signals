@@ -226,35 +226,29 @@ public class SignalBoxPathway {
     public void updatePathwaySignals() {
         if (world == null)
             return;
+        final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+        SignalStateInfo lastInfo = null;
+        if (lastSignal.isPresent()) {
+            final Signal nextSignal = SignalBoxHandler.getSignal(identifier, lastSignal.get());
+            if (nextSignal != null)
+                lastInfo = new SignalStateInfo(world, lastSignal.get(), nextSignal);
+        }
+        final SignalStateInfo lastSignalInfo = lastInfo;
         this.signalPositions.ifPresent(entry -> {
             if (isBlocked)
                 return;
-            final PosIdentifier identifier = new PosIdentifier(tilePos, world);
             final Signal first = SignalBoxHandler.getSignal(identifier, entry.getKey());
             if (first == null)
                 return;
             final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(), first);
-            SignalStateInfo nextInfo = null;
-            final BlockPos nextPos = entry.getValue();
-            if (entry.getValue() != null) {
-                final Signal nextSignal = SignalBoxHandler.getSignal(identifier, nextPos);
-                if (nextSignal != null)
-                    nextInfo = new SignalStateInfo(world, nextPos, nextSignal);
-            }
-            final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed, zs2Value, type);
-            SignalConfig.change(info);
+            SignalConfig.change(new ConfigInfo(firstInfo, lastSignalInfo, speed, zs2Value, type));
         });
         distantSignalPositions.forEach(position -> {
-            final SignalStateInfo nextInfo = lastSignal.isPresent()
-                    ? new SignalStateInfo(world, lastSignal.get(),
-                            SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
-                                    lastSignal.get()))
-                    : null;
-            final ConfigInfo info = new ConfigInfo(
-                    new SignalStateInfo(world, position, SignalBoxHandler
-                            .getSignal(new PosIdentifier(tilePos, world), position)),
-                    nextInfo, speed, zs2Value, type);
-            SignalConfig.change(info);
+            final Signal current = SignalBoxHandler.getSignal(identifier, position);
+            if (current == null)
+                return;
+            SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position, current),
+                    lastSignalInfo, speed, zs2Value, type));
         });
     }
 
