@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -228,13 +229,18 @@ public class SignalBoxPathway {
         this.signalPositions.ifPresent(entry -> {
             if (isBlocked)
                 return;
-            final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(),
-                    SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()));
-            final SignalStateInfo nextInfo = entry.getValue() != null
-                    ? new SignalStateInfo(world, entry.getValue(),
-                            SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
-                                    entry.getValue()))
-                    : null;
+            final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+            final Signal first = SignalBoxHandler.getSignal(identifier, entry.getKey());
+            if (first == null)
+                return;
+            final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(), first);
+            SignalStateInfo nextInfo = null;
+            final BlockPos nextPos = entry.getValue();
+            if (entry.getValue() != null) {
+                final Signal nextSignal = SignalBoxHandler.getSignal(identifier, nextPos);
+                if (nextSignal != null)
+                    nextInfo = new SignalStateInfo(world, nextPos, nextSignal);
+            }
             final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed, zs2Value, type);
             SignalConfig.change(info);
         });
