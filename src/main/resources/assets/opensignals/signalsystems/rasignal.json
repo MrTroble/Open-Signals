@@ -23,7 +23,7 @@
             "defaultState": false,
             "changeableStage": "APISTAGE",
             "autoname": true,
-            "dependencies": "check(RATYPE.RA11A) || check(RATYPE.RA11B) || check(RATYPE.RA11_DWARF)"
+            "dependencies": "config(RATYPE.RA11A) || config(RATYPE.RA11B) || config(RATYPE.RA11_DWARF)"
         },
         {
             "name": "ralightsignal",
@@ -31,7 +31,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(RATYPE.RA6_9)"
+            "dependencies": "config(RATYPE.RA6_9)"
         }
     ]
 }

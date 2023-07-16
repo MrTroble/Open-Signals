@@ -25,13 +25,13 @@ public class ClientSignalStateHandler implements INetworkSync {
 
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
-
     public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
             return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
         }
     }
+
+    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(5);
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {

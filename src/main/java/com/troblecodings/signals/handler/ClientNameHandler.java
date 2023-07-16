@@ -10,7 +10,6 @@ import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
@@ -42,14 +41,9 @@ public class ClientNameHandler implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buffer.getByte();
         }
-        final Level world = mc.level;
         final String name = new String(array);
         synchronized (CLIENT_NAMES) {
             CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), name);
-        }
-        final BlockEntity tile = world.getBlockEntity(pos);
-        if (tile instanceof BasicBlockEntity) {
-            ((BasicBlockEntity) tile).setCustomName(name);
         }
     }
 

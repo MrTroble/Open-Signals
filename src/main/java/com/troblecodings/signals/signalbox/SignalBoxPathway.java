@@ -85,6 +85,8 @@ public class SignalBoxPathway {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final Builder<BlockPos> distantPosBuilder = ImmutableList.builder();
+        mapOfBlockingPositions.clear();
+        mapOfResetPositions.clear();
         foreachEntry((optionEntry, node) -> {
             optionEntry.getEntry(PathEntryType.SPEED)
                     .ifPresent(value -> atomic.updateAndGet(in -> Math.min(in, value)));

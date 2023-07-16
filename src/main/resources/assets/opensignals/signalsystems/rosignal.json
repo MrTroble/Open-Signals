@@ -23,7 +23,7 @@
             "defaultState": false,
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(ROTYPE.ATWS)"
+            "dependencies": "config(ROTYPE.ATWS)"
         }
     ]
 }

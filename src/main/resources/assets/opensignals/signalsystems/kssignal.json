@@ -22,7 +22,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(KOMBITYPE.KS_STOPSIGNAL)"
+            "dependencies": "config(KOMBITYPE.KS_STOPSIGNAL)"
         },
         {
             "name": "kombisignal_main",
@@ -30,7 +30,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(KOMBITYPE.KS_MAIN)"
+            "dependencies": "config(KOMBITYPE.KS_MAIN)"
         },
         {
             "name": "kombisignal_distant",
@@ -38,7 +38,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(KOMBITYPE.DISTANT)"
+            "dependencies": "config(KOMBITYPE.DISTANT)"
         },
         {
             "name": "mastsign",

@@ -8,8 +8,8 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
+import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.world.entity.player.Player;
