@@ -45,10 +45,6 @@ public class ClientNameHandler implements INetworkSync {
         synchronized (CLIENT_NAMES) {
             CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), name);
         }
-        final BlockEntity tile = mc.level.getBlockEntity(pos);
-        if (tile instanceof BasicBlockEntity) {
-            ((BasicBlockEntity) tile).setCustomName(name);
-        }
     }
 
     private static void setRemoved(final BlockPos pos) {

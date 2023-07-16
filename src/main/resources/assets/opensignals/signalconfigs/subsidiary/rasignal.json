@@ -1,0 +1,8 @@
+{
+    "currentSignal": "rasignal",
+    "allStates": {
+        "SH1": [
+            "ralight.TRUE"
+        ]
+    }
+}
