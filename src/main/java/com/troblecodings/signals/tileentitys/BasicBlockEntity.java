@@ -13,14 +13,12 @@ import com.troblecodings.signals.handler.NameStateInfo;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 
 public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
     public static final String GUI_TAG = "guiTag";
     public static final String POS_TAG = "posTag";
     protected final ArrayList<BlockPos> linkedPositions = new ArrayList<>();
-    protected String customName = null;
 
     public BasicBlockEntity(final TileEntityInfo info) {
         super(info.type, info.pos, info.state);
@@ -50,25 +48,14 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
 
     @Override
     public String getNameWrapper() {
-        if (customName == null || customName.isEmpty()) {
-            final NameStateInfo info = new NameStateInfo(level, worldPosition);
-            customName = level.isClientSide ? ClientNameHandler.getClientName(info)
-                    : NameHandler.getName(info);
-            final BlockState state = this.getBlockState();
-            this.level.setBlocksDirty(worldPosition, state, state);
-        }
-        return customName == null ? "" : customName;
+        final NameStateInfo info = new NameStateInfo(level, worldPosition);
+        return level.isClientSide ? ClientNameHandler.getClientName(info)
+                : NameHandler.getName(info);
+
     }
 
     @Override
     public boolean hasCustomName() {
-        if (customName == null)
-            getNameWrapper();
-        return customName != null;
-    }
-
-    public void setCustomName(final String name) {
-        this.customName = name;
-        level.setBlocksDirty(worldPosition, getBlockState(), getBlockState());
+        return !getNameWrapper().isEmpty();
     }
 }
