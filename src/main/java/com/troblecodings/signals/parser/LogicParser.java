@@ -14,7 +14,7 @@ import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 @SuppressWarnings({
-        "rawtypes", "unchecked"
+        "rawtypes", "unchecked", "deprecation"
 })
 public final class LogicParser {
 

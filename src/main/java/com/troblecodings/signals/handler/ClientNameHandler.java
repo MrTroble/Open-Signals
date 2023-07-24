@@ -6,12 +6,10 @@ import java.util.Map;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -48,6 +46,8 @@ public class ClientNameHandler implements INetworkSync {
         mc.addScheduledTask(() -> {
             level.getChunkFromBlockCoords(pos).markDirty();
             final IBlockState state = level.getBlockState(pos);
+            if (state == null)
+                return;
             mc.renderGlobal.notifyLightSet(pos);
             mc.renderGlobal.notifyBlockUpdate(level, pos, state, state, 8);
             level.notifyBlockUpdate(pos, state, state, 3);
