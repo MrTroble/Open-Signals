@@ -36,15 +36,15 @@ import net.minecraft.world.level.block.Rotation;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
+    protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
+    protected SignalBoxGrid grid;
     private final AtomicReference<Map<BlockPos, LinkType>> propertiesForType = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, Signal>> properties = new AtomicReference<>();
     private final AtomicReference<Map<BlockPos, String>> names = new AtomicReference<>();
-    private SignalBoxTileEntity tile;
     private final GuiInfo info;
-    protected SignalBoxGrid grid;
+    private SignalBoxTileEntity tile;
     private Consumer<String> run;
     private Consumer<List<SignalBoxNode>> colorUpdates;
-    protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -63,8 +63,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         buffer.putByte((byte) SignalBoxNetwork.SEND_GRID.ordinal());
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
-        final Map<BlockPos, LinkType> positions = SignalBoxHandler
-                .getAllLinkedPos(new PosIdentifier(tile.getBlockPos(), info.world));
+        final PosIdentifier identifier = new PosIdentifier(tile.getBlockPos(), info.world);
+        final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
         buffer.putInt(positions.size());
         positions.forEach((pos, type) -> {
             buffer.putBlockPos(pos);
@@ -119,11 +119,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 } else {
                     node.removeManuellOutput(modeSet);
                 }
-                break;
-            }
-            case RESET_SUBSIDIARY: {
-                final Point point = Point.of(buffer);
-                enabledSubsidiaryTypes.remove(point);
                 break;
             }
             default:
@@ -216,6 +211,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     sucess.putByte((byte) (state ? 1 : 0));
                     OpenSignalsMain.network.sendTo(info.player, sucess.build());
                 }
+                break;
+            }
+            case SET_AUTO_POINT: {
+                final Point point = Point.of(buffer);
+                final boolean state = buffer.getByte() == 1 ? true : false;
+                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
+                node.setAutoPoint(state);
+                SignalBoxHandler.updatePathwayToAutomatic(
+                        new PosIdentifier(tile.getBlockPos(), info.world), point);
                 break;
             }
             default:

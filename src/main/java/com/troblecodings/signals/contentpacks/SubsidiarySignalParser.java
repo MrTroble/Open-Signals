@@ -61,7 +61,8 @@ public class SubsidiarySignalParser {
             }
         }
         if (enumState == null)
-            throw new ContentPackException(enumName + " is not a valid Subsidiary State!");
+            throw new ContentPackException(enumName + " is not a valid Subsidiary State! "
+                    + "Valid Subsidiary States are: " + SubsidiaryState.ALL_STATES);
         final Map<SEProperty, String> allValues = new HashMap<>();
         values.forEach(str -> {
             final String[] value = str.split("\\.");

@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -56,6 +57,8 @@ public class SignalBoxPathway {
     private Level world;
     private BlockPos tilePos;
     private boolean isBlocked;
+    private boolean isAutoPathway = false;
+    private Point originalFirstPoint = null;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
@@ -76,12 +79,15 @@ public class SignalBoxPathway {
         if (this.type.equals(PathType.NONE))
             throw new IllegalArgumentException();
         initalize();
+        updatePathwayToAutomatic();
     }
 
     private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final Builder<BlockPos> distantPosBuilder = ImmutableList.builder();
+        mapOfBlockingPositions.clear();
+        mapOfResetPositions.clear();
         foreachEntry((optionEntry, node) -> {
             optionEntry.getEntry(PathEntryType.SPEED)
                     .ifPresent(value -> atomic.updateAndGet(in -> Math.min(in, value)));
@@ -137,6 +143,7 @@ public class SignalBoxPathway {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
     private static final String IS_BLOCKED = "isBlocked";
+    private static final String IS_AUTOMATIC = "isAutomatic";
 
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
@@ -146,6 +153,7 @@ public class SignalBoxPathway {
         })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
         tag.putBoolean(IS_BLOCKED, isBlocked);
+        tag.putBoolean(IS_AUTOMATIC, isAutoPathway);
     }
 
     public void read(final NBTWrapper tag) {
@@ -165,6 +173,7 @@ public class SignalBoxPathway {
         this.listOfNodes = nodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         this.isBlocked = tag.getBoolean(IS_BLOCKED);
+        this.isAutoPathway = tag.getBoolean(IS_AUTOMATIC);
         if (this.listOfNodes.size() < 2) {
             OpenSignalsMain.getLogger().error("Detecting pathway with only 2 elements!");
             this.emptyOrBroken = true;
@@ -217,30 +226,29 @@ public class SignalBoxPathway {
     public void updatePathwaySignals() {
         if (world == null)
             return;
+        final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+        SignalStateInfo lastInfo = null;
+        if (lastSignal.isPresent()) {
+            final Signal nextSignal = SignalBoxHandler.getSignal(identifier, lastSignal.get());
+            if (nextSignal != null)
+                lastInfo = new SignalStateInfo(world, lastSignal.get(), nextSignal);
+        }
+        final SignalStateInfo lastSignalInfo = lastInfo;
         this.signalPositions.ifPresent(entry -> {
             if (isBlocked)
                 return;
-            final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(),
-                    SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()));
-            final SignalStateInfo nextInfo = entry.getValue() != null
-                    ? new SignalStateInfo(world, entry.getValue(),
-                            SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
-                                    entry.getValue()))
-                    : null;
-            final ConfigInfo info = new ConfigInfo(firstInfo, nextInfo, speed, zs2Value, type);
-            SignalConfig.change(info);
+            final Signal first = SignalBoxHandler.getSignal(identifier, entry.getKey());
+            if (first == null)
+                return;
+            final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(), first);
+            SignalConfig.change(new ConfigInfo(firstInfo, lastSignalInfo, speed, zs2Value, type));
         });
         distantSignalPositions.forEach(position -> {
-            final SignalStateInfo nextInfo = lastSignal.isPresent()
-                    ? new SignalStateInfo(world, lastSignal.get(),
-                            SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
-                                    lastSignal.get()))
-                    : null;
-            final ConfigInfo info = new ConfigInfo(
-                    new SignalStateInfo(world, position, SignalBoxHandler
-                            .getSignal(new PosIdentifier(tilePos, world), position)),
-                    nextInfo, speed, zs2Value, type);
-            SignalConfig.change(info);
+            final Signal current = SignalBoxHandler.getSignal(identifier, position);
+            if (current == null)
+                return;
+            SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position, current),
+                    lastSignalInfo, speed, zs2Value, type));
         });
     }
 
@@ -249,17 +257,23 @@ public class SignalBoxPathway {
     }
 
     private void resetFirstSignal() {
-        this.signalPositions.ifPresent(entry -> SignalConfig.reset(new SignalStateInfo(world,
-                entry.getKey(),
-                SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), entry.getKey()))));
-        final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(tilePos);
-        tile.getSignalBoxGrid().resetSubsidiary(firstPoint, tile);
+        this.signalPositions.ifPresent(entry -> {
+            final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+                    entry.getKey());
+            if (current == null)
+                return;
+            SignalConfig.reset(new SignalStateInfo(world, entry.getKey(), current));
+        });
     }
 
     private void resetOther() {
-        distantSignalPositions
-                .forEach(position -> SignalConfig.reset(new SignalStateInfo(world, position,
-                        SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world), position))));
+        distantSignalPositions.forEach(position -> {
+            final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+                    position);
+            if (current == null)
+                return;
+            SignalConfig.reset(new SignalStateInfo(world, position, current));
+        });
     }
 
     public void resetPathway(final @Nullable Point point) {
@@ -278,11 +292,14 @@ public class SignalBoxPathway {
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));
             for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
-                node.getOption(new ModeSet(mode, rotation)).ifPresent(option -> option
-                        .getEntry(PathEntryType.SIGNAL)
-                        .ifPresent(position -> SignalConfig
-                                .reset(new SignalStateInfo(world, position, SignalBoxHandler
-                                        .getSignal(new PosIdentifier(tilePos, world), position)))));
+                node.getOption(new ModeSet(mode, rotation)).ifPresent(
+                        option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
+                            final Signal current = SignalBoxHandler
+                                    .getSignal(new PosIdentifier(tilePos, world), position);
+                            if (current == null)
+                                return;
+                            SignalConfig.reset(new SignalStateInfo(world, position, current));
+                        }));
             }
         }, point);
         this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
@@ -330,6 +347,20 @@ public class SignalBoxPathway {
             outputs.forEach(pos -> SignalBoxHandler
                     .updateRedstoneOutput(new PosIdentifier(pos, world), false));
         }, null);
+    }
+
+    public void updatePathwayToAutomatic() {
+        final SignalBoxNode first = modeGrid.get(firstPoint);
+        this.isAutoPathway = first.isAutoPoint();
+        this.originalFirstPoint = new Point(firstPoint);
+    }
+
+    public void checkReRequest() {
+        if (isAutoPathway) {
+            final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+            SignalBoxHandler.requestPathway(identifier, originalFirstPoint, getLastPoint(),
+                    modeGrid);
+        }
     }
 
     /**

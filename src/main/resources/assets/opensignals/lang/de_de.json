@@ -473,5 +473,14 @@
     "property.manuell_rs.name": "Manueller Redstone Output",
     "property.manuell_rs.desc": "Ändert den manuellen Redstone Output, z.B. für manuelle Weichensteuerung.",
     "property.zp9.name": "Zp9",
-    "property.zp9.desc": "Zp9 Abfahren: Das Signal wird vom Zugführer gegeben und der Triebfahrzeugführer soll abfahren."
+    "property.zp9.desc": "Zp9 Abfahren: Das Signal wird vom Zugführer gegeben und der Triebfahrzeugführer soll abfahren.",
+    "property.auto_pathway.name": "Selbststellbetrieb",
+    "property.auto_pathway.desc": "WIP",
+    "property.sh1.name": "Sh1",
+    "property.sh1.desc": "§nSh1§r: Fahrtverbot aufgehoben",
+    "property.statuslight.name": "Kennlicht",
+    "property.statuslight.desc": "§nKennlicht§r: Das Signal ist betrieblich abgeschaltet",
+    "property.semavr.name": "Formvorsignal",
+    "property.semavr.desc": "Vorsignale kündigen an, was das nächste Hauptsignal zeigt.%n§nVr0§r: Halt erwarten%n§nVr1§r: Fahrt erwarten%n§nVr2§r: Langsamfahrt erwarten"
+
 }

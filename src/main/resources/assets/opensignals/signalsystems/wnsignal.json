@@ -16,7 +16,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(WNTYPE.FALSE)"
+            "dependencies": "config(WNTYPE.FALSE)"
         },
         {
             "name": "wncross",
@@ -24,7 +24,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(WNTYPE.TRUE)"
+            "dependencies": "config(WNTYPE.TRUE)"
         }
     ]
 }

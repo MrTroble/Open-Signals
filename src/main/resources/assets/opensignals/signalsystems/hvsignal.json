@@ -22,7 +22,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(HPTYPE.STOPSIGNAL)"
+            "dependencies": "config(HPTYPE.STOPSIGNAL)"
         },
         {
             "name": "hphome",
@@ -30,7 +30,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(HPTYPE.HPHOME)"
+            "dependencies": "config(HPTYPE.HPHOME)"
         },
         {
             "name": "hpblock",
@@ -38,7 +38,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(HPTYPE.HPBLOCK)"
+            "dependencies": "config(HPTYPE.HPBLOCK)"
         },
         {
             "name": "identifier",

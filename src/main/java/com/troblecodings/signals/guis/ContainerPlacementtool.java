@@ -80,9 +80,9 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final ItemStack stack = player.getMainHandItem();
         final Placementtool tool = (Placementtool) stack.getItem();
         if (first == 255) {
-            final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
             final int id = buffer.getInt();
             if (id == -1) {
+                final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
                 final int nameSize = buffer.getByteAsInt();
                 final byte[] name = new byte[nameSize];
                 for (int i = 0; i < nameSize; i++) {
@@ -91,6 +91,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
                 wrapper.putString(SIGNAL_NAME, new String(name));
                 return;
             }
+            final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
             properties.clear();

@@ -4,7 +4,6 @@
 		"canLink": false,
 		"defaultHeight": 1,
 		"signScale": 3.5,
-		"offsetX": -5,
 		"offsetY": 1.8,
 		"doubleSidedText": {
 			"config(OTHERTYPE.HM2)": true
@@ -30,7 +29,7 @@
 			"enumClass": "CrossingSign",
 			"defaultState": "OFF",
 			"changeableStage": "GUISTAGE",
-			"dependencies": "check(othertype.RC1)"
+			"dependencies": "config(othertype.RC1)"
 		}
 	]
 }

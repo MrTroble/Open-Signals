@@ -473,5 +473,13 @@
     "property.manuell_rs.name": "Manual Redstone Output",
     "property.manuell_rs.desc": "Change the manual redstone output, e.g. for manual switch control.",
     "property.zp9.name": "Zp9",
-    "property.zp9.desc": "Zp9 Departure: The signal is given by the train conductor and the driver of the multiple unit is to depart."
+    "property.zp9.desc": "Zp9 Departure: The signal is given by the train conductor and the driver of the multiple unit is to depart.",
+    "property.auto_pathway.name": "Auto pathways",
+    "property.auto_pathway.desc": "WIP",
+    "property.sh1.name": "Sh1",
+    "property.sh1.desc": "§nSh1§r: Prohibition on driving lifted",
+    "property.statuslight.name": "Identify Light",
+    "property.statuslight.desc": "§nIdentify Light§r: The signal is turned off for operational reasons",
+    "property.semavr.name": "Semaphore distant signal",
+    "property.semavr.desc": "Distant signals announce what the next main signal will show.%n§nVr0§r: Expect stop%n§nVr1§r: Expect go%n§nVr2§r: Expect slow"
 }

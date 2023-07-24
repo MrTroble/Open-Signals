@@ -12,6 +12,18 @@
         ],
         "ZP9": [
             "zs2.ZP9"
+        ],
+        "SH1": [
+            "mainlightsignal.HL_SHUNTING",
+            "exitsignal.HL_SHUNTING",
+            "blockexitsignal.HL_SHUNTING"
+        ],
+        "STATUSLIGHT": [
+            "mainlightsignal.HL_STATUS_LIGHT",
+            "mainlightsignal_distant.HL_STATUS_LIGHT",
+            "exitsignal.HL_STATUS_LIGHT",
+            "blocksignal.HL_STATUS_LIGHT",
+            "blockexitsignal.HL_STATUS_LIGHT"
         ]
     }
 }

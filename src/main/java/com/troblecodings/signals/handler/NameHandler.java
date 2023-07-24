@@ -199,7 +199,13 @@ public final class NameHandler implements INetworkSync {
         chunk.getBlockEntitiesPos().forEach(pos -> {
             final Block block = chunk.getBlockState(pos).getBlock();
             if (block instanceof Signal || block instanceof RedstoneIO) {
-                states.add(new NameStateInfo(world, pos));
+                final NameStateInfo info = new NameStateInfo(world, pos);
+                states.add(info);
+                synchronized (ALL_NAMES) {
+                    if (ALL_NAMES.containsKey(info)) {
+                        sendTo(player, packToBuffer(pos, ALL_NAMES.get(info)));
+                    }
+                }
             }
         });
         loadNames(states, player);
