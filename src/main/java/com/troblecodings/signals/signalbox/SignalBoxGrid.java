@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
@@ -22,7 +21,6 @@ import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumPathUsage;
-import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -39,6 +37,7 @@ import net.minecraft.world.World;
 public class SignalBoxGrid implements INetworkSavable {
 
     private static final String NODE_LIST = "nodeList";
+    private static final String SUBSIDIARY_LIST = "subsidiaryList";
 
     public final Map<Point, SignalBoxPathway> clientPathways = new HashMap<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
@@ -74,6 +73,16 @@ public class SignalBoxGrid implements INetworkSavable {
         tag.putList(NODE_LIST, modeGrid.values().stream().map(node -> {
             final NBTWrapper nodeTag = new NBTWrapper();
             node.write(nodeTag);
+            final Map<ModeSet, SubsidiaryEntry> subsidiaries = enabledSubsidiaryTypes
+                    .get(node.getPoint());
+            if (subsidiaries == null)
+                return nodeTag;
+            nodeTag.putList(SUBSIDIARY_LIST, subsidiaries.entrySet().stream().map(entry -> {
+                final NBTWrapper subsidiaryTag = new NBTWrapper();
+                entry.getKey().write(subsidiaryTag);
+                entry.getValue().writeNBT(tag);
+                return subsidiaryTag;
+            })::iterator);
             return nodeTag;
         })::iterator);
     }
@@ -81,10 +90,20 @@ public class SignalBoxGrid implements INetworkSavable {
     @Override
     public void read(final NBTWrapper tag) {
         modeGrid.clear();
+        enabledSubsidiaryTypes.clear();
         tag.getList(NODE_LIST).forEach(comp -> {
             final SignalBoxNode node = new SignalBoxNode();
             node.read(comp);
             modeGrid.put(node.getPoint(), node);
+            final List<NBTWrapper> subsidiaryTags = comp.getList(SUBSIDIARY_LIST);
+            if (subsidiaryTags == null)
+                return;
+            final Map<ModeSet, SubsidiaryEntry> states = new HashMap<>();
+            subsidiaryTags.forEach(subsidiaryTag -> {
+                final ModeSet mode = new ModeSet(subsidiaryTag);
+                states.put(mode, SubsidiaryEntry.of(tag));
+            });
+            enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
     }
 
@@ -141,7 +160,7 @@ public class SignalBoxGrid implements INetworkSavable {
             final Function<? super Point, ? extends SignalBoxNode> funtion) {
         return modeGrid.computeIfAbsent(point, funtion);
     }
-    
+
     public void putAllNodes(final Map<Point, SignalBoxNode> nodes) {
         modeGrid.putAll(nodes);
     }
@@ -296,17 +315,5 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public Map<Point, Map<ModeSet, SubsidiaryEntry>> getAllSubsidiaries() {
         return ImmutableMap.copyOf(enabledSubsidiaryTypes);
-    }
-
-    public void resetSubsidiary(final Point point, final SignalBoxTileEntity tile) {
-        if (!enabledSubsidiaryTypes.containsKey(point))
-            return;
-        enabledSubsidiaryTypes.remove(point);
-        if (!tile.isBlocked())
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalBoxNetwork.RESET_SUBSIDIARY.ordinal());
-        point.writeNetwork(buffer);
-        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer.build());
     }
 }

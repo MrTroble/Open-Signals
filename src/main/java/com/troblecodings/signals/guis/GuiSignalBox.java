@@ -263,33 +263,41 @@ public class GuiSignalBox extends GuiBase {
                         mode, rotation);
                 break;
             case HP: {
+                parent.add(GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
+                    setAutoPoint(node.getPoint(), (byte) e);
+                    node.setAutoPoint(e == 1 ? true : false);
+                }, node.isAutoPoint() ? 1 : 0));
+            }
+            case RS: {
                 if (option.containsEntry(PathEntryType.SIGNAL))
                     parent.add(GuiElements.createButton(I18n.get("btn.subsidiary"), e -> {
+                        final UIBox hbox = new UIBox(UIBox.VBOX, 1);
+                        final UIEntity list = new UIEntity();
+                        list.setInherits(true);
+                        list.add(hbox);
+                        list.add(GuiElements.createButton(I18n.get("btn.return"), a -> {
+                            pop();
+                        }));
+                        final ModeSet modeSet = new ModeSet(mode, rotation);
+                        SubsidiaryState.ALL_STATES.forEach(state -> {
+                            final int defaultValue = container.grid
+                                    .getSubsidiaryState(node.getPoint(), modeSet, state) ? 0 : 1;
+                            list.add(GuiElements.createEnumElement(new SizeIntegerables<>(
+                                    state.getName(), 2, i -> i == 1 ? "false" : "true"), a -> {
+                                        final SubsidiaryEntry entry = new SubsidiaryEntry(state,
+                                                a == 0 ? true : false);
+                                        sendSubsidiaryRequest(entry, node, modeSet);
+                                        container.grid.setClientState(node.getPoint(), modeSet,
+                                                entry);
+                                        pop();
+                                    }, defaultValue));
+                        });
                         final UIEntity screen = GuiElements.createScreen(selection -> {
-                            final UIBox hbox = new UIBox(UIBox.VBOX, 3);
-                            selection.add(hbox);
-                            selection.add(GuiElements.createButton(I18n.get("btn.return"), a -> {
-                                pop();
-                            }));
-                            final ModeSet modeSet = new ModeSet(mode, rotation);
-                            SubsidiaryState.ALL_STATES.forEach(state -> {
-                                final int defaultValue = container.grid.getSubsidiaryState(
-                                        node.getPoint(), modeSet, state) ? 0 : 1;
-                                selection.add(GuiElements.createEnumElement(new SizeIntegerables<>(
-                                        state.getName(), 2, i -> i == 1 ? "false" : "true"), a -> {
-                                            final SubsidiaryEntry entry = new SubsidiaryEntry(state,
-                                                    a == 0 ? true : false);
-                                            sendSubsidiaryRequest(entry, node, modeSet);
-                                            container.grid.setClientState(node.getPoint(), modeSet,
-                                                    entry);
-                                            pop();
-                                        }, defaultValue));
-                            });
+                            selection.add(list);
+                            selection.add(GuiElements.createPageSelect(hbox));
                         });
                         push(screen);
                     }));
-            }
-            case RS: {
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
                         mode, rotation);
             }
@@ -699,6 +707,16 @@ public class GuiSignalBox extends GuiBase {
         point.writeNetwork(buffer);
         mode.writeNetwork(buffer);
         buffer.putByte((byte) (state ? 1 : 0));
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+    }
+    
+    private void setAutoPoint(final Point point, final byte state) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) SignalBoxNetwork.SET_AUTO_POINT.ordinal());
+        point.writeNetwork(buffer);
+        buffer.putByte(state);
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 

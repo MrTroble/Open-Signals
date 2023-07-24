@@ -7,7 +7,9 @@ import java.util.Map;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.core.ReadBuffer;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
@@ -18,10 +20,7 @@ public class ClientNameHandler implements INetworkSync {
 
     public static String getClientName(final NameStateInfo info) {
         synchronized (CLIENT_NAMES) {
-            final String name = CLIENT_NAMES.get(info);
-            if (name == null)
-                return "";
-            return name;
+            return CLIENT_NAMES.getOrDefault(info, "");
         }
     }
 
@@ -43,7 +42,16 @@ public class ClientNameHandler implements INetworkSync {
         synchronized (CLIENT_NAMES) {
             CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), name);
         }
+        final ClientWorld world = mc.level;
+        mc.doRunTask(() -> { //TODO Cedric
+            final BlockState state = world.getBlockState(pos);
+            if (state == null)
+                return;
+            world.setBlocksDirty(pos, state, state);
+            world.setBlockAndUpdate(pos, state);
+        });
     }
+
 
     private static void setRemoved(final BlockPos pos) {
         final Minecraft mc = Minecraft.getInstance();

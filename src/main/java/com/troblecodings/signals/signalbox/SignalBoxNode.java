@@ -35,6 +35,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private final List<ModeSet> manuellEnabledOutputs = new ArrayList<>();
     private final Point point;
     private String identifier;
+    private boolean isAutoPoint = false;
 
     public SignalBoxNode() {
         this(new Point());
@@ -78,6 +79,14 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public void remove(final ModeSet modeSet) {
         possibleModes.remove(modeSet);
+    }
+    
+    public void setAutoPoint(final boolean isAutoPoint) {
+        this.isAutoPoint = isAutoPoint;
+    }
+
+    public boolean isAutoPoint() {
+        return isAutoPoint;
     }
 
     public void post() {
@@ -145,6 +154,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     private static final String POINT_LIST = "pointList";
     private static final String ENABLED_OUTPUTS = "enabledOutputs";
+    private static final String IS_AUTO_POINT = "isAutoPoint";
 
     @Override
     public void write(final NBTWrapper compound) {
@@ -162,6 +172,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         });
         compound.putList(ENABLED_OUTPUTS, enabledOutputs);
         this.point.write(compound);
+        compound.putBoolean(IS_AUTO_POINT, isAutoPoint);
     }
 
     @Override
@@ -179,6 +190,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         });
         this.point.read(compound);
         this.identifier = point.getX() + "." + point.getY();
+        this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
         post();
     }
 
@@ -286,9 +298,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         possibleModes.clear();
         manuellEnabledOutputs.clear();
         final int size = buffer.getByteAsInt();
+        final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         for (int i = 0; i < size; i++) {
             final ModeSet mode = ModeSet.of(buffer);
-            final PathOptionEntry entry = SignalBoxFactory.getFactory().getEntry();
+            final PathOptionEntry entry = factory.getEntry();
             entry.readNetwork(buffer);
             possibleModes.put(mode, entry);
         }
@@ -298,6 +311,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             if (!manuellEnabledOutputs.contains(modeSet))
                 manuellEnabledOutputs.add(modeSet);
         }
+        this.isAutoPoint = buffer.getByte() == 1 ? true : false;
         post();
     }
 
@@ -318,6 +332,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             if (!manuellEnabledOutputs.contains(modeSet))
                 manuellEnabledOutputs.add(modeSet);
         }
+        this.isAutoPoint = buffer.getByte() == 1 ? true : false;
         post();
     }
 
@@ -330,6 +345,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         });
         buffer.putByte((byte) manuellEnabledOutputs.size());
         manuellEnabledOutputs.forEach(mode -> mode.writeNetwork(buffer));
+        buffer.putByte((byte) (isAutoPoint ? 1 : 0));
     }
 
     public void writeUpdateNetwork(final WriteBuffer buffer) {
@@ -346,5 +362,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             }
         });
         buffer.putByte((byte) 0);
+        buffer.putByte((byte) (isAutoPoint ? 1 : 0));
     }
 }

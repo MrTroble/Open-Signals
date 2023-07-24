@@ -121,7 +121,6 @@ public class Placementtool extends Item
             }
             checkPos = checkPos.above();
         }
-        
         BlockPos ghostPos = pos.above();
         for (int i = 0; i < height; i++) {
             worldIn.setBlock(ghostPos, OSBlocks.GHOST_BLOCK.defaultBlockState(), 3);
