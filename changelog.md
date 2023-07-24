@@ -1,5 +1,14 @@
 # Changelog
 
+## [Beta 11]
+
+* fix: lang keys
+* fix: custom name renderer
+* fix: issue with too many subsidiary states
+* fix: added checks for null signals and others checks
+* fix: custom names
+* ref: better code performance
+
 ## [1.12.2 Beta 10]
 
 * feat: added sh1 and statuslight to subsidiary systems

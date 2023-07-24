@@ -16,7 +16,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 
-import com.troblecodings.contentpacklib.FileReader;
+import com.troblecodings.contentpacklib.ContentPackHandler;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.handler.NameHandler;
@@ -55,7 +55,7 @@ public class OpenSignalsMain {
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
         debug = true;
         log = LoggerContext.getContext().getLogger(MODID);
-        contentPacks = new FileReader(MODID, "assets/" + MODID, log, name -> {
+        contentPacks = new ContentPackHandler(MODID, "assets/" + MODID, log, name -> {
             final Optional<Path> path = getRessourceLocation(name);
             if (path.isPresent())
                 return path.get().toAbsolutePath();
@@ -69,7 +69,7 @@ public class OpenSignalsMain {
     private static Logger log = null;
     public static GuiHandler handler = null;
     public static NetworkHandler network = null;
-    public static FileReader contentPacks = null;
+    public static ContentPackHandler contentPacks = null;
     private static boolean debug;
 
     /**
