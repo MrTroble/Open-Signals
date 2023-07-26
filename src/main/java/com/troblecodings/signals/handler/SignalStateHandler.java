@@ -420,6 +420,11 @@ public final class SignalStateHandler implements INetworkSync {
                 synchronized (CURRENTLY_LOADED_STATES) {
                     CURRENTLY_LOADED_STATES.put(info, properties);
                 }
+                if (player == null) {
+                    sendToAll(info, properties);
+                } else {
+                    sendToPlayer(info, properties, player);
+                }
             });
         }, "OSSignalStateHandler:loadSignals").start();
     }
