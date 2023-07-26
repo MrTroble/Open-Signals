@@ -43,7 +43,7 @@ public class ClientNameHandler implements INetworkSync {
             CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), name);
         }
         final ClientWorld world = mc.level;
-        mc.doRunTask(() -> { //TODO Cedric
+        mc.submit(() -> {
             final BlockState state = world.getBlockState(pos);
             if (state == null)
                 return;
@@ -51,7 +51,6 @@ public class ClientNameHandler implements INetworkSync {
             world.setBlockAndUpdate(pos, state);
         });
     }
-
 
     private static void setRemoved(final BlockPos pos) {
         final Minecraft mc = Minecraft.getInstance();
