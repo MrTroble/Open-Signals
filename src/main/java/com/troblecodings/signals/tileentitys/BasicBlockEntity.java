@@ -15,7 +15,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BasicBlockEntity extends TileEntity implements NamableWrapper {
+public class BasicBlockEntity extends TileEntity implements NamableWrapper, IChunkLoadable {
 
     public static final String GUI_TAG = "guiTag";
     public static final String POS_TAG = "posTag";
@@ -75,7 +75,7 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     public String getNameWrapper() {
         final NameStateInfo info = new NameStateInfo(world, pos);
         final String customName = world.isRemote ? ClientNameHandler.getClientName(info)
-                    : NameHandler.getName(info);
+                : NameHandler.getName(info);
         return customName;
     }
 

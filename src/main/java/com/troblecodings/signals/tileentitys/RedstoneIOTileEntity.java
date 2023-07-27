@@ -10,6 +10,7 @@ import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
@@ -52,8 +53,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         final boolean power = this.world.getBlockState(this.pos).getValue(RedstoneIO.POWER);
         final RedstoneUpdatePacket update = new RedstoneUpdatePacket(world, pos, power,
                 (RedstoneInput) getBlockType());
-        linkedPositions.forEach(
-                pos -> SignalBoxHandler.updateInput(new PosIdentifier(pos, world), update));
+        linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, pos,
+                (_u1, _u2) -> SignalBoxHandler.updateInput(new PosIdentifier(pos, world), update)));
     }
 
     @Override
@@ -94,7 +95,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     public boolean isValid(final EntityPlayer player) {
         return true;
     }
-    
+
     @Override
     public boolean shouldRefresh(final World world, final BlockPos pos, final IBlockState oldState,
             final IBlockState newSate) {
