@@ -87,7 +87,7 @@ public class NamableGui extends GuiBase {
     }
 
     private void updateText(final String input) {
-        if (input.isEmpty() || input.equalsIgnoreCase(
+        if (input.isEmpty() || input.equals(
                 ClientNameHandler.getClientName(new NameStateInfo(mc.world, container.pos))))
             return;
         final byte[] bytes = input.getBytes();
