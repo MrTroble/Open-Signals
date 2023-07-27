@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.12.2 Beta 11]
+*fix: Issue when InputUpdate comes when SignalBox is not loaded
+
 ## [1.12.2 Beta 10]
 
 * feat: added sh1 and statuslight to subsidiary systems
