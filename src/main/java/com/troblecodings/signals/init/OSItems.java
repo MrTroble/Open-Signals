@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.linkableapi.Linkingtool;
+import com.troblecodings.linkableapi.MultiLinkingTool;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.ItemArmorTemplate;
@@ -41,6 +42,19 @@ public final class OSItems {
         new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
                 state.getBlock().getRegistryName().getPath());
     });
+    public static final MultiLinkingTool MULTI_LINKING_TOOL = new MultiLinkingTool(OSTabs.TAB,
+            (world, pos) -> {
+                final BlockState state = world.getBlockState(pos);
+                final Block block = state.getBlock();
+                final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
+                        || block == OSBlocks.REDSTONE_OUT || block == OSBlocks.COMBI_REDSTONE_INPUT;
+                return isRedstoneBlock
+                        || (block instanceof Signal && ((Signal) block).canBeLinked());
+            }, _u -> true, (level, pos, tag) -> {
+                final BlockState state = level.getBlockState(pos);
+                new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
+                        state.getBlock().getRegistryName().getPath());
+            });
     public static final Item CONDUCTOR_TROWEL_GREEN = new Item(
             new Properties().tab(CreativeModeTab.TAB_COMBAT));
     public static final Item CONDUCTOR_TROWEL_RED = new Item(
