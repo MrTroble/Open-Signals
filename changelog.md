@@ -1,6 +1,10 @@
 # Changelog
 
-## [Beta 11]
+
+## [1.12.2 Beta 12]
+*fix: Issue when InputUpdate comes when SignalBox is not loaded
+
+## [1.12.2 Beta 11]
 
 * fix: lang keys
 * fix: custom name renderer
