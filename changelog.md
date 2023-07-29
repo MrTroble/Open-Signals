@@ -1,5 +1,20 @@
 # Changelog
 
+## [1.16.5 Beta 11]
+
+* feat: better network system
+* feat: added sh signals and status light to subsidiary system
+* feat: added autopathways
+* fix: issue with signal config
+* fix: lang keys
+* fix: custom name renderer
+* fix: issue with too many subsidiary states
+* fix: ks config
+* fix: added checks for null signals and others checks
+* fix: custom names
+* apply 1.12 fixes
+* ref: better code performance
+
 ## [1.16.5 Beta 4]
 
 * fix: missing lang keys
