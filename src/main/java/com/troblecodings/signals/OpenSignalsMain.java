@@ -14,7 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 
-import com.troblecodings.contentpacklib.FileReader;
+import com.troblecodings.contentpacklib.ContentPackHandler;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.handler.NameHandler;
@@ -68,7 +68,7 @@ public class OpenSignalsMain {
     private static Logger log = null;
     public static GuiHandler handler = null;
     public static NetworkHandler network = null;
-    public static FileReader contentPacks = null;
+    public static ContentPackHandler contentPacks = null;
     private static boolean debug;
 
     /**
@@ -87,7 +87,7 @@ public class OpenSignalsMain {
         debug = false;
         log = LoggerContext.getContext().getLogger(MODID);
         file = ModList.get().getModFileById(MODID).getFile();
-        contentPacks = new FileReader(MODID, "assets/" + MODID, log,
+        contentPacks = new ContentPackHandler(MODID, "assets/" + MODID, log,
                 name -> file.findResource(name));
         proxy.initModEvent(event);
     }

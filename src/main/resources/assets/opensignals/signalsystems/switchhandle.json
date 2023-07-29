@@ -18,7 +18,7 @@
             "defaultState": false,
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(MANUAL.TRUE)"
+            "dependencies": "config(MANUAL.TRUE)"
         },
         {
             "name": "fallback_switch",
@@ -47,7 +47,7 @@
             "defaultState": "WN1",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "check(MANUAL.FALSE)"
+            "dependencies": "config(MANUAL.FALSE)"
         }
     ]
 }

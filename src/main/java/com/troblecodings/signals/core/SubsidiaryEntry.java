@@ -2,6 +2,8 @@ package com.troblecodings.signals.core;
 
 import java.util.Objects;
 
+import com.troblecodings.core.NBTWrapper;
+
 public class SubsidiaryEntry {
 
     public final SubsidiaryState enumValue;
@@ -20,6 +22,17 @@ public class SubsidiaryEntry {
     public static SubsidiaryEntry of(final ReadBuffer buffer) {
         return new SubsidiaryEntry(SubsidiaryState.of(buffer),
                 buffer.getByte() == 1 ? true : false);
+    }
+    
+    private static final String SUBSIDIARY_VALUE = "subsidiaryValue";
+
+    public void writeNBT(final NBTWrapper tag) {
+        enumValue.writeNBT(tag);
+        tag.putBoolean(SUBSIDIARY_VALUE, state);
+    }
+
+    public static SubsidiaryEntry of(final NBTWrapper tag) {
+        return new SubsidiaryEntry(SubsidiaryState.of(tag), tag.getBoolean(SUBSIDIARY_VALUE));
     }
 
     @Override

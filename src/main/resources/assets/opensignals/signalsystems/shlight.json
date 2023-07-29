@@ -4,7 +4,7 @@
         "canLink": true,
         "defaultHeight": 0,
         "customNameRenderHeight": 0.373,
-        "offsetX": -7.5,
+        "offsetX": 4,
         "offsetY": -6.3,
         "renderHeights": {
             "config(SH_HIGH.TRUE)": 2.373
@@ -18,7 +18,8 @@
             "name": "sh_light_bottom",
             "enumClass": "SHLight",
             "defaultState": "OFF",
-            "changeableStage": "APISTAGE_NONE_CONFIG"
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true
         },
         {
             "name": "sh_high",

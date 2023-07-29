@@ -5,7 +5,7 @@
         "canLink": true,
         "defaultHeight": 0,
         "customNameRenderHeight": 1.04,
-        "offsetX": 7.0,
+        "offsetX": -8,
         "offsetY": -9.8,
         "renderHeights": {
             "config(SH_HIGH.TRUE)": 3.04
@@ -19,7 +19,8 @@
             "name": "sh_mech",
             "enumClass": "SHMech",
             "defaultState": "SH0",
-            "changeableStage": "APISTAGE_NONE_CONFIG"
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true
         },
         {
             "name": "sh_high",

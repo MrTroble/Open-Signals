@@ -14,7 +14,7 @@ import com.troblecodings.signals.parser.interm.LogicalSymbols;
 import net.minecraftforge.client.model.data.IModelData;
 
 @SuppressWarnings({
-        "rawtypes", "unchecked"
+        "rawtypes", "unchecked", "deprecation"
 })
 public final class LogicParser {
 
