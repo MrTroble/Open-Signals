@@ -36,6 +36,15 @@ public class PathwayHolder {
         this.world = world;
         startsToPath.values().forEach(pw -> pw.setWorldAndPos(world, tilePos));
     }
+    
+    public void updatePathwayToAutomatic(final Point point) {
+        final SignalBoxPathway pathway = startsToPath.get(point);
+        if (pathway == null) {
+            OpenSignalsMain.getLogger().warn("No pathway to update automatic at [" + point + "]!");
+            return;
+        }
+        pathway.updatePathwayToAutomatic();
+    }
 
     private void onWayAdd(final SignalBoxPathway pathway) {
         startsToPath.put(pathway.getFirstPoint(), pathway);
@@ -81,9 +90,7 @@ public class PathwayHolder {
     }
 
     public void resetAllPathways() {
-        this.startsToPath.values().forEach(pathway -> {
-            pathway.resetPathway();
-        });
+        this.startsToPath.values().forEach(pathway -> pathway.resetPathway());
         clearPaths();
     }
 
@@ -123,6 +130,7 @@ public class PathwayHolder {
                 if (pathway.isEmptyOrBroken()) {
                     resetPathway(pathway);
                     updateToNet(pathway);
+                    pathway.checkReRequest();
                 } else {
                     updateToNet(pathway);
                     pathway.compact(optPoint.get());

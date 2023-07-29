@@ -1,0 +1,11 @@
+{
+    "currentSignal": "shlight",
+    "allStates": {
+        "SH1": [
+            "sh_light_bottom.SH1"
+        ],
+        "STATUSLIGHT": [
+            "sh_light_bottom.STATUS_LIGHT"
+        ]
+    }
+}

@@ -3,31 +3,24 @@ package com.troblecodings.signals.handler;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 
+import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientNameHandler implements INetworkSync {
 
     private static final Map<NameStateInfo, String> CLIENT_NAMES = new HashMap<>();
-    private static final ExecutorService SERVICE = Executors.newFixedThreadPool(2);
 
     public static String getClientName(final NameStateInfo info) {
         synchronized (CLIENT_NAMES) {
-            final String name = CLIENT_NAMES.get(info);
-            if (name == null)
-                return "";
-            return name;
+            return CLIENT_NAMES.getOrDefault(info, "");
         }
     }
 
@@ -45,18 +38,17 @@ public class ClientNameHandler implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buffer.getByte();
         }
-        final World world = mc.level;
         final String name = new String(array);
-        SERVICE.execute(() -> {
-            TileEntity tile;
-            while ((tile = world.getBlockEntity(pos)) == null)
-                continue;
-            synchronized (CLIENT_NAMES) {
-                CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), name);
-            }
-            if (tile instanceof BasicBlockEntity) {
-                ((BasicBlockEntity) tile).setCustomName(name);
-            }
+        synchronized (CLIENT_NAMES) {
+            CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), name);
+        }
+        final ClientWorld world = mc.level;
+        mc.submit(() -> {
+            final BlockState state = world.getBlockState(pos);
+            if (state == null)
+                return;
+            world.setBlocksDirty(pos, state, state);
+            world.setBlockAndUpdate(pos, state);
         });
     }
 
