@@ -1,11 +1,13 @@
 {
     "currentSignal": "kssignal",
     "allStates": {
-        "ZS1" : [
-            "kombisignal.KS_ZS1", "kombisignal_main.KS_ZS1"
+        "ZS1": [
+            "kombisignal.KS_ZS1",
+            "kombisignal_main.KS_ZS1"
         ],
         "ZS7": [
-            "kombisignal.KS_ZS7", "kombisignal_main.KS_ZS7"
+            "kombisignal.KS_ZS7",
+            "kombisignal_main.KS_ZS7"
         ],
         "ZS8": [
             "zs2.ZS8"
