@@ -13,7 +13,6 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.ItemArmorTemplate;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.items.ToolParser;
-import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -39,8 +38,8 @@ public final class OSItems {
         return isRedstoneBlock || (block instanceof Signal && ((Signal) block).canBeLinked());
     }, _u -> true, (level, pos, tag) -> {
         final BlockState state = level.getBlockState(pos);
-        new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
-                state.getBlock().getRegistryName().getPath());
+        final NBTWrapper wrapper = new NBTWrapper(tag);
+        wrapper.putString(pos.toShortString(), state.getBlock().getRegistryName().getPath());
     });
     public static final MultiLinkingTool MULTI_LINKING_TOOL = new MultiLinkingTool(OSTabs.TAB,
             (world, pos) -> {
@@ -52,7 +51,8 @@ public final class OSItems {
                         || (block instanceof Signal && ((Signal) block).canBeLinked());
             }, _u -> true, (level, pos, tag) -> {
                 final BlockState state = level.getBlockState(pos);
-                new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
+                final NBTWrapper wrapper = new NBTWrapper(tag);
+                wrapper.putString(pos.toShortString(),
                         state.getBlock().getRegistryName().getPath());
             });
     public static final Item CONDUCTOR_TROWEL_GREEN = new Item(
