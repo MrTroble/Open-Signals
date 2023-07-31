@@ -148,7 +148,7 @@ public class GuiSignalController extends GuiBase {
                 currentProfile) ? controller.allRSStates.get(currentProfile) : new HashMap<>();
         controller.getReference().forEach((property, value) -> {
             if (!properties.containsKey(property)) {
-                properties.put(property, property.getDefault());
+                properties.put(property, "DISABLED");
             }
         });
         properties.forEach((property, value) -> {

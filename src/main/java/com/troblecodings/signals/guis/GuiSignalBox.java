@@ -18,7 +18,6 @@ import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.UIStack;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
@@ -139,10 +138,9 @@ public class GuiSignalBox extends GuiBase {
             final LinkType type, final PathEntryType<BlockPos> entryType, final EnumGuiMode mode,
             final Rotation rotation, final String suffix) {
         final List<BlockPos> positions = new ArrayList<>();
-        positions.add(null);
         positions.addAll(entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList()));
-        if (positions.size() > 1) {
+        if (positions.size() > 0) {
             final DisableIntegerable<String> blockPos = new DisableIntegerable<>(
                     SizeIntegerables.of("prop." + type.name() + suffix, positions.size(), id -> {
                         final BlockPos pos = positions.get(id);
@@ -164,13 +162,7 @@ public class GuiSignalBox extends GuiBase {
                     option.setEntry(entryType, setPos);
                     sendPosEntryToServer(setPos, node, mode, rotation, entryType);
                 }
-            });
-            blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
-                e.setMin(-1);
-                final int index = option.getEntry(entryType).map(entry -> positions.indexOf(entry))
-                        .orElse(-1);
-                e.setIndex(index);
-            });
+            }, option.getEntry(entryType).map(entry -> positions.indexOf(entry)).orElse(-1));
             parent.add(blockSelect);
         }
     }
