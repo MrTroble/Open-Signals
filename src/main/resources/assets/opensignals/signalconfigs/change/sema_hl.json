@@ -10,6 +10,7 @@
         "map(stop)": ["semavr.VR0"],
         "map(drive)": ["semavr.VR1"],
 
+        "map(slow)": ["semavr.VR2"],
         "map(slow) && config(mainlightsignallightbar.OFF)": ["semavr.VR2"],
         "map(slow) && config(mainlightsignallightbar.GREEN)": ["semavr.VR1"],
         "map(slow) && config(mainlightsignallightbar.YELLOW)": ["semavr.VR2"],
