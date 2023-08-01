@@ -15,6 +15,7 @@ import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 
@@ -66,11 +67,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         linkedPositions.forEach(
                 pos -> SignalBoxHandler.updateInput(new PosIdentifier(pos, level), update));
         linkedSignalController.forEach(pos -> {
-            // TODO IChunkLoadable
-            final SignalControllerTileEntity controller = (SignalControllerTileEntity) level
-                    .getBlockEntity(pos);
-            if (controller != null)
-                controller.updateFromRSInput();
+            loadChunkAndGetTile(SignalControllerTileEntity.class, (ServerLevel) level, pos,
+                    (tile, _u) -> tile.updateFromRSInput());
         });
     }
 

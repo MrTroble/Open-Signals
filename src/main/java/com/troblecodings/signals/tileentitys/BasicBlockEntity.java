@@ -15,7 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class BasicBlockEntity extends BlockEntity implements NamableWrapper {
+public class BasicBlockEntity extends BlockEntity implements NamableWrapper, IChunkLoadable {
 
     public static final String GUI_TAG = "guiTag";
     public static final String POS_TAG = "posTag";

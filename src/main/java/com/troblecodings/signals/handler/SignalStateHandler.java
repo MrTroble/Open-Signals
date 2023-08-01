@@ -33,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.world.ChunkEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -318,6 +319,11 @@ public final class SignalStateHandler implements INetworkSync {
         }
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         stateInfo.world.players().forEach(playerEntity -> sendTo(playerEntity, buffer));
+    }
+
+    @SubscribeEvent
+    public static void onChunkLoad(final ChunkEvent.Load event) {
+
     }
 
     @SubscribeEvent

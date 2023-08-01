@@ -21,14 +21,17 @@ import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 
-public class ContainerSignalController extends ContainerBase implements UIClientSync, INetworkSync {
+public class ContainerSignalController extends ContainerBase
+        implements UIClientSync, INetworkSync, IChunkLoadable {
 
     private final AtomicReference<Map<SEProperty, String>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
@@ -250,10 +253,8 @@ public class ContainerSignalController extends ContainerBase implements UIClient
             }
             case UNLINK_INPUT_POS: {
                 final BlockPos linkedInput = controllerEntity.getLinkedRSInput();
-                final RedstoneIOTileEntity tile = (RedstoneIOTileEntity) info.world
-                        .getBlockEntity(linkedInput);
-                if (tile != null)
-                    tile.unlinkController(info.pos);
+                loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerLevel) info.world,
+                        linkedInput, (tile, _u) -> tile.unlinkController(info.pos));
                 controllerEntity.setLinkedRSInput(null);
                 break;
             }

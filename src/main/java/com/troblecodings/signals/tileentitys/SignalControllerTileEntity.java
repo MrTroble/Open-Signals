@@ -26,6 +26,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 
@@ -267,10 +268,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             return true;
         } else if (block instanceof RedstoneInput) {
             linkedRSInput = pos;
-            // TODO IChunkLoadable
-            final RedstoneIOTileEntity tile = (RedstoneIOTileEntity) level.getBlockEntity(pos);
-            if (tile != null)
-                tile.linkController(getBlockPos());
+            loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerLevel) level, pos,
+                    (tile, _u) -> tile.linkController(getBlockPos()));
             return true;
         }
         return false;
