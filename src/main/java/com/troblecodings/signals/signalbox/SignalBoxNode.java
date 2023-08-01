@@ -36,6 +36,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private final Point point;
     private String identifier;
     private boolean isAutoPoint = false;
+    private String customText = "";
 
     public SignalBoxNode() {
         this(new Point());
@@ -312,6 +313,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 manuellEnabledOutputs.add(modeSet);
         }
         this.isAutoPoint = buffer.getByte() == 1 ? true : false;
+        final int nameSize = buffer.getByteAsInt();
+        final byte[] array = new byte[nameSize];
+        for (int i = 0; i < nameSize; i++)
+            array[i] = buffer.getByte();
+        this.customText = new String(array);
         post();
     }
 
@@ -333,6 +339,12 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 manuellEnabledOutputs.add(modeSet);
         }
         this.isAutoPoint = buffer.getByte() == 1 ? true : false;
+        final int nameSize = buffer.getByteAsInt();
+        final byte[] array = new byte[nameSize];
+        for (int i = 0; i < nameSize; i++)
+            array[i] = buffer.getByte();
+        this.customText = new String(array);
+
         post();
     }
 
@@ -346,6 +358,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         buffer.putByte((byte) manuellEnabledOutputs.size());
         manuellEnabledOutputs.forEach(mode -> mode.writeNetwork(buffer));
         buffer.putByte((byte) (isAutoPoint ? 1 : 0));
+        final byte[] array = customText.getBytes();
+        buffer.putByte((byte) array.length);
+        for (final byte b : array)
+            buffer.putByte(b);
     }
 
     public void writeUpdateNetwork(final WriteBuffer buffer) {
@@ -363,5 +379,17 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         });
         buffer.putByte((byte) 0);
         buffer.putByte((byte) (isAutoPoint ? 1 : 0));
+        final byte[] array = customText.getBytes();
+        buffer.putByte((byte) array.length);
+        for (final byte b : array)
+            buffer.putByte(b);
+    }
+
+    public String getCustomText() {
+        return customText;
+    }
+
+    public void setCustomText(final String text) {
+        this.customText = text;
     }
 }

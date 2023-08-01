@@ -19,6 +19,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIStack;
+import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
@@ -190,6 +191,15 @@ public class GuiSignalBox extends GuiBase {
         modeLabel.setCenterX(false);
         entity.add(modeLabel);
         parent.add(entity);
+        final UIEntity input = new UIEntity();
+        input.setInherits(true);
+        final UITextInput namingInput = new UITextInput(node.getCustomText());
+        input.add(namingInput);
+        parent.add(input);
+        namingInput.setOnTextUpdate(str -> {
+            node.setCustomText(str);
+            sendName(node.getPoint(), str);
+        });
         final Set<Entry<BlockPos, LinkType>> entrySet = container.getPositionForTypes().entrySet();
 
         switch (mode) {
@@ -508,6 +518,14 @@ public class GuiSignalBox extends GuiBase {
                 if (!node.isEmpty())
                     allTiles.put(name, sbt);
                 tile.add(sbt);
+                if (!node.getCustomText().isEmpty()) {
+                    final UIEntity inputEntity = new UIEntity();
+                    inputEntity.add(new UIScale(0.7f, 0.7f, 0.7f));
+                    final UILabel label = new UILabel(node.getCustomText());
+                    inputEntity.add(label);
+                    inputEntity.setX(5);
+                    tile.add(inputEntity);
+                }
                 consumer.accept(tile, sbt);
                 row.add(tile);
             }
@@ -709,6 +727,19 @@ public class GuiSignalBox extends GuiBase {
         buffer.putByte((byte) SignalBoxNetwork.SET_AUTO_POINT.ordinal());
         point.writeNetwork(buffer);
         buffer.putByte(state);
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+    }
+
+    private void sendName(final Point point, final String name) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) SignalBoxNetwork.SEND_NAME.ordinal());
+        point.writeNetwork(buffer);
+        final byte[] array = name.getBytes();
+        buffer.putByte((byte) array.length);
+        for (final byte b : array)
+            buffer.putByte(b);
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
