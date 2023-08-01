@@ -99,17 +99,15 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         buffer.putInt(getSignal().getID());
         buffer.putByte((byte) currentMode.ordinal());
         buffer.putByte((byte) propertiesToSend.size());
-        propertiesToSend.forEach((property, value) -> {
-            packPropertyToBuffer(buffer, stateInfo, property, value);
-        });
+        propertiesToSend.forEach(
+                (property, value) -> packPropertyToBuffer(buffer, stateInfo, property, value));
         buffer.putByte((byte) controllerEntity.getProfile());
         buffer.putByte((byte) allStatesToSend.size());
         allStatesToSend.forEach((profile, props) -> {
             buffer.putByte(profile);
             buffer.putByte((byte) props.size());
-            props.forEach((property, value) -> {
-                packPropertyToBuffer(buffer, stateInfo, property, value);
-            });
+            props.forEach(
+                    (property, value) -> packPropertyToBuffer(buffer, stateInfo, property, value));
         });
 
         buffer.putByte((byte) enabledStates.size());
@@ -147,6 +145,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         }
         reference.set(properites);
         lastProfile = buffer.getByteAsInt();
+        allRSStates.clear();
         final int allStatesSize = buffer.getByteAsInt();
         for (int i = 0; i < allStatesSize; i++) {
             final int profile = buffer.getByteAsInt();
@@ -159,13 +158,14 @@ public class ContainerSignalController extends ContainerBase implements UIClient
             }
             allRSStates.put(profile, profileProps);
         }
+        enabledRSStates.clear();
         final int enabledStatesSize = buffer.getByteAsInt();
         for (int i = 0; i < enabledStatesSize; i++) {
             final Direction direction = Direction.values()[buffer.getByteAsInt()];
             final int propSize = buffer.getByteAsInt();
             final Map<EnumState, Integer> states = new HashMap<>();
             for (int j = 0; j < propSize; j++) {
-                final EnumState mode = EnumState.values()[buffer.getByteAsInt()];
+                final EnumState mode = EnumState.of(buffer);
                 states.put(mode, buffer.getByteAsInt());
             }
             enabledRSStates.put(direction, states);
@@ -179,11 +179,10 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         if (propertiesList == null) {
             propertiesList = getSignal().getProperties();
         }
-        final SignalControllerNetwork mode = SignalControllerNetwork.values()[buffer
-                .getByteAsInt()];
+        final SignalControllerNetwork mode = SignalControllerNetwork.of(buffer);
         switch (mode) {
             case SEND_MODE: {
-                currentMode = EnumMode.values()[buffer.getByteAsInt()];
+                currentMode = EnumMode.of(buffer);
                 controllerEntity.setLastMode(currentMode);
                 break;
             }
@@ -199,32 +198,37 @@ public class ContainerSignalController extends ContainerBase implements UIClient
                             new SignalStateInfo(info.world, linkedPos, getSignal()), property,
                             value);
                 } else if (currentMode.equals(EnumMode.SINGLE)) {
-                    if (!controllerEntity.containsProfile((byte) currentRSProfile)) {
-                        controllerEntity.initializeProfile((byte) currentRSProfile, getReference());
-                    }
                     controllerEntity.updateRedstoneProfile((byte) currentRSProfile, property,
                             value);
                 }
                 break;
             }
-            case SET_PROFILE: {
-                final EnumState state = EnumState.values()[buffer.getByteAsInt()];
-                final Direction direction = Direction.values()[buffer.getByteAsInt()];
-                final int profile = buffer.getByteAsInt();
-                controllerEntity.updateEnabledStates(direction, state, profile);
+            case REMOVE_PROPERTY: {
+                if (currentMode.equals(EnumMode.SINGLE)) {
+                    final SEProperty property = propertiesList.get(buffer.getByteAsInt());
+                    controllerEntity.removePropertyFromProfile((byte) currentRSProfile, property);
+                }
                 break;
             }
-            case INITIALIZE_DIRECTION: {
-                final Direction direction = Direction.values()[buffer.getByteAsInt()];
-                final Map<EnumState, Byte> states = new HashMap<>();
-                states.put(EnumState.OFFSTATE, (byte) 0);
-                states.put(EnumState.ONSTATE, (byte) 0);
-                controllerEntity.initializeDirection(direction, states);
+            case REMOVE_PROFILE: {
+                final EnumState state = EnumState.of(buffer);
+                final Direction direction = deserializeDirection(buffer);
+                controllerEntity.removeProfileFromDirection(direction, state);
+            }
+            case SET_PROFILE: {
+                final EnumState state = EnumState.of(buffer);
+                final Direction direction = deserializeDirection(buffer);
+                final int profile = buffer.getByteAsInt();
+                controllerEntity.updateEnabledStates(direction, state, profile);
                 break;
             }
             default:
                 break;
         }
+    }
+
+    private static Direction deserializeDirection(final ReadBuffer buffer) {
+        return Direction.values()[buffer.getByteAsInt()];
     }
 
     public Map<SEProperty, String> getReference() {

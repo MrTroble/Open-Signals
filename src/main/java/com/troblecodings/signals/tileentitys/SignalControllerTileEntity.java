@@ -70,18 +70,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         return lastState;
     }
 
-    public void initializeDirection(final Direction direction, final Map<EnumState, Byte> states) {
-        enabledStates.put(direction, states);
-    }
-
-    public void initializeProfile(final Byte profile, final Map<SEProperty, String> properties) {
-        allStates.put(profile, ImmutableMap.copyOf(properties));
-    }
-
-    public boolean containsProfile(final Byte profile) {
-        return allStates.containsKey(profile);
-    }
-
     public int getProfile() {
         return lastProfile;
     }
@@ -90,26 +78,26 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         lastProfile = profile;
     }
 
+    public void removePropertyFromProfile(final Byte profile, final SEProperty property) {
+        final Map<SEProperty, String> properties = allStates.get(profile);
+        if (properties != null)
+            properties.remove(property);
+    }
+
+    public void removeProfileFromDirection(final Direction direction, final EnumState state) {
+        final Map<EnumState, Byte> properties = enabledStates.get(direction);
+        if (properties != null)
+            properties.remove(state);
+    }
+
     public void updateRedstoneProfile(final Byte profile, final SEProperty property,
             final String value) {
-        final Map<SEProperty, String> properties = allStates.containsKey(profile)
-                ? allStates.get(profile)
-                : new HashMap<>();
-        final Map<SEProperty, String> setProperties = new HashMap<>();
-        setProperties.putAll(properties);
-        setProperties.put(property, value);
-        allStates.put((byte) profile, ImmutableMap.copyOf(setProperties));
+        allStates.computeIfAbsent(profile, _u -> new HashMap<>()).put(property, value);
     }
 
     public void updateEnabledStates(final Direction direction, final EnumState state,
             final int profile) {
-        final Map<EnumState, Byte> states = enabledStates.containsKey(direction)
-                ? enabledStates.get(direction)
-                : new HashMap<>();
-        final Map<EnumState, Byte> setStates = new HashMap<>();
-        setStates.putAll(states);
-        setStates.put(state, (byte) profile);
-        enabledStates.put(direction, ImmutableMap.copyOf(setStates));
+        enabledStates.computeIfAbsent(direction, _u -> new HashMap<>()).put(state, (byte) profile);
     }
 
     public Map<Byte, Map<SEProperty, String>> getAllStates() {
