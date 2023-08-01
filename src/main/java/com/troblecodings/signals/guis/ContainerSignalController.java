@@ -21,6 +21,7 @@ import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -31,15 +32,17 @@ public class ContainerSignalController extends ContainerBase implements UIClient
 
     private final AtomicReference<Map<SEProperty, String>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
-    protected final Map<Integer, Map<SEProperty, String>> allRSStates = new HashMap<>();
-    protected final Map<Direction, Map<EnumState, Integer>> enabledRSStates = new HashMap<>();
-    private List<SEProperty> propertiesList;
     private final GuiInfo info;
+    private List<SEProperty> propertiesList;
     private BlockPos linkedPos;
-    protected int lastProfile;
-    protected EnumMode currentMode = EnumMode.MANUELL;
     private SignalControllerTileEntity controllerEntity;
     private int currentRSProfile;
+    protected final Map<Integer, Map<SEProperty, String>> allRSStates = new HashMap<>();
+    protected final Map<Direction, Map<EnumState, Integer>> enabledRSStates = new HashMap<>();
+    protected int lastProfile;
+    protected EnumMode currentMode = EnumMode.MANUELL;
+    protected BlockPos linkedRSInput = null;
+    protected int linkedRSInputProfile = -1;
 
     public ContainerSignalController(final GuiInfo info) {
         super(info);
@@ -119,6 +122,13 @@ public class ContainerSignalController extends ContainerBase implements UIClient
                 buffer.putByte(profile);
             });
         });
+        final BlockPos linkedRSInput = controllerEntity.getLinkedRSInput();
+        buffer.putByte((byte) (linkedRSInput != null ? 1 : 0));
+        if (linkedRSInput != null)
+            buffer.putBlockPos(linkedRSInput);
+        buffer.putByte((byte) (controllerEntity.getProfileRSInput() != -1 ? 1 : 0));
+        if (controllerEntity.getProfileRSInput() != -1)
+            buffer.putByte(controllerEntity.getProfileRSInput());
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
@@ -170,6 +180,12 @@ public class ContainerSignalController extends ContainerBase implements UIClient
             }
             enabledRSStates.put(direction, states);
         }
+        final boolean isInputConnected = buffer.getByte() == 1 ? true : false;
+        if (isInputConnected)
+            linkedRSInput = buffer.getBlockPos();
+        final boolean isProfileInputenabled = buffer.getByte() == 1 ? true : false;
+        if (isProfileInputenabled)
+            linkedRSInputProfile = buffer.getByteAsInt();
         update();
     }
 
@@ -214,12 +230,31 @@ public class ContainerSignalController extends ContainerBase implements UIClient
                 final EnumState state = EnumState.of(buffer);
                 final Direction direction = deserializeDirection(buffer);
                 controllerEntity.removeProfileFromDirection(direction, state);
+                break;
             }
             case SET_PROFILE: {
                 final EnumState state = EnumState.of(buffer);
                 final Direction direction = deserializeDirection(buffer);
                 final int profile = buffer.getByteAsInt();
                 controllerEntity.updateEnabledStates(direction, state, profile);
+                break;
+            }
+            case SET_RS_INPUT_PROFILE: {
+                final int profile = buffer.getByteAsInt();
+                controllerEntity.setProfileRSInput((byte) profile);
+                break;
+            }
+            case REMOVE_RS_INPUT_PROFILE: {
+                controllerEntity.setProfileRSInput((byte) -1);
+                break;
+            }
+            case UNLINK_INPUT_POS: {
+                final BlockPos linkedInput = controllerEntity.getLinkedRSInput();
+                final RedstoneIOTileEntity tile = (RedstoneIOTileEntity) info.world
+                        .getBlockEntity(linkedInput);
+                if (tile != null)
+                    tile.unlinkController(info.pos);
+                controllerEntity.setLinkedRSInput(null);
                 break;
             }
             default:

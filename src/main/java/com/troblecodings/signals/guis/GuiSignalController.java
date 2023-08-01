@@ -77,8 +77,8 @@ public class GuiSignalController extends GuiBase {
             case SINGLE:
                 addSingleRSMode();
                 break;
-            case MUX:
-                addMUXMode();
+            case RS_INPUT:
+                addRSInputMode();
                 break;
             default:
                 break;
@@ -126,14 +126,10 @@ public class GuiSignalController extends GuiBase {
                 SizeIntegerables.of("profileOff." + face.getName(), 32, in -> String.valueOf(in)));
         final IIntegerable<Object> onProfile = new DisableIntegerable(
                 SizeIntegerables.of("profileOn." + face.getName(), 32, in -> String.valueOf(in)));
-        final UIEntity offElement = GuiElements.createEnumElement(offProfile, e -> {
-            sendAndSetProfile(face, e, EnumState.OFFSTATE);
-        }, offIndex);
-        final UIEntity onElement = GuiElements.createEnumElement(onProfile, e -> {
-            sendAndSetProfile(face, e, EnumState.ONSTATE);
-        }, onIndex);
-        offElement.findRecursive(UIEnumerable.class).forEach(e -> e.setMin(-1));
-        onElement.findRecursive(UIEnumerable.class).forEach(e -> e.setMin(-1));
+        final UIEntity offElement = GuiElements.createEnumElement(offProfile,
+                e -> sendAndSetProfile(face, e, EnumState.OFFSTATE), offIndex);
+        final UIEntity onElement = GuiElements.createEnumElement(onProfile,
+                e -> sendAndSetProfile(face, e, EnumState.ONSTATE), onIndex);
         leftSide.add(offElement);
         leftSide.add(onElement);
         leftSide.add(GuiElements.createPageSelect(boxMode));
@@ -201,7 +197,6 @@ public class GuiSignalController extends GuiBase {
             createPageForSide(faceing, leftSide, bRender);
         });
         rightSide.add(toggle);
-
         for (final Direction face : Direction.values()) {
             final List<BakedQuad> quad = model.getQuads(state, face, SignalCustomModel.RANDOM,
                     EmptyModelData.INSTANCE);
@@ -217,12 +212,23 @@ public class GuiSignalController extends GuiBase {
             faceEntity.add(label);
             rightSide.add(faceEntity);
         }
-
         this.lowerEntity.add(rightSide);
     }
 
-    private void addMUXMode() {
-        this.lowerEntity.add(new UILabel("Currently Not in Use!"));
+    private void addRSInputMode() {
+        this.lowerEntity.add(new UIBox(UIBox.VBOX, 5));
+        final String posString = controller.linkedRSInput == null ? "not linked"
+                : controller.linkedRSInput.toShortString();
+        final UILabel label = new UILabel("Linked To: " + posString);
+        lowerEntity.add(label);
+        final IIntegerable<String> profile = new DisableIntegerable<>(
+                SizeIntegerables.of("profile", 32, in -> String.valueOf(in)));
+        lowerEntity.add(GuiElements.createEnumElement(profile, e -> sendRSInputProfileToServer(e),
+                controller.linkedRSInputProfile));
+        lowerEntity.add(GuiElements.createButton("gui.unlink", e -> {
+            unlinkInputPos();
+            label.setText("Linked To: not linked");
+        }));
     }
 
     private void initInternal() {
@@ -388,6 +394,25 @@ public class GuiSignalController extends GuiBase {
                 : SignalControllerNetwork.SEND_PROPERTY.ordinal()));
         buffer.putByte((byte) controller.getSignal().getIDFromProperty(property));
         buffer.putByte((byte) value);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
+    }
+
+    private void sendRSInputProfileToServer(final int profile) {
+        if (!loaded) {
+            return;
+        }
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte(
+                (byte) (profile == -1 ? SignalControllerNetwork.REMOVE_RS_INPUT_PROFILE.ordinal()
+                        : SignalControllerNetwork.SET_RS_INPUT_PROFILE.ordinal()));
+        buffer.putByte((byte) profile);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
+    }
+
+    private void unlinkInputPos() {
+        controller.linkedRSInput = null;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) SignalControllerNetwork.UNLINK_INPUT_POS.ordinal());
         OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
