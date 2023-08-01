@@ -80,6 +80,7 @@ public class SignalBoxPathway {
             throw new IllegalArgumentException();
         initalize();
         updatePathwayToAutomatic();
+        this.originalFirstPoint = new Point(firstPoint);
     }
 
     private void initalize() {
@@ -143,6 +144,7 @@ public class SignalBoxPathway {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
     private static final String IS_BLOCKED = "isBlocked";
+    private static final String ORIGINAL_FIRST_POINT = "origianlFirstPoint";
 
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
@@ -152,6 +154,11 @@ public class SignalBoxPathway {
         })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
         tag.putBoolean(IS_BLOCKED, isBlocked);
+        if (originalFirstPoint != null) {
+            final NBTWrapper originalFirstPoint = new NBTWrapper();
+            this.originalFirstPoint.write(originalFirstPoint);
+            tag.putWrapper(ORIGINAL_FIRST_POINT, originalFirstPoint);
+        }
     }
 
     public void read(final NBTWrapper tag) {
@@ -178,6 +185,11 @@ public class SignalBoxPathway {
         }
         this.initalize();
         updatePathwayToAutomatic();
+        final NBTWrapper originalFirstPoint = tag.getWrapper(ORIGINAL_FIRST_POINT);
+        if (originalFirstPoint != null) {
+            this.originalFirstPoint = new Point();
+            this.originalFirstPoint.read(originalFirstPoint);
+        }
     }
 
     private void foreachEntry(final Consumer<PathOptionEntry> consumer,
@@ -350,7 +362,6 @@ public class SignalBoxPathway {
     public void updatePathwayToAutomatic() {
         final SignalBoxNode first = modeGrid.get(firstPoint);
         this.isAutoPathway = first.isAutoPoint();
-        this.originalFirstPoint = new Point(firstPoint);
     }
 
     public void checkReRequest() {
