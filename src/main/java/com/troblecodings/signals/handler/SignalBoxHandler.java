@@ -317,7 +317,7 @@ public final class SignalBoxHandler {
         if (identifier.world.isClientSide)
             return;
         BlockState blockState = identifier.world.getBlockState(identifier.pos);
-        if (blockState != null) {
+        if (blockState != null && blockState.getBlock() == OSBlocks.REDSTONE_OUT) {
             blockState = blockState.setValue(RedstoneIO.POWER, state);
             identifier.world.setBlockAndUpdate(identifier.pos, blockState);
             return;
