@@ -186,7 +186,7 @@ public class SignalBoxPathway {
         this.initalize();
         updatePathwayToAutomatic();
         final NBTWrapper originalFirstPoint = tag.getWrapper(ORIGINAL_FIRST_POINT);
-        if (originalFirstPoint != null) {
+        if (!originalFirstPoint.isTagNull()) {
             this.originalFirstPoint = new Point();
             this.originalFirstPoint.read(originalFirstPoint);
         }
