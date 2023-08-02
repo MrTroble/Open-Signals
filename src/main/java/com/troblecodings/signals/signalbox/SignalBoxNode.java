@@ -156,6 +156,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private static final String POINT_LIST = "pointList";
     private static final String ENABLED_OUTPUTS = "enabledOutputs";
     private static final String IS_AUTO_POINT = "isAutoPoint";
+    private static final String CUSTOM_NAME = "customTextName";
 
     @Override
     public void write(final NBTWrapper compound) {
@@ -174,6 +175,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         compound.putList(ENABLED_OUTPUTS, enabledOutputs);
         this.point.write(compound);
         compound.putBoolean(IS_AUTO_POINT, isAutoPoint);
+        compound.putString(CUSTOM_NAME, customText);
     }
 
     @Override
@@ -192,6 +194,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         this.point.read(compound);
         this.identifier = point.getX() + "." + point.getY();
         this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
+        this.customText = compound.getString(CUSTOM_NAME);
         post();
     }
 
