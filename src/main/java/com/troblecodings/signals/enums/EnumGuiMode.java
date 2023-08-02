@@ -18,11 +18,7 @@ public enum EnumGuiMode {
             0, 0.1f, 1, 0.1f, 0, 0.2f, 1, 0.2f
     }), BUE(new float[] {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
-    }), HP(0), VP(1), RS(2), RA10(3), SH2(4), IN_CONNECTION(() -> new UILines(new float[] {
-            0, 0.5f, 1, 0.5f, 0.5f, 0.05f, 0.95f, 0.5f, 0.5f, 0.95f, 0.95f, 0.5f
-    }, 2)), OUT_CONNECTION(new float[] {
-            0, 0.5f, 1, 0.5f, 0.05f, 0.5f, 0.5f, 0.05f, 0.05f, 0.5f, 0.5f, 0.95f
-    });
+    }), HP(0), VP(1), RS(2), RA10(3), SH2(4);
 
     /**
      * Naming
