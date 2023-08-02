@@ -225,7 +225,7 @@ public class GuiSignalController extends GuiBase {
                 SizeIntegerables.of("profile", 32, in -> String.valueOf(in)));
         lowerEntity.add(GuiElements.createEnumElement(profile, e -> sendRSInputProfileToServer(e),
                 controller.linkedRSInputProfile));
-        lowerEntity.add(GuiElements.createButton("gui.unlink", e -> {
+        lowerEntity.add(GuiElements.createButton(I18n.get("gui.unlink"), e -> {
             unlinkInputPos();
             label.setText("Linked To: not linked");
         }));
