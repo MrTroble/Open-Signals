@@ -191,15 +191,6 @@ public class GuiSignalBox extends GuiBase {
         modeLabel.setCenterX(false);
         entity.add(modeLabel);
         parent.add(entity);
-        final UIEntity input = new UIEntity();
-        input.setInherits(true);
-        final UITextInput namingInput = new UITextInput(node.getCustomText());
-        input.add(namingInput);
-        parent.add(input);
-        namingInput.setOnTextUpdate(str -> {
-            node.setCustomText(str);
-            sendName(node.getPoint(), str);
-        });
         final Set<Entry<BlockPos, LinkType>> entrySet = container.getPositionForTypes().entrySet();
 
         switch (mode) {
@@ -365,6 +356,16 @@ public class GuiSignalBox extends GuiBase {
         list.add(box);
         lowerEntity.add(new UIBox(UIBox.VBOX, 3));
         lowerEntity.add(list);
+        final UIEntity input = new UIEntity();
+        input.setInheritWidth(true);
+        final UITextInput namingInput = new UITextInput(node.getCustomText());
+        input.add(namingInput);
+        input.setHeight(20);
+        list.add(input);
+        namingInput.setOnTextUpdate(str -> {
+            node.setCustomText(str);
+            sendName(node.getPoint(), str);
+        });
         node.forEach(modeSet -> setupModeSettings(list, modeSet.mode, modeSet.rotation, node,
                 node.getOption(modeSet).get()));
         lowerEntity.add(GuiElements.createPageSelect(box));
