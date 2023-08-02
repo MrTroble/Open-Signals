@@ -70,6 +70,6 @@ public class SignalBox extends BasicBlock {
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState state2,
             boolean bool) {
-        SignalBoxHandler.relinkAllInputs(new PosIdentifier(pos, world));
+        SignalBoxHandler.relinkAllRedstoneIOs(new PosIdentifier(pos, world));
     }
 }

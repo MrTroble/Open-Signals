@@ -174,7 +174,7 @@ public final class SignalBoxHandler {
         return linked;
     }
 
-    public static void relinkAllInputs(final PosIdentifier identifier) {
+    public static void relinkAllRedstoneIOs(final PosIdentifier identifier) {
         if (identifier.world.isClientSide)
             return;
         LinkedPositions holder;
@@ -183,7 +183,7 @@ public final class SignalBoxHandler {
         }
         if (holder == null)
             return;
-        holder.getInputs().forEach(pos -> linkTileToPos(identifier, pos));
+        holder.getAllRedstoneIOs().forEach(pos -> linkTileToPos(identifier, pos));
     }
 
     public static Signal getSignal(final PosIdentifier identifier, final BlockPos signalPos) {

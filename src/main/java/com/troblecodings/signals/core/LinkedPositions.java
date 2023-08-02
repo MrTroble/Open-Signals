@@ -124,9 +124,9 @@ public class LinkedPositions {
         SignalStateHandler.unloadSignals(signalInfos);
     }
 
-    public List<BlockPos> getInputs() {
+    public List<BlockPos> getAllRedstoneIOs() {
         return linkedBlocks.entrySet().stream()
-                .filter(entry -> entry.getValue().equals(LinkType.INPUT))
+                .filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
                 .map(entry -> entry.getKey()).collect(Collectors.toUnmodifiableList());
     }
 
