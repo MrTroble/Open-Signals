@@ -66,4 +66,10 @@ public class SignalBox extends BasicBlock {
         }
         super.playerWillDestroy(world, pos, state, player);
     }
+
+    @Override
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState state2,
+            boolean bool) {
+        SignalBoxHandler.relinkAllInputs(new PosIdentifier(pos, world));
+    }
 }

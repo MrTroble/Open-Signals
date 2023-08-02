@@ -174,6 +174,18 @@ public final class SignalBoxHandler {
         return linked;
     }
 
+    public static void relinkAllInputs(final PosIdentifier identifier) {
+        if (identifier.world.isClientSide)
+            return;
+        LinkedPositions holder;
+        synchronized (ALL_LINKED_POS) {
+            holder = ALL_LINKED_POS.get(identifier);
+        }
+        if (holder == null)
+            return;
+        holder.getInputs().forEach(pos -> linkTileToPos(identifier, pos));
+    }
+
     public static Signal getSignal(final PosIdentifier identifier, final BlockPos signalPos) {
         if (identifier.world.isClientSide)
             return null;
