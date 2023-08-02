@@ -482,6 +482,8 @@
     "property.statuslight.desc": "§nKennlicht§r: Das Signal ist betrieblich abgeschaltet",
     "property.semavr.name": "Formvorsignal",
     "property.semavr.desc": "Vorsignale kündigen an, was das nächste Hauptsignal zeigt.%n§nVr0§r: Halt erwarten%n§nVr1§r: Fahrt erwarten%n§nVr2§r: Langsamfahrt erwarten",
-    "item.opensignals.multilinkingtool": "Signal Multi Verlinker"
+    "item.opensignals.multilinkingtool": "Signal Multi Verlinker",
+    "property.value.RS_INPUT": "Redstone Eingang",
+    "gui.unlink": "Entlinken"
 
 }
