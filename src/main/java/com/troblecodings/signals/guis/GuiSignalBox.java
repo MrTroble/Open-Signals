@@ -523,6 +523,7 @@ public class GuiSignalBox extends GuiBase {
                     final UIEntity inputEntity = new UIEntity();
                     inputEntity.add(new UIScale(0.7f, 0.7f, 0.7f));
                     final UILabel label = new UILabel(node.getCustomText());
+                    label.setTextColor(0xFFFFFFFF);
                     inputEntity.add(label);
                     inputEntity.setX(5);
                     tile.add(inputEntity);
