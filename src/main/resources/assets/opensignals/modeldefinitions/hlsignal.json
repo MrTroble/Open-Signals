@@ -62,7 +62,7 @@
         "hl/hl_number": {
             "textures": [
                 {
-                    "blockstate": "hasandis(CUSTOMNAME)"
+                    "blockstate": "hasandis(CUSTOMNAME) && !with(HLTYPE.DISTANT)"
                 }
             ],
             "y": 0

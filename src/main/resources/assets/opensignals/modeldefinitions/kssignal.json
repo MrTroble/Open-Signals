@@ -45,7 +45,7 @@
         "ks/ks_number": {
             "textures": [
                 {
-                    "blockstate": "hasandis(CUSTOMNAME)"
+                    "blockstate": "hasandis(CUSTOMNAME) && !with(KOMBITYPE.DISTANT)"
                 }
             ],
             "y": 4
