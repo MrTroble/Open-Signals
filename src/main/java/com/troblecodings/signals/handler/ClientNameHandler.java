@@ -42,7 +42,7 @@ public class ClientNameHandler implements INetworkSync {
         String name = "";
         try {
             name = new String(array, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
             e.printStackTrace();
         }
         synchronized (CLIENT_NAMES) {

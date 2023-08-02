@@ -30,7 +30,7 @@ public interface IChunkLoadable {
             ForgeChunkManager.forceChunk(world, OpenSignalsMain.MODID, pos, chunkPos.x, chunkPos.z,
                     false, true);
             return flag;
-        } catch (Exception e) {
+        } catch (final Exception e) {
             e.printStackTrace();
         }
         return false;
