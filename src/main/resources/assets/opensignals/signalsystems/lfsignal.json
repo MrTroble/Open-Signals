@@ -21,6 +21,13 @@
             "defaultState": "LF1",
             "autoname": true,
             "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "lfarrow",
+            "enumClass": "ELArrow",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
         }
     ]
 }
