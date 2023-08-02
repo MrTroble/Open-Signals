@@ -15,7 +15,8 @@
         {
             "name": "barrier_open",
             "defaultState": false,
-            "changeableStage": "APISTAGE_NONE_CONFIG"
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true
         }
     ]
 }
