@@ -107,7 +107,7 @@ public final class NameHandler implements INetworkSync {
         final byte[] bytes = name.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(pos);
-        buffer.putByte((byte) name.length());
+        buffer.putByte((byte) bytes.length);
         for (final byte b : bytes) {
             buffer.putByte(b);
         }

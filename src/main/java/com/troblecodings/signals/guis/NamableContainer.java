@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,7 +83,12 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
             array[i] = buffer.getByte();
         }
         final NameStateInfo info = new NameStateInfo(this.info.world, this.info.pos);
-        final String name = new String(array);
+        String name = "";
+        try {
+            name = new String(array, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         if (tile instanceof SignalTileEntity) {
             NameHandler.setNameForSignal(info, name);
         } else {

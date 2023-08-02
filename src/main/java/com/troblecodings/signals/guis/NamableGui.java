@@ -96,7 +96,7 @@ public class NamableGui extends GuiBase {
             return;
         final byte[] bytes = input.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) input.length());
+        buffer.putByte((byte) bytes.length);
         for (final byte b : bytes) {
             buffer.putByte(b);
         }
