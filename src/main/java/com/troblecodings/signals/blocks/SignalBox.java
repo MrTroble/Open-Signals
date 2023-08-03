@@ -66,4 +66,10 @@ public class SignalBox extends BasicBlock {
         }
         super.playerWillDestroy(world, pos, state, player);
     }
+
+    @Override
+    public void onPlace(final BlockState state, final Level world, final BlockPos pos,
+            final BlockState state2, final boolean bool) {
+        SignalBoxHandler.relinkAllRedstoneIOs(new PosIdentifier(pos, world));
+    }
 }

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
@@ -121,6 +122,12 @@ public class LinkedPositions {
         final List<SignalStateInfo> signalInfos = new ArrayList<>();
         signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
         SignalStateHandler.unloadSignals(signalInfos);
+    }
+
+    public List<BlockPos> getAllRedstoneIOs() {
+        return linkedBlocks.entrySet().stream()
+                .filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
+                .map(entry -> entry.getKey()).collect(Collectors.toUnmodifiableList());
     }
 
     @Override

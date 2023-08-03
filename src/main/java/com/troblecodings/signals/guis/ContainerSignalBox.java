@@ -222,6 +222,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                         new PosIdentifier(tile.getBlockPos(), info.world), point);
                 break;
             }
+            case SEND_NAME: {
+                final Point point = Point.of(buffer);
+                final int size = buffer.getByteAsInt();
+                final byte[] array = new byte[size];
+                for (int i = 0; i < size; i++)
+                    array[i] = buffer.getByte();
+                tile.getSignalBoxGrid().getNode(point).setCustomText(new String(array));
+                break;
+            }
             default:
                 break;
         }

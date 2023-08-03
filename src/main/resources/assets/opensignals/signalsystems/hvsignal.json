@@ -7,7 +7,10 @@
         "colors": [
             16777215,
             16761344
-        ]
+        ],
+        "renderHeights": {
+            "!(config(HPTYPE.STOPSIGNAL) || config(HPTYPE.HPHOME) || config(HPTYPE.HPBLOCK)) ": -1
+        }
     },
     "seProperties": [
         {

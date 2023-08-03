@@ -82,6 +82,10 @@ public class NamableGui extends GuiBase {
                 pos -> list.add(GuiElements.createLabel(String.format("%s: x = %d, y = %d, z = %d",
                         OSBlocks.SIGNAL_BOX.getName().getString(), pos.getX(), pos.getY(),
                         pos.getZ()))));
+        this.container.linkedController.forEach(
+                pos -> list.add(GuiElements.createLabel(String.format("%s: x = %d, y = %d, z = %d",
+                        OSBlocks.HV_SIGNAL_CONTROLLER.getName().getString(), pos.getX(), pos.getY(),
+                        pos.getZ()))));
         inner.add(list);
         inner.add(GuiElements.createPageSelect(layout));
     }
@@ -92,7 +96,7 @@ public class NamableGui extends GuiBase {
             return;
         final byte[] bytes = input.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) input.length());
+        buffer.putByte((byte) bytes.length);
         for (final byte b : bytes) {
             buffer.putByte(b);
         }
