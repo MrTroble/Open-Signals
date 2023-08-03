@@ -79,8 +79,8 @@ public class SignalBoxPathway {
         if (this.type.equals(PathType.NONE))
             throw new IllegalArgumentException();
         initalize();
-        updatePathwayToAutomatic();
         this.originalFirstPoint = new Point(firstPoint);
+        updatePathwayToAutomatic();
     }
 
     private void initalize() {
