@@ -15,6 +15,7 @@
 * fix: issue with autoPathway not working after rejoin
 * fix: missing lang keys
 * fix: distant signal shown custom names
+* fix: sound ticking
 * ref: better handling of autoPathway
 
 ## [1.16.5 Beta 11]
