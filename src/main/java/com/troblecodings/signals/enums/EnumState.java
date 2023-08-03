@@ -1,6 +1,7 @@
 package com.troblecodings.signals.enums;
 
 import com.troblecodings.core.interfaces.NamableWrapper;
+import com.troblecodings.signals.core.ReadBuffer;
 
 public enum EnumState implements NamableWrapper {
     DISABLED("DISABLED"), OFFSTATE("OFFSTATE"), ONSTATE("ONSTATE");
@@ -24,5 +25,9 @@ public enum EnumState implements NamableWrapper {
             }
         }
         return null;
+    }
+
+    public static EnumState of(final ReadBuffer buffer) {
+        return values()[buffer.getByteAsInt()];
     }
 }

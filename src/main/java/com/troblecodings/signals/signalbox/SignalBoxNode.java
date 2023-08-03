@@ -36,6 +36,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private final Point point;
     private String identifier;
     private boolean isAutoPoint = false;
+    private String customText = "";
 
     public SignalBoxNode() {
         this(new Point());
@@ -155,6 +156,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private static final String POINT_LIST = "pointList";
     private static final String ENABLED_OUTPUTS = "enabledOutputs";
     private static final String IS_AUTO_POINT = "isAutoPoint";
+    private static final String CUSTOM_NAME = "customTextName";
 
     @Override
     public void write(final NBTWrapper compound) {
@@ -173,6 +175,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         compound.putList(ENABLED_OUTPUTS, enabledOutputs);
         this.point.write(compound);
         compound.putBoolean(IS_AUTO_POINT, isAutoPoint);
+        compound.putString(CUSTOM_NAME, customText);
     }
 
     @Override
@@ -191,6 +194,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         this.point.read(compound);
         this.identifier = point.getX() + "." + point.getY();
         this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
+        this.customText = compound.getString(CUSTOM_NAME);
         post();
     }
 
@@ -312,6 +316,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 manuellEnabledOutputs.add(modeSet);
         }
         this.isAutoPoint = buffer.getByte() == 1 ? true : false;
+        final int nameSize = buffer.getByteAsInt();
+        final byte[] array = new byte[nameSize];
+        for (int i = 0; i < nameSize; i++)
+            array[i] = buffer.getByte();
+        this.customText = new String(array);
         post();
     }
 
@@ -333,6 +342,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 manuellEnabledOutputs.add(modeSet);
         }
         this.isAutoPoint = buffer.getByte() == 1 ? true : false;
+        final int nameSize = buffer.getByteAsInt();
+        final byte[] array = new byte[nameSize];
+        for (int i = 0; i < nameSize; i++)
+            array[i] = buffer.getByte();
+        this.customText = new String(array);
         post();
     }
 
@@ -346,6 +360,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         buffer.putByte((byte) manuellEnabledOutputs.size());
         manuellEnabledOutputs.forEach(mode -> mode.writeNetwork(buffer));
         buffer.putByte((byte) (isAutoPoint ? 1 : 0));
+        final byte[] array = customText.getBytes();
+        buffer.putByte((byte) array.length);
+        for (final byte b : array)
+            buffer.putByte(b);
     }
 
     public void writeUpdateNetwork(final WriteBuffer buffer) {
@@ -363,5 +381,17 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         });
         buffer.putByte((byte) 0);
         buffer.putByte((byte) (isAutoPoint ? 1 : 0));
+        final byte[] array = customText.getBytes();
+        buffer.putByte((byte) array.length);
+        for (final byte b : array)
+            buffer.putByte(b);
+    }
+
+    public String getCustomText() {
+        return customText;
+    }
+
+    public void setCustomText(final String text) {
+        this.customText = text;
     }
 }

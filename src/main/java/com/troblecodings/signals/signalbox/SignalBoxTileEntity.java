@@ -13,7 +13,6 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
-import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
 import net.minecraft.block.Block;
@@ -65,8 +64,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean link(final BlockPos pos, final NBTTagCompound tag) {
-        final Block block = Block.REGISTRY.getObject(new ResourceLocation(OpenSignalsMain.MODID,
-                tag.getString(SignalControllerTileEntity.SIGNAL_NAME)));
+        final Block block = Block.REGISTRY.getObject(
+                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toString())));
         if (block == null || block instanceof BlockAir)
             return false;
         LinkType type = LinkType.SIGNAL;

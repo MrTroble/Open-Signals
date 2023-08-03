@@ -15,6 +15,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 
@@ -62,8 +63,13 @@ public class ClientSignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
         }
         mc.addScheduledTask(() -> {
-            level.getChunkFromBlockCoords(signalPos).markDirty();
+            final Chunk chunk = level.getChunkFromBlockCoords(signalPos);
+            if (chunk == null)
+                return;
+            chunk.markDirty();
             final IBlockState state = level.getBlockState(signalPos);
+            if (state == null)
+                return;
             mc.renderGlobal.notifyLightSet(signalPos);
             mc.renderGlobal.notifyBlockUpdate(level, signalPos, state, state, 8);
             level.notifyBlockUpdate(signalPos, state, state, 3);
