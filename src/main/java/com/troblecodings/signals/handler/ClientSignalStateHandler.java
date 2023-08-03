@@ -38,7 +38,6 @@ public class ClientSignalStateHandler implements INetworkSync {
         if (level == null)
             return;
         final BlockPos signalPos = buffer.getBlockPos();
-
         final int signalID = buffer.getInt();
         final int propertiesSize = buffer.getByteAsInt();
         if (propertiesSize == 255) {

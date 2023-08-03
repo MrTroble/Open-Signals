@@ -21,6 +21,8 @@ import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
+import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,7 +30,8 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
-public class ContainerSignalController extends ContainerBase implements UIClientSync, INetworkSync {
+public class ContainerSignalController extends ContainerBase
+        implements UIClientSync, INetworkSync, IChunkLoadable {
 
     private final AtomicReference<Map<SEProperty, String>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
@@ -245,6 +248,22 @@ public class ContainerSignalController extends ContainerBase implements UIClient
                 final EnumFacing direction = deserializeDirection(buffer);
                 final int profile = buffer.getByteAsInt();
                 controllerEntity.updateEnabledStates(direction, state, profile);
+                break;
+            }
+            case SET_RS_INPUT_PROFILE: {
+                final int profile = buffer.getByteAsInt();
+                controllerEntity.setProfileRSInput((byte) profile);
+                break;
+            }
+            case REMOVE_RS_INPUT_PROFILE: {
+                controllerEntity.setProfileRSInput((byte) -1);
+                break;
+            }
+            case UNLINK_INPUT_POS: {
+                final BlockPos linkedInput = controllerEntity.getLinkedRSInput();
+                loadChunkAndGetTile(RedstoneIOTileEntity.class, info.world, linkedInput,
+                        (tile, _u) -> tile.unlinkController(info.pos));
+                controllerEntity.setLinkedRSInput(null);
                 break;
             }
             default:
