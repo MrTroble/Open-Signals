@@ -175,7 +175,7 @@ public final class SignalBoxHandler {
     }
 
     public static void relinkAllRedstoneIOs(final PosIdentifier identifier) {
-        if (identifier.world.isRemote)
+        if (identifier.worldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {

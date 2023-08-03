@@ -35,6 +35,8 @@ public class ClientSignalStateHandler implements INetworkSync {
         final ReadBuffer buffer = new ReadBuffer(buf);
         final Minecraft mc = Minecraft.getMinecraft();
         final WorldClient level = mc.world;
+        if (level == null)
+            return;
         final BlockPos signalPos = buffer.getBlockPos();
 
         final int signalID = buffer.getInt();
