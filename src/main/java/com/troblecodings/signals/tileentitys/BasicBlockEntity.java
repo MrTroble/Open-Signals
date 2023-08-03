@@ -3,6 +3,7 @@ package com.troblecodings.signals.tileentitys;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.signals.core.TileEntityInfo;
@@ -15,7 +16,7 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 
-public class BasicBlockEntity extends TileEntity implements NamableWrapper {
+public class BasicBlockEntity extends TileEntity implements NamableWrapper, IChunkLoadable {
 
     public static final String GUI_TAG = "guiTag";
     public static final String POS_TAG = "posTag";
@@ -57,7 +58,7 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper {
     }
 
     public List<BlockPos> getLinkedPos() {
-        return linkedPositions;
+        return ImmutableList.copyOf(linkedPositions);
     }
 
     @Override

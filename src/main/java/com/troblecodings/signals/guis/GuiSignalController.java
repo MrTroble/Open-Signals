@@ -77,8 +77,8 @@ public class GuiSignalController extends GuiBase {
             case SINGLE:
                 addSingleRSMode();
                 break;
-            case MUX:
-                addMUXMode();
+            case RS_INPUT:
+                addRSInputMode();
                 break;
             default:
                 break;
@@ -111,8 +111,8 @@ public class GuiSignalController extends GuiBase {
         updateProfileProperties(middlePart, bRender, profileEnum);
         leftSide.add(middlePart);
 
-        int onIndex = 0;
-        int offIndex = 0;
+        int onIndex = -1;
+        int offIndex = -1;
         if (controller.enabledRSStates.containsKey(face)) {
             final Map<EnumState, Integer> states = controller.enabledRSStates.get(face);
             if (states.containsKey(EnumState.ONSTATE)) {
@@ -126,18 +126,13 @@ public class GuiSignalController extends GuiBase {
                 SizeIntegerables.of("profileOff." + face.getName(), 32, in -> String.valueOf(in)));
         final IIntegerable<Object> onProfile = new DisableIntegerable(
                 SizeIntegerables.of("profileOn." + face.getName(), 32, in -> String.valueOf(in)));
-        final UIEntity offElement = GuiElements.createEnumElement(offProfile, e -> {
-            sendAndSetProfile(face, e, EnumState.OFFSTATE);
-        }, offIndex);
-        final UIEntity onElement = GuiElements.createEnumElement(onProfile, e -> {
-            sendAndSetProfile(face, e, EnumState.ONSTATE);
-        }, onIndex);
-        offElement.findRecursive(UIEnumerable.class).forEach(e -> e.setMin(-1));
-        onElement.findRecursive(UIEnumerable.class).forEach(e -> e.setMin(-1));
+        final UIEntity offElement = GuiElements.createEnumElement(offProfile,
+                e -> sendAndSetProfile(face, e, EnumState.OFFSTATE), offIndex);
+        final UIEntity onElement = GuiElements.createEnumElement(onProfile,
+                e -> sendAndSetProfile(face, e, EnumState.ONSTATE), onIndex);
         leftSide.add(offElement);
         leftSide.add(onElement);
         leftSide.add(GuiElements.createPageSelect(boxMode));
-        initializeDirection(face);
     }
 
     private void updateProfileProperties(final UIEntity middlePart, final UIBlockRender bRender,
@@ -148,7 +143,7 @@ public class GuiSignalController extends GuiBase {
                 currentProfile) ? controller.allRSStates.get(currentProfile) : new HashMap<>();
         controller.getReference().forEach((property, value) -> {
             if (!properties.containsKey(property)) {
-                properties.put(property, property.getDefault());
+                properties.put(property, "DISABLED");
             }
         });
         properties.forEach((property, value) -> {
@@ -156,11 +151,13 @@ public class GuiSignalController extends GuiBase {
                     .createEnumElement(new DisableIntegerable<>(property), e -> {
                         applyModelChange(bRender);
                         sendPropertyToServer(property, e);
-                        final Map<SEProperty, String> map = controller.allRSStates.containsKey(
-                                currentProfile) ? controller.allRSStates.get(currentProfile)
-                                        : new HashMap<>();
-                        map.put(property, property.getObjFromID(e));
-                        controller.allRSStates.put(currentProfile, map);
+                        final Map<SEProperty, String> map = controller.allRSStates
+                                .computeIfAbsent(currentProfile, _u -> new HashMap<>());
+                        if (e == -1) {
+                            map.remove(property);
+                        } else {
+                            map.put(property, property.getObjFromID(e));
+                        }
                     }, property.getParent().getIDFromValue(value));
             middlePart.add(entity);
         });
@@ -220,8 +217,20 @@ public class GuiSignalController extends GuiBase {
         this.lowerEntity.add(rightSide);
     }
 
-    private void addMUXMode() {
-        this.lowerEntity.add(new UILabel("Currently Not in Use!"));
+    private void addRSInputMode() {
+        this.lowerEntity.add(new UIBox(UIBox.VBOX, 5));
+        final String posString = controller.linkedRSInput == null ? "not linked"
+                : controller.linkedRSInput.toShortString();
+        final UILabel label = new UILabel("Linked To: " + posString);
+        lowerEntity.add(label);
+        final IIntegerable<String> profile = new DisableIntegerable<>(
+                SizeIntegerables.of("profile", 32, in -> String.valueOf(in)));
+        lowerEntity.add(GuiElements.createEnumElement(profile, e -> sendRSInputProfileToServer(e),
+                controller.linkedRSInputProfile));
+        lowerEntity.add(GuiElements.createButton(I18n.get("gui.unlink"), e -> {
+            unlinkInputPos();
+            label.setText("Linked To: not linked");
+        }));
     }
 
     private void initInternal() {
@@ -342,26 +351,19 @@ public class GuiSignalController extends GuiBase {
         if (!loaded) {
             return;
         }
-        final Map<EnumState, Integer> map = controller.enabledRSStates.containsKey(facing)
-                ? controller.enabledRSStates.get(facing)
-                : new HashMap<>();
-        map.put(state, profile);
-        controller.enabledRSStates.put(facing, map);
+        final Map<EnumState, Integer> map = controller.enabledRSStates.computeIfAbsent(facing,
+                _u -> new HashMap<>());
+        if (profile == -1) {
+            map.remove(state);
+        } else {
+            map.put(state, profile);
+        }
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalControllerNetwork.SET_PROFILE.ordinal());
+        buffer.putByte((byte) (profile == -1 ? SignalControllerNetwork.REMOVE_PROFILE.ordinal()
+                : SignalControllerNetwork.SET_PROFILE.ordinal()));
         buffer.putByte((byte) state.ordinal());
         buffer.putByte((byte) facing.ordinal());
         buffer.putByte((byte) profile);
-        OpenSignalsMain.network.sendTo(player, buffer.build());
-    }
-
-    private void initializeDirection(final Direction direction) {
-        if (controller.enabledRSStates.containsKey(direction)) {
-            return;
-        }
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalControllerNetwork.INITIALIZE_DIRECTION.ordinal());
-        buffer.putByte((byte) direction.ordinal());
         OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
@@ -390,9 +392,29 @@ public class GuiSignalController extends GuiBase {
             return;
         }
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalControllerNetwork.SEND_PROPERTY.ordinal());
+        buffer.putByte((byte) (value == -1 ? SignalControllerNetwork.REMOVE_PROPERTY.ordinal()
+                : SignalControllerNetwork.SEND_PROPERTY.ordinal()));
         buffer.putByte((byte) controller.getSignal().getIDFromProperty(property));
         buffer.putByte((byte) value);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
+    }
+
+    private void sendRSInputProfileToServer(final int profile) {
+        if (!loaded) {
+            return;
+        }
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte(
+                (byte) (profile == -1 ? SignalControllerNetwork.REMOVE_RS_INPUT_PROFILE.ordinal()
+                        : SignalControllerNetwork.SET_RS_INPUT_PROFILE.ordinal()));
+        buffer.putByte((byte) profile);
+        OpenSignalsMain.network.sendTo(player, buffer.build());
+    }
+
+    private void unlinkInputPos() {
+        controller.linkedRSInput = null;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) SignalControllerNetwork.UNLINK_INPUT_POS.ordinal());
         OpenSignalsMain.network.sendTo(player, buffer.build());
     }
 
