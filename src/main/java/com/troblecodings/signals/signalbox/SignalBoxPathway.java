@@ -361,6 +361,10 @@ public class SignalBoxPathway {
 
     public void updatePathwayToAutomatic() {
         final SignalBoxNode first = modeGrid.get(originalFirstPoint);
+        if (first == null) {
+            isAutoPathway = false;
+            return;
+        }
         this.isAutoPathway = first.isAutoPoint();
     }
 
