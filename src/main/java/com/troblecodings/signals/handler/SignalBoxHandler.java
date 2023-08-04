@@ -174,6 +174,18 @@ public final class SignalBoxHandler {
         return linked;
     }
 
+    public static void relinkAllRedstoneIOs(final PosIdentifier identifier) {
+        if (identifier.world.isClientSide)
+            return;
+        LinkedPositions holder;
+        synchronized (ALL_LINKED_POS) {
+            holder = ALL_LINKED_POS.get(identifier);
+        }
+        if (holder == null)
+            return;
+        holder.getAllRedstoneIOs().forEach(pos -> linkTileToPos(identifier, pos));
+    }
+
     public static Signal getSignal(final PosIdentifier identifier, final BlockPos signalPos) {
         if (identifier.world.isClientSide)
             return null;
@@ -305,7 +317,7 @@ public final class SignalBoxHandler {
         if (identifier.world.isClientSide)
             return;
         BlockState blockState = identifier.world.getBlockState(identifier.pos);
-        if (blockState != null) {
+        if (blockState != null && blockState.getBlock() == OSBlocks.REDSTONE_OUT) {
             blockState = blockState.setValue(RedstoneIO.POWER, state);
             identifier.world.setBlockAndUpdate(identifier.pos, blockState);
             return;
@@ -354,7 +366,7 @@ public final class SignalBoxHandler {
             return;
         holder.unloadSignals(identifier.world);
     }
-    
+
     public static void updatePathwayToAutomatic(final PosIdentifier identifier, final Point point) {
         if (identifier.world.isClientSide)
             return;

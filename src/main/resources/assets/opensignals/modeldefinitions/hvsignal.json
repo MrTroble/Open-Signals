@@ -75,7 +75,7 @@
 		"hv/hv_number": {
 			"textures": [
 				{
-					"blockstate": "hasandis(CUSTOMNAME)"
+					"blockstate": "hasandis(CUSTOMNAME) && (with(HPTYPE.STOPSIGNAL) || with(HPTYPE.HPHOME) || with(HPTYPE.HPBLOCK))"
 				}
 			],
 			"y": 2

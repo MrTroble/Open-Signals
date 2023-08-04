@@ -1,5 +1,6 @@
 package com.troblecodings.signals.handler;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +39,12 @@ public class ClientNameHandler implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buffer.getByte();
         }
-        final String name = new String(array);
+        String name = "";
+        try {
+            name = new String(array, "UTF-8");
+        } catch (final UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         synchronized (CLIENT_NAMES) {
             CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), name);
         }

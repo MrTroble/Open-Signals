@@ -110,7 +110,7 @@ public final class NameHandler implements INetworkSync {
         final byte[] bytes = name.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(pos);
-        buffer.putByte((byte) name.length());
+        buffer.putByte((byte) bytes.length);
         for (final byte b : bytes) {
             buffer.putByte(b);
         }
@@ -255,7 +255,12 @@ public final class NameHandler implements INetworkSync {
                     LOAD_COUNTER.put(info, 1);
                     String name;
                     synchronized (ALL_LEVEL_FILES) {
-                        name = ALL_LEVEL_FILES.get(info.world).getString(info.pos);
+                        final NameHandlerFile file = ALL_LEVEL_FILES.get(info.world);
+                        if (file == null)
+                            return;
+                        synchronized (file) {
+                            name = file.getString(info.pos);
+                        }
                     }
                     synchronized (ALL_NAMES) {
                         ALL_NAMES.put(info, name);

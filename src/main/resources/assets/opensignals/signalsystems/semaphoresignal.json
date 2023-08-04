@@ -15,7 +15,8 @@
             "config(SEMATYPE.MAIN_SMALL)": 4
         },
         "renderHeights": {
-            "config(SEMATYPE.MAIN_SMALL)": 1.04
+            "config(SEMATYPE.MAIN_SMALL)": 1.04,
+            "config(SEMATYPE.DIST)": -1
         }
     },
     "seProperties": [
