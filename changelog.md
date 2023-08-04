@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.12.2 - 3.0.0]
+
+* feat: added multilinking tool
+* feat: added lf direction arrows
+* feat: added RedstoneInput Support to SignalController
+* feat: searchbar now works
+* feat: custom texts in signalbox UI
+* feat: added support for UTF-8 chars
+* feat/fix: added system to link all redstone inputs after replacing old signalbox
+* fix: relinking of redstone outputs
+* fix: some signal configs
+* fix: signal controller default state don't work
+* fix: issue with autoPathway not working after rejoin
+* fix: missing lang keys
+* fix: distant signal shown custom names
+* ref: better handling of autoPathway
 
 ## [1.12.2 Beta 12]
 

@@ -3,6 +3,7 @@ package com.troblecodings.signals.tileentitys;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.signals.handler.ClientNameHandler;
@@ -57,7 +58,7 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper, IChu
     }
 
     public List<BlockPos> getLinkedPos() {
-        return linkedPositions;
+        return ImmutableList.copyOf(linkedPositions);
     }
 
     public void syncClient() {

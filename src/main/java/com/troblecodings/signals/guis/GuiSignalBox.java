@@ -19,8 +19,8 @@ import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.UIStack;
+import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
@@ -140,10 +140,9 @@ public class GuiSignalBox extends GuiBase {
             final LinkType type, final PathEntryType<BlockPos> entryType, final EnumGuiMode mode,
             final Rotation rotation, final String suffix) {
         final List<BlockPos> positions = new ArrayList<>();
-        positions.add(null);
         positions.addAll(entrySet.stream().filter(e -> e.getValue().equals(type))
                 .map(e -> e.getKey()).collect(Collectors.toList()));
-        if (positions.size() > 1) {
+        if (positions.size() > 0) {
             final DisableIntegerable<String> blockPos = new DisableIntegerable<>(
                     SizeIntegerables.of("prop." + type.name() + suffix, positions.size(), id -> {
                         final BlockPos pos = positions.get(id);
@@ -165,13 +164,7 @@ public class GuiSignalBox extends GuiBase {
                     option.setEntry(entryType, setPos);
                     sendPosEntryToServer(setPos, node, mode, rotation, entryType);
                 }
-            });
-            blockSelect.findRecursive(UIEnumerable.class).forEach(e -> {
-                e.setMin(-1);
-                final int index = option.getEntry(entryType).map(entry -> positions.indexOf(entry))
-                        .orElse(-1);
-                e.setIndex(index);
-            });
+            }, option.getEntry(entryType).map(entry -> positions.indexOf(entry)).orElse(-1));
             parent.add(blockSelect);
         }
     }
@@ -364,6 +357,16 @@ public class GuiSignalBox extends GuiBase {
         list.add(box);
         lowerEntity.add(new UIBox(UIBox.VBOX, 3));
         lowerEntity.add(list);
+        final UIEntity input = new UIEntity();
+        input.setInheritWidth(true);
+        final UITextInput namingInput = new UITextInput(node.getCustomText());
+        input.add(namingInput);
+        input.setHeight(20);
+        list.add(input);
+        namingInput.setOnTextUpdate(str -> {
+            node.setCustomText(str);
+            sendName(node.getPoint(), str);
+        });
         node.forEach(modeSet -> setupModeSettings(list, modeSet.mode, modeSet.rotation, node,
                 node.getOption(modeSet).get()));
         lowerEntity.add(GuiElements.createPageSelect(box));
@@ -517,6 +520,15 @@ public class GuiSignalBox extends GuiBase {
                 if (!node.isEmpty())
                     allTiles.put(name, sbt);
                 tile.add(sbt);
+                if (!node.getCustomText().isEmpty()) {
+                    final UIEntity inputEntity = new UIEntity();
+                    inputEntity.add(new UIScale(0.7f, 0.7f, 0.7f));
+                    final UILabel label = new UILabel(node.getCustomText());
+                    label.setTextColor(0xFFFFFFFF);
+                    inputEntity.add(label);
+                    inputEntity.setX(5);
+                    tile.add(inputEntity);
+                }
                 consumer.accept(tile, sbt);
                 row.add(tile);
             }
@@ -718,6 +730,19 @@ public class GuiSignalBox extends GuiBase {
         buffer.putByte((byte) SignalBoxNetwork.SET_AUTO_POINT.ordinal());
         point.writeNetwork(buffer);
         buffer.putByte(state);
+        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+    }
+
+    private void sendName(final Point point, final String name) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) SignalBoxNetwork.SEND_NAME.ordinal());
+        point.writeNetwork(buffer);
+        final byte[] array = name.getBytes();
+        buffer.putByte((byte) array.length);
+        for (final byte b : array)
+            buffer.putByte(b);
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 

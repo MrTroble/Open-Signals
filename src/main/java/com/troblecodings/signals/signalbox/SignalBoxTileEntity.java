@@ -13,7 +13,6 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
-import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
 import net.minecraft.block.Block;
@@ -26,7 +25,10 @@ import net.minecraft.world.World;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
+    private static final String ALL_LINKED = "allLinked";
+
     private final SignalBoxGrid grid;
+    private boolean alreadyLinked = false;
 
     public SignalBoxTileEntity() {
         grid = SignalBoxFactory.getFactory().getGrid();
@@ -45,6 +47,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         this.grid.write(gridTag);
         SignalBoxHandler.writeTileNBT(new PosIdentifier(pos, world), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
+        wrapper.putBoolean(ALL_LINKED, !alreadyLinked);
     }
 
     private NBTWrapper copy = null;
@@ -56,6 +59,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (world != null) {
             onLoad();
         }
+        alreadyLinked = !wrapper.getBoolean(ALL_LINKED);
+        if (!alreadyLinked) {
+            SignalBoxHandler.relinkAllRedstoneIOs(new PosIdentifier(pos, world));
+            alreadyLinked = true;
+        }
     }
 
     @Override
@@ -65,8 +73,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean link(final BlockPos pos, final NBTTagCompound tag) {
-        final Block block = Block.REGISTRY.getObject(new ResourceLocation(OpenSignalsMain.MODID,
-                tag.getString(SignalControllerTileEntity.SIGNAL_NAME)));
+        final Block block = Block.REGISTRY.getObject(
+                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toString())));
         if (block == null || block instanceof BlockAir)
             return false;
         LinkType type = LinkType.SIGNAL;
@@ -87,9 +95,15 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         grid.setPosAndWorld(pos, world);
         if (world.isRemote)
             return;
-        SignalBoxHandler.readTileNBT(new PosIdentifier(pos, world),
-                copy == null ? new NBTWrapper() : copy, grid.getModeGrid());
-        SignalBoxHandler.loadSignals(new PosIdentifier(pos, world));
+        final PosIdentifier identifier = new PosIdentifier(pos, world);
+        SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy,
+                grid.getModeGrid());
+        SignalBoxHandler.loadSignals(identifier);
+    }
+
+    @Override
+    public void onChunkUnload() {
+        SignalBoxHandler.unloadSignals(new PosIdentifier(pos, world));
     }
 
     @Override

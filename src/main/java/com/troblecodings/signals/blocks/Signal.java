@@ -323,30 +323,30 @@ public class Signal extends BasicBlock {
         }
         final SignalAngel face = state.getValue(Signal.ANGEL);
         final float angel = face.getDregree();
-        
+
         GlStateManager.enableAlpha();
         GlStateManager.disableLighting();
         GlStateManager.pushMatrix();
         GlStateManager.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
         GlStateManager.rotate(angel, 0, 1, 0);
-        
+
         renderSingleScaleOverlay(info);
-        
+
         if (doubleSidedText) {
             GlStateManager.rotate(180, 0, 1, 0);
             renderSingleScaleOverlay(info);
         }
-        
+
         GlStateManager.popMatrix();
         GlStateManager.enableLighting();
     }
-    
+
     @SideOnly(Side.CLIENT)
-    public void renderSingleScaleOverlay(final RenderOverlayInfo info){
+    public void renderSingleScaleOverlay(final RenderOverlayInfo info) {
         final String name = info.tileEntity.getNameWrapper();
         final float nameWidth = info.font.getStringWidth(name);
         final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
-        
+
         GlStateManager.pushMatrix();
         GlStateManager.scale(-scale, -scale, 1);
         GlStateManager.translate(-nameWidth / 2, 0, -0.32f);
@@ -382,13 +382,11 @@ public class Signal extends BasicBlock {
                 doubleSidedText = boolProp.doubleSided;
             }
         }
-        
+
         final String name = info.tileEntity.getNameWrapper();
         final String[] splitNames = name.split("\\[n\\]");
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final float scale = this.prop.signScale;
-        
-
 
         GlStateManager.enableAlpha();
         GlStateManager.pushMatrix();
@@ -406,19 +404,19 @@ public class Signal extends BasicBlock {
     }
 
     @SideOnly(Side.CLIENT)
-    public void renderSingleOverlay(final RenderOverlayInfo info, final String[] splitNames){
+    public void renderSingleOverlay(final RenderOverlayInfo info, final String[] splitNames) {
         final float signWidth = this.prop.signWidth;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
-        
+
         GlStateManager.pushMatrix();
         GlStateManager.translate(offsetX, 0, -4.2f + offsetZ);
         for (int j = 0; j < splitNames.length; j++) {
             final String name = splitNames[j];
             final float nameWidth = info.font.getStringWidth(name);
             final float center = (signWidth - nameWidth) / 2;
-            info.font.drawSplitString(name, (int) center - 10, j * 10,
-                    (int) signWidth, this.prop.textColor);
+            info.font.drawSplitString(name, (int) center - 10, j * 10, (int) signWidth,
+                    this.prop.textColor);
         }
         GlStateManager.popMatrix();
     }
@@ -435,8 +433,9 @@ public class Signal extends BasicBlock {
     public boolean onBlockActivated(final World world, final BlockPos pos, final IBlockState state,
             final EntityPlayer player, final EnumHand hand, final EnumFacing facing,
             final float hitX, final float hitY, final float hitZ) {
+        final Item item = player.getHeldItemMainhand().getItem();
         if (!(state.getBlock() instanceof Signal)
-                || player.getHeldItem(EnumHand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)) {
+                || (item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {
             return false;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);

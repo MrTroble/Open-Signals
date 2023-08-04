@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
+import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.util.math.BlockPos;
@@ -22,7 +24,8 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
     public BasicBlockEntity tile;
     private final GuiInfo info;
     protected BlockPos pos;
-    protected List<BlockPos> linkedPos = new ArrayList<>();
+    protected final List<BlockPos> linkedPos = new ArrayList<>();
+    protected final List<BlockPos> linkedController = new ArrayList<>();
 
     public NamableContainer(final GuiInfo info) {
         super(info);
@@ -37,8 +40,15 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         if (tile == null)
             tile = info.getTile();
         buffer.putBlockPos(info.pos);
-        buffer.putByte((byte) tile.getLinkedPos().size());
-        tile.getLinkedPos().forEach(pos -> buffer.putBlockPos(pos));
+        final List<BlockPos> linkedPos = tile.getLinkedPos();
+        buffer.putByte((byte) linkedPos.size());
+        linkedPos.forEach(pos -> buffer.putBlockPos(pos));
+        if (tile instanceof RedstoneIOTileEntity) {
+            final List<BlockPos> linkedController = ((RedstoneIOTileEntity) tile)
+                    .getLinkedController();
+            buffer.putByte((byte) linkedController.size());
+            linkedController.forEach(pos -> buffer.putBlockPos(pos));
+        }
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
@@ -49,6 +59,8 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
 
     @Override
     public void deserializeClient(final ByteBuffer buf) {
+        linkedPos.clear();
+        linkedController.clear();
         final ReadBuffer buffer = new ReadBuffer(buf);
         pos = buffer.getBlockPos();
         final int size = buffer.getByteAsInt();
@@ -67,7 +79,12 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
             array[i] = buffer.getByte();
         }
         final NameStateInfo info = new NameStateInfo(this.info.world, this.info.pos);
-        final String name = new String(array);
+        String name = "";
+        try {
+            name = new String(array, "UTF-8");
+        } catch (final UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         if (tile instanceof SignalTileEntity) {
             NameHandler.setNameForSignal(info, name);
         } else {

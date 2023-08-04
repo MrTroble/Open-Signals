@@ -100,6 +100,50 @@
                 }
             ],
             "y": 1
+        },
+        "el/el_arrow_lr": {
+            "textures": [
+                {
+                    "blockstate": "with(LFARROW.LEFT_RIGHT) && (with(LFTYPE.LF1) || with(LFTYPE.LF4) || with(LFTYPE.LF6))",
+                    "retexture": {
+						"2": "opensignals:blocks/lf/lf_arrow_lr"
+					}
+                }
+            ],
+            "y": 1.65
+        },
+        "el/el_arrow_l": {
+            "textures": [
+                {
+                    "blockstate": "with(LFARROW.LEFT) && (with(LFTYPE.LF1) || with(LFTYPE.LF4) || with(LFTYPE.LF6))",
+                    "retexture": {
+						"2": "opensignals:blocks/lf/lf_arrow_l"
+					}
+                }
+            ],
+            "y": 1.65
+        },
+        "el/el_arrow_r": {
+            "textures": [
+                {
+                    "blockstate": "with(LFARROW.RIGHT) && (with(LFTYPE.LF1) || with(LFTYPE.LF4) || with(LFTYPE.LF6))",
+                    "retexture": {
+						"2": "opensignals:blocks/lf/lf_arrow_r"
+					}
+                }
+            ],
+            "y": 1.65
+        },
+        "el/el_arrow_up": {
+            "textures": [
+                {
+                    "blockstate": "with(LFARROW.UP) && (with(LFTYPE.LF1) || with(LFTYPE.LF4) || with(LFTYPE.LF6))",
+                    "retexture": {
+						"2": "opensignals:blocks/lf/lf_arrow_up"
+					}
+                }
+            ],
+            "y": 1.65
         }
     }
 }

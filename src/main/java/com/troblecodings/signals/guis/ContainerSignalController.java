@@ -21,6 +21,8 @@ import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
+import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.entity.player.EntityPlayer;
@@ -28,19 +30,22 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
-public class ContainerSignalController extends ContainerBase implements UIClientSync, INetworkSync {
+public class ContainerSignalController extends ContainerBase
+        implements UIClientSync, INetworkSync, IChunkLoadable {
 
     private final AtomicReference<Map<SEProperty, String>> reference = new AtomicReference<>();
     private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
-    protected final Map<Integer, Map<SEProperty, String>> allRSStates = new HashMap<>();
-    protected final Map<EnumFacing, Map<EnumState, Integer>> enabledRSStates = new HashMap<>();
-    private List<SEProperty> propertiesList;
     private final GuiInfo info;
+    private List<SEProperty> propertiesList;
     private BlockPos linkedPos;
-    protected int lastProfile;
-    protected EnumMode currentMode = EnumMode.MANUELL;
     private SignalControllerTileEntity controllerEntity;
     private int currentRSProfile;
+    protected final Map<Integer, Map<SEProperty, String>> allRSStates = new HashMap<>();
+    protected final Map<EnumFacing, Map<EnumState, Integer>> enabledRSStates = new HashMap<>();
+    protected int lastProfile;
+    protected EnumMode currentMode = EnumMode.MANUELL;
+    protected BlockPos linkedRSInput = null;
+    protected int linkedRSInputProfile = -1;
 
     public ContainerSignalController(final GuiInfo info) {
         super(info);
@@ -104,17 +109,15 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         }
         buffer.putByte((byte) currentMode.ordinal());
         buffer.putByte((byte) propertiesToSend.size());
-        propertiesToSend.forEach((property, value) -> {
-            packPropertyToBuffer(buffer, stateInfo, property, value);
-        });
+        propertiesToSend.forEach(
+                (property, value) -> packPropertyToBuffer(buffer, stateInfo, property, value));
         buffer.putByte((byte) controllerEntity.getProfile());
         buffer.putByte((byte) allStatesToSend.size());
         allStatesToSend.forEach((profile, props) -> {
             buffer.putByte(profile);
             buffer.putByte((byte) props.size());
-            props.forEach((property, value) -> {
-                packPropertyToBuffer(buffer, stateInfo, property, value);
-            });
+            props.forEach(
+                    (property, value) -> packPropertyToBuffer(buffer, stateInfo, property, value));
         });
 
         buffer.putByte((byte) enabledStates.size());
@@ -126,6 +129,13 @@ public class ContainerSignalController extends ContainerBase implements UIClient
                 buffer.putByte(profile);
             });
         });
+        final BlockPos linkedRSInput = controllerEntity.getLinkedRSInput();
+        buffer.putByte((byte) (linkedRSInput != null ? 1 : 0));
+        if (linkedRSInput != null)
+            buffer.putBlockPos(linkedRSInput);
+        buffer.putByte((byte) (controllerEntity.getProfileRSInput() != -1 ? 1 : 0));
+        if (controllerEntity.getProfileRSInput() != -1)
+            buffer.putByte(controllerEntity.getProfileRSInput());
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
@@ -156,6 +166,7 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         }
         reference.set(properites);
         lastProfile = buffer.getByteAsInt();
+        allRSStates.clear();
         final int allStatesSize = buffer.getByteAsInt();
         for (int i = 0; i < allStatesSize; i++) {
             final int profile = buffer.getByteAsInt();
@@ -168,17 +179,24 @@ public class ContainerSignalController extends ContainerBase implements UIClient
             }
             allRSStates.put(profile, profileProps);
         }
+        enabledRSStates.clear();
         final int enabledStatesSize = buffer.getByteAsInt();
         for (int i = 0; i < enabledStatesSize; i++) {
             final EnumFacing direction = EnumFacing.values()[buffer.getByteAsInt()];
             final int propSize = buffer.getByteAsInt();
             final Map<EnumState, Integer> states = new HashMap<>();
             for (int j = 0; j < propSize; j++) {
-                final EnumState mode = EnumState.values()[buffer.getByteAsInt()];
+                final EnumState mode = EnumState.of(buffer);
                 states.put(mode, buffer.getByteAsInt());
             }
             enabledRSStates.put(direction, states);
         }
+        final boolean isInputConnected = buffer.getByte() == 1 ? true : false;
+        if (isInputConnected)
+            linkedRSInput = buffer.getBlockPos();
+        final boolean isProfileInputenabled = buffer.getByte() == 1 ? true : false;
+        if (isProfileInputenabled)
+            linkedRSInputProfile = buffer.getByteAsInt();
         update();
     }
 
@@ -188,11 +206,10 @@ public class ContainerSignalController extends ContainerBase implements UIClient
         if (propertiesList == null) {
             propertiesList = getSignal().getProperties();
         }
-        final SignalControllerNetwork mode = SignalControllerNetwork.values()[buffer
-                .getByteAsInt()];
+        final SignalControllerNetwork mode = SignalControllerNetwork.of(buffer);
         switch (mode) {
             case SEND_MODE: {
-                currentMode = EnumMode.values()[buffer.getByteAsInt()];
+                currentMode = EnumMode.of(buffer);
                 controllerEntity.setLastMode(currentMode);
                 break;
             }
@@ -208,32 +225,54 @@ public class ContainerSignalController extends ContainerBase implements UIClient
                             new SignalStateInfo(info.world, linkedPos, getSignal()), property,
                             value);
                 } else if (currentMode.equals(EnumMode.SINGLE)) {
-                    if (!controllerEntity.containsProfile((byte) currentRSProfile)) {
-                        controllerEntity.initializeProfile((byte) currentRSProfile, getReference());
-                    }
                     controllerEntity.updateRedstoneProfile((byte) currentRSProfile, property,
                             value);
                 }
                 break;
             }
+            case REMOVE_PROPERTY: {
+                if (currentMode.equals(EnumMode.SINGLE)) {
+                    final SEProperty property = propertiesList.get(buffer.getByteAsInt());
+                    controllerEntity.removePropertyFromProfile((byte) currentRSProfile, property);
+                }
+                break;
+            }
+            case REMOVE_PROFILE: {
+                final EnumState state = EnumState.of(buffer);
+                final EnumFacing direction = deserializeDirection(buffer);
+                controllerEntity.removeProfileFromDirection(direction, state);
+                break;
+            }
             case SET_PROFILE: {
-                final EnumState state = EnumState.values()[buffer.getByteAsInt()];
-                final EnumFacing direction = EnumFacing.values()[buffer.getByteAsInt()];
+                final EnumState state = EnumState.of(buffer);
+                final EnumFacing direction = deserializeDirection(buffer);
                 final int profile = buffer.getByteAsInt();
                 controllerEntity.updateEnabledStates(direction, state, profile);
                 break;
             }
-            case INITIALIZE_DIRECTION: {
-                final EnumFacing direction = EnumFacing.values()[buffer.getByteAsInt()];
-                final Map<EnumState, Byte> states = new HashMap<>();
-                states.put(EnumState.OFFSTATE, (byte) 0);
-                states.put(EnumState.ONSTATE, (byte) 0);
-                controllerEntity.initializeDirection(direction, states);
+            case SET_RS_INPUT_PROFILE: {
+                final int profile = buffer.getByteAsInt();
+                controllerEntity.setProfileRSInput((byte) profile);
+                break;
+            }
+            case REMOVE_RS_INPUT_PROFILE: {
+                controllerEntity.setProfileRSInput((byte) -1);
+                break;
+            }
+            case UNLINK_INPUT_POS: {
+                final BlockPos linkedInput = controllerEntity.getLinkedRSInput();
+                loadChunkAndGetTile(RedstoneIOTileEntity.class, info.world, linkedInput,
+                        (tile, _u) -> tile.unlinkController(info.pos));
+                controllerEntity.setLinkedRSInput(null);
                 break;
             }
             default:
                 break;
         }
+    }
+
+    private static EnumFacing deserializeDirection(final ReadBuffer buffer) {
+        return EnumFacing.values()[buffer.getByteAsInt()];
     }
 
     public Map<SEProperty, String> getReference() {

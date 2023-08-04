@@ -7,12 +7,12 @@ import java.util.ArrayList;
 import com.google.gson.Gson;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.linkableapi.Linkingtool;
+import com.troblecodings.linkableapi.MultiLinkingTool;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.ItemArmorTemplate;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.items.ToolParser;
-import com.troblecodings.signals.tileentitys.SignalControllerTileEntity;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -37,10 +37,25 @@ public final class OSItems {
         return isRedstoneBlock || (block instanceof Signal && ((Signal) block).canBeLinked());
     }, _u -> true, (level, pos, tag) -> {
         final IBlockState state = level.getBlockState(pos);
-        new NBTWrapper(tag).putString(SignalControllerTileEntity.SIGNAL_NAME,
-                state.getBlock().getRegistryName().getResourcePath());
+        final NBTWrapper wrapper = new NBTWrapper(tag);
+        wrapper.putString(pos.toString(), state.getBlock().getRegistryName().getResourcePath());
     });
-    public static final Item CONDUCTOR_TROWEL_GREEN = new Item().setCreativeTab(CreativeTabs.COMBAT);
+    public static final MultiLinkingTool MULTI_LINKING_TOOL = new MultiLinkingTool(OSTabs.TAB,
+            (world, pos) -> {
+                final IBlockState state = world.getBlockState(pos);
+                final Block block = state.getBlock();
+                final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
+                        || block == OSBlocks.REDSTONE_OUT || block == OSBlocks.COMBI_REDSTONE_INPUT;
+                return isRedstoneBlock
+                        || (block instanceof Signal && ((Signal) block).canBeLinked());
+            }, _u -> true, (level, pos, tag) -> {
+                final IBlockState state = level.getBlockState(pos);
+                final NBTWrapper wrapper = new NBTWrapper(tag);
+                wrapper.putString(pos.toString(),
+                        state.getBlock().getRegistryName().getResourcePath());
+            });
+    public static final Item CONDUCTOR_TROWEL_GREEN = new Item()
+            .setCreativeTab(CreativeTabs.COMBAT);
     public static final Item CONDUCTOR_TROWEL_RED = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item WARNING_FLAG = new Item().setCreativeTab(CreativeTabs.COMBAT);
     public static final Item K_BOARD = new Item().setCreativeTab(CreativeTabs.COMBAT);
