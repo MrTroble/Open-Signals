@@ -79,8 +79,8 @@ public class SignalBoxPathway {
         if (this.type.equals(PathType.NONE))
             throw new IllegalArgumentException();
         initalize();
-        updatePathwayToAutomatic();
         this.originalFirstPoint = new Point(firstPoint);
+        updatePathwayToAutomatic();
     }
 
     private void initalize() {
@@ -360,7 +360,11 @@ public class SignalBoxPathway {
     }
 
     public void updatePathwayToAutomatic() {
-        final SignalBoxNode first = modeGrid.get(firstPoint);
+        final SignalBoxNode first = modeGrid.get(originalFirstPoint);
+        if (first == null) {
+            isAutoPathway = false;
+            return;
+        }
         this.isAutoPathway = first.isAutoPoint();
     }
 
