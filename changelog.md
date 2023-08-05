@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.12.2 - 3.0.2]
+
+* feat/fix: better and working system for relinking inputs after SignalBox Placement
+
 ## [1.12.2 - 3.0.1]
 
 * fix: server startup
