@@ -25,10 +25,7 @@ import net.minecraft.world.World;
 
 public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable, ILinkableTile {
 
-    private static final String ALL_LINKED = "allLinked";
-
     private final SignalBoxGrid grid;
-    private boolean alreadyLinked = false;
 
     public SignalBoxTileEntity() {
         grid = SignalBoxFactory.getFactory().getGrid();
@@ -47,7 +44,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         this.grid.write(gridTag);
         SignalBoxHandler.writeTileNBT(new PosIdentifier(pos, world), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
-        wrapper.putBoolean(ALL_LINKED, !alreadyLinked);
     }
 
     private NBTWrapper copy = null;
@@ -58,11 +54,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         copy = wrapper.copy();
         if (world != null) {
             onLoad();
-        }
-        alreadyLinked = !wrapper.getBoolean(ALL_LINKED);
-        if (!alreadyLinked) {
-            SignalBoxHandler.relinkAllRedstoneIOs(new PosIdentifier(pos, world));
-            alreadyLinked = true;
         }
     }
 

@@ -11,8 +11,10 @@ import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
@@ -57,6 +59,12 @@ public class SignalBox extends BasicBlock {
     @Override
     public Optional<String> getSupplierWrapperName() {
         return Optional.of("signalbox");
+    }
+
+    @Override
+    public void onBlockPlacedBy(final World worldIn, final BlockPos pos, final IBlockState state,
+            final EntityLivingBase placer, final ItemStack stack) {
+        SignalBoxHandler.relinkAllRedstoneIOs(new PosIdentifier(pos, worldIn));
     }
 
     @Override
