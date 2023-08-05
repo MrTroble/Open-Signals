@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.18.2 - 3.0.1]
+
+*fix: ServerStartup issue
+
 ## [1.18.2 - 3.0.0]
 
 * feat: added multilinking tool
