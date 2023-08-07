@@ -1,5 +1,7 @@
 package com.troblecodings.signals.guis;
 
+import java.util.function.BiConsumer;
+
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
@@ -21,6 +23,8 @@ public class UIMenu extends UIComponent {
     private double mY;
     private int selection = 0;
     private int rotation = 0;
+    private BiConsumer<Integer, Integer> consumer = (i1, i2) -> {
+    };
 
     @Override
     public void draw(final DrawInfo info) {
@@ -64,6 +68,10 @@ public class UIMenu extends UIComponent {
         return selection;
     }
 
+    public void setConsumer(final BiConsumer<Integer, Integer> consumer) {
+        this.consumer = consumer;
+    }
+
     @Override
     public void mouseEvent(final MouseEvent event) {
         switch (event.state) {
@@ -76,6 +84,7 @@ public class UIMenu extends UIComponent {
                 }
                 this.selection = Math.max(0, Math.min(EnumGuiMode.values().length - 1,
                         (int) ((event.x - this.mX) / 22.0f)));
+                consumer.accept(selection, rotation);
                 this.setVisible(true);
                 break;
             case RELEASE:
@@ -93,6 +102,7 @@ public class UIMenu extends UIComponent {
             this.rotation++;
             if (this.rotation >= Rotation.values().length)
                 this.rotation = 0;
+            consumer.accept(selection, rotation);
         }
     }
 
