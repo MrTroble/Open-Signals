@@ -484,7 +484,7 @@ public class GuiSignalBox extends GuiBase {
         nextNode.setInheritWidth(true);
 
         final UIEntity labelEntity = new UIEntity();
-        final UILabel nameLabel = new UILabel("label.nextnode");
+        final UILabel nameLabel = new UILabel(I18n.get("label.nextnode"));
         nameLabel.setTextColor(0xFFFFFFFF);
         nameLabel.setCenterY(false);
         labelEntity.add(new UIScale(0.8f, 0.8f, 0.8f));
@@ -507,7 +507,7 @@ public class GuiSignalBox extends GuiBase {
         list.add(GuiElements.createSpacerV(5));
 
         final UIEntity rKeyEntity = new UIEntity();
-        final UILabel rKey = new UILabel("label.rkey");
+        final UILabel rKey = new UILabel(I18n.get("label.rkey"));
         rKey.setTextColor(0xFFFFFFFF);
         rKey.setCenterY(false);
         rKeyEntity.add(new UIScale(0.8f, 0.8f, 0.8f));
