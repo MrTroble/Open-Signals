@@ -491,5 +491,16 @@
 	"info.key.r": "Element Rotieren",
 	"info.key.lmb": "Element (Un)setzen",
 	"info.key.rmb": "Auswahl öffenen (Halten)",
-	"info.infolabel": "Info & Hilfe"
+	"info.infolabel": "Info & Hilfe",
+	"info.description": "Beschreibung",
+	"info.straight": "Gerader Pfad",
+	"info.corner": "Diagonaler Pfad",
+	"info.end": "Gleisabschluss",
+	"info.platform": "Bahnsteig",
+	"info.bue": "Bahnübergang",
+	"info.hp": "Hauptsignal",
+	"info.vp": "Vorsignal",
+	"info.rs": "Schutzhaltsignal",
+	"info.ra10": "Rangierhalttafel",
+	"info.sh2": "Gleissperre"
 }

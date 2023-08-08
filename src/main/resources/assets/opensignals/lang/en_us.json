@@ -491,5 +491,16 @@
 	"info.key.r": "Rotate Element",
 	"info.key.lmb": "(Un)set Element",
 	"info.key.rmb": "Open Selection (Hold)",
-	"info.infolabel": "Info & Help"
+	"info.infolabel": "Info & Help",
+	"info.description": "Description",
+	"info.straight": "Straight path",
+	"info.corner": "Diagonal path",
+	"info.end": "Track end tile",
+	"info.platform": "Platform tile",
+	"info.bue": "Level crossing tile",
+	"info.hp": "Main signal",
+	"info.vp": "Distant signal",
+	"info.rs": "Shunting signal",
+	"info.ra10": "Shunting holding sign",
+	"info.sh2": "Track blocking tile"
 }

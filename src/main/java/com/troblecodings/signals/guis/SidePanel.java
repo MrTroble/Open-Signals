@@ -112,11 +112,12 @@ public class SidePanel {
         }));
         preview.add(new UIColor(0xFFAFAFAF));
         final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
-        node.add(new ModeSet(EnumGuiMode.values()[selection], Rotation.values()[rotation]));
+        final EnumGuiMode modes = EnumGuiMode.values()[selection];
+        node.add(new ModeSet(modes, Rotation.values()[rotation]));
         final UISignalBoxTile sbt = new UISignalBoxTile(node);
         preview.add(sbt);
         preview.add(new UIBorder(UIColor.BASIC_COLOR_PRIMARY));
-        
+
         helpPage.add(preview);
         helpPage.add(GuiElements.createSpacerV(5));
         helpPage.add(GuiElements.createLabel("[R] = " + I18n.get("info.key.r"),
@@ -124,6 +125,11 @@ public class SidePanel {
         helpPage.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.key.lmb"),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.key.rmb"),
+                UIColor.INFO_COLOR_PRIMARY, 0.5f));
+        helpPage.add(GuiElements.createSpacerV(5));
+        helpPage.add(GuiElements.createLabel(I18n.get("info.description"),
+                UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+        helpPage.add(GuiElements.createLabel(I18n.get("info." + modes.toString().toLowerCase()),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
         addHelpPageToPlane();
     }
