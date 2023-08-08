@@ -124,11 +124,11 @@ public class SidePanel {
 
         helpPage.add(preview);
         helpPage.add(GuiElements.createSpacerV(5));
-        helpPage.add(GuiElements.createLabel("[R] = " + I18n.get("info.key.r"),
+        helpPage.add(GuiElements.createLabel("[R] = " + I18n.get("info.editor.key.r"),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
-        helpPage.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.key.lmb"),
+        helpPage.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.editor.key.lmb"),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
-        helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.key.rmb"),
+        helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.editor.key.rmb"),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
         helpPage.add(GuiElements.createSpacerV(5));
         helpPage.add(GuiElements.createLabel(I18n.get("info.description"),
@@ -138,4 +138,14 @@ public class SidePanel {
         addHelpPageToPlane();
     }
 
+    public void helpUsageMode() {
+        helpPage.clearChildren();
+        helpPage.add(GuiElements.createLabel(I18n.get("info.keys"),
+                UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+        helpPage.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.usage.key.lmb"),
+                UIColor.INFO_COLOR_PRIMARY, 0.5f));
+        helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
+                UIColor.INFO_COLOR_PRIMARY, 0.5f));
+        addHelpPageToPlane();
+    }
 }

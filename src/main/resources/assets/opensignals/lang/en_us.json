@@ -488,9 +488,9 @@
 	"property.lfarrow.name": "Direction Arrow",
 	"property.lfarrow.desc": "Indicates the direction",
 	"info.nextelement": "Next Element",
-	"info.key.r": "Rotate Element",
-	"info.key.lmb": "(Un)set Element",
-	"info.key.rmb": "Open Selection (Hold)",
+	"info.editor.key.r": "Rotate Element",
+	"info.editor.key.lmb": "(Un)set Element",
+	"info.editor.key.rmb": "Open Selection (Hold)",
 	"info.infolabel": "Info & Help",
 	"info.description": "Description",
 	"info.straight": "Straight path",
@@ -503,5 +503,7 @@
 	"info.rs": "Shunting signal",
 	"info.ra10": "Shunting holding sign",
 	"info.sh2": "Track blocking tile",
-    "info.info": "Info"
+    "info.info": "Info",
+    "info.usage.key.lmb": "Very Important Key",
+	"info.usage.key.rmb": "Open config"
 }

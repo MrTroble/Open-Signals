@@ -488,9 +488,9 @@
     "property.lfarrow.name": "Richtungspfeil",
     "property.lfarrow.desc": "Gibt die Richtung an.",
 	"info.nextelement": "Nächstes Element",
-	"info.key.r": "Element Rotieren",
-	"info.key.lmb": "Element (Un)setzen",
-	"info.key.rmb": "Auswahl öffenen (Halten)",
+	"info.editor.key.r": "Element Rotieren",
+	"info.editor.key.lmb": "Element (de)platzieren",
+	"info.editor.key.rmb": "Auswahl öffnen (Halten)",
 	"info.infolabel": "Info & Hilfe",
 	"info.description": "Beschreibung",
 	"info.straight": "Gerader Pfad",
@@ -503,5 +503,7 @@
 	"info.rs": "Schutzhaltsignal",
 	"info.ra10": "Rangierhalttafel",
 	"info.sh2": "Gleissperre",
-    "info.info": "Info"
+    "info.info": "Info",
+    "info.usage.key.lmb": "Very Important Key",
+	"info.usage.key.rmb": "Config öffnen"
 }

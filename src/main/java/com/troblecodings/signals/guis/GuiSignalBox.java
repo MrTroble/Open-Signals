@@ -422,6 +422,7 @@ public class GuiSignalBox extends GuiBase {
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
         this.pageCheck(Page.USAGE);
+        helpPage.helpUsageMode();
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
