@@ -18,7 +18,6 @@ import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.guilib.ecs.entitys.UIStack;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
@@ -57,13 +56,13 @@ import net.minecraft.world.level.block.Rotation;
 
 public class GuiSignalBox extends GuiBase {
 
-    private static final int SELECTION_COLOR = 0x2900FF00;
-    private static final int BACKGROUND_COLOR = 0xFF8B8B8B;
-    private static final int LINE_COLOR = 0xFF5B5B5B;
+    public static final int SELECTION_COLOR = 0x2900FF00;
+    public static final int BACKGROUND_COLOR = 0xFF8B8B8B;
+    public static final int LINE_COLOR = 0xFF5B5B5B;
 
-    private static final float[] ALL_LINES = getLines();
-    private static final int TILE_WIDTH = 10;
-    private static final int TILE_COUNT = 100;
+    public static final float[] ALL_LINES = getLines();
+    public static final int TILE_WIDTH = 10;
+    public static final int TILE_COUNT = 100;
 
     private static float[] getLines() {
         final float[] lines = new float[2 * (TILE_COUNT + 1) * 4];
@@ -96,6 +95,7 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity plane = null;
     private boolean allPacketsRecived = false;
     private final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
+    private SidePanel helpPage;
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
@@ -451,11 +451,12 @@ public class GuiSignalBox extends GuiBase {
                 initializeFieldTemplate(
                         (fieldEntity, name) -> this.tileEdit(fieldEntity, menu, name));
                 lowerEntity.add(menu);
-                menu.setConsumer((selection, rotation) -> updateNextNode(selection, rotation));
+                menu.setConsumer(
+                        (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
                 resetSelection(entity);
                 this.pageCheck(Page.EDIT);
                 resetAllPathways();
-                updateNextNode(menu.getSelection(), menu.getRotation());
+                helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
             });
             final UIEntity buttonNo = GuiElements.createButton(I18n.get("btn.no"), e -> {
                 pop();
@@ -471,69 +472,7 @@ public class GuiSignalBox extends GuiBase {
         pageCheck(Page.CHANGE_MODE);
     }
 
-    private void updateNextNode(final int selection, final int rotation) {
-        helpPage.clearChildren();
-
-        final UIEntity list = new UIEntity();
-        list.add(new UIBox(UIBox.VBOX, 2));
-        list.setInherits(true);
-
-        final UIEntity nextNode = new UIEntity();
-        nextNode.add(new UIBox(UIBox.VBOX, 0));
-        nextNode.setHeight(30);
-        nextNode.setInheritWidth(true);
-
-        final UIEntity labelEntity = new UIEntity();
-        final UILabel nameLabel = new UILabel("label.nextnode");
-        nameLabel.setTextColor(0xFFFFFFFF);
-        nameLabel.setCenterY(false);
-        labelEntity.add(new UIScale(0.8f, 0.8f, 0.8f));
-        labelEntity.add(nameLabel);
-        labelEntity.setInherits(true);
-        nextNode.add(labelEntity);
-
-        final UIEntity preview = new UIEntity();
-        preview.setHeight(20);
-        preview.setWidth(20);
-        preview.setX(23);
-        preview.add(new UIColor(0xFFAFAFAF));
-        final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
-        node.add(new ModeSet(EnumGuiMode.values()[selection], Rotation.values()[rotation]));
-        final UISignalBoxTile sbt = new UISignalBoxTile(node);
-        preview.add(sbt);
-        nextNode.add(preview);
-
-        list.add(nextNode);
-        list.add(GuiElements.createSpacerV(5));
-
-        final UIEntity rKeyEntity = new UIEntity();
-        final UILabel rKey = new UILabel("label.rkey");
-        rKey.setTextColor(0xFFFFFFFF);
-        rKey.setCenterY(false);
-        rKeyEntity.add(new UIScale(0.8f, 0.8f, 0.8f));
-        rKeyEntity.add(rKey);
-        rKeyEntity.setInherits(true);
-        list.add(rKeyEntity);
-
-        helpPage.add(list);
-    }
-
-    private boolean showHelpPage = false;
-    private UIEntity helpPage;
-
-    private void addHelpPageToPlane() {
-        if (showHelpPage) {
-            lowerEntity.add(helpPage);
-        } else {
-            lowerEntity.remove(helpPage);
-        }
-    }
-
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
-        lowerEntity.add(new UIColor(BACKGROUND_COLOR));
-        lowerEntity.add(new UIStack());
-        lowerEntity.add(new UIScissor());
-
         plane = new UIEntity();
         plane.clearChildren();
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
@@ -592,25 +531,16 @@ public class GuiSignalBox extends GuiBase {
             }
             plane.add(row);
         }
-        lowerEntity.add(plane);
+        final UIEntity splitter = new UIEntity();
+        splitter.add(new UIColor(BACKGROUND_COLOR));
+        splitter.add(new UIScissor());
+        splitter.add(new UIBorder(0xFF000000, 4));
+        splitter.add(plane);
+        splitter.setInherits(true);
+        lowerEntity.add(new UIBox(UIBox.HBOX, 2));
+        lowerEntity.add(splitter);
+        helpPage = new SidePanel(lowerEntity);
 
-        final UIEntity frame = new UIEntity();
-        frame.setInheritHeight(true);
-        frame.setInheritWidth(true);
-        frame.add(new UIBorder(0xFF000000, 4));
-        lowerEntity.add(frame);
-        if (helpPage == null) {
-            helpPage = new UIEntity();
-            helpPage.setWidth(80);
-            helpPage.setInheritHeight(true);
-            helpPage.add(new UIBox(UIBox.VBOX, 2));
-            helpPage.setX(260);
-            helpPage.add(new UIColor(BACKGROUND_COLOR));
-            helpPage.add(new UIBorder(LINE_COLOR, 2));
-        } else {
-            helpPage.clearChildren();
-        }
-        addHelpPageToPlane();
         buildColors(container.grid.getNodes());
     }
 
@@ -637,14 +567,7 @@ public class GuiSignalBox extends GuiBase {
         header.add(GuiElements.createButton(I18n.get("btn.edit"), this::initializeFieldEdit));
         mainButton = GuiElements.createButton(I18n.get("btn.main"), this::initializeFieldUsage);
         header.add(mainButton);
-        final UIEntity helpBool = GuiElements.createBoolElement(BoolIntegerables.of("btn.help"),
-                e -> {
-                    showHelpPage = e == 1 ? true : false;
-                    addHelpPageToPlane();
-                });
-        helpBool.setY(5);
         header.add(GuiElements.createSpacerH(5));
-        header.add(helpBool);
         resetSelection(mainButton);
 
         final UIEntity middlePart = new UIEntity();

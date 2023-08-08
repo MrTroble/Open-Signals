@@ -486,6 +486,11 @@
     "property.value.RS_INPUT": "Redstone Eingang",
     "gui.unlink": "Entlinken",
     "property.lfarrow.name": "Richtungspfeil",
-    "property.lfarrow.desc": "Gibt die Richtung an."
+    "property.lfarrow.desc": "Gibt die Richtung an.",
+	"info.nextelement": "Nächstes Element",
+	"info.key.r": "Element Rotieren",
+	"info.key.lmb": "Element (Un)setzen",
+	"info.key.rmb": "Auswahl öffenen (Halten)",
+	"info.infolabel": "Info & Hilfe"
 
 }
