@@ -383,12 +383,11 @@ public class Signal extends BasicBlock {
             return InteractionResult.SUCCESS;
         }
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
-        if (!placer.getItemInHand(InteractionHand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)
+        if (placer.getItemInHand(InteractionHand.MAIN_HAND).getItem().equals(OSItems.MANIPULATOR)
                 && (canBeLinked() || customname)) {
             OpenSignalsMain.handler.invokeGui(Signal.class, placer, level, blockPos, "signal");
-            return InteractionResult.SUCCESS;
         }
-        return InteractionResult.FAIL;
+        return InteractionResult.SUCCESS;
     }
 
     @SuppressWarnings("unchecked")

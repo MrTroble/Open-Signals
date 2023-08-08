@@ -110,6 +110,7 @@ public final class OSItems {
     public static final Item LAMPS = new Item(new Properties().tab(CreativeModeTab.TAB_MATERIALS));
     public static final Item ELECTRIC_PARTS = new Item(
             new Properties().tab(CreativeModeTab.TAB_MATERIALS));
+    public static final Item MANIPULATOR = new Item(new Properties().tab(OSTabs.TAB));
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
