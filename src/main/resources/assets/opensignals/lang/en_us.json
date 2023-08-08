@@ -502,5 +502,6 @@
 	"info.vp": "Distant signal",
 	"info.rs": "Shunting signal",
 	"info.ra10": "Shunting holding sign",
-	"info.sh2": "Track blocking tile"
+	"info.sh2": "Track blocking tile",
+    "info.info": "Info"
 }

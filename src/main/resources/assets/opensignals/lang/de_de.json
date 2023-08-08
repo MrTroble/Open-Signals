@@ -502,5 +502,6 @@
 	"info.vp": "Vorsignal",
 	"info.rs": "Schutzhaltsignal",
 	"info.ra10": "Rangierhalttafel",
-	"info.sh2": "Gleissperre"
+	"info.sh2": "Gleissperre",
+    "info.info": "Info"
 }

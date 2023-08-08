@@ -9,6 +9,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -37,6 +38,9 @@ public class SidePanel {
         final UIRotate rotate = new UIRotate();
         rotate.setRotateZ((float) Math.PI / 2.0f);
         label.add(rotate);
+        final UIIndependentTranslate tl = new UIIndependentTranslate();
+        tl.setX(-30);
+        label.add(tl);
         final UILabel labelComponent = new UILabel(I18n.get("info.infolabel"));
         labelComponent.setTextColor(UIColor.BASIC_COLOR_PRIMARY);
         label.add(labelComponent);
@@ -70,7 +74,7 @@ public class SidePanel {
 
     public void addHelpPageToPlane() {
         if (showHelpPage) {
-            helpPageButton.setText(">");
+            helpPageButton.setText(I18n.get("info.info") + "  >");
             helpPage.remove(label);
             spacerEntity.setWidth(80);
             lowerEntity.update();
