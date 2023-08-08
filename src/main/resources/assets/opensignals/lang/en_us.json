@@ -490,5 +490,6 @@
     "property.btn.help.name": "Help",
     "property.btn.help.desc": "Enable the info screen.",
     "label.nextnode": "Element",
-    "label.rkey": "Press 'R' to rotate the element"
+    "label.rkey": "Press 'R' to rotate the element",
+    "item.opensignals.manipulator": "Manipulator"
 }

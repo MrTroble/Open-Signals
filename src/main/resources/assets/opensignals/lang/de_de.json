@@ -486,6 +486,11 @@
     "property.value.RS_INPUT": "Redstone Eingang",
     "gui.unlink": "Entlinken",
     "property.lfarrow.name": "Richtungspfeil",
-    "property.lfarrow.desc": "Gibt die Richtung an."
+    "property.lfarrow.desc": "Gibt die Richtung an.",
+    "property.btn.help.name": "Hilfe",
+    "property.btn.help.desc": "Aktiviert das Info-Bild.",
+    "label.nextnode": "Element",
+    "label.rkey": "Drücke 'R' um das Element zu drehen.",
+    "item.opensignals.manipulator": "Manipulator"
 
 }
