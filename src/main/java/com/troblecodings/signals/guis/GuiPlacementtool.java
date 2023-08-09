@@ -16,6 +16,7 @@ import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
+import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
@@ -161,6 +162,7 @@ public class GuiPlacementtool extends GuiBase {
         textfield.setInheritWidth(true);
         if (currentSelectedBlock.canHaveCustomname(new HashMap<>())) {
             final UITextInput name = new UITextInput(container.signalName);
+            textfield.add(new UIToolTip(I18n.get("property.customname.desc")));
             name.setOnTextUpdate(this::sendName);
             textfield.add(name);
             list.add(textfield);

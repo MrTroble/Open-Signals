@@ -248,7 +248,7 @@
 	"property.buetype.name": "Bü Signals",
 	"property.bueadd.name": "Bü4 & Bü5 Addition",
 	"property.bueshort.name": "Bü2 Short Brake Distance",
-	"property.customname.desc": "Here you can enter a signal label/caption. Use §l'[n]'§r to move to the next line.",
+	"property.customname.desc": "Here you can enter a signal label/caption. Use §l[n]§r to move to the next line.",
 	"property.sh_high.desc": "Protection holding signals give or lift a prohibition on driving.",
 	"property.sh_mech.desc": "§nSH0§r: Prohibition on driving%n§nSh1§r: Prohibition on driving lifted%n§nGsp2§r: Track block removed",
 	"property.sh_light_bottom.desc": "§nSH0§r: Prohibition on driving%n§nSh1§r: Prohibition on driving lifted%n§nIdentification light§r: The signal is operationally switched off",
@@ -505,5 +505,6 @@
 	"info.sh2": "Track blocking tile",
     "info.info": "Info",
     "info.usage.key.lmb": "Very Important Key",
-	"info.usage.key.rmb": "Open config"
+	"info.usage.key.rmb": "Open config",
+    "item.opensignals.manipulator": "Manipulator"
 }
