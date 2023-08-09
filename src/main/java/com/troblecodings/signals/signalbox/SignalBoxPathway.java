@@ -318,6 +318,8 @@ public class SignalBoxPathway {
     }
 
     public Optional<Point> tryReset(final BlockPos position) {
+        if (checkReverseReset(position))
+            return Optional.of(firstPoint);
         final SignalBoxNode node = this.mapOfResetPositions.get(position);
         if (node == null)
             return Optional.empty();
@@ -333,6 +335,39 @@ public class SignalBoxPathway {
             return Optional.empty();
         this.resetPathway(point);
         return Optional.of(point);
+    }
+
+    private boolean checkReverseReset(final BlockPos pos) {
+        if (mapOfResetPositions.containsKey(pos)) {
+            return false;
+        }
+        final SignalBoxNode firstNode = listOfNodes.get(listOfNodes.size() - 1);
+        final SignalBoxNode secondNode = listOfNodes.get(listOfNodes.size() - 2);
+        final Rotation rotaion = SignalBoxUtil
+                .getRotationFromDelta(firstNode.getPoint().delta(secondNode.getPoint()));
+        final AtomicBoolean canReset = new AtomicBoolean(false);
+        for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.CORNER, EnumGuiMode.STRAIGHT)) {
+            firstNode.getOption(new ModeSet(mode, rotaion)).ifPresent(
+                    entry -> entry.getEntry(PathEntryType.RESETING).ifPresent(blockPos -> {
+                        if (!blockPos.equals(pos)) {
+                            return;
+                        }
+                        final AtomicBoolean atomic = new AtomicBoolean(false);
+                        foreachEntry((option, cNode) -> {
+                            option.getEntry(PathEntryType.BLOCKING).ifPresent(blockingPos -> {
+                                if (isPowerd(blockingPos)) {
+                                    atomic.set(true);
+                                }
+                            });
+                        });
+                        if (atomic.get()) {
+                            return;
+                        }
+                        canReset.set(true);
+                        this.resetPathway();
+                    }));
+        }
+        return canReset.get();
     }
 
     private boolean isPowerd(final BlockPos pos) {
