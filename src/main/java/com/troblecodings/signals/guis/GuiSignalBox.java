@@ -573,6 +573,7 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
+        helpPage.helpUsageMode();
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {
