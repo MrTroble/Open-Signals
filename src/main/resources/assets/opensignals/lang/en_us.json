@@ -95,7 +95,7 @@
 	"property.prop.INPUT.resetting.desc": "Resets a path. Paths are reset directly in front of a signal or on an empty piece (e.g. for partial path resolution)",
 	"msg.isblocked": "The signal box is already in use.",
 	"label.linkedto": "Linked to",
-	"gui.keyprompt": "Press [LSHIFT] for more info!",
+	"gui.keyprompt": "Hold [LSHIFT] for more info!%nHold [CTRL] to hide.",
 	"property.enummode.name": "Mode",
 	"property.enummode.desc": "Here you can switch between Manual Mode and Redstone Mode and MUX Mode. In Manual Mode you can change the signal through the GUI, in Redstone Mode you can connect Redstone to the signal controller to control the signal.",
 	"property.value.MANUELL": "Manual Mode",

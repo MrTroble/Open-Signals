@@ -95,7 +95,7 @@
     "property.prop.INPUT.resetting.desc": "Setzt eine Fahrstraße zurück. Fahrstraßen werden direkt vor einem Signal zurückgesetzt oder auf einem freien Stück (z.B. für eine Teilfahrstraßenauflösung)",
     "msg.isblocked": "Das Stellwerk wird bereits verwendet.",
     "label.linkedto": "Verlinkt mit",
-    "gui.keyprompt": "Drücke [LSHIFT] für mehr Infos!",
+    "gui.keyprompt": "Halte [LSHIFT] für mehr Infos!%nHalte [CTRL] zum Verstecken.",
     "property.enummode.name": "Modus",
     "property.enummode.desc": "Hier kannst du zwischen Manuellen Modus und Redstone Modus und MUX-Modus umschalten. im Manuellen Modus kannst du das Signal über die GUI ändern, im Redstone Modus kannst du an den Signalsteuerer Redstone anschließen, um darüber das Signal steuern.",
     "property.value.MANUELL": "Manueller Modus",
