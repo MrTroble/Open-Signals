@@ -318,11 +318,14 @@ public class SignalBoxPathway {
     }
 
     public Optional<Point> tryReset(final BlockPos position) {
-        if (checkReverseReset(position))
-            return Optional.of(firstPoint);
         final SignalBoxNode node = this.mapOfResetPositions.get(position);
-        if (node == null)
-            return Optional.empty();
+        if (node == null) {
+            if (checkReverseReset(position)) {
+                return Optional.of(firstPoint);
+            } else {
+                return Optional.empty();
+            }
+        }
         final Point point = node.getPoint();
         final AtomicBoolean atomic = new AtomicBoolean(false);
         foreachEntry((option, cNode) -> {
@@ -338,9 +341,6 @@ public class SignalBoxPathway {
     }
 
     private boolean checkReverseReset(final BlockPos pos) {
-        if (mapOfResetPositions.containsKey(pos)) {
-            return false;
-        }
         final SignalBoxNode firstNode = listOfNodes.get(listOfNodes.size() - 1);
         final SignalBoxNode secondNode = listOfNodes.get(listOfNodes.size() - 2);
         final Rotation rotaion = SignalBoxUtil
@@ -349,9 +349,8 @@ public class SignalBoxPathway {
         for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.CORNER, EnumGuiMode.STRAIGHT)) {
             firstNode.getOption(new ModeSet(mode, rotaion)).ifPresent(
                     entry -> entry.getEntry(PathEntryType.RESETING).ifPresent(blockPos -> {
-                        if (!blockPos.equals(pos)) {
+                        if (!blockPos.equals(pos))
                             return;
-                        }
                         final AtomicBoolean atomic = new AtomicBoolean(false);
                         foreachEntry((option, cNode) -> {
                             option.getEntry(PathEntryType.BLOCKING).ifPresent(blockingPos -> {
@@ -360,9 +359,8 @@ public class SignalBoxPathway {
                                 }
                             });
                         });
-                        if (atomic.get()) {
+                        if (atomic.get())
                             return;
-                        }
                         canReset.set(true);
                         this.resetPathway();
                     }));

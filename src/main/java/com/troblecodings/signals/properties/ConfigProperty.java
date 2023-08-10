@@ -10,7 +10,7 @@ import com.troblecodings.signals.SEProperty;
 public class ConfigProperty {
 
     public final Predicate predicate;
-    public Map<SEProperty, String> values;
+    public final Map<SEProperty, String> values;
 
     public ConfigProperty(final SEProperty property, final String value) {
         this(t -> true, property, value);
@@ -31,5 +31,4 @@ public class ConfigProperty {
     public ConfigProperty(final Map<SEProperty, String> values) {
         this(t -> true, values);
     }
-
 }

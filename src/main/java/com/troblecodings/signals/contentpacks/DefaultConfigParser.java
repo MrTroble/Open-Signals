@@ -124,5 +124,4 @@ public class DefaultConfigParser {
             DEFAULTCONFIGS.put(signal, properties);
         }
     }
-
 }

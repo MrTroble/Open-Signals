@@ -85,7 +85,8 @@ public class PathwayHolder {
             count++;
         }
         if (count == 0) {
-            OpenSignalsMain.getLogger().debug("Could not find previous! " + pathway);
+            if (OpenSignalsMain.isDebug())
+                OpenSignalsMain.getLogger().debug("Could not find previous! " + pathway);
         }
     }
 

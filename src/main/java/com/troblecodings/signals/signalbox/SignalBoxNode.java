@@ -34,7 +34,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private final HashMap<ModeSet, PathOptionEntry> possibleModes = new HashMap<>();
     private final List<ModeSet> manuellEnabledOutputs = new ArrayList<>();
     private final Point point;
-    private String identifier;
     private boolean isAutoPoint = false;
     private String customText = "";
 
@@ -44,7 +43,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public SignalBoxNode(final Point point) {
         this.point = Objects.requireNonNull(point);
-        this.identifier = point.getX() + "." + point.getY();
     }
 
     public void add(final ModeSet modeSet) {
@@ -192,7 +190,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 manuellEnabledOutputs.add(modeSet);
         });
         this.point.read(compound);
-        this.identifier = point.getX() + "." + point.getY();
         this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
         this.customText = compound.getString(CUSTOM_NAME);
         post();
@@ -288,13 +285,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     @Override
     public Iterator<ModeSet> iterator() {
         return this.possibleModes.keySet().iterator();
-    }
-
-    /**
-     * @return the identifier
-     */
-    public String getIdentifier() {
-        return identifier;
     }
 
     @Override

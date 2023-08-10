@@ -22,7 +22,6 @@ import net.minecraft.core.BlockPos;
 public class NamableContainer extends ContainerBase implements INetworkSync {
 
     public BasicBlockEntity tile;
-    private final GuiInfo info;
     protected BlockPos pos;
     protected final List<BlockPos> linkedPos = new ArrayList<>();
     protected final List<BlockPos> linkedController = new ArrayList<>();
@@ -33,12 +32,11 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         info.player.containerMenu = this;
         if (info.pos != null)
             this.tile = info.getTile();
-        this.info = info;
     }
 
     private void sendSignalPos() {
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putBlockPos(info.pos);
+        buffer.putBlockPos(getInfo().pos);
         final List<BlockPos> linkedPos = tile.getLinkedPos();
         buffer.putByte((byte) linkedPos.size());
         linkedPos.forEach(pos -> buffer.putBlockPos(pos));
@@ -48,7 +46,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
             buffer.putByte((byte) linkedController.size());
             linkedController.forEach(pos -> buffer.putBlockPos(pos));
         }
-        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+        OpenSignalsMain.network.sendTo(getInfo().player, buffer.build());
     }
 
     @Override
@@ -65,7 +63,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         final int size = buffer.getByteAsInt();
         for (int i = 0; i < size; i++)
             linkedPos.add(buffer.getBlockPos());
-        tile = (BasicBlockEntity) info.world.getBlockEntity(pos);
+        tile = (BasicBlockEntity) getInfo().world.getBlockEntity(pos);
         if (tile instanceof RedstoneIOTileEntity) {
             final int controllerLinkSize = buffer.getByteAsInt();
             for (int i = 0; i < controllerLinkSize; i++)
@@ -82,7 +80,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
         for (int i = 0; i < byteLength; i++) {
             array[i] = buffer.getByte();
         }
-        final NameStateInfo info = new NameStateInfo(this.info.world, this.info.pos);
+        final NameStateInfo info = new NameStateInfo(this.getInfo().world, this.getInfo().pos);
         String name = "";
         try {
             name = new String(array, "UTF-8");

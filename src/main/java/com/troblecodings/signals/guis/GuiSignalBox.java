@@ -87,8 +87,6 @@ public class GuiSignalBox extends GuiBase {
     private final UIEntity lowerEntity = new UIEntity();
     private final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
-    @SuppressWarnings("unused")
-    private Page page = Page.USAGE;
     private UIEntity mainButton;
     private final GuiInfo info;
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
@@ -100,13 +98,13 @@ public class GuiSignalBox extends GuiBase {
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
-        container.setConsumer(this::update);
+        container.setInfoConsumer(this::infoUpdate);
         container.setColorUpdater(this::applyColorChanges);
         info.player.containerMenu = this.container;
         this.info = info;
     }
 
-    public void update(final String errorString) {
+    public void infoUpdate(final String errorString) {
         this.resetTileSelection();
         final UIToolTip tooltip = new UIToolTip(errorString);
         lowerEntity.add(tooltip);
@@ -368,19 +366,11 @@ public class GuiSignalBox extends GuiBase {
         node.forEach(modeSet -> setupModeSettings(list, modeSet.mode, modeSet.rotation, node,
                 node.getOption(modeSet).get()));
         lowerEntity.add(GuiElements.createPageSelect(box));
-        lowerEntity.add(new UIClickable(e -> {
-            initializeFieldUsage(mainButton);
-        }, 1));
-        pageCheck(Page.TILE_CONFIG);
-    }
-
-    private void pageCheck(final Page page) {
-        this.page = page;
+        lowerEntity.add(new UIClickable(e -> initializeFieldUsage(mainButton), 1));
     }
 
     private void initializePageSettings(final UIEntity entity) {
         reset();
-        this.pageCheck(Page.SETTINGS);
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
@@ -421,7 +411,6 @@ public class GuiSignalBox extends GuiBase {
         sendModeChanges();
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
-        this.pageCheck(Page.USAGE);
         helpPage.helpUsageMode();
     }
 
@@ -455,7 +444,6 @@ public class GuiSignalBox extends GuiBase {
                 menu.setConsumer(
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
                 resetSelection(entity);
-                this.pageCheck(Page.EDIT);
                 resetAllPathways();
                 helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
             });
@@ -470,7 +458,6 @@ public class GuiSignalBox extends GuiBase {
             selectionEntity.add(buttons);
         });
         push(screen);
-        pageCheck(Page.CHANGE_MODE);
     }
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
@@ -749,12 +736,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void reset() {
-        this.page = Page.NONE;
         lowerEntity.clear();
-    }
-
-    private static enum Page {
-        USAGE, EDIT, SETTINGS, TILE_CONFIG, CHANGE_MODE, NONE;
     }
 
     @Override

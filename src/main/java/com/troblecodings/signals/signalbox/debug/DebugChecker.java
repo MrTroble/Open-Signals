@@ -14,5 +14,4 @@ public class DebugChecker extends ConnectionChecker {
         }
         return flag;
     }
-
 }

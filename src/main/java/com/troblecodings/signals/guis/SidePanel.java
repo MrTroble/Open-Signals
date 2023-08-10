@@ -140,8 +140,8 @@ public class SidePanel {
 
     public void helpUsageMode() {
         helpPage.clearChildren();
-        helpPage.add(GuiElements.createLabel(I18n.get("info.keys"),
-                UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+        helpPage.add(
+                GuiElements.createLabel(I18n.get("info.keys"), UIColor.BASIC_COLOR_PRIMARY, 0.8f));
         helpPage.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.usage.key.lmb"),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),

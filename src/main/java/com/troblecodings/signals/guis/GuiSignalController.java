@@ -139,9 +139,9 @@ public class GuiSignalController extends GuiBase {
             final UIEnumerable profile) {
         middlePart.clearChildren();
         profile.setIndex(currentProfile);
-        final Map<SEProperty, String> properties = controller.allRSStates.containsKey(
-                currentProfile) ? controller.allRSStates.get(currentProfile) : new HashMap<>();
-        controller.getReference().forEach((property, value) -> {
+        final Map<SEProperty, String> properties = controller.allRSStates
+                .computeIfAbsent(currentProfile, _u -> new HashMap<>());
+        controller.getProperties().forEach((property, value) -> {
             if (!properties.containsKey(property)) {
                 properties.put(property, "DISABLED");
             }
@@ -151,12 +151,10 @@ public class GuiSignalController extends GuiBase {
                     .createEnumElement(new DisableIntegerable<>(property), e -> {
                         applyModelChange(bRender);
                         sendPropertyToServer(property, e);
-                        final Map<SEProperty, String> map = controller.allRSStates
-                                .computeIfAbsent(currentProfile, _u -> new HashMap<>());
                         if (e == -1) {
-                            map.remove(property);
+                            properties.remove(property);
                         } else {
-                            map.put(property, property.getObjFromID(e));
+                            properties.put(property, property.getObjFromID(e));
                         }
                     }, property.getParent().getIDFromValue(value));
             middlePart.add(entity);
@@ -326,7 +324,7 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 
         holders.clear();
-        final Map<SEProperty, String> map = this.controller.getReference();
+        final Map<SEProperty, String> map = this.controller.getProperties();
         if (map == null)
             return;
         map.forEach((property, value) -> {
@@ -425,5 +423,4 @@ public class GuiSignalController extends GuiBase {
     private void applyModelChange(final UIBlockRender blockRender) {
         // TODO new model system
     }
-
 }

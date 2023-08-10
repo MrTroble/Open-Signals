@@ -25,5 +25,4 @@ public class UIPropertyEnumHolder {
         blockstate.setData(property, value);
         return blockstate;
     }
-
 }

@@ -10,7 +10,6 @@ public class HeightProperty {
     public final int height;
 
     public HeightProperty(final Predicate predicate, final int height) {
-        super();
         this.predicate = predicate;
         this.height = height;
     }

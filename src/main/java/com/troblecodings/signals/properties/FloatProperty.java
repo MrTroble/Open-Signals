@@ -10,7 +10,6 @@ public class FloatProperty {
     public final float height;
 
     public FloatProperty(final Predicate predicate, final float height) {
-        super();
         this.predicate = predicate;
         this.height = height;
     }
@@ -30,5 +29,4 @@ public class FloatProperty {
         return Float.floatToIntBits(height) == Float.floatToIntBits(other.height)
                 && Objects.equals(predicate, other.predicate);
     }
-
 }

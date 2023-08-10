@@ -16,10 +16,8 @@ public class SoundProperty {
     }
 
     public SoundProperty(final SoundEvent sound, final Predicate predicate, final int duration) {
-        super();
         this.sound = sound;
         this.predicate = predicate;
         this.duration = duration;
     }
-
 }

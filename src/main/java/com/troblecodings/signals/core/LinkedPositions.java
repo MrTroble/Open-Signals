@@ -132,6 +132,6 @@ public class LinkedPositions {
 
     @Override
     public String toString() {
-        return "AllSignals = " + signals + ", AllLinkedPos = " + linkedBlocks;
+        return "LinkedPos [AllSignals = " + signals + ", AllLinkedPos = " + linkedBlocks + "]";
     }
 }

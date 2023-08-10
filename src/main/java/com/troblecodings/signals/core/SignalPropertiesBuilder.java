@@ -53,11 +53,10 @@ public class SignalPropertiesBuilder {
                     break;
                 }
             }
-            if (placementtool == null)
-                throw new ContentPackException(
-                        "There doesn't exists a placementtool with the name '" + placementToolName
-                                + "'!");
         }
+        if (placementtool == null)
+            throw new ContentPackException("There doesn't exists a placementtool with the name '"
+                    + placementToolName + "'!");
 
         final List<HeightProperty> signalheights = new ArrayList<>();
         if (signalHeights != null) {
@@ -73,7 +72,6 @@ public class SignalPropertiesBuilder {
                 }
             });
         }
-
         final List<FloatProperty> renderheights = new ArrayList<>();
         if (renderHeights != null) {
             renderHeights.forEach((property, height) -> {
@@ -88,7 +86,6 @@ public class SignalPropertiesBuilder {
                 }
             });
         }
-
         final List<SoundProperty> soundProperties = new ArrayList<>();
         if (sounds != null) {
             for (final Map.Entry<String, SoundPropertyParser> soundProperty : sounds.entrySet()) {
@@ -112,7 +109,6 @@ public class SignalPropertiesBuilder {
                 }
             }
         }
-
         final List<ValuePack> rsOutputs = new ArrayList<>();
         if (redstoneOutputs != null) {
             for (final Map.Entry<String, String> outputs : redstoneOutputs.entrySet()) {
@@ -121,7 +117,7 @@ public class SignalPropertiesBuilder {
                         new ValuePack(property, LogicParser.predicate(outputs.getKey(), info)));
             }
         }
-        
+
         final List<BooleanProperty> doubleText = new ArrayList<>();
         if (doubleSidedText != null) {
             doubleSidedText.forEach((property, bool) -> {
@@ -136,13 +132,12 @@ public class SignalPropertiesBuilder {
                 }
             });
         }
-
         this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
-                ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale, autoscale,
-                ImmutableList.copyOf(doubleText), textColor, canLink, colors, ImmutableList.copyOf(renderheights),
-                ImmutableList.copyOf(soundProperties), ImmutableList.copyOf(rsOutputs),
-                defaultItemDamage);
+                ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
+                autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
+                ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
+                ImmutableList.copyOf(rsOutputs), defaultItemDamage);
     }
 }

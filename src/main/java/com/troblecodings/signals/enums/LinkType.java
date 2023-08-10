@@ -5,6 +5,7 @@ import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.signals.core.ReadBuffer;
 
 public enum LinkType implements NamableWrapper {
+
     SIGNAL("signal"), INPUT("input"), OUTPUT("output");
 
     private static final String LINK_TYPE = "linkType";

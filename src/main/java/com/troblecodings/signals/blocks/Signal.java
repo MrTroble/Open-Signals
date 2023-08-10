@@ -277,11 +277,11 @@ public class Signal extends BasicBlock {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void renderSingleScaleOverlay(final RenderOverlayInfo info){
+    public void renderSingleScaleOverlay(final RenderOverlayInfo info) {
         final String name = info.tileEntity.getNameWrapper();
         final float nameWidth = info.font.width(name);
         final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
-        
+
         info.stack.pushPose();
         info.stack.scale(-scale, -scale, 1);
         info.stack.translate(-nameWidth / 2, 0, -0.32f);
@@ -293,7 +293,7 @@ public class Signal extends BasicBlock {
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        
+
         final Map<SEProperty, String> map = ClientSignalStateHandler
                 .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
                         info.tileEntity.getBlockPos()));
@@ -330,7 +330,6 @@ public class Signal extends BasicBlock {
         info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
         info.stack.mulPose(angle);
         info.stack.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
-        
 
         renderSingleOverlay(info, splitNames);
 
@@ -356,8 +355,7 @@ public class Signal extends BasicBlock {
             final String name = splitNames[j];
             final float nameWidth = info.font.width(name);
             final float center = (signWidth - nameWidth) / 2;
-            info.font.draw(info.stack, name, (int) center -10, j * 10,
-                    this.prop.textColor);
+            info.font.draw(info.stack, name, (int) center - 10, j * 10, this.prop.textColor);
         }
         info.stack.popPose();
     }

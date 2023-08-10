@@ -160,5 +160,4 @@ public final class OSItems {
         final IForgeRegistry<Item> registry = event.getRegistry();
         registeredItems.forEach(registry::register);
     }
-
 }

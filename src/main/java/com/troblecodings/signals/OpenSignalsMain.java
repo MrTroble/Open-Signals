@@ -35,8 +35,8 @@ import net.minecraftforge.forgespi.locating.IModFile;
 @Mod(OpenSignalsMain.MODID)
 public class OpenSignalsMain {
 
-    private static OpenSignalsMain instance;
     public static final String MODID = "opensignals";
+    private static OpenSignalsMain instance;
 
     public static OpenSignalsMain getInstance() {
         return instance;
@@ -56,11 +56,11 @@ public class OpenSignalsMain {
 
     public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new,
             () -> CommonProxy::new);
-    private static Logger log = null;
     public static GuiHandler handler = null;
     public static NetworkHandler network = null;
     public static ContentPackHandler contentPacks = null;
     private static boolean debug;
+    private static Logger log = null;
 
     /**
      * @return the debug
@@ -68,8 +68,6 @@ public class OpenSignalsMain {
     public static boolean isDebug() {
         return debug;
     }
-
-    public static final int GUI_SIGNAL_CONTROLLER = 1;
 
     public IModFile file;
 

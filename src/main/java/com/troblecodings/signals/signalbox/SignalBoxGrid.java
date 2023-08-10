@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -131,10 +130,6 @@ public class SignalBoxGrid implements INetworkSavable {
                 .map(entry -> entry.toString()).collect(Collectors.joining("\n")) + "]";
     }
 
-    public boolean isEmpty() {
-        return this.modeGrid.isEmpty();
-    }
-
     public SignalBoxNode getNode(final Point point) {
         return modeGrid.get(point);
     }
@@ -149,15 +144,6 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public void putNode(final Point point, final SignalBoxNode node) {
         modeGrid.put(point, node);
-    }
-
-    public SignalBoxNode removeNode(final Point point) {
-        return modeGrid.remove(point);
-    }
-
-    public SignalBoxNode computeIfAbsent(final Point point,
-            final Function<? super Point, ? extends SignalBoxNode> funtion) {
-        return modeGrid.computeIfAbsent(point, funtion);
     }
 
     public void putAllNodes(final Map<Point, SignalBoxNode> nodes) {

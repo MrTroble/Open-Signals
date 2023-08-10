@@ -29,7 +29,7 @@ public class OneSignalConfigParser {
         loadResetConfigs();
     }
 
-    public static void loadShuntigConfigs() {
+    private static void loadShuntigConfigs() {
         for (final Map.Entry<String, String> files : OpenSignalsMain.contentPacks
                 .getFiles("signalconfigs/shunting")) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
@@ -55,7 +55,7 @@ public class OneSignalConfigParser {
         }
     }
 
-    public static void loadResetConfigs() {
+    private static void loadResetConfigs() {
         for (final Map.Entry<String, String> files : OpenSignalsMain.contentPacks
                 .getFiles("signalconfigs/reset")) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
@@ -90,5 +90,4 @@ public class OneSignalConfigParser {
         }
         return signal;
     }
-
 }

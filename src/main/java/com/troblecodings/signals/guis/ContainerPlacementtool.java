@@ -27,19 +27,17 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
     public final Map<SEProperty, Integer> properties = new HashMap<>();
     protected int signalID;
     protected String signalName = "";
-    private final Player player;
     private Signal signal;
 
     public ContainerPlacementtool(final GuiInfo info) {
         super(info);
         info.base = this;
-        this.player = info.player;
         info.player.containerMenu = this;
     }
 
     @Override
     public void sendAllDataToRemote() {
-        sendItemProperties(player);
+        sendItemProperties(getInfo().player);
     }
 
     private void sendItemProperties(final Player player) {
@@ -77,7 +75,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
     public void deserializeServer(final ByteBuffer buf) {
         final ReadBuffer buffer = new ReadBuffer(buf);
         final int first = buffer.getByteAsInt();
-        final ItemStack stack = player.getMainHandItem();
+        final ItemStack stack = getInfo().player.getMainHandItem();
         final Placementtool tool = (Placementtool) stack.getItem();
         if (first == 255) {
             final int id = buffer.getInt();
@@ -95,7 +93,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
             properties.clear();
-            sendItemProperties(player);
+            sendItemProperties(getInfo().player);
         } else {
             final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
             final SEProperty property = signal.getProperties().get(first);
@@ -113,7 +111,7 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final ReadBuffer buffer = new ReadBuffer(buf);
         signalID = buffer.getInt();
         final int size = buffer.getByteAsInt();
-        final Placementtool tool = (Placementtool) player.getMainHandItem().getItem();
+        final Placementtool tool = (Placementtool) getInfo().player.getMainHandItem().getItem();
         final Signal signal = tool.getObjFromID(signalID);
         final List<SEProperty> signalProperties = signal.getProperties();
         properties.clear();

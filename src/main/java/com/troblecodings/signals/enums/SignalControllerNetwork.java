@@ -10,5 +10,4 @@ public enum SignalControllerNetwork {
     public static SignalControllerNetwork of(final ReadBuffer buffer) {
         return values()[buffer.getByteAsInt()];
     }
-
 }
