@@ -345,9 +345,18 @@ public class SignalBoxPathway {
         final SignalBoxNode secondNode = listOfNodes.get(listOfNodes.size() - 2);
         final Rotation rotaion = SignalBoxUtil
                 .getRotationFromDelta(firstNode.getPoint().delta(secondNode.getPoint()));
+        if (tryReversReset(pos, firstNode, rotaion)) {
+            return true;
+        } else {
+            return tryReversReset(pos, firstNode, rotaion.getRotated(Rotation.CLOCKWISE_180));
+        }
+    }
+
+    private boolean tryReversReset(final BlockPos pos, final SignalBoxNode node,
+            final Rotation rot) {
         final AtomicBoolean canReset = new AtomicBoolean(false);
         for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.CORNER, EnumGuiMode.STRAIGHT)) {
-            firstNode.getOption(new ModeSet(mode, rotaion)).ifPresent(
+            node.getOption(new ModeSet(mode, rot)).ifPresent(
                     entry -> entry.getEntry(PathEntryType.RESETING).ifPresent(blockPos -> {
                         if (!blockPos.equals(pos))
                             return;
