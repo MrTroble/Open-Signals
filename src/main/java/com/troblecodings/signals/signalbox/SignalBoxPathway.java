@@ -342,14 +342,12 @@ public class SignalBoxPathway {
 
     private boolean checkReverseReset(final BlockPos pos) {
         final SignalBoxNode firstNode = listOfNodes.get(listOfNodes.size() - 1);
-        final SignalBoxNode secondNode = listOfNodes.get(listOfNodes.size() - 2);
-        final Rotation rotaion = SignalBoxUtil
-                .getRotationFromDelta(firstNode.getPoint().delta(secondNode.getPoint()));
-        if (tryReversReset(pos, firstNode, rotaion)) {
-            return true;
-        } else {
-            return tryReversReset(pos, firstNode, rotaion.getRotated(Rotation.CLOCKWISE_180));
+        for (final Rotation rot : Rotation.values()) {
+            if (tryReversReset(pos, firstNode, rot)) {
+                return true;
+            }
         }
+        return false;
     }
 
     private boolean tryReversReset(final BlockPos pos, final SignalBoxNode node,
