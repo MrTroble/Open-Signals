@@ -320,18 +320,15 @@ public class GuiSignalBox extends GuiBase {
             c.add(new UIColor(SELECTION_COLOR));
             if (lastTile == null) {
                 lastTile = currentTile;
-                helpPage.helpUsageMode(lastTile);
             } else {
                 if (lastTile == currentTile) {
                     this.resetTileSelection();
                     lastTile = null;
-                    helpPage.helpUsageMode(lastTile);
                     return;
                 }
                 sendPWRequest(currentTile.getNode());
                 this.resetTileSelection();
                 lastTile = null;
-                helpPage.helpUsageMode(lastTile);
             }
         }));
         tile.add(new UIClickable(e -> initializePageTileConfig(currentTile.getNode()), 1));
@@ -414,7 +411,7 @@ public class GuiSignalBox extends GuiBase {
         sendModeChanges();
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
-        helpPage.helpUsageMode(lastTile);
+        helpPage.helpUsageMode();
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -577,7 +574,7 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-        helpPage.helpUsageMode(lastTile);
+        helpPage.helpUsageMode();
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {
