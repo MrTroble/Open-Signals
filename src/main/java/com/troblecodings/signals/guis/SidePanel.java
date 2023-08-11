@@ -138,7 +138,7 @@ public class SidePanel {
         addHelpPageToPlane();
     }
 
-    public void helpUsageMode() {
+    public void helpUsageMode(final UISignalBoxTile currentStartTile) {
         helpPage.clearChildren();
         helpPage.add(
                 GuiElements.createLabel(I18n.get("info.keys"), UIColor.BASIC_COLOR_PRIMARY, 0.8f));
@@ -146,6 +146,13 @@ public class SidePanel {
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
+        if (currentStartTile != null) {
+            helpPage.add(GuiElements.createLabel(
+                    I18n.get("info.usage.startpoint") + " = [x="
+                            + currentStartTile.getPoint().getX() + ", y="
+                            + currentStartTile.getPoint().getY() + "]",
+                    UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+        }
         addHelpPageToPlane();
     }
 }
