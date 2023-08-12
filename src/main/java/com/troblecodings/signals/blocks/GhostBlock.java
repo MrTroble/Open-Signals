@@ -1,5 +1,6 @@
 package com.troblecodings.signals.blocks;
 
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.Minecraft;
@@ -23,7 +24,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class GhostBlock extends BasicBlock {
 
     public GhostBlock() {
-        super(Properties.of(Material.GLASS).noOcclusion().lightLevel(u -> 1));
+        super(Properties.of(Material.GLASS).noOcclusion()
+                .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get()));
         registerDefaultState(defaultBlockState());
     }
 

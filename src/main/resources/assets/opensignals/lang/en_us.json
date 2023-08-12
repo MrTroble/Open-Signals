@@ -504,8 +504,15 @@
 	"info.ra10": "Shunting holding sign",
 	"info.sh2": "Track blocking tile",
     "info.info": "Info",
-    "info.keys": "Keys",
+    "info.keys": "Controls",
     "info.usage.key.lmb": "Very Important Key",
 	"info.usage.key.rmb": "Open config",
-    "item.opensignals.manipulator": "Manipulator"
+    "item.opensignals.manipulator": "Manipulator",
+	"info.usage.node": "Selection",
+	"info.usage.edit": "Configure",
+	"info.usage.subsidiary": "Active Subsidiary",
+    "sb.disablesubsidiary": "Turn off",
+    "info.usage.edit.desc": "Here you enter the edit mode for the tile.",
+    "btn.subsidiary.desc": "Here you can turn on subsidiary signals.",
+    "button.reset.desc": "Reset the drive path."
 }

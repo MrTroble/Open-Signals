@@ -16,6 +16,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
@@ -181,6 +182,7 @@ public class SidePanel {
             reset.setScaleY(0.8f);
             reset.setX(5);
             helpPage.add(reset);
+            reset.add(new UIToolTip(I18n.get("button.reset.desc")));
             if (guiModes.contains(EnumGuiMode.HP)) {
                 final UIEntity entity = GuiElements
                         .createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
@@ -244,9 +246,10 @@ public class SidePanel {
                     entity.setScaleY(0.8f);
                     entity.setX(5);
                     helpPage.add(entity);
+                    entity.add(new UIToolTip(I18n.get("btn.subsidiary.desc")));
                 }
             }
-            final UIEntity edit = GuiElements.createButton("info.usage.edit", e -> {
+            final UIEntity edit = GuiElements.createButton(I18n.get("info.usage.edit"), e -> {
                 helpUsageMode(subsidiaries, null);
                 gui.initializePageTileConfig(node);
             });
@@ -254,12 +257,7 @@ public class SidePanel {
             edit.setScaleY(0.8f);
             edit.setX(5);
             helpPage.add(edit);
-            final UIEntity remove = GuiElements.createButton("info.usage.remove",
-                    e -> helpUsageMode(subsidiaries, null));
-            remove.setScaleX(0.8f);
-            remove.setScaleY(0.8f);
-            remove.setX(5);
-            helpPage.add(remove);
+            edit.add(new UIToolTip(I18n.get("info.usage.edit.desc")));
         }
         if (!subsidiaries.isEmpty()) {
             helpPage.add(GuiElements.createLabel(I18n.get("info.usage.subsidiary"),

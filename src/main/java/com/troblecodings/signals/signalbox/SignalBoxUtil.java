@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -17,9 +18,9 @@ import net.minecraft.world.level.block.Rotation;
 
 public final class SignalBoxUtil {
 
-    public static final int FREE_COLOR = 0xFF000000;
-    public static final int SELECTED_COLOR = 0xFF00FF00;
-    public static final int USED_COLOR = 0xFFFF0000;
+    public static final int FREE_COLOR = ConfigHandler.CLIENT.signalboxFreeColor.get();
+    public static final int SELECTED_COLOR = ConfigHandler.CLIENT.signalboxSelectColor.get();
+    public static final int USED_COLOR = ConfigHandler.CLIENT.signalboxUsedColor.get();
 
     private SignalBoxUtil() {
     }

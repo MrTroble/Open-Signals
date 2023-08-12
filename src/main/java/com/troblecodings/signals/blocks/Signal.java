@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableList;
 import com.mojang.math.Quaternion;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
@@ -81,7 +82,8 @@ public class Signal extends BasicBlock {
     private SEProperty powerProperty = null;
 
     public Signal(final SignalProperties prop) {
-        super(Properties.of(Material.STONE).noOcclusion().lightLevel(u -> 1));
+        super(Properties.of(Material.STONE).noOcclusion()
+                .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get()));
         this.prop = prop;
         this.id = SIGNAL_IDS.size();
         SIGNAL_IDS.add(this);
