@@ -385,4 +385,8 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     public void setCustomText(final String text) {
         this.customText = text;
     }
+
+    public Map<ModeSet, PathOptionEntry> getModes() {
+        return possibleModes;
+    }
 }

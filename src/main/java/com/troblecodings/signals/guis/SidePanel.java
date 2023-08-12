@@ -1,8 +1,12 @@
 package com.troblecodings.signals.guis;
 
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
+import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
+import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -14,13 +18,17 @@ import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
+import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
+import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
+import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
@@ -104,6 +112,11 @@ public class SidePanel {
         label.setVisible(true);
     }
 
+    protected void setShowHelpPage(final boolean showHelpPage) {
+        this.showHelpPage = showHelpPage;
+        addHelpPageToPlane();
+    }
+
     public void reset() {
 
     }
@@ -150,7 +163,8 @@ public class SidePanel {
         addHelpPageToPlane();
     }
 
-    public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries) {
+    public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries,
+            final SignalBoxNode node) {
         helpPage.clearChildren();
         helpPage.add(
                 GuiElements.createLabel(I18n.get("info.keys"), UIColor.BASIC_COLOR_PRIMARY, 0.8f));
@@ -158,6 +172,101 @@ public class SidePanel {
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
+        if (node != null) {
+            final Map<ModeSet, PathOptionEntry> modes = node.getModes();
+            final List<EnumGuiMode> guiModes = modes.keySet().stream().map(mode -> mode.mode)
+                    .collect(Collectors.toList());
+            helpPage.add(GuiElements.createLabel(I18n.get("info.usage.node"),
+                    UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+            final UIEntity reset = GuiElements.createButton(I18n.get("button.reset"), e -> {
+                reset();
+                gui.resetPathwayOnServer(node);
+                helpUsageMode(subsidiaries, null);
+            });
+            reset.setScaleX(0.8f);
+            reset.setScaleY(0.8f);
+            reset.setX(5);
+            helpPage.add(reset);
+            if (guiModes.contains(EnumGuiMode.HP)) {
+                final UIEntity entity = GuiElements
+                        .createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
+                            gui.setAutoPoint(node.getPoint(), (byte) e);
+                            node.setAutoPoint(e == 1 ? true : false);
+                        }, node.isAutoPoint() ? 1 : 0);
+                entity.setScaleX(0.8f);
+                entity.setScaleY(0.8f);
+                entity.setX(5);
+                helpPage.add(entity);
+            }
+            for (Map.Entry<ModeSet, PathOptionEntry> mapEntry : modes.entrySet()) {
+                final ModeSet mode = mapEntry.getKey();
+                final PathOptionEntry option = mapEntry.getValue();
+
+                if (mode.mode.equals(EnumGuiMode.HP) || mode.mode.equals(EnumGuiMode.RS)) {
+                    final UIEntity entity = GuiElements.createButton(I18n.get("btn.subsidiary"),
+                            e -> {
+                                final UIBox hbox = new UIBox(UIBox.VBOX, 1);
+                                final UIEntity list = new UIEntity();
+                                list.setInherits(true);
+                                list.add(hbox);
+                                list.add(GuiElements.createButton(I18n.get("btn.return"),
+                                        a -> gui.pop()));
+                                SubsidiaryState.ALL_STATES.forEach(state -> {
+                                    final int defaultValue = gui.container.grid.getSubsidiaryState(
+                                            node.getPoint(), mode, state) ? 0 : 1;
+                                    list.add(GuiElements.createEnumElement(
+                                            new SizeIntegerables<>(state.getName(), 2,
+                                                    i -> i == 1 ? "false" : "true"),
+                                            a -> {
+                                                final SubsidiaryEntry entry = new SubsidiaryEntry(
+                                                        state, a == 0 ? true : false);
+                                                gui.sendSubsidiaryRequest(entry, node.getPoint(),
+                                                        mode);
+                                                gui.container.grid.setClientState(node.getPoint(),
+                                                        mode, entry);
+                                                final BlockPos signalPos = option
+                                                        .getEntry(PathEntryType.SIGNAL)
+                                                        .orElse(null);
+                                                if (signalPos != null) {
+                                                    if (entry.state) {
+                                                        subsidiaries.put(signalPos,
+                                                                new SubsidiaryHolder(entry,
+                                                                        node.getPoint(), mode));
+                                                    } else {
+                                                        subsidiaries.remove(signalPos);
+                                                    }
+                                                }
+                                                gui.pop();
+                                                helpUsageMode(subsidiaries, node);
+                                            }, defaultValue));
+                                });
+                                final UIEntity screen = GuiElements.createScreen(selection -> {
+                                    selection.add(list);
+                                    selection.add(GuiElements.createPageSelect(hbox));
+                                });
+                                gui.push(screen);
+                            });
+                    entity.setScaleX(0.8f);
+                    entity.setScaleY(0.8f);
+                    entity.setX(5);
+                    helpPage.add(entity);
+                }
+            }
+            final UIEntity edit = GuiElements.createButton("info.usage.edit", e -> {
+                helpUsageMode(subsidiaries, null);
+                gui.initializePageTileConfig(node);
+            });
+            edit.setScaleX(0.8f);
+            edit.setScaleY(0.8f);
+            edit.setX(5);
+            helpPage.add(edit);
+            final UIEntity remove = GuiElements.createButton("info.usage.remove",
+                    e -> helpUsageMode(subsidiaries, null));
+            remove.setScaleX(0.8f);
+            remove.setScaleY(0.8f);
+            remove.setX(5);
+            helpPage.add(remove);
+        }
         if (!subsidiaries.isEmpty()) {
             helpPage.add(GuiElements.createLabel(I18n.get("info.usage.subsidiary"),
                     UIColor.BASIC_COLOR_PRIMARY, 0.8f));
@@ -201,6 +310,9 @@ public class SidePanel {
                     });
                     gui.push(screen);
                 });
+                button.setScaleX(0.8f);
+                button.setScaleY(0.8f);
+                button.setX(5);
                 helpPage.add(button);
             });
         }

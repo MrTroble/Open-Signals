@@ -61,6 +61,7 @@ public class GuiSignalBox extends GuiBase {
     public static final int SELECTION_COLOR = 0x2900FF00;
     public static final int BACKGROUND_COLOR = 0xFF8B8B8B;
     public static final int LINE_COLOR = 0xFF5B5B5B;
+    public static final int EDIT_COLOR = 0x0000FF;
 
     public static final float[] ALL_LINES = getLines();
     public static final int TILE_WIDTH = 10;
@@ -87,7 +88,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private final UIEntity lowerEntity = new UIEntity();
-    private final ContainerSignalBox container;
+    protected final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
     private UIEntity mainButton;
     private final GuiInfo info;
@@ -123,8 +124,8 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void resetTileSelection() {
-        this.entity.findRecursive(UIColor.class).stream()
-                .filter(color -> color.getColor() == SELECTION_COLOR)
+        this.entity.findRecursive(UIColor.class).stream().filter(
+                color -> color.getColor() == SELECTION_COLOR || color.getColor() == EDIT_COLOR)
                 .forEach(color -> color.getParent().remove(color));
     }
 
@@ -296,7 +297,7 @@ public class GuiSignalBox extends GuiBase {
                                             }
                                         }
                                         pop();
-                                        helpPage.helpUsageMode(enabledSubsidiaries);
+                                        helpPage.helpUsageMode(enabledSubsidiaries, null);
                                     }, defaultValue));
                         });
                         final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -319,7 +320,7 @@ public class GuiSignalBox extends GuiBase {
         sendSubsidiaryRequest(entry, holder.point, holder.modeSet);
         container.grid.setClientState(holder.point, holder.modeSet, entry);
         enabledSubsidiaries.remove(pos);
-        helpPage.helpUsageMode(enabledSubsidiaries);
+        helpPage.helpUsageMode(enabledSubsidiaries, null);
     }
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
@@ -355,7 +356,7 @@ public class GuiSignalBox extends GuiBase {
                 lastTile = null;
             }
         }));
-        tile.add(new UIClickable(e -> initializePageTileConfig(currentTile.getNode()), 1));
+        tile.add(new UIClickable(e -> openNodeShortcuts(currentTile.getNode(), e), 1));
     }
 
     private void resetSelection(final UIEntity entity) {
@@ -366,7 +367,16 @@ public class GuiSignalBox extends GuiBase {
         entity.findRecursive(UIClickable.class).forEach(click -> click.setVisible(false));
     }
 
-    private void initializePageTileConfig(final SignalBoxNode node) {
+    private void openNodeShortcuts(final SignalBoxNode node, final UIEntity entity) {
+        if (node.isEmpty())
+            return;
+        this.resetTileSelection();
+        entity.add(new UIColor(EDIT_COLOR));
+        helpPage.helpUsageMode(enabledSubsidiaries, node);
+        helpPage.setShowHelpPage(true);
+    }
+
+    protected void initializePageTileConfig(final SignalBoxNode node) {
         if (node.isEmpty())
             return;
         reset();
@@ -435,7 +445,7 @@ public class GuiSignalBox extends GuiBase {
         sendModeChanges();
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
-        helpPage.helpUsageMode(enabledSubsidiaries);
+        helpPage.helpUsageMode(enabledSubsidiaries, null);
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -602,7 +612,7 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-        helpPage.helpUsageMode(enabledSubsidiaries);
+        helpPage.helpUsageMode(enabledSubsidiaries, null);
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {
@@ -615,7 +625,7 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void resetPathwayOnServer(final SignalBoxNode node) {
+    protected void resetPathwayOnServer(final SignalBoxNode node) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
@@ -719,7 +729,7 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void sendSubsidiaryRequest(final SubsidiaryEntry entry, final Point point,
+    protected void sendSubsidiaryRequest(final SubsidiaryEntry entry, final Point point,
             final ModeSet mode) {
         if (!allPacketsRecived)
             return;
@@ -742,7 +752,7 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void setAutoPoint(final Point point, final byte state) {
+    protected void setAutoPoint(final Point point, final byte state) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
