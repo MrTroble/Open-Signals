@@ -280,7 +280,20 @@ public class GuiSignalBox extends GuiBase {
                                         sendSubsidiaryRequest(entry, node, modeSet);
                                         container.grid.setClientState(node.getPoint(), modeSet,
                                                 entry);
+                                        final Map<ModeSet, SubsidiaryEntry> map = container.enabledSubsidiaryTypes
+                                                .computeIfAbsent(node.getPoint(),
+                                                        _u -> new HashMap<>());
+                                        if (entry.state) {
+                                            map.put(modeSet, entry);
+                                        } else {
+                                            map.remove(modeSet);
+                                        }
+                                        if (map.isEmpty()) {
+                                            container.enabledSubsidiaryTypes
+                                                    .remove(node.getPoint());
+                                        }
                                         pop();
+                                        helpPage.helpUsageMode(container);
                                     }, defaultValue));
                         });
                         final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -411,7 +424,7 @@ public class GuiSignalBox extends GuiBase {
         sendModeChanges();
         initializeFieldTemplate(this::tileNormal);
         resetSelection(entity);
-        helpPage.helpUsageMode();
+        helpPage.helpUsageMode(container);
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -574,7 +587,7 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-        helpPage.helpUsageMode();
+        helpPage.helpUsageMode(container);
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {

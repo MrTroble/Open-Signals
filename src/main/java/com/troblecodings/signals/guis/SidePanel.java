@@ -138,7 +138,7 @@ public class SidePanel {
         addHelpPageToPlane();
     }
 
-    public void helpUsageMode() {
+    public void helpUsageMode(final ContainerSignalBox container) {
         helpPage.clearChildren();
         helpPage.add(
                 GuiElements.createLabel(I18n.get("info.keys"), UIColor.BASIC_COLOR_PRIMARY, 0.8f));
@@ -146,6 +146,23 @@ public class SidePanel {
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
+        if (!container.enabledSubsidiaryTypes.isEmpty()) {
+            helpPage.add(GuiElements.createLabel(I18n.get("info.usage.subsidiary"),
+                    UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+            container.enabledSubsidiaryTypes.forEach((point, map) -> {
+                map.forEach((mode, entry) -> {
+                    helpPage.add(
+                            GuiElements
+                                    .createLabel(
+                                            "[x=" + point.getX() + ",y=" + point.getY() + "] "
+                                                    + I18n.get("info."
+                                                            + mode.mode.toString().toLowerCase())
+                                                    + " : "
+                                                    + entry.enumValue.toString().toUpperCase(),
+                                            UIColor.INFO_COLOR_PRIMARY, 0.5f));
+                });
+            });
+        }
         addHelpPageToPlane();
     }
 }
