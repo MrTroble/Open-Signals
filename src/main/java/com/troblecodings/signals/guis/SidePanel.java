@@ -104,6 +104,7 @@ public class SidePanel {
         helpPage.forEach(entity -> {
             entity.setVisible(showHelpPage);
         });
+        label.setVisible(true);
         button.setVisible(true);
     }
 
