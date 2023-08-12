@@ -422,7 +422,7 @@ public class GuiSignalBox extends GuiBase {
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
         sendModeChanges();
-        initializeFieldTemplate(this::tileNormal);
+        initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
         helpPage.helpUsageMode(container);
     }
@@ -452,7 +452,7 @@ public class GuiSignalBox extends GuiBase {
                 final UIMenu menu = new UIMenu();
                 menu.setVisible(false);
                 initializeFieldTemplate(
-                        (fieldEntity, name) -> this.tileEdit(fieldEntity, menu, name));
+                        (fieldEntity, name) -> this.tileEdit(fieldEntity, menu, name), true);
                 lowerEntity.add(menu);
                 menu.setConsumer(
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
@@ -474,7 +474,8 @@ public class GuiSignalBox extends GuiBase {
         push(screen);
     }
 
-    private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer) {
+    private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer,
+            final boolean showLines) {
         plane = new UIEntity();
         plane.clearChildren();
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
@@ -492,9 +493,11 @@ public class GuiSignalBox extends GuiBase {
             plane.setY(plane.getY() + y);
             plane.update();
         }, 2));
-        final UILines allLines = new UILines(ALL_LINES, 0.5F);
-        allLines.setColor(LINE_COLOR);
-        plane.add(allLines);
+        if (showLines) {
+            final UILines allLines = new UILines(ALL_LINES, 0.5F);
+            allLines.setColor(LINE_COLOR);
+            plane.add(allLines);
+        }
         final UIBox vbox = new UIBox(UIBox.VBOX, 0);
         vbox.setPageable(false);
         plane.add(vbox);
@@ -581,7 +584,7 @@ public class GuiSignalBox extends GuiBase {
 
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
-        initializeFieldTemplate(this::tileNormal);
+        initializeFieldTemplate(this::tileNormal, false);
 
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(middlePart);
