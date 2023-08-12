@@ -507,5 +507,12 @@
     "info.keys": "Steuerung",
     "info.usage.key.lmb": "Very Important Key",
 	"info.usage.key.rmb": "Config öffnen",
-    "item.opensignals.manipulator": "Manipulator"
+    "item.opensignals.manipulator": "Manipulator",
+	"info.usage.node": "Auswahl",
+	"info.usage.edit": "Konfigurieren",
+    "info.usage.subsidiary": "Aktive Zusatzsignale",
+    "sb.disablesubsidiary": "Ausschalten",
+    "info.usage.edit.desc": "Hier kommst du in den Bearbeitungsmodus für die Kachel.",
+    "btn.subsidiary.desc": "Hier kannst du Zusatzsignale einschalten.",
+    "button.reset.desc": "Setzt die Fahrstraße zurück."
 }
