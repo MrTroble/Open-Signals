@@ -167,17 +167,15 @@ public class SidePanel {
                 new UIEntity().getInfoTextColor(), 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
+        final Minecraft mc = Minecraft.getInstance();
         if (node != null) {
             final Map<ModeSet, PathOptionEntry> modes = node.getModes();
             final List<EnumGuiMode> guiModes = modes.keySet().stream().map(mode -> mode.mode)
                     .collect(Collectors.toList());
             helpPage.add(GuiElements.createLabel(I18n.get("info.usage.node"),
                     new UIEntity().getBasicTextColor(), 0.8f));
-            final UIEntity reset = GuiElements.createButton(I18n.get("button.reset"), e -> {
-                reset();
-                gui.resetPathwayOnServer(node);
-                helpUsageMode(subsidiaries, null);
-            });
+            final UIEntity reset = GuiElements.createButton(I18n.get("button.reset"),
+                    e -> gui.resetPathwayOnServer(node));
             reset.setScaleX(0.8f);
             reset.setScaleY(0.8f);
             reset.setX(5);
@@ -198,7 +196,13 @@ public class SidePanel {
                 final ModeSet mode = mapEntry.getKey();
                 final PathOptionEntry option = mapEntry.getValue();
 
-                if (mode.mode.equals(EnumGuiMode.HP) || mode.mode.equals(EnumGuiMode.RS)) {
+                if (option.containsEntry(PathEntryType.SIGNAL)) {
+                    final String signalName = ClientNameHandler.getClientName(new NameStateInfo(
+                            mc.level, option.getEntry(PathEntryType.SIGNAL).get()));
+                    helpPage.add(GuiElements.createLabel(
+                            (signalName.isEmpty() ? "Rotaion: " + mode.rotation.toString()
+                                    : signalName) + " - " + mode.mode.toString(),
+                            new UIEntity().getBasicTextColor(), 0.8f));
                     final UIEntity entity = GuiElements.createButton(I18n.get("btn.subsidiary"),
                             e -> {
                                 final UIBox hbox = new UIBox(UIBox.VBOX, 1);
@@ -262,7 +266,6 @@ public class SidePanel {
         if (!subsidiaries.isEmpty()) {
             helpPage.add(GuiElements.createLabel(I18n.get("info.usage.subsidiary"),
                     new UIEntity().getBasicTextColor(), 0.8f));
-            final Minecraft mc = Minecraft.getInstance();
             subsidiaries.forEach((pos, holder) -> {
                 final String name = ClientNameHandler
                         .getClientName(new NameStateInfo(mc.level, pos));
