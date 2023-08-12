@@ -164,14 +164,14 @@ public class SidePanel {
             final Minecraft mc = Minecraft.getInstance();
             subsidiaries.forEach((pos, holder) -> {
                 final String name = ClientNameHandler
-                        .getClientName(new NameStateInfo(mc.level, pos)) + " : "
-                        + holder.entry.enumValue.toString().toUpperCase();
+                        .getClientName(new NameStateInfo(mc.level, pos));
                 final UIEntity button = GuiElements.createButton(name, e -> {
                     final UIEntity screen = GuiElements.createScreen(selectionEntity -> {
                         final UIBox hbox = new UIBox(UIBox.VBOX, 3);
                         selectionEntity.add(hbox);
                         final UIEntity question = new UIEntity();
-                        final UILabel label = new UILabel(name);
+                        final UILabel label = new UILabel(
+                                name + " : " + holder.entry.enumValue.toString().toUpperCase());
                         label.setTextColor(0xFFFFFFFF);
                         question.setScaleX(1.1f);
                         question.setScaleY(1.1f);
