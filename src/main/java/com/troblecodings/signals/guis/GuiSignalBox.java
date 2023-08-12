@@ -61,7 +61,7 @@ public class GuiSignalBox extends GuiBase {
     public static final int SELECTION_COLOR = 0x2900FF00;
     public static final int BACKGROUND_COLOR = 0xFF8B8B8B;
     public static final int LINE_COLOR = 0xFF5B5B5B;
-    public static final int EDIT_COLOR = 0x0000FF;
+    public static final int EDIT_COLOR = 0x5000A2FF;
 
     public static final float[] ALL_LINES = getLines();
     public static final int TILE_WIDTH = 10;
