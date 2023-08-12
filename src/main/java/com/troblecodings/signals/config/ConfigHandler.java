@@ -36,9 +36,6 @@ public class ConfigHandler {
         public final ConfigValue<Integer> signalboxFreeColor;
         public final ConfigValue<Integer> signalboxSelectColor;
         public final ConfigValue<Integer> signalboxUsedColor;
-        public final ConfigValue<Integer> basicTextColor;
-        public final ConfigValue<Integer> infoTextColor;
-        public final ConfigValue<Integer> errorTextColor;
 
         public Client(final ForgeConfigSpec.Builder builder) {
             String desc;
@@ -55,15 +52,6 @@ public class ConfigHandler {
             
             desc = "Change the color of a blocked path. Default: -65536";
             signalboxUsedColor = builder.comment(desc).define("Signalbox used color", 0xFFFF0000);
-            
-            desc = "Change the color of a default text. Default: -16777216";
-            basicTextColor = builder.comment(desc).define("Basic text color", 0xFF000000);
-            
-            desc = "Change the color of an info text. Default: -16777046";
-            infoTextColor = builder.comment(desc).define("info text color", 0xFF0000AA);
-            
-            desc = "Change the color of an error text. Default: -16776961";
-            errorTextColor = builder.comment(desc).define("Error text color", 0xFF0000FF);
             
             builder.pop();
 

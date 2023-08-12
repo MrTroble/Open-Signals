@@ -59,7 +59,7 @@ public class SidePanel {
         rotate.setRotateZ((float) Math.PI / 2.0f);
         label.add(rotate);
         final UILabel labelComponent = new UILabel(I18n.get("info.infolabel"));
-        labelComponent.setTextColor(UIColor.BASIC_COLOR_PRIMARY);
+        labelComponent.setTextColor(new UIEntity().getBasicTextColor());
         label.add(labelComponent);
         label.setY(25);
         label.setX(2);
@@ -124,7 +124,7 @@ public class SidePanel {
         helpPage.clearChildren();
         helpPage.add(GuiElements.createSpacerV(2));
         helpPage.add(GuiElements.createLabel(I18n.get("info.nextelement"),
-                UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+                new UIEntity().getBasicTextColor(), 0.8f));
 
         final UIEntity preview = new UIEntity();
         preview.setInheritWidth(true);
@@ -140,39 +140,39 @@ public class SidePanel {
         node.add(new ModeSet(modes, Rotation.values()[rotation]));
         final UISignalBoxTile sbt = new UISignalBoxTile(node);
         preview.add(sbt);
-        preview.add(new UIBorder(UIColor.BASIC_COLOR_PRIMARY));
+        preview.add(new UIBorder(new UIEntity().getBasicTextColor()));
 
         helpPage.add(preview);
         helpPage.add(GuiElements.createSpacerV(5));
         helpPage.add(GuiElements.createLabel("[R] = " + I18n.get("info.editor.key.r"),
-                UIColor.INFO_COLOR_PRIMARY, 0.5f));
+                new UIEntity().getInfoTextColor(), 0.5f));
         helpPage.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.editor.key.lmb"),
-                UIColor.INFO_COLOR_PRIMARY, 0.5f));
+                new UIEntity().getInfoTextColor(), 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.editor.key.rmb"),
-                UIColor.INFO_COLOR_PRIMARY, 0.5f));
+                new UIEntity().getInfoTextColor(), 0.5f));
         helpPage.add(GuiElements.createSpacerV(5));
         helpPage.add(GuiElements.createLabel(I18n.get("info.description"),
-                UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+                new UIEntity().getBasicTextColor(), 0.8f));
         helpPage.add(GuiElements.createLabel(I18n.get("info." + modes.toString().toLowerCase()),
-                UIColor.INFO_COLOR_PRIMARY, 0.5f));
+                new UIEntity().getInfoTextColor(), 0.5f));
         addHelpPageToPlane();
     }
 
     public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries,
             final SignalBoxNode node) {
         helpPage.clearChildren();
-        helpPage.add(
-                GuiElements.createLabel(I18n.get("info.keys"), UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+        helpPage.add(GuiElements.createLabel(I18n.get("info.keys"),
+                new UIEntity().getBasicTextColor(), 0.8f));
         helpPage.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.usage.key.lmb"),
-                UIColor.INFO_COLOR_PRIMARY, 0.5f));
+                new UIEntity().getInfoTextColor(), 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
-                UIColor.INFO_COLOR_PRIMARY, 0.5f));
+                new UIEntity().getInfoTextColor(), 0.5f));
         if (node != null) {
             final Map<ModeSet, PathOptionEntry> modes = node.getModes();
             final List<EnumGuiMode> guiModes = modes.keySet().stream().map(mode -> mode.mode)
                     .collect(Collectors.toList());
             helpPage.add(GuiElements.createLabel(I18n.get("info.usage.node"),
-                    UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+                    new UIEntity().getBasicTextColor(), 0.8f));
             final UIEntity reset = GuiElements.createButton(I18n.get("button.reset"), e -> {
                 reset();
                 gui.resetPathwayOnServer(node);
@@ -261,7 +261,7 @@ public class SidePanel {
         }
         if (!subsidiaries.isEmpty()) {
             helpPage.add(GuiElements.createLabel(I18n.get("info.usage.subsidiary"),
-                    UIColor.BASIC_COLOR_PRIMARY, 0.8f));
+                    new UIEntity().getBasicTextColor(), 0.8f));
             final Minecraft mc = Minecraft.getInstance();
             subsidiaries.forEach((pos, holder) -> {
                 final String name = ClientNameHandler
