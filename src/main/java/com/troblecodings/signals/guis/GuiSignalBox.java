@@ -32,6 +32,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
@@ -59,8 +60,8 @@ import net.minecraft.world.level.block.Rotation;
 public class GuiSignalBox extends GuiBase {
 
     public static final int SELECTION_COLOR = 0x2900FF00;
-    public static final int BACKGROUND_COLOR = 0xFF8B8B8B;
-    public static final int LINE_COLOR = 0xFF5B5B5B;
+    public static final int BACKGROUND_COLOR = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
+    public static final int GRID_COLOR = 0xFF5B5B5B;
     public static final int EDIT_COLOR = 0x5000A2FF;
 
     public static final float[] ALL_LINES = getLines();
@@ -516,7 +517,7 @@ public class GuiSignalBox extends GuiBase {
         }, 2));
         if (showLines) {
             final UILines allLines = new UILines(ALL_LINES, 0.5F);
-            allLines.setColor(LINE_COLOR);
+            allLines.setColor(GRID_COLOR);
             plane.add(allLines);
         }
         final UIBox vbox = new UIBox(UIBox.VBOX, 0);
