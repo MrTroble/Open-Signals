@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -128,6 +129,7 @@ public class GuiSignalBox extends GuiBase {
         this.entity.findRecursive(UIColor.class).stream().filter(
                 color -> color.getColor() == SELECTION_COLOR || color.getColor() == EDIT_COLOR)
                 .forEach(color -> color.getParent().remove(color));
+        this.lastTile = null;
     }
 
     private void selectLink(final UIEntity parent, final SignalBoxNode node,
@@ -272,9 +274,7 @@ public class GuiSignalBox extends GuiBase {
                         final UIEntity list = new UIEntity();
                         list.setInherits(true);
                         list.add(hbox);
-                        list.add(GuiElements.createButton(I18n.get("btn.return"), a -> {
-                            pop();
-                        }));
+                        list.add(GuiElements.createButton(I18n.get("btn.return"), a -> pop()));
                         final ModeSet modeSet = new ModeSet(mode, rotation);
                         SubsidiaryState.ALL_STATES.forEach(state -> {
                             final int defaultValue = container.grid
@@ -322,6 +322,7 @@ public class GuiSignalBox extends GuiBase {
         container.grid.setClientState(holder.point, holder.modeSet, entry);
         enabledSubsidiaries.remove(pos);
         helpPage.helpUsageMode(enabledSubsidiaries, null);
+        this.resetTileSelection();
     }
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
@@ -349,12 +350,10 @@ public class GuiSignalBox extends GuiBase {
             } else {
                 if (lastTile == currentTile) {
                     this.resetTileSelection();
-                    lastTile = null;
                     return;
                 }
                 sendPWRequest(currentTile.getNode());
                 this.resetTileSelection();
-                lastTile = null;
             }
         }));
         tile.add(new UIClickable(e -> openNodeShortcuts(currentTile.getNode(), e), 1));
@@ -370,6 +369,17 @@ public class GuiSignalBox extends GuiBase {
 
     private void openNodeShortcuts(final SignalBoxNode node, final UIEntity entity) {
         if (node.isEmpty())
+            return;
+        final AtomicBoolean isAlreadyOpen = new AtomicBoolean(false);
+        entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == EDIT_COLOR)
+                .forEach(color -> {
+                    color.getParent().remove(color);
+                    helpPage.helpUsageMode(enabledSubsidiaries, null);
+                    helpPage.setShowHelpPage(false);
+                    isAlreadyOpen.set(true);
+                    this.resetTileSelection();
+                });
+        if (isAlreadyOpen.get())
             return;
         this.resetTileSelection();
         entity.add(new UIColor(EDIT_COLOR));
