@@ -1,5 +1,8 @@
 package com.troblecodings.signals.guis;
 
+import java.util.Map;
+import java.util.function.BiConsumer;
+
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -11,12 +14,17 @@ import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
+import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.handler.ClientNameHandler;
+import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Rotation;
 
 public class SidePanel {
@@ -28,9 +36,13 @@ public class SidePanel {
     private final UIEntity button = new UIEntity();
     private final UIEntity label = new UIEntity();
     private final UIEntity spacerEntity = new UIEntity();
+    private final GuiSignalBox gui;
 
-    public SidePanel(final UIEntity lowerEntity) {
+    private BiConsumer<BlockPos, SubsidiaryHolder> disableSubsidiary;
+
+    public SidePanel(final UIEntity lowerEntity, final GuiSignalBox gui) {
         this.lowerEntity = lowerEntity;
+        this.gui = gui;
 
         helpPage.setInherits(true);
         helpPage.add(new UIBox(UIBox.VBOX, 2));
@@ -138,7 +150,7 @@ public class SidePanel {
         addHelpPageToPlane();
     }
 
-    public void helpUsageMode(final ContainerSignalBox container) {
+    public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries) {
         helpPage.clearChildren();
         helpPage.add(
                 GuiElements.createLabel(I18n.get("info.keys"), UIColor.BASIC_COLOR_PRIMARY, 0.8f));
@@ -146,23 +158,56 @@ public class SidePanel {
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
                 UIColor.INFO_COLOR_PRIMARY, 0.5f));
-        if (!container.enabledSubsidiaryTypes.isEmpty()) {
+        if (!subsidiaries.isEmpty()) {
             helpPage.add(GuiElements.createLabel(I18n.get("info.usage.subsidiary"),
                     UIColor.BASIC_COLOR_PRIMARY, 0.8f));
-            container.enabledSubsidiaryTypes.forEach((point, map) -> {
-                map.forEach((mode, entry) -> {
-                    helpPage.add(
-                            GuiElements
-                                    .createLabel(
-                                            "[x=" + point.getX() + ",y=" + point.getY() + "] "
-                                                    + I18n.get("info."
-                                                            + mode.mode.toString().toLowerCase())
-                                                    + " : "
-                                                    + entry.enumValue.toString().toUpperCase(),
-                                            UIColor.INFO_COLOR_PRIMARY, 0.5f));
+            final Minecraft mc = Minecraft.getInstance();
+            subsidiaries.forEach((pos, holder) -> {
+                final String name = ClientNameHandler
+                        .getClientName(new NameStateInfo(mc.level, pos)) + " : "
+                        + holder.entry.enumValue.toString().toUpperCase();
+                final UIEntity button = GuiElements.createButton(name, e -> {
+                    final UIEntity screen = GuiElements.createScreen(selectionEntity -> {
+                        final UIBox hbox = new UIBox(UIBox.VBOX, 3);
+                        selectionEntity.add(hbox);
+                        final UIEntity question = new UIEntity();
+                        final UILabel label = new UILabel(name);
+                        label.setTextColor(0xFFFFFFFF);
+                        question.setScaleX(1.1f);
+                        question.setScaleY(1.1f);
+                        question.add(label);
+                        question.setInherits(true);
+                        final UILabel info = new UILabel(I18n.get("sb.disablesubsidiary"));
+                        info.setTextColor(0xFFFFFFFF);
+                        final UIEntity infoEntity = new UIEntity();
+                        infoEntity.add(info);
+                        infoEntity.setInherits(true);
+                        selectionEntity.add(question);
+                        selectionEntity.add(infoEntity);
+                        final UIEntity buttons = new UIEntity();
+                        final UIEntity buttonYes = GuiElements.createButton(I18n.get("btn.yes"),
+                                e1 -> {
+                                    gui.pop();
+                                    disableSubsidiary.accept(pos, holder);
+                                });
+                        final UIEntity buttonNo = GuiElements.createButton(I18n.get("btn.no"),
+                                e2 -> gui.pop());
+                        buttons.setInherits(true);
+                        final UIBox vbox = new UIBox(UIBox.HBOX, 1);
+                        buttons.add(vbox);
+                        buttons.add(buttonYes);
+                        buttons.add(buttonNo);
+                        selectionEntity.add(buttons);
+                    });
+                    gui.push(screen);
                 });
+                helpPage.add(button);
             });
         }
         addHelpPageToPlane();
+    }
+
+    public void setDisableSubdsidiary(final BiConsumer<BlockPos, SubsidiaryHolder> consumer) {
+        this.disableSubsidiary = consumer;
     }
 }

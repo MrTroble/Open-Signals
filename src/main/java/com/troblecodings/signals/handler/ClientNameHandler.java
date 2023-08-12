@@ -21,7 +21,7 @@ public class ClientNameHandler implements INetworkSync {
 
     public static String getClientName(final NameStateInfo info) {
         synchronized (CLIENT_NAMES) {
-            return CLIENT_NAMES.getOrDefault(info, "");
+            return new String(CLIENT_NAMES.getOrDefault(info, ""));
         }
     }
 

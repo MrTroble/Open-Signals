@@ -34,6 +34,7 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.SubsidiaryEntry;
+import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -50,6 +51,7 @@ import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Rotation;
@@ -94,6 +96,7 @@ public class GuiSignalBox extends GuiBase {
     private boolean allPacketsRecived = false;
     private final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
+    private final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
@@ -166,7 +169,8 @@ public class GuiSignalBox extends GuiBase {
         }
     }
 
-    private String getSignalInfo(final BlockPos signalPos, final LinkType type) {
+    public static String getSignalInfo(final BlockPos signalPos, final LinkType type) {
+        final Minecraft mc = Minecraft.getInstance();
         final String customName = ClientNameHandler
                 .getClientName(new NameStateInfo(mc.level, signalPos));
         return String.format("%s (x=%d, y=%d. z=%d)",
@@ -277,23 +281,22 @@ public class GuiSignalBox extends GuiBase {
                                     state.getName(), 2, i -> i == 1 ? "false" : "true"), a -> {
                                         final SubsidiaryEntry entry = new SubsidiaryEntry(state,
                                                 a == 0 ? true : false);
-                                        sendSubsidiaryRequest(entry, node, modeSet);
+                                        sendSubsidiaryRequest(entry, node.getPoint(), modeSet);
                                         container.grid.setClientState(node.getPoint(), modeSet,
                                                 entry);
-                                        final Map<ModeSet, SubsidiaryEntry> map = container.enabledSubsidiaryTypes
-                                                .computeIfAbsent(node.getPoint(),
-                                                        _u -> new HashMap<>());
-                                        if (entry.state) {
-                                            map.put(modeSet, entry);
-                                        } else {
-                                            map.remove(modeSet);
-                                        }
-                                        if (map.isEmpty()) {
-                                            container.enabledSubsidiaryTypes
-                                                    .remove(node.getPoint());
+                                        final BlockPos signalPos = option
+                                                .getEntry(PathEntryType.SIGNAL).orElse(null);
+                                        if (signalPos != null) {
+                                            if (entry.state) {
+                                                enabledSubsidiaries.put(signalPos,
+                                                        new SubsidiaryHolder(entry, node.getPoint(),
+                                                                modeSet));
+                                            } else {
+                                                enabledSubsidiaries.remove(signalPos);
+                                            }
                                         }
                                         pop();
-                                        helpPage.helpUsageMode(container);
+                                        helpPage.helpUsageMode(enabledSubsidiaries);
                                     }, defaultValue));
                         });
                         final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -309,6 +312,14 @@ public class GuiSignalBox extends GuiBase {
             default:
                 break;
         }
+    }
+
+    private void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
+        final SubsidiaryEntry entry = new SubsidiaryEntry(holder.entry.enumValue, false);
+        sendSubsidiaryRequest(entry, holder.point, holder.modeSet);
+        container.grid.setClientState(holder.point, holder.modeSet, entry);
+        enabledSubsidiaries.remove(pos);
+        helpPage.helpUsageMode(enabledSubsidiaries);
     }
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
@@ -424,7 +435,7 @@ public class GuiSignalBox extends GuiBase {
         sendModeChanges();
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
-        helpPage.helpUsageMode(container);
+        helpPage.helpUsageMode(enabledSubsidiaries);
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -544,7 +555,8 @@ public class GuiSignalBox extends GuiBase {
         splitter.setInherits(true);
         lowerEntity.add(new UIBox(UIBox.HBOX, 2));
         lowerEntity.add(splitter);
-        helpPage = new SidePanel(lowerEntity);
+        helpPage = new SidePanel(lowerEntity, this);
+        helpPage.setDisableSubdsidiary(this::disableSubsidiary);
 
         buildColors(container.grid.getNodes());
     }
@@ -590,7 +602,7 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-        helpPage.helpUsageMode(container);
+        helpPage.helpUsageMode(enabledSubsidiaries);
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {
@@ -707,14 +719,14 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void sendSubsidiaryRequest(final SubsidiaryEntry entry, final SignalBoxNode node,
+    private void sendSubsidiaryRequest(final SubsidiaryEntry entry, final Point point,
             final ModeSet mode) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) SignalBoxNetwork.REQUEST_SUBSIDIARY.ordinal());
         entry.writeNetwork(buffer);
-        node.getPoint().writeNetwork(buffer);
+        point.writeNetwork(buffer);
         mode.writeNetwork(buffer);
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
@@ -760,9 +772,23 @@ public class GuiSignalBox extends GuiBase {
     @Override
     public void updateFromContainer() {
         if (!allPacketsRecived) {
+            updateEnabledSubsidiaries();
             initializeBasicUI();
             allPacketsRecived = true;
         }
+    }
+
+    private void updateEnabledSubsidiaries() {
+        container.enabledSubsidiaryTypes.forEach((point, map) -> map.forEach((modeSet, state) -> {
+            if (!state.state)
+                return;
+            final SignalBoxNode node = container.grid.getNode(point);
+            if (node == null)
+                return;
+            node.getOption(modeSet).get().getEntry(PathEntryType.SIGNAL)
+                    .ifPresent(pos -> enabledSubsidiaries.put(pos,
+                            new SubsidiaryHolder(state, point, modeSet)));
+        }));
     }
 
     private void buildColors(final List<SignalBoxNode> nodes) {
