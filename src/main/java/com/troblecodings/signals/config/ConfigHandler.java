@@ -23,7 +23,7 @@ public class ConfigHandler {
             builder.push("General");
             
             desc = "Change the light emssion value of a signal. When you change the value, the signal block lights up and illuminates the environment. Default: 1";
-            lightEmission = builder.comment(desc).defineInRange("Signalbox background color", 1, 0, 15);
+            lightEmission = builder.comment(desc).defineInRange("Signal light emission", 1, 0, 15);
             
             builder.pop();
         }
