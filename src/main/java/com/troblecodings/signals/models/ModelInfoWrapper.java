@@ -1,13 +1,24 @@
 package com.troblecodings.signals.models;
 
+import java.util.Map;
+
+import com.troblecodings.core.interfaces.BlockModelDataWrapper;
 import com.troblecodings.signals.SEProperty;
 
 import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelDataMap.Builder;
 import net.minecraftforge.client.model.data.ModelProperty;
 
-public class ModelInfoWrapper implements IModelData {
+public class ModelInfoWrapper implements BlockModelDataWrapper {
 
     private final IModelData data;
+
+    public ModelInfoWrapper(final Map<SEProperty, String> states) {
+        final Builder builder = new ModelDataMap.Builder();
+        states.forEach((property, value) -> builder.withInitial(property, value));
+        this.data = builder.build();
+    }
 
     public ModelInfoWrapper(final IModelData data) {
         this.data = data;

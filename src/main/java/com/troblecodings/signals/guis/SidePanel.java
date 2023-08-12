@@ -16,7 +16,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
@@ -58,14 +57,11 @@ public class SidePanel {
         final UIRotate rotate = new UIRotate();
         rotate.setRotateZ((float) Math.PI / 2.0f);
         label.add(rotate);
-        final UIIndependentTranslate tl = new UIIndependentTranslate();
-        tl.setX(-30);
-        label.add(tl);
         final UILabel labelComponent = new UILabel(I18n.get("info.infolabel"));
         labelComponent.setTextColor(UIColor.BASIC_COLOR_PRIMARY);
         label.add(labelComponent);
-        label.add(new UIOnUpdate(
-                () -> label.setY((helpPage.getHeight() - labelComponent.getTextWidth()) / 2)));
+        label.setY(25);
+        label.setX(2);
 
         button.setInheritWidth(true);
         button.setHeight(20);
@@ -101,7 +97,6 @@ public class SidePanel {
         } else {
             helpPageButton.setText("<");
             helpPage.add(label);
-            label.setX(2);
             spacerEntity.setWidth(12);
             lowerEntity.update();
         }
@@ -109,7 +104,6 @@ public class SidePanel {
             entity.setVisible(showHelpPage);
         });
         button.setVisible(true);
-        label.setVisible(true);
     }
 
     protected void setShowHelpPage(final boolean showHelpPage) {
@@ -198,7 +192,7 @@ public class SidePanel {
                 entity.setX(5);
                 helpPage.add(entity);
             }
-            for (Map.Entry<ModeSet, PathOptionEntry> mapEntry : modes.entrySet()) {
+            for (final Map.Entry<ModeSet, PathOptionEntry> mapEntry : modes.entrySet()) {
                 final ModeSet mode = mapEntry.getKey();
                 final PathOptionEntry option = mapEntry.getValue();
 
