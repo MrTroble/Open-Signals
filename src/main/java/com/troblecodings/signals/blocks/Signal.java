@@ -388,7 +388,7 @@ public class Signal extends BasicBlock {
             level.blockUpdated(blockPos, this);
             return InteractionResult.SUCCESS;
         }
-        return InteractionResult.FAIL;
+        return InteractionResult.SUCCESS;
     }
 
     @SuppressWarnings("unchecked")
