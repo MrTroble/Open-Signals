@@ -385,7 +385,7 @@ public class Signal extends BasicBlock {
             return InteractionResult.SUCCESS;
         }
         if (loadRedstoneOutput(level, stateInfo)) {
-            level.blockUpdated(blockPos, blockstate.getBlock());
+            level.blockUpdated(blockPos, this);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.FAIL;
