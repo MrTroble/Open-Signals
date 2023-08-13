@@ -251,8 +251,11 @@ public class ContainerSignalController extends ContainerBase
             }
             case UNLINK_INPUT_POS: {
                 final BlockPos linkedInput = controllerEntity.getLinkedRSInput();
-                loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerLevel) getInfo().world,
-                        linkedInput, (tile, _u) -> tile.unlinkController(getInfo().pos));
+                final GuiInfo info = getInfo();
+                if (info.pos == null || linkedInput == null)
+                    break;
+                loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerLevel) info.world,
+                        linkedInput, (tile, _u) -> tile.unlinkController(info.pos));
                 controllerEntity.setLinkedRSInput(null);
                 break;
             }

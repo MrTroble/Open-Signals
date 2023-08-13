@@ -2,7 +2,6 @@ package com.troblecodings.signals.guis;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.IntConsumer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -10,18 +9,12 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
-import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
-import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
-import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
-import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
-import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -30,7 +23,6 @@ import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
-import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
@@ -43,17 +35,15 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 public class GuiPlacementtool extends GuiBase {
 
     public static final int GUI_PLACEMENTTOOL = 0;
-    public static final float MODIFIER = 0.1f;
 
     private final UIEntity list = new UIEntity();
-    private final UIBlockRender blockRender = new UIBlockRender();
+    private final PreviewSideBar previewSidebar = new PreviewSideBar(-9);
     private Signal currentSelectedBlock;
     private final Placementtool tool;
     private final Player player;
     private final ContainerPlacementtool container;
     private UIEnumerable enumerable;
     private boolean loaded = false;
-    private final Map<SEProperty, String> properties = new HashMap<>();
 
     public GuiPlacementtool(final GuiInfo info) {
         super(info);
@@ -68,19 +58,18 @@ public class GuiPlacementtool extends GuiBase {
     }
 
     @Override
-    public void renderComponentTooltip(final PoseStack stack, final List<Component> list, final int mouseX,
-            final int mouseY) {
+    public void renderComponentTooltip(final PoseStack stack, final List<Component> list,
+            final int mouseX, final int mouseY) {
         final int oldWidth = this.width;
         this.width *= 0.7;
         super.renderComponentTooltip(stack, list, mouseX, mouseY);
         this.width = oldWidth;
     }
-    
+
     private void initInternal() {
         final UIBox vbox = new UIBox(UIBox.VBOX, 5);
         this.list.add(vbox);
-        this.list.setInheritHeight(true);
-        this.list.setInheritWidth(true);
+        this.list.setInherits(true);
 
         final UIEntity lowerEntity = new UIEntity();
         lowerEntity.add(GuiElements.createSpacerH(10));
@@ -92,7 +81,7 @@ public class GuiPlacementtool extends GuiBase {
                     currentSelectedBlock = tool.getObjFromID(input);
                     this.list.clearChildren();
                     if (container.signalID != input) {
-                        properties.clear();
+                        previewSidebar.clear();
                         sendSignalId(input);
                     }
                 });
@@ -105,27 +94,10 @@ public class GuiPlacementtool extends GuiBase {
         leftSide.add(list);
         leftSide.add(GuiElements.createPageSelect(vbox));
 
-        final UIEntity blockRenderEntity = new UIEntity();
-        blockRenderEntity.setInheritHeight(true);
-        blockRenderEntity.setWidth(60);
-
-        final UIRotate rotation = new UIRotate();
-        rotation.setRotateY((float)Math.toRadians(180));
-        blockRenderEntity.add(
-                new UIDrag((x, y) -> rotation.setRotateY((float) (rotation.getRotateY() + x * MODIFIER))));
-
-        blockRenderEntity.add(new UIScissor());
-        blockRenderEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
-        blockRenderEntity.add(new UIScale(20, -20, 20));
-        blockRenderEntity.add(new UIIndependentTranslate(1.5, 0, 1.5));
-        blockRenderEntity.add(rotation);
-        blockRenderEntity.add(new UIIndependentTranslate(-0.5, -9, -0.5));
-        blockRenderEntity.add(blockRender);
-
         lowerEntity.add(new UIBox(UIBox.HBOX, 5));
 
         lowerEntity.add(leftSide);
-        lowerEntity.add(blockRenderEntity);
+        lowerEntity.add(previewSidebar.get());
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
 
@@ -153,7 +125,7 @@ public class GuiPlacementtool extends GuiBase {
     public void of(final SEProperty property, final IntConsumer consumer, final int value) {
         if (property == null)
             return;
-        addToRenderList(property, value);
+        previewSidebar.addToRenderList(property, value);
         if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
             if (property.getParent().equals(JsonEnum.BOOLEAN)) {
                 list.add(GuiElements.createBoolElement(property, consumer, value));
@@ -162,24 +134,6 @@ public class GuiPlacementtool extends GuiBase {
             list.add(GuiElements.createEnumElement(property, consumer, value));
         } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
             list.add(GuiElements.createBoolElement(property, consumer, value));
-        }
-    }
-
-    private void addToRenderList(final SEProperty property, final int valueId) {
-        if (valueId < 0) {
-            properties.remove(property);
-            return;
-        }
-        if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-            properties.put(property, property.getObjFromID(valueId));
-        } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-            if (valueId > 0) {
-                properties.put(property, property.getDefault());
-            } else {
-                properties.remove(property);
-            }
-        } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
-            properties.put(property, property.getDefault());
         }
     }
 
@@ -203,20 +157,18 @@ public class GuiPlacementtool extends GuiBase {
         }
         this.entity.update();
         loaded = true;
-        blockRender.setBlockState(currentSelectedBlock.defaultBlockState(),
-                new ModelInfoWrapper(properties));
+        previewSidebar.update(currentSelectedBlock);
     }
 
     private void applyPropertyChanges(final SEProperty property, final int valueId) {
-        addToRenderList(property, valueId);
+        previewSidebar.addToRenderList(property, valueId);
         if (loaded) {
             final int propertyId = currentSelectedBlock.getIDFromProperty(property);
             final WriteBuffer buffer = new WriteBuffer();
             buffer.putByte((byte) propertyId);
             buffer.putByte((byte) valueId);
             OpenSignalsMain.network.sendTo(player, buffer.build());
-            blockRender.setBlockState(currentSelectedBlock.defaultBlockState(),
-                    new ModelInfoWrapper(properties));
+            previewSidebar.update(currentSelectedBlock);
         }
     }
 
