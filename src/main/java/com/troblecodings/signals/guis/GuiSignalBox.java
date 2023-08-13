@@ -231,6 +231,15 @@ public class GuiSignalBox extends GuiBase {
                 selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
                         mode, rotation);
                 if (option.getEntry(PathEntryType.OUTPUT).isPresent()) {
+                    final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
+                    for (Map.Entry<ModeSet, PathOptionEntry> entry : node.getModes().entrySet()) {
+                        final Optional<EnumPathUsage> usage = entry.getValue()
+                                .getEntry(PathEntryType.PATHUSAGE);
+                        if (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)) {
+                            canBeManuelChanged.set(false);
+                            break;
+                        }
+                    }
                     final UILabel currentStatus = new UILabel(I18n.get("info.usage.status") + " : "
                             + I18n.get("info.usage.status.free"));
                     currentStatus.setTextColor(new UIEntity().getBasicTextColor());
@@ -242,12 +251,10 @@ public class GuiSignalBox extends GuiBase {
                     parent.add(GuiElements.createButton(I18n.get("info.usage.manuel"), e1 -> {
                         final Optional<EnumPathUsage> usage = option
                                 .getEntry(PathEntryType.PATHUSAGE);
-                        final boolean canBeManuelChanged = !usage.isPresent()
-                                || usage.get().equals(EnumPathUsage.FREE);
                         final UIEntity info = new UIEntity();
                         info.setInherits(true);
                         info.add(new UIBox(UIBox.VBOX, 5));
-                        info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                        info.add(new UIColor(BACKGROUND_COLOR));
                         info.add(new UIClickable(_u -> pop(), 1));
                         info.add(statusEntity);
                         final UIEntity textureEntity = new UIEntity();
@@ -255,7 +262,7 @@ public class GuiSignalBox extends GuiBase {
                         textureEntity.setWidth(40);
                         textureEntity.setX(120);
                         textureEntity.add(new UIToolTip(I18n.get("info.usage.rs.desc")));
-                        if (canBeManuelChanged) {
+                        if (canBeManuelChanged.get()) {
                             if (node.containsManuellOutput(modeSet)) {
                                 textureEntity.add(new UITexture(SidePanel.REDSTONE_ON));
                             } else {
@@ -281,10 +288,9 @@ public class GuiSignalBox extends GuiBase {
                         outputEntity.setHeight(20);
                         outputEntity.add(outputStatus);
                         info.add(outputEntity);
-                        if (canBeManuelChanged) {
+                        if (canBeManuelChanged.get()) {
                             info.add(GuiElements.createButton(I18n.get("info.usage.change"), i -> {
-                                final boolean turnOff = node
-                                        .containsManuellOutput(new ModeSet(mode, rotation));
+                                final boolean turnOff = node.containsManuellOutput(modeSet);
                                 textureEntity.clear();
                                 textureEntity.add(new UIToolTip(I18n.get("info.usage.rs.desc")));
                                 if (turnOff) {
@@ -486,10 +492,11 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
         final UIEntity list = new UIEntity();
-        final UIBox uibox = new UIBox(UIBox.VBOX, 2);
-        list.add(uibox);
+        list.add(list);
         list.setInheritHeight(true);
         list.setInheritWidth(true);
+        final UIBox uibox = new UIBox(UIBox.VBOX, 2);
+        list.add(uibox);
         container.getPositionForTypes().forEach((p, t) -> {
             final String name = getSignalInfo(p, t);
             final UIEntity layout = new UIEntity();
