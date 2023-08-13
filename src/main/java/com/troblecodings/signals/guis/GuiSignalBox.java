@@ -198,6 +198,7 @@ public class GuiSignalBox extends GuiBase {
         entity.add(modeLabel);
         parent.add(entity);
         final Set<Entry<BlockPos, LinkType>> entrySet = container.getPositionForTypes().entrySet();
+        final ModeSet modeSet = new ModeSet(mode, rotation);
 
         switch (mode) {
             case CORNER:
@@ -229,12 +230,78 @@ public class GuiSignalBox extends GuiBase {
 
                 selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
                         mode, rotation);
-                if (option.getEntry(PathEntryType.OUTPUT).isPresent())
-                    parent.add(GuiElements.createBoolElement(BoolIntegerables.of("manuell_rs"),
-                            e -> changeRedstoneOutput(node.getPoint(), new ModeSet(mode, rotation),
-                                    e == 1 ? true : false),
-                            node.containsManuellOutput(new ModeSet(mode, rotation)) ? 1 : 0));
-
+                if (option.getEntry(PathEntryType.OUTPUT).isPresent()) {
+                    final UILabel currentStatus = new UILabel(I18n.get("info.usage.status") + " : "
+                            + I18n.get("info.usage.status.free"));
+                    currentStatus.setTextColor(new UIEntity().getBasicTextColor());
+                    final UIEntity statusEntity = new UIEntity();
+                    statusEntity.setInheritWidth(true);
+                    statusEntity.setHeight(20);
+                    statusEntity.add(new UIScale(1.1f, 1.1f, 1));
+                    statusEntity.add(currentStatus);
+                    parent.add(GuiElements.createButton(I18n.get("info.usage.manuel"), e1 -> {
+                        final Optional<EnumPathUsage> usage = option
+                                .getEntry(PathEntryType.PATHUSAGE);
+                        final boolean canBeManuelChanged = !usage.isPresent()
+                                || usage.get().equals(EnumPathUsage.FREE);
+                        final UIEntity info = new UIEntity();
+                        info.setInherits(true);
+                        info.add(new UIBox(UIBox.VBOX, 5));
+                        info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                        info.add(new UIClickable(_u -> pop(), 1));
+                        info.add(statusEntity);
+                        final UIEntity textureEntity = new UIEntity();
+                        textureEntity.setHeight(40);
+                        textureEntity.setWidth(40);
+                        textureEntity.setX(120);
+                        textureEntity.add(new UIToolTip(I18n.get("info.usage.rs.desc")));
+                        if (canBeManuelChanged) {
+                            if (node.containsManuellOutput(modeSet)) {
+                                textureEntity.add(new UITexture(SidePanel.REDSTONE_ON));
+                            } else {
+                                textureEntity.add(new UITexture(SidePanel.REDSTONE_OFF));
+                            }
+                        } else {
+                            if (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)) {
+                                textureEntity.add(new UITexture(SidePanel.REDSTONE_ON_BLOCKED));
+                            } else {
+                                textureEntity.add(new UITexture(SidePanel.REDSTONE_OFF_BLOCKED));
+                            }
+                        }
+                        info.add(textureEntity);
+                        final UILabel outputStatus = new UILabel(
+                                ((usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE))
+                                        || node.containsManuellOutput(modeSet))
+                                                ? I18n.get("info.usage.rs.true")
+                                                : I18n.get("info.usage.rs.false"));
+                        outputStatus.setCenterY(false);
+                        outputStatus.setTextColor(new UIEntity().getBasicTextColor());
+                        final UIEntity outputEntity = new UIEntity();
+                        outputEntity.setInheritWidth(true);
+                        outputEntity.setHeight(20);
+                        outputEntity.add(outputStatus);
+                        info.add(outputEntity);
+                        if (canBeManuelChanged) {
+                            info.add(GuiElements.createButton(I18n.get("info.usage.change"), i -> {
+                                final boolean turnOff = node
+                                        .containsManuellOutput(new ModeSet(mode, rotation));
+                                textureEntity.clear();
+                                textureEntity.add(new UIToolTip(I18n.get("info.usage.rs.desc")));
+                                if (turnOff) {
+                                    changeRedstoneOutput(node.getPoint(), modeSet, false);
+                                    outputStatus.setText(I18n.get("info.usage.rs.false"));
+                                    textureEntity.add(new UITexture(SidePanel.REDSTONE_OFF));
+                                } else {
+                                    changeRedstoneOutput(node.getPoint(), modeSet, true);
+                                    outputStatus.setText(I18n.get("info.usage.rs.true"));
+                                    textureEntity.add(new UITexture(SidePanel.REDSTONE_ON));
+                                }
+                            }));
+                        }
+                        final UIEntity screen = GuiElements.createScreen(e -> e.add(info));
+                        push(screen);
+                    }));
+                }
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
                         mode, rotation, ".blocking");
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
@@ -274,7 +341,6 @@ public class GuiSignalBox extends GuiBase {
                         list.setInherits(true);
                         list.add(hbox);
                         list.add(GuiElements.createButton(I18n.get("btn.return"), a -> pop()));
-                        final ModeSet modeSet = new ModeSet(mode, rotation);
                         SubsidiaryState.ALL_STATES.forEach(state -> {
                             final int defaultValue = container.grid
                                     .getSubsidiaryState(node.getPoint(), modeSet, state) ? 0 : 1;

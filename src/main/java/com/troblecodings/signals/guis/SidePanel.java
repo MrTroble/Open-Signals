@@ -290,8 +290,11 @@ public class SidePanel {
                                         outputEntity.setHeight(20);
                                         outputEntity.add(outputStatus);
                                         info.add(outputEntity);
-                                        if (!canBeManuelChanged.get())
+                                        if (!canBeManuelChanged.get()) {
+                                            gui.push(GuiElements
+                                                    .createScreen(entity -> entity.add(info)));
                                             return;
+                                        }
                                         info.add(GuiElements
                                                 .createButton(I18n.get("info.usage.change"), i -> {
                                                     final boolean turnOff = currentNode
