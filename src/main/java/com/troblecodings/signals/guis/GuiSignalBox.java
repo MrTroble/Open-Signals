@@ -230,11 +230,10 @@ public class GuiSignalBox extends GuiBase {
                 selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
                         mode, rotation);
                 if (option.getEntry(PathEntryType.OUTPUT).isPresent())
-                    parent.add(
-                            GuiElements.createBoolElement(BoolIntegerables.of("manuell_rs"), e -> {
-                                changeRedstoneOutput(node.getPoint(), new ModeSet(mode, rotation),
-                                        e == 1 ? true : false);
-                            }, node.containsManuellOutput(new ModeSet(mode, rotation)) ? 1 : 0));
+                    parent.add(GuiElements.createBoolElement(BoolIntegerables.of("manuell_rs"),
+                            e -> changeRedstoneOutput(node.getPoint(), new ModeSet(mode, rotation),
+                                    e == 1 ? true : false),
+                            node.containsManuellOutput(new ModeSet(mode, rotation)) ? 1 : 0));
 
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
                         mode, rotation, ".blocking");
@@ -298,7 +297,8 @@ public class GuiSignalBox extends GuiBase {
                                             }
                                         }
                                         pop();
-                                        helpPage.helpUsageMode(enabledSubsidiaries, null);
+                                        helpPage.helpUsageMode(enabledSubsidiaries, null,
+                                                container.grid.getNodes());
                                     }, defaultValue));
                         });
                         final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -321,7 +321,7 @@ public class GuiSignalBox extends GuiBase {
         sendSubsidiaryRequest(entry, holder.point, holder.modeSet);
         container.grid.setClientState(holder.point, holder.modeSet, entry);
         enabledSubsidiaries.remove(pos);
-        helpPage.helpUsageMode(enabledSubsidiaries, null);
+        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes());
         this.resetTileSelection();
     }
 
@@ -374,7 +374,7 @@ public class GuiSignalBox extends GuiBase {
         entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == EDIT_COLOR)
                 .forEach(color -> {
                     color.getParent().remove(color);
-                    helpPage.helpUsageMode(enabledSubsidiaries, null);
+                    helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes());
                     helpPage.setShowHelpPage(false);
                     isAlreadyOpen.set(true);
                     this.resetTileSelection();
@@ -383,7 +383,7 @@ public class GuiSignalBox extends GuiBase {
             return;
         this.resetTileSelection();
         entity.add(new UIColor(EDIT_COLOR));
-        helpPage.helpUsageMode(enabledSubsidiaries, node);
+        helpPage.helpUsageMode(enabledSubsidiaries, node, container.grid.getNodes());
         helpPage.setShowHelpPage(true);
     }
 
@@ -456,7 +456,7 @@ public class GuiSignalBox extends GuiBase {
         sendModeChanges();
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
-        helpPage.helpUsageMode(enabledSubsidiaries, null);
+        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes());
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -623,7 +623,7 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-        helpPage.helpUsageMode(enabledSubsidiaries, null);
+        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes());
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {
@@ -752,7 +752,8 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
-    private void changeRedstoneOutput(final Point point, final ModeSet mode, final boolean state) {
+    protected void changeRedstoneOutput(final Point point, final ModeSet mode,
+            final boolean state) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();

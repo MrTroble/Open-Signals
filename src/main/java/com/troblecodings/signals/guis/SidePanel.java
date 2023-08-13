@@ -1,7 +1,10 @@
 package com.troblecodings.signals.guis;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -10,18 +13,26 @@ import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIScrollBox;
+import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIOnUpdate;
+import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
 import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
+import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
+import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -33,9 +44,19 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Rotation;
 
 public class SidePanel {
+
+    public static final ResourceLocation REDSTONE_OFF = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_off.png");
+    public static final ResourceLocation REDSTONE_OFF_BLOCKED = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
+    public static final ResourceLocation REDSTONE_ON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_on.png");
+    public static final ResourceLocation REDSTONE_ON_BLOCKED = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
 
     private boolean showHelpPage = false;
     private final UIEntity helpPage = new UIEntity();
@@ -160,7 +181,7 @@ public class SidePanel {
     }
 
     public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries,
-            final SignalBoxNode node) {
+            final SignalBoxNode node, final List<SignalBoxNode> allNodes) {
         helpPage.clearChildren();
         helpPage.add(GuiElements.createLabel(I18n.get("info.keys"),
                 new UIEntity().getBasicTextColor(), 0.8f));
@@ -168,7 +189,190 @@ public class SidePanel {
                 new UIEntity().getInfoTextColor(), 0.5f));
         helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
+
         final Minecraft mc = Minecraft.getInstance();
+        if (!allNodes.isEmpty()) {
+            final UIEntity manuelButton = GuiElements.createButton(I18n.get("info.usage.manuel"),
+                    e -> {
+                        final UIEntity screen = GuiElements.createScreen(searchPanel -> {
+                            final UIEntity searchBar = new UIEntity();
+                            searchBar.setInheritWidth(true);
+                            searchBar.setHeight(20);
+                            final UITextInput input = new UITextInput("");
+                            searchBar.add(input);
+                            searchPanel.add(searchBar);
+
+                            final UIEntity listWithScroll = new UIEntity();
+                            listWithScroll.setInheritHeight(true);
+                            listWithScroll.setInheritWidth(true);
+                            listWithScroll.add(new UIBox(UIBox.HBOX, 2));
+                            listWithScroll.add(new UIScissor());
+                            listWithScroll.add(new UIBorder(0xFF00FFFF));
+                            searchPanel.add(listWithScroll);
+
+                            final UIEntity list = new UIEntity();
+                            listWithScroll.add(list);
+                            list.setInheritHeight(true);
+                            list.setInheritWidth(true);
+
+                            final UIScrollBox scrollbox = new UIScrollBox(UIBox.VBOX, 2);
+                            list.add(scrollbox);
+                            final Map<String, UIEntity> nameToUIEntity = new HashMap<>();
+
+                            allNodes.forEach(currentNode -> {
+                                final UILabel currentStatus = new UILabel(
+                                        I18n.get("info.usage.status") + " : "
+                                                + I18n.get("info.usage.status.free"));
+                                currentStatus.setTextColor(new UIEntity().getBasicTextColor());
+                                final UIEntity statusEntity = new UIEntity();
+                                statusEntity.setInheritWidth(true);
+                                statusEntity.setHeight(20);
+                                statusEntity.add(new UIScale(1.1f, 1.1f, 1));
+                                statusEntity.add(currentStatus);
+                                final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
+                                currentNode.getModes().forEach((mode, entry) -> {
+                                    final Optional<EnumPathUsage> pathUsage = entry
+                                            .getEntry(PathEntryType.PATHUSAGE);
+                                    if (pathUsage.isPresent()
+                                            && !pathUsage.get().equals(EnumPathUsage.FREE)) {
+                                        currentStatus.setText(I18n.get("info.usage.status") + " : "
+                                                + I18n.get("info.usage.status.blocked"));
+                                        canBeManuelChanged.set(false);
+                                    }
+                                    if (entry.containsEntry(PathEntryType.OUTPUT)) {
+                                        final String name = currentNode.getPoint().toString()
+                                                + " - "
+                                                + ClientNameHandler
+                                                        .getClientName(new NameStateInfo(mc.level,
+                                                                entry.getEntry(PathEntryType.OUTPUT)
+                                                                        .get()));
+                                        final UIEntity button = GuiElements.createButton(name,
+                                                e1 -> {
+                                                    gui.pop();
+                                                    final UIEntity info = new UIEntity();
+                                                    info.setInherits(true);
+                                                    info.add(new UIBox(UIBox.VBOX, 5));
+                                                    info.add(new UIClickable(_u -> gui.pop(), 1));
+                                                    info.add(new UIColor(
+                                                            GuiSignalBox.BACKGROUND_COLOR));
+                                                    info.add(statusEntity);
+                                                    final UIEntity textureEntity = new UIEntity();
+                                                    textureEntity.setHeight(40);
+                                                    textureEntity.setWidth(40);
+                                                    textureEntity.setX(120);
+                                                    textureEntity.add(new UIToolTip(
+                                                            I18n.get("info.usage.rs.desc")));
+                                                    if (canBeManuelChanged.get()) {
+                                                        if (currentNode
+                                                                .containsManuellOutput(mode)) {
+                                                            textureEntity.add(
+                                                                    new UITexture(REDSTONE_ON));
+                                                        } else {
+                                                            textureEntity.add(
+                                                                    new UITexture(REDSTONE_OFF));
+                                                        }
+                                                    } else {
+                                                        if (pathUsage.isPresent() && !pathUsage
+                                                                .get().equals(EnumPathUsage.FREE)) {
+                                                            textureEntity.add(new UITexture(
+                                                                    REDSTONE_ON_BLOCKED));
+                                                        } else {
+                                                            textureEntity.add(new UITexture(
+                                                                    REDSTONE_OFF_BLOCKED));
+                                                        }
+                                                    }
+                                                    info.add(textureEntity);
+                                                    final UILabel outputStatus = new UILabel(
+                                                            ((pathUsage.isPresent()
+                                                                    && !pathUsage.get().equals(
+                                                                            EnumPathUsage.FREE))
+                                                                    || currentNode
+                                                                            .containsManuellOutput(
+                                                                                    mode)) ? I18n
+                                                                                            .get("info.usage.rs.true")
+                                                                                            : I18n.get(
+                                                                                                    "info.usage.rs.false"));
+                                                    outputStatus.setCenterY(false);
+                                                    outputStatus.setTextColor(
+                                                            new UIEntity().getBasicTextColor());
+                                                    final UIEntity outputEntity = new UIEntity();
+                                                    outputEntity.setInheritWidth(true);
+                                                    outputEntity.setHeight(20);
+                                                    outputEntity.add(outputStatus);
+                                                    info.add(outputEntity);
+                                                    if (canBeManuelChanged.get()) {
+                                                        info.add(GuiElements.createButton(
+                                                                I18n.get("info.usage.change"),
+                                                                i -> {
+                                                                    final boolean turnOff = currentNode
+                                                                            .containsManuellOutput(
+                                                                                    mode);
+                                                                    textureEntity.clear();
+                                                                    textureEntity.add(
+                                                                            new UIToolTip(I18n.get(
+                                                                                    "info.usage.rs.desc")));
+                                                                    if (turnOff) {
+                                                                        gui.changeRedstoneOutput(
+                                                                                currentNode
+                                                                                        .getPoint(),
+                                                                                mode, false);
+                                                                        outputStatus.setText(I18n
+                                                                                .get("info.usage.rs.false"));
+                                                                        textureEntity
+                                                                                .add(new UITexture(
+                                                                                        REDSTONE_OFF));
+                                                                    } else {
+                                                                        gui.changeRedstoneOutput(
+                                                                                currentNode
+                                                                                        .getPoint(),
+                                                                                mode, true);
+                                                                        outputStatus.setText(I18n
+                                                                                .get("info.usage.rs.true"));
+                                                                        textureEntity
+                                                                                .add(new UITexture(
+                                                                                        REDSTONE_ON));
+                                                                    }
+                                                                }));
+                                                    }
+                                                    gui.push(GuiElements.createScreen(
+                                                            entity -> entity.add(info)));
+                                                });
+                                        list.add(button);
+                                        nameToUIEntity.put(name, button);
+                                    }
+                                });
+                            });
+                            final UIScroll scroll = new UIScroll();
+                            final UIEntity scrollBar = GuiElements.createScrollBar(scrollbox, 10,
+                                    scroll);
+                            scrollbox.setConsumer(size -> {
+                                if (size > list.getHeight()) {
+                                    listWithScroll.add(scroll);
+                                    listWithScroll.add(scrollBar);
+                                } else {
+                                    listWithScroll.remove(scrollBar);
+                                    listWithScroll.remove(scroll);
+                                }
+                            });
+                            input.setOnTextUpdate(string -> {
+                                nameToUIEntity.forEach((name, entity) -> {
+                                    if (!name.contains(string.toLowerCase())) {
+                                        list.remove(entity);
+                                    } else {
+                                        list.add(entity);
+                                    }
+                                });
+                            });
+                        });
+                        screen.add(new UIClickable(e1 -> gui.pop(), 1));
+                        gui.push(screen);
+                    });
+            manuelButton.setScaleX(0.8f);
+            manuelButton.setScaleY(0.8f);
+            manuelButton.setX(5);
+            helpPage.add(manuelButton);
+        }
+
         if (node != null) {
             final Map<ModeSet, PathOptionEntry> modes = node.getModes();
             final List<EnumGuiMode> guiModes = modes.keySet().stream().map(mode -> mode.mode)
@@ -238,7 +442,7 @@ public class SidePanel {
                                                     }
                                                 }
                                                 gui.pop();
-                                                helpUsageMode(subsidiaries, node);
+                                                helpUsageMode(subsidiaries, node, allNodes);
                                             }, defaultValue));
                                 });
                                 final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -255,7 +459,7 @@ public class SidePanel {
                 }
             }
             final UIEntity edit = GuiElements.createButton(I18n.get("info.usage.edit"), e -> {
-                helpUsageMode(subsidiaries, null);
+                helpUsageMode(subsidiaries, null, allNodes);
                 gui.initializePageTileConfig(node);
             });
             edit.setScaleX(0.8f);
@@ -264,6 +468,7 @@ public class SidePanel {
             helpPage.add(edit);
             edit.add(new UIToolTip(I18n.get("info.usage.edit.desc")));
         }
+
         if (!subsidiaries.isEmpty()) {
             helpPage.add(GuiElements.createLabel(I18n.get("info.usage.subsidiary"),
                     new UIEntity().getBasicTextColor(), 0.8f));
