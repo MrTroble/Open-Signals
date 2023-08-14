@@ -1,5 +1,7 @@
 package com.troblecodings.signals.config;
 
+import com.troblecodings.guilib.ecs.GuiConfigHandler;
+
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
@@ -55,6 +57,15 @@ public class ConfigHandler {
             desc = "Change the color of a blocked path. Default: -65536";
             signalboxUsedColor = builder.comment(desc).define("Signalbox used color", 0xFFFF0000);
 
+            desc = "Change the color of a default text. Default: -16777216";
+            GuiConfigHandler.basicTextColor = builder.comment(desc).define("Basic text color", 0xFF000000);
+            
+            desc = "Change the color of an info text. Default: -16777046";
+            GuiConfigHandler.infoTextColor = builder.comment(desc).define("info text color", 0xFF0000AA);
+            
+            desc = "Change the color of an error text. Default: -16776961";
+            GuiConfigHandler.errorTextColor = builder.comment(desc).define("Error text color", 0xFF0000FF);
+            
             builder.pop();
 
         }
