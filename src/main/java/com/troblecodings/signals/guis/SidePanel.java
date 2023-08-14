@@ -323,7 +323,7 @@ public class SidePanel {
                                                 .createScreen(entity -> entity.add(info)));
                                     });
                                     list.add(button);
-                                    nameToUIEntity.put(name, button);
+                                    nameToUIEntity.put(name.toLowerCase(), button);
 
                                 });
                             });
