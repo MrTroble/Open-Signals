@@ -395,7 +395,6 @@ public class Signal extends BasicBlock {
     private boolean loadRedstoneOutput(final Level worldIn, final SignalStateInfo info) {
         if (!this.prop.redstoneOutputs.isEmpty()) {
             final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
-            this.powerProperty = null;
             for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (pack.predicate.test(properties)) {
                     this.powerProperty = pack.property;
@@ -421,7 +420,6 @@ public class Signal extends BasicBlock {
         return getDirectSignal(state, getter, pos, direction);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public int getDirectSignal(final BlockState blockState, final BlockGetter blockAccess,
             final BlockPos pos, final Direction side) {
@@ -430,15 +428,11 @@ public class Signal extends BasicBlock {
             return 0;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
-        if (SignalStateHandler.getState(stateInfo, powerProperty)
-                .filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
+        final Optional<String> state = SignalStateHandler.getState(stateInfo, powerProperty);
+        if (state.filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
             return 0;
-        }
-        final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        for (final ValuePack pack : this.prop.redstoneOutputs) {
-            if (pack.predicate.test(properties)) {
-                return 15;
-            }
+        } else if (state.filter(power -> power.equalsIgnoreCase("true")).isPresent()) {
+            return 15;
         }
         return 0;
     }
