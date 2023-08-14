@@ -183,11 +183,27 @@ public class SidePanel {
     public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries,
             final SignalBoxNode node, final List<SignalBoxNode> allNodes) {
         helpPage.clearChildren();
-        helpPage.add(GuiElements.createLabel(I18n.get("info.keys"),
+
+        final UIEntity helpScroll = new UIEntity();
+        helpScroll.setInheritHeight(true);
+        helpScroll.setInheritWidth(true);
+        helpScroll.add(new UIBox(UIBox.HBOX, 2));
+        helpScroll.add(new UIScissor());
+        helpScroll.add(new UIBorder(0xFF00FFFF));
+        helpPage.add(helpScroll);
+
+        final UIEntity helpList = new UIEntity();
+        helpScroll.add(helpList);
+        helpList.setInheritHeight(true);
+        helpList.setInheritWidth(true);
+
+        final UIScrollBox helpScrollbox = new UIScrollBox(UIBox.VBOX, 2);
+
+        helpList.add(GuiElements.createLabel(I18n.get("info.keys"),
                 new UIEntity().getBasicTextColor(), 0.8f));
-        helpPage.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.usage.key.lmb"),
+        helpList.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.usage.key.lmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
-        helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
+        helpList.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.usage.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
 
         final Minecraft mc = Minecraft.getInstance();
@@ -355,7 +371,7 @@ public class SidePanel {
             manuelButton.setScaleX(0.8f);
             manuelButton.setScaleY(0.8f);
             manuelButton.setX(5);
-            helpPage.add(manuelButton);
+            helpList.add(manuelButton);
             manuelButton.add(new UIToolTip(I18n.get("info.usage.manuel.desc")));
         }
 
@@ -363,14 +379,14 @@ public class SidePanel {
             final Map<ModeSet, PathOptionEntry> modes = node.getModes();
             final List<EnumGuiMode> guiModes = modes.keySet().stream().map(mode -> mode.mode)
                     .collect(Collectors.toList());
-            helpPage.add(GuiElements.createLabel(I18n.get("info.usage.node"),
+            helpList.add(GuiElements.createLabel(I18n.get("info.usage.node"),
                     new UIEntity().getBasicTextColor(), 0.8f));
             final UIEntity reset = GuiElements.createButton(I18n.get("button.reset"),
                     e -> gui.resetPathwayOnServer(node));
             reset.setScaleX(0.8f);
             reset.setScaleY(0.8f);
             reset.setX(5);
-            helpPage.add(reset);
+            helpList.add(reset);
             reset.add(new UIToolTip(I18n.get("button.reset.desc")));
             if (guiModes.contains(EnumGuiMode.HP)) {
                 final UIEntity entity = GuiElements
@@ -381,7 +397,7 @@ public class SidePanel {
                 entity.setScaleX(0.8f);
                 entity.setScaleY(0.8f);
                 entity.setX(5);
-                helpPage.add(entity);
+                helpList.add(entity);
             }
             for (final Map.Entry<ModeSet, PathOptionEntry> mapEntry : modes.entrySet()) {
                 final ModeSet mode = mapEntry.getKey();
@@ -390,7 +406,7 @@ public class SidePanel {
                 if (option.containsEntry(PathEntryType.SIGNAL)) {
                     final String signalName = ClientNameHandler.getClientName(new NameStateInfo(
                             mc.level, option.getEntry(PathEntryType.SIGNAL).get()));
-                    helpPage.add(GuiElements.createLabel(
+                    helpList.add(GuiElements.createLabel(
                             (signalName.isEmpty() ? "Rotaion: " + mode.rotation.toString()
                                     : signalName) + " - " + mode.mode.toString(),
                             new UIEntity().getBasicTextColor(), 0.8f));
@@ -440,7 +456,7 @@ public class SidePanel {
                     entity.setScaleX(0.8f);
                     entity.setScaleY(0.8f);
                     entity.setX(5);
-                    helpPage.add(entity);
+                    helpList.add(entity);
                     entity.add(new UIToolTip(I18n.get("btn.subsidiary.desc")));
                 }
             }
@@ -451,12 +467,12 @@ public class SidePanel {
             edit.setScaleX(0.8f);
             edit.setScaleY(0.8f);
             edit.setX(5);
-            helpPage.add(edit);
+            helpList.add(edit);
             edit.add(new UIToolTip(I18n.get("info.usage.edit.desc")));
         }
 
         if (!subsidiaries.isEmpty()) {
-            helpPage.add(GuiElements.createLabel(I18n.get("info.usage.subsidiary"),
+            helpList.add(GuiElements.createLabel(I18n.get("info.usage.subsidiary"),
                     new UIEntity().getBasicTextColor(), 0.8f));
             subsidiaries.forEach((pos, holder) -> {
                 final String name = ClientNameHandler
@@ -500,9 +516,22 @@ public class SidePanel {
                 button.setScaleX(0.8f);
                 button.setScaleY(0.8f);
                 button.setX(5);
-                helpPage.add(button);
+                helpList.add(button);
             });
         }
+        final UIScroll helpScrolling = new UIScroll();
+        final UIEntity helpScrollBar = GuiElements.createScrollBar(helpScrollbox, 10,
+                helpScrolling);
+        helpScrollbox.setConsumer(size -> {
+            if (size > helpList.getHeight()) {
+                helpScroll.add(helpScroll);
+                helpScroll.add(helpScrollBar);
+            } else {
+                helpScroll.remove(helpScrollBar);
+                helpScroll.remove(helpScroll);
+            }
+        });
+        helpList.add(helpScrollbox);
         addHelpPageToPlane();
     }
 
