@@ -45,7 +45,7 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
-import com.troblecodings.signals.enums.SortingOption;
+import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -501,36 +501,40 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
-        final IIntegerable<SortingOption> sorting = new DisableIntegerable<>(
-                new EnumIntegerable<>(SortingOption.class));
+        final IIntegerable<ShowTypes> sorting = new EnumIntegerable<>(ShowTypes.class);
         lowerEntity.add(GuiElements.createEnumElement(sorting, i -> {
             lastValue = i;
             if (i == -1)
                 return;
-            final SortingOption option = SortingOption.values()[i];
+            final ShowTypes option = ShowTypes.values()[i];
             final Map<BlockPos, LinkType> sorted = new HashMap<>();
             switch (option) {
-                case TYPE_ASCENDING:
-                    sorted.putAll(types.entrySet().stream()
-                            .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+                case ALL: {
+                    initializePageSettings(entity);
+                    break;
+                }
+                case INPUT: {
+                    sorted.putAll(container.getPositionForTypes().entrySet().stream()
+                            .filter(entry -> entry.getValue().equals(LinkType.INPUT))
                             .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
                                     Map.Entry::getValue)));
                     initializePageSettings(entity, sorted);
                     break;
-                case TYPE_DSECENDING: {
-                    // TODO Sorting Algo schreiben
-                    break;
                 }
-                case DISTANCE_ASCENDING: {
-                    sorted.putAll(types.entrySet().stream().sorted((e1, e2) -> {
-                        return e1.getKey().distManhattan(e2.getKey());
-                    }).collect(
-                            Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
+                case OUTPUT: {
+                    sorted.putAll(container.getPositionForTypes().entrySet().stream()
+                            .filter(entry -> entry.getValue().equals(LinkType.OUTPUT))
+                            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                                    Map.Entry::getValue)));
                     initializePageSettings(entity, sorted);
                     break;
                 }
-                case DISTANCE_DESCENDING: {
-                    // TODO
+                case SIGNAL: {
+                    sorted.putAll(container.getPositionForTypes().entrySet().stream()
+                            .filter(entry -> entry.getValue().equals(LinkType.SIGNAL))
+                            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                                    Map.Entry::getValue)));
+                    initializePageSettings(entity, sorted);
                     break;
                 }
                 default:
