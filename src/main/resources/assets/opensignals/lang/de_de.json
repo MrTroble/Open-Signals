@@ -515,7 +515,7 @@
     "info.usage.edit.desc": "Hier kommst du in den Bearbeitungsmodus für die Kachel.",
     "btn.subsidiary.desc": "Hier kannst du Zusatzsignale einschalten.",
     "button.reset.desc": "Setzt die Fahrstraße zurück.",
-    "info.usage.manuel": "Manueller Redstone Output",
+    "info.usage.manuel": "Weichen",
     "info.usage.manuel.desc": "Ändert den manuellen Redstone Output, z.B. für manuelle Weichensteuerung.",
     "info.usage.status": "Status",
     "info.usage.status.free": "Frei",
