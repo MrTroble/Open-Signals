@@ -44,8 +44,8 @@ import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
-import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.ShowTypes;
+import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -235,7 +235,7 @@ public class GuiSignalBox extends GuiBase {
                         mode, rotation);
                 if (option.getEntry(PathEntryType.OUTPUT).isPresent()) {
                     final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
-                    for (Map.Entry<ModeSet, PathOptionEntry> entry : node.getModes().entrySet()) {
+                    for (final Map.Entry<ModeSet, PathOptionEntry> entry : node.getModes().entrySet()) {
                         final Optional<EnumPathUsage> usage = entry.getValue()
                                 .getEntry(PathEntryType.PATHUSAGE);
                         if (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)) {
@@ -310,6 +310,7 @@ public class GuiSignalBox extends GuiBase {
                         final UIEntity screen = GuiElements.createScreen(e -> e.add(info));
                         push(screen);
                     }));
+                    parent.add(new UIToolTip(I18n.get("info.usage.manuel.desc")));
                 }
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
                         mode, rotation, ".blocking");

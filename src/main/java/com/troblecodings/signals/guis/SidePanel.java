@@ -356,6 +356,7 @@ public class SidePanel {
             manuelButton.setScaleY(0.8f);
             manuelButton.setX(5);
             helpPage.add(manuelButton);
+            manuelButton.add(new UIToolTip(I18n.get("info.usage.manuel.desc")));
         }
 
         if (node != null) {

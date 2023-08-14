@@ -514,5 +514,20 @@
     "sb.disablesubsidiary": "Ausschalten",
     "info.usage.edit.desc": "Hier kommst du in den Bearbeitungsmodus für die Kachel.",
     "btn.subsidiary.desc": "Hier kannst du Zusatzsignale einschalten.",
-    "button.reset.desc": "Setzt die Fahrstraße zurück."
+    "button.reset.desc": "Setzt die Fahrstraße zurück.",
+    "info.usage.manuel": "Manueller Redstone Output",
+    "info.usage.manuel.desc": "Ändert den manuellen Redstone Output, z.B. für manuelle Weichensteuerung.",
+    "info.usage.status": "Status",
+    "info.usage.status.free": "Frei",
+    "info.usage.status.blocked": "Blockiert",
+    "info.usage.rs.desc": "Wenn die Fackel durchgestrichen ist, kann der manuelle Modus nicht verwendet werden, weil eine Fahrstraße anliegt. Anderenfalls kann der manuelle Redstone Modus umgestellt werden.",
+    "info.usage.rs.true": "Aktiviert",
+    "info.usage.rs.false": "Deaktiviert",
+    "info.usage.change": "Umstellen",
+	"property.showtypes.name": "Sortierung",
+	"property.showtypes.desc": "Hier kannst du den Sortierungsfilter umstellen.",
+    "property.value.ALL": "All",
+	"property.value.SIGNAL": "Signal",
+	"property.value.INPUT": "Redstone Input",
+	"property.value.OUTPUT": "Redstone Output"
 }
