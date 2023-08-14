@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableMap;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
@@ -264,7 +263,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     public Map<BlockPos, LinkType> getPositionForTypes() {
-        return ImmutableMap.copyOf(propertiesForType);
+        return new HashMap<>(propertiesForType);
     }
 
     @Override

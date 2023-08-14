@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
+import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
@@ -32,6 +33,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
+import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnumHolder;
@@ -43,6 +45,7 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.enums.SortingOption;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -487,17 +490,67 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void initializePageSettings(final UIEntity entity) {
+        this.initializePageSettings(entity, container.getPositionForTypes());
+    }
+
+    private int lastValue = 0;
+
+    private void initializePageSettings(final UIEntity entity,
+            final Map<BlockPos, LinkType> types) {
         reset();
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
+        final IIntegerable<SortingOption> sorting = new DisableIntegerable<>(
+                new EnumIntegerable<>(SortingOption.class));
+        lowerEntity.add(GuiElements.createEnumElement(sorting, i -> {
+            lastValue = i;
+            if (i == -1)
+                return;
+            final SortingOption option = SortingOption.values()[i];
+            final Map<BlockPos, LinkType> sorted = new HashMap<>();
+            switch (option) {
+                case TYPE_ASCENDING:
+                    sorted.putAll(types.entrySet().stream()
+                            .sorted((e1, e2) -> e1.getValue().compareTo(e2.getValue()))
+                            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                                    Map.Entry::getValue)));
+                    initializePageSettings(entity, sorted);
+                    break;
+                case TYPE_DSECENDING: {
+                    // TODO Sorting Algo schreiben
+                    break;
+                }
+                case DISTANCE_ASCENDING: {
+                    sorted.putAll(types.entrySet().stream().sorted((e1, e2) -> {
+                        return e1.getKey().distManhattan(e2.getKey());
+                    }).collect(
+                            Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
+                    initializePageSettings(entity, sorted);
+                    break;
+                }
+                case DISTANCE_DESCENDING: {
+                    // TODO
+                    break;
+                }
+                default:
+                    break;
+            }
+        }, lastValue));
+        final UIEntity inputEntity = new UIEntity();
+        inputEntity.setInheritWidth(true);
+        inputEntity.setHeight(20);
+        final UITextInput input = new UITextInput("");
+        inputEntity.add(input);
+        lowerEntity.add(inputEntity);
         final UIEntity list = new UIEntity();
         list.add(list);
         list.setInheritHeight(true);
         list.setInheritWidth(true);
         final UIBox uibox = new UIBox(UIBox.VBOX, 2);
         list.add(uibox);
-        container.getPositionForTypes().forEach((p, t) -> {
+        final Map<String, UIEntity> nameToUIEntity = new HashMap<>();
+        types.forEach((p, t) -> {
             final String name = getSignalInfo(p, t);
             final UIEntity layout = new UIEntity();
             layout.setHeight(20);
@@ -518,10 +571,20 @@ public class GuiSignalBox extends GuiBase {
                 list.remove(layout);
             }));
             list.add(layout);
+            nameToUIEntity.put(name.toLowerCase(), layout);
         });
         lowerEntity.add(list);
         lowerEntity.add(GuiElements.createPageSelect(uibox));
         resetSelection(entity);
+        input.setOnTextUpdate(string -> {
+            nameToUIEntity.forEach((name, e) -> {
+                if (!name.contains(string.toLowerCase())) {
+                    list.remove(e);
+                } else {
+                    list.add(e);
+                }
+            });
+        });
     }
 
     private void initializeFieldUsage(final UIEntity entity) {
