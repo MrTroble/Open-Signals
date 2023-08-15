@@ -420,6 +420,7 @@ public class Signal extends BasicBlock {
         return getDirectSignal(state, getter, pos, direction);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public int getDirectSignal(final BlockState blockState, final BlockGetter blockAccess,
             final BlockPos pos, final Direction side) {
@@ -428,7 +429,13 @@ public class Signal extends BasicBlock {
             return 0;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
-        final Optional<String> state = SignalStateHandler.getState(stateInfo, powerProperty);
+        final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
+        for (final ValuePack pack : this.prop.redstoneOutputs) {
+            if (pack.predicate.test(properties)) {
+                return 15;
+            }
+        }
+        final Optional<String> state = Optional.of(properties.get(powerProperty));
         if (state.filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
             return 0;
         } else if (state.filter(power -> power.equalsIgnoreCase("true")).isPresent()) {
