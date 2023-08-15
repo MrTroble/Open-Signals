@@ -7,6 +7,10 @@ import net.minecraftforge.common.ForgeConfigSpec.ConfigValue;
 
 public class ConfigHandler {
 
+    private ConfigHandler() {
+
+    }
+
     private static final ForgeConfigSpec.Builder CLIENT_BUILDER = new ForgeConfigSpec.Builder();
     private static final ForgeConfigSpec.Builder GENERAL_BUILDER = new ForgeConfigSpec.Builder();
 
@@ -24,7 +28,9 @@ public class ConfigHandler {
             String desc;
             builder.push("General");
 
-            desc = "Change the light emssion value of a signal. When you change the value, the signal block lights up and illuminates the environment. Default: 1";
+            desc = "Change the light emssion value of a signal."
+                    + " When you change the value, the signal block lights "
+                    + "up and illuminates the environment. Default: 1";
             lightEmission = builder.comment(desc).defineInRange("Signal light emission", 1, 0, 15);
 
             builder.pop();
@@ -58,14 +64,17 @@ public class ConfigHandler {
             signalboxUsedColor = builder.comment(desc).define("Signalbox used color", 0xFFFF0000);
 
             desc = "Change the color of a default text. Default: -16777216";
-            GuiConfigHandler.basicTextColor = builder.comment(desc).define("Basic text color", 0xFF000000);
-            
+            GuiConfigHandler.basicTextColor = builder.comment(desc).define("Basic text color",
+                    0xFF000000);
+
             desc = "Change the color of an info text. Default: -16777046";
-            GuiConfigHandler.infoTextColor = builder.comment(desc).define("info text color", 0xFF0000AA);
-            
+            GuiConfigHandler.infoTextColor = builder.comment(desc).define("info text color",
+                    0xFF0000AA);
+
             desc = "Change the color of an error text. Default: -16776961";
-            GuiConfigHandler.errorTextColor = builder.comment(desc).define("Error text color", 0xFF0000FF);
-            
+            GuiConfigHandler.errorTextColor = builder.comment(desc).define("Error text color",
+                    0xFF0000FF);
+
             builder.pop();
 
         }
