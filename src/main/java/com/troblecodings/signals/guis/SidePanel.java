@@ -181,7 +181,8 @@ public class SidePanel {
     }
 
     public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries,
-            final SignalBoxNode node, final List<SignalBoxNode> allNodes) {
+            final SignalBoxNode node, final List<SignalBoxNode> allNodes,
+            final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries) {
         helpPage.clearChildren();
 
         final UIEntity helpScroll = new UIEntity();
@@ -404,8 +405,9 @@ public class SidePanel {
                 final PathOptionEntry option = mapEntry.getValue();
 
                 if (option.containsEntry(PathEntryType.SIGNAL)) {
-                    final String signalName = ClientNameHandler.getClientName(new NameStateInfo(
-                            mc.level, option.getEntry(PathEntryType.SIGNAL).get()));
+                    final BlockPos signalPos = option.getEntry(PathEntryType.SIGNAL).get();
+                    final String signalName = ClientNameHandler
+                            .getClientName(new NameStateInfo(mc.level, signalPos));
                     helpList.add(GuiElements.createLabel(
                             (signalName.isEmpty() ? "Rotaion: " + mode.rotation.toString()
                                     : signalName) + " - " + mode.mode.toString(),
@@ -418,7 +420,9 @@ public class SidePanel {
                                 list.add(hbox);
                                 list.add(GuiElements.createButton(I18n.get("btn.return"),
                                         a -> gui.pop()));
-                                SubsidiaryState.ALL_STATES.forEach(state -> {
+                                final List<SubsidiaryState> possibleSubsidiaires = possibleSubsidiaries
+                                        .getOrDefault(signalPos, SubsidiaryState.ALL_STATES);
+                                possibleSubsidiaires.forEach(state -> {
                                     final int defaultValue = gui.container.grid.getSubsidiaryState(
                                             node.getPoint(), mode, state) ? 0 : 1;
                                     list.add(GuiElements.createEnumElement(
@@ -431,9 +435,6 @@ public class SidePanel {
                                                         mode);
                                                 gui.container.grid.setClientState(node.getPoint(),
                                                         mode, entry);
-                                                final BlockPos signalPos = option
-                                                        .getEntry(PathEntryType.SIGNAL)
-                                                        .orElse(null);
                                                 if (signalPos != null) {
                                                     if (entry.state) {
                                                         subsidiaries.put(signalPos,
@@ -444,7 +445,8 @@ public class SidePanel {
                                                     }
                                                 }
                                                 gui.pop();
-                                                helpUsageMode(subsidiaries, node, allNodes);
+                                                helpUsageMode(subsidiaries, node, allNodes,
+                                                        possibleSubsidiaries);
                                             }, defaultValue));
                                 });
                                 final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -461,7 +463,7 @@ public class SidePanel {
                 }
             }
             final UIEntity edit = GuiElements.createButton(I18n.get("info.usage.edit"), e -> {
-                helpUsageMode(subsidiaries, null, allNodes);
+                helpUsageMode(subsidiaries, null, allNodes, possibleSubsidiaries);
                 gui.initializePageTileConfig(node);
             });
             edit.setScaleX(0.8f);

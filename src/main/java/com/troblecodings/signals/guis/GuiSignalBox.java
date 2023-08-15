@@ -235,7 +235,8 @@ public class GuiSignalBox extends GuiBase {
                         mode, rotation);
                 if (option.getEntry(PathEntryType.OUTPUT).isPresent()) {
                     final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
-                    for (final Map.Entry<ModeSet, PathOptionEntry> entry : node.getModes().entrySet()) {
+                    for (final Map.Entry<ModeSet, PathOptionEntry> entry : node.getModes()
+                            .entrySet()) {
                         final Optional<EnumPathUsage> usage = entry.getValue()
                                 .getEntry(PathEntryType.PATHUSAGE);
                         if (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)) {
@@ -351,7 +352,10 @@ public class GuiSignalBox extends GuiBase {
                         list.setInherits(true);
                         list.add(hbox);
                         list.add(GuiElements.createButton(I18n.get("btn.return"), a -> pop()));
-                        SubsidiaryState.ALL_STATES.forEach(state -> {
+                        final BlockPos pos = option.getEntry(PathEntryType.SIGNAL).get();
+                        final List<SubsidiaryState> subsidiaries = container.possibleSubsidiaries
+                                .getOrDefault(pos, SubsidiaryState.ALL_STATES);
+                        subsidiaries.forEach(state -> {
                             final int defaultValue = container.grid
                                     .getSubsidiaryState(node.getPoint(), modeSet, state) ? 0 : 1;
                             list.add(GuiElements.createEnumElement(new SizeIntegerables<>(
@@ -374,7 +378,8 @@ public class GuiSignalBox extends GuiBase {
                                         }
                                         pop();
                                         helpPage.helpUsageMode(enabledSubsidiaries, null,
-                                                container.grid.getNodes());
+                                                container.grid.getNodes(),
+                                                container.possibleSubsidiaries);
                                     }, defaultValue));
                         });
                         final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -397,7 +402,8 @@ public class GuiSignalBox extends GuiBase {
         sendSubsidiaryRequest(entry, holder.point, holder.modeSet);
         container.grid.setClientState(holder.point, holder.modeSet, entry);
         enabledSubsidiaries.remove(pos);
-        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes());
+        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
+                container.possibleSubsidiaries);
         this.resetTileSelection();
     }
 
@@ -450,7 +456,8 @@ public class GuiSignalBox extends GuiBase {
         entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == EDIT_COLOR)
                 .forEach(color -> {
                     color.getParent().remove(color);
-                    helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes());
+                    helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
+                            container.possibleSubsidiaries);
                     helpPage.setShowHelpPage(false);
                     isAlreadyOpen.set(true);
                     this.resetTileSelection();
@@ -459,7 +466,8 @@ public class GuiSignalBox extends GuiBase {
             return;
         this.resetTileSelection();
         entity.add(new UIColor(EDIT_COLOR));
-        helpPage.helpUsageMode(enabledSubsidiaries, node, container.grid.getNodes());
+        helpPage.helpUsageMode(enabledSubsidiaries, node, container.grid.getNodes(),
+                container.possibleSubsidiaries);
         helpPage.setShowHelpPage(true);
     }
 
@@ -597,7 +605,8 @@ public class GuiSignalBox extends GuiBase {
         sendModeChanges();
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
-        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes());
+        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
+                container.possibleSubsidiaries);
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -764,7 +773,8 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes());
+        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
+                container.possibleSubsidiaries);
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {

@@ -8,11 +8,14 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.properties.ConfigProperty;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 
 import net.minecraft.core.BlockPos;
@@ -27,15 +30,19 @@ public class LinkedPositions {
 
     private final Map<BlockPos, Signal> signals;
     private final Map<BlockPos, LinkType> linkedBlocks;
+    private final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries;
 
     public LinkedPositions() {
         signals = new HashMap<>();
         linkedBlocks = new HashMap<>();
+        possibleSubsidiaries = new HashMap<>();
     }
 
     public void addSignal(final BlockPos signalPos, final Signal signal, final Level world) {
         signals.put(signalPos, signal);
-        SignalConfig.reset(new SignalStateInfo(world, signalPos, signal));
+        final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
+        SignalConfig.reset(info);
+        loadPossibleSubsidiaires(info);
     }
 
     public Signal getSignal(final BlockPos pos) {
@@ -50,9 +57,9 @@ public class LinkedPositions {
     }
 
     public void removeLinkedPos(final BlockPos pos) {
-        final LinkType type = linkedBlocks.remove(pos);
-        if (type != null && type.equals(LinkType.SIGNAL))
-            signals.remove(pos);
+        linkedBlocks.remove(pos);
+        signals.remove(pos);
+        possibleSubsidiaries.remove(pos);
     }
 
     public boolean isEmpty() {
@@ -75,6 +82,7 @@ public class LinkedPositions {
                         .unlinkTileFromPos(new PosIdentifier(tilePos, world), entry.getKey()));
         linkedBlocks.clear();
         signals.clear();
+        possibleSubsidiaries.clear();
         SignalStateHandler.unloadSignals(signalsToUnload);
     }
 
@@ -114,6 +122,7 @@ public class LinkedPositions {
         final List<SignalStateInfo> signalInfos = new ArrayList<>();
         signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
         SignalStateHandler.loadSignals(signalInfos);
+        signalInfos.forEach(this::loadPossibleSubsidiaires);
     }
 
     public void unloadSignals(final Level world) {
@@ -124,10 +133,32 @@ public class LinkedPositions {
         SignalStateHandler.unloadSignals(signalInfos);
     }
 
+    private void loadPossibleSubsidiaires(final SignalStateInfo info) {
+        final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
+        final Map<SubsidiaryState, ConfigProperty> subsidiaries = SubsidiarySignalParser.SUBSIDIARY_SIGNALS
+                .get(info.signal);
+        if (subsidiaries == null)
+            return;
+        final List<SubsidiaryState> validStates = possibleSubsidiaries.computeIfAbsent(info.pos,
+                _u -> new ArrayList<>());
+        subsidiaries.forEach((state, config) -> {
+            for (final SEProperty property : config.values.keySet()) {
+                if (properties.containsKey(property)) {
+                    validStates.add(state);
+                    break;
+                }
+            }
+        });
+    }
+
     public List<BlockPos> getAllRedstoneIOs() {
         return linkedBlocks.entrySet().stream()
                 .filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
                 .map(entry -> entry.getKey()).collect(Collectors.toUnmodifiableList());
+    }
+
+    public Map<BlockPos, List<SubsidiaryState>> getValidSubsidiariesForPos() {
+        return ImmutableMap.copyOf(possibleSubsidiaries);
     }
 
     @Override

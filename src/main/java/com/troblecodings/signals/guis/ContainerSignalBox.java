@@ -1,11 +1,13 @@
 package com.troblecodings.signals.guis;
 
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -14,6 +16,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.SubsidiaryEntry;
+import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
@@ -34,7 +37,8 @@ import net.minecraft.world.level.block.Rotation;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
-    protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
+    protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
+    protected final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     protected SignalBoxGrid grid;
     private final Map<BlockPos, LinkType> propertiesForType = new HashMap<>();
     private SignalBoxTileEntity tile;
@@ -58,7 +62,17 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         buffer.putBlockPos(getInfo().pos);
         grid.writeNetwork(buffer);
         final PosIdentifier identifier = new PosIdentifier(tile.getBlockPos(), getInfo().world);
-        final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
+        final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = SignalBoxHandler
+                .getPossibleSubsidiaries(identifier);
+        final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier)
+                .entrySet().stream().filter(e -> !e.getValue().equals(LinkType.SIGNAL))
+                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        buffer.putInt(possibleSubsidiaries.size());
+        possibleSubsidiaries.forEach((pos, list) -> {
+            buffer.putBlockPos(pos);
+            buffer.putByte((byte) list.size());
+            list.forEach(state -> buffer.putByte((byte) state.getID()));
+        });
         buffer.putInt(positions.size());
         positions.forEach((pos, type) -> {
             buffer.putBlockPos(pos);
@@ -79,9 +93,22 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 }
                 grid = tile.getSignalBoxGrid();
                 grid.readNetwork(buffer);
-                enabledSubsidiaryTypes = new HashMap<>(grid.getAllSubsidiaries());
-                final int size = buffer.getInt();
+                enabledSubsidiaryTypes.putAll(grid.getAllSubsidiaries());
                 propertiesForType.clear();
+                possibleSubsidiaries.clear();
+                final int signalSize = buffer.getInt();
+                for (int i = 0; i < signalSize; i++) {
+                    final BlockPos signalPos = buffer.getBlockPos();
+                    propertiesForType.put(signalPos, LinkType.SIGNAL);
+                    final List<SubsidiaryState> validSubsidiaries = new ArrayList<>();
+                    final int listSize = buffer.getByteAsInt();
+                    for (int j = 0; j < listSize; j++) {
+                        validSubsidiaries
+                                .add(SubsidiaryState.ALL_STATES.get(buffer.getByteAsInt()));
+                    }
+                    possibleSubsidiaries.put(signalPos, validSubsidiaries);
+                }
+                final int size = buffer.getInt();
                 for (int i = 0; i < size; i++) {
                     final BlockPos blockPos = buffer.getBlockPos();
                     final LinkType type = LinkType.of(buffer);
