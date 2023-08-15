@@ -60,6 +60,7 @@ public class SidePanel {
 
     private boolean showHelpPage = false;
     private final UIEntity helpPage = new UIEntity();
+    private final UIEntity infoEntity = new UIEntity();
     private final UIButton helpPageButton = new UIButton(">");
     private final UIEntity lowerEntity;
     private final UIEntity button = new UIEntity();
@@ -73,6 +74,9 @@ public class SidePanel {
     public SidePanel(final UIEntity lowerEntity, final GuiSignalBox gui) {
         this.lowerEntity = lowerEntity;
         this.gui = gui;
+
+        infoEntity.setInherits(true);
+        infoEntity.add(new UIBox(UIBox.VBOX, 2));
 
         helpPage.setInherits(true);
         helpPage.add(new UIBox(UIBox.VBOX, 2));
@@ -114,18 +118,19 @@ public class SidePanel {
     public void addHelpPageToPlane() {
         if (showHelpPage) {
             helpPageButton.setText(I18n.get("info.info") + "  >");
-            helpPage.remove(helpPageSpacer);
-            helpPage.remove(label);
             spacerEntity.setWidth(80);
+            helpPage.clearChildren();
+            helpPage.add(infoEntity);
             lowerEntity.update();
         } else {
             helpPageButton.setText("<");
+            helpPage.clearChildren();
             helpPage.add(helpPageSpacer);
             helpPage.add(label);
             spacerEntity.setWidth(12);
             lowerEntity.update();
         }
-        helpPage.forEach(entity -> entity.setVisible(showHelpPage));
+        infoEntity.forEach(entity -> entity.setVisible(showHelpPage));
         label.setVisible(true);
         button.setVisible(true);
         helpPageSpacer.setVisible(true);
@@ -146,9 +151,9 @@ public class SidePanel {
     }
 
     public void updateNextNode(final int selection, final int rotation) {
-        helpPage.clearChildren();
-        helpPage.add(GuiElements.createSpacerV(2));
-        helpPage.add(GuiElements.createLabel(I18n.get("info.nextelement"),
+        infoEntity.clearChildren();
+        infoEntity.add(GuiElements.createSpacerV(2));
+        infoEntity.add(GuiElements.createLabel(I18n.get("info.nextelement"),
                 new UIEntity().getBasicTextColor(), 0.8f));
 
         final UIEntity preview = new UIEntity();
@@ -167,18 +172,18 @@ public class SidePanel {
         preview.add(sbt);
         preview.add(new UIBorder(new UIEntity().getBasicTextColor()));
 
-        helpPage.add(preview);
-        helpPage.add(GuiElements.createSpacerV(5));
-        helpPage.add(GuiElements.createLabel("[R] = " + I18n.get("info.editor.key.r"),
+        infoEntity.add(preview);
+        infoEntity.add(GuiElements.createSpacerV(5));
+        infoEntity.add(GuiElements.createLabel("[R] = " + I18n.get("info.editor.key.r"),
                 new UIEntity().getInfoTextColor(), 0.5f));
-        helpPage.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.editor.key.lmb"),
+        infoEntity.add(GuiElements.createLabel("[LMB] = " + I18n.get("info.editor.key.lmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
-        helpPage.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.editor.key.rmb"),
+        infoEntity.add(GuiElements.createLabel("[RMB] = " + I18n.get("info.editor.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
-        helpPage.add(GuiElements.createSpacerV(5));
-        helpPage.add(GuiElements.createLabel(I18n.get("info.description"),
+        infoEntity.add(GuiElements.createSpacerV(5));
+        infoEntity.add(GuiElements.createLabel(I18n.get("info.description"),
                 new UIEntity().getBasicTextColor(), 0.8f));
-        helpPage.add(GuiElements.createLabel(I18n.get("info." + modes.toString().toLowerCase()),
+        infoEntity.add(GuiElements.createLabel(I18n.get("info." + modes.toString().toLowerCase()),
                 new UIEntity().getInfoTextColor(), 0.5f));
         addHelpPageToPlane();
     }
@@ -186,14 +191,14 @@ public class SidePanel {
     public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries,
             final SignalBoxNode node, final List<SignalBoxNode> allNodes,
             final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries) {
-        helpPage.clearChildren();
+        infoEntity.clearChildren();
 
         final UIEntity helpScroll = new UIEntity();
         helpScroll.setInheritHeight(true);
         helpScroll.setInheritWidth(true);
         helpScroll.add(new UIBox(UIBox.HBOX, 0));
         helpScroll.add(new UIScissor());
-        helpPage.add(helpScroll);
+        infoEntity.add(helpScroll);
 
         final UIEntity helpList = new UIEntity();
         helpScroll.add(helpList);
