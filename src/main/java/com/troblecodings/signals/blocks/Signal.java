@@ -424,8 +424,7 @@ public class Signal extends BasicBlock {
     @Override
     public int getDirectSignal(final BlockState blockState, final BlockGetter blockAccess,
             final BlockPos pos, final Direction side) {
-        if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null
-                || !(blockAccess instanceof Level)) {
+        if (this.prop.redstoneOutputs.isEmpty() || !(blockAccess instanceof Level)) {
             return 0;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
@@ -434,6 +433,9 @@ public class Signal extends BasicBlock {
             if (pack.predicate.test(properties)) {
                 return 15;
             }
+        }
+        if (powerProperty == null) {
+            return 0;
         }
         final Optional<String> state = Optional.of(properties.get(powerProperty));
         if (state.filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
