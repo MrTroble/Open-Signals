@@ -82,8 +82,8 @@ public class SidePanel {
         final UILabel labelComponent = new UILabel(I18n.get("info.infolabel"));
         labelComponent.setTextColor(new UIEntity().getBasicTextColor());
         label.add(labelComponent);
-        label.setY(25);
         label.setX(2);
+
 
         button.setInheritWidth(true);
         button.setHeight(20);
@@ -100,7 +100,6 @@ public class SidePanel {
         entity.add(new UIBox(UIBox.HBOX, 0));
         entity.add(GuiElements.createSpacerH(4));
         entity.add(helpPage);
-        entity.add(GuiElements.createSpacerH(4));
 
         spacerEntity.setInheritHeight(true);
         spacerEntity.add(new UIBox(UIBox.VBOX, 0));
@@ -188,9 +187,8 @@ public class SidePanel {
         final UIEntity helpScroll = new UIEntity();
         helpScroll.setInheritHeight(true);
         helpScroll.setInheritWidth(true);
-        helpScroll.add(new UIBox(UIBox.HBOX, 2));
+        helpScroll.add(new UIBox(UIBox.HBOX, 0));
         helpScroll.add(new UIScissor());
-        helpScroll.add(new UIBorder(0xFF00FFFF));
         helpPage.add(helpScroll);
 
         final UIEntity helpList = new UIEntity();
@@ -522,7 +520,7 @@ public class SidePanel {
             });
         }
         final UIScroll helpScrolling = new UIScroll();
-        final UIEntity helpScrollBar = GuiElements.createScrollBar(helpScrollbox, 10,
+        final UIEntity helpScrollBar = GuiElements.createScrollBar(helpScrollbox, 7,
                 helpScrolling);
         helpScrollbox.setConsumer(size -> {
             if (size > helpList.getHeight()) {
