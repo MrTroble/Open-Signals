@@ -65,6 +65,7 @@ public class SidePanel {
     private final UIEntity button = new UIEntity();
     private final UIEntity label = new UIEntity();
     private final UIEntity spacerEntity = new UIEntity();
+    private final UIEntity helpPageSpacer = new UIEntity();
     private final GuiSignalBox gui;
 
     private BiConsumer<BlockPos, SubsidiaryHolder> disableSubsidiary;
@@ -83,7 +84,6 @@ public class SidePanel {
         labelComponent.setTextColor(new UIEntity().getBasicTextColor());
         label.add(labelComponent);
         label.setX(2);
-
 
         button.setInheritWidth(true);
         button.setHeight(20);
@@ -107,25 +107,29 @@ public class SidePanel {
         spacerEntity.add(entity);
         spacerEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
         lowerEntity.add(spacerEntity);
+
+        helpPageSpacer.setHeight(30);
     }
 
     public void addHelpPageToPlane() {
         if (showHelpPage) {
             helpPageButton.setText(I18n.get("info.info") + "  >");
+            helpPage.remove(helpPageSpacer);
             helpPage.remove(label);
             spacerEntity.setWidth(80);
             lowerEntity.update();
         } else {
             helpPageButton.setText("<");
+            helpPage.add(helpPageSpacer);
             helpPage.add(label);
             spacerEntity.setWidth(12);
             lowerEntity.update();
         }
-        helpPage.forEach(entity -> {
-            entity.setVisible(showHelpPage);
-        });
+        helpPage.forEach(entity -> entity.setVisible(showHelpPage));
         label.setVisible(true);
         button.setVisible(true);
+        helpPageSpacer.setVisible(true);
+        helpPage.update();
     }
 
     protected void setShowHelpPage(final boolean showHelpPage) {
@@ -520,8 +524,7 @@ public class SidePanel {
             });
         }
         final UIScroll helpScrolling = new UIScroll();
-        final UIEntity helpScrollBar = GuiElements.createScrollBar(helpScrollbox, 7,
-                helpScrolling);
+        final UIEntity helpScrollBar = GuiElements.createScrollBar(helpScrollbox, 7, helpScrolling);
         helpScrollbox.setConsumer(size -> {
             if (size > helpList.getHeight()) {
                 helpScroll.add(helpScroll);
