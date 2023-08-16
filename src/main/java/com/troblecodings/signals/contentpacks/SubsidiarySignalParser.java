@@ -36,8 +36,9 @@ public class SubsidiarySignalParser {
                     SubsidiarySignalParser.class);
             final Signal signal = Signal.SIGNALS.get(parser.currentSignal.toLowerCase());
             if (signal == null)
-                throw new ContentPackException("There doesn't exists a signal with the name '"
-                        + parser.currentSignal + "'!");
+                throw new ContentPackException(
+                        "There doesn't exists a signal with the name '" + parser.currentSignal
+                                + "'! Valid Signals are: " + Signal.SIGNALS.keySet());
             if (SUBSIDIARY_SIGNALS.containsKey(signal))
                 throw new ContentPackException(
                         "There already exists a Subsidiary Config for " + signal + "!");

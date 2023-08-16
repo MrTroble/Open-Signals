@@ -34,7 +34,8 @@ public class SEPropertyParser {
 
         if (parent == null)
             throw new ContentPackException(String.format("Property[%s], with class %s not found!",
-                    name, enumClass.toLowerCase()));
+                    name, enumClass.toLowerCase()) + " Valid EnumClasses: "
+                    + JsonEnumHolder.PROPERTIES.keySet());
 
         ChangeableStage stage = ChangeableStage.APISTAGE;
         if (changeableStage != null && !changeableStage.isEmpty()) {

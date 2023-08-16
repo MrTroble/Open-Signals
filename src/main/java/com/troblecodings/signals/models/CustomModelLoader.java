@@ -50,8 +50,9 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
             final Map<String, String> extentionProperties = extentions.getValue();
             final ModelExtention extentionValues = extention.get(extentionName);
             if (extentionValues == null)
-                throw new ContentPackException(String
-                        .format("There doesn't exists an extention named [%s]!", extentionName));
+                throw new ContentPackException(
+                        String.format("There doesn't exists an extention named [%s]!",
+                                extentionName) + " Valid Extentions: " + extention.keySet());
 
             for (final Map.Entry<String, String> entry : extentionValues.getExtention()
                     .entrySet()) {

@@ -85,8 +85,9 @@ public class OneSignalConfigParser {
     private static Signal checkSignal(final String signalName, final String filename) {
         final Signal signal = Signal.SIGNALS.get(signalName.toLowerCase());
         if (signal == null) {
-            throw new ContentPackException("The signal '" + signalName + "' doesn't exists! "
-                    + "Please check " + filename + " where to problem is!");
+            throw new ContentPackException(
+                    "The signal '" + signalName + "' doesn't exists! " + "Please check " + filename
+                            + " where to problem is! Valid Signals: " + Signal.SIGNALS.keySet());
         }
         return signal;
     }

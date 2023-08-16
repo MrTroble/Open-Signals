@@ -57,7 +57,7 @@ public class SignalPropertiesBuilder {
         }
         if (placementtool == null)
             throw new ContentPackException("There doesn't exists a placementtool with the name '"
-                    + placementToolName + "'!");
+                    + placementToolName + "'! Valid Placementtool: " + OSItems.placementtools);
 
         final List<HeightProperty> signalheights = new ArrayList<>();
         if (signalHeights != null) {
