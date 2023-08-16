@@ -20,6 +20,7 @@ import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.init.OSItems;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
@@ -259,7 +260,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     public boolean link(final BlockPos pos, final CompoundNBT tag) {
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK.get(
-                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
+                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(OSItems.readStringFromPos(pos))));
         if (block != null && block instanceof Signal) {
             unlink();
             linkedSignalPosition = pos;

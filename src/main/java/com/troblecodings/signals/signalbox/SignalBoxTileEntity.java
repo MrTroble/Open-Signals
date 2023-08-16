@@ -13,6 +13,7 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.SyncableTileEntity;
 
@@ -70,8 +71,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public boolean link(final BlockPos pos, final CompoundNBT tag) {
         @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK.get(
-                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
+        final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
+                tag.getString(OSItems.readStringFromPos(pos))));
         if (block == null || block instanceof AirBlock)
             return false;
         LinkType type = LinkType.SIGNAL;

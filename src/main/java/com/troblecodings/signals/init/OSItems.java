@@ -21,6 +21,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.Item.Properties;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -39,7 +40,7 @@ public final class OSItems {
     }, _u -> true, (level, pos, tag) -> {
         final BlockState state = level.getBlockState(pos);
         final NBTWrapper wrapper = new NBTWrapper(tag);
-        wrapper.putString(pos.toShortString(), state.getBlock().getRegistryName().getPath());
+        wrapper.putString(readStringFromPos(pos), state.getBlock().getRegistryName().getPath());
     });
     public static final MultiLinkingTool MULTI_LINKING_TOOL = new MultiLinkingTool(OSTabs.TAB,
             (world, pos) -> {
@@ -52,7 +53,7 @@ public final class OSItems {
             }, _u -> true, (level, pos, tag) -> {
                 final BlockState state = level.getBlockState(pos);
                 final NBTWrapper wrapper = new NBTWrapper(tag);
-                wrapper.putString(pos.toShortString(),
+                wrapper.putString(readStringFromPos(pos),
                         state.getBlock().getRegistryName().getPath());
             });
     public static final Item CONDUCTOR_TROWEL_GREEN = new Item(
@@ -158,4 +159,7 @@ public final class OSItems {
         registeredItems.forEach(registry::register);
     }
 
+    public static String readStringFromPos(final BlockPos pos) {
+        return "[x=" + pos.getX() + ",y=" + pos.getY() + ",z=" + pos.getZ() + "]";
+    }
 }
