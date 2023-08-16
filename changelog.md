@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.16.5 - 3.0.2]
+
+fix: linking crash
+
 ## [1.16.5 - 3.0.1]
 
 fix: ServerStartup issue
