@@ -83,7 +83,8 @@ public class Signal extends BasicBlock {
 
     public Signal(final SignalProperties prop) {
         super(Properties.of(Material.STONE).noOcclusion()
-                .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get()));
+                .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get())
+                .isRedstoneConductor((_u1, _u2, _u3) -> false));
         this.prop = prop;
         this.id = SIGNAL_IDS.size();
         SIGNAL_IDS.add(this);
