@@ -444,10 +444,13 @@ public class Signal extends BasicBlock {
         if (powerProperty == null) {
             return 0;
         }
-        final Optional<String> state = Optional.of(properties.get(powerProperty));
-        if (state.filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
+        final String power = properties.get(powerProperty);
+        if (power == null || power.isEmpty()) {
             return 0;
-        } else if (state.filter(power -> power.equalsIgnoreCase("true")).isPresent()) {
+        }
+        if (power.equalsIgnoreCase("false")) {
+            return 0;
+        } else if (power.equalsIgnoreCase("true")) {
             return 15;
         }
         return 0;

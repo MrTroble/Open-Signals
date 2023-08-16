@@ -28,6 +28,8 @@ import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
+import com.troblecodings.signals.handler.ClientSignalStateHandler;
+import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.models.SignalCustomModel;
 
@@ -138,6 +140,13 @@ public class GuiSignalController extends GuiBase {
                 properties.put(property, "DISABLED");
             }
         });
+        ClientSignalStateHandler
+                .getClientStates(new ClientSignalStateInfo(mc.level, controller.getPos()))
+                .forEach((property, value) -> {
+                    previewRedstone.addToRenderNormal(property,
+                            property.getParent().getIDFromValue(value));
+                });
+
         properties.forEach((property, value) -> {
             final JsonEnum enumJson = property.getParent();
             previewRedstone.addToRenderNormal(property, enumJson.getIDFromValue(value));
@@ -291,6 +300,11 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 
         holders.clear();
+        ClientSignalStateHandler
+                .getClientStates(new ClientSignalStateInfo(mc.level, controller.getPos()))
+                .forEach((property, value) -> previewSidebar.addToRenderNormal(property,
+                        property.getParent().getIDFromValue(value)));
+
         final Map<SEProperty, String> map = this.controller.getProperties();
         if (map == null)
             return;
