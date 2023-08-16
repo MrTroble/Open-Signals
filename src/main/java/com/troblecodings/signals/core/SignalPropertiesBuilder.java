@@ -3,6 +3,7 @@ package com.troblecodings.signals.core;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -41,7 +42,7 @@ public class SignalPropertiesBuilder {
     private boolean canLink = true;
     private List<Integer> colors;
     private Map<String, SoundPropertyParser> sounds;
-    private Map<String, String> redstoneOutputs;
+    private Map<String, Object> redstoneOutputs;
     private int defaultItemDamage = 1;
 
     public SignalProperties build(final FunctionParsingInfo info) {
@@ -109,12 +110,26 @@ public class SignalPropertiesBuilder {
                 }
             }
         }
-        final List<ValuePack> rsOutputs = new ArrayList<>();
+        final List<Object> rsOutputs = new ArrayList<>();
         if (redstoneOutputs != null) {
-            for (final Map.Entry<String, String> outputs : redstoneOutputs.entrySet()) {
-                final SEProperty property = (SEProperty) info.getProperty(outputs.getValue());
-                rsOutputs.add(
-                        new ValuePack(property, LogicParser.predicate(outputs.getKey(), info)));
+            for (final Map.Entry<String, Object> outputs : redstoneOutputs.entrySet()) {
+                @SuppressWarnings("rawtypes")
+                final Predicate predicate = LogicParser.predicate(outputs.getKey(), info);
+                final Object obj = outputs.getValue();
+                if (obj instanceof Boolean) {
+                    rsOutputs.add(new BooleanProperty(predicate, (boolean) obj));
+                } else if (obj instanceof String) {
+                    final String str = (String) obj;
+                    if (str.equalsIgnoreCase("false") || str.equalsIgnoreCase("true")) {
+                        rsOutputs.add(new BooleanProperty(predicate, (boolean) obj));
+                        continue;
+                    }
+                    final SEProperty property = (SEProperty) info.getProperty(str);
+                    rsOutputs.add(new ValuePack(property, predicate));
+                } else {
+                    throw new ContentPackException("[" + obj
+                            + "] is not a valid state for RSOutputs! Valid are: String, Boolean");
+                }
             }
         }
 

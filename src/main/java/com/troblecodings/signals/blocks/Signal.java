@@ -256,7 +256,7 @@ public class Signal extends BasicBlock {
         boolean doubleSidedText = false;
         for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
             if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.doubleSided;
+                doubleSidedText = boolProp.state;
             }
         }
         final SignalAngel face = state.getValue(Signal.ANGEL);
@@ -318,7 +318,7 @@ public class Signal extends BasicBlock {
         boolean doubleSidedText = false;
         for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
             if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.doubleSided;
+                doubleSidedText = boolProp.state;
             }
         }
 
@@ -395,14 +395,17 @@ public class Signal extends BasicBlock {
     private boolean loadRedstoneOutput(final Level worldIn, final SignalStateInfo info) {
         if (!this.prop.redstoneOutputs.isEmpty()) {
             final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
-            for (final ValuePack pack : this.prop.redstoneOutputs) {
-                if (pack.predicate.test(properties)) {
-                    this.powerProperty = pack.property;
-                    if (properties.containsKey(pack.property)) {
-                        SignalStateHandler.setState(info, powerProperty,
-                                Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));
+            for (final Object pack : this.prop.redstoneOutputs) {
+                if (pack instanceof ValuePack) {
+                    final ValuePack valuePack = (ValuePack) pack;
+                    if (valuePack.predicate.test(properties)) {
+                        this.powerProperty = valuePack.property;
+                        if (properties.containsKey(valuePack.property)) {
+                            SignalStateHandler.setState(info, powerProperty, Boolean.toString(
+                                    !Boolean.valueOf(properties.get(valuePack.property))));
+                        }
+                        return true;
                     }
-                    return true;
                 }
             }
         }
@@ -429,9 +432,12 @@ public class Signal extends BasicBlock {
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        for (final ValuePack pack : this.prop.redstoneOutputs) {
-            if (pack.predicate.test(properties)) {
-                return 15;
+        for (final Object pack : this.prop.redstoneOutputs) {
+            if (pack instanceof BooleanProperty) {
+                final BooleanProperty bool = (BooleanProperty) pack;
+                if (bool.predicate.test(properties)) {
+                    return bool.state ? 15 : 0;
+                }
             }
         }
         if (powerProperty == null) {
