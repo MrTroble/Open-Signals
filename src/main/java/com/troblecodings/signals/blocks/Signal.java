@@ -388,12 +388,14 @@ public class Signal extends BasicBlock {
 
     @SuppressWarnings("unchecked")
     private boolean loadRedstoneOutput(final Level worldIn, final SignalStateInfo info) {
-        if (!this.prop.redstoneOutputs.isEmpty()) {
+        if (worldIn.isClientSide)
+            return true;
+        if (!this.prop.redstoneOutputPacks.isEmpty()) {
             final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
             for (final ValuePack pack : this.prop.redstoneOutputPacks) {
                 if (properties.containsKey(pack.property) || pack.predicate.test(properties)) {
-                    SignalStateHandler.setState(info, pack.property, Boolean
-                            .toString(!Boolean.valueOf(properties.get(pack.property))));
+                    SignalStateHandler.setState(info, pack.property,
+                            Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));
                     return true;
                 }
             }
@@ -425,15 +427,15 @@ public class Signal extends BasicBlock {
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        for (final PredicateProperty<Boolean> pack : this.prop.redstoneOutputs) {
-            if (pack.predicate.test(properties)) {
-                return pack.state ? 15 : 0;
-            }
-        }
         boolean powerFlag = false;
-        for (final ValuePack pack : this.prop.redstoneOutputPacks) {
-            if (properties.containsKey(pack.property) || pack.predicate.test(properties)) {
-                powerFlag = true;
+        for (final List<ValuePack> valuePacks : ImmutableList.of(this.prop.redstoneOutputPacks,
+                this.prop.redstoneOutputs)) {
+            for (final ValuePack pack : valuePacks) {
+                if (properties.containsKey(pack.property) && pack.predicate.test(properties)
+                        && !properties.get(pack.property)
+                                .equalsIgnoreCase(pack.property.getDefault())) {
+                    powerFlag = true;
+                }
             }
         }
         if (powerFlag)

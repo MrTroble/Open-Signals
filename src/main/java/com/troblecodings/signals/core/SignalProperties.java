@@ -24,17 +24,18 @@ public class SignalProperties {
     public final boolean canLink;
     public final List<Integer> colors;
     public final List<SoundProperty> sounds;
-    public final List<PredicateProperty<Boolean>> redstoneOutputs;
+    public final List<ValuePack> redstoneOutputs;
     public final List<ValuePack> redstoneOutputPacks;
     public final int defaultItemDamage;
 
     public SignalProperties(final Placementtool placementtool, final float customNameRenderHeight,
-            final int height, final List<PredicateProperty<Integer>> signalHeights, final float signWidth,
-            final float offsetX, final float offsetY, final float signScale,
+            final int height, final List<PredicateProperty<Integer>> signalHeights,
+            final float signWidth, final float offsetX, final float offsetY, final float signScale,
             final boolean autoscale, final List<PredicateProperty<Boolean>> doubleSidedText,
             final int textColor, final boolean canLink, final List<Integer> colors,
             final List<PredicateProperty<Float>> renderheights, final List<SoundProperty> sounds,
-            final List<PredicateProperty<Boolean>> redstoneOutputs, final int defaultItemDamage, final List<ValuePack> redstoneOutputPacks) {
+            final List<ValuePack> redstoneOutputs, final int defaultItemDamage,
+            final List<ValuePack> redstoneOutputPacks) {
         this.placementtool = placementtool;
         this.customNameRenderHeight = customNameRenderHeight;
         this.defaultHeight = height;

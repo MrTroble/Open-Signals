@@ -25,23 +25,24 @@ import net.minecraft.sounds.SoundEvent;
 public class SignalPropertiesBuilder {
 
     private transient Placementtool placementtool = null;
-    private final String placementToolName = null;
-    private final int defaultHeight = 1;
+    private String placementToolName = null;
+    private int defaultHeight = 1;
     private Map<String, Integer> signalHeights;
-    private final float customNameRenderHeight = -1;
+    private float customNameRenderHeight = -1;
     private Map<String, Float> renderHeights;
-    private final float signWidth = 22;
-    private final boolean autoscale = false;
-    private final float offsetX = 0;
-    private final float offsetY = 0;
-    private final float signScale = 1;
+    private float signWidth = 22;
+    private boolean autoscale = false;
+    private float offsetX = 0;
+    private float offsetY = 0;
+    private float signScale = 1;
     private Map<String, Boolean> doubleSidedText;
-    private final int textColor = 0;
-    private final boolean canLink = true;
+    private int textColor = 0;
+    private boolean canLink = true;
     private List<Integer> colors;
     private Map<String, SoundPropertyParser> sounds;
-    private Map<String, Object> redstoneOutputs;
-    private final int defaultItemDamage = 1;
+    private Map<String, String> redstoneOutputs;
+    private Map<String, String> remoteRedstoneOutputs;
+    private int defaultItemDamage = 1;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
@@ -109,28 +110,22 @@ public class SignalPropertiesBuilder {
             }
         }
         final List<ValuePack> redstoneValuePacks = new ArrayList<>();
-        final List<PredicateProperty<Boolean>> redstoneOutputBooleans = new ArrayList<>();
+        final List<ValuePack> remoteRedstoneValuePacks = new ArrayList<>();
         if (redstoneOutputs != null) {
-            for (final Map.Entry<String, Object> outputs : redstoneOutputs.entrySet()) {
+            for (final Map.Entry<String, String> outputs : redstoneOutputs.entrySet()) {
                 final Predicate<Map<SEProperty, String>> predicate = LogicParser
                         .predicate(outputs.getKey(), info);
-                final Object obj = outputs.getValue();
-                if (obj instanceof Boolean) {
-                    redstoneOutputBooleans
-                            .add(new PredicateProperty<Boolean>(predicate, (boolean) obj));
-                } else if (obj instanceof String) {
-                    final String str = (String) obj;
-                    if (str.equalsIgnoreCase("false") || str.equalsIgnoreCase("true")) {
-                        redstoneOutputBooleans
-                                .add(new PredicateProperty<Boolean>(predicate, (boolean) obj));
-                        continue;
-                    }
-                    final SEProperty property = (SEProperty) info.getProperty(str);
-                    redstoneValuePacks.add(new ValuePack(property, predicate));
-                } else {
-                    throw new ContentPackException("[" + obj
-                            + "] is not a valid state for RSOutputs! Valid are: String, Boolean");
-                }
+                final SEProperty property = (SEProperty) info.getProperty(outputs.getValue());
+                redstoneValuePacks.add(new ValuePack(property, predicate));
+            }
+        }
+
+        if (remoteRedstoneOutputs != null) {
+            for (final Map.Entry<String, String> outputs : redstoneOutputs.entrySet()) {
+                final Predicate<Map<SEProperty, String>> predicate = LogicParser
+                        .predicate(outputs.getKey(), info);
+                final SEProperty property = (SEProperty) info.getProperty(outputs.getValue());
+                remoteRedstoneValuePacks.add(new ValuePack(property, predicate));
             }
         }
 
@@ -154,7 +149,7 @@ public class SignalPropertiesBuilder {
                 ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
                 autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
                 ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
-                ImmutableList.copyOf(redstoneOutputBooleans), defaultItemDamage,
+                ImmutableList.copyOf(remoteRedstoneValuePacks), defaultItemDamage,
                 ImmutableList.copyOf(redstoneValuePacks));
     }
 }
