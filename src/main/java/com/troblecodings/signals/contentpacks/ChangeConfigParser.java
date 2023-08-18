@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -13,8 +14,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
-import com.troblecodings.signals.properties.ConfigProperty;
-import com.troblecodings.signals.properties.SignalPair;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public class ChangeConfigParser {
 
@@ -23,11 +23,10 @@ public class ChangeConfigParser {
     private Map<String, String> savedPredicates;
     private Map<String, List<String>> values;
 
-    public static final Map<SignalPair, List<ConfigProperty>> CHANGECONFIGS = new HashMap<>();
+    public static final Map<Map.Entry<Signal, Signal>, List<ConfigProperty>> CHANGECONFIGS = new HashMap<>();
 
     private static final Gson GSON = new Gson();
 
-    @SuppressWarnings("rawtypes")
     public static void loadChangeConfigs() {
 
         for (final Map.Entry<String, String> files : OpenSignalsMain.contentPacks
@@ -43,7 +42,7 @@ public class ChangeConfigParser {
                         + "This config with filename '" + files.getKey() + "' will be skiped!");
                 continue;
             }
-            final SignalPair pair = new SignalPair(start, end);
+            final Map.Entry<Signal, Signal> pair = Maps.immutableEntry(start, end);
             if (CHANGECONFIGS.containsKey(pair)) {
                 throw new LogicalParserException("A signalconfig with the signals ["
                         + start.getSignalTypeName() + ", " + end.getSignalTypeName()

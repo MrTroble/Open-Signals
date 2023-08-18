@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicalParserException;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public class OneSignalConfigParser {
 
@@ -48,8 +49,8 @@ public class OneSignalConfigParser {
             final List<ConfigProperty> propertes = new ArrayList<>();
             for (final String property : parser.values) {
                 final String[] value = property.split("\\.");
-                propertes
-                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
+                propertes.add(new ConfigProperty(t -> true,
+                        ImmutableMap.of((SEProperty) info.getProperty(value[0]), value[1])));
             }
             SHUNTINGCONFIGS.put(signal, propertes);
         }
@@ -76,7 +77,7 @@ public class OneSignalConfigParser {
             for (final String property : parser.values) {
                 final String[] value = property.split("\\.");
                 propertes
-                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
+                        .add(new ConfigProperty(t -> true, ImmutableMap.of((SEProperty) info.getProperty(value[0]), value[1])));
             }
             RESETCONFIGS.put(signal, propertes);
         }

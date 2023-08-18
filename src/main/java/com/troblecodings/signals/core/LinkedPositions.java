@@ -15,7 +15,7 @@ import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 
 import net.minecraft.core.BlockPos;
@@ -142,7 +142,7 @@ public class LinkedPositions {
         final List<SubsidiaryState> validStates = possibleSubsidiaries.computeIfAbsent(info.pos,
                 _u -> new ArrayList<>());
         subsidiaries.forEach((state, config) -> {
-            for (final SEProperty property : config.values.keySet()) {
+            for (final SEProperty property : config.state.keySet()) {
                 if (properties.containsKey(property)) {
                     validStates.add(state);
                     break;

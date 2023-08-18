@@ -45,17 +45,6 @@ public final class PredicateHolder {
         };
     }
 
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static Predicate<Map<SEProperty, String>> check(final ValuePack pack) {
-        return t -> {
-            final String value = t.get(pack.property);
-            if (value == null)
-                return false;
-            return pack.predicate.test(value.toUpperCase());
-        };
-    }
-
     @SuppressWarnings("unchecked")
     public static Predicate<Map<SEProperty, String>> config(final ValuePack pack) {
         return t -> {

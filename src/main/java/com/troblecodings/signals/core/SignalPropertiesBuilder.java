@@ -17,9 +17,7 @@ import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 import com.troblecodings.signals.parser.ValuePack;
-import com.troblecodings.signals.properties.BooleanProperty;
-import com.troblecodings.signals.properties.FloatProperty;
-import com.troblecodings.signals.properties.HeightProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.PredicateProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 
 import net.minecraft.sounds.SoundEvent;
@@ -27,23 +25,23 @@ import net.minecraft.sounds.SoundEvent;
 public class SignalPropertiesBuilder {
 
     private transient Placementtool placementtool = null;
-    private String placementToolName = null;
-    private int defaultHeight = 1;
+    private final String placementToolName = null;
+    private final int defaultHeight = 1;
     private Map<String, Integer> signalHeights;
-    private float customNameRenderHeight = -1;
+    private final float customNameRenderHeight = -1;
     private Map<String, Float> renderHeights;
-    private float signWidth = 22;
-    private boolean autoscale = false;
-    private float offsetX = 0;
-    private float offsetY = 0;
-    private float signScale = 1;
+    private final float signWidth = 22;
+    private final boolean autoscale = false;
+    private final float offsetX = 0;
+    private final float offsetY = 0;
+    private final float signScale = 1;
     private Map<String, Boolean> doubleSidedText;
-    private int textColor = 0;
-    private boolean canLink = true;
+    private final int textColor = 0;
+    private final boolean canLink = true;
     private List<Integer> colors;
     private Map<String, SoundPropertyParser> sounds;
     private Map<String, Object> redstoneOutputs;
-    private int defaultItemDamage = 1;
+    private final int defaultItemDamage = 1;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
@@ -59,12 +57,12 @@ public class SignalPropertiesBuilder {
             throw new ContentPackException("There doesn't exists a placementtool with the name '"
                     + placementToolName + "'! Valid Placementtool: " + OSItems.placementtools);
 
-        final List<HeightProperty> signalheights = new ArrayList<>();
+        final List<PredicateProperty<Integer>> signalheights = new ArrayList<>();
         if (signalHeights != null) {
             signalHeights.forEach((property, height) -> {
                 try {
-                    signalheights
-                            .add(new HeightProperty(LogicParser.predicate(property, info), height));
+                    signalheights.add(new PredicateProperty<Integer>(
+                            LogicParser.predicate(property, info), height));
                 } catch (final LogicalParserException e) {
                     OpenSignalsMain.getLogger()
                             .error("Something went wrong during the registry of a predicate in "
@@ -73,12 +71,12 @@ public class SignalPropertiesBuilder {
                 }
             });
         }
-        final List<FloatProperty> renderheights = new ArrayList<>();
+        final List<PredicateProperty<Float>> renderheights = new ArrayList<>();
         if (renderHeights != null) {
             renderHeights.forEach((property, height) -> {
                 try {
-                    renderheights
-                            .add(new FloatProperty(LogicParser.predicate(property, info), height));
+                    renderheights.add(new PredicateProperty<Float>(
+                            LogicParser.predicate(property, info), height));
                 } catch (final LogicalParserException e) {
                     OpenSignalsMain.getLogger()
                             .error("Something went wrong during the registry of a predicate in "
@@ -98,9 +96,9 @@ public class SignalPropertiesBuilder {
                     continue;
                 }
                 try {
-                    soundProperties.add(new SoundProperty(sound,
-                            LogicParser.predicate(soundProperty.getKey(), info),
-                            soundProp.getLength()));
+                    soundProperties.add(
+                            new SoundProperty(LogicParser.predicate(soundProperty.getKey(), info),
+                                    sound, soundProp.getLength()));
                 } catch (final LogicalParserException e) {
                     OpenSignalsMain.getLogger()
                             .error("Something went wrong during the registry of a predicate in "
@@ -110,22 +108,25 @@ public class SignalPropertiesBuilder {
                 }
             }
         }
-        final List<Object> rsOutputs = new ArrayList<>();
+        final List<ValuePack> redstoneValuePacks = new ArrayList<>();
+        final List<PredicateProperty<Boolean>> redstoneOutputBooleans = new ArrayList<>();
         if (redstoneOutputs != null) {
             for (final Map.Entry<String, Object> outputs : redstoneOutputs.entrySet()) {
-                @SuppressWarnings("rawtypes")
-                final Predicate predicate = LogicParser.predicate(outputs.getKey(), info);
+                final Predicate<Map<SEProperty, String>> predicate = LogicParser
+                        .predicate(outputs.getKey(), info);
                 final Object obj = outputs.getValue();
                 if (obj instanceof Boolean) {
-                    rsOutputs.add(new BooleanProperty(predicate, (boolean) obj));
+                    redstoneOutputBooleans
+                            .add(new PredicateProperty<Boolean>(predicate, (boolean) obj));
                 } else if (obj instanceof String) {
                     final String str = (String) obj;
                     if (str.equalsIgnoreCase("false") || str.equalsIgnoreCase("true")) {
-                        rsOutputs.add(new BooleanProperty(predicate, (boolean) obj));
+                        redstoneOutputBooleans
+                                .add(new PredicateProperty<Boolean>(predicate, (boolean) obj));
                         continue;
                     }
                     final SEProperty property = (SEProperty) info.getProperty(str);
-                    rsOutputs.add(new ValuePack(property, predicate));
+                    redstoneValuePacks.add(new ValuePack(property, predicate));
                 } else {
                     throw new ContentPackException("[" + obj
                             + "] is not a valid state for RSOutputs! Valid are: String, Boolean");
@@ -133,12 +134,12 @@ public class SignalPropertiesBuilder {
             }
         }
 
-        final List<BooleanProperty> doubleText = new ArrayList<>();
+        final List<PredicateProperty<Boolean>> doubleText = new ArrayList<>();
         if (doubleSidedText != null) {
             doubleSidedText.forEach((property, bool) -> {
                 try {
-                    doubleText
-                            .add(new BooleanProperty(LogicParser.predicate(property, info), bool));
+                    doubleText.add(new PredicateProperty<Boolean>(
+                            LogicParser.predicate(property, info), bool));
                 } catch (final LogicalParserException e) {
                     OpenSignalsMain.getLogger()
                             .error("Something went wrong during the registry of a predicate in "
@@ -153,6 +154,7 @@ public class SignalPropertiesBuilder {
                 ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
                 autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
                 ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
-                ImmutableList.copyOf(rsOutputs), defaultItemDamage);
+                ImmutableList.copyOf(redstoneOutputBooleans), defaultItemDamage,
+                ImmutableList.copyOf(redstoneValuePacks));
     }
 }

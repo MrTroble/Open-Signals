@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Maps;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.ChangeConfigParser;
@@ -13,8 +14,7 @@ import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
-import com.troblecodings.signals.properties.ConfigProperty;
-import com.troblecodings.signals.properties.SignalPair;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public final class SignalConfig {
 
@@ -26,8 +26,8 @@ public final class SignalConfig {
         if (info.type.equals(PathType.NORMAL)) {
             if (info.nextinfo != null) {
                 final Signal nextSignal = info.nextinfo.signal;
-                final SignalPair pair = new SignalPair(currentSignal, nextSignal);
-                final List<ConfigProperty> values = ChangeConfigParser.CHANGECONFIGS.get(pair);
+                final List<ConfigProperty> values = ChangeConfigParser.CHANGECONFIGS
+                        .get(Maps.immutableEntry(currentSignal, nextSignal));
                 if (values != null) {
                     changeIfPresent(values, info);
                 } else {
@@ -61,11 +61,8 @@ public final class SignalConfig {
         }
     }
 
-    @SuppressWarnings({
-            "rawtypes", "unchecked"
-    })
     private static void changeIfPresent(final List<ConfigProperty> values, final ConfigInfo info) {
-        final Map<Class, Object> object = new HashMap<>();
+        final Map<Class<?>, Object> object = new HashMap<>();
         final Map<SEProperty, String> oldProperties = SignalStateHandler
                 .getStates(info.currentinfo);
         if (info.nextinfo != null) {
@@ -75,8 +72,8 @@ public final class SignalConfig {
         object.put(String.class, info.zs2Value);
         final Map<SEProperty, String> propertiesToSet = new HashMap<>();
         values.forEach(property -> {
-            if (property.predicate.test(object)) {
-                propertiesToSet.putAll(property.values.entrySet().stream()
+            if (property.test(object)) {
+                propertiesToSet.putAll(property.state.entrySet().stream()
                         .filter(entry -> oldProperties.containsKey(entry.getKey()))
                         .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
                                 Map.Entry::getValue)));
@@ -92,7 +89,7 @@ public final class SignalConfig {
             final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(current);
             final Map<SEProperty, String> propertiesToSet = new HashMap<>();
             values.forEach(property -> {
-                propertiesToSet.putAll(property.values.entrySet().stream()
+                propertiesToSet.putAll(property.state.entrySet().stream()
                         .filter(entry -> oldProperties.containsKey(entry.getKey()))
                         .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
                                 Map.Entry::getValue)));

@@ -23,7 +23,7 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
@@ -265,7 +265,7 @@ public class SignalBoxGrid implements INetworkSavable {
             return;
         final SignalStateInfo info = new SignalStateInfo(world, pos.get(), signal);
         final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(info);
-        SignalStateHandler.setStates(info, properties.values.entrySet().stream()
+        SignalStateHandler.setStates(info, properties.state.entrySet().stream()
                 .filter(propertyEntry -> oldProperties.containsKey(propertyEntry.getKey()))
                 .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue)));
         states.put(mode, entry);

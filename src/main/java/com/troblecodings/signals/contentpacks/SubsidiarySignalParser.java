@@ -10,7 +10,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public class SubsidiarySignalParser {
 
@@ -71,7 +71,7 @@ public class SubsidiarySignalParser {
         });
         final Map<SubsidiaryState, ConfigProperty> properties = SUBSIDIARY_SIGNALS
                 .computeIfAbsent(signal, _u -> new HashMap<>());
-        properties.put(enumState, new ConfigProperty(allValues));
+        properties.put(enumState, new ConfigProperty(t -> true, allValues));
         SUBSIDIARY_SIGNALS.put(signal, properties);
     }
 
