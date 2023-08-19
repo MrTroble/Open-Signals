@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.contentpacks.ContentPackException;
@@ -111,23 +112,20 @@ public class SignalPropertiesBuilder {
         }
         final List<ValuePack> redstoneValuePacks = new ArrayList<>();
         final List<ValuePack> remoteRedstoneValuePacks = new ArrayList<>();
-        if (redstoneOutputs != null) {
-            for (final Map.Entry<String, String> outputs : redstoneOutputs.entrySet()) {
-                final Predicate<Map<SEProperty, String>> predicate = LogicParser
-                        .predicate(outputs.getKey(), info);
-                final SEProperty property = (SEProperty) info.getProperty(outputs.getValue());
-                redstoneValuePacks.add(new ValuePack(property, predicate));
-            }
-        }
 
-        if (remoteRedstoneOutputs != null) {
-            for (final Map.Entry<String, String> outputs : redstoneOutputs.entrySet()) {
-                final Predicate<Map<SEProperty, String>> predicate = LogicParser
-                        .predicate(outputs.getKey(), info);
-                final SEProperty property = (SEProperty) info.getProperty(outputs.getValue());
-                remoteRedstoneValuePacks.add(new ValuePack(property, predicate));
-            }
-        }
+        ImmutableList
+                .of(Maps.immutableEntry(redstoneOutputs, redstoneValuePacks),
+                        Maps.immutableEntry(remoteRedstoneOutputs, remoteRedstoneValuePacks))
+                .forEach((entry) -> {
+                    if (entry.getKey() != null) {
+                        entry.getKey().forEach((key, value) -> {
+                            final Predicate<Map<SEProperty, String>> predicate = LogicParser
+                                    .predicate(key, info);
+                            final SEProperty property = (SEProperty) info.getProperty(value);
+                            entry.getValue().add(new ValuePack(property, predicate));
+                        });
+                    }
+                });
 
         final List<PredicateProperty<Boolean>> doubleText = new ArrayList<>();
         if (doubleSidedText != null) {

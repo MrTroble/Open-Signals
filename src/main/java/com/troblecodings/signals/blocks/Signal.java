@@ -393,7 +393,7 @@ public class Signal extends BasicBlock {
         if (!this.prop.redstoneOutputPacks.isEmpty()) {
             final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
             for (final ValuePack pack : this.prop.redstoneOutputPacks) {
-                if (properties.containsKey(pack.property) || pack.predicate.test(properties)) {
+                if (properties.containsKey(pack.property) && pack.predicate.test(properties)) {
                     SignalStateHandler.setState(info, pack.property,
                             Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));
                     return true;
