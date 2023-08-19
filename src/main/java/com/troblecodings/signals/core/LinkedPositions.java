@@ -131,6 +131,7 @@ public class LinkedPositions {
         final List<SignalStateInfo> signalInfos = new ArrayList<>();
         signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
         SignalStateHandler.unloadSignals(signalInfos);
+        possibleSubsidiaries.clear();
     }
 
     private void loadPossibleSubsidiaires(final SignalStateInfo info) {
@@ -139,8 +140,7 @@ public class LinkedPositions {
                 .get(info.signal);
         if (subsidiaries == null)
             return;
-        final List<SubsidiaryState> validStates = possibleSubsidiaries.computeIfAbsent(info.pos,
-                _u -> new ArrayList<>());
+        final List<SubsidiaryState> validStates = new ArrayList<>();
         subsidiaries.forEach((state, config) -> {
             for (final SEProperty property : config.state.keySet()) {
                 if (properties.containsKey(property)) {
@@ -149,6 +149,7 @@ public class LinkedPositions {
                 }
             }
         });
+        possibleSubsidiaries.put(info.pos, validStates);
     }
 
     public List<BlockPos> getAllRedstoneIOs() {
