@@ -59,7 +59,7 @@ public class ChangeConfigParser {
             for (final Map.Entry<String, List<String>> entry : parser.values.entrySet()) {
 
                 String valueToParse = entry.getKey().toLowerCase();
-                Predicate predicate = t -> true;
+                Predicate<Map<Class<?>, Object>> predicate = t -> true;
 
                 if (valueToParse.contains("map(") && savedPredicates != null
                         && !savedPredicates.isEmpty()) {

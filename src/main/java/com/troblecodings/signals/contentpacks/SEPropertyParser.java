@@ -22,7 +22,6 @@ public class SEPropertyParser {
     private int itemDamage = 1;
     private transient JsonEnum parent;
 
-    @SuppressWarnings("unchecked")
     public SEProperty createSEProperty(final FunctionParsingInfo info) {
         if (defaultState instanceof Boolean) {
             parent = JsonEnum.BOOLEAN;

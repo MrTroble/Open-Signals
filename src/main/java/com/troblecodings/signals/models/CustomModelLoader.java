@@ -33,7 +33,6 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
     private CustomModelLoader() {
     }
 
-    @SuppressWarnings("unchecked")
     private static void loadExtention(final TextureStats texturestate,
             final Map<String, ModelExtention> extention, final String modelname,
             final ModelStats states, final Models models, final FunctionParsingInfo info,
@@ -120,7 +119,6 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onResourceManagerReload(final ResourceManager manager) {
         registeredModels.clear();
