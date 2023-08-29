@@ -323,11 +323,6 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     @SubscribeEvent
-    public static void onChunkLoad(final ChunkEvent.Load event) {
-
-    }
-
-    @SubscribeEvent
     public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
         final ServerLevel world = event.getWorld();
         if (world.isClientSide)
