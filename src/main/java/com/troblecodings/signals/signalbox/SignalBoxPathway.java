@@ -184,12 +184,12 @@ public class SignalBoxPathway {
             return;
         }
         this.initalize();
-        updatePathwayToAutomatic();
         final NBTWrapper originalFirstPoint = tag.getWrapper(ORIGINAL_FIRST_POINT);
         if (!originalFirstPoint.isTagNull()) {
             this.originalFirstPoint = new Point();
             this.originalFirstPoint.read(originalFirstPoint);
         }
+        updatePathwayToAutomatic();
     }
 
     private void foreachEntry(final Consumer<PathOptionEntry> consumer,
