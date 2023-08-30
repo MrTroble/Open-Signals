@@ -18,7 +18,7 @@ jobs:
 
     - name: Match
       run: |
-        if [[steps.changed.outputs.matched == 'true']];
+        if steps.changed.outputs.matched == 'true';
         then
           echo "Matched"
         else
