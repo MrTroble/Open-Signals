@@ -76,8 +76,8 @@ public class OneSignalConfigParser {
             final List<ConfigProperty> propertes = new ArrayList<>();
             for (final String property : parser.values) {
                 final String[] value = property.split("\\.");
-                propertes
-                        .add(new ConfigProperty(t -> true, ImmutableMap.of((SEProperty) info.getProperty(value[0]), value[1])));
+                propertes.add(new ConfigProperty(t -> true,
+                        ImmutableMap.of((SEProperty) info.getProperty(value[0]), value[1])));
             }
             RESETCONFIGS.put(signal, propertes);
         }
