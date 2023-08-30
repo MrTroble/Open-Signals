@@ -16,8 +16,11 @@ jobs:
       with:
         paths: github/workflows/gradle.yml
 
-    - name: Echo Match
-      if: steps.changed.outputs.matched == 'false'; then
-      exit 1
-      if: steps.changed.outputs.matched == 'true'
-      run: echo Matched
+    - name: Match
+      run: |
+        if [["${{ steps.changed.outputs.matched }}" == 'true']];
+        then
+          echo "Matched"
+        else
+          exit 1
+          fi
