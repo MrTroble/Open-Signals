@@ -427,19 +427,16 @@ public class Signal extends BasicBlock {
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        boolean powerFlag = false;
         for (final List<ValuePack> valuePacks : ImmutableList.of(this.prop.redstoneOutputPacks,
                 this.prop.redstoneOutputs)) {
             for (final ValuePack pack : valuePacks) {
                 if (properties.containsKey(pack.property) && pack.predicate.test(properties)
                         && !properties.get(pack.property)
                                 .equalsIgnoreCase(pack.property.getDefault())) {
-                    powerFlag = true;
+                    return 15;
                 }
             }
         }
-        if (powerFlag)
-            return 15;
         return 0;
     }
 

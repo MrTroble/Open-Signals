@@ -516,34 +516,33 @@ public class GuiSignalBox extends GuiBase {
             if (i == -1)
                 return;
             final ShowTypes option = ShowTypes.values()[i];
-            final Map<BlockPos, LinkType> sorted = new HashMap<>();
             switch (option) {
                 case ALL: {
                     initializePageSettings(entity);
                     break;
                 }
                 case INPUT: {
-                    sorted.putAll(container.getPositionForTypes().entrySet().stream()
-                            .filter(entry -> entry.getValue().equals(LinkType.INPUT))
-                            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
-                                    Map.Entry::getValue)));
-                    initializePageSettings(entity, sorted);
+                    initializePageSettings(entity,
+                            container.getPositionForTypes().entrySet().stream()
+                                    .filter(entry -> entry.getValue().equals(LinkType.INPUT))
+                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                                            Map.Entry::getValue)));
                     break;
                 }
                 case OUTPUT: {
-                    sorted.putAll(container.getPositionForTypes().entrySet().stream()
-                            .filter(entry -> entry.getValue().equals(LinkType.OUTPUT))
-                            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
-                                    Map.Entry::getValue)));
-                    initializePageSettings(entity, sorted);
+                    initializePageSettings(entity,
+                            container.getPositionForTypes().entrySet().stream()
+                                    .filter(entry -> entry.getValue().equals(LinkType.OUTPUT))
+                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                                            Map.Entry::getValue)));
                     break;
                 }
                 case SIGNAL: {
-                    sorted.putAll(container.getPositionForTypes().entrySet().stream()
-                            .filter(entry -> entry.getValue().equals(LinkType.SIGNAL))
-                            .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
-                                    Map.Entry::getValue)));
-                    initializePageSettings(entity, sorted);
+                    initializePageSettings(entity,
+                            container.getPositionForTypes().entrySet().stream()
+                                    .filter(entry -> entry.getValue().equals(LinkType.SIGNAL))
+                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                                            Map.Entry::getValue)));
                     break;
                 }
                 default:
