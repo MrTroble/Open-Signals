@@ -14,7 +14,7 @@ jobs:
       id: changed
       uses: foodee/pr-includes-file-change@master
       with:
-        paths: github\workflows\^gradle.yml
+        paths: ^github/workflows/gradle.yml
 
     - name: Echo Match
       if: steps.changed.outputs.matched == 'true'
