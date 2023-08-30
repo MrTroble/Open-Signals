@@ -18,6 +18,6 @@ jobs:
 
     - name: Echo Match
       if: steps.changed.outputs.matched == 'false'
-       echo: 'Not matched'
+        run: echo Not matched
       if: steps.changed.outputs.matched == 'true'
-      run: echo Matched
+        run: echo Matched
