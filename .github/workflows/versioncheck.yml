@@ -19,5 +19,5 @@ jobs:
     - name: Echo Match
       if: steps.changed.outputs.matched == 'true'
       run: echo Matched
-      else:
+      if: steps.changed.outputs.matched == 'false'
       run: exit 1
