@@ -529,5 +529,8 @@
 	"property.value.ALL": "All",
 	"property.value.SIGNAL": "Signal",
 	"property.value.INPUT": "Redstone Input",
-	"property.value.OUTPUT": "Redstone Output"
+	"property.value.OUTPUT": "Redstone Output",
+    "property.value.BLACK_WHITE": "Black-white",
+    "property.value.BLACK_WHITE_W": "Black-white W",
+    "property.value.BLACK_YELLOW": "Black-yellow"
 }

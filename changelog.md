@@ -13,6 +13,7 @@
 * feat: configurable colors
 * feat: add preview renderer
 * feat: added sorting and search option in linking list
+* feat: switch handle with opposide basic position
 * fix: circle model
 * fix: tooltip out of screen
 * fix: bug in signal configs (hl, zs2v, semaphore)
