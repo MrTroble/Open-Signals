@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.core.ReadBuffer;
@@ -387,6 +388,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public Map<ModeSet, PathOptionEntry> getModes() {
-        return possibleModes;
+        return ImmutableMap.copyOf(possibleModes);
     }
 }
