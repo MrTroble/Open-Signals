@@ -104,6 +104,7 @@ public final class OSItems {
     public static final Item SIGNAL_SHIELD = new Item().setCreativeTab(CreativeTabs.MISC);
     public static final Item LAMPS = new Item().setCreativeTab(CreativeTabs.MISC);
     public static final Item ELECTRIC_PARTS = new Item().setCreativeTab(CreativeTabs.MISC);
+    public static final Item MANIPULATOR = new Item().setCreativeTab(OSTabs.TAB);
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 

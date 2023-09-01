@@ -18,6 +18,8 @@ public class GhostBlock extends BasicBlock {
     public GhostBlock() {
         super(Material.GLASS);
     }
+    
+    // TODO do lightlevel
 
     @Override
     public boolean isTranslucent(final IBlockState state) {

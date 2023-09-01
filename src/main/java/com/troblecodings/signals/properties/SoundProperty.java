@@ -1,25 +1,20 @@
 package com.troblecodings.signals.properties;
 
+import java.util.Map;
 import java.util.function.Predicate;
+
+import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.PredicateProperty;
 
 import net.minecraft.util.SoundEvent;
 
-@SuppressWarnings("rawtypes")
-public class SoundProperty {
+public class SoundProperty extends PredicateProperty<SoundEvent> {
 
-    public final SoundEvent sound;
-    public final Predicate predicate;
     public final int duration;
 
-    public SoundProperty() {
-        this(null, t -> true, -1);
-    }
-
-    public SoundProperty(final SoundEvent sound, final Predicate predicate, final int duration) {
-        super();
-        this.sound = sound;
-        this.predicate = predicate;
+    public SoundProperty(final SoundEvent sound, final Predicate<Map<SEProperty, String>> predicate,
+            final int duration) {
+        super(predicate, sound);
         this.duration = duration;
     }
-
 }

@@ -42,5 +42,4 @@ public final class JsonEnumHolder {
         returnmap.put(JsonEnum.BOOLEAN.getName(), JsonEnum.BOOLEAN);
         return returnmap;
     }
-
 }

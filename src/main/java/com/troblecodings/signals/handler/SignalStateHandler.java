@@ -56,7 +56,7 @@ public final class SignalStateHandler implements INetworkSync {
         MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
     }
 
-    public static void add(final Object object) {
+    public static void registerToNetworkChannel(final Object object) {
         channel.register(object);
     }
 

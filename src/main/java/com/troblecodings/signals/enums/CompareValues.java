@@ -23,7 +23,7 @@ public enum CompareValues {
                 return value;
         }
         OpenSignalsMain.getLogger()
-                .warn("The string [" + name + "] is not permitted for the speed function. "
+                .error("The string [" + name + "] is not permitted for the speed function. "
                         + "EQUALS was taken as default. Please fix this in your pack!");
         return EQUALS;
     }

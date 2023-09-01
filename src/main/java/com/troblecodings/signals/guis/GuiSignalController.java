@@ -140,7 +140,7 @@ public class GuiSignalController extends GuiBase {
         profile.setIndex(currentProfile);
         final Map<SEProperty, String> properties = controller.allRSStates
                 .computeIfAbsent(currentProfile, _u -> new HashMap<>());
-        controller.getReference().forEach((property, value) -> {
+        controller.getProperties().forEach((property, value) -> {
             if (!properties.containsKey(property)) {
                 properties.put(property, "DISABLED");
             }
@@ -324,7 +324,7 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.add(createPreview(blockRender));
         lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 
-        final Map<SEProperty, String> map = this.controller.getReference();
+        final Map<SEProperty, String> map = this.controller.getProperties();
         if (map == null)
             return;
         map.forEach((property, value) -> {

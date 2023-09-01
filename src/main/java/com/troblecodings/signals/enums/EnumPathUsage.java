@@ -22,5 +22,4 @@ public enum EnumPathUsage {
     public int getColor() {
         return color;
     }
-
 }
