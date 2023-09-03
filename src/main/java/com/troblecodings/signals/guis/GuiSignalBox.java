@@ -682,7 +682,7 @@ public class GuiSignalBox extends GuiBase {
         }, 2));
         if (showLines) {
             final UILines allLines = new UILines(ALL_LINES, 0.5F);
-            allLines.setColor(LINE_COLOR);
+            allLines.setColor(GRID_COLOR);
             plane.add(allLines);
         }
         final UIBox vbox = new UIBox(UIBox.VBOX, 0);

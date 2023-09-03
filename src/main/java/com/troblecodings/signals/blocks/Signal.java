@@ -427,8 +427,11 @@ public class Signal extends BasicBlock {
     public boolean onBlockActivated(final World world, final BlockPos pos, final IBlockState state,
             final EntityPlayer player, final EnumHand hand, final EnumFacing facing,
             final float hitX, final float hitY, final float hitZ) {
+        if (!(state.getBlock() instanceof Signal))
+            return false;
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
-        final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
+        final Map<SEProperty, String> states = SignalStateHandler.getStates(stateInfo);
+        final boolean customname = canHaveCustomname(states);
         if (player.getHeldItemMainhand().getItem().equals(OSItems.MANIPULATOR)
                 && (canBeLinked() || customname)) {
             if (world.isRemote)
@@ -436,20 +439,19 @@ public class Signal extends BasicBlock {
             OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
             return true;
         }
-        if (loadRedstoneOutput(world, stateInfo)) {
+        if (loadRedstoneOutput(world, stateInfo, states)) {
             world.setBlockState(pos, state, 3);
             world.notifyNeighborsOfStateChange(pos, this, false);
             world.markAndNotifyBlock(pos, null, state, state, 3);
-            return true;
         }
-        return false;
+        return true;
     }
 
     @SuppressWarnings("unchecked")
-    private boolean loadRedstoneOutput(final World worldIn, final SignalStateInfo info) {
+    private boolean loadRedstoneOutput(final World worldIn, final SignalStateInfo info,
+            final Map<SEProperty, String> properties) {
         if (!this.prop.redstoneOutputs.isEmpty()) {
-            final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
-            for (final ValuePack pack : this.prop.redstoneOutputPacks) {
+            for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (properties.containsKey(pack.property) && pack.predicate.test(properties)) {
                     SignalStateHandler.setState(info, pack.property,
                             Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));

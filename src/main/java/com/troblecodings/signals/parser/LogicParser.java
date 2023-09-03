@@ -6,11 +6,11 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.parser.interm.EvaluationLevel;
 import com.troblecodings.signals.parser.interm.IntermidiateNode;
 import com.troblecodings.signals.parser.interm.LogicalSymbols;
 
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 @SuppressWarnings({
@@ -64,7 +64,7 @@ public final class LogicParser {
                 }, info.parameter)));
     }
 
-    public static Predicate<IExtendedBlockState> nDegreeFunctionParser(final String name,
+    public static Predicate<ModelInfoWrapper> nDegreeFunctionParser(final String name,
             final FunctionParsingInfo parser, final String... parameter) {
         final String[] arguments = parameter;
         final MethodInfo method = parser.getTable().get(name.toLowerCase());

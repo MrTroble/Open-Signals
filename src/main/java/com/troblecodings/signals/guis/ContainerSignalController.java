@@ -73,7 +73,7 @@ public class ContainerSignalController extends ContainerBase
         if (properties == null || properties.isEmpty())
             return;
         this.properties.clear();
-        properties.putAll(properties);
+        this.properties.putAll(properties);
         final Map<SEProperty, String> propertiesToSend = new HashMap<>();
         properties.forEach((property, value) -> {
             if ((property.isChangabelAtStage(ChangeableStage.APISTAGE)

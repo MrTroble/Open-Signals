@@ -13,6 +13,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 
 public class PreviewSideBar {
 
@@ -28,7 +29,7 @@ public class PreviewSideBar {
         blockRenderEntity.setWidth(60);
 
         blockRenderEntity.add(new UIDrag((x, y) -> blockRender
-                .updateRotation(Quaternion.fromXYZ(0, (float) x * MODIFIER, 0))));
+                .updateRotation(new Quaternion(0, (float) x * MODIFIER, 0, 0))));
 
         blockRenderEntity.add(new UIScissor());
         blockRenderEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
@@ -70,7 +71,7 @@ public class PreviewSideBar {
     }
 
     public void update(final Signal signal) {
-        blockRender.setBlockState(signal.getBlockState(), new ModelInfoWrapper(properties));
+        blockRender.setBlockState(new ModelInfoWrapper(signal, properties));
     }
 
 }
