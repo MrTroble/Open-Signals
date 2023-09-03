@@ -21,7 +21,6 @@ import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.guilib.ecs.entitys.UIStack;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
@@ -289,8 +288,7 @@ public class GuiSignalBox extends GuiBase {
                                                 ? I18n.format("info.usage.rs.true")
                                                 : I18n.format("info.usage.rs.false"));
                         outputStatus.setCenterY(false);
-                        // TODO Config
-                        // outputStatus.setTextColor(new UIEntity().getBasicTextColor());
+                        outputStatus.setTextColor(new UIEntity().getBasicTextColor());
                         final UIEntity outputEntity = new UIEntity();
                         outputEntity.setInheritWidth(true);
                         outputEntity.setHeight(20);
@@ -659,16 +657,12 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer,
             final boolean showLines) {
-        lowerEntity.add(new UIColor(BACKGROUND_COLOR));
-        lowerEntity.add(new UIStack());
-        lowerEntity.add(new UIScissor());
-
         plane = new UIEntity();
         plane.clearChildren();
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
         plane.setHeight(TILE_COUNT * TILE_WIDTH);
         lowerEntity.add(new UIScroll(s -> {
-            final float newScale = (float) (plane.getScaleX() + s * 0.001f);
+            final float newScale = (float) (plane.getScaleX() + s * 0.05f);
             if (newScale <= 0)
                 return;
             plane.setScaleX(newScale);
@@ -723,8 +717,6 @@ public class GuiSignalBox extends GuiBase {
             }
             plane.add(row);
         }
-        lowerEntity.add(plane);
-
         final UIEntity splitter = new UIEntity();
         splitter.add(new UIColor(BACKGROUND_COLOR));
         splitter.add(new UIScissor());
@@ -735,6 +727,7 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(splitter);
         helpPage = new SidePanel(lowerEntity, this);
         helpPage.setDisableSubdsidiary(this::disableSubsidiary);
+
         buildColors(container.grid.getNodes());
     }
 
