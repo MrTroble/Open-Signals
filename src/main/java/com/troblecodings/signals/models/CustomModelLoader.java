@@ -23,7 +23,6 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -141,7 +140,7 @@ public final class CustomModelLoader implements ICustomModelLoader {
 
                         final String blockstate = texturestate.getBlockstate();
 
-                        Predicate<IExtendedBlockState> state = null;
+                        Predicate<ModelInfoWrapper> state = null;
 
                         boolean extentionloaded = false;
 

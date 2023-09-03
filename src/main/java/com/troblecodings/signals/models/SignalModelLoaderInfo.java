@@ -3,7 +3,6 @@ package com.troblecodings.signals.models;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -11,13 +10,13 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class SignalModelLoaderInfo {
 
     public final String name;
-    public final Predicate<IExtendedBlockState> state;
+    public final Predicate<ModelInfoWrapper> state;
     public final float x;
     public final float y;
     public final float z;
     public final Map<String, String> retexture;
 
-    public SignalModelLoaderInfo(final String name, final Predicate<IExtendedBlockState> state,
+    public SignalModelLoaderInfo(final String name, final Predicate<ModelInfoWrapper> state,
             final float x, final float y, final float z, final Map<String, String> retexture) {
         this.name = name;
         this.state = state;

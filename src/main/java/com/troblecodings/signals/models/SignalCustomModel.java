@@ -38,7 +38,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class SignalCustomModel implements IModel {
 
-    private final HashMap<Predicate<IExtendedBlockState>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
+    private final HashMap<Predicate<ModelInfoWrapper>, Pair<IModel, Vector3f>> modelCache = new HashMap<>();
     private List<ResourceLocation> textures = new ArrayList<>();
     private IBakedModel cachedModel = null;
     private SignalAngel angel = SignalAngel.ANGEL0;
@@ -110,7 +110,9 @@ public class SignalCustomModel implements IModel {
                 final IModel model = m.first();
                 final Vector3f f = m.second();
                 final TRSRTransformation baseState = new TRSRTransformation(f, null, null, null);
-                build.putModel(blockstate -> pr.test((IExtendedBlockState) blockstate),
+                build.putModel(
+                        blockstate -> pr
+                                .test(new ModelInfoWrapper((IExtendedBlockState) blockstate)),
                         transform(model.bake(baseState, format, bakedTextureGetter)));
             });
             return cachedModel = build.makeMultipartModel();
@@ -128,7 +130,7 @@ public class SignalCustomModel implements IModel {
         return textures;
     }
 
-    protected void register(final String name, final Predicate<IExtendedBlockState> state,
+    protected void register(final String name, final Predicate<ModelInfoWrapper> state,
             final float x, final float y, final float z, final Map<String, String> map) {
         IModel m = ModelLoaderRegistry.getModelOrLogError(
                 new ResourceLocation(OpenSignalsMain.MODID, "block/" + name),

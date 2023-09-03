@@ -1,41 +1,66 @@
 package com.troblecodings.signals.models;
 
 import java.util.Map;
+import java.util.Optional;
 
-import com.google.common.collect.ImmutableMap.Builder;
+import com.troblecodings.core.interfaces.BlockModelDataWrapper;
 import com.troblecodings.signals.SEProperty;
 
-public class ModelInfoWrapper {
+import net.minecraft.block.Block;
+import net.minecraftforge.common.property.IExtendedBlockState;
+import net.minecraftforge.common.property.IUnlistedProperty;
 
-    private final IModelData data;
+public class ModelInfoWrapper implements BlockModelDataWrapper {
 
-    public ModelInfoWrapper(final Map<SEProperty, String> states) {
-        final Builder builder = new ModelDataMap.Builder();
-        states.forEach((property, value) -> builder.withInitial(property, value));
-        this.data = builder.build();
+    public IExtendedBlockState state;
+
+    public ModelInfoWrapper(final IExtendedBlockState state) {
+        this.state = state;
     }
 
-    public ModelInfoWrapper(final IModelData data) {
-        this.data = data;
+    public ModelInfoWrapper(final Block block) {
+        this.state = (IExtendedBlockState) block.getDefaultState();
+    }
+
+    public ModelInfoWrapper(final Block block, final Map<SEProperty, String> properties) {
+        this(block);
+        properties.forEach((property, value) -> {
+            state = state.withProperty(property, value);
+        });
     }
 
     @Override
-    public boolean hasProperty(final ModelProperty<?> prop) {
-        return data.hasProperty(prop);
+    public IExtendedBlockState getIExtendedBlockState() {
+        return state;
     }
 
-    @Override
-    public <T> T getData(final ModelProperty<T> prop) {
-        return data.getData(prop);
+    public <T> boolean hasProperty(final IUnlistedProperty<T> prop) {
+        return state.getUnlistedNames().contains(prop);
     }
 
-    @Override
-    public <T> T setData(final ModelProperty<T> prop, final T value) {
-        return data.setData(prop, value);
+    @SuppressWarnings("unchecked")
+    public <T> T getData(final IUnlistedProperty<T> prop) {
+        final Optional<T> opt = (Optional<T>) state.getUnlistedProperties().get(prop);
+        if (opt.isPresent())
+            return opt.get();
+        return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    public <T> T setData(final IUnlistedProperty<T> prop, final T value) {
+        state = state.withProperty(prop, value);
+        return (T) prop;
     }
 
     public boolean has(final SEProperty property) {
         return hasProperty(property);
     }
 
+    public String get(final SEProperty property) {
+        return getData(property);
+    }
+
+    public void set(final SEProperty property, final String value) {
+        setData(property, value);
+    }
 }
