@@ -431,6 +431,11 @@ public class Signal extends BasicBlock {
             final float hitX, final float hitY, final float hitZ) {
         if (!(state.getBlock() instanceof Signal))
             return false;
+        final Item item = player.getHeldItemMainhand().getItem();
+        if (!(state.getBlock() instanceof Signal)
+                || (item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {
+            return false;
+        }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> states = SignalStateHandler.getStates(stateInfo);
         final boolean customname = canHaveCustomname(states);
