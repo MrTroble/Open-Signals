@@ -446,7 +446,7 @@ public class Signal extends BasicBlock {
         }
         if (loadRedstoneOutput(world, stateInfo, states)) {
             world.setBlockState(pos, state, 3);
-            world.notifyNeighborsOfStateChange(pos, this, false);
+            world.notifyNeighborsOfStateChange(pos, this, true);
             world.markAndNotifyBlock(pos, null, state, state, 3);
         }
         return true;
