@@ -559,6 +559,9 @@
         "WHITE_BLACK_W",
         "YELLOW",
         "YELLOW_BLACK",
-        "RED_YELLOW"
+        "RED_YELLOW",
+        "BLACK_WHITE",
+        "BLACK_WHITE_W",
+        "BLACK_YELLOW"
     ]
 }

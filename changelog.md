@@ -1,5 +1,26 @@
 # Changelog
 
+## [1.12.2 - 3.1.0]
+
+* feat: added help panel to signalbox
+* feat: added shortcuts in help panel
+* feat: added manipulator tool for new signal renaming
+* feat: reverse resetting pathways
+* feat: added tooltip to text input field
+* feat: added tooltip hiding option
+* feat: remove grid in usage mode from signalbox
+* feat: readded configurable block light emission
+* feat: configurable colors
+* feat: add preview renderer
+* feat: added sorting and search option in linking list
+* feat: switch handle with opposide basic position
+* fix: circle model
+* fix: tooltip out of screen
+* fix: bug in signal configs (hl, zs2v, semaphore)
+* fix: redstone output of switch signals
+* ref: better code performance
+* ref: predicate properties
+
 ## [1.12.2 - 3.0.2]
 
 * feat/fix: better and working system for relinking inputs after SignalBox Placement

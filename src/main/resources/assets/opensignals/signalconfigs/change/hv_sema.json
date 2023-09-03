@@ -2,8 +2,8 @@
     "currentSignal": "hvsignal",
     "nextSignal": "semaphoresignal",
     "savedPredicates": {
-        "stop": "config(wing1.FALSE) && config(wing2.FALSE)",
-        "drive": "config(wing1.TRUE) && config(wing2.FALSE)",
+        "stop": "(config(wing1.FALSE) && config(wing2.FALSE)) || config(wing1.FALSE)",
+        "drive": "(config(wing1.TRUE) && config(wing2.FALSE)) || config(wing1.TRUE)",
         "slow": "config(wing1.TRUE) && config(wing2.TRUE)"
     },
     "values": {

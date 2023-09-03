@@ -1,0 +1,21 @@
+name: "Check version!"
+on:
+  pull_request:
+      types: [opened, synchronize, reopened, ready_for_review, labeled, unlabeled, push]
+
+jobs:
+  # Enforces the update of the gradle file on every pull request 
+  test:
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
+    steps:
+    - name: Get Changed Files
+      id: changed
+      uses: foodee/pr-includes-file-change@master
+      with:
+        paths: github/workflows/gradle.yml
+
+    - name: Echo Match
+      if: steps.changed.outputs.matched == 'true'
+      run: echo Matched
