@@ -90,9 +90,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 }
                 grid = tile.getSignalBoxGrid();
                 grid.readNetwork(buffer);
-                propertiesForType.clear();
-                enabledSubsidiaryTypes = grid.getAllSubsidiaries();
-                enabledSubsidiaryTypes.putAll(grid.getAllSubsidiaries());
+                enabledSubsidiaryTypes = new HashMap<>(grid.getAllSubsidiaries());
                 propertiesForType.clear();
                 possibleSubsidiaries.clear();
                 final int signalSize = buffer.getInt();
