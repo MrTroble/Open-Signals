@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
@@ -93,6 +94,7 @@ public class Signal extends BasicBlock {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
+        setLightLevel(ConfigHandler.lightEmission / 15.0f);
     }
 
     public int getID() {
