@@ -429,8 +429,6 @@ public class Signal extends BasicBlock {
     public boolean onBlockActivated(final World world, final BlockPos pos, final IBlockState state,
             final EntityPlayer player, final EnumHand hand, final EnumFacing facing,
             final float hitX, final float hitY, final float hitZ) {
-        if (!(state.getBlock() instanceof Signal))
-            return false;
         final Item item = player.getHeldItemMainhand().getItem();
         if (!(state.getBlock() instanceof Signal)
                 || (item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {

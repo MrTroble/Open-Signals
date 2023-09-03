@@ -71,6 +71,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             buffer.putByte((byte) list.size());
             list.forEach(state -> buffer.putByte((byte) state.getID()));
         });
+        buffer.putInt(positions.size());
         positions.forEach((pos, type) -> {
             buffer.putBlockPos(pos);
             buffer.putByte((byte) type.ordinal());
