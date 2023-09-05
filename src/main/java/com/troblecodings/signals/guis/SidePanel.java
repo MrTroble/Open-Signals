@@ -82,7 +82,7 @@ public class SidePanel {
         helpPage.add(new UIBox(UIBox.VBOX, 2));
 
         final UIRotate rotate = new UIRotate();
-        rotate.setRotateZ((float) Math.PI / 2.0f);
+        rotate.setRotateZ(90);
         label.add(rotate);
         final UILabel labelComponent = new UILabel(I18n.format("info.infolabel"));
         labelComponent.setTextColor(new UIEntity().getBasicTextColor());
