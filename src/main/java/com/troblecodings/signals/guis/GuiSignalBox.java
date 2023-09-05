@@ -36,6 +36,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
@@ -64,8 +65,7 @@ import net.minecraft.util.math.BlockPos;
 public class GuiSignalBox extends GuiBase {
 
     public static final int SELECTION_COLOR = 0x2900FF00;
-    public static final int BACKGROUND_COLOR = 0xFF8B8B8B;
-    // TODO Config integration
+    public static final int BACKGROUND_COLOR = ConfigHandler.signalboxBackgroundColor;
     public static final int GRID_COLOR = 0xFF5B5B5B;
     public static final int EDIT_COLOR = 0x5000A2FF;
 
@@ -247,8 +247,7 @@ public class GuiSignalBox extends GuiBase {
                     }
                     final UILabel currentStatus = new UILabel(I18n.format("info.usage.status")
                             + " : " + I18n.format("info.usage.status.free"));
-                    // TODO COnfig
-                    // currentStatus.setTextColor(new UIEntity().getBasicTextColor());
+                    currentStatus.setTextColor(new UIEntity().getBasicTextColor());
                     final UIEntity statusEntity = new UIEntity();
                     statusEntity.setInheritWidth(true);
                     statusEntity.setHeight(20);
