@@ -390,9 +390,9 @@ public class Signal extends BasicBlock {
     private boolean loadRedstoneOutput(final Level worldIn, final SignalStateInfo info) {
         if (worldIn.isClientSide)
             return true;
-        if (!this.prop.redstoneOutputPacks.isEmpty()) {
+        if (!this.prop.redstoneOutputs.isEmpty()) {
             final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
-            for (final ValuePack pack : this.prop.redstoneOutputPacks) {
+            for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (properties.containsKey(pack.property) && pack.predicate.test(properties)) {
                     SignalStateHandler.setState(info, pack.property,
                             Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));
