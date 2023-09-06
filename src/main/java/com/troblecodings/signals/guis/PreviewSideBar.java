@@ -29,7 +29,7 @@ public class PreviewSideBar {
         blockRenderEntity.setWidth(60);
 
         blockRenderEntity.add(new UIDrag((x, y) -> blockRender
-                .updateRotation(new Quaternion(0, (float) x * MODIFIER, 0, 0))));
+                .updateRotation(new Quaternion(0, 90, (float) x * MODIFIER, 180))));
 
         blockRenderEntity.add(new UIScissor());
         blockRenderEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
