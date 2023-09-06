@@ -24,13 +24,11 @@ public class ModelInfoWrapper implements BlockModelDataWrapper {
 
     public ModelInfoWrapper(final Block block, final Map<SEProperty, String> properties) {
         this(block);
-        properties.forEach((property, value) -> {
-            state = state.withProperty(property, value);
-        });
+        properties.forEach((property, value) -> state = state.withProperty(property, value));
     }
 
     @Override
-    public IExtendedBlockState getIExtendedBlockState() {
+    public IExtendedBlockState getBlockState() {
         return state;
     }
 
