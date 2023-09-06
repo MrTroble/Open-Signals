@@ -105,7 +105,7 @@ public class Signal extends BasicBlock {
     public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
             final BlockPos pos) {
         final TileEntity te = source.getTileEntity(pos);
-        if (te == null)
+        if (te == null || !(te instanceof SignalTileEntity))
             return FULL_BLOCK_AABB;
         final World world = te.getWorld();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
