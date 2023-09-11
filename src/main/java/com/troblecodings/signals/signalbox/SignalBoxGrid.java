@@ -79,7 +79,7 @@ public class SignalBoxGrid implements INetworkSavable {
             nodeTag.putList(SUBSIDIARY_LIST, subsidiaries.entrySet().stream().map(entry -> {
                 final NBTWrapper subsidiaryTag = new NBTWrapper();
                 entry.getKey().write(subsidiaryTag);
-                entry.getValue().writeNBT(tag);
+                entry.getValue().writeNBT(subsidiaryTag);
                 return subsidiaryTag;
             })::iterator);
             return nodeTag;
