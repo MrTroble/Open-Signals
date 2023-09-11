@@ -88,11 +88,12 @@ public class LinkedPositions {
 
     public void write(final NBTWrapper wrapper) {
         final NBTWrapper posWrapper = new NBTWrapper();
-        posWrapper.putList(LINKED_POS_LIST, linkedBlocks.entrySet().stream().map(entry -> {
-            final NBTWrapper item = NBTWrapper.getBlockPosWrapper(entry.getKey());
-            entry.getValue().write(item);
-            return item;
-        })::iterator);
+        posWrapper.putList(LINKED_POS_LIST, linkedBlocks.entrySet().stream()
+                .filter(entry -> !entry.getValue().equals(LinkType.SIGNAL)).map(entry -> {
+                    final NBTWrapper item = NBTWrapper.getBlockPosWrapper(entry.getKey());
+                    entry.getValue().write(item);
+                    return item;
+                })::iterator);
         posWrapper.putList(LINKED_SIGNALS, signals.entrySet().stream().map(entry -> {
             final NBTWrapper signal = NBTWrapper.getBlockPosWrapper(entry.getKey());
             signal.putString(SIGNAL_NAME, entry.getValue().getSignalTypeName());

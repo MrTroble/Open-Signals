@@ -69,21 +69,22 @@ public class SignalBoxGrid implements INetworkSavable {
 
     @Override
     public void write(final NBTWrapper tag) {
-        tag.putList(NODE_LIST, modeGrid.values().stream().map(node -> {
-            final NBTWrapper nodeTag = new NBTWrapper();
-            node.write(nodeTag);
-            final Map<ModeSet, SubsidiaryEntry> subsidiaries = enabledSubsidiaryTypes
-                    .get(node.getPoint());
-            if (subsidiaries == null)
-                return nodeTag;
-            nodeTag.putList(SUBSIDIARY_LIST, subsidiaries.entrySet().stream().map(entry -> {
-                final NBTWrapper subsidiaryTag = new NBTWrapper();
-                entry.getKey().write(subsidiaryTag);
-                entry.getValue().writeNBT(subsidiaryTag);
-                return subsidiaryTag;
-            })::iterator);
-            return nodeTag;
-        })::iterator);
+        tag.putList(NODE_LIST,
+                modeGrid.values().stream().filter(node -> !node.isEmpty()).map(node -> {
+                    final NBTWrapper nodeTag = new NBTWrapper();
+                    node.write(nodeTag);
+                    final Map<ModeSet, SubsidiaryEntry> subsidiaries = enabledSubsidiaryTypes
+                            .get(node.getPoint());
+                    if (subsidiaries == null)
+                        return nodeTag;
+                    nodeTag.putList(SUBSIDIARY_LIST, subsidiaries.entrySet().stream().map(entry -> {
+                        final NBTWrapper subsidiaryTag = new NBTWrapper();
+                        entry.getKey().write(subsidiaryTag);
+                        entry.getValue().writeNBT(subsidiaryTag);
+                        return subsidiaryTag;
+                    })::iterator);
+                    return nodeTag;
+                })::iterator);
     }
 
     @Override
@@ -100,7 +101,7 @@ public class SignalBoxGrid implements INetworkSavable {
             final Map<ModeSet, SubsidiaryEntry> states = new HashMap<>();
             subsidiaryTags.forEach(subsidiaryTag -> {
                 final ModeSet mode = new ModeSet(subsidiaryTag);
-                states.put(mode, SubsidiaryEntry.of(tag));
+                states.put(mode, SubsidiaryEntry.of(subsidiaryTag));
             });
             enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
