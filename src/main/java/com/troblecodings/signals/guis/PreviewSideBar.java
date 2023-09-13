@@ -3,8 +3,6 @@ package com.troblecodings.signals.guis;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.lwjgl.util.vector.Quaternion;
-
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
@@ -29,7 +27,7 @@ public class PreviewSideBar {
         blockRenderEntity.setWidth(60);
 
         blockRenderEntity.add(new UIDrag((x, y) -> blockRender
-                .updateRotation(new Quaternion(0, 90, (float) x * MODIFIER, 180))));
+                .updateRotation(0, (float) x * MODIFIER, 0)));
 
         blockRenderEntity.add(new UIScissor());
         blockRenderEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
