@@ -116,7 +116,7 @@ public class GuiSignalBox extends GuiBase {
 
     public void update(final String errorString) {
         this.resetTileSelection();
-        final UIToolTip tooltip = new UIToolTip(errorString);
+        final UIToolTip tooltip = new UIToolTip(errorString, true);
         lowerEntity.add(tooltip);
         new Thread(() -> {
             try {
