@@ -4,7 +4,10 @@
         "canLink": true,
         "defaultHeight": 0,
         "redstoneOutputs": {
-            "config(manual.TRUE)" : "powered"
+            "config(manual.TRUE)": "powered"
+        },
+        "remoteRedstoneOutputs": {
+            "config(manual.FALSE)": "powered"
         }
     },
     "seProperties": [
@@ -17,8 +20,7 @@
             "name": "powered",
             "defaultState": false,
             "changeableStage": "APISTAGE_NONE_CONFIG",
-            "autoname": true,
-            "dependencies": "config(MANUAL.TRUE)"
+            "autoname": true
         },
         {
             "name": "fallback_switch",

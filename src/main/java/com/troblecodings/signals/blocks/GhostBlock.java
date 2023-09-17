@@ -1,5 +1,7 @@
 package com.troblecodings.signals.blocks;
 
+import com.troblecodings.signals.config.ConfigHandler;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -17,6 +19,7 @@ public class GhostBlock extends BasicBlock {
 
     public GhostBlock() {
         super(Material.GLASS);
+        setLightLevel(ConfigHandler.lightEmission / 15.0F);
     }
 
     @Override

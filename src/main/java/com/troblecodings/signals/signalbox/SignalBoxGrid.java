@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -24,7 +23,7 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
@@ -70,21 +69,22 @@ public class SignalBoxGrid implements INetworkSavable {
 
     @Override
     public void write(final NBTWrapper tag) {
-        tag.putList(NODE_LIST, modeGrid.values().stream().map(node -> {
-            final NBTWrapper nodeTag = new NBTWrapper();
-            node.write(nodeTag);
-            final Map<ModeSet, SubsidiaryEntry> subsidiaries = enabledSubsidiaryTypes
-                    .get(node.getPoint());
-            if (subsidiaries == null)
-                return nodeTag;
-            nodeTag.putList(SUBSIDIARY_LIST, subsidiaries.entrySet().stream().map(entry -> {
-                final NBTWrapper subsidiaryTag = new NBTWrapper();
-                entry.getKey().write(subsidiaryTag);
-                entry.getValue().writeNBT(tag);
-                return subsidiaryTag;
-            })::iterator);
-            return nodeTag;
-        })::iterator);
+        tag.putList(NODE_LIST,
+                modeGrid.values().stream().filter(node -> !node.isEmpty()).map(node -> {
+                    final NBTWrapper nodeTag = new NBTWrapper();
+                    node.write(nodeTag);
+                    final Map<ModeSet, SubsidiaryEntry> subsidiaries = enabledSubsidiaryTypes
+                            .get(node.getPoint());
+                    if (subsidiaries == null)
+                        return nodeTag;
+                    nodeTag.putList(SUBSIDIARY_LIST, subsidiaries.entrySet().stream().map(entry -> {
+                        final NBTWrapper subsidiaryTag = new NBTWrapper();
+                        entry.getKey().write(subsidiaryTag);
+                        entry.getValue().writeNBT(subsidiaryTag);
+                        return subsidiaryTag;
+                    })::iterator);
+                    return nodeTag;
+                })::iterator);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class SignalBoxGrid implements INetworkSavable {
             final Map<ModeSet, SubsidiaryEntry> states = new HashMap<>();
             subsidiaryTags.forEach(subsidiaryTag -> {
                 final ModeSet mode = new ModeSet(subsidiaryTag);
-                states.put(mode, SubsidiaryEntry.of(tag));
+                states.put(mode, SubsidiaryEntry.of(subsidiaryTag));
             });
             enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
@@ -132,10 +132,6 @@ public class SignalBoxGrid implements INetworkSavable {
                 .map(entry -> entry.toString()).collect(Collectors.joining("\n")) + "]";
     }
 
-    public boolean isEmpty() {
-        return this.modeGrid.isEmpty();
-    }
-
     public SignalBoxNode getNode(final Point point) {
         return modeGrid.get(point);
     }
@@ -150,15 +146,6 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public void putNode(final Point point, final SignalBoxNode node) {
         modeGrid.put(point, node);
-    }
-
-    public SignalBoxNode removeNode(final Point point) {
-        return modeGrid.remove(point);
-    }
-
-    public SignalBoxNode computeIfAbsent(final Point point,
-            final Function<? super Point, ? extends SignalBoxNode> funtion) {
-        return modeGrid.computeIfAbsent(point, funtion);
     }
 
     public void putAllNodes(final Map<Point, SignalBoxNode> nodes) {
@@ -280,7 +267,7 @@ public class SignalBoxGrid implements INetworkSavable {
         final SignalStateInfo info = new SignalStateInfo(world, pos.get(), signal);
         final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(info);
         SignalStateHandler.setStates(info,
-                properties.values.entrySet().stream()
+                properties.state.entrySet().stream()
                         .filter(propertyEntry -> oldProperties.containsKey(propertyEntry.getKey()))
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
         states.put(mode, entry);

@@ -23,7 +23,6 @@ import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.ICustomModelLoader;
 import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -37,7 +36,6 @@ public final class CustomModelLoader implements ICustomModelLoader {
     private CustomModelLoader() {
     }
 
-    @SuppressWarnings("unchecked")
     private static void loadExtention(final TextureStats texturestate,
             final Map<String, ModelExtention> extention, final String modelname,
             final ModelStats states, final Models models, final FunctionParsingInfo info,
@@ -54,8 +52,9 @@ public final class CustomModelLoader implements ICustomModelLoader {
             final Map<String, String> extentionProperties = extentions.getValue();
             final ModelExtention extentionValues = extention.get(extentionName);
             if (extentionValues == null)
-                throw new ContentPackException(String
-                        .format("There doesn't exists an extention named [%s]!", extentionName));
+                throw new ContentPackException(
+                        String.format("There doesn't exists an extention named [%s]!",
+                                extentionName) + " Valid Extentions: " + extention.keySet());
 
             for (final Map.Entry<String, String> entry : extentionValues.getExtention()
                     .entrySet()) {
@@ -98,7 +97,6 @@ public final class CustomModelLoader implements ICustomModelLoader {
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onResourceManagerReload(final IResourceManager manager) {
         registeredModels.clear();
@@ -142,7 +140,7 @@ public final class CustomModelLoader implements ICustomModelLoader {
 
                         final String blockstate = texturestate.getBlockstate();
 
-                        Predicate<IExtendedBlockState> state = null;
+                        Predicate<ModelInfoWrapper> state = null;
 
                         boolean extentionloaded = false;
 

@@ -6,15 +6,15 @@ import java.util.Map;
 import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.parser.interm.EvaluationLevel;
 import com.troblecodings.signals.parser.interm.IntermidiateNode;
 import com.troblecodings.signals.parser.interm.LogicalSymbols;
 
-import net.minecraftforge.common.property.IExtendedBlockState;
 import net.minecraftforge.common.property.IUnlistedProperty;
 
 @SuppressWarnings({
-        "rawtypes", "unchecked", "deprecation"
+        "rawtypes", "unchecked"
 })
 public final class LogicParser {
 
@@ -38,7 +38,7 @@ public final class LogicParser {
                 objects -> PredicateHolder.hasAndIsNot((SEProperty) objects[0]), SEProperty.class));
 
         TRANSLATION_TABLE.put("check", new MethodInfo(Map.class, "check",
-                objects -> PredicateHolder.check((ValuePack) objects[0]), ValuePack.class));
+                objects -> PredicateHolder.config((ValuePack) objects[0]), ValuePack.class));
 
         TRANSLATION_TABLE.put("config", new MethodInfo(Map.class, "config",
                 objects -> PredicateHolder.config((ValuePack) objects[0]), ValuePack.class));
@@ -64,7 +64,7 @@ public final class LogicParser {
                 }, info.parameter)));
     }
 
-    public static Predicate<IExtendedBlockState> nDegreeFunctionParser(final String name,
+    public static Predicate<ModelInfoWrapper> nDegreeFunctionParser(final String name,
             final FunctionParsingInfo parser, final String... parameter) {
         final String[] arguments = parameter;
         final MethodInfo method = parser.getTable().get(name.toLowerCase());
@@ -145,7 +145,7 @@ public final class LogicParser {
         return logic;
     }
 
-    public static Predicate predicate(final String input, final FunctionParsingInfo info) {
+    public static <T> Predicate<T> predicate(final String input, final FunctionParsingInfo info) {
         return parse(input, info).pop().getPredicate();
     }
 }

@@ -5,6 +5,7 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import net.minecraft.client.gui.FontRenderer;
 
 public class RenderOverlayInfo {
+
     public final double x;
     public final double y;
     public final double z;
@@ -13,7 +14,6 @@ public class RenderOverlayInfo {
 
     public RenderOverlayInfo(final double x, final double y, final double z,
             final FontRenderer fontRenderer) {
-        super();
         this.x = x;
         this.y = y;
         this.z = z;

@@ -15,5 +15,4 @@ public class ContentPackException extends RuntimeException {
     public ContentPackException(final String message, final Throwable err) {
         super(message, err);
     }
-
 }

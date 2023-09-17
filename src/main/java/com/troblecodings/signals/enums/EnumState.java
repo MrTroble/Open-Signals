@@ -1,6 +1,7 @@
 package com.troblecodings.signals.enums;
 
 import com.troblecodings.core.interfaces.NamableWrapper;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ReadBuffer;
 
 public enum EnumState implements NamableWrapper {
@@ -24,7 +25,9 @@ public enum EnumState implements NamableWrapper {
                 return state;
             }
         }
-        return null;
+        OpenSignalsMain.getLogger().error("[" + name
+                + "] is not a valid state of EnumState! [DISABLED] was taken as default!");
+        return EnumState.DISABLED;
     }
 
     public static EnumState of(final ReadBuffer buffer) {

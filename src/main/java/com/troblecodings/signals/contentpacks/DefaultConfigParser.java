@@ -13,7 +13,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public class DefaultConfigParser {
 
@@ -25,7 +25,6 @@ public class DefaultConfigParser {
 
     private static final Gson GSON = new Gson();
 
-    @SuppressWarnings("rawtypes")
     public static void loadDefaultConfigs() {
 
         for (final Map.Entry<String, String> files : OpenSignalsMain.contentPacks
@@ -55,7 +54,7 @@ public class DefaultConfigParser {
             for (final Map.Entry<String, List<String>> entry : parser.values.entrySet()) {
 
                 String valueToParse = entry.getKey().toLowerCase();
-                Predicate predicate = t -> true;
+                Predicate<Map<Class<?>, Object>> predicate = t -> true;
 
                 if (valueToParse.contains("map(") && savedPredicates != null
                         && !savedPredicates.isEmpty()) {
@@ -124,5 +123,4 @@ public class DefaultConfigParser {
             DEFAULTCONFIGS.put(signal, properties);
         }
     }
-
 }

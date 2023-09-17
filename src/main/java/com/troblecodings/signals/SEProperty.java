@@ -103,10 +103,6 @@ public class SEProperty implements IIntegerable<String>, IUnlistedProperty<Strin
         return this.deps.test(t);
     }
 
-    public static SEProperty cst(final Object iup) {
-        return (SEProperty) iup;
-    }
-
     public JsonEnum getParent() {
         return parent;
     }
