@@ -16,7 +16,7 @@ public final class ConfigHandler {
     }
 
     @RangeInt(min = 0, max = 15)
-    @Name("Signal light emission")
+    @Name(value = "Signal light emission")
     @RequiresMcRestart
     @Comment(value = {
             "Change the light emssion value of a signal.",
@@ -25,43 +25,43 @@ public final class ConfigHandler {
     })
     public static int lightEmission = 1;
 
-    @Name("Signalbox background color")
+    @Name(value = "Signalbox background color")
     @Comment(value = {
             "Change the background color of the signalbox gui. Default: -7631989"
     })
     public static int signalboxBackgroundColor = 0xFF8B8B8B;
 
-    @Name("Signalbox free color")
+    @Name(value = "Signalbox free color")
     @Comment(value = {
             "Change the color of normal path elements. Default: -16777216"
     })
     public static int signalboxFreeColor = 0xFF000000;
 
-    @Name("Signalbox select color")
+    @Name(value = "Signalbox select color")
     @Comment(value = {
             "Change the color of a selected path. Default: -16711936"
     })
     public static int signalboxSelectColor = 0xFF00FF00;
 
-    @Name("Signalbox used color")
+    @Name(value = "Signalbox used color")
     @Comment(value = {
             "Change the color of a blocked path. Default: -65536"
     })
     public static int signalboxUsedColor = 0xFFFF0000;
 
-    @Name("Basic text color")
+    @Name(value = "Basic text color")
     @Comment(value = {
             "Change the color of a default text. Default: -16777216"
     })
     public static int basicTextColor = GuiConfigHandler.basicTextColor;
 
-    @Name("info text color")
+    @Name(value = "info text color")
     @Comment(value = {
             "Change the color of an info text. Default: -16777046"
     })
     public static int infoTextColor = GuiConfigHandler.infoTextColor;
 
-    @Name("Error text color")
+    @Name(value = "Error text color")
     @Comment(value = {
             "Change the color of an error text. Default: -16776961"
     })
