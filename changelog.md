@@ -18,6 +18,7 @@
 * fix: tooltip out of screen
 * fix: bug in signal configs (hl, zs2v, semaphore)
 * fix: redstone output of switch signals
+* fix: content pack problems
 * ref: better code performance
 * ref: predicate properties
 
