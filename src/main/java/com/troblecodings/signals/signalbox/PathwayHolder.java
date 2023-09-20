@@ -36,7 +36,7 @@ public class PathwayHolder {
         this.world = world;
         startsToPath.values().forEach(pw -> pw.setWorldAndPos(world, tilePos));
     }
-    
+
     public void updatePathwayToAutomatic(final Point point) {
         final SignalBoxPathway pathway = startsToPath.get(point);
         if (pathway == null) {
@@ -85,7 +85,8 @@ public class PathwayHolder {
             count++;
         }
         if (count == 0) {
-            OpenSignalsMain.getLogger().debug("Could not find previous! " + pathway);
+            if (OpenSignalsMain.isDebug())
+                OpenSignalsMain.getLogger().debug("Could not find previous! " + pathway);
         }
     }
 

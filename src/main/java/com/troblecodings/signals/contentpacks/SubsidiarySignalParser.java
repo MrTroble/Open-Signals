@@ -10,7 +10,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public class SubsidiarySignalParser {
 
@@ -37,7 +37,7 @@ public class SubsidiarySignalParser {
             final Signal signal = Signal.SIGNALS.get(parser.currentSignal.toLowerCase());
             if (signal == null)
                 throw new ContentPackException("There doesn't exists a signal with the name '"
-                        + parser.currentSignal + "'!");
+                        + parser.currentSignal + "'! Valid Signals: " + Signal.SIGNALS.keySet());
             if (SUBSIDIARY_SIGNALS.containsKey(signal))
                 throw new ContentPackException(
                         "There already exists a Subsidiary Config for " + signal + "!");
@@ -70,7 +70,7 @@ public class SubsidiarySignalParser {
         });
         final Map<SubsidiaryState, ConfigProperty> properties = SUBSIDIARY_SIGNALS
                 .computeIfAbsent(signal, _u -> new HashMap<>());
-        properties.put(enumState, new ConfigProperty(allValues));
+        properties.put(enumState, new ConfigProperty(t -> true, allValues));
         SUBSIDIARY_SIGNALS.put(signal, properties);
     }
 

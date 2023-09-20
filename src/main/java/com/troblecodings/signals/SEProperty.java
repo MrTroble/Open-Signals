@@ -108,10 +108,6 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
         return this.deps.test(t);
     }
 
-    public static SEProperty cst(final Object iup) {
-        return (SEProperty) iup;
-    }
-
     public JsonEnum getParent() {
         return parent;
     }

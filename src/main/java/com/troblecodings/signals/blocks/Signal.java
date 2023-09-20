@@ -29,9 +29,7 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.parser.ValuePack;
-import com.troblecodings.signals.properties.BooleanProperty;
-import com.troblecodings.signals.properties.FloatProperty;
-import com.troblecodings.signals.properties.HeightProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.PredicateProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
@@ -78,7 +76,6 @@ public class Signal extends BasicBlock {
     private final int id;
     private List<SEProperty> signalProperties;
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
-    private SEProperty powerProperty = null;
 
     public Signal(final SignalProperties prop) {
         super(Properties.of(Material.STONE).noOcclusion().lightLevel(u -> 1));
@@ -91,6 +88,7 @@ public class Signal extends BasicBlock {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
+        // TODO Light Level
     }
 
     public int getID() {
@@ -185,9 +183,9 @@ public class Signal extends BasicBlock {
 
     @SuppressWarnings("unchecked")
     public int getHeight(final Map<SEProperty, String> map) {
-        for (final HeightProperty property : this.prop.signalHeights) {
-            if (property.predicate.test(map))
-                return property.height;
+        for (final PredicateProperty<Integer> property : this.prop.signalHeights) {
+            if (property.test(map))
+                return property.state;
         }
         return this.prop.defaultHeight;
     }
@@ -239,9 +237,9 @@ public class Signal extends BasicBlock {
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
         float customRenderHeight = renderHeight;
-        for (final FloatProperty property : this.prop.customRenderHeights) {
+        for (final PredicateProperty<Float> property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
-                customRenderHeight = property.height;
+                customRenderHeight = property.state;
             }
             if (customRenderHeight == -1)
                 return;
@@ -253,9 +251,9 @@ public class Signal extends BasicBlock {
             return;
         }
         boolean doubleSidedText = false;
-        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+        for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
             if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.doubleSided;
+                doubleSidedText = boolProp.state;
             }
         }
         final SignalAngel face = state.getValue(Signal.ANGEL);
@@ -300,9 +298,9 @@ public class Signal extends BasicBlock {
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
-        for (final FloatProperty property : this.prop.customRenderHeights) {
+        for (final PredicateProperty<Float> property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
-                customRenderHeight = property.height;
+                customRenderHeight = property.state;
             }
         }
         if (customRenderHeight == -1)
@@ -314,9 +312,9 @@ public class Signal extends BasicBlock {
             return;
         }
         boolean doubleSidedText = false;
-        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+        for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
             if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.doubleSided;
+                doubleSidedText = boolProp.state;
             }
         }
         final String name = info.tileEntity.getNameWrapper();
@@ -375,31 +373,28 @@ public class Signal extends BasicBlock {
             return ActionResultType.FAIL;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
-        if (loadRedstoneOutput(world, stateInfo)) {
-            world.blockUpdated(pos, state.getBlock());
-            return ActionResultType.SUCCESS;
-        }
-        final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
-        if (!player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)
+        final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
+        final boolean customname = canHaveCustomname(properties);
+        if (player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.MANIPULATOR)
                 && (canBeLinked() || customname)) {
             OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
+            return ActionResultType.SUCCESS;
+        }
+        if (loadRedstoneOutput(world, stateInfo, properties)) {
+            world.blockUpdated(pos, state.getBlock());
             return ActionResultType.SUCCESS;
         }
         return ActionResultType.FAIL;
     }
 
     @SuppressWarnings("unchecked")
-    private boolean loadRedstoneOutput(final World worldIn, final SignalStateInfo info) {
+    private boolean loadRedstoneOutput(final World worldIn, final SignalStateInfo info,
+            final Map<SEProperty, String> properties) {
         if (!this.prop.redstoneOutputs.isEmpty()) {
-            final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
-            this.powerProperty = null;
             for (final ValuePack pack : this.prop.redstoneOutputs) {
-                if (pack.predicate.test(properties)) {
-                    this.powerProperty = pack.property;
-                    if (properties.containsKey(pack.property)) {
-                        SignalStateHandler.setState(info, powerProperty,
-                                Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));
-                    }
+                if (properties.containsKey(pack.property) && pack.predicate.test(properties)) {
+                    SignalStateHandler.setState(info, pack.property,
+                            Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));
                     return true;
                 }
             }
@@ -407,9 +402,13 @@ public class Signal extends BasicBlock {
         return false;
     }
 
+    public boolean hasRedstoneOut() {
+        return !this.prop.redstoneOutputs.isEmpty() || !this.prop.redstoneOutputPacks.isEmpty();
+    }
+
     @Override
     public boolean isSignalSource(final BlockState state) {
-        return !this.prop.redstoneOutputs.isEmpty();
+        return hasRedstoneOut();
     }
 
     @Override
@@ -422,19 +421,19 @@ public class Signal extends BasicBlock {
     @Override
     public int getDirectSignal(final BlockState blockState, final IBlockReader blockAccess,
             final BlockPos pos, final Direction side) {
-        if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null
-                || !(blockAccess instanceof World)) {
+        if (!hasRedstoneOut() || !(blockAccess instanceof World)) {
             return 0;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((World) blockAccess, pos, this);
-        if (SignalStateHandler.getState(stateInfo, powerProperty)
-                .filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
-            return 0;
-        }
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        for (final ValuePack pack : this.prop.redstoneOutputs) {
-            if (pack.predicate.test(properties)) {
-                return 15;
+        for (final List<ValuePack> valuePacks : ImmutableList.of(this.prop.redstoneOutputPacks,
+                this.prop.redstoneOutputs)) {
+            for (final ValuePack pack : valuePacks) {
+                if (properties.containsKey(pack.property) && pack.predicate.test(properties)
+                        && !properties.get(pack.property)
+                                .equalsIgnoreCase(pack.property.getDefault())) {
+                    return 15;
+                }
             }
         }
         return 0;
@@ -452,7 +451,7 @@ public class Signal extends BasicBlock {
             return;
 
         if (sound.duration == 1) {
-            world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
         } else {
             if (world.getBlockTicks().hasScheduledTick(pos, this)) {
                 return;
@@ -485,7 +484,7 @@ public class Signal extends BasicBlock {
         if (sound.duration <= 1) {
             return;
         }
-        world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
+        world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
         world.getBlockTicks().scheduleTick(pos, this, sound.duration);
     }
 

@@ -23,6 +23,7 @@ public class GhostBlock extends BasicBlock {
     public GhostBlock() {
         super(Properties.of(Material.GLASS).noOcclusion().lightLevel(u -> 1));
         registerDefaultState(defaultBlockState());
+        // TODO Config Light Level
     }
 
     @Override

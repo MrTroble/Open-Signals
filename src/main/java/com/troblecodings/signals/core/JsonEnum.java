@@ -1,6 +1,5 @@
 package com.troblecodings.signals.core;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -55,10 +54,7 @@ public class JsonEnum extends ModelProperty<String> implements IIntegerable<Stri
     }
 
     public Collection<String> getAllowedValues() {
-        if (values != null) {
-            return values;
-        }
-        return new ArrayList<>();
+        return values;
     }
 
     @Override

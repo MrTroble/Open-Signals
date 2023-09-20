@@ -5,13 +5,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.gson.Gson;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicalParserException;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public class OneSignalConfigParser {
 
@@ -29,7 +30,7 @@ public class OneSignalConfigParser {
         loadResetConfigs();
     }
 
-    public static void loadShuntigConfigs() {
+    private static void loadShuntigConfigs() {
         for (final Map.Entry<String, String> files : OpenSignalsMain.contentPacks
                 .getFiles("signalconfigs/shunting")) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
@@ -48,14 +49,14 @@ public class OneSignalConfigParser {
             final List<ConfigProperty> propertes = new ArrayList<>();
             for (final String property : parser.values) {
                 final String[] value = property.split("\\.");
-                propertes
-                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
+                propertes.add(new ConfigProperty(t -> true,
+                        ImmutableMap.of((SEProperty) info.getProperty(value[0]), value[1])));
             }
             SHUNTINGCONFIGS.put(signal, propertes);
         }
     }
 
-    public static void loadResetConfigs() {
+    private static void loadResetConfigs() {
         for (final Map.Entry<String, String> files : OpenSignalsMain.contentPacks
                 .getFiles("signalconfigs/reset")) {
             final OneSignalConfigParser parser = GSON.fromJson(files.getValue(),
@@ -75,8 +76,8 @@ public class OneSignalConfigParser {
             final List<ConfigProperty> propertes = new ArrayList<>();
             for (final String property : parser.values) {
                 final String[] value = property.split("\\.");
-                propertes
-                        .add(new ConfigProperty((SEProperty) info.getProperty(value[0]), value[1]));
+                propertes.add(new ConfigProperty(t -> true,
+                        ImmutableMap.of((SEProperty) info.getProperty(value[0]), value[1])));
             }
             RESETCONFIGS.put(signal, propertes);
         }
@@ -85,8 +86,9 @@ public class OneSignalConfigParser {
     private static Signal checkSignal(final String signalName, final String filename) {
         final Signal signal = Signal.SIGNALS.get(signalName.toLowerCase());
         if (signal == null) {
-            throw new ContentPackException("The signal '" + signalName + "' doesn't exists! "
-                    + "Please check " + filename + " where to problem is!");
+            throw new ContentPackException(
+                    "The signal '" + signalName + "' doesn't exists! " + "Please check " + filename
+                            + " where to problem is! Valid Signals: " + Signal.SIGNALS.keySet());
         }
         return signal;
     }

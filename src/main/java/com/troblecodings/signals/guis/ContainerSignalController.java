@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.guilib.ecs.ContainerBase;
@@ -33,10 +32,9 @@ import net.minecraft.world.server.ServerWorld;
 public class ContainerSignalController extends ContainerBase
         implements UIClientSync, INetworkSync, IChunkLoadable {
 
-    private final AtomicReference<Map<SEProperty, String>> reference = new AtomicReference<>();
-    private final AtomicReference<Signal> referenceBlock = new AtomicReference<>();
+    private final Map<SEProperty, String> properties = new HashMap<>();
+    private Signal currentSignal = null;
     private List<SEProperty> propertiesList;
-    private final GuiInfo info;
     private BlockPos linkedPos;
     private SignalControllerTileEntity controllerEntity;
     private int currentRSProfile;
@@ -51,7 +49,6 @@ public class ContainerSignalController extends ContainerBase
         super(info);
         info.base = this;
         info.player.containerMenu = this;
-        this.info = info;
     }
 
     @Override
@@ -60,20 +57,23 @@ public class ContainerSignalController extends ContainerBase
     }
 
     private void sendProperitesToClient() {
-        if (info.pos == null) {
+        if (getInfo().pos == null) {
             return;
         }
-        controllerEntity = (SignalControllerTileEntity) info.world.getBlockEntity(info.pos);
+        controllerEntity = (SignalControllerTileEntity) getInfo().world
+                .getBlockEntity(getInfo().pos);
         linkedPos = controllerEntity.getLinkedPosition();
         if (linkedPos == null) {
             return;
         }
-        referenceBlock.set(controllerEntity.getLinkedSignal());
-        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos, getSignal());
+        currentSignal = controllerEntity.getLinkedSignal();
+        final SignalStateInfo stateInfo = new SignalStateInfo(getInfo().world, linkedPos,
+                getSignal());
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
         if (properties == null || properties.isEmpty())
             return;
-        reference.set(properties);
+        this.properties.clear();
+        this.properties.putAll(properties);
         final Map<SEProperty, String> propertiesToSend = new HashMap<>();
         properties.forEach((property, value) -> {
             if ((property.isChangabelAtStage(ChangeableStage.APISTAGE)
@@ -133,7 +133,7 @@ public class ContainerSignalController extends ContainerBase
         buffer.putByte((byte) (controllerEntity.getProfileRSInput() != -1 ? 1 : 0));
         if (controllerEntity.getProfileRSInput() != -1)
             buffer.putByte(controllerEntity.getProfileRSInput());
-        OpenSignalsMain.network.sendTo(info.player, buffer.build());
+        OpenSignalsMain.network.sendTo(getInfo().player, buffer.build());
     }
 
     private void packPropertyToBuffer(final WriteBuffer buffer, final SignalStateInfo stateInfo,
@@ -147,17 +147,14 @@ public class ContainerSignalController extends ContainerBase
         final ReadBuffer buffer = new ReadBuffer(buf);
         linkedPos = buffer.getBlockPos();
         final int signalID = buffer.getInt();
-        final Signal signal = Signal.SIGNAL_IDS.get(signalID);
-        referenceBlock.set(signal);
+        currentSignal = Signal.SIGNAL_IDS.get(signalID);
         currentMode = EnumMode.values()[buffer.getByteAsInt()];
         final int size = buffer.getByteAsInt();
-        final Map<SEProperty, String> properites = new HashMap<>();
-        propertiesList = signal.getProperties();
+        propertiesList = currentSignal.getProperties();
         for (int i = 0; i < size; i++) {
             final SEProperty property = propertiesList.get(buffer.getByteAsInt());
-            properites.put(property, property.getObjFromID(buffer.getByteAsInt()));
+            properties.put(property, property.getObjFromID(buffer.getByteAsInt()));
         }
-        reference.set(properites);
         lastProfile = buffer.getByteAsInt();
         allRSStates.clear();
         final int allStatesSize = buffer.getByteAsInt();
@@ -215,7 +212,7 @@ public class ContainerSignalController extends ContainerBase
                 final String value = property.getObjFromID(buffer.getByteAsInt());
                 if (currentMode.equals(EnumMode.MANUELL)) {
                     SignalStateHandler.setState(
-                            new SignalStateInfo(info.world, linkedPos, getSignal()), property,
+                            new SignalStateInfo(getInfo().world, linkedPos, getSignal()), property,
                             value);
                 } else if (currentMode.equals(EnumMode.SINGLE)) {
                     controllerEntity.updateRedstoneProfile((byte) currentRSProfile, property,
@@ -254,8 +251,8 @@ public class ContainerSignalController extends ContainerBase
             }
             case UNLINK_INPUT_POS: {
                 final BlockPos linkedInput = controllerEntity.getLinkedRSInput();
-                loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerWorld) info.world,
-                        linkedInput, (tile, _u) -> tile.unlinkController(info.pos));
+                loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerWorld) getInfo().world,
+                        linkedInput, (tile, _u) -> tile.unlinkController(getInfo().pos));
                 controllerEntity.setLinkedRSInput(null);
                 break;
             }
@@ -268,23 +265,23 @@ public class ContainerSignalController extends ContainerBase
         return Direction.values()[buffer.getByteAsInt()];
     }
 
-    public Map<SEProperty, String> getReference() {
-        return reference.get();
+    public Map<SEProperty, String> getProperties() {
+        return properties;
     }
 
     public Signal getSignal() {
-        return referenceBlock.get();
+        return currentSignal;
     }
 
     @Override
     public PlayerEntity getPlayer() {
-        return info.player;
+        return getInfo().player;
     }
 
     @Override
     public boolean stillValid(final PlayerEntity playerIn) {
         if (playerIn instanceof PlayerEntity) {
-            this.info.player = playerIn;
+            this.getInfo().player = playerIn;
         }
         return true;
     }

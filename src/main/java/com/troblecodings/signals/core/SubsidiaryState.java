@@ -34,7 +34,7 @@ public class SubsidiaryState {
     public static SubsidiaryState of(final ReadBuffer buffer) {
         return ALL_STATES.get(buffer.getByteAsInt());
     }
-    
+
     private static final String STATE_ID = "stateID";
 
     public void writeNBT(final NBTWrapper tag) {
@@ -60,5 +60,10 @@ public class SubsidiaryState {
             return false;
         final SubsidiaryState other = (SubsidiaryState) obj;
         return id == other.id && Objects.equals(name, other.name);
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }

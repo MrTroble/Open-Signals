@@ -17,6 +17,7 @@ import net.minecraft.util.Rotation;
 
 public final class SignalBoxUtil {
 
+    // TODO Config
     public static final int FREE_COLOR = 0xFF000000;
     public static final int SELECTED_COLOR = 0xFF00FF00;
     public static final int USED_COLOR = 0xFFFF0000;
