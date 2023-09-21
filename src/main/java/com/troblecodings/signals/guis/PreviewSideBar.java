@@ -13,6 +13,8 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
+import net.minecraft.util.math.vector.Quaternion;
+
 public class PreviewSideBar {
 
     public static final float MODIFIER = 0.1f;
@@ -26,8 +28,9 @@ public class PreviewSideBar {
         blockRenderEntity.setInheritHeight(true);
         blockRenderEntity.setWidth(60);
 
+        // TODO Check if right
         blockRenderEntity.add(new UIDrag((x, y) -> blockRender
-                .updateRotation(QuaternionWrapper.fromXYZ(0, (float) x * MODIFIER, 0))));
+                .updateRotation(new Quaternion(0, (float) x * MODIFIER, 0, false))));
 
         blockRenderEntity.add(new UIScissor());
         blockRenderEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
@@ -69,7 +72,7 @@ public class PreviewSideBar {
     }
 
     public void update(final Signal signal) {
-        blockRender.setBlockState(new ModelInfoWrapper(signal, properties));
+        blockRender.setBlockState(signal.defaultBlockState(), new ModelInfoWrapper(properties));
     }
 
 }

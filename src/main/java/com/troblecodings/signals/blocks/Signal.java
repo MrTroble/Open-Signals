@@ -181,7 +181,6 @@ public class Signal extends BasicBlock {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public int getHeight(final Map<SEProperty, String> map) {
         for (final PredicateProperty<Integer> property : this.prop.signalHeights) {
             if (property.test(map))
@@ -227,7 +226,6 @@ public class Signal extends BasicBlock {
         this.renderOverlay(info, this.prop.customNameRenderHeight);
     }
 
-    @SuppressWarnings("unchecked")
     @OnlyIn(Dist.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
         final Map<SEProperty, String> map = ClientSignalStateHandler
@@ -288,7 +286,6 @@ public class Signal extends BasicBlock {
         info.stack.popPose();
     }
 
-    @SuppressWarnings("unchecked")
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
@@ -439,7 +436,6 @@ public class Signal extends BasicBlock {
         return 0;
     }
 
-    @SuppressWarnings("unchecked")
     public void getUpdate(final World world, final BlockPos pos) {
         if (this.prop.sounds.isEmpty())
             return;
@@ -463,14 +459,13 @@ public class Signal extends BasicBlock {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public SoundProperty getSound(final Map<SEProperty, String> map) {
         for (final SoundProperty property : this.prop.sounds) {
             if (property.predicate.test(map)) {
                 return property;
             }
         }
-        return new SoundProperty();
+        return new SoundProperty(null, t -> true, -1);
     }
 
     @Override

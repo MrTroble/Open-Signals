@@ -245,8 +245,8 @@ public class SidePanel {
 
                             allNodes.forEach(currentNode -> {
                                 final UILabel currentStatus = new UILabel(
-                                        I18n.format("info.usage.status") + " : "
-                                                + I18n.format("info.usage.status.free"));
+                                        I18n.get("info.usage.status") + " : "
+                                                + I18n.get("info.usage.status.free"));
                                 currentStatus.setTextColor(new UIEntity().getBasicTextColor());
                                 final UIEntity statusEntity = new UIEntity();
                                 statusEntity.setInheritWidth(true);
@@ -259,15 +259,15 @@ public class SidePanel {
                                             .getEntry(PathEntryType.PATHUSAGE);
                                     if (pathUsage.isPresent()
                                             && !pathUsage.get().equals(EnumPathUsage.FREE)) {
-                                        currentStatus.setText(I18n.format("info.usage.status")
-                                                + " : " + I18n.format("info.usage.status.blocked"));
+                                        currentStatus.setText(I18n.get("info.usage.status") + " : "
+                                                + I18n.get("info.usage.status.blocked"));
                                         canBeManuelChanged.set(false);
                                     }
                                     if (!entry.containsEntry(PathEntryType.OUTPUT))
                                         return;
                                     final String name = currentNode.getPoint().toString() + " - "
                                             + ClientNameHandler.getClientName(new NameStateInfo(
-                                                    mc.world,
+                                                    mc.level,
                                                     entry.getEntry(PathEntryType.OUTPUT).get()));
                                     final UIEntity button = GuiElements.createButton(name, e1 -> {
                                         gui.pop();

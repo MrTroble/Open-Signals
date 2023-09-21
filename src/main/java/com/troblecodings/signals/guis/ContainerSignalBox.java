@@ -13,7 +13,6 @@ import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.SubsidiaryEntry;
