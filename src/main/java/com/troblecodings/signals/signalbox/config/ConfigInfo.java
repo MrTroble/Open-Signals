@@ -19,5 +19,4 @@ public class ConfigInfo {
         this.zs2Value = zs2Value;
         this.type = type;
     }
-
 }

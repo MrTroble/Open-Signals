@@ -3,6 +3,7 @@ package com.troblecodings.signals.core;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
@@ -47,12 +48,10 @@ public class LinkingUpdates {
     private static final String POS_REMOVE = "posRemove";
 
     public void writeNBT(final NBTWrapper wrapper) {
-        final List<NBTWrapper> addList = new ArrayList<>();
-        final List<NBTWrapper> removeList = new ArrayList<>();
-        posToAdd.forEach(pos -> addList.add(NBTWrapper.getBlockPosWrapper(pos)));
-        posToRemove.forEach(pos -> removeList.add(NBTWrapper.getBlockPosWrapper(pos)));
-        wrapper.putList(POS_ADD, addList);
-        wrapper.putList(POS_REMOVE, removeList);
+        wrapper.putList(POS_ADD, posToAdd.stream().map(pos -> NBTWrapper.getBlockPosWrapper(pos))
+                .collect(Collectors.toList()));
+        wrapper.putList(POS_REMOVE, posToRemove.stream()
+                .map(pos -> NBTWrapper.getBlockPosWrapper(pos)).collect(Collectors.toList()));
     }
 
     public void readNBT(final NBTWrapper wrapper) {
@@ -82,6 +81,6 @@ public class LinkingUpdates {
 
     @Override
     public String toString() {
-        return "LinkingUpdates: PosToAdd: " + posToAdd + ", PosToRemove: " + posToRemove;
+        return "LinkingUpdates [PosToAdd: " + posToAdd + ", PosToRemove: " + posToRemove + "]";
     }
 }

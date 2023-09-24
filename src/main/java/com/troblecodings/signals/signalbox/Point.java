@@ -76,14 +76,14 @@ public class Point implements INetworkSavable {
 
     @Override
     public void write(final NBTWrapper tag) {
-        tag.putInteger("x", x);
-        tag.putInteger("y", y);
+        tag.putByte("x", (byte) x);
+        tag.putByte("y", (byte) y);
     }
 
     @Override
     public void read(final NBTWrapper tag) {
-        this.x = tag.getInteger("x");
-        this.y = tag.getInteger("y");
+        this.x = Byte.toUnsignedInt(tag.getByte("x"));
+        this.y = Byte.toUnsignedInt(tag.getByte("y"));
     }
 
     @Override

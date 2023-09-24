@@ -28,8 +28,8 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void initModEvent(final FMLConstructModEvent event) {
         super.initModEvent(event);
-        SignalStateHandler.add(new ClientSignalStateHandler());
-        NameHandler.add(new ClientNameHandler());
+        SignalStateHandler.registerToNetworkChannel(new ClientSignalStateHandler());
+        NameHandler.registerToNetworkChannel(new ClientNameHandler());
         OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);
         OpenSignalsMain.handler.addGui(SignalController.class, GuiSignalController::new);
         OpenSignalsMain.handler.addGui(SignalBox.class, GuiSignalBox::new);

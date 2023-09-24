@@ -10,7 +10,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public class SubsidiarySignalParser {
 
@@ -36,8 +36,9 @@ public class SubsidiarySignalParser {
                     SubsidiarySignalParser.class);
             final Signal signal = Signal.SIGNALS.get(parser.currentSignal.toLowerCase());
             if (signal == null)
-                throw new ContentPackException("There doesn't exists a signal with the name '"
-                        + parser.currentSignal + "'!");
+                throw new ContentPackException(
+                        "There doesn't exists a signal with the name '" + parser.currentSignal
+                                + "'! Valid Signals are: " + Signal.SIGNALS.keySet());
             if (SUBSIDIARY_SIGNALS.containsKey(signal))
                 throw new ContentPackException(
                         "There already exists a Subsidiary Config for " + signal + "!");
@@ -62,7 +63,7 @@ public class SubsidiarySignalParser {
         }
         if (enumState == null)
             throw new ContentPackException(enumName + " is not a valid Subsidiary State! "
-                    + "Valid Subsidiary States are: " + SubsidiaryState.ALL_STATES);
+                    + "Valid Subsidiary States: " + SubsidiaryState.ALL_STATES);
         final Map<SEProperty, String> allValues = new HashMap<>();
         values.forEach(str -> {
             final String[] value = str.split("\\.");
@@ -70,7 +71,7 @@ public class SubsidiarySignalParser {
         });
         final Map<SubsidiaryState, ConfigProperty> properties = SUBSIDIARY_SIGNALS
                 .computeIfAbsent(signal, _u -> new HashMap<>());
-        properties.put(enumState, new ConfigProperty(allValues));
+        properties.put(enumState, new ConfigProperty(t -> true, allValues));
         SUBSIDIARY_SIGNALS.put(signal, properties);
     }
 

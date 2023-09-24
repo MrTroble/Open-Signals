@@ -106,7 +106,5 @@ public final class OSBlocks {
             registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
                     .setRegistryName(block.getRegistryName()));
         });
-
     }
-
 }

@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.contentpacks.ContentPackException;
 
 @SuppressWarnings("rawtypes")
 public class FunctionParsingInfo {
@@ -70,7 +71,8 @@ public class FunctionParsingInfo {
         });
         if (property == null) {
             throw new LogicalParserException(
-                    String.format("Could not find property=%s in system=%S!", name, signalName));
+                    String.format("Could not make predicate=%s with system=%S!", name, signalName)
+                            + " Valid Properties: " + properties);
         }
         return property;
     }
@@ -85,11 +87,15 @@ public class FunctionParsingInfo {
             argument = parts[0];
             final SEProperty property = (SEProperty) getProperty();
             final String value = parts[1].toUpperCase();
+            if (!property.getParent().isValid(new String(value)))
+                throw new ContentPackException("[" + value + "] is not a valid state of " + property
+                        + "! Valid States: " + property.getParent().getAllowedValues());
             return new ValuePack(property, ext -> ext.equals(value));
         });
         if (predicate == null)
-            throw new LogicalParserException(String
-                    .format("Could not make predicate=%s with system=%S!", argument, signalName));
+            throw new LogicalParserException(
+                    String.format("Could not make predicate=%s with system=%S!", argument,
+                            signalName) + " Valid Properties: " + properties);
         return predicate;
     }
 

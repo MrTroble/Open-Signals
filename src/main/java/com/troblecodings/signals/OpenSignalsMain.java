@@ -7,6 +7,7 @@ import org.apache.logging.log4j.core.LoggerContext;
 import com.troblecodings.contentpacklib.ContentPackHandler;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSBlocks;
@@ -25,6 +26,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
@@ -35,8 +37,8 @@ import net.minecraftforge.forgespi.locating.IModFile;
 @Mod(OpenSignalsMain.MODID)
 public class OpenSignalsMain {
 
-    private static OpenSignalsMain instance;
     public static final String MODID = "opensignals";
+    private static OpenSignalsMain instance;
 
     public static OpenSignalsMain getInstance() {
         return instance;
@@ -51,16 +53,18 @@ public class OpenSignalsMain {
         eventBus.register(OSSounds.class);
         MinecraftForge.EVENT_BUS.register(NameHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, ConfigHandler.CLIENT_SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, ConfigHandler.GENERAL_SPEC);
         DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () -> eventBus.register(OSModels.class));
     }
 
     public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new,
             () -> CommonProxy::new);
-    private static Logger log = null;
     public static GuiHandler handler = null;
     public static NetworkHandler network = null;
     public static ContentPackHandler contentPacks = null;
     private static boolean debug;
+    private static Logger log = null;
 
     /**
      * @return the debug
@@ -68,8 +72,6 @@ public class OpenSignalsMain {
     public static boolean isDebug() {
         return debug;
     }
-
-    public static final int GUI_SIGNAL_CONTROLLER = 1;
 
     public IModFile file;
 

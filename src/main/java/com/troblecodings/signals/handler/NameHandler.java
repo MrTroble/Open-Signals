@@ -52,7 +52,7 @@ public final class NameHandler implements INetworkSync {
         channel.registerObject(new NameHandler());
     }
 
-    public static void add(final Object obj) {
+    public static void registerToNetworkChannel(final Object obj) {
         channel.registerObject(obj);
     }
 

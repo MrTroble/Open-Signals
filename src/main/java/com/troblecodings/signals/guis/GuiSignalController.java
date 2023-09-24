@@ -11,28 +11,25 @@ import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
-import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
-import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
-import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
-import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
-import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
+import com.troblecodings.signals.handler.ClientSignalStateHandler;
+import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.models.SignalCustomModel;
 
@@ -52,12 +49,13 @@ public class GuiSignalController extends GuiBase {
 
     private final ContainerSignalController controller;
     private final UIEntity lowerEntity = new UIEntity();
-    private boolean previewMode = false;
     private final List<UIPropertyEnumHolder> holders = new ArrayList<>();
     private boolean loaded = false;
     private final Player player;
     private EnumMode currentMode;
     private int currentProfile = 0;
+    private final PreviewSideBar previewSidebar = new PreviewSideBar(-8);
+    private final PreviewSideBar previewRedstone = new PreviewSideBar(-8);
 
     public GuiSignalController(final GuiInfo info) {
         super(info);
@@ -88,8 +86,7 @@ public class GuiSignalController extends GuiBase {
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })
-    private void createPageForSide(final Direction face, final UIEntity leftSide,
-            final UIBlockRender bRender) {
+    private void createPageForSide(final Direction face, final UIEntity leftSide) {
         final UIEntity middlePart = new UIEntity();
 
         final IIntegerable<String> profile = SizeIntegerables.of("profile", 32,
@@ -98,17 +95,15 @@ public class GuiSignalController extends GuiBase {
         leftSide.add(GuiElements.createEnumElement(profileEnum, profile, x -> {
             currentProfile = x;
             sendRSProfile(x);
-            updateProfileProperties(middlePart, bRender, profileEnum);
-            applyModelChange(bRender);
+            updateProfileProperties(middlePart, profileEnum);
         }, this.controller.lastProfile));
         currentProfile = this.controller.lastProfile;
 
-        middlePart.setInheritHeight(true);
-        middlePart.setInheritWidth(true);
+        middlePart.setInherits(true);
         final UIBox boxMode = new UIBox(UIBox.VBOX, 1);
         middlePart.add(boxMode);
 
-        updateProfileProperties(middlePart, bRender, profileEnum);
+        updateProfileProperties(middlePart, profileEnum);
         leftSide.add(middlePart);
 
         int onIndex = -1;
@@ -135,32 +130,40 @@ public class GuiSignalController extends GuiBase {
         leftSide.add(GuiElements.createPageSelect(boxMode));
     }
 
-    private void updateProfileProperties(final UIEntity middlePart, final UIBlockRender bRender,
-            final UIEnumerable profile) {
+    private void updateProfileProperties(final UIEntity middlePart, final UIEnumerable profile) {
         middlePart.clearChildren();
         profile.setIndex(currentProfile);
-        final Map<SEProperty, String> properties = controller.allRSStates.containsKey(
-                currentProfile) ? controller.allRSStates.get(currentProfile) : new HashMap<>();
-        controller.getReference().forEach((property, value) -> {
+        final Map<SEProperty, String> properties = controller.allRSStates
+                .computeIfAbsent(currentProfile, _u -> new HashMap<>());
+        controller.getProperties().forEach((property, value) -> {
             if (!properties.containsKey(property)) {
                 properties.put(property, "DISABLED");
             }
         });
+        ClientSignalStateHandler
+                .getClientStates(new ClientSignalStateInfo(mc.level, controller.getPos()))
+                .forEach((property, value) -> {
+                    previewRedstone.addToRenderNormal(property,
+                            property.getParent().getIDFromValue(value));
+                });
+
         properties.forEach((property, value) -> {
+            final JsonEnum enumJson = property.getParent();
+            previewRedstone.addToRenderNormal(property, enumJson.getIDFromValue(value));
             final UIEntity entity = GuiElements
                     .createEnumElement(new DisableIntegerable<>(property), e -> {
-                        applyModelChange(bRender);
                         sendPropertyToServer(property, e);
-                        final Map<SEProperty, String> map = controller.allRSStates
-                                .computeIfAbsent(currentProfile, _u -> new HashMap<>());
+                        previewRedstone.addToRenderNormal(property, e);
                         if (e == -1) {
-                            map.remove(property);
+                            properties.remove(property);
                         } else {
-                            map.put(property, property.getObjFromID(e));
+                            properties.put(property, property.getObjFromID(e));
                         }
+                        previewRedstone.update(controller.getSignal());
                     }, property.getParent().getIDFromValue(value));
             middlePart.add(entity);
         });
+        previewRedstone.update(controller.getSignal());
     }
 
     private void addSingleRSMode() {
@@ -171,9 +174,7 @@ public class GuiSignalController extends GuiBase {
         leftSide.setInheritWidth(true);
         leftSide.add(new UIBox(UIBox.VBOX, 2));
         this.lowerEntity.add(leftSide);
-
-        final UIBlockRender bRender = new UIBlockRender();
-        this.lowerEntity.add(createPreview(bRender));
+        this.lowerEntity.add(this.previewRedstone.get());
 
         final UIEntity rightSide = new UIEntity();
         rightSide.setInheritHeight(true);
@@ -181,7 +182,7 @@ public class GuiSignalController extends GuiBase {
         rightSide.add(new UIBox(UIBox.VBOX, 4));
 
         currentProfile = controller.lastProfile;
-        createPageForSide(Direction.DOWN, leftSide, bRender);
+        createPageForSide(Direction.DOWN, leftSide);
 
         final Minecraft mc = Minecraft.getInstance();
         final BlockState state = OSBlocks.HV_SIGNAL_CONTROLLER.defaultBlockState();
@@ -194,7 +195,7 @@ public class GuiSignalController extends GuiBase {
             colors.forEach(c -> c.setColor(0x70000000));
             colors.get(e).setColor(0x70FF0000);
             leftSide.clearChildren();
-            createPageForSide(faceing, leftSide, bRender);
+            createPageForSide(faceing, leftSide);
         });
         rightSide.add(toggle);
         for (final Direction face : Direction.values()) {
@@ -239,10 +240,9 @@ public class GuiSignalController extends GuiBase {
             this.entity.add(new UILabel("Not connected"));
             return;
         }
-        lowerEntity.setInheritHeight(true);
-        lowerEntity.setInheritWidth(true);
+        lowerEntity.setInherits(true);
 
-        final String name = I18n.get("tile." + signal.getRegistryName().getPath() + ".name");
+        final String name = I18n.get("tile." + signal.delegate.name().getPath() + ".name");
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);
@@ -280,32 +280,6 @@ public class GuiSignalController extends GuiBase {
         this.entity.add(new UIBox(UIBox.HBOX, 1));
     }
 
-    private UIEntity createPreview(final UIBlockRender blockRender) {
-        final UIToolTip tooltip = new UIToolTip(I18n.get("controller.preview", previewMode));
-
-        final UIEntity rightSide = new UIEntity();
-        rightSide.setWidth(60);
-        rightSide.setInheritHeight(true);
-        final UIRotate rotation = new UIRotate();
-        rotation.setRotateY(180);
-        rightSide.add(new UIClickable(e -> {
-            previewMode = !previewMode;
-            applyModelChange(blockRender);
-            tooltip.setDescripton(I18n.get("controller.preview", previewMode));
-        }, 1));
-        rightSide.add(
-                new UIDrag((x, y) -> rotation.setRotateY((float) (rotation.getRotateY() + x))));
-        rightSide.add(tooltip);
-
-        rightSide.add(new UIScissor());
-        rightSide.add(new UIIndependentTranslate(35, 150, 40));
-        rightSide.add(rotation);
-        rightSide.add(new UIIndependentTranslate(-0.5, -3.5, -0.5));
-        rightSide.add(new UIScale(20, -20, 20));
-        rightSide.add(blockRender);
-        return rightSide;
-    }
-
     private void addManuellMode() {
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
@@ -321,27 +295,33 @@ public class GuiSignalController extends GuiBase {
         leftSide.add(new UIBox(UIBox.VBOX, 5));
         lowerEntity.add(leftSide);
 
-        final UIBlockRender blockRender = new UIBlockRender();
-        lowerEntity.add(createPreview(blockRender));
+        previewSidebar.clear();
+        lowerEntity.add(previewSidebar.get());
         lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 
         holders.clear();
-        final Map<SEProperty, String> map = this.controller.getReference();
+        ClientSignalStateHandler
+                .getClientStates(new ClientSignalStateInfo(mc.level, controller.getPos()))
+                .forEach((property, value) -> previewSidebar.addToRenderNormal(property,
+                        property.getParent().getIDFromValue(value)));
+
+        final Map<SEProperty, String> map = this.controller.getProperties();
         if (map == null)
             return;
         map.forEach((property, value) -> {
             final UIEnumerable enumarable = new UIEnumerable(property.count(), property.getName());
             final int index = property.getParent().getIDFromValue(value);
             list.add(GuiElements.createEnumElement(enumarable, property, e -> {
+                previewSidebar.addToRenderNormal(property, e);
                 if (loaded) {
-                    sendPropertyToServer(property, enumarable.getIndex());
+                    sendPropertyToServer(property, e);
+                    previewSidebar.update(controller.getSignal());
                 }
-                applyModelChange(blockRender);
             }, index));
             holders.add(new UIPropertyEnumHolder(property, enumarable));
-
+            previewSidebar.addToRenderNormal(property, index);
         });
-        applyModelChange(blockRender);
+        previewSidebar.update(controller.getSignal());
     }
 
     private void sendAndSetProfile(final Direction facing, final int profile,
@@ -421,9 +401,4 @@ public class GuiSignalController extends GuiBase {
         initInternal();
         loaded = true;
     }
-
-    private void applyModelChange(final UIBlockRender blockRender) {
-        // TODO new model system
-    }
-
 }

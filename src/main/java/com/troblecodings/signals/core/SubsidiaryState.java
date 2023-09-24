@@ -61,4 +61,9 @@ public class SubsidiaryState {
         final SubsidiaryState other = (SubsidiaryState) obj;
         return id == other.id && Objects.equals(name, other.name);
     }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

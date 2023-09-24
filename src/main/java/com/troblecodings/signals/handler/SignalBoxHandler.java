@@ -19,6 +19,7 @@ import com.troblecodings.signals.core.LinkedPositions;
 import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
+import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.PathwayHolder;
@@ -184,6 +185,19 @@ public final class SignalBoxHandler {
         if (holder == null)
             return;
         holder.getAllRedstoneIOs().forEach(pos -> linkTileToPos(identifier, pos));
+    }
+
+    public static Map<BlockPos, List<SubsidiaryState>> getPossibleSubsidiaries(
+            final PosIdentifier identifier) {
+        if (identifier.world.isClientSide)
+            return new HashMap<>();
+        LinkedPositions holder;
+        synchronized (ALL_LINKED_POS) {
+            holder = ALL_LINKED_POS.get(identifier);
+        }
+        if (holder == null)
+            return new HashMap<>();
+        return holder.getValidSubsidiariesForPos();
     }
 
     public static Signal getSignal(final PosIdentifier identifier, final BlockPos signalPos) {

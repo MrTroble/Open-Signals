@@ -8,10 +8,6 @@ import com.troblecodings.signals.core.TileEntityInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.Connection;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 
 public class SyncableTileEntity extends BasicBlockEntity {
@@ -21,16 +17,6 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();
-
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public void onDataPacket(final Connection net, final ClientboundBlockEntityDataPacket pkt) {
-        super.onDataPacket(net, pkt);
-    }
 
     @Override
     public CompoundTag getUpdateTag() {

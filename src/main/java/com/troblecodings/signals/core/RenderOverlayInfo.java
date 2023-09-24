@@ -6,6 +6,7 @@ import com.troblecodings.signals.tileentitys.SignalTileEntity;
 import net.minecraft.client.gui.Font;
 
 public class RenderOverlayInfo {
+
     public final PoseStack stack;
     public final double x;
     public final double y;
@@ -15,7 +16,6 @@ public class RenderOverlayInfo {
 
     public RenderOverlayInfo(final PoseStack stack, final double x, final double y, final double z,
             final Font font) {
-        super();
         this.stack = stack;
         this.x = x;
         this.y = y;

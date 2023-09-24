@@ -28,5 +28,4 @@ public enum PathType {
         return Arrays.stream(PathType.values()).filter(type -> type.hasMode(mode)).findFirst()
                 .orElse(NONE);
     }
-
 }

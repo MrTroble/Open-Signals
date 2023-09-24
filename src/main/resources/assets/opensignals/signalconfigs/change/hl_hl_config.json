@@ -9,10 +9,10 @@
         "100": "config(mainlightsignallightbar.GREEN)"
     },
     "values": {
-        "map(stop) && (speed(<.1) || speed(>=.11))": ["mainlightsignallightbar.OFF", "mainlightsignal.HL10", "mainlightsignal_distant.HL10", "exitsignal.HL1", "blocksignal.HL10", "blockexitsignal.HL1"],
-        "map(stop) && speed(>=.1) && speed(<=.5)": ["mainlightsignallightbar.OFF", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1"],
-        "map(stop) && speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1"],
-        "map(stop) && speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1"],
+        "map(stop) && (speed(<.1) || speed(>=.11))": ["mainlightsignallightbar.OFF", "mainlightsignal.HL10", "mainlightsignal_distant.HL10", "exitsignal.HL1", "blocksignal.HL10", "blockexitsignal.HL1", "zs2v.OFF"],
+        "map(stop) && speed(>=.1) && speed(<=.5)": ["mainlightsignallightbar.OFF", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1", "zs2v.OFF"],
+        "map(stop) && speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1", "zs2v.OFF"],
+        "map(stop) && speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL11_12", "mainlightsignal_distant.HL10", "exitsignal.HL2_3", "blocksignal.HL10", "blockexitsignal.HL1", "zs2v.OFF"],
 
         "map(drive) && (speed(<.1) || speed(>=.11))": ["mainlightsignallightbar.OFF", "mainlightsignal.HL1", "mainlightsignal_distant.HL1", "exitsignal.HL1", "blocksignal.HL1", "blockexitsignal.HL1"],
         "map(drive) && speed(>=.1) && speed(<=.5)": ["mainlightsignallightbar.OFF", "mainlightsignal.HL2_3", "mainlightsignal_distant.HL1", "exitsignal.HL2_3", "blocksignal.HL1", "blockexitsignal.HL1"],

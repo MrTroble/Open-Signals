@@ -2,6 +2,8 @@ package com.troblecodings.signals.tileentitys;
 
 import java.util.Map;
 
+import javax.annotation.Nonnull;
+
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
@@ -14,8 +16,6 @@ import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
-import net.minecraftforge.client.model.data.ModelDataMap.Builder;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
@@ -43,13 +43,9 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     }
 
     @Override
-    public IModelData getModelData() {
+    public @Nonnull IModelData getModelData() {
         final Map<SEProperty, String> states = ClientSignalStateHandler
                 .getClientStates(new ClientSignalStateInfo(level, worldPosition));
-        final Builder builder = new ModelDataMap.Builder();
-        states.forEach((property, value) -> {
-            builder.withInitial(property, value);
-        });
-        return new ModelInfoWrapper(builder.build());
+        return new ModelInfoWrapper(states);
     }
 }
