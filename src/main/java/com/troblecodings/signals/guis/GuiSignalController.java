@@ -28,8 +28,10 @@ import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
+import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.ClientSignalStateInfo;
+import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.models.SignalCustomModel;
 
@@ -242,7 +244,8 @@ public class GuiSignalController extends GuiBase {
         }
         lowerEntity.setInherits(true);
 
-        final String name = I18n.get("tile." + signal.delegate.name().getPath() + ".name");
+        final String name = I18n.get("tile." + signal.delegate.name().getPath() + ".name")
+                + ClientNameHandler.getClientName(new NameStateInfo(mc.level, controller.getPos()));
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);
