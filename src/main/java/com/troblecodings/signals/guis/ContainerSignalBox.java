@@ -56,7 +56,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     public void sendAllDataToRemote() {
         final SignalBoxGrid grid = tile.getSignalBoxGrid();
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalBoxNetwork.SEND_GRID.ordinal());
+        buffer.putEnumValue(SignalBoxNetwork.SEND_GRID);
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
         final PosIdentifier identifier = new PosIdentifier(tile.getBlockPos(), info.world);

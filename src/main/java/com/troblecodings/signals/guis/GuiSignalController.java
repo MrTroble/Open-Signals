@@ -245,6 +245,7 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.setInherits(true);
 
         final String name = I18n.get("tile." + signal.delegate.name().getPath() + ".name")
+                + "; Name: "
                 + ClientNameHandler.getClientName(new NameStateInfo(mc.level, controller.getPos()));
 
         final UILabel titlelabel = new UILabel(name);

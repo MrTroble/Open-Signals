@@ -928,7 +928,7 @@ public class GuiSignalBox extends GuiBase {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalBoxNetwork.SEND_NAME.ordinal());
+        buffer.putEnumValue(SignalBoxNetwork.SEND_NAME);
         point.writeNetwork(buffer);
         buffer.putString(name);
         OpenSignalsMain.network.sendTo(info.player, buffer);
