@@ -10,11 +10,11 @@ import java.util.Map;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.WriteBuffer;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;

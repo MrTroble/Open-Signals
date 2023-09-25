@@ -2,9 +2,9 @@ package com.troblecodings.signals.enums;
 
 import java.util.function.Supplier;
 
+import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
-import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.guis.UISignalBoxTile;
 
 public enum EnumGuiMode {
@@ -39,6 +39,6 @@ public enum EnumGuiMode {
     }
 
     public static EnumGuiMode of(final ReadBuffer buffer) {
-        return values()[buffer.getByteAsInt()];
+        return values()[buffer.getByteToUnsignedInt()];
     }
 }

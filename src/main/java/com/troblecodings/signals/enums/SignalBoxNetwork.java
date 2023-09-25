@@ -1,7 +1,5 @@
 package com.troblecodings.signals.enums;
 
-import com.troblecodings.signals.core.ReadBuffer;
-
 public enum SignalBoxNetwork {
 
     SEND_POS_ENTRY, SEND_INT_ENTRY, REMOVE_ENTRY, REQUEST_PW, REMOVE_POS, RESET_PW, SEND_GRID,
@@ -9,7 +7,4 @@ public enum SignalBoxNetwork {
     REQUEST_SUBSIDIARY, SEND_ZS2_ENTRY, UPDATE_RS_OUTPUT, NO_OUTPUT_UPDATE, OUTPUT_UPDATE,
     RESET_SUBSIDIARY, SET_AUTO_POINT, SEND_NAME;
 
-    public static SignalBoxNetwork of(final ReadBuffer buffer) {
-        return values()[buffer.getByteAsInt()];
-    }
 }

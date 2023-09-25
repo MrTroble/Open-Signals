@@ -13,12 +13,12 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.SignalStateListener;
-import com.troblecodings.signals.core.WriteBuffer;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;

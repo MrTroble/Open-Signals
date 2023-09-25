@@ -11,14 +11,14 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.core.PosIdentifier;
-import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -159,7 +159,7 @@ public class SignalBoxGrid implements INetworkSavable {
         for (int i = 0; i < size; i++) {
             final Point point = Point.of(buffer);
             final SignalBoxNode node = new SignalBoxNode(point);
-            final int enabledSubsidariesSize = buffer.getByteAsInt();
+            final int enabledSubsidariesSize = buffer.getByteToUnsignedInt();
             if (enabledSubsidariesSize != 0) {
                 for (int j = 0; j < enabledSubsidariesSize; j++) {
                     final Map<ModeSet, SubsidiaryEntry> allTypes = enabledSubsidiaryTypes

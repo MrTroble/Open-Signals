@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 
 public class SubsidiaryState {
 
@@ -32,7 +34,7 @@ public class SubsidiaryState {
     }
 
     public static SubsidiaryState of(final ReadBuffer buffer) {
-        return ALL_STATES.get(buffer.getByteAsInt());
+        return ALL_STATES.get(buffer.getByteToUnsignedInt());
     }
 
     private static final String STATE_ID = "stateID";

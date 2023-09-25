@@ -1,8 +1,8 @@
 package com.troblecodings.signals.enums;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.NamableWrapper;
-import com.troblecodings.signals.core.ReadBuffer;
 
 public enum LinkType implements NamableWrapper {
 
@@ -36,6 +36,6 @@ public enum LinkType implements NamableWrapper {
     }
 
     public static LinkType of(final ReadBuffer buffer) {
-        return values()[buffer.getByteAsInt()];
+        return values()[buffer.getByteToUnsignedInt()];
     }
 }

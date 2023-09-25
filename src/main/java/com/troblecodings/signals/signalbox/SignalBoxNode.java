@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -292,7 +292,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     public void readNetwork(final ReadBuffer buffer) {
         possibleModes.clear();
         manuellEnabledOutputs.clear();
-        final int size = buffer.getByteAsInt();
+        final int size = buffer.getByteToUnsignedInt();
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         for (int i = 0; i < size; i++) {
             final ModeSet mode = ModeSet.of(buffer);
@@ -300,14 +300,14 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             entry.readNetwork(buffer);
             possibleModes.put(mode, entry);
         }
-        final int outputsSize = buffer.getByteAsInt();
+        final int outputsSize = buffer.getByteToUnsignedInt();
         for (int i = 0; i < outputsSize; i++) {
             final ModeSet modeSet = ModeSet.of(buffer);
             if (!manuellEnabledOutputs.contains(modeSet))
                 manuellEnabledOutputs.add(modeSet);
         }
         this.isAutoPoint = buffer.getByte() == 1 ? true : false;
-        final int nameSize = buffer.getByteAsInt();
+        final int nameSize = buffer.getByteToUnsignedInt();
         final byte[] array = new byte[nameSize];
         for (int i = 0; i < nameSize; i++)
             array[i] = buffer.getByte();
@@ -316,7 +316,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public void readUpdateNetwork(final ReadBuffer buffer) {
-        final int size = buffer.getByteAsInt();
+        final int size = buffer.getByteToUnsignedInt();
         for (int i = 0; i < size; i++) {
             final ModeSet mode = ModeSet.of(buffer);
             final PathOptionEntry entry = possibleModes.computeIfAbsent(mode,
@@ -324,7 +324,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             entry.readNetwork(buffer);
             possibleModes.put(mode, entry);
         }
-        final int outputsSize = buffer.getByteAsInt();
+        final int outputsSize = buffer.getByteToUnsignedInt();
         if (outputsSize == 0)
             manuellEnabledOutputs.clear();
         for (int i = 0; i < outputsSize; i++) {
@@ -333,7 +333,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 manuellEnabledOutputs.add(modeSet);
         }
         this.isAutoPoint = buffer.getByte() == 1 ? true : false;
-        final int nameSize = buffer.getByteAsInt();
+        final int nameSize = buffer.getByteToUnsignedInt();
         final byte[] array = new byte[nameSize];
         for (int i = 0; i < nameSize; i++)
             array[i] = buffer.getByte();

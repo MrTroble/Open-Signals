@@ -7,10 +7,10 @@ import java.util.Optional;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -173,7 +173,7 @@ public class PathwayHolder {
             node.getPoint().writeNetwork(buffer);
             node.writeUpdateNetwork(buffer);
         });
-        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer.build());
+        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
     }
 
     public void read(final NBTWrapper tag, final Map<Point, SignalBoxNode> modeGrid) {

@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -9,7 +10,6 @@ import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
@@ -96,13 +96,9 @@ public class NamableGui extends GuiBase {
         if (input.isEmpty() || input.equals(
                 ClientNameHandler.getClientName(new NameStateInfo(mc.level, container.pos))))
             return;
-        final byte[] bytes = input.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) bytes.length);
-        for (final byte b : bytes) {
-            buffer.putByte(b);
-        }
-        OpenSignalsMain.network.sendTo(player, buffer.build());
+        buffer.putString(input);
+        OpenSignalsMain.network.sendTo(player, buffer);
         labelComp.setText(input);
     }
 

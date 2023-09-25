@@ -6,6 +6,7 @@ import java.util.function.IntConsumer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -20,7 +21,6 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnum;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.items.Placementtool;
 
@@ -167,7 +167,7 @@ public class GuiPlacementtool extends GuiBase {
             final WriteBuffer buffer = new WriteBuffer();
             buffer.putByte((byte) propertyId);
             buffer.putByte((byte) valueId);
-            OpenSignalsMain.network.sendTo(player, buffer.build());
+            OpenSignalsMain.network.sendTo(player, buffer);
             previewSidebar.update(currentSelectedBlock);
         }
     }
@@ -178,7 +178,7 @@ public class GuiPlacementtool extends GuiBase {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) 255);
         buffer.putInt(id);
-        OpenSignalsMain.network.sendTo(player, buffer.build());
+        OpenSignalsMain.network.sendTo(player, buffer);
     }
 
     private void sendName(final String name) {
@@ -187,12 +187,8 @@ public class GuiPlacementtool extends GuiBase {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putByte((byte) 255);
         buffer.putInt(-1);
-        final byte[] signalName = name.getBytes();
-        buffer.putByte((byte) signalName.length);
-        for (final byte b : signalName) {
-            buffer.putByte(b);
-        }
-        OpenSignalsMain.network.sendTo(player, buffer.build());
+        buffer.putString(name);
+        OpenSignalsMain.network.sendTo(player, buffer);
     }
 
 }
