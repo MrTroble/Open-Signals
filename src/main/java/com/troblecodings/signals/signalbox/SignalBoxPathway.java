@@ -49,9 +49,10 @@ public class SignalBoxPathway {
     private Point lastPoint = new Point();
     private int speed = -1;
     private String zs2Value = "";
-    private Optional<Entry<BlockPos, BlockPos>> signalPositions = Optional.empty();
-    private Optional<BlockPos> lastSignal = Optional.empty();
-    private ImmutableList<BlockPos> distantSignalPositions = ImmutableList.of();
+    private Optional<Entry<MainSignalIdentifier, MainSignalIdentifier>> signalPositions = Optional
+            .empty();
+    private Optional<MainSignalIdentifier> lastSignal = Optional.empty();
+    private ImmutableList<OtherSignalIdentifier> distantSignalPositions = ImmutableList.of();
     private Map<Point, SignalBoxNode> modeGrid = null;
     private boolean emptyOrBroken = false;
     private Level world;
@@ -86,7 +87,7 @@ public class SignalBoxPathway {
     private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
-        final Builder<BlockPos> distantPosBuilder = ImmutableList.builder();
+        final Builder<OtherSignalIdentifier> distantPosBuilder = ImmutableList.builder();
         mapOfBlockingPositions.clear();
         mapOfResetPositions.clear();
         foreachEntry((optionEntry, node) -> {
@@ -102,19 +103,25 @@ public class SignalBoxPathway {
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));
             for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
-                node.getOption(new ModeSet(mode, rotation))
-                        .ifPresent(option -> option.getEntry(PathEntryType.SIGNAL)
-                                .ifPresent(position -> distantPosBuilder.add(position)));
+                final ModeSet modeSet = new ModeSet(mode, rotation);
+                node.getOption(modeSet).ifPresent(
+                        option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
+                            final Optional<Boolean> repeaterOption = option
+                                    .getEntry(PathEntryType.SIGNAL_REPEATER);
+                            distantPosBuilder.add(
+                                    new OtherSignalIdentifier(node.getPoint(), modeSet, position,
+                                            repeaterOption.isPresent() && repeaterOption.get()));
+                        }));
             }
         }, null);
         this.distantSignalPositions = distantPosBuilder.build();
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
         this.firstPoint = firstNode.getPoint();
-        final BlockPos firstPos = makeFromNext(type, firstNode,
+        final MainSignalIdentifier firstPos = makeFromNext(type, firstNode,
                 this.listOfNodes.get(this.listOfNodes.size() - 2), Rotation.NONE);
         final SignalBoxNode lastNode = this.listOfNodes.get(0);
         this.lastPoint = lastNode.getPoint();
-        final BlockPos lastPos = makeFromNext(type, lastNode, this.listOfNodes.get(1),
+        final MainSignalIdentifier lastPos = makeFromNext(type, lastNode, this.listOfNodes.get(1),
                 Rotation.CLOCKWISE_180);
         if (lastPos != null) {
             lastSignal = Optional.of(lastPos);
@@ -128,15 +135,16 @@ public class SignalBoxPathway {
         this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
     }
 
-    private BlockPos makeFromNext(final PathType type, final SignalBoxNode first,
+    private MainSignalIdentifier makeFromNext(final PathType type, final SignalBoxNode first,
             final SignalBoxNode next, final Rotation pRotation) {
         final Point delta = first.getPoint().delta(next.getPoint());
         final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta).getRotated(pRotation);
         for (final EnumGuiMode mode : type.getModes()) {
-            final BlockPos possiblePosition = first.getOption(new ModeSet(mode, rotation))
+            final ModeSet modeSet = new ModeSet(mode, rotation);
+            final BlockPos possiblePosition = first.getOption(modeSet)
                     .flatMap(option -> option.getEntry(PathEntryType.SIGNAL)).orElse(null);
             if (possiblePosition != null)
-                return possiblePosition;
+                return new MainSignalIdentifier(first.getPoint(), modeSet, possiblePosition);
         }
         return null;
     }
@@ -239,26 +247,26 @@ public class SignalBoxPathway {
         final PosIdentifier identifier = new PosIdentifier(tilePos, world);
         SignalStateInfo lastInfo = null;
         if (lastSignal.isPresent()) {
-            final Signal nextSignal = SignalBoxHandler.getSignal(identifier, lastSignal.get());
+            final Signal nextSignal = SignalBoxHandler.getSignal(identifier, lastSignal.get().pos);
             if (nextSignal != null)
-                lastInfo = new SignalStateInfo(world, lastSignal.get(), nextSignal);
+                lastInfo = new SignalStateInfo(world, lastSignal.get().pos, nextSignal);
         }
         final SignalStateInfo lastSignalInfo = lastInfo;
         this.signalPositions.ifPresent(entry -> {
             if (isBlocked)
                 return;
-            final Signal first = SignalBoxHandler.getSignal(identifier, entry.getKey());
+            final Signal first = SignalBoxHandler.getSignal(identifier, entry.getKey().pos);
             if (first == null)
                 return;
-            final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey(), first);
+            final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey().pos, first);
             SignalConfig.change(new ConfigInfo(firstInfo, lastSignalInfo, speed, zs2Value, type));
         });
         distantSignalPositions.forEach(position -> {
-            final Signal current = SignalBoxHandler.getSignal(identifier, position);
+            final Signal current = SignalBoxHandler.getSignal(identifier, position.pos);
             if (current == null)
                 return;
-            SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position, current),
-                    lastSignalInfo, speed, zs2Value, type));
+            SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position.pos, current),
+                    lastSignalInfo, speed, zs2Value, type, position.isRepeater));
         });
     }
 
@@ -269,20 +277,20 @@ public class SignalBoxPathway {
     private void resetFirstSignal() {
         this.signalPositions.ifPresent(entry -> {
             final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
-                    entry.getKey());
+                    entry.getKey().pos);
             if (current == null)
                 return;
-            SignalConfig.reset(new SignalStateInfo(world, entry.getKey(), current));
+            SignalConfig.reset(new SignalStateInfo(world, entry.getKey().pos, current));
         });
     }
 
     private void resetOther() {
         distantSignalPositions.forEach(position -> {
             final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
-                    position);
+                    position.pos);
             if (current == null)
                 return;
-            SignalConfig.reset(new SignalStateInfo(world, position, current));
+            SignalConfig.reset(new SignalStateInfo(world, position.pos, current));
         });
     }
 

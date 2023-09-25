@@ -41,6 +41,9 @@ public final class PathEntryType<T> {
 
     public static final PathEntryType<Byte> ZS2 = new PathEntryType<>(ByteEntry.class, "zs2");
 
+    public static final PathEntryType<Boolean> SIGNAL_REPEATER = new PathEntryType<>(
+            BoolEntry.class, "signal_repeater");
+
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 
         public EnumPathUsageEntry() {

@@ -243,6 +243,18 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 node.setCustomText(buffer.getString());
                 break;
             }
+            case SEND_SIGNAL_REPEATER: {
+                final Point point = Point.of(buffer);
+                final ModeSet modeSet = ModeSet.of(buffer);
+                final boolean state = buffer.getBoolean();
+                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
+                final Optional<PathOptionEntry> option = node.getOption(modeSet);
+                if (option.isPresent()) {
+                    option.get().setEntry(PathEntryType.SIGNAL_REPEATER, state);
+                } else {
+                    node.addAndSetEntry(modeSet, PathEntryType.SIGNAL_REPEATER, state);
+                }
+            }
             default:
                 break;
         }

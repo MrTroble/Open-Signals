@@ -70,6 +70,7 @@ public final class SignalConfig {
         }
         object.put(Integer.class, info.speed);
         object.put(String.class, info.zs2Value);
+        object.put(Boolean.class, info.isSignalRepeater);
         final Map<SEProperty, String> propertiesToSet = new HashMap<>();
         values.forEach(property -> {
             if (property.test(object)) {

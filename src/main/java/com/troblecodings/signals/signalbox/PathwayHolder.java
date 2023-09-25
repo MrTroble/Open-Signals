@@ -167,7 +167,7 @@ public class PathwayHolder {
             return;
         final List<SignalBoxNode> nodes = pathway.getListOfNodes();
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalBoxNetwork.SEND_PW_UPDATE.ordinal());
+        buffer.putEnumValue(SignalBoxNetwork.SEND_PW_UPDATE);
         buffer.putInt(nodes.size());
         nodes.forEach(node -> {
             node.getPoint().writeNetwork(buffer);

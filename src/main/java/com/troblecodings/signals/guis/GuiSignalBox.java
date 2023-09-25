@@ -337,6 +337,13 @@ public class GuiSignalBox extends GuiBase {
             case VP:
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
                         mode, rotation);
+                final Optional<Boolean> opt = option.getEntry(PathEntryType.SIGNAL_REPEATER);
+                parent.add(
+                        GuiElements.createBoolElement(BoolIntegerables.of("signal_repeater"), e -> {
+                            final boolean state = e == 1 ? true : false;
+                            sendSignalRepeater(node.getPoint(), modeSet, state);
+                            option.setEntry(PathEntryType.SIGNAL_REPEATER, state);
+                        }, opt.isPresent() && opt.get() ? 1 : 0));
                 break;
             case HP: {
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
@@ -931,6 +938,17 @@ public class GuiSignalBox extends GuiBase {
         buffer.putEnumValue(SignalBoxNetwork.SEND_NAME);
         point.writeNetwork(buffer);
         buffer.putString(name);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void sendSignalRepeater(final Point point, final ModeSet mode, final boolean state) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_SIGNAL_REPEATER);
+        point.writeNetwork(buffer);
+        mode.writeNetwork(buffer);
+        buffer.putBoolean(state);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 

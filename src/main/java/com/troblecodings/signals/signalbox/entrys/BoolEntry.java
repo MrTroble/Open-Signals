@@ -60,11 +60,11 @@ public class BoolEntry extends IPathEntry<Boolean> implements IIntegerable<Boole
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {
-        value = buffer.getByte() != 0;
+        value = buffer.getBoolean();
     }
 
     @Override
     public void writeNetwork(final WriteBuffer buffer) {
-        buffer.putByte((byte) (value ? 1 : 0));
+        buffer.putBoolean(value);
     }
 }
