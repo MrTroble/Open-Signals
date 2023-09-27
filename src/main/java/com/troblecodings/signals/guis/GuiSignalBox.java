@@ -103,13 +103,13 @@ public class GuiSignalBox extends GuiBase {
     private final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
     private final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
+    private final Map<Point, UIColor> colors = new HashMap<>();
 
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
         container.setInfoConsumer(this::infoUpdate);
         container.setColorUpdater(this::applyColorChanges);
-        info.player.containerMenu = this.container;
         this.info = info;
     }
 
@@ -129,9 +129,8 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void resetTileSelection() {
-        this.entity.findRecursive(UIColor.class).stream().filter(
-                color -> color.getColor() == SELECTION_COLOR || color.getColor() == EDIT_COLOR)
-                .forEach(color -> color.getParent().remove(color));
+        colors.values().forEach(color -> color.getParent().remove(color));
+        colors.clear();
         this.lastTile = null;
     }
 
@@ -433,7 +432,13 @@ public class GuiSignalBox extends GuiBase {
         tile.add(new UIClickable(c -> {
             if (!currentTile.isValidStart())
                 return;
-            c.add(new UIColor(SELECTION_COLOR));
+            final UIColor previous = colors.get(currentTile.getPoint());
+            if (previous != null)
+                previous.getParent().remove(previous);
+
+            final UIColor newColor = new UIColor(SELECTION_COLOR);
+            c.add(newColor);
+            colors.put(currentTile.getPoint(), newColor);
             if (lastTile == null) {
                 lastTile = currentTile;
             } else {
@@ -459,20 +464,19 @@ public class GuiSignalBox extends GuiBase {
     private void openNodeShortcuts(final SignalBoxNode node, final UIEntity entity) {
         if (node.isEmpty())
             return;
-        final AtomicBoolean isAlreadyOpen = new AtomicBoolean(false);
-        entity.findRecursive(UIColor.class).stream().filter(color -> color.getColor() == EDIT_COLOR)
-                .forEach(color -> {
-                    color.getParent().remove(color);
-                    helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
-                            container.possibleSubsidiaries);
-                    helpPage.setShowHelpPage(false);
-                    isAlreadyOpen.set(true);
-                    this.resetTileSelection();
-                });
-        if (isAlreadyOpen.get())
+        final UIColor previous = colors.get(node.getPoint());
+        if (previous != null && previous.getColor() == EDIT_COLOR) {
+            helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
+                    container.possibleSubsidiaries);
+            helpPage.setShowHelpPage(false);
+            this.resetTileSelection();
             return;
+        }
         this.resetTileSelection();
-        entity.add(new UIColor(EDIT_COLOR));
+
+        final UIColor newColor = new UIColor(EDIT_COLOR);
+        entity.add(newColor);
+        colors.put(node.getPoint(), newColor);
         helpPage.helpUsageMode(enabledSubsidiaries, node, container.grid.getNodes(),
                 container.possibleSubsidiaries);
         helpPage.setShowHelpPage(true);
