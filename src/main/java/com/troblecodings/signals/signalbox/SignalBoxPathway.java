@@ -16,7 +16,8 @@ import java.util.function.Consumer;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableList.Builder;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -30,6 +31,7 @@ import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
+import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -52,7 +54,8 @@ public class SignalBoxPathway {
     private Optional<Entry<MainSignalIdentifier, MainSignalIdentifier>> signalPositions = Optional
             .empty();
     private Optional<MainSignalIdentifier> lastSignal = Optional.empty();
-    private ImmutableList<OtherSignalIdentifier> distantSignalPositions = ImmutableList.of();
+    private ImmutableMap<BlockPos, OtherSignalIdentifier> distantSignalPositions = ImmutableMap
+            .of();
     private Map<Point, SignalBoxNode> modeGrid = null;
     private boolean emptyOrBroken = false;
     private Level world;
@@ -87,7 +90,7 @@ public class SignalBoxPathway {
     private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
-        final Builder<OtherSignalIdentifier> distantPosBuilder = ImmutableList.builder();
+        final Builder<BlockPos, OtherSignalIdentifier> distantPosBuilder = ImmutableMap.builder();
         mapOfBlockingPositions.clear();
         mapOfResetPositions.clear();
         foreachEntry((optionEntry, node) -> {
@@ -108,7 +111,7 @@ public class SignalBoxPathway {
                         option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
                             final Optional<Boolean> repeaterOption = option
                                     .getEntry(PathEntryType.SIGNAL_REPEATER);
-                            distantPosBuilder.add(
+                            distantPosBuilder.put(position,
                                     new OtherSignalIdentifier(node.getPoint(), modeSet, position,
                                             repeaterOption.isPresent() && repeaterOption.get()));
                         }));
@@ -170,7 +173,8 @@ public class SignalBoxPathway {
     }
 
     public void read(final NBTWrapper tag) {
-        final Builder<SignalBoxNode> nodeBuilder = ImmutableList.builder();
+        final com.google.common.collect.ImmutableList.Builder<SignalBoxNode> nodeBuilder = ImmutableList
+                .builder();
         tag.getList(LIST_OF_NODES).forEach(nodeNBT -> {
             final Point point = new Point();
             point.read(nodeNBT);
@@ -261,7 +265,7 @@ public class SignalBoxPathway {
             final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey().pos, first);
             SignalConfig.change(new ConfigInfo(firstInfo, lastSignalInfo, speed, zs2Value, type));
         });
-        distantSignalPositions.forEach(position -> {
+        distantSignalPositions.values().forEach(position -> {
             final Signal current = SignalBoxHandler.getSignal(identifier, position.pos);
             if (current == null)
                 return;
@@ -280,17 +284,19 @@ public class SignalBoxPathway {
                     entry.getKey().pos);
             if (current == null)
                 return;
-            SignalConfig.reset(new SignalStateInfo(world, entry.getKey().pos, current));
+            SignalConfig.reset(
+                    new ResetInfo(new SignalStateInfo(world, entry.getKey().pos, current), false));
         });
     }
 
     private void resetOther() {
-        distantSignalPositions.forEach(position -> {
+        distantSignalPositions.values().forEach(position -> {
             final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
                     position.pos);
             if (current == null)
                 return;
-            SignalConfig.reset(new SignalStateInfo(world, position.pos, current));
+            SignalConfig.reset(new ResetInfo(new SignalStateInfo(world, position.pos, current),
+                    position.isRepeater));
         });
     }
 
@@ -316,7 +322,12 @@ public class SignalBoxPathway {
                                     .getSignal(new PosIdentifier(tilePos, world), position);
                             if (current == null)
                                 return;
-                            SignalConfig.reset(new SignalStateInfo(world, position, current));
+                            final OtherSignalIdentifier identifier = distantSignalPositions
+                                    .getOrDefault(position, new OtherSignalIdentifier(point,
+                                            new ModeSet(mode, rotation), position, false));
+                            SignalConfig.reset(
+                                    new ResetInfo(new SignalStateInfo(world, position, current),
+                                            identifier.isRepeater));
                         }));
             }
         }, point);

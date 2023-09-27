@@ -11,8 +11,8 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.contentpacks.ChangeConfigParser;
-import com.troblecodings.signals.contentpacks.DefaultConfigParser;
-import com.troblecodings.signals.contentpacks.OneSignalConfigParser;
+import com.troblecodings.signals.contentpacks.OneSignalPredicateConfigParser;
+import com.troblecodings.signals.contentpacks.OneSignalNonPredicateConfigParser;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.guis.ContainerPlacementtool;
 import com.troblecodings.signals.guis.ContainerSignalBox;
@@ -48,9 +48,9 @@ public class CommonProxy {
     public void preinit(final FMLCommonSetupEvent event) {
         OSItems.init();
 
-        OneSignalConfigParser.loadOneSignalConfigs();
+        OneSignalNonPredicateConfigParser.loadOneSignalConfigs();
         ChangeConfigParser.loadChangeConfigs();
-        DefaultConfigParser.loadDefaultConfigs();
+        OneSignalPredicateConfigParser.loadDefaultConfigs();
         SubsidiarySignalParser.loadAllSubsidiarySignals();
     }
 }

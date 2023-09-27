@@ -16,6 +16,7 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
+import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 
 import net.minecraft.core.BlockPos;
@@ -41,7 +42,7 @@ public class LinkedPositions {
     public void addSignal(final BlockPos signalPos, final Signal signal, final Level world) {
         signals.put(signalPos, signal);
         final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
-        SignalConfig.reset(info);
+        SignalConfig.reset(new ResetInfo(info, false));
         loadPossibleSubsidiaires(info);
     }
 
@@ -74,7 +75,7 @@ public class LinkedPositions {
         final List<SignalStateInfo> signalsToUnload = new ArrayList<>();
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
-            SignalConfig.reset(info);
+            SignalConfig.reset(new ResetInfo(info, false));
             signalsToUnload.add(info);
         });
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))

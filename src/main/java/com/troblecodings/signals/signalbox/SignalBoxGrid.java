@@ -24,6 +24,7 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
+import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
@@ -247,7 +248,7 @@ public class SignalBoxGrid implements INetworkSavable {
         if (!entry.state) {
             if (!enabledSubsidiaryTypes.containsKey(point))
                 return;
-            SignalConfig.reset(new SignalStateInfo(world, pos.get(), signal));
+            SignalConfig.reset(new ResetInfo(new SignalStateInfo(world, pos.get(), signal), false));
             final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
             states.remove(mode);
             if (states.isEmpty()) {
