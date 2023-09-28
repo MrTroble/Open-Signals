@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
@@ -29,7 +30,6 @@ import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Rotation;
@@ -119,11 +119,11 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 break;
             }
             case NO_PW_FOUND: {
-                infoUpdates.accept(I18n.get("error.nopathfound"));
+                infoUpdates.accept(I18Wrapper.format("error.nopathfound"));
                 break;
             }
             case NO_OUTPUT_UPDATE: {
-                infoUpdates.accept(I18n.get("error.nooutputupdate"));
+                infoUpdates.accept(I18Wrapper.format("error.nooutputupdate"));
                 break;
             }
             case OUTPUT_UPDATE: {

@@ -5,10 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
-import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -37,7 +38,6 @@ import com.troblecodings.signals.models.SignalCustomModel;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.player.Player;
@@ -228,7 +228,7 @@ public class GuiSignalController extends GuiBase {
                 SizeIntegerables.of("profile", 32, in -> String.valueOf(in)));
         lowerEntity.add(GuiElements.createEnumElement(profile, e -> sendRSInputProfileToServer(e),
                 controller.linkedRSInputProfile));
-        lowerEntity.add(GuiElements.createButton(I18n.get("gui.unlink"), e -> {
+        lowerEntity.add(GuiElements.createButton(I18Wrapper.format("gui.unlink"), e -> {
             unlinkInputPos();
             label.setText("Linked To: not linked");
         }));
@@ -244,7 +244,7 @@ public class GuiSignalController extends GuiBase {
         }
         lowerEntity.setInherits(true);
 
-        final String name = I18n.get("tile." + signal.delegate.name().getPath() + ".name")
+        final String name = I18Wrapper.format("tile." + signal.delegate.name().getPath() + ".name")
                 + "; Name: "
                 + ClientNameHandler.getClientName(new NameStateInfo(mc.level, controller.getPos()));
 

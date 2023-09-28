@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
@@ -15,7 +16,6 @@ import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.entity.player.Player;
 
 public class NamableGui extends GuiBase {
@@ -62,10 +62,10 @@ public class NamableGui extends GuiBase {
 
         final UITextInput input = new UITextInput(container.tile.getNameWrapper());
         textfield.add(input);
-        textfield.add(new UIToolTip(I18n.get("property.customname.desc")));
+        textfield.add(new UIToolTip(I18Wrapper.format("property.customname.desc")));
 
         hbox.add(textfield);
-        final UIEntity apply = GuiElements.createButton(I18n.get("btn.apply"),
+        final UIEntity apply = GuiElements.createButton(I18Wrapper.format("btn.apply"),
                 _u -> this.updateText(input.getText()));
         apply.setInheritWidth(false);
         apply.setWidth(60);
@@ -74,7 +74,7 @@ public class NamableGui extends GuiBase {
         if (!(container.tile instanceof RedstoneIOTileEntity)) {
             return;
         }
-        inner.add(GuiElements.createLabel(I18n.get("label.linkedto")));
+        inner.add(GuiElements.createLabel(I18Wrapper.format("label.linkedto")));
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
         list.setInheritWidth(true);

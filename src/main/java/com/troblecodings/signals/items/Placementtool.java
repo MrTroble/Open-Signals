@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
@@ -21,7 +22,6 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
 
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -50,8 +50,8 @@ public class Placementtool extends Item
     @OnlyIn(Dist.CLIENT)
     @Override
     public String getNamedObj(final int obj) {
-        return I18n.get("property." + this.getName() + ".name") + ": "
-                + I18n.get(this.getObjFromID(obj).toString());
+        return I18Wrapper.format("property." + this.getName() + ".name") + ": "
+                + I18Wrapper.format(this.getObjFromID(obj).toString());
     }
 
     @Override
