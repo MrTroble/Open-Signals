@@ -147,7 +147,7 @@ public class SignalPropertiesBuilder {
                 ImmutableList.copyOf(signalheights), signWidth, offsetX, offsetY, signScale,
                 autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
                 ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
-                ImmutableList.copyOf(remoteRedstoneValuePacks), defaultItemDamage,
-                ImmutableList.copyOf(redstoneValuePacks));
+                ImmutableList.copyOf(redstoneValuePacks), defaultItemDamage,
+                ImmutableList.copyOf(remoteRedstoneValuePacks));
     }
 }
