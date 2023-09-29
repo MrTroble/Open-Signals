@@ -469,7 +469,7 @@ public class Signal extends BasicBlock {
                 return property;
             }
         }
-        return new SoundProperty(null, null, 0);
+        return new SoundProperty(t -> true, null, 0);
     }
 
     @Override
