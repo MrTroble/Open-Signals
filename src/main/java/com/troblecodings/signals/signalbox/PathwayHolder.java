@@ -187,6 +187,10 @@ public class PathwayHolder {
         return false;
     }
 
+    public void removeNextPathway(final Point start, final Point end) {
+        nextPathways.remove(Maps.immutableEntry(start, end));
+    }
+
     public void resetPathway(final Point p1) {
         if (startsToPath.isEmpty())
             return;

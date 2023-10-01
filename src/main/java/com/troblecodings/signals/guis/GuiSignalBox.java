@@ -100,7 +100,7 @@ public class GuiSignalBox extends GuiBase {
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
     private UIEntity plane = null;
     private boolean allPacketsRecived = false;
-    private final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
+    protected final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
     private final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
     private final Map<Point, UIColor> colors = new HashMap<>();
@@ -119,7 +119,7 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(tooltip);
         new Thread(() -> {
             try {
-                Thread.sleep(4000);
+                Thread.sleep(3000);
             } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
@@ -128,7 +128,7 @@ public class GuiSignalBox extends GuiBase {
         return;
     }
 
-    private void resetTileSelection() {
+    protected void resetTileSelection() {
         colors.values().forEach(color -> color.getParent().remove(color));
         colors.clear();
         this.lastTile = null;
@@ -968,6 +968,16 @@ public class GuiSignalBox extends GuiBase {
         point.writeNetwork(buffer);
         mode.writeNetwork(buffer);
         buffer.putBoolean(state);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void removeNextPathwayFromServer(final Point start, final Point end) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
+        start.writeNetwork(buffer);
+        end.writeNetwork(buffer);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 

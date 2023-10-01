@@ -285,6 +285,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     node.addAndSetEntry(modeSet, PathEntryType.SIGNAL_REPEATER, state);
                 }
             }
+            case REMOVE_SAVEDPW: {
+                final Point start = Point.of(buffer);
+                final Point end = Point.of(buffer);
+                SignalBoxHandler.removeNextPathway(
+                        new PosIdentifier(tile.getBlockPos(), info.world), start, end);
+            }
             default:
                 break;
         }

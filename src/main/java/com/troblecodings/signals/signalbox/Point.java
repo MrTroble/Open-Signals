@@ -74,6 +74,10 @@ public class Point implements INetworkSavable {
         return "Point[x=" + this.x + ",y=" + this.y + "]";
     }
 
+    public String toShortString() {
+        return "[x=" + this.x + ",y=" + this.y + "]";
+    }
+
     @Override
     public void write(final NBTWrapper tag) {
         tag.putByte("x", (byte) x);

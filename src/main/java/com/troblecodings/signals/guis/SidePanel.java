@@ -405,10 +405,30 @@ public class SidePanel {
                         list.add(scrollbox);
 
                         gui.container.nextPathways.forEach(entry -> {
+                            final UIEntity layout = new UIEntity();
+                            layout.setHeight(20);
+                            layout.setInheritWidth(true);
+                            layout.add(new UIBox(UIBox.HBOX, 2));
                             final UIEntity button = GuiElements
-                                    .createButton("Start: " + entry.getKey().toString() + ", End: "
-                                            + entry.getValue().toString());
-                            list.add(button);
+                                    .createButton("Start: " + entry.getKey().toShortString()
+                                            + ", End: " + entry.getValue().toShortString());
+                            layout.add(button);
+                            layout.add(GuiElements
+                                    .createButton(I18Wrapper.format("info.usage.show"), 40, _u -> {
+                                        gui.resetTileSelection();
+                                        gui.pop();
+                                        setShowHelpPage(false);
+                                        addColorToTile(entry.getKey(), entry.getValue(),
+                                                GuiSignalBox.SELECTION_COLOR);
+                                        // TODO Maby other color?
+                                    }));
+                            layout.add(GuiElements.createButton("x", 20, _u -> {
+                                gui.container.nextPathways.remove(entry);
+                                list.remove(layout);
+                                gui.removeNextPathwayFromServer(entry.getKey(), entry.getValue());
+                                gui.pop();
+                            }));
+                            list.add(layout);
                         });
 
                         final UIScroll scroll = new UIScroll();
@@ -625,6 +645,25 @@ public class SidePanel {
         });
         helpList.add(helpScrollbox);
         addHelpPageToPlane();
+    }
+
+    private void addColorToTile(final Point start, final Point end, final int color) {
+        final UISignalBoxTile startTile = gui.allTiles.get(start);
+        final UISignalBoxTile endTile = gui.allTiles.get(end);
+        if (startTile == null || endTile == null)
+            return;
+        final UIColor uiColor = new UIColor(color);
+        new Thread(() -> {
+            startTile.getParent().add(uiColor);
+            endTile.getParent().add(uiColor);
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            startTile.getParent().remove(uiColor);
+            endTile.getParent().remove(uiColor);
+        }, "GuiSignalBox:showNextPathway").start();
     }
 
     public void setDisableSubdsidiary(final BiConsumer<BlockPos, SubsidiaryHolder> consumer) {

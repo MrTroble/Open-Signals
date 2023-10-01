@@ -108,6 +108,19 @@ public final class SignalBoxHandler {
         return grid.addNextPathway(start, end);
     }
 
+    public static void removeNextPathway(final PosIdentifier identifier, final Point start,
+            final Point end) {
+        if (identifier.world.isClientSide)
+            return;
+        PathwayHolder grid;
+        synchronized (ALL_GRIDS) {
+            grid = ALL_GRIDS.get(identifier);
+        }
+        if (grid == null)
+            return;
+        grid.removeNextPathway(start, end);
+    }
+
     public static void resetAllPathways(final PosIdentifier identifier) {
         if (identifier.world.isClientSide)
             return;
