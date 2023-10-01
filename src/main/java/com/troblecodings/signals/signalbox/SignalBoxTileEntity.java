@@ -93,9 +93,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (level.isClientSide) {
             return;
         }
-        SignalBoxHandler.readTileNBT(new PosIdentifier(worldPosition, level),
-                copy == null ? new NBTWrapper() : copy, grid.getModeGrid());
-        SignalBoxHandler.loadSignals(new PosIdentifier(worldPosition, level));
+        final PosIdentifier identifier = new PosIdentifier(worldPosition, level);
+        SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy);
+        SignalBoxHandler.loadSignals(identifier);
+        SignalBoxHandler.updateModeGrid(identifier, grid);
     }
 
     @Override

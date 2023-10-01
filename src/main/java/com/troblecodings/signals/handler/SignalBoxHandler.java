@@ -24,7 +24,7 @@ import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.PathwayHolder;
 import com.troblecodings.signals.signalbox.Point;
-import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -59,7 +59,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean requestPathway(final PosIdentifier identifier, final Point p1,
-            final Point p2, final Map<Point, SignalBoxNode> modeGrid) {
+            final Point p2) {
         if (identifier.world.isClientSide)
             return false;
         PathwayHolder grid;
@@ -68,7 +68,44 @@ public final class SignalBoxHandler {
         }
         if (grid == null)
             return false;
-        return grid.requestWay(p1, p2, modeGrid);
+        return grid.requestWay(p1, p2);
+    }
+
+    public static void updateModeGrid(final PosIdentifier identifier, final SignalBoxGrid grid) {
+        if (identifier.world.isClientSide)
+            return;
+        PathwayHolder holder;
+        synchronized (ALL_GRIDS) {
+            holder = ALL_GRIDS.get(identifier);
+        }
+        if (holder == null)
+            return;
+        holder.updateModeGrid(grid);
+    }
+
+    public static List<Map.Entry<Point, Point>> getNextPathways(final PosIdentifier identifier) {
+        if (identifier.world.isClientSide)
+            return new ArrayList<>();
+        PathwayHolder holder;
+        synchronized (ALL_GRIDS) {
+            holder = ALL_GRIDS.get(identifier);
+        }
+        if (holder == null)
+            return new ArrayList<>();
+        return holder.getNextPathways();
+    }
+
+    public static boolean addNextPathway(final PosIdentifier identifier, final Point start,
+            final Point end) {
+        if (identifier.world.isClientSide)
+            return false;
+        PathwayHolder grid;
+        synchronized (ALL_GRIDS) {
+            grid = ALL_GRIDS.get(identifier);
+        }
+        if (grid == null)
+            return false;
+        return grid.addNextPathway(start, end);
     }
 
     public static void resetAllPathways(final PosIdentifier identifier) {
@@ -115,8 +152,7 @@ public final class SignalBoxHandler {
         holder.write(wrapper);
     }
 
-    public static void readTileNBT(final PosIdentifier identifier, final NBTWrapper wrapper,
-            final Map<Point, SignalBoxNode> modeGrid) {
+    public static void readTileNBT(final PosIdentifier identifier, final NBTWrapper wrapper) {
         if (identifier.world.isClientSide)
             return;
         LinkedPositions holder;
@@ -129,7 +165,7 @@ public final class SignalBoxHandler {
             grid = ALL_GRIDS.computeIfAbsent(identifier,
                     _u -> new PathwayHolder(identifier.world, identifier.pos));
         }
-        grid.read(wrapper, modeGrid);
+        grid.read(wrapper);
     }
 
     public static void setWorld(final PosIdentifier identifier) {

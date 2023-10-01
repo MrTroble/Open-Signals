@@ -8,6 +8,7 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Maps;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
@@ -38,6 +39,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
     protected final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
+    protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
     protected SignalBoxGrid grid;
     private final Map<BlockPos, LinkType> propertiesForType = new HashMap<>();
     private SignalBoxTileEntity tile;
@@ -76,6 +78,13 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             buffer.putBlockPos(pos);
             buffer.putByte((byte) type.ordinal());
         });
+        final List<Map.Entry<Point, Point>> nextPathways = SignalBoxHandler
+                .getNextPathways(identifier);
+        buffer.putByte((byte) nextPathways.size());
+        nextPathways.forEach(entry -> {
+            entry.getKey().writeNetwork(buffer);
+            entry.getValue().writeNetwork(buffer);
+        });
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -93,6 +102,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 enabledSubsidiaryTypes.putAll(grid.getAllSubsidiaries());
                 propertiesForType.clear();
                 possibleSubsidiaries.clear();
+                nextPathways.clear();
                 final int signalSize = buffer.getInt();
                 for (int i = 0; i < signalSize; i++) {
                     final BlockPos signalPos = buffer.getBlockPos();
@@ -111,6 +121,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     final LinkType type = LinkType.of(buffer);
                     propertiesForType.put(blockPos, type);
                 }
+                final int nextPathwaySize = buffer.getByteToUnsignedInt();
+                for (int i = 0; i < nextPathwaySize; i++) {
+                    final Point start = Point.of(buffer);
+                    final Point end = Point.of(buffer);
+                    nextPathways.add(Maps.immutableEntry(start, end));
+                }
                 update();
                 break;
             }
@@ -122,8 +138,11 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 infoUpdates.accept(I18Wrapper.format("error.nopathfound"));
                 break;
             }
-            case NO_OUTPUT_UPDATE: {
-                infoUpdates.accept(I18Wrapper.format("error.nooutputupdate"));
+            case ADDED_TO_SAVER: {
+                final Point start = Point.of(buffer);
+                final Point end = Point.of(buffer);
+                nextPathways.add(Maps.immutableEntry(start, end));
+                infoUpdates.accept(I18Wrapper.format("info.pathwaysaver"));
                 break;
             }
             case OUTPUT_UPDATE: {
@@ -136,6 +155,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 } else {
                     node.removeManuellOutput(modeSet);
                 }
+                break;
+            }
+            case REMOVE_SAVEDPW: {
+                final Point start = Point.of(buffer);
+                final Point end = Point.of(buffer);
+                nextPathways.remove(Maps.immutableEntry(start, end));
                 break;
             }
             default:
@@ -186,8 +211,17 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
                 if (!grid.requestWay(start, end)) {
+                    if (SignalBoxHandler.addNextPathway(
+                            new PosIdentifier(tile.getBlockPos(), tile.getLevel()), start, end)) {
+                        final WriteBuffer sucess = new WriteBuffer();
+                        sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
+                        start.writeNetwork(sucess);
+                        end.writeNetwork(sucess);
+                        OpenSignalsMain.network.sendTo(info.player, sucess);
+                        break;
+                    }
                     final WriteBuffer error = new WriteBuffer();
-                    error.putByte((byte) SignalBoxNetwork.NO_PW_FOUND.ordinal());
+                    error.putEnumValue(SignalBoxNetwork.NO_PW_FOUND);
                     OpenSignalsMain.network.sendTo(info.player, error);
                 }
                 break;
@@ -212,18 +246,14 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final ModeSet modeSet = ModeSet.of(buffer);
                 final boolean state = buffer.getBoolean();
                 final BlockPos pos = grid.updateManuellRSOutput(point, modeSet, state);
-                if (pos == null) {
-                    final WriteBuffer error = new WriteBuffer();
-                    error.putByte((byte) SignalBoxNetwork.NO_OUTPUT_UPDATE.ordinal());
-                    OpenSignalsMain.network.sendTo(info.player, error);
-                } else {
+                if (pos != null) {
                     SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, info.world),
                             state);
                     final WriteBuffer sucess = new WriteBuffer();
-                    sucess.putByte((byte) SignalBoxNetwork.OUTPUT_UPDATE.ordinal());
+                    sucess.putEnumValue(SignalBoxNetwork.OUTPUT_UPDATE);
                     point.writeNetwork(sucess);
                     modeSet.writeNetwork(sucess);
-                    sucess.putByte((byte) (state ? 1 : 0));
+                    sucess.putBoolean(state);
                     OpenSignalsMain.network.sendTo(info.player, sucess);
                 }
                 break;

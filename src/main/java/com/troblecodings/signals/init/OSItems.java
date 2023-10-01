@@ -35,7 +35,8 @@ public final class OSItems {
         final Block block = state.getBlock();
         final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
                 || block == OSBlocks.REDSTONE_OUT || block == OSBlocks.COMBI_REDSTONE_INPUT;
-        return isRedstoneBlock || (block instanceof Signal && ((Signal) block).canBeLinked());
+        return isRedstoneBlock || (block instanceof Signal && ((Signal) block).canBeLinked())
+                || block == OSBlocks.SIGNAL_BOX;
     }, _u -> true, (level, pos, tag) -> {
         final BlockState state = level.getBlockState(pos);
         final NBTWrapper wrapper = new NBTWrapper(tag);

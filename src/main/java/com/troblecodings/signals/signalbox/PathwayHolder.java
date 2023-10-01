@@ -1,11 +1,13 @@
 package com.troblecodings.signals.signalbox;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -21,11 +23,16 @@ import net.minecraft.world.level.Level;
 public class PathwayHolder {
 
     private static final String PATHWAY_LIST = "pathwayList";
+    private static final String NEXT_PATHWAYS = "nextPathways";
+    private static final String START_POINT = "startPoint";
+    private static final String END_POINT = "endPoint";
 
     private final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
     private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
+    private final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
     private Level world;
     private final BlockPos tilePos;
+    private Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
 
     public PathwayHolder(final Level world, final BlockPos pos) {
         this.world = world;
@@ -52,8 +59,11 @@ public class PathwayHolder {
         updatePrevious(pathway);
     }
 
-    public boolean requestWay(final Point p1, final Point p2,
-            final Map<Point, SignalBoxNode> modeGrid) {
+    public void updateModeGrid(final SignalBoxGrid grid) {
+        this.modeGrid = grid.modeGrid;
+    }
+
+    public boolean requestWay(final Point p1, final Point p2) {
         if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
             return false;
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
@@ -98,6 +108,7 @@ public class PathwayHolder {
     private void clearPaths() {
         startsToPath.clear();
         endsToPath.clear();
+        nextPathways.clear();
     }
 
     public void updateInput(final RedstoneUpdatePacket update) {
@@ -140,6 +151,40 @@ public class PathwayHolder {
                 }
             }
         });
+        tryNextPathways();
+    }
+
+    private void tryNextPathways() {
+        nextPathways.removeIf(entry -> {
+            final boolean bool = requestWay(entry.getKey(), entry.getValue());
+            if (bool) {
+                final SignalBoxTileEntity tile = (SignalBoxTileEntity) world
+                        .getBlockEntity(tilePos);
+                if (tile == null || !tile.isBlocked())
+                    return bool;
+                final WriteBuffer buffer = new WriteBuffer();
+                buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
+                entry.getKey().writeNetwork(buffer);
+                entry.getValue().writeNetwork(buffer);
+                OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
+            }
+            return bool;
+        });
+        if (startsToPath.isEmpty())
+            nextPathways.clear();
+    }
+
+    public List<Map.Entry<Point, Point>> getNextPathways() {
+        return ImmutableList.copyOf(nextPathways);
+    }
+
+    public boolean addNextPathway(final Point start, final Point end) {
+        final Map.Entry<Point, Point> entry = Maps.immutableEntry(start, end);
+        if (!nextPathways.contains(entry)) {
+            nextPathways.add(entry);
+            return true;
+        }
+        return false;
     }
 
     public void resetPathway(final Point p1) {
@@ -152,6 +197,7 @@ public class PathwayHolder {
         }
         resetPathway(pathway);
         updateToNet(pathway);
+        tryNextPathways();
     }
 
     private void resetPathway(final SignalBoxPathway pathway) {
@@ -176,7 +222,7 @@ public class PathwayHolder {
         OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
     }
 
-    public void read(final NBTWrapper tag, final Map<Point, SignalBoxNode> modeGrid) {
+    public void read(final NBTWrapper tag) {
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         if (!tag.contains(PATHWAY_LIST))
             return;
@@ -192,6 +238,13 @@ public class PathwayHolder {
             pathway.setWorldAndPos(world, tilePos);
             onWayAdd(pathway);
         });
+        tag.getList(NEXT_PATHWAYS).forEach(comp -> {
+            final Point start = new Point();
+            start.read(comp.getWrapper(START_POINT));
+            final Point end = new Point();
+            end.read(comp.getWrapper(END_POINT));
+            nextPathways.add(Maps.immutableEntry(start, end));
+        });
     }
 
     public void write(final NBTWrapper tag) {
@@ -201,5 +254,15 @@ public class PathwayHolder {
                     pathway.write(path);
                     return path;
                 })::iterator);
+        tag.putList(NEXT_PATHWAYS, nextPathways.stream().map(entry -> {
+            final NBTWrapper wrapper = new NBTWrapper();
+            final NBTWrapper start = new NBTWrapper();
+            entry.getKey().write(start);
+            final NBTWrapper end = new NBTWrapper();
+            entry.getValue().write(end);
+            wrapper.putWrapper(START_POINT, start);
+            wrapper.putWrapper(END_POINT, end);
+            return wrapper;
+        })::iterator);
     }
 }

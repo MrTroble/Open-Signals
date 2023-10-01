@@ -60,7 +60,7 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
-        return SignalBoxHandler.requestPathway(new PosIdentifier(tilePos, world), p1, p2, modeGrid);
+        return SignalBoxHandler.requestPathway(new PosIdentifier(tilePos, world), p1, p2);
     }
 
     public void resetAllPathways() {

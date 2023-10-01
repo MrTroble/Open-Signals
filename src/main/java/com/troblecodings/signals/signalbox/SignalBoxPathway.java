@@ -430,8 +430,7 @@ public class SignalBoxPathway {
     public void checkReRequest() {
         if (isAutoPathway) {
             final PosIdentifier identifier = new PosIdentifier(tilePos, world);
-            SignalBoxHandler.requestPathway(identifier, originalFirstPoint, getLastPoint(),
-                    modeGrid);
+            SignalBoxHandler.requestPathway(identifier, originalFirstPoint, getLastPoint());
         }
     }
 

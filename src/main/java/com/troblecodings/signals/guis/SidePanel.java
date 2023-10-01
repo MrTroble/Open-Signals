@@ -239,8 +239,7 @@ public class SidePanel {
 
                             final UIEntity list = new UIEntity();
                             listWithScroll.add(list);
-                            list.setInheritHeight(true);
-                            list.setInheritWidth(true);
+                            list.setInherits(true);
 
                             final UIScrollBox scrollbox = new UIScrollBox(UIBox.VBOX, 2);
                             list.add(scrollbox);
@@ -386,6 +385,52 @@ public class SidePanel {
             helpList.add(manuelButton);
             manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
         }
+
+        final UIEntity savedPathways = GuiElements
+                .createButton(I18Wrapper.format("info.usage.savedpathways"), e -> {
+                    final UIEntity screen = GuiElements.createScreen(entity -> {
+                        final UIEntity listWithScroll = new UIEntity();
+                        listWithScroll.setInheritHeight(true);
+                        listWithScroll.setInheritWidth(true);
+                        listWithScroll.add(new UIBox(UIBox.HBOX, 2));
+                        listWithScroll.add(new UIScissor());
+                        listWithScroll.add(new UIBorder(0xFF00FFFF));
+                        entity.add(listWithScroll);
+
+                        final UIEntity list = new UIEntity();
+                        listWithScroll.add(list);
+                        list.setInherits(true);
+
+                        final UIScrollBox scrollbox = new UIScrollBox(UIBox.VBOX, 2);
+                        list.add(scrollbox);
+
+                        gui.container.nextPathways.forEach(entry -> {
+                            final UIEntity button = GuiElements
+                                    .createButton("Start: " + entry.getKey().toString() + ", End: "
+                                            + entry.getValue().toString());
+                            list.add(button);
+                        });
+
+                        final UIScroll scroll = new UIScroll();
+                        final UIEntity scrollBar = GuiElements.createScrollBar(scrollbox, 10,
+                                scroll);
+                        scrollbox.setConsumer(size -> {
+                            if (size > list.getHeight()) {
+                                listWithScroll.add(scroll);
+                                listWithScroll.add(scrollBar);
+                            } else {
+                                listWithScroll.remove(scrollBar);
+                                listWithScroll.remove(scroll);
+                            }
+                        });
+                    });
+                    screen.add(new UIClickable(_u -> gui.pop(), 1));
+                    gui.push(screen);
+                });
+        savedPathways.setScaleX(0.8f);
+        savedPathways.setScaleY(0.8f);
+        savedPathways.setX(5);
+        helpList.add(savedPathways);
 
         if (node != null) {
             final Map<ModeSet, PathOptionEntry> modes = node.getModes();
