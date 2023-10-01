@@ -67,6 +67,7 @@ public class GuiSignalBox extends GuiBase {
     public static final int BACKGROUND_COLOR = ConfigHandler.CLIENT.signalboxBackgroundColor.get();
     public static final int GRID_COLOR = 0xFF5B5B5B;
     public static final int EDIT_COLOR = 0x5000A2FF;
+    public static final int OUTPUT_COLOR = 0xffff00;
 
     private static final float[] ALL_LINES = getLines();
     private static final int TILE_WIDTH = 10;
@@ -938,6 +939,8 @@ public class GuiSignalBox extends GuiBase {
         mode.writeNetwork(buffer);
         buffer.putBoolean(state);
         OpenSignalsMain.network.sendTo(info.player, buffer);
+        final UISignalBoxTile tile = allTiles.get(point);
+        tile.setColor(mode, state ? OUTPUT_COLOR : SignalBoxUtil.FREE_COLOR);
     }
 
     protected void setAutoPoint(final Point point, final byte state) {
@@ -1010,9 +1013,15 @@ public class GuiSignalBox extends GuiBase {
     private void buildColors(final List<SignalBoxNode> nodes) {
         nodes.forEach(node -> {
             final UISignalBoxTile tile = allTiles.get(node.getPoint());
-            node.forEach(mode -> tile.setColor(mode,
-                    node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
-                            .orElseGet(() -> EnumPathUsage.FREE).getColor()));
+            node.forEach(mode -> {
+                if (node.containsManuellOutput(mode)) {
+                    tile.setColor(mode, OUTPUT_COLOR);
+                    return;
+                }
+                final int color = node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
+                        .orElseGet(() -> EnumPathUsage.FREE).getColor();
+                tile.setColor(mode, color);
+            });
         });
     }
 

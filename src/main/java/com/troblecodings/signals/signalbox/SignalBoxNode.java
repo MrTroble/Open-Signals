@@ -11,6 +11,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
@@ -75,6 +76,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 .add(possibleModes.get(mode).getEntry(PathEntryType.OUTPUT).get()));
         manuellEnabledOutputs.clear();
         return returnList;
+    }
+
+    public List<ModeSet> getManuellEnabledOutputs() {
+        return ImmutableList.copyOf(manuellEnabledOutputs);
     }
 
     public void remove(final ModeSet modeSet) {
