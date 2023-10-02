@@ -532,5 +532,15 @@
 	"property.value.OUTPUT": "Redstone Output",
     "property.value.BLACK_WHITE": "Schwarz-Weiß",
     "property.value.BLACK_WHITE_W": "Schwarz-Weiß W",
-    "property.value.BLACK_YELLOW": "Schwarz-Gelb"
+    "property.value.BLACK_YELLOW": "Schwarz-Gelb",
+	"block.opensignals.pathwayrequester": "Fahrstraßenanfrager",
+	"btn.parse": "Anwenden",
+	"btn.save": "Speichern",
+	"gui.notvalid": "Ungültig",
+    "gui.accepted": "Zulässig",
+	"info.usage.savedpathways": "Gesp. Pfade",
+	"property.delay.name": "Verzögerungszeit",
+	"property.delay.desc": "Insert wonderful description",
+	"property.signal_repeater.name": "Vorsignalwiederholer",
+	"property.signal_repeater.desc": "Insert wonderful description"
 }
