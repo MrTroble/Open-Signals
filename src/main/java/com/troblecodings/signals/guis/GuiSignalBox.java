@@ -250,8 +250,8 @@ public class GuiSignalBox extends GuiBase {
                     statusEntity.setHeight(20);
                     statusEntity.add(new UIScale(1.1f, 1.1f, 1));
                     statusEntity.add(currentStatus);
-                    parent.add(
-                            GuiElements.createButton(I18Wrapper.format("info.usage.manuel"), e1 -> {
+                    final UIEntity manuelButton = GuiElements
+                            .createButton(I18Wrapper.format("info.usage.manuel"), e1 -> {
                                 final Optional<EnumPathUsage> usage = option
                                         .getEntry(PathEntryType.PATHUSAGE);
                                 final UIEntity info = new UIEntity();
@@ -322,8 +322,10 @@ public class GuiSignalBox extends GuiBase {
                                 }
                                 final UIEntity screen = GuiElements.createScreen(e -> e.add(info));
                                 push(screen);
-                            }));
-                    parent.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
+                            });
+                    manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
+                    parent.add(manuelButton);
+
                 }
                 selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
                         mode, rotation, ".blocking");
