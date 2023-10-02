@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.12.2 - 3.1.1]
+
+* fix: preview renderer
+
 ## [1.12.2 - 3.1.0]
 
 * feat: added help panel to signalbox
