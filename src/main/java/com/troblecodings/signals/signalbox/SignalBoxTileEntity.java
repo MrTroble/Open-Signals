@@ -94,9 +94,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             return;
         }
         final PosIdentifier identifier = new PosIdentifier(worldPosition, level);
+        SignalBoxHandler.updateModeGrid(identifier, grid);
         SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy);
         SignalBoxHandler.loadSignals(identifier);
-        SignalBoxHandler.updateModeGrid(identifier, grid);
     }
 
     @Override

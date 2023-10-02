@@ -76,10 +76,9 @@ public final class SignalBoxHandler {
             return;
         PathwayHolder holder;
         synchronized (ALL_GRIDS) {
-            holder = ALL_GRIDS.get(identifier);
+            holder = ALL_GRIDS.computeIfAbsent(identifier,
+                    _u -> new PathwayHolder(identifier.world, identifier.pos));
         }
-        if (holder == null)
-            return;
         holder.updateModeGrid(grid);
     }
 
