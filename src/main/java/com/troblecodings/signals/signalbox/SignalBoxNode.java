@@ -284,6 +284,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode));
     }
 
+    public boolean isValidEnd() {
+        return this.possibleModes.keySet().stream()
+                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode));
+    }
+
     public Set<Path> connections() {
         return ImmutableSet.copyOf(this.possibleConnections.keySet());
     }

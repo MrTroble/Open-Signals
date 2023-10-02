@@ -210,6 +210,10 @@ public class SidePanel {
 
         final UIScrollBox helpScrollbox = new UIScrollBox(UIBox.VBOX, 2);
 
+        if (node != null)
+            helpList.add(GuiElements.createLabel(node.getPoint().toShortString(),
+                    new UIEntity().getBasicTextColor(), 0.8f));
+
         helpList.add(GuiElements.createLabel(I18Wrapper.format("info.keys"),
                 new UIEntity().getBasicTextColor(), 0.8f));
         helpList.add(GuiElements.createLabel("[LMB] = " + I18Wrapper.format("info.usage.key.lmb"),
