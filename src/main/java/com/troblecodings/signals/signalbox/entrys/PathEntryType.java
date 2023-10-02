@@ -44,6 +44,9 @@ public final class PathEntryType<T> {
     public static final PathEntryType<Boolean> SIGNAL_REPEATER = new PathEntryType<>(
             BoolEntry.class, "signal_repeater");
 
+    public static final PathEntryType<Integer> DELAY = new PathEntryType<>(IntegerEntry.class,
+            "delay");
+
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 
         public EnumPathUsageEntry() {

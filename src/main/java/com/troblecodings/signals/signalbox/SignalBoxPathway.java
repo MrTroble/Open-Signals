@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -43,6 +45,8 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalBoxPathway {
 
+    private final ExecutorService SERVICE = Executors.newCachedThreadPool();
+
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
     private final Map<BlockPos, SignalBoxNode> mapOfBlockingPositions = new HashMap<>();
     private ImmutableList<SignalBoxNode> listOfNodes = ImmutableList.of();
@@ -51,6 +55,7 @@ public class SignalBoxPathway {
     private Point lastPoint = new Point();
     private int speed = -1;
     private String zs2Value = "";
+    private int delay = 0;
     private Optional<Entry<MainSignalIdentifier, MainSignalIdentifier>> signalPositions = Optional
             .empty();
     private Optional<MainSignalIdentifier> lastSignal = Optional.empty();
@@ -63,6 +68,7 @@ public class SignalBoxPathway {
     private boolean isBlocked;
     private boolean isAutoPathway = false;
     private Point originalFirstPoint = null;
+    private Consumer<SignalBoxPathway> consumer;
 
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
@@ -90,6 +96,7 @@ public class SignalBoxPathway {
     private void initalize() {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
+        final AtomicInteger delayAtomic = new AtomicInteger(0);
         final Builder<BlockPos, OtherSignalIdentifier> distantPosBuilder = ImmutableMap.builder();
         mapOfBlockingPositions.clear();
         mapOfResetPositions.clear();
@@ -116,6 +123,10 @@ public class SignalBoxPathway {
                                             repeaterOption.isPresent() && repeaterOption.get()));
                         }));
             }
+            node.getModes().entrySet().stream()
+                    .filter(entry -> entry.getKey().mode.equals(EnumGuiMode.BUE))
+                    .forEach(entry -> entry.getValue().getEntry(PathEntryType.DELAY).ifPresent(
+                            value -> delayAtomic.updateAndGet(in -> Math.max(in, value))));
         }, null);
         this.distantSignalPositions = distantPosBuilder.build();
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
@@ -136,6 +147,7 @@ public class SignalBoxPathway {
         }
         this.speed = atomic.get();
         this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
+        this.delay = delayAtomic.get();
     }
 
     private MainSignalIdentifier makeFromNext(final PathType type, final SignalBoxNode first,
@@ -255,7 +267,28 @@ public class SignalBoxPathway {
             if (nextSignal != null)
                 lastInfo = new SignalStateInfo(world, lastSignal.get().pos, nextSignal);
         }
-        final SignalStateInfo lastSignalInfo = lastInfo;
+        final SignalStateInfo lastSignal = lastInfo;
+        if (delay > 0) {
+            setPathStatus(EnumPathUsage.PREPARED);
+            SERVICE.execute(() -> {
+                try {
+                    Thread.sleep(delay * 1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized (distantSignalPositions) {
+                    setSignals(lastSignal);
+                }
+                setPathStatus(EnumPathUsage.SELECTED);
+                world.getServer().execute(() -> consumer.accept(this));
+            });
+            return;
+        }
+        setSignals(lastSignal);
+    }
+
+    private void setSignals(final SignalStateInfo lastSignal) {
+        final PosIdentifier identifier = new PosIdentifier(tilePos, world);
         this.signalPositions.ifPresent(entry -> {
             if (isBlocked)
                 return;
@@ -263,15 +296,19 @@ public class SignalBoxPathway {
             if (first == null)
                 return;
             final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey().pos, first);
-            SignalConfig.change(new ConfigInfo(firstInfo, lastSignalInfo, speed, zs2Value, type));
+            SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, speed, zs2Value, type));
         });
         distantSignalPositions.values().forEach(position -> {
             final Signal current = SignalBoxHandler.getSignal(identifier, position.pos);
             if (current == null)
                 return;
             SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position.pos, current),
-                    lastSignalInfo, speed, zs2Value, type, position.isRepeater));
+                    lastSignal, speed, zs2Value, type, position.isRepeater));
         });
+    }
+
+    public void setUpdater(final Consumer<SignalBoxPathway> consumer) {
+        this.consumer = consumer;
     }
 
     public void resetPathway() {
@@ -301,6 +338,7 @@ public class SignalBoxPathway {
     }
 
     public void resetPathway(final @Nullable Point point) {
+        SERVICE.shutdownNow();
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
         if (point == null || point.equals(this.getLastPoint())

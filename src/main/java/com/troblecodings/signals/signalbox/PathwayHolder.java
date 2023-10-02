@@ -84,6 +84,10 @@ public class PathwayHolder {
         ways.ifPresent(way -> {
             way.setWorldAndPos(world, tilePos);
             way.deactivateAllOutputsOnPathway();
+            way.setUpdater(pathway -> {
+                updatePrevious(pathway);
+                updateToNet(pathway);
+            });
             way.setPathStatus(EnumPathUsage.SELECTED);
             way.updatePathwaySignals();
             this.onWayAdd(way);
@@ -247,6 +251,10 @@ public class PathwayHolder {
         clearPaths();
         tag.getList(PATHWAY_LIST).forEach(comp -> {
             final SignalBoxPathway pathway = factory.getPathway(modeGrid);
+            pathway.setUpdater(way -> {
+                updatePrevious(way);
+                updateToNet(way);
+            });
             pathway.read(comp);
             if (pathway.isEmptyOrBroken()) {
                 OpenSignalsMain.getLogger()

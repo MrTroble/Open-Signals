@@ -333,8 +333,10 @@ public class GuiSignalBox extends GuiBase {
                 final UIEntity zs2Entity = GuiElements.createEnumElement(JsonEnumHolder.ZS32, e -> {
                     if (e == 0) {
                         removeEntryFromServer(node, mode, rotation, PathEntryType.ZS2);
+                        option.removeEntry(PathEntryType.ZS2);
                     } else {
                         sendZS2Entry((byte) e, node, mode, rotation, PathEntryType.ZS2);
+                        option.setEntry(PathEntryType.ZS2, (byte) e);
                     }
                 }, option.getEntry(PathEntryType.ZS2).orElse((byte) 0));
                 parent.add(zs2Entity);
@@ -410,8 +412,16 @@ public class GuiSignalBox extends GuiBase {
                     }));
                 selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
                         mode, rotation);
-            }
                 break;
+            }
+            case BUE: {
+                parent.add(GuiElements.createEnumElement(
+                        new SizeIntegerables<>("delay", 60, get -> String.valueOf(get)), i -> {
+                            option.setEntry(PathEntryType.DELAY, i);
+                            sendIntEntryToServer(i, node, mode, rotation, PathEntryType.DELAY);
+                        }, option.getEntry(PathEntryType.DELAY).orElse(0)));
+                break;
+            }
             default:
                 break;
         }
@@ -834,8 +844,6 @@ public class GuiSignalBox extends GuiBase {
         buffer.putByte((byte) rotation.ordinal());
         buffer.putByte((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
-        node.addAndSetEntry(new ModeSet(mode, rotation), entry, pos);
-        container.grid.putNode(node.getPoint(), node);
     }
 
     private void sendIntEntryToServer(final int speed, final SignalBoxNode node,
@@ -850,8 +858,6 @@ public class GuiSignalBox extends GuiBase {
         buffer.putByte((byte) rotation.ordinal());
         buffer.putByte((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
-        node.addAndSetEntry(new ModeSet(mode, rotation), entry, speed);
-        container.grid.putNode(node.getPoint(), node);
     }
 
     private void sendZS2Entry(final byte value, final SignalBoxNode node, final EnumGuiMode mode,
@@ -866,8 +872,6 @@ public class GuiSignalBox extends GuiBase {
         buffer.putByte((byte) rotation.ordinal());
         buffer.putByte((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
-        node.addAndSetEntry(new ModeSet(mode, rotation), entry, value);
-        container.grid.putNode(node.getPoint(), node);
     }
 
     private void removeEntryFromServer(final SignalBoxNode node, final EnumGuiMode mode,
@@ -881,7 +885,6 @@ public class GuiSignalBox extends GuiBase {
         buffer.putByte((byte) rotation.ordinal());
         buffer.putByte((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
-        node.getOption(new ModeSet(mode, rotation)).get().removeEntry(entry);
     }
 
     private void resetAllPathways() {
