@@ -539,6 +539,8 @@
 	"gui.notvalid": "Not Valid",
 	"gui.accepted": "Accepted",
 	"info.usage.savedpathways": "Saved paths",
+	"info.pathwaysaver": "Path saved",
+	"info.usage.show": "Show",
 	"property.delay.name": "Delay time",
 	"property.delay.desc": "Insert wonderful description",
 	"property.signal_repeater.name": "Signal repeater",
