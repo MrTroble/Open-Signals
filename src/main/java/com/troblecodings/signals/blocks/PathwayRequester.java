@@ -15,15 +15,23 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class PathwayRequester extends BasicBlock {
 
+    public static final BooleanProperty POWERD = BooleanProperty.create("powerd");
     public static final TileEntitySupplierWrapper WRAPPER = PathwayRequesterTileEntity::new;
 
     public PathwayRequester() {
         super(Properties.of(Material.METAL));
+    }
+
+    @Override
+    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+        builder.add(POWERD);
     }
 
     @Override
@@ -32,10 +40,15 @@ public class PathwayRequester extends BasicBlock {
         if (world.isClientSide)
             return;
         if (world.hasNeighborSignal(pos)) {
-            final BlockEntity entity = world.getBlockEntity(pos);
-            if (entity instanceof PathwayRequesterTileEntity) {
-                ((PathwayRequesterTileEntity) entity).requestPathway();
+            if (!state.getValue(POWERD)) {
+                world.setBlockAndUpdate(pos, state.setValue(POWERD, true));
+                final BlockEntity entity = world.getBlockEntity(pos);
+                if (entity instanceof PathwayRequesterTileEntity) {
+                    ((PathwayRequesterTileEntity) entity).requestPathway();
+                }
             }
+        } else {
+            world.setBlockAndUpdate(pos, state.setValue(POWERD, false));
         }
     }
 

@@ -63,6 +63,20 @@ public class PathwayHolder {
         this.modeGrid = grid.modeGrid;
     }
 
+    public boolean isValidStart(final Point point) {
+        final SignalBoxNode node = modeGrid.get(point);
+        if (node == null)
+            return false;
+        return node.isValidStart();
+    }
+
+    public boolean isValidEnd(final Point point) {
+        final SignalBoxNode node = modeGrid.get(point);
+        if (node == null)
+            return false;
+        return node.isValidEnd();
+    }
+
     public boolean requestWay(final Point p1, final Point p2) {
         if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
             return false;

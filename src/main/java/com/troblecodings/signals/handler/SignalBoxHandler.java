@@ -83,6 +83,19 @@ public final class SignalBoxHandler {
         holder.updateModeGrid(grid);
     }
 
+    public static boolean arePointsValidStartAndEnd(final PosIdentifier identifier,
+            final Point start, final Point end) {
+        if (identifier.world.isClientSide)
+            return false;
+        PathwayHolder grid;
+        synchronized (ALL_GRIDS) {
+            grid = ALL_GRIDS.get(identifier);
+        }
+        if (grid == null)
+            return false;
+        return grid.isValidStart(start) && grid.isValidEnd(end);
+    }
+
     public static List<Map.Entry<Point, Point>> getNextPathways(final PosIdentifier identifier) {
         if (identifier.world.isClientSide)
             return new ArrayList<>();

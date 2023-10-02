@@ -9,6 +9,7 @@ import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.signalbox.Point;
 
@@ -23,6 +24,20 @@ public class PathwayRequesterGui extends GuiBase {
         super(info);
         this.container = (PathwayRequesterContainer) info.base;
         this.player = info.player;
+        this.container.setConsumer(this::update);
+    }
+
+    private void update(final String str) {
+        final UIToolTip tooltip = new UIToolTip(str, true);
+        entity.add(tooltip);
+        new Thread(() -> {
+            try {
+                Thread.sleep(4000);
+            } catch (final InterruptedException e) {
+                e.printStackTrace();
+            }
+            entity.remove(tooltip);
+        }).start();
     }
 
     private void initOwn() {
@@ -72,9 +87,9 @@ public class PathwayRequesterGui extends GuiBase {
         startHbox.setHeight(25);
         startHbox.setInheritWidth(true);
 
-        startHbox.add(GuiElements.createLabel("Start X:"));
+        startHbox.add(GuiElements.createLabel("Start x:"));
         startHbox.add(startXEntity);
-        startHbox.add(GuiElements.createLabel("Start Y:"));
+        startHbox.add(GuiElements.createLabel("Start y:"));
         startHbox.add(startYEntity);
         startHbox.add(GuiElements.createButton(I18Wrapper.format("btn.parse"), e -> {
             try {
@@ -93,9 +108,9 @@ public class PathwayRequesterGui extends GuiBase {
         endHbox.setHeight(25);
         endHbox.setInheritWidth(true);
 
-        endHbox.add(GuiElements.createLabel("End X:"));
+        endHbox.add(GuiElements.createLabel("End x:"));
         endHbox.add(endXEntity);
-        endHbox.add(GuiElements.createLabel("End Y:"));
+        endHbox.add(GuiElements.createLabel("End y:"));
         endHbox.add(endYEntity);
         endHbox.add(GuiElements.createButton(I18Wrapper.format("btn.parse"), e -> {
             try {
