@@ -59,6 +59,7 @@ import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Rotation;
 
 public class GuiSignalBox extends GuiBase {
@@ -639,6 +640,14 @@ public class GuiSignalBox extends GuiBase {
                                             Map.Entry::getValue)));
                     break;
                 }
+                case SIGNALBOX: {
+                    initializePageSettings(entity,
+                            container.getPositionForTypes().entrySet().stream()
+                                    .filter(entry -> entry.getValue().equals(LinkType.SIGNALBOX))
+                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
+                                            Map.Entry::getValue)));
+                    break;
+                }
                 default:
                     break;
             }
@@ -665,7 +674,11 @@ public class GuiSignalBox extends GuiBase {
 
             final int id = t.ordinal();
             final UIEntity icon = new UIEntity();
-            icon.add(new UITexture(UISignalBoxTile.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1));
+            final UITexture texture = t.equals(LinkType.SIGNALBOX)
+                    ? new UITexture(new ResourceLocation(OpenSignalsMain.MODID,
+                            "textures/blocks/signalbox.png"))
+                    : new UITexture(UISignalBoxTile.ICON, 0.2 * id, 0.5, 0.2 * id + 0.2, 1);
+            icon.add(texture);
             icon.setHeight(20);
             icon.setWidth(20);
             icon.add(new UIToolTip(I18Wrapper.format("type." + t.name())));
