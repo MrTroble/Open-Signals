@@ -40,6 +40,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
     protected final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
+    protected final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
     protected SignalBoxGrid grid;
     private final Map<BlockPos, LinkType> propertiesForType = new HashMap<>();
     private SignalBoxTileEntity tile;
@@ -85,6 +86,16 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             entry.getKey().writeNetwork(buffer);
             entry.getValue().writeNetwork(buffer);
         });
+        final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
+        positions.entrySet().stream().filter(entry -> entry.getValue().equals(LinkType.SIGNALBOX))
+                .forEach(entry -> validInConnections.put(entry.getKey(), SignalBoxHandler
+                        .getAllInConnections(new PosIdentifier(entry.getKey(), info.world))));
+        buffer.putByte((byte) validInConnections.size());
+        validInConnections.forEach((pos, list) -> {
+            buffer.putBlockPos(pos);
+            buffer.putByte((byte) list.size());
+            list.forEach(point -> point.writeNetwork(buffer));
+        });
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -103,6 +114,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 propertiesForType.clear();
                 possibleSubsidiaries.clear();
                 nextPathways.clear();
+                validInConnections.clear();
                 final int signalSize = buffer.getInt();
                 for (int i = 0; i < signalSize; i++) {
                     final BlockPos signalPos = buffer.getBlockPos();
@@ -126,6 +138,16 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     final Point start = Point.of(buffer);
                     final Point end = Point.of(buffer);
                     nextPathways.add(Maps.immutableEntry(start, end));
+                }
+                final int validInConnectionsSize = buffer.getByteToUnsignedInt();
+                for (int i = 0; i < validInConnectionsSize; i++) {
+                    final BlockPos boxPos = buffer.getBlockPos();
+                    final List<Point> points = new ArrayList<>();
+                    final int listSize = buffer.getByteToUnsignedInt();
+                    for (int j = 0; j < listSize; j++) {
+                        points.add(Point.of(buffer));
+                    }
+                    validInConnections.put(boxPos, points);
                 }
                 update();
                 break;
@@ -210,6 +232,25 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             case REQUEST_PW: {
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
+                if (grid.getNode(end).containsOutConnection()) {
+                    if (!SignalBoxHandler.requesetInterSignalBoxPathway(
+                            new PosIdentifier(info.pos, info.world), start, end)) {
+                        if (SignalBoxHandler.addNextPathway(
+                                new PosIdentifier(tile.getBlockPos(), tile.getLevel()), start,
+                                end)) {
+                            final WriteBuffer sucess = new WriteBuffer();
+                            sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
+                            start.writeNetwork(sucess);
+                            end.writeNetwork(sucess);
+                            OpenSignalsMain.network.sendTo(info.player, sucess);
+                            break;
+                        }
+                        final WriteBuffer error = new WriteBuffer();
+                        error.putEnumValue(SignalBoxNetwork.NO_PW_FOUND);
+                        OpenSignalsMain.network.sendTo(info.player, error);
+                    }
+                    break;
+                }
                 if (!grid.requestWay(start, end)) {
                     if (SignalBoxHandler.addNextPathway(
                             new PosIdentifier(tile.getBlockPos(), tile.getLevel()), start, end)) {
@@ -290,6 +331,11 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final Point end = Point.of(buffer);
                 SignalBoxHandler.removeNextPathway(
                         new PosIdentifier(tile.getBlockPos(), info.world), start, end);
+                break;
+            }
+            case SEND_POINT_ENTRY: {
+                deserializeEntry(buffer, Point.of(buffer));
+                break;
             }
             default:
                 break;

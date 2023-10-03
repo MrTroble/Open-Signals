@@ -4,7 +4,7 @@ import java.util.Arrays;
 
 public enum PathType {
 
-    NORMAL(EnumGuiMode.HP, EnumGuiMode.END),
+    NORMAL(EnumGuiMode.HP, EnumGuiMode.END, EnumGuiMode.IN_CONNECTION, EnumGuiMode.OUT_CONNECTION),
     SHUNTING(EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END), NONE();
 
     private final EnumGuiMode[] modes;

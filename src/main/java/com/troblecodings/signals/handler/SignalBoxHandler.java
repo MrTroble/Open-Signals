@@ -20,17 +20,24 @@ import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.SubsidiaryState;
+import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.PathwayHolder;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
+import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.SignalBoxPathway;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
+import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.NbtIo;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.world.WorldEvent;
@@ -82,6 +89,42 @@ public final class SignalBoxHandler {
         holder.updateModeGrid(grid);
     }
 
+    public static List<Point> getValidStarts(final PosIdentifier identifier) {
+        if (identifier.world.isClientSide)
+            return new ArrayList<>();
+        PathwayHolder grid;
+        synchronized (ALL_GRIDS) {
+            grid = ALL_GRIDS.get(identifier);
+        }
+        if (grid == null)
+            return new ArrayList<>();
+        return grid.getValidStarts();
+    }
+
+    public static List<Point> getValidEnds(final PosIdentifier identifier) {
+        if (identifier.world.isClientSide)
+            return new ArrayList<>();
+        PathwayHolder grid;
+        synchronized (ALL_GRIDS) {
+            grid = ALL_GRIDS.get(identifier);
+        }
+        if (grid == null)
+            return new ArrayList<>();
+        return grid.getValidEnds();
+    }
+
+    public static List<Point> getAllInConnections(final PosIdentifier identifier) {
+        if (identifier.world.isClientSide)
+            return new ArrayList<>();
+        PathwayHolder grid;
+        synchronized (ALL_GRIDS) {
+            grid = ALL_GRIDS.get(identifier);
+        }
+        if (grid == null)
+            return new ArrayList<>();
+        return grid.getAllInConnections();
+    }
+
     public static boolean arePointsValidStartAndEnd(final PosIdentifier identifier,
             final Point start, final Point end) {
         if (identifier.world.isClientSide)
@@ -95,6 +138,74 @@ public final class SignalBoxHandler {
         return grid.isValidStart(start) && grid.isValidEnd(end);
     }
 
+    public static boolean requesetInterSignalBoxPathway(final PosIdentifier startBox,
+            final Point start, final Point end) {
+        if (startBox.world.isClientSide)
+            return false;
+        PathwayHolder startGrid;
+        synchronized (ALL_GRIDS) {
+            startGrid = ALL_GRIDS.get(startBox);
+        }
+        if (startGrid == null)
+            return false;
+        final SignalBoxNode endNode = startGrid.getNode(end);
+        PathOptionEntry outConnectionEntry = null;
+        for (final Rotation rot : Rotation.values()) {
+            final Optional<PathOptionEntry> entry = endNode
+                    .getOption(new ModeSet(EnumGuiMode.OUT_CONNECTION, rot));
+            if (entry.isPresent()) {
+                outConnectionEntry = entry.get();
+                break;
+            }
+        }
+        if (outConnectionEntry == null) {
+            return false;
+        }
+        final Optional<BlockPos> otherPos = outConnectionEntry.getEntry(PathEntryType.SIGNALBOX);
+        final Optional<Point> otherStartPoint = outConnectionEntry.getEntry(PathEntryType.POINT);
+        if (!otherPos.isPresent() || !otherStartPoint.isPresent())
+            return false;
+        PathwayHolder endGrid;
+        synchronized (ALL_GRIDS) {
+            endGrid = ALL_GRIDS.get(new PosIdentifier(otherPos.get(), startBox.world));
+        }
+        if (endGrid == null)
+            return false;
+        final SignalBoxNode otherStartNode = endGrid.getNode(otherStartPoint.get());
+        if (otherStartNode == null) {
+            return false;
+        }
+        PathOptionEntry inConnectionEntry = null;
+        for (final Rotation rot : Rotation.values()) {
+            final Optional<PathOptionEntry> entry = otherStartNode
+                    .getOption(new ModeSet(EnumGuiMode.IN_CONNECTION, rot));
+            if (entry.isPresent()) {
+                inConnectionEntry = entry.get();
+                break;
+            }
+        }
+        if (inConnectionEntry == null) {
+            return false;
+        }
+        final Optional<Point> otherEndPoint = inConnectionEntry.getEntry(PathEntryType.POINT);
+        if (!otherEndPoint.isPresent()) {
+            return false;
+        }
+        final boolean startRequeset = startGrid.requestWay(start, end);
+        final boolean endRequeset = endGrid.requestWay(otherStartPoint.get(), otherEndPoint.get());
+        if (!startRequeset || !endRequeset) {
+            startGrid.resetPathway(start);
+            endGrid.resetPathway(otherStartPoint.get());
+            return false;
+        }
+        final SignalBoxPathway startPath = startGrid.getPathwayByLastPoint(end);
+        final SignalBoxPathway endPath = endGrid.getPathwayByLastPoint(otherEndPoint.get());
+        startPath.setOtherPathwayToBlock(endPath);
+        endPath.setOtherPathwayToReset(startPath);
+        startPath.updatePathwaySignals();
+        return true;
+    }
+
     public static List<Map.Entry<Point, Point>> getNextPathways(final PosIdentifier identifier) {
         if (identifier.world.isClientSide)
             return new ArrayList<>();
@@ -105,6 +216,12 @@ public final class SignalBoxHandler {
         if (holder == null)
             return new ArrayList<>();
         return holder.getNextPathways();
+    }
+
+    public static PathwayHolder getPathwayHolder(final PosIdentifier identifier) {
+        synchronized (ALL_GRIDS) {
+            return ALL_GRIDS.get(identifier);
+        }
     }
 
     public static boolean addNextPathway(final PosIdentifier identifier, final Point start,

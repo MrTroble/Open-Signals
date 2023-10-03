@@ -140,6 +140,11 @@ public class SignalBoxGrid implements INetworkSavable {
         return ImmutableList.copyOf(this.modeGrid.values());
     }
 
+    public List<Point> getValidEnds() {
+        return modeGrid.values().stream().filter(SignalBoxNode::isValidEnd)
+                .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
+    }
+
     protected Map<Point, SignalBoxNode> getModeGrid() {
         return modeGrid;
     }

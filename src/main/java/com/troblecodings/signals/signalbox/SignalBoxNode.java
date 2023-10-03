@@ -144,6 +144,25 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                             break;
                     }
                     break;
+                case IN_CONNECTION: {
+                    switch (mode.rotation) {
+                        case NONE:
+                        case CLOCKWISE_180: {
+                            p1.translate(1, 0);
+                            p2.translate(-1, 0);
+                            break;
+                        }
+                        case CLOCKWISE_90:
+                        case COUNTERCLOCKWISE_90: {
+                            p1.translate(0, 1);
+                            p2.translate(0, -1);
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
                 default:
                     continue;
             }
@@ -286,7 +305,18 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public boolean isValidEnd() {
         return this.possibleModes.keySet().stream()
-                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode));
+                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode)
+                        || modeSet.mode.equals(EnumGuiMode.OUT_CONNECTION));
+    }
+
+    public boolean containsInConnection() {
+        return this.possibleModes.keySet().stream()
+                .anyMatch(modeSet -> modeSet.mode.equals(EnumGuiMode.IN_CONNECTION));
+    }
+
+    public boolean containsOutConnection() {
+        return this.possibleModes.keySet().stream()
+                .anyMatch(modeSet -> modeSet.mode.equals(EnumGuiMode.OUT_CONNECTION));
     }
 
     public Set<Path> connections() {

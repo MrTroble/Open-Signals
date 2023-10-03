@@ -424,6 +424,60 @@ public class GuiSignalBox extends GuiBase {
                         }, option.getEntry(PathEntryType.DELAY).orElse(0)));
                 break;
             }
+            case OUT_CONNECTION: {
+                selectLink(parent, node, option, entrySet, LinkType.SIGNALBOX,
+                        PathEntryType.SIGNALBOX, mode, rotation);
+                final Optional<BlockPos> boxPos = option.getEntry(PathEntryType.SIGNALBOX);
+                if (!boxPos.isPresent())
+                    break;
+                final List<Point> validInConnections = container.validInConnections
+                        .getOrDefault(boxPos.get(), new ArrayList<>());
+                if (validInConnections.isEmpty())
+                    break;
+                final IIntegerable<String> integerable = new DisableIntegerable<>(
+                        SizeIntegerables.of("inconnection", validInConnections.size(), id -> {
+                            final Point point = validInConnections.get(id);
+                            if (point == null)
+                                return "Disabled";
+                            return point.toShortString();
+                        }));
+                parent.add(GuiElements.createEnumElement(integerable, e -> {
+                    final Point point = validInConnections.get(e);
+                    if (point == null) {
+                        option.removeEntry(PathEntryType.POINT);
+                        removeEntryFromServer(node, mode, rotation, PathEntryType.POINT);
+                    } else {
+                        option.setEntry(PathEntryType.POINT, point);
+                        sendPointEntry(point, node, mode, rotation, PathEntryType.POINT);
+                    }
+                }, option.getEntry(PathEntryType.POINT)
+                        .map(point -> validInConnections.indexOf(point)).orElse(-1)));
+                break;
+            }
+            case IN_CONNECTION: {
+                final List<Point> validEnds = container.grid.getValidEnds();
+                if (validEnds.isEmpty())
+                    break;
+                final IIntegerable<String> integerable = new DisableIntegerable<>(
+                        SizeIntegerables.of("inconnection", validEnds.size(), id -> {
+                            final Point point = validEnds.get(id);
+                            if (point == null)
+                                return "Disabled";
+                            return point.toShortString();
+                        }));
+                parent.add(GuiElements.createEnumElement(integerable, e -> {
+                    final Point point = validEnds.get(e);
+                    if (point == null) {
+                        option.removeEntry(PathEntryType.POINT);
+                        removeEntryFromServer(node, mode, rotation, PathEntryType.POINT);
+                    } else {
+                        option.setEntry(PathEntryType.POINT, point);
+                        sendPointEntry(point, node, mode, rotation, PathEntryType.POINT);
+                    }
+                }, option.getEntry(PathEntryType.POINT).map(point -> validEnds.indexOf(point))
+                        .orElse(-1)));
+                break;
+            }
             default:
                 break;
         }
@@ -456,24 +510,27 @@ public class GuiSignalBox extends GuiBase {
 
     private void tileNormal(final UIEntity tile, final UISignalBoxTile currentTile) {
         tile.add(new UIClickable(c -> {
-            if (!currentTile.isValidStart())
-                return;
-            final UIColor previous = colors.get(currentTile.getPoint());
-            if (previous != null)
-                previous.getParent().remove(previous);
-
-            final UIColor newColor = new UIColor(SELECTION_COLOR);
-            c.add(newColor);
-            colors.put(currentTile.getPoint(), newColor);
             if (lastTile == null) {
-                lastTile = currentTile;
+                if (currentTile.isValidStart()) {
+                    this.lastTile = currentTile;
+                    final UIColor previous = colors.get(currentTile.getPoint());
+                    if (previous != null)
+                        previous.getParent().remove(previous);
+
+                    final UIColor newColor = new UIColor(SELECTION_COLOR);
+                    c.add(newColor);
+                    colors.put(currentTile.getPoint(), newColor);
+                }
             } else {
                 if (lastTile == currentTile) {
                     this.resetTileSelection();
                     return;
                 }
-                sendPWRequest(currentTile.getNode());
-                this.resetTileSelection();
+                if (currentTile.isValidEnd()) {
+                    sendPWRequest(currentTile.getNode());
+                    this.resetTileSelection();
+                    return;
+                }
             }
         }));
         tile.add(new UIClickable(e -> openNodeShortcuts(currentTile.getNode(), e), 1));
@@ -869,6 +926,20 @@ public class GuiSignalBox extends GuiBase {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_ZS2_ENTRY);
         buffer.putByte(value);
+        node.getPoint().writeNetwork(buffer);
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+        buffer.putByte((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void sendPointEntry(final Point point, final SignalBoxNode node, final EnumGuiMode mode,
+            final Rotation rotation, final PathEntryType<Point> entry) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_POINT_ENTRY);
+        point.writeNetwork(buffer);
         node.getPoint().writeNetwork(buffer);
         buffer.putByte((byte) mode.ordinal());
         buffer.putByte((byte) rotation.ordinal());

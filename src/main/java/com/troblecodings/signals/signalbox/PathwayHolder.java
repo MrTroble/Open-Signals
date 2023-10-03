@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
@@ -12,15 +13,19 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 
-public class PathwayHolder {
+public class PathwayHolder implements IChunkLoadable {
 
     private static final String PATHWAY_LIST = "pathwayList";
     private static final String NEXT_PATHWAYS = "nextPathways";
@@ -64,6 +69,7 @@ public class PathwayHolder {
     }
 
     public boolean isValidStart(final Point point) {
+        checkTileWasLoaded();
         final SignalBoxNode node = modeGrid.get(point);
         if (node == null)
             return false;
@@ -71,15 +77,40 @@ public class PathwayHolder {
     }
 
     public boolean isValidEnd(final Point point) {
+        checkTileWasLoaded();
         final SignalBoxNode node = modeGrid.get(point);
         if (node == null)
             return false;
         return node.isValidEnd();
     }
 
+    public List<Point> getValidStarts() {
+        checkTileWasLoaded();
+        return modeGrid.values().stream().filter(SignalBoxNode::isValidStart)
+                .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
+    }
+
+    public List<Point> getValidEnds() {
+        checkTileWasLoaded();
+        return modeGrid.values().stream().filter(SignalBoxNode::isValidEnd)
+                .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
+    }
+
+    public List<Point> getAllInConnections() {
+        checkTileWasLoaded();
+        return modeGrid.values().stream().filter(SignalBoxNode::containsInConnection)
+                .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
+    }
+
+    public SignalBoxNode getNode(final Point point) {
+        checkTileWasLoaded();
+        return modeGrid.get(point);
+    }
+
     public boolean requestWay(final Point p1, final Point p2) {
         if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
             return false;
+        checkTileWasLoaded();
         final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
         ways.ifPresent(way -> {
             way.setWorldAndPos(world, tilePos);
@@ -94,6 +125,18 @@ public class PathwayHolder {
             updateToNet(way);
         });
         return ways.isPresent();
+    }
+
+    private void checkTileWasLoaded() {
+        if (modeGrid == null || modeGrid.isEmpty()) {
+            loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) world, tilePos,
+                    (tile, _u) -> {
+                    });
+        }
+    }
+
+    public SignalBoxPathway getPathwayByLastPoint(final Point end) {
+        return endsToPath.get(end);
     }
 
     private void updatePrevious(final SignalBoxPathway pathway) {
@@ -174,6 +217,22 @@ public class PathwayHolder {
 
     private void tryNextPathways() {
         nextPathways.removeIf(entry -> {
+            if (getNode(entry.getKey()).containsOutConnection()) {
+                final boolean bool = SignalBoxHandler.requesetInterSignalBoxPathway(
+                        new PosIdentifier(tilePos, world), entry.getKey(), entry.getValue());
+                if (bool) {
+                    final SignalBoxTileEntity tile = (SignalBoxTileEntity) world
+                            .getBlockEntity(tilePos);
+                    if (tile == null || !tile.isBlocked())
+                        return bool;
+                    final WriteBuffer buffer = new WriteBuffer();
+                    buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
+                    entry.getKey().writeNetwork(buffer);
+                    entry.getValue().writeNetwork(buffer);
+                    OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
+                }
+                return bool;
+            }
             final boolean bool = requestWay(entry.getKey(), entry.getValue());
             if (bool) {
                 final SignalBoxTileEntity tile = (SignalBoxTileEntity) world
@@ -222,7 +281,7 @@ public class PathwayHolder {
         tryNextPathways();
     }
 
-    private void resetPathway(final SignalBoxPathway pathway) {
+    protected void resetPathway(final SignalBoxPathway pathway) {
         pathway.resetPathway();
         updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());

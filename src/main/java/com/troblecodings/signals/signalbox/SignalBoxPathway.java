@@ -70,6 +70,9 @@ public class SignalBoxPathway {
     private Point originalFirstPoint = null;
     private Consumer<SignalBoxPathway> consumer;
 
+    private SignalBoxPathway pathwayToBlock;
+    private SignalBoxPathway pathwayToReset;
+
     public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
         this.modeGrid = modeGrid;
     }
@@ -257,9 +260,7 @@ public class SignalBoxPathway {
         setPathStatus(status, null);
     }
 
-    public void updatePathwaySignals() {
-        if (world == null)
-            return;
+    private SignalStateInfo getLastSignalInfo() {
         final PosIdentifier identifier = new PosIdentifier(tilePos, world);
         SignalStateInfo lastInfo = null;
         if (lastSignal.isPresent()) {
@@ -267,9 +268,27 @@ public class SignalBoxPathway {
             if (nextSignal != null)
                 lastInfo = new SignalStateInfo(world, lastSignal.get().pos, nextSignal);
         }
-        final SignalStateInfo lastSignal = lastInfo;
+        if (pathwayToBlock != null && pathwayToBlock.lastSignal.isPresent()) {
+            final Signal nextSignal = SignalBoxHandler.getSignal(
+                    new PosIdentifier(pathwayToBlock.tilePos, pathwayToBlock.world),
+                    pathwayToBlock.lastSignal.get().pos);
+            if (nextSignal != null)
+                lastInfo = new SignalStateInfo(world, pathwayToBlock.lastSignal.get().pos,
+                        nextSignal);
+        }
+        return lastInfo;
+    }
+
+    public void updatePathwaySignals() {
+        if (world == null)
+            return;
+        final SignalStateInfo lastSignal = getLastSignalInfo();
         if (delay > 0) {
             setPathStatus(EnumPathUsage.PREPARED);
+            if (pathwayToBlock != null) {
+                pathwayToBlock.setPathStatus(EnumPathUsage.PREPARED);
+                pathwayToBlock.consumer.accept(pathwayToBlock);
+            }
             SERVICE.execute(() -> {
                 try {
                     Thread.sleep(delay * 1000);
@@ -280,7 +299,14 @@ public class SignalBoxPathway {
                     setSignals(lastSignal);
                 }
                 setPathStatus(EnumPathUsage.SELECTED);
-                world.getServer().execute(() -> consumer.accept(this));
+                if (pathwayToBlock != null) {
+                    pathwayToBlock.setPathStatus(EnumPathUsage.SELECTED);
+                }
+                world.getServer().execute(() -> {
+                    consumer.accept(this);
+                    if (pathwayToBlock != null)
+                        pathwayToBlock.consumer.accept(pathwayToBlock);
+                });
             });
             return;
         }
@@ -305,10 +331,25 @@ public class SignalBoxPathway {
             SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position.pos, current),
                     lastSignal, speed, zs2Value, type, position.isRepeater));
         });
+        if (this.lastSignal.isPresent() && pathwayToReset != null) {
+            final Signal signal = SignalBoxHandler.getSignal(identifier, this.lastSignal.get().pos);
+            if (signal == null)
+                return;
+            pathwayToReset
+                    .setSignals(new SignalStateInfo(world, this.lastSignal.get().pos, signal));
+        }
     }
 
     public void setUpdater(final Consumer<SignalBoxPathway> consumer) {
         this.consumer = consumer;
+    }
+
+    public void setOtherPathwayToBlock(final SignalBoxPathway pathway) {
+        this.pathwayToBlock = pathway;
+    }
+
+    public void setOtherPathwayToReset(final SignalBoxPathway pathway) {
+        this.pathwayToReset = pathway;
     }
 
     public void resetPathway() {
@@ -346,6 +387,12 @@ public class SignalBoxPathway {
             this.emptyOrBroken = true;
             this.isBlocked = false;
             resetOther();
+            if (pathwayToReset != null) {
+                final PathwayHolder holder = SignalBoxHandler.getPathwayHolder(
+                        new PosIdentifier(pathwayToReset.tilePos, pathwayToReset.world));
+                holder.resetPathway(pathwayToReset);
+                pathwayToReset.consumer.accept(pathwayToReset);
+            }
         }
     }
 
@@ -445,6 +492,10 @@ public class SignalBoxPathway {
         resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
         isBlocked = true;
+        if (pathwayToBlock != null) {
+            pathwayToBlock.setPathStatus(EnumPathUsage.BLOCKED);
+            pathwayToBlock.consumer.accept(pathwayToBlock);
+        }
         return true;
     }
 

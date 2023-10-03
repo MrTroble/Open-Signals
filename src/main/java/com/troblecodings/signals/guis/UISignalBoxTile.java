@@ -101,6 +101,10 @@ public class UISignalBoxTile extends UIComponentEntity {
         return this.node.isValidStart();
     }
 
+    public boolean isValidEnd() {
+        return this.node.isValidEnd();
+    }
+
     public Point getPoint() {
         return this.node.getPoint();
     }

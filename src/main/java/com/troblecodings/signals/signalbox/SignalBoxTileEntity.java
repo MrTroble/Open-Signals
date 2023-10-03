@@ -79,6 +79,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             type = LinkType.INPUT;
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
+        } else if (block == OSBlocks.SIGNAL_BOX) {
+            type = LinkType.SIGNALBOX;
         }
         if (type.equals(LinkType.SIGNAL)) {
             SignalStateHandler.loadSignal(new SignalStateInfo(level, pos, (Signal) block));
