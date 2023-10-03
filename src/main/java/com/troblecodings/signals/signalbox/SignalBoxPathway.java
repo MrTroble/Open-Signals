@@ -37,13 +37,15 @@ import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class SignalBoxPathway {
+public class SignalBoxPathway implements IChunkLoadable {
 
     private final ExecutorService SERVICE = Executors.newCachedThreadPool();
 
@@ -171,6 +173,10 @@ public class SignalBoxPathway {
     private static final String PATH_TYPE = "pathType";
     private static final String IS_BLOCKED = "isBlocked";
     private static final String ORIGINAL_FIRST_POINT = "origianlFirstPoint";
+    private static final String PATHWAY_TO_BLOCK = "pathwayToBlock";
+    private static final String PATHWAY_TO_RESET = "pathwayToReset";
+    private static final String END_POINT = "endPoint";
+    private static final String TILE_POS = "signalBoxPos";
 
     public void write(final NBTWrapper tag) {
         tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
@@ -184,6 +190,22 @@ public class SignalBoxPathway {
             final NBTWrapper originalFirstPoint = new NBTWrapper();
             this.originalFirstPoint.write(originalFirstPoint);
             tag.putWrapper(ORIGINAL_FIRST_POINT, originalFirstPoint);
+        }
+        if (pathwayToBlock != null) {
+            final NBTWrapper blockWrapper = new NBTWrapper();
+            blockWrapper.putBlockPos(TILE_POS, pathwayToBlock.tilePos);
+            final NBTWrapper pointWrapper = new NBTWrapper();
+            pathwayToBlock.lastPoint.write(pointWrapper);
+            blockWrapper.putWrapper(END_POINT, pointWrapper);
+            tag.putWrapper(PATHWAY_TO_BLOCK, blockWrapper);
+        }
+        if (pathwayToReset != null) {
+            final NBTWrapper resetWrapper = new NBTWrapper();
+            resetWrapper.putBlockPos(TILE_POS, pathwayToReset.tilePos);
+            final NBTWrapper pointWrapper = new NBTWrapper();
+            pathwayToReset.lastPoint.write(pointWrapper);
+            resetWrapper.putWrapper(END_POINT, pointWrapper);
+            tag.putWrapper(PATHWAY_TO_RESET, resetWrapper);
         }
     }
 
@@ -217,6 +239,41 @@ public class SignalBoxPathway {
             this.originalFirstPoint.read(originalFirstPoint);
         }
         updatePathwayToAutomatic();
+    }
+
+    public void readLinkedPathways(final NBTWrapper tag) {
+        if (world == null)
+            return;
+        final NBTWrapper blockWrapper = tag.getWrapper(PATHWAY_TO_BLOCK);
+        if (!blockWrapper.isTagNull()) {
+            final Point end = new Point();
+            end.read(blockWrapper.getWrapper(END_POINT));
+            final BlockPos otherPos = blockWrapper.getBlockPos(TILE_POS);
+            PathwayHolder holder = SignalBoxHandler
+                    .getPathwayHolder(new PosIdentifier(otherPos, world));
+            if (holder == null) {
+                loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) world, otherPos,
+                        (tile, _u) -> tile.onLoad());
+                holder = SignalBoxHandler.getPathwayHolder(new PosIdentifier(otherPos, world));
+            }
+            final SignalBoxPathway otherPathway = holder.getPathwayByLastPoint(end);
+            pathwayToBlock = otherPathway;
+        }
+        final NBTWrapper resetWrapper = tag.getWrapper(PATHWAY_TO_RESET);
+        if (!resetWrapper.isTagNull()) {
+            final Point end = new Point();
+            end.read(resetWrapper.getWrapper(END_POINT));
+            final BlockPos otherPos = resetWrapper.getBlockPos(TILE_POS);
+            PathwayHolder holder = SignalBoxHandler
+                    .getPathwayHolder(new PosIdentifier(otherPos, world));
+            if (holder == null) {
+                loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) world, otherPos,
+                        (tile, _u) -> tile.onLoad());
+                holder = SignalBoxHandler.getPathwayHolder(new PosIdentifier(otherPos, world));
+            }
+            final SignalBoxPathway otherPathway = holder.getPathwayByLastPoint(end);
+            pathwayToReset = otherPathway;
+        }
     }
 
     private void foreachEntry(final Consumer<PathOptionEntry> consumer,

@@ -235,16 +235,6 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 if (grid.getNode(end).containsOutConnection()) {
                     if (!SignalBoxHandler.requesetInterSignalBoxPathway(
                             new PosIdentifier(info.pos, info.world), start, end)) {
-                        if (SignalBoxHandler.addNextPathway(
-                                new PosIdentifier(tile.getBlockPos(), tile.getLevel()), start,
-                                end)) {
-                            final WriteBuffer sucess = new WriteBuffer();
-                            sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
-                            start.writeNetwork(sucess);
-                            end.writeNetwork(sucess);
-                            OpenSignalsMain.network.sendTo(info.player, sucess);
-                            break;
-                        }
                         final WriteBuffer error = new WriteBuffer();
                         error.putEnumValue(SignalBoxNetwork.NO_PW_FOUND);
                         OpenSignalsMain.network.sendTo(info.player, error);
@@ -325,6 +315,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 } else {
                     node.addAndSetEntry(modeSet, PathEntryType.SIGNAL_REPEATER, state);
                 }
+                break;
             }
             case REMOVE_SAVEDPW: {
                 final Point start = Point.of(buffer);

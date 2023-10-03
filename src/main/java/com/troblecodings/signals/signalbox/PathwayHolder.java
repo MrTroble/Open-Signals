@@ -13,11 +13,9 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
-import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
@@ -217,22 +215,6 @@ public class PathwayHolder implements IChunkLoadable {
 
     private void tryNextPathways() {
         nextPathways.removeIf(entry -> {
-            if (getNode(entry.getKey()).containsOutConnection()) {
-                final boolean bool = SignalBoxHandler.requesetInterSignalBoxPathway(
-                        new PosIdentifier(tilePos, world), entry.getKey(), entry.getValue());
-                if (bool) {
-                    final SignalBoxTileEntity tile = (SignalBoxTileEntity) world
-                            .getBlockEntity(tilePos);
-                    if (tile == null || !tile.isBlocked())
-                        return bool;
-                    final WriteBuffer buffer = new WriteBuffer();
-                    buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
-                    entry.getKey().writeNetwork(buffer);
-                    entry.getValue().writeNetwork(buffer);
-                    OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
-                }
-                return bool;
-            }
             final boolean bool = requestWay(entry.getKey(), entry.getValue());
             if (bool) {
                 final SignalBoxTileEntity tile = (SignalBoxTileEntity) world
@@ -314,14 +296,15 @@ public class PathwayHolder implements IChunkLoadable {
                 updatePrevious(way);
                 updateToNet(way);
             });
+            pathway.setWorldAndPos(world, tilePos);
             pathway.read(comp);
             if (pathway.isEmptyOrBroken()) {
                 OpenSignalsMain.getLogger()
                         .error("Remove empty or broken pathway, try to recover!");
                 return;
             }
-            pathway.setWorldAndPos(world, tilePos);
             onWayAdd(pathway);
+            pathway.readLinkedPathways(comp);
         });
         tag.getList(NEXT_PATHWAYS).forEach(comp -> {
             final Point start = new Point();
