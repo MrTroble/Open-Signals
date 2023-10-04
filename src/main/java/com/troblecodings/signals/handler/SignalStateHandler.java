@@ -149,21 +149,28 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         }
         final AtomicBoolean contains = new AtomicBoolean(false);
+        final Map<SEProperty, String> changedProperties = new HashMap<>();
         synchronized (CURRENTLY_LOADED_STATES) {
             if (CURRENTLY_LOADED_STATES.containsKey(info)) {
                 contains.set(true);
                 final Map<SEProperty, String> oldStates = new HashMap<>(
                         CURRENTLY_LOADED_STATES.get(info));
+                states.entrySet().stream().filter(entry -> {
+                    final String oldState = oldStates.get(entry.getKey());
+                    return !entry.getValue().equals(oldState);
+                }).forEach(entry -> changedProperties.put(entry.getKey(), entry.getValue()));
                 oldStates.putAll(states);
                 CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
+            } else {
+                changedProperties.putAll(states);
             }
         }
         new Thread(() -> {
-            sendToAll(info, states);
+            sendToAll(info, changedProperties);
             updateListeners(info, false);
             info.signal.getUpdate(info.world, info.pos);
             if (!contains.get())
-                createToFile(info, states);
+                createToFile(info, changedProperties);
         }, "OSSignalStateHandler:setStates").start();
         info.world.updateNeighborsAt(info.pos, info.signal);
     }
