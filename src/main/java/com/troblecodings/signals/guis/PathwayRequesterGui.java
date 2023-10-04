@@ -2,14 +2,14 @@ package com.troblecodings.signals.guis;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
+import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.signalbox.Point;
 
@@ -24,133 +24,57 @@ public class PathwayRequesterGui extends GuiBase {
         super(info);
         this.container = (PathwayRequesterContainer) info.base;
         this.player = info.player;
-        this.container.setConsumer(this::update);
-    }
-
-    private void update(final String str) {
-        final UIToolTip tooltip = new UIToolTip(str, true);
-        entity.add(tooltip);
-        new Thread(() -> {
-            try {
-                Thread.sleep(4000);
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
-            entity.remove(tooltip);
-        }).start();
     }
 
     private void initOwn() {
         this.entity.clear();
-        this.entity.add(new UIBox(UIBox.HBOX, 5));
+        this.entity.add(new UIBox(UIBox.VBOX, 5));
 
         final UIEntity inner = new UIEntity();
+        inner.setWidth(200);
         inner.setInheritHeight(true);
-        inner.setInheritWidth(true);
-        inner.add(new UIBox(UIBox.VBOX, 2));
-        this.entity.add(GuiElements.createSpacerH(10));
-        this.entity.add(inner);
-        this.entity.add(GuiElements.createSpacerH(10));
+        inner.setX(70);
+        inner.add(new UIBox(UIBox.VBOX, 5));
+        inner.add(GuiElements.createSpacerV(10));
 
-        final UITextInput startX = new UITextInput(container.start.getX() + "");
-        final UITextInput startY = new UITextInput(container.start.getY() + "");
-        final UITextInput endX = new UITextInput(container.end.getX() + "");
-        final UITextInput endY = new UITextInput(container.end.getY() + "");
+        final UIEntity label = GuiElements.createLabel(I18Wrapper.format("tile.pathwayrequester"),
+                0x7678a0);
+        label.setScaleX(1.5f);
+        label.setScaleY(1.5f);
+        label.setX(-6);
+        inner.add(label);
+        inner.add(GuiElements.createSpacerV(20));
 
-        final UIEntity startXEntity = new UIEntity();
-        startXEntity.setHeight(20);
-        startXEntity.setInheritWidth(true);
-        startXEntity.add(startX);
+        final IIntegerable<String> start = SizeIntegerables.of("StartPoint",
+                container.validStarts.size(), e -> container.validStarts.get(e).toShortString());
+        final IIntegerable<String> end = SizeIntegerables.of("EndPoint",
+                container.validStarts.size(), e -> container.validEnds.get(e).toShortString());
 
-        final UIEntity startYEntity = new UIEntity();
-        startYEntity.setHeight(20);
-        startYEntity.setInheritWidth(true);
-        startYEntity.add(startY);
-
-        final UIEntity endXEntity = new UIEntity();
-        endXEntity.setHeight(20);
-        endXEntity.setInheritWidth(true);
-        endXEntity.add(endX);
-
-        final UIEntity endYEntity = new UIEntity();
-        endYEntity.setHeight(20);
-        endYEntity.setInheritWidth(true);
-        endYEntity.add(endY);
-
-        final UILabel startLabel = new UILabel("Start: " + container.start.toShortString());
-        startLabel.setCenterY(false);
-        final UILabel endLabel = new UILabel("End: " + container.end.toShortString());
-        endLabel.setCenterY(false);
-
-        final UIEntity startHbox = new UIEntity();
-        startHbox.add(new UIBox(UIBox.HBOX, 2));
-        startHbox.setHeight(25);
-        startHbox.setInheritWidth(true);
-
-        startHbox.add(GuiElements.createLabel("Start x:"));
-        startHbox.add(startXEntity);
-        startHbox.add(GuiElements.createLabel("Start y:"));
-        startHbox.add(startYEntity);
-        startHbox.add(GuiElements.createButton(I18Wrapper.format("btn.parse"), e -> {
-            try {
-                final Point newStart = new Point(Integer.parseInt(startX.getText()),
-                        Integer.parseInt(startY.getText()));
-                container.start = newStart;
-                startLabel.setText("Start: " + newStart.toShortString());
-            } catch (Exception e2) {
-                startLabel.setText(I18Wrapper.format("btn.invalid"));
-            }
-        }));
-        inner.add(startHbox);
-
-        final UIEntity endHbox = new UIEntity();
-        endHbox.add(new UIBox(UIBox.HBOX, 2));
-        endHbox.setHeight(25);
-        endHbox.setInheritWidth(true);
-
-        endHbox.add(GuiElements.createLabel("End x:"));
-        endHbox.add(endXEntity);
-        endHbox.add(GuiElements.createLabel("End y:"));
-        endHbox.add(endYEntity);
-        endHbox.add(GuiElements.createButton(I18Wrapper.format("btn.parse"), e -> {
-            try {
-                final Point newEnd = new Point(Integer.parseInt(endX.getText()),
-                        Integer.parseInt(endY.getText()));
-                container.end = newEnd;
-                endLabel.setText("End: " + newEnd.toShortString());
-            } catch (Exception e2) {
-                endLabel.setText(I18Wrapper.format("btn.invalid"));
-            }
-        }));
-        inner.add(endHbox);
-        inner.add(GuiElements.createSpacerV(5));
-
-        final UIEntity startLabelEntity = new UIEntity();
-        startLabelEntity.setHeight(20);
-        startLabelEntity.setInheritWidth(true);
-        startLabelEntity.add(startLabel);
-
-        final UIEntity endLabelEntity = new UIEntity();
-        endLabelEntity.setHeight(20);
-        endLabelEntity.setInheritWidth(true);
-        endLabelEntity.add(endLabel);
-
-        inner.add(startLabelEntity);
-        inner.add(endLabelEntity);
+        inner.add(GuiElements.createEnumElement(start, e -> {
+            container.start = container.validStarts.get(e);
+        }, container.start != null ? container.start.equals(new Point()) ? 0
+                : container.validStarts.indexOf(container.start) : 0));
+        inner.add(GuiElements.createEnumElement(end, e -> {
+            container.end = container.validStarts.get(e);
+        }, container.end != null
+                ? container.end.equals(new Point()) ? 0 : container.validEnds.indexOf(container.end)
+                : 0));
 
         inner.add(GuiElements.createButton(I18Wrapper.format("btn.save"), e -> sendToServer()));
         inner.add(GuiElements.createSpacerV(5));
 
-        final UILabel label = new UILabel("Linked SignalBox: "
+        final UILabel Linkedlabel = new UILabel("Linked SignalBox: "
                 + (container.linkedPos == null ? "Not linked!" : container.linkedPos.toString()));
-        label.setCenterY(false);
+        Linkedlabel.setCenterY(false);
 
         final UIEntity posLabel = new UIEntity();
         posLabel.setHeight(20);
         posLabel.setInheritWidth(true);
-        posLabel.add(label);
+        posLabel.add(Linkedlabel);
 
         inner.add(posLabel);
+
+        entity.add(inner);
     }
 
     @Override

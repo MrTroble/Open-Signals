@@ -1,9 +1,9 @@
 package com.troblecodings.signals.guis;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
-import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
@@ -12,19 +12,21 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import com.troblecodings.signals.tileentitys.PathwayRequesterTileEntity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 
-public class PathwayRequesterContainer extends ContainerBase {
+public class PathwayRequesterContainer extends ContainerBase implements IChunkLoadable {
 
+    protected final List<Point> validStarts = new ArrayList<>();
+    protected final List<Point> validEnds = new ArrayList<>();
     protected PathwayRequesterTileEntity tile;
     protected Point start = null;
     protected Point end = null;
     protected BlockPos linkedPos;
-    private boolean dataSend = false;
-    private Consumer<String> infoUpdates = s -> {
-    };
 
     public PathwayRequesterContainer(GuiInfo info) {
         super(info);
@@ -41,43 +43,48 @@ public class PathwayRequesterContainer extends ContainerBase {
         final Map.Entry<Point, Point> previousPathway = tile.getNextPathway();
         previousPathway.getKey().writeNetwork(buffer);
         previousPathway.getValue().writeNetwork(buffer);
+        if (signalBoxPos != null) {
+            final PosIdentifier identifier = new PosIdentifier(signalBoxPos, info.world);
+            List<Point> validStarts = SignalBoxHandler.getValidStarts(identifier);
+            if (validStarts == null || validStarts.isEmpty()) {
+                loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) info.world,
+                        signalBoxPos, (boxTile, _u) -> boxTile.onLoad());
+                validStarts = SignalBoxHandler.getValidStarts(identifier);
+            }
+            List<Point> validEnds = SignalBoxHandler.getValidEnds(identifier);
+            buffer.putByte((byte) validStarts.size());
+            validStarts.forEach(point -> point.writeNetwork(buffer));
+            buffer.putByte((byte) validEnds.size());
+            validEnds.forEach(point -> point.writeNetwork(buffer));
+        }
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     @Override
     public void deserializeClient(ReadBuffer buffer) {
-        if (!dataSend) {
-            this.linkedPos = buffer.getBlockPos();
-            if (this.linkedPos.equals(BlockPos.ZERO))
-                this.linkedPos = null;
-            start = Point.of(buffer);
-            end = Point.of(buffer);
-            dataSend = true;
-            update();
-            return;
+        this.linkedPos = buffer.getBlockPos();
+        if (this.linkedPos.equals(BlockPos.ZERO))
+            this.linkedPos = null;
+        start = Point.of(buffer);
+        end = Point.of(buffer);
+
+        validStarts.clear();
+        validEnds.clear();
+        final int validStartsSize = buffer.getByteToUnsignedInt();
+        for (int i = 0; i < validStartsSize; i++) {
+            validStarts.add(Point.of(buffer));
         }
-        final int message = buffer.getByteToUnsignedInt();
-        infoUpdates.accept(message == 1 ? I18Wrapper.format("gui.accepted")
-                : I18Wrapper.format("gui.notvalid"));
+        final int validEndsSize = buffer.getByteToUnsignedInt();
+        for (int i = 0; i < validEndsSize; i++) {
+            validEnds.add(Point.of(buffer));
+        }
+        update();
     }
 
     @Override
     public void deserializeServer(ReadBuffer buffer) {
         final Point start = Point.of(buffer);
         final Point end = Point.of(buffer);
-        final WriteBuffer awnser = new WriteBuffer();
-        if (SignalBoxHandler.arePointsValidStartAndEnd(
-                new PosIdentifier(tile.getLinkedSignalBox(), info.world), start, end)) {
-            tile.setNextPathway(start, end);
-            awnser.putByte((byte) 1);
-        } else {
-            awnser.putByte((byte) 0);
-        }
-        OpenSignalsMain.network.sendTo(info.player, awnser);
+        tile.setNextPathway(start, end);
     }
-
-    public void setConsumer(final Consumer<String> consumer) {
-        this.infoUpdates = consumer;
-    }
-
 }

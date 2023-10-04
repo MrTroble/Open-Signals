@@ -57,7 +57,7 @@ public class PathwayRequester extends BasicBlock {
     public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
             InteractionHand hand, BlockHitResult result) {
         final Item item = player.getMainHandItem().getItem();
-        if (item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL)) {
+        if (!(item.equals(OSItems.LINKING_TOOL) && item.equals(OSItems.MULTI_LINKING_TOOL))) {
             OpenSignalsMain.handler.invokeGui(PathwayRequester.class, player, world, pos,
                     "pathwayrequester");
             return InteractionResult.SUCCESS;
