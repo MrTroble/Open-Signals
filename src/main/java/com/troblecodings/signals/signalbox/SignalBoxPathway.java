@@ -71,6 +71,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     private boolean isAutoPathway = false;
     private Point originalFirstPoint = null;
     private Consumer<SignalBoxPathway> consumer;
+    private boolean isPathwayReseted = false;
 
     private SignalBoxPathway pathwayToBlock;
     private SignalBoxPathway pathwayToReset;
@@ -317,7 +318,11 @@ public class SignalBoxPathway implements IChunkLoadable {
         setPathStatus(status, null);
     }
 
+    private SignalStateInfo lastSignalInfo = null;
+
     private SignalStateInfo getLastSignalInfo() {
+        if (lastSignalInfo != null)
+            return lastSignalInfo;
         final PosIdentifier identifier = new PosIdentifier(tilePos, world);
         SignalStateInfo lastInfo = null;
         if (lastSignal.isPresent()) {
@@ -336,6 +341,8 @@ public class SignalBoxPathway implements IChunkLoadable {
         return lastInfo;
     }
 
+    private boolean isExecutingSignalSet = false;
+
     public void updatePathwaySignals() {
         if (world == null)
             return;
@@ -346,14 +353,20 @@ public class SignalBoxPathway implements IChunkLoadable {
                 pathwayToBlock.setPathStatus(EnumPathUsage.PREPARED);
                 pathwayToBlock.consumer.accept(pathwayToBlock);
             }
+            if (isExecutingSignalSet)
+                return;
+            this.isExecutingSignalSet = true;
             SERVICE.execute(() -> {
                 try {
                     Thread.sleep(delay * 1000);
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
                 }
+                if (isPathwayReseted) {
+                    return;
+                }
+                this.isExecutingSignalSet = false;
                 synchronized (distantSignalPositions) {
-                    setSignals(lastSignal);
+                    setSignals(getLastSignalInfo());
                 }
                 setPathStatus(EnumPathUsage.SELECTED);
                 if (pathwayToBlock != null) {
@@ -371,6 +384,8 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private void setSignals(final SignalStateInfo lastSignal) {
+        if (isExecutingSignalSet)
+            return;
         final PosIdentifier identifier = new PosIdentifier(tilePos, world);
         this.signalPositions.ifPresent(entry -> {
             if (isBlocked)
@@ -436,13 +451,13 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public void resetPathway(final @Nullable Point point) {
-        SERVICE.shutdownNow();
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
         if (point == null || point.equals(this.getLastPoint())
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
             this.emptyOrBroken = true;
             this.isBlocked = false;
+            this.isPathwayReseted = true;
             resetOther();
             if (pathwayToReset != null) {
                 final PathwayHolder holder = SignalBoxHandler.getPathwayHolder(
