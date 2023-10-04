@@ -64,7 +64,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean hasLink() {
-        return SignalBoxHandler.isTileEmpty(new PosIdentifier(worldPosition, level));
+        return !SignalBoxHandler.isTileEmpty(new PosIdentifier(worldPosition, level));
     }
 
     @Override

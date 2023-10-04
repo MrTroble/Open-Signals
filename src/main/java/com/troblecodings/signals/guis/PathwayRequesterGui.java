@@ -24,6 +24,8 @@ public class PathwayRequesterGui extends GuiBase {
         super(info);
         this.container = (PathwayRequesterContainer) info.base;
         this.player = info.player;
+        this.entity.clear();
+        this.entity.add(new UILabel("Not connected"));
     }
 
     private void initOwn() {
@@ -50,17 +52,48 @@ public class PathwayRequesterGui extends GuiBase {
         final IIntegerable<String> end = SizeIntegerables.of("EndPoint",
                 container.validStarts.size(), e -> container.validEnds.get(e).toShortString());
 
-        inner.add(GuiElements.createEnumElement(start, e -> {
-            container.start = container.validStarts.get(e);
-        }, container.start != null ? container.start.equals(new Point()) ? 0
-                : container.validStarts.indexOf(container.start) : 0));
-        inner.add(GuiElements.createEnumElement(end, e -> {
-            container.end = container.validStarts.get(e);
-        }, container.end != null
-                ? container.end.equals(new Point()) ? 0 : container.validEnds.indexOf(container.end)
-                : 0));
+        if (!container.validStarts.isEmpty()) {
+            inner.add(GuiElements.createEnumElement(start, e -> {
+                container.start = container.validStarts.get(e);
+            }, container.start != null ? container.start.equals(new Point()) ? 0
+                    : container.validStarts.indexOf(container.start) : 0));
+        } else {
+            final UIEntity infoLabelEntity = new UIEntity();
+            infoLabelEntity.setInheritWidth(true);
+            infoLabelEntity.setHeight(20);
+            final UILabel infoLabel = new UILabel("No start to set!");
+            infoLabel.setCenterY(false);
+            infoLabelEntity.add(infoLabel);
+            inner.add(infoLabelEntity);
+        }
 
-        inner.add(GuiElements.createButton(I18Wrapper.format("btn.save"), e -> sendToServer()));
+        if (!container.validEnds.isEmpty()) {
+            inner.add(GuiElements.createEnumElement(end, e -> {
+                container.end = container.validStarts.get(e);
+            }, container.end != null ? container.end.equals(new Point()) ? 0
+                    : container.validEnds.indexOf(container.end) : 0));
+        } else {
+            final UIEntity infoLabelEntity = new UIEntity();
+            infoLabelEntity.setInheritWidth(true);
+            infoLabelEntity.setHeight(20);
+            final UILabel infoLabel = new UILabel("No end to set!");
+            infoLabel.setCenterY(false);
+            infoLabelEntity.add(infoLabel);
+            inner.add(infoLabelEntity);
+        }
+
+        if (!container.validStarts.isEmpty() && !container.validEnds.isEmpty()) {
+            inner.add(GuiElements.createButton(I18Wrapper.format("btn.save"), e -> sendToServer()));
+        } else {
+            final UIEntity infoLabelEntity = new UIEntity();
+            infoLabelEntity.setInheritWidth(true);
+            infoLabelEntity.setHeight(20);
+            final UILabel infoLabel = new UILabel("Nothing to save!");
+            infoLabel.setCenterY(false);
+            infoLabelEntity.add(infoLabel);
+            inner.add(infoLabelEntity);
+        }
+
         inner.add(GuiElements.createSpacerV(5));
 
         final UILabel Linkedlabel = new UILabel("Linked SignalBox: "

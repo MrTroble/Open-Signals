@@ -70,6 +70,8 @@ public class PathwayRequesterContainer extends ContainerBase implements IChunkLo
 
         validStarts.clear();
         validEnds.clear();
+        if (linkedPos == null)
+            return;
         final int validStartsSize = buffer.getByteToUnsignedInt();
         for (int i = 0; i < validStartsSize; i++) {
             validStarts.add(Point.of(buffer));
