@@ -26,7 +26,6 @@
         "(config(zs3.Z13) || config(zs3plate.Z13))": ["zs3v.Z13"],
         "(config(zs3.Z14) || config(zs3plate.Z14))": ["zs3v.Z14"],
         "(config(zs3.Z15) || config(zs3plate.Z15))": ["zs3v.Z15"],
-        "signalRepeater(true)": ["VRLIGHT.TRUE"],
 
         "speed(<.1) || speed(>.15)": ["stopsignal.HP1", "hphome.HP1", "hpblock.HP1"],
         "speed(==.1)": ["zs3.Z1", "stopsignal.HP2", "hphome.HP2", "hpblock.HP1"],

@@ -24,8 +24,10 @@
         "(config(zs3.Z15) || config(zs3plate.Z15))": ["zs3v.Z15"],
 
         "map(stop)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF", "zs2v.OFF"],
+        "map(stop) && signalRepeater(true)": ["kombisignal_distant.KS2_REPEAT"],
         "map(drive)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
         "map(drive) && map(zs3)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
+        "map(drive) && map(zs3) && signalRepeater(true)": ["kombisignal_distant.KS1_REPEAT"],
 
         "speed(==.1)": ["zs3.Z1"],
         "speed(==.2)": ["zs3.Z2"],
