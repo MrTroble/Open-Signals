@@ -662,7 +662,7 @@ public class SidePanel {
             endTile.getParent().add(uiColor);
             try {
                 Thread.sleep(3000);
-            } catch (InterruptedException e) {
+            } catch (final InterruptedException e) {
                 e.printStackTrace();
             }
             startTile.getParent().remove(uiColor);

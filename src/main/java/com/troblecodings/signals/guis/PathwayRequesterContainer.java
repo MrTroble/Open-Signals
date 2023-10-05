@@ -28,7 +28,7 @@ public class PathwayRequesterContainer extends ContainerBase implements IChunkLo
     protected Point end = null;
     protected BlockPos linkedPos;
 
-    public PathwayRequesterContainer(GuiInfo info) {
+    public PathwayRequesterContainer(final GuiInfo info) {
         super(info);
         if (info.pos != null)
             this.tile = info.getTile();
@@ -61,7 +61,7 @@ public class PathwayRequesterContainer extends ContainerBase implements IChunkLo
     }
 
     @Override
-    public void deserializeClient(ReadBuffer buffer) {
+    public void deserializeClient(final ReadBuffer buffer) {
         this.linkedPos = buffer.getBlockPos();
         if (this.linkedPos.equals(BlockPos.ZERO))
             this.linkedPos = null;
@@ -84,7 +84,7 @@ public class PathwayRequesterContainer extends ContainerBase implements IChunkLo
     }
 
     @Override
-    public void deserializeServer(ReadBuffer buffer) {
+    public void deserializeServer(final ReadBuffer buffer) {
         final Point start = Point.of(buffer);
         final Point end = Point.of(buffer);
         tile.setNextPathway(start, end);

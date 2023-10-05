@@ -31,13 +31,13 @@ public class PathwayRequester extends BasicBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
         builder.add(POWERD);
     }
 
     @Override
-    public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block,
-            BlockPos toPos, boolean moveing) {
+    public void neighborChanged(final BlockState state, final Level world, final BlockPos pos,
+            final Block block, final BlockPos toPos, final boolean moveing) {
         if (world.isClientSide)
             return;
         if (world.hasNeighborSignal(pos)) {
@@ -54,8 +54,8 @@ public class PathwayRequester extends BasicBlock {
     }
 
     @Override
-    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player,
-            InteractionHand hand, BlockHitResult result) {
+    public InteractionResult use(final BlockState state, final Level world, final BlockPos pos,
+            final Player player, final InteractionHand hand, final BlockHitResult result) {
         final Item item = player.getMainHandItem().getItem();
         if (!(item.equals(OSItems.LINKING_TOOL) && item.equals(OSItems.MULTI_LINKING_TOOL))) {
             OpenSignalsMain.handler.invokeGui(PathwayRequester.class, player, world, pos,

@@ -10,22 +10,22 @@ public class PointEntry extends IPathEntry<Point> {
     private Point point;
 
     @Override
-    public void readNetwork(ReadBuffer buffer) {
+    public void readNetwork(final ReadBuffer buffer) {
         this.point = Point.of(buffer);
     }
 
     @Override
-    public void writeNetwork(WriteBuffer buffer) {
+    public void writeNetwork(final WriteBuffer buffer) {
         point.writeNetwork(buffer);
     }
 
     @Override
-    public void write(NBTWrapper tag) {
+    public void write(final NBTWrapper tag) {
         point.write(tag);
     }
 
     @Override
-    public void read(NBTWrapper tag) {
+    public void read(final NBTWrapper tag) {
         this.point = new Point();
         this.point.read(tag);
     }
@@ -36,7 +36,7 @@ public class PointEntry extends IPathEntry<Point> {
     }
 
     @Override
-    public void setValue(Point value) {
+    public void setValue(final Point value) {
         this.point = value;
     }
 }

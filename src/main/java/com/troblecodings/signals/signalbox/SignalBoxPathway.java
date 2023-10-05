@@ -47,7 +47,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalBoxPathway implements IChunkLoadable {
 
-    private final ExecutorService SERVICE = Executors.newFixedThreadPool(1);
+    private final ExecutorService service = Executors.newFixedThreadPool(1);
 
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
     private final Map<BlockPos, SignalBoxNode> mapOfBlockingPositions = new HashMap<>();
@@ -356,10 +356,10 @@ public class SignalBoxPathway implements IChunkLoadable {
             if (isExecutingSignalSet)
                 return;
             this.isExecutingSignalSet = true;
-            SERVICE.execute(() -> {
+            service.execute(() -> {
                 try {
                     Thread.sleep(delay * 1000);
-                } catch (InterruptedException e) {
+                } catch (final InterruptedException e) {
                 }
                 if (isPathwayReseted) {
                     return;

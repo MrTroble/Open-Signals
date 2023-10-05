@@ -24,7 +24,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     private BlockPos linkedSignalBox;
     private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(), new Point());
 
-    public PathwayRequesterTileEntity(TileEntityInfo info) {
+    public PathwayRequesterTileEntity(final TileEntityInfo info) {
         super(info);
     }
 
@@ -33,7 +33,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     private static final String END_POINT = "endPoint";
 
     @Override
-    public void loadWrapper(NBTWrapper wrapper) {
+    public void loadWrapper(final NBTWrapper wrapper) {
         linkedSignalBox = wrapper.getBlockPos(LINKED_SIGNALBOX);
         final Point start = new Point();
         start.read(wrapper.getWrapper(START_POINT));
@@ -43,7 +43,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public void saveWrapper(NBTWrapper wrapper) {
+    public void saveWrapper(final NBTWrapper wrapper) {
         if (linkedSignalBox != null)
             wrapper.putBlockPos(LINKED_SIGNALBOX, linkedSignalBox);
         final NBTWrapper startPoint = new NBTWrapper();
@@ -66,7 +66,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     }
 
     @Override
-    public boolean link(BlockPos pos, CompoundTag tag) {
+    public boolean link(final BlockPos pos, final CompoundTag tag) {
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK.get(
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));

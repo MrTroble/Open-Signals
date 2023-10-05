@@ -8,7 +8,7 @@ public class OtherSignalIdentifier extends MainSignalIdentifier {
 
     public final boolean isRepeater;
 
-    public OtherSignalIdentifier(Point point, ModeSet mode, BlockPos pos,
+    public OtherSignalIdentifier(final Point point, final ModeSet mode, final BlockPos pos,
             final boolean isRepeater) {
         super(point, mode, pos);
         this.isRepeater = isRepeater;
@@ -23,14 +23,14 @@ public class OtherSignalIdentifier extends MainSignalIdentifier {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (!super.equals(obj))
             return false;
         if (getClass() != obj.getClass())
             return false;
-        OtherSignalIdentifier other = (OtherSignalIdentifier) obj;
+        final OtherSignalIdentifier other = (OtherSignalIdentifier) obj;
         return isRepeater == other.isRepeater && super.equals(obj);
     }
 }

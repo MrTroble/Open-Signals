@@ -20,7 +20,7 @@ public class PathwayRequesterGui extends GuiBase {
     private final PathwayRequesterContainer container;
     private final Player player;
 
-    public PathwayRequesterGui(GuiInfo info) {
+    public PathwayRequesterGui(final GuiInfo info) {
         super(info);
         this.container = (PathwayRequesterContainer) info.base;
         this.player = info.player;
@@ -96,14 +96,14 @@ public class PathwayRequesterGui extends GuiBase {
 
         inner.add(GuiElements.createSpacerV(5));
 
-        final UILabel Linkedlabel = new UILabel("Linked SignalBox: "
+        final UILabel linkedlabel = new UILabel("Linked SignalBox: "
                 + (container.linkedPos == null ? "Not linked!" : container.linkedPos.toString()));
-        Linkedlabel.setCenterY(false);
+        linkedlabel.setCenterY(false);
 
         final UIEntity posLabel = new UIEntity();
         posLabel.setHeight(20);
         posLabel.setInheritWidth(true);
-        posLabel.add(Linkedlabel);
+        posLabel.add(linkedlabel);
 
         inner.add(posLabel);
 

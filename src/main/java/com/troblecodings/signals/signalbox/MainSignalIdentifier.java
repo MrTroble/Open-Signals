@@ -10,7 +10,7 @@ public class MainSignalIdentifier {
     public final ModeSet mode;
     public final BlockPos pos;
 
-    public MainSignalIdentifier(Point point, ModeSet mode, BlockPos pos) {
+    public MainSignalIdentifier(final Point point, final ModeSet mode, final BlockPos pos) {
         this.point = point;
         this.mode = mode;
         this.pos = pos;
@@ -22,14 +22,14 @@ public class MainSignalIdentifier {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (this == obj)
             return true;
         if (obj == null)
             return false;
         if (getClass() != obj.getClass())
             return false;
-        MainSignalIdentifier other = (MainSignalIdentifier) obj;
+        final MainSignalIdentifier other = (MainSignalIdentifier) obj;
         return Objects.equals(mode, other.mode) && Objects.equals(point, other.point)
                 && Objects.equals(pos, other.pos);
     }
