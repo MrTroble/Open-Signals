@@ -2,23 +2,24 @@ package com.troblecodings.signals.signalbox;
 
 import java.util.Objects;
 
+import com.troblecodings.signals.core.ModeIdentifier;
+
 import net.minecraft.core.BlockPos;
 
 public class MainSignalIdentifier {
 
-    public final Point point;
-    public final ModeSet mode;
+    public final ModeIdentifier identifier;
     public final BlockPos pos;
+    public SignalState state = SignalState.RED;
 
     public MainSignalIdentifier(final Point point, final ModeSet mode, final BlockPos pos) {
-        this.point = point;
-        this.mode = mode;
+        this.identifier = new ModeIdentifier(point, mode);
         this.pos = pos;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(mode, point, pos);
+        return Objects.hash(identifier, pos);
     }
 
     @Override
@@ -30,7 +31,12 @@ public class MainSignalIdentifier {
         if (getClass() != obj.getClass())
             return false;
         final MainSignalIdentifier other = (MainSignalIdentifier) obj;
-        return Objects.equals(mode, other.mode) && Objects.equals(point, other.point)
-                && Objects.equals(pos, other.pos);
+        return Objects.equals(identifier, other.identifier) && Objects.equals(pos, other.pos);
+    }
+
+    public static enum SignalState {
+
+        RED, GREEN;
+
     }
 }

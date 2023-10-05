@@ -16,6 +16,7 @@ import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -37,6 +38,7 @@ import net.minecraft.world.level.block.Rotation;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
+    protected final List<ModeIdentifier> greenSignals = new ArrayList<>();
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
     protected final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
@@ -96,6 +98,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             buffer.putByte((byte) list.size());
             list.forEach(point -> point.writeNetwork(buffer));
         });
+        final List<ModeIdentifier> greenSignals = SignalBoxHandler.getGreenSignals(identifier);
+        buffer.putInt(greenSignals.size());
+        greenSignals.forEach(signal -> signal.writeNetwork(buffer));
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -115,6 +120,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 possibleSubsidiaries.clear();
                 nextPathways.clear();
                 validInConnections.clear();
+                greenSignals.clear();
                 final int signalSize = buffer.getInt();
                 for (int i = 0; i < signalSize; i++) {
                     final BlockPos signalPos = buffer.getBlockPos();
@@ -148,6 +154,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                         points.add(Point.of(buffer));
                     }
                     validInConnections.put(boxPos, points);
+                }
+                final int greenSignalsSize = buffer.getInt();
+                for (int i = 0; i < greenSignalsSize; i++) {
+                    greenSignals.add(ModeIdentifier.of(buffer));
                 }
                 update();
                 break;
@@ -183,6 +193,19 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
                 nextPathways.remove(Maps.immutableEntry(start, end));
+                break;
+            }
+            case SET_SIGNALS: {
+                final int redSignalSize = buffer.getByteToUnsignedInt();
+                for (int i = 0; i < redSignalSize; i++) {
+                    greenSignals.remove(ModeIdentifier.of(buffer));
+                }
+                final int greenSignalSize = buffer.getByteToUnsignedInt();
+                for (int i = 0; i < greenSignalSize; i++) {
+                    final ModeIdentifier modeIdentifier = ModeIdentifier.of(buffer);
+                    if (!greenSignals.contains(modeIdentifier))
+                        greenSignals.add(modeIdentifier);
+                }
                 break;
             }
             default:

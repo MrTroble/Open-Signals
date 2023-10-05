@@ -17,6 +17,7 @@ import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LinkedPositions;
 import com.troblecodings.signals.core.LinkingUpdates;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -222,6 +223,18 @@ public final class SignalBoxHandler {
         synchronized (ALL_GRIDS) {
             return ALL_GRIDS.get(identifier);
         }
+    }
+
+    public static List<ModeIdentifier> getGreenSignals(final PosIdentifier identifier) {
+        if (identifier.world.isClientSide)
+            return new ArrayList<>();
+        PathwayHolder holder;
+        synchronized (ALL_GRIDS) {
+            holder = ALL_GRIDS.get(identifier);
+        }
+        if (holder == null)
+            return new ArrayList<>();
+        return holder.getGreenSignals();
     }
 
     public static boolean addNextPathway(final PosIdentifier identifier, final Point start,

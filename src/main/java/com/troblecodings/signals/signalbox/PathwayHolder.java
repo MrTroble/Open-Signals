@@ -13,6 +13,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
@@ -30,9 +31,9 @@ public class PathwayHolder implements IChunkLoadable {
     private static final String START_POINT = "startPoint";
     private static final String END_POINT = "endPoint";
 
-    private final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
-    private final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
-    private final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
+    protected final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
+    protected final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
+    protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
     private Level world;
     private final BlockPos tilePos;
     private Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
@@ -105,6 +106,12 @@ public class PathwayHolder implements IChunkLoadable {
         return modeGrid.get(point);
     }
 
+    public List<ModeIdentifier> getGreenSignals() {
+        final List<ModeIdentifier> returnList = new ArrayList<>();
+        startsToPath.values().forEach(pathway -> returnList.addAll(pathway.getGreenSignals()));
+        return returnList;
+    }
+
     public boolean requestWay(final Point p1, final Point p2) {
         if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
             return false;
@@ -117,6 +124,7 @@ public class PathwayHolder implements IChunkLoadable {
                 updatePrevious(pathway);
                 updateToNet(pathway);
             });
+            way.setPathwayHolder(this);
             way.setPathStatus(EnumPathUsage.SELECTED);
             way.updatePathwaySignals();
             this.onWayAdd(way);
@@ -296,6 +304,7 @@ public class PathwayHolder implements IChunkLoadable {
                 updatePrevious(way);
                 updateToNet(way);
             });
+            pathway.setPathwayHolder(this);
             pathway.setWorldAndPos(world, tilePos);
             pathway.read(comp);
             if (pathway.isEmptyOrBroken()) {
