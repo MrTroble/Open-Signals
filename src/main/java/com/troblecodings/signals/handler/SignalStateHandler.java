@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.annotation.Nullable;
@@ -29,9 +32,10 @@ import net.minecraft.network.play.client.CPacketCustomPayload;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
@@ -40,6 +44,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public final class SignalStateHandler implements INetworkSync {
 
+    private static ExecutorService IO_SERVICE = Executors.newFixedThreadPool(3);
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, Integer> SIGNAL_COUNTER = new HashMap<>();
@@ -47,17 +52,27 @@ public final class SignalStateHandler implements INetworkSync {
     private static final String CHANNELNAME = "statehandlernet";
     private static FMLEventChannel channel;
 
-    private SignalStateHandler() {
-    }
-
     public static void init() {
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNELNAME);
         channel.register(new SignalStateHandler());
-        MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
     }
 
     public static void registerToNetworkChannel(final Object object) {
         channel.register(object);
+    }
+
+    @EventHandler
+    public static void onServerStop(final FMLServerStoppingEvent event) {
+        synchronized (CURRENTLY_LOADED_STATES) {
+            CURRENTLY_LOADED_STATES.forEach((info, map) -> createToFile(info, map));
+        }
+        IO_SERVICE.shutdown();
+        try {
+            IO_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+        IO_SERVICE = Executors.newFixedThreadPool(3);
     }
 
     public static void createStates(final SignalStateInfo info,
@@ -382,9 +397,9 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void loadSignals(final List<SignalStateInfo> signals,
             final @Nullable EntityPlayer player) {
-        if (signals == null || signals.isEmpty())
+        if (signals == null || signals.isEmpty() || IO_SERVICE.isShutdown())
             return;
-        new Thread(() -> {
+        IO_SERVICE.execute(() -> {
             signals.forEach(info -> {
                 synchronized (ALL_LEVEL_FILES) {
                     if (!ALL_LEVEL_FILES.containsKey(info.world)) {
@@ -414,8 +429,7 @@ public final class SignalStateHandler implements INetworkSync {
                     sendToPlayer(info, properties, player);
                 }
             });
-        }, "OSSignalStateHandler:loadSignals").start();
-
+        });
     }
 
     public static void unloadSignal(final SignalStateInfo info) {
@@ -423,9 +437,9 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void unloadSignals(final List<SignalStateInfo> signals) {
-        if (signals == null || signals.isEmpty())
+        if (signals == null || signals.isEmpty() || IO_SERVICE.isShutdown())
             return;
-        new Thread(() -> {
+        IO_SERVICE.execute(() -> {
             signals.forEach(info -> {
                 synchronized (SIGNAL_COUNTER) {
                     Integer count = SIGNAL_COUNTER.get(info);
@@ -443,7 +457,7 @@ public final class SignalStateHandler implements INetworkSync {
                     return;
                 createToFile(info, properties);
             });
-        }, "OSSignalStateHandler:unloadSignals").start();
+        });
     }
 
     private static void sendTo(final EntityPlayer player, final ByteBuffer buf) {

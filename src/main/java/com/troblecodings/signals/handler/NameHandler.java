@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
@@ -28,6 +31,8 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
@@ -37,6 +42,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public final class NameHandler implements INetworkSync {
 
+    private static ExecutorService IO_SERVICE = Executors.newFixedThreadPool(3);
     private static final Map<NameStateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<NameStateInfo, Integer> LOAD_COUNTER = new HashMap<>();
@@ -46,6 +52,20 @@ public final class NameHandler implements INetworkSync {
     public static void init() {
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNELNAME);
         channel.register(new NameHandler());
+    }
+
+    @EventHandler
+    public static void onServerStop(final FMLServerStoppingEvent event) {
+        synchronized (ALL_NAMES) {
+            ALL_NAMES.forEach((info, name) -> createToFile(info, name));
+        }
+        IO_SERVICE.shutdown();
+        try {
+            IO_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+        IO_SERVICE = Executors.newFixedThreadPool(3);
     }
 
     public static void registerToNetworkChannel(final Object obj) {
@@ -229,9 +249,9 @@ public final class NameHandler implements INetworkSync {
 
     private static void loadNames(final List<NameStateInfo> infos,
             final @Nullable EntityPlayer player) {
-        if (infos == null || infos.isEmpty())
+        if (infos == null || infos.isEmpty() || IO_SERVICE.isShutdown())
             return;
-        new Thread(() -> {
+        IO_SERVICE.execute(() -> {
             infos.forEach(info -> {
                 synchronized (LOAD_COUNTER) {
                     Integer count = LOAD_COUNTER.get(info);
@@ -259,13 +279,13 @@ public final class NameHandler implements INetworkSync {
                     }
                 }
             });
-        }, "OSNameHandler:loadNames").start();
+        });
     }
 
     private static void unloadNames(final List<NameStateInfo> infos) {
-        if (infos == null || infos.isEmpty())
+        if (infos == null || infos.isEmpty() || IO_SERVICE.isShutdown())
             return;
-        new Thread(() -> {
+        IO_SERVICE.execute(() -> {
             infos.forEach(info -> {
                 synchronized (LOAD_COUNTER) {
                     Integer count = LOAD_COUNTER.get(info);
@@ -284,7 +304,7 @@ public final class NameHandler implements INetworkSync {
                 createToFile(info, name);
 
             });
-        }, "OSNameHandler:unloadNames").start();
+        });
     }
 
     private static void sendTo(final EntityPlayer player, final ByteBuffer buf) {

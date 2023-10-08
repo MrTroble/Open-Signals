@@ -21,6 +21,7 @@ import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
@@ -33,6 +34,7 @@ import net.minecraftforge.fml.common.Mod.Instance;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 
 @Mod(modid = OpenSignalsMain.MODID, acceptedMinecraftVersions = "[1.12.2]")
 public class OpenSignalsMain {
@@ -52,6 +54,7 @@ public class OpenSignalsMain {
         MinecraftForge.EVENT_BUS.register(OSItems.class);
         MinecraftForge.EVENT_BUS.register(OSSounds.class);
         MinecraftForge.EVENT_BUS.register(NameHandler.class);
+        MinecraftForge.EVENT_BUS.register(SignalStateHandler.class);
         MinecraftForge.EVENT_BUS.register(SignalBoxHandler.class);
         debug = true;
         log = LoggerContext.getContext().getLogger(MODID);
@@ -63,8 +66,7 @@ public class OpenSignalsMain {
         });
     }
 
-    @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy",
-            clientSide = "com.troblecodings.signals.proxy.ClientProxy")
+    @SidedProxy(serverSide = "com.troblecodings.signals.proxy.CommonProxy", clientSide = "com.troblecodings.signals.proxy.ClientProxy")
     public static CommonProxy proxy;
     private static Logger log = null;
     public static GuiHandler handler = null;
@@ -77,6 +79,12 @@ public class OpenSignalsMain {
      */
     public static boolean isDebug() {
         return debug;
+    }
+
+    @EventHandler
+    public void onServerStop(final FMLServerStoppingEvent event) {
+        SignalStateHandler.onServerStop(event);
+        NameHandler.onServerStop(event);
     }
 
     @EventHandler
