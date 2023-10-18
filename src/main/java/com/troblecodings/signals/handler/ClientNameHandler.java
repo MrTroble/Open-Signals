@@ -50,6 +50,8 @@ public class ClientNameHandler implements INetworkSync {
             CLIENT_NAMES.put(new StateInfo(mc.world, pos), name);
         }
         final WorldClient level = mc.world;
+        if (level == null)
+            return;
         mc.addScheduledTask(() -> {
             level.getChunkFromBlockCoords(pos).markDirty();
             final IBlockState state = level.getBlockState(pos);

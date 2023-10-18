@@ -130,7 +130,8 @@ public final class SignalStateHandler implements INetworkSync {
         }
         if (listeners == null)
             return;
-        listeners.forEach(listener -> listener.update(info, changedProperties, changedState));
+        info.world.getMinecraftServer().addScheduledTask(() -> listeners
+                .forEach(listener -> listener.update(info, changedProperties, changedState)));
     }
 
     private static void statesToBuffer(final Signal signal, final Map<SEProperty, String> states,

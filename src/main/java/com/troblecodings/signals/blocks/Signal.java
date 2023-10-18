@@ -109,7 +109,7 @@ public class Signal extends BasicBlock {
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isRemote
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
-                : SignalStateHandler.getStates(info);
+                : ((SignalTileEntity) te).getProperties();
         return FULL_BLOCK_AABB.expand(0, getHeight(properties), 0);
     }
 
