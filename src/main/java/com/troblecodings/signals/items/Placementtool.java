@@ -12,10 +12,10 @@ import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.guis.ContainerPlacementtool;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
@@ -105,7 +105,7 @@ public class Placementtool extends Item
         }
         final SignalStateInfo info = new SignalStateInfo(worldIn, placePos, signal);
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
-        final NameStateInfo nameInfo = new NameStateInfo(worldIn, placePos);
+        final StateInfo nameInfo = new StateInfo(worldIn, placePos);
         String nametoSet = "";
         if (!(signalName == null || signalName.isEmpty())) {
             signalProperties.put(Signal.CUSTOMNAME, "true");

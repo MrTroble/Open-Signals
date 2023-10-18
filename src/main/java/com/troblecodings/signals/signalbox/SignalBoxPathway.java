@@ -23,7 +23,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnumHolder;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -223,7 +223,7 @@ public class SignalBoxPathway {
     public void setPathStatus(final EnumPathUsage status, final @Nullable Point point) {
         foreachEntry(option -> {
             option.getEntry(PathEntryType.OUTPUT).ifPresent(
-                    pos -> SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, world),
+                    pos -> SignalBoxHandler.updateRedstoneOutput(new StateInfo(world, pos),
                             !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
@@ -236,7 +236,7 @@ public class SignalBoxPathway {
     public void updatePathwaySignals() {
         if (world == null)
             return;
-        final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+        final StateInfo identifier = new StateInfo(world, tilePos);
         SignalStateInfo lastInfo = null;
         if (lastSignal.isPresent()) {
             final Signal nextSignal = SignalBoxHandler.getSignal(identifier, lastSignal.get());
@@ -268,7 +268,7 @@ public class SignalBoxPathway {
 
     private void resetFirstSignal() {
         this.signalPositions.ifPresent(entry -> {
-            final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+            final Signal current = SignalBoxHandler.getSignal(new StateInfo(world, tilePos),
                     entry.getKey());
             if (current == null)
                 return;
@@ -278,7 +278,7 @@ public class SignalBoxPathway {
 
     private void resetOther() {
         distantSignalPositions.forEach(position -> {
-            final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+            final Signal current = SignalBoxHandler.getSignal(new StateInfo(world, tilePos),
                     position);
             if (current == null)
                 return;
@@ -305,7 +305,7 @@ public class SignalBoxPathway {
                 node.getOption(new ModeSet(mode, rotation)).ifPresent(
                         option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
                             final Signal current = SignalBoxHandler
-                                    .getSignal(new PosIdentifier(tilePos, world), position);
+                                    .getSignal(new StateInfo(world, tilePos), position);
                             if (current == null)
                                 return;
                             SignalConfig.reset(new SignalStateInfo(world, position, current));
@@ -394,8 +394,8 @@ public class SignalBoxPathway {
     public void deactivateAllOutputsOnPathway() {
         foreachPath((_u, node) -> {
             final List<BlockPos> outputs = node.clearAllManuellOutputs();
-            outputs.forEach(pos -> SignalBoxHandler
-                    .updateRedstoneOutput(new PosIdentifier(pos, world), false));
+            outputs.forEach(
+                    pos -> SignalBoxHandler.updateRedstoneOutput(new StateInfo(world, pos), false));
         }, null);
     }
 
@@ -410,7 +410,7 @@ public class SignalBoxPathway {
 
     public void checkReRequest() {
         if (isAutoPathway) {
-            final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+            final StateInfo identifier = new StateInfo(world, tilePos);
             SignalBoxHandler.requestPathway(identifier, originalFirstPoint, getLastPoint(),
                     modeGrid);
         }

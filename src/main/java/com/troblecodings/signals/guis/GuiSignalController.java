@@ -23,12 +23,12 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -140,7 +140,7 @@ public class GuiSignalController extends GuiBase {
             }
         });
         ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(mc.world, controller.getPos()))
+                .getClientStates(new StateInfo(mc.world, controller.getPos()))
                 .forEach((property, value) -> {
                     previewRedstone.addToRenderNormal(property,
                             property.getParent().getIDFromValue(value));
@@ -297,7 +297,7 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 
         ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(mc.world, controller.getPos()))
+                .getClientStates(new StateInfo(mc.world, controller.getPos()))
                 .forEach((property, value) -> previewSidebar.addToRenderNormal(property,
                         property.getParent().getIDFromValue(value)));
 

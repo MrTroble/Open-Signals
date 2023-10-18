@@ -15,6 +15,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -40,8 +41,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private final boolean[] currentStates = new boolean[EnumFacing.values().length];
     private final Map<Byte, Map<SEProperty, String>> allStates = new HashMap<>();
     private final Map<EnumFacing, Map<EnumState, Byte>> enabledStates = new HashMap<>();
-    private final SignalStateListener listener = (_u, removed) -> {
-        if (removed) {
+    private final SignalStateListener listener = (_u, properties, state) -> {
+        if (state.equals(ChangedState.REMOVED_FROM_FILE)) {
             linkedSignalPosition = null;
             linkedSignal = null;
             allStates.clear();

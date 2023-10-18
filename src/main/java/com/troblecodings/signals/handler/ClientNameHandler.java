@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.StateInfo;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -17,9 +18,9 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 
 public class ClientNameHandler implements INetworkSync {
 
-    private static final Map<NameStateInfo, String> CLIENT_NAMES = new HashMap<>();
+    private static final Map<StateInfo, String> CLIENT_NAMES = new HashMap<>();
 
-    public static String getClientName(final NameStateInfo info) {
+    public static String getClientName(final StateInfo info) {
         synchronized (CLIENT_NAMES) {
             return new String(CLIENT_NAMES.getOrDefault(info, ""));
         }
@@ -46,7 +47,7 @@ public class ClientNameHandler implements INetworkSync {
             e.printStackTrace();
         }
         synchronized (CLIENT_NAMES) {
-            CLIENT_NAMES.put(new NameStateInfo(mc.world, pos), name);
+            CLIENT_NAMES.put(new StateInfo(mc.world, pos), name);
         }
         final WorldClient level = mc.world;
         mc.addScheduledTask(() -> {
@@ -63,7 +64,7 @@ public class ClientNameHandler implements INetworkSync {
     private static void setRemoved(final BlockPos pos) {
         final Minecraft mc = Minecraft.getMinecraft();
         synchronized (CLIENT_NAMES) {
-            CLIENT_NAMES.remove(new NameStateInfo(mc.world, pos));
+            CLIENT_NAMES.remove(new StateInfo(mc.world, pos));
         }
     }
 

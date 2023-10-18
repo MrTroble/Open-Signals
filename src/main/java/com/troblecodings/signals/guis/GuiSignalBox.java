@@ -38,6 +38,7 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnumHolder;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -48,7 +49,6 @@ import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Path;
 import com.troblecodings.signals.signalbox.Point;
@@ -180,7 +180,7 @@ public class GuiSignalBox extends GuiBase {
     public static String getSignalInfo(final BlockPos signalPos, final LinkType type) {
         final Minecraft mc = Minecraft.getMinecraft();
         final String customName = ClientNameHandler
-                .getClientName(new NameStateInfo(mc.world, signalPos));
+                .getClientName(new StateInfo(mc.world, signalPos));
         return String.format("%s (x=%d, y=%d. z=%d)",
                 customName == null
                         ? (type.equals(LinkType.SIGNAL) ? "" : I18n.format("type." + type.name()))

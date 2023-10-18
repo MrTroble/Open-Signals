@@ -3,10 +3,9 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
@@ -41,7 +40,7 @@ public class RedstoneIO extends BasicBlock {
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ,
             final int meta, final EntityLivingBase placer, final EnumHand hand) {
         if (!world.isRemote)
-            NameHandler.createName(new NameStateInfo(world, pos), getLocalizedName());
+            NameHandler.createName(new StateInfo(world, pos), getLocalizedName());
         return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer, hand);
     }
 
@@ -111,8 +110,9 @@ public class RedstoneIO extends BasicBlock {
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         if (!worldIn.isRemote) {
             new Thread(() -> {
-                NameHandler.setRemoved(new NameStateInfo(worldIn, pos));
-                SignalBoxHandler.onPosRemove(new PosIdentifier(pos, worldIn));
+                final StateInfo info = new StateInfo(worldIn, pos);
+                NameHandler.setRemoved(info);
+                SignalBoxHandler.onPosRemove(info);
             }, "RedstoneIO:breakBlock").start();
         }
         super.breakBlock(worldIn, pos, state);

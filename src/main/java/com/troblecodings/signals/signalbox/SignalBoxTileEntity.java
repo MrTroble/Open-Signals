@@ -6,7 +6,7 @@ import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -35,14 +35,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public void setWorld(final World worldIn) {
         super.setWorld(worldIn);
         grid.setPosAndWorld(pos, world);
-        SignalBoxHandler.setWorld(new PosIdentifier(pos, world));
+        SignalBoxHandler.setWorld(new StateInfo(world, pos));
     }
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
         final NBTWrapper gridTag = new NBTWrapper();
         this.grid.write(gridTag);
-        SignalBoxHandler.writeTileNBT(new PosIdentifier(pos, world), wrapper);
+        SignalBoxHandler.writeTileNBT(new StateInfo(world, pos), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
     }
 
@@ -59,7 +59,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean hasLink() {
-        return SignalBoxHandler.isTileEmpty(new PosIdentifier(pos, world));
+        return SignalBoxHandler.isTileEmpty(new StateInfo(world, pos));
     }
 
     @Override
@@ -77,7 +77,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (type.equals(LinkType.SIGNAL)) {
             SignalStateHandler.loadSignal(new SignalStateInfo(world, pos, (Signal) block));
         }
-        return SignalBoxHandler.linkPosToSignalBox(new PosIdentifier(this.pos, world), pos,
+        return SignalBoxHandler.linkPosToSignalBox(new StateInfo(world, this.pos), pos,
                 (BasicBlock) block, type);
     }
 
@@ -86,7 +86,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         grid.setPosAndWorld(pos, world);
         if (world.isRemote)
             return;
-        final PosIdentifier identifier = new PosIdentifier(pos, world);
+        final StateInfo identifier = new StateInfo(world, pos);
         SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy,
                 grid.getModeGrid());
         SignalBoxHandler.loadSignals(identifier);
@@ -94,12 +94,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public void onChunkUnload() {
-        SignalBoxHandler.unloadSignals(new PosIdentifier(pos, world));
+        SignalBoxHandler.unloadSignals(new StateInfo(world, pos));
     }
 
     @Override
     public boolean unlink() {
-        SignalBoxHandler.unlinkAll(new PosIdentifier(pos, world));
+        SignalBoxHandler.unlinkAll(new StateInfo(world, pos));
         return true;
     }
 

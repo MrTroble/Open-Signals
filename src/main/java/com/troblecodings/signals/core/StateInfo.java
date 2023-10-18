@@ -1,23 +1,22 @@
-package com.troblecodings.signals.handler;
+package com.troblecodings.signals.core;
 
 import java.util.Objects;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class ClientSignalStateInfo extends SignalStateInfo {
+public class StateInfo {
 
-    public ClientSignalStateInfo(final World world, final BlockPos pos) {
-        super(world, pos, null);
+    public final World world;
+    public final BlockPos pos;
+
+    public StateInfo(final World world, final BlockPos pos) {
+        this.world = world;
+        this.pos = pos;
     }
 
-    public ClientSignalStateInfo(final SignalStateInfo info) {
-        super(info.world, info.pos, null);
-    }
-
-    @Override
-    public String toString() {
-        return "ClientSignalStateInfo [world=" + world + ", pos=" + pos + "]";
+    public boolean worldNullOrClientSide() {
+        return world == null || world.isRemote;
     }
 
     @Override
@@ -33,7 +32,13 @@ public class ClientSignalStateInfo extends SignalStateInfo {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final SignalStateInfo other = (SignalStateInfo) obj;
+        final StateInfo other = (StateInfo) obj;
         return Objects.equals(pos, other.pos) && Objects.equals(world, other.world);
     }
+
+    @Override
+    public String toString() {
+        return "StateInfo [world= " + world + ",pos=" + pos + "]";
+    }
+
 }

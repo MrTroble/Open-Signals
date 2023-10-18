@@ -22,6 +22,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import io.netty.buffer.Unpooled;
@@ -34,7 +35,6 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
@@ -43,6 +43,9 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public final class SignalStateHandler implements INetworkSync {
+
+    private SignalStateHandler() {
+    }
 
     private static ExecutorService IO_SERVICE = Executors.newFixedThreadPool(3);
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
@@ -54,14 +57,12 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void init() {
         channel = NetworkRegistry.INSTANCE.newEventDrivenChannel(CHANNELNAME);
-        channel.register(new SignalStateHandler());
     }
 
     public static void registerToNetworkChannel(final Object object) {
         channel.register(object);
     }
 
-    @EventHandler
     public static void onServerStop(final FMLServerStoppingEvent event) {
         synchronized (CURRENTLY_LOADED_STATES) {
             CURRENTLY_LOADED_STATES.forEach((info, map) -> createToFile(info, map));
@@ -88,6 +89,7 @@ public final class SignalStateHandler implements INetworkSync {
             }
             sendToAll(info, states);
             createToFile(info, states);
+            updateListeners(info, states, ChangedState.ADDED_TO_FILE);
         }, "OSSignalStateHandler:createStates").start();
     }
 
@@ -115,14 +117,15 @@ public final class SignalStateHandler implements INetworkSync {
         }
     }
 
-    private static void updateListeners(final SignalStateInfo info, final boolean removed) {
+    private static void updateListeners(final SignalStateInfo info,
+            final Map<SEProperty, String> changedProperties, final ChangedState changedState) {
         final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
             listeners = ALL_LISTENERS.get(info);
         }
         if (listeners == null)
             return;
-        listeners.forEach(listener -> listener.update(info, removed));
+        listeners.forEach(listener -> listener.update(info, changedProperties, changedState));
     }
 
     private static void statesToBuffer(final Signal signal, final Map<SEProperty, String> states,
@@ -171,7 +174,7 @@ public final class SignalStateHandler implements INetworkSync {
         }
         new Thread(() -> {
             sendToAll(info, states);
-            updateListeners(info, false);
+            updateListeners(info, states, ChangedState.UPDATED);
             info.world.getMinecraftServer()
                     .addScheduledTask(() -> info.signal.getUpdate(info.world, info.pos));
             if (!contains.get())
@@ -255,12 +258,12 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
-        new Thread(() -> {
+        IO_SERVICE.execute(() -> {
             synchronized (ALL_LEVEL_FILES) {
                 maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
                         .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
             }
-        }, "OSSignalStateHandler:save").start();
+        });
     }
 
     @SubscribeEvent
@@ -273,8 +276,9 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void setRemoved(final SignalStateInfo info) {
+        Map<SEProperty, String> removedProperties;
         synchronized (CURRENTLY_LOADED_STATES) {
-            CURRENTLY_LOADED_STATES.remove(info);
+            removedProperties = CURRENTLY_LOADED_STATES.remove(info);
         }
         SignalStateFile file;
         synchronized (ALL_LEVEL_FILES) {
@@ -285,7 +289,7 @@ public final class SignalStateHandler implements INetworkSync {
             SIGNAL_COUNTER.remove(info);
         }
         sendRemoved(info);
-        updateListeners(info, true);
+        updateListeners(info, removedProperties, ChangedState.REMOVED_FROM_FILE);
         synchronized (ALL_LISTENERS) {
             ALL_LISTENERS.remove(info);
         }
@@ -428,6 +432,7 @@ public final class SignalStateHandler implements INetworkSync {
                 } else {
                     sendToPlayer(info, properties, player);
                 }
+                updateListeners(info, properties, ChangedState.ADDED_TO_CACHE);
             });
         });
     }
@@ -456,6 +461,7 @@ public final class SignalStateHandler implements INetworkSync {
                 if (properties == null)
                     return;
                 createToFile(info, properties);
+                updateListeners(info, properties, ChangedState.REMOVED_FROM_CACHE);
             });
         });
     }

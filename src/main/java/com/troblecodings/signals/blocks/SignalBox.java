@@ -3,7 +3,7 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
@@ -64,14 +64,14 @@ public class SignalBox extends BasicBlock {
     @Override
     public void onBlockPlacedBy(final World worldIn, final BlockPos pos, final IBlockState state,
             final EntityLivingBase placer, final ItemStack stack) {
-        SignalBoxHandler.relinkAllRedstoneIOs(new PosIdentifier(pos, worldIn));
+        SignalBoxHandler.relinkAllRedstoneIOs(new StateInfo(worldIn, pos));
     }
 
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         if (!worldIn.isRemote) {
             ((SignalBoxTileEntity) worldIn.getTileEntity(pos)).unlink();
-            SignalBoxHandler.removeSignalBox(new PosIdentifier(pos, worldIn));
+            SignalBoxHandler.removeSignalBox(new StateInfo(worldIn, pos));
         }
         super.breakBlock(worldIn, pos, state);
     }
