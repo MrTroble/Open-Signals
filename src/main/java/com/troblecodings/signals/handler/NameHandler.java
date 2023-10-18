@@ -159,12 +159,10 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_NAMES) {
             map = ImmutableMap.copyOf(ALL_NAMES);
         }
-        new Thread(() -> {
-            synchronized (ALL_LEVEL_FILES) {
-                map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
-                        .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
-            }
-        }, "OSNameHandler:Save").start();
+        IO_SERVICE.execute(() -> {
+            map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
+                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
+        });
     }
 
     @SubscribeEvent
@@ -201,16 +199,6 @@ public final class NameHandler implements INetworkSync {
             return;
         final EntityPlayer player = event.getPlayer();
         final List<StateInfo> states = new ArrayList<>();
-        synchronized (ALL_LEVEL_FILES) {
-            if (!ALL_LEVEL_FILES.containsKey(world)) {
-                ALL_LEVEL_FILES.put(world,
-                        new NameHandlerFile(Paths.get("osfiles/namefiles/"
-                                + ((WorldServer) world).getMinecraftServer().getName()
-                                        .replace(":", "").replace("/", "").replace("\\", "")
-                                + "/" + ((WorldServer) world).provider.getDimensionType().getName()
-                                        .replace(":", ""))));
-            }
-        }
         chunk.getTileEntityMap().forEach((pos, tile) -> {
             if (tile instanceof SignalTileEntity || tile instanceof RedstoneIOTileEntity) {
                 final StateInfo info = new StateInfo(world, pos);
@@ -262,13 +250,20 @@ public final class NameHandler implements INetworkSync {
                     }
                     LOAD_COUNTER.put(info, 1);
                     String name;
+                    NameHandlerFile file;
                     synchronized (ALL_LEVEL_FILES) {
-                        final NameHandlerFile file = ALL_LEVEL_FILES.get(info.world);
-                        if (file == null)
-                            return;
-                        synchronized (file) {
-                            name = file.getString(info.pos);
+                        file = ALL_LEVEL_FILES.get(info.world);
+                        if (file == null) {
+                            file = new NameHandlerFile(Paths.get("osfiles/namefiles/"
+                                    + ((WorldServer) info.world).getMinecraftServer().getName()
+                                            .replace(":", "").replace("/", "").replace("\\", "")
+                                    + "/" + ((WorldServer) info.world).provider.getDimensionType()
+                                            .getName().replace(":", "")));
+                            ALL_LEVEL_FILES.put(info.world, file);
                         }
+                    }
+                    synchronized (file) {
+                        name = file.getString(info.pos);
                     }
                     synchronized (ALL_NAMES) {
                         ALL_NAMES.put(info, name);

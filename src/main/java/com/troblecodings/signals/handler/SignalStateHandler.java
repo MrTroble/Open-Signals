@@ -145,12 +145,17 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> states) {
         if (states == null)
             return;
-        final SignalStateFile file;
+        SignalStateFile file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
             if (file == null) {
-                return;
+                file = new SignalStateFile(Paths.get("osfiles/signalfiles/"
+                        + ((WorldServer) info.world).getMinecraftServer().getName().replace(":", "")
+                                .replace("/", "").replace("\\", "")
+                        + "/" + ((WorldServer) info.world).provider.getDimensionType().getName()
+                                .replace(":", "")));
             }
+            ALL_LEVEL_FILES.put(info.world, file);
         }
         SignalStatePos pos = file.find(info.pos);
         if (pos == null) {
@@ -200,6 +205,10 @@ public final class SignalStateHandler implements INetworkSync {
             if (info.world.isRemote) {
                 return new HashMap<>();
             }
+            synchronized (SIGNAL_COUNTER) {
+                if (SIGNAL_COUNTER.containsKey(info))
+                    return new HashMap<>();
+            }
             return readAndSerialize(info);
         }
     }
@@ -225,9 +234,15 @@ public final class SignalStateHandler implements INetworkSync {
         SignalStateFile file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(stateInfo.world);
+            if (file == null) {
+                file = new SignalStateFile(Paths.get("osfiles/signalfiles/"
+                        + ((WorldServer) stateInfo.world).getMinecraftServer().getName()
+                                .replace(":", "").replace("/", "").replace("\\", "")
+                        + "/" + ((WorldServer) stateInfo.world).provider.getDimensionType()
+                                .getName().replace(":", "")));
+            }
+            ALL_LEVEL_FILES.put(stateInfo.world, file);
         }
-        if (file == null)
-            return new HashMap<>();
         SignalStatePos pos = file.find(stateInfo.pos);
         if (pos == null) {
             if (stateInfo.world.isRemote) {
@@ -264,10 +279,8 @@ public final class SignalStateHandler implements INetworkSync {
             maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
         IO_SERVICE.execute(() -> {
-            synchronized (ALL_LEVEL_FILES) {
-                maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
-                        .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
-            }
+            maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
+                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
         });
     }
 
@@ -350,16 +363,6 @@ public final class SignalStateHandler implements INetworkSync {
 
         final EntityPlayer player = event.getPlayer();
         final List<StateLoadHolder> states = new ArrayList<>();
-        synchronized (ALL_LEVEL_FILES) {
-            if (!ALL_LEVEL_FILES.containsKey(world)) {
-                ALL_LEVEL_FILES.put(world,
-                        new SignalStateFile(Paths.get("osfiles/signalfiles/"
-                                + ((WorldServer) world).getMinecraftServer().getName()
-                                        .replace(":", "").replace("/", "").replace("\\", "")
-                                + "/" + ((WorldServer) world).provider.getDimensionType().getName()
-                                        .replace(":", ""))));
-            }
-        }
         chunk.getTileEntityMap().forEach((pos, tile) -> {
             if (tile instanceof SignalTileEntity) {
                 final SignalTileEntity signalTile = (SignalTileEntity) tile;
