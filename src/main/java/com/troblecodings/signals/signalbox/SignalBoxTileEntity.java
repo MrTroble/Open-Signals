@@ -6,7 +6,9 @@ import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -74,8 +76,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
         }
-        if (type.equals(LinkType.SIGNAL)) {
-            SignalStateHandler.loadSignal(new SignalStateInfo(world, pos, (Signal) block));
+        if (type.equals(LinkType.SIGNAL) && !world.isRemote) {
+            SignalStateHandler
+                    .loadSignal(new StateLoadHolder(new SignalStateInfo(world, pos, (Signal) block),
+                            new LoadHolder<>(new StateInfo(world, pos))));
         }
         return SignalBoxHandler.linkPosToSignalBox(new StateInfo(world, this.pos), pos,
                 (BasicBlock) block, type);

@@ -14,7 +14,10 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
@@ -228,7 +231,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             final SignalStateInfo info = new SignalStateInfo(world, linkedSignalPosition,
                     linkedSignal);
             if (linkedSignalPosition != null && linkedSignal != null) {
-                SignalStateHandler.loadSignal(info);
+                SignalStateHandler.loadSignal(
+                        new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, pos))));
                 SignalStateHandler.addListener(info, listener);
             }
         }
@@ -236,8 +240,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     public void unloadSignal() {
         if (linkedSignalPosition != null & linkedSignal != null)
-            SignalStateHandler
-                    .unloadSignal(new SignalStateInfo(world, linkedSignalPosition, linkedSignal));
+            SignalStateHandler.unloadSignal(new StateLoadHolder(
+                    new SignalStateInfo(world, linkedSignalPosition, linkedSignal),
+                    new LoadHolder<>(new StateInfo(world, pos))));
     }
 
     public BlockPos getLinkedPosition() {

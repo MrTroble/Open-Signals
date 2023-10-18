@@ -29,9 +29,14 @@ public class LinkedPositions {
     private static final String SIGNAL_NAME = "signalName";
     private static final String ALL_POS = "allPos";
 
+    private final BlockPos thisPos;
     private final Map<BlockPos, Signal> signals = new HashMap<>();
     private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
     private final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
+
+    public LinkedPositions(final BlockPos thisPos) {
+        this.thisPos = thisPos;
+    }
 
     private final SignalStateListener listener = (stateInfo, properties, changed) -> {
         if (changed.equals(ChangedState.UPDATED) || changed.equals(ChangedState.ADDED_TO_CACHE)) {
@@ -45,6 +50,8 @@ public class LinkedPositions {
         signals.put(signalPos, signal);
         final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
         SignalConfig.reset(info);
+        SignalStateHandler.loadSignal(
+                new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, thisPos))));
         loadPossibleSubsidiaires(info, SignalStateHandler.getStates(info));
     }
 
@@ -77,11 +84,12 @@ public class LinkedPositions {
     }
 
     public void unlink(final BlockPos tilePos, final World world) {
-        final List<SignalStateInfo> signalsToUnload = new ArrayList<>();
+        final List<StateLoadHolder> signalsToUnload = new ArrayList<>();
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
             SignalConfig.reset(info);
-            signalsToUnload.add(info);
+            signalsToUnload.add(
+                    new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, tilePos))));
             SignalStateHandler.removeListener(info, listener);
         });
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
@@ -127,10 +135,12 @@ public class LinkedPositions {
     public void loadSignals(final World world) {
         if (world.isRemote)
             return;
-        final List<SignalStateInfo> signalInfos = new ArrayList<>();
+        final List<StateLoadHolder> signalInfos = new ArrayList<>();
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
             SignalStateHandler.addListener(info, listener);
+            signalInfos.add(
+                    new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, thisPos))));
         });
         SignalStateHandler.loadSignals(signalInfos);
     }
@@ -138,8 +148,10 @@ public class LinkedPositions {
     public void unloadSignals(final World world) {
         if (world.isRemote)
             return;
-        final List<SignalStateInfo> signalInfos = new ArrayList<>();
-        signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
+        final List<StateLoadHolder> signalInfos = new ArrayList<>();
+        signals.forEach((pos, signal) -> signalInfos
+                .add(new StateLoadHolder(new SignalStateInfo(world, pos, signal),
+                        new LoadHolder<>(new StateInfo(world, thisPos)))));
         SignalStateHandler.unloadSignals(signalInfos);
     }
 

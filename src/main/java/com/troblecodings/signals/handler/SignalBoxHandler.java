@@ -120,7 +120,8 @@ public final class SignalBoxHandler {
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
-            holder = ALL_LINKED_POS.computeIfAbsent(identifier, _u -> new LinkedPositions());
+            holder = ALL_LINKED_POS.computeIfAbsent(identifier,
+                    _u -> new LinkedPositions(identifier.pos));
         }
         holder.read(wrapper);
         PathwayHolder grid;
@@ -161,7 +162,8 @@ public final class SignalBoxHandler {
             return false;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
-            holder = ALL_LINKED_POS.computeIfAbsent(identifier, _u -> new LinkedPositions());
+            holder = ALL_LINKED_POS.computeIfAbsent(identifier,
+                    _u -> new LinkedPositions(identifier.pos));
         }
         final boolean linked = holder.addLinkedPos(linkPos, type);
         if (!linked)
