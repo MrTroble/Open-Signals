@@ -50,8 +50,8 @@ public final class SignalStateHandler implements INetworkSync {
     private SignalStateHandler() {
     }
 
-    private static ExecutorService READ_SERVICE = Executors.newCachedThreadPool();
-    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(6);
+    private static ExecutorService READ_SERVICE = Executors.newFixedThreadPool(10);
+    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(4);
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
@@ -76,7 +76,7 @@ public final class SignalStateHandler implements INetworkSync {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        READ_SERVICE = Executors.newCachedThreadPool();
+        READ_SERVICE = Executors.newFixedThreadPool(10);
         WRITE_SERVICE = Executors.newFixedThreadPool(4);
     }
 
@@ -241,19 +241,22 @@ public final class SignalStateHandler implements INetworkSync {
             }
             ALL_LEVEL_FILES.put(stateInfo.world, file);
         }
-        SignalStatePos pos = file.find(stateInfo.pos);
-        if (pos == null) {
-            if (stateInfo.world.isRemote) {
-                OpenSignalsMain.getLogger()
-                        .warn("Position [" + stateInfo + "] not found on client!");
-                return map;
-            } else {
-                OpenSignalsMain.getLogger()
-                        .warn("Position [" + stateInfo + "] not found in file, recovering!");
-                pos = file.create(stateInfo.pos);
+        ByteBuffer buffer;
+        synchronized (file) {
+            SignalStatePos pos = file.find(stateInfo.pos);
+            if (pos == null) {
+                if (stateInfo.world.isRemote) {
+                    OpenSignalsMain.getLogger()
+                            .warn("Position [" + stateInfo + "] not found on client!");
+                    return map;
+                } else {
+                    OpenSignalsMain.getLogger()
+                            .warn("Position [" + stateInfo + "] not found in file, recovering!");
+                    pos = file.create(stateInfo.pos);
+                }
             }
+            buffer = file.read(pos);
         }
-        final ByteBuffer buffer = file.read(pos);
         final List<SEProperty> properties = stateInfo.signal.getProperties();
         final byte[] byteArray = buffer.array();
         for (int i = 0; i < properties.size(); i++) {

@@ -182,8 +182,8 @@ public final class NameHandler implements INetworkSync {
         }
         if (file == null)
             return;
-        SignalStatePos posInFile = file.find(info.pos);
         synchronized (file) {
+            SignalStatePos posInFile = file.find(info.pos);
             if (posInFile == null) {
                 posInFile = file.createState(info.pos, name);
                 return;
@@ -299,7 +299,6 @@ public final class NameHandler implements INetworkSync {
                 if (name == null)
                     return;
                 createToFile(info, name);
-
             });
         });
     }
