@@ -39,7 +39,7 @@ public class LinkedPositions {
     }
 
     private final SignalStateListener listener = (stateInfo, properties, changed) -> {
-        if (changed.equals(ChangedState.UPDATED) || changed.equals(ChangedState.ADDED_TO_CACHE)) {
+        if (changed.equals(ChangedState.ADDED_TO_CACHE)) {
             loadPossibleSubsidiaires(stateInfo, properties);
         } else if (changed.equals(ChangedState.REMOVED_FROM_FILE)) {
             possibleSubsidiaries.remove(stateInfo.pos);

@@ -43,7 +43,8 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public final class NameHandler implements INetworkSync {
 
-    private static ExecutorService IO_SERVICE = Executors.newFixedThreadPool(6);
+    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(4);
+    private static ExecutorService READ_SERVICE = Executors.newFixedThreadPool(10);
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<StateInfo, Integer> LOAD_COUNTER = new HashMap<>();
@@ -57,16 +58,16 @@ public final class NameHandler implements INetworkSync {
 
     @EventHandler
     public static void onServerStop(final FMLServerStoppingEvent event) {
-        synchronized (ALL_NAMES) {
-            ALL_NAMES.forEach((info, name) -> createToFile(info, name));
-        }
-        IO_SERVICE.shutdown();
+        READ_SERVICE.shutdown();
+        WRITE_SERVICE.shutdown();
         try {
-            IO_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
+            READ_SERVICE.awaitTermination(10, TimeUnit.DAYS);
+            WRITE_SERVICE.awaitTermination(10, TimeUnit.DAYS);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        IO_SERVICE = Executors.newFixedThreadPool(6);
+        READ_SERVICE = Executors.newFixedThreadPool(10);
+        WRITE_SERVICE = Executors.newFixedThreadPool(4);
     }
 
     public static void registerToNetworkChannel(final Object obj) {
@@ -159,7 +160,7 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_NAMES) {
             map = ImmutableMap.copyOf(ALL_NAMES);
         }
-        IO_SERVICE.execute(() -> {
+        WRITE_SERVICE.execute(() -> {
             map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
                     .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
         });
@@ -238,9 +239,9 @@ public final class NameHandler implements INetworkSync {
 
     private static void loadNames(final List<StateInfo> infos,
             final @Nullable EntityPlayer player) {
-        if (infos == null || infos.isEmpty() || IO_SERVICE.isShutdown())
+        if (infos == null || infos.isEmpty() || READ_SERVICE.isShutdown())
             return;
-        IO_SERVICE.execute(() -> {
+        READ_SERVICE.execute(() -> {
             infos.forEach(info -> {
                 synchronized (LOAD_COUNTER) {
                     Integer count = LOAD_COUNTER.get(info);
@@ -279,9 +280,9 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static void unloadNames(final List<StateInfo> infos) {
-        if (infos == null || infos.isEmpty() || IO_SERVICE.isShutdown())
+        if (infos == null || infos.isEmpty() || WRITE_SERVICE.isShutdown())
             return;
-        IO_SERVICE.execute(() -> {
+        WRITE_SERVICE.execute(() -> {
             infos.forEach(info -> {
                 synchronized (LOAD_COUNTER) {
                     Integer count = LOAD_COUNTER.get(info);

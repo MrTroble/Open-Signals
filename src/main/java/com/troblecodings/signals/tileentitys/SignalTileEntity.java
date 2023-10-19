@@ -22,7 +22,6 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     private final SignalStateListener listener = (info, states, changed) -> {
         switch (changed) {
-            case ADDED_TO_FILE:
             case ADDED_TO_CACHE: {
                 properties.clear();
                 properties.putAll(SignalStateHandler.getStates(info));

@@ -50,7 +50,8 @@ public final class SignalStateHandler implements INetworkSync {
     private SignalStateHandler() {
     }
 
-    private static ExecutorService IO_SERVICE = Executors.newFixedThreadPool(6);
+    private static ExecutorService READ_SERVICE = Executors.newFixedThreadPool(10);
+    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(4);
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
@@ -67,16 +68,16 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void onServerStop(final FMLServerStoppingEvent event) {
-        synchronized (CURRENTLY_LOADED_STATES) {
-            CURRENTLY_LOADED_STATES.forEach((info, map) -> createToFile(info, map));
-        }
-        IO_SERVICE.shutdown();
+        READ_SERVICE.shutdown();
+        WRITE_SERVICE.shutdown();
         try {
-            IO_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
+            READ_SERVICE.awaitTermination(10, TimeUnit.DAYS);
+            WRITE_SERVICE.awaitTermination(10, TimeUnit.DAYS);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        IO_SERVICE = Executors.newFixedThreadPool(6);
+        READ_SERVICE = Executors.newFixedThreadPool(10);
+        WRITE_SERVICE = Executors.newFixedThreadPool(4);
     }
 
     public static void createStates(final SignalStateInfo info,
@@ -206,10 +207,6 @@ public final class SignalStateHandler implements INetworkSync {
             if (info.world.isRemote) {
                 return new HashMap<>();
             }
-            synchronized (SIGNAL_COUNTER) {
-                if (SIGNAL_COUNTER.containsKey(info))
-                    return new HashMap<>();
-            }
             return readAndSerialize(info);
         }
     }
@@ -279,7 +276,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
-        IO_SERVICE.execute(() -> {
+        WRITE_SERVICE.execute(() -> {
             maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
                     .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
         });
@@ -412,9 +409,9 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void loadSignals(final List<StateLoadHolder> signals,
             final @Nullable EntityPlayer player) {
-        if (signals == null || signals.isEmpty() || IO_SERVICE.isShutdown())
+        if (signals == null || signals.isEmpty() || READ_SERVICE.isShutdown())
             return;
-        IO_SERVICE.execute(() -> {
+        READ_SERVICE.execute(() -> {
             signals.forEach(info -> {
                 synchronized (ALL_LEVEL_FILES) {
                     if (!ALL_LEVEL_FILES.containsKey(info.info.world)) {
@@ -457,9 +454,9 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void unloadSignals(final List<StateLoadHolder> signals) {
-        if (signals == null || signals.isEmpty() || IO_SERVICE.isShutdown())
+        if (signals == null || signals.isEmpty() || WRITE_SERVICE.isShutdown())
             return;
-        IO_SERVICE.execute(() -> {
+        WRITE_SERVICE.execute(() -> {
             signals.forEach(info -> {
                 synchronized (SIGNAL_COUNTER) {
                     final List<LoadHolder<?>> holders = SIGNAL_COUNTER.getOrDefault(info.info,
