@@ -252,30 +252,30 @@ public final class NameHandler implements INetworkSync {
                         return;
                     }
                     LOAD_COUNTER.put(info, 1);
-                    String name;
-                    NameHandlerFile file;
-                    synchronized (ALL_LEVEL_FILES) {
-                        file = ALL_LEVEL_FILES.get(info.world);
-                        if (file == null) {
-                            file = new NameHandlerFile(Paths.get("osfiles/namefiles/"
-                                    + ((WorldServer) info.world).getMinecraftServer().getName()
-                                            .replace(":", "").replace("/", "").replace("\\", "")
-                                    + "/" + ((WorldServer) info.world).provider.getDimensionType()
-                                            .getName().replace(":", "")));
-                            ALL_LEVEL_FILES.put(info.world, file);
-                        }
+                }
+                String name;
+                NameHandlerFile file;
+                synchronized (ALL_LEVEL_FILES) {
+                    file = ALL_LEVEL_FILES.get(info.world);
+                    if (file == null) {
+                        file = new NameHandlerFile(Paths.get("osfiles/namefiles/"
+                                + ((WorldServer) info.world).getMinecraftServer().getName()
+                                        .replace(":", "").replace("/", "").replace("\\", "")
+                                + "/" + ((WorldServer) info.world).provider.getDimensionType()
+                                        .getName().replace(":", "")));
+                        ALL_LEVEL_FILES.put(info.world, file);
                     }
-                    synchronized (file) {
-                        name = file.getString(info.pos);
-                    }
-                    synchronized (ALL_NAMES) {
-                        ALL_NAMES.put(info, name);
-                    }
-                    if (player == null) {
-                        sendToAll(info, name);
-                    } else {
-                        sendTo(player, packToBuffer(info.pos, name));
-                    }
+                }
+                synchronized (file) {
+                    name = file.getString(info.pos);
+                }
+                synchronized (ALL_NAMES) {
+                    ALL_NAMES.put(info, name);
+                }
+                if (player == null) {
+                    sendToAll(info, name);
+                } else {
+                    sendTo(player, packToBuffer(info.pos, name));
                 }
             });
         });
