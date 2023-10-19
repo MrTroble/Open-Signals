@@ -50,8 +50,8 @@ public final class SignalStateHandler implements INetworkSync {
     private SignalStateHandler() {
     }
 
-    private static ExecutorService READ_SERVICE = Executors.newFixedThreadPool(20);
-    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(4);
+    private static ExecutorService READ_SERVICE = Executors.newCachedThreadPool();
+    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(5);
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
@@ -76,8 +76,8 @@ public final class SignalStateHandler implements INetworkSync {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        READ_SERVICE = Executors.newFixedThreadPool(20);
-        WRITE_SERVICE = Executors.newFixedThreadPool(4);
+        READ_SERVICE = Executors.newCachedThreadPool();
+        WRITE_SERVICE = Executors.newFixedThreadPool(5);
     }
 
     public static void createStates(final SignalStateInfo info,

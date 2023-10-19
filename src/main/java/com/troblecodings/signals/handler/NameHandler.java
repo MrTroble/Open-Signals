@@ -43,8 +43,8 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 
 public final class NameHandler implements INetworkSync {
 
-    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(4);
-    private static ExecutorService READ_SERVICE = Executors.newFixedThreadPool(20);
+    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(5);
+    private static ExecutorService READ_SERVICE = Executors.newCachedThreadPool();
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<StateInfo, Integer> LOAD_COUNTER = new HashMap<>();
@@ -66,8 +66,8 @@ public final class NameHandler implements INetworkSync {
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        READ_SERVICE = Executors.newFixedThreadPool(20);
-        WRITE_SERVICE = Executors.newFixedThreadPool(4);
+        READ_SERVICE = Executors.newCachedThreadPool();
+        WRITE_SERVICE = Executors.newFixedThreadPool(5);
     }
 
     public static void registerToNetworkChannel(final Object obj) {
