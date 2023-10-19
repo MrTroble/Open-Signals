@@ -140,7 +140,9 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
         }
-        file.deleteIndex(info.pos);
+        synchronized (file) {
+            file.deleteIndex(info.pos);
+        }
         sendRemoved(info);
     }
 
