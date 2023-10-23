@@ -22,6 +22,8 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     public static final ResourceLocation ICON = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/symbols.png");
+    public static final ResourceLocation ARROW_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/connection.png");
 
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
