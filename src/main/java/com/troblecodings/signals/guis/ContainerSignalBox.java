@@ -38,7 +38,7 @@ import net.minecraft.world.level.block.Rotation;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
-    protected final List<ModeIdentifier> greenSignals = new ArrayList<>();
+    protected final Map<Point, List<ModeSet>> greenSignals = new HashMap<>();
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
     protected final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
@@ -48,6 +48,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private SignalBoxTileEntity tile;
     private Consumer<String> infoUpdates;
     private Consumer<List<SignalBoxNode>> colorUpdates;
+    private Consumer<List<Point>> signalUpdates;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -157,7 +158,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 }
                 final int greenSignalsSize = buffer.getInt();
                 for (int i = 0; i < greenSignalsSize; i++) {
-                    greenSignals.add(ModeIdentifier.of(buffer));
+                    final ModeIdentifier identifier = ModeIdentifier.of(buffer);
+                    final List<ModeSet> greenSignals = this.greenSignals
+                            .computeIfAbsent(identifier.point, _u -> new ArrayList<>());
+                    greenSignals.add(identifier.mode);
                 }
                 update();
                 break;
@@ -196,16 +200,24 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 break;
             }
             case SET_SIGNALS: {
+                final List<Point> pointUpdates = new ArrayList<>();
                 final int redSignalSize = buffer.getByteToUnsignedInt();
                 for (int i = 0; i < redSignalSize; i++) {
-                    greenSignals.remove(ModeIdentifier.of(buffer));
+                    final ModeIdentifier identifier = ModeIdentifier.of(buffer);
+                    greenSignals.remove(identifier.point);
+                    pointUpdates.add(identifier.point);
                 }
                 final int greenSignalSize = buffer.getByteToUnsignedInt();
                 for (int i = 0; i < greenSignalSize; i++) {
                     final ModeIdentifier modeIdentifier = ModeIdentifier.of(buffer);
-                    if (!greenSignals.contains(modeIdentifier))
-                        greenSignals.add(modeIdentifier);
+                    if (!greenSignals.containsKey(modeIdentifier.point)) {
+                        final List<ModeSet> greenSignals = this.greenSignals
+                                .computeIfAbsent(modeIdentifier.point, _u -> new ArrayList<>());
+                        greenSignals.add(modeIdentifier.mode);
+                    }
+                    pointUpdates.add(modeIdentifier.point);
                 }
+                signalUpdates.accept(pointUpdates);
                 break;
             }
             default:
@@ -410,5 +422,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     protected void setColorUpdater(final Consumer<List<SignalBoxNode>> updater) {
         this.colorUpdates = updater;
+    }
+
+    protected void setSignalUpdater(final Consumer<List<Point>> updater) {
+        this.signalUpdates = updater;
     }
 }

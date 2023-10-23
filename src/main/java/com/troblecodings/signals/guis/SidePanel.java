@@ -1,5 +1,6 @@
 package com.troblecodings.signals.guis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -168,7 +169,7 @@ public class SidePanel {
         final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
         node.add(new ModeSet(modes, Rotation.values()[rotation]));
-        final UISignalBoxTile sbt = new UISignalBoxTile(node);
+        final UISignalBoxTile sbt = new UISignalBoxTile(node, new ArrayList<>());
         preview.add(sbt);
         preview.add(new UIBorder(new UIEntity().getBasicTextColor()));
 

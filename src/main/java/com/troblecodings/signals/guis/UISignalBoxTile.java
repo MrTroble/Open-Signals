@@ -1,6 +1,8 @@
 package com.troblecodings.signals.guis;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
@@ -11,6 +13,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
@@ -24,15 +27,30 @@ public class UISignalBoxTile extends UIComponentEntity {
             "gui/textures/symbols.png");
     public static final ResourceLocation ARROW_ICON = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/connection.png");
+    public static final ResourceLocation SIGNALS = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/signals.png");
 
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
+    private final List<ModeSet> greenSignals;
 
-    public UISignalBoxTile(final SignalBoxNode node) {
+    public UISignalBoxTile(final SignalBoxNode node, final List<ModeSet> greenSignals) {
         super(new UIEntity());
         this.node = node;
+        this.greenSignals = new ArrayList<>(greenSignals);
         if (this.node != null)
             this.node.forEach(this::localAdd);
+    }
+
+    public void setGreenSignals(final List<ModeSet> list) {
+        greenSignals.clear();
+        greenSignals.addAll(list);
+    }
+
+    public void updateModeSet(final ModeSet mode) {
+        localRemove(mode);
+        localAdd(mode);
+        update();
     }
 
     public void setNode(final SignalBoxNode node) {
@@ -51,7 +69,8 @@ public class UISignalBoxTile extends UIComponentEntity {
             entity.add(rotation);
         }
         entity.add(new UIIndependentTranslate(0, 0, 1));
-        entity.add((UIComponent) modeSet.mode.consumer.get());
+        entity.add((UIComponent) modeSet.mode.consumer
+                .get(greenSignals.contains(modeSet) ? SignalState.GREEN : SignalState.RED));
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
         this.entity.setVisible(!setToEntity.isEmpty());

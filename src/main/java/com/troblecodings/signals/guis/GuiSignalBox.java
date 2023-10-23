@@ -112,6 +112,7 @@ public class GuiSignalBox extends GuiBase {
         this.container = (ContainerSignalBox) info.base;
         container.setInfoConsumer(this::infoUpdate);
         container.setColorUpdater(this::applyColorChanges);
+        container.setSignalUpdater(this::updateSignals);
         this.info = info;
     }
 
@@ -128,6 +129,19 @@ public class GuiSignalBox extends GuiBase {
             lowerEntity.remove(tooltip);
         }).start();
         return;
+    }
+
+    public void updateSignals(final List<Point> updated) {
+        updated.forEach(point -> {
+            final UISignalBoxTile tile = allTiles.get(point);
+            tile.setGreenSignals(container.greenSignals.getOrDefault(point, new ArrayList<>()));
+            tile.getNode().forEach(mode -> {
+                if (mode.mode.equals(EnumGuiMode.HP) || mode.mode.equals(EnumGuiMode.VP)
+                        || mode.mode.equals(EnumGuiMode.RS)) {
+                    tile.updateModeSet(mode);
+                }
+            });
+        });
     }
 
     protected void resetTileSelection() {
@@ -806,7 +820,8 @@ public class GuiSignalBox extends GuiBase {
                 if (node == null) {
                     node = new SignalBoxNode(name);
                 }
-                final UISignalBoxTile sbt = new UISignalBoxTile(node);
+                final UISignalBoxTile sbt = new UISignalBoxTile(node,
+                        container.greenSignals.getOrDefault(name, new ArrayList<>()));
                 if (!node.isEmpty())
                     allTiles.put(name, sbt);
                 tile.add(sbt);
