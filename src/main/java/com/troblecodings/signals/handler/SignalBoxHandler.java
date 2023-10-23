@@ -139,6 +139,18 @@ public final class SignalBoxHandler {
         return grid.isValidStart(start) && grid.isValidEnd(end);
     }
 
+    public static SignalBoxNode getNodeFromGrid(final PosIdentifier identifier, final Point point) {
+        if (identifier.world.isClientSide)
+            return new SignalBoxNode();
+        PathwayHolder grid;
+        synchronized (ALL_GRIDS) {
+            grid = ALL_GRIDS.get(identifier);
+        }
+        if (grid == null)
+            return new SignalBoxNode();
+        return grid.getNode(point);
+    }
+
     public static boolean requesetInterSignalBoxPathway(final PosIdentifier startBox,
             final Point start, final Point end) {
         if (startBox.world.isClientSide)

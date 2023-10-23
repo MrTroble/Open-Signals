@@ -103,7 +103,7 @@ public class PathwayHolder implements IChunkLoadable {
 
     public SignalBoxNode getNode(final Point point) {
         checkTileWasLoaded();
-        return modeGrid.get(point);
+        return modeGrid.getOrDefault(point, new SignalBoxNode());
     }
 
     public List<ModeIdentifier> getGreenSignals() {

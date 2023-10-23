@@ -56,8 +56,15 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
 
     public void requestPathway() {
         final PosIdentifier identifier = new PosIdentifier(linkedSignalBox, level);
-        if (!SignalBoxHandler.requestPathway(identifier, pathway.getKey(), pathway.getValue())) {
-            SignalBoxHandler.addNextPathway(identifier, pathway.getKey(), pathway.getValue());
+        if (SignalBoxHandler.getNodeFromGrid(identifier, pathway.getValue())
+                .containsOutConnection()) {
+            SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
+                    pathway.getValue());
+        } else {
+            if (!SignalBoxHandler.requestPathway(identifier, pathway.getKey(),
+                    pathway.getValue())) {
+                SignalBoxHandler.addNextPathway(identifier, pathway.getKey(), pathway.getValue());
+            }
         }
     }
 

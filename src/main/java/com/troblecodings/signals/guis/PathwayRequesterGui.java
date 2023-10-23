@@ -69,7 +69,7 @@ public class PathwayRequesterGui extends GuiBase {
 
         if (!container.validEnds.isEmpty()) {
             inner.add(GuiElements.createEnumElement(end, e -> {
-                container.end = container.validStarts.get(e);
+                container.end = container.validEnds.get(e);
             }, container.end != null ? container.end.equals(new Point()) ? 0
                     : container.validEnds.indexOf(container.end) : 0));
         } else {
