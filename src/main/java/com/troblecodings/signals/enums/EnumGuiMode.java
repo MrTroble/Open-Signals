@@ -35,11 +35,9 @@ public enum EnumGuiMode {
     private EnumGuiMode(final int id, final boolean unused) {
         this((state) -> {
             if (state.equals(SignalState.RED)) {
-                return new UITexture(UISignalBoxTile.SIGNALS, id * 2 * 0.1666, 0,
-                        id * 2 * 0.1666 + 0.1666, 1);
+                return new UITexture(UISignalBoxTile.SIGNALS, id * 0.286f, 0, id * 0.286f + 0.143f, 1);
             } else {
-                return new UITexture(UISignalBoxTile.SIGNALS, (id + 0.5) * 2 * 0.1666, 0,
-                        (id + 0.5) * 2 * 0.1666 + 0.1666, 1);
+                return new UITexture(UISignalBoxTile.SIGNALS, id * 0.286f + 0.143f, 0, id * 0.286f + 0.286f, 1);
             }
         });
     }
