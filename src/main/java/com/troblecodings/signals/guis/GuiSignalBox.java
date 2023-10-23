@@ -443,7 +443,7 @@ public class GuiSignalBox extends GuiBase {
                             return point.toShortString();
                         }));
                 parent.add(GuiElements.createEnumElement(integerable, e -> {
-                    final Point point = validInConnections.get(e);
+                    final Point point = e >= 0 ? validInConnections.get(e) : null;
                     if (point == null) {
                         option.removeEntry(PathEntryType.POINT);
                         removeEntryFromServer(node, mode, rotation, PathEntryType.POINT);
@@ -467,7 +467,7 @@ public class GuiSignalBox extends GuiBase {
                             return point.toShortString();
                         }));
                 parent.add(GuiElements.createEnumElement(integerable, e -> {
-                    final Point point = validEnds.get(e);
+                    final Point point = e >= 0 ? validEnds.get(e) : null;
                     if (point == null) {
                         option.removeEntry(PathEntryType.POINT);
                         removeEntryFromServer(node, mode, rotation, PathEntryType.POINT);
