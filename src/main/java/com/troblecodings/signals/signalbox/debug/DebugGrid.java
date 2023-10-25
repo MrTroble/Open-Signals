@@ -10,7 +10,7 @@ public class DebugGrid extends SignalBoxGrid {
     }
 
     @Override
-    public void resetPathway(final Point p1) {
-        super.resetPathway(p1);
+    public boolean resetPathway(final Point p1) {
+        return super.resetPathway(p1);
     }
 }

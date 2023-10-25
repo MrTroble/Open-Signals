@@ -257,17 +257,18 @@ public class PathwayHolder implements IChunkLoadable {
         nextPathways.remove(Maps.immutableEntry(start, end));
     }
 
-    public void resetPathway(final Point p1) {
+    public boolean resetPathway(final Point p1) {
         if (startsToPath.isEmpty())
-            return;
+            return false;
         final SignalBoxPathway pathway = startsToPath.get(p1);
         if (pathway == null) {
             OpenSignalsMain.getLogger().warn("No Pathway to reset on [" + p1 + "]!");
-            return;
+            return false;
         }
         resetPathway(pathway);
         updateToNet(pathway);
         tryNextPathways();
+        return true;
     }
 
     protected void resetPathway(final SignalBoxPathway pathway) {

@@ -585,6 +585,11 @@ public class SidePanel {
                                                 }
                                                 gui.updateSignals(
                                                         ImmutableList.of(node.getPoint()));
+                                                if (state.isCountable() && entry.state) {
+                                                    gui.container.grid.countOne();
+                                                    gui.updateCounter();
+                                                    gui.sendCurrentCounterToServer();
+                                                }
                                             }, defaultValue));
                                 });
                                 final UIEntity screen = GuiElements.createScreen(selection -> {

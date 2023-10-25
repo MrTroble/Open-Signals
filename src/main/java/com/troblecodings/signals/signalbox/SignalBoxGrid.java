@@ -38,10 +38,12 @@ public class SignalBoxGrid implements INetworkSavable {
 
     private static final String NODE_LIST = "nodeList";
     private static final String SUBSIDIARY_LIST = "subsidiaryList";
+    private static final String SUBSIDIARY_COUNTER = "subsidiaryCounter";
 
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final SignalBoxFactory factory;
     private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
+    private int counter;
     private BlockPos tilePos;
     private Level world;
 
@@ -54,9 +56,9 @@ public class SignalBoxGrid implements INetworkSavable {
         this.world = world;
     }
 
-    public void resetPathway(final Point p1) {
-        SignalBoxHandler.resetPathway(new PosIdentifier(tilePos, world), p1);
+    public boolean resetPathway(final Point p1) {
         enabledSubsidiaryTypes.remove(p1);
+        return SignalBoxHandler.resetPathway(new PosIdentifier(tilePos, world), p1);
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
@@ -85,6 +87,7 @@ public class SignalBoxGrid implements INetworkSavable {
                     })::iterator);
                     return nodeTag;
                 })::iterator);
+        tag.putInteger(SUBSIDIARY_COUNTER, counter);
     }
 
     @Override
@@ -105,6 +108,7 @@ public class SignalBoxGrid implements INetworkSavable {
             });
             enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
+        counter = tag.getInteger(SUBSIDIARY_COUNTER);
     }
 
     @Override
@@ -145,6 +149,22 @@ public class SignalBoxGrid implements INetworkSavable {
                 .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
     }
 
+    public int getCurrentCounter() {
+        return counter;
+    }
+
+    public void countOne() {
+        counter++;
+    }
+
+    public void setCurrentCounter(final int counter) {
+        if (counter < 10000) {
+            this.counter = counter;
+        } else {
+            this.counter = 0;
+        }
+    }
+
     protected Map<Point, SignalBoxNode> getModeGrid() {
         return modeGrid;
     }
@@ -179,6 +199,7 @@ public class SignalBoxGrid implements INetworkSavable {
             node.readNetwork(buffer);
             modeGrid.put(point, node);
         }
+        counter = buffer.getInt();
     }
 
     @Override
@@ -199,6 +220,7 @@ public class SignalBoxGrid implements INetworkSavable {
             }
             node.writeNetwork(buffer);
         });
+        buffer.putInt(counter);
     }
 
     public List<SignalBoxNode> readUpdateNetwork(final ReadBuffer buffer, final boolean override) {

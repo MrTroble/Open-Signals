@@ -117,6 +117,7 @@ public class GuiSignalBox extends GuiBase {
         container.setInfoConsumer(this::infoUpdate);
         container.setColorUpdater(this::applyColorChanges);
         container.setSignalUpdater(this::updateSignals);
+        container.setConuterUpdater(this::updateCounter);
         this.info = info;
     }
 
@@ -426,8 +427,9 @@ public class GuiSignalBox extends GuiBase {
                                         final MainSignalIdentifier identifier = new MainSignalIdentifier(
                                                 new ModeIdentifier(node.getPoint(), modeSet), pos,
                                                 SignalState.combine(state.getSubsidiaryShowType()));
-                                        final List<MainSignalIdentifier> greenSignals = container.greenSignals
-                                                .computeIfAbsent(identifier.getPoint(),
+                                        final List<MainSignalIdentifier> greenSignals = //
+                                                container.greenSignals.computeIfAbsent(
+                                                        identifier.getPoint(),
                                                         _u -> new ArrayList<>());
                                         if (entry.state) {
                                             if (greenSignals.contains(identifier))
@@ -437,6 +439,11 @@ public class GuiSignalBox extends GuiBase {
                                             greenSignals.remove(identifier);
                                         }
                                         updateSignals(ImmutableList.of(node.getPoint()));
+                                        if (state.isCountable() && entry.state) {
+                                            container.grid.countOne();
+                                            updateCounter();
+                                            sendCurrentCounterToServer();
+                                        }
                                     }, defaultValue));
                         });
                         final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -879,6 +886,12 @@ public class GuiSignalBox extends GuiBase {
         buildColors(container.grid.getNodes());
     }
 
+    private UIButton counterButton;
+
+    public void updateCounter() {
+        counterButton.setText(container.grid.getCurrentCounter() + "");
+    }
+
     private void initializeBasicUI() {
         final String name = I18Wrapper.format("tile.signalbox.name");
 
@@ -896,7 +909,7 @@ public class GuiSignalBox extends GuiBase {
         header.setHeight(20);
         header.add(new UIBox(UIBox.HBOX, 4));
         header.add(titel);
-        header.add(GuiElements.createSpacerH(40));
+        header.add(GuiElements.createSpacerH(20));
         header.add(GuiElements.createButton(I18Wrapper.format("btn.settings"),
                 this::initializePageSettings));
         header.add(
@@ -904,7 +917,10 @@ public class GuiSignalBox extends GuiBase {
         mainButton = GuiElements.createButton(I18Wrapper.format("btn.main"),
                 this::initializeFieldUsage);
         header.add(mainButton);
-        header.add(GuiElements.createSpacerH(5));
+        final UIEntity counter = GuiElements.createButton(container.grid.getCurrentCounter() + "");
+        counter.findRecursive(UIButton.class).forEach(b -> counterButton = b);
+        counter.add(new UIToolTip("btn.counter.tooltip"));
+        header.add(counter);
         resetSelection(mainButton);
 
         final UIEntity middlePart = new UIEntity();
@@ -1111,6 +1127,15 @@ public class GuiSignalBox extends GuiBase {
         buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
         start.writeNetwork(buffer);
         end.writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void sendCurrentCounterToServer() {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
+        buffer.putInt(container.grid.getCurrentCounter());
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 

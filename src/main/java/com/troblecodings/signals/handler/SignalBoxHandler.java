@@ -54,16 +54,16 @@ public final class SignalBoxHandler {
     private static final Map<PosIdentifier, LinkingUpdates> POS_UPDATES = new HashMap<>();
     private static final Map<PosIdentifier, Boolean> OUTPUT_UPDATES = new HashMap<>();
 
-    public static void resetPathway(final PosIdentifier identifier, final Point point) {
+    public static boolean resetPathway(final PosIdentifier identifier, final Point point) {
         if (identifier.world.isClientSide)
-            return;
+            return false;
         PathwayHolder grid;
         synchronized (ALL_GRIDS) {
             grid = ALL_GRIDS.get(identifier);
         }
         if (grid == null)
-            return;
-        grid.resetPathway(point);
+            return false;
+        return grid.resetPathway(point);
     }
 
     public static boolean requestPathway(final PosIdentifier identifier, final Point p1,

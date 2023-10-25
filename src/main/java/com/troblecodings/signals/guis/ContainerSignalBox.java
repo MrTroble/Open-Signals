@@ -51,6 +51,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     private Consumer<String> infoUpdates;
     private Consumer<List<SignalBoxNode>> colorUpdates;
     private Consumer<List<Point>> signalUpdates;
+    private Runnable counterUpdater;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -62,7 +63,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     @Override
     public void sendAllDataToRemote() {
-        final SignalBoxGrid grid = tile.getSignalBoxGrid();
+        this.grid = tile.getSignalBoxGrid();
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_GRID);
         buffer.putBlockPos(info.pos);
@@ -250,6 +251,11 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 signalUpdates.accept(pointUpdates);
                 break;
             }
+            case SEND_COUNTER: {
+                grid.setCurrentCounter(buffer.getInt());
+                counterUpdater.run();
+                break;
+            }
             default:
                 break;
         }
@@ -257,7 +263,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     @Override
     public void deserializeServer(final ReadBuffer buffer) {
-        final SignalBoxGrid grid = tile.getSignalBoxGrid();
+        if (grid == null)
+            grid = tile.getSignalBoxGrid();
         final SignalBoxNetwork mode = buffer.getEnumValue(SignalBoxNetwork.class);
         switch (mode) {
             case SEND_INT_ENTRY: {
@@ -291,7 +298,13 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             }
             case RESET_PW: {
                 final Point point = Point.of(buffer);
-                grid.resetPathway(point);
+                if (grid.resetPathway(point)) {
+                    grid.countOne();
+                    final WriteBuffer sucess = new WriteBuffer();
+                    sucess.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
+                    sucess.putInt(grid.getCurrentCounter());
+                    OpenSignalsMain.network.sendTo(info.player, sucess);
+                }
                 break;
             }
             case REQUEST_PW: {
@@ -393,6 +406,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 deserializeEntry(buffer, Point.of(buffer));
                 break;
             }
+            case SEND_COUNTER: {
+                grid.setCurrentCounter(buffer.getInt());
+                break;
+            }
             default:
                 break;
         }
@@ -456,5 +473,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     protected void setSignalUpdater(final Consumer<List<Point>> updater) {
         this.signalUpdates = updater;
+    }
+
+    protected void setConuterUpdater(final Runnable run) {
+        this.counterUpdater = run;
     }
 }
