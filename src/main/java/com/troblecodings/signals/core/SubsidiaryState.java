@@ -7,18 +7,32 @@ import java.util.Objects;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.signals.enums.ShowSubsidiary;
 
 public class SubsidiaryState {
 
     public static final List<SubsidiaryState> ALL_STATES = new ArrayList<>();
 
-    private final int id;
-    private final String name;
+    private transient int id;
+    private transient ShowSubsidiary showSubsidiary = ShowSubsidiary.SIGNAL_RED;
+    private String name;
+    private String showSubsidiaryAtSignal;
+    private boolean isCountable = false;
 
     public SubsidiaryState(final String name) {
         this.name = name.toLowerCase();
         this.id = ALL_STATES.size();
         ALL_STATES.add(this);
+    }
+
+    public void prepareData() {
+        this.name = name.toLowerCase();
+        this.id = ALL_STATES.size();
+        ALL_STATES.add(this);
+        if (showSubsidiaryAtSignal != null) {
+            showSubsidiary = Enum.valueOf(ShowSubsidiary.class,
+                    showSubsidiaryAtSignal.toUpperCase());
+        }
     }
 
     public int getID() {
@@ -27,6 +41,14 @@ public class SubsidiaryState {
 
     public String getName() {
         return name;
+    }
+
+    public ShowSubsidiary getSubsidiaryShowType() {
+        return showSubsidiary;
+    }
+
+    public boolean isCountable() {
+        return isCountable;
     }
 
     public void writeNetwork(final WriteBuffer buffer) {

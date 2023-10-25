@@ -17,13 +17,13 @@ import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LinkedPositions;
 import com.troblecodings.signals.core.LinkingUpdates;
-import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.PathwayHolder;
 import com.troblecodings.signals.signalbox.Point;
@@ -237,7 +237,7 @@ public final class SignalBoxHandler {
         }
     }
 
-    public static List<ModeIdentifier> getGreenSignals(final PosIdentifier identifier) {
+    public static List<MainSignalIdentifier> getGreenSignals(final PosIdentifier identifier) {
         if (identifier.world.isClientSide)
             return new ArrayList<>();
         PathwayHolder holder;

@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 import com.troblecodings.guilib.ecs.entitys.DrawInfo;
@@ -51,7 +50,7 @@ public class UIMenu extends UIComponent {
                 preview.add(new UIColor(0xFFAFAFAF));
                 final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
                 node.add(new ModeSet(mode, Rotation.values()[this.rotation]));
-                final UISignalBoxTile sbt = new UISignalBoxTile(node, new ArrayList<>());
+                final UISignalBoxTile sbt = new UISignalBoxTile(node);
                 preview.add(sbt);
                 preview.setHeight(20);
                 preview.setWidth(20);

@@ -5,7 +5,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.signals.core.OSSupplier;
 import com.troblecodings.signals.guis.UISignalBoxTile;
-import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 
 public enum EnumGuiMode {
     STRAIGHT(new float[] {
@@ -34,12 +33,39 @@ public enum EnumGuiMode {
 
     private EnumGuiMode(final int id, final boolean unused) {
         this((state) -> {
-            if (state.equals(SignalState.RED)) {
-                return new UITexture(UISignalBoxTile.SIGNALS, id * 0.286f, 0, id * 0.286f + 0.143f, 1);
-            } else {
-                return new UITexture(UISignalBoxTile.SIGNALS, id * 0.286f + 0.143f, 0, id * 0.286f + 0.286f, 1);
+            switch (state) {
+                case GREEN: {
+                    return new UITexture(UISignalBoxTile.SIGNALS, id * 0.067f, 0,
+                            id * 0.067f + 0.06f, 1);
+                }
+                case RED: {
+                    return new UITexture(UISignalBoxTile.SIGNALS, id * 0.067f + 3 * 0.067f, 0,
+                            id * 0.067f + 3 * 0.067f + 0.06f, 1);
+                }
+                case OFF: {
+                    return new UITexture(UISignalBoxTile.SIGNALS, id * 0.067f + 6 * 0.067f, 0,
+                            id * 0.067f + 6 * 0.067f + 0.06f, 1);
+                }
+                case SUBSIDIARY_GREEN: {
+                    final int factor = 9;
+                    return new UITexture(UISignalBoxTile.SIGNALS, (id + factor) * 0.067f, 0,
+                            id * 0.067f + factor * 0.067f + 0.06f, 1);
+                }
+                case SUBSIDIARY_RED: {
+                    final int factor = 10;
+                    return new UITexture(UISignalBoxTile.SIGNALS, (id + factor) * 0.067f, 0,
+                            (id + factor) * 0.067f + 0.06f, 1);
+                }
+                case SUBSIDIARY_OFF: {
+                    final int factor = 11;
+                    return new UITexture(UISignalBoxTile.SIGNALS, (id + factor) * 0.067f, 0,
+                            (id + factor) * 0.067f + 0.06f, 1);
+                }
+                default:
+                    return new UITexture(UISignalBoxTile.SIGNALS);
             }
         });
+        System.out.println(this.toString() + " ID: " + id);
     }
 
     private EnumGuiMode(final float[] array) {

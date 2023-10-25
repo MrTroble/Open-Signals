@@ -13,7 +13,6 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
-import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
@@ -106,8 +105,8 @@ public class PathwayHolder implements IChunkLoadable {
         return modeGrid.getOrDefault(point, new SignalBoxNode());
     }
 
-    public List<ModeIdentifier> getGreenSignals() {
-        final List<ModeIdentifier> returnList = new ArrayList<>();
+    public List<MainSignalIdentifier> getGreenSignals() {
+        final List<MainSignalIdentifier> returnList = new ArrayList<>();
         startsToPath.values().forEach(pathway -> returnList.addAll(pathway.getGreenSignals()));
         return returnList;
     }

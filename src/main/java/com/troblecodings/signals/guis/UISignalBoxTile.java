@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +12,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -32,19 +32,21 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
-    private final List<ModeSet> greenSignals;
+    private final Map<ModeSet, MainSignalIdentifier> greenSignals = new HashMap<>();
 
-    public UISignalBoxTile(final SignalBoxNode node, final List<ModeSet> greenSignals) {
+    public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
         this.node = node;
-        this.greenSignals = new ArrayList<>(greenSignals);
         if (this.node != null)
             this.node.forEach(this::localAdd);
     }
 
-    public void setGreenSignals(final List<ModeSet> list) {
+    public void setGreenSignals(final List<MainSignalIdentifier> list) {
         greenSignals.clear();
-        greenSignals.addAll(list);
+        list.forEach(identifier -> {
+            greenSignals.put(identifier.getModeSet(), identifier);
+            updateModeSet(identifier.getModeSet());
+        });
     }
 
     public void updateModeSet(final ModeSet mode) {
@@ -69,8 +71,11 @@ public class UISignalBoxTile extends UIComponentEntity {
             entity.add(rotation);
         }
         entity.add(new UIIndependentTranslate(0, 0, 1));
-        entity.add((UIComponent) modeSet.mode.consumer
-                .get(greenSignals.contains(modeSet) ? SignalState.GREEN : SignalState.RED));
+
+        final MainSignalIdentifier identifier = greenSignals.get(modeSet);
+        final SignalState state = identifier != null ? identifier.state : SignalState.RED;
+
+        entity.add((UIComponent) modeSet.mode.consumer.get(state));
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
         this.entity.setVisible(!setToEntity.isEmpty());

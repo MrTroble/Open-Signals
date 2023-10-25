@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
@@ -39,6 +40,7 @@ import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnumHolder;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -49,11 +51,13 @@ import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Path;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -419,6 +423,20 @@ public class GuiSignalBox extends GuiBase {
                                         helpPage.helpUsageMode(enabledSubsidiaries, null,
                                                 container.grid.getNodes(),
                                                 container.possibleSubsidiaries);
+                                        final MainSignalIdentifier identifier = new MainSignalIdentifier(
+                                                new ModeIdentifier(node.getPoint(), modeSet), pos,
+                                                SignalState.combine(state.getSubsidiaryShowType()));
+                                        final List<MainSignalIdentifier> greenSignals = container.greenSignals
+                                                .computeIfAbsent(identifier.getPoint(),
+                                                        _u -> new ArrayList<>());
+                                        if (entry.state) {
+                                            if (greenSignals.contains(identifier))
+                                                greenSignals.remove(identifier);
+                                            greenSignals.add(identifier);
+                                        } else {
+                                            greenSignals.remove(identifier);
+                                        }
+                                        updateSignals(ImmutableList.of(node.getPoint()));
                                     }, defaultValue));
                         });
                         final UIEntity screen = GuiElements.createScreen(selection -> {
@@ -506,6 +524,14 @@ public class GuiSignalBox extends GuiBase {
         helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
                 container.possibleSubsidiaries);
         this.resetTileSelection();
+
+        final MainSignalIdentifier identifier = new MainSignalIdentifier(
+                new ModeIdentifier(holder.point, holder.modeSet), pos,
+                SignalState.combine(entry.enumValue.getSubsidiaryShowType()));
+        final List<MainSignalIdentifier> greenSignals = container.greenSignals
+                .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
+        greenSignals.remove(identifier);
+        updateSignals(ImmutableList.of(holder.point));
     }
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
@@ -820,11 +846,11 @@ public class GuiSignalBox extends GuiBase {
                 if (node == null) {
                     node = new SignalBoxNode(name);
                 }
-                final UISignalBoxTile sbt = new UISignalBoxTile(node,
-                        container.greenSignals.getOrDefault(name, new ArrayList<>()));
+                final UISignalBoxTile sbt = new UISignalBoxTile(node);
                 if (!node.isEmpty())
                     allTiles.put(name, sbt);
                 tile.add(sbt);
+                sbt.setGreenSignals(container.greenSignals.getOrDefault(name, new ArrayList<>()));
                 if (!node.getCustomText().isEmpty()) {
                     final UIEntity inputEntity = new UIEntity();
                     inputEntity.add(new UIScale(0.7f, 0.7f, 0.7f));

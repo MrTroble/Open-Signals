@@ -24,6 +24,8 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -38,7 +40,7 @@ import net.minecraft.world.level.block.Rotation;
 
 public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
-    protected final Map<Point, List<ModeSet>> greenSignals = new HashMap<>();
+    protected final Map<Point, List<MainSignalIdentifier>> greenSignals = new HashMap<>();
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
     protected final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
@@ -99,7 +101,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             buffer.putByte((byte) list.size());
             list.forEach(point -> point.writeNetwork(buffer));
         });
-        final List<ModeIdentifier> greenSignals = SignalBoxHandler.getGreenSignals(identifier);
+        final List<MainSignalIdentifier> greenSignals = SignalBoxHandler
+                .getGreenSignals(identifier);
         buffer.putInt(greenSignals.size());
         greenSignals.forEach(signal -> signal.writeNetwork(buffer));
         OpenSignalsMain.network.sendTo(info.player, buffer);
@@ -158,11 +161,30 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 }
                 final int greenSignalsSize = buffer.getInt();
                 for (int i = 0; i < greenSignalsSize; i++) {
-                    final ModeIdentifier identifier = ModeIdentifier.of(buffer);
-                    final List<ModeSet> greenSignals = this.greenSignals
-                            .computeIfAbsent(identifier.point, _u -> new ArrayList<>());
-                    greenSignals.add(identifier.mode);
+                    final MainSignalIdentifier identifier = MainSignalIdentifier.of(buffer);
+
+                    final Map<ModeSet, SubsidiaryEntry> subsidiary = enabledSubsidiaryTypes
+                            .getOrDefault(identifier.getPoint(), new HashMap<>());
+                    final SubsidiaryEntry entry = subsidiary.get(identifier.getModeSet());
+                    if (entry != null) {
+                        identifier.state = SignalState
+                                .combine(entry.enumValue.getSubsidiaryShowType());
+                    }
+
+                    final List<MainSignalIdentifier> greenSignals = this.greenSignals
+                            .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
+                    greenSignals.add(identifier);
                 }
+                enabledSubsidiaryTypes.forEach((point, map) -> {
+                    map.forEach((modeSet, subsidiary) -> {
+                        final MainSignalIdentifier identifier = new MainSignalIdentifier(
+                                new ModeIdentifier(point, modeSet), pos,
+                                SignalState.combine(subsidiary.enumValue.getSubsidiaryShowType()));
+                        final List<MainSignalIdentifier> greenSignals = this.greenSignals
+                                .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
+                        greenSignals.add(identifier);
+                    });
+                });
                 update();
                 break;
             }
@@ -203,19 +225,27 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final List<Point> pointUpdates = new ArrayList<>();
                 final int redSignalSize = buffer.getByteToUnsignedInt();
                 for (int i = 0; i < redSignalSize; i++) {
-                    final ModeIdentifier identifier = ModeIdentifier.of(buffer);
-                    greenSignals.remove(identifier.point);
-                    pointUpdates.add(identifier.point);
+                    final MainSignalIdentifier identifier = MainSignalIdentifier.of(buffer);
+                    greenSignals.remove(identifier.getPoint());
+                    pointUpdates.add(identifier.getPoint());
                 }
                 final int greenSignalSize = buffer.getByteToUnsignedInt();
                 for (int i = 0; i < greenSignalSize; i++) {
-                    final ModeIdentifier modeIdentifier = ModeIdentifier.of(buffer);
-                    if (!greenSignals.containsKey(modeIdentifier.point)) {
-                        final List<ModeSet> greenSignals = this.greenSignals
-                                .computeIfAbsent(modeIdentifier.point, _u -> new ArrayList<>());
-                        greenSignals.add(modeIdentifier.mode);
+                    final MainSignalIdentifier modeIdentifier = MainSignalIdentifier.of(buffer);
+                    final List<MainSignalIdentifier> greenSignals = this.greenSignals
+                            .computeIfAbsent(modeIdentifier.getPoint(), _u -> new ArrayList<>());
+
+                    final Map<ModeSet, SubsidiaryEntry> subsidiary = enabledSubsidiaryTypes
+                            .getOrDefault(modeIdentifier.getPoint(), new HashMap<>());
+                    final SubsidiaryEntry entry = subsidiary.get(modeIdentifier.getModeSet());
+                    if (entry != null) {
+                        modeIdentifier.state = SignalState
+                                .combine(entry.enumValue.getSubsidiaryShowType());
                     }
-                    pointUpdates.add(modeIdentifier.point);
+                    if (!greenSignals.contains(modeIdentifier))
+                        greenSignals.add(modeIdentifier);
+
+                    pointUpdates.add(modeIdentifier.getPoint());
                 }
                 signalUpdates.accept(pointUpdates);
                 break;

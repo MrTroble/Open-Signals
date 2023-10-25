@@ -9,6 +9,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -30,6 +31,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -37,9 +39,11 @@ import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -169,7 +173,7 @@ public class SidePanel {
         final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
         node.add(new ModeSet(modes, Rotation.values()[rotation]));
-        final UISignalBoxTile sbt = new UISignalBoxTile(node, new ArrayList<>());
+        final UISignalBoxTile sbt = new UISignalBoxTile(node);
         preview.add(sbt);
         preview.add(new UIBorder(new UIEntity().getBasicTextColor()));
 
@@ -562,6 +566,22 @@ public class SidePanel {
                                                 gui.pop();
                                                 helpUsageMode(subsidiaries, node, allNodes,
                                                         possibleSubsidiaries);
+                                                final MainSignalIdentifier identifier = new MainSignalIdentifier(
+                                                        new ModeIdentifier(node.getPoint(), mode),
+                                                        signalPos, SignalState.combine(
+                                                                state.getSubsidiaryShowType()));
+                                                final List<MainSignalIdentifier> greenSignals = gui.container.greenSignals
+                                                        .computeIfAbsent(identifier.getPoint(),
+                                                                _u -> new ArrayList<>());
+                                                if (entry.state) {
+                                                    if (greenSignals.contains(identifier))
+                                                        greenSignals.remove(identifier);
+                                                    greenSignals.add(identifier);
+                                                } else {
+                                                    greenSignals.remove(identifier);
+                                                }
+                                                gui.updateSignals(
+                                                        ImmutableList.of(node.getPoint()));
                                             }, defaultValue));
                                 });
                                 final UIEntity screen = GuiElements.createScreen(selection -> {

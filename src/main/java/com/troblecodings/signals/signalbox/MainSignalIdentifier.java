@@ -2,7 +2,10 @@ package com.troblecodings.signals.signalbox;
 
 import java.util.Objects;
 
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.enums.ShowSubsidiary;
 
 import net.minecraft.core.BlockPos;
 
@@ -12,9 +15,34 @@ public class MainSignalIdentifier {
     public final BlockPos pos;
     public SignalState state = SignalState.RED;
 
+    public MainSignalIdentifier(final ModeIdentifier identifier, final BlockPos pos,
+            final SignalState state) {
+        this(identifier.point, identifier.mode, pos);
+        this.state = state;
+    }
+
     public MainSignalIdentifier(final Point point, final ModeSet mode, final BlockPos pos) {
         this.identifier = new ModeIdentifier(point, mode);
         this.pos = pos;
+    }
+
+    public void writeNetwork(final WriteBuffer buffer) {
+        identifier.writeNetwork(buffer);
+        buffer.putBlockPos(pos);
+        buffer.putEnumValue(state);
+    }
+
+    public Point getPoint() {
+        return identifier.point;
+    }
+
+    public ModeSet getModeSet() {
+        return identifier.mode;
+    }
+
+    public static MainSignalIdentifier of(final ReadBuffer buffer) {
+        return new MainSignalIdentifier(ModeIdentifier.of(buffer), buffer.getBlockPos(),
+                buffer.getEnumValue(SignalState.class));
     }
 
     @Override
@@ -36,7 +64,20 @@ public class MainSignalIdentifier {
 
     public static enum SignalState {
 
-        RED, GREEN;
+        RED, GREEN, OFF, SUBSIDIARY_GREEN, SUBSIDIARY_RED, SUBSIDIARY_OFF;
+
+        public static SignalState combine(final ShowSubsidiary show) {
+            if (show == null)
+                return SUBSIDIARY_RED;
+            switch (show) {
+                case SIGNAL_RED:
+                    return SUBSIDIARY_RED;
+                case SIGNAL_GREEN:
+                    return SUBSIDIARY_GREEN;
+                default:
+                    return SUBSIDIARY_OFF;
+            }
+        }
 
     }
 }
