@@ -566,12 +566,15 @@ public class SidePanel {
                                                 gui.pop();
                                                 helpUsageMode(subsidiaries, node, allNodes,
                                                         possibleSubsidiaries);
-                                                final MainSignalIdentifier identifier = new MainSignalIdentifier(
-                                                        new ModeIdentifier(node.getPoint(), mode),
-                                                        signalPos, SignalState.combine(
-                                                                state.getSubsidiaryShowType()));
-                                                final List<MainSignalIdentifier> greenSignals = gui.container.greenSignals
-                                                        .computeIfAbsent(identifier.getPoint(),
+                                                final MainSignalIdentifier identifier = //
+                                                        new MainSignalIdentifier(
+                                                                new ModeIdentifier(node.getPoint(),
+                                                                        mode),
+                                                                signalPos, SignalState.combine(state
+                                                                        .getSubsidiaryShowType()));
+                                                final List<MainSignalIdentifier> greenSignals = //
+                                                        gui.container.greenSignals.computeIfAbsent(
+                                                                identifier.getPoint(),
                                                                 _u -> new ArrayList<>());
                                                 if (entry.state) {
                                                     if (greenSignals.contains(identifier))
