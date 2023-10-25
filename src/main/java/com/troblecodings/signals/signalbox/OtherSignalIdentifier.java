@@ -7,11 +7,13 @@ import net.minecraft.core.BlockPos;
 public class OtherSignalIdentifier extends MainSignalIdentifier {
 
     public final boolean isRepeater;
+    public final boolean isRSSignal;
 
     public OtherSignalIdentifier(final Point point, final ModeSet mode, final BlockPos pos,
-            final boolean isRepeater) {
+            final boolean isRepeater, final boolean isRSSignal) {
         super(point, mode, pos);
         this.isRepeater = isRepeater;
+        this.isRSSignal = isRSSignal;
     }
 
     @Override
@@ -31,6 +33,7 @@ public class OtherSignalIdentifier extends MainSignalIdentifier {
         if (getClass() != obj.getClass())
             return false;
         final OtherSignalIdentifier other = (OtherSignalIdentifier) obj;
-        return isRepeater == other.isRepeater && super.equals(obj);
+        return isRepeater == other.isRepeater && super.equals(obj)
+                && isRSSignal == other.isRSSignal;
     }
 }

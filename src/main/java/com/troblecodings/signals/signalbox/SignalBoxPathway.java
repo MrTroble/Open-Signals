@@ -131,7 +131,8 @@ public class SignalBoxPathway implements IChunkLoadable {
                                     .getEntry(PathEntryType.SIGNAL_REPEATER);
                             distantPosBuilder.put(position,
                                     new OtherSignalIdentifier(node.getPoint(), modeSet, position,
-                                            repeaterOption.isPresent() && repeaterOption.get()));
+                                            repeaterOption.isPresent() && repeaterOption.get(),
+                                            mode.equals(EnumGuiMode.RS)));
                         }));
             }
             node.getModes().entrySet().stream()
@@ -431,6 +432,9 @@ public class SignalBoxPathway implements IChunkLoadable {
             } else {
                 position.state = SignalState.RED;
             }
+            if (position.isRSSignal) {
+                position.state = SignalState.GREEN;
+            }
             if (position.state.equals(previous)) {
                 return;
             } else {
@@ -488,16 +492,18 @@ public class SignalBoxPathway implements IChunkLoadable {
             final List<MainSignalIdentifier> greenSignals) {
         if (redSignals.isEmpty() && greenSignals.isEmpty())
             return;
-        final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(tilePos);
-        if (tile == null || !tile.isBlocked())
-            return;
-        final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SET_SIGNALS);
-        buffer.putByte((byte) redSignals.size());
-        redSignals.forEach(signal -> signal.writeNetwork(buffer));
-        buffer.putByte((byte) greenSignals.size());
-        greenSignals.forEach(signal -> signal.writeNetwork(buffer));
-        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
+        world.getServer().execute(() -> {
+            final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(tilePos);
+            if (tile == null || !tile.isBlocked())
+                return;
+            final WriteBuffer buffer = new WriteBuffer();
+            buffer.putEnumValue(SignalBoxNetwork.SET_SIGNALS);
+            buffer.putByte((byte) redSignals.size());
+            redSignals.forEach(signal -> signal.writeNetwork(buffer));
+            buffer.putByte((byte) greenSignals.size());
+            greenSignals.forEach(signal -> signal.writeNetwork(buffer));
+            OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
+        });
     }
 
     public void resetPathway() {
@@ -569,8 +575,10 @@ public class SignalBoxPathway implements IChunkLoadable {
                             if (current == null)
                                 return;
                             final OtherSignalIdentifier identifier = distantSignalPositions
-                                    .getOrDefault(position, new OtherSignalIdentifier(point,
-                                            new ModeSet(mode, rotation), position, false));
+                                    .getOrDefault(position,
+                                            new OtherSignalIdentifier(point,
+                                                    new ModeSet(mode, rotation), position, false,
+                                                    mode.equals(EnumGuiMode.RS)));
                             SignalConfig.reset(
                                     new ResetInfo(new SignalStateInfo(world, position, current),
                                             identifier.isRepeater));

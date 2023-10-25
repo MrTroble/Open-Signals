@@ -65,7 +65,6 @@ public enum EnumGuiMode {
                     return new UITexture(UISignalBoxTile.SIGNALS);
             }
         });
-        System.out.println(this.toString() + " ID: " + id);
     }
 
     private EnumGuiMode(final float[] array) {
