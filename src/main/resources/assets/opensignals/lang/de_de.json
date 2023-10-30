@@ -510,7 +510,7 @@
     "item.opensignals.manipulator": "Manipulator",
 	"info.usage.node": "Auswahl",
 	"info.usage.edit": "Konfigurieren",
-    "info.usage.subsidiary": "Aktive Zusatzsignale",
+    "info.usage.subsidiary": "Aktive%nZusatzsignale",
     "sb.disablesubsidiary": "Ausschalten",
     "info.usage.edit.desc": "Hier kommst du in den Bearbeitungsmodus für die Kachel.",
     "btn.subsidiary.desc": "Hier kannst du Zusatzsignale einschalten.",
@@ -558,5 +558,9 @@
 	"property.inconnection.desc": "TODO: Insert wonderful description",
     "property.value.SIGNALBOX": "Stellwerk",
     "sb.resetpage": "Fahrstraße",
-    "sb.pathwayreset": "Fahrstraße zurücksetzen?"
+    "sb.pathwayreset": "Fahrstraße zurücksetzen?",
+    "type.SIGNALBOX": "Stellwerk",
+    "property.prop.SIGNALBOX.name": "Stellwerk",
+    "property.prop.SIGNALBOX.desc": "TODO: Insert wonderful description",
+	"btn.counter.tooltip": "TODO: Insert wonderful description"
 }

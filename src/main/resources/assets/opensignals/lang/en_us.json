@@ -510,7 +510,7 @@
     "item.opensignals.manipulator": "Manipulator",
 	"info.usage.node": "Selection",
 	"info.usage.edit": "Configure",
-	"info.usage.subsidiary": "Active Subsidiary",
+	"info.usage.subsidiary": "Active%nSubsidiary",
     "sb.disablesubsidiary": "Turn off",
     "info.usage.edit.desc": "Here you enter the edit mode for the tile.",
     "btn.subsidiary.desc": "Here you can turn on subsidiary signals.",
@@ -558,5 +558,9 @@
 	"property.inconnection.desc": "TODO: Insert wonderful description",
     "property.value.SIGNALBOX": "Signalbox",
     "sb.resetpage": "Pathway",
-    "sb.pathwayreset": "Reset pathway?"
+    "sb.pathwayreset": "Reset pathway?",
+    "type.SIGNALBOX": "Signalbox",
+    "property.prop.SIGNALBOX.name": "Signalbox",
+    "property.prop.SIGNALBOX.desc": "TODO: Insert wonderful description",
+	"btn.counter.tooltip": "TODO: Insert wonderful description"
 }

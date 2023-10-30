@@ -52,12 +52,12 @@ import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Path;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
-import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -919,7 +919,7 @@ public class GuiSignalBox extends GuiBase {
         header.add(mainButton);
         final UIEntity counter = GuiElements.createButton(container.grid.getCurrentCounter() + "");
         counter.findRecursive(UIButton.class).forEach(b -> counterButton = b);
-        counter.add(new UIToolTip("btn.counter.tooltip"));
+        counter.add(new UIToolTip(I18Wrapper.format("btn.counter.tooltip")));
         header.add(counter);
         resetSelection(mainButton);
 
