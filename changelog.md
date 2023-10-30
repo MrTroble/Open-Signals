@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.18.2 - 3.2.0]
+
+* feat: added customName to signalcontroller
+* feat: added system for distant signal repeater
+* feat: added pathway requester
+* feat/fix: hv distant signal turn off with HP0
+* feat: added pathway saver
+* feat: added color, when manual output is active
+* feat: added level crossing function with delay and color
+* feat: added intersignalbox pathways
+* feat: visual signal feedback in signalbox
+* feat: added counter for subsidiaries and pathway reset
+* fix: issues in GUIs
+* fix: issues with SignalState and NameHandler
+* ref: a lot of background changes
+* ref: ImageBot optimize images beep-boop
+
 ## [1.18.2 - 3.1.0]
 
 * feat: added help panel to signalbox
