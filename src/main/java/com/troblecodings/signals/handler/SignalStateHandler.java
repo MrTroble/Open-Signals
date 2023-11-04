@@ -365,7 +365,7 @@ public final class SignalStateHandler implements INetworkSync {
 
         final EntityPlayer player = event.getPlayer();
         final List<StateLoadHolder> states = new ArrayList<>();
-        chunk.getTileEntityMap().forEach((pos, tile) -> {
+        ImmutableMap.copyOf(chunk.getTileEntityMap()).forEach((pos, tile) -> {
             if (tile instanceof SignalTileEntity) {
                 final SignalTileEntity signalTile = (SignalTileEntity) tile;
                 final SignalStateInfo info = new SignalStateInfo(world, pos,
@@ -388,7 +388,7 @@ public final class SignalStateHandler implements INetworkSync {
         if (world.isRemote)
             return;
         final List<StateLoadHolder> states = new ArrayList<>();
-        chunk.getTileEntityMap().forEach((pos, tile) -> {
+        ImmutableMap.copyOf(chunk.getTileEntityMap()).forEach((pos, tile) -> {
             if (tile instanceof SignalTileEntity) {
                 final SignalTileEntity signalTile = (SignalTileEntity) tile;
                 states.add(
