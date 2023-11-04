@@ -65,6 +65,9 @@ public class PathwayHolder {
             this.onWayAdd(way);
             updateToNet(way);
         });
+        System.out.println(
+                "Requested Pathway from [" + p1 + "] to [" + p2 + "]! Printing StackTrace...");
+        System.out.println(Thread.currentThread().getStackTrace());
         return ways.isPresent();
     }
 

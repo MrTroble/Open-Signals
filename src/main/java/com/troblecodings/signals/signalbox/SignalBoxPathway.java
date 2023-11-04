@@ -227,6 +227,9 @@ public class SignalBoxPathway {
                             !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
+        System.out.println(
+                "Setting PathStatus [" + status + "] on [" + this + "]! Printing StackTrace...");
+        System.out.println(Thread.currentThread().getStackTrace());
     }
 
     public void setPathStatus(final EnumPathUsage status) {
@@ -388,6 +391,7 @@ public class SignalBoxPathway {
         resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
         isBlocked = true;
+        System.out.println("Blocked Pathway [" + this + "]!");
         return true;
     }
 
