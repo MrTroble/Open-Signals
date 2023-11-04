@@ -32,7 +32,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.network.play.client.CPacketCustomPayload;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
@@ -81,7 +80,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void createStates(final SignalStateInfo info,
-            final Map<SEProperty, String> states) {
+            final Map<SEProperty, String> states, final EntityPlayer creator) {
         if (info.world.isRemote)
             return;
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -89,7 +88,7 @@ public final class SignalStateHandler implements INetworkSync {
         }
         new Thread(() -> {
             final List<LoadHolder<?>> list = new ArrayList<>();
-            list.add(new LoadHolder<>(new ChunkPos(info.pos)));
+            list.add(new LoadHolder<>(creator));
             synchronized (SIGNAL_COUNTER) {
                 SIGNAL_COUNTER.put(info, list);
             }
@@ -371,7 +370,7 @@ public final class SignalStateHandler implements INetworkSync {
                 final SignalTileEntity signalTile = (SignalTileEntity) tile;
                 final SignalStateInfo info = new SignalStateInfo(world, pos,
                         signalTile.getSignal());
-                states.add(new StateLoadHolder(info, new LoadHolder<>(new ChunkPos(pos))));
+                states.add(new StateLoadHolder(info, new LoadHolder<>(player)));
                 synchronized (CURRENTLY_LOADED_STATES) {
                     if (CURRENTLY_LOADED_STATES.containsKey(info)) {
                         sendToPlayer(info, CURRENTLY_LOADED_STATES.get(info), player);
@@ -394,7 +393,7 @@ public final class SignalStateHandler implements INetworkSync {
                 final SignalTileEntity signalTile = (SignalTileEntity) tile;
                 states.add(
                         new StateLoadHolder(new SignalStateInfo(world, pos, signalTile.getSignal()),
-                                new LoadHolder<>(new ChunkPos(pos))));
+                                new LoadHolder<>(event.getPlayer())));
             }
         });
         unloadSignals(states);
