@@ -72,6 +72,7 @@ public class SidePanel {
     private final UIEntity label = new UIEntity();
     private final UIEntity spacerEntity = new UIEntity();
     private final UIEntity helpPageSpacer = new UIEntity();
+    private UIEntity counterButton = new UIEntity();
     private final GuiSignalBox gui;
 
     private BiConsumer<BlockPos, SubsidiaryHolder> disableSubsidiary;
@@ -196,6 +197,12 @@ public class SidePanel {
         addHelpPageToPlane();
     }
 
+    protected void updateCounterButton() {
+        counterButton.findRecursive(UIButton.class)
+                .forEach(button -> button.setText(gui.container.grid.getCurrentCounter() + ""));
+        lowerEntity.update();
+    }
+
     public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries,
             final SignalBoxNode node, final List<SignalBoxNode> allNodes,
             final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries) {
@@ -225,6 +232,13 @@ public class SidePanel {
                 new UIEntity().getInfoTextColor(), 0.5f));
         helpList.add(GuiElements.createLabel("[RMB] = " + I18Wrapper.format("info.usage.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
+
+        counterButton = GuiElements.createButton(gui.container.grid.getCurrentCounter() + "");
+        counterButton.setScaleX(0.8f);
+        counterButton.setScaleY(0.8f);
+        counterButton.setX(5);
+        counterButton.add(new UIToolTip(I18Wrapper.format("btn.counter.tooltip")));
+        helpList.add(counterButton);
 
         final Minecraft mc = Minecraft.getInstance();
         if (!allNodes.isEmpty()) {

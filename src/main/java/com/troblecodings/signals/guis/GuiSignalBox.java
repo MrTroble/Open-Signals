@@ -886,10 +886,8 @@ public class GuiSignalBox extends GuiBase {
         buildColors(container.grid.getNodes());
     }
 
-    private UIButton counterButton;
-
     public void updateCounter() {
-        counterButton.setText(container.grid.getCurrentCounter() + "");
+        helpPage.updateCounterButton();
     }
 
     private void initializeBasicUI() {
@@ -917,10 +915,6 @@ public class GuiSignalBox extends GuiBase {
         mainButton = GuiElements.createButton(I18Wrapper.format("btn.main"),
                 this::initializeFieldUsage);
         header.add(mainButton);
-        final UIEntity counter = GuiElements.createButton(container.grid.getCurrentCounter() + "");
-        counter.findRecursive(UIButton.class).forEach(b -> counterButton = b);
-        counter.add(new UIToolTip(I18Wrapper.format("btn.counter.tooltip")));
-        header.add(counter);
         resetSelection(mainButton);
 
         final UIEntity middlePart = new UIEntity();
