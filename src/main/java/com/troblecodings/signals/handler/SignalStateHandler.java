@@ -449,6 +449,7 @@ public final class SignalStateHandler implements INetworkSync {
                     sendToPlayer(info.info, properties, player);
                 }
                 updateListeners(info.info, properties, ChangedState.ADDED_TO_CACHE);
+                System.out.println("Loaded [" + info.info + "]!");
             });
         });
     }
@@ -478,6 +479,7 @@ public final class SignalStateHandler implements INetworkSync {
                     return;
                 createToFile(info.info, properties);
                 updateListeners(info.info, properties, ChangedState.REMOVED_FROM_CACHE);
+                System.out.println("Unloaded [" + info.info + "]!");
             });
         });
     }
