@@ -71,6 +71,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
             loadChunkAndGetTile(SignalControllerTileEntity.class, world, pos,
                     (tile, _u) -> tile.updateFromRSInput());
         });
+        System.out.println("Sending InputUpdateData [" + update + "] to " + linkedPositions + "!");
     }
 
     public List<BlockPos> getLinkedController() {
