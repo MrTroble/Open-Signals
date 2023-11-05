@@ -62,6 +62,7 @@ public class ClientSignalStateHandler implements INetworkSync {
                 properties.put(property, value);
             }
             CURRENTLY_LOADED_STATES.put(stateInfo, properties);
+            System.out.println("Added [" + stateInfo + "] to Cache with [" + properties + "]!");
         }
         mc.addScheduledTask(() -> {
             final Chunk chunk = level.getChunkFromBlockCoords(signalPos);
@@ -74,6 +75,7 @@ public class ClientSignalStateHandler implements INetworkSync {
             mc.renderGlobal.notifyLightSet(signalPos);
             mc.renderGlobal.notifyBlockUpdate(level, signalPos, state, state, 8);
             level.notifyBlockUpdate(signalPos, state, state, 3);
+            System.out.println("Updated Signal with state [" + stateInfo + "]!");
         });
     }
 

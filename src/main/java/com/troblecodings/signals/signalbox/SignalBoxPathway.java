@@ -227,9 +227,7 @@ public class SignalBoxPathway {
                             !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
-        System.out.println(
-                "Setting PathStatus [" + status + "] on [" + this + "]! Printing StackTrace...");
-        System.out.println(Thread.currentThread().getStackTrace());
+        System.out.println("Setting PathStatus [" + status + "] on [" + this + "]!");
     }
 
     public void setPathStatus(final EnumPathUsage status) {
@@ -263,6 +261,7 @@ public class SignalBoxPathway {
             SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position, current),
                     lastSignalInfo, speed, zs2Value, type));
         });
+        System.out.println("Updated PathwaySignals on [" + this + "]!");
     }
 
     public void resetPathway() {
@@ -276,6 +275,7 @@ public class SignalBoxPathway {
             if (current == null)
                 return;
             SignalConfig.reset(new SignalStateInfo(world, entry.getKey(), current));
+            System.out.println("Rested First Signal on [" + this + "]!");
         });
     }
 
@@ -286,6 +286,7 @@ public class SignalBoxPathway {
             if (current == null)
                 return;
             SignalConfig.reset(new SignalStateInfo(world, position, current));
+            System.out.println("Rested All Other Signals on [" + this + "]!");
         });
     }
 
@@ -297,6 +298,7 @@ public class SignalBoxPathway {
             this.emptyOrBroken = true;
             this.isBlocked = false;
             resetOther();
+            System.out.println("Completly Reseted [" + this + "]!");
         }
     }
 
@@ -324,6 +326,7 @@ public class SignalBoxPathway {
         final SignalBoxNode node = this.mapOfResetPositions.get(position);
         if (node == null) {
             if (checkReverseReset(position)) {
+                System.out.println("Revers Reset [" + this + "]!");
                 return Optional.of(firstPoint);
             } else {
                 return Optional.empty();
@@ -340,6 +343,7 @@ public class SignalBoxPathway {
         if (atomic.get())
             return Optional.empty();
         this.resetPathway(point);
+        System.out.println("Rested [" + this + "] until [" + point + "]!");
         return Optional.of(point);
     }
 

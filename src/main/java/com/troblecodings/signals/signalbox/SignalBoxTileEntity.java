@@ -94,11 +94,13 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy,
                 grid.getModeGrid());
         SignalBoxHandler.loadSignals(identifier);
+        System.out.println("Loaded [" + identifier + "]!");
     }
 
     @Override
     public void onChunkUnload() {
         SignalBoxHandler.unloadSignals(new StateInfo(world, pos));
+        System.out.println("Unloaded [" + new StateInfo(world, pos) + "]!");
     }
 
     @Override
