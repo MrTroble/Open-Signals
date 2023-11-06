@@ -473,8 +473,8 @@ public final class SignalStateHandler implements INetworkSync {
                     holders.remove(info.holder);
                     if (!holders.isEmpty())
                         return;
+                    SIGNAL_COUNTER.remove(info.info);
                 }
-                SIGNAL_COUNTER.remove(info.info);
                 Map<SEProperty, String> properties;
                 synchronized (CURRENTLY_LOADED_STATES) {
                     properties = CURRENTLY_LOADED_STATES.remove(info.info);
