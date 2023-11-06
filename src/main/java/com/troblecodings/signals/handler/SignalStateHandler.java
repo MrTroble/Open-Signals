@@ -148,15 +148,12 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         SignalStateFile file;
         synchronized (ALL_LEVEL_FILES) {
-            file = ALL_LEVEL_FILES.get(info.world);
-            if (file == null) {
-                file = new SignalStateFile(Paths.get("osfiles/signalfiles/"
-                        + ((WorldServer) info.world).getMinecraftServer().getName().replace(":", "")
-                                .replace("/", "").replace("\\", "")
-                        + "/" + ((WorldServer) info.world).provider.getDimensionType().getName()
-                                .replace(":", "")));
-            }
-            ALL_LEVEL_FILES.put(info.world, file);
+            file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
+                    _u -> new SignalStateFile(Paths.get("osfiles/signalfiles/"
+                            + ((WorldServer) info.world).getMinecraftServer().getName()
+                                    .replace(":", "").replace("/", "").replace("\\", "")
+                            + "/" + ((WorldServer) info.world).provider.getDimensionType().getName()
+                                    .replace(":", ""))));
         }
         SignalStatePos pos = file.find(info.pos);
         if (pos == null) {
@@ -339,6 +336,15 @@ public final class SignalStateHandler implements INetworkSync {
         return buffer.build();
     }
 
+    private static void sendTo(final SignalStateInfo info, final Map<SEProperty, String> properties,
+            final @Nullable EntityPlayer player) {
+        if (player == null) {
+            sendToAll(info, properties);
+        } else {
+            sendToPlayer(info, properties, player);
+        }
+    }
+
     private static void sendToPlayer(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties, final EntityPlayer player) {
         if (properties == null || properties.isEmpty()) {
@@ -371,11 +377,6 @@ public final class SignalStateHandler implements INetworkSync {
                 final SignalStateInfo info = new SignalStateInfo(world, pos,
                         signalTile.getSignal());
                 states.add(new StateLoadHolder(info, new LoadHolder<>(player)));
-                synchronized (CURRENTLY_LOADED_STATES) {
-                    if (CURRENTLY_LOADED_STATES.containsKey(info)) {
-                        sendToPlayer(info, CURRENTLY_LOADED_STATES.get(info), player);
-                    }
-                }
             }
         });
         loadSignals(states, player);
@@ -428,26 +429,30 @@ public final class SignalStateHandler implements INetworkSync {
                                                 .getDimensionType().getName().replace(":", ""))));
                     }
                 }
+                boolean isLoaded = false;
                 synchronized (SIGNAL_COUNTER) {
-                    List<LoadHolder<?>> holders = SIGNAL_COUNTER.get(info.info);
-                    if (holders != null && holders.size() > 0) {
+                    List<LoadHolder<?>> holders = SIGNAL_COUNTER.computeIfAbsent(info.info,
+                            _u -> new ArrayList<>());
+                    if (holders.size() > 0) {
                         if (!holders.contains(info.holder))
                             holders.add(info.holder);
-                        return;
+                        isLoaded = true;
                     }
-                    holders = new ArrayList<>();
                     holders.add(info.holder);
-                    SIGNAL_COUNTER.put(info.info, holders);
+                }
+                if (isLoaded) {
+                    Map<SEProperty, String> sendProperties;
+                    synchronized (CURRENTLY_LOADED_STATES) {
+                        sendProperties = CURRENTLY_LOADED_STATES.get(info.info);
+                    }
+                    sendTo(info.info, sendProperties, player);
+                    return;
                 }
                 final Map<SEProperty, String> properties = readAndSerialize(info.info);
                 synchronized (CURRENTLY_LOADED_STATES) {
                     CURRENTLY_LOADED_STATES.put(info.info, properties);
                 }
-                if (player == null) {
-                    sendToAll(info.info, properties);
-                } else {
-                    sendToPlayer(info.info, properties, player);
-                }
+                sendTo(info.info, properties, player);
                 updateListeners(info.info, properties, ChangedState.ADDED_TO_CACHE);
             });
         });
