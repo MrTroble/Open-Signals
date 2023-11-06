@@ -470,7 +470,7 @@ public final class SignalStateHandler implements INetworkSync {
                 synchronized (CURRENTLY_LOADED_STATES) {
                     CURRENTLY_LOADED_STATES.put(info.info, properties);
                 }
-                sendTo(info.info, properties, player);
+                sendToAll(info.info, properties);
                 updateListeners(info.info, properties, ChangedState.ADDED_TO_CACHE);
             });
         });
