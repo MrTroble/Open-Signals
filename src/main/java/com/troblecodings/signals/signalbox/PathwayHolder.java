@@ -65,7 +65,6 @@ public class PathwayHolder {
             this.onWayAdd(way);
             updateToNet(way);
         });
-        System.out.println("Requested Pathway from [" + p1 + "] to [" + p2 + "]!");
         return ways.isPresent();
     }
 
@@ -113,7 +112,6 @@ public class PathwayHolder {
             tryBlock(nodeCopy, update.pos);
             tryReset(nodeCopy, update.pos);
         }
-        System.out.println("Updated [" + tilePos + "] with [" + update + "]!");
     }
 
     private void tryBlock(final List<SignalBoxPathway> pathways, final BlockPos pos) {
