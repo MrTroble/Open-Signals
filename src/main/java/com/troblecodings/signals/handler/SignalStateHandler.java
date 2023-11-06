@@ -349,7 +349,14 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> properties, final EntityPlayer player) {
         if (properties == null || properties.isEmpty()) {
             System.out.println("Tried to send empty PropertiesMap on [" + stateInfo
-                    + "] to Player [" + player + "]!");
+                    + "] to Player [" + player + "]! Printing StackTrace...");
+            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+                System.out.println(e);
+            }
+            synchronized (SIGNAL_COUNTER) {
+                System.out.println("\nIs alredy added to SignalCounter: "
+                        + SIGNAL_COUNTER.containsKey(stateInfo));
+            }
             return;
         }
         sendTo(player, packToByteBuffer(stateInfo, properties));
@@ -358,7 +365,15 @@ public final class SignalStateHandler implements INetworkSync {
     private static void sendToAll(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties) {
         if (properties == null || properties.isEmpty()) {
-            System.out.println("Tried to send empty PropertiesMap on [" + stateInfo + "] to all!");
+            System.out.println("Tried to send empty PropertiesMap on [" + stateInfo
+                    + "] to all! Printing StackTrace...");
+            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+                System.out.println(e);
+            }
+            synchronized (SIGNAL_COUNTER) {
+                System.out.println("\nIs alredy added to SignalCounter: "
+                        + SIGNAL_COUNTER.containsKey(stateInfo));
+            }
             return;
         }
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
