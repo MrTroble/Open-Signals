@@ -7,6 +7,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.enums.LinkType;
@@ -85,6 +86,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
                 (BasicBlock) block, type);
     }
 
+    public void updateInput(final RedstoneUpdatePacket update) {
+        SignalBoxHandler.updateInput(new StateInfo(world, pos), update);
+    }
+
     @Override
     public void onLoad() {
         grid.setPosAndWorld(pos, world);
@@ -94,13 +99,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy,
                 grid.getModeGrid());
         SignalBoxHandler.loadSignals(identifier);
-        System.out.println("Loaded [" + identifier + "]!");
     }
 
     @Override
     public void onChunkUnload() {
         SignalBoxHandler.unloadSignals(new StateInfo(world, pos));
-        System.out.println("Unloaded [" + new StateInfo(world, pos) + "]!");
     }
 
     @Override
