@@ -44,7 +44,6 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 public final class NameHandler implements INetworkSync {
 
     private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(5);
-    private static ExecutorService READ_SERVICE = Executors.newFixedThreadPool(14);
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<StateInfo, Integer> LOAD_COUNTER = new HashMap<>();
@@ -58,15 +57,12 @@ public final class NameHandler implements INetworkSync {
 
     @EventHandler
     public static void onServerStop(final FMLServerStoppingEvent event) {
-        READ_SERVICE.shutdown();
         WRITE_SERVICE.shutdown();
         try {
-            READ_SERVICE.awaitTermination(1, TimeUnit.MINUTES);
-            WRITE_SERVICE.awaitTermination(5, TimeUnit.MINUTES);
+            WRITE_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        READ_SERVICE = Executors.newFixedThreadPool(14);
         WRITE_SERVICE = Executors.newFixedThreadPool(5);
     }
 
@@ -184,8 +180,8 @@ public final class NameHandler implements INetworkSync {
         }
         if (file == null)
             return;
+        SignalStatePos posInFile = file.find(info.pos);
         synchronized (file) {
-            SignalStatePos posInFile = file.find(info.pos);
             if (posInFile == null) {
                 posInFile = file.createState(info.pos, name);
                 return;
@@ -202,15 +198,10 @@ public final class NameHandler implements INetworkSync {
             return;
         final EntityPlayer player = event.getPlayer();
         final List<StateInfo> states = new ArrayList<>();
-        chunk.getTileEntityMap().forEach((pos, tile) -> {
+        ImmutableMap.copyOf(chunk.getTileEntityMap()).forEach((pos, tile) -> {
             if (tile instanceof SignalTileEntity || tile instanceof RedstoneIOTileEntity) {
                 final StateInfo info = new StateInfo(world, pos);
                 states.add(info);
-                synchronized (ALL_NAMES) {
-                    if (ALL_NAMES.containsKey(info)) {
-                        sendTo(player, packToBuffer(pos, ALL_NAMES.get(info)));
-                    }
-                }
             }
         });
         loadNames(states, player);
@@ -221,7 +212,7 @@ public final class NameHandler implements INetworkSync {
         final Chunk chunk = event.getChunkInstance();
         final World world = chunk.getWorld();
         final List<StateInfo> states = new ArrayList<>();
-        chunk.getTileEntityMap().forEach((pos, tile) -> {
+        ImmutableMap.copyOf(chunk.getTileEntityMap()).forEach((pos, tile) -> {
             if (tile instanceof SignalTileEntity || tile instanceof RedstoneIOTileEntity) {
                 states.add(new StateInfo(world, pos));
             }
@@ -241,44 +232,50 @@ public final class NameHandler implements INetworkSync {
 
     private static void loadNames(final List<StateInfo> infos,
             final @Nullable EntityPlayer player) {
-        if (infos == null || infos.isEmpty() || READ_SERVICE.isShutdown())
+        if (infos == null || infos.isEmpty())
             return;
-        READ_SERVICE.execute(() -> {
+        new Thread(() -> {
             infos.forEach(info -> {
+                boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
                     Integer count = LOAD_COUNTER.get(info);
                     if (count != null && count > 0) {
                         LOAD_COUNTER.put(info, ++count);
-                        return;
+                        isLoaded = true;
+                    } else {
+                        LOAD_COUNTER.put(info, 1);
                     }
-                    LOAD_COUNTER.put(info, 1);
                 }
-                String name;
+                if (isLoaded) {
+                    if (player == null)
+                        return;
+                    String name;
+                    synchronized (ALL_NAMES) {
+                        name = ALL_NAMES.get(info);
+                    }
+                    sendTo(player, packToBuffer(info.pos, name));
+                    return;
+                }
                 NameHandlerFile file;
                 synchronized (ALL_LEVEL_FILES) {
-                    file = ALL_LEVEL_FILES.get(info.world);
-                    if (file == null) {
-                        file = new NameHandlerFile(Paths.get("osfiles/namefiles/"
-                                + ((WorldServer) info.world).getMinecraftServer().getName()
-                                        .replace(":", "").replace("/", "").replace("\\", "")
-                                + "/" + ((WorldServer) info.world).provider.getDimensionType()
-                                        .getName().replace(":", "")));
-                        ALL_LEVEL_FILES.put(info.world, file);
-                    }
+                    file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
+                            _u -> new NameHandlerFile(Paths.get("osfiles/namefiles/"
+                                    + ((WorldServer) info.world).getMinecraftServer().getName()
+                                            .replace(":", "").replace("/", "").replace("\\", "")
+                                    + "/" + ((WorldServer) info.world).provider.getDimensionType()
+                                            .getName().replace(":", ""))));
                 }
+                String name;
                 synchronized (file) {
                     name = file.getString(info.pos);
                 }
                 synchronized (ALL_NAMES) {
                     ALL_NAMES.put(info, name);
                 }
-                if (player == null) {
-                    sendToAll(info, name);
-                } else {
-                    sendTo(player, packToBuffer(info.pos, name));
-                }
+                sendToAll(info, name);
             });
-        });
+        }, "OSNameHandler:loadNames").start();
+
     }
 
     private static void unloadNames(final List<StateInfo> infos) {

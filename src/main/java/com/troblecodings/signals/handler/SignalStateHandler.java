@@ -49,7 +49,6 @@ public final class SignalStateHandler implements INetworkSync {
     private SignalStateHandler() {
     }
 
-    private static ExecutorService READ_SERVICE = Executors.newFixedThreadPool(14);
     private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(5);
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
@@ -67,15 +66,12 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void onServerStop(final FMLServerStoppingEvent event) {
-        READ_SERVICE.shutdown();
         WRITE_SERVICE.shutdown();
         try {
-            READ_SERVICE.awaitTermination(1, TimeUnit.MINUTES);
-            WRITE_SERVICE.awaitTermination(5, TimeUnit.MINUTES);
+            WRITE_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        READ_SERVICE = Executors.newFixedThreadPool(14);
         WRITE_SERVICE = Executors.newFixedThreadPool(5);
     }
 
@@ -227,15 +223,12 @@ public final class SignalStateHandler implements INetworkSync {
         final Map<SEProperty, String> map = new HashMap<>();
         SignalStateFile file;
         synchronized (ALL_LEVEL_FILES) {
-            file = ALL_LEVEL_FILES.get(stateInfo.world);
-            if (file == null) {
-                file = new SignalStateFile(Paths.get("osfiles/signalfiles/"
-                        + ((WorldServer) stateInfo.world).getMinecraftServer().getName()
-                                .replace(":", "").replace("/", "").replace("\\", "")
-                        + "/" + ((WorldServer) stateInfo.world).provider.getDimensionType()
-                                .getName().replace(":", "")));
-            }
-            ALL_LEVEL_FILES.put(stateInfo.world, file);
+            file = ALL_LEVEL_FILES.computeIfAbsent(stateInfo.world,
+                    _u -> new SignalStateFile(Paths.get("osfiles/signalfiles/"
+                            + ((WorldServer) stateInfo.world).getMinecraftServer().getName()
+                                    .replace(":", "").replace("/", "").replace("\\", "")
+                            + "/" + ((WorldServer) stateInfo.world).provider.getDimensionType()
+                                    .getName().replace(":", ""))));
         }
         ByteBuffer buffer;
         synchronized (file) {
@@ -414,31 +407,19 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void loadSignals(final List<StateLoadHolder> signals,
             final @Nullable EntityPlayer player) {
-        if (signals == null || signals.isEmpty() || READ_SERVICE.isShutdown())
+        if (signals == null || signals.isEmpty())
             return;
-        READ_SERVICE.execute(() -> {
+        new Thread(() -> {
             signals.forEach(info -> {
-                synchronized (ALL_LEVEL_FILES) {
-                    if (!ALL_LEVEL_FILES.containsKey(info.info.world)) {
-                        ALL_LEVEL_FILES.put(info.info.world,
-                                new SignalStateFile(Paths.get("osfiles/signalfiles/"
-                                        + ((WorldServer) info.info.world).getMinecraftServer()
-                                                .getName().replace(":", "").replace("/", "")
-                                                .replace("\\", "")
-                                        + "/" + ((WorldServer) info.info.world).provider
-                                                .getDimensionType().getName().replace(":", ""))));
-                    }
-                }
                 boolean isLoaded = false;
                 synchronized (SIGNAL_COUNTER) {
-                    List<LoadHolder<?>> holders = SIGNAL_COUNTER.computeIfAbsent(info.info,
+                    final List<LoadHolder<?>> holders = SIGNAL_COUNTER.computeIfAbsent(info.info,
                             _u -> new ArrayList<>());
                     if (holders.size() > 0) {
-                        if (!holders.contains(info.holder))
-                            holders.add(info.holder);
                         isLoaded = true;
                     }
-                    holders.add(info.holder);
+                    if (!holders.contains(info.holder))
+                        holders.add(info.holder);
                 }
                 if (isLoaded) {
                     Map<SEProperty, String> sendProperties;
@@ -455,7 +436,7 @@ public final class SignalStateHandler implements INetworkSync {
                 sendToAll(info.info, properties);
                 updateListeners(info.info, properties, ChangedState.ADDED_TO_CACHE);
             });
-        });
+        }, "OSSignalStateHandler:loadSignals").start();
     }
 
     public static void unloadSignal(final StateLoadHolder info) {
