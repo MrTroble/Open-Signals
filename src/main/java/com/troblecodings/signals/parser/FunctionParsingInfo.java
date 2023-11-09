@@ -71,8 +71,8 @@ public class FunctionParsingInfo {
         });
         if (property == null) {
             throw new LogicalParserException(
-                    String.format("Could not make predicate=%s with system=%S!", argument,
-                            signalName) + " Valid Properties: " + properties);
+                    String.format("Could not make predicate=%s with system=%S!", name, signalName)
+                            + " Valid Properties: " + properties);
         }
         return property;
     }
