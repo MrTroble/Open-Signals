@@ -256,6 +256,8 @@ public final class NameHandler implements INetworkSync {
                     synchronized (ALL_NAMES) {
                         name = ALL_NAMES.getOrDefault(info, "");
                     }
+                    if (name.isEmpty())
+                        return;
                     sendTo(player, packToBuffer(info.pos, name));
                     return;
                 }
