@@ -9,7 +9,7 @@ import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.core.LinkingUpdates;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
@@ -65,7 +65,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         final RedstoneUpdatePacket update = new RedstoneUpdatePacket(level, worldPosition, power,
                 (RedstoneInput) this.getBlockState().getBlock());
         linkedPositions.forEach(
-                pos -> SignalBoxHandler.updateInput(new PosIdentifier(pos, level), update));
+                pos -> SignalBoxHandler.updateInput(new StateInfo(level, pos), update));
         linkedSignalController.forEach(pos -> {
             loadChunkAndGetTile(SignalControllerTileEntity.class, (ServerLevel) level, pos,
                     (tile, _u) -> tile.updateFromRSInput());
@@ -82,15 +82,15 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         if (level == null || level.isClientSide)
             return;
         final LinkingUpdates update = SignalBoxHandler
-                .getPosUpdates(new PosIdentifier(worldPosition, level));
+                .getPosUpdates(new StateInfo(level, worldPosition));
         if (update == null)
             return;
         update.getPosToRemove().forEach(pos -> unlink(pos));
         update.getPosToAdd().forEach(pos -> link(pos));
-        if (SignalBoxHandler.containsOutputUpdates(new PosIdentifier(worldPosition, level))) {
+        if (SignalBoxHandler.containsOutputUpdates(new StateInfo(level, worldPosition))) {
             BlockState state = level.getBlockState(worldPosition);
             state = state.setValue(RedstoneIO.POWER,
-                    SignalBoxHandler.getNewOutputState(new PosIdentifier(worldPosition, level)));
+                    SignalBoxHandler.getNewOutputState(new StateInfo(level, worldPosition)));
             level.setBlockAndUpdate(worldPosition, state);
         }
     }

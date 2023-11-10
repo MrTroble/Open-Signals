@@ -8,8 +8,8 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
@@ -68,7 +68,7 @@ public class NamableContainer extends ContainerBase {
 
     @Override
     public void deserializeServer(final ReadBuffer buffer) {
-        final NameStateInfo info = new NameStateInfo(this.info.world, this.info.pos);
+        final StateInfo info = new StateInfo(this.info.world, this.info.pos);
         final String name = buffer.getString();
         if (tile instanceof SignalTileEntity) {
             NameHandler.setNameForSignal(info, name);

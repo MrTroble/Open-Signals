@@ -28,7 +28,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnumHolder;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -257,11 +257,11 @@ public class SignalBoxPathway implements IChunkLoadable {
             end.read(blockWrapper.getWrapper(END_POINT));
             final BlockPos otherPos = blockWrapper.getBlockPos(TILE_POS);
             PathwayHolder holder = SignalBoxHandler
-                    .getPathwayHolder(new PosIdentifier(otherPos, world));
+                    .getPathwayHolder(new StateInfo(world, otherPos));
             if (holder == null) {
                 loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) world, otherPos,
                         (tile, _u) -> tile.onLoad());
-                holder = SignalBoxHandler.getPathwayHolder(new PosIdentifier(otherPos, world));
+                holder = SignalBoxHandler.getPathwayHolder(new StateInfo(world, otherPos));
             }
             final SignalBoxPathway otherPathway = holder.getPathwayByLastPoint(end);
             pathwayToBlock = otherPathway;
@@ -272,11 +272,11 @@ public class SignalBoxPathway implements IChunkLoadable {
             end.read(resetWrapper.getWrapper(END_POINT));
             final BlockPos otherPos = resetWrapper.getBlockPos(TILE_POS);
             PathwayHolder holder = SignalBoxHandler
-                    .getPathwayHolder(new PosIdentifier(otherPos, world));
+                    .getPathwayHolder(new StateInfo(world, otherPos));
             if (holder == null) {
                 loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) world, otherPos,
                         (tile, _u) -> tile.onLoad());
-                holder = SignalBoxHandler.getPathwayHolder(new PosIdentifier(otherPos, world));
+                holder = SignalBoxHandler.getPathwayHolder(new StateInfo(world, otherPos));
             }
             final SignalBoxPathway otherPathway = holder.getPathwayByLastPoint(end);
             pathwayToReset = otherPathway;
@@ -314,7 +314,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     public void setPathStatus(final EnumPathUsage status, final @Nullable Point point) {
         foreachEntry(option -> {
             option.getEntry(PathEntryType.OUTPUT).ifPresent(
-                    pos -> SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, world),
+                    pos -> SignalBoxHandler.updateRedstoneOutput(new StateInfo(world, pos),
                             !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
@@ -329,7 +329,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     private SignalStateInfo getLastSignalInfo() {
         if (lastSignalInfo != null)
             return lastSignalInfo;
-        final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+        final StateInfo identifier = new StateInfo(world, tilePos);
         SignalStateInfo lastInfo = null;
         if (lastSignal.isPresent()) {
             final Signal nextSignal = SignalBoxHandler.getSignal(identifier, lastSignal.get().pos);
@@ -338,7 +338,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         }
         if (pathwayToBlock != null && pathwayToBlock.lastSignal.isPresent()) {
             final Signal nextSignal = SignalBoxHandler.getSignal(
-                    new PosIdentifier(pathwayToBlock.tilePos, pathwayToBlock.world),
+                    new StateInfo(pathwayToBlock.world, pathwayToBlock.tilePos),
                     pathwayToBlock.lastSignal.get().pos);
             if (nextSignal != null)
                 lastInfo = new SignalStateInfo(world, pathwayToBlock.lastSignal.get().pos,
@@ -398,7 +398,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             return;
         final List<MainSignalIdentifier> redSignals = new ArrayList<>();
         final List<MainSignalIdentifier> greenSignals = new ArrayList<>();
-        final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+        final StateInfo identifier = new StateInfo(world, tilePos);
         this.signalPositions.ifPresent(entry -> {
             if (isBlocked)
                 return;
@@ -512,7 +512,7 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     private void resetFirstSignal() {
         this.signalPositions.ifPresent(entry -> {
-            final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+            final Signal current = SignalBoxHandler.getSignal(new StateInfo(world, tilePos),
                     entry.getKey().pos);
             if (current == null)
                 return;
@@ -529,7 +529,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     private void resetOther() {
         final List<MainSignalIdentifier> redSignals = new ArrayList<>();
         distantSignalPositions.values().forEach(position -> {
-            final Signal current = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
+            final Signal current = SignalBoxHandler.getSignal(new StateInfo(world, tilePos),
                     position.pos);
             if (current == null)
                 return;
@@ -555,7 +555,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             resetOther();
             if (pathwayToReset != null) {
                 final PathwayHolder holder = SignalBoxHandler.getPathwayHolder(
-                        new PosIdentifier(pathwayToReset.tilePos, pathwayToReset.world));
+                        new StateInfo(pathwayToReset.world, pathwayToReset.tilePos));
                 holder.resetPathway(pathwayToReset);
                 pathwayToReset.consumer.accept(pathwayToReset);
             }
@@ -571,7 +571,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                 node.getOption(new ModeSet(mode, rotation)).ifPresent(
                         option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
                             final Signal current = SignalBoxHandler
-                                    .getSignal(new PosIdentifier(tilePos, world), position);
+                                    .getSignal(new StateInfo(world, tilePos), position);
                             if (current == null)
                                 return;
                             final OtherSignalIdentifier identifier = distantSignalPositions
@@ -677,8 +677,8 @@ public class SignalBoxPathway implements IChunkLoadable {
     public void deactivateAllOutputsOnPathway() {
         foreachPath((_u, node) -> {
             final List<BlockPos> outputs = node.clearAllManuellOutputs();
-            outputs.forEach(pos -> SignalBoxHandler
-                    .updateRedstoneOutput(new PosIdentifier(pos, world), false));
+            outputs.forEach(
+                    pos -> SignalBoxHandler.updateRedstoneOutput(new StateInfo(world, pos), false));
         }, null);
     }
 
@@ -693,7 +693,7 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     public void checkReRequest() {
         if (isAutoPathway) {
-            final PosIdentifier identifier = new PosIdentifier(tilePos, world);
+            final StateInfo identifier = new StateInfo(world, tilePos);
             SignalBoxHandler.requestPathway(identifier, originalFirstPoint, getLastPoint());
         }
     }

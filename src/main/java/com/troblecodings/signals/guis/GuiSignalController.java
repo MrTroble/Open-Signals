@@ -26,13 +26,12 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnum;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.enums.SignalControllerNetwork;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.models.SignalCustomModel;
 
@@ -142,8 +141,7 @@ public class GuiSignalController extends GuiBase {
                 properties.put(property, "DISABLED");
             }
         });
-        ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(mc.level, controller.getPos()))
+        ClientSignalStateHandler.getClientStates(new StateInfo(mc.level, controller.getPos()))
                 .forEach((property, value) -> {
                     previewRedstone.addToRenderNormal(property,
                             property.getParent().getIDFromValue(value));
@@ -246,7 +244,7 @@ public class GuiSignalController extends GuiBase {
 
         final String name = I18Wrapper.format("tile." + signal.delegate.name().getPath() + ".name")
                 + "; Name: "
-                + ClientNameHandler.getClientName(new NameStateInfo(mc.level, controller.getPos()));
+                + ClientNameHandler.getClientName(new StateInfo(mc.level, controller.getPos()));
 
         final UILabel titlelabel = new UILabel(name);
         titlelabel.setCenterX(false);
@@ -304,8 +302,7 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 
         holders.clear();
-        ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(mc.level, controller.getPos()))
+        ClientSignalStateHandler.getClientStates(new StateInfo(mc.level, controller.getPos()))
                 .forEach((property, value) -> previewSidebar.addToRenderNormal(property,
                         property.getParent().getIDFromValue(value)));
 

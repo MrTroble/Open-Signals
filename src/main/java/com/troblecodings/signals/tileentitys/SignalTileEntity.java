@@ -1,17 +1,22 @@
 package com.troblecodings.signals.tileentitys;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.Nonnull;
 
+import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
+import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
+import com.troblecodings.signals.handler.SignalStateHandler;
+import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.world.entity.player.Player;
@@ -22,6 +27,29 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
     }
+
+    private final Map<SEProperty, String> properties = new HashMap<>();
+
+    private final SignalStateListener listener = (info, states, changed) -> {
+        switch (changed) {
+            case ADDED_TO_CACHE: {
+                properties.clear();
+                properties.putAll(SignalStateHandler.getStates(info));
+                break;
+            }
+            case REMOVED_FROM_FILE:
+            case REMOVED_FROM_CACHE: {
+                properties.clear();
+                break;
+            }
+            case UPDATED: {
+                properties.putAll(states);
+                break;
+            }
+            default:
+                break;
+        }
+    };
 
     @Override
     public boolean isValid(final Player player) {
@@ -42,10 +70,30 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return ((Signal) getBlockState().getBlock());
     }
 
+    public Map<SEProperty, String> getProperties() {
+        return ImmutableMap.copyOf(properties);
+    }
+
     @Override
     public @Nonnull IModelData getModelData() {
         final Map<SEProperty, String> states = ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(level, worldPosition));
+                .getClientStates(new StateInfo(level, worldPosition));
         return new ModelInfoWrapper(states);
+    }
+
+    @Override
+    public void onLoad() {
+        if (!level.isClientSide) {
+            SignalStateHandler.addListener(new SignalStateInfo(level, worldPosition, getSignal()),
+                    listener);
+        }
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        if (!level.isClientSide) {
+            SignalStateHandler.removeListener(
+                    new SignalStateInfo(level, worldPosition, getSignal()), listener);
+        }
     }
 }

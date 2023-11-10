@@ -32,18 +32,18 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.handler.ClientNameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
@@ -292,7 +292,7 @@ public class SidePanel {
                                     if (!entry.containsEntry(PathEntryType.OUTPUT))
                                         return;
                                     final String name = currentNode.getPoint().toString() + " - "
-                                            + ClientNameHandler.getClientName(new NameStateInfo(
+                                            + ClientNameHandler.getClientName(new StateInfo(
                                                     mc.level,
                                                     entry.getEntry(PathEntryType.OUTPUT).get()));
                                     final UIEntity button = GuiElements.createButton(name, e1 -> {
@@ -540,7 +540,7 @@ public class SidePanel {
                 if (option.containsEntry(PathEntryType.SIGNAL)) {
                     final BlockPos signalPos = option.getEntry(PathEntryType.SIGNAL).get();
                     final String signalName = ClientNameHandler
-                            .getClientName(new NameStateInfo(mc.level, signalPos));
+                            .getClientName(new StateInfo(mc.level, signalPos));
                     helpList.add(GuiElements.createLabel(
                             (signalName.isEmpty() ? "Rotaion: " + mode.rotation.toString()
                                     : signalName) + " - " + mode.mode.toString(),
@@ -635,8 +635,7 @@ public class SidePanel {
             helpList.add(GuiElements.createLabel(I18Wrapper.format("info.usage.subsidiary"),
                     new UIEntity().getBasicTextColor(), 0.8f));
             subsidiaries.forEach((pos, holder) -> {
-                final String name = ClientNameHandler
-                        .getClientName(new NameStateInfo(mc.level, pos));
+                final String name = ClientNameHandler.getClientName(new StateInfo(mc.level, pos));
                 final UIEntity button = GuiElements.createButton(name, e -> {
                     final UIEntity screen = GuiElements.createScreen(selectionEntity -> {
                         final UIBox hbox = new UIBox(UIBox.VBOX, 3);

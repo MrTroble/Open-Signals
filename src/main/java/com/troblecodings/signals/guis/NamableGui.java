@@ -11,8 +11,8 @@ import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.ClientNameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
@@ -93,8 +93,8 @@ public class NamableGui extends GuiBase {
     }
 
     private void updateText(final String input) {
-        if (input.isEmpty() || input.equals(
-                ClientNameHandler.getClientName(new NameStateInfo(mc.level, container.pos))))
+        if (input.isEmpty() || input
+                .equals(ClientNameHandler.getClientName(new StateInfo(mc.level, container.pos))))
             return;
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putString(input);

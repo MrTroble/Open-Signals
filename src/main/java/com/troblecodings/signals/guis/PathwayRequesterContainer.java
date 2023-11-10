@@ -9,7 +9,7 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
@@ -44,7 +44,7 @@ public class PathwayRequesterContainer extends ContainerBase implements IChunkLo
         previousPathway.getKey().writeNetwork(buffer);
         previousPathway.getValue().writeNetwork(buffer);
         if (signalBoxPos != null) {
-            final PosIdentifier identifier = new PosIdentifier(signalBoxPos, info.world);
+            final StateInfo identifier = new StateInfo(info.world, signalBoxPos);
             List<Point> validStarts = SignalBoxHandler.getValidStarts(identifier);
             if (validStarts == null || validStarts.isEmpty()) {
                 loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) info.world,

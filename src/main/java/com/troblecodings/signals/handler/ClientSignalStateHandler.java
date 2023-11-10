@@ -11,6 +11,7 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.StateInfo;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -22,9 +23,9 @@ import net.minecraftforge.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientSignalStateHandler implements INetworkSync {
 
-    private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
+    private static final Map<StateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
 
-    public static final Map<SEProperty, String> getClientStates(final ClientSignalStateInfo info) {
+    public static final Map<SEProperty, String> getClientStates(final StateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
             return CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>());
         }
@@ -50,7 +51,7 @@ public class ClientSignalStateHandler implements INetworkSync {
             valueIDs[i] = buffer.getByteToUnsignedInt();
         }
         final List<SEProperty> signalProperties = Signal.SIGNAL_IDS.get(signalID).getProperties();
-        final ClientSignalStateInfo stateInfo = new ClientSignalStateInfo(level, signalPos);
+        final StateInfo stateInfo = new StateInfo(level, signalPos);
         synchronized (CURRENTLY_LOADED_STATES) {
             final Map<SEProperty, String> properties = CURRENTLY_LOADED_STATES
                     .computeIfAbsent(stateInfo, _u -> new HashMap<>());
@@ -81,7 +82,7 @@ public class ClientSignalStateHandler implements INetworkSync {
     private static void setRemoved(final BlockPos pos) {
         final Minecraft mc = Minecraft.getInstance();
         synchronized (CURRENTLY_LOADED_STATES) {
-            CURRENTLY_LOADED_STATES.remove(new ClientSignalStateInfo(mc.level, pos));
+            CURRENTLY_LOADED_STATES.remove(new StateInfo(mc.level, pos));
         }
     }
 

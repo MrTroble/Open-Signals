@@ -16,7 +16,7 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumPathUsage;
@@ -58,15 +58,15 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public boolean resetPathway(final Point p1) {
         enabledSubsidiaryTypes.remove(p1);
-        return SignalBoxHandler.resetPathway(new PosIdentifier(tilePos, world), p1);
+        return SignalBoxHandler.resetPathway(new StateInfo(world, tilePos), p1);
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
-        return SignalBoxHandler.requestPathway(new PosIdentifier(tilePos, world), p1, p2);
+        return SignalBoxHandler.requestPathway(new StateInfo(world, tilePos), p1, p2);
     }
 
     public void resetAllPathways() {
-        SignalBoxHandler.resetAllPathways(new PosIdentifier(tilePos, world));
+        SignalBoxHandler.resetAllPathways(new StateInfo(world, tilePos));
     }
 
     @Override
@@ -270,8 +270,7 @@ public class SignalBoxGrid implements INetworkSavable {
         final Optional<BlockPos> pos = node.getOption(mode).get().getEntry(PathEntryType.SIGNAL);
         if (pos.isEmpty())
             return;
-        final Signal signal = SignalBoxHandler.getSignal(new PosIdentifier(tilePos, world),
-                pos.get());
+        final Signal signal = SignalBoxHandler.getSignal(new StateInfo(world, tilePos), pos.get());
         if (!entry.state) {
             if (!enabledSubsidiaryTypes.containsKey(point))
                 return;

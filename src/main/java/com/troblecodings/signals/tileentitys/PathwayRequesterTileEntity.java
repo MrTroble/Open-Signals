@@ -7,7 +7,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.SignalBox;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.Point;
@@ -55,7 +55,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     }
 
     public void requestPathway() {
-        final PosIdentifier identifier = new PosIdentifier(linkedSignalBox, level);
+        final StateInfo identifier = new StateInfo(level, linkedSignalBox);
         if (SignalBoxHandler.getNodeFromGrid(identifier, pathway.getValue())
                 .containsOutConnection()) {
             SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),

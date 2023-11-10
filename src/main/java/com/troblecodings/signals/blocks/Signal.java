@@ -14,16 +14,14 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnum;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -135,8 +133,8 @@ public class Signal extends BasicBlock {
         final Level world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
-                ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
-                : SignalStateHandler.getStates(info);
+                ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
+                : te.getProperties();
         return Shapes.create(Shapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
 
@@ -177,8 +175,8 @@ public class Signal extends BasicBlock {
         GhostBlock.destroyUpperBlock(worldIn, pos);
         if (!worldIn.isClientSide() && worldIn instanceof Level) {
             SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos, this));
-            NameHandler.setRemoved(new NameStateInfo((Level) worldIn, pos));
-            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (Level) worldIn));
+            NameHandler.setRemoved(new StateInfo((Level) worldIn, pos));
+            SignalBoxHandler.onPosRemove(new StateInfo((Level) worldIn, pos));
         }
     }
 
@@ -229,9 +227,8 @@ public class Signal extends BasicBlock {
 
     @OnlyIn(Dist.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
-        final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
-                        info.tileEntity.getBlockPos()));
+        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
+                new StateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
@@ -291,9 +288,8 @@ public class Signal extends BasicBlock {
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
 
-        final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
-                        info.tileEntity.getBlockPos()));
+        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
+                new StateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;

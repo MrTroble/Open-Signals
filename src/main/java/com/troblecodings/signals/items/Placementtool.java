@@ -13,10 +13,10 @@ import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.guis.ContainerPlacementtool;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
@@ -129,7 +129,7 @@ public class Placementtool extends Item
             ghostPos = ghostPos.above();
         }
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
-        final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
+        final StateInfo nameInfo = new StateInfo(worldIn, pos);
         String nametoSet = "";
         if (!(signalName == null || signalName.isEmpty())) {
             signalProperties.put(Signal.CUSTOMNAME, "true");
@@ -139,7 +139,7 @@ public class Placementtool extends Item
             nametoSet = signal.getSignalTypeName();
         }
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
-        SignalStateHandler.createStates(info, signalProperties);
+        SignalStateHandler.createStates(info, signalProperties, player);
         NameHandler.createName(nameInfo, nametoSet);
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
         return InteractionResult.SUCCESS;

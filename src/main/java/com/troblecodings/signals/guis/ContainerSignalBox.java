@@ -17,7 +17,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ModeIdentifier;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -68,7 +68,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         buffer.putEnumValue(SignalBoxNetwork.SEND_GRID);
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
-        final PosIdentifier identifier = new PosIdentifier(tile.getBlockPos(), info.world);
+        final StateInfo identifier = new StateInfo(info.world, tile.getBlockPos());
         final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = SignalBoxHandler
                 .getPossibleSubsidiaries(identifier);
         final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier)
@@ -95,7 +95,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
         positions.entrySet().stream().filter(entry -> entry.getValue().equals(LinkType.SIGNALBOX))
                 .forEach(entry -> validInConnections.put(entry.getKey(), SignalBoxHandler
-                        .getAllInConnections(new PosIdentifier(entry.getKey(), info.world))));
+                        .getAllInConnections(new StateInfo(info.world, entry.getKey()))));
         buffer.putByte((byte) validInConnections.size());
         validInConnections.forEach((pos, list) -> {
             buffer.putBlockPos(pos);
@@ -293,7 +293,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             case REMOVE_POS: {
                 final BlockPos pos = buffer.getBlockPos();
                 SignalBoxHandler.unlinkPosFromSignalBox(
-                        new PosIdentifier(tile.getBlockPos(), tile.getLevel()), pos);
+                        new StateInfo(tile.getLevel(), tile.getBlockPos()), pos);
                 break;
             }
             case RESET_PW: {
@@ -312,7 +312,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final Point end = Point.of(buffer);
                 if (grid.getNode(end).containsOutConnection()) {
                     if (!SignalBoxHandler.requesetInterSignalBoxPathway(
-                            new PosIdentifier(info.pos, info.world), start, end)) {
+                            new StateInfo(info.world, info.pos), start, end)) {
                         final WriteBuffer error = new WriteBuffer();
                         error.putEnumValue(SignalBoxNetwork.NO_PW_FOUND);
                         OpenSignalsMain.network.sendTo(info.player, error);
@@ -321,7 +321,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 }
                 if (!grid.requestWay(start, end)) {
                     if (SignalBoxHandler.addNextPathway(
-                            new PosIdentifier(tile.getBlockPos(), tile.getLevel()), start, end)) {
+                            new StateInfo(tile.getLevel(), tile.getBlockPos()), start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
                         start.writeNetwork(sucess);
@@ -356,8 +356,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final boolean state = buffer.getBoolean();
                 final BlockPos pos = grid.updateManuellRSOutput(point, modeSet, state);
                 if (pos != null) {
-                    SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, info.world),
-                            state);
+                    SignalBoxHandler.updateRedstoneOutput(new StateInfo(info.world, pos), state);
                     final WriteBuffer sucess = new WriteBuffer();
                     sucess.putEnumValue(SignalBoxNetwork.OUTPUT_UPDATE);
                     point.writeNetwork(sucess);
@@ -373,7 +372,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
                 node.setAutoPoint(state);
                 SignalBoxHandler.updatePathwayToAutomatic(
-                        new PosIdentifier(tile.getBlockPos(), info.world), point);
+                        new StateInfo(info.world, tile.getBlockPos()), point);
                 break;
             }
             case SEND_NAME: {
@@ -398,8 +397,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             case REMOVE_SAVEDPW: {
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
-                SignalBoxHandler.removeNextPathway(
-                        new PosIdentifier(tile.getBlockPos(), info.world), start, end);
+                SignalBoxHandler.removeNextPathway(new StateInfo(info.world, tile.getBlockPos()),
+                        start, end);
                 break;
             }
             case SEND_POINT_ENTRY: {
