@@ -236,9 +236,6 @@ public final class NameHandler implements INetworkSync {
             return;
         new Thread(() -> {
             infos.forEach(info -> {
-                if (info.world == null || info.pos == null) {
-                    System.out.println("A StateInfo has a null value! info: [" + info + "]");
-                }
                 boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
                     Integer count = LOAD_COUNTER.get(info);
