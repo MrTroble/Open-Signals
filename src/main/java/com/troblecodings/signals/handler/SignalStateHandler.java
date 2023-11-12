@@ -341,6 +341,11 @@ public final class SignalStateHandler implements INetworkSync {
     private static void sendToPlayer(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties, final EntityPlayer player) {
         if (properties == null || properties.isEmpty()) {
+            System.out.println("Tried to send empty PropertiesMap on [" + stateInfo
+                    + "] to Player [" + player + "]! Printing StackTrace...");
+            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+                System.out.println(e);
+            }
             return;
         }
         sendTo(player, packToByteBuffer(stateInfo, properties));
@@ -349,7 +354,11 @@ public final class SignalStateHandler implements INetworkSync {
     private static void sendToAll(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties) {
         if (properties == null || properties.isEmpty()) {
-            return;
+            System.out.println("Tried to send empty PropertiesMap on [" + stateInfo
+                    + "] to all! Printing StackTrace...");
+            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
+                System.out.println(e);
+            }
         }
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         stateInfo.world.playerEntities.forEach(player -> sendTo(player, buffer));
