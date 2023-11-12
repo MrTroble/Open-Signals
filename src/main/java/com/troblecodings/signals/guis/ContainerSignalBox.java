@@ -179,7 +179,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 enabledSubsidiaryTypes.forEach((point, map) -> {
                     map.forEach((modeSet, subsidiary) -> {
                         final MainSignalIdentifier identifier = new MainSignalIdentifier(
-                                new ModeIdentifier(point, modeSet), pos,
+                                new ModeIdentifier(point, modeSet),
+                                grid.getNode(point).getOption(modeSet).get()
+                                        .getEntry(PathEntryType.SIGNAL).get(),
                                 SignalState.combine(subsidiary.enumValue.getSubsidiaryShowType()));
                         final List<MainSignalIdentifier> greenSignals = this.greenSignals
                                 .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
@@ -229,6 +231,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     final MainSignalIdentifier identifier = MainSignalIdentifier.of(buffer);
                     greenSignals.remove(identifier.getPoint());
                     pointUpdates.add(identifier.getPoint());
+                    removeFromEnabledSubsidiaries(identifier);
                 }
                 final int greenSignalSize = buffer.getByteToUnsignedInt();
                 for (int i = 0; i < greenSignalSize; i++) {
@@ -433,6 +436,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     private static Rotation deserializeRotation(final ReadBuffer buffer) {
         return Rotation.values()[buffer.getByteToUnsignedInt()];
+    }
+
+    private void removeFromEnabledSubsidiaries(final MainSignalIdentifier identifier) {
+        final Map<ModeSet, SubsidiaryEntry> map = enabledSubsidiaryTypes.get(identifier.getPoint());
+        if (map == null)
+            return;
+        map.remove(identifier.getModeSet());
+        if (map.isEmpty())
+            enabledSubsidiaryTypes.remove(identifier.getPoint());
     }
 
     @Override

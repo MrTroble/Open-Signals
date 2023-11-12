@@ -29,6 +29,7 @@ import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -494,14 +495,21 @@ public class SignalBoxPathway implements IChunkLoadable {
             return;
         world.getServer().execute(() -> {
             final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(tilePos);
-            if (tile == null || !tile.isBlocked())
+            if (tile == null)
                 return;
+            final SignalBoxGrid grid = tile.getSignalBoxGrid();
             final WriteBuffer buffer = new WriteBuffer();
             buffer.putEnumValue(SignalBoxNetwork.SET_SIGNALS);
             buffer.putByte((byte) redSignals.size());
-            redSignals.forEach(signal -> signal.writeNetwork(buffer));
+            redSignals.forEach(signal -> {
+                signal.writeNetwork(buffer);
+                grid.updateSubsidiarySignal(signal.getPoint(), signal.getModeSet(),
+                        new SubsidiaryEntry(null, false));
+            });
             buffer.putByte((byte) greenSignals.size());
             greenSignals.forEach(signal -> signal.writeNetwork(buffer));
+            if (!tile.isBlocked())
+                return;
             OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
         });
     }

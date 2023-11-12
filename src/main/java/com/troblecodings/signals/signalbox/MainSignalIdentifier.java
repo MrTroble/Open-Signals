@@ -62,6 +62,12 @@ public class MainSignalIdentifier {
         return Objects.equals(identifier, other.identifier) && Objects.equals(pos, other.pos);
     }
 
+    @Override
+    public String toString() {
+        return "MainSignalIdentifier [ModeIdentifier=" + identifier + ",pos=" + pos + ",state="
+                + state + "]";
+    }
+
     public static enum SignalState {
 
         RED, GREEN, OFF, SUBSIDIARY_GREEN, SUBSIDIARY_RED, SUBSIDIARY_OFF;
