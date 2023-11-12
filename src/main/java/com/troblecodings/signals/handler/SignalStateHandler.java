@@ -366,6 +366,7 @@ public final class SignalStateHandler implements INetworkSync {
         }
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         stateInfo.world.players().forEach(playerEntity -> sendTo(playerEntity, buffer));
+        System.out.println(stateInfo.world.players());
     }
 
     @SubscribeEvent
@@ -442,7 +443,7 @@ public final class SignalStateHandler implements INetworkSync {
                 synchronized (CURRENTLY_LOADED_STATES) {
                     CURRENTLY_LOADED_STATES.put(info.info, properties);
                 }
-                sendToAll(info.info, properties);
+                sendTo(info.info, properties, player);
                 updateListeners(info.info, properties, ChangedState.ADDED_TO_CACHE);
             });
         }, "OSSignalStateHandler:loadSignals").start();
