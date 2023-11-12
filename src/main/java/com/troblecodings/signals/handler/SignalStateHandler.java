@@ -258,17 +258,7 @@ public final class SignalStateHandler implements INetworkSync {
             map.put(property, value);
         }
         if (map.isEmpty()) {
-            System.out.println(
-                    "Map from read of [" + stateInfo + "] is emtpy! Read out byte array: [");
-            for (final byte b : byteArray) {
-                System.out.print(b + ", ");
-            }
-            System.out.println("Printing SEProperties List ... [" + properties + "]!");
-            System.out.println("\nPrinting StackTrace...");
-            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
-                System.out.println(e.toString());
-            }
-            System.out.println("\n\n");
+            System.out.println("Map from read of [" + stateInfo + "] is emtpy!");
         }
         return map;
     }
