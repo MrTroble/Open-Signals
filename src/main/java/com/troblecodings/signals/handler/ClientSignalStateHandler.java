@@ -30,6 +30,13 @@ public class ClientSignalStateHandler implements INetworkSync {
         }
     }
 
+    // TODO Only for debugging
+    public static boolean containsState(final StateInfo info) {
+        synchronized (CURRENTLY_LOADED_STATES) {
+            return CURRENTLY_LOADED_STATES.containsKey(info);
+        }
+    }
+
     @Override
     public void deserializeClient(final ByteBuffer buf) {
         final ReadBuffer buffer = new ReadBuffer(buf);
