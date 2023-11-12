@@ -184,7 +184,12 @@ public class Signal extends BasicBlock {
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isRemote
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
-                : SignalStateHandler.getStates(info);
+                : tile.getProperties();
+        if (properties.isEmpty()) {
+            System.out.println("Properties Map for [" + info
+                    + "] is Empty! Is state on Client loaded: "
+                    + ClientSignalStateHandler.isStateLoaded(new StateInfo(world, pos)) + "!");
+        }
         properties.forEach((property, value) -> blockState
                 .getAndUpdate(oldState -> oldState.withProperty(property, value)));
         return blockState.get();
