@@ -353,6 +353,8 @@ public final class SignalStateHandler implements INetworkSync {
     private static void sendToAll(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties) {
         if (properties == null || properties.isEmpty()) {
+            System.out
+                    .println("Tried to send empty Data to all Clients! Info: [" + stateInfo + "]!");
             return;
         }
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
