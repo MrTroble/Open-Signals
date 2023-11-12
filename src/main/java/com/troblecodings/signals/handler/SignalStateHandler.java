@@ -25,7 +25,6 @@ import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangedState;
-import com.troblecodings.signals.signalbox.debug.DebugSignalStateFile;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import io.netty.buffer.Unpooled;
@@ -146,7 +145,7 @@ public final class SignalStateHandler implements INetworkSync {
         SignalStateFile file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
-                    _u -> new DebugSignalStateFile(Paths.get("osfiles/signalfiles/"
+                    _u -> new SignalStateFile(Paths.get("osfiles/signalfiles/"
                             + ((WorldServer) info.world).getMinecraftServer().getName()
                                     .replace(":", "").replace("/", "").replace("\\", "")
                             + "/" + ((WorldServer) info.world).provider.getDimensionType().getName()
@@ -225,7 +224,7 @@ public final class SignalStateHandler implements INetworkSync {
         SignalStateFile file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.computeIfAbsent(stateInfo.world,
-                    _u -> new DebugSignalStateFile(Paths.get("osfiles/signalfiles/"
+                    _u -> new SignalStateFile(Paths.get("osfiles/signalfiles/"
                             + ((WorldServer) stateInfo.world).getMinecraftServer().getName()
                                     .replace(":", "").replace("/", "").replace("\\", "")
                             + "/" + ((WorldServer) stateInfo.world).provider.getDimensionType()
@@ -256,9 +255,6 @@ public final class SignalStateHandler implements INetworkSync {
                 continue;
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
-        }
-        if (map.isEmpty()) {
-            System.out.println("Map from read of [" + stateInfo + "] is emtpy!");
         }
         return map;
     }
