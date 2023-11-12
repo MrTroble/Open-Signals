@@ -185,12 +185,6 @@ public class Signal extends BasicBlock {
         final Map<SEProperty, String> properties = world.isRemote
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
                 : SignalStateHandler.getStates(info);
-        if (properties.isEmpty()) {
-            System.out.println("PropertiesMap for [" + pos + "] is empty! Printing Tile... [" + tile
-                    + "]. Is State on Client loaded: "
-                    + ClientSignalStateHandler.containsState(new StateInfo(info.world, info.pos))
-                    + "!");
-        }
         properties.forEach((property, value) -> blockState
                 .getAndUpdate(oldState -> oldState.withProperty(property, value)));
         return blockState.get();
@@ -241,6 +235,9 @@ public class Signal extends BasicBlock {
         super.breakBlock(worldIn, pos, state);
         GhostBlock.destroyUpperBlock(worldIn, pos);
         if (!worldIn.isRemote) {
+            final SignalStateInfo info = new SignalStateInfo(worldIn, pos, this);
+            SignalStateHandler.sendRemoved(info);
+            NameHandler.sendRemoved(new StateInfo(worldIn, pos));
             new Thread(() -> {
                 SignalStateHandler.setRemoved(new SignalStateInfo(worldIn, pos, this));
                 NameHandler.setRemoved(new StateInfo(worldIn, pos));

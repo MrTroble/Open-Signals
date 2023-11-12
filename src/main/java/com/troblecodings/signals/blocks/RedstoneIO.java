@@ -109,8 +109,9 @@ public class RedstoneIO extends BasicBlock {
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         if (!worldIn.isRemote) {
+            final StateInfo info = new StateInfo(worldIn, pos);
+            NameHandler.sendRemoved(info);
             new Thread(() -> {
-                final StateInfo info = new StateInfo(worldIn, pos);
                 NameHandler.setRemoved(info);
                 SignalBoxHandler.onPosRemove(info);
             }, "RedstoneIO:breakBlock").start();

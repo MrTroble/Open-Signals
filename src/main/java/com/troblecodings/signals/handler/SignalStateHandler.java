@@ -298,14 +298,13 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (SIGNAL_COUNTER) {
             SIGNAL_COUNTER.remove(info);
         }
-        sendRemoved(info);
         updateListeners(info, removedProperties, ChangedState.REMOVED_FROM_FILE);
         synchronized (ALL_LISTENERS) {
             ALL_LISTENERS.remove(info);
         }
     }
 
-    private static void sendRemoved(final SignalStateInfo info) {
+    public static void sendRemoved(final SignalStateInfo info) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putInt(info.signal.getID());
@@ -341,11 +340,6 @@ public final class SignalStateHandler implements INetworkSync {
     private static void sendToPlayer(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties, final EntityPlayer player) {
         if (properties == null || properties.isEmpty()) {
-            System.out.println("Tried to send empty PropertiesMap on [" + stateInfo
-                    + "] to Player [" + player + "]! Printing StackTrace...");
-            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
-                System.out.println(e);
-            }
             return;
         }
         sendTo(player, packToByteBuffer(stateInfo, properties));
@@ -354,11 +348,7 @@ public final class SignalStateHandler implements INetworkSync {
     private static void sendToAll(final SignalStateInfo stateInfo,
             final Map<SEProperty, String> properties) {
         if (properties == null || properties.isEmpty()) {
-            System.out.println("Tried to send empty PropertiesMap on [" + stateInfo
-                    + "] to all! Printing StackTrace...");
-            for (final StackTraceElement e : Thread.currentThread().getStackTrace()) {
-                System.out.println(e);
-            }
+            return;
         }
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         stateInfo.world.playerEntities.forEach(player -> sendTo(player, buffer));

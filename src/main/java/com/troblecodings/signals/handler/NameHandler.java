@@ -139,10 +139,9 @@ public final class NameHandler implements INetworkSync {
         synchronized (file) {
             file.deleteIndex(info.pos);
         }
-        sendRemoved(info);
     }
 
-    private static void sendRemoved(final StateInfo info) {
+    public static void sendRemoved(final StateInfo info) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putByte((byte) 255);
