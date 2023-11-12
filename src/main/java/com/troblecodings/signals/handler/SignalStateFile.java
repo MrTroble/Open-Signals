@@ -71,6 +71,9 @@ public class SignalStateFile {
 
     @Nullable
     public synchronized SignalStatePos find(final BlockPos pos) {
+        final SignalStatePos cachePos = posCache.get(pos);
+        if (cachePos != null)
+            return cachePos;
         return (SignalStatePos) internalFind(pos,
                 (stream, blockPos, offset, file) -> new SignalStatePos(file, offset), "r");
     }
@@ -82,7 +85,7 @@ public class SignalStateFile {
                 stream.seek(pointer - 16);
                 stream.writeLong(0);
                 stream.writeLong(0);
-                // TODO posCache.remove(pos);
+                posCache.remove(pos);
                 return new SignalStatePos(file, offset);
             } catch (final IOException e) {
                 e.printStackTrace();
@@ -119,7 +122,7 @@ public class SignalStateFile {
                         if (currentOffset == hashOffset)
                             continue nextFile; // Nothing found
                     } while (!pos.equals(currenPosition));
-                    // TODO posCache.put(pos, new SignalStatePos(counter, offset));
+                    posCache.put(pos, new SignalStatePos(counter, offset));
                     return function.apply(stream, currenPosition, offset, counter);
                 }
             }
