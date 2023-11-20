@@ -135,8 +135,7 @@ public class PathwayHolder implements IChunkLoadable {
     private void checkTileWasLoaded() {
         if (modeGrid == null || modeGrid.isEmpty()) {
             loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) world, tilePos,
-                    (tile, _u) -> {
-                    });
+                    (tile, _u) -> tile.onLoad());
         }
     }
 

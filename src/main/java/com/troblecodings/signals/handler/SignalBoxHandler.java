@@ -207,8 +207,10 @@ public final class SignalBoxHandler {
         final boolean startRequeset = startGrid.requestWay(start, end);
         final boolean endRequeset = endGrid.requestWay(otherStartPoint.get(), otherEndPoint.get());
         if (!startRequeset || !endRequeset) {
-            startGrid.resetPathway(start);
-            endGrid.resetPathway(otherStartPoint.get());
+            if (!startRequeset)
+                startGrid.resetPathway(start);
+            if (!endRequeset)
+                endGrid.resetPathway(otherStartPoint.get());
             return false;
         }
         final SignalBoxPathway startPath = startGrid.getPathwayByLastPoint(end);
