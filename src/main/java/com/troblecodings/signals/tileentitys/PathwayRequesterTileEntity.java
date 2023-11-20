@@ -22,7 +22,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         implements ILinkableTile, IChunkLoadable {
 
     private BlockPos linkedSignalBox;
-    private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(), new Point());
+    private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(-1, -1),
+            new Point(-1, -1));
 
     public PathwayRequesterTileEntity(final TileEntityInfo info) {
         super(info);

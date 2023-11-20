@@ -2,6 +2,7 @@ package com.troblecodings.signals.guis;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
@@ -48,15 +49,27 @@ public class PathwayRequesterGui extends GuiBase {
         inner.add(GuiElements.createSpacerV(20));
 
         final IIntegerable<String> start = SizeIntegerables.of("StartPoint",
-                container.validStarts.size(), e -> container.validStarts.get(e).toShortString());
+                container.validStarts.size(), e -> {
+                    if (e == -1)
+                        return "Disabled";
+                    return container.validStarts.get(e).toShortString();
+                });
         final IIntegerable<String> end = SizeIntegerables.of("EndPoint",
-                container.validStarts.size(), e -> container.validEnds.get(e).toShortString());
+                container.validStarts.size(), e -> {
+                    if (e == -1)
+                        return "Disabled";
+                    return container.validEnds.get(e).toShortString();
+                });
 
         if (!container.validStarts.isEmpty()) {
-            inner.add(GuiElements.createEnumElement(start, e -> {
+            inner.add(GuiElements.createEnumElement(new DisableIntegerable<>(start), e -> {
+                if (e == -1) {
+                    container.start = new Point(-1, -1);
+                    return;
+                }
                 container.start = container.validStarts.get(e);
-            }, container.start != null ? container.start.equals(new Point()) ? 0
-                    : container.validStarts.indexOf(container.start) : 0));
+            }, container.start != null ? container.start.equals(new Point(-1, -1)) ? -1
+                    : container.validStarts.indexOf(container.start) : -1));
         } else {
             final UIEntity infoLabelEntity = new UIEntity();
             infoLabelEntity.setInheritWidth(true);
@@ -68,10 +81,14 @@ public class PathwayRequesterGui extends GuiBase {
         }
 
         if (!container.validEnds.isEmpty()) {
-            inner.add(GuiElements.createEnumElement(end, e -> {
+            inner.add(GuiElements.createEnumElement(new DisableIntegerable<>(end), e -> {
+                if (e == -1) {
+                    container.end = new Point(-1, -1);
+                    return;
+                }
                 container.end = container.validEnds.get(e);
-            }, container.end != null ? container.end.equals(new Point()) ? 0
-                    : container.validEnds.indexOf(container.end) : 0));
+            }, container.end != null ? container.end.equals(new Point(-1, -1)) ? -1
+                    : container.validEnds.indexOf(container.end) : -1));
         } else {
             final UIEntity infoLabelEntity = new UIEntity();
             infoLabelEntity.setInheritWidth(true);
