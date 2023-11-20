@@ -49,7 +49,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         if (pathwayCopy != null) {
             grid.readPathways(pathwayCopy);
             pathwayCopy = null;
-            System.out.println("Read out PWs for [" + worldPosition + "]!");
         }
     }
 
@@ -60,7 +59,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         SignalBoxHandler.writeTileNBT(new StateInfo(level, worldPosition), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
         grid.writePathways(wrapper);
-        System.out.println("Saved NBT for [" + worldPosition + "]!");
     }
 
     private NBTWrapper copy = null;
@@ -74,7 +72,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             readOutPathwayNBT();
             onLoad();
         }
-        System.out.println("Read out NBT for [" + worldPosition + "]!");
     }
 
     @Override

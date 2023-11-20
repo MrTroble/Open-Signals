@@ -437,6 +437,7 @@ public final class SignalStateHandler implements INetworkSync {
                         sendProperties = CURRENTLY_LOADED_STATES.get(info.info);
                     }
                     sendTo(info.info, sendProperties, player);
+                    return;
                 }
                 final Map<SEProperty, String> properties = readAndSerialize(info.info);
                 synchronized (CURRENTLY_LOADED_STATES) {

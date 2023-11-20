@@ -102,7 +102,6 @@ public class SignalBoxGrid implements INetworkSavable {
         resetPathway(pathway);
         updateToNet(pathway);
         tryNextPathways();
-        System.out.println("Resetted PW on [" + p1 + "]!");
         return true;
     }
 
@@ -302,7 +301,6 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void writePathways(final NBTWrapper tag) {
-        System.out.println("Writing PW... [" + startsToPath + "] on [" + tilePos + "]!");
         tag.putList(PATHWAY_LIST,
                 startsToPath.values().stream().filter(pw -> !pw.isEmptyOrBroken()).map(pathway -> {
                     final NBTWrapper path = new NBTWrapper();
@@ -371,7 +369,6 @@ public class SignalBoxGrid implements INetworkSavable {
             end.read(comp.getWrapper(END_POINT));
             nextPathways.add(Maps.immutableEntry(start, end));
         });
-        System.out.println("Read PW: [" + startsToPath + "] on [" + tilePos + "]!");
     }
 
     @Override
