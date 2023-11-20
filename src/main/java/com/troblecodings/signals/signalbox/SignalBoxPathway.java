@@ -422,11 +422,13 @@ public class SignalBoxPathway implements IChunkLoadable {
             final SignalBoxPathway next = getNextPathway();
             final SignalState previous = position.state;
             if (lastSignal != null && next != null && !next.isPathwayRestted()) {
-                position.state = SignalState.GREEN;
+                if (!next.isExecutingSignalSet)
+                    position.state = SignalState.GREEN;
             } else if (pathwayToBlock != null) {
                 final SignalBoxPathway otherNext = pathwayToBlock.getNextPathway();
                 if (otherNext != null && !otherNext.isPathwayRestted()) {
-                    position.state = SignalState.GREEN;
+                    if (!otherNext.isExecutingSignalSet)
+                        position.state = SignalState.GREEN;
                 } else {
                     position.state = SignalState.RED;
                 }
