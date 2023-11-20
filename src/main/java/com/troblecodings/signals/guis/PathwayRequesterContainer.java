@@ -3,6 +3,7 @@ package com.troblecodings.signals.guis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
@@ -12,6 +13,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import com.troblecodings.signals.tileentitys.PathwayRequesterTileEntity;
@@ -44,14 +46,13 @@ public class PathwayRequesterContainer extends ContainerBase implements IChunkLo
         previousPathway.getKey().writeNetwork(buffer);
         previousPathway.getValue().writeNetwork(buffer);
         if (signalBoxPos != null) {
-            final StateInfo identifier = new StateInfo(info.world, signalBoxPos);
-            List<Point> validStarts = SignalBoxHandler.getValidStarts(identifier);
-            if (validStarts == null || validStarts.isEmpty()) {
+            final AtomicReference<SignalBoxGrid> grid = new AtomicReference<>();
+            grid.set(SignalBoxHandler.getGrid(new StateInfo(info.world, signalBoxPos)));
+            if (grid.get() == null)
                 loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) info.world,
-                        signalBoxPos, (boxTile, _u) -> boxTile.onLoad());
-                validStarts = SignalBoxHandler.getValidStarts(identifier);
-            }
-            List<Point> validEnds = SignalBoxHandler.getValidEnds(identifier);
+                        signalBoxPos, (tile, _u) -> grid.set(tile.getSignalBoxGrid()));
+            List<Point> validStarts = grid.get().getValidStarts();
+            List<Point> validEnds = grid.get().getValidEnds();
             buffer.putByte((byte) validStarts.size());
             validStarts.forEach(point -> point.writeNetwork(buffer));
             buffer.putByte((byte) validEnds.size());

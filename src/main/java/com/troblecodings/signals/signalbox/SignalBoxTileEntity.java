@@ -40,9 +40,17 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public void setLevel(final Level world) {
         super.setLevel(world);
         grid.setPosAndWorld(worldPosition, world);
-        if (world.isClientSide)
-            return;
-        SignalBoxHandler.setWorld(new StateInfo(world, worldPosition));
+        readOutPathwayNBT();
+    }
+
+    private NBTWrapper pathwayCopy;
+
+    private void readOutPathwayNBT() {
+        if (pathwayCopy != null) {
+            grid.readPathways(pathwayCopy);
+            pathwayCopy = null;
+            System.out.println("Read out PWs for [" + worldPosition + "]!");
+        }
     }
 
     @Override
@@ -51,6 +59,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         this.grid.write(gridTag);
         SignalBoxHandler.writeTileNBT(new StateInfo(level, worldPosition), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
+        grid.writePathways(wrapper);
+        System.out.println("Saved NBT for [" + worldPosition + "]!");
     }
 
     private NBTWrapper copy = null;
@@ -59,9 +69,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public void loadWrapper(final NBTWrapper wrapper) {
         grid.read(wrapper.getWrapper(GUI_TAG));
         copy = wrapper.copy();
+        pathwayCopy = wrapper.copy();
         if (level != null) {
+            readOutPathwayNBT();
             onLoad();
         }
+        System.out.println("Read out NBT for [" + worldPosition + "]!");
     }
 
     @Override
@@ -100,9 +113,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             return;
         }
         final StateInfo identifier = new StateInfo(level, worldPosition);
-        SignalBoxHandler.updateModeGrid(identifier, grid);
-        SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy);
+        SignalBoxHandler.putGrid(identifier, grid);
         SignalBoxHandler.loadSignals(identifier);
+        SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy);
     }
 
     @Override

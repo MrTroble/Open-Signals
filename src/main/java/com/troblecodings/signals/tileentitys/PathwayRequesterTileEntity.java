@@ -11,11 +11,14 @@ import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbox.SignalBoxGrid;
+import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 
 public class PathwayRequesterTileEntity extends SyncableTileEntity
@@ -56,17 +59,20 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     }
 
     public void requestPathway() {
-        final StateInfo identifier = new StateInfo(level, linkedSignalBox);
-        if (SignalBoxHandler.getNodeFromGrid(identifier, pathway.getValue())
-                .containsOutConnection()) {
-            SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
-                    pathway.getValue());
-        } else {
-            if (!SignalBoxHandler.requestPathway(identifier, pathway.getKey(),
-                    pathway.getValue())) {
-                SignalBoxHandler.addNextPathway(identifier, pathway.getKey(), pathway.getValue());
-            }
-        }
+        loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) level, linkedSignalBox,
+                (tile, _u) -> {
+                    final StateInfo identifier = new StateInfo(level, linkedSignalBox);
+                    final SignalBoxGrid grid = tile.getSignalBoxGrid();
+                    if (grid.getNode(pathway.getValue()).containsOutConnection()) {
+                        SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
+                                pathway.getValue());
+                    } else {
+                        if (!grid.requestWay(pathway.getKey(), pathway.getValue())) {
+                            grid.addNextPathway(pathway.getKey(), pathway.getValue());
+                        }
+                    }
+                });
+
     }
 
     public void setNextPathway(final Point start, final Point end) {

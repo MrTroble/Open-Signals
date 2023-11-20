@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -33,12 +34,14 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Rotation;
 
-public class ContainerSignalBox extends ContainerBase implements UIClientSync {
+public class ContainerSignalBox extends ContainerBase implements UIClientSync, IChunkLoadable {
 
     protected final Map<Point, List<MainSignalIdentifier>> greenSignals = new HashMap<>();
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
@@ -85,8 +88,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             buffer.putBlockPos(pos);
             buffer.putByte((byte) type.ordinal());
         });
-        final List<Map.Entry<Point, Point>> nextPathways = SignalBoxHandler
-                .getNextPathways(identifier);
+        final List<Map.Entry<Point, Point>> nextPathways = grid.getNextPathways();
         buffer.putByte((byte) nextPathways.size());
         nextPathways.forEach(entry -> {
             entry.getKey().writeNetwork(buffer);
@@ -94,16 +96,22 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         });
         final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
         positions.entrySet().stream().filter(entry -> entry.getValue().equals(LinkType.SIGNALBOX))
-                .forEach(entry -> validInConnections.put(entry.getKey(), SignalBoxHandler
-                        .getAllInConnections(new StateInfo(info.world, entry.getKey()))));
+                .forEach(entry -> {
+                    final AtomicReference<SignalBoxGrid> grid = new AtomicReference<>();
+                    grid.set(SignalBoxHandler.getGrid(new StateInfo(info.world, entry.getKey())));
+                    if (grid.get() == null)
+                        loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) info.world,
+                                entry.getKey(),
+                                (otherTile, _u) -> grid.set(otherTile.getSignalBoxGrid()));
+                    validInConnections.put(entry.getKey(), grid.get().getAllInConnections());
+                });
         buffer.putByte((byte) validInConnections.size());
         validInConnections.forEach((pos, list) -> {
             buffer.putBlockPos(pos);
             buffer.putByte((byte) list.size());
             list.forEach(point -> point.writeNetwork(buffer));
         });
-        final List<MainSignalIdentifier> greenSignals = SignalBoxHandler
-                .getGreenSignals(identifier);
+        final List<MainSignalIdentifier> greenSignals = grid.getGreenSignals();
         buffer.putInt(greenSignals.size());
         greenSignals.forEach(signal -> signal.writeNetwork(buffer));
         OpenSignalsMain.network.sendTo(info.player, buffer);
@@ -323,8 +331,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     break;
                 }
                 if (!grid.requestWay(start, end)) {
-                    if (SignalBoxHandler.addNextPathway(
-                            new StateInfo(tile.getLevel(), tile.getBlockPos()), start, end)) {
+                    if (grid.addNextPathway(start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
                         start.writeNetwork(sucess);
@@ -374,8 +381,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final boolean state = buffer.getBoolean();
                 final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
                 node.setAutoPoint(state);
-                SignalBoxHandler.updatePathwayToAutomatic(
-                        new StateInfo(info.world, tile.getBlockPos()), point);
+                grid.updatePathwayToAutomatic(point);
                 break;
             }
             case SEND_NAME: {
@@ -400,8 +406,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             case REMOVE_SAVEDPW: {
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
-                SignalBoxHandler.removeNextPathway(new StateInfo(info.world, tile.getBlockPos()),
-                        start, end);
+                grid.removeNextPathway(start, end);
                 break;
             }
             case SEND_POINT_ENTRY: {
