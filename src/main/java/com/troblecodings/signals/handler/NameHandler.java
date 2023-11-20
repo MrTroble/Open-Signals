@@ -47,7 +47,7 @@ public final class NameHandler implements INetworkSync {
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<Level, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<StateInfo, Integer> LOAD_COUNTER = new HashMap<>();
-    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(5);
+    private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
 
@@ -60,13 +60,13 @@ public final class NameHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onServerStop(final ServerStoppingEvent event) {
-        WRITE_SERVICE.shutdown();
+        writeService.shutdown();
         try {
-            WRITE_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
+            writeService.awaitTermination(10, TimeUnit.MINUTES);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        WRITE_SERVICE = Executors.newFixedThreadPool(5);
+        writeService = Executors.newFixedThreadPool(5);
     }
 
     public static void registerToNetworkChannel(final Object obj) {
@@ -161,7 +161,7 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_NAMES) {
             map = ImmutableMap.copyOf(ALL_NAMES);
         }
-        WRITE_SERVICE.execute(() -> {
+        writeService.execute(() -> {
             map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
                     .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
         });
@@ -300,7 +300,7 @@ public final class NameHandler implements INetworkSync {
     private static void unloadNames(final List<StateInfo> infos) {
         if (infos == null || infos.isEmpty())
             return;
-        WRITE_SERVICE.execute(() -> {
+        writeService.execute(() -> {
             infos.forEach(info -> {
                 synchronized (LOAD_COUNTER) {
                     Integer count = LOAD_COUNTER.get(info);
