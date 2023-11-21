@@ -247,6 +247,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             this.originalFirstPoint.read(originalFirstPoint);
         }
         updatePathwayToAutomatic();
+        updateSignalStates();
     }
 
     public void readLinkedPathways(final NBTWrapper tag) {
@@ -395,8 +396,6 @@ public class SignalBoxPathway implements IChunkLoadable {
     private void setSignals(final SignalStateInfo lastSignal) {
         if (isExecutingSignalSet)
             return;
-        final List<MainSignalIdentifier> redSignals = new ArrayList<>();
-        final List<MainSignalIdentifier> greenSignals = new ArrayList<>();
         final StateInfo identifier = new StateInfo(world, tilePos);
         this.signalPositions.ifPresent(entry -> {
             if (isBlocked)
@@ -406,10 +405,6 @@ public class SignalBoxPathway implements IChunkLoadable {
                 return;
             final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey().pos, first);
             SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, speed, zs2Value, type));
-            final SignalState previous = entry.getKey().state;
-            entry.getKey().state = SignalState.GREEN;
-            if (!entry.getKey().state.equals(previous))
-                greenSignals.add(entry.getKey());
         });
         distantSignalPositions.values().forEach(position -> {
             final Signal current = SignalBoxHandler.getSignal(identifier, position.pos);
@@ -417,6 +412,29 @@ public class SignalBoxPathway implements IChunkLoadable {
                 return;
             SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position.pos, current),
                     lastSignal, speed, zs2Value, type, position.isRepeater));
+        });
+        if (this.lastSignal.isPresent() && pathwayToReset != null) {
+            final Signal signal = SignalBoxHandler.getSignal(identifier, this.lastSignal.get().pos);
+            if (signal == null)
+                return;
+            pathwayToReset
+                    .setSignals(new SignalStateInfo(world, this.lastSignal.get().pos, signal));
+        }
+        updateSignalStates();
+    }
+
+    private void updateSignalStates() {
+        final List<MainSignalIdentifier> redSignals = new ArrayList<>();
+        final List<MainSignalIdentifier> greenSignals = new ArrayList<>();
+        this.signalPositions.ifPresent(entry -> {
+            if (isBlocked)
+                return;
+            final SignalState previous = entry.getKey().state;
+            entry.getKey().state = SignalState.GREEN;
+            if (!entry.getKey().state.equals(previous))
+                greenSignals.add(entry.getKey());
+        });
+        distantSignalPositions.values().forEach(position -> {
             final SignalBoxPathway next = getNextPathway();
             final SignalState previous = position.state;
             if (lastSignal != null && next != null && !next.isPathwayRestted()) {
@@ -446,13 +464,6 @@ public class SignalBoxPathway implements IChunkLoadable {
                 }
             }
         });
-        if (this.lastSignal.isPresent() && pathwayToReset != null) {
-            final Signal signal = SignalBoxHandler.getSignal(identifier, this.lastSignal.get().pos);
-            if (signal == null)
-                return;
-            pathwayToReset
-                    .setSignals(new SignalStateInfo(world, this.lastSignal.get().pos, signal));
-        }
         updateSignalsOnClient(redSignals, greenSignals);
     }
 
@@ -491,7 +502,7 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     private void updateSignalsOnClient(final List<MainSignalIdentifier> redSignals,
             final List<MainSignalIdentifier> greenSignals) {
-        if (redSignals.isEmpty() && greenSignals.isEmpty())
+        if (redSignals.isEmpty() && greenSignals.isEmpty() || world.isClientSide)
             return;
         world.getServer().execute(() -> {
             final SignalBoxTileEntity tile = (SignalBoxTileEntity) world.getBlockEntity(tilePos);
