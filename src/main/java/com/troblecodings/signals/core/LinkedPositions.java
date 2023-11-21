@@ -11,7 +11,6 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
-import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -39,21 +38,16 @@ public class LinkedPositions {
         this.thisPos = pos;
     }
 
-    private final SignalStateListener listener = (stateInfo, properties, changed) -> {
-        if (changed.equals(ChangedState.ADDED_TO_CACHE)) {
-            loadPossibleSubsidiaires(stateInfo, properties);
-        } else if (changed.equals(ChangedState.REMOVED_FROM_FILE)) {
-            possibleSubsidiaries.remove(stateInfo.pos);
-        }
-    };
-
     public void addSignal(final BlockPos signalPos, final Signal signal, final Level world) {
+        if (world.isClientSide)
+            return;
         signals.put(signalPos, signal);
         final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
+        SignalStateHandler.runTaskWhenSignalLoaded(info,
+                (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
         SignalConfig.reset(new ResetInfo(info, false));
         SignalStateHandler.loadSignal(
                 new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, thisPos))));
-        loadPossibleSubsidiaires(info, SignalStateHandler.getStates(info));
     }
 
     public Signal getSignal(final BlockPos pos) {
@@ -68,11 +62,10 @@ public class LinkedPositions {
     }
 
     public void removeLinkedPos(final BlockPos pos, final Level world) {
+        if (world.isClientSide)
+            return;
         linkedBlocks.remove(pos);
-        final Signal signal = signals.remove(pos);
-        if (signal != null) {
-            SignalStateHandler.removeListener(new SignalStateInfo(world, pos, signal), listener);
-        }
+        signals.remove(pos);
         possibleSubsidiaries.remove(pos);
     }
 
@@ -85,13 +78,14 @@ public class LinkedPositions {
     }
 
     public void unlink(final BlockPos tilePos, final Level world) {
+        if (world.isClientSide)
+            return;
         final List<StateLoadHolder> signalsToUnload = new ArrayList<>();
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
             SignalConfig.reset(new ResetInfo(info, false));
             signalsToUnload.add(
                     new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, tilePos))));
-            SignalStateHandler.removeListener(info, listener);
         });
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
                 .forEach(entry -> SignalBoxHandler.unlinkTileFromPos(new StateInfo(world, tilePos),
@@ -139,7 +133,6 @@ public class LinkedPositions {
         final List<StateLoadHolder> signalInfos = new ArrayList<>();
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
-            SignalStateHandler.addListener(info, listener);
             signalInfos.add(
                     new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, thisPos))));
         });

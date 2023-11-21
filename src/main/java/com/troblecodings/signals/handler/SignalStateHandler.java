@@ -54,6 +54,7 @@ public final class SignalStateHandler implements INetworkSync {
     private static final Map<Level, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
     private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
+    private static final Map<SignalStateInfo, List<SignalStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
 
@@ -102,7 +103,38 @@ public final class SignalStateHandler implements INetworkSync {
         }, "OSSignalStateHandler:createStates").start();
     }
 
+    public static boolean isSignalLoaded(final SignalStateInfo info) {
+        if (info.world.isClientSide)
+            return false;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            return CURRENTLY_LOADED_STATES.containsKey(info);
+        }
+    }
+
+    public static void runTaskWhenSignalLoaded(final SignalStateInfo info,
+            final SignalStateListener listener) {
+        if (info == null || info.world.isClientSide)
+            return;
+        if (isSignalLoaded(info)) {
+            synchronized (CURRENTLY_LOADED_STATES) {
+                listener.update(info, CURRENTLY_LOADED_STATES.get(info), ChangedState.UPDATED);
+            }
+            synchronized (TASKS_WHEN_LOAD) {
+                TASKS_WHEN_LOAD.remove(info);
+            }
+        } else {
+            synchronized (TASKS_WHEN_LOAD) {
+                final List<SignalStateListener> list = TASKS_WHEN_LOAD.computeIfAbsent(info,
+                        _u -> new ArrayList<>());
+                if (!list.contains(listener))
+                    list.add(listener);
+            }
+        }
+    }
+
     public static void addListener(final SignalStateInfo info, final SignalStateListener listener) {
+        if (info.world.isClientSide)
+            return;
         synchronized (ALL_LISTENERS) {
             final List<SignalStateListener> listeners = ALL_LISTENERS.computeIfAbsent(info,
                     _u -> new ArrayList<>());
@@ -112,6 +144,8 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void removeListener(final SignalStateInfo info,
             final SignalStateListener listener) {
+        if (info.world.isClientSide)
+            return;
         final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
             listeners = ALL_LISTENERS.get(info);
@@ -445,6 +479,12 @@ public final class SignalStateHandler implements INetworkSync {
                 }
                 sendTo(info.info, properties, player);
                 updateListeners(info.info, properties, ChangedState.ADDED_TO_CACHE);
+                synchronized (TASKS_WHEN_LOAD) {
+                    final List<SignalStateListener> tasks = TASKS_WHEN_LOAD.remove(info.info);
+                    if (tasks != null)
+                        tasks.forEach(listener -> listener.update(info.info, properties,
+                                ChangedState.ADDED_TO_CACHE));
+                }
             });
         }, "OSSignalStateHandler:loadSignals").start();
 

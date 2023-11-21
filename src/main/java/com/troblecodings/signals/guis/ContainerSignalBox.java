@@ -103,7 +103,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                         loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) info.world,
                                 entry.getKey(),
                                 (otherTile, _u) -> grid.set(otherTile.getSignalBoxGrid()));
-                    validInConnections.put(entry.getKey(), grid.get().getAllInConnections());
+                    if (grid.get() != null)
+                        validInConnections.put(entry.getKey(), grid.get().getAllInConnections());
                 });
         buffer.putByte((byte) validInConnections.size());
         validInConnections.forEach((pos, list) -> {

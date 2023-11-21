@@ -315,7 +315,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             }
             final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
                     linkedSignal);
-            SignalStateHandler.setStates(info, allStates.get(profile));
+            SignalStateHandler.runTaskWhenSignalLoaded(info, (stateInfo, _u1,
+                    _u2) -> SignalStateHandler.setStates(info, allStates.get(profile)));
         }
     }
 
@@ -323,9 +324,12 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (level.isClientSide)
             return;
         final Map<SEProperty, String> properties = allStates.get(profileRSInput);
-        if (properties != null)
-            SignalStateHandler.setStates(
-                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal), properties);
+        if (properties != null) {
+            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
+                    linkedSignal);
+            SignalStateHandler.runTaskWhenSignalLoaded(info,
+                    (stateInfo, _u1, _u2) -> SignalStateHandler.setStates(info, properties));
+        }
     }
 
     @Override

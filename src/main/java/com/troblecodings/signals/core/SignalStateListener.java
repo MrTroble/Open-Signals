@@ -10,5 +10,4 @@ public interface SignalStateListener {
 
     public void update(final SignalStateInfo info, final Map<SEProperty, String> changedProperties,
             final ChangedState changedState);
-
 }

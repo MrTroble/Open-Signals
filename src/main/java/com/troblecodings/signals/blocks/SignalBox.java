@@ -63,6 +63,7 @@ public class SignalBox extends BasicBlock {
         if (!world.isClientSide) {
             ((SignalBoxTileEntity) world.getBlockEntity(pos)).unlink();
             SignalBoxHandler.removeSignalBox(new StateInfo(world, pos));
+            SignalBoxHandler.onPosRemove(new StateInfo(world, pos));
         }
         super.playerWillDestroy(world, pos, state, player);
     }

@@ -39,37 +39,27 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public void setLevel(final Level world) {
         super.setLevel(world);
-        grid.setPosAndWorld(worldPosition, world);
-        readOutPathwayNBT();
-    }
-
-    private NBTWrapper pathwayCopy;
-
-    private void readOutPathwayNBT() {
-        if (pathwayCopy != null) {
-            grid.readPathways(pathwayCopy);
-            pathwayCopy = null;
-        }
+        grid.setTile(this);
     }
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
         final NBTWrapper gridTag = new NBTWrapper();
         this.grid.write(gridTag);
+        grid.writePathways(wrapper);
         SignalBoxHandler.writeTileNBT(new StateInfo(level, worldPosition), wrapper);
         wrapper.putWrapper(GUI_TAG, gridTag);
-        grid.writePathways(wrapper);
     }
 
     private NBTWrapper copy = null;
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
+        grid.setTile(this);
         grid.read(wrapper.getWrapper(GUI_TAG));
+        grid.readPathways(wrapper);
         copy = wrapper.copy();
-        pathwayCopy = wrapper.copy();
         if (level != null) {
-            readOutPathwayNBT();
             onLoad();
         }
     }
@@ -81,6 +71,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public boolean link(final BlockPos pos, final CompoundTag tag) {
+        if (level.isClientSide)
+            return false;
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK.get(
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
@@ -105,10 +97,11 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     @Override
     public void onLoad() {
-        grid.setPosAndWorld(worldPosition, level);
+        grid.setTile(this);
         if (level.isClientSide) {
             return;
         }
+        grid.onLoad();
         final StateInfo identifier = new StateInfo(level, worldPosition);
         SignalBoxHandler.putGrid(identifier, grid);
         SignalBoxHandler.loadSignals(identifier);
