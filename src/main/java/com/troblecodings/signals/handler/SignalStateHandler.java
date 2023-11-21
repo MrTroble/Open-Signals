@@ -119,9 +119,6 @@ public final class SignalStateHandler implements INetworkSync {
             synchronized (CURRENTLY_LOADED_STATES) {
                 listener.update(info, CURRENTLY_LOADED_STATES.get(info), ChangedState.UPDATED);
             }
-            synchronized (TASKS_WHEN_LOAD) {
-                TASKS_WHEN_LOAD.remove(info);
-            }
         } else {
             synchronized (TASKS_WHEN_LOAD) {
                 final List<SignalStateListener> list = TASKS_WHEN_LOAD.computeIfAbsent(info,
@@ -481,9 +478,10 @@ public final class SignalStateHandler implements INetworkSync {
                 updateListeners(info.info, properties, ChangedState.ADDED_TO_CACHE);
                 synchronized (TASKS_WHEN_LOAD) {
                     final List<SignalStateListener> tasks = TASKS_WHEN_LOAD.remove(info.info);
-                    if (tasks != null)
+                    if (tasks != null) {
                         tasks.forEach(listener -> listener.update(info.info, properties,
                                 ChangedState.ADDED_TO_CACHE));
+                    }
                 }
             });
         }, "OSSignalStateHandler:loadSignals").start();

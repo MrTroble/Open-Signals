@@ -46,8 +46,6 @@ public class LinkedPositions {
         SignalStateHandler.runTaskWhenSignalLoaded(info,
                 (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
         SignalConfig.reset(new ResetInfo(info, false));
-        SignalStateHandler.loadSignal(
-                new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, thisPos))));
     }
 
     public Signal getSignal(final BlockPos pos) {
@@ -135,6 +133,8 @@ public class LinkedPositions {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
             signalInfos.add(
                     new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, thisPos))));
+            SignalStateHandler.runTaskWhenSignalLoaded(info,
+                    (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
         });
         SignalStateHandler.loadSignals(signalInfos);
     }
