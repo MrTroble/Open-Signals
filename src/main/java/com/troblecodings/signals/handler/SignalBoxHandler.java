@@ -143,7 +143,6 @@ public final class SignalBoxHandler {
                                         .getPathwayByLastPoint(otherEndPoint.get());
                                 startPath.setOtherPathwayToBlock(endPath);
                                 endPath.setOtherPathwayToReset(startPath);
-                                startPath.updatePathwaySignals();
                             });
                 });
         return returnBoolean.get();

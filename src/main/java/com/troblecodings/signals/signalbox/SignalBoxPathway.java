@@ -424,8 +424,9 @@ public class SignalBoxPathway implements IChunkLoadable {
                 }
                 world.getServer().execute(() -> {
                     consumer.accept(this);
-                    if (pathwayToBlock != null)
+                    if (pathwayToBlock != null) {
                         pathwayToBlock.consumer.accept(pathwayToBlock);
+                    }
                 });
             });
             return;
@@ -530,6 +531,13 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     public void setOtherPathwayToBlock(final SignalBoxPathway pathway) {
         this.pathwayToBlock = pathway;
+        if (this.delay == 0 && pathwayToBlock.delay > 0) {
+            resetFirstSignal();
+            resetOther();
+        }
+        this.delay = Math.max(delay, pathwayToBlock.delay);
+        updatePathwaySignals();
+        consumer.accept(pathway);
     }
 
     public void setOtherPathwayToReset(final SignalBoxPathway pathway) {
