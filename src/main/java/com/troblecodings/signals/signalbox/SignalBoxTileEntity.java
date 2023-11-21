@@ -59,9 +59,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         grid.read(wrapper.getWrapper(GUI_TAG));
         grid.readPathways(wrapper);
         copy = wrapper.copy();
-        if (level != null) {
-            onLoad();
-        }
     }
 
     @Override
@@ -98,14 +95,14 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public void onLoad() {
         grid.setTile(this);
+        grid.onLoad();
         if (level.isClientSide) {
             return;
         }
-        grid.onLoad();
         final StateInfo identifier = new StateInfo(level, worldPosition);
         SignalBoxHandler.putGrid(identifier, grid);
-        SignalBoxHandler.loadSignals(identifier);
         SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy);
+        SignalBoxHandler.loadSignals(identifier);
     }
 
     @Override
