@@ -400,8 +400,12 @@ public class SignalBoxPathway implements IChunkLoadable {
         if (delay > 0) {
             setPathStatus(EnumPathUsage.PREPARED);
             if (pathwayToBlock != null) {
-                pathwayToBlock.setPathStatus(EnumPathUsage.PREPARED);
-                pathwayToBlock.consumer.accept(pathwayToBlock);
+                loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) pathwayToBlock.world,
+                        pathwayToBlock.tilePos, (_u, _u1) -> {
+                            pathwayToBlock.isExecutingSignalSet = true;
+                            pathwayToBlock.setPathStatus(EnumPathUsage.PREPARED);
+                            pathwayToBlock.consumer.accept(pathwayToBlock);
+                        });
             }
             if (isExecutingSignalSet)
                 return;
@@ -418,14 +422,23 @@ public class SignalBoxPathway implements IChunkLoadable {
                 synchronized (distantSignalPositions) {
                     setSignals(getLastSignalInfo());
                 }
-                setPathStatus(EnumPathUsage.SELECTED);
-                if (pathwayToBlock != null) {
-                    pathwayToBlock.setPathStatus(EnumPathUsage.SELECTED);
-                }
                 world.getServer().execute(() -> {
-                    consumer.accept(this);
+                    loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) world, tilePos,
+                            (thisTile, _u1) -> {
+                                final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
+                                        .getPathwayByLastPoint(getLastPoint());
+                                pw.setPathStatus(EnumPathUsage.SELECTED);
+                                pw.consumer.accept(this);
+                            });
                     if (pathwayToBlock != null) {
-                        pathwayToBlock.consumer.accept(pathwayToBlock);
+                        loadChunkAndGetTile(SignalBoxTileEntity.class,
+                                (ServerLevel) pathwayToBlock.world, pathwayToBlock.tilePos,
+                                (otherTile, _u1) -> {
+                                    final SignalBoxPathway otherPW = otherTile.getSignalBoxGrid()
+                                            .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
+                                    otherPW.setPathStatus(EnumPathUsage.SELECTED);
+                                    otherPW.consumer.accept(pathwayToBlock);
+                                });
                     }
                 });
             });
@@ -537,7 +550,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         }
         this.delay = Math.max(delay, pathwayToBlock.delay);
         updatePathwaySignals();
-        consumer.accept(pathway);
+        consumer.accept(this);
     }
 
     public void setOtherPathwayToReset(final SignalBoxPathway pathway) {

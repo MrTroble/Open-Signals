@@ -227,7 +227,7 @@ public final class SignalStateHandler implements INetworkSync {
             if (!contains.get())
                 createToFile(info, changedProperties);
         }, "OSSignalStateHandler:setStates").start();
-        info.world.updateNeighborsAt(info.pos, info.signal);
+        info.world.getServer().execute(() -> info.world.updateNeighborsAt(info.pos, info.signal));
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {

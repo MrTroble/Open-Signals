@@ -91,7 +91,8 @@ public class PathOptionEntry implements INetworkSavable {
     public void readNetwork(final ReadBuffer buffer) {
         final int size = buffer.getByteToUnsignedInt();
         for (int i = 0; i < size; i++) {
-            final PathEntryType<?> type = PathEntryType.ALL_ENTRIES.get(buffer.getByteToUnsignedInt());
+            final PathEntryType<?> type = PathEntryType.ALL_ENTRIES
+                    .get(buffer.getByteToUnsignedInt());
             final IPathEntry<?> entry = pathEntrys.computeIfAbsent(type, _u -> type.newValue());
             entry.readNetwork(buffer);
             pathEntrys.put(type, entry);
