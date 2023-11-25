@@ -45,6 +45,16 @@ public class PathwayRequester extends BasicBlock {
     }
 
     @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(POWERD) ? 0 : 1;
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(POWERD, meta == 1);
+    }
+
+    @Override
     public boolean onBlockActivated(final World worldIn, final BlockPos pos,
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
