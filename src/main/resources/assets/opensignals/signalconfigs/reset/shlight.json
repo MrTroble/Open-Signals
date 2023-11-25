@@ -1,6 +1,8 @@
 {
     "currentSignal": "shlight",
-    "values": [
-        "sh_light_bottom.SH0"
-    ]
+    "values": {
+        "true": [
+            "sh_light_bottom.SH0"
+        ]
+    }
 }

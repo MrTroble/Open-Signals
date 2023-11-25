@@ -1,6 +1,8 @@
 {
     "currentSignal": "rasignal",
-    "values": [
-        "ralight.FALSE"
-    ]
+    "values": {
+        "true": [
+            "ralight.FALSE"
+        ]
+    }
 }
