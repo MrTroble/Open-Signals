@@ -9,6 +9,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.blocks.GhostBlock;
+import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.Post;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.RedstoneInput;
@@ -39,6 +40,7 @@ public final class OSBlocks {
     public static final RedstoneInput REDSTONE_IN = new RedstoneInput();
     public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
     public static final CombinedRedstoneInput COMBI_REDSTONE_INPUT = new CombinedRedstoneInput();
+    public static final PathwayRequester PATHWAY_REQUESTER = new PathwayRequester();
 
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 

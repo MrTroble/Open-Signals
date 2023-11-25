@@ -1,43 +1,39 @@
 package com.troblecodings.signals.guis;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.core.interfaces.INetworkSync;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 
-public class ContainerPlacementtool extends ContainerBase implements INetworkSync {
+public class ContainerPlacementtool extends ContainerBase {
 
     public static final String SIGNAL_NAME = "signalName";
 
-    public final Map<SEProperty, Integer> properties = new HashMap<>();
+    protected final Map<SEProperty, Integer> properties = new HashMap<>();
     protected int signalID;
     protected String signalName = "";
     private Signal signal;
 
     public ContainerPlacementtool(final GuiInfo info) {
         super(info);
-        info.base = this;
-        info.player.openContainer = this;
     }
 
     @Override
     public void sendAllDataToRemote() {
-        sendItemProperties(getInfo().player);
+        sendItemProperties(info.player);
     }
 
     private void sendItemProperties(final EntityPlayer player) {
@@ -59,45 +55,33 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putInt(signalID);
         buffer.putByte((byte) propertiesToSend.size());
-        propertiesToSend.forEach(obj -> {
-            buffer.putByte(obj);
-        });
+        propertiesToSend.forEach(buffer::putByte);
         final String signalName = wrapper.getString(SIGNAL_NAME);
-        final byte[] allBytes = signalName.getBytes();
-        buffer.putByte((byte) allBytes.length);
-        for (final byte b : allBytes) {
-            buffer.putByte(b);
-        }
-        OpenSignalsMain.network.sendTo(player, buffer.build());
+        buffer.putString(signalName);
+        OpenSignalsMain.network.sendTo(player, buffer);
     }
 
     @Override
-    public void deserializeServer(final ByteBuffer buf) {
-        final ReadBuffer buffer = new ReadBuffer(buf);
-        final int first = buffer.getByteAsInt();
-        final ItemStack stack = getInfo().player.getHeldItemMainhand();
+    public void deserializeServer(final ReadBuffer buffer) {
+        final int first = buffer.getByteToUnsignedInt();
+        final ItemStack stack = info.player.getHeldItemMainhand();
         final Placementtool tool = (Placementtool) stack.getItem();
         if (first == 255) {
             final int id = buffer.getInt();
             if (id == -1) {
                 final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
-                final int nameSize = buffer.getByteAsInt();
-                final byte[] name = new byte[nameSize];
-                for (int i = 0; i < nameSize; i++) {
-                    name[i] = buffer.getByte();
-                }
-                wrapper.putString(SIGNAL_NAME, new String(name));
+                wrapper.putString(SIGNAL_NAME, buffer.getString());
                 return;
             }
             final NBTWrapper wrapper = NBTWrapper.createForStack(stack);
             wrapper.putInteger(Placementtool.BLOCK_TYPE_ID, id);
             this.signal = tool.getObjFromID(id);
             properties.clear();
-            sendItemProperties(getInfo().player);
+            sendItemProperties(info.player);
         } else {
             final NBTWrapper wrapper = NBTWrapper.getOrCreateWrapper(stack);
             final SEProperty property = signal.getProperties().get(first);
-            final String value = property.getObjFromID(buffer.getByteAsInt());
+            final String value = property.getObjFromID(buffer.getByteToUnsignedInt());
             if (property.getDefault().equals(value)) {
                 wrapper.remove(property.getName());
                 return;
@@ -107,25 +91,19 @@ public class ContainerPlacementtool extends ContainerBase implements INetworkSyn
     }
 
     @Override
-    public void deserializeClient(final ByteBuffer buf) {
-        final ReadBuffer buffer = new ReadBuffer(buf);
+    public void deserializeClient(final ReadBuffer buffer) {
         signalID = buffer.getInt();
-        final int size = buffer.getByteAsInt();
-        final Placementtool tool = (Placementtool) getInfo().player.getHeldItemMainhand().getItem();
+        final int size = buffer.getByteToUnsignedInt();
+        final Placementtool tool = (Placementtool) info.player.getHeldItemMainhand().getItem();
         final Signal signal = tool.getObjFromID(signalID);
         final List<SEProperty> signalProperties = signal.getProperties();
         properties.clear();
         for (int i = 0; i < size / 2; i++) {
-            final SEProperty property = signalProperties.get(buffer.getByteAsInt());
-            final int value = buffer.getByteAsInt();
+            final SEProperty property = signalProperties.get(buffer.getByteToUnsignedInt());
+            final int value = buffer.getByteToUnsignedInt();
             properties.put(property, value);
         }
-        final int nameSize = buffer.getByteAsInt();
-        final byte[] name = new byte[nameSize];
-        for (int i = 0; i < nameSize; i++) {
-            name[i] = buffer.getByte();
-        }
-        signalName = new String(name);
+        signalName = buffer.getString();
         signalProperties.forEach(property -> {
             if (!properties.containsKey(property)) {
                 properties.put(property,

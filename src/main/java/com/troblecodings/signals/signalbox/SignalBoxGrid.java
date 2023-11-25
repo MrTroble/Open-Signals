@@ -10,20 +10,25 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.SEProperty;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
-import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumPathUsage;
+import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
+import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
@@ -31,40 +36,244 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 public class SignalBoxGrid implements INetworkSavable {
 
     private static final String NODE_LIST = "nodeList";
     private static final String SUBSIDIARY_LIST = "subsidiaryList";
+    private static final String SUBSIDIARY_COUNTER = "subsidiaryCounter";
+    private static final String PATHWAY_LIST = "pathwayList";
+    private static final String NEXT_PATHWAYS = "nextPathways";
+    private static final String START_POINT = "startPoint";
+    private static final String END_POINT = "endPoint";
 
-    public final Map<Point, SignalBoxPathway> clientPathways = new HashMap<>();
+    protected final Map<Point, SignalBoxPathway> startsToPath = new HashMap<>();
+    protected final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
+    protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final SignalBoxFactory factory;
     private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
-    private BlockPos tilePos;
-    private World world;
+    private int counter;
+    private SignalBoxTileEntity tile;
 
     public SignalBoxGrid() {
         this.factory = SignalBoxFactory.getFactory();
     }
 
-    public void setPosAndWorld(final BlockPos tilePos, final World world) {
-        this.tilePos = tilePos;
-        this.world = world;
+    public void setTile(final SignalBoxTileEntity tile) {
+        this.tile = tile;
+        startsToPath.values().forEach(pw -> pw.setTile(tile));
     }
 
-    public void resetPathway(final Point p1) {
-        SignalBoxHandler.resetPathway(new StateInfo(world, tilePos), p1);
+    public void onLoad() {
+        startsToPath.values().forEach(pw -> pw.linkPathways());
+    }
+
+    public void updatePathwayToAutomatic(final Point point) {
+        final SignalBoxPathway pathway = startsToPath.get(point);
+        if (pathway == null) {
+            OpenSignalsMain.getLogger().warn("No pathway to update automatic at [" + point + "]!");
+            return;
+        }
+        pathway.updatePathwayToAutomatic();
+    }
+
+    private void onWayAdd(final SignalBoxPathway pathway) {
+        startsToPath.put(pathway.getFirstPoint(), pathway);
+        endsToPath.put(pathway.getLastPoint(), pathway);
+        updatePrevious(pathway);
+    }
+
+    public List<MainSignalIdentifier> getGreenSignals() {
+        final List<MainSignalIdentifier> returnList = new ArrayList<>();
+        startsToPath.values().forEach(pathway -> returnList.addAll(pathway.getGreenSignals()));
+        return returnList;
+    }
+
+    public boolean resetPathway(final Point p1) {
         enabledSubsidiaryTypes.remove(p1);
+        if (startsToPath.isEmpty())
+            return false;
+        final SignalBoxPathway pathway = startsToPath.get(p1);
+        if (pathway == null) {
+            OpenSignalsMain.getLogger().warn("No Pathway to reset on [" + p1 + "]!");
+            return false;
+        }
+        resetPathway(pathway);
+        updateToNet(pathway);
+        tryNextPathways();
+        return true;
+    }
+
+    protected void resetPathway(final SignalBoxPathway pathway) {
+        pathway.resetPathway();
+        updatePrevious(pathway);
+        this.startsToPath.remove(pathway.getFirstPoint());
+        this.endsToPath.remove(pathway.getLastPoint());
+    }
+
+    private void updateToNet(final SignalBoxPathway pathway) {
+        if (tile == null || !tile.isBlocked())
+            return;
+        final List<SignalBoxNode> nodes = pathway.getListOfNodes();
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_PW_UPDATE);
+        buffer.putInt(nodes.size());
+        nodes.forEach(node -> {
+            node.getPoint().writeNetwork(buffer);
+            node.writeUpdateNetwork(buffer);
+        });
+        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
     }
 
     public boolean requestWay(final Point p1, final Point p2) {
-        return SignalBoxHandler.requestPathway(new StateInfo(world, tilePos), p1, p2, modeGrid);
+        if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
+            return false;
+        final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestWay(modeGrid, p1, p2);
+        ways.ifPresent(way -> {
+            way.setTile(tile);
+            way.deactivateAllOutputsOnPathway();
+            way.setUpdater(pathway -> {
+                updatePrevious(pathway);
+                updateToNet(pathway);
+            });
+            way.setSignalBoxGrid(this);
+            way.setPathStatus(EnumPathUsage.SELECTED);
+            way.updatePathwaySignals();
+            this.onWayAdd(way);
+            updateToNet(way);
+        });
+        return ways.isPresent();
+    }
+
+    private void updatePrevious(final SignalBoxPathway pathway) {
+        SignalBoxPathway previousPath = pathway;
+        int count = 0;
+        while ((previousPath = endsToPath.get(previousPath.getFirstPoint())) != null) {
+            if (count > endsToPath.size()) {
+                OpenSignalsMain.getLogger().error("Detected signalpath cycle, aborting!");
+                startsToPath.values().forEach(path -> {
+                    path.resetPathway();
+                    updateToNet(path);
+                });
+                this.clearPaths();
+                break;
+            }
+            previousPath.updatePathwaySignals();
+            count++;
+        }
+        if (count == 0) {
+            if (OpenSignalsMain.isDebug())
+                OpenSignalsMain.getLogger().debug("Could not find previous! " + pathway);
+        }
     }
 
     public void resetAllPathways() {
-        SignalBoxHandler.resetAllPathways(new StateInfo(world, tilePos));
+        this.startsToPath.values().forEach(pathway -> pathway.resetPathway());
+        clearPaths();
+    }
+
+    private void clearPaths() {
+        startsToPath.clear();
+        endsToPath.clear();
+        nextPathways.clear();
+    }
+
+    public List<Point> getAllInConnections() {
+        return modeGrid.values().stream().filter(SignalBoxNode::containsInConnection)
+                .map(SignalBoxNode::getPoint).collect(Collectors.toList());
+    }
+
+    public List<Point> getValidStarts() {
+        return modeGrid.values().stream().filter(SignalBoxNode::isValidStart)
+                .map(SignalBoxNode::getPoint).collect(Collectors.toList());
+    }
+
+    public List<Point> getValidEnds() {
+        return modeGrid.values().stream().filter(SignalBoxNode::isValidEnd)
+                .map(SignalBoxNode::getPoint).collect(Collectors.toList());
+    }
+
+    public void updateInput(final RedstoneUpdatePacket update) {
+        final List<SignalBoxPathway> nodeCopy = ImmutableList.copyOf(startsToPath.values());
+        if (update.block instanceof CombinedRedstoneInput) {
+            if (update.state) {
+                tryBlock(nodeCopy, update.pos);
+            } else {
+                tryReset(nodeCopy, update.pos);
+            }
+        } else {
+            tryBlock(nodeCopy, update.pos);
+            tryReset(nodeCopy, update.pos);
+        }
+    }
+
+    private void tryBlock(final List<SignalBoxPathway> pathways, final BlockPos pos) {
+        pathways.forEach(pathway -> {
+            if (pathway.tryBlock(pos)) {
+                updatePrevious(pathway);
+                updateToNet(pathway);
+            }
+        });
+    }
+
+    private void tryReset(final List<SignalBoxPathway> pathways, final BlockPos pos) {
+        pathways.forEach(pathway -> {
+            final Point first = pathway.getFirstPoint();
+            final Optional<Point> optPoint = pathway.tryReset(pos);
+            if (optPoint.isPresent()) {
+                if (pathway.isEmptyOrBroken()) {
+                    resetPathway(pathway);
+                    updateToNet(pathway);
+                    pathway.checkReRequest();
+                } else {
+                    updateToNet(pathway);
+                    pathway.compact(optPoint.get());
+                    this.startsToPath.remove(first);
+                    this.startsToPath.put(pathway.getFirstPoint(), pathway);
+                }
+            }
+        });
+        tryNextPathways();
+    }
+
+    private void tryNextPathways() {
+        nextPathways.removeIf(entry -> {
+            final boolean bool = requestWay(entry.getKey(), entry.getValue());
+            if (bool) {
+                if (tile == null || !tile.isBlocked())
+                    return bool;
+                final WriteBuffer buffer = new WriteBuffer();
+                buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
+                entry.getKey().writeNetwork(buffer);
+                entry.getValue().writeNetwork(buffer);
+                OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
+            }
+            return bool;
+        });
+        if (startsToPath.isEmpty())
+            nextPathways.clear();
+    }
+
+    public List<Map.Entry<Point, Point>> getNextPathways() {
+        return ImmutableList.copyOf(nextPathways);
+    }
+
+    public boolean addNextPathway(final Point start, final Point end) {
+        final Map.Entry<Point, Point> entry = Maps.immutableEntry(start, end);
+        if (!nextPathways.contains(entry)) {
+            nextPathways.add(entry);
+            return true;
+        }
+        return false;
+    }
+
+    public SignalBoxPathway getPathwayByLastPoint(final Point end) {
+        return endsToPath.get(end);
+    }
+
+    public void removeNextPathway(final Point start, final Point end) {
+        nextPathways.remove(Maps.immutableEntry(start, end));
     }
 
     @Override
@@ -85,6 +294,26 @@ public class SignalBoxGrid implements INetworkSavable {
                     })::iterator);
                     return nodeTag;
                 })::iterator);
+        tag.putInteger(SUBSIDIARY_COUNTER, counter);
+    }
+
+    public void writePathways(final NBTWrapper tag) {
+        tag.putList(PATHWAY_LIST,
+                startsToPath.values().stream().filter(pw -> !pw.isEmptyOrBroken()).map(pathway -> {
+                    final NBTWrapper path = new NBTWrapper();
+                    pathway.write(path);
+                    return path;
+                })::iterator);
+        tag.putList(NEXT_PATHWAYS, nextPathways.stream().map(entry -> {
+            final NBTWrapper wrapper = new NBTWrapper();
+            final NBTWrapper start = new NBTWrapper();
+            entry.getKey().write(start);
+            final NBTWrapper end = new NBTWrapper();
+            entry.getValue().write(end);
+            wrapper.putWrapper(START_POINT, start);
+            wrapper.putWrapper(END_POINT, end);
+            return wrapper;
+        })::iterator);
     }
 
     @Override
@@ -105,11 +334,43 @@ public class SignalBoxGrid implements INetworkSavable {
             });
             enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
+        counter = tag.getInteger(SUBSIDIARY_COUNTER);
+    }
+
+    public void readPathways(final NBTWrapper tag) {
+        final SignalBoxFactory factory = SignalBoxFactory.getFactory();
+        if (!tag.contains(PATHWAY_LIST))
+            return;
+        clearPaths();
+        tag.getList(PATHWAY_LIST).forEach(comp -> {
+            final SignalBoxPathway pathway = factory.getPathway(modeGrid);
+            pathway.setUpdater(way -> {
+                updatePrevious(way);
+                updateToNet(way);
+            });
+            pathway.setSignalBoxGrid(this);
+            pathway.setTile(tile);
+            pathway.read(comp);
+            if (pathway.isEmptyOrBroken()) {
+                OpenSignalsMain.getLogger()
+                        .error("Remove empty or broken pathway, try to recover!");
+                return;
+            }
+            onWayAdd(pathway);
+            pathway.readLinkedPathways(comp);
+        });
+        tag.getList(NEXT_PATHWAYS).forEach(comp -> {
+            final Point start = new Point();
+            start.read(comp.getWrapper(START_POINT));
+            final Point end = new Point();
+            end.read(comp.getWrapper(END_POINT));
+            nextPathways.add(Maps.immutableEntry(start, end));
+        });
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(enabledSubsidiaryTypes, modeGrid, tilePos);
+        return Objects.hash(enabledSubsidiaryTypes, modeGrid, tile);
     }
 
     @Override
@@ -122,8 +383,7 @@ public class SignalBoxGrid implements INetworkSavable {
             return false;
         final SignalBoxGrid other = (SignalBoxGrid) obj;
         return Objects.equals(enabledSubsidiaryTypes, other.enabledSubsidiaryTypes)
-                && Objects.equals(modeGrid, other.modeGrid)
-                && Objects.equals(tilePos, other.tilePos);
+                && Objects.equals(modeGrid, other.modeGrid) && Objects.equals(tile, other.tile);
     }
 
     @Override
@@ -138,6 +398,26 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public List<SignalBoxNode> getNodes() {
         return ImmutableList.copyOf(this.modeGrid.values());
+    }
+
+    public int getCurrentCounter() {
+        return counter;
+    }
+
+    public void countOne() {
+        if (counter < 9999) {
+            counter++;
+        } else {
+            counter = 0;
+        }
+    }
+
+    public void setCurrentCounter(final int counter) {
+        if (counter < 9999) {
+            this.counter = counter;
+        } else {
+            this.counter = 0;
+        }
     }
 
     protected Map<Point, SignalBoxNode> getModeGrid() {
@@ -160,7 +440,7 @@ public class SignalBoxGrid implements INetworkSavable {
         for (int i = 0; i < size; i++) {
             final Point point = Point.of(buffer);
             final SignalBoxNode node = new SignalBoxNode(point);
-            final int enabledSubsidariesSize = buffer.getByteAsInt();
+            final int enabledSubsidariesSize = buffer.getByteToUnsignedInt();
             if (enabledSubsidariesSize != 0) {
                 for (int j = 0; j < enabledSubsidariesSize; j++) {
                     final Map<ModeSet, SubsidiaryEntry> allTypes = enabledSubsidiaryTypes
@@ -174,6 +454,7 @@ public class SignalBoxGrid implements INetworkSavable {
             node.readNetwork(buffer);
             modeGrid.put(point, node);
         }
+        counter = buffer.getInt();
     }
 
     @Override
@@ -194,6 +475,7 @@ public class SignalBoxGrid implements INetworkSavable {
             }
             node.writeNetwork(buffer);
         });
+        buffer.putInt(counter);
     }
 
     public List<SignalBoxNode> readUpdateNetwork(final ReadBuffer buffer, final boolean override) {
@@ -242,11 +524,13 @@ public class SignalBoxGrid implements INetworkSavable {
         final Optional<BlockPos> pos = node.getOption(mode).get().getEntry(PathEntryType.SIGNAL);
         if (!pos.isPresent())
             return;
-        final Signal signal = SignalBoxHandler.getSignal(new StateInfo(world, tilePos), pos.get());
+        final Signal signal = SignalBoxHandler
+                .getSignal(new StateInfo(tile.getWorld(), tile.getPos()), pos.get());
         if (!entry.state) {
             if (!enabledSubsidiaryTypes.containsKey(point))
                 return;
-            SignalConfig.reset(new SignalStateInfo(world, pos.get(), signal));
+            SignalConfig.reset(
+                    new ResetInfo(new SignalStateInfo(tile.getWorld(), pos.get(), signal), false));
             final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
             states.remove(mode);
             if (states.isEmpty()) {
@@ -263,12 +547,13 @@ public class SignalBoxGrid implements INetworkSavable {
         final ConfigProperty properties = configs.get(entry.enumValue);
         if (properties == null)
             return;
-        final SignalStateInfo info = new SignalStateInfo(world, pos.get(), signal);
-        final Map<SEProperty, String> oldProperties = SignalStateHandler.getStates(info);
-        SignalStateHandler.setStates(info,
-                properties.state.entrySet().stream()
-                        .filter(propertyEntry -> oldProperties.containsKey(propertyEntry.getKey()))
-                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        final SignalStateInfo info = new SignalStateInfo(tile.getWorld(), pos.get(), signal);
+        SignalStateHandler.runTaskWhenSignalLoaded(info, (stateInfo, oldProperties, _u) -> {
+            SignalStateHandler.setStates(info,
+                    properties.state.entrySet().stream().filter(
+                            propertyEntry -> oldProperties.containsKey(propertyEntry.getKey()))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        });
         states.put(mode, entry);
         enabledSubsidiaryTypes.put(point, states);
     }

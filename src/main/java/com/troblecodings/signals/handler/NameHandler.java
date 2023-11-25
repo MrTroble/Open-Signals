@@ -13,10 +13,10 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.StateInfo;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 

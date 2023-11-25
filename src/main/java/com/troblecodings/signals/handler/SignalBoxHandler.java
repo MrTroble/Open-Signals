@@ -10,26 +10,34 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.ChunkLoadable;
 import com.troblecodings.signals.core.LinkedPositions;
 import com.troblecodings.signals.core.LinkingUpdates;
-import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
+import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.init.OSBlocks;
-import com.troblecodings.signals.signalbox.PathwayHolder;
+import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.SignalBoxPathway;
+import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
+import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldServer;
@@ -41,70 +49,107 @@ public final class SignalBoxHandler {
     private SignalBoxHandler() {
     }
 
-    private static final Map<StateInfo, PathwayHolder> ALL_GRIDS = new HashMap<>();
+    private static final Map<StateInfo, SignalBoxGrid> ALL_GRIDS = new HashMap<>();
     private static final Map<StateInfo, LinkedPositions> ALL_LINKED_POS = new HashMap<>();
     private static final Map<StateInfo, LinkingUpdates> POS_UPDATES = new HashMap<>();
     private static final Map<StateInfo, Boolean> OUTPUT_UPDATES = new HashMap<>();
 
-    public static void resetPathway(final StateInfo identifier, final Point point) {
-        if (identifier.worldNullOrClientSide())
-            return;
-        PathwayHolder grid;
+    public static void putGrid(final StateInfo info, final SignalBoxGrid grid) {
         synchronized (ALL_GRIDS) {
-            grid = ALL_GRIDS.get(identifier);
+            ALL_GRIDS.put(info, grid);
         }
-        if (grid == null)
-            return;
-        grid.resetPathway(point);
     }
 
-    public static boolean requestPathway(final StateInfo identifier, final Point p1, final Point p2,
-            final Map<Point, SignalBoxNode> modeGrid) {
-        if (identifier.worldNullOrClientSide())
+    public static SignalBoxGrid getGrid(final StateInfo info) {
+        synchronized (ALL_GRIDS) {
+            return ALL_GRIDS.get(info);
+        }
+    }
+
+    public static boolean requesetInterSignalBoxPathway(final StateInfo startBox, final Point start,
+            final Point end) {
+        if (startBox.worldNullOrClientSide())
             return false;
-        PathwayHolder grid;
-        synchronized (ALL_GRIDS) {
-            grid = ALL_GRIDS.get(identifier);
-        }
-        if (grid == null)
-            return false;
-        return grid.requestWay(p1, p2, modeGrid);
-    }
-
-    public static void resetAllPathways(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
-            return;
-        PathwayHolder grid;
-        synchronized (ALL_GRIDS) {
-            grid = ALL_GRIDS.get(identifier);
-        }
-        if (grid == null)
-            return;
-        grid.resetAllPathways();
-    }
-
-    public static void updateInput(final StateInfo identifier, final RedstoneUpdatePacket update) {
-        if (identifier.worldNullOrClientSide())
-            return;
-        PathwayHolder grid;
-        synchronized (ALL_GRIDS) {
-            grid = ALL_GRIDS.get(identifier);
-        }
-        if (grid == null)
-            return;
-        grid.updateInput(update);
+        final AtomicBoolean returnBoolean = new AtomicBoolean(true);
+        final ChunkLoadable chunkLoader = new ChunkLoadable();
+        chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class, startBox.world, startBox.pos,
+                (startTile, _u) -> {
+                    final SignalBoxGrid startGrid = startTile.getSignalBoxGrid();
+                    final SignalBoxNode endNode = startGrid.getNode(end);
+                    PathOptionEntry outConnectionEntry = null;
+                    for (final Rotation rot : Rotation.values()) {
+                        final Optional<PathOptionEntry> entry = endNode
+                                .getOption(new ModeSet(EnumGuiMode.OUT_CONNECTION, rot));
+                        if (entry.isPresent()) {
+                            outConnectionEntry = entry.get();
+                            break;
+                        }
+                    }
+                    if (outConnectionEntry == null) {
+                        returnBoolean.set(false);
+                        return;
+                    }
+                    final Optional<BlockPos> otherPos = outConnectionEntry
+                            .getEntry(PathEntryType.SIGNALBOX);
+                    final Optional<Point> otherStartPoint = outConnectionEntry
+                            .getEntry(PathEntryType.POINT);
+                    if (!otherPos.isPresent() || !otherStartPoint.isPresent()) {
+                        returnBoolean.set(false);
+                        return;
+                    }
+                    chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class, startBox.world,
+                            otherPos.get(), (endTile, _u2) -> {
+                                final SignalBoxGrid endGrid = endTile.getSignalBoxGrid();
+                                final SignalBoxNode otherStartNode = endGrid
+                                        .getNode(otherStartPoint.get());
+                                if (otherStartNode == null) {
+                                    returnBoolean.set(false);
+                                    return;
+                                }
+                                PathOptionEntry inConnectionEntry = null;
+                                for (final Rotation rot : Rotation.values()) {
+                                    final Optional<PathOptionEntry> entry = otherStartNode
+                                            .getOption(new ModeSet(EnumGuiMode.IN_CONNECTION, rot));
+                                    if (entry.isPresent()) {
+                                        inConnectionEntry = entry.get();
+                                        break;
+                                    }
+                                }
+                                if (inConnectionEntry == null) {
+                                    returnBoolean.set(false);
+                                    return;
+                                }
+                                final Optional<Point> otherEndPoint = inConnectionEntry
+                                        .getEntry(PathEntryType.POINT);
+                                if (!otherEndPoint.isPresent()) {
+                                    returnBoolean.set(false);
+                                    return;
+                                }
+                                final boolean startRequeset = startGrid.requestWay(start, end);
+                                final boolean endRequeset = endGrid
+                                        .requestWay(otherStartPoint.get(), otherEndPoint.get());
+                                if (!startRequeset || !endRequeset) {
+                                    if (startRequeset)
+                                        startGrid.resetPathway(start);
+                                    if (endRequeset)
+                                        endGrid.resetPathway(otherStartPoint.get());
+                                    returnBoolean.set(false);
+                                    return;
+                                }
+                                final SignalBoxPathway startPath = startGrid
+                                        .getPathwayByLastPoint(end);
+                                final SignalBoxPathway endPath = endGrid
+                                        .getPathwayByLastPoint(otherEndPoint.get());
+                                startPath.setOtherPathwayToBlock(endPath);
+                                endPath.setOtherPathwayToReset(startPath);
+                            });
+                });
+        return returnBoolean.get();
     }
 
     public static void writeTileNBT(final StateInfo identifier, final NBTWrapper wrapper) {
         if (identifier.worldNullOrClientSide())
             return;
-        PathwayHolder grid;
-        synchronized (ALL_GRIDS) {
-            grid = ALL_GRIDS.get(identifier);
-        }
-        if (grid == null)
-            return;
-        grid.write(wrapper);
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
             holder = ALL_LINKED_POS.get(identifier);
@@ -114,8 +159,7 @@ public final class SignalBoxHandler {
         holder.write(wrapper);
     }
 
-    public static void readTileNBT(final StateInfo identifier, final NBTWrapper wrapper,
-            final Map<Point, SignalBoxNode> modeGrid) {
+    public static void readTileNBT(final StateInfo identifier, final NBTWrapper wrapper) {
         if (identifier.worldNullOrClientSide())
             return;
         LinkedPositions holder;
@@ -124,24 +168,6 @@ public final class SignalBoxHandler {
                     _u -> new LinkedPositions(identifier.pos));
         }
         holder.read(wrapper);
-        PathwayHolder grid;
-        synchronized (ALL_GRIDS) {
-            grid = ALL_GRIDS.computeIfAbsent(identifier,
-                    _u -> new PathwayHolder(identifier.world, identifier.pos));
-        }
-        grid.read(wrapper, modeGrid);
-    }
-
-    public static void setWorld(final StateInfo identifier) {
-        if (identifier.worldNullOrClientSide())
-            return;
-        PathwayHolder grid;
-        synchronized (ALL_GRIDS) {
-            grid = ALL_GRIDS.get(identifier);
-        }
-        if (grid == null)
-            return;
-        grid.setWorld(identifier.world);
     }
 
     public static boolean isTileEmpty(final StateInfo identifier) {
@@ -378,18 +404,6 @@ public final class SignalBoxHandler {
         if (holder == null)
             return;
         holder.unloadSignals(identifier.world);
-    }
-
-    public static void updatePathwayToAutomatic(final StateInfo identifier, final Point point) {
-        if (identifier.world.isRemote)
-            return;
-        PathwayHolder holder;
-        synchronized (ALL_GRIDS) {
-            holder = ALL_GRIDS.get(identifier);
-        }
-        if (holder == null)
-            return;
-        holder.updatePathwayToAutomatic(point);
     }
 
     private static final String LINKING_UPDATE = "linkingUpdates";

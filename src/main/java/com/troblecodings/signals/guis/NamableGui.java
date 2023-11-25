@@ -1,5 +1,7 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
@@ -10,12 +12,10 @@ import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.StateInfo;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 
 public class NamableGui extends GuiBase {
@@ -64,7 +64,7 @@ public class NamableGui extends GuiBase {
         textfield.add(input);
 
         hbox.add(textfield);
-        final UIEntity apply = GuiElements.createButton(I18n.format("btn.apply"),
+        final UIEntity apply = GuiElements.createButton(I18Wrapper.format("btn.apply"),
                 _u -> this.updateText(input.getText()));
         apply.setInheritWidth(false);
         apply.setWidth(60);
@@ -73,7 +73,7 @@ public class NamableGui extends GuiBase {
         if (!(container.tile instanceof RedstoneIOTileEntity)) {
             return;
         }
-        inner.add(GuiElements.createLabel(I18n.format("label.linkedto")));
+        inner.add(GuiElements.createLabel(I18Wrapper.format("label.linkedto")));
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
         list.setInheritWidth(true);
@@ -94,12 +94,8 @@ public class NamableGui extends GuiBase {
         if (input.isEmpty() || input
                 .equals(ClientNameHandler.getClientName(new StateInfo(mc.world, container.pos))))
             return;
-        final byte[] bytes = input.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) bytes.length);
-        for (final byte b : bytes) {
-            buffer.putByte(b);
-        }
+        buffer.putString(input);
         OpenSignalsMain.network.sendTo(player, buffer.build());
         labelComp.setText(input);
     }

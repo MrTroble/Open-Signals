@@ -1,15 +1,14 @@
 package com.troblecodings.signals.handler;
 
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.StateInfo;
 
 import net.minecraft.block.state.IBlockState;
@@ -26,20 +25,20 @@ public class ClientSignalStateHandler implements INetworkSync {
 
     public static final Map<SEProperty, String> getClientStates(final StateInfo info) {
         synchronized (CURRENTLY_LOADED_STATES) {
-            return ImmutableMap.copyOf(CURRENTLY_LOADED_STATES.getOrDefault(info, new HashMap<>()));
+            return ImmutableMap
+                    .copyOf(CURRENTLY_LOADED_STATES.computeIfAbsent(info, _u -> new HashMap<>()));
         }
     }
 
     @Override
-    public void deserializeClient(final ByteBuffer buf) {
-        final ReadBuffer buffer = new ReadBuffer(buf);
+    public void deserializeClient(final ReadBuffer buffer) {
         final Minecraft mc = Minecraft.getMinecraft();
         final WorldClient level = mc.world;
         if (level == null)
             return;
         final BlockPos signalPos = buffer.getBlockPos();
         final int signalID = buffer.getInt();
-        final int propertiesSize = buffer.getByteAsInt();
+        final int propertiesSize = buffer.getByteToUnsignedInt();
         if (propertiesSize == 255) {
             setRemoved(signalPos);
             return;
@@ -47,8 +46,8 @@ public class ClientSignalStateHandler implements INetworkSync {
         final int[] propertyIDs = new int[propertiesSize];
         final int[] valueIDs = new int[propertiesSize];
         for (int i = 0; i < propertiesSize; i++) {
-            propertyIDs[i] = buffer.getByteAsInt();
-            valueIDs[i] = buffer.getByteAsInt();
+            propertyIDs[i] = buffer.getByteToUnsignedInt();
+            valueIDs[i] = buffer.getByteToUnsignedInt();
         }
         final List<SEProperty> signalProperties = Signal.SIGNAL_IDS.get(signalID).getProperties();
         final StateInfo stateInfo = new StateInfo(level, signalPos);

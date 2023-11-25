@@ -1,8 +1,8 @@
 package com.troblecodings.signals.signalbox;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
 public class Point implements INetworkSavable {
@@ -52,7 +52,7 @@ public class Point implements INetworkSavable {
     }
 
     public static Point of(final ReadBuffer buffer) {
-        return new Point(buffer.getByteAsInt(), buffer.getByteAsInt());
+        return new Point(buffer.getByteToUnsignedInt(), buffer.getByteToUnsignedInt());
     }
 
     @Override
@@ -74,6 +74,10 @@ public class Point implements INetworkSavable {
         return "Point[x=" + this.x + ",y=" + this.y + "]";
     }
 
+    public String toShortString() {
+        return "[x=" + this.x + ",y=" + this.y + "]";
+    }
+
     @Override
     public void write(final NBTWrapper tag) {
         tag.putByte("x", (byte) x);
@@ -88,8 +92,8 @@ public class Point implements INetworkSavable {
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {
-        this.x = buffer.getByteAsInt();
-        this.y = buffer.getByteAsInt();
+        this.x = buffer.getByteToUnsignedInt();
+        this.y = buffer.getByteToUnsignedInt();
 
     }
 

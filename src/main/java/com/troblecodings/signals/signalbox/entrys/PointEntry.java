@@ -3,38 +3,40 @@ package com.troblecodings.signals.signalbox.entrys;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.signals.signalbox.Point;
 
-public class ByteEntry extends IPathEntry<Byte> {
+public class PointEntry extends IPathEntry<Point> {
 
-    private int value;
+    private Point point;
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {
-        value = buffer.getByteToUnsignedInt();
+        this.point = Point.of(buffer);
     }
 
     @Override
     public void writeNetwork(final WriteBuffer buffer) {
-        buffer.putByte((byte) value);
+        point.writeNetwork(buffer);
     }
 
     @Override
     public void write(final NBTWrapper tag) {
-        tag.putInteger(getName(), value);
+        point.write(tag);
     }
 
     @Override
     public void read(final NBTWrapper tag) {
-        value = tag.getInteger(getName());
+        this.point = new Point();
+        this.point.read(tag);
     }
 
     @Override
-    public Byte getValue() {
-        return (byte) value;
+    public Point getValue() {
+        return point;
     }
 
     @Override
-    public void setValue(final Byte value) {
-        this.value = value;
+    public void setValue(final Point value) {
+        this.point = value;
     }
 }

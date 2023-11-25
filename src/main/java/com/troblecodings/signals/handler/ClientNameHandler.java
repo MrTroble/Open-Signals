@@ -1,12 +1,11 @@
 package com.troblecodings.signals.handler;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
-import com.troblecodings.signals.core.ReadBuffer;
 import com.troblecodings.signals.core.StateInfo;
 
 import net.minecraft.block.state.IBlockState;
@@ -27,11 +26,10 @@ public class ClientNameHandler implements INetworkSync {
     }
 
     @Override
-    public void deserializeClient(final ByteBuffer buf) {
+    public void deserializeClient(final ReadBuffer buffer) {
         final Minecraft mc = Minecraft.getMinecraft();
-        final ReadBuffer buffer = new ReadBuffer(buf);
         final BlockPos pos = buffer.getBlockPos();
-        final int byteLength = buffer.getByteAsInt();
+        final int byteLength = buffer.getByteToUnsignedInt();
         if (byteLength == 255) {
             setRemoved(pos);
             return;

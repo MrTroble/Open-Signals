@@ -510,22 +510,23 @@ public class Signal extends BasicBlock {
             return;
 
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
-        final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        final SoundProperty sound = getSound(properties);
-        if (sound.duration < 1)
-            return;
-
-        if (sound.duration == 1) {
-            world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        } else {
-            if (world.isUpdateScheduled(pos, this)) {
+        SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
+            final SoundProperty sound = getSound(properties);
+            if (sound.duration < 1)
                 return;
+
+            if (sound.duration == 1) {
+                world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
             } else {
-                if (sound.predicate.test(properties)) {
-                    world.scheduleUpdate(pos, this, 1);
+                if (world.isUpdateScheduled(pos, this)) {
+                    return;
+                } else {
+                    if (sound.predicate.test(properties)) {
+                        world.scheduleUpdate(pos, this, 1);
+                    }
                 }
             }
-        }
+        });
     }
 
     public SoundProperty getSound(final Map<SEProperty, String> map) {
@@ -544,12 +545,14 @@ public class Signal extends BasicBlock {
             return;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(worldIn, pos, this);
-        final SoundProperty sound = getSound(SignalStateHandler.getStates(stateInfo));
-        if (sound.duration <= 1) {
-            return;
-        }
-        worldIn.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        worldIn.scheduleUpdate(pos, this, sound.duration);
+        SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
+            final SoundProperty sound = getSound(properties);
+            if (sound.duration <= 1) {
+                return;
+            }
+            worldIn.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            worldIn.scheduleUpdate(pos, this, sound.duration);
+        });
     }
 
     @Override

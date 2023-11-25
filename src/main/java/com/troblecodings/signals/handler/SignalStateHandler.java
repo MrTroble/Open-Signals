@@ -16,6 +16,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -23,7 +24,6 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateLoadHolder;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
@@ -54,6 +54,7 @@ public final class SignalStateHandler implements INetworkSync {
     private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
     private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
+    private static final Map<SignalStateInfo, List<SignalStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
     private static final String CHANNELNAME = "statehandlernet";
     private static FMLEventChannel channel;
 
@@ -92,6 +93,32 @@ public final class SignalStateHandler implements INetworkSync {
             createToFile(info, states);
             updateListeners(info, states, ChangedState.ADDED_TO_FILE);
         }, "OSSignalStateHandler:createStates").start();
+    }
+
+    public static boolean isSignalLoaded(final SignalStateInfo info) {
+        if (info.world.isRemote)
+            return false;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            return CURRENTLY_LOADED_STATES.containsKey(info);
+        }
+    }
+
+    public static void runTaskWhenSignalLoaded(final SignalStateInfo info,
+            final SignalStateListener listener) {
+        if (info == null || info.world.isRemote)
+            return;
+        if (isSignalLoaded(info)) {
+            synchronized (CURRENTLY_LOADED_STATES) {
+                listener.update(info, CURRENTLY_LOADED_STATES.get(info), ChangedState.UPDATED);
+            }
+        } else {
+            synchronized (TASKS_WHEN_LOAD) {
+                final List<SignalStateListener> list = TASKS_WHEN_LOAD.computeIfAbsent(info,
+                        _u -> new ArrayList<>());
+                if (!list.contains(listener))
+                    list.add(listener);
+            }
+        }
     }
 
     public static void addListener(final SignalStateInfo info, final SignalStateListener listener) {
@@ -167,24 +194,32 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         }
         final AtomicBoolean contains = new AtomicBoolean(false);
+        final Map<SEProperty, String> changedProperties = new HashMap<>();
         synchronized (CURRENTLY_LOADED_STATES) {
             if (CURRENTLY_LOADED_STATES.containsKey(info)) {
                 contains.set(true);
                 final Map<SEProperty, String> oldStates = new HashMap<>(
                         CURRENTLY_LOADED_STATES.get(info));
+                states.entrySet().stream().filter(entry -> {
+                    final String oldState = oldStates.get(entry.getKey());
+                    return !entry.getValue().equals(oldState);
+                }).forEach(entry -> changedProperties.put(entry.getKey(), entry.getValue()));
                 oldStates.putAll(states);
                 CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(oldStates));
+            } else {
+                changedProperties.putAll(states);
             }
         }
         new Thread(() -> {
-            sendToAll(info, states);
-            updateListeners(info, states, ChangedState.UPDATED);
+            sendToAll(info, changedProperties);
+            updateListeners(info, changedProperties, ChangedState.UPDATED);
             info.world.getMinecraftServer()
                     .addScheduledTask(() -> info.signal.getUpdate(info.world, info.pos));
             if (!contains.get())
-                createToFile(info, states);
+                createToFile(info, changedProperties);
         }, "OSSignalStateHandler:setStates").start();
-        info.world.notifyNeighborsOfStateChange(info.pos, info.signal, true);
+        info.world.getMinecraftServer().addScheduledTask(
+                () -> info.world.notifyNeighborsOfStateChange(info.pos, info.signal, true));
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
@@ -434,6 +469,13 @@ public final class SignalStateHandler implements INetworkSync {
                 }
                 sendToAll(info.info, properties);
                 updateListeners(info.info, properties, ChangedState.ADDED_TO_CACHE);
+                synchronized (TASKS_WHEN_LOAD) {
+                    final List<SignalStateListener> tasks = TASKS_WHEN_LOAD.remove(info.info);
+                    if (tasks != null) {
+                        tasks.forEach(listener -> listener.update(info.info, properties,
+                                ChangedState.ADDED_TO_CACHE));
+                    }
+                }
             });
         }, "OSSignalStateHandler:loadSignals").start();
     }

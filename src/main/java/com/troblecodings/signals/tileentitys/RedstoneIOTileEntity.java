@@ -66,11 +66,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         final RedstoneUpdatePacket update = new RedstoneUpdatePacket(world, pos, power,
                 (RedstoneInput) getBlockType());
         linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, pos,
-                (tile, _u) -> tile.updateInput(update)));
-        linkedSignalController.forEach(pos -> {
-            loadChunkAndGetTile(SignalControllerTileEntity.class, world, pos,
-                    (tile, _u) -> tile.updateFromRSInput());
-        });
+                (tile, _u) -> tile.getSignalBoxGrid().updateInput(update)));
+        linkedSignalController.forEach(pos -> loadChunkAndGetTile(SignalControllerTileEntity.class,
+                world, pos, (tile, _u) -> tile.updateFromRSInput()));
+
     }
 
     public List<BlockPos> getLinkedController() {
