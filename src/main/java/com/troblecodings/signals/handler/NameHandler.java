@@ -134,7 +134,12 @@ public final class NameHandler implements INetworkSync {
         }
         NameHandlerFile file;
         synchronized (ALL_LEVEL_FILES) {
-            file = ALL_LEVEL_FILES.get(info.world);
+            file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
+                    _u -> new NameHandlerFile(Paths.get("osfiles/namefiles/"
+                            + ((WorldServer) info.world).getMinecraftServer().getName()
+                                    .replace(":", "").replace("/", "").replace("\\", "")
+                            + "/" + ((WorldServer) info.world).provider.getDimensionType().getName()
+                                    .replace(":", ""))));
         }
         synchronized (file) {
             file.deleteIndex(info.pos);
