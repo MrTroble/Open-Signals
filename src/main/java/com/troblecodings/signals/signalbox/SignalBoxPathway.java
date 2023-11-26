@@ -436,7 +436,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                                     final SignalBoxPathway otherPW = otherTile.getSignalBoxGrid()
                                             .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
                                     otherPW.setPathStatus(EnumPathUsage.SELECTED);
-                                    otherPW.consumer.accept(pathwayToBlock);
+                                    otherPW.consumer.accept(otherPW);
                                 });
                     }
                 });
