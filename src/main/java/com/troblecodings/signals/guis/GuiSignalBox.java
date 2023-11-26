@@ -105,7 +105,7 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity mainButton;
     private final GuiInfo info;
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
-    private UIEntity plane = null;
+    private UIEntity splitter = new UIEntity();
     private boolean allPacketsRecived = false;
     protected final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
@@ -545,6 +545,8 @@ public class GuiSignalBox extends GuiBase {
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
         tile.add(new UIClickable(e -> {
+            if (!splitter.isHovered())
+                return;
             final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
             final Rotation rotation = Rotation.values()[menu.getRotation()];
             final ModeSet modeSet = new ModeSet(mode, rotation);
@@ -803,7 +805,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer,
             final boolean showLines) {
-        plane = new UIEntity();
+        final UIEntity plane = new UIEntity();
         plane.clearChildren();
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
         plane.setHeight(TILE_COUNT * TILE_WIDTH);
@@ -864,7 +866,7 @@ public class GuiSignalBox extends GuiBase {
             }
             plane.add(row);
         }
-        final UIEntity splitter = new UIEntity();
+        splitter = new UIEntity();
         splitter.add(new UIColor(BACKGROUND_COLOR));
         splitter.add(new UIScissor());
         splitter.add(new UIBorder(0xFF000000, 4));
