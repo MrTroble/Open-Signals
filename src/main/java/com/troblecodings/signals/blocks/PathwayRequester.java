@@ -40,6 +40,8 @@ public class PathwayRequester extends BasicBlock {
                 if (entity != null) {
                     ((PathwayRequesterTileEntity) entity).requestPathway();
                 }
+            } else {
+                worldIn.setBlockState(pos, state.withProperty(POWERD, false));
             }
         }
     }
@@ -59,7 +61,7 @@ public class PathwayRequester extends BasicBlock {
             final IBlockState state, final EntityPlayer playerIn, final EnumHand hand,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
         final Item item = playerIn.getHeldItemMainhand().getItem();
-        if (!(item.equals(OSItems.LINKING_TOOL) && item.equals(OSItems.MULTI_LINKING_TOOL))) {
+        if (!(item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {
             OpenSignalsMain.handler.invokeGui(PathwayRequester.class, playerIn, worldIn, pos,
                     "pathwayrequester");
             return true;
@@ -80,7 +82,7 @@ public class PathwayRequester extends BasicBlock {
     }
 
     @Override
-    public TileEntity createTileEntity(final World world, final IBlockState state) {
+    public TileEntity createNewTileEntity(World worldIn, int meta) {
         return new PathwayRequesterTileEntity();
     }
 }

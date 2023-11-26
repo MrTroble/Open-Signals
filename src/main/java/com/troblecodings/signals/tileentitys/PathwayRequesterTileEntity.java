@@ -14,9 +14,11 @@ import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class PathwayRequesterTileEntity extends SyncableTileEntity
         implements ILinkableTile, IChunkLoadable {
@@ -99,6 +101,12 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
 
     public Map.Entry<Point, Point> getNextPathway() {
         return pathway;
+    }
+
+    @Override
+    public boolean shouldRefresh(final World world, final BlockPos pos, final IBlockState oldState,
+            final IBlockState newSate) {
+        return false;
     }
 
 }
