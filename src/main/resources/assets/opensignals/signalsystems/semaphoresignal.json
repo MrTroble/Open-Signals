@@ -67,15 +67,18 @@
         },
         {
             "name": "zs1",
-            "defaultState": false
+            "defaultState": false,
+            "autoname": true
         },
         {
             "name": "zs7",
-            "defaultState": false
+            "defaultState": false,
+            "autoname": true
         },
         {
             "name": "ra12",
-            "defaultState": false
+            "defaultState": false,
+            "autoname": true
         },
         {
             "name": "semavr",

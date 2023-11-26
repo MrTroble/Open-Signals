@@ -22,7 +22,7 @@ import net.minecraft.world.World;
 
 public class PathwayRequester extends BasicBlock {
 
-    public static final PropertyBool POWERD = PropertyBool.create("powerd");
+    public static final PropertyBool POWERED = PropertyBool.create("powered");
 
     public PathwayRequester() {
         super(Material.ROCK);
@@ -34,26 +34,26 @@ public class PathwayRequester extends BasicBlock {
         if (worldIn.isRemote)
             return;
         if (worldIn.isBlockPowered(pos)) {
-            if (!state.getValue(POWERD)) {
-                worldIn.setBlockState(pos, state.withProperty(POWERD, true));
+            if (!state.getValue(POWERED)) {
+                worldIn.setBlockState(pos, state.withProperty(POWERED, true));
                 final TileEntity entity = worldIn.getTileEntity(pos);
                 if (entity != null) {
                     ((PathwayRequesterTileEntity) entity).requestPathway();
                 }
             } else {
-                worldIn.setBlockState(pos, state.withProperty(POWERD, false));
+                worldIn.setBlockState(pos, state.withProperty(POWERED, false));
             }
         }
     }
 
     @Override
     public int getMetaFromState(final IBlockState state) {
-        return state.getValue(POWERD) ? 0 : 1;
+        return state.getValue(POWERED) ? 0 : 1;
     }
 
     @Override
     public IBlockState getStateFromMeta(final int meta) {
-        return this.getDefaultState().withProperty(POWERD, meta == 1);
+        return this.getDefaultState().withProperty(POWERED, meta == 1);
     }
 
     @Override
@@ -72,7 +72,7 @@ public class PathwayRequester extends BasicBlock {
     @Override
     protected BlockStateContainer createBlockState() {
         return new BlockStateContainer(this, new IProperty[] {
-                POWERD
+                POWERED
         });
     }
 
