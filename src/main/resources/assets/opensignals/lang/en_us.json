@@ -562,5 +562,6 @@
     "type.SIGNALBOX": "Signalbox",
     "property.prop.SIGNALBOX.name": "Signalbox",
     "property.prop.SIGNALBOX.desc": "Select the signal box here. You must then close and reopen the window to select the appropriate input connection.",
-	"btn.counter.tooltip": "The counter counts supsidiary signal operations and auxiliary route terminations. At a value of 1000, it starts counting from the beginning."
+	"btn.counter.tooltip": "The counter counts supsidiary signal operations and auxiliary route terminations. At a value of 1000, it starts counting from the beginning.",
+	"property.PREPARED": "Prepared"
 }
