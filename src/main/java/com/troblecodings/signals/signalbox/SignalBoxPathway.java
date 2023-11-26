@@ -418,8 +418,8 @@ public class SignalBoxPathway implements IChunkLoadable {
                 if (isPathwayReseted) {
                     return;
                 }
-                this.isExecutingSignalSet = false;
                 synchronized (distantSignalPositions) {
+                    this.isExecutingSignalSet = false;
                     setSignals(getLastSignalInfo());
                 }
                 world.getServer().execute(() -> {
@@ -449,6 +449,10 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     private SignalBoxPathway getNextPathway() {
         return holder.startsToPath.get(lastPoint);
+    }
+
+    public void setSignals() {
+        setSignals(getLastSignalInfo());
     }
 
     private void setSignals(final SignalStateInfo lastSignal) {
