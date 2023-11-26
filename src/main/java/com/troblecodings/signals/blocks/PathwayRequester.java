@@ -78,7 +78,7 @@ public class PathwayRequester extends BasicBlock {
 
     @Override
     public Optional<String> getSupplierWrapperName() {
-        return Optional.of("pathwayrequeseter");
+        return Optional.of("pathwayrequester");
     }
 
     @Override
