@@ -20,6 +20,7 @@
 * fix: issue in ContentPackHandler
 * fix: bugs in configs
 * fix: signal can be placed into blocks
+* fix: issue with UIClickable and Info&Help Page
 
 ## [1.12.2 - 3.1.0]
 
