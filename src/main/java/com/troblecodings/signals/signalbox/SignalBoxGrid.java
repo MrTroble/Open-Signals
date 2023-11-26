@@ -159,7 +159,7 @@ public class SignalBoxGrid implements INetworkSavable {
                 this.clearPaths();
                 break;
             }
-            previousPath.updatePathwaySignals();
+            previousPath.setSignals();
             count++;
         }
         if (count == 0) {
