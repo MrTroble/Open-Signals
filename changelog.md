@@ -16,6 +16,8 @@
 * fix: issues with SignalState and NameHandler
 * ref: a lot of background changes
 * ref: ImageBot optimize images beep-boop
+* fix: issues in configs
+* fix: issue with UIClickable and Info&Help Page
 
 ## [1.18.2 - 3.1.0]
 
