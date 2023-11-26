@@ -82,7 +82,7 @@ public class PathwayRequester extends BasicBlock {
     }
 
     @Override
-    public TileEntity createNewTileEntity(World worldIn, int meta) {
+    public TileEntity createNewTileEntity(final World worldIn, final int meta) {
         return new PathwayRequesterTileEntity();
     }
 }
