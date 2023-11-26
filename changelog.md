@@ -19,6 +19,7 @@
 * fix: issue in PreviewRenderer
 * fix: issue in ContentPackHandler
 * fix: bugs in configs
+* fix: signal can be placed into blocks
 
 ## [1.12.2 - 3.1.0]
 
