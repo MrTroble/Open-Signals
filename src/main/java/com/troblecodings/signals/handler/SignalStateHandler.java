@@ -49,7 +49,7 @@ public final class SignalStateHandler implements INetworkSync {
     private SignalStateHandler() {
     }
 
-    private static ExecutorService WRITE_SERVICE = Executors.newFixedThreadPool(5);
+    private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
@@ -67,13 +67,13 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void onServerStop(final FMLServerStoppingEvent event) {
-        WRITE_SERVICE.shutdown();
+        writeService.shutdown();
         try {
-            WRITE_SERVICE.awaitTermination(10, TimeUnit.MINUTES);
+            writeService.awaitTermination(10, TimeUnit.MINUTES);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        WRITE_SERVICE = Executors.newFixedThreadPool(5);
+        writeService = Executors.newFixedThreadPool(5);
     }
 
     public static void createStates(final SignalStateInfo info,
@@ -303,7 +303,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
-        WRITE_SERVICE.execute(() -> {
+        writeService.execute(() -> {
             maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
                     .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
         });
@@ -485,9 +485,9 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void unloadSignals(final List<StateLoadHolder> signals) {
-        if (signals == null || signals.isEmpty() || WRITE_SERVICE.isShutdown())
+        if (signals == null || signals.isEmpty() || writeService.isShutdown())
             return;
-        WRITE_SERVICE.execute(() -> {
+        writeService.execute(() -> {
             signals.forEach(info -> {
                 synchronized (SIGNAL_COUNTER) {
                     final List<LoadHolder<?>> holders = SIGNAL_COUNTER.getOrDefault(info.info,
