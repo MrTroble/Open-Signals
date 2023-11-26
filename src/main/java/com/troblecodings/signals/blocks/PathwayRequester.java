@@ -45,12 +45,12 @@ public class PathwayRequester extends BasicBlock {
     }
 
     @Override
-    public int getMetaFromState(IBlockState state) {
+    public int getMetaFromState(final IBlockState state) {
         return state.getValue(POWERD) ? 0 : 1;
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
+    public IBlockState getStateFromMeta(final int meta) {
         return this.getDefaultState().withProperty(POWERD, meta == 1);
     }
 
