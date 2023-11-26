@@ -180,6 +180,8 @@ public class GuiPlacementtool extends GuiBase {
         if (!loaded)
             return;
         final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) 255);
+        buffer.putInt(-1);
         buffer.putString(name);
         OpenSignalsMain.network.sendTo(player, buffer.build());
     }
