@@ -404,7 +404,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                         pathwayToBlock.tilePos, (_u, _u1) -> {
                             pathwayToBlock.isExecutingSignalSet = true;
                             pathwayToBlock.setPathStatus(EnumPathUsage.PREPARED);
-                            pathwayToBlock.consumer.accept(pathwayToBlock);
+                            pathwayToBlock.executeConsumer();
                         });
 
             if (isExecutingSignalSet)
@@ -428,15 +428,15 @@ public class SignalBoxPathway implements IChunkLoadable {
                                 final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
                                         .getPathwayByLastPoint(getLastPoint());
                                 pw.setPathStatus(EnumPathUsage.SELECTED);
-                                pw.consumer.accept(this);
+                                pw.executeConsumer();
                             });
                     if (pathwayToBlock != null) {
                         loadChunkAndGetTile(SignalBoxTileEntity.class, pathwayToBlock.world,
                                 pathwayToBlock.tilePos, (otherTile, _u1) -> {
-                                    final SignalBoxPathway otherPW = otherTile.getSignalBoxGrid()
+                                    pathwayToBlock = otherTile.getSignalBoxGrid()
                                             .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
-                                    otherPW.setPathStatus(EnumPathUsage.SELECTED);
-                                    otherPW.consumer.accept(otherPW);
+                                    pathwayToBlock.setPathStatus(EnumPathUsage.SELECTED);
+                                    pathwayToBlock.executeConsumer();
                                 });
                     }
                 });
@@ -545,6 +545,10 @@ public class SignalBoxPathway implements IChunkLoadable {
         this.consumer = consumer;
     }
 
+    private void executeConsumer() {
+        consumer.accept(this);
+    }
+
     public void setOtherPathwayToBlock(final SignalBoxPathway pathway) {
         this.pathwayToBlock = pathway;
         if (this.delay == 0 && pathwayToBlock.delay > 0) {
@@ -553,7 +557,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         }
         this.delay = Math.max(delay, pathwayToBlock.delay);
         updatePathwaySignals();
-        consumer.accept(this);
+        executeConsumer();
     }
 
     public void setOtherPathwayToReset(final SignalBoxPathway pathway) {
@@ -754,10 +758,10 @@ public class SignalBoxPathway implements IChunkLoadable {
         if (pathwayToBlock != null) {
             loadChunkAndGetTile(SignalBoxTileEntity.class, pathwayToBlock.world,
                     pathwayToBlock.tilePos, (otherTile, _u) -> {
-                        final SignalBoxPathway block = otherTile.getSignalBoxGrid()
+                        pathwayToBlock = otherTile.getSignalBoxGrid()
                                 .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
-                        block.setPathStatus(EnumPathUsage.BLOCKED);
-                        block.consumer.accept(block);
+                        pathwayToBlock.setPathStatus(EnumPathUsage.BLOCKED);
+                        pathwayToBlock.executeConsumer();
                     });
         }
         return true;
