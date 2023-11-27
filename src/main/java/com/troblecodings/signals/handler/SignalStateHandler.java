@@ -71,13 +71,19 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onServerStop(final ServerStoppingEvent event) {
+        Map<SignalStateInfo, Map<SEProperty, String>> maps;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
+        }
+        writeService.execute(() -> maps.entrySet()
+                .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
         writeService.shutdown();
         try {
             writeService.awaitTermination(10, TimeUnit.MINUTES);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        writeService = Executors.newFixedThreadPool(5);
+        writeService = null;
     }
 
     public static void registerToNetworkChannel(final Object object) {
@@ -303,6 +309,13 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     @SubscribeEvent
+    public static void onWorldLoad(final WorldEvent.Load load) {
+        if (load.getWorld().isClientSide() || writeService != null)
+            return;
+        writeService = Executors.newFixedThreadPool(5);
+    }
+
+    @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save save) {
         final Level world = (Level) save.getWorld();
         if (world.isClientSide)
@@ -312,10 +325,10 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             maps = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
         }
-        writeService.execute(() -> {
-            maps.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
-                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
-        });
+        if (writeService != null)
+            writeService.execute(() -> maps.entrySet().stream()
+                    .filter(entry -> entry.getKey().world.equals(world))
+                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
     }
 
     @SubscribeEvent
@@ -493,7 +506,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void unloadSignals(final List<StateLoadHolder> signals) {
-        if (signals == null || signals.isEmpty())
+        if (signals == null || signals.isEmpty() || writeService == null)
             return;
         writeService.execute(() -> {
             signals.forEach(info -> {

@@ -60,13 +60,19 @@ public final class NameHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onServerStop(final ServerStoppingEvent event) {
+        Map<StateInfo, String> map;
+        synchronized (ALL_NAMES) {
+            map = ImmutableMap.copyOf(ALL_NAMES);
+        }
+        writeService.execute(() -> map.entrySet()
+                .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
         writeService.shutdown();
         try {
             writeService.awaitTermination(10, TimeUnit.MINUTES);
         } catch (final InterruptedException e) {
             e.printStackTrace();
         }
-        writeService = Executors.newFixedThreadPool(5);
+        writeService = null;
     }
 
     public static void registerToNetworkChannel(final Object obj) {
@@ -153,6 +159,13 @@ public final class NameHandler implements INetworkSync {
     }
 
     @SubscribeEvent
+    public static void onWorldLoad(final WorldEvent.Load load) {
+        if (load.getWorld().isClientSide() || writeService != null)
+            return;
+        writeService = Executors.newFixedThreadPool(5);
+    }
+
+    @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
         final Level world = (Level) event.getWorld();
         if (world.isClientSide)
@@ -161,10 +174,10 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_NAMES) {
             map = ImmutableMap.copyOf(ALL_NAMES);
         }
-        writeService.execute(() -> {
-            map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
-                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
-        });
+        if (writeService != null)
+            writeService.execute(() -> map.entrySet().stream()
+                    .filter(entry -> entry.getKey().world.equals(world))
+                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
     }
 
     @SubscribeEvent
@@ -173,9 +186,6 @@ public final class NameHandler implements INetworkSync {
             return;
         synchronized (ALL_LEVEL_FILES) {
             ALL_LEVEL_FILES.remove(unload.getWorld());
-        }
-        synchronized (LOAD_COUNTER) {
-            LOAD_COUNTER.clear();
         }
     }
 
@@ -298,7 +308,7 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static void unloadNames(final List<StateInfo> infos) {
-        if (infos == null || infos.isEmpty())
+        if (infos == null || infos.isEmpty() || writeService == null)
             return;
         writeService.execute(() -> {
             infos.forEach(info -> {
