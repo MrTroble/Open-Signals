@@ -459,7 +459,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private void setSignals(final SignalStateInfo lastSignal) {
-        if (isExecutingSignalSet)
+        if (isExecutingSignalSet || world == null || world.isClientSide)
             return;
         final StateInfo identifier = new StateInfo(world, tilePos);
         this.signalPositions.ifPresent(entry -> {
