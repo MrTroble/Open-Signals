@@ -68,7 +68,7 @@ public final class SignalBoxHandler {
 
     public static boolean requesetInterSignalBoxPathway(final StateInfo startBox, final Point start,
             final Point end) {
-        if (startBox.world.isClientSide)
+        if (startBox.isWorldNullOrClientSide())
             return false;
 
         final AtomicBoolean returnBoolean = new AtomicBoolean(true);
@@ -149,7 +149,7 @@ public final class SignalBoxHandler {
     }
 
     public static void writeTileNBT(final StateInfo identifier, final NBTWrapper wrapper) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -161,7 +161,7 @@ public final class SignalBoxHandler {
     }
 
     public static void readTileNBT(final StateInfo identifier, final NBTWrapper wrapper) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -172,7 +172,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean isTileEmpty(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return true;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -185,7 +185,7 @@ public final class SignalBoxHandler {
 
     public static boolean linkPosToSignalBox(final StateInfo identifier, final BlockPos linkPos,
             final BasicBlock block, final LinkType type) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return false;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -204,7 +204,7 @@ public final class SignalBoxHandler {
     }
 
     public static void relinkAllRedstoneIOs(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -217,7 +217,7 @@ public final class SignalBoxHandler {
 
     public static Map<BlockPos, List<SubsidiaryState>> getPossibleSubsidiaries(
             final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return new HashMap<>();
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -229,7 +229,7 @@ public final class SignalBoxHandler {
     }
 
     public static Signal getSignal(final StateInfo identifier, final BlockPos signalPos) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return null;
         final LinkedPositions signals;
         synchronized (ALL_LINKED_POS) {
@@ -241,7 +241,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unlinkPosFromSignalBox(final StateInfo identifier, final BlockPos pos) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -253,7 +253,7 @@ public final class SignalBoxHandler {
     }
 
     public static Map<BlockPos, LinkType> getAllLinkedPos(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return new HashMap<>();
         final LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -265,7 +265,7 @@ public final class SignalBoxHandler {
     }
 
     public static void onPosRemove(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         synchronized (ALL_LINKED_POS) {
             ALL_LINKED_POS.forEach((pos, holder) -> {
@@ -279,7 +279,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unlinkAll(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions allPos;
         synchronized (ALL_LINKED_POS) {
@@ -291,7 +291,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unlinkTileFromPos(final StateInfo identifier, final BlockPos posToUnlink) {
-        if (identifier.world.isClientSide || tryDirectUnlink(identifier, posToUnlink))
+        if (identifier.isWorldNullOrClientSide() || tryDirectUnlink(identifier, posToUnlink))
             return;
         final LinkingUpdates update;
         synchronized (POS_UPDATES) {
@@ -302,7 +302,7 @@ public final class SignalBoxHandler {
     }
 
     public static void linkTileToPos(final StateInfo identifier, final BlockPos posToLink) {
-        if (identifier.world.isClientSide || tryDirectLink(identifier, posToLink))
+        if (identifier.isWorldNullOrClientSide() || tryDirectLink(identifier, posToLink))
             return;
         final LinkingUpdates update;
         synchronized (POS_UPDATES) {
@@ -313,7 +313,7 @@ public final class SignalBoxHandler {
     }
 
     private static boolean tryDirectLink(final StateInfo identifier, final BlockPos posToLink) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return false;
         final BlockEntity entity = identifier.world.getBlockEntity(posToLink);
         if (entity != null && entity instanceof RedstoneIOTileEntity) {
@@ -324,7 +324,7 @@ public final class SignalBoxHandler {
     }
 
     private static boolean tryDirectUnlink(final StateInfo identifier, final BlockPos posToUnlink) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return false;
         final BlockEntity entity = identifier.world.getBlockEntity(posToUnlink);
         if (entity != null && entity instanceof RedstoneIOTileEntity) {
@@ -335,7 +335,7 @@ public final class SignalBoxHandler {
     }
 
     public static void removeSignalBox(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         synchronized (ALL_LINKED_POS) {
             ALL_LINKED_POS.remove(identifier);
@@ -346,7 +346,7 @@ public final class SignalBoxHandler {
     }
 
     public static LinkingUpdates getPosUpdates(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return null;
         synchronized (POS_UPDATES) {
             return POS_UPDATES.remove(identifier);
@@ -354,7 +354,7 @@ public final class SignalBoxHandler {
     }
 
     public static void updateRedstoneOutput(final StateInfo identifier, final boolean state) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         BlockState blockState = identifier.world.getBlockState(identifier.pos);
         if (blockState != null && blockState.getBlock() == OSBlocks.REDSTONE_OUT) {
@@ -368,7 +368,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean containsOutputUpdates(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return false;
         synchronized (OUTPUT_UPDATES) {
             return OUTPUT_UPDATES.containsKey(identifier);
@@ -376,7 +376,7 @@ public final class SignalBoxHandler {
     }
 
     public static boolean getNewOutputState(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return false;
         synchronized (OUTPUT_UPDATES) {
             return OUTPUT_UPDATES.remove(identifier);
@@ -384,7 +384,7 @@ public final class SignalBoxHandler {
     }
 
     public static void loadSignals(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {
@@ -396,7 +396,7 @@ public final class SignalBoxHandler {
     }
 
     public static void unloadSignals(final StateInfo identifier) {
-        if (identifier.world.isClientSide)
+        if (identifier.isWorldNullOrClientSide())
             return;
         LinkedPositions holder;
         synchronized (ALL_LINKED_POS) {

@@ -15,6 +15,10 @@ public class StateInfo {
         this.world = world;
     }
 
+    public boolean isWorldNullOrClientSide() {
+        return world == null || world.isClientSide;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(pos, world);
