@@ -416,7 +416,6 @@ public class SignalBoxPathway implements IChunkLoadable {
                 try {
                     Thread.sleep(delay * 1000);
                 } catch (final InterruptedException e) {
-                    isExecutingSignalSet = false;
                 }
                 if (isPathwayReseted) {
                     return;
@@ -555,16 +554,13 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     public void setOtherPathwayToBlock(final SignalBoxPathway pathway) {
         this.pathwayToBlock = pathway;
-        this.delay = Math.max(delay, pathwayToBlock.delay);
-        if (delay > 0) {
-            pathwayToBlock.service.shutdownNow();
-            service.shutdownNow();
+        if (this.delay == 0 && pathwayToBlock.delay > 0) {
             resetFirstSignal();
             resetOther();
-            updatePathwaySignals();
-            executeConsumer();
-            pathwayToBlock.executeConsumer();
         }
+        this.delay = Math.max(delay, pathwayToBlock.delay);
+        updatePathwaySignals();
+        executeConsumer();
     }
 
     public void setOtherPathwayToReset(final SignalBoxPathway pathway) {
