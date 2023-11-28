@@ -39,4 +39,10 @@ public class RedstoneUpdatePacket {
         return Objects.equals(block, other.block) && Objects.equals(pos, other.pos)
                 && state == other.state && Objects.equals(world, other.world);
     }
+
+    @Override
+    public String toString() {
+        return "RedstoneUpdatePacket [world=" + world + ",pos=" + pos + ",state=" + state
+                + ",block=" + block + "]";
+    }
 }

@@ -5,9 +5,6 @@
         "handle_blackyellow": "opensignals:blocks/wn/handle_black_yellow",
         "handle_redyellow": "opensignals:blocks/wn/handle_red_yellow_red",
         "handle_yellow": "opensignals:blocks/wn/handle_yellow",
-        "handle_whiteblack": "opensignals:blocks/wn/handle_white_black",
-        "handle_whiteblack_w": "opensignals:blocks/wn/handle_white_black_w",
-        "handle_yellowblack": "opensignals:blocks/wn/handle_yellow_black",
         "wn2_2": "opensignals:blocks/wn/wn2_2",
         "orange": "opensignals:blocks/default/orange",
         "wn1_orange": "opensignals:blocks/wn/wn1_orange",
@@ -25,33 +22,15 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w"
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow"
-                    }
-                },
-                {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack"
                     }
                 },
                 {
@@ -77,16 +56,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -97,29 +66,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "0": "orange",
                         "4": "wn1_orange",
                         "5": "wn2_1_orange",
@@ -154,13 +103,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "5": "wn2_2"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -168,23 +110,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "5": "wn2_2"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "5": "wn2_2"
-                    }
-                },
-                {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "5": "wn2_2"
                     }
                 },
@@ -213,16 +141,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -233,29 +151,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "0": "orange",
                         "4": "wn1_orange",
                         "5": "wn2_2_orange",
@@ -285,6 +183,110 @@
             ],
             "y": 0
         },
+        "wn/switchhandle_on_invert": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                }
+            ],
+            "y":0
+        },
         "wn/switchhandle_on_right": {
             "textures": [
                 {
@@ -294,33 +296,15 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w"
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow"
-                    }
-                },
-                {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack"
                     }
                 },
                 {
@@ -346,16 +330,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -366,29 +340,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "0": "orange",
                         "4": "wn1_orange",
                         "5": "wn2_1_orange",
@@ -423,13 +377,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "5": "wn2_2"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -437,23 +384,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "5": "wn2_2"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "5": "wn2_2"
-                    }
-                },
-                {
-                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "5": "wn2_2"
                     }
                 },
@@ -482,16 +415,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -502,29 +425,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
-                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "0": "orange",
                         "4": "wn1_orange",
                         "5": "wn2_2_orange",
@@ -554,6 +457,110 @@
             ],
             "y": 0
         },
+        "wn/switchhandle_on_right_invert": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandis(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                }
+            ],
+            "y": 0
+        },
         "wn/switchhandle_off": {
             "textures": [
                 {
@@ -563,33 +570,15 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w"
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow"
-                    }
-                },
-                {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack"
                     }
                 },
                 {
@@ -615,16 +604,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -635,29 +614,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "0": "orange",
                         "4": "wn1_orange",
                         "5": "wn2_1_orange",
@@ -692,13 +651,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "5": "wn2_2"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -706,23 +658,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "5": "wn2_2"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "5": "wn2_2"
-                    }
-                },
-                {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "5": "wn2_2"
                     }
                 },
@@ -751,16 +689,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -771,29 +699,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "0": "orange",
                         "4": "wn1_orange",
                         "5": "wn2_2_orange",
@@ -823,6 +731,110 @@
             ],
             "y": 0
         },
+        "wn/switchhandle_off_invert": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandisnot(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                }
+            ],
+            "y": 0
+        },
         "wn/switchhandle_off_right": {
             "textures": [
                 {
@@ -832,33 +844,15 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w"
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow"
-                    }
-                },
-                {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack"
                     }
                 },
                 {
@@ -884,16 +878,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -904,29 +888,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_1_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "0": "orange",
                         "4": "wn1_orange",
                         "5": "wn2_1_orange",
@@ -961,13 +925,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "5": "wn2_2"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -975,23 +932,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "5": "wn2_2"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "5": "wn2_2"
-                    }
-                },
-                {
-                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "5": "wn2_2"
                     }
                 },
@@ -1020,16 +963,6 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.WHITE_BLACK_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackwhite_w",
@@ -1040,29 +973,9 @@
                     }
                 },
                 {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_whiteblack_w",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
                     "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW_BLACK) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_blackyellow",
-                        "0": "orange",
-                        "4": "wn1_orange",
-                        "5": "wn2_2_orange",
-                        "6": "wn2_3_orange"
-                    }
-                },
-                {
-                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
-                    "retexture": {
-                        "7": "handle_yellowblack",
                         "0": "orange",
                         "4": "wn1_orange",
                         "5": "wn2_2_orange",
@@ -1083,6 +996,110 @@
                     "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.YELLOW) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
                     "retexture": {
                         "7": "handle_yellow",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                }
+            ],
+            "y": 0
+        },
+        "wn/switchhandle_off_right_invert": {
+            "textures": [
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandisnot(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_1_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandisnot(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
+                        "5": "wn2_2"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_WHITE_W) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackwhite_w",
+                        "0": "orange",
+                        "4": "wn1_orange",
+                        "5": "wn2_2_orange",
+                        "6": "wn2_3_orange"
+                    }
+                },
+                {
+                    "blockstate": "hasandisnot(POWERED) && hasandis(FALLBACK_SWITCH) && with(WEIGHTCOLOR.BLACK_YELLOW) && hasandis(SWITCHSIDE) && hasandis(SWITCHPLACESIDE) && hasandis(MANUAL)",
+                    "retexture": {
+                        "7": "handle_blackyellow",
                         "0": "orange",
                         "4": "wn1_orange",
                         "5": "wn2_2_orange",

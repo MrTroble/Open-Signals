@@ -1,7 +1,7 @@
 package com.troblecodings.signals.signalbox.entrys;
 
-import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 
 public interface INetworkSavable extends ISaveable {
 

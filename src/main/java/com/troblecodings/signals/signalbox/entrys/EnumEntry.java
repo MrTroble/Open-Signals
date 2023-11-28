@@ -3,9 +3,9 @@ package com.troblecodings.signals.signalbox.entrys;
 import java.util.function.IntConsumer;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
-import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.core.WriteBuffer;
 
 public class EnumEntry<T extends Enum<T>> extends IPathEntry<T>
         implements IIntegerable<T>, IntConsumer {

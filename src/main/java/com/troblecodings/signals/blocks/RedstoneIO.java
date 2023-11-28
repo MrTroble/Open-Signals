@@ -3,10 +3,9 @@ package com.troblecodings.signals.blocks;
 import java.util.Optional;
 
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
@@ -46,7 +45,7 @@ public class RedstoneIO extends BasicBlock {
     public BlockState getStateForPlacement(final BlockPlaceContext context) {
         final Level world = context.getLevel();
         if (!world.isClientSide) {
-            NameHandler.createName(new NameStateInfo(world, context.getClickedPos()),
+            NameHandler.createName(new StateInfo(world, context.getClickedPos()),
                     this.getRegistryName().getPath());
         }
         return super.getStateForPlacement(context);
@@ -95,8 +94,8 @@ public class RedstoneIO extends BasicBlock {
     public void destroy(final LevelAccessor acess, final BlockPos pos, final BlockState state) {
         super.destroy(acess, pos, state);
         if (!acess.isClientSide()) {
-            NameHandler.setRemoved(new NameStateInfo((Level) acess, pos));
-            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (Level) acess));
+            NameHandler.setRemoved(new StateInfo((Level) acess, pos));
+            SignalBoxHandler.onPosRemove(new StateInfo((Level) acess, pos));
         }
     }
 }

@@ -8,6 +8,7 @@ import java.util.Objects;
 
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.enums.EnumPathUsage;
+import com.troblecodings.signals.signalbox.Point;
 
 import net.minecraft.core.BlockPos;
 
@@ -40,6 +41,18 @@ public final class PathEntryType<T> {
             "speed");
 
     public static final PathEntryType<Byte> ZS2 = new PathEntryType<>(ByteEntry.class, "zs2");
+
+    public static final PathEntryType<Boolean> SIGNAL_REPEATER = new PathEntryType<>(
+            BoolEntry.class, "signal_repeater");
+
+    public static final PathEntryType<Integer> DELAY = new PathEntryType<>(IntegerEntry.class,
+            "delay");
+
+    public static final PathEntryType<Point> POINT = new PathEntryType<>(PointEntry.class,
+            "pointentry");
+
+    public static final PathEntryType<BlockPos> SIGNALBOX = new PathEntryType<>(BlockposEntry.class,
+            "signalbox");
 
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 

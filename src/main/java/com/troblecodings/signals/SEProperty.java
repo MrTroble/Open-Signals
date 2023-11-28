@@ -7,12 +7,12 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.enums.ChangeableStage;
 
-import net.minecraft.client.resources.language.I18n;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.model.data.IModelData;
@@ -141,7 +141,8 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
         @OnlyIn(Dist.CLIENT)
         @Override
         public String getNamedObj(final int obj) {
-            return I18n.get("property." + this.getName() + ".name") + ": " + getObjFromID(obj);
+            return I18Wrapper.format("property." + this.getName() + ".name") + ": "
+                    + getObjFromID(obj);
         }
     }
 }

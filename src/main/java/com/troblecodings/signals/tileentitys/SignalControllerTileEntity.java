@@ -14,8 +14,12 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -43,8 +47,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private final boolean[] currentStates = new boolean[Direction.values().length];
     private final Map<Byte, Map<SEProperty, String>> allStates = new HashMap<>();
     private final Map<Direction, Map<EnumState, Byte>> enabledStates = new HashMap<>();
-    private final SignalStateListener listener = (_u, removed) -> {
-        if (removed) {
+    private final SignalStateListener listener = (_u, properties, state) -> {
+        if (state.equals(ChangedState.REMOVED_FROM_FILE)) {
             linkedSignalPosition = null;
             linkedSignal = null;
             allStates.clear();
@@ -230,7 +234,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
                     linkedSignal);
             if (linkedSignalPosition != null && linkedSignal != null) {
-                SignalStateHandler.loadSignal(info);
+                SignalStateHandler.loadSignal(new StateLoadHolder(info,
+                        new LoadHolder<>(new StateInfo(level, worldPosition))));
                 SignalStateHandler.addListener(info, listener);
             }
         }
@@ -238,8 +243,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     public void unloadSignal() {
         if (linkedSignalPosition != null & linkedSignal != null)
-            SignalStateHandler
-                    .unloadSignal(new SignalStateInfo(level, linkedSignalPosition, linkedSignal));
+            SignalStateHandler.unloadSignal(new StateLoadHolder(
+                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal),
+                    new LoadHolder<>(new StateInfo(level, worldPosition))));
     }
 
     public BlockPos getLinkedPosition() {
@@ -309,7 +315,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             }
             final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
                     linkedSignal);
-            SignalStateHandler.setStates(info, allStates.get(profile));
+            SignalStateHandler.runTaskWhenSignalLoaded(info, (stateInfo, _u1,
+                    _u2) -> SignalStateHandler.setStates(info, allStates.get(profile)));
         }
     }
 
@@ -317,9 +324,12 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (level.isClientSide)
             return;
         final Map<SEProperty, String> properties = allStates.get(profileRSInput);
-        if (properties != null)
-            SignalStateHandler.setStates(
-                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal), properties);
+        if (properties != null) {
+            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
+                    linkedSignal);
+            SignalStateHandler.runTaskWhenSignalLoaded(info,
+                    (stateInfo, _u1, _u2) -> SignalStateHandler.setStates(info, properties));
+        }
     }
 
     @Override

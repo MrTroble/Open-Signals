@@ -1,42 +1,37 @@
 package com.troblecodings.signals.guis;
 
-import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.troblecodings.core.interfaces.INetworkSync;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.tileentitys.BasicBlockEntity;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import net.minecraft.core.BlockPos;
 
-public class NamableContainer extends ContainerBase implements INetworkSync {
+public class NamableContainer extends ContainerBase {
 
-    public BasicBlockEntity tile;
+    protected BasicBlockEntity tile;
     protected BlockPos pos;
     protected final List<BlockPos> linkedPos = new ArrayList<>();
     protected final List<BlockPos> linkedController = new ArrayList<>();
 
     public NamableContainer(final GuiInfo info) {
         super(info);
-        info.base = this;
-        info.player.containerMenu = this;
         if (info.pos != null)
             this.tile = info.getTile();
     }
 
     private void sendSignalPos() {
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putBlockPos(getInfo().pos);
+        buffer.putBlockPos(info.pos);
         final List<BlockPos> linkedPos = tile.getLinkedPos();
         buffer.putByte((byte) linkedPos.size());
         linkedPos.forEach(pos -> buffer.putBlockPos(pos));
@@ -46,7 +41,7 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
             buffer.putByte((byte) linkedController.size());
             linkedController.forEach(pos -> buffer.putBlockPos(pos));
         }
-        OpenSignalsMain.network.sendTo(getInfo().player, buffer.build());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     @Override
@@ -55,17 +50,16 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
     }
 
     @Override
-    public void deserializeClient(final ByteBuffer buf) {
+    public void deserializeClient(final ReadBuffer buffer) {
         linkedPos.clear();
         linkedController.clear();
-        final ReadBuffer buffer = new ReadBuffer(buf);
         pos = buffer.getBlockPos();
-        final int size = buffer.getByteAsInt();
+        final int size = buffer.getByteToUnsignedInt();
         for (int i = 0; i < size; i++)
             linkedPos.add(buffer.getBlockPos());
-        tile = (BasicBlockEntity) getInfo().world.getBlockEntity(pos);
+        tile = (BasicBlockEntity) info.world.getBlockEntity(pos);
         if (tile instanceof RedstoneIOTileEntity) {
-            final int controllerLinkSize = buffer.getByteAsInt();
+            final int controllerLinkSize = buffer.getByteToUnsignedInt();
             for (int i = 0; i < controllerLinkSize; i++)
                 linkedController.add(buffer.getBlockPos());
         }
@@ -73,20 +67,9 @@ public class NamableContainer extends ContainerBase implements INetworkSync {
     }
 
     @Override
-    public void deserializeServer(final ByteBuffer buf) {
-        final ReadBuffer buffer = new ReadBuffer(buf);
-        final int byteLength = buffer.getByteAsInt();
-        final byte[] array = new byte[byteLength];
-        for (int i = 0; i < byteLength; i++) {
-            array[i] = buffer.getByte();
-        }
-        final NameStateInfo info = new NameStateInfo(this.getInfo().world, this.getInfo().pos);
-        String name = "";
-        try {
-            name = new String(array, "UTF-8");
-        } catch (final UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+    public void deserializeServer(final ReadBuffer buffer) {
+        final StateInfo info = new StateInfo(this.info.world, this.info.pos);
+        final String name = buffer.getString();
         if (tile instanceof SignalTileEntity) {
             NameHandler.setNameForSignal(info, name);
         } else {

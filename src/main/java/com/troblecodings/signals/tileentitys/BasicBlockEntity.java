@@ -6,10 +6,10 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -49,7 +49,7 @@ public class BasicBlockEntity extends BlockEntity implements NamableWrapper, ICh
 
     @Override
     public String getNameWrapper() {
-        final NameStateInfo info = new NameStateInfo(level, worldPosition);
+        final StateInfo info = new StateInfo(level, worldPosition);
         return level.isClientSide ? ClientNameHandler.getClientName(info)
                 : NameHandler.getName(info);
 

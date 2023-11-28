@@ -1,8 +1,8 @@
 package com.troblecodings.signals.signalbox.entrys;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 
 import net.minecraft.core.BlockPos;
 
