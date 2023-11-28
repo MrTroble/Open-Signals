@@ -6,9 +6,9 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.interfaces.NamableWrapper;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
@@ -74,7 +74,7 @@ public class BasicBlockEntity extends TileEntity implements NamableWrapper, IChu
 
     @Override
     public String getNameWrapper() {
-        final NameStateInfo info = new NameStateInfo(world, pos);
+        final StateInfo info = new StateInfo(world, pos);
         final String customName = world.isRemote ? ClientNameHandler.getClientName(info)
                 : NameHandler.getName(info);
         return customName;

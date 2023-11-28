@@ -1,12 +1,12 @@
 package com.troblecodings.signals.handler;
 
 import java.io.UnsupportedEncodingException;
-import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
-import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.StateInfo;
 
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -17,20 +17,19 @@ import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketE
 
 public class ClientNameHandler implements INetworkSync {
 
-    private static final Map<NameStateInfo, String> CLIENT_NAMES = new HashMap<>();
+    private static final Map<StateInfo, String> CLIENT_NAMES = new HashMap<>();
 
-    public static String getClientName(final NameStateInfo info) {
+    public static String getClientName(final StateInfo info) {
         synchronized (CLIENT_NAMES) {
             return new String(CLIENT_NAMES.getOrDefault(info, ""));
         }
     }
 
     @Override
-    public void deserializeClient(final ByteBuffer buf) {
+    public void deserializeClient(final ReadBuffer buffer) {
         final Minecraft mc = Minecraft.getMinecraft();
-        final ReadBuffer buffer = new ReadBuffer(buf);
         final BlockPos pos = buffer.getBlockPos();
-        final int byteLength = buffer.getByteAsInt();
+        final int byteLength = buffer.getByteToUnsignedInt();
         if (byteLength == 255) {
             setRemoved(pos);
             return;
@@ -46,9 +45,11 @@ public class ClientNameHandler implements INetworkSync {
             e.printStackTrace();
         }
         synchronized (CLIENT_NAMES) {
-            CLIENT_NAMES.put(new NameStateInfo(mc.world, pos), name);
+            CLIENT_NAMES.put(new StateInfo(mc.world, pos), name);
         }
         final WorldClient level = mc.world;
+        if (level == null)
+            return;
         mc.addScheduledTask(() -> {
             level.getChunkFromBlockCoords(pos).markDirty();
             final IBlockState state = level.getBlockState(pos);
@@ -63,7 +64,7 @@ public class ClientNameHandler implements INetworkSync {
     private static void setRemoved(final BlockPos pos) {
         final Minecraft mc = Minecraft.getMinecraft();
         synchronized (CLIENT_NAMES) {
-            CLIENT_NAMES.remove(new NameStateInfo(mc.world, pos));
+            CLIENT_NAMES.remove(new StateInfo(mc.world, pos));
         }
     }
 

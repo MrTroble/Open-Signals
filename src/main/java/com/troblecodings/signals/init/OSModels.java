@@ -24,6 +24,7 @@ public final class OSModels {
         registerModel(Item.getItemFromBlock(OSBlocks.REDSTONE_IN));
         registerModel(Item.getItemFromBlock(OSBlocks.REDSTONE_OUT));
         registerModel(Item.getItemFromBlock(OSBlocks.COMBI_REDSTONE_INPUT));
+        registerModel(Item.getItemFromBlock(OSBlocks.PATHWAY_REQUESTER));
     }
 
     @SubscribeEvent

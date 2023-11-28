@@ -3,19 +3,17 @@ package com.troblecodings.signals.handler;
 import java.util.Objects;
 
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.StateInfo;
 
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class SignalStateInfo {
+public class SignalStateInfo extends StateInfo {
 
-    public final World world;
-    public final BlockPos pos;
     public final Signal signal;
 
     public SignalStateInfo(final World world, final BlockPos pos, final Signal signal) {
-        this.world = world;
-        this.pos = pos;
+        super(world, pos);
         this.signal = signal;
     }
 

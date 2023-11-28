@@ -21,6 +21,7 @@ public final class SignalBoxUtil {
     public static final int FREE_COLOR = ConfigHandler.signalboxFreeColor;
     public static final int SELECTED_COLOR = ConfigHandler.signalboxSelectColor;
     public static final int USED_COLOR = ConfigHandler.signalboxUsedColor;
+    public static final int PREPARED_COLOR = ConfigHandler.signalboxPreparedColor;
 
     private SignalBoxUtil() {
     }

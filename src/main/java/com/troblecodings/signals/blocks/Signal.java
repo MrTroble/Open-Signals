@@ -14,16 +14,14 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnum;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -110,8 +108,8 @@ public class Signal extends BasicBlock {
         final World world = te.getWorld();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isRemote
-                ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
-                : SignalStateHandler.getStates(info);
+                ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
+                : ((SignalTileEntity) te).getProperties();
         return FULL_BLOCK_AABB.expand(0, getHeight(properties), 0);
     }
 
@@ -185,8 +183,8 @@ public class Signal extends BasicBlock {
         final World world = tile.getWorld();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isRemote
-                ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
-                : SignalStateHandler.getStates(info);
+                ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
+                : tile.getProperties();
         properties.forEach((property, value) -> blockState
                 .getAndUpdate(oldState -> oldState.withProperty(property, value)));
         return blockState.get();
@@ -237,10 +235,13 @@ public class Signal extends BasicBlock {
         super.breakBlock(worldIn, pos, state);
         GhostBlock.destroyUpperBlock(worldIn, pos);
         if (!worldIn.isRemote) {
+            final SignalStateInfo info = new SignalStateInfo(worldIn, pos, this);
+            SignalStateHandler.sendRemoved(info);
+            NameHandler.sendRemoved(new StateInfo(worldIn, pos));
             new Thread(() -> {
                 SignalStateHandler.setRemoved(new SignalStateInfo(worldIn, pos, this));
-                NameHandler.setRemoved(new NameStateInfo(worldIn, pos));
-                SignalBoxHandler.onPosRemove(new PosIdentifier(pos, worldIn));
+                NameHandler.setRemoved(new StateInfo(worldIn, pos));
+                SignalBoxHandler.onPosRemove(new StateInfo(worldIn, pos));
             }, "Signal:breakBlock").start();
         }
     }
@@ -294,7 +295,7 @@ public class Signal extends BasicBlock {
     @SideOnly(Side.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
         final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
-                new ClientSignalStateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
+                new StateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
@@ -355,7 +356,7 @@ public class Signal extends BasicBlock {
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
         final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
-                new ClientSignalStateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
+                new StateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
@@ -509,22 +510,23 @@ public class Signal extends BasicBlock {
             return;
 
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
-        final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        final SoundProperty sound = getSound(properties);
-        if (sound.duration < 1)
-            return;
-
-        if (sound.duration == 1) {
-            world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        } else {
-            if (world.isUpdateScheduled(pos, this)) {
+        SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
+            final SoundProperty sound = getSound(properties);
+            if (sound.duration < 1)
                 return;
+
+            if (sound.duration == 1) {
+                world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
             } else {
-                if (sound.predicate.test(properties)) {
-                    world.scheduleUpdate(pos, this, 1);
+                if (world.isUpdateScheduled(pos, this)) {
+                    return;
+                } else {
+                    if (sound.predicate.test(properties)) {
+                        world.scheduleUpdate(pos, this, 1);
+                    }
                 }
             }
-        }
+        });
     }
 
     public SoundProperty getSound(final Map<SEProperty, String> map) {
@@ -543,12 +545,14 @@ public class Signal extends BasicBlock {
             return;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(worldIn, pos, this);
-        final SoundProperty sound = getSound(SignalStateHandler.getStates(stateInfo));
-        if (sound.duration <= 1) {
-            return;
-        }
-        worldIn.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        worldIn.scheduleUpdate(pos, this, sound.duration);
+        SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
+            final SoundProperty sound = getSound(properties);
+            if (sound.duration <= 1) {
+                return;
+            }
+            worldIn.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            worldIn.scheduleUpdate(pos, this, sound.duration);
+        });
     }
 
     @Override

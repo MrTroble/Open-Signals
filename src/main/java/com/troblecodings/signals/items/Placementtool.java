@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
@@ -12,16 +13,15 @@ import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.guis.ContainerPlacementtool;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -52,7 +52,7 @@ public class Placementtool extends Item
     @SideOnly(Side.CLIENT)
     @Override
     public String getNamedObj(final int obj) {
-        return I18n.format("property." + this.getName() + ".name") + ": "
+        return I18Wrapper.format("property." + this.getName() + ".name") + ": "
                 + this.getObjFromID(obj).getLocalizedName();
     }
 
@@ -105,7 +105,7 @@ public class Placementtool extends Item
         }
         final SignalStateInfo info = new SignalStateInfo(worldIn, placePos, signal);
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
-        final NameStateInfo nameInfo = new NameStateInfo(worldIn, placePos);
+        final StateInfo nameInfo = new StateInfo(worldIn, placePos);
         String nametoSet = "";
         if (!(signalName == null || signalName.isEmpty())) {
             signalProperties.put(Signal.CUSTOMNAME, "true");
@@ -114,15 +114,6 @@ public class Placementtool extends Item
             signalProperties.put(Signal.CUSTOMNAME, "false");
             nametoSet = signal.getSignalTypeName();
         }
-        SignalStateHandler.createStates(info, signalProperties);
-        NameHandler.createName(nameInfo, nametoSet);
-
-        worldIn.setBlockState(placePos, signal.getStateForPlacement(worldIn, placePos, facing, hitX,
-                hitY, hitZ, 0, player, hand), 3);
-
-        final ItemStack item = player.getHeldItemMainhand();
-        item.damageItem(Math.abs(cost), player);
-
         final int height = signal.getHeight(signalProperties);
         BlockPos checkPos = placePos.up();
         for (int i = 0; i < height; i++) {
@@ -133,6 +124,14 @@ public class Placementtool extends Item
             }
             checkPos = checkPos.up();
         }
+        SignalStateHandler.createStates(info, signalProperties, player);
+        NameHandler.createName(nameInfo, nametoSet);
+
+        worldIn.setBlockState(placePos, signal.getStateForPlacement(worldIn, placePos, facing, hitX,
+                hitY, hitZ, 0, player, hand), 3);
+
+        final ItemStack item = player.getHeldItemMainhand();
+        item.damageItem(Math.abs(cost), player);
 
         BlockPos ghostPos = placePos.up();
         for (int i = 0; i < height; i++) {

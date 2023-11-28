@@ -24,6 +24,7 @@ public class FunctionParsingInfo {
         PARAMETER_PARSER.put(ValuePack.class, FunctionParsingInfo::getPredicate);
         PARAMETER_PARSER.put(StringInteger.class, FunctionParsingInfo::getStringInt);
         PARAMETER_PARSER.put(String.class, FunctionParsingInfo::getString);
+        PARAMETER_PARSER.put(Boolean.class, FunctionParsingInfo::getBoolean);
     }
 
     public String argument;
@@ -71,8 +72,8 @@ public class FunctionParsingInfo {
         });
         if (property == null) {
             throw new LogicalParserException(
-                    String.format("Could not make predicate=%s with system=%S!", argument,
-                            signalName) + " Valid Properties: " + properties);
+                    String.format("Could not make predicate=%s with system=%S!", name, signalName)
+                            + " Valid Properties: " + properties);
         }
         return property;
     }
@@ -112,6 +113,10 @@ public class FunctionParsingInfo {
 
     public Object getString() {
         return argument;
+    }
+
+    public Object getBoolean() {
+        return Boolean.valueOf(argument);
     }
 
     public Map<String, MethodInfo> getTable() {

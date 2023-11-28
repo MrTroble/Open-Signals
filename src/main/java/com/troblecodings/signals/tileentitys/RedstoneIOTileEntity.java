@@ -10,8 +10,8 @@ import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.core.LinkingUpdates;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
@@ -66,11 +66,10 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         final RedstoneUpdatePacket update = new RedstoneUpdatePacket(world, pos, power,
                 (RedstoneInput) getBlockType());
         linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, pos,
-                (_u1, _u2) -> SignalBoxHandler.updateInput(new PosIdentifier(pos, world), update)));
-        linkedSignalController.forEach(pos -> {
-            loadChunkAndGetTile(SignalControllerTileEntity.class, world, pos,
-                    (tile, _u) -> tile.updateFromRSInput());
-        });
+                (tile, _u) -> tile.getSignalBoxGrid().updateInput(update)));
+        linkedSignalController.forEach(pos -> loadChunkAndGetTile(SignalControllerTileEntity.class,
+                world, pos, (tile, _u) -> tile.updateFromRSInput()));
+
     }
 
     public List<BlockPos> getLinkedController() {
@@ -82,15 +81,15 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         super.onLoad();
         if (world == null || world.isRemote)
             return;
-        final LinkingUpdates update = SignalBoxHandler.getPosUpdates(new PosIdentifier(pos, world));
+        final LinkingUpdates update = SignalBoxHandler.getPosUpdates(new StateInfo(world, pos));
         if (update == null)
             return;
         update.getPosToRemove().forEach(pos -> unlink(pos));
         update.getPosToAdd().forEach(pos -> link(pos));
-        if (SignalBoxHandler.containsOutputUpdates(new PosIdentifier(pos, world))) {
+        if (SignalBoxHandler.containsOutputUpdates(new StateInfo(world, pos))) {
             IBlockState state = world.getBlockState(pos);
             state = state.withProperty(RedstoneIO.POWER,
-                    SignalBoxHandler.getNewOutputState(new PosIdentifier(pos, world)));
+                    SignalBoxHandler.getNewOutputState(new StateInfo(world, pos)));
             world.setBlockState(pos, state);
         }
     }

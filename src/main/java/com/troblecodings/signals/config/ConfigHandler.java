@@ -41,6 +41,10 @@ public final class ConfigHandler {
     @Comment("Change the color of a blocked path. Default: -65536")
     public static int signalboxUsedColor = 0xFFFF0000;
 
+    @Name("Signalbox prepared color")
+    @Comment("Change the color of a prepared path. Default: 16776960")
+    public static int signalboxPreparedColor = 0xffff00;
+
     @Name("Basic text color")
     @Comment("Change the color of a default text. Default: -16777216")
     public static int basicTextColor = GuiConfigHandler.basicTextColor;
