@@ -12,6 +12,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -73,7 +74,11 @@ public class UISignalBoxTile extends UIComponentEntity {
         entity.add(new UIIndependentTranslate(0, 0, modeSet.mode.depth));
 
         final MainSignalIdentifier identifier = greenSignals.get(modeSet);
-        final SignalState state = identifier != null ? identifier.state : SignalState.RED;
+        SignalState state = identifier != null ? identifier.state : SignalState.RED;
+        if (modeSet.mode.equals(EnumGuiMode.RS)
+                && setToEntity.containsKey(new ModeSet(EnumGuiMode.HP, modeSet.rotation))) {
+            state = SignalState.OFF;
+        }
 
         entity.add((UIComponent) modeSet.mode.consumer.get(state));
         this.entity.add(entity);
