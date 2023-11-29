@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.12.2 - 3.2.1]
+
+* fix: red shunting signal with green main signal
+
 ## [1.12.2 - 3.2.0]
 
 * feat: added customName to signalcontroller
