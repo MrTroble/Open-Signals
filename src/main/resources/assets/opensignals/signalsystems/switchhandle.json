@@ -4,7 +4,10 @@
         "canLink": true,
         "defaultHeight": 0,
         "redstoneOutputs": {
-            "config(manual.TRUE)" : "powered"
+            "config(manual.TRUE)": "powered"
+        },
+        "remoteRedstoneOutputs": {
+            "config(manual.FALSE)": "powered"
         }
     },
     "seProperties": [
