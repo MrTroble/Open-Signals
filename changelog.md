@@ -1,5 +1,42 @@
 # Changelog
 
+## [1.16.5 - 3.2.0]
+
+* feat: added help panel to signalbox
+* feat: added shortcuts in help panel
+* feat: added manipulator tool for new signal renaming
+* feat: reverse resetting pathways
+* feat: added tooltip to text input field
+* feat: added tooltip hiding option
+* feat: remove grid in usage mode from signalbox
+* feat: readded configurable block light emission
+* feat: configurable colors
+* feat: add preview renderer
+* feat: added sorting and search option in linking list
+* feat: switch handle with opposide basic position
+* feat: added customName to signalcontroller
+* feat: added system for distant signal repeater
+* feat: added pathway requester
+* feat/fix: hv distant signal turn off with HP0
+* feat: added pathway saver
+* feat: added color, when manual output is active
+* feat: added level crossing function with delay and color
+* feat: added intersignalbox pathways
+* feat: visual signal feedback in signalbox
+* feat: added counter for subsidiaries and pathway reset
+* fix: circle model
+* fix: tooltip out of screen
+* fix: bug in signal configs (hl, zs2v, semaphore)
+* fix: redstone output of switch signals
+* fix: issues in GUIs
+* fix: issues with SignalState and NameHandler
+* ref: a lot of background changes
+* fix: issues in configs
+* fix: issue with UIClickable and Info&Help Page
+* ref: better code performance
+* ref: predicate properties
+* ref: ImageBot optimize images beep-boop
+
 ## [1.16.5 - 3.0.2]
 
 fix: linking crash

@@ -8,6 +8,7 @@
     "values": {
         "map(stop)": ["distantsignal.VR0", "zs3v.OFF"],
         "map(drive)": ["distantsignal.VR1"],
+        "signalRepeater(true)": ["vrlight.true"],
 
         "(config(zs3.Z1) || config(zs3plate.Z1))": ["zs3v.Z1", "distantsignal.VR2"],
         "(config(zs3.Z2) || config(zs3plate.Z2))": ["zs3v.Z2", "distantsignal.VR2"],

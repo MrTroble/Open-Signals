@@ -11,11 +11,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -75,6 +76,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 .add(possibleModes.get(mode).getEntry(PathEntryType.OUTPUT).get()));
         manuellEnabledOutputs.clear();
         return returnList;
+    }
+    
+    public List<ModeSet> getManuellEnabledOutputs() {
+        return ImmutableList.copyOf(manuellEnabledOutputs);
     }
 
     public void remove(final ModeSet modeSet) {
@@ -139,6 +144,25 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                             break;
                     }
                     break;
+                case IN_CONNECTION: {
+                    switch (mode.rotation) {
+                        case NONE:
+                        case CLOCKWISE_180: {
+                            p1.translate(1, 0);
+                            p2.translate(-1, 0);
+                            break;
+                        }
+                        case CLOCKWISE_90:
+                        case COUNTERCLOCKWISE_90: {
+                            p1.translate(0, 1);
+                            p2.translate(0, -1);
+                            break;
+                        }
+                        default:
+                            break;
+                    }
+                    break;
+                }
                 default:
                     continue;
             }
@@ -278,6 +302,22 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return this.possibleModes.keySet().stream()
                 .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode));
     }
+    
+    public boolean isValidEnd() {
+        return this.possibleModes.keySet().stream()
+                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode)
+                        || modeSet.mode.equals(EnumGuiMode.OUT_CONNECTION));
+    }
+
+    public boolean containsInConnection() {
+        return this.possibleModes.keySet().stream()
+                .anyMatch(modeSet -> modeSet.mode.equals(EnumGuiMode.IN_CONNECTION));
+    }
+
+    public boolean containsOutConnection() {
+        return this.possibleModes.keySet().stream()
+                .anyMatch(modeSet -> modeSet.mode.equals(EnumGuiMode.OUT_CONNECTION));
+    }
 
     public Set<Path> connections() {
         return ImmutableSet.copyOf(this.possibleConnections.keySet());
@@ -292,7 +332,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     public void readNetwork(final ReadBuffer buffer) {
         possibleModes.clear();
         manuellEnabledOutputs.clear();
-        final int size = buffer.getByteAsInt();
+        final int size = buffer.getByteToUnsignedInt();
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         for (int i = 0; i < size; i++) {
             final ModeSet mode = ModeSet.of(buffer);
@@ -300,14 +340,14 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             entry.readNetwork(buffer);
             possibleModes.put(mode, entry);
         }
-        final int outputsSize = buffer.getByteAsInt();
+        final int outputsSize = buffer.getByteToUnsignedInt();
         for (int i = 0; i < outputsSize; i++) {
             final ModeSet modeSet = ModeSet.of(buffer);
             if (!manuellEnabledOutputs.contains(modeSet))
                 manuellEnabledOutputs.add(modeSet);
         }
         this.isAutoPoint = buffer.getByte() == 1 ? true : false;
-        final int nameSize = buffer.getByteAsInt();
+        final int nameSize = buffer.getByteToUnsignedInt();
         final byte[] array = new byte[nameSize];
         for (int i = 0; i < nameSize; i++)
             array[i] = buffer.getByte();
@@ -316,7 +356,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public void readUpdateNetwork(final ReadBuffer buffer) {
-        final int size = buffer.getByteAsInt();
+        final int size = buffer.getByteToUnsignedInt();
         for (int i = 0; i < size; i++) {
             final ModeSet mode = ModeSet.of(buffer);
             final PathOptionEntry entry = possibleModes.computeIfAbsent(mode,
@@ -324,7 +364,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             entry.readNetwork(buffer);
             possibleModes.put(mode, entry);
         }
-        final int outputsSize = buffer.getByteAsInt();
+        final int outputsSize = buffer.getByteToUnsignedInt();
         if (outputsSize == 0)
             manuellEnabledOutputs.clear();
         for (int i = 0; i < outputsSize; i++) {
@@ -333,7 +373,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 manuellEnabledOutputs.add(modeSet);
         }
         this.isAutoPoint = buffer.getByte() == 1 ? true : false;
-        final int nameSize = buffer.getByteAsInt();
+        final int nameSize = buffer.getByteToUnsignedInt();
         final byte[] array = new byte[nameSize];
         for (int i = 0; i < nameSize; i++)
             array[i] = buffer.getByte();

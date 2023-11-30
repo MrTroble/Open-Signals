@@ -5,8 +5,9 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
-import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.StateInfo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
@@ -17,9 +18,9 @@ import net.minecraftforge.fml.network.NetworkEvent.ServerCustomPayloadEvent;
 
 public class ClientNameHandler implements INetworkSync {
 
-    private static final Map<NameStateInfo, String> CLIENT_NAMES = new HashMap<>();
+    private static final Map<StateInfo, String> CLIENT_NAMES = new HashMap<>();
 
-    public static String getClientName(final NameStateInfo info) {
+    public static String getClientName(final StateInfo info) {
         synchronized (CLIENT_NAMES) {
             return CLIENT_NAMES.getOrDefault(info, "");
         }
@@ -30,7 +31,7 @@ public class ClientNameHandler implements INetworkSync {
         final Minecraft mc = Minecraft.getInstance();
         final ReadBuffer buffer = new ReadBuffer(buf);
         final BlockPos pos = buffer.getBlockPos();
-        final int byteLength = buffer.getByteAsInt();
+        final int byteLength = buffer.getByteToUnsignedInt();
         if (byteLength == 255) {
             setRemoved(pos);
             return;
@@ -46,7 +47,7 @@ public class ClientNameHandler implements INetworkSync {
             e.printStackTrace();
         }
         synchronized (CLIENT_NAMES) {
-            CLIENT_NAMES.put(new NameStateInfo(mc.level, pos), name);
+            CLIENT_NAMES.put(new StateInfo(mc.level, pos), name);
         }
         final ClientWorld world = mc.level;
         mc.submit(() -> {
@@ -61,7 +62,7 @@ public class ClientNameHandler implements INetworkSync {
     private static void setRemoved(final BlockPos pos) {
         final Minecraft mc = Minecraft.getInstance();
         synchronized (CLIENT_NAMES) {
-            CLIENT_NAMES.remove(new NameStateInfo(mc.level, pos));
+            CLIENT_NAMES.remove(new StateInfo(mc.level, pos));
         }
     }
 

@@ -6,7 +6,9 @@ import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
@@ -38,38 +40,36 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public void setLevelAndPosition(final World world, final BlockPos blockPos) {
         super.setLevelAndPosition(world, blockPos);
-        grid.setPosAndWorld(worldPosition, world);
-        if (world.isClientSide)
-            return;
-        SignalBoxHandler.setWorld(new PosIdentifier(blockPos, world));
+        grid.setTile(this);
     }
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
         final NBTWrapper gridTag = new NBTWrapper();
         this.grid.write(gridTag);
-        SignalBoxHandler.writeTileNBT(new PosIdentifier(worldPosition, level), wrapper);
-        wrapper.putWrapper(GUI_TAG, gridTag);
+        grid.writePathways(wrapper);
+        SignalBoxHandler.writeTileNBT(new StateInfo(level, worldPosition), wrapper);
     }
 
     private NBTWrapper copy = null;
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
+        grid.setTile(this);
         grid.read(wrapper.getWrapper(GUI_TAG));
+        grid.readPathways(wrapper);
         copy = wrapper.copy();
-        if (level != null) {
-            onLoad();
-        }
     }
 
     @Override
     public boolean hasLink() {
-        return SignalBoxHandler.isTileEmpty(new PosIdentifier(worldPosition, level));
+        return !SignalBoxHandler.isTileEmpty(new StateInfo(level, worldPosition));
     }
 
     @Override
     public boolean link(final BlockPos pos, final CompoundNBT tag) {
+        if (level.isClientSide)
+            return false;
         @SuppressWarnings("deprecation")
         final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
                 tag.getString(OSItems.readStringFromPos(pos))));
@@ -80,28 +80,34 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
             type = LinkType.INPUT;
         } else if (block == OSBlocks.REDSTONE_OUT) {
             type = LinkType.OUTPUT;
+        } else if (block == OSBlocks.SIGNAL_BOX) {
+            type = LinkType.SIGNALBOX;
         }
         if (type.equals(LinkType.SIGNAL)) {
-            SignalStateHandler.loadSignal(new SignalStateInfo(level, pos, (Signal) block));
+            SignalStateHandler
+                    .loadSignal(new StateLoadHolder(new SignalStateInfo(level, pos, (Signal) block),
+                            new LoadHolder<>(new StateInfo(level, pos))));
         }
-        return SignalBoxHandler.linkPosToSignalBox(new PosIdentifier(worldPosition, level), pos,
+        return SignalBoxHandler.linkPosToSignalBox(new StateInfo(level, worldPosition), pos,
                 (BasicBlock) block, type);
     }
 
     @Override
     public void onLoad() {
-        grid.setPosAndWorld(worldPosition, level);
+        grid.setTile(this);
+        grid.onLoad();
         if (level.isClientSide) {
             return;
         }
-        SignalBoxHandler.readTileNBT(new PosIdentifier(worldPosition, level),
-                copy == null ? new NBTWrapper() : copy, grid.getModeGrid());
-        SignalBoxHandler.loadSignals(new PosIdentifier(worldPosition, level));
+        final StateInfo identifier = new StateInfo(level, worldPosition);
+        SignalBoxHandler.putGrid(identifier, grid);
+        SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy);
+        SignalBoxHandler.loadSignals(identifier);
     }
 
     @Override
     public boolean unlink() {
-        SignalBoxHandler.unlinkAll(new PosIdentifier(worldPosition, level));
+        SignalBoxHandler.unlinkAll(new StateInfo(level, worldPosition));
         return true;
     }
 
@@ -118,5 +124,10 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
 
     public SignalBoxGrid getSignalBoxGrid() {
         return grid;
+    }
+    
+    @Override
+    public boolean canBeLinked() {
+        return true;
     }
 }

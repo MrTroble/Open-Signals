@@ -48,6 +48,8 @@ public final class LogicParser {
 
         TRANSLATION_TABLE.put("zs2value", new MethodInfo(String.class, "zs2value",
                 obj -> PredicateHolder.zs2Value((String) obj[0]), String.class));
+        TRANSLATION_TABLE.put("signalrepeater", new MethodInfo(Boolean.class, "signalrepeater",
+                obj -> PredicateHolder.signalRepeater((boolean) obj[0]), Boolean.class));
 
         TRANSLATION_TABLE.forEach((name, info) -> UNIVERSAL_TRANSLATION_TABLE.put(name,
                 new MethodInfo(Map.class, name, objects -> {

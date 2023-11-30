@@ -3,6 +3,8 @@ package com.troblecodings.signals.core;
 import java.util.Objects;
 
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 
 public class SubsidiaryEntry {
 

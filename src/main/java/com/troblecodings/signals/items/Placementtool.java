@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
@@ -12,16 +13,15 @@ import com.troblecodings.guilib.ecs.interfaces.ITagableItem;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.guis.ContainerPlacementtool;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSTabs;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
 import net.minecraft.item.Item;
@@ -50,8 +50,8 @@ public class Placementtool extends Item
     @OnlyIn(Dist.CLIENT)
     @Override
     public String getNamedObj(final int obj) {
-        return I18n.get("property." + this.getName() + ".name") + ": "
-                + I18n.get(this.getObjFromID(obj).toString());
+        return I18Wrapper.format("property." + this.getName() + ".name") + ": "
+                + I18Wrapper.format(this.getObjFromID(obj).toString());
     }
 
     @Override
@@ -127,7 +127,7 @@ public class Placementtool extends Item
             ghostPos = ghostPos.above();
         }
         final String signalName = wrapper.getString(ContainerPlacementtool.SIGNAL_NAME);
-        final NameStateInfo nameInfo = new NameStateInfo(worldIn, pos);
+        final StateInfo nameInfo = new StateInfo(worldIn, pos);
         String nametoSet = "";
         if (!(signalName == null || signalName.isEmpty())) {
             signalProperties.put(Signal.CUSTOMNAME, "true");
@@ -137,7 +137,7 @@ public class Placementtool extends Item
             nametoSet = signal.getSignalTypeName();
         }
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
-        SignalStateHandler.createStates(info, signalProperties);
+        SignalStateHandler.createStates(info, signalProperties, player);
         NameHandler.createName(nameInfo, nametoSet);
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockItemUseContext(context)), 3);
         return ActionResultType.SUCCESS;

@@ -6,15 +6,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableMap;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.signals.core.StateInfo;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
@@ -33,15 +37,17 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
 import net.minecraftforge.fml.network.NetworkEvent.ClientCustomPayloadEvent;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.event.EventNetworkChannel;
 
 public final class NameHandler implements INetworkSync {
 
-    private static final Map<NameStateInfo, String> ALL_NAMES = new HashMap<>();
+    private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
-    private static final Map<NameStateInfo, Integer> LOAD_COUNTER = new HashMap<>();
+    private static final Map<StateInfo, Integer> LOAD_COUNTER = new HashMap<>();
+    private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
 
@@ -51,12 +57,29 @@ public final class NameHandler implements INetworkSync {
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new NameHandler());
     }
+    
+    @SubscribeEvent
+    public static void onServerStop(final FMLServerStoppingEvent event) {
+        Map<StateInfo, String> map;
+        synchronized (ALL_NAMES) {
+            map = ImmutableMap.copyOf(ALL_NAMES);
+        }
+        writeService.execute(() -> map.entrySet()
+                .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
+        writeService.shutdown();
+        try {
+            writeService.awaitTermination(10, TimeUnit.MINUTES);
+        } catch (final InterruptedException e) {
+            e.printStackTrace();
+        }
+        writeService = null;
+    }
 
-    public static void add(final Object obj) {
+    public static void registerToNetworkChannel(final Object obj) {
         channel.registerObject(obj);
     }
 
-    public static void createName(final NameStateInfo info, final String name) {
+    public static void createName(final StateInfo info, final String name) {
         if (info.world.isClientSide || name == null)
             return;
         new Thread(() -> {
@@ -65,7 +88,7 @@ public final class NameHandler implements INetworkSync {
         }, "OSNameHandler:createName").start();
     }
 
-    public static void setNameForSignal(final NameStateInfo info, final String name) {
+    public static void setNameForSignal(final StateInfo info, final String name) {
         if (info.world.isClientSide || name == null)
             return;
         setNameForNonSignal(info, name);
@@ -76,7 +99,7 @@ public final class NameHandler implements INetworkSync {
         }
     }
 
-    public static void setNameForNonSignal(final NameStateInfo info, final String name) {
+    public static void setNameForNonSignal(final StateInfo info, final String name) {
         if (info.world.isClientSide || name == null)
             return;
         new Thread(() -> {
@@ -90,7 +113,7 @@ public final class NameHandler implements INetworkSync {
         }, "OSNameHandler:setName").start();
     }
 
-    public static String getName(final NameStateInfo info) {
+    public static String getName(final StateInfo info) {
         if (info.world.isClientSide)
             return "";
         synchronized (ALL_NAMES) {
@@ -101,7 +124,7 @@ public final class NameHandler implements INetworkSync {
         }
     }
 
-    private static void sendToAll(final NameStateInfo info, final String name) {
+    private static void sendToAll(final StateInfo info, final String name) {
         final ByteBuffer buffer = packToBuffer(info.pos, name);
         info.world.players().forEach(player -> sendTo(player, buffer));
     }
@@ -117,7 +140,7 @@ public final class NameHandler implements INetworkSync {
         return buffer.build();
     }
 
-    public static void setRemoved(final NameStateInfo info) {
+    public static void setRemoved(final StateInfo info) {
         synchronized (ALL_NAMES) {
             ALL_NAMES.remove(info);
         }
@@ -125,11 +148,13 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
         }
-        file.deleteIndex(info.pos);
+        synchronized (file) {
+            file.deleteIndex(info.pos);
+        }
         sendRemoved(info);
     }
 
-    private static void sendRemoved(final NameStateInfo info) {
+    private static void sendRemoved(final StateInfo info) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
         buffer.putByte((byte) 255);
@@ -137,20 +162,25 @@ public final class NameHandler implements INetworkSync {
     }
 
     @SubscribeEvent
+    public static void onWorldLoad(final WorldEvent.Load load) {
+        if (load.getWorld().isClientSide() || writeService != null)
+            return;
+        writeService = Executors.newFixedThreadPool(5);
+    }
+
+    @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
         final World world = (World) event.getWorld();
         if (world.isClientSide)
             return;
-        Map<NameStateInfo, String> map;
+        Map<StateInfo, String> map;
         synchronized (ALL_NAMES) {
             map = ImmutableMap.copyOf(ALL_NAMES);
         }
-        new Thread(() -> {
-            synchronized (ALL_LEVEL_FILES) {
-                map.entrySet().stream().filter(entry -> entry.getKey().world.equals(world))
-                        .forEach(entry -> createToFile(entry.getKey(), entry.getValue()));
-            }
-        }, "OSNameHandler:Save").start();
+        if (writeService != null)
+            writeService.execute(() -> map.entrySet().stream()
+                    .filter(entry -> entry.getKey().world.equals(world))
+                    .forEach(entry -> createToFile(entry.getKey(), entry.getValue())));
     }
 
     @SubscribeEvent
@@ -159,13 +189,10 @@ public final class NameHandler implements INetworkSync {
             return;
         synchronized (ALL_LEVEL_FILES) {
             ALL_LEVEL_FILES.remove(unload.getWorld());
-            synchronized (LOAD_COUNTER) {
-                LOAD_COUNTER.clear();
-            }
         }
     }
 
-    private static void createToFile(final NameStateInfo info, final String name) {
+    private static void createToFile(final StateInfo info, final String name) {
         NameHandlerFile file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
@@ -189,7 +216,7 @@ public final class NameHandler implements INetworkSync {
             return;
         final IChunk chunk = world.getChunk(event.getPos().getWorldPosition());
         final PlayerEntity player = event.getPlayer();
-        final List<NameStateInfo> states = new ArrayList<>();
+        final List<StateInfo> states = new ArrayList<>();
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
@@ -202,13 +229,8 @@ public final class NameHandler implements INetworkSync {
         chunk.getBlockEntitiesPos().forEach(pos -> {
             final Block block = chunk.getBlockState(pos).getBlock();
             if (block instanceof Signal || block instanceof RedstoneIO) {
-                final NameStateInfo info = new NameStateInfo(world, pos);
+                final StateInfo info = new StateInfo(world, pos);
                 states.add(info);
-                synchronized (ALL_NAMES) {
-                    if (ALL_NAMES.containsKey(info)) {
-                        sendTo(player, packToBuffer(pos, ALL_NAMES.get(info)));
-                    }
-                }
             }
         });
         loadNames(states, player);
@@ -220,11 +242,11 @@ public final class NameHandler implements INetworkSync {
         if (world.isClientSide)
             return;
         final IChunk chunk = world.getChunk(event.getPos().getWorldPosition());
-        final List<NameStateInfo> states = new ArrayList<>();
+        final List<StateInfo> states = new ArrayList<>();
         chunk.getBlockEntitiesPos().forEach(pos -> {
             final Block block = chunk.getBlockState(pos).getBlock();
             if (block instanceof Signal || block instanceof RedstoneIO) {
-                states.add(new NameStateInfo(world, pos));
+                states.add(new StateInfo(world, pos));
             }
         });
         unloadNames(states);
@@ -233,52 +255,66 @@ public final class NameHandler implements INetworkSync {
     @SubscribeEvent
     public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
         final PlayerEntity player = event.getPlayer();
-        Map<NameStateInfo, String> map;
+        Map<StateInfo, String> map;
         synchronized (ALL_NAMES) {
             map = ImmutableMap.copyOf(ALL_NAMES);
         }
         map.forEach((state, name) -> sendTo(player, packToBuffer(state.pos, name)));
     }
 
-    private static void loadNames(final List<NameStateInfo> infos,
+    private static void loadNames(final List<StateInfo> infos,
             final @Nullable PlayerEntity player) {
         if (infos == null || infos.isEmpty())
             return;
         new Thread(() -> {
             infos.forEach(info -> {
+                boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
                     Integer count = LOAD_COUNTER.get(info);
                     if (count != null && count > 0) {
                         LOAD_COUNTER.put(info, ++count);
-                        return;
-                    }
-                    LOAD_COUNTER.put(info, 1);
-                    String name;
-                    synchronized (ALL_LEVEL_FILES) {
-                        final NameHandlerFile file = ALL_LEVEL_FILES.get(info.world);
-                        if (file == null)
-                            return;
-                        synchronized (file) {
-                            name = file.getString(info.pos);
-                        }
-                    }
-                    synchronized (ALL_NAMES) {
-                        ALL_NAMES.put(info, name);
-                    }
-                    if (player == null) {
-                        sendToAll(info, name);
+                        isLoaded = true;
                     } else {
-                        sendTo(player, packToBuffer(info.pos, name));
+                        LOAD_COUNTER.put(info, 1);
                     }
                 }
+                if (isLoaded) {
+                    if (player == null)
+                        return;
+                    String name;
+                    synchronized (ALL_NAMES) {
+                        name = ALL_NAMES.getOrDefault(info, "");
+                    }
+                    if (name.isEmpty())
+                        return;
+                    sendTo(player, packToBuffer(info.pos, name));
+                    return;
+                }
+                NameHandlerFile file;
+                synchronized (ALL_LEVEL_FILES) {
+                    file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
+                            _u -> new NameHandlerFile(Paths.get("osfiles/namefiles/"
+                                    + info.world.getServer().getWorldData().getLevelName()
+                                            .replace(":", "").replace("/", "").replace("\\", "")
+                                    + "/" + info.world.dimension().location().toString()
+                                            .replace(":", ""))));
+                }
+                String name;
+                synchronized (file) {
+                    name = file.getString(info.pos);
+                }
+                synchronized (ALL_NAMES) {
+                    ALL_NAMES.put(info, name);
+                }
+                sendToAll(info, name);
             });
         }, "NameHandler:loadNames").start();
     }
 
-    private static void unloadNames(final List<NameStateInfo> infos) {
+    private static void unloadNames(final List<StateInfo> infos) {
         if (infos == null || infos.isEmpty())
             return;
-        new Thread(() -> {
+        writeService.execute(() -> {
             infos.forEach(info -> {
                 synchronized (LOAD_COUNTER) {
                     Integer count = LOAD_COUNTER.get(info);
@@ -294,7 +330,7 @@ public final class NameHandler implements INetworkSync {
                     createToFile(info, name);
                 }
             });
-        }, "NameHandler:unloadNames").start();
+        });
     }
 
     private static void sendTo(final PlayerEntity player, final ByteBuffer buf) {

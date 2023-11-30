@@ -26,24 +26,24 @@ import net.minecraft.util.SoundEvent;
 public class SignalPropertiesBuilder {
 
     private transient Placementtool placementtool = null;
-    private String placementToolName = null;
-    private int defaultHeight = 1;
+    private final String placementToolName = null;
+    private final int defaultHeight = 1;
     private Map<String, Integer> signalHeights;
-    private float customNameRenderHeight = -1;
+    private final float customNameRenderHeight = -1;
     private Map<String, Float> renderHeights;
-    private float signWidth = 22;
-    private boolean autoscale = false;
-    private float offsetX = 0;
-    private float offsetY = 0;
-    private float signScale = 1;
+    private final float signWidth = 22;
+    private final boolean autoscale = false;
+    private final float offsetX = 0;
+    private final float offsetY = 0;
+    private final float signScale = 1;
     private Map<String, Boolean> doubleSidedText;
-    private int textColor = 0;
-    private boolean canLink = true;
+    private final int textColor = 0;
+    private final boolean canLink = true;
     private List<Integer> colors;
     private Map<String, SoundPropertyParser> sounds;
     private Map<String, String> redstoneOutputs;
     private Map<String, String> remoteRedstoneOutputs;
-    private int defaultItemDamage = 1;
+    private final int defaultItemDamage = 1;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
@@ -100,9 +100,9 @@ public class SignalPropertiesBuilder {
                     continue;
                 }
                 try {
-                    soundProperties.add(new SoundProperty(sound,
-                            LogicParser.predicate(soundProperty.getKey(), info),
-                            soundProp.getLength()));
+                    soundProperties.add(
+                            new SoundProperty(LogicParser.predicate(soundProperty.getKey(), info),
+                                    sound, soundProp.getLength()));
                 } catch (final LogicalParserException e) {
                     OpenSignalsMain.getLogger()
                             .error("Something went wrong during the registry of a predicate in "

@@ -1,27 +1,32 @@
 package com.troblecodings.signals.guis;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.Maps;
+import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.PosIdentifier;
-import com.troblecodings.signals.core.ReadBuffer;
+import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
-import com.troblecodings.signals.core.WriteBuffer;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier;
+import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -29,21 +34,27 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.server.ServerWorld;
 
-public class ContainerSignalBox extends ContainerBase implements UIClientSync {
+public class ContainerSignalBox extends ContainerBase implements UIClientSync, IChunkLoadable {
 
+    protected final Map<Point, List<MainSignalIdentifier>> greenSignals = new HashMap<>();
     protected final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
     protected Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
+    protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
+    protected final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
     protected SignalBoxGrid grid;
     private final Map<BlockPos, LinkType> propertiesForType = new HashMap<>();
     private SignalBoxTileEntity tile;
     private Consumer<String> infoUpdates;
     private Consumer<List<SignalBoxNode>> colorUpdates;
+    private Consumer<List<Point>> signalUpdates;
+    private Runnable counterUpdater;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -56,12 +67,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     @Override
     public void sendAllDataToRemote() {
-        final SignalBoxGrid grid = tile.getSignalBoxGrid();
+        this.grid = tile.getSignalBoxGrid();
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalBoxNetwork.SEND_GRID.ordinal());
-        buffer.putBlockPos(getInfo().pos);
+        buffer.putEnumValue(SignalBoxNetwork.SEND_GRID);
+        buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
-        final PosIdentifier identifier = new PosIdentifier(tile.getBlockPos(), getInfo().world);
+        final StateInfo identifier = new StateInfo(getInfo().world, tile.getBlockPos());
         final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = SignalBoxHandler
                 .getPossibleSubsidiaries(identifier);
         final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier)
@@ -78,33 +89,62 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             buffer.putBlockPos(pos);
             buffer.putByte((byte) type.ordinal());
         });
-        OpenSignalsMain.network.sendTo(getInfo().player, buffer.build());
+        final List<Map.Entry<Point, Point>> nextPathways = grid.getNextPathways();
+        buffer.putByte((byte) nextPathways.size());
+        nextPathways.forEach(entry -> {
+            entry.getKey().writeNetwork(buffer);
+            entry.getValue().writeNetwork(buffer);
+        });
+        final Map<BlockPos, List<Point>> validInConnections = new HashMap<>();
+        positions.entrySet().stream().filter(entry -> entry.getValue().equals(LinkType.SIGNALBOX))
+                .forEach(entry -> {
+                    final AtomicReference<SignalBoxGrid> grid = new AtomicReference<>();
+                    grid.set(SignalBoxHandler.getGrid(new StateInfo(info.world, entry.getKey())));
+                    if (grid.get() == null)
+                        loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerWorld) info.world,
+                                entry.getKey(),
+                                (otherTile, _u) -> grid.set(otherTile.getSignalBoxGrid()));
+                    if (grid.get() != null)
+                        validInConnections.put(entry.getKey(), grid.get().getAllInConnections());
+                });
+        buffer.putByte((byte) validInConnections.size());
+        validInConnections.forEach((pos, list) -> {
+            buffer.putBlockPos(pos);
+            buffer.putByte((byte) list.size());
+            list.forEach(point -> point.writeNetwork(buffer));
+        });
+        final List<MainSignalIdentifier> greenSignals = grid.getGreenSignals();
+        buffer.putInt(greenSignals.size());
+        greenSignals.forEach(signal -> signal.writeNetwork(buffer));
+        OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     @Override
-    public void deserializeClient(final ByteBuffer buf) {
-        final ReadBuffer buffer = new ReadBuffer(buf);
+    public void deserializeClient(final ReadBuffer buffer) {
         final SignalBoxNetwork mode = SignalBoxNetwork.of(buffer);
         switch (mode) {
             case SEND_GRID: {
                 final BlockPos pos = buffer.getBlockPos();
                 if (this.tile == null) {
-                    this.tile = (SignalBoxTileEntity) getInfo().world.getBlockEntity(pos);
+                    this.tile = (SignalBoxTileEntity) info.world.getBlockEntity(pos);
                 }
                 grid = tile.getSignalBoxGrid();
                 grid.readNetwork(buffer);
                 enabledSubsidiaryTypes = new HashMap<>(grid.getAllSubsidiaries());
                 propertiesForType.clear();
                 possibleSubsidiaries.clear();
+                nextPathways.clear();
+                validInConnections.clear();
+                greenSignals.clear();
                 final int signalSize = buffer.getInt();
                 for (int i = 0; i < signalSize; i++) {
                     final BlockPos signalPos = buffer.getBlockPos();
                     propertiesForType.put(signalPos, LinkType.SIGNAL);
                     final List<SubsidiaryState> validSubsidiaries = new ArrayList<>();
-                    final int listSize = buffer.getByteAsInt();
+                    final int listSize = buffer.getByteToUnsignedInt();
                     for (int j = 0; j < listSize; j++) {
                         validSubsidiaries
-                                .add(SubsidiaryState.ALL_STATES.get(buffer.getByteAsInt()));
+                                .add(SubsidiaryState.ALL_STATES.get(buffer.getByteToUnsignedInt()));
                     }
                     possibleSubsidiaries.put(signalPos, validSubsidiaries);
                 }
@@ -114,6 +154,50 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                     final LinkType type = LinkType.of(buffer);
                     propertiesForType.put(blockPos, type);
                 }
+                final int nextPathwaySize = buffer.getByteToUnsignedInt();
+                for (int i = 0; i < nextPathwaySize; i++) {
+                    final Point start = Point.of(buffer);
+                    final Point end = Point.of(buffer);
+                    nextPathways.add(Maps.immutableEntry(start, end));
+                }
+                final int validInConnectionsSize = buffer.getByteToUnsignedInt();
+                for (int i = 0; i < validInConnectionsSize; i++) {
+                    final BlockPos boxPos = buffer.getBlockPos();
+                    final List<Point> points = new ArrayList<>();
+                    final int listSize = buffer.getByteToUnsignedInt();
+                    for (int j = 0; j < listSize; j++) {
+                        points.add(Point.of(buffer));
+                    }
+                    validInConnections.put(boxPos, points);
+                }
+                final int greenSignalsSize = buffer.getInt();
+                for (int i = 0; i < greenSignalsSize; i++) {
+                    final MainSignalIdentifier identifier = MainSignalIdentifier.of(buffer);
+
+                    final Map<ModeSet, SubsidiaryEntry> subsidiary = enabledSubsidiaryTypes
+                            .getOrDefault(identifier.getPoint(), new HashMap<>());
+                    final SubsidiaryEntry entry = subsidiary.get(identifier.getModeSet());
+                    if (entry != null) {
+                        identifier.state = SignalState
+                                .combine(entry.enumValue.getSubsidiaryShowType());
+                    }
+
+                    final List<MainSignalIdentifier> greenSignals = this.greenSignals
+                            .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
+                    greenSignals.add(identifier);
+                }
+                enabledSubsidiaryTypes.forEach((point, map) -> {
+                    map.forEach((modeSet, subsidiary) -> {
+                        final MainSignalIdentifier identifier = new MainSignalIdentifier(
+                                new ModeIdentifier(point, modeSet),
+                                grid.getNode(point).getOption(modeSet).get()
+                                        .getEntry(PathEntryType.SIGNAL).get(),
+                                SignalState.combine(subsidiary.enumValue.getSubsidiaryShowType()));
+                        final List<MainSignalIdentifier> greenSignals = this.greenSignals
+                                .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
+                        greenSignals.add(identifier);
+                    });
+                });
                 update();
                 break;
             }
@@ -122,17 +206,20 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 break;
             }
             case NO_PW_FOUND: {
-                infoUpdates.accept(I18n.get("error.nopathfound"));
+                infoUpdates.accept(I18Wrapper.format("error.nopathfound"));
                 break;
             }
-            case NO_OUTPUT_UPDATE: {
-                infoUpdates.accept(I18n.get("error.nooutputupdate"));
+            case ADDED_TO_SAVER: {
+                final Point start = Point.of(buffer);
+                final Point end = Point.of(buffer);
+                nextPathways.add(Maps.immutableEntry(start, end));
+                infoUpdates.accept(I18Wrapper.format("info.pathwaysaver"));
                 break;
             }
             case OUTPUT_UPDATE: {
                 final Point point = Point.of(buffer);
                 final ModeSet modeSet = ModeSet.of(buffer);
-                final boolean state = buffer.getByte() == 1 ? true : false;
+                final boolean state = buffer.getBoolean();
                 final SignalBoxNode node = grid.getNode(point);
                 if (state) {
                     node.addManuellOutput(modeSet);
@@ -141,19 +228,60 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 }
                 break;
             }
+            case REMOVE_SAVEDPW: {
+                final Point start = Point.of(buffer);
+                final Point end = Point.of(buffer);
+                nextPathways.remove(Maps.immutableEntry(start, end));
+                break;
+            }
+            case SET_SIGNALS: {
+                final List<Point> pointUpdates = new ArrayList<>();
+                final int redSignalSize = buffer.getByteToUnsignedInt();
+                for (int i = 0; i < redSignalSize; i++) {
+                    final MainSignalIdentifier identifier = MainSignalIdentifier.of(buffer);
+                    greenSignals.remove(identifier.getPoint());
+                    pointUpdates.add(identifier.getPoint());
+                    removeFromEnabledSubsidiaries(identifier);
+                }
+                final int greenSignalSize = buffer.getByteToUnsignedInt();
+                for (int i = 0; i < greenSignalSize; i++) {
+                    final MainSignalIdentifier modeIdentifier = MainSignalIdentifier.of(buffer);
+                    final List<MainSignalIdentifier> greenSignals = this.greenSignals
+                            .computeIfAbsent(modeIdentifier.getPoint(), _u -> new ArrayList<>());
+
+                    final Map<ModeSet, SubsidiaryEntry> subsidiary = enabledSubsidiaryTypes
+                            .getOrDefault(modeIdentifier.getPoint(), new HashMap<>());
+                    final SubsidiaryEntry entry = subsidiary.get(modeIdentifier.getModeSet());
+                    if (entry != null) {
+                        modeIdentifier.state = SignalState
+                                .combine(entry.enumValue.getSubsidiaryShowType());
+                    }
+                    if (!greenSignals.contains(modeIdentifier))
+                        greenSignals.add(modeIdentifier);
+
+                    pointUpdates.add(modeIdentifier.getPoint());
+                }
+                signalUpdates.accept(pointUpdates);
+                break;
+            }
+            case SEND_COUNTER: {
+                grid.setCurrentCounter(buffer.getInt());
+                counterUpdater.run();
+                break;
+            }
             default:
                 break;
         }
     }
 
     @Override
-    public void deserializeServer(final ByteBuffer buf) {
-        final ReadBuffer buffer = new ReadBuffer(buf);
-        final SignalBoxGrid grid = tile.getSignalBoxGrid();
-        final SignalBoxNetwork mode = SignalBoxNetwork.of(buffer);
+    public void deserializeServer(final ReadBuffer buffer) {
+        if (grid == null)
+            grid = tile.getSignalBoxGrid();
+        final SignalBoxNetwork mode = buffer.getEnumValue(SignalBoxNetwork.class);
         switch (mode) {
             case SEND_INT_ENTRY: {
-                deserializeEntry(buffer, buffer.getByteAsInt());
+                deserializeEntry(buffer, buffer.getByteToUnsignedInt());
                 break;
             }
             case REMOVE_ENTRY: {
@@ -161,7 +289,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
                 final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
                 final Rotation rotation = deserializeRotation(buffer);
                 final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES
-                        .get(buffer.getByteAsInt());
+                        .get(buffer.getByteToUnsignedInt());
                 final ModeSet modeSet = new ModeSet(guiMode, rotation);
                 grid.getNode(point).getOption(modeSet).ifPresent(entry -> {
                     entry.removeEntry(entryType);
@@ -179,21 +307,44 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             case REMOVE_POS: {
                 final BlockPos pos = buffer.getBlockPos();
                 SignalBoxHandler.unlinkPosFromSignalBox(
-                        new PosIdentifier(tile.getBlockPos(), tile.getLevel()), pos);
+                        new StateInfo(tile.getLevel(), tile.getBlockPos()), pos);
                 break;
             }
             case RESET_PW: {
                 final Point point = Point.of(buffer);
-                grid.resetPathway(point);
+                if (grid.resetPathway(point)) {
+                    grid.countOne();
+                    final WriteBuffer sucess = new WriteBuffer();
+                    sucess.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
+                    sucess.putInt(grid.getCurrentCounter());
+                    OpenSignalsMain.network.sendTo(info.player, sucess);
+                }
                 break;
             }
             case REQUEST_PW: {
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
+                if (grid.getNode(end).containsOutConnection()) {
+                    if (!SignalBoxHandler.requesetInterSignalBoxPathway(
+                            new StateInfo(info.world, info.pos), start, end)) {
+                        final WriteBuffer error = new WriteBuffer();
+                        error.putEnumValue(SignalBoxNetwork.NO_PW_FOUND);
+                        OpenSignalsMain.network.sendTo(info.player, error);
+                    }
+                    break;
+                }
                 if (!grid.requestWay(start, end)) {
+                    if (grid.addNextPathway(start, end)) {
+                        final WriteBuffer sucess = new WriteBuffer();
+                        sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
+                        start.writeNetwork(sucess);
+                        end.writeNetwork(sucess);
+                        OpenSignalsMain.network.sendTo(info.player, sucess);
+                        break;
+                    }
                     final WriteBuffer error = new WriteBuffer();
-                    error.putByte((byte) SignalBoxNetwork.NO_PW_FOUND.ordinal());
-                    OpenSignalsMain.network.sendTo(getInfo().player, error.build());
+                    error.putEnumValue(SignalBoxNetwork.NO_PW_FOUND);
+                    OpenSignalsMain.network.sendTo(info.player, error.build());
                 }
                 break;
             }
@@ -215,40 +366,58 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
             case UPDATE_RS_OUTPUT: {
                 final Point point = Point.of(buffer);
                 final ModeSet modeSet = ModeSet.of(buffer);
-                final boolean state = buffer.getByte() == 1 ? true : false;
+                final boolean state = buffer.getBoolean();
                 final BlockPos pos = grid.updateManuellRSOutput(point, modeSet, state);
                 if (pos == null) {
-                    final WriteBuffer error = new WriteBuffer();
-                    error.putByte((byte) SignalBoxNetwork.NO_OUTPUT_UPDATE.ordinal());
-                    OpenSignalsMain.network.sendTo(getInfo().player, error.build());
-                } else {
-                    SignalBoxHandler.updateRedstoneOutput(new PosIdentifier(pos, getInfo().world),
-                            state);
+                    SignalBoxHandler.updateRedstoneOutput(new StateInfo(info.world, pos), state);
                     final WriteBuffer sucess = new WriteBuffer();
-                    sucess.putByte((byte) SignalBoxNetwork.OUTPUT_UPDATE.ordinal());
+                    sucess.putEnumValue(SignalBoxNetwork.OUTPUT_UPDATE);
                     point.writeNetwork(sucess);
                     modeSet.writeNetwork(sucess);
-                    sucess.putByte((byte) (state ? 1 : 0));
-                    OpenSignalsMain.network.sendTo(getInfo().player, sucess.build());
+                    sucess.putBoolean(state);
+                    OpenSignalsMain.network.sendTo(info.player, sucess.build());
                 }
                 break;
             }
             case SET_AUTO_POINT: {
                 final Point point = Point.of(buffer);
-                final boolean state = buffer.getByte() == 1 ? true : false;
+                final boolean state = buffer.getBoolean();
                 final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
                 node.setAutoPoint(state);
-                SignalBoxHandler.updatePathwayToAutomatic(
-                        new PosIdentifier(tile.getBlockPos(), getInfo().world), point);
+                grid.updatePathwayToAutomatic(point);
                 break;
             }
             case SEND_NAME: {
                 final Point point = Point.of(buffer);
-                final int size = buffer.getByteAsInt();
-                final byte[] array = new byte[size];
-                for (int i = 0; i < size; i++)
-                    array[i] = buffer.getByte();
-                tile.getSignalBoxGrid().getNode(point).setCustomText(new String(array));
+                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
+                node.setCustomText(buffer.getString());
+                break;
+            }
+            case SEND_SIGNAL_REPEATER: {
+                final Point point = Point.of(buffer);
+                final ModeSet modeSet = ModeSet.of(buffer);
+                final boolean state = buffer.getBoolean();
+                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
+                final Optional<PathOptionEntry> option = node.getOption(modeSet);
+                if (option.isPresent()) {
+                    option.get().setEntry(PathEntryType.SIGNAL_REPEATER, state);
+                } else {
+                    node.addAndSetEntry(modeSet, PathEntryType.SIGNAL_REPEATER, state);
+                }
+                break;
+            }
+            case REMOVE_SAVEDPW: {
+                final Point start = Point.of(buffer);
+                final Point end = Point.of(buffer);
+                grid.removeNextPathway(start, end);
+                break;
+            }
+            case SEND_POINT_ENTRY: {
+                deserializeEntry(buffer, Point.of(buffer));
+                break;
+            }
+            case SEND_COUNTER: {
+                grid.setCurrentCounter(buffer.getInt());
                 break;
             }
             default:
@@ -262,7 +431,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
         final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
         final Rotation rotation = deserializeRotation(buffer);
         final PathEntryType<T> entryType = (PathEntryType<T>) PathEntryType.ALL_ENTRIES
-                .get(buffer.getByteAsInt());
+                .get(buffer.getByteToUnsignedInt());
         final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
         final ModeSet modeSet = new ModeSet(guiMode, rotation);
         final Optional<PathOptionEntry> option = node.getOption(modeSet);
@@ -274,7 +443,16 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     }
 
     private static Rotation deserializeRotation(final ReadBuffer buffer) {
-        return Rotation.values()[buffer.getByteAsInt()];
+        return Rotation.values()[buffer.getByteToUnsignedInt()];
+    }
+
+    private void removeFromEnabledSubsidiaries(final MainSignalIdentifier identifier) {
+        final Map<ModeSet, SubsidiaryEntry> map = enabledSubsidiaryTypes.get(identifier.getPoint());
+        if (map == null)
+            return;
+        map.remove(identifier.getModeSet());
+        if (map.isEmpty())
+            enabledSubsidiaryTypes.remove(identifier.getPoint());
     }
 
     @Override
@@ -286,7 +464,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     @Override
     public PlayerEntity getPlayer() {
-        return this.getInfo().player;
+        return this.info.player;
     }
 
     public Map<BlockPos, LinkType> getPositionForTypes() {
@@ -297,8 +475,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
     public boolean stillValid(final PlayerEntity playerIn) {
         if (tile.isBlocked() && !tile.isValid(playerIn))
             return false;
-        if (this.getInfo().player == null) {
-            this.getInfo().player = playerIn;
+        if (this.info.player == null) {
+            this.info.player = playerIn;
             this.tile.add(this);
         }
         return true;
@@ -310,5 +488,13 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync {
 
     protected void setColorUpdater(final Consumer<List<SignalBoxNode>> updater) {
         this.colorUpdates = updater;
+    }
+    
+    protected void setSignalUpdater(final Consumer<List<Point>> updater) {
+        this.signalUpdates = updater;
+    }
+
+    protected void setConuterUpdater(final Runnable run) {
+        this.counterUpdater = run;
     }
 }

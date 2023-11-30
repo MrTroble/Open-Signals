@@ -9,20 +9,19 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
-import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
+import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnum;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -78,7 +77,9 @@ public class Signal extends BasicBlock {
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
 
     public Signal(final SignalProperties prop) {
-        super(Properties.of(Material.STONE).noOcclusion().lightLevel(u -> 1));
+        super(Properties.of(Material.STONE).noOcclusion()
+                .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get())
+                .isRedstoneConductor((_u1, _u2, _u3) -> false));
         this.prop = prop;
         this.id = SIGNAL_IDS.size();
         SIGNAL_IDS.add(this);
@@ -88,7 +89,6 @@ public class Signal extends BasicBlock {
             final SEProperty property = signalProperties.get(i);
             signalPropertiesToInt.put(property, i);
         }
-        // TODO Light Level
     }
 
     public int getID() {
@@ -133,8 +133,8 @@ public class Signal extends BasicBlock {
         final World world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
-                ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
-                : SignalStateHandler.getStates(info);
+                ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
+                : te.getProperties();
         return VoxelShapes
                 .create(VoxelShapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
@@ -167,7 +167,7 @@ public class Signal extends BasicBlock {
     }
 
     public String getSignalTypeName() {
-        return this.getRegistryName().getPath();
+        return this.delegate.name().getPath();
     }
 
     @Override
@@ -176,8 +176,8 @@ public class Signal extends BasicBlock {
         GhostBlock.destroyUpperBlock(worldIn, pos);
         if (!worldIn.isClientSide() && worldIn instanceof World) {
             SignalStateHandler.setRemoved(new SignalStateInfo((World) worldIn, pos, this));
-            NameHandler.setRemoved(new NameStateInfo((World) worldIn, pos));
-            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (World) worldIn));
+            NameHandler.setRemoved(new StateInfo((World) worldIn, pos));
+            SignalBoxHandler.onPosRemove(new StateInfo((World) worldIn, pos));
         }
     }
 
@@ -229,7 +229,7 @@ public class Signal extends BasicBlock {
     @OnlyIn(Dist.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
         final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
+                .getClientStates(new StateInfo(info.tileEntity.getLevel(),
                         info.tileEntity.getBlockPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
@@ -265,7 +265,7 @@ public class Signal extends BasicBlock {
 
         if (doubleSidedText) {
             final Quaternion quad = new Quaternion(
-                    SignalAngel.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+                    QuaternionWrapper.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
             renderSingleScaleOverlay(info);
@@ -290,7 +290,7 @@ public class Signal extends BasicBlock {
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
         final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
+                .getClientStates(new StateInfo(info.tileEntity.getLevel(),
                         info.tileEntity.getBlockPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
@@ -329,7 +329,7 @@ public class Signal extends BasicBlock {
 
         if (doubleSidedText) {
             final Quaternion quad = new Quaternion(
-                    UIRotate.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+                    QuaternionWrapper.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
             renderSingleOverlay(info, splitNames);
@@ -377,7 +377,7 @@ public class Signal extends BasicBlock {
             OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
             return ActionResultType.SUCCESS;
         }
-        if (loadRedstoneOutput(world, stateInfo, properties)) {
+        if (loadRedstoneOutput(world, stateInfo)) {
             world.blockUpdated(pos, state.getBlock());
             return ActionResultType.SUCCESS;
         }
@@ -385,9 +385,11 @@ public class Signal extends BasicBlock {
     }
 
     @SuppressWarnings("unchecked")
-    private boolean loadRedstoneOutput(final World worldIn, final SignalStateInfo info,
-            final Map<SEProperty, String> properties) {
+    private boolean loadRedstoneOutput(final World worldIn, final SignalStateInfo info) {
+        if(worldIn.isClientSide)
+            return true;
         if (!this.prop.redstoneOutputs.isEmpty()) {
+            final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
             for (final ValuePack pack : this.prop.redstoneOutputs) {
                 if (properties.containsKey(pack.property) && pack.predicate.test(properties)) {
                     SignalStateHandler.setState(info, pack.property,
@@ -441,22 +443,22 @@ public class Signal extends BasicBlock {
             return;
 
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
-        final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        final SoundProperty sound = getSound(properties);
-        if (sound.duration < 1)
-            return;
-
-        if (sound.duration == 1) {
-            world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        } else {
-            if (world.getBlockTicks().hasScheduledTick(pos, this)) {
+        SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
+            final SoundProperty sound = getSound(properties);
+            if (sound.duration < 1)
                 return;
+            if (sound.duration == 1) {
+                world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
             } else {
-                if (sound.predicate.test(properties)) {
-                    world.getBlockTicks().scheduleTick(pos, this, 1);
+                if (world.getBlockTicks().hasScheduledTick(pos, this)) {
+                    return;
+                } else {
+                    if (sound.predicate.test(properties)) {
+                        world.getBlockTicks().scheduleTick(pos, this, 1);
+                    }
                 }
             }
-        }
+        });
     }
 
     public SoundProperty getSound(final Map<SEProperty, String> map) {
@@ -465,7 +467,7 @@ public class Signal extends BasicBlock {
                 return property;
             }
         }
-        return new SoundProperty(null, t -> true, -1);
+        return new SoundProperty(t -> true, null, 0);
     }
 
     @Override
@@ -475,12 +477,14 @@ public class Signal extends BasicBlock {
             return;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
-        final SoundProperty sound = getSound(SignalStateHandler.getStates(stateInfo));
-        if (sound.duration <= 1) {
-            return;
-        }
-        world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        world.getBlockTicks().scheduleTick(pos, this, sound.duration);
+        SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
+            final SoundProperty sound = getSound(properties);
+            if (sound.duration <= 1) {
+                return;
+            }
+            world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.getBlockTicks().scheduleTick(pos, this, sound.duration);
+        });
     }
 
     @Override

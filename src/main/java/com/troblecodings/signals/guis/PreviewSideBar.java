@@ -3,6 +3,7 @@ package com.troblecodings.signals.guis;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
@@ -12,8 +13,6 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.models.ModelInfoWrapper;
-
-import net.minecraft.util.math.vector.Quaternion;
 
 public class PreviewSideBar {
 
@@ -28,9 +27,8 @@ public class PreviewSideBar {
         blockRenderEntity.setInheritHeight(true);
         blockRenderEntity.setWidth(60);
 
-        // TODO Check if right
         blockRenderEntity.add(new UIDrag((x, y) -> blockRender
-                .updateRotation(new Quaternion(0, (float) x * MODIFIER, 0, false))));
+                .updateRotation(QuaternionWrapper.fromXYZ(0, (float) x * MODIFIER, 0))));
 
         blockRenderEntity.add(new UIScissor());
         blockRenderEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));

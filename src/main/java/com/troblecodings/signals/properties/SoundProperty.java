@@ -12,9 +12,9 @@ public class SoundProperty extends PredicateProperty<SoundEvent> {
 
     public final int duration;
 
-    public SoundProperty(final SoundEvent sound, final Predicate<Map<SEProperty, String>> predicate,
+    public SoundProperty(final Predicate<Map<SEProperty, String>> predicate, final SoundEvent state, 
             final int duration) {
-        super(predicate, sound);
+        super(predicate, state);
         this.duration = duration;
     }
 }

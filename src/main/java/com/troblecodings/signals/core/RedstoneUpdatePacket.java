@@ -35,8 +35,14 @@ public class RedstoneUpdatePacket {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        RedstoneUpdatePacket other = (RedstoneUpdatePacket) obj;
+        final RedstoneUpdatePacket other = (RedstoneUpdatePacket) obj;
         return Objects.equals(block, other.block) && Objects.equals(pos, other.pos)
                 && state == other.state && Objects.equals(world, other.world);
+    }
+    
+    @Override
+    public String toString() {
+        return "RedstoneUpdatePacket [world=" + world + ",pos=" + pos + ",state=" + state
+                + ",block=" + block + "]";
     }
 }

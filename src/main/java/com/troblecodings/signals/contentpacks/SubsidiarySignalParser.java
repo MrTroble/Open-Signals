@@ -23,9 +23,17 @@ public class SubsidiarySignalParser {
 
     private static void loadSubsidiaryStates() {
         OpenSignalsMain.contentPacks.getFiles("signalconfigs/subsidiaryenums").forEach(entry -> {
-            final SubsidiaryEnumParser parser = GSON.fromJson(entry.getValue(),
-                    SubsidiaryEnumParser.class);
-            parser.subsidiaryStates.forEach(state -> new SubsidiaryState(state));
+            try {
+                final SubsidiaryEnumParser parser = GSON.fromJson(entry.getValue(),
+                        SubsidiaryEnumParser.class);
+                parser.subsidiaryStates.forEach(state -> state.prepareData());
+            } catch (final Exception e) {
+                OpenSignalsMain.getLogger()
+                        .error("Please update your SubsidiaryEnumFile: " + entry.getKey() + "!");
+                final OldSubsidiaryEnumParser parser = GSON.fromJson(entry.getValue(),
+                        OldSubsidiaryEnumParser.class);
+                parser.subsidiaryStates.forEach(name -> new SubsidiaryState(name));
+            }
         });
     }
 
@@ -75,8 +83,10 @@ public class SubsidiarySignalParser {
     }
 
     private static class SubsidiaryEnumParser {
+        private List<SubsidiaryState> subsidiaryStates;
+    }
 
+    private static class OldSubsidiaryEnumParser {
         private List<String> subsidiaryStates;
-
     }
 }

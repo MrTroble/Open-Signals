@@ -7,8 +7,6 @@ import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.core.TileEntityInfo;
 
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.network.NetworkManager;
-import net.minecraft.network.play.server.SUpdateTileEntityPacket;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -19,16 +17,6 @@ public class SyncableTileEntity extends BasicBlockEntity {
     }
 
     protected final ArrayList<UIClientSync> clientSyncs = new ArrayList<>();
-
-    @Override
-    public SUpdateTileEntityPacket getUpdatePacket() {
-        return new SUpdateTileEntityPacket(worldPosition, 0, getUpdateTag());
-    }
-
-    @Override
-    public void onDataPacket(final NetworkManager net, final SUpdateTileEntityPacket pkt) {
-        super.onDataPacket(net, pkt);
-    }
 
     @Override
     public CompoundNBT getUpdateTag() {

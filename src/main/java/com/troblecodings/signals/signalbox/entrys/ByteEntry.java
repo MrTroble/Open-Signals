@@ -1,8 +1,8 @@
 package com.troblecodings.signals.signalbox.entrys;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.core.ReadBuffer;
-import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.WriteBuffer;
 
 public class ByteEntry extends IPathEntry<Byte> {
 
@@ -10,7 +10,7 @@ public class ByteEntry extends IPathEntry<Byte> {
 
     @Override
     public void readNetwork(final ReadBuffer buffer) {
-        value = buffer.getByteAsInt();
+        value = buffer.getByteToUnsignedInt();
     }
 
     @Override

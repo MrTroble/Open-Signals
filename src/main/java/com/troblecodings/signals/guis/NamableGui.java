@@ -1,5 +1,7 @@
 package com.troblecodings.signals.guis;
 
+import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -7,14 +9,13 @@ import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.core.WriteBuffer;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.ClientNameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.PlayerEntity;
 
 public class NamableGui extends GuiBase {
@@ -61,9 +62,10 @@ public class NamableGui extends GuiBase {
 
         final UITextInput input = new UITextInput(container.tile.getNameWrapper());
         textfield.add(input);
+        textfield.add(new UIToolTip(I18Wrapper.format("property.customname.desc")));
 
         hbox.add(textfield);
-        final UIEntity apply = GuiElements.createButton(I18n.get("btn.apply"),
+        final UIEntity apply = GuiElements.createButton(I18Wrapper.format("btn.apply"),
                 _u -> this.updateText(input.getText()));
         apply.setInheritWidth(false);
         apply.setWidth(60);
@@ -72,7 +74,7 @@ public class NamableGui extends GuiBase {
         if (!(container.tile instanceof RedstoneIOTileEntity)) {
             return;
         }
-        inner.add(GuiElements.createLabel(I18n.get("label.linkedto")));
+        inner.add(GuiElements.createLabel(I18Wrapper.format("label.linkedto")));
         final UIEntity list = new UIEntity();
         list.setInheritHeight(true);
         list.setInheritWidth(true);
@@ -92,15 +94,11 @@ public class NamableGui extends GuiBase {
 
     private void updateText(final String input) {
         if (input.isEmpty() || input.equals(
-                ClientNameHandler.getClientName(new NameStateInfo(mc.level, container.pos))))
+                ClientNameHandler.getClientName(new StateInfo(mc.level, container.pos))))
             return;
-        final byte[] bytes = input.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) bytes.length);
-        for (final byte b : bytes) {
-            buffer.putByte(b);
-        }
-        OpenSignalsMain.network.sendTo(player, buffer.build());
+        buffer.putString(input);
+        OpenSignalsMain.network.sendTo(player, buffer);
         labelComp.setText(input);
     }
 
