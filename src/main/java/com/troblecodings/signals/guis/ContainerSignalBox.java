@@ -72,7 +72,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         buffer.putEnumValue(SignalBoxNetwork.SEND_GRID);
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
-        final StateInfo identifier = new StateInfo(getInfo().world, tile.getBlockPos());
+        final StateInfo identifier = new StateInfo(info.world, tile.getBlockPos());
         final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = SignalBoxHandler
                 .getPossibleSubsidiaries(identifier);
         final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier)
@@ -121,7 +121,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     @Override
     public void deserializeClient(final ReadBuffer buffer) {
-        final SignalBoxNetwork mode = SignalBoxNetwork.of(buffer);
+        final SignalBoxNetwork mode = buffer.getEnumValue(SignalBoxNetwork.class);
         switch (mode) {
             case SEND_GRID: {
                 final BlockPos pos = buffer.getBlockPos();
@@ -130,7 +130,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 }
                 grid = tile.getSignalBoxGrid();
                 grid.readNetwork(buffer);
-                enabledSubsidiaryTypes = new HashMap<>(grid.getAllSubsidiaries());
+                enabledSubsidiaryTypes.putAll(grid.getAllSubsidiaries());
                 propertiesForType.clear();
                 possibleSubsidiaries.clear();
                 nextPathways.clear();
@@ -344,7 +344,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                     }
                     final WriteBuffer error = new WriteBuffer();
                     error.putEnumValue(SignalBoxNetwork.NO_PW_FOUND);
-                    OpenSignalsMain.network.sendTo(info.player, error.build());
+                    OpenSignalsMain.network.sendTo(info.player, error);
                 }
                 break;
             }
@@ -368,14 +368,14 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final ModeSet modeSet = ModeSet.of(buffer);
                 final boolean state = buffer.getBoolean();
                 final BlockPos pos = grid.updateManuellRSOutput(point, modeSet, state);
-                if (pos == null) {
+                if (pos != null) {
                     SignalBoxHandler.updateRedstoneOutput(new StateInfo(info.world, pos), state);
                     final WriteBuffer sucess = new WriteBuffer();
                     sucess.putEnumValue(SignalBoxNetwork.OUTPUT_UPDATE);
                     point.writeNetwork(sucess);
                     modeSet.writeNetwork(sucess);
                     sucess.putBoolean(state);
-                    OpenSignalsMain.network.sendTo(info.player, sucess.build());
+                    OpenSignalsMain.network.sendTo(info.player, sucess);
                 }
                 break;
             }
@@ -468,7 +468,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     }
 
     public Map<BlockPos, LinkType> getPositionForTypes() {
-        return this.propertiesForType;
+        return new HashMap<>(propertiesForType);
     }
 
     @Override
@@ -482,8 +482,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         return true;
     }
 
-    protected void setConsumer(final Consumer<String> run) {
-        this.infoUpdates = run;
+    protected void setInfoConsumer(final Consumer<String> consumer) {
+        this.infoUpdates = consumer;
     }
 
     protected void setColorUpdater(final Consumer<List<SignalBoxNode>> updater) {

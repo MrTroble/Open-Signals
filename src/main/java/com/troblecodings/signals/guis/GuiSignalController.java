@@ -239,8 +239,7 @@ public class GuiSignalController extends GuiBase {
             this.entity.add(new UILabel("Not connected"));
             return;
         }
-        lowerEntity.setInheritHeight(true);
-        lowerEntity.setInheritWidth(true);
+        lowerEntity.setInherits(true);
 
         final String name = I18Wrapper.format("tile." + signal.delegate.name().getPath() + ".name")
                 + "; Name: "
@@ -314,11 +313,12 @@ public class GuiSignalController extends GuiBase {
             list.add(GuiElements.createEnumElement(enumarable, property, e -> {
                 previewSidebar.addToRenderNormal(property, e);
                 if (loaded) {
-                    sendPropertyToServer(property, enumarable.getIndex());
+                    sendPropertyToServer(property, e);
+                    previewSidebar.update(controller.getSignal());
                 }
-                previewSidebar.update(controller.getSignal());
             }, index));
             holders.add(new UIPropertyEnumHolder(property, enumarable));
+            previewSidebar.addToRenderNormal(property, index);
 
         });
         previewSidebar.update(controller.getSignal());
@@ -363,9 +363,9 @@ public class GuiSignalController extends GuiBase {
             return;
         }
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) SignalControllerNetwork.SEND_RS_PROFILE.ordinal());
+        buffer.putEnumValue(SignalControllerNetwork.SEND_RS_PROFILE);
         buffer.putByte((byte) profile);
-        OpenSignalsMain.network.sendTo(player, buffer.build());
+        OpenSignalsMain.network.sendTo(player, buffer);
     }
 
     private void sendPropertyToServer(final SEProperty property, final int value) {

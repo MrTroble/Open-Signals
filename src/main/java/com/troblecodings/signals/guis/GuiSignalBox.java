@@ -104,7 +104,7 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity mainButton;
     private final GuiInfo info;
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
-    private final UIEntity splitter = new UIEntity();
+    private UIEntity splitter = new UIEntity();
     private boolean allPacketsRecived = false;
     protected final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
@@ -114,7 +114,7 @@ public class GuiSignalBox extends GuiBase {
     public GuiSignalBox(final GuiInfo info) {
         super(info);
         this.container = (ContainerSignalBox) info.base;
-        container.setConsumer(this::infoUpdate);
+        container.setInfoConsumer(this::infoUpdate);
         container.setColorUpdater(this::applyColorChanges);
         container.setSignalUpdater(this::updateSignals);
         container.setConuterUpdater(this::updateCounter);
@@ -123,7 +123,7 @@ public class GuiSignalBox extends GuiBase {
 
     public void infoUpdate(final String errorString) {
         this.resetTileSelection();
-        final UIToolTip tooltip = new UIToolTip(errorString);
+        final UIToolTip tooltip = new UIToolTip(errorString, true);
         lowerEntity.add(tooltip);
         new Thread(() -> {
             try {
@@ -700,11 +700,13 @@ public class GuiSignalBox extends GuiBase {
         inputEntity.add(input);
         lowerEntity.add(inputEntity);
         final UIEntity list = new UIEntity();
+        list.add(list);
+        list.setInheritHeight(true);
+        list.setInheritWidth(true);
         final UIBox uibox = new UIBox(UIBox.VBOX, 2);
         list.add(uibox);
         final Map<String, UIEntity> nameToUIEntity = new HashMap<>();
         list.add(uibox);
-        list.setInherits(true);
         types.forEach((p, t) -> {
             final String name = getSignalInfo(p, t);
             final UIEntity layout = new UIEntity();
@@ -865,7 +867,6 @@ public class GuiSignalBox extends GuiBase {
             plane.add(row);
         }
         UIEntity splitter = new UIEntity();
-        splitter = new UIEntity();
         splitter.add(new UIColor(BACKGROUND_COLOR));
         splitter.add(new UIScissor());
         splitter.add(new UIBorder(0xFF000000, 4));
@@ -923,6 +924,8 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
+        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
+                container.possibleSubsidiaries);
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {

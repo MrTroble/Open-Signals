@@ -64,7 +64,7 @@ public class ContainerPlacementtool extends ContainerBase {
     @Override
     public void deserializeServer(final ReadBuffer buffer) {
         final int first = buffer.getByteToUnsignedInt();
-        final ItemStack stack = getInfo().player.getMainHandItem();
+        final ItemStack stack = info.player.getMainHandItem();
         final Placementtool tool = (Placementtool) stack.getItem();
         if (first == 255) {
             final int id = buffer.getInt();
@@ -103,6 +103,7 @@ public class ContainerPlacementtool extends ContainerBase {
             final int value = buffer.getByteToUnsignedInt();
             properties.put(property, value);
         }
+        signalName = buffer.getString();
         signalProperties.forEach(property -> {
             if (!properties.containsKey(property)) {
                 properties.put(property,

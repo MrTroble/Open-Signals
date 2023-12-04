@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.function.IntConsumer;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
@@ -26,6 +27,7 @@ import com.troblecodings.signals.items.Placementtool;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -53,6 +55,15 @@ public class GuiPlacementtool extends GuiBase {
                 .getInteger(Placementtool.BLOCK_TYPE_ID);
         currentSelectedBlock = tool.getObjFromID(usedBlock);
         initInternal();
+    }
+
+    @Override
+    public void renderComponentTooltip(final MatrixStack stack, final List<ITextComponent> list,
+            final int mouseX, final int mouseY) {
+        final int oldWidth = this.width;
+        this.width *= 0.7;
+        super.renderComponentTooltip(stack, list, mouseX, mouseY);
+        this.width = oldWidth;
     }
 
     private void initInternal() {
