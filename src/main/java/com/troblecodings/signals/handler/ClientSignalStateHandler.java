@@ -64,7 +64,6 @@ public class ClientSignalStateHandler implements INetworkSync {
         }
         final long startTime = Calendar.getInstance().getTimeInMillis();
         SERVICE.execute(() -> {
-            mc.levelRenderer.blockChanged(null, signalPos, null, null, 8);
             TileEntity entity;
             while ((entity = level.getBlockEntity(signalPos)) == null) {
                 final long currentTime = Calendar.getInstance().getTimeInMillis();

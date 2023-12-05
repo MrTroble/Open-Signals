@@ -381,7 +381,7 @@ public class Signal extends BasicBlock {
             world.blockUpdated(pos, state.getBlock());
             return ActionResultType.SUCCESS;
         }
-        return ActionResultType.FAIL;
+        return ActionResultType.PASS;
     }
 
     @SuppressWarnings("unchecked")

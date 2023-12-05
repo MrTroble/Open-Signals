@@ -103,13 +103,10 @@ public final class NameHandler implements INetworkSync {
         if (info.world.isClientSide || name == null)
             return;
         new Thread(() -> {
-            if (info.world.isClientSide)
-                return;
-            sendToAll(info, name);
             synchronized (ALL_NAMES) {
                 ALL_NAMES.put(info, name);
             }
-            createToFile(info, name);
+            sendToAll(info, name);
         }, "OSNameHandler:setName").start();
     }
 
@@ -312,7 +309,7 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static void unloadNames(final List<StateInfo> infos) {
-        if (infos == null || infos.isEmpty())
+        if (infos == null || infos.isEmpty() || writeService == null)
             return;
         writeService.execute(() -> {
             infos.forEach(info -> {
