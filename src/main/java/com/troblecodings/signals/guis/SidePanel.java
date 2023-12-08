@@ -682,11 +682,11 @@ public class SidePanel {
         final UIEntity helpScrollBar = GuiElements.createScrollBar(helpScrollbox, 7, helpScrolling);
         helpScrollbox.setConsumer(size -> {
             if (size > helpList.getHeight()) {
-                helpScroll.add(helpScroll);
+                helpScroll.add(helpScrolling);
                 helpScroll.add(helpScrollBar);
             } else {
                 helpScroll.remove(helpScrollBar);
-                helpScroll.remove(helpScroll);
+                helpScroll.remove(helpScrolling);
             }
         });
         helpList.add(helpScrollbox);

@@ -708,9 +708,7 @@ public class GuiSignalBox extends GuiBase {
         inputEntity.add(input);
         lowerEntity.add(inputEntity);
         final UIEntity list = new UIEntity();
-        list.add(list);
-        list.setInheritHeight(true);
-        list.setInheritWidth(true);
+        list.setInherits(true);
         final UIBox uibox = new UIBox(UIBox.VBOX, 2);
         list.add(uibox);
         final Map<String, UIEntity> nameToUIEntity = new HashMap<>();
@@ -813,10 +811,11 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer,
             final boolean showLines) {
+        splitter.clear();
         final UIEntity plane = new UIEntity();
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
         plane.setHeight(TILE_COUNT * TILE_WIDTH);
-        lowerEntity.add(new UIScroll(s -> {
+        splitter.add(new UIScroll(s -> {
             final float newScale = (float) (plane.getScaleX() + s * 0.05f);
             if (newScale <= 0)
                 return;
@@ -824,7 +823,7 @@ public class GuiSignalBox extends GuiBase {
             plane.setScaleY(newScale);
             plane.update();
         }));
-        lowerEntity.add(new UIDrag((x, y) -> {
+        splitter.add(new UIDrag((x, y) -> {
             plane.setX(plane.getX() + x);
             plane.setY(plane.getY() + y);
             plane.update();
@@ -873,7 +872,6 @@ public class GuiSignalBox extends GuiBase {
             }
             plane.add(row);
         }
-        splitter = new UIEntity();
         splitter.add(new UIColor(BACKGROUND_COLOR));
         splitter.add(new UIScissor());
         splitter.add(new UIBorder(0xFF000000, 4));
