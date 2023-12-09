@@ -708,6 +708,9 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private boolean checkReverseReset(final BlockPos pos) {
+        if (!isBlocked || getFirstPoint().equals(originalFirstPoint)) {
+            return false;
+        }
         final SignalBoxNode firstNode = listOfNodes.get(listOfNodes.size() - 1);
         for (final Rotation rot : Rotation.values()) {
             if (tryReversReset(pos, firstNode, rot)) {
