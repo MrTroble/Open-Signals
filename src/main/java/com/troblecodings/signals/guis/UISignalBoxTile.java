@@ -80,6 +80,10 @@ public class UISignalBoxTile extends UIComponentEntity {
 
         final MainSignalIdentifier identifier = greenSignals.get(modeSet);
         SignalState state = identifier != null ? identifier.state : SignalState.RED;
+        if (modeSet.mode.equals(EnumGuiMode.RS)
+                && setToEntity.containsKey(new ModeSet(EnumGuiMode.HP, modeSet.rotation))) {
+            state = SignalState.OFF;
+        }
         entity.add((UIComponent) modeSet.mode.consumer.get(state));
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
