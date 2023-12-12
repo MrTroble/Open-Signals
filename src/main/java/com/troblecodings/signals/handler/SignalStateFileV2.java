@@ -21,7 +21,7 @@ public class SignalStateFileV2 {
     public static final int HEADER_SIZE = 4;
     public static final int START_OFFSET = HEADER_SIZE + 4;
     public static final int MAX_ELEMENTS_PER_FILE = 256;
-    public static final int ALIGNMENT_PER_INDEX_ITEM = 3;
+    public static final int ALIGNMENT_PER_INDEX_ITEM = 4;
     public static final int SIZE_OF_INDEX = MAX_ELEMENTS_PER_FILE * ALIGNMENT_PER_INDEX_ITEM;
     public static final int MAX_OFFSET_OF_INDEX = SIZE_OF_INDEX + START_OFFSET;
     public static final byte HEADER_VERSION = 2;
@@ -61,20 +61,27 @@ public class SignalStateFileV2 {
         });
     }
 
-    public static byte[] getChunkPosFromPos(final BlockPos pos) {
+    public static byte[] getChunkPosFromPos(final ChunkPos chunk, final BlockPos pos) {
         final byte[] array = new byte[3];
-        array[0] = (byte) (pos.getX() & 16);
-        array[1] = (byte) pos.getY();
-        array[2] = (byte) (pos.getZ() & 16);
+        final byte chunkCoordX = (byte) Math.ceil(pos.getX() - 16 * chunk.x);
+        final byte chunkCoordZ = (byte) Math.ceil(pos.getZ() - 16 * chunk.z);
+        array[0] = (byte) ((chunkCoordX << 4) | chunkCoordZ);
+        array[1] = (byte) (((pos.getY() + 64) >> 8) & 0xFF);
+        array[2] = (byte) ((pos.getY() + 64) & 0xFF);
         return array;
     }
 
     public static BlockPos getPosFromChunkPos(final ChunkPos chunk, final byte[] array) {
-        return new BlockPos(chunk.x * 16 + array[0], array[1], chunk.z * 16 + array[2]);
+        final int chunkPosX = Byte.toUnsignedInt(array[0]) >> 4;
+        final int chunkPosZ = array[0] & 0x0f;
+        final int blockX = chunkPosX + 16 * chunk.x;
+        final int blockY = (((array[1] & 0xFF) << 8) | (array[2] & 0xFF)) - 64;
+        final int blockZ = chunkPosZ + 16 * chunk.z;
+        return new BlockPos(blockX, blockY, blockZ);
     }
 
     private static String getFileNameForChunk(final ChunkPos pos) {
-        return pos.getRegionX() + "." + pos.getRegionZ();
+        return pos.x + "." + pos.z;
     }
 
     private static long hash(final BlockPos pos) {
@@ -91,11 +98,11 @@ public class SignalStateFileV2 {
         return (SignalStatePosV2) internalFind(pos, (stream, blockPos, offset, file) -> {
             try {
                 final long pointer = stream.getFilePointer();
+                stream.seek(pointer);
                 stream.write(NULL_ARRAY);
                 stream.seek(HEADER_SIZE);
                 final int addedElements = stream.readInt();
                 stream.writeInt(addedElements - 1);
-                stream.seek(pointer - ALIGNMENT_PER_INDEX_ITEM);
                 return new SignalStatePosV2(file, offset);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -126,7 +133,7 @@ public class SignalStateFileV2 {
                 final byte[] array = new byte[3];
                 stream.readFully(array);
                 currenPosition = getPosFromChunkPos(chunk, array);
-                offset = Integer.toUnsignedLong(stream.readInt());
+                offset = Integer.toUnsignedLong(stream.read());
                 final long currentOffset = stream.getFilePointer();
                 if (currentOffset >= MAX_OFFSET_OF_INDEX)
                     stream.seek(START_OFFSET); // Wrap around search
@@ -193,15 +200,17 @@ public class SignalStateFileV2 {
                         return null;
                     }
                 }
+                final ChunkPos chunk = new ChunkPos(pos);
                 final long actualOffset = stream.getFilePointer() - ALIGNMENT_PER_INDEX_ITEM;
                 stream.seek(actualOffset);
-                stream.write(getChunkPosFromPos(pos));
                 final int offset = addedElements * STATE_BLOCK_SIZE + MAX_OFFSET_OF_INDEX;
-                stream.writeInt(offset);
+                stream.write(getChunkPosFromPos(chunk, pos));
+                stream.writeByte(offset);
                 stream.seek(offset);
                 stream.write(array);
                 stream.seek(HEADER_SIZE);
                 stream.writeInt(addedElements + 1);
+                return new SignalStatePosV2(chunk, offset);
             }
         } catch (final IOException e) {
             e.printStackTrace();

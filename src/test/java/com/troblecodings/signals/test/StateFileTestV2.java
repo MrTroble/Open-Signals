@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Random;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import com.troblecodings.signals.handler.SignalStateFile;
 import com.troblecodings.signals.handler.SignalStateFileV2;
 import com.troblecodings.signals.handler.SignalStatePosV2;
 
@@ -51,13 +51,18 @@ public class StateFileTestV2 {
         }
     }
 
+    private static final Random RANDOM = new Random();
+
+    private static BlockPos getRandomBlockPos() {
+        return new BlockPos(RANDOM.nextInt(), RANDOM.nextInt(-64, 321), RANDOM.nextInt());
+    }
+
     @Test
     public void serializeAndDeserializePos() {
-        for (int i = 0; i < 1000; i++) {
-            final BlockPos pos = new BlockPos(GIRSyncEntryTests.RANDOM.nextInt(),
-                    GIRSyncEntryTests.RANDOM.nextInt(100), GIRSyncEntryTests.RANDOM.nextInt());
+        for (int i = 0; i < 999999999; i++) {
+            final BlockPos pos = getRandomBlockPos();
             final ChunkPos chunk = new ChunkPos(pos);
-            final byte[] array = SignalStateFileV2.getChunkPosFromPos(pos);
+            final byte[] array = SignalStateFileV2.getChunkPosFromPos(chunk, pos);
             assertEquals(pos, SignalStateFileV2.getPosFromChunkPos(chunk, array));
         }
     }
@@ -65,9 +70,9 @@ public class StateFileTestV2 {
     @Test
     public void creationAndAddition() {
         final SignalStateFileV2 file = new SignalStateFileV2(path);
-        final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
+        final BlockPos firstcreate = getRandomBlockPos();
         final SignalStatePosV2 createPos = file.create(firstcreate);
-        assertFalse(createPos.offset < SignalStateFile.MAX_OFFSET_OF_INDEX);
+        assertFalse(createPos.offset < SignalStateFileV2.MAX_OFFSET_OF_INDEX);
         assertNotNull(createPos);
 
         final SignalStatePosV2 position = file.find(firstcreate);
