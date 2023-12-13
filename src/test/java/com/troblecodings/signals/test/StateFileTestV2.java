@@ -36,9 +36,7 @@ public class StateFileTestV2 {
         if (Files.exists(path)) {
             Files.list(path).forEach(t -> {
                 try {
-                    synchronized (path) {
-                        Files.deleteIfExists(t);
-                    }
+                    Files.deleteIfExists(t);
                 } catch (final IOException e) {
                     e.printStackTrace();
                 }
@@ -51,9 +49,7 @@ public class StateFileTestV2 {
         if (Files.exists(path)) {
             Files.list(path).forEach(t -> {
                 try {
-                    synchronized (path) {
-                        Files.deleteIfExists(t);
-                    }
+                    Files.deleteIfExists(t);
                 } catch (final IOException e) {
                     e.printStackTrace();
                 }
