@@ -140,7 +140,7 @@ public class SignalStateFileV2 {
                 if (currentOffset == hashOffset)
                     return null; // Nothing found
             } while (!pos.equals(currenPosition));
-            return function.apply(stream, currenPosition, offset, new ChunkPos(pos));
+            return function.apply(stream, currenPosition, offset, chunk);
         } catch (final IOException e) {
             e.printStackTrace();
         }
