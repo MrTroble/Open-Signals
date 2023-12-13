@@ -92,13 +92,20 @@ public class StateFileTest {
     public void moreThenPossible() {
         final SignalStateFile file = new SignalStateFile(path);
         final List<Map.Entry<BlockPos, SignalStatePos>> listOfPos = new ArrayList<>();
-        for (int i = 0; i < SignalStateFile.MAX_ELEMENTS_PER_FILE + 10; i++) {
+        final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
+        buffer.array()[0] = (byte) 0xFF;
+        buffer.array()[255] = (byte) 0x0F;
+        for (int i = 0; i < 5000; i++) {
             final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
-            listOfPos.add(Map.entry(firstcreate, file.create(firstcreate)));
+            final SignalStatePos statePos = file.create(firstcreate);
+            file.write(statePos, buffer);
+            listOfPos.add(Map.entry(firstcreate, statePos));
         }
         for (int i = 0; i < listOfPos.size() / 1000; i++) {
             final Map.Entry<BlockPos, SignalStatePos> entry = listOfPos.get(i);
-            assertEquals(entry.getValue(), file.find(entry.getKey()));
+            final SignalStatePos findPos = file.find(entry.getKey());
+            assertEquals(buffer, file.read(findPos));
+            assertEquals(entry.getValue(), findPos);
         }
     }
 

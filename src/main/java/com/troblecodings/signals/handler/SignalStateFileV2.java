@@ -30,9 +30,6 @@ public class SignalStateFileV2 {
     private static final byte[] DEFAULT_HEADER = new byte[] {
             HEADER_VERSION, 0, 0, 0
     };
-    private static final byte[] NULL_ARRAY = new byte[] {
-            0, 0, 0
-    };
 
     private final Map<ChunkPos, Path> pathCache = new HashMap<>();
     private final Path path;
@@ -49,13 +46,16 @@ public class SignalStateFileV2 {
     private Path getFileForPos(final BlockPos pos) {
         final ChunkPos file = new ChunkPos(pos);
         return pathCache.computeIfAbsent(file, identifier -> {
-            final Path nextFile = this.path.resolve(getFileNameForChunk(file));
-            try (RandomAccessFile stream = new RandomAccessFile(nextFile.toFile(), "rw")) {
-                stream.write(DEFAULT_HEADER);
-                final byte[] zeroMemory = new byte[SIZE_OF_INDEX];
-                stream.write(zeroMemory);
-            } catch (final IOException e) {
-                e.printStackTrace();
+            final Path nextFile = this.path.resolve(getFileNameForChunk(identifier));
+            if (!Files.exists(nextFile)) {
+                try (RandomAccessFile stream = new RandomAccessFile(nextFile.toFile(), "rw")) {
+                    stream.write(DEFAULT_HEADER);
+                    stream.writeInt(0);
+                    final byte[] zeroMemory = new byte[SIZE_OF_INDEX];
+                    stream.write(zeroMemory);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
             }
             return nextFile;
         });
@@ -63,8 +63,8 @@ public class SignalStateFileV2 {
 
     public static byte[] getChunkPosFromPos(final ChunkPos chunk, final BlockPos pos) {
         final byte[] array = new byte[3];
-        final byte chunkCoordX = (byte) Math.ceil(pos.getX() - 16 * chunk.x);
-        final byte chunkCoordZ = (byte) Math.ceil(pos.getZ() - 16 * chunk.z);
+        final byte chunkCoordX = (byte) Math.floor(pos.getX() - 16 * chunk.x);
+        final byte chunkCoordZ = (byte) Math.floor(pos.getZ() - 16 * chunk.z);
         array[0] = (byte) ((chunkCoordX << 4) | chunkCoordZ);
         array[1] = (byte) (((pos.getY() + 64) >> 8) & 0xFF);
         array[2] = (byte) ((pos.getY() + 64) & 0xFF);
@@ -84,9 +84,12 @@ public class SignalStateFileV2 {
         return pos.x + "." + pos.z;
     }
 
-    private static long hash(final BlockPos pos) {
-        return (Integer.toUnsignedLong(pos.hashCode()) % MAX_ELEMENTS_PER_FILE)
-                * ALIGNMENT_PER_INDEX_ITEM + START_OFFSET;
+    public static long hash(final BlockPos pos, final ChunkPos chunk) {
+        final int chunkCoordX = (int) Math.floor(pos.getX() - 16 * chunk.x);
+        final int chunkCoordY = pos.getY();
+        final int chunkCoordZ = (int) Math.floor(pos.getZ() - 16 * chunk.z);
+        return (Integer.toUnsignedLong((chunkCoordY + chunkCoordZ * 31) * 31 + chunkCoordX)
+                % MAX_ELEMENTS_PER_FILE) * ALIGNMENT_PER_INDEX_ITEM + START_OFFSET;
     }
 
     public synchronized SignalStatePosV2 find(final BlockPos pos) {
@@ -98,11 +101,8 @@ public class SignalStateFileV2 {
         return (SignalStatePosV2) internalFind(pos, (stream, blockPos, offset, file) -> {
             try {
                 final long pointer = stream.getFilePointer();
-                stream.seek(pointer);
-                stream.write(NULL_ARRAY);
-                stream.seek(HEADER_SIZE);
-                final int addedElements = stream.readInt();
-                stream.writeInt(addedElements - 1);
+                stream.seek(pointer - ALIGNMENT_PER_INDEX_ITEM);
+                stream.writeInt(0);
                 return new SignalStatePosV2(file, offset);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -124,19 +124,21 @@ public class SignalStateFileV2 {
             }
             if (stream.readInt() == 0)
                 return null;
-            final long hashOffset = hash(pos);
-            stream.seek(hashOffset);
             final ChunkPos chunk = new ChunkPos(pos);
+            final long hashOffset = hash(pos, chunk);
+            stream.seek(hashOffset);
             BlockPos currenPosition = null;
             long offset = 0;
             do {
                 final byte[] array = new byte[3];
                 stream.readFully(array);
                 currenPosition = getPosFromChunkPos(chunk, array);
-                offset = Integer.toUnsignedLong(stream.read());
+                offset = Byte.toUnsignedInt(stream.readByte());
                 final long currentOffset = stream.getFilePointer();
                 if (currentOffset >= MAX_OFFSET_OF_INDEX)
                     stream.seek(START_OFFSET); // Wrap around search
+                if (currentOffset == hashOffset)
+                    return null; // Nothing found
             } while (!pos.equals(currenPosition));
             return function.apply(stream, currenPosition, offset, new ChunkPos(pos));
         } catch (final IOException e) {
@@ -150,7 +152,7 @@ public class SignalStateFileV2 {
         try (RandomAccessFile stream = new RandomAccessFile(pathCache.get(pos.file).toFile(),
                 "r")) {
             final ByteBuffer buffer = ByteBuffer.allocate(STATE_BLOCK_SIZE);
-            stream.seek(pos.offset);
+            stream.seek(pos.offset * STATE_BLOCK_SIZE + MAX_OFFSET_OF_INDEX);
             stream.read(buffer.array());
             return buffer;
         } catch (final IOException e) {
@@ -162,7 +164,7 @@ public class SignalStateFileV2 {
     public synchronized void write(final SignalStatePosV2 pos, final ByteBuffer buffer) {
         try (RandomAccessFile stream = new RandomAccessFile(pathCache.get(pos.file).toFile(),
                 "rw")) {
-            stream.seek(pos.offset);
+            stream.seek(pos.offset * STATE_BLOCK_SIZE + MAX_OFFSET_OF_INDEX);
             stream.write(buffer.array());
         } catch (final IOException e) {
             e.printStackTrace();
@@ -189,9 +191,10 @@ public class SignalStateFileV2 {
                             path.toString());
                     return null;
                 }
-                final long offsetHash = hash(pos);
+                final ChunkPos chunk = new ChunkPos(pos);
+                final long offsetHash = hash(pos, chunk);
                 stream.seek(offsetHash);
-                while ((stream.readLong() | stream.readLong()) != 0) {
+                while (stream.readInt() != 0) {
                     if (stream.getFilePointer() >= MAX_OFFSET_OF_INDEX)
                         stream.seek(START_OFFSET); // Wrap around search
                     if (stream.getFilePointer() == offsetHash) {
@@ -200,17 +203,16 @@ public class SignalStateFileV2 {
                         return null;
                     }
                 }
-                final ChunkPos chunk = new ChunkPos(pos);
                 final long actualOffset = stream.getFilePointer() - ALIGNMENT_PER_INDEX_ITEM;
                 stream.seek(actualOffset);
                 final int offset = addedElements * STATE_BLOCK_SIZE + MAX_OFFSET_OF_INDEX;
                 stream.write(getChunkPosFromPos(chunk, pos));
-                stream.writeByte(offset);
+                stream.writeByte(addedElements);
                 stream.seek(offset);
                 stream.write(array);
                 stream.seek(HEADER_SIZE);
                 stream.writeInt(addedElements + 1);
-                return new SignalStatePosV2(chunk, offset);
+                return new SignalStatePosV2(chunk, addedElements);
             }
         } catch (final IOException e) {
             e.printStackTrace();
