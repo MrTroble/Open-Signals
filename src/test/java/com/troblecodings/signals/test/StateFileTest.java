@@ -173,9 +173,11 @@ public class StateFileTest {
             file.write(statePos, buffer);
             map.put(firstcreate, buffer);
         }
-        file.getAllEntries().forEach((pos, byteBuffer) -> {
-            assertTrue(map.containsKey(pos));
-            assertEquals(byteBuffer, map.get(pos));
+        final Map<BlockPos, ByteBuffer> readOutEntries = file.getAllEntries();
+        assertEquals(map.size(), readOutEntries.size());
+        map.forEach((pos, byteBuffer) -> {
+            assertTrue(readOutEntries.containsKey(pos));
+            assertEquals(byteBuffer, readOutEntries.get(pos));
         });
     }
 }

@@ -187,7 +187,7 @@ public class StateFileTestV2 {
     }
 
     @Test
-    public void testIntegration() {
+    public void testMigration() {
         final SignalStateFile file = new SignalStateFile(path);
         final Map<BlockPos, ByteBuffer> map = new HashMap<>();
         for (int i = 0; i < SignalStateFile.MAX_ELEMENTS_PER_FILE + 100; i++) {
@@ -200,6 +200,7 @@ public class StateFileTestV2 {
         }
         final Map<BlockPos, ByteBuffer> contentMap = file.getAllEntries();
         final SignalStateFileV2 fileV2 = new SignalStateFileV2(path);
+        assertEquals(map.size(), contentMap.size());
         contentMap.forEach((pos, buffer) -> {
             final SignalStatePosV2 statePos = fileV2.create(pos);
             fileV2.write(statePos, buffer);
