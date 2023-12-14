@@ -19,9 +19,10 @@ import net.minecraft.world.level.ChunkPos;
 public class SignalStateFileV2 {
 
     public static final int HEADER_SIZE = 4;
-    public static final int START_OFFSET = HEADER_SIZE + 4;
     public static final int MAX_ELEMENTS_PER_FILE = 256;
     public static final int ALIGNMENT_PER_INDEX_ITEM = 4;
+    public static final int SIZE_OF_OCCUPIED_MARKER = MAX_ELEMENTS_PER_FILE / 8;
+    public static final int START_OFFSET = HEADER_SIZE + 4 + SIZE_OF_OCCUPIED_MARKER;
     public static final int SIZE_OF_INDEX = MAX_ELEMENTS_PER_FILE * ALIGNMENT_PER_INDEX_ITEM;
     public static final int MAX_OFFSET_OF_INDEX = SIZE_OF_INDEX + START_OFFSET;
     public static final byte HEADER_VERSION = 2;
@@ -51,6 +52,7 @@ public class SignalStateFileV2 {
                 try (RandomAccessFile stream = new RandomAccessFile(nextFile.toFile(), "rw")) {
                     stream.write(DEFAULT_HEADER);
                     stream.writeInt(0);
+                    stream.write(new byte[SIZE_OF_OCCUPIED_MARKER]);
                     final byte[] zeroMemory = new byte[SIZE_OF_INDEX];
                     stream.write(zeroMemory);
                 } catch (final IOException e) {
@@ -59,6 +61,48 @@ public class SignalStateFileV2 {
             }
             return nextFile;
         });
+    }
+
+    private static int getNextFreeOffset(final RandomAccessFile stream) {
+        try {
+            stream.seek(HEADER_SIZE + 4);
+            for (int i = 0; i < SIZE_OF_OCCUPIED_MARKER; i++) {
+                final boolean[] isSectionOccupied = getStatesFromByte(stream.readByte());
+                for (int j = 0; j < isSectionOccupied.length; j++) {
+                    if (!isSectionOccupied[j]) {
+                        return i * 8 + j;
+                    }
+                }
+            }
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    private static boolean[] getStatesFromByte(final byte b) {
+        final boolean[] bits = new boolean[8];
+        for (int i = 7; i >= 0; i--) {
+            bits[i] = (b & (1 << i)) != 0;
+        }
+        return bits;
+    }
+
+    private static void setOffsetOccupied(final RandomAccessFile stream, final int offset,
+            final boolean setOccupied) {
+        final byte bytePosition = (byte) Math.floor(offset / 8);
+        final byte bitPosition = (byte) (offset % 8);
+        try {
+            final int bytePos = HEADER_SIZE + 4 + bytePosition;
+            stream.seek(bytePos);
+            final byte b = stream.readByte();
+            final byte byteToWrite = (byte) (setOccupied ? b | (1 << bitPosition)
+                    : b & ~(1 << bitPosition));
+            stream.seek(bytePos);
+            stream.writeByte(byteToWrite);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static byte[] getChunkPosFromPos(final ChunkPos chunk, final BlockPos pos) {
@@ -103,6 +147,7 @@ public class SignalStateFileV2 {
                 final long pointer = stream.getFilePointer();
                 stream.seek(pointer - ALIGNMENT_PER_INDEX_ITEM);
                 stream.writeInt(0);
+                setOffsetOccupied(stream, offset, false);
                 return new SignalStatePosV2(file, offset);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -128,7 +173,7 @@ public class SignalStateFileV2 {
             final long hashOffset = hash(pos, chunk);
             stream.seek(hashOffset);
             BlockPos currenPosition = null;
-            long offset = 0;
+            int offset = 0;
             do {
                 final byte[] array = new byte[3];
                 stream.readFully(array);
@@ -204,15 +249,17 @@ public class SignalStateFileV2 {
                     }
                 }
                 final long actualOffset = stream.getFilePointer() - ALIGNMENT_PER_INDEX_ITEM;
+                final int freeOffsetInFile = getNextFreeOffset(stream);
+                final int offset = freeOffsetInFile * STATE_BLOCK_SIZE + MAX_OFFSET_OF_INDEX;
                 stream.seek(actualOffset);
-                final int offset = addedElements * STATE_BLOCK_SIZE + MAX_OFFSET_OF_INDEX;
                 stream.write(getChunkPosFromPos(chunk, pos));
-                stream.writeByte(addedElements);
+                stream.writeByte(freeOffsetInFile);
                 stream.seek(offset);
                 stream.write(array);
                 stream.seek(HEADER_SIZE);
                 stream.writeInt(addedElements + 1);
-                return new SignalStatePosV2(chunk, addedElements);
+                setOffsetOccupied(stream, freeOffsetInFile, true);
+                return new SignalStatePosV2(chunk, freeOffsetInFile);
             }
         } catch (final IOException e) {
             e.printStackTrace();
@@ -239,7 +286,7 @@ public class SignalStateFileV2 {
 
     @FunctionalInterface
     public interface InternalFunction {
-        public Object apply(final RandomAccessFile stream, final BlockPos pos, final long offset,
+        public Object apply(final RandomAccessFile stream, final BlockPos pos, final int offset,
                 final ChunkPos file);
     }
 

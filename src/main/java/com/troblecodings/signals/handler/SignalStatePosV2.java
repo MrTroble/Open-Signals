@@ -7,9 +7,9 @@ import net.minecraft.world.level.ChunkPos;
 public class SignalStatePosV2 {
 
     public final ChunkPos file;
-    public final long offset;
+    public final int offset;
 
-    public SignalStatePosV2(final ChunkPos file, final long offset) {
+    public SignalStatePosV2(final ChunkPos file, final int offset) {
         this.file = file;
         this.offset = offset;
     }
