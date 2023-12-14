@@ -148,6 +148,10 @@ public class SignalStateFileV2 {
                 stream.seek(pointer - ALIGNMENT_PER_INDEX_ITEM);
                 stream.writeInt(0);
                 setOffsetOccupied(stream, offset, false);
+                stream.seek(HEADER_SIZE);
+                final int addedElements = stream.readInt();
+                stream.seek(HEADER_SIZE);
+                stream.writeInt(addedElements - 1);
                 return new SignalStatePosV2(file, offset);
             } catch (IOException e) {
                 e.printStackTrace();
