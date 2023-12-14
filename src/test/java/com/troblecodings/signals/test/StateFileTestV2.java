@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -21,6 +23,7 @@ import org.junit.jupiter.api.Test;
 
 import com.troblecodings.signals.handler.SignalStateFile;
 import com.troblecodings.signals.handler.SignalStateFileV2;
+import com.troblecodings.signals.handler.SignalStatePos;
 import com.troblecodings.signals.handler.SignalStatePosV2;
 
 import net.minecraft.core.BlockPos;
@@ -183,4 +186,30 @@ public class StateFileTestV2 {
         assertNull(file.find(getRandomBlockPos()));
     }
 
+    @Test
+    public void testIntegration() {
+        final SignalStateFile file = new SignalStateFile(path);
+        final Map<BlockPos, ByteBuffer> map = new HashMap<>();
+        for (int i = 0; i < SignalStateFile.MAX_ELEMENTS_PER_FILE + 100; i++) {
+            final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
+            RANDOM.nextBytes(buffer.array());
+            final BlockPos firstcreate = getRandomBlockPos();
+            final SignalStatePos statePos = file.create(firstcreate);
+            file.write(statePos, buffer);
+            map.put(firstcreate, buffer);
+        }
+        final Map<BlockPos, ByteBuffer> contentMap = file.getAllEntries();
+        final SignalStateFileV2 fileV2 = new SignalStateFileV2(path);
+        contentMap.forEach((pos, buffer) -> {
+            final SignalStatePosV2 statePos = fileV2.create(pos);
+            fileV2.write(statePos, buffer);
+        });
+        contentMap.forEach((pos, buffer) -> {
+            final SignalStatePos posOldFile = file.find(pos);
+            final SignalStatePosV2 posInNewFile = fileV2.find(pos);
+            assertTrue(posOldFile != null);
+            assertTrue(posInNewFile != null);
+            assertEquals(file.read(posOldFile), fileV2.read(posInNewFile));
+        });
+    }
 }
