@@ -8,10 +8,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Maps;
 import com.troblecodings.signals.OpenSignalsMain;
 
 import net.minecraft.core.BlockPos;
@@ -50,6 +52,31 @@ public class SignalStateFile {
         if (pathCache.isEmpty()) {
             pathCache.add(createNextFile());
         }
+    }
+
+    public Map<BlockPos, ByteBuffer> getAllEntries() {
+        final Map<BlockPos, ByteBuffer> map = new HashMap<>();
+        for (int i = 0; i < pathCache.size(); i++) {
+            final Path path = pathCache.get(i);
+            try (RandomAccessFile stream = new RandomAccessFile(path.toFile(), "r")) {
+                final List<Map.Entry<BlockPos, Long>> posList = new ArrayList<>();
+                stream.seek(START_OFFSET);
+                do {
+                    final BlockPos pos = new BlockPos(stream.readInt(), stream.readInt(),
+                            stream.readInt());
+                    final long offset = Integer.toUnsignedLong(stream.readInt());
+                    if (!pos.equals(BlockPos.ZERO)) {
+                        posList.add(Maps.immutableEntry(pos, offset));
+                    }
+                } while (stream.getFilePointer() < MAX_OFFSET_OF_INDEX);
+                final int counter = i;
+                posList.forEach(entry -> map.put(entry.getKey(),
+                        read(new SignalStatePos(counter, entry.getValue()))));
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return map;
     }
 
     private Path createNextFile() {

@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -12,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -157,5 +159,23 @@ public class StateFileTest {
         assertEquals(secondPos, secondPosToFind);
         file.deleteIndex(first);
         assertNull(file.find(first));
+    }
+
+    @Test
+    public void testGetAllEntries() {
+        final SignalStateFile file = new SignalStateFile(path);
+        final Map<BlockPos, ByteBuffer> map = new HashMap<>();
+        for (int i = 0; i < SignalStateFile.MAX_ELEMENTS_PER_FILE + 100; i++) {
+            final ByteBuffer buffer = ByteBuffer.allocate(SignalStateFile.STATE_BLOCK_SIZE);
+            GIRSyncEntryTests.RANDOM.nextBytes(buffer.array());
+            final BlockPos firstcreate = GIRSyncEntryTests.randomBlockPos();
+            final SignalStatePos statePos = file.create(firstcreate);
+            file.write(statePos, buffer);
+            map.put(firstcreate, buffer);
+        }
+        file.getAllEntries().forEach((pos, byteBuffer) -> {
+            assertTrue(map.containsKey(pos));
+            assertEquals(byteBuffer, map.get(pos));
+        });
     }
 }
