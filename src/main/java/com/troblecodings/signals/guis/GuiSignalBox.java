@@ -847,11 +847,11 @@ public class GuiSignalBox extends GuiBase {
                 if (node == null) {
                     node = new SignalBoxNode(name);
                 }
-                final UISignalBoxTile sbt = new UISignalBoxTile(node,
-                        container.greenSignals.getOrDefault(name, new ArrayList<>()));
+                final UISignalBoxTile sbt = new UISignalBoxTile(node);
                 if (!node.isEmpty())
                     allTiles.put(name, sbt);
                 tile.add(sbt);
+                sbt.setGreenSignals(container.greenSignals.getOrDefault(name, new ArrayList<>()));
                 if (!node.getCustomText().isEmpty()) {
                     final UIEntity inputEntity = new UIEntity();
                     inputEntity.add(new UIScale(0.7f, 0.7f, 0.7f));

@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,12 +35,7 @@ public class UISignalBoxTile extends UIComponentEntity {
     private final Map<ModeSet, MainSignalIdentifier> greenSignals = new HashMap<>();
 
     public UISignalBoxTile(final SignalBoxNode node) {
-        this(node, new ArrayList<>());
-    }
-
-    public UISignalBoxTile(final SignalBoxNode node, final List<MainSignalIdentifier> list) {
         super(new UIEntity());
-        list.forEach(mode -> greenSignals.put(mode.getModeSet(), mode));
         this.node = node;
         if (this.node != null)
             this.node.forEach(this::localAdd);
@@ -76,14 +70,11 @@ public class UISignalBoxTile extends UIComponentEntity {
             rotation.setRotateZ(modeSet.rotation.ordinal() * ((float) 90));
             entity.add(rotation);
         }
-        entity.add(new UIIndependentTranslate(0, 0, modeSet.mode.depth));
+        entity.add(new UIIndependentTranslate(0, 0, 1));
 
         final MainSignalIdentifier identifier = greenSignals.get(modeSet);
         SignalState state = identifier != null ? identifier.state : SignalState.RED;
-        if (modeSet.mode.equals(EnumGuiMode.RS)
-                && setToEntity.containsKey(new ModeSet(EnumGuiMode.HP, modeSet.rotation))) {
-            state = SignalState.OFF;
-        }
+        
         entity.add((UIComponent) modeSet.mode.consumer.get(state));
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
