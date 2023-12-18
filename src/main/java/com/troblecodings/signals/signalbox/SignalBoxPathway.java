@@ -750,10 +750,11 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public boolean tryBlock(final BlockPos position) {
-        if (!mapOfBlockingPositions.containsKey(position))
+        final SignalBoxNode blockNode = mapOfBlockingPositions.get(position);
+        if (blockNode == null)
             return false;
         resetFirstSignal();
-        this.setPathStatus(EnumPathUsage.BLOCKED);
+        setPathStatus(EnumPathUsage.BLOCKED, blockNode.getPoint());
         isBlocked = true;
         if (pathwayToBlock != null) {
             pathwayToBlock.loadTileAndExecute(otherTile -> {
