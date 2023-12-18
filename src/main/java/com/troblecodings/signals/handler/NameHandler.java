@@ -1,6 +1,9 @@
 package com.troblecodings.signals.handler;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -45,7 +48,7 @@ import net.minecraftforge.network.event.EventNetworkChannel;
 public final class NameHandler implements INetworkSync {
 
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
-    private static final Map<Level, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<Level, NameHandlerFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<StateInfo, Integer> LOAD_COUNTER = new HashMap<>();
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static EventNetworkChannel channel;
@@ -141,7 +144,7 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_NAMES) {
             ALL_NAMES.remove(info);
         }
-        NameHandlerFile file;
+        NameHandlerFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
         }
@@ -158,9 +161,52 @@ public final class NameHandler implements INetworkSync {
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
+    private static void migrateWorldFilesToV2(final Level world) {
+        final Path oldPath = Paths.get("osfiles/namefiles/"
+                + world.getServer().getWorldData().getLevelName().replace(":", "").replace("/", "")
+                        .replace("\\", "")
+                + "/" + world.dimension().location().toString().replace(":", ""));
+        if (!Files.exists(oldPath))
+            return;
+        OpenSignalsMain.getLogger()
+                .info("Starting Migration from NameHandlerFileV1 to NameHandlerFileV2...");
+        final NameHandlerFile oldFile = new NameHandlerFile(oldPath);
+        NameHandlerFileV2 newFile;
+        synchronized (ALL_LEVEL_FILES) {
+            newFile = ALL_LEVEL_FILES.get(world);
+        }
+        oldFile.getAllEntries().forEach((pos, buffer) -> newFile.create(pos, buffer.array()));
+        OpenSignalsMain.getLogger()
+                .info("Finished Migration from NameHandlerFileV1 to NameHandlerFileV2!");
+        try {
+            Files.list(oldPath).forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            Files.delete(oldPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @SubscribeEvent
     public static void onWorldLoad(final WorldEvent.Load load) {
-        if (load.getWorld().isClientSide() || writeService != null)
+        final Level world = (Level) load.getWorld();
+        if (world.isClientSide)
+            return;
+        synchronized (ALL_LEVEL_FILES) {
+            ALL_LEVEL_FILES.put(world,
+                    new NameHandlerFileV2(Paths.get("saves/"
+                            + world.getServer().getWorldData().getLevelName().replace("/", "_")
+                                    .replace(".", "_")
+                            + "/osfiles/namefiles/"
+                            + world.dimension().location().toString().replace(":", ""))));
+        }
+        migrateWorldFilesToV2(world);
+        if (writeService != null)
             return;
         writeService = Executors.newFixedThreadPool(5);
     }
@@ -190,13 +236,13 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static void createToFile(final StateInfo info, final String name) {
-        NameHandlerFile file;
+        NameHandlerFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
         }
         if (file == null)
             return;
-        SignalStatePos posInFile = file.find(info.pos);
+        SignalStatePosV2 posInFile = file.find(info.pos);
         synchronized (file) {
             if (posInFile == null) {
                 posInFile = file.createState(info.pos, name);
@@ -217,10 +263,11 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             if (!ALL_LEVEL_FILES.containsKey(world)) {
                 ALL_LEVEL_FILES.put(world,
-                        new NameHandlerFile(Paths.get("osfiles/namefiles/"
-                                + world.getServer().getWorldData().getLevelName().replace(":", "")
-                                        .replace("/", "").replace("\\", "")
-                                + "/" + world.dimension().location().toString().replace(":", ""))));
+                        new NameHandlerFileV2(Paths.get("saves/"
+                                + world.getServer().getWorldData().getLevelName().replace("/", "_")
+                                        .replace(".", "_")
+                                + "/osfiles/namefiles/"
+                                + world.dimension().location().toString().replace(":", ""))));
             }
         }
         chunk.getBlockEntitiesPos().forEach(pos -> {
@@ -286,14 +333,14 @@ public final class NameHandler implements INetworkSync {
                     sendTo(player, packToBuffer(info.pos, name));
                     return;
                 }
-                NameHandlerFile file;
+                NameHandlerFileV2 file;
                 synchronized (ALL_LEVEL_FILES) {
                     file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
-                            _u -> new NameHandlerFile(Paths.get("osfiles/namefiles/"
+                            _u -> new NameHandlerFileV2(Paths.get("saves/"
                                     + info.world.getServer().getWorldData().getLevelName()
-                                            .replace(":", "").replace("/", "").replace("\\", "")
-                                    + "/" + info.world.dimension().location().toString()
-                                            .replace(":", ""))));
+                                            .replace("/", "_").replace(".", "_")
+                                    + "/osfiles/namefiles/" + info.world.dimension().location()
+                                            .toString().replace(":", ""))));
                 }
                 String name;
                 synchronized (file) {
