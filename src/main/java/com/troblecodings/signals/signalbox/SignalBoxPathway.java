@@ -754,7 +754,22 @@ public class SignalBoxPathway implements IChunkLoadable {
         if (blockNode == null)
             return false;
         resetFirstSignal();
-        setPathStatus(EnumPathUsage.BLOCKED, blockNode.getPoint());
+        boolean foundStartBlock = false;
+        for (int i = listOfNodes.size() - 2; i > 0; i--) {
+            final Point oldPos = listOfNodes.get(i - 1).getPoint();
+            final Point newPos = listOfNodes.get(i + 1).getPoint();
+            final SignalBoxNode current = listOfNodes.get(i);
+            final Path path = new Path(oldPos, newPos);
+            final PathOptionEntry entry = current.getOption(path).get();
+            entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.BLOCKED);
+            final Optional<BlockPos> blocking = entry.getEntry(PathEntryType.BLOCKING);
+            if (blocking.isPresent() && blocking.get().equals(position)) {
+                foundStartBlock = true;
+            }
+            if (foundStartBlock && blocking.isPresent() && !blocking.get().equals(position)) {
+                break;
+            }
+        }
         isBlocked = true;
         if (pathwayToBlock != null) {
             pathwayToBlock.loadTileAndExecute(otherTile -> {
