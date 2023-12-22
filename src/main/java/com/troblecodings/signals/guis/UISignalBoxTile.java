@@ -8,10 +8,14 @@ import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.UpdateEvent;
+import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
+import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -33,6 +37,7 @@ public class UISignalBoxTile extends UIComponentEntity {
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
     private final Map<ModeSet, MainSignalIdentifier> greenSignals = new HashMap<>();
+    private final UIEntity trainNumberEntity = new UIEntity();
 
     public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
@@ -142,5 +147,21 @@ public class UISignalBoxTile extends UIComponentEntity {
     public void setColor(final ModeSet mode, final int color) {
         final UIEntity entity = setToEntity.get(mode);
         entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
+    }
+
+    public void updateTrainNumber() {
+        this.getParent().remove(trainNumberEntity);
+        final TrainNumber number = this.node.getTrainNumber();
+        if (number.trainNumber.isEmpty()) {
+            return;
+        }
+        trainNumberEntity.clear();
+        trainNumberEntity.add(new UIScale(0.45f, 0.45f, 0.45f));
+        final UILabel label = new UILabel(number.trainNumber);
+        label.setTextColor(ConfigHandler.CLIENT.signalboxUsedColor.get());
+        trainNumberEntity.add(label);
+        trainNumberEntity.setX(5);
+        trainNumberEntity.setY(9);
+        this.getParent().add(trainNumberEntity);
     }
 }

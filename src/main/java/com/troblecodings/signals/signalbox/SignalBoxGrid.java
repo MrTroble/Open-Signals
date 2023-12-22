@@ -22,6 +22,7 @@ import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
@@ -270,6 +271,10 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public SignalBoxPathway getPathwayByLastPoint(final Point end) {
         return endsToPath.get(end);
+    }
+
+    public void updateTrainNumber(final SignalBoxNode node, final TrainNumber number) {
+        startsToPath.values().forEach(pathway -> pathway.checkTrainNumberUpdate(number, node));
     }
 
     public void removeNextPathway(final Point start, final Point end) {

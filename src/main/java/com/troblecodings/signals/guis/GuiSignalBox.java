@@ -118,6 +118,7 @@ public class GuiSignalBox extends GuiBase {
         container.setColorUpdater(this::applyColorChanges);
         container.setSignalUpdater(this::updateSignals);
         container.setConuterUpdater(this::updateCounter);
+        container.setTrainNumberUpdater(this::updateTrainNumber);
         this.info = info;
     }
 
@@ -147,6 +148,14 @@ public class GuiSignalBox extends GuiBase {
                 }
             });
         });
+    }
+
+    private void updateTrainNumber(final List<Point> points) {
+        points.forEach(point -> {
+            final UISignalBoxTile tile = allTiles.get(point);
+            tile.updateTrainNumber();
+        });
+        lowerEntity.update();
     }
 
     protected void resetTileSelection() {
@@ -233,6 +242,35 @@ public class GuiSignalBox extends GuiBase {
                 final String pathUsage = I18Wrapper.format("property." + path);
                 stateEntity.add(new UILabel(pathUsageName + pathUsage));
                 parent.add(stateEntity);
+
+                if (path.equals(EnumPathUsage.BLOCKED)) {
+                    parent.add(GuiElements.createButton(I18Wrapper.format("sb.trainnumber"), _u -> {
+                        final UIEntity screen = GuiElements.createScreen(panel -> {
+
+                            final UIBox hbox = new UIBox(UIBox.VBOX, 3);
+                            panel.add(hbox);
+                            final UITextInput textInput = new UITextInput(
+                                    node.getTrainNumber().trainNumber);
+                            final UIEntity input = new UIEntity();
+                            input.setInheritWidth(true);
+                            input.setHeight(20);
+                            input.add(textInput);
+                            final UIEntity change = GuiElements
+                                    .createButton(I18Wrapper.format("sb.change_trainnumber"), e -> {
+                                        sendTrainNumber(node.getPoint(), textInput.getText());
+                                        pop();
+                                    });
+                            final UIEntity changeEntity = new UIEntity();
+                            changeEntity.setInherits(true);
+                            changeEntity.add(new UIBox(UIBox.VBOX, 3));
+                            changeEntity.add(input);
+                            changeEntity.add(change);
+                            panel.add(changeEntity);
+                        });
+                        screen.add(new UIClickable(e1 -> pop(), 1));
+                        push(screen);
+                    }));
+                }
 
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
@@ -869,6 +907,7 @@ public class GuiSignalBox extends GuiBase {
                 }
                 consumer.accept(tile, sbt);
                 row.add(tile);
+                sbt.updateTrainNumber();
             }
             plane.add(row);
         }
@@ -1129,6 +1168,16 @@ public class GuiSignalBox extends GuiBase {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
         buffer.putInt(container.grid.getCurrentCounter());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void sendTrainNumber(final Point point, final String number) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
+        point.writeNetwork(buffer);
+        buffer.putString(number);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 

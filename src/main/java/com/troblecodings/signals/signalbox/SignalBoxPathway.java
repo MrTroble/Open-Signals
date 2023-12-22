@@ -30,6 +30,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -79,6 +80,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     private boolean isPathwayReseted = false;
     private SignalBoxGrid holder = null;
     private SignalBoxTileEntity tile;
+    private TrainNumber trainNumber;
 
     private SignalBoxPathway pathwayToBlock;
     private SignalBoxPathway pathwayToReset;
@@ -105,6 +107,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         initalize();
         this.originalFirstPoint = new Point(firstPoint);
         updatePathwayToAutomatic();
+        resetAllTrainNumbers();
     }
 
     private void initalize() {
@@ -217,6 +220,9 @@ public class SignalBoxPathway implements IChunkLoadable {
             resetWrapper.putWrapper(END_POINT, pointWrapper);
             tag.putWrapper(PATHWAY_TO_RESET, resetWrapper);
         }
+        if (trainNumber != null) {
+            this.trainNumber.writeTag(tag);
+        }
     }
 
     public void read(final NBTWrapper tag) {
@@ -248,6 +254,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             this.originalFirstPoint = new Point();
             this.originalFirstPoint.read(originalFirstPoint);
         }
+        this.trainNumber = TrainNumber.of(tag);
         updatePathwayToAutomatic();
         updateSignalStates();
     }
@@ -629,6 +636,8 @@ public class SignalBoxPathway implements IChunkLoadable {
             }
         });
         updateSignalsOnClient(redSignals);
+        resetAllTrainNumbers();
+        sendTrainNumberUpdates();
     }
 
     public void resetPathway(final @Nullable Point point) {
@@ -679,6 +688,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                 this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
         this.initalize();
         updateSignalsOnClient(redSignals);
+        updateTrainNumber(trainNumber);
     }
 
     public Optional<Point> tryReset(final BlockPos position) {
@@ -750,25 +760,12 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public boolean tryBlock(final BlockPos position) {
-        final SignalBoxNode blockNode = mapOfBlockingPositions.get(position);
-        if (blockNode == null)
+        if (!mapOfBlockingPositions.containsKey(position))
             return false;
         resetFirstSignal();
-        boolean foundStartBlock = false;
-        for (int i = listOfNodes.size() - 2; i > 0; i--) {
-            final Point oldPos = listOfNodes.get(i - 1).getPoint();
-            final Point newPos = listOfNodes.get(i + 1).getPoint();
-            final SignalBoxNode current = listOfNodes.get(i);
-            final Path path = new Path(oldPos, newPos);
-            final PathOptionEntry entry = current.getOption(path).get();
-            entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.BLOCKED);
-            final Optional<BlockPos> blocking = entry.getEntry(PathEntryType.BLOCKING);
-            if (blocking.isPresent() && blocking.get().equals(position)) {
-                foundStartBlock = true;
-            }
-            if (foundStartBlock && blocking.isPresent() && !blocking.get().equals(position)) {
-                break;
-            }
+        this.setPathStatus(EnumPathUsage.BLOCKED);
+        if (!isBlocked) {
+            getTrainNumberFromPrevious();
         }
         isBlocked = true;
         if (pathwayToBlock != null) {
@@ -776,10 +773,48 @@ public class SignalBoxPathway implements IChunkLoadable {
                 pathwayToBlock = otherTile.getSignalBoxGrid()
                         .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
                 pathwayToBlock.setPathStatus(EnumPathUsage.BLOCKED);
-                pathwayToBlock.executeConsumer();
+                pathwayToBlock.updateTrainNumber(trainNumber);
             });
         }
         return true;
+    }
+
+    private void getTrainNumberFromPrevious() {
+        final SignalBoxPathway previous = holder.getPathwayByLastPoint(firstPoint);
+        if (previous != null) {
+            updateTrainNumber(previous.trainNumber);
+        }
+    }
+
+    public void checkTrainNumberUpdate(final TrainNumber number, final SignalBoxNode node) {
+        if (!listOfNodes.contains(node))
+            return;
+        updateTrainNumber(number);
+    }
+
+    private void updateTrainNumber(final TrainNumber number) {
+        resetAllTrainNumbers();
+        final SignalBoxNode setNode = listOfNodes.get((listOfNodes.size() - 1) / 2);
+        setNode.setTrainNumber(number);
+        this.trainNumber = number;
+        sendTrainNumberUpdates();
+    }
+
+    private void sendTrainNumberUpdates() {
+        if (!this.tile.isBlocked())
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
+        buffer.putInt(listOfNodes.size());
+        listOfNodes.forEach(node -> {
+            node.getPoint().writeNetwork(buffer);
+            node.getTrainNumber().writeNetwork(buffer);
+        });
+        OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
+    }
+
+    private void resetAllTrainNumbers() {
+        listOfNodes.forEach(node -> node.removeTrainNumber());
     }
 
     public void deactivateAllOutputsOnPathway() {
