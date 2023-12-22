@@ -277,12 +277,12 @@ public final class SignalStateHandler implements INetworkSync {
             Files.list(oldPath).forEach(path -> {
                 try {
                     Files.delete(path);
-                } catch (IOException e) {
+                } catch (final IOException e) {
                     e.printStackTrace();
                 }
             });
             Files.delete(oldPath);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }

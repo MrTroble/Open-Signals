@@ -100,7 +100,7 @@ public class SignalStateFileV2 {
                     : b & ~(1 << bitPosition));
             stream.seek(bytePos);
             stream.writeByte(byteToWrite);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             e.printStackTrace();
         }
     }
@@ -153,7 +153,7 @@ public class SignalStateFileV2 {
                 stream.seek(HEADER_SIZE);
                 stream.writeInt(addedElements - 1);
                 return new SignalStatePosV2(file, offset);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 e.printStackTrace();
             }
             return null;
