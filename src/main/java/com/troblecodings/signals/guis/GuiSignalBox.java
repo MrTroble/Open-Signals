@@ -255,8 +255,10 @@ public class GuiSignalBox extends GuiBase {
                     final UITextInput input = new UITextInput("");
                     inputEntity.add(input);
                     layout.add(inputEntity);
-                    layout.add(GuiElements.createButton(I18Wrapper.format("btn.save"),
-                            e -> sendTrainNumber(node.getPoint(), input.getText())));
+                    layout.add(GuiElements.createButton(I18Wrapper.format("btn.save"), e -> {
+                        sendTrainNumber(node.getPoint(), input.getText());
+                        input.setText("");
+                    }));
                     layout.add(
                             GuiElements.createButton("x", e -> deleteTrainNumber(node.getPoint())));
                     parent.add(layout);
