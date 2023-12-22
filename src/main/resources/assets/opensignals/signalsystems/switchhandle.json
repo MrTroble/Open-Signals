@@ -11,7 +11,10 @@
         },
         "interactionTasks": {
             "placementtool": {
-                "config(manual.TRUE)": "POWERED.TRUE"
+                "config(manual.TRUE)": "WEIGHTCOLOR.YELLOW"
+            },
+            "signplacementtool": {
+                "config(manual.TRUE)": "WEIGHTCOLOR.WHITE_BLACK"
             }
         }
     },

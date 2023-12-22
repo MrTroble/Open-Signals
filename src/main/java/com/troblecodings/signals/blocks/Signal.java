@@ -385,7 +385,7 @@ public class Signal extends BasicBlock {
     }
 
     private void interactionWithItem(final Item item, final SignalStateInfo info) {
-        final String itemName = item.getRegistryName().getPath();
+        final String itemName = item.getRegistryName().getPath().toLowerCase();
         final Map<SEProperty, String> propertiesToSet = new HashMap<>();
         SignalStateHandler.runTaskWhenSignalLoaded(info, (stateInfo, properties, _u) -> {
             final List<PredicateProperty<Map.Entry<SEProperty, String>>> interaction = //

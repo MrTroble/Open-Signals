@@ -154,6 +154,7 @@ public class SignalPropertiesBuilder {
                     final SEProperty property = (SEProperty) info.getProperty(array[0]);
                     properties.add(new PredicateProperty<>(LogicParser.predicate(predicate, info),
                             Maps.immutableEntry(property, array[1])));
+                    interactionResults.put(itemRegistryName.toLowerCase(), properties);
                 });
             });
         }
