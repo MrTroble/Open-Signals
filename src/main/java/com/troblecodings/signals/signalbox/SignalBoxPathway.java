@@ -77,7 +77,6 @@ public class SignalBoxPathway implements IChunkLoadable {
     private boolean isAutoPathway = false;
     private Point originalFirstPoint = null;
     private Consumer<SignalBoxPathway> consumer;
-    private boolean isPathwayReseted = false;
     private SignalBoxGrid holder = null;
     private SignalBoxTileEntity tile;
     private TrainNumber trainNumber;
@@ -421,7 +420,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                     Thread.sleep(delay * 1000);
                 } catch (final InterruptedException e) {
                 }
-                if (isPathwayReseted) {
+                if (emptyOrBroken) {
                     return;
                 }
                 synchronized (distantSignalPositions) {
@@ -503,12 +502,12 @@ public class SignalBoxPathway implements IChunkLoadable {
         distantSignalPositions.values().forEach(position -> {
             final SignalBoxPathway next = getNextPathway();
             final SignalState previous = position.state;
-            if (lastSignal != null && next != null && !next.isPathwayRestted()) {
+            if (lastSignal != null && next != null && !next.isEmptyOrBroken()) {
                 if (!next.isExecutingSignalSet)
                     position.state = SignalState.GREEN;
             } else if (pathwayToBlock != null) {
                 final SignalBoxPathway otherNext = pathwayToBlock.getNextPathway();
-                if (otherNext != null && !otherNext.isPathwayRestted()) {
+                if (otherNext != null && !otherNext.isEmptyOrBroken()) {
                     if (!otherNext.isExecutingSignalSet)
                         position.state = SignalState.GREEN;
                 } else {
@@ -647,7 +646,6 @@ public class SignalBoxPathway implements IChunkLoadable {
                 || point.equals(this.listOfNodes.get(1).getPoint())) {
             this.emptyOrBroken = true;
             this.isBlocked = false;
-            this.isPathwayReseted = true;
             resetOther();
             if (pathwayToReset != null) {
                 pathwayToReset.loadTileAndExecute(tile -> tile.getSignalBoxGrid()
@@ -901,9 +899,5 @@ public class SignalBoxPathway implements IChunkLoadable {
      */
     public boolean isEmptyOrBroken() {
         return emptyOrBroken;
-    }
-
-    public boolean isPathwayRestted() {
-        return isPathwayReseted;
     }
 }
