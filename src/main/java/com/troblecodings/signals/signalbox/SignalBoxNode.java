@@ -39,7 +39,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private final Point point;
     private boolean isAutoPoint = false;
     private String customText = "";
-    private TrainNumber trainNumber = new TrainNumber();
+    private TrainNumber trainNumber = TrainNumber.DEFAULT;
 
     public SignalBoxNode() {
         this(new Point());
@@ -101,11 +101,11 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public void removeTrainNumber() {
-        this.trainNumber = new TrainNumber();
+        this.trainNumber = TrainNumber.DEFAULT;
     }
 
     public TrainNumber getTrainNumber() {
-        return trainNumber == null ? new TrainNumber() : trainNumber;
+        return trainNumber == null ? TrainNumber.DEFAULT : trainNumber;
     }
 
     public void post() {
@@ -406,7 +406,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         if (trainNumber != null) {
             trainNumber.writeNetwork(buffer);
         } else {
-            new TrainNumber().writeNetwork(buffer);
+            TrainNumber.DEFAULT.writeNetwork(buffer);
         }
     }
 
@@ -429,7 +429,7 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         if (trainNumber != null) {
             trainNumber.writeNetwork(buffer);
         } else {
-            new TrainNumber().writeNetwork(buffer);
+            TrainNumber.DEFAULT.writeNetwork(buffer);
         }
     }
 

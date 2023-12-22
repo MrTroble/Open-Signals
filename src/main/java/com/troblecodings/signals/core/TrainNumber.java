@@ -9,10 +9,11 @@ import com.troblecodings.core.WriteBuffer;
 public class TrainNumber {
 
     private static final String TRAIN_NUMBER = "trainNumber";
+    public static final TrainNumber DEFAULT = new TrainNumber();
 
     public final String trainNumber;
 
-    public TrainNumber() {
+    private TrainNumber() {
         this("");
     }
 

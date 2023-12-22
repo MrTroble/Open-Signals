@@ -45,6 +45,7 @@ import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
@@ -244,32 +245,21 @@ public class GuiSignalBox extends GuiBase {
                 parent.add(stateEntity);
 
                 if (path.equals(EnumPathUsage.BLOCKED)) {
-                    parent.add(GuiElements.createButton(I18Wrapper.format("sb.trainnumber"), _u -> {
-                        final UIEntity screen = GuiElements.createScreen(panel -> {
-
-                            final UIBox hbox = new UIBox(UIBox.VBOX, 3);
-                            panel.add(hbox);
-                            final UITextInput textInput = new UITextInput(
-                                    node.getTrainNumber().trainNumber);
-                            final UIEntity input = new UIEntity();
-                            input.setInheritWidth(true);
-                            input.setHeight(20);
-                            input.add(textInput);
-                            final UIEntity change = GuiElements
-                                    .createButton(I18Wrapper.format("sb.change_trainnumber"), e -> {
-                                        sendTrainNumber(node.getPoint(), textInput.getText());
-                                        pop();
-                                    });
-                            final UIEntity changeEntity = new UIEntity();
-                            changeEntity.setInherits(true);
-                            changeEntity.add(new UIBox(UIBox.VBOX, 3));
-                            changeEntity.add(input);
-                            changeEntity.add(change);
-                            panel.add(changeEntity);
-                        });
-                        screen.add(new UIClickable(e1 -> pop(), 1));
-                        push(screen);
-                    }));
+                    final UIEntity layout = new UIEntity();
+                    layout.add(new UIBox(UIBox.HBOX, 2));
+                    layout.setHeight(20);
+                    layout.setInheritWidth(true);
+                    final UIEntity inputEntity = new UIEntity();
+                    inputEntity.setInheritHeight(true);
+                    inputEntity.setWidth(250);
+                    final UITextInput input = new UITextInput("");
+                    inputEntity.add(input);
+                    layout.add(inputEntity);
+                    layout.add(GuiElements.createButton(I18Wrapper.format("btn.save"),
+                            e -> sendTrainNumber(node.getPoint(), input.getText())));
+                    layout.add(
+                            GuiElements.createButton("x", e -> deleteTrainNumber(node.getPoint())));
+                    parent.add(layout);
                 }
 
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
@@ -1178,6 +1168,16 @@ public class GuiSignalBox extends GuiBase {
         buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
         point.writeNetwork(buffer);
         buffer.putString(number);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void deleteTrainNumber(final Point point) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
+        point.writeNetwork(buffer);
+        buffer.putString(TrainNumber.DEFAULT.trainNumber);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
