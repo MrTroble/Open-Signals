@@ -1,11 +1,13 @@
 package com.troblecodings.signals.core;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
@@ -43,6 +45,7 @@ public class SignalPropertiesBuilder {
     private Map<String, SoundPropertyParser> sounds;
     private Map<String, String> redstoneOutputs;
     private Map<String, String> remoteRedstoneOutputs;
+    private Map<String, Map<String, String>> interactionTasks;
     private int defaultItemDamage = 1;
 
     public SignalProperties build(final FunctionParsingInfo info) {
@@ -141,6 +144,19 @@ public class SignalPropertiesBuilder {
                 }
             });
         }
+        final Map<String, List<PredicateProperty<Map.Entry<SEProperty, String>>>> interactionResults //
+                = new HashMap<>();
+        if (this.interactionTasks != null) {
+            this.interactionTasks.forEach((itemRegistryName, map) -> {
+                final List<PredicateProperty<Map.Entry<SEProperty, String>>> properties = new ArrayList<>();
+                map.forEach((predicate, toSet) -> {
+                    final String[] array = toSet.split("\\.");
+                    final SEProperty property = (SEProperty) info.getProperty(array[0]);
+                    properties.add(new PredicateProperty<>(LogicParser.predicate(predicate, info),
+                            Maps.immutableEntry(property, array[1])));
+                });
+            });
+        }
         this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
@@ -148,6 +164,7 @@ public class SignalPropertiesBuilder {
                 autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
                 ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
                 ImmutableList.copyOf(redstoneValuePacks), defaultItemDamage,
-                ImmutableList.copyOf(remoteRedstoneValuePacks));
+                ImmutableList.copyOf(remoteRedstoneValuePacks),
+                ImmutableMap.copyOf(interactionResults));
     }
 }

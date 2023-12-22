@@ -8,6 +8,11 @@
         },
         "remoteRedstoneOutputs": {
             "config(manual.FALSE)": "powered"
+        },
+        "interactionTasks": {
+            "placementtool": {
+                "config(manual.TRUE)": "POWERED.TRUE"
+            }
         }
     },
     "seProperties": [

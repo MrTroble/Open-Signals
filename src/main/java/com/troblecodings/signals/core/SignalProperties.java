@@ -1,7 +1,9 @@
 package com.troblecodings.signals.core;
 
 import java.util.List;
+import java.util.Map;
 
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.parser.ValuePack;
 import com.troblecodings.signals.properties.PredicatedPropertyBase.PredicateProperty;
@@ -27,6 +29,7 @@ public class SignalProperties {
     public final List<ValuePack> redstoneOutputs;
     public final List<ValuePack> redstoneOutputPacks;
     public final int defaultItemDamage;
+    public final Map<String, List<PredicateProperty<Map.Entry<SEProperty, String>>>> interactionResults;
 
     public SignalProperties(final Placementtool placementtool, final float customNameRenderHeight,
             final int height, final List<PredicateProperty<Integer>> signalHeights,
@@ -35,7 +38,8 @@ public class SignalProperties {
             final int textColor, final boolean canLink, final List<Integer> colors,
             final List<PredicateProperty<Float>> renderheights, final List<SoundProperty> sounds,
             final List<ValuePack> redstoneOutputs, final int defaultItemDamage,
-            final List<ValuePack> redstoneOutputPacks) {
+            final List<ValuePack> redstoneOutputPacks,
+            final Map<String, List<PredicateProperty<Map.Entry<SEProperty, String>>>> interactionResults) {
         this.placementtool = placementtool;
         this.customNameRenderHeight = customNameRenderHeight;
         this.defaultHeight = height;
@@ -54,5 +58,6 @@ public class SignalProperties {
         this.redstoneOutputs = redstoneOutputs;
         this.defaultItemDamage = defaultItemDamage;
         this.redstoneOutputPacks = redstoneOutputPacks;
+        this.interactionResults = interactionResults;
     }
 }
