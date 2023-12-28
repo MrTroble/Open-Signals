@@ -1,6 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +49,6 @@ public class GuiSignalController extends GuiBase {
 
     private final ContainerSignalController controller;
     private final UIEntity lowerEntity = new UIEntity();
-    private final List<UIPropertyEnumHolder> holders = new ArrayList<>();
     private boolean loaded = false;
     private final Player player;
     private EnumMode currentMode;
@@ -301,7 +299,6 @@ public class GuiSignalController extends GuiBase {
         lowerEntity.add(previewSidebar.get());
         lowerEntity.add(new UIBox(UIBox.HBOX, 1));
 
-        holders.clear();
         ClientSignalStateHandler.getClientStates(new StateInfo(mc.level, controller.getPos()))
                 .forEach((property, value) -> previewSidebar.addToRenderNormal(property,
                         property.getParent().getIDFromValue(value)));
@@ -319,7 +316,6 @@ public class GuiSignalController extends GuiBase {
                     previewSidebar.update(controller.getSignal());
                 }
             }, index));
-            holders.add(new UIPropertyEnumHolder(property, enumarable));
             previewSidebar.addToRenderNormal(property, index);
         });
         previewSidebar.update(controller.getSignal());

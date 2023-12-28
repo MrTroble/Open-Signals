@@ -17,6 +17,8 @@ public interface IChunkLoadable {
     @SuppressWarnings("unchecked")
     default <T> boolean loadChunkAndGetTile(final Class<T> clazz, final ServerLevel world,
             final BlockPos pos, final BiConsumer<T, LevelChunk> consumer) {
+        if (pos == null)
+            return false;
         try {
             final LevelChunk chunk = world.getChunkAt(pos);
             final ChunkPos chunkPos = chunk.getPos();

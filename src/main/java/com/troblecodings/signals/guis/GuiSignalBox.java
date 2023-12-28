@@ -254,13 +254,19 @@ public class GuiSignalBox extends GuiBase {
                     inputEntity.setWidth(250);
                     final UITextInput input = new UITextInput("");
                     inputEntity.add(input);
+                    inputEntity.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.change")));
                     layout.add(inputEntity);
-                    layout.add(GuiElements.createButton(I18Wrapper.format("btn.save"), e -> {
-                        sendTrainNumber(node.getPoint(), input.getText());
-                        input.setText("");
-                    }));
-                    layout.add(
-                            GuiElements.createButton("x", e -> deleteTrainNumber(node.getPoint())));
+                    final UIEntity save = GuiElements.createButton(I18Wrapper.format("btn.save"),
+                            e -> {
+                                sendTrainNumber(node.getPoint(), input.getText());
+                                input.setText("");
+                            });
+                    save.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.save")));
+                    layout.add(save);
+                    final UIEntity remove = GuiElements.createButton("x",
+                            e -> deleteTrainNumber(node.getPoint()));
+                    remove.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.remove")));
+                    layout.add(remove);
                     parent.add(layout);
                 }
 

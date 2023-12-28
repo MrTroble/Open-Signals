@@ -435,7 +435,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             case SEND_TRAIN_NUMBER: {
                 final Point point = Point.of(buffer);
                 final TrainNumber number = TrainNumber.of(buffer);
-                grid.updateTrainNumber(grid.getNode(point), number);
+                grid.updateTrainNumber(point, number);
                 break;
             }
             default:

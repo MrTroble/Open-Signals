@@ -16,6 +16,7 @@ import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
+import com.troblecodings.signals.blocks.TrainNumberBlock;
 import com.troblecodings.signals.core.SignalLoader;
 
 import net.minecraft.resources.ResourceLocation;
@@ -41,6 +42,7 @@ public final class OSBlocks {
     public static final RedstoneIO REDSTONE_OUT = new RedstoneIO();
     public static final CombinedRedstoneInput COMBI_REDSTONE_INPUT = new CombinedRedstoneInput();
     public static final PathwayRequester PATHWAY_REQUESTER = new PathwayRequester();
+    public static final TrainNumberBlock TRAIN_NUMBER_BLOCK = new TrainNumberBlock();
 
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 
