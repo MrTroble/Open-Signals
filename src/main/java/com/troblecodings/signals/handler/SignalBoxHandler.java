@@ -495,6 +495,7 @@ public final class SignalBoxHandler {
         }
         final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
         try {
+            Files.createDirectories(newPath);
             Files.copy(oldPath, newPath);
             if (Files.isDirectory(oldPath)) {
                 Files.list(oldPath).forEach(path -> {
