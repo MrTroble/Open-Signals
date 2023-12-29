@@ -21,6 +21,7 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
 
 import io.netty.buffer.Unpooled;
@@ -197,13 +198,9 @@ public final class NameHandler implements INetworkSync {
         final Level world = (Level) load.getWorld();
         if (world.isClientSide)
             return;
+        final Path path = PathGetter.getNewPathForFiles(world, "namefiles");
         synchronized (ALL_LEVEL_FILES) {
-            ALL_LEVEL_FILES.put(world,
-                    new NameHandlerFileV2(Paths.get("saves/"
-                            + world.getServer().getWorldData().getLevelName().replace("/", "_")
-                                    .replace(".", "_")
-                            + "/osfiles/namefiles/"
-                            + world.dimension().location().toString().replace(":", ""))));
+            ALL_LEVEL_FILES.put(world, new NameHandlerFileV2(path));
         }
         migrateWorldFilesToV2(world);
         if (writeService != null)

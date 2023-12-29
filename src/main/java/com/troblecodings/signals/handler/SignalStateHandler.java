@@ -25,6 +25,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.enums.ChangedState;
@@ -348,13 +349,9 @@ public final class SignalStateHandler implements INetworkSync {
         final Level world = (Level) load.getWorld();
         if (world.isClientSide)
             return;
+        final Path path = PathGetter.getNewPathForFiles(world, "signalfiles");
         synchronized (ALL_LEVEL_FILES) {
-            ALL_LEVEL_FILES.put(world,
-                    new DebugSignalStateFileV2(Paths.get("saves/"
-                            + world.getServer().getWorldData().getLevelName().replace("/", "_")
-                                    .replace(".", "_")
-                            + "/osfiles/signalfiles/"
-                            + world.dimension().location().toString().replace(":", ""))));
+            ALL_LEVEL_FILES.put(world, new DebugSignalStateFileV2(path));
         }
         migrateWorldFilesToV2(world);
         if (writeService != null)
