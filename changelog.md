@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.18.2 - 3.3.0]
+
+* feat: new SignalFile system (V2) now in world folder and migration from old system
+* feat: added train number system
+* feat: added train number changing block
+* fix: issue with reverse reset and rerequest of PW
+* fix: missing models
+* fix: scroll in Info&Help page
+* fix: issue with next PWs 
+
+**When starting the world for the first time, the migration of the SignalFiles may take a moment.**
+
 ## [1.18.2 - 3.2.0]
 
 * feat: added customName to signalcontroller
