@@ -496,6 +496,16 @@ public final class SignalBoxHandler {
         final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
         try {
             Files.copy(oldPath, newPath);
+            if (Files.isDirectory(oldPath)) {
+                Files.list(oldPath).forEach(path -> {
+                    try {
+                        Files.deleteIfExists(path);
+                    } catch (final IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+            Files.deleteIfExists(oldPath);
         } catch (final IOException e) {
             e.printStackTrace();
         }
