@@ -372,7 +372,6 @@ public class Signal extends BasicBlock {
         final SignalStateInfo stateInfo = new SignalStateInfo(level, blockPos, this);
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
         final Item item = placer.getItemInHand(InteractionHand.MAIN_HAND).getItem();
-        interactionWithItem(item, stateInfo);
         if (item.equals(OSItems.MANIPULATOR) && (canBeLinked() || customname)) {
             OpenSignalsMain.handler.invokeGui(Signal.class, placer, level, blockPos, "signal");
             return InteractionResult.SUCCESS;
@@ -382,24 +381,6 @@ public class Signal extends BasicBlock {
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
-    }
-
-    private void interactionWithItem(final Item item, final SignalStateInfo info) {
-        final String itemName = item.getRegistryName().getPath().toLowerCase();
-        final Map<SEProperty, String> propertiesToSet = new HashMap<>();
-        SignalStateHandler.runTaskWhenSignalLoaded(info, (stateInfo, properties, _u) -> {
-            final List<PredicateProperty<Map.Entry<SEProperty, String>>> interaction = //
-                    this.prop.interactionResults.get(itemName);
-            if (interaction != null) {
-                interaction.forEach(property -> {
-                    if (property.predicate.test(properties)) {
-                        propertiesToSet.put(property.state.getKey(), property.state.getValue());
-                    }
-                });
-            }
-        });
-        if (!propertiesToSet.isEmpty())
-            SignalStateHandler.setStates(info, propertiesToSet);
     }
 
     @SuppressWarnings("unchecked")

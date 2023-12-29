@@ -8,14 +8,6 @@
         },
         "remoteRedstoneOutputs": {
             "config(manual.FALSE)": "powered"
-        },
-        "interactionTasks": {
-            "placementtool": {
-                "config(manual.TRUE)": "WEIGHTCOLOR.YELLOW"
-            },
-            "signplacementtool": {
-                "config(manual.TRUE)": "WEIGHTCOLOR.WHITE_BLACK"
-            }
         }
     },
     "seProperties": [
