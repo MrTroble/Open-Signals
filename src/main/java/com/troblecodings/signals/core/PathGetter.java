@@ -8,6 +8,10 @@ import net.minecraft.world.level.Level;
 
 public final class PathGetter {
 
+    private PathGetter() {
+
+    }
+
     public static Path getNewPathForFiles(final Level world, final String subDirectory) {
         final MinecraftServer server = world.getServer();
         Path path = Paths.get("osfiles");
