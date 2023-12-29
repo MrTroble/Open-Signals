@@ -500,15 +500,20 @@ public final class SignalBoxHandler {
             if (Files.isDirectory(oldPath)) {
                 Files.list(oldPath).forEach(path -> {
                     try {
-                        Files.deleteIfExists(path);
+                        Files.delete(path);
                     } catch (final IOException e) {
                         e.printStackTrace();
                     }
                 });
             }
-            Files.deleteIfExists(oldPath);
         } catch (final IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                Files.delete(oldPath);
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }
