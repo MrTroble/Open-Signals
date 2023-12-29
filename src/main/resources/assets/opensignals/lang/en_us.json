@@ -568,5 +568,6 @@
     "tile.trainnumberchanger": "Train-number block",
     "gui.trainnumber.change_set": "Set",
     "property.gui.setpoint.name": "Path element",
-    "property.gui.setpoint.desc": "Select the point in the signalbox where the train number of the respective path is to be displayed."
+    "property.gui.setpoint.desc": "Select the point in the signalbox where the train number of the respective path is to be displayed.",
+	"sb.trainnumber.change": "Here you can enter a train number for the respective train in the path, which then moves through the signal box."
 }
