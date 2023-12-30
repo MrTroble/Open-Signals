@@ -74,7 +74,7 @@ public class TrainNumberGui extends GuiBase {
                     setTrainNumber();
                     textInput.setText("");
                 }));
-        inputEntity.add(new UIToolTip("gui.trainnumber.info.change"));
+        inputEntity.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.info.change")));
         inner.add(inputEntity);
 
         final IIntegerable<String> points = SizeIntegerables.of(I18Wrapper.format("gui.setpoint"),
