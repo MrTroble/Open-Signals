@@ -55,8 +55,8 @@ public class PathwayRequesterGui extends GuiBase {
                         return "Disabled";
                     return container.validStarts.get(e).toShortString();
                 });
-        final IIntegerable<String> end = SizeIntegerables.of("EndPoint",
-                container.validStarts.size(), e -> {
+        final IIntegerable<String> end = SizeIntegerables.of("EndPoint", container.validEnds.size(),
+                e -> {
                     if (e == -1)
                         return "Disabled";
                     return container.validEnds.get(e).toShortString();

@@ -898,4 +898,8 @@ public class SignalBoxPathway implements IChunkLoadable {
     public boolean isEmptyOrBroken() {
         return emptyOrBroken;
     }
+
+    public boolean isShuntingPath() {
+        return type.equals(PathType.SHUNTING);
+    }
 }
