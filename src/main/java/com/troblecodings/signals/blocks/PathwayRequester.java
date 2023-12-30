@@ -34,15 +34,14 @@ public class PathwayRequester extends BasicBlock {
         if (worldIn.isRemote)
             return;
         if (worldIn.isBlockPowered(pos)) {
-            if (!state.getValue(POWERED)) {
+            if (state.getValue(POWERED) != true) {
                 worldIn.setBlockState(pos, state.withProperty(POWERED, true));
                 final TileEntity entity = worldIn.getTileEntity(pos);
-                if (entity != null) {
+                if (entity instanceof PathwayRequesterTileEntity)
                     ((PathwayRequesterTileEntity) entity).requestPathway();
-                }
-            } else {
-                worldIn.setBlockState(pos, state.withProperty(POWERED, false));
             }
+        } else {
+            worldIn.setBlockState(pos, state.withProperty(POWERED, false));
         }
     }
 

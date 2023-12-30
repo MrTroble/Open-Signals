@@ -40,9 +40,9 @@ public class TrainNumberBlock extends BasicBlock {
                 if (entity != null) {
                     ((TrainNumberTileEntity) entity).updateTrainNumberViaRedstone();
                 }
-            } else {
-                worldIn.setBlockState(pos, state.withProperty(POWERED, false));
             }
+        } else {
+            worldIn.setBlockState(pos, state.withProperty(POWERED, false));
         }
     }
 
