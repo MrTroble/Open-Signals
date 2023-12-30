@@ -468,7 +468,7 @@ public final class SignalBoxHandler {
         migrateFilesToNewDirectory(world);
         try {
             final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
-            if (!newPath.toFile().exists())
+            if (!Files.exists(newPath))
                 return;
             final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(newPath.toFile()));
             wrapper.getList(LINKING_UPDATE).forEach(tag -> {
@@ -500,7 +500,6 @@ public final class SignalBoxHandler {
         }
         final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
         try {
-            Files.createDirectories(newPath);
             Files.copy(oldPath, newPath);
             if (Files.isDirectory(oldPath)) {
                 Files.list(oldPath).forEach(path -> {
