@@ -418,15 +418,13 @@ public final class SignalBoxHandler {
             return;
         final NBTWrapper wrapper = new NBTWrapper();
         final List<NBTWrapper> wrapperList = new ArrayList<>();
-        final String levelName = ((WorldServer) world).getMinecraftServer().getName().replace("/",
-                "") + "_"
+        final String levelName = ((WorldServer) world).getMinecraftServer().getFolderName() + "_"
                 + ((WorldServer) world).provider.getDimensionType().getName().replace(":", "_");
         synchronized (POS_UPDATES) {
             POS_UPDATES.forEach((pos, update) -> {
-                if (!levelName.equals(
-                        ((WorldServer) world).getMinecraftServer().getName().replace("/", "") + "_"
-                                + ((WorldServer) world).provider.getDimensionType().getName()
-                                        .replace(":", "_")))
+                if (!levelName.equals(((WorldServer) world).getMinecraftServer().getFolderName()
+                        + "_" + ((WorldServer) world).provider.getDimensionType().getName()
+                                .replace(":", "_")))
                     return;
                 final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
                 update.writeNBT(posWrapper);
@@ -437,10 +435,9 @@ public final class SignalBoxHandler {
         wrapperList.clear();
         synchronized (OUTPUT_UPDATES) {
             OUTPUT_UPDATES.forEach((pos, state) -> {
-                if (!levelName.equals(
-                        ((WorldServer) world).getMinecraftServer().getName().replace("/", "") + "_"
-                                + ((WorldServer) world).provider.getDimensionType().getName()
-                                        .replace(":", "_")))
+                if (!levelName.equals(((WorldServer) world).getMinecraftServer().getFolderName()
+                        + "_" + ((WorldServer) world).provider.getDimensionType().getName()
+                                .replace(":", "_")))
                     return;
                 final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
                 posWrapper.putBoolean(BOOL_STATE, state);
@@ -449,11 +446,14 @@ public final class SignalBoxHandler {
         }
         wrapper.putList(OUTPUT_UPDATE, wrapperList);
         try {
-            final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
-                    .toFile();
+            final Path path = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            final File file = path.toFile();
             if (file.exists())
                 file.delete();
-            Files.createFile(file.toPath());
+            file.createNewFile();
             CompressedStreamTools.write(wrapper.tag, file);
         } catch (final IOException e) {
             e.printStackTrace();
@@ -468,6 +468,8 @@ public final class SignalBoxHandler {
         migrateFilesToNewDirectory(world);
         try {
             final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            if (!newPath.toFile().exists())
+                return;
             final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(newPath.toFile()));
             wrapper.getList(LINKING_UPDATE).forEach(tag -> {
                 final LinkingUpdates updates = new LinkingUpdates();

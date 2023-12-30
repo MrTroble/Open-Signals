@@ -17,13 +17,10 @@ public final class PathGetter {
         final MinecraftServer server = world.getMinecraftServer();
         Path path = Paths.get("osfiles");
         if (!world.isRemote && server != null && server.isDedicatedServer()) {
-            path = Paths.get(world.getMinecraftServer().getName().replace("/", "_").replace(".",
-                    "_") + "/osfiles/" + subDirectory + "/"
+            path = Paths.get(server.getFolderName() + "/osfiles/" + subDirectory + "/"
                     + ((WorldServer) world).provider.getDimensionType().getName().replace(":", ""));
-        } else if (!world.isRemote && (server == null || !server.isDedicatedServer())) {
-            path = Paths.get("saves/"
-                    + world.getMinecraftServer().getName().replace("/", "_").replace(".", "_")
-                    + "/osfiles/" + subDirectory + "/"
+        } else if (!world.isRemote && !server.isDedicatedServer()) {
+            path = Paths.get("saves/" + server.getFolderName() + "/osfiles/" + subDirectory + "/"
                     + ((WorldServer) world).provider.getDimensionType().getName().replace(":", ""));
         }
         return path;
