@@ -9,9 +9,11 @@ import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class TrainNumberTileEntity extends SyncableTileEntity implements ILinkableTile {
 
@@ -91,5 +93,11 @@ public class TrainNumberTileEntity extends SyncableTileEntity implements ILinkab
 
     public void setNewPoint(final Point point) {
         this.point = point;
+    }
+
+    @Override
+    public boolean shouldRefresh(final World world, final BlockPos pos, final IBlockState oldState,
+            final IBlockState newSate) {
+        return false;
     }
 }
