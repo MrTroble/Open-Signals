@@ -569,5 +569,6 @@
     "gui.trainnumber.change_set": "Setzen",
     "property.gui.setpoint.name": "Fahrstraßenelement",
     "property.gui.setpoint.desc": "Wähle hier den Punkt im Stellwerk aus, auf dem die Zugnummer der jeweiligen Fahrstraße angezeigt werden soll.",
-    "sb.trainnumber.change": "Hier kannst du für den jeweiligen Zug in der Fahrstraße eine Zugnummer eingeben, die dann durch das Stellwerk mitläuft."
+    "sb.trainnumber.change": "Hier kannst du für den jeweiligen Zug in der Fahrstraße eine Zugnummer eingeben, die dann durch das Stellwerk mitläuft.",
+    "gui.trainnumber.info.change": "Hier kannst du für den jeweiligen Zug in der Fahrstraße eine Zugnummer eingeben, die dann durch das Stellwerk mitläuft."
 }

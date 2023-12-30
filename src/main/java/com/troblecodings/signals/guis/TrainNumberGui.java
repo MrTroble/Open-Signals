@@ -2,11 +2,11 @@ package com.troblecodings.signals.guis;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
+import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
-import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
-import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
@@ -68,7 +68,7 @@ public class TrainNumberGui extends GuiBase {
                     setTrainNumber();
                     textInput.setText("");
                 }));
-        inputEntity.add(new UIToolTip("gui.trainnumber.info.change"));
+        inputEntity.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.info.change")));
         inner.add(inputEntity);
 
         final IIntegerable<String> points = SizeIntegerables.of(I18Wrapper.format("gui.setpoint"),
