@@ -1,6 +1,9 @@
 package com.troblecodings.signals.handler;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,7 +18,9 @@ import javax.annotation.Nullable;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
@@ -45,7 +50,7 @@ public final class NameHandler implements INetworkSync {
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
-    private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<World, NameHandlerFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<StateInfo, Integer> LOAD_COUNTER = new HashMap<>();
     private static final String CHANNELNAME = "namehandlernet";
     private static FMLEventChannel channel;
@@ -132,14 +137,9 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_NAMES) {
             ALL_NAMES.remove(info);
         }
-        NameHandlerFile file;
+        NameHandlerFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
-            file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
-                    _u -> new NameHandlerFile(Paths.get("osfiles/namefiles/"
-                            + ((WorldServer) info.world).getMinecraftServer().getName()
-                                    .replace(":", "").replace("/", "").replace("\\", "")
-                            + "/" + ((WorldServer) info.world).provider.getDimensionType().getName()
-                                    .replace(":", ""))));
+            file = ALL_LEVEL_FILES.get(info.world);
         }
         synchronized (file) {
             file.deleteIndex(info.pos);
@@ -151,6 +151,50 @@ public final class NameHandler implements INetworkSync {
         buffer.putBlockPos(info.pos);
         buffer.putByte((byte) 255);
         info.world.playerEntities.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
+    }
+
+    private static void migrateWorldFilesToV2(final World world) {
+        final Path oldPath = (Paths.get("osfiles/namefiles/"
+                + ((WorldServer) world).getMinecraftServer().getName().replace(":", "")
+                        .replace("/", "").replace("\\", "")
+                + "/"
+                + ((WorldServer) world).provider.getDimensionType().getName().replace(":", "")));
+        if (!Files.exists(oldPath))
+            return;
+        OpenSignalsMain.getLogger()
+                .info("Starting Migration from NameHandlerFileV1 to NameHandlerFileV2...");
+        final NameHandlerFile oldFile = new NameHandlerFile(oldPath);
+        NameHandlerFileV2 newFile;
+        synchronized (ALL_LEVEL_FILES) {
+            newFile = ALL_LEVEL_FILES.get(world);
+        }
+        oldFile.getAllEntries().forEach((pos, buffer) -> newFile.create(pos, buffer.array()));
+        OpenSignalsMain.getLogger()
+                .info("Finished Migration from NameHandlerFileV1 to NameHandlerFileV2!");
+        try {
+            Files.list(oldPath).forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            Files.delete(oldPath);
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onWorldLoad(final WorldEvent.Load event) {
+        final World world = event.getWorld();
+        if (world.isRemote)
+            return;
+        final Path path = PathGetter.getNewPathForFiles(world, "namefiles");
+        synchronized (ALL_LEVEL_FILES) {
+            ALL_LEVEL_FILES.put(world, new NameHandlerFileV2(path));
+        }
+        migrateWorldFilesToV2(world);
     }
 
     @SubscribeEvent
@@ -178,13 +222,13 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static void createToFile(final StateInfo info, final String name) {
-        NameHandlerFile file;
+        NameHandlerFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
         }
         if (file == null)
             return;
-        SignalStatePos posInFile = file.find(info.pos);
+        SignalStatePosV2 posInFile = file.find(info.pos);
         synchronized (file) {
             if (posInFile == null) {
                 posInFile = file.createState(info.pos, name);
@@ -262,14 +306,9 @@ public final class NameHandler implements INetworkSync {
                     sendTo(player, packToBuffer(info.pos, name));
                     return;
                 }
-                NameHandlerFile file;
+                NameHandlerFileV2 file;
                 synchronized (ALL_LEVEL_FILES) {
-                    file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
-                            _u -> new NameHandlerFile(Paths.get("osfiles/namefiles/"
-                                    + ((WorldServer) info.world).getMinecraftServer().getName()
-                                            .replace(":", "").replace("/", "").replace("\\", "")
-                                    + "/" + ((WorldServer) info.world).provider.getDimensionType()
-                                            .getName().replace(":", ""))));
+                    file = ALL_LEVEL_FILES.get(info.world);
                 }
                 String name;
                 synchronized (file) {

@@ -19,6 +19,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.ChunkLoadable;
 import com.troblecodings.signals.core.LinkedPositions;
 import com.troblecodings.signals.core.LinkingUpdates;
+import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -409,7 +410,6 @@ public final class SignalBoxHandler {
     private static final String LINKING_UPDATE = "linkingUpdates";
     private static final String OUTPUT_UPDATE = "ouputUpdates";
     private static final String BOOL_STATE = "boolState";
-    private static final Path NBT_FILES_DIRECTORY = Paths.get("osfiles/signalboxhandler");
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
@@ -449,11 +449,7 @@ public final class SignalBoxHandler {
         }
         wrapper.putList(OUTPUT_UPDATE, wrapperList);
         try {
-            Files.createDirectories(NBT_FILES_DIRECTORY);
-            final File file = Paths.get("osfiles/signalboxhandler/",
-                    ((WorldServer) world).getMinecraftServer().getName().replace("/", "") + "_"
-                            + ((WorldServer) world).provider.getDimensionType().getName()
-                                    .replace(":", "_"))
+            final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
                     .toFile();
             if (file.exists())
                 file.delete();
@@ -469,18 +465,10 @@ public final class SignalBoxHandler {
         final World world = (World) event.getWorld();
         if (world.isRemote)
             return;
+        migrateFilesToNewDirectory(world);
         try {
-            Files.createDirectories(NBT_FILES_DIRECTORY);
-            final Optional<Path> file = Files.list(NBT_FILES_DIRECTORY)
-                    .filter(path -> path.endsWith(
-                            ((WorldServer) world).getMinecraftServer().getName().replace("/", "")
-                                    + "_" + ((WorldServer) world).provider.getDimensionType()
-                                            .getName().replace(":", "_")))
-                    .findFirst();
-            if (!file.isPresent() || !file.get().toFile().exists())
-                return;
-            final NBTWrapper wrapper = new NBTWrapper(
-                    CompressedStreamTools.read(file.get().toFile()));
+            final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(newPath.toFile()));
             wrapper.getList(LINKING_UPDATE).forEach(tag -> {
                 final LinkingUpdates updates = new LinkingUpdates();
                 updates.readNBT(tag);
@@ -497,6 +485,38 @@ public final class SignalBoxHandler {
             });
         } catch (final IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void migrateFilesToNewDirectory(final World world) {
+        final Path oldPath = Paths.get("osfiles/signalboxhandler/",
+                ((WorldServer) world).getMinecraftServer().getName().replace("/", "") + "_"
+                        + ((WorldServer) world).provider.getDimensionType().getName().replace(":",
+                                "_"));
+        if (!Files.exists(oldPath)) {
+            return;
+        }
+        final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+        try {
+            Files.createDirectories(newPath);
+            Files.copy(oldPath, newPath);
+            if (Files.isDirectory(oldPath)) {
+                Files.list(oldPath).forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch (final IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        } catch (final IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                Files.delete(oldPath);
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

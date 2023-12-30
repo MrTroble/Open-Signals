@@ -22,6 +22,7 @@ import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
@@ -237,20 +238,27 @@ public class SignalBoxGrid implements INetworkSavable {
         tryNextPathways();
     }
 
+    private final List<Map.Entry<Point, Point>> toAdd = new ArrayList<>();
+    private boolean executingForEach = false;
+
     private void tryNextPathways() {
+        executingForEach = true;
         nextPathways.removeIf(entry -> {
-            final boolean bool = requestWay(entry.getKey(), entry.getValue());
-            if (bool) {
+            final boolean request = requestWay(entry.getKey(), entry.getValue());
+            if (request) {
                 if (tile == null || !tile.isBlocked())
-                    return bool;
+                    return request;
                 final WriteBuffer buffer = new WriteBuffer();
                 buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
                 entry.getKey().writeNetwork(buffer);
                 entry.getValue().writeNetwork(buffer);
                 OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
             }
-            return bool;
+            return request;
         });
+        executingForEach = false;
+        toAdd.forEach(nextPathways::add);
+        toAdd.clear();
         if (startsToPath.isEmpty())
             nextPathways.clear();
     }
@@ -262,7 +270,11 @@ public class SignalBoxGrid implements INetworkSavable {
     public boolean addNextPathway(final Point start, final Point end) {
         final Map.Entry<Point, Point> entry = Maps.immutableEntry(start, end);
         if (!nextPathways.contains(entry)) {
-            nextPathways.add(entry);
+            if (executingForEach) {
+                toAdd.add(entry);
+            } else {
+                nextPathways.add(entry);
+            }
             return true;
         }
         return false;
@@ -270,6 +282,11 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public SignalBoxPathway getPathwayByLastPoint(final Point end) {
         return endsToPath.get(end);
+    }
+
+    public void updateTrainNumber(final Point point, final TrainNumber number) {
+        final SignalBoxNode node = modeGrid.getOrDefault(point, new SignalBoxNode());
+        startsToPath.values().forEach(pathway -> pathway.checkTrainNumberUpdate(number, node));
     }
 
     public void removeNextPathway(final Point start, final Point end) {
@@ -584,5 +601,9 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public Map<Point, Map<ModeSet, SubsidiaryEntry>> getAllSubsidiaries() {
         return ImmutableMap.copyOf(enabledSubsidiaryTypes);
+    }
+
+    public List<Point> getAllPoints() {
+        return ImmutableList.copyOf(modeGrid.keySet());
     }
 }

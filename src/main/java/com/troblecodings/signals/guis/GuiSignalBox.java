@@ -46,6 +46,7 @@ import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
@@ -119,6 +120,7 @@ public class GuiSignalBox extends GuiBase {
         container.setColorUpdater(this::applyColorChanges);
         container.setSignalUpdater(this::updateSignals);
         container.setConuterUpdater(this::updateCounter);
+        container.setTrainNumberUpdater(this::updateTrainNumber);
         info.player.openContainer = this.container;
         this.info = info;
     }
@@ -149,6 +151,14 @@ public class GuiSignalBox extends GuiBase {
                 }
             });
         });
+    }
+
+    private void updateTrainNumber(final List<Point> points) {
+        points.forEach(point -> {
+            final UISignalBoxTile tile = allTiles.get(point);
+            tile.updateTrainNumber();
+        });
+        lowerEntity.update();
     }
 
     protected void resetTileSelection() {
@@ -235,6 +245,32 @@ public class GuiSignalBox extends GuiBase {
                 final String pathUsage = I18Wrapper.format("property." + path);
                 stateEntity.add(new UILabel(pathUsageName + pathUsage));
                 parent.add(stateEntity);
+
+                if (path.equals(EnumPathUsage.BLOCKED)) {
+                    final UIEntity layout = new UIEntity();
+                    layout.add(new UIBox(UIBox.HBOX, 2));
+                    layout.setHeight(20);
+                    layout.setInheritWidth(true);
+                    final UIEntity inputEntity = new UIEntity();
+                    inputEntity.setInheritHeight(true);
+                    inputEntity.setWidth(250);
+                    final UITextInput input = new UITextInput("");
+                    inputEntity.add(input);
+                    inputEntity.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.change")));
+                    layout.add(inputEntity);
+                    final UIEntity save = GuiElements.createButton(I18Wrapper.format("btn.save"),
+                            e -> {
+                                sendTrainNumber(node.getPoint(), input.getText());
+                                input.setText("");
+                            });
+                    save.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.save")));
+                    layout.add(save);
+                    final UIEntity remove = GuiElements.createButton("x",
+                            e -> deleteTrainNumber(node.getPoint()));
+                    remove.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.remove")));
+                    layout.add(remove);
+                    parent.add(layout);
+                }
 
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
@@ -805,11 +841,12 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializeFieldTemplate(final BiConsumer<UIEntity, UISignalBoxTile> consumer,
             final boolean showLines) {
+        splitter.clear();
         final UIEntity plane = new UIEntity();
         plane.clearChildren();
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
         plane.setHeight(TILE_COUNT * TILE_WIDTH);
-        lowerEntity.add(new UIScroll(s -> {
+        splitter.add(new UIScroll(s -> {
             final float newScale = (float) (plane.getScaleX() + s * 0.001f);
             if (newScale <= 0)
                 return;
@@ -817,7 +854,7 @@ public class GuiSignalBox extends GuiBase {
             plane.setScaleY(newScale);
             plane.update();
         }));
-        lowerEntity.add(new UIDrag((x, y) -> {
+        splitter.add(new UIDrag((x, y) -> {
             plane.setX(plane.getX() + x);
             plane.setY(plane.getY() + y);
             plane.update();
@@ -863,10 +900,10 @@ public class GuiSignalBox extends GuiBase {
                 }
                 consumer.accept(tile, sbt);
                 row.add(tile);
+                sbt.updateTrainNumber();
             }
             plane.add(row);
         }
-        splitter = new UIEntity();
         splitter.add(new UIColor(BACKGROUND_COLOR));
         splitter.add(new UIScissor());
         splitter.add(new UIBorder(0xFF000000, 4));
@@ -1124,6 +1161,26 @@ public class GuiSignalBox extends GuiBase {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
         buffer.putInt(container.grid.getCurrentCounter());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void sendTrainNumber(final Point point, final String number) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
+        point.writeNetwork(buffer);
+        buffer.putString(number);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    private void deleteTrainNumber(final Point point) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
+        point.writeNetwork(buffer);
+        buffer.putString(TrainNumber.DEFAULT.trainNumber);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 

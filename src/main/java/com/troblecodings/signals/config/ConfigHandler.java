@@ -45,6 +45,10 @@ public final class ConfigHandler {
     @Comment("Change the color of a prepared path. Default: 16776960")
     public static int signalboxPreparedColor = 0xffff00;
 
+    @Name("Signalbox TrainNumber color")
+    @Comment("Change the color of the TrainNumber in the UI. Default: -1")
+    public static int signalboxTrainNumberColor = 0xFFFFFFFF;
+
     @Name("Basic text color")
     @Comment("Change the color of a default text. Default: -16777216")
     public static int basicTextColor = GuiConfigHandler.basicTextColor;
