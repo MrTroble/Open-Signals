@@ -32,6 +32,7 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.SignalBoxPathway;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -324,7 +325,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             }
             case RESET_PW: {
                 final Point point = Point.of(buffer);
-                if (grid.resetPathway(point)) {
+                final SignalBoxPathway pw = grid.getPathwayByStartPoint(point);
+                final boolean isShuntingPath = pw != null ? pw.isShuntingPath() : false;
+                if (grid.resetPathway(point) && !isShuntingPath) {
                     grid.countOne();
                     final WriteBuffer sucess = new WriteBuffer();
                     sucess.putEnumValue(SignalBoxNetwork.SEND_COUNTER);

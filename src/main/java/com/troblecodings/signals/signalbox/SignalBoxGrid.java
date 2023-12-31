@@ -280,6 +280,10 @@ public class SignalBoxGrid implements INetworkSavable {
         return false;
     }
 
+    public SignalBoxPathway getPathwayByStartPoint(final Point start) {
+        return startsToPath.get(start);
+    }
+
     public SignalBoxPathway getPathwayByLastPoint(final Point end) {
         return endsToPath.get(end);
     }
