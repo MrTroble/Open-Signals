@@ -467,6 +467,8 @@ public final class SignalBoxHandler {
         try {
             final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
             final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(newPath.toFile()));
+            if (wrapper.isTagNull())
+                return;
             wrapper.getList(LINKING_UPDATE).forEach(tag -> {
                 final LinkingUpdates updates = new LinkingUpdates();
                 updates.readNBT(tag);
