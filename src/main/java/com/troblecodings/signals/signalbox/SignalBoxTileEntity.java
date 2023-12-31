@@ -49,6 +49,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         this.grid.write(gridTag);
         grid.writePathways(wrapper);
         SignalBoxHandler.writeTileNBT(new StateInfo(level, worldPosition), wrapper);
+        wrapper.putWrapper(GUI_TAG, gridTag);
     }
 
     private NBTWrapper copy = null;
@@ -125,7 +126,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public SignalBoxGrid getSignalBoxGrid() {
         return grid;
     }
-    
+
     @Override
     public boolean canBeLinked() {
         return true;
