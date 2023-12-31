@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 
-public class PathGetter {
+public final class PathGetter {
 
     public static Path getNewPathForFiles(final World world, final String subDirectory) {
         final MinecraftServer server = world.getServer();
