@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.16.5 - 3.2.0]
+## [1.16.5 - 3.3.0]
 
 * feat: added help panel to signalbox
 * feat: added shortcuts in help panel
@@ -24,18 +24,29 @@
 * feat: added intersignalbox pathways
 * feat: visual signal feedback in signalbox
 * feat: added counter for subsidiaries and pathway reset
+* feat: new SignalFile system (V2) now in world folder and migration from old system
+* feat: added train number system
+* feat: added train number changing block
+* fix: issue with reverse reset and rerequest of PW
 * fix: circle model
 * fix: tooltip out of screen
 * fix: bug in signal configs (hl, zs2v, semaphore)
 * fix: redstone output of switch signals
 * fix: issues in GUIs
 * fix: issues with SignalState and NameHandler
+* fix: issue with reverse reset and rerequest of PW
+* fix: missing models
+* fix: scroll in Info&Help page
+* fix: issue with next PWs 
 * ref: a lot of background changes
 * fix: issues in configs
 * fix: issue with UIClickable and Info&Help Page
 * ref: better code performance
 * ref: predicate properties
 * ref: ImageBot optimize images beep-boop
+
+**When starting the world for the first time, the migration of the SignalFiles may take a moment.**
+
 
 ## [1.16.5 - 3.0.2]
 

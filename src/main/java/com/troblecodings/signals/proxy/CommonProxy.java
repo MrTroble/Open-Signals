@@ -11,6 +11,7 @@ import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
+import com.troblecodings.signals.blocks.TrainNumberBlock;
 import com.troblecodings.signals.contentpacks.ChangeConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalNonPredicateConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalPredicateConfigParser;
@@ -20,6 +21,7 @@ import com.troblecodings.signals.guis.ContainerPlacementtool;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.guis.NamableContainer;
+import com.troblecodings.signals.guis.TrainNumberContainer;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSItems;
@@ -46,6 +48,7 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(Signal.class, NamableContainer::new);
         OpenSignalsMain.handler.addServer(RedstoneIO.class, NamableContainer::new);
         OpenSignalsMain.handler.addServer(PathwayRequester.class, ContainerPathwayRequester::new);
+        OpenSignalsMain.handler.addServer(TrainNumberBlock.class, TrainNumberContainer::new);
     }
 
     public void preinit(final FMLCommonSetupEvent event) {

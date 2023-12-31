@@ -12,6 +12,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -33,6 +34,7 @@ public class UISignalBoxTile extends UIComponentEntity {
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
     private final Map<ModeSet, MainSignalIdentifier> greenSignals = new HashMap<>();
+    private final UITrainNumber uiTrainNumber = new UITrainNumber();
 
     public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
@@ -40,7 +42,7 @@ public class UISignalBoxTile extends UIComponentEntity {
         if (this.node != null)
             this.node.forEach(this::localAdd);
     }
-    
+
     public void setGreenSignals(final List<MainSignalIdentifier> list) {
         greenSignals.clear();
         list.forEach(identifier -> {
@@ -125,7 +127,7 @@ public class UISignalBoxTile extends UIComponentEntity {
     public boolean isValidStart() {
         return this.node.isValidStart();
     }
-    
+
     public boolean isValidEnd() {
         return this.node.isValidEnd();
     }
@@ -141,5 +143,13 @@ public class UISignalBoxTile extends UIComponentEntity {
     public void setColor(final ModeSet mode, final int color) {
         final UIEntity entity = setToEntity.get(mode);
         entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
+    }
+
+    public void updateTrainNumber() {
+        this.getParent().remove(uiTrainNumber);
+        final TrainNumber number = this.node.getTrainNumber();
+        uiTrainNumber.setTrainNumber(number);
+        if (!number.trainNumber.isEmpty())
+            this.getParent().add(uiTrainNumber);
     }
 }

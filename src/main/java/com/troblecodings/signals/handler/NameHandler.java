@@ -1,6 +1,9 @@
 package com.troblecodings.signals.handler;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +21,7 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
 
 import io.netty.buffer.Unpooled;
@@ -45,7 +49,7 @@ import net.minecraftforge.fml.network.event.EventNetworkChannel;
 public final class NameHandler implements INetworkSync {
 
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
-    private static final Map<World, NameHandlerFile> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<World, NameHandlerFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<StateInfo, Integer> LOAD_COUNTER = new HashMap<>();
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static EventNetworkChannel channel;
@@ -57,7 +61,7 @@ public final class NameHandler implements INetworkSync {
                 OpenSignalsMain.MODID::equalsIgnoreCase, OpenSignalsMain.MODID::equalsIgnoreCase);
         channel.registerObject(new NameHandler());
     }
-    
+
     @SubscribeEvent
     public static void onServerStop(final FMLServerStoppingEvent event) {
         Map<StateInfo, String> map;
@@ -141,7 +145,7 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_NAMES) {
             ALL_NAMES.remove(info);
         }
-        NameHandlerFile file;
+        NameHandlerFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
         }
@@ -158,9 +162,48 @@ public final class NameHandler implements INetworkSync {
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
+    private static void migrateWorldFilesToV2(final World world) {
+        final Path oldPath = Paths.get("osfiles/namefiles/"
+                + world.getServer().getWorldData().getLevelName().replace(":", "").replace("/", "")
+                        .replace("\\", "")
+                + "/" + world.dimension().location().toString().replace(":", ""));
+        if (!Files.exists(oldPath))
+            return;
+        OpenSignalsMain.getLogger()
+                .info("Starting Migration from NameHandlerFileV1 to NameHandlerFileV2...");
+        final NameHandlerFile oldFile = new NameHandlerFile(oldPath);
+        NameHandlerFileV2 newFile;
+        synchronized (ALL_LEVEL_FILES) {
+            newFile = ALL_LEVEL_FILES.get(world);
+        }
+        oldFile.getAllEntries().forEach((pos, buffer) -> newFile.create(pos, buffer.array()));
+        OpenSignalsMain.getLogger()
+                .info("Finished Migration from NameHandlerFileV1 to NameHandlerFileV2!");
+        try {
+            Files.list(oldPath).forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            Files.delete(oldPath);
+        } catch (final IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     @SubscribeEvent
     public static void onWorldLoad(final WorldEvent.Load load) {
-        if (load.getWorld().isClientSide() || writeService != null)
+        final World world = (World) load.getWorld();
+        if (world.isClientSide)
+            return;
+        final Path path = PathGetter.getNewPathForFiles(world, "namefiles");
+        synchronized (ALL_LEVEL_FILES) {
+            ALL_LEVEL_FILES.put(world, new NameHandlerFileV2(path));
+        }
+        migrateWorldFilesToV2(world);
+        if (writeService != null)
             return;
         writeService = Executors.newFixedThreadPool(5);
     }
@@ -190,13 +233,13 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static void createToFile(final StateInfo info, final String name) {
-        NameHandlerFile file;
+        NameHandlerFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
         }
         if (file == null)
             return;
-        SignalStatePos posInFile = file.find(info.pos);
+        SignalStatePosV2 posInFile = file.find(info.pos);
         synchronized (file) {
             if (posInFile == null) {
                 posInFile = file.createState(info.pos, name);
@@ -214,15 +257,6 @@ public final class NameHandler implements INetworkSync {
         final IChunk chunk = world.getChunk(event.getPos().getWorldPosition());
         final PlayerEntity player = event.getPlayer();
         final List<StateInfo> states = new ArrayList<>();
-        synchronized (ALL_LEVEL_FILES) {
-            if (!ALL_LEVEL_FILES.containsKey(world)) {
-                ALL_LEVEL_FILES.put(world,
-                        new NameHandlerFile(Paths.get("osfiles/namefiles/"
-                                + world.getServer().getWorldData().getLevelName().replace(":", "")
-                                        .replace("/", "").replace("\\", "")
-                                + "/" + world.dimension().location().toString().replace(":", ""))));
-            }
-        }
         chunk.getBlockEntitiesPos().forEach(pos -> {
             final Block block = chunk.getBlockState(pos).getBlock();
             if (block instanceof Signal || block instanceof RedstoneIO) {
@@ -287,14 +321,9 @@ public final class NameHandler implements INetworkSync {
                     sendTo(player, packToBuffer(info.pos, name));
                     return;
                 }
-                NameHandlerFile file;
+                NameHandlerFileV2 file;
                 synchronized (ALL_LEVEL_FILES) {
-                    file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
-                            _u -> new NameHandlerFile(Paths.get("osfiles/namefiles/"
-                                    + info.world.getServer().getWorldData().getLevelName()
-                                            .replace(":", "").replace("/", "").replace("\\", "")
-                                    + "/" + info.world.dimension().location().toString()
-                                            .replace(":", ""))));
+                    file = ALL_LEVEL_FILES.get(info.world);
                 }
                 String name;
                 synchronized (file) {

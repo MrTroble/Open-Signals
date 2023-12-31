@@ -37,6 +37,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
@@ -228,9 +229,8 @@ public class Signal extends BasicBlock {
 
     @OnlyIn(Dist.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
-        final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new StateInfo(info.tileEntity.getLevel(),
-                        info.tileEntity.getBlockPos()));
+        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
+                new StateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
@@ -289,9 +289,8 @@ public class Signal extends BasicBlock {
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new StateInfo(info.tileEntity.getLevel(),
-                        info.tileEntity.getBlockPos()));
+        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
+                new StateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
@@ -372,8 +371,8 @@ public class Signal extends BasicBlock {
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
         final boolean customname = canHaveCustomname(properties);
-        if (player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.MANIPULATOR)
-                && (canBeLinked() || customname)) {
+        final Item item = player.getItemInHand(Hand.MAIN_HAND).getItem();
+        if (item.equals(OSItems.MANIPULATOR) && (canBeLinked() || customname)) {
             OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
             return ActionResultType.SUCCESS;
         }
@@ -386,7 +385,7 @@ public class Signal extends BasicBlock {
 
     @SuppressWarnings("unchecked")
     private boolean loadRedstoneOutput(final World worldIn, final SignalStateInfo info) {
-        if(worldIn.isClientSide)
+        if (worldIn.isClientSide)
             return true;
         if (!this.prop.redstoneOutputs.isEmpty()) {
             final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
