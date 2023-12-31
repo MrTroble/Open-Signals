@@ -164,6 +164,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         }
         this.speed = atomic.get();
         this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
+        this.delay = delayAtomic.get();
     }
 
     private MainSignalIdentifier makeFromNext(final PathType type, final SignalBoxNode first,
