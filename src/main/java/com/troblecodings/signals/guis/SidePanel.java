@@ -197,7 +197,7 @@ public class SidePanel {
                         new UIEntity().getInfoTextColor(), 0.5f));
         addHelpPageToPlane();
     }
-    
+
     protected void updateCounterButton() {
         counterButton.findRecursive(UIButton.class)
                 .forEach(button -> button.setText(gui.container.grid.getCurrentCounter() + ""));
@@ -224,13 +224,15 @@ public class SidePanel {
         final UIScrollBox helpScrollbox = new UIScrollBox(UIBox.VBOX, 2);
 
         if (node != null)
+            helpList.add(GuiElements.createLabel(node.getPoint().toShortString(),
+                    new UIEntity().getBasicTextColor(), 0.8f));
         helpList.add(GuiElements.createLabel(I18n.get("info.keys"),
                 new UIEntity().getBasicTextColor(), 0.8f));
         helpList.add(GuiElements.createLabel("[LMB] = " + I18Wrapper.format("info.usage.key.lmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
         helpList.add(GuiElements.createLabel("[RMB] = " + I18Wrapper.format("info.usage.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
-        
+
         counterButton = GuiElements.createButton(gui.container.grid.getCurrentCounter() + "");
         counterButton.setScaleX(0.8f);
         counterButton.setScaleY(0.8f);
@@ -406,7 +408,7 @@ public class SidePanel {
             helpList.add(manuelButton);
             manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
         }
-        
+
         final UIEntity savedPathways = GuiElements
                 .createButton(I18Wrapper.format("info.usage.savedpathways"), e -> {
                     final UIEntity screen = GuiElements.createScreen(entity -> {
@@ -633,8 +635,7 @@ public class SidePanel {
             helpList.add(GuiElements.createLabel(I18Wrapper.format("info.usage.subsidiary"),
                     new UIEntity().getBasicTextColor(), 0.8f));
             subsidiaries.forEach((pos, holder) -> {
-                final String name = ClientNameHandler
-                        .getClientName(new StateInfo(mc.level, pos));
+                final String name = ClientNameHandler.getClientName(new StateInfo(mc.level, pos));
                 final UIEntity button = GuiElements.createButton(name, e -> {
                     final UIEntity screen = GuiElements.createScreen(selectionEntity -> {
                         final UIBox hbox = new UIBox(UIBox.VBOX, 3);
@@ -691,7 +692,7 @@ public class SidePanel {
         helpList.add(helpScrollbox);
         addHelpPageToPlane();
     }
-    
+
     private void addColorToTile(final Point start, final Point end, final int color) {
         final UISignalBoxTile startTile = gui.allTiles.get(start);
         final UISignalBoxTile endTile = gui.allTiles.get(end);

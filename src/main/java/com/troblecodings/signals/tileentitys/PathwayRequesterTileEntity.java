@@ -10,6 +10,7 @@ import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
@@ -22,7 +23,7 @@ import net.minecraft.util.registry.Registry;
 import net.minecraft.world.server.ServerWorld;
 
 public class PathwayRequesterTileEntity extends SyncableTileEntity
-implements ILinkableTile, IChunkLoadable {
+        implements ILinkableTile, IChunkLoadable {
 
     private BlockPos linkedSignalBox;
     private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(-1, -1),
@@ -72,7 +73,6 @@ implements ILinkableTile, IChunkLoadable {
                         }
                     }
                 });
-
     }
 
     public void setNextPathway(final Point start, final Point end) {
@@ -82,8 +82,8 @@ implements ILinkableTile, IChunkLoadable {
     @Override
     public boolean link(final BlockPos pos, final CompoundNBT tag) {
         @SuppressWarnings("deprecation")
-        final Block block = Registry.BLOCK.get(
-                new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
+        final Block block = Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
+                tag.getString(OSItems.readStringFromPos(pos))));
         if (block instanceof SignalBox) {
             linkedSignalBox = pos;
             return true;
