@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -495,7 +496,7 @@ public final class SignalBoxHandler {
         final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
         try {
             Files.createDirectories(newPath);
-            Files.copy(oldPath, newPath);
+            Files.copy(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
             if (Files.isDirectory(oldPath)) {
                 Files.list(oldPath).forEach(path -> {
                     try {
