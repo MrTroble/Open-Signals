@@ -563,5 +563,12 @@
     "property.prop.SIGNALBOX.name": "Stellwerk",
     "property.prop.SIGNALBOX.desc": "Wähle hier das Stellwerk aus. Du musst dann das Fenster nochmal schließen und erneut öffnen, um dann die passende Eingangsverbindung zu wählen.",
 	"btn.counter.tooltip": "Das Zählwerk zählt Zs Bedienungen und Hilfsfahrstraßenauflösungen. Bei einem Wert von 1000, fängt er von vorne an zu zählen.",
-    "property.PREPARED": "Vorbereitet"
+    "property.PREPARED": "Vorbereitet",
+    "block.opensignals.trainnumberblock": "Zugnummern Block",
+    "tile.trainnumberchanger": "Zugnummern Block",
+    "gui.trainnumber.change_set": "Setzen",
+    "property.gui.setpoint.name": "Fahrstraßenelement",
+    "property.gui.setpoint.desc": "Wähle hier den Punkt im Stellwerk aus, auf dem die Zugnummer der jeweiligen Fahrstraße angezeigt werden soll.",
+    "sb.trainnumber.change": "Hier kannst du für den jeweiligen Zug in der Fahrstraße eine Zugnummer eingeben, die dann durch das Stellwerk mitläuft.",
+    "gui.trainnumber.info.change": "Hier kannst du für den jeweiligen Zug in der Fahrstraße eine Zugnummer eingeben, die dann durch das Stellwerk mitläuft."
 }

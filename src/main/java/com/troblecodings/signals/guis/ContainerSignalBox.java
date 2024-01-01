@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.I18Wrapper;
@@ -21,6 +20,7 @@ import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
@@ -31,6 +31,7 @@ import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.SignalBoxPathway;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -55,6 +56,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     private Consumer<List<SignalBoxNode>> colorUpdates;
     private Consumer<List<Point>> signalUpdates;
     private Runnable counterUpdater;
+    private Consumer<List<Point>> trainNumberUpdater;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -74,9 +76,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         final StateInfo identifier = new StateInfo(info.world, tile.getBlockPos());
         final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = SignalBoxHandler
                 .getPossibleSubsidiaries(identifier);
-        final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier)
-                .entrySet().stream().filter(e -> !e.getValue().equals(LinkType.SIGNAL))
-                .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
         buffer.putInt(possibleSubsidiaries.size());
         possibleSubsidiaries.forEach((pos, list) -> {
             buffer.putBlockPos(pos);
@@ -268,6 +268,18 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 counterUpdater.run();
                 break;
             }
+            case SEND_TRAIN_NUMBER: {
+                final List<Point> updates = new ArrayList<>();
+                final int size = buffer.getInt();
+                for (int i = 0; i < size; i++) {
+                    final Point point = Point.of(buffer);
+                    final TrainNumber number = TrainNumber.of(buffer);
+                    grid.getNode(point).setTrainNumber(number);
+                    updates.add(point);
+                }
+                trainNumberUpdater.accept(updates);
+                break;
+            }
             default:
                 break;
         }
@@ -310,7 +322,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             }
             case RESET_PW: {
                 final Point point = Point.of(buffer);
-                if (grid.resetPathway(point)) {
+                final SignalBoxPathway pw = grid.getPathwayByStartPoint(point);
+                final boolean isShuntingPath = pw != null ? pw.isShuntingPath() : false;
+                if (grid.resetPathway(point) && !isShuntingPath) {
                     grid.countOne();
                     final WriteBuffer sucess = new WriteBuffer();
                     sucess.putEnumValue(SignalBoxNetwork.SEND_COUNTER);
@@ -418,6 +432,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 grid.setCurrentCounter(buffer.getInt());
                 break;
             }
+            case SEND_TRAIN_NUMBER: {
+                final Point point = Point.of(buffer);
+                final TrainNumber number = TrainNumber.of(buffer);
+                grid.updateTrainNumber(point, number);
+                break;
+            }
             default:
                 break;
         }
@@ -494,5 +514,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     protected void setConuterUpdater(final Runnable run) {
         this.counterUpdater = run;
+    }
+
+    protected void setTrainNumberUpdater(final Consumer<List<Point>> updater) {
+        this.trainNumberUpdater = updater;
     }
 }

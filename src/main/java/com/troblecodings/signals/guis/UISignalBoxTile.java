@@ -12,6 +12,8 @@ import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.TrainNumber;
+import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -32,7 +34,8 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
-    private final Map<ModeSet, MainSignalIdentifier> greenSignals = new HashMap<>();
+    private final Map<ModeSet, SignalState> greenSignals = new HashMap<>();
+    private final UITrainNumber uiTrainNumber = new UITrainNumber();
 
     public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
@@ -44,7 +47,7 @@ public class UISignalBoxTile extends UIComponentEntity {
     public void setGreenSignals(final List<MainSignalIdentifier> list) {
         greenSignals.clear();
         list.forEach(identifier -> {
-            greenSignals.put(identifier.getModeSet(), identifier);
+            greenSignals.put(identifier.getModeSet(), identifier.state);
             updateModeSet(identifier.getModeSet());
         });
     }
@@ -52,7 +55,8 @@ public class UISignalBoxTile extends UIComponentEntity {
     public void updateModeSet(final ModeSet mode) {
         localRemove(mode);
         localAdd(mode);
-        update();
+        if (hasParent())
+            update();
     }
 
     public void setNode(final SignalBoxNode node) {
@@ -72,8 +76,34 @@ public class UISignalBoxTile extends UIComponentEntity {
         }
         entity.add(new UIIndependentTranslate(0, 0, 1));
 
-        final MainSignalIdentifier identifier = greenSignals.get(modeSet);
-        final SignalState state = identifier != null ? identifier.state : SignalState.RED;
+        SignalState state = greenSignals.getOrDefault(modeSet, SignalState.RED);
+        if (modeSet.mode.equals(EnumGuiMode.RS)) {
+            final ModeSet hpMode = new ModeSet(EnumGuiMode.HP, modeSet.rotation);
+            SignalState hpState = greenSignals.getOrDefault(hpMode, SignalState.RED);
+            if (setToEntity.containsKey(hpMode)) {
+                if (hpState.equals(SignalState.RED)) {
+                    switch (state) {
+                        case SUBSIDIARY_RED:
+                        case GREEN: {
+                            hpState = SignalState.SUBSIDIARY_RED;
+                            break;
+                        }
+                        case SUBSIDIARY_OFF: {
+                            hpState = SignalState.SUBSIDIARY_OFF;
+                            break;
+                        }
+                        default: {
+                            hpState = SignalState.RED;
+                            break;
+                        }
+                    }
+                }
+                greenSignals.put(hpMode, hpState);
+                localRemove(modeSet);
+                updateModeSet(hpMode);
+                return;
+            }
+        }
 
         entity.add((UIComponent) modeSet.mode.consumer.get(state));
         this.entity.add(entity);
@@ -141,6 +171,15 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     public void setColor(final ModeSet mode, final int color) {
         final UIEntity entity = setToEntity.get(mode);
-        entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
+        if (entity != null)
+            entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
+    }
+
+    public void updateTrainNumber() {
+        this.getParent().remove(uiTrainNumber);
+        final TrainNumber number = this.node.getTrainNumber();
+        uiTrainNumber.setTrainNumber(number);
+        if (!number.trainNumber.isEmpty())
+            this.getParent().add(uiTrainNumber);
     }
 }
