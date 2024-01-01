@@ -161,6 +161,7 @@ public class GuiPlacementtool extends GuiBase {
     }
 
     private void applyPropertyChanges(final SEProperty property, final int valueId) {
+        previewSidebar.addToRenderList(property, valueId);
         if (loaded) {
             final int propertyId = currentSelectedBlock.getIDFromProperty(property);
             final WriteBuffer buffer = new WriteBuffer();
