@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.I18Wrapper;
@@ -74,9 +73,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         final StateInfo identifier = new StateInfo(info.world, tile.getPos());
         final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = SignalBoxHandler
                 .getPossibleSubsidiaries(identifier);
-        final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier)
-                .entrySet().stream().filter(e -> !e.getValue().equals(LinkType.SIGNAL))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
         buffer.putInt(possibleSubsidiaries.size());
         possibleSubsidiaries.forEach((pos, list) -> {
             buffer.putBlockPos(pos);
