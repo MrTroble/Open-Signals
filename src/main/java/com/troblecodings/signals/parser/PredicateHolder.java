@@ -45,17 +45,6 @@ public final class PredicateHolder {
         };
     }
 
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static Predicate<Map<SEProperty, String>> check(final ValuePack pack) {
-        return t -> {
-            final String value = t.get(pack.property);
-            if (value == null)
-                return false;
-            return pack.predicate.test(value.toUpperCase());
-        };
-    }
-
     @SuppressWarnings("unchecked")
     public static Predicate<Map<SEProperty, String>> config(final ValuePack pack) {
         return t -> {
@@ -74,46 +63,34 @@ public final class PredicateHolder {
         final int speed = stringInt.integer;
         switch (values) {
             case GREATER:
-                return s -> {
-                    return s > speed;
-                };
+                return s -> s > speed;
 
             case GREATEREQUALS:
-                return s -> {
-                    return s >= speed;
-                };
+                return s -> s >= speed;
 
             case EQUALS:
-                return s -> {
-                    return s == speed;
-                };
+                return s -> s == speed;
 
             case SMALLEREQUALS:
-                return s -> {
-                    return s <= speed;
-                };
+                return s -> s <= speed;
 
             case SMALLER:
-                return s -> {
-                    return s < speed;
-                };
+                return s -> s < speed;
 
             case UNEQUALS:
-                return s -> {
-                    return s != speed;
-                };
+                return s -> s != speed;
 
             default:
-                return s -> {
-                    return s == speed;
-                };
+                return s -> s == speed;
         }
 
     }
 
     public static Predicate<String> zs2Value(final String value) {
-        return s -> {
-            return s.equalsIgnoreCase(value);
-        };
+        return s -> s.equalsIgnoreCase(value);
+    }
+
+    public static Predicate<Boolean> signalRepeater(final boolean state) {
+        return s -> s.booleanValue() == state;
     }
 }

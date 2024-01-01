@@ -5,14 +5,18 @@ import java.util.Objects;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class PosIdentifier {
+public class StateInfo {
 
     public final BlockPos pos;
     public final World world;
 
-    public PosIdentifier(final BlockPos pos, final World world) {
+    public StateInfo(final World world, final BlockPos pos) {
         this.pos = pos;
         this.world = world;
+    }
+    
+    public boolean isWorldNullOrClientSide() {
+        return world == null || world.isClientSide;
     }
 
     @Override
@@ -28,12 +32,12 @@ public class PosIdentifier {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        PosIdentifier other = (PosIdentifier) obj;
+        final StateInfo other = (StateInfo) obj;
         return Objects.equals(pos, other.pos) && Objects.equals(world, other.world);
     }
 
     @Override
     public String toString() {
-        return "pos: " + pos + " world: " + world;
+        return "StateInfo [world= " + world + ",pos=" + pos + "]";
     }
 }

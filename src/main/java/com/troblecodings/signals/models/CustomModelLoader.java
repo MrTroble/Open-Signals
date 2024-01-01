@@ -37,7 +37,6 @@ public final class CustomModelLoader implements IModelLoader<Geometry> {
     private CustomModelLoader() {
     }
 
-    @SuppressWarnings("unchecked")
     private static void loadExtention(final TextureStats texturestate,
             final Map<String, ModelExtention> extention, final String modelname,
             final ModelStats states, final Models models, final FunctionParsingInfo info,
@@ -54,8 +53,9 @@ public final class CustomModelLoader implements IModelLoader<Geometry> {
             final Map<String, String> extentionProperties = extentions.getValue();
             final ModelExtention extentionValues = extention.get(extentionName);
             if (extentionValues == null)
-                throw new ContentPackException(String
-                        .format("There doesn't exists an extention named [%s]!", extentionName));
+                throw new ContentPackException(
+                        String.format("There doesn't exists an extention named [%s]!",
+                                extentionName) + " Valid Extentions: " + extention.keySet());
 
             for (final Map.Entry<String, String> entry : extentionValues.getExtention()
                     .entrySet()) {
@@ -128,7 +128,6 @@ public final class CustomModelLoader implements IModelLoader<Geometry> {
 
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void onResourceManagerReload(final IResourceManager manager) {
         registeredModels.clear();

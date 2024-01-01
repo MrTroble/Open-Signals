@@ -2,14 +2,18 @@ package com.troblecodings.signals.proxy;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
+import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
+import com.troblecodings.signals.blocks.TrainNumberBlock;
+import com.troblecodings.signals.guis.GuiPathwayRequester;
 import com.troblecodings.signals.guis.GuiPlacementtool;
 import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.GuiSignalController;
 import com.troblecodings.signals.guis.NamableGui;
+import com.troblecodings.signals.guis.TrainNumberGui;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.NameHandler;
@@ -31,13 +35,15 @@ public class ClientProxy extends CommonProxy {
     @Override
     public void initModEvent(final FMLConstructModEvent event) {
         super.initModEvent(event);
-        SignalStateHandler.add(new ClientSignalStateHandler());
-        NameHandler.add(new ClientNameHandler());
+        SignalStateHandler.registerToNetworkChannel(new ClientSignalStateHandler());
+        NameHandler.registerToNetworkChannel(new ClientNameHandler());
         OpenSignalsMain.handler.addGui(Placementtool.class, GuiPlacementtool::new);
         OpenSignalsMain.handler.addGui(SignalController.class, GuiSignalController::new);
         OpenSignalsMain.handler.addGui(SignalBox.class, GuiSignalBox::new);
         OpenSignalsMain.handler.addGui(RedstoneIO.class, NamableGui::new);
         OpenSignalsMain.handler.addGui(Signal.class, NamableGui::new);
+        OpenSignalsMain.handler.addGui(PathwayRequester.class, GuiPathwayRequester::new);
+        OpenSignalsMain.handler.addGui(TrainNumberBlock.class, TrainNumberGui::new);
         ModelLoaderRegistry.registerLoader(
                 new ResourceLocation(OpenSignalsMain.MODID, "oscustommodelloader"),
                 CustomModelLoader.INSTANCE);

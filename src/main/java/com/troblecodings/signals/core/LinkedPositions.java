@@ -8,11 +8,15 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
+import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 
 import net.minecraft.util.math.BlockPos;
@@ -25,17 +29,23 @@ public class LinkedPositions {
     private static final String SIGNAL_NAME = "signalName";
     private static final String ALL_POS = "allPos";
 
-    private final Map<BlockPos, Signal> signals;
-    private final Map<BlockPos, LinkType> linkedBlocks;
+    private final BlockPos thisPos;
+    private final Map<BlockPos, Signal> signals = new HashMap<>();
+    private final Map<BlockPos, LinkType> linkedBlocks = new HashMap<>();
+    private final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = new HashMap<>();
 
-    public LinkedPositions() {
-        signals = new HashMap<>();
-        linkedBlocks = new HashMap<>();
+    public LinkedPositions(final BlockPos pos) {
+        this.thisPos = pos;
     }
 
     public void addSignal(final BlockPos signalPos, final Signal signal, final World world) {
+        if (world.isClientSide)
+            return;
         signals.put(signalPos, signal);
-        SignalConfig.reset(new SignalStateInfo(world, signalPos, signal));
+        final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
+        SignalStateHandler.runTaskWhenSignalLoaded(info,
+                (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
+        SignalConfig.reset(new ResetInfo(info, false));
     }
 
     public Signal getSignal(final BlockPos pos) {
@@ -49,10 +59,12 @@ public class LinkedPositions {
         return true;
     }
 
-    public void removeLinkedPos(final BlockPos pos) {
-        final LinkType type = linkedBlocks.remove(pos);
-        if (type != null && type.equals(LinkType.SIGNAL))
-            signals.remove(pos);
+    public void removeLinkedPos(final BlockPos pos, final World world) {
+        if (world.isClientSide)
+            return;
+        linkedBlocks.remove(pos);
+        signals.remove(pos);
+        possibleSubsidiaries.remove(pos);
     }
 
     public boolean isEmpty() {
@@ -64,15 +76,17 @@ public class LinkedPositions {
     }
 
     public void unlink(final BlockPos tilePos, final World world) {
-        final List<SignalStateInfo> signalsToUnload = new ArrayList<>();
+        if (world.isClientSide)
+            return;
+        final List<StateLoadHolder> signalsToUnload = new ArrayList<>();
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
-            SignalConfig.reset(info);
-            signalsToUnload.add(info);
+            SignalConfig.reset(new ResetInfo(info, false));
+            signalsToUnload.add(new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, tilePos))));
         });
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
                 .forEach(entry -> SignalBoxHandler
-                        .unlinkTileFromPos(new PosIdentifier(tilePos, world), entry.getKey()));
+                        .unlinkTileFromPos(new StateInfo(world, tilePos), entry.getKey()));
         linkedBlocks.clear();
         signals.clear();
         SignalStateHandler.unloadSignals(signalsToUnload);
@@ -80,11 +94,12 @@ public class LinkedPositions {
 
     public void write(final NBTWrapper wrapper) {
         final NBTWrapper posWrapper = new NBTWrapper();
-        posWrapper.putList(LINKED_POS_LIST, linkedBlocks.entrySet().stream().map(entry -> {
-            final NBTWrapper item = NBTWrapper.getBlockPosWrapper(entry.getKey());
-            entry.getValue().write(item);
-            return item;
-        })::iterator);
+        posWrapper.putList(LINKED_POS_LIST, linkedBlocks.entrySet().stream()
+                .filter(entry -> !entry.getValue().equals(LinkType.SIGNAL)).map(entry -> {
+                    final NBTWrapper item = NBTWrapper.getBlockPosWrapper(entry.getKey());
+                    entry.getValue().write(item);
+                    return item;
+                })::iterator);
         posWrapper.putList(LINKED_SIGNALS, signals.entrySet().stream().map(entry -> {
             final NBTWrapper signal = NBTWrapper.getBlockPosWrapper(entry.getKey());
             signal.putString(SIGNAL_NAME, entry.getValue().getSignalTypeName());
@@ -111,27 +126,57 @@ public class LinkedPositions {
     public void loadSignals(final World world) {
         if (world.isClientSide)
             return;
-        final List<SignalStateInfo> signalInfos = new ArrayList<>();
-        signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
+        final List<StateLoadHolder> signalInfos = new ArrayList<>();
+        signals.forEach((pos, signal) -> {
+            final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
+            signalInfos.add(
+                    new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, thisPos))));
+            SignalStateHandler.runTaskWhenSignalLoaded(info,
+                    (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
+        });
         SignalStateHandler.loadSignals(signalInfos);
     }
 
     public void unloadSignals(final World world) {
         if (world.isClientSide)
             return;
-        final List<SignalStateInfo> signalInfos = new ArrayList<>();
-        signals.forEach((pos, signal) -> signalInfos.add(new SignalStateInfo(world, pos, signal)));
+        final List<StateLoadHolder> signalInfos = new ArrayList<>();
+        signals.forEach((pos, signal) -> signalInfos
+                .add(new StateLoadHolder(new SignalStateInfo(world, pos, signal),
+                        new LoadHolder<>(new StateInfo(world, thisPos)))));
         SignalStateHandler.unloadSignals(signalInfos);
     }
-    
+
+    private void loadPossibleSubsidiaires(final SignalStateInfo info,
+            final Map<SEProperty, String> properties) {
+        final Map<SubsidiaryState, ConfigProperty> subsidiaries = SubsidiarySignalParser.SUBSIDIARY_SIGNALS
+                .get(info.signal);
+        if (subsidiaries == null)
+            return;
+        final List<SubsidiaryState> validStates = new ArrayList<>();
+        subsidiaries.forEach((state, config) -> {
+            for (final SEProperty property : config.state.keySet()) {
+                if (properties.containsKey(property)) {
+                    validStates.add(state);
+                    break;
+                }
+            }
+        });
+        possibleSubsidiaries.put(info.pos, validStates);
+    }
+
     public List<BlockPos> getAllRedstoneIOs() {
         return linkedBlocks.entrySet().stream()
                 .filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
                 .map(entry -> entry.getKey()).collect(Collectors.toList());
     }
 
+    public Map<BlockPos, List<SubsidiaryState>> getValidSubsidiariesForPos() {
+        return ImmutableMap.copyOf(possibleSubsidiaries);
+    }
+
     @Override
     public String toString() {
-        return "AllSignals = " + signals + ", AllLinkedPos = " + linkedBlocks;
+        return "LinkedPos [AllSignals = " + signals + ", AllLinkedPos = " + linkedBlocks + "]";
     }
 }

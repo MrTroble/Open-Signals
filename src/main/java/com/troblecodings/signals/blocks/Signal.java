@@ -9,29 +9,26 @@ import java.util.Random;
 import java.util.function.Consumer;
 
 import com.google.common.collect.ImmutableList;
-import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
+import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnum;
-import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
-import com.troblecodings.signals.handler.ClientSignalStateInfo;
 import com.troblecodings.signals.handler.NameHandler;
-import com.troblecodings.signals.handler.NameStateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.parser.ValuePack;
-import com.troblecodings.signals.properties.BooleanProperty;
-import com.troblecodings.signals.properties.FloatProperty;
-import com.troblecodings.signals.properties.HeightProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.PredicateProperty;
 import com.troblecodings.signals.properties.SoundProperty;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
@@ -40,6 +37,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.BlockItemUseContext;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.EnumProperty;
 import net.minecraft.state.StateContainer.Builder;
@@ -78,10 +76,11 @@ public class Signal extends BasicBlock {
     private final int id;
     private List<SEProperty> signalProperties;
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
-    private SEProperty powerProperty = null;
 
     public Signal(final SignalProperties prop) {
-        super(Properties.of(Material.STONE).noOcclusion().lightLevel(u -> 1));
+        super(Properties.of(Material.STONE).noOcclusion()
+                .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get())
+                .isRedstoneConductor((_u1, _u2, _u3) -> false));
         this.prop = prop;
         this.id = SIGNAL_IDS.size();
         SIGNAL_IDS.add(this);
@@ -135,8 +134,8 @@ public class Signal extends BasicBlock {
         final World world = te.getLevel();
         final SignalStateInfo info = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> properties = world.isClientSide
-                ? ClientSignalStateHandler.getClientStates(new ClientSignalStateInfo(info))
-                : SignalStateHandler.getStates(info);
+                ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
+                : te.getProperties();
         return VoxelShapes
                 .create(VoxelShapes.block().bounds().expandTowards(0, getHeight(properties), 0));
     }
@@ -169,7 +168,7 @@ public class Signal extends BasicBlock {
     }
 
     public String getSignalTypeName() {
-        return this.getRegistryName().getPath();
+        return this.delegate.name().getPath();
     }
 
     @Override
@@ -178,16 +177,15 @@ public class Signal extends BasicBlock {
         GhostBlock.destroyUpperBlock(worldIn, pos);
         if (!worldIn.isClientSide() && worldIn instanceof World) {
             SignalStateHandler.setRemoved(new SignalStateInfo((World) worldIn, pos, this));
-            NameHandler.setRemoved(new NameStateInfo((World) worldIn, pos));
-            SignalBoxHandler.onPosRemove(new PosIdentifier(pos, (World) worldIn));
+            NameHandler.setRemoved(new StateInfo((World) worldIn, pos));
+            SignalBoxHandler.onPosRemove(new StateInfo((World) worldIn, pos));
         }
     }
 
-    @SuppressWarnings("unchecked")
     public int getHeight(final Map<SEProperty, String> map) {
-        for (final HeightProperty property : this.prop.signalHeights) {
-            if (property.predicate.test(map))
-                return property.height;
+        for (final PredicateProperty<Integer> property : this.prop.signalHeights) {
+            if (property.test(map))
+                return property.state;
         }
         return this.prop.defaultHeight;
     }
@@ -229,19 +227,17 @@ public class Signal extends BasicBlock {
         this.renderOverlay(info, this.prop.customNameRenderHeight);
     }
 
-    @SuppressWarnings("unchecked")
     @OnlyIn(Dist.CLIENT)
     public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
-        final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
-                        info.tileEntity.getBlockPos()));
+        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
+                new StateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
         float customRenderHeight = renderHeight;
-        for (final FloatProperty property : this.prop.customRenderHeights) {
+        for (final PredicateProperty<Float> property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
-                customRenderHeight = property.height;
+                customRenderHeight = property.state;
             }
             if (customRenderHeight == -1)
                 return;
@@ -253,9 +249,9 @@ public class Signal extends BasicBlock {
             return;
         }
         boolean doubleSidedText = false;
-        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+        for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
             if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.doubleSided;
+                doubleSidedText = boolProp.state;
             }
         }
         final SignalAngel face = state.getValue(Signal.ANGEL);
@@ -269,7 +265,7 @@ public class Signal extends BasicBlock {
 
         if (doubleSidedText) {
             final Quaternion quad = new Quaternion(
-                    SignalAngel.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+                    QuaternionWrapper.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
             renderSingleScaleOverlay(info);
@@ -290,19 +286,17 @@ public class Signal extends BasicBlock {
         info.stack.popPose();
     }
 
-    @SuppressWarnings("unchecked")
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
         float customRenderHeight = renderHeight;
-        final Map<SEProperty, String> map = ClientSignalStateHandler
-                .getClientStates(new ClientSignalStateInfo(info.tileEntity.getLevel(),
-                        info.tileEntity.getBlockPos()));
+        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
+                new StateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos()));
         final String customNameState = map.get(CUSTOMNAME);
         if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
             return;
-        for (final FloatProperty property : this.prop.customRenderHeights) {
+        for (final PredicateProperty<Float> property : this.prop.customRenderHeights) {
             if (property.predicate.test(map)) {
-                customRenderHeight = property.height;
+                customRenderHeight = property.state;
             }
         }
         if (customRenderHeight == -1)
@@ -314,9 +308,9 @@ public class Signal extends BasicBlock {
             return;
         }
         boolean doubleSidedText = false;
-        for (final BooleanProperty boolProp : this.prop.doubleSidedText) {
+        for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
             if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.doubleSided;
+                doubleSidedText = boolProp.state;
             }
         }
         final String name = info.tileEntity.getNameWrapper();
@@ -334,7 +328,7 @@ public class Signal extends BasicBlock {
 
         if (doubleSidedText) {
             final Quaternion quad = new Quaternion(
-                    UIRotate.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+                    QuaternionWrapper.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
             renderSingleOverlay(info, splitNames);
@@ -375,31 +369,30 @@ public class Signal extends BasicBlock {
             return ActionResultType.FAIL;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
+        final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
+        final boolean customname = canHaveCustomname(properties);
+        final Item item = player.getItemInHand(Hand.MAIN_HAND).getItem();
+        if (item.equals(OSItems.MANIPULATOR) && (canBeLinked() || customname)) {
+            OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
+            return ActionResultType.SUCCESS;
+        }
         if (loadRedstoneOutput(world, stateInfo)) {
             world.blockUpdated(pos, state.getBlock());
             return ActionResultType.SUCCESS;
         }
-        final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
-        if (!player.getItemInHand(Hand.MAIN_HAND).getItem().equals(OSItems.LINKING_TOOL)
-                && (canBeLinked() || customname)) {
-            OpenSignalsMain.handler.invokeGui(Signal.class, player, world, pos, "signal");
-            return ActionResultType.SUCCESS;
-        }
-        return ActionResultType.FAIL;
+        return ActionResultType.PASS;
     }
 
     @SuppressWarnings("unchecked")
     private boolean loadRedstoneOutput(final World worldIn, final SignalStateInfo info) {
+        if (worldIn.isClientSide)
+            return true;
         if (!this.prop.redstoneOutputs.isEmpty()) {
             final Map<SEProperty, String> properties = SignalStateHandler.getStates(info);
-            this.powerProperty = null;
             for (final ValuePack pack : this.prop.redstoneOutputs) {
-                if (pack.predicate.test(properties)) {
-                    this.powerProperty = pack.property;
-                    if (properties.containsKey(pack.property)) {
-                        SignalStateHandler.setState(info, powerProperty,
-                                Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));
-                    }
+                if (properties.containsKey(pack.property) && pack.predicate.test(properties)) {
+                    SignalStateHandler.setState(info, pack.property,
+                            Boolean.toString(!Boolean.valueOf(properties.get(pack.property))));
                     return true;
                 }
             }
@@ -407,9 +400,13 @@ public class Signal extends BasicBlock {
         return false;
     }
 
+    public boolean hasRedstoneOut() {
+        return !this.prop.redstoneOutputs.isEmpty() || !this.prop.redstoneOutputPacks.isEmpty();
+    }
+
     @Override
     public boolean isSignalSource(final BlockState state) {
-        return !this.prop.redstoneOutputs.isEmpty();
+        return hasRedstoneOut();
     }
 
     @Override
@@ -422,56 +419,54 @@ public class Signal extends BasicBlock {
     @Override
     public int getDirectSignal(final BlockState blockState, final IBlockReader blockAccess,
             final BlockPos pos, final Direction side) {
-        if (this.prop.redstoneOutputs.isEmpty() || this.powerProperty == null
-                || !(blockAccess instanceof World)) {
+        if (!hasRedstoneOut() || !(blockAccess instanceof World)) {
             return 0;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo((World) blockAccess, pos, this);
-        if (SignalStateHandler.getState(stateInfo, powerProperty)
-                .filter(power -> power.equalsIgnoreCase("false")).isPresent()) {
-            return 0;
-        }
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        for (final ValuePack pack : this.prop.redstoneOutputs) {
-            if (pack.predicate.test(properties)) {
-                return 15;
+        for (final List<ValuePack> valuePacks : ImmutableList.of(this.prop.redstoneOutputPacks,
+                this.prop.redstoneOutputs)) {
+            for (final ValuePack pack : valuePacks) {
+                if (properties.containsKey(pack.property) && pack.predicate.test(properties)
+                        && !properties.get(pack.property)
+                                .equalsIgnoreCase(pack.property.getDefault())) {
+                    return 15;
+                }
             }
         }
         return 0;
     }
 
-    @SuppressWarnings("unchecked")
     public void getUpdate(final World world, final BlockPos pos) {
         if (this.prop.sounds.isEmpty())
             return;
 
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
-        final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
-        final SoundProperty sound = getSound(properties);
-        if (sound.duration < 1)
-            return;
-
-        if (sound.duration == 1) {
-            world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        } else {
-            if (world.getBlockTicks().hasScheduledTick(pos, this)) {
+        SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
+            final SoundProperty sound = getSound(properties);
+            if (sound.duration < 1)
                 return;
+            if (sound.duration == 1) {
+                world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
             } else {
-                if (sound.predicate.test(properties)) {
-                    world.getBlockTicks().scheduleTick(pos, this, 1);
+                if (world.getBlockTicks().hasScheduledTick(pos, this)) {
+                    return;
+                } else {
+                    if (sound.predicate.test(properties)) {
+                        world.getBlockTicks().scheduleTick(pos, this, 1);
+                    }
                 }
             }
-        }
+        });
     }
 
-    @SuppressWarnings("unchecked")
     public SoundProperty getSound(final Map<SEProperty, String> map) {
         for (final SoundProperty property : this.prop.sounds) {
             if (property.predicate.test(map)) {
                 return property;
             }
         }
-        return new SoundProperty();
+        return new SoundProperty(t -> true, null, 0);
     }
 
     @Override
@@ -481,12 +476,14 @@ public class Signal extends BasicBlock {
             return;
         }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
-        final SoundProperty sound = getSound(SignalStateHandler.getStates(stateInfo));
-        if (sound.duration <= 1) {
-            return;
-        }
-        world.playSound(null, pos, sound.sound, SoundCategory.BLOCKS, 1.0F, 1.0F);
-        world.getBlockTicks().scheduleTick(pos, this, sound.duration);
+        SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
+            final SoundProperty sound = getSound(properties);
+            if (sound.duration <= 1) {
+                return;
+            }
+            world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            world.getBlockTicks().scheduleTick(pos, this, sound.duration);
+        });
     }
 
     @Override

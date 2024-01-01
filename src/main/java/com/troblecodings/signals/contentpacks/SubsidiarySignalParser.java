@@ -10,7 +10,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
-import com.troblecodings.signals.properties.ConfigProperty;
+import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public class SubsidiarySignalParser {
 
@@ -23,9 +23,17 @@ public class SubsidiarySignalParser {
 
     private static void loadSubsidiaryStates() {
         OpenSignalsMain.contentPacks.getFiles("signalconfigs/subsidiaryenums").forEach(entry -> {
-            final SubsidiaryEnumParser parser = GSON.fromJson(entry.getValue(),
-                    SubsidiaryEnumParser.class);
-            parser.subsidiaryStates.forEach(state -> new SubsidiaryState(state));
+            try {
+                final SubsidiaryEnumParser parser = GSON.fromJson(entry.getValue(),
+                        SubsidiaryEnumParser.class);
+                parser.subsidiaryStates.forEach(state -> state.prepareData());
+            } catch (final Exception e) {
+                OpenSignalsMain.getLogger()
+                        .error("Please update your SubsidiaryEnumFile: " + entry.getKey() + "!");
+                final OldSubsidiaryEnumParser parser = GSON.fromJson(entry.getValue(),
+                        OldSubsidiaryEnumParser.class);
+                parser.subsidiaryStates.forEach(name -> new SubsidiaryState(name));
+            }
         });
     }
 
@@ -37,7 +45,7 @@ public class SubsidiarySignalParser {
             final Signal signal = Signal.SIGNALS.get(parser.currentSignal.toLowerCase());
             if (signal == null)
                 throw new ContentPackException("There doesn't exists a signal with the name '"
-                        + parser.currentSignal + "'!");
+                        + parser.currentSignal + "'! Valid Signals: " + Signal.SIGNALS.keySet());
             if (SUBSIDIARY_SIGNALS.containsKey(signal))
                 throw new ContentPackException(
                         "There already exists a Subsidiary Config for " + signal + "!");
@@ -70,13 +78,15 @@ public class SubsidiarySignalParser {
         });
         final Map<SubsidiaryState, ConfigProperty> properties = SUBSIDIARY_SIGNALS
                 .computeIfAbsent(signal, _u -> new HashMap<>());
-        properties.put(enumState, new ConfigProperty(allValues));
+        properties.put(enumState, new ConfigProperty(t -> true, allValues));
         SUBSIDIARY_SIGNALS.put(signal, properties);
     }
 
     private static class SubsidiaryEnumParser {
+        private List<SubsidiaryState> subsidiaryStates;
+    }
 
+    private static class OldSubsidiaryEnumParser {
         private List<String> subsidiaryStates;
-
     }
 }

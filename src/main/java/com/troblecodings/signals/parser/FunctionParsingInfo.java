@@ -8,6 +8,7 @@ import java.util.function.Function;
 
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.contentpacks.ContentPackException;
 
 @SuppressWarnings("rawtypes")
 public class FunctionParsingInfo {
@@ -23,6 +24,7 @@ public class FunctionParsingInfo {
         PARAMETER_PARSER.put(ValuePack.class, FunctionParsingInfo::getPredicate);
         PARAMETER_PARSER.put(StringInteger.class, FunctionParsingInfo::getStringInt);
         PARAMETER_PARSER.put(String.class, FunctionParsingInfo::getString);
+        PARAMETER_PARSER.put(Boolean.class, FunctionParsingInfo::getBoolean);
     }
 
     public String argument;
@@ -70,7 +72,8 @@ public class FunctionParsingInfo {
         });
         if (property == null) {
             throw new LogicalParserException(
-                    String.format("Could not find property=%s in system=%S!", name, signalName));
+                    String.format("Could not make predicate=%s with system=%S!", argument,
+                            signalName) + " Valid Properties: " + properties);
         }
         return property;
     }
@@ -85,6 +88,9 @@ public class FunctionParsingInfo {
             argument = parts[0];
             final SEProperty property = (SEProperty) getProperty();
             final String value = parts[1].toUpperCase();
+            if (!property.getParent().isValid(new String(value)))
+                throw new ContentPackException("[" + value + "] is not a valid state of " + property
+                        + "! Valid States: " + property.getParent().getAllowedValues());
             return new ValuePack(property, ext -> ext.equals(value));
         });
         if (predicate == null)
@@ -107,6 +113,10 @@ public class FunctionParsingInfo {
 
     public Object getString() {
         return argument;
+    }
+    
+    public Object getBoolean() {
+        return Boolean.valueOf(argument);
     }
 
     public Map<String, MethodInfo> getTable() {

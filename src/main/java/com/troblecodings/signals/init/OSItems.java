@@ -36,7 +36,8 @@ public final class OSItems {
         final Block block = state.getBlock();
         final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
                 || block == OSBlocks.REDSTONE_OUT || block == OSBlocks.COMBI_REDSTONE_INPUT;
-        return isRedstoneBlock || (block instanceof Signal && ((Signal) block).canBeLinked());
+        return isRedstoneBlock || (block instanceof Signal && ((Signal) block).canBeLinked())
+                || block == OSBlocks.SIGNAL_BOX;
     }, _u -> true, (level, pos, tag) -> {
         final BlockState state = level.getBlockState(pos);
         final NBTWrapper wrapper = new NBTWrapper(tag);
@@ -49,7 +50,8 @@ public final class OSItems {
                 final boolean isRedstoneBlock = block == OSBlocks.REDSTONE_IN
                         || block == OSBlocks.REDSTONE_OUT || block == OSBlocks.COMBI_REDSTONE_INPUT;
                 return isRedstoneBlock
-                        || (block instanceof Signal && ((Signal) block).canBeLinked());
+                        || (block instanceof Signal && ((Signal) block).canBeLinked())
+                        || block == OSBlocks.SIGNAL_BOX;
             }, _u -> true, (level, pos, tag) -> {
                 final BlockState state = level.getBlockState(pos);
                 final NBTWrapper wrapper = new NBTWrapper(tag);
@@ -109,6 +111,7 @@ public final class OSItems {
     public static final Item LAMPS = new Item(new Properties().tab(ItemGroup.TAB_MATERIALS));
     public static final Item ELECTRIC_PARTS = new Item(
             new Properties().tab(ItemGroup.TAB_MATERIALS));
+    public static final Item MANIPULATOR = new Item(new Properties().tab(OSTabs.TAB));
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 

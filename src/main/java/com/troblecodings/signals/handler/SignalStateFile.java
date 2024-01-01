@@ -6,11 +6,14 @@ import java.nio.ByteBuffer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Maps;
 import com.troblecodings.signals.OpenSignalsMain;
 
 import net.minecraft.util.math.BlockPos;
@@ -32,6 +35,7 @@ public class SignalStateFile {
 
     private final Path path;
     private final List<Path> pathCache = new ArrayList<>();
+    private final HashMap<BlockPos, SignalStatePos> posCache = new HashMap<>();
 
     public SignalStateFile(final Path path) {
         this.path = path;
@@ -48,6 +52,31 @@ public class SignalStateFile {
         if (pathCache.isEmpty()) {
             pathCache.add(createNextFile());
         }
+    }
+
+    public Map<BlockPos, ByteBuffer> getAllEntries() {
+        final Map<BlockPos, ByteBuffer> map = new HashMap<>();
+        for (int i = 0; i < pathCache.size(); i++) {
+            final Path path = pathCache.get(i);
+            try (RandomAccessFile stream = new RandomAccessFile(path.toFile(), "r")) {
+                final List<Map.Entry<BlockPos, Long>> posList = new ArrayList<>();
+                stream.seek(START_OFFSET);
+                do {
+                    final BlockPos pos = new BlockPos(stream.readInt(), stream.readInt(),
+                            stream.readInt());
+                    final long offset = Integer.toUnsignedLong(stream.readInt());
+                    if (!pos.equals(BlockPos.ZERO)) {
+                        posList.add(Maps.immutableEntry(pos, offset));
+                    }
+                } while (stream.getFilePointer() < MAX_OFFSET_OF_INDEX);
+                final int counter = i;
+                posList.forEach(entry -> map.put(entry.getKey(),
+                        read(new SignalStatePos(counter, entry.getValue()))));
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return map;
     }
 
     private Path createNextFile() {
@@ -69,6 +98,9 @@ public class SignalStateFile {
 
     @Nullable
     public synchronized SignalStatePos find(final BlockPos pos) {
+        final SignalStatePos cachePos = posCache.get(pos);
+        if (cachePos != null)
+            return cachePos;
         return (SignalStatePos) internalFind(pos,
                 (stream, blockPos, offset, file) -> new SignalStatePos(file, offset), "r");
     }
@@ -80,6 +112,7 @@ public class SignalStateFile {
                 stream.seek(pointer - 16);
                 stream.writeLong(0);
                 stream.writeLong(0);
+                posCache.remove(pos);
                 return new SignalStatePos(file, offset);
             } catch (final IOException e) {
                 e.printStackTrace();
@@ -116,6 +149,7 @@ public class SignalStateFile {
                         if (currentOffset == hashOffset)
                             continue nextFile; // Nothing found
                     } while (!pos.equals(currenPosition));
+                    posCache.put(pos, new SignalStatePos(counter, offset));
                     return function.apply(stream, currenPosition, offset, counter);
                 }
             }
