@@ -3,11 +3,10 @@ package com.troblecodings.signals.init;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.models.CustomModelLoader;
 
-import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.world.item.Item;
-import net.minecraftforge.client.event.ColorHandlerEvent;
-import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class OSModels {
@@ -16,7 +15,7 @@ public final class OSModels {
     }
 
     @SubscribeEvent
-    public static void register(final ModelRegistryEvent event) {
+    public static void register(final ModelEvent.RegisterAdditional event) {
         OSItems.registeredItems.forEach(OSModels::registerModel);
         CustomModelLoader.INSTANCE.onResourceManagerReload(null);
         return;
@@ -28,14 +27,12 @@ public final class OSModels {
     }
 
     @SubscribeEvent
-    public static void addColor(final ColorHandlerEvent.Block event) {
-        final BlockColors colors = event.getBlockColors();
+    public static void addColor(final RegisterColorHandlersEvent.Block event) {
         OSBlocks.BLOCKS_TO_REGISTER.forEach(block -> {
-            if (block instanceof Signal) {
-                final Signal signal = (Signal) block;
-                if (signal.hasCostumColor())
-                    colors.register((_u1, _u2, _u3, index) -> signal.colorMultiplier(index), block);
-            }
+            if (!(block instanceof Signal))
+                return;
+            event.register((_u1, _u2, _u3, index) -> ((Signal) block).colorMultiplier(index),
+                    block);
         });
     }
 

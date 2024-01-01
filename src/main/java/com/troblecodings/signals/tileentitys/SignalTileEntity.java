@@ -3,7 +3,7 @@ package com.troblecodings.signals.tileentitys;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.Nonnull;
+import org.jetbrains.annotations.NotNull;
 
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.NamableWrapper;
@@ -12,15 +12,13 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
-import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
-import com.troblecodings.signals.handler.ClientSignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.client.model.data.IModelData;
+import net.minecraftforge.client.model.data.ModelData;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
@@ -75,10 +73,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     }
 
     @Override
-    public @Nonnull IModelData getModelData() {
-        final Map<SEProperty, String> states = ClientSignalStateHandler
-                .getClientStates(new StateInfo(level, worldPosition));
-        return new ModelInfoWrapper(states);
+    public @NotNull ModelData getModelData() {
+        return new ModelInfoWrapper(properties).getModelData();
     }
 
     @Override

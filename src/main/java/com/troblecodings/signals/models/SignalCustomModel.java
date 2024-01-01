@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -31,6 +32,7 @@ import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
@@ -97,7 +99,7 @@ public class SignalCustomModel implements UnbakedModel {
                 new SimpleModelState(transformation), location);
         blockModel.textureMap.putAll(defaultMap);
         final Matrix4f reverse = new Matrix4f();
-        reverse.setIdentity();
+        reverse.identity();
         reverse.multiplyWithTranslation(-0.5f, 0, -0.5f);
 
         final Matrix4f matrix = Matrix4f.createScaleMatrix(1, 1, 1);
@@ -132,26 +134,26 @@ public class SignalCustomModel implements UnbakedModel {
     }
 
     @Override
-    public BakedModel bake(final ModelBakery bakery,
-            final Function<Material, TextureAtlasSprite> function, final ModelState state,
-            final ResourceLocation resource) {
+    public BakedModel bake(ModelBaker bakery, Function<Material, TextureAtlasSprite> function,
+            ModelState p_119536_, ResourceLocation p_119537_) {
         list.forEach(info -> {
             if (info.model == null) {
                 final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
                         "block/" + info.name);
-                if (bakery instanceof ForgeModelBakery) {
-                    info.model = ((ForgeModelBakery) bakery).getModelOrLogError(location,
-                            String.format("Could not find %s!", location));
-                } else {
-                    info.model = bakery.getModel(location);
-                }
+                info.model = bakery.getModel(location);
             }
         });
-        final Quaternion quaternion = angel.getQuaternion();
+        final Quaternionf quaternion = angel.getQuaternion();
         return new SignalBakedModel(
                 list.stream()
                         .map(info -> transform(info, bakery, resource, function,
                                 materialsFromString, quaternion))
                         .collect(Collectors.toUnmodifiableList()));
+    }
+
+    @Override
+    public void resolveParents(Function<ResourceLocation, UnbakedModel> p_119538_) {
+        // TODO Auto-generated method stub
+        
     }
 }

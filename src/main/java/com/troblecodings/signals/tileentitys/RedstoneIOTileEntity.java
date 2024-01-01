@@ -9,8 +9,8 @@ import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.core.LinkingUpdates;
-import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
@@ -36,7 +36,7 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
     public String getNameWrapper() {
         final String name = super.getNameWrapper();
         return name == null || name.isEmpty()
-                ? this.getBlockState().getBlock().getRegistryName().getPath()
+                ? this.getBlockState().getBlock().getName().getString()
                 : name;
     }
 

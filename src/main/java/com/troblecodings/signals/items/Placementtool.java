@@ -20,7 +20,6 @@ import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
-import com.troblecodings.signals.init.OSTabs;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -44,7 +43,7 @@ public class Placementtool extends Item
     public final ArrayList<Signal> signals = new ArrayList<>();
 
     public Placementtool() {
-        super(new Item.Properties().tab(OSTabs.TAB).durability(100).setNoRepair());
+        super(new Item.Properties().durability(100).setNoRepair());
     }
 
     @OnlyIn(Dist.CLIENT)

@@ -44,9 +44,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.level.ChunkWatchEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
-import net.minecraftforge.event.world.ChunkWatchEvent;
-import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.network.NetworkEvent.ClientCustomPayloadEvent;
 import net.minecraftforge.network.NetworkRegistry;
@@ -345,8 +345,8 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     @SubscribeEvent
-    public static void onWorldLoad(final WorldEvent.Load load) {
-        final Level world = (Level) load.getWorld();
+    public static void onWorldLoad(final LevelEvent.Load load) {
+        final Level world = (Level) load.getLevel();
         if (world.isClientSide)
             return;
         final Path path = PathGetter.getNewPathForFiles(world, "signalfiles");
@@ -360,8 +360,8 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     @SubscribeEvent
-    public static void onWorldSave(final WorldEvent.Save save) {
-        final Level world = (Level) save.getWorld();
+    public static void onWorldSave(final LevelEvent.Save save) {
+        final Level world = (Level) save.getLevel();
         if (world.isClientSide)
             return;
 
@@ -376,11 +376,11 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     @SubscribeEvent
-    public static void onWorldUnload(final WorldEvent.Unload unload) {
-        if (unload.getWorld().isClientSide())
+    public static void onWorldUnload(final LevelEvent.Unload unload) {
+        if (unload.getLevel().isClientSide())
             return;
         synchronized (ALL_LEVEL_FILES) {
-            ALL_LEVEL_FILES.remove(unload.getWorld());
+            ALL_LEVEL_FILES.remove(unload.getLevel());
         }
     }
 
@@ -458,7 +458,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onChunkWatch(final ChunkWatchEvent.Watch event) {
-        final ServerLevel world = event.getWorld();
+        final ServerLevel world = event.getLevel();
         if (world.isClientSide)
             return;
         final ChunkAccess chunk = world.getChunk(event.getPos().getWorldPosition());
@@ -476,7 +476,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     @SubscribeEvent
     public static void onChunkUnWatch(final ChunkWatchEvent.UnWatch event) {
-        final ServerLevel world = event.getWorld();
+        final ServerLevel world = event.getLevel();
         if (world.isClientSide)
             return;
         final ChunkAccess chunk = world.getChunk(event.getPos().getWorldPosition());

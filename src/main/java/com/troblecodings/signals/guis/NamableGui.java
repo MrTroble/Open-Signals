@@ -82,11 +82,10 @@ public class NamableGui extends GuiBase {
         list.add(layout);
         this.container.linkedPos.forEach(
                 pos -> list.add(GuiElements.createLabel(String.format("%s: x = %d, y = %d, z = %d",
-                        OSBlocks.SIGNAL_BOX.getName().getString(), pos.getX(), pos.getY(),
-                        pos.getZ()))));
+                        OSBlocks.SIGNAL_BOX.getBlockName(), pos.getX(), pos.getY(), pos.getZ()))));
         this.container.linkedController.forEach(
                 pos -> list.add(GuiElements.createLabel(String.format("%s: x = %d, y = %d, z = %d",
-                        OSBlocks.HV_SIGNAL_CONTROLLER.getName().getString(), pos.getX(), pos.getY(),
+                        OSBlocks.HV_SIGNAL_CONTROLLER.getBlockName(), pos.getX(), pos.getY(),
                         pos.getZ()))));
         inner.add(list);
         inner.add(GuiElements.createPageSelect(layout));

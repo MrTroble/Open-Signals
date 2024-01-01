@@ -42,7 +42,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 public final class SignalBoxHandler {
@@ -413,8 +413,8 @@ public final class SignalBoxHandler {
     private static final String BOOL_STATE = "boolState";
 
     @SubscribeEvent
-    public static void onWorldSave(final WorldEvent.Save event) {
-        final Level world = (Level) event.getWorld();
+    public static void onWorldSave(final LevelEvent.Save event) {
+        final Level world = (Level) event.getLevel();
         if (world.isClientSide)
             return;
         final NBTWrapper wrapper = new NBTWrapper();
@@ -459,8 +459,8 @@ public final class SignalBoxHandler {
     }
 
     @SubscribeEvent
-    public static void onWorldLoad(final WorldEvent.Load event) {
-        final Level world = (Level) event.getWorld();
+    public static void onWorldLoad(final LevelEvent.Load event) {
+        final Level world = (Level) event.getLevel();
         if (world.isClientSide)
             return;
         migrateFilesToNewDirectory(world);

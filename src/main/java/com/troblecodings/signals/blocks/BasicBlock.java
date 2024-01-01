@@ -20,6 +20,9 @@ public class BasicBlock extends Block implements EntityBlock {
     private static final Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
     private static final Map<TileEntitySupplierWrapper, Set<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
     public static final Map<TileEntitySupplierWrapper, BlockEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
+    public static final Map<BlockEntityType<?>, String> TYPE_TO_NAME = new HashMap<>();
+
+    private String name = "";
 
     public BasicBlock(final Properties properties) {
         super(properties);
@@ -30,6 +33,14 @@ public class BasicBlock extends Block implements EntityBlock {
                 BLOCK_NAMES.computeIfAbsent(supplier, _u -> name);
             });
         });
+    }
+
+    public void setBlockName(final String name) {
+        this.name = name;
+    }
+
+    public String getBlockName() {
+        return name;
     }
 
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
@@ -50,8 +61,8 @@ public class BasicBlock extends Block implements EntityBlock {
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> {
             final BlockEntityType type = new BlockEntityType(wrapper, blocks, null);
-            type.setRegistryName(BLOCK_NAMES.get(wrapper));
             BLOCK_ENTITYS.put(wrapper, type);
+            TYPE_TO_NAME.put(type, BLOCK_NAMES.get(wrapper));
         });
     }
 

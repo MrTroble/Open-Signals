@@ -24,7 +24,6 @@ import com.troblecodings.signals.guis.PathwayRequesterContainer;
 import com.troblecodings.signals.guis.TrainNumberContainer;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
-import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
 
@@ -52,8 +51,6 @@ public class CommonProxy {
     }
 
     public void preinit(final FMLCommonSetupEvent event) {
-        OSItems.init();
-
         OneSignalNonPredicateConfigParser.loadOneSignalConfigs();
         ChangeConfigParser.loadChangeConfigs();
         OneSignalPredicateConfigParser.loadDefaultConfigs();

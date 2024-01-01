@@ -5,38 +5,29 @@ import java.util.Map;
 import com.troblecodings.core.interfaces.BlockModelDataWrapper;
 import com.troblecodings.signals.SEProperty;
 
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
-import net.minecraftforge.client.model.data.ModelDataMap.Builder;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 public class ModelInfoWrapper implements BlockModelDataWrapper {
 
-    private final IModelData data;
+    private final ModelData data;
 
     public ModelInfoWrapper(final Map<SEProperty, String> states) {
-        final Builder builder = new ModelDataMap.Builder();
-        states.forEach((property, value) -> builder.withInitial(property, value));
+        final ModelData.Builder builder = ModelData.builder();
+        states.forEach((property, value) -> builder.with(property, value));
         this.data = builder.build();
     }
 
-    public ModelInfoWrapper(final IModelData data) {
+    public ModelInfoWrapper(final ModelData data) {
         this.data = data;
     }
 
-    @Override
     public boolean hasProperty(final ModelProperty<?> prop) {
-        return data.hasProperty(prop);
+        return data.has(prop);
     }
 
-    @Override
     public <T> T getData(final ModelProperty<T> prop) {
-        return data.getData(prop);
-    }
-
-    @Override
-    public <T> T setData(final ModelProperty<T> prop, final T value) {
-        return data.setData(prop, value);
+        return data.get(prop);
     }
 
     public boolean has(final SEProperty property) {
@@ -47,7 +38,8 @@ public class ModelInfoWrapper implements BlockModelDataWrapper {
         return getData(property);
     }
 
-    public void set(final SEProperty property, final String value) {
-        setData(property, value);
+    public ModelData getModelData() {
+        return data;
     }
+
 }

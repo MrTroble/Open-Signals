@@ -86,6 +86,7 @@ public class OpenSignalsMain {
         proxy.initModEvent(event);
     }
 
+    @SuppressWarnings("removal")
     @SubscribeEvent
     public void client(final FMLClientSetupEvent event) {
         OSBlocks.BLOCKS_TO_REGISTER.forEach(block -> {

@@ -49,7 +49,7 @@ public class SignalPropertiesBuilder {
         if (placementToolName != null) {
             for (int i = 0; i < OSItems.placementtools.size(); i++) {
                 final Placementtool tool = OSItems.placementtools.get(i);
-                if (tool.getRegistryName().getPath().equalsIgnoreCase(placementToolName)) {
+                if (tool.getDescription().getString().equalsIgnoreCase(placementToolName)) {
                     placementtool = tool;
                     break;
                 }
