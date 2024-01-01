@@ -35,31 +35,31 @@ public enum EnumGuiMode {
         this((state) -> {
             switch (state) {
                 case GREEN: {
-                    return new UITexture(UISignalBoxTile.SIGNALS, id * 0.067f, 0,
-                            id * 0.067f + 0.06f, 1);
+                    return new UITexture(UISignalBoxTile.SIGNALS, id * 0.0667f, 0,
+                            id * 0.066667f + 0.06f, 1);
                 }
                 case RED: {
-                    return new UITexture(UISignalBoxTile.SIGNALS, id * 0.067f + 3 * 0.067f, 0,
-                            id * 0.067f + 3 * 0.067f + 0.06f, 1);
+                    return new UITexture(UISignalBoxTile.SIGNALS, id * 0.067f + 3 * 0.0666667f, 0,
+                            id * 0.066667f + 3 * 0.067f + 0.06f, 1);
                 }
                 case OFF: {
-                    return new UITexture(UISignalBoxTile.SIGNALS, id * 0.067f + 6 * 0.067f, 0,
-                            id * 0.067f + 6 * 0.067f + 0.06f, 1);
+                    return new UITexture(UISignalBoxTile.SIGNALS, id * 0.067f + 6 * 0.0666667f, 0,
+                            id * 0.066667f + 6 * 0.067f + 0.06f, 1);
                 }
                 case SUBSIDIARY_GREEN: {
                     final int factor = 9;
-                    return new UITexture(UISignalBoxTile.SIGNALS, (id + factor) * 0.067f, 0,
-                            id * 0.067f + factor * 0.067f + 0.06f, 1);
+                    return new UITexture(UISignalBoxTile.SIGNALS, (id + factor) * 0.0666667f, 0,
+                            id * 0.066667f + factor * 0.067f + 0.06f, 1);
                 }
                 case SUBSIDIARY_RED: {
                     final int factor = 10;
-                    return new UITexture(UISignalBoxTile.SIGNALS, (id + factor) * 0.067f, 0,
-                            (id + factor) * 0.067f + 0.06f, 1);
+                    return new UITexture(UISignalBoxTile.SIGNALS, (id + factor) * 0.0666667f, 0,
+                            (id + factor) * 0.066667f + 0.06f, 1);
                 }
                 case SUBSIDIARY_OFF: {
                     final int factor = 11;
-                    return new UITexture(UISignalBoxTile.SIGNALS, (id + factor) * 0.067f, 0,
-                            (id + factor) * 0.067f + 0.06f, 1);
+                    return new UITexture(UISignalBoxTile.SIGNALS, (id + factor) * 0.0666667f, 0,
+                            (id + factor) * 0.066667f + 0.06f, 1);
                 }
                 default:
                     return new UITexture(UISignalBoxTile.SIGNALS);
