@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,6 +20,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.ChunkLoadable;
 import com.troblecodings.signals.core.LinkedPositions;
 import com.troblecodings.signals.core.LinkingUpdates;
+import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -409,7 +411,6 @@ public final class SignalBoxHandler {
     private static final String LINKING_UPDATE = "linkingUpdates";
     private static final String OUTPUT_UPDATE = "ouputUpdates";
     private static final String BOOL_STATE = "boolState";
-    private static final Path NBT_FILES_DIRECTORY = Paths.get("osfiles/signalboxhandler");
 
     @SubscribeEvent
     public static void onWorldSave(final WorldEvent.Save event) {
@@ -418,15 +419,13 @@ public final class SignalBoxHandler {
             return;
         final NBTWrapper wrapper = new NBTWrapper();
         final List<NBTWrapper> wrapperList = new ArrayList<>();
-        final String levelName = ((WorldServer) world).getMinecraftServer().getName().replace("/",
-                "") + "_"
+        final String levelName = ((WorldServer) world).getMinecraftServer().getFolderName() + "_"
                 + ((WorldServer) world).provider.getDimensionType().getName().replace(":", "_");
         synchronized (POS_UPDATES) {
             POS_UPDATES.forEach((pos, update) -> {
-                if (!levelName.equals(
-                        ((WorldServer) world).getMinecraftServer().getName().replace("/", "") + "_"
-                                + ((WorldServer) world).provider.getDimensionType().getName()
-                                        .replace(":", "_")))
+                if (!levelName.equals(((WorldServer) world).getMinecraftServer().getFolderName()
+                        + "_" + ((WorldServer) world).provider.getDimensionType().getName()
+                                .replace(":", "_")))
                     return;
                 final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
                 update.writeNBT(posWrapper);
@@ -437,10 +436,9 @@ public final class SignalBoxHandler {
         wrapperList.clear();
         synchronized (OUTPUT_UPDATES) {
             OUTPUT_UPDATES.forEach((pos, state) -> {
-                if (!levelName.equals(
-                        ((WorldServer) world).getMinecraftServer().getName().replace("/", "") + "_"
-                                + ((WorldServer) world).provider.getDimensionType().getName()
-                                        .replace(":", "_")))
+                if (!levelName.equals(((WorldServer) world).getMinecraftServer().getFolderName()
+                        + "_" + ((WorldServer) world).provider.getDimensionType().getName()
+                                .replace(":", "_")))
                     return;
                 final NBTWrapper posWrapper = NBTWrapper.getBlockPosWrapper(pos.pos);
                 posWrapper.putBoolean(BOOL_STATE, state);
@@ -449,15 +447,14 @@ public final class SignalBoxHandler {
         }
         wrapper.putList(OUTPUT_UPDATE, wrapperList);
         try {
-            Files.createDirectories(NBT_FILES_DIRECTORY);
-            final File file = Paths.get("osfiles/signalboxhandler/",
-                    ((WorldServer) world).getMinecraftServer().getName().replace("/", "") + "_"
-                            + ((WorldServer) world).provider.getDimensionType().getName()
-                                    .replace(":", "_"))
-                    .toFile();
+            final Path path = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            if (!Files.exists(path)) {
+                Files.createDirectories(path);
+            }
+            final File file = path.toFile();
             if (file.exists())
                 file.delete();
-            Files.createFile(file.toPath());
+            file.createNewFile();
             CompressedStreamTools.write(wrapper.tag, file);
         } catch (final IOException e) {
             e.printStackTrace();
@@ -469,18 +466,12 @@ public final class SignalBoxHandler {
         final World world = (World) event.getWorld();
         if (world.isRemote)
             return;
+        migrateFilesToNewDirectory(world);
         try {
-            Files.createDirectories(NBT_FILES_DIRECTORY);
-            final Optional<Path> file = Files.list(NBT_FILES_DIRECTORY)
-                    .filter(path -> path.endsWith(
-                            ((WorldServer) world).getMinecraftServer().getName().replace("/", "")
-                                    + "_" + ((WorldServer) world).provider.getDimensionType()
-                                            .getName().replace(":", "_")))
-                    .findFirst();
-            if (!file.isPresent() || !file.get().toFile().exists())
+            final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            if (!Files.exists(newPath))
                 return;
-            final NBTWrapper wrapper = new NBTWrapper(
-                    CompressedStreamTools.read(file.get().toFile()));
+            final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(newPath.toFile()));
             wrapper.getList(LINKING_UPDATE).forEach(tag -> {
                 final LinkingUpdates updates = new LinkingUpdates();
                 updates.readNBT(tag);
@@ -497,6 +488,38 @@ public final class SignalBoxHandler {
             });
         } catch (final IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void migrateFilesToNewDirectory(final World world) {
+        final Path oldPath = Paths.get("osfiles/signalboxhandler/",
+                ((WorldServer) world).getMinecraftServer().getName().replace("/", "") + "_"
+                        + ((WorldServer) world).provider.getDimensionType().getName().replace(":",
+                                "_"));
+        if (!Files.exists(oldPath)) {
+            return;
+        }
+        final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+        try {
+            Files.createDirectories(newPath);
+            Files.copy(oldPath, newPath, StandardCopyOption.REPLACE_EXISTING);
+            if (Files.isDirectory(oldPath)) {
+                Files.list(oldPath).forEach(path -> {
+                    try {
+                        Files.delete(path);
+                    } catch (final IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
+        } catch (final IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                Files.delete(oldPath);
+            } catch (final IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

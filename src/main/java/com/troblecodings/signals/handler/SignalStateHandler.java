@@ -1,6 +1,9 @@
 package com.troblecodings.signals.handler;
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -22,9 +25,11 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.enums.ChangedState;
+import com.troblecodings.signals.signalbox.debug.DebugSignalStateFileV2;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
 import io.netty.buffer.Unpooled;
@@ -51,7 +56,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
-    private static final Map<World, SignalStateFile> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<World, SignalStateFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
     private static final Map<SignalStateInfo, List<SignalStateListener>> ALL_LISTENERS = new HashMap<>();
     private static final Map<SignalStateInfo, List<SignalStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
@@ -169,16 +174,14 @@ public final class SignalStateHandler implements INetworkSync {
             final Map<SEProperty, String> states) {
         if (states == null)
             return;
-        SignalStateFile file;
+        SignalStateFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
-            file = ALL_LEVEL_FILES.computeIfAbsent(info.world,
-                    _u -> new SignalStateFile(Paths.get("osfiles/signalfiles/"
-                            + ((WorldServer) info.world).getMinecraftServer().getName()
-                                    .replace(":", "").replace("/", "").replace("\\", "")
-                            + "/" + ((WorldServer) info.world).provider.getDimensionType().getName()
-                                    .replace(":", ""))));
+            file = ALL_LEVEL_FILES.get(info.world);
+            if (file == null) {
+                return;
+            }
         }
-        SignalStatePos pos = file.find(info.pos);
+        SignalStatePosV2 pos = file.find(info.pos);
         if (pos == null) {
             pos = file.create(info.pos);
         }
@@ -186,6 +189,38 @@ public final class SignalStateHandler implements INetworkSync {
             final ByteBuffer buffer = file.read(pos);
             statesToBuffer(info.signal, states, buffer.array());
             file.write(pos, buffer);
+        }
+    }
+
+    private static void migrateWorldFilesToV2(final World world) {
+        final Path oldPath = Paths.get("osfiles/signalfiles/"
+                + ((WorldServer) world).getMinecraftServer().getName().replace(":", "")
+                        .replace("/", "").replace("\\", "")
+                + "/"
+                + ((WorldServer) world).provider.getDimensionType().getName().replace(":", ""));
+        if (!Files.exists(oldPath))
+            return;
+        OpenSignalsMain.getLogger()
+                .info("Starting Migration from SignalStateFileV1 to SignalStateFileV2...");
+        final SignalStateFile oldFile = new SignalStateFile(oldPath);
+        SignalStateFileV2 newFile;
+        synchronized (ALL_LEVEL_FILES) {
+            newFile = ALL_LEVEL_FILES.get(world);
+        }
+        oldFile.getAllEntries().forEach((pos, buffer) -> newFile.create(pos, buffer.array()));
+        OpenSignalsMain.getLogger()
+                .info("Finished Migration from SignalStateFileV1 to SignalStateFileV2!");
+        try {
+            Files.list(oldPath).forEach(path -> {
+                try {
+                    Files.delete(path);
+                } catch (final IOException e) {
+                    e.printStackTrace();
+                }
+            });
+            Files.delete(oldPath);
+        } catch (final IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -256,18 +291,13 @@ public final class SignalStateHandler implements INetworkSync {
 
     private static Map<SEProperty, String> readAndSerialize(final SignalStateInfo stateInfo) {
         final Map<SEProperty, String> map = new HashMap<>();
-        SignalStateFile file;
+        SignalStateFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
-            file = ALL_LEVEL_FILES.computeIfAbsent(stateInfo.world,
-                    _u -> new SignalStateFile(Paths.get("osfiles/signalfiles/"
-                            + ((WorldServer) stateInfo.world).getMinecraftServer().getName()
-                                    .replace(":", "").replace("/", "").replace("\\", "")
-                            + "/" + ((WorldServer) stateInfo.world).provider.getDimensionType()
-                                    .getName().replace(":", ""))));
+            file = ALL_LEVEL_FILES.get(stateInfo.world);
         }
         ByteBuffer buffer;
         synchronized (file) {
-            SignalStatePos pos = file.find(stateInfo.pos);
+            SignalStatePosV2 pos = file.find(stateInfo.pos);
             if (pos == null) {
                 if (stateInfo.world.isRemote) {
                     OpenSignalsMain.getLogger()
@@ -292,6 +322,18 @@ public final class SignalStateHandler implements INetworkSync {
             map.put(property, value);
         }
         return map;
+    }
+
+    @SubscribeEvent
+    public static void onWorldLoad(final WorldEvent.Load event) {
+        final World world = event.getWorld();
+        if (world.isRemote)
+            return;
+        final Path path = PathGetter.getNewPathForFiles(world, "signalfiles");
+        synchronized (ALL_LEVEL_FILES) {
+            ALL_LEVEL_FILES.put(world, new DebugSignalStateFileV2(path));
+        }
+        migrateWorldFilesToV2(world);
     }
 
     @SubscribeEvent
@@ -323,7 +365,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             removedProperties = CURRENTLY_LOADED_STATES.remove(info);
         }
-        SignalStateFile file;
+        SignalStateFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
         }
