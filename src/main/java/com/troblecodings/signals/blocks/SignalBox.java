@@ -10,7 +10,7 @@ import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -39,8 +39,7 @@ public class SignalBox extends BasicBlock {
                 OpenSignalsMain.handler.invokeGui(SignalBox.class, playerIn, worldIn, pos,
                         "signalbox");
             } else {
-                playerIn.sendMessage(new TranslatableComponent("msg.isblocked"),
-                        playerIn.getUUID());
+                playerIn.sendSystemMessage(Component.translatable("msg.isblocked"));
             }
             return InteractionResult.SUCCESS;
         }

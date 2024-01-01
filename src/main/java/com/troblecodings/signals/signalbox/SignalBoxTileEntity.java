@@ -125,9 +125,4 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public SignalBoxGrid getSignalBoxGrid() {
         return grid;
     }
-
-    @Override
-    public boolean canBeLinked() {
-        return true;
-    }
 }

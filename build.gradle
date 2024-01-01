@@ -45,7 +45,7 @@ curseforge {
     changelog = file('changelog.md')
     releaseType = 'release'
     changelogType = 'markdown'
-    addGameVersion '1.18.2'
+    addGameVersion '1.19.4'
   }
   options {
     detectNewerJava = true
@@ -54,12 +54,12 @@ curseforge {
 
 version = ver
 group = 'com.troblecodings'
-archivesBaseName = 'OpenSignals-1.18.2'
+archivesBaseName = 'OpenSignals-1.19.4'
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-	mappings channel: 'official', version: '1.18.2'
+	mappings channel: 'official', version: '1.19.4'
 	accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     runs {
         client {
@@ -76,9 +76,8 @@ minecraft {
 }
 
 dependencies {   
-    minecraft 'net.minecraftforge:forge:1.18.2-40.1.86'
+    minecraft 'net.minecraftforge:forge:1.19.4-45.1.2'
     testImplementation("org.junit.jupiter:junit-jupiter:5.9.1")
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 test {
@@ -91,7 +90,7 @@ processResources {
 	inputs.property "version", project.version
 	
 	filesMatching("mcmod.info") {
-		expand "version": project.version, "mcversion": "1.18.2"
+		expand "version": project.version, "mcversion": "1.19.4"
 	}
 }
 

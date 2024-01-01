@@ -3,7 +3,7 @@ package com.troblecodings.signals.items;
 import com.troblecodings.signals.OpenSignalsMain;
 
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ArmorItem.Type;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.crafting.Ingredient;
 
@@ -36,15 +36,15 @@ public final class EnumHelper {
             this.toughness = toughness;
             this.knock = knock;
         }
-
+        
         @Override
-        public int getDurabilityForSlot(final EquipmentSlot slot) {
+        public int getDurabilityForType(final Type type) {
             return durability;
         }
 
         @Override
-        public int getDefenseForSlot(final EquipmentSlot slot) {
-            return this.defense[slot.getIndex()];
+        public int getDefenseForType(final Type type) {
+            return this.defense[type.getSlot().getIndex()];
         }
 
         @Override
