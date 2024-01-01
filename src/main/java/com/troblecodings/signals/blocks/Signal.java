@@ -7,8 +7,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
 
+import org.joml.Quaternionf;
+
 import com.google.common.collect.ImmutableList;
-import com.mojang.math.Quaternion;
+import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
@@ -254,7 +256,7 @@ public class Signal extends BasicBlock {
             }
         }
         final SignalAngel face = state.getValue(Signal.ANGEL);
-        final Quaternion angle = face.getQuaternion();
+        final Quaternionf angle = face.getQuaternion();
 
         info.stack.pushPose();
         info.stack.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
@@ -263,8 +265,8 @@ public class Signal extends BasicBlock {
         renderSingleScaleOverlay(info);
 
         if (doubleSidedText) {
-            final Quaternion quad = new Quaternion(
-                    Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+            final Quaternionf quad = new Quaternionf(
+                    QuaternionWrapper.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
             renderSingleScaleOverlay(info);
@@ -317,7 +319,7 @@ public class Signal extends BasicBlock {
         final String name = info.tileEntity.getNameWrapper();
         final String[] splitNames = name.split("\\[n\\]");
         final SignalAngel face = state.getValue(Signal.ANGEL);
-        final Quaternion angle = face.getQuaternion();
+        final Quaternionf angle = face.getQuaternion();
         final float scale = this.prop.signScale;
 
         info.stack.pushPose();
@@ -328,8 +330,8 @@ public class Signal extends BasicBlock {
         renderSingleOverlay(info, splitNames);
 
         if (doubleSidedText) {
-            final Quaternion quad = new Quaternion(
-                    Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
+            final Quaternionf quad = new Quaternionf(
+                    QuaternionWrapper.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
             renderSingleOverlay(info, splitNames);
