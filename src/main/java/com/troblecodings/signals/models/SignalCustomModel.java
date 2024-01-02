@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -22,7 +21,6 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.datafixers.util.Either;
 import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Quaternion;
 import com.mojang.math.Transformation;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.SignalAngel;
@@ -38,18 +36,17 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.ForgeModelBakery;
 import net.minecraftforge.client.model.SimpleModelState;
-import net.minecraftforge.client.model.data.EmptyModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class SignalCustomModel implements UnbakedModel {
 
     @Nonnull
-    public static final Random RANDOM = new Random();
+    public static final RandomSource RANDOM = RandomSource.create();
 
     private final SignalAngel angel;
     private final List<SignalModelLoaderInfo> list;
@@ -77,17 +74,18 @@ public class SignalCustomModel implements UnbakedModel {
             final float y = Float.intBitsToFloat(oldVertex[i + 1]);
             final float z = Float.intBitsToFloat(oldVertex[i + 2]);
             final Vector4f vector = new Vector4f(x, y, z, 1);
-            vector.transform(quaterion);
+            quaterion.transform(vector);
             oldVertex[i + 0] = Float.floatToIntBits(vector.x());
             oldVertex[i + 1] = Float.floatToIntBits(vector.y());
             oldVertex[i + 2] = Float.floatToIntBits(vector.z());
         }
     }
 
+    @SuppressWarnings("deprecation")
     private static BakedModelPair transform(final SignalModelLoaderInfo info,
             final ModelBakery bakery, final ResourceLocation location,
             final Function<Material, TextureAtlasSprite> function,
-            final Map<String, Either<Material, String>> material, final Quaternion rotation) {
+            final Map<String, Either<Material, String>> material, final Quaternionf rotation) {
         final Transformation transformation = new Transformation(
                 new Vector3f(info.x, info.y, info.z), null, null, null);
         final BlockModel blockModel = (BlockModel) info.model;
@@ -95,22 +93,23 @@ public class SignalCustomModel implements UnbakedModel {
                 .copyOf(blockModel.textureMap);
         info.retexture.forEach((id, texture) -> blockModel.textureMap.computeIfPresent(id,
                 (_u, old) -> material.get(texture)));
-        final BakedModel model = info.model.bake(bakery, function,
+        final BakedModel model = info.model.bake((ModelBaker) bakery, function,
                 new SimpleModelState(transformation), location);
         blockModel.textureMap.putAll(defaultMap);
         final Matrix4f reverse = new Matrix4f();
         reverse.identity();
-        reverse.multiplyWithTranslation(-0.5f, 0, -0.5f);
+        reverse.translate(-0.5f, 0, -0.5f);
+        
+        final Matrix4f matrix = new Matrix4f();
+        matrix.scale(1, 1, 1);
+        matrix.translate(0.5f, 0, 0.5f);
+        matrix.rotate(rotation);
+        matrix.mul(reverse);
 
-        final Matrix4f matrix = Matrix4f.createScaleMatrix(1, 1, 1);
-        matrix.multiplyWithTranslation(0.5f, 0, 0.5f);
-        matrix.multiply(rotation);
-        matrix.multiply(reverse);
-
-        model.getQuads(null, null, RANDOM, EmptyModelData.INSTANCE)
+        model.getQuads(null, null, RANDOM)
                 .forEach(quad -> transform(quad, matrix));
         for (final Direction direction : Direction.values()) {
-            model.getQuads(null, direction, RANDOM, EmptyModelData.INSTANCE)
+            model.getQuads(null, direction, RANDOM)
                     .forEach(quad -> transform(quad, matrix));
         }
         return new BakedModelPair(info.state, model);
@@ -134,8 +133,8 @@ public class SignalCustomModel implements UnbakedModel {
     }
 
     @Override
-    public BakedModel bake(ModelBaker bakery, Function<Material, TextureAtlasSprite> function,
-            ModelState p_119536_, ResourceLocation p_119537_) {
+    public BakedModel bake(final ModelBaker bakery, final Function<Material, TextureAtlasSprite> function,
+            final ModelState p_119536_, final ResourceLocation p_119537_) {
         list.forEach(info -> {
             if (info.model == null) {
                 final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
@@ -152,7 +151,7 @@ public class SignalCustomModel implements UnbakedModel {
     }
 
     @Override
-    public void resolveParents(Function<ResourceLocation, UnbakedModel> p_119538_) {
+    public void resolveParents(final Function<ResourceLocation, UnbakedModel> p_119538_) {
         // TODO Auto-generated method stub
         
     }
