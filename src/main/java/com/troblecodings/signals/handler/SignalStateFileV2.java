@@ -175,6 +175,10 @@ public class SignalStateFileV2 {
                 return null;
             final ChunkPos chunk = new ChunkPos(pos);
             final long hashOffset = hash(pos, chunk);
+            if (hashOffset < START_OFFSET) {
+                OpenSignalsMain.getLogger().error("Invalid HashOffset! Please report to Mod Author! pos=" + pos + ",chunkPos=" + chunk + ",hashOffset=" + hashOffset);
+                return null;
+            }
             stream.seek(hashOffset);
             BlockPos currenPosition = null;
             int offset = 0;
