@@ -194,8 +194,7 @@ public class SignalStateFileV2 {
                     stream.seek(START_OFFSET); // Wrap around search
                     searchingAtBeginOfFile = true;
                 }
-                if (currentOffset == hashOffset
-                        || (hashOffset == START_OFFSET && !pos.equals(currenPosition)))
+                if (currentOffset == hashOffset)
                     return null; // Nothing found
             } while (!pos.equals(currenPosition));
             return function.apply(stream, currenPosition, offset, chunk);

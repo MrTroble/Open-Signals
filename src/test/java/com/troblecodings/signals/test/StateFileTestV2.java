@@ -214,4 +214,14 @@ public class StateFileTestV2 {
             assertEquals(file.read(posOldFile), fileV2.read(posInNewFile));
         });
     }
+
+    @Test
+    public void testHash() {
+        final BlockPos pos = new BlockPos(-50, 82, -6156);
+        final ChunkPos chunk = new ChunkPos(pos);
+        System.out.println(SignalStateFileV2.hash(pos, chunk));
+        final byte[] array = SignalStateFileV2.getChunkPosFromPos(chunk, pos);
+        assertEquals(pos, SignalStateFileV2.getPosFromChunkPos(chunk, array));
+
+    }
 }
