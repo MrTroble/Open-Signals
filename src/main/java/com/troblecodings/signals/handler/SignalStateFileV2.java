@@ -186,8 +186,8 @@ public class SignalStateFileV2 {
                 offset = Byte.toUnsignedInt(stream.readByte());
                 final long currentOffset = stream.getFilePointer();
                 if (hashOffset == 40) {
-                    System.out
-                            .println("Readout pos:" + currenPosition + ",posToSearch=" + pos + "]");
+                    System.out.println("Readout pos:" + currenPosition + ",posToSearch=" + pos
+                            + "], CurrentOffset=" + currentOffset);
                 }
                 if (currentOffset >= MAX_OFFSET_OF_INDEX) {
                     if (searchingAtBeginOfFile) {
