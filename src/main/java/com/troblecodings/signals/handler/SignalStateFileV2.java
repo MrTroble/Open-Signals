@@ -185,6 +185,10 @@ public class SignalStateFileV2 {
                 currenPosition = getPosFromChunkPos(chunk, array);
                 offset = Byte.toUnsignedInt(stream.readByte());
                 final long currentOffset = stream.getFilePointer();
+                if (hashOffset == 40) {
+                    System.out
+                            .println("Readout pos:" + currenPosition + ",posToSearch=" + pos + "]");
+                }
                 if (currentOffset >= MAX_OFFSET_OF_INDEX) {
                     if (searchingAtBeginOfFile) {
                         OpenSignalsMain.getLogger()
@@ -261,6 +265,10 @@ public class SignalStateFileV2 {
                     }
                 }
                 final long actualOffset = stream.getFilePointer() - ALIGNMENT_PER_INDEX_ITEM;
+                if (offsetHash == 40) {
+                    System.out.println(
+                            "Creating [" + pos + "] with Offset 40 at [" + actualOffset + "]!");
+                }
                 final int freeOffsetInFile = getNextFreeOffset(stream);
                 final int offset = freeOffsetInFile * STATE_BLOCK_SIZE + MAX_OFFSET_OF_INDEX;
                 stream.seek(actualOffset);
