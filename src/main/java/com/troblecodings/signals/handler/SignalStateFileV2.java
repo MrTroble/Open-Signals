@@ -185,6 +185,8 @@ public class SignalStateFileV2 {
                 currenPosition = getPosFromChunkPos(chunk, array);
                 offset = Byte.toUnsignedInt(stream.readByte());
                 final long currentOffset = stream.getFilePointer();
+                System.out.println("Are positions equal: " + pos.equals(currenPosition) + ", pos="
+                        + currenPosition);
                 if (hashOffset == 40) {
                     System.out.println("Readout pos:" + currenPosition + ",posToSearch=" + pos
                             + "], CurrentOffset=" + currentOffset);
@@ -201,6 +203,7 @@ public class SignalStateFileV2 {
                 if (currentOffset == hashOffset)
                     return null; // Nothing found
             } while (!pos.equals(currenPosition));
+            System.out.println("Found [" + currenPosition + "]!");
             return function.apply(stream, currenPosition, offset, chunk);
         } catch (final IOException e) {
             e.printStackTrace();
