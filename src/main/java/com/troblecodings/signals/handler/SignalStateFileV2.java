@@ -203,7 +203,7 @@ public class SignalStateFileV2 {
                 if (currentOffset == hashOffset)
                     return null; // Nothing found
             } while (!pos.equals(currenPosition));
-            System.out.println("Found [" + currenPosition + "]!");
+            System.out.println("Found [" + currenPosition + "] with offset [" + offset + "]!");
             return function.apply(stream, currenPosition, offset, chunk);
         } catch (final IOException e) {
             e.printStackTrace();
@@ -274,6 +274,10 @@ public class SignalStateFileV2 {
                 }
                 final int freeOffsetInFile = getNextFreeOffset(stream);
                 final int offset = freeOffsetInFile * STATE_BLOCK_SIZE + MAX_OFFSET_OF_INDEX;
+                if (offsetHash == 40) {
+                    System.out.println("Creating [" + pos + "] with Offset 40 at offsetInFile ["
+                            + offset + "]!");
+                }
                 stream.seek(actualOffset);
                 stream.write(getChunkPosFromPos(chunk, pos));
                 stream.writeByte(freeOffsetInFile);
