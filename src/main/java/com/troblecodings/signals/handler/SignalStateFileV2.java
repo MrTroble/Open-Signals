@@ -175,22 +175,26 @@ public class SignalStateFileV2 {
                 return null;
             final ChunkPos chunk = new ChunkPos(pos);
             final long hashOffset = hash(pos, chunk);
-            if (hashOffset < START_OFFSET) {
-                OpenSignalsMain.getLogger().error("Invalid HashOffset! Please report to Mod Author! pos=" + pos + ",chunkPos=" + chunk + ",hashOffset=" + hashOffset);
-                return null;
-            }
             stream.seek(hashOffset);
             BlockPos currenPosition = null;
             int offset = 0;
+            boolean searchingAtBeginOfFile = false;
             do {
                 final byte[] array = new byte[3];
                 stream.readFully(array);
                 currenPosition = getPosFromChunkPos(chunk, array);
                 offset = Byte.toUnsignedInt(stream.readByte());
                 final long currentOffset = stream.getFilePointer();
-                if (currentOffset >= MAX_OFFSET_OF_INDEX)
+                if (currentOffset >= MAX_OFFSET_OF_INDEX) {
+                    if (searchingAtBeginOfFile) {
+                        OpenSignalsMain.getLogger()
+                                .error("Haven't found [" + pos + "]! HashOffset=" + hashOffset);
+                        return null;
+                    }
                     stream.seek(START_OFFSET); // Wrap around search
-                if (currentOffset == hashOffset)
+                    searchingAtBeginOfFile = true;
+                }
+                if (currentOffset == hashOffset || hashOffset == START_OFFSET)
                     return null; // Nothing found
             } while (!pos.equals(currenPosition));
             return function.apply(stream, currenPosition, offset, chunk);
