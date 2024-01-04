@@ -1,12 +1,9 @@
 package com.troblecodings.signals.models;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -20,7 +17,6 @@ import org.joml.Vector4f;
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.datafixers.util.Either;
-import com.mojang.datafixers.util.Pair;
 import com.mojang.math.Transformation;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.SignalAngel;
@@ -31,7 +27,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
@@ -83,7 +78,7 @@ public class SignalCustomModel implements UnbakedModel {
 
     @SuppressWarnings("deprecation")
     private static BakedModelPair transform(final SignalModelLoaderInfo info,
-            final ModelBakery bakery, final ResourceLocation location,
+            final ModelBaker bakery, final ResourceLocation location,
             final Function<Material, TextureAtlasSprite> function,
             final Map<String, Either<Material, String>> material, final Quaternionf rotation) {
         final Transformation transformation = new Transformation(
@@ -99,18 +94,16 @@ public class SignalCustomModel implements UnbakedModel {
         final Matrix4f reverse = new Matrix4f();
         reverse.identity();
         reverse.translate(-0.5f, 0, -0.5f);
-        
+
         final Matrix4f matrix = new Matrix4f();
         matrix.scale(1, 1, 1);
         matrix.translate(0.5f, 0, 0.5f);
         matrix.rotate(rotation);
         matrix.mul(reverse);
 
-        model.getQuads(null, null, RANDOM)
-                .forEach(quad -> transform(quad, matrix));
+        model.getQuads(null, null, RANDOM).forEach(quad -> transform(quad, matrix));
         for (final Direction direction : Direction.values()) {
-            model.getQuads(null, direction, RANDOM)
-                    .forEach(quad -> transform(quad, matrix));
+            model.getQuads(null, direction, RANDOM).forEach(quad -> transform(quad, matrix));
         }
         return new BakedModelPair(info.state, model);
     }
@@ -120,21 +113,21 @@ public class SignalCustomModel implements UnbakedModel {
         return this.dependencies;
     }
 
-    @Override
-    public Collection<Material> getMaterials(
-            final Function<ResourceLocation, UnbakedModel> function,
-            final Set<Pair<String, String>> modelState) {
-        final List<Material> material = new ArrayList<>();
-        this.dependencies.forEach(location -> material
-                .addAll(function.apply(location).getMaterials(function, modelState)));
-        materialsFromString.values().stream().map(either -> either.left())
-                .filter(Optional::isPresent).forEach(opt -> material.add(opt.get()));
-        return material;
-    }
+    /*
+     * @Override public Collection<Material> getMaterials( final
+     * Function<ResourceLocation, UnbakedModel> function, final Set<Pair<String,
+     * String>> modelState) { final List<Material> material = new ArrayList<>();
+     * this.dependencies.forEach(location -> material
+     * .addAll(function.apply(location).getMaterials(function, modelState)));
+     * materialsFromString.values().stream().map(either -> either.left())
+     * .filter(Optional::isPresent).forEach(opt -> material.add(opt.get())); return
+     * material; }
+     */
 
     @Override
-    public BakedModel bake(final ModelBaker bakery, final Function<Material, TextureAtlasSprite> function,
-            final ModelState p_119536_, final ResourceLocation p_119537_) {
+    public BakedModel bake(final ModelBaker bakery,
+            final Function<Material, TextureAtlasSprite> function, final ModelState p_119536_,
+            final ResourceLocation resource) {
         list.forEach(info -> {
             if (info.model == null) {
                 final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID,
@@ -153,6 +146,6 @@ public class SignalCustomModel implements UnbakedModel {
     @Override
     public void resolveParents(final Function<ResourceLocation, UnbakedModel> p_119538_) {
         // TODO Auto-generated method stub
-        
+
     }
 }

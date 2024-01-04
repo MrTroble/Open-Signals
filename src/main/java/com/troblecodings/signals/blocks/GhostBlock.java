@@ -1,7 +1,6 @@
 package com.troblecodings.signals.blocks;
 
 import com.troblecodings.signals.config.ConfigHandler;
-import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -67,7 +66,7 @@ public class GhostBlock extends BasicBlock {
     @Override
     public StateDefinition<Block, BlockState> getStateDefinition() {
         if (!Minecraft.getInstance().isLocalServer()) {
-            CustomModelLoader.INSTANCE.prepare();
+            // CustomModelLoader.INSTANCE.prepare();
         }
         return super.getStateDefinition();
     }

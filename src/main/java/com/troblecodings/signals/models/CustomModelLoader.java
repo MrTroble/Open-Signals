@@ -10,18 +10,15 @@ import java.util.function.Predicate;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.ContentPackException;
-import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
 import com.troblecodings.signals.parser.LogicalParserException;
 
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.ForgeModelBakery;
 
 @OnlyIn(Dist.CLIENT)
 public final class CustomModelLoader implements ResourceManagerReloadListener {
@@ -101,24 +98,18 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
         wrapper.putNormal(new ModelResourceLocation(OpenSignalsMain.MODID, name, ""),
                 DefaultModel.INSTANCE);
     }
-
-    public void prepare() {
-        final ForgeModelBakery bakery = ForgeModelBakery.instance();
-        if (!(bakery.unbakedCache instanceof MapWrapper)) {
-            wrapper = new MapWrapper(bakery.unbakedCache, registeredModels.keySet());
-            defaultModel(wrapper, "ghostblock");
-            registeredModels.forEach((name, loaderList) -> {
-                defaultModel(wrapper, name);
-                for (final SignalAngel angel : SignalAngel.values()) {
-                    wrapper.putNormal(
-                            new ModelResourceLocation(OpenSignalsMain.MODID, name,
-                                    "angel=" + angel.getNameWrapper()),
-                            new SignalCustomModel(angel, loaderList));
-                }
-            });
-            bakery.unbakedCache = wrapper;
-        }
-    }
+    // TODO Maby do something?
+    /*
+     * public void prepare() { final ForgeModelBakery bakery =
+     * ForgeModelBakery.instance(); if (!(bakery.unbakedCache instanceof
+     * MapWrapper)) { wrapper = new MapWrapper(bakery.unbakedCache,
+     * registeredModels.keySet()); defaultModel(wrapper, "ghostblock");
+     * registeredModels.forEach((name, loaderList) -> { defaultModel(wrapper, name);
+     * for (final SignalAngel angel : SignalAngel.values()) { wrapper.putNormal( new
+     * ModelResourceLocation(OpenSignalsMain.MODID, name, "angel=" +
+     * angel.getNameWrapper()), new SignalCustomModel(angel, loaderList)); } });
+     * bakery.unbakedCache = wrapper; } }
+     */
 
     @Override
     public void onResourceManagerReload(final ResourceManager manager) {
