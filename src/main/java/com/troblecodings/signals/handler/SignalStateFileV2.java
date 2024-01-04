@@ -178,7 +178,7 @@ public class SignalStateFileV2 {
             stream.seek(hashOffset);
             BlockPos currenPosition = null;
             int offset = 0;
-            boolean searchingAtBeginOfFile = false;
+            boolean startSearchAtBegin = false;
             do {
                 final byte[] array = new byte[3];
                 stream.readFully(array);
@@ -186,13 +186,11 @@ public class SignalStateFileV2 {
                 offset = Byte.toUnsignedInt(stream.readByte());
                 final long currentOffset = stream.getFilePointer();
                 if (currentOffset >= MAX_OFFSET_OF_INDEX) {
-                    if (searchingAtBeginOfFile) {
-                        OpenSignalsMain.getLogger()
-                                .error("Haven't found [" + pos + "]! HashOffset=" + hashOffset);
+                    if (startSearchAtBegin) {
                         return null;
                     }
                     stream.seek(START_OFFSET); // Wrap around search
-                    searchingAtBeginOfFile = true;
+                    startSearchAtBegin = true;
                 }
                 if (currentOffset == hashOffset)
                     return null; // Nothing found
