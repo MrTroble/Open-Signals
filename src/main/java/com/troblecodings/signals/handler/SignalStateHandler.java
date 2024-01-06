@@ -351,7 +351,7 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final Path path = PathGetter.getNewPathForFiles(world, "signalfiles");
         synchronized (ALL_LEVEL_FILES) {
-            ALL_LEVEL_FILES.put(world, new DebugSignalStateFileV2(path));
+            ALL_LEVEL_FILES.put(world, new SignalStateFileV2(path));
         }
         migrateWorldFilesToV2(world);
         if (writeService != null)
