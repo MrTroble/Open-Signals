@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.16.5 - 3.3.1]
+
+* fix issue in SignalStateFileV2
+
 ## [1.16.5 - 3.3.0]
 
 * feat: added help panel to signalbox
