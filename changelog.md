@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.16.5 - 3.3.1]
+
+* fix: issue in SignalStateFileV2
+* fix: linking list empty when copying
+
 ## [1.16.5 - 3.3.0]
 
 * feat: added help panel to signalbox

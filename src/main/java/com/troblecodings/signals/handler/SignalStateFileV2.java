@@ -178,14 +178,20 @@ public class SignalStateFileV2 {
             stream.seek(hashOffset);
             BlockPos currenPosition = null;
             int offset = 0;
+            boolean startSearchAtBegin = false;
             do {
                 final byte[] array = new byte[3];
                 stream.readFully(array);
                 currenPosition = getPosFromChunkPos(chunk, array);
                 offset = Byte.toUnsignedInt(stream.readByte());
                 final long currentOffset = stream.getFilePointer();
-                if (currentOffset >= MAX_OFFSET_OF_INDEX)
+                if (currentOffset >= MAX_OFFSET_OF_INDEX) {
+                    if (startSearchAtBegin) {
+                        return null;
+                    }
                     stream.seek(START_OFFSET); // Wrap around search
+                    startSearchAtBegin = true;
+                }
                 if (currentOffset == hashOffset)
                     return null; // Nothing found
             } while (!pos.equals(currenPosition));
