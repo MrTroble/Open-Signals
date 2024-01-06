@@ -2,7 +2,8 @@
 
 ## [1.18.2 - 3.3.1]
 
-* fix issue in SignalStateFileV2
+* fix: issue in SignalStateFileV2
+* fix: linking list empty when copying
 
 ## [1.18.2 - 3.3.0]
 
