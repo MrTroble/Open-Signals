@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.12.2 - 3.3.1]
+
+* fix issue in SignalStateFileV2
+
 ## [1.12.2 - 3.3.0]
 
 * feat: new SignalFile system (V2) now in world folder and migration from old system
