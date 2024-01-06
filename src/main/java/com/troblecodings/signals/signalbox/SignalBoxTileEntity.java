@@ -56,6 +56,9 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         grid.read(wrapper.getWrapper(GUI_TAG));
         grid.readPathways(wrapper);
         copy = wrapper.copy();
+        if (world != null) {
+            onLoad();
+        }
     }
 
     @Override
