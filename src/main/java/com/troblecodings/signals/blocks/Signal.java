@@ -97,6 +97,11 @@ public class Signal extends BasicBlock {
     }
 
     @Override
+    public boolean shouldHaveItem() {
+        return false;
+    }
+
+    @Override
     public boolean propagatesSkylightDown(final BlockState state, final BlockGetter getter,
             final BlockPos pos) {
         return true;

@@ -1,0 +1,20 @@
+{
+    "signalbridge_base": {
+        "type" : "BASE"
+    },
+    "signalbridge_cantilever": {
+        "type": "CANTILEVER"
+    },
+    "signalbridge_cantilever_end": {
+        "type": "CANTILEVER_END"
+    },
+    "signalbridge_mast": {
+        "type": "MAST"
+    },
+    "signalbridge_mast_cage": {
+        "type": "MAST"
+    },
+    "signalbridge_mast_head": {
+        "type": "MAST_HEAD"
+    }
+}

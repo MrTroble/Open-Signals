@@ -30,6 +30,11 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
+    public boolean shouldHaveItem() {
+        return false;
+    }
+
+    @Override
     public RenderShape getRenderShape(final BlockState state) {
         return RenderShape.INVISIBLE;
     }
