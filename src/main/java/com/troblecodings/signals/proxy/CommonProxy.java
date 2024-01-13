@@ -5,6 +5,7 @@ import java.util.Map;
 import com.troblecodings.core.UIInit;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
+import com.troblecodings.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.RedstoneIO;
@@ -21,6 +22,7 @@ import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.guis.NamableContainer;
 import com.troblecodings.signals.guis.PathwayRequesterContainer;
+import com.troblecodings.signals.guis.SignalBridgeContainer;
 import com.troblecodings.signals.guis.TrainNumberContainer;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -49,6 +51,7 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(RedstoneIO.class, NamableContainer::new);
         OpenSignalsMain.handler.addServer(PathwayRequester.class, PathwayRequesterContainer::new);
         OpenSignalsMain.handler.addServer(TrainNumberBlock.class, TrainNumberContainer::new);
+        OpenSignalsMain.handler.addServer(SignalBridgeBasicBlock.class, SignalBridgeContainer::new);
     }
 
     public void preinit(final FMLCommonSetupEvent event) {
