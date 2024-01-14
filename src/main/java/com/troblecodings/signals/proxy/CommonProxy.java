@@ -5,7 +5,6 @@ import java.util.Map;
 import com.troblecodings.core.UIInit;
 import com.troblecodings.core.net.NetworkHandler;
 import com.troblecodings.guilib.ecs.GuiHandler;
-import com.troblecodings.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.RedstoneIO;
@@ -29,6 +28,7 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
+import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;

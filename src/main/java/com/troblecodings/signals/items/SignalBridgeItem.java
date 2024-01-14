@@ -1,8 +1,8 @@
 package com.troblecodings.signals.items;
 
-import com.troblecodings.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.init.OSTabs;
+import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;

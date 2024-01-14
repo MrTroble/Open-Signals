@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.mojang.math.Quaternion;
 import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.DrawUtil.NamedEnumIntegerable;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
@@ -25,16 +26,19 @@ import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
-import com.troblecodings.signalbridge.SignalBridgeBasicBlock;
-import com.troblecodings.signalbridge.SignalBridgeBuilder;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SignalBridgeBlockParser;
+import com.troblecodings.signals.enums.SignalBridgeNetwork;
 import com.troblecodings.signals.enums.SignalBridgeType;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Vec3i;
+import net.minecraft.world.entity.player.Player;
 
 public class SignalBridgeGui extends GuiBase {
 
@@ -46,12 +50,14 @@ public class SignalBridgeGui extends GuiBase {
     private final UIEntity leftEntity = new UIEntity();
     private final UIEntity rightEntity = new UIEntity();
     private final Map<SignalBridgeBasicBlock, UIEntity> blockForEntity = new HashMap<>();
-    private final SignalBridgeBuilder bridgeBuilder = new SignalBridgeBuilder();
+    private final SignalBridgeContainer container;
+    private final Player player;
     private SignalBridgeBasicBlock currentBlock;
 
     public SignalBridgeGui(final GuiInfo info) {
         super(info);
-        initInternal();
+        this.container = (SignalBridgeContainer) info.base;
+        this.player = info.player;
     }
 
     private void initInternal() {
@@ -140,6 +146,7 @@ public class SignalBridgeGui extends GuiBase {
             }
         });
         list.add(scrollBox);
+        entity.update();
     }
 
     private void buildGrid() {
@@ -166,32 +173,41 @@ public class SignalBridgeGui extends GuiBase {
                 tile.setWidth(TILE_WIDTH);
                 tile.add(new UIBorder(GuiSignalBox.GRID_COLOR, 0.5f));
                 row.add(tile);
+                final SignalBridgeBasicBlock savedBlock = container.builder.getBlockOnPoint(point);
+                if (savedBlock != null) {
+                    final UIEntity blockEntity = createPreviewForBlock(savedBlock, 15, -1, 1,
+                            TILE_WIDTH, TILE_WIDTH, false, -12.5f, 3, false);
+                    tile.add(blockEntity);
+                }
                 tile.add(new UIClickable(e -> {
                     if (currentBlock == null) {
                         return;
                     }
-                    final SignalBridgeBasicBlock block = bridgeBuilder.getBlockOnPoint(point);
+                    final SignalBridgeBasicBlock block = container.builder.getBlockOnPoint(point);
                     final UIEntity blockEntity = createPreviewForBlock(currentBlock, 15, -1, 1,
                             TILE_WIDTH, TILE_WIDTH, false, -12.5f, 3, false);
                     if (block == null) {
                         tile.add(blockEntity);
-                        bridgeBuilder.addBlock(point, currentBlock);
+                        container.builder.addBlock(point, currentBlock);
+                        sendNewBlock(point, currentBlock);
                     } else if (block == currentBlock) {
                         tile.clearChildren();
-                        bridgeBuilder.removeBridgeBlock(point);
+                        container.builder.removeBridgeBlock(point);
+                        sendRemoveBlock(point);
                     }
                     tile.update();
                 }));
                 tile.add(new UIClickable(e -> {
                     if (Screen.hasControlDown()) {
                         tile.add(new UIBorder(0xFF0000FF, 2));
-                        bridgeBuilder.changeStartPoint(point);
+                        container.builder.changeStartPoint(point);
                     }
                 }, 1));
             }
             plane.add(row);
         }
         rightEntity.add(plane);
+        entity.update();
     }
 
     private void buildBridgePreview() {
@@ -206,7 +222,7 @@ public class SignalBridgeGui extends GuiBase {
         renderEntity.setX(140);
         renderEntity.setY(-17);
         final UIMultiBlockRender render = new UIMultiBlockRender(20, -10);
-        final List<Map.Entry<Vec3i, BasicBlock>> list = bridgeBuilder.getRelativesToStart();
+        final List<Map.Entry<Vec3i, BasicBlock>> list = container.builder.getRelativesToStart();
         if (list.isEmpty()) {
             entity.add(new UILabel("gui.signalbridge.noblock"));
             return;
@@ -220,7 +236,16 @@ public class SignalBridgeGui extends GuiBase {
         entity.add(renderEntity);
         entity.add(new UIDrag(
                 (x, y) -> render.updateRotation(Quaternion.fromXYZ(0, (float) x * 0.1f, 0))));
+        entity.add(new UIScroll(s -> {
+            final float newScale = (float) (entity.getScaleX() + s * 0.05f);
+            if (newScale <= 0)
+                return;
+            entity.setScaleX(newScale);
+            entity.setScaleY(newScale);
+            entity.update();
+        }));
         rightEntity.add(entity);
+        entity.update();
     }
 
     private static UIEntity createPreviewForBlock(final SignalBridgeBasicBlock block,
@@ -269,6 +294,40 @@ public class SignalBridgeGui extends GuiBase {
         final UIEntity blockEntity = blockForEntity.get(block);
         blockEntity.add(SELECTED_BORDER);
         blockEntity.update();
+    }
+
+    private void sendNewBlock(final Point point, final SignalBridgeBasicBlock block) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBridgeNetwork.SET_BLOCK);
+        point.writeNetwork(buffer);
+        buffer.putInt(block.getID());
+        OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    private void sendRemoveBlock(final Point point) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBridgeNetwork.REMOVE_BLOCK);
+        point.writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    private void sendSignal(final Vec3i vec, final Signal signal) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBridgeNetwork.SET_BLOCK);
+        buffer.putInt(vec.getX());
+        buffer.putInt(vec.getY());
+        buffer.putInt(vec.getZ());
+        buffer.putInt(signal.getID());
+        OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    private void sendRemoveSignal(final Vec3i vec) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBridgeNetwork.REMOVE_SIGNAL);
+        buffer.putInt(vec.getX());
+        buffer.putInt(vec.getY());
+        buffer.putInt(vec.getZ());
+        OpenSignalsMain.network.sendTo(player, buffer);
     }
 
     @Override
