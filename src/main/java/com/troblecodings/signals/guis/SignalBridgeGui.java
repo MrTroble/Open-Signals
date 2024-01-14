@@ -14,6 +14,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIMultiBlockRender;
 import com.troblecodings.guilib.ecs.entitys.UIScrollBox;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
@@ -25,10 +26,15 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signalbridge.SignalBridgeBasicBlock;
+import com.troblecodings.signalbridge.SignalBridgeBuilder;
+import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.contentpacks.SignalBridgeBlockParser;
 import com.troblecodings.signals.enums.SignalBridgeType;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
+
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.Vec3i;
 
 public class SignalBridgeGui extends GuiBase {
 
@@ -40,7 +46,7 @@ public class SignalBridgeGui extends GuiBase {
     private final UIEntity leftEntity = new UIEntity();
     private final UIEntity rightEntity = new UIEntity();
     private final Map<SignalBridgeBasicBlock, UIEntity> blockForEntity = new HashMap<>();
-    private final Map<Point, SignalBridgeBasicBlock> blocks = new HashMap<>();
+    private final SignalBridgeBuilder bridgeBuilder = new SignalBridgeBuilder();
     private SignalBridgeBasicBlock currentBlock;
 
     public SignalBridgeGui(final GuiInfo info) {
@@ -61,12 +67,15 @@ public class SignalBridgeGui extends GuiBase {
         header.add(new UIBox(UIBox.HBOX, 5));
         header.add(GuiElements.createLabel(I18Wrapper.format("gui.signalbridge.title"),
                 header.getBasicTextColor(), 1.1f));
+        header.add(GuiElements.createSpacerH(10));
+        header.add(GuiElements.createButton(I18Wrapper.format("gui.signalbride.preview"),
+                e -> buildBridgePreview()));
         header.add(GuiElements.createButton("?", 20, e -> {
             final UIEntity screen = GuiElements.createScreen(screenEntity -> {
                 screenEntity.add(
                         GuiElements.createButton(I18Wrapper.format("gui.return"), _u -> pop()));
                 screenEntity.add(GuiElements.createSpacerV(50));
-                screenEntity.add(GuiElements.createLabel(I18Wrapper.format("signalbridge.gui.info"),
+                screenEntity.add(GuiElements.createLabel(I18Wrapper.format("gui.signalbridge.info"),
                         screenEntity.getBasicTextColor(), 1.1f));
             });
             push(screen);
@@ -113,7 +122,7 @@ public class SignalBridgeGui extends GuiBase {
                 }
                 addUISelection(block);
                 currentBlock = block;
-            }, 1));
+            }));
             list.add(blockEntity);
             blockForEntity.put(block, blockEntity);
         });
@@ -161,22 +170,57 @@ public class SignalBridgeGui extends GuiBase {
                     if (currentBlock == null) {
                         return;
                     }
-                    final SignalBridgeBasicBlock block = blocks.get(point);
+                    final SignalBridgeBasicBlock block = bridgeBuilder.getBlockOnPoint(point);
                     final UIEntity blockEntity = createPreviewForBlock(currentBlock, 15, -1, 1,
                             TILE_WIDTH, TILE_WIDTH, false, -12.5f, 3, false);
                     if (block == null) {
                         tile.add(blockEntity);
-                        blocks.put(point, currentBlock);
+                        bridgeBuilder.addBlock(point, currentBlock);
                     } else if (block == currentBlock) {
                         tile.clearChildren();
-                        blocks.remove(point);
+                        bridgeBuilder.removeBridgeBlock(point);
                     }
                     tile.update();
                 }));
+                tile.add(new UIClickable(e -> {
+                    if (Screen.hasControlDown()) {
+                        tile.add(new UIBorder(0xFF0000FF, 2));
+                        bridgeBuilder.changeStartPoint(point);
+                    }
+                }, 1));
             }
             plane.add(row);
         }
         rightEntity.add(plane);
+    }
+
+    private void buildBridgePreview() {
+        rightEntity.clear();
+        rightEntity.setInherits(true);
+        final UIEntity entity = new UIEntity();
+        entity.setHeight(200);
+        entity.setWidth(200);
+        entity.add(new UIBorder(GuiSignalBox.GRID_COLOR, 2));
+        entity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        final UIEntity renderEntity = new UIEntity();
+        renderEntity.setX(140);
+        renderEntity.setY(-17);
+        final UIMultiBlockRender render = new UIMultiBlockRender(20, -10);
+        final List<Map.Entry<Vec3i, BasicBlock>> list = bridgeBuilder.getRelativesToStart();
+        if (list.isEmpty()) {
+            entity.add(new UILabel("gui.signalbridge.noblock"));
+            return;
+        }
+        list.forEach(entry -> {
+            final Vec3i vec = entry.getKey();
+            render.setBlockState(entry.getValue().defaultBlockState(), EMPTY_WRAPPER, vec.getX(),
+                    vec.getY(), vec.getZ());
+        });
+        renderEntity.add(render);
+        entity.add(renderEntity);
+        entity.add(new UIDrag(
+                (x, y) -> render.updateRotation(Quaternion.fromXYZ(0, (float) x * 0.1f, 0))));
+        rightEntity.add(entity);
     }
 
     private static UIEntity createPreviewForBlock(final SignalBridgeBasicBlock block,
@@ -205,7 +249,8 @@ public class SignalBridgeGui extends GuiBase {
 
         if (enableRotation)
             preview.add(new UIDrag(
-                    (x, y) -> renderer.updateRotation(Quaternion.fromXYZ(0, (float) x * 0.1f, 0))));
+                    (x, y) -> renderer.updateRotation(Quaternion.fromXYZ(0, (float) x * 0.1f, 0)),
+                    1));
 
         preview.add(new UIScissor());
         preview.add(renderer);
