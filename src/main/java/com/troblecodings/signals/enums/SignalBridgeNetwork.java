@@ -2,6 +2,6 @@ package com.troblecodings.signals.enums;
 
 public enum SignalBridgeNetwork {
 
-    SET_BLOCK, REMOVE_BLOCK, SET_SIGNAL, REMOVE_SIGNAL;
+    SET_BLOCK, REMOVE_BLOCK, SET_SIGNAL, REMOVE_SIGNAL, SEND_START_POINT;
 
 }

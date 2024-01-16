@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
@@ -25,29 +27,42 @@ public class SignalBridgeBuilder {
     public static final String VECTOR_X = "vectorX";
     public static final String VECTOR_Y = "vectorY";
     public static final String VECTOR_Z = "vectorZ";
+    public static final String START_POINT = "startPoint";
 
     private final Map<Point, SignalBridgeBasicBlock> pointForBlocks = new HashMap<>();
     private final Map<Vec3i, Signal> vecForSignal = new HashMap<>();
-    private Point startPoint = null;
+    private List<Map.Entry<Vec3i, BasicBlock>> relativesToStart = ImmutableList.of();
+    private Point startPoint = new Point(-1, -1);
 
     public void changeStartPoint(final Point newPoint) {
+        if (newPoint.equals(startPoint))
+            return;
         this.startPoint = newPoint;
+        updateRelativesToStart();
+    }
+
+    public Point getStartPoint() {
+        return startPoint;
     }
 
     public void addBlock(final Point point, final SignalBridgeBasicBlock block) {
         pointForBlocks.put(point, block);
+        updateRelativesToStart();
     }
 
     public void removeBridgeBlock(final Point point) {
         pointForBlocks.remove(point);
+        updateRelativesToStart();
     }
 
     public void addSignal(final Vec3i vec, final Signal signal) {
         vecForSignal.put(vec, signal);
+        updateRelativesToStart();
     }
 
     public void removeSignal(final Vec3i vec) {
         vecForSignal.remove(vec);
+        updateRelativesToStart();
     }
 
     public SignalBridgeBasicBlock getBlockOnPoint(final Point point) {
@@ -58,18 +73,24 @@ public class SignalBridgeBuilder {
         return vecForSignal.get(vector);
     }
 
-    public List<Map.Entry<Vec3i, BasicBlock>> getRelativesToStart() {
-        final List<Map.Entry<Vec3i, BasicBlock>> relativeToStart = new ArrayList<>();
-        if (startPoint == null)
-            return relativeToStart;
+    private void updateRelativesToStart() {
+        if (startPoint == null) {
+            this.relativesToStart = ImmutableList.of();
+            return;
+        }
+        final Builder<Map.Entry<Vec3i, BasicBlock>> builder = ImmutableList.builder();
         final Vec3i startVec = new Vec3i(startPoint.getX(), startPoint.getY(), 0);
         pointForBlocks.forEach((point, block) -> {
             final Vec3i vector = new Vec3i(point.getX(), point.getY(), 0);
-            relativeToStart.add(Maps.immutableEntry(startVec.subtract(vector), block));
+            builder.add(Maps.immutableEntry(startVec.subtract(vector), block));
         });
-        vecForSignal.forEach((vec, signal) -> relativeToStart
-                .add(Maps.immutableEntry(startVec.subtract(vec), signal)));
-        return relativeToStart;
+        vecForSignal.forEach(
+                (vec, signal) -> builder.add(Maps.immutableEntry(startVec.subtract(vec), signal)));
+        this.relativesToStart = builder.build();
+    }
+
+    public List<Map.Entry<Vec3i, BasicBlock>> getRelativesToStart() {
+        return relativesToStart;
     }
 
     public void write(final NBTWrapper wrapper) {
@@ -90,6 +111,11 @@ public class SignalBridgeBuilder {
         });
         wrapper.putList(SIGNALBRIDGE_BLOCKS, blockList);
         wrapper.putList(SIGNALS_ON_BRIDGE, signalList);
+        if (startPoint != null) {
+            final NBTWrapper startPointNBT = new NBTWrapper();
+            startPoint.write(startPointNBT);
+            wrapper.putWrapper(START_POINT, startPointNBT);
+        }
     }
 
     @SuppressWarnings("deprecation")
@@ -111,6 +137,12 @@ public class SignalBridgeBuilder {
             vecForSignal.put(vector, (Signal) Registry.BLOCK.get(
                     new ResourceLocation(OpenSignalsMain.MODID, tag.getString(SIGNALS_ON_BRIDGE))));
         });
+        final NBTWrapper startPointWrapper = wrapper.getWrapper(START_POINT);
+        if (!startPointWrapper.isTagNull()) {
+            this.startPoint = new Point();
+            this.startPoint.read(startPointWrapper);
+        }
+        updateRelativesToStart();
     }
 
     public void writeNetwork(final WriteBuffer buffer) {
@@ -126,6 +158,7 @@ public class SignalBridgeBuilder {
             buffer.putInt(vec.getZ());
             buffer.putInt(signal.getID());
         });
+        startPoint.writeNetwork(buffer);
     }
 
     public void readNetwork(final ReadBuffer buffer) {
@@ -141,5 +174,9 @@ public class SignalBridgeBuilder {
             vecForSignal.put(new Vec3i(buffer.getInt(), buffer.getInt(), buffer.getInt()),
                     Signal.SIGNAL_IDS.get(buffer.getInt()));
         }
+        this.startPoint = Point.of(buffer);
+        if (this.startPoint.equals(new Point(-1, -1)))
+            this.startPoint = null;
+        updateRelativesToStart();
     }
 }

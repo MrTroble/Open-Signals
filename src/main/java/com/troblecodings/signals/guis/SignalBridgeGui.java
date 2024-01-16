@@ -21,9 +21,11 @@ import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
 import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
+import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
+import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -74,8 +76,17 @@ public class SignalBridgeGui extends GuiBase {
         header.add(GuiElements.createLabel(I18Wrapper.format("gui.signalbridge.title"),
                 header.getBasicTextColor(), 1.1f));
         header.add(GuiElements.createSpacerH(10));
-        header.add(GuiElements.createButton(I18Wrapper.format("gui.signalbride.preview"),
-                e -> buildBridgePreview()));
+        final UIEntity editButton = GuiElements
+                .createButton(I18Wrapper.format("gui.signalbridge.edit"), e -> {
+                    buildGrid();
+                    resetSelection(e);
+                });
+        header.add(editButton);
+        resetSelection(editButton);
+        header.add(GuiElements.createButton(I18Wrapper.format("gui.signalbride.preview"), e -> {
+            buildBridgePreview();
+            resetSelection(e);
+        }));
         header.add(GuiElements.createButton("?", 20, e -> {
             final UIEntity screen = GuiElements.createScreen(screenEntity -> {
                 screenEntity.add(
@@ -179,6 +190,9 @@ public class SignalBridgeGui extends GuiBase {
                             TILE_WIDTH, TILE_WIDTH, false, -12.5f, 3, false);
                     tile.add(blockEntity);
                 }
+                if (point.equals(container.builder.getStartPoint())) {
+                    tile.add(new UIBorder(0xFF0000FF, 2));
+                }
                 tile.add(new UIClickable(e -> {
                     if (currentBlock == null) {
                         return;
@@ -201,6 +215,7 @@ public class SignalBridgeGui extends GuiBase {
                     if (Screen.hasControlDown()) {
                         tile.add(new UIBorder(0xFF0000FF, 2));
                         container.builder.changeStartPoint(point);
+                        sendNewStartPoint(point);
                     }
                 }, 1));
             }
@@ -224,7 +239,7 @@ public class SignalBridgeGui extends GuiBase {
         final UIMultiBlockRender render = new UIMultiBlockRender(20, -10);
         final List<Map.Entry<Vec3i, BasicBlock>> list = container.builder.getRelativesToStart();
         if (list.isEmpty()) {
-            entity.add(new UILabel("gui.signalbridge.noblock"));
+            rightEntity.add(new UILabel(I18Wrapper.format("gui.signalbridge.nostartblock")));
             return;
         }
         list.forEach(entry -> {
@@ -237,12 +252,12 @@ public class SignalBridgeGui extends GuiBase {
         entity.add(new UIDrag(
                 (x, y) -> render.updateRotation(Quaternion.fromXYZ(0, (float) x * 0.1f, 0))));
         entity.add(new UIScroll(s -> {
-            final float newScale = (float) (entity.getScaleX() + s * 0.05f);
+            final float newScale = (float) (renderEntity.getScaleX() + s * 0.05f);
             if (newScale <= 0)
                 return;
-            entity.setScaleX(newScale);
-            entity.setScaleY(newScale);
-            entity.update();
+            renderEntity.setScaleX(newScale);
+            renderEntity.setScaleY(newScale);
+            renderEntity.update();
         }));
         rightEntity.add(entity);
         entity.update();
@@ -284,6 +299,14 @@ public class SignalBridgeGui extends GuiBase {
         return blockEntity;
     }
 
+    private static void resetSelection(final UIEntity entity) {
+        final UIEntity parent = entity.getParent();
+        parent.findRecursive(UIClickable.class).forEach(click -> click.setVisible(true));
+        parent.findRecursive(UIButton.class).forEach(btn -> btn.setEnabled(true));
+        entity.findRecursive(UIButton.class).forEach(btn -> btn.setEnabled(false));
+        entity.findRecursive(UIClickable.class).forEach(click -> click.setVisible(false));
+    }
+
     private void removeUISelection(final SignalBridgeBasicBlock block) {
         final UIEntity blockEntity = blockForEntity.get(block);
         blockEntity.remove(SELECTED_BORDER);
@@ -307,6 +330,13 @@ public class SignalBridgeGui extends GuiBase {
     private void sendRemoveBlock(final Point point) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBridgeNetwork.REMOVE_BLOCK);
+        point.writeNetwork(buffer);
+        OpenSignalsMain.network.sendTo(player, buffer);
+    }
+
+    private void sendNewStartPoint(final Point point) {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBridgeNetwork.SEND_START_POINT);
         point.writeNetwork(buffer);
         OpenSignalsMain.network.sendTo(player, buffer);
     }

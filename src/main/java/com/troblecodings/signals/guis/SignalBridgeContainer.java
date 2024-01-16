@@ -67,6 +67,12 @@ public class SignalBridgeContainer extends ContainerBase {
             case REMOVE_SIGNAL: {
                 final Vec3i vec = new Vec3i(buf.getInt(), buf.getInt(), buf.getInt());
                 builder.removeSignal(vec);
+                break;
+            }
+            case SEND_START_POINT: {
+                final Point point = Point.of(buf);
+                builder.changeStartPoint(point);
+                break;
             }
             default:
                 break;
