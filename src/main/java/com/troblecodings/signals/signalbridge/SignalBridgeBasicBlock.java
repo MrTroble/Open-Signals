@@ -9,15 +9,18 @@ import com.troblecodings.signals.enums.SignalBridgeType;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.LadderBlock;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition.Builder;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -26,6 +29,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class SignalBridgeBasicBlock extends BasicBlock {
 
+    public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final List<SignalBridgeBasicBlock> ALL_SIGNALBRIDGE_BLOCKS = new ArrayList<>();
 
     private final SignalBridgeBlockProperties properties;
@@ -36,7 +40,7 @@ public class SignalBridgeBasicBlock extends BasicBlock {
         super(Properties.of(Material.STONE).noOcclusion()
                 .lightLevel(u -> ConfigHandler.GENERAL.lightEmission.get())
                 .isRedstoneConductor((_u1, _u2, _u3) -> false));
-        registerDefaultState(defaultBlockState());
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH));
         this.properties = properties;
         this.id = ALL_SIGNALBRIDGE_BLOCKS.size();
         ALL_SIGNALBRIDGE_BLOCKS.add(this);
@@ -48,6 +52,28 @@ public class SignalBridgeBasicBlock extends BasicBlock {
 
     public SignalBridgeType getType() {
         return properties.getType();
+    }
+
+    @Override
+    public BlockState getStateForPlacement(final BlockPlaceContext context) {
+        return this.defaultBlockState().setValue(FACING,
+                context.getHorizontalDirection().getOpposite());
+    }
+
+    @Override
+    protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
+        builder.add(FACING);
+    }
+
+    @Override
+    public BlockState rotate(final BlockState state, final Rotation rotaion) {
+        return state.setValue(FACING, rotaion.rotate(state.getValue(FACING)));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public BlockState mirror(final BlockState state, final Mirror mirror) {
+        return state.rotate(mirror.getRotation(state.getValue(FACING)));
     }
 
     @Override
