@@ -25,7 +25,6 @@ import com.troblecodings.guilib.ecs.entitys.render.UIButton;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
-import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -213,9 +212,9 @@ public class SignalBridgeGui extends GuiBase {
                 }));
                 tile.add(new UIClickable(e -> {
                     if (Screen.hasControlDown()) {
-                        tile.add(new UIBorder(0xFF0000FF, 2));
                         container.builder.changeStartPoint(point);
                         sendNewStartPoint(point);
+                        buildGrid();
                     }
                 }, 1));
             }
