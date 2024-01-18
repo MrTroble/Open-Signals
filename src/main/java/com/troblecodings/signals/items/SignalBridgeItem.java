@@ -57,8 +57,9 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
                 return InteractionResult.FAIL;
             }
         }
-        blocks.forEach((pos, block) -> worldIn.setBlock(pos,
-                block.getStateForPlacement(new BlockPlaceContext(context)), 3));
+        final BlockPlaceContext placeContext = new BlockPlaceContext(context);
+        blocks.forEach(
+                (pos, block) -> worldIn.setBlock(pos, block.getStateForPlacement(placeContext), 3));
         return InteractionResult.SUCCESS;
     }
 
