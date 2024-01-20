@@ -236,7 +236,7 @@ public class SignalBridgeGui extends GuiBase {
         renderEntity.setX(140);
         renderEntity.setY(-17);
         final UIMultiBlockRender render = new UIMultiBlockRender(20, -10);
-        final List<Map.Entry<Vec3i, BasicBlock>> list = container.builder.getRelativesToStart();
+        final List<Map.Entry<Vec3i, BasicBlock>> list = container.builder.getRenderPosAndBlocks();
         if (list.isEmpty()) {
             rightEntity.add(new UILabel(I18Wrapper.format("gui.signalbridge.nostartblock")));
             return;

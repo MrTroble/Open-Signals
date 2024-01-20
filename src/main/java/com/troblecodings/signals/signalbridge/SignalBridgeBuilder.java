@@ -28,6 +28,7 @@ public class SignalBridgeBuilder {
     public static final String VECTOR_Y = "vectorY";
     public static final String VECTOR_Z = "vectorZ";
     public static final String START_POINT = "startPoint";
+    private static final Point RENDER_START = new Point(8, 8);
 
     private final Map<Point, SignalBridgeBasicBlock> pointForBlocks = new HashMap<>();
     private final Map<Vec3i, Signal> vecForSignal = new HashMap<>();
@@ -38,7 +39,7 @@ public class SignalBridgeBuilder {
         if (newPoint.equals(startPoint))
             return;
         this.startPoint = newPoint;
-        updateRelativesToStart();
+        this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 
     public Point getStartPoint() {
@@ -47,22 +48,22 @@ public class SignalBridgeBuilder {
 
     public void addBlock(final Point point, final SignalBridgeBasicBlock block) {
         pointForBlocks.put(point, block);
-        updateRelativesToStart();
+        this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 
     public void removeBridgeBlock(final Point point) {
         pointForBlocks.remove(point);
-        updateRelativesToStart();
+        this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 
     public void addSignal(final Vec3i vec, final Signal signal) {
         vecForSignal.put(vec, signal);
-        updateRelativesToStart();
+        this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 
     public void removeSignal(final Vec3i vec) {
         vecForSignal.remove(vec);
-        updateRelativesToStart();
+        this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 
     public SignalBridgeBasicBlock getBlockOnPoint(final Point point) {
@@ -73,10 +74,9 @@ public class SignalBridgeBuilder {
         return vecForSignal.get(vector);
     }
 
-    private void updateRelativesToStart() {
+    private List<Map.Entry<Vec3i, BasicBlock>> calculateRelativesToPoint(final Point startPoint) {
         if (startPoint == null) {
-            this.relativesToStart = ImmutableList.of();
-            return;
+            return new ArrayList<>();
         }
         final Builder<Map.Entry<Vec3i, BasicBlock>> builder = ImmutableList.builder();
         final Vec3i startVec = new Vec3i(startPoint.getX(), startPoint.getY(), 0);
@@ -86,7 +86,11 @@ public class SignalBridgeBuilder {
         });
         vecForSignal.forEach(
                 (vec, signal) -> builder.add(Maps.immutableEntry(startVec.subtract(vec), signal)));
-        this.relativesToStart = builder.build();
+        return builder.build();
+    }
+
+    public List<Map.Entry<Vec3i, BasicBlock>> getRenderPosAndBlocks() {
+        return calculateRelativesToPoint(RENDER_START);
     }
 
     public List<Map.Entry<Vec3i, BasicBlock>> getRelativesToStart() {
@@ -142,7 +146,7 @@ public class SignalBridgeBuilder {
             this.startPoint = new Point();
             this.startPoint.read(startPointWrapper);
         }
-        updateRelativesToStart();
+        this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 
     public void writeNetwork(final WriteBuffer buffer) {
@@ -177,6 +181,6 @@ public class SignalBridgeBuilder {
         this.startPoint = Point.of(buffer);
         if (this.startPoint.equals(new Point(-1, -1)))
             this.startPoint = null;
-        updateRelativesToStart();
+        this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 }
