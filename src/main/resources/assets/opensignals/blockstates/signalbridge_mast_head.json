@@ -1,1 +1,19 @@
-{"variants": {"": {"model": "opensignals:block/signalbridge_mast_head"}}}
+{
+    "variants": {
+        "facing=east": {
+            "model": "opensignals:block/signalbridge_mast_head",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "opensignals:block/signalbridge_mast_head"
+        },
+        "facing=south": {
+            "model": "opensignals:block/signalbridge_mast_head",
+            "y": 180
+        },
+        "facing=west": {
+            "model": "opensignals:block/signalbridge_mast_head",
+            "y": 270
+        }
+    }
+}
