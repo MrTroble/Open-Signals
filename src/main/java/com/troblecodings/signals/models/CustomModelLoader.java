@@ -148,9 +148,8 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
                 final Signal signaltype = Signal.SIGNALS.get(lowercaseName);
 
                 if (signaltype == null) {
-                    OpenSignalsMain.getLogger().error(
-                            "There doesn't exists a signalsystem named " + lowercaseName + "!");
-                    return;
+                    throw new IllegalArgumentException("There doesn't exists a signalsystem named "
+                            + lowercaseName + "! Allowed Signals: " + Signal.SIGNALS.keySet());
                 }
 
                 final FunctionParsingInfo parsinginfo = new FunctionParsingInfo(signaltype);

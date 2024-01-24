@@ -1,6 +1,7 @@
 package com.troblecodings.signals.blocks;
 
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.models.CustomModelLoader;
 
 import net.minecraft.client.Minecraft;
@@ -35,6 +36,11 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
+    public boolean shouldBeDestroyedWithOtherBlocks() {
+        return true;
+    }
+
+    @Override
     public RenderShape getRenderShape(final BlockState state) {
         return RenderShape.INVISIBLE;
     }
@@ -45,27 +51,10 @@ public class GhostBlock extends BasicBlock {
         return Shapes.block();
     }
 
-    public static void destroyUpperBlock(final LevelAccessor worldIn, final BlockPos pos) {
-        final BlockPos posUp = pos.above();
-        final BlockState state = worldIn.getBlockState(posUp);
-        final Block blockUp = state.getBlock();
-        if (blockUp instanceof GhostBlock) {
-            worldIn.destroyBlock(posUp, false);
-            blockUp.destroy(worldIn, posUp, state);
-        }
-    }
-
     @Override
     public void destroy(final LevelAccessor worldIn, final BlockPos pos, final BlockState state) {
         super.destroy(worldIn, pos, state);
-        destroyUpperBlock(worldIn, pos);
-
-        final BlockPos posdown = pos.below();
-        final Block lowerBlock = worldIn.getBlockState(posdown).getBlock();
-        if (lowerBlock instanceof GhostBlock || lowerBlock instanceof Signal) {
-            worldIn.destroyBlock(posdown, false);
-            lowerBlock.destroy(worldIn, posdown, state);
-        }
+        DestroyHelper.checkAndDestroyOtherBlocks(worldIn, pos, state);
     }
 
     @OnlyIn(Dist.CLIENT)

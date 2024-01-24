@@ -27,6 +27,7 @@ public class SignalProperties {
     public final List<ValuePack> redstoneOutputs;
     public final List<ValuePack> redstoneOutputPacks;
     public final int defaultItemDamage;
+    public final boolean isBridgeSignal;
 
     public SignalProperties(final Placementtool placementtool, final float customNameRenderHeight,
             final int height, final List<PredicateProperty<Integer>> signalHeights,
@@ -35,7 +36,7 @@ public class SignalProperties {
             final int textColor, final boolean canLink, final List<Integer> colors,
             final List<PredicateProperty<Float>> renderheights, final List<SoundProperty> sounds,
             final List<ValuePack> redstoneOutputs, final int defaultItemDamage,
-            final List<ValuePack> redstoneOutputPacks) {
+            final List<ValuePack> redstoneOutputPacks, final boolean isBridgeSignal) {
         this.placementtool = placementtool;
         this.customNameRenderHeight = customNameRenderHeight;
         this.defaultHeight = height;
@@ -54,5 +55,6 @@ public class SignalProperties {
         this.redstoneOutputs = redstoneOutputs;
         this.defaultItemDamage = defaultItemDamage;
         this.redstoneOutputPacks = redstoneOutputPacks;
+        this.isBridgeSignal = isBridgeSignal;
     }
 }

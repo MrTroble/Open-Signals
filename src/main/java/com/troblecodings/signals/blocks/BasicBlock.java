@@ -48,6 +48,10 @@ public class BasicBlock extends Block implements EntityBlock {
         return true;
     }
 
+    public boolean shouldBeDestroyedWithOtherBlocks() {
+        return false;
+    }
+
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })

@@ -309,7 +309,7 @@ public final class SignalStateHandler implements INetworkSync {
         SignalStateFileV2 file;
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.computeIfAbsent(stateInfo.world,
-                    _u -> new DebugSignalStateFileV2(Paths.get("saves/"
+                    _u -> new SignalStateFileV2(Paths.get("saves/"
                             + stateInfo.world.getServer().getWorldData().getLevelName()
                                     .replace("/", "_").replace(".", "_")
                             + "/osfiles/signalfiles/"

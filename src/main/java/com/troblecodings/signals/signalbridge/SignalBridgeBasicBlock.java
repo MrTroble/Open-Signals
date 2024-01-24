@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.enums.SignalBridgeType;
 
 import net.minecraft.core.BlockPos;
@@ -102,19 +103,7 @@ public class SignalBridgeBasicBlock extends BasicBlock {
 
     @Override
     public void destroy(final LevelAccessor acess, final BlockPos pos, final BlockState state) {
-        for (final Direction direction : Direction.values()) {
-            checkAndDestroyBlockInDirection(acess, pos, state, direction);
-        }
+        super.destroy(acess, pos, state);
+        DestroyHelper.checkAndDestroyOtherBlocks(acess, pos, state);
     }
-
-    private void checkAndDestroyBlockInDirection(final LevelAccessor acess, final BlockPos basePos,
-            final BlockState baseState, final Direction direction) {
-        final BlockPos thisPos = basePos.relative(direction);
-        final Block otherBlock = acess.getBlockState(thisPos).getBlock();
-        if (otherBlock instanceof SignalBridgeBasicBlock) {
-            acess.destroyBlock(thisPos, false);
-            otherBlock.destroy(acess, thisPos, baseState);
-        }
-    }
-
 }
