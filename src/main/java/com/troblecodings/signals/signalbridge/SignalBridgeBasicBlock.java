@@ -83,6 +83,11 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     }
 
     @Override
+    public boolean shouldBeDestroyedWithOtherBlocks() {
+        return true;
+    }
+
+    @Override
     public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
             final CollisionContext context) {
         return Shapes.create(Shapes.block().bounds().expandTowards(properties.extentionX,

@@ -18,6 +18,7 @@ import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
+import com.troblecodings.guilib.ecs.entitys.UIBlockRenderInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIMultiBlockRender;
@@ -40,13 +41,13 @@ import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SignalBridgeBlockParser;
 import com.troblecodings.signals.core.JsonEnum;
-import com.troblecodings.signals.core.RenderData;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.enums.SignalBridgeNetwork;
 import com.troblecodings.signals.enums.SignalBridgeType;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
+import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
 
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
@@ -166,7 +167,7 @@ public class SignalBridgeGui extends GuiBase {
                 .getOrDefault(type, new ArrayList<>());
         typeBlocks.forEach(block -> {
             final UIEntity blockEntity = createPreviewForBlock(block, 14, -2, 1.9f, 80, 60, true, 0,
-                    0, true, RenderData.EMPTY_WRAPPER);
+                    0, true, SignalBridgeBuilder.EMPTY_WRAPPER);
             blockEntity.add(new UIClickable(e -> {
                 if (currentBlock != null)
                     removeUISelection(currentBlock);
@@ -228,7 +229,7 @@ public class SignalBridgeGui extends GuiBase {
                 if (savedBlock != null) {
                     final UIEntity blockEntity = createPreviewForBlock(savedBlock, 15, -1, 1,
                             TILE_WIDTH, TILE_WIDTH, false, -12.5f, 3, false,
-                            RenderData.EMPTY_WRAPPER);
+                            SignalBridgeBuilder.EMPTY_WRAPPER);
                     tile.add(blockEntity);
                 }
                 if (point.equals(container.builder.getStartPoint())) {
@@ -241,7 +242,7 @@ public class SignalBridgeGui extends GuiBase {
                     final SignalBridgeBasicBlock block = container.builder.getBlockOnPoint(point);
                     final UIEntity blockEntity = createPreviewForBlock(currentBlock, 15, -1, 1,
                             TILE_WIDTH, TILE_WIDTH, false, -12.5f, 3, false,
-                            RenderData.EMPTY_WRAPPER);
+                            SignalBridgeBuilder.EMPTY_WRAPPER);
                     if (block == null) {
                         tile.add(blockEntity);
                         container.builder.addBlock(point, currentBlock);
@@ -283,7 +284,7 @@ public class SignalBridgeGui extends GuiBase {
         renderEntity.setX(140);
         renderEntity.setY(-17);
         multiRenderer = new UIMultiBlockRender(20, -10);
-        final List<RenderData> list = container.builder.getRenderPosAndBlocks();
+        final List<UIBlockRenderInfo> list = container.builder.getRenderPosAndBlocks();
         if (list.isEmpty()) {
             middleEntity.add(new UILabel(I18Wrapper.format("gui.signalbridge.nostartblock")));
             return;
@@ -305,13 +306,9 @@ public class SignalBridgeGui extends GuiBase {
         entity.update();
     }
 
-    private void updateMultiRenderer(List<RenderData> list) {
+    private void updateMultiRenderer(List<UIBlockRenderInfo> list) {
         multiRenderer.clear();
-        list.forEach(entry -> {
-            final Vec3i vec = entry.vector;
-            multiRenderer.setBlockState(entry.block.defaultBlockState(), entry.modelInfo,
-                    vec.getX(), vec.getY(), vec.getZ());
-        });
+        list.forEach(info -> multiRenderer.setBlockState(info));
     }
 
     private void buildBridgeList() {
@@ -686,7 +683,7 @@ public class SignalBridgeGui extends GuiBase {
         }
         final UIEntity preview = new UIEntity();
         final UIBlockRender renderer = new UIBlockRender(renderScale, renderHeight);
-        renderer.setBlockState(block.defaultBlockState(), modelInfo);
+        renderer.setBlockState(new UIBlockRenderInfo(block.defaultBlockState(), modelInfo));
         preview.setWidth(60);
         preview.setHeight(previewHeight);
         preview.setX(previewX);

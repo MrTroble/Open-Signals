@@ -367,6 +367,8 @@ public final class NameHandler implements INetworkSync {
                     synchronized (ALL_NAMES) {
                         name = ALL_NAMES.remove(info);
                     }
+                    if (name == null)
+                        return;
                     createToFile(info, name);
                 }
             });

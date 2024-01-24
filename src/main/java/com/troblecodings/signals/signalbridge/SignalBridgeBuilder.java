@@ -14,18 +14,22 @@ import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.guilib.ecs.entitys.UIBlockRenderInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.RenderData;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
 
 import net.minecraft.core.Registry;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.client.model.data.EmptyModelData;
 
 public class SignalBridgeBuilder {
+
+    public static final ModelInfoWrapper EMPTY_WRAPPER = new ModelInfoWrapper(
+            EmptyModelData.INSTANCE);
 
     public static final String SIGNALBRIDGE_BLOCKS = "signalBridgeBlocks";
     public static final String SIGNALS_ON_BRIDGE = "signalsOnBridge";
@@ -39,7 +43,7 @@ public class SignalBridgeBuilder {
     private final Map<Point, SignalBridgeBasicBlock> pointForBlocks = new HashMap<>();
     private final Map<Entry<String, Signal>, Vec3i> vecForSignal = new HashMap<>();
     private List<Map.Entry<Vec3i, BasicBlock>> relativesToStart = ImmutableList.of();
-    private Function<String, ModelInfoWrapper> function = (_u) -> RenderData.EMPTY_WRAPPER;
+    private Function<String, ModelInfoWrapper> function = (_u) -> EMPTY_WRAPPER;
     private Point startPoint = new Point(-1, -1);
 
     public void changeStartPoint(final Point newPoint) {
@@ -126,16 +130,19 @@ public class SignalBridgeBuilder {
         return map;
     }
 
-    public List<RenderData> getRenderPosAndBlocks() {
-        final Builder<RenderData> builder = ImmutableList.builder();
+    public List<UIBlockRenderInfo> getRenderPosAndBlocks() {
+        final Builder<UIBlockRenderInfo> builder = ImmutableList.builder();
         final Vec3i startVec = new Vec3i(RENDER_START.getX(), RENDER_START.getY(), 0);
         pointForBlocks.forEach((point, block) -> {
             final Vec3i vector = new Vec3i(point.getX(), point.getY(), 0);
-            builder.add(new RenderData(startVec.subtract(vector), block));
+            builder.add(new UIBlockRenderInfo(block.defaultBlockState(), EMPTY_WRAPPER,
+                    startVec.subtract(vector)));
         });
-        vecForSignal.forEach((entry, vec) -> builder.add(new RenderData(startVec.subtract(vec),
-                entry.getValue(), function.apply(entry.getKey()))));
+        vecForSignal.forEach((entry, vec) -> builder
+                .add(new UIBlockRenderInfo(entry.getValue().defaultBlockState(),
+                        function.apply(entry.getKey()), startVec.subtract(vec))));
         return builder.build();
+
     }
 
     public List<Entry<Vec3i, BasicBlock>> getRelativesToStart() {
