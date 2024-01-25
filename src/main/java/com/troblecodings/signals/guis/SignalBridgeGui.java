@@ -460,6 +460,7 @@ public class SignalBridgeGui extends GuiBase {
 
     private void addButtonsToEditSignal(final UIEntity list, final UIEntity blockEntity,
             final String name) {
+        disableRightEntity();
         final Signal signal = container.allSignals.get(name).getKey();
         final Consumer<UIEntity> consumer = e -> {
             removeUISelection(currentSignal);
@@ -567,9 +568,7 @@ public class SignalBridgeGui extends GuiBase {
         rightEntity.add(GuiElements.createSpacerV(5));
         rightEntity.add(GuiElements.createButton(I18Wrapper.format("btn.return"), e -> {
             removeUISelection(name);
-            rightEntity.clear();
-            rightEntity.setWidth(0);
-            rightEntity.getParent().update();
+            disableRightEntity();
         }));
         for (final Axis axis : Direction.Axis.values()) {
             for (final AxisDirection axisDirection : Direction.AxisDirection.values()) {
@@ -604,6 +603,12 @@ public class SignalBridgeGui extends GuiBase {
         }
         checkMaxAndMins(startVec);
         this.entity.update();
+    }
+
+    private void disableRightEntity() {
+        rightEntity.clear();
+        rightEntity.setWidth(0);
+        rightEntity.getParent().update();
     }
 
     private void checkMaxAndMins(final Vec3i vector) {

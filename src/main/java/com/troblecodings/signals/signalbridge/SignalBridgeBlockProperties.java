@@ -7,9 +7,6 @@ public class SignalBridgeBlockProperties {
 
     public transient SignalBridgeType bridgeType;
     private String type;
-    public int extentionX = 0;
-    public int extentionY = 0;
-    public int extentionZ = 0;
 
     public SignalBridgeType getType() {
         if (bridgeType == null) {

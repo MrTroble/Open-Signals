@@ -24,9 +24,6 @@ import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class SignalBridgeBasicBlock extends BasicBlock {
 
@@ -88,22 +85,9 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     }
 
     @Override
-    public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
-            final CollisionContext context) {
-        return Shapes.create(Shapes.block().bounds().expandTowards(properties.extentionX,
-                properties.extentionY, properties.extentionZ));
-    }
-
-    @Override
     public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
             final BlockGetter level, final BlockPos pos, final Player player) {
         return null;
-    }
-
-    @Override
-    public VoxelShape getCollisionShape(final BlockState state, final BlockGetter getter,
-            final BlockPos pos, final CollisionContext context) {
-        return getShape(state, getter, pos, context);
     }
 
     @Override
