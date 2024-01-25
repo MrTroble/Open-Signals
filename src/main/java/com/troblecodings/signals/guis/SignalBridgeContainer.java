@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
@@ -147,7 +148,9 @@ public class SignalBridgeContainer extends ContainerBase {
             case CHANGE_NAME: {
                 final String previous = buf.getString();
                 final String newName = buf.getString();
-                allSignals.put(newName, allSignals.remove(previous));
+                final Entry<Signal, Map<SEProperty, Integer>> entry = allSignals.remove(previous);
+                allSignals.put(newName, entry);
+                builder.updateSignalName(previous, newName, entry.getKey());
                 break;
             }
             default:

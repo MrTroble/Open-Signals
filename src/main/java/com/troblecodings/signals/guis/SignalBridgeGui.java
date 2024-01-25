@@ -284,12 +284,7 @@ public class SignalBridgeGui extends GuiBase {
         renderEntity.setX(140);
         renderEntity.setY(-17);
         multiRenderer = new UIMultiBlockRender(20, -10);
-        final List<UIBlockRenderInfo> list = container.builder.getRenderPosAndBlocks();
-        if (list.isEmpty()) {
-            middleEntity.add(new UILabel(I18Wrapper.format("gui.signalbridge.nostartblock")));
-            return;
-        }
-        updateMultiRenderer(list);
+        updateMultiRenderer();
         renderEntity.add(multiRenderer);
         entity.add(renderEntity);
         entity.add(new UIDrag((x, y) -> multiRenderer
@@ -306,9 +301,10 @@ public class SignalBridgeGui extends GuiBase {
         entity.update();
     }
 
-    private void updateMultiRenderer(List<UIBlockRenderInfo> list) {
+    private void updateMultiRenderer() {
         multiRenderer.clear();
-        list.forEach(info -> multiRenderer.setBlockState(info));
+        container.builder.getRenderPosAndBlocks()
+                .forEach(info -> multiRenderer.setBlockState(info));
     }
 
     private void buildBridgeList() {
@@ -491,7 +487,7 @@ public class SignalBridgeGui extends GuiBase {
                         sendRemoveSignal(signal, name);
                         container.allSignals.remove(name);
                         container.builder.removeSignal(Maps.immutableEntry(name, signal));
-                        updateMultiRenderer(container.builder.getRenderPosAndBlocks());
+                        updateMultiRenderer();
                     }))));
             inner.add(createSpacerLine(GuiElements.createButton(
                     I18Wrapper.format("btn.signalbridge.editonplane"), consumer.andThen(e -> {
@@ -499,7 +495,7 @@ public class SignalBridgeGui extends GuiBase {
                         final Vec3i vec = container.builder.addSignal(
                                 new Vec3i(startPoint.getX(), startPoint.getY(), 1), signal, name);
                         sendSignalPos(vec, signal, name);
-                        updateMultiRenderer(container.builder.getRenderPosAndBlocks());
+                        updateMultiRenderer();
                         buildSystemToAddSignal(name, signal, vec);
                     }))));
             inner.add(createSpacerLine(GuiElements.createButton(
@@ -536,9 +532,7 @@ public class SignalBridgeGui extends GuiBase {
                                         return;
                                     }
                                     sendNameChange(name, signalName);
-                                    container.allSignals.put(signalName,
-                                            container.allSignals.remove(name));
-                                    container.builder.updateSignalName(name, signalName, signal);
+                                    updateSignalName(name, signalName, signal);
                                     pop();
                                     buildBridgeList();
                                     enableMultiRenderer();
@@ -550,6 +544,12 @@ public class SignalBridgeGui extends GuiBase {
                     }))));
             screen.add(inner);
         }));
+    }
+
+    private void updateSignalName(final String oldName, final String newName, final Signal signal) {
+        container.allSignals.put(newName, container.allSignals.remove(oldName));
+        container.builder.updateSignalName(oldName, newName, signal);
+        nameForRenderProperties.put(newName, nameForRenderProperties.remove(oldName));
     }
 
     private final Map<String, UIEntity> nameForButton = new HashMap<>();
@@ -594,7 +594,7 @@ public class SignalBridgeGui extends GuiBase {
                             break;
                     }
                     container.builder.setNewSignalPos(signal, name, vector);
-                    updateMultiRenderer(container.builder.getRenderPosAndBlocks());
+                    updateMultiRenderer();
                     sendSignalPos(vector, signal, name);
                     checkMaxAndMins(vector);
                 });
@@ -789,7 +789,7 @@ public class SignalBridgeGui extends GuiBase {
 
     private void enableMultiRenderer() {
         renderEntity.add(multiRenderer);
-        updateMultiRenderer(container.builder.getRenderPosAndBlocks());
+        updateMultiRenderer();
     }
 
     private void applyPropertyChanges(final String signalName, final SEProperty property,
