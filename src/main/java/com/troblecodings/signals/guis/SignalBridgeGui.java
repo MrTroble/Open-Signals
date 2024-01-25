@@ -496,11 +496,11 @@ public class SignalBridgeGui extends GuiBase {
             inner.add(createSpacerLine(GuiElements.createButton(
                     I18Wrapper.format("btn.signalbridge.editonplane"), consumer.andThen(e -> {
                         final Point startPoint = container.builder.getStartPoint();
-                        sendSignalPos(container.builder.addSignal(
-                                new Vec3i(startPoint.getX(), startPoint.getY(), 1), signal, name),
-                                signal, name);
+                        final Vec3i vec = container.builder.addSignal(
+                                new Vec3i(startPoint.getX(), startPoint.getY(), 1), signal, name);
+                        sendSignalPos(vec, signal, name);
                         updateMultiRenderer(container.builder.getRenderPosAndBlocks());
-                        buildSystemToAddSignal(name, signal);
+                        buildSystemToAddSignal(name, signal, vec);
                     }))));
             inner.add(createSpacerLine(GuiElements.createButton(
                     I18Wrapper.format("btn.signalbridge.rename"), consumer.andThen(e -> {
@@ -552,7 +552,11 @@ public class SignalBridgeGui extends GuiBase {
         }));
     }
 
-    private void buildSystemToAddSignal(final String name, final Signal signal) {
+    private final Map<String, UIEntity> nameForButton = new HashMap<>();
+
+    private void buildSystemToAddSignal(final String name, final Signal signal,
+            final Vec3i startVec) {
+        nameForButton.clear();
         addUISelection(name);
         final Entry<String, Signal> entry = Maps.immutableEntry(name, signal);
         rightEntity.clear();
@@ -569,36 +573,77 @@ public class SignalBridgeGui extends GuiBase {
         }));
         for (final Axis axis : Direction.Axis.values()) {
             for (final AxisDirection axisDirection : Direction.AxisDirection.values()) {
-                rightEntity.add(GuiElements.createButton(
-                        axis.getName() + (axisDirection == AxisDirection.POSITIVE ? "+" : "-"),
-                        e -> {
-                            Vec3i vector = container.builder.getVecForSignal(entry);
-                            final int step = axisDirection == AxisDirection.POSITIVE ? -1 : 1;
-                            switch (axis) {
-                                case X: {
-                                    vector = new Vec3i(vector.getX() + step, vector.getY(),
-                                            vector.getZ());
-                                    break;
-                                }
-                                case Y: {
-                                    vector = new Vec3i(vector.getX(), vector.getY() + step,
-                                            vector.getZ());
-                                    break;
-                                }
-                                case Z: {
-                                    vector = new Vec3i(vector.getX(), vector.getY(),
-                                            vector.getZ() + step);
-                                }
-                                default:
-                                    break;
-                            }
-                            container.builder.setNewSignalPos(signal, name, vector);
-                            updateMultiRenderer(container.builder.getRenderPosAndBlocks());
-                            sendSignalPos(vector, signal, name);
-                        }));
+                final String buttonName = axis.getName()
+                        + (axisDirection == AxisDirection.POSITIVE ? "+" : "-");
+                final UIEntity button = GuiElements.createButton(buttonName, e -> {
+                    Vec3i vector = container.builder.getVecForSignal(entry);
+                    final int step = axisDirection == AxisDirection.POSITIVE ? -1 : 1;
+                    switch (axis) {
+                        case X: {
+                            vector = new Vec3i(vector.getX() + step, vector.getY(), vector.getZ());
+                            break;
+                        }
+                        case Y: {
+                            vector = new Vec3i(vector.getX(), vector.getY() + step, vector.getZ());
+                            break;
+                        }
+                        case Z: {
+                            vector = new Vec3i(vector.getX(), vector.getY(), vector.getZ() + step);
+                        }
+                        default:
+                            break;
+                    }
+                    container.builder.setNewSignalPos(signal, name, vector);
+                    updateMultiRenderer(container.builder.getRenderPosAndBlocks());
+                    sendSignalPos(vector, signal, name);
+                    checkMaxAndMins(vector);
+                });
+                nameForButton.put(buttonName, button);
+                rightEntity.add(button);
             }
         }
+        checkMaxAndMins(startVec);
         this.entity.update();
+    }
+
+    private void checkMaxAndMins(final Vec3i vector) {
+        for (final Axis axis : Axis.values()) {
+            for (final AxisDirection axisDirection : AxisDirection.values()) {
+                final String buttonName = axis.getName()
+                        + (axisDirection == AxisDirection.POSITIVE ? "+" : "-");
+                final UIEntity button = nameForButton.get(buttonName);
+                switch (axis) {
+                    case X: {
+                        checkEnableAndDisable(axisDirection.opposite(), 0, 9, vector.getX(),
+                                button);
+                        break;
+                    }
+                    case Y: {
+                        checkEnableAndDisable(axisDirection.opposite(), 0, 9, vector.getY(),
+                                button);
+                        break;
+                    }
+                    case Z: {
+                        checkEnableAndDisable(axisDirection.opposite(), -5, 5, vector.getZ(),
+                                button);
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+    }
+
+    private static void checkEnableAndDisable(final AxisDirection axisDirection, final int min,
+            final int max, final int value, final UIEntity button) {
+        if (value >= max && axisDirection == AxisDirection.POSITIVE) {
+            disableSelection(button);
+        } else if (value <= min && axisDirection == AxisDirection.NEGATIVE) {
+            disableSelection(button);
+        } else {
+            enableSelection(button);
+        }
     }
 
     private void buildSignalPropertiesSelection(final Signal signal, final String name) {
@@ -704,10 +749,18 @@ public class SignalBridgeGui extends GuiBase {
 
     private static void resetSelection(final UIEntity entity) {
         final UIEntity parent = entity.getParent();
-        parent.findRecursive(UIClickable.class).forEach(click -> click.setVisible(true));
-        parent.findRecursive(UIButton.class).forEach(btn -> btn.setEnabled(true));
+        enableSelection(parent);
+        disableSelection(entity);
+    }
+
+    private static void disableSelection(final UIEntity entity) {
         entity.findRecursive(UIButton.class).forEach(btn -> btn.setEnabled(false));
         entity.findRecursive(UIClickable.class).forEach(click -> click.setVisible(false));
+    }
+
+    private static void enableSelection(final UIEntity entity) {
+        entity.findRecursive(UIButton.class).forEach(btn -> btn.setEnabled(true));
+        entity.findRecursive(UIClickable.class).forEach(click -> click.setVisible(true));
     }
 
     private void removeUISelection(final SignalBridgeBasicBlock block) {
