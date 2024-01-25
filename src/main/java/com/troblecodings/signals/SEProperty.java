@@ -15,7 +15,6 @@ import com.troblecodings.signals.enums.ChangeableStage;
 
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.model.data.IModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 
 public class SEProperty extends ModelProperty<String> implements IIntegerable<String> {
@@ -38,10 +37,6 @@ public class SEProperty extends ModelProperty<String> implements IIntegerable<St
         this.deps = deps;
         this.allowedValues = ImmutableList.copyOf(parent.getAllowedValues());
         this.itemDamage = itemDamage;
-    }
-
-    public Object getWrapper(final Object object) {
-        return ((IModelData) object).getData(this);
     }
 
     @Override

@@ -394,7 +394,7 @@ public class SignalBridgeGui extends GuiBase {
                                     sendCreateSignal(signalName, signal);
                                     final Map<SEProperty, Integer> properties = new HashMap<>();
                                     fillRenderPropertiesUp(signal, properties);
-                                    updateRenderProperties(name, properties);
+                                    updateRenderProperties(signalName, properties);
                                 })));
                         nameEntity.add(GuiElements.createSpacerV(7));
                         nameEntity.add(infoEntity);
@@ -487,6 +487,7 @@ public class SignalBridgeGui extends GuiBase {
                         sendSignalRemovedFromList(name);
                         sendRemoveSignal(signal, name);
                         container.allSignals.remove(name);
+                        nameForRenderProperties.remove(name);
                         container.builder.removeSignal(Maps.immutableEntry(name, signal));
                         updateMultiRenderer();
                     }))));
