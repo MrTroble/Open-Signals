@@ -44,13 +44,17 @@ public class SignalBridgeBuilder {
     private final Map<Entry<String, Signal>, Vec3i> vecForSignal = new HashMap<>();
     private List<Map.Entry<Vec3i, BasicBlock>> relativesToStart = ImmutableList.of();
     private Function<String, ModelInfoWrapper> function = (_u) -> EMPTY_WRAPPER;
-    private Point startPoint = new Point(-1, -1);
+    private Point startPoint;
 
     public void changeStartPoint(final Point newPoint) {
         if (newPoint.equals(startPoint))
             return;
         this.startPoint = newPoint;
         this.relativesToStart = calculateRelativesToPoint(startPoint);
+    }
+
+    public boolean hasStartPoint() {
+        return startPoint != null;
     }
 
     public Point getStartPoint() {
@@ -92,6 +96,14 @@ public class SignalBridgeBuilder {
 
     public Vec3i getVecForSignal(final Entry<String, Signal> entry) {
         return vecForSignal.get(entry);
+    }
+
+    public boolean hasBlockOn(final Vec3i vec, final Entry<String, Signal> entry) {
+        final boolean isCollidingWithBlock = vec.getZ() == 0
+                ? pointForBlocks.containsKey(new Point(vec.getX(), vec.getY()))
+                : false;
+        final Vec3i signalVec = vecForSignal.get(entry);
+        return isCollidingWithBlock || (!vec.equals(signalVec) && vecForSignal.containsValue(vec));
     }
 
     public void updateSignalName(final String oldName, final String newName, final Signal signal) {
@@ -223,7 +235,9 @@ public class SignalBridgeBuilder {
             buffer.putInt(vec.getY());
             buffer.putInt(vec.getZ());
         });
-        startPoint.writeNetwork(buffer);
+        buffer.putBoolean(startPoint != null);
+        if (startPoint != null)
+            startPoint.writeNetwork(buffer);
     }
 
     public void readNetwork(final ReadBuffer buffer) {
@@ -240,9 +254,8 @@ public class SignalBridgeBuilder {
                     Maps.immutableEntry(buffer.getString(), Signal.SIGNAL_IDS.get(buffer.getInt())),
                     new Vec3i(buffer.getInt(), buffer.getInt(), buffer.getInt()));
         }
-        this.startPoint = Point.of(buffer);
-        if (this.startPoint.equals(new Point(-1, -1)))
-            this.startPoint = null;
+        if (buffer.getBoolean())
+            this.startPoint = Point.of(buffer);
         this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 }

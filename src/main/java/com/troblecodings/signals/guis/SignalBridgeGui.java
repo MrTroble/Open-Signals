@@ -62,16 +62,18 @@ public class SignalBridgeGui extends GuiBase {
     private static final UIBorder SELECTED_BORDER = new UIBorder(0xFF00FF00, 1);
     private static final int TILE_WIDTH = 20;
     private static final int TILE_COUNT = 10;
+    private static final UIToolTip COLLISION_TOOLTIP = new UIToolTip(
+            I18Wrapper.format("gui.signalbridge.collision"), true);
 
     private final UIEntity leftEntity = new UIEntity();
     private final UIEntity middleEntity = new UIEntity();
     private final UIEntity rightEntity = new UIEntity();
     private final Map<SignalBridgeBasicBlock, UIEntity> blockForEntity = new HashMap<>();
     private final Map<String, UIEntity> signalNameForEntity = new HashMap<>();
-    private final Map<String, Map<SEProperty, String>> nameForRenderProperties = new HashMap<>();
     private final SignalBridgeContainer container;
     private final Player player;
     private final PreviewSideBar previewSidebar = new PreviewSideBar(-5);
+    private final SignalBridgeRenderData renderData;
     private final UIEntity signalPropertiesList = new UIEntity();
     private SignalBridgeBasicBlock currentBlock;
     private String currentSignal;
@@ -86,11 +88,12 @@ public class SignalBridgeGui extends GuiBase {
         super(info);
         this.container = (SignalBridgeContainer) info.base;
         this.player = info.player;
+        this.renderData = new SignalBridgeRenderData(container.builder);
     }
 
     private void initInternal() {
-        container.builder.setFunctionForModelData(name -> new ModelInfoWrapper(
-                nameForRenderProperties.getOrDefault(name, new HashMap<>())));
+        container.builder.setFunctionForModelData(
+                name -> new ModelInfoWrapper(renderData.getDataForName(name)));
         this.entity.add(new UIBox(UIBox.VBOX, 5));
         final UIEntity lowerEntity = new UIEntity();
         lowerEntity.setInherits(true);
@@ -232,7 +235,8 @@ public class SignalBridgeGui extends GuiBase {
                             SignalBridgeBuilder.EMPTY_WRAPPER);
                     tile.add(blockEntity);
                 }
-                if (point.equals(container.builder.getStartPoint())) {
+                if (container.builder.hasStartPoint()
+                        && point.equals(container.builder.getStartPoint())) {
                     tile.add(new UIBorder(0xFF0000FF, 2));
                 }
                 tile.add(new UIClickable(e -> {
@@ -394,7 +398,7 @@ public class SignalBridgeGui extends GuiBase {
                                     sendCreateSignal(signalName, signal);
                                     final Map<SEProperty, Integer> properties = new HashMap<>();
                                     fillRenderPropertiesUp(signal, properties);
-                                    updateRenderProperties(signalName, properties);
+                                    updateRenderProperties(signalName, properties, signal);
                                 })));
                         nameEntity.add(GuiElements.createSpacerV(7));
                         nameEntity.add(infoEntity);
@@ -430,9 +434,8 @@ public class SignalBridgeGui extends GuiBase {
         list.add(addButton);
         container.allSignals.forEach((name, entry) -> {
             final UIEntity blockEntity = createPreviewForBlock(entry.getKey(), 14, -3.5f, 1.9f, 80,
-                    100, true, 0, 0, true, name, new ModelInfoWrapper(
-                            nameForRenderProperties.getOrDefault(name, new HashMap<>())),
-                    100);
+                    100, true, 0, 0, true, name,
+                    new ModelInfoWrapper(renderData.getDataForName(name)), 100);
             blockEntity.add(new UIClickable(e -> {
                 addUISelection(name);
                 currentSignal = name;
@@ -484,11 +487,7 @@ public class SignalBridgeGui extends GuiBase {
             inner.add(createSpacerLine(GuiElements.createButton(I18Wrapper.format("btn.remove"),
                     consumer.andThen(e -> {
                         list.remove(blockEntity);
-                        sendSignalRemovedFromList(name);
-                        sendRemoveSignal(signal, name);
-                        container.allSignals.remove(name);
-                        nameForRenderProperties.remove(name);
-                        container.builder.removeSignal(Maps.immutableEntry(name, signal));
+                        removeSignal(signal, name);
                         updateMultiRenderer();
                     }))));
             inner.add(createSpacerLine(GuiElements.createButton(
@@ -548,10 +547,18 @@ public class SignalBridgeGui extends GuiBase {
         }));
     }
 
+    private void removeSignal(final Signal signal, final String name) {
+        sendSignalRemovedFromList(name);
+        sendRemoveSignal(signal, name);
+        container.allSignals.remove(name);
+        renderData.removeSignal(name);
+        container.builder.removeSignal(Maps.immutableEntry(name, signal));
+    }
+
     private void updateSignalName(final String oldName, final String newName, final Signal signal) {
         container.allSignals.put(newName, container.allSignals.remove(oldName));
         container.builder.updateSignalName(oldName, newName, signal);
-        nameForRenderProperties.put(newName, nameForRenderProperties.remove(oldName));
+        renderData.updateName(oldName, newName);
     }
 
     private final Map<String, UIEntity> nameForButton = new HashMap<>();
@@ -593,6 +600,7 @@ public class SignalBridgeGui extends GuiBase {
                         default:
                             break;
                     }
+                    checkCollision(name, vector, signal);
                     container.builder.setNewSignalPos(signal, name, vector);
                     updateMultiRenderer();
                     sendSignalPos(vector, signal, name);
@@ -602,14 +610,25 @@ public class SignalBridgeGui extends GuiBase {
                 rightEntity.add(button);
             }
         }
+        checkCollision(name, startVec, signal);
         checkMaxAndMins(startVec);
         this.entity.update();
+    }
+
+    private void checkCollision(final String signalName, final Vec3i signalVec,
+            final Signal signal) {
+        if (!renderData.checkCollision(signalName, signalVec, signal)) {
+            entity.remove(COLLISION_TOOLTIP);
+            return;
+        }
+        entity.add(COLLISION_TOOLTIP);
     }
 
     private void disableRightEntity() {
         rightEntity.clear();
         rightEntity.setWidth(0);
         rightEntity.getParent().update();
+        entity.remove(COLLISION_TOOLTIP);
     }
 
     private void checkMaxAndMins(final Vec3i vector) {
@@ -817,15 +836,15 @@ public class SignalBridgeGui extends GuiBase {
         previewSidebar.addToRenderList(property, valueId);
         previewSidebar.update(signal);
         properties.put(property, valueId);
-        updateRenderProperties(signalName, properties);
+        updateRenderProperties(signalName, properties, signal);
     }
 
     private void updateRenderProperties(final String name,
-            final Map<SEProperty, Integer> properties) {
-        final Map<SEProperty, String> renderProperties = nameForRenderProperties
-                .computeIfAbsent(name, _u -> new HashMap<>());
+            final Map<SEProperty, Integer> properties, final Signal signal) {
+        final Map<SEProperty, String> renderProperties = new HashMap<>();
         properties.forEach(
                 (property, valueID) -> addToRenderNormal(renderProperties, property, valueID));
+        renderData.putSignal(name, renderProperties, signal);
     }
 
     private static void addToRenderNormal(final Map<SEProperty, String> properties,
@@ -972,7 +991,7 @@ public class SignalBridgeGui extends GuiBase {
         container.allSignals.forEach((name, entry) -> {
             final Map<SEProperty, Integer> properties = new HashMap<>(entry.getValue());
             fillRenderPropertiesUp(entry.getKey(), properties);
-            updateRenderProperties(name, properties);
+            updateRenderProperties(name, properties, entry.getKey());
         });
     }
 
