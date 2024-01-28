@@ -294,8 +294,6 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void removeNextPathway(final Point start, final Point end) {
-        System.out.println(
-                "Removing [" + Maps.immutableEntry(start, end) + "]! " + Thread.currentThread());
         nextPathways.remove(Maps.immutableEntry(start, end));
     }
 

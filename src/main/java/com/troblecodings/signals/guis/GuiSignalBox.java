@@ -76,8 +76,8 @@ public class GuiSignalBox extends GuiBase {
     public static final int OUTPUT_COLOR = 0xffff00;
 
     private static final float[] ALL_LINES = getLines();
-    private static final int TILE_WIDTH = 10;
-    private static final int TILE_COUNT = 100;
+    protected static final int TILE_WIDTH = 10;
+    protected static final int TILE_COUNT = 100;
 
     private static float[] getLines() {
         final float[] lines = new float[2 * (TILE_COUNT + 1) * 4];
