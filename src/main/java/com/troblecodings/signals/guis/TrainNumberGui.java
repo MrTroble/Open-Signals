@@ -2,20 +2,25 @@ package com.troblecodings.signals.guis;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
-import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
+import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
+import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
+import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
+import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
+import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
-import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
+import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.guis.TrainNumberContainer.TrainNumberNetwork;
 import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.world.entity.player.Player;
 
@@ -71,35 +76,20 @@ public class TrainNumberGui extends GuiBase {
         inputEntity.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.info.change")));
         inner.add(inputEntity);
 
-        final IIntegerable<String> points = SizeIntegerables.of(I18Wrapper.format("gui.setpoint"),
-                container.validPoints.size(), e -> {
-                    if (e == -1)
-                        return "Disabled";
-                    return container.validPoints.get(e).toShortString();
+        final UIEntity changeButton = GuiElements
+                .createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e -> {
+                    final UIEntity grid = new UIEntity();
+                    grid.setInherits(true);
+                    initializeGrid(grid);
+                    push(GuiElements.createScreen(screen -> screen.add(grid)));
                 });
-        inner.add(GuiElements.createEnumElement(new DisableIntegerable<>(points), e -> {
-            if (e == -1) {
-                container.setPoint = new Point(-1, -1);
-                sendNewPoint();
-                return;
-            }
-            container.setPoint = container.validPoints.get(e);
-            sendNewPoint();
-        }, container.setPoint != null ? container.setPoint.equals(new Point(-1, -1)) ? -1
-                : container.validPoints.indexOf(container.setPoint) : -1));
-
+        changeButton.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.setpoint.desc")));
+        inner.add(changeButton);
         inner.add(GuiElements.createSpacerV(5));
 
-        final UILabel linkedlabel = new UILabel("Linked SignalBox: "
-                + (container.linkedPos == null ? "Not linked!" : container.linkedPos.toString()));
-        linkedlabel.setCenterY(false);
-
-        final UIEntity posLabel = new UIEntity();
-        posLabel.setHeight(20);
-        posLabel.setInheritWidth(true);
-        posLabel.add(linkedlabel);
-
-        inner.add(posLabel);
+        inner.add(GuiElements
+                .createLabel("Linked SignalBox: " + (container.linkedPos == null ? "Not linked!"
+                        : container.linkedPos.toShortString()), 1.2f));
 
         entity.add(inner);
     }
@@ -107,6 +97,78 @@ public class TrainNumberGui extends GuiBase {
     @Override
     public void updateFromContainer() {
         initOwn();
+    }
+
+    private void initializeGrid(final UIEntity lowerEntity) {
+        final UIEntity splitter = new UIEntity();
+        splitter.setInherits(true);
+        final UIEntity plane = new UIEntity();
+        plane.setWidth(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
+        plane.setHeight(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
+        splitter.add(new UIScroll(s -> {
+            final float newScale = (float) (plane.getScaleX() + s * 0.05f);
+            if (newScale <= 0)
+                return;
+            plane.setScaleX(newScale);
+            plane.setScaleY(newScale);
+            plane.update();
+        }));
+        splitter.add(new UIDrag((x, y) -> {
+            plane.setX(plane.getX() + x);
+            plane.setY(plane.getY() + y);
+            plane.update();
+        }, 2));
+        final UIBox vbox = new UIBox(UIBox.VBOX, 0);
+        vbox.setPageable(false);
+        plane.add(vbox);
+        for (int x = 0; x < GuiSignalBox.TILE_COUNT; x++) {
+            final UIEntity row = new UIEntity();
+            final UIBox hbox = new UIBox(UIBox.HBOX, 0);
+            hbox.setPageable(false);
+            row.add(hbox);
+            row.setHeight(GuiSignalBox.TILE_WIDTH);
+            row.setWidth(GuiSignalBox.TILE_WIDTH);
+            for (int y = 0; y < GuiSignalBox.TILE_COUNT; y++) {
+                final UIEntity tile = new UIEntity();
+                tile.setHeight(GuiSignalBox.TILE_WIDTH);
+                tile.setWidth(GuiSignalBox.TILE_WIDTH);
+                final Point name = new Point(y, x);
+                SignalBoxNode node = container.grid.getNode(name);
+                if (node == null) {
+                    node = new SignalBoxNode(name);
+                }
+                final UISignalBoxTile sbt = new UISignalBoxTile(node);
+                tile.add(sbt);
+                if (!node.getCustomText().isEmpty()) {
+                    final UIEntity inputEntity = new UIEntity();
+                    inputEntity.add(new UIScale(0.7f, 0.7f, 0.7f));
+                    final UILabel label = new UILabel(node.getCustomText());
+                    label.setTextColor(0xFFFFFFFF);
+                    inputEntity.add(label);
+                    inputEntity.setX(5);
+                    tile.add(inputEntity);
+                }
+                final SignalBoxNode finalNode = node;
+                tile.add(new UIClickable(e -> {
+                    if (finalNode.isEmpty())
+                        return;
+                    container.setPoint = name;
+                    sendNewPoint();
+                    pop();
+                }));
+                if (name.equals(container.setPoint)) {
+                    tile.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
+                }
+                row.add(tile);
+            }
+            plane.add(row);
+        }
+        splitter.add(new UIScissor());
+        splitter.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        splitter.add(new UIBorder(0xFF000000, 4));
+        splitter.add(plane);
+        lowerEntity.add(new UIBox(UIBox.HBOX, 2));
+        lowerEntity.add(splitter);
     }
 
     private void sendNewPoint() {
