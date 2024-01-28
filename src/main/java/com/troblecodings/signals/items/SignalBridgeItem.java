@@ -59,7 +59,8 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
         final Map<BlockPos, BasicBlock> blocks = calculatePositions(builder, startPos,
                 context.getHorizontalDirection().getOpposite());
         if (blocks.isEmpty()) {
-            translateMessageWrapper(player, "signalbridge.noblock");
+            translateMessageWrapper(player, "signalbridge.nostartblock");
+            return InteractionResult.FAIL;
         }
         for (final BlockPos pos : blocks.keySet()) {
             if (!worldIn.isEmptyBlock(pos)) {
