@@ -1,6 +1,5 @@
 package com.troblecodings.signals.handler;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -447,12 +446,10 @@ public final class SignalBoxHandler {
         }
         wrapper.putList(OUTPUT_UPDATE, wrapperList);
         try {
-            final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
-                    .toFile();
-            if (file.exists())
-                file.delete();
-            Files.createFile(file.toPath());
-            NbtIo.write(wrapper.tag, file);
+            final Path file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            Files.deleteIfExists(file);
+            Files.createFile(file);
+            NbtIo.write(wrapper.tag, file.toFile());
         } catch (final IOException e) {
             e.printStackTrace();
         }
@@ -467,6 +464,8 @@ public final class SignalBoxHandler {
         try {
             final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
             final NBTWrapper wrapper = new NBTWrapper(NbtIo.read(newPath.toFile()));
+            if (wrapper.isTagNull())
+                return;
             wrapper.getList(LINKING_UPDATE).forEach(tag -> {
                 final LinkingUpdates updates = new LinkingUpdates();
                 updates.readNBT(tag);
