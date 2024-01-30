@@ -133,6 +133,7 @@ public final class NameHandler implements INetworkSync {
     private static ByteBuffer packToBuffer(final BlockPos pos, final String name) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(pos);
+        buffer.putBoolean(false);
         buffer.putString(name);
         return buffer.build();
     }
@@ -154,7 +155,7 @@ public final class NameHandler implements INetworkSync {
     private static void sendRemoved(final StateInfo info) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
-        buffer.putByte((byte) 255);
+        buffer.putBoolean(true);
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 

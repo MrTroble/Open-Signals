@@ -28,8 +28,8 @@ public class ClientNameHandler implements INetworkSync {
     public void deserializeClient(final ReadBuffer buffer) {
         final Minecraft mc = Minecraft.getInstance();
         final BlockPos pos = buffer.getBlockPos();
-        final int byteLength = buffer.getByteToUnsignedInt();
-        if (byteLength == 255) {
+        final boolean removed = buffer.getBoolean();
+        if (removed) {
             setRemoved(pos);
             return;
         }
