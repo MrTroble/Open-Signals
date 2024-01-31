@@ -118,12 +118,12 @@ public class SignalBridgeGui extends GuiBase {
         header.add(editButton);
         resetSelection(editButton);
         final UIEntity preview = GuiElements
-                .createButton(I18Wrapper.format("gui.signalbride.preview"), e -> {
+                .createButton(I18Wrapper.format("gui.signalbridge.preview"), e -> {
                     buildBridgePreview();
                     buildBridgeList();
                     resetSelection(e);
                 });
-        preview.add(new UIToolTip(I18Wrapper.format("gui.signalbride.preview.desc")));
+        preview.add(new UIToolTip(I18Wrapper.format("gui.signalbridge.preview.desc")));
         header.add(preview);
         header.add(GuiElements.createButton("?", 20, e -> {
             final UIEntity screen = GuiElements.createScreen(screenEntity -> {
