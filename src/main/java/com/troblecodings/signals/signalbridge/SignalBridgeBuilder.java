@@ -109,6 +109,8 @@ public class SignalBridgeBuilder {
     public void updateSignalName(final String oldName, final String newName, final Signal signal) {
         final Entry<String, Signal> oldEntry = Maps.immutableEntry(oldName, signal);
         final Entry<String, Signal> newEntry = Maps.immutableEntry(newName, signal);
+        if (!vecForSignal.containsKey(oldEntry))
+            return;
         vecForSignal.put(newEntry, vecForSignal.remove(oldEntry));
         this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
