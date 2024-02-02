@@ -38,7 +38,7 @@ public class SignalBridgeBuilder {
     public static final String VECTOR_Z = "vectorZ";
     public static final String START_POINT = "startPoint";
     public static final String CUSTOMNAME = "signalCustomName";
-    private static final Point RENDER_START = new Point(8, 8);
+    private static final Vec3i RENDER_START = new Vec3i(15, 15, 0);
 
     private final Map<Point, SignalBridgeBasicBlock> pointForBlocks = new HashMap<>();
     private final Map<Entry<String, Signal>, Vec3i> vecForSignal = new HashMap<>();
@@ -146,15 +146,14 @@ public class SignalBridgeBuilder {
 
     public List<UIBlockRenderInfo> getRenderPosAndBlocks() {
         final Builder<UIBlockRenderInfo> builder = ImmutableList.builder();
-        final Vec3i startVec = new Vec3i(RENDER_START.getX(), RENDER_START.getY(), 0);
         pointForBlocks.forEach((point, block) -> {
             final Vec3i vector = new Vec3i(point.getX(), point.getY(), 0);
             builder.add(new UIBlockRenderInfo(block.defaultBlockState(), EMPTY_WRAPPER,
-                    startVec.subtract(vector)));
+                    RENDER_START.subtract(vector)));
         });
         vecForSignal.forEach((entry, vec) -> builder
                 .add(new UIBlockRenderInfo(entry.getValue().defaultBlockState(),
-                        function.apply(entry.getKey()), startVec.subtract(vec))));
+                        function.apply(entry.getKey()), RENDER_START.subtract(vec))));
         return builder.build();
 
     }

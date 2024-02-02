@@ -60,8 +60,8 @@ public class SignalBridgeGui extends GuiBase {
 
     private static final List<Signal> SIGNALS_FOR_BRIDGE = new ArrayList<>();
     private static final UIBorder SELECTED_BORDER = new UIBorder(0xFF00FF00, 1);
-    private static final int TILE_WIDTH = 20;
-    private static final int TILE_COUNT = 10;
+    private static final int TILE_WIDTH = 13;
+    private static final int TILE_COUNT = 15;
     private static final UIToolTip COLLISION_TOOLTIP = new UIToolTip(
             I18Wrapper.format("gui.signalbridge.collision"), true);
 
@@ -205,15 +205,16 @@ public class SignalBridgeGui extends GuiBase {
         rightEntity.clear();
         rightEntity.setWidth(0);
         middleEntity.clear();
-        middleEntity.setHeight(200);
-        middleEntity.setWidth(200);
-        middleEntity.add(new UIBox(UIBox.HBOX, 1));
+        middleEntity.setHeight(TILE_COUNT * TILE_WIDTH);
+        middleEntity.setWidth(TILE_COUNT * TILE_WIDTH);
         final UIEntity plane = new UIEntity();
         plane.setHeight(TILE_COUNT * TILE_WIDTH);
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
         plane.add(new UIBorder(GuiSignalBox.GRID_COLOR, 2));
         plane.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
-        plane.add(new UIBox(UIBox.VBOX, 0));
+        final UIBox vbox = new UIBox(UIBox.VBOX, 0);
+        vbox.setPageable(false);
+        plane.add(vbox);
         for (int x = 0; x < TILE_COUNT; x++) {
             final UIEntity row = new UIEntity();
             final UIBox hbox = new UIBox(UIBox.HBOX, 0);
@@ -230,8 +231,8 @@ public class SignalBridgeGui extends GuiBase {
                 row.add(tile);
                 final SignalBridgeBasicBlock savedBlock = container.builder.getBlockOnPoint(point);
                 if (savedBlock != null) {
-                    final UIEntity blockEntity = createPreviewForBlock(savedBlock, 15, -1, 1,
-                            TILE_WIDTH, TILE_WIDTH, false, -12.5f, 3, false,
+                    final UIEntity blockEntity = createPreviewForBlock(savedBlock, 15, -1, 0.7f,
+                            TILE_WIDTH, TILE_WIDTH, false, -9.5f, 1.5f, false,
                             SignalBridgeBuilder.EMPTY_WRAPPER);
                     tile.add(blockEntity);
                 }
@@ -244,8 +245,8 @@ public class SignalBridgeGui extends GuiBase {
                         return;
                     }
                     final SignalBridgeBasicBlock block = container.builder.getBlockOnPoint(point);
-                    final UIEntity blockEntity = createPreviewForBlock(currentBlock, 15, -1, 1,
-                            TILE_WIDTH, TILE_WIDTH, false, -12.5f, 3, false,
+                    final UIEntity blockEntity = createPreviewForBlock(currentBlock, 15, -1, 0.7f,
+                            TILE_WIDTH, TILE_WIDTH, false, -9.5f, 1.5f, false,
                             SignalBridgeBuilder.EMPTY_WRAPPER);
                     if (block == null) {
                         tile.add(blockEntity);
@@ -273,36 +274,26 @@ public class SignalBridgeGui extends GuiBase {
     }
 
     private UIEntity renderEntity = new UIEntity();
-    private UIMultiBlockRender multiRenderer = new UIMultiBlockRender(20, -10);
+    private UIMultiBlockRender multiRenderer = new UIMultiBlockRender(12, -17);
 
     private void buildBridgePreview() {
         middleEntity.clear();
-        middleEntity.setWidth(200);
-        middleEntity.setHeight(200);
+        middleEntity.setHeight(TILE_COUNT * TILE_WIDTH);
+        middleEntity.setWidth(TILE_COUNT * TILE_WIDTH);
         final UIEntity entity = new UIEntity();
-        entity.setHeight(200);
-        entity.setWidth(200);
+        entity.setHeight(TILE_COUNT * TILE_WIDTH);
+        entity.setWidth(TILE_COUNT * TILE_WIDTH);
         entity.add(new UIBorder(GuiSignalBox.GRID_COLOR, 2));
         entity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
         renderEntity = new UIEntity();
-        renderEntity.setX(140);
-        renderEntity.setY(-17);
-        multiRenderer = new UIMultiBlockRender(20, -10);
+        renderEntity.setHeight(TILE_COUNT * TILE_WIDTH);
+        renderEntity.setWidth(TILE_COUNT * TILE_WIDTH);
+        renderEntity.setX(180);
+        multiRenderer = new UIMultiBlockRender(12, -17);
         updateMultiRenderer();
         renderEntity.add(multiRenderer);
         entity.add(renderEntity);
-        entity.add(new UIDrag((x, y) -> multiRenderer
-                .updateRotation(Quaternion.fromXYZ(0, (float) x * 0.1f, 0))));
-        entity.add(new UIScroll(s -> {
-            final float newScale = (float) (renderEntity.getScaleX() + s * 0.05f);
-            if (newScale <= 0)
-                return;
-            renderEntity.setScaleX(newScale);
-            renderEntity.setScaleY(newScale);
-            renderEntity.update();
-        }));
         middleEntity.add(entity);
-        entity.update();
     }
 
     private void updateMultiRenderer() {
@@ -639,12 +630,12 @@ public class SignalBridgeGui extends GuiBase {
                 final UIEntity button = nameForButton.get(buttonName);
                 switch (axis) {
                     case X: {
-                        checkEnableAndDisable(axisDirection.opposite(), 0, 9, vector.getX(),
+                        checkEnableAndDisable(axisDirection.opposite(), -1, 14, vector.getX(),
                                 button);
                         break;
                     }
                     case Y: {
-                        checkEnableAndDisable(axisDirection.opposite(), 0, 9, vector.getY(),
+                        checkEnableAndDisable(axisDirection.opposite(), -1, 14, vector.getY(),
                                 button);
                         break;
                     }

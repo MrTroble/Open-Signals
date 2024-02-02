@@ -448,7 +448,6 @@ public final class SignalBoxHandler {
         try {
             final Path file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
             Files.deleteIfExists(file);
-            Files.createDirectories(file);
             Files.createFile(file);
             NbtIo.write(wrapper.tag, file.toFile());
         } catch (final IOException e) {
@@ -464,6 +463,8 @@ public final class SignalBoxHandler {
         migrateFilesToNewDirectory(world);
         try {
             final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            if (!Files.exists(newPath))
+                return;
             final NBTWrapper wrapper = new NBTWrapper(NbtIo.read(newPath.toFile()));
             if (wrapper.isTagNull())
                 return;
