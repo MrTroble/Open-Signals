@@ -62,6 +62,8 @@ public class SidePanel {
             "gui/textures/redstone_on.png");
     public static final ResourceLocation REDSTONE_ON_BLOCKED = new ResourceLocation(
             OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
+    public static final ResourceLocation COUNTER_TEXTURE = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/counter.png");
 
     private boolean showHelpPage = false;
     private final UIEntity helpPage = new UIEntity();
@@ -72,7 +74,7 @@ public class SidePanel {
     private final UIEntity label = new UIEntity();
     private final UIEntity spacerEntity = new UIEntity();
     private final UIEntity helpPageSpacer = new UIEntity();
-    private UIEntity counterButton = new UIEntity();
+    private UILabel counterLabel = new UILabel("");
     private final GuiSignalBox gui;
 
     private BiConsumer<BlockPos, SubsidiaryHolder> disableSubsidiary;
@@ -80,6 +82,8 @@ public class SidePanel {
     public SidePanel(final UIEntity lowerEntity, final GuiSignalBox gui) {
         this.lowerEntity = lowerEntity;
         this.gui = gui;
+
+        counterLabel.setCenterY(false);
 
         infoEntity.setInherits(true);
         infoEntity.add(new UIBox(UIBox.VBOX, 2));
@@ -198,9 +202,7 @@ public class SidePanel {
     }
 
     protected void updateCounterButton() {
-        counterButton.findRecursive(UIButton.class)
-                .forEach(button -> button.setText(gui.container.grid.getCurrentCounter() + ""));
-        lowerEntity.update();
+        counterLabel.setText(String.format("%04d", gui.container.grid.getCurrentCounter()));
     }
 
     public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries,
@@ -233,12 +235,25 @@ public class SidePanel {
         helpList.add(GuiElements.createLabel("[RMB] = " + I18Wrapper.format("info.usage.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
 
-        counterButton = GuiElements.createButton(gui.container.grid.getCurrentCounter() + "");
-        counterButton.setScaleX(0.8f);
-        counterButton.setScaleY(0.8f);
+        final UIEntity counterButton = new UIEntity();
+        counterButton.setHeight(20);
+        counterButton.setWidth(60);
         counterButton.setX(5);
+
+        counterButton.add(new UITexture(COUNTER_TEXTURE));
+        final UIEntity labelEntity = GuiElements.createLabel(
+                String.format("%04d", gui.container.grid.getCurrentCounter()), 0xFFFFFFFF);
+        labelEntity.setX(32);
+        labelEntity.setY(3);
+        labelEntity.setScaleX(1.2f);
+        labelEntity.setScaleY(1.2f);
+        counterButton.add(labelEntity);
+
+        labelEntity.findRecursive(UILabel.class).forEach(label -> counterLabel = label);
         counterButton.add(new UIToolTip(I18Wrapper.format("btn.counter.tooltip")));
+
         helpList.add(counterButton);
+        helpList.add(GuiElements.createSpacerV(3));
 
         final Minecraft mc = Minecraft.getInstance();
         if (!allNodes.isEmpty()) {
