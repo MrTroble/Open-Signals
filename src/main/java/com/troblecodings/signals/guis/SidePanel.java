@@ -237,16 +237,18 @@ public class SidePanel {
 
         final UIEntity counterButton = new UIEntity();
         counterButton.setHeight(20);
-        counterButton.setWidth(60);
+        counterButton.setInheritWidth(true);
         counterButton.setX(5);
+        counterButton.setScaleX(0.8f);
+        counterButton.setScaleY(0.8f);
 
         counterButton.add(new UITexture(COUNTER_TEXTURE));
         final UIEntity labelEntity = GuiElements.createLabel(
                 String.format("%04d", gui.container.grid.getCurrentCounter()), 0xFFFFFFFF);
-        labelEntity.setX(32);
+        labelEntity.setX(43);
         labelEntity.setY(3);
-        labelEntity.setScaleX(1.2f);
-        labelEntity.setScaleY(1.2f);
+        labelEntity.setScaleX(1.4f);
+        labelEntity.setScaleY(1.4f);
         counterButton.add(labelEntity);
 
         labelEntity.findRecursive(UILabel.class).forEach(label -> counterLabel = label);
