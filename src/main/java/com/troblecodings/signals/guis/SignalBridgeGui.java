@@ -736,7 +736,7 @@ public class SignalBridgeGui extends GuiBase {
         blockEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
         if (showName) {
             final UILabel label = new UILabel(customName.isEmpty()
-                    ? I18Wrapper.format("block." + block.delegate.name().getPath() + ".name")
+                    ? I18Wrapper.format("block." + OpenSignalsMain.MODID + "." + block.delegate.name().getPath())
                     : customName);
             label.setCenterY(false);
             label.setTextColor(blockEntity.getBasicTextColor());

@@ -76,7 +76,7 @@ public class SignalBridgeBasicBlock extends BasicBlock {
 
     @Override
     public boolean shouldHaveItem() {
-        return false;
+        return true;
     }
 
     @Override

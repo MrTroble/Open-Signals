@@ -596,5 +596,13 @@
 	"gui.signalbridge.name": "Signal Name",
 	"gui.signalbridge.rename": "Rename",
 	"property.Signal.name": "Signal",
-	"gui.signalbridge.namenotvalid": "Name not valid!"
+	"gui.signalbridge.namenotvalid": "Name not valid!",
+	"gui.trainnumber.setpoint": "Select point",
+	"gui.trainnumber.setpoint.desc": "Here you can select a point in the signalbox where the train number is to be entered.",
+	"block.opensignals.signalbridge_base": "Base",
+	"block.opensignals.signalbridge_mast": "Mast",
+	"block.opensignals.signalbridge_mast_cage": "Mast Cage",
+	"block.opensignals.signalbridge_cantilever": "Cantilever",
+	"block.opensignals.signalbridge_cantilever_end": "Cantilever End",
+	"block.opensignals.signalbridge_mast_head": "Mast Head"
 }
