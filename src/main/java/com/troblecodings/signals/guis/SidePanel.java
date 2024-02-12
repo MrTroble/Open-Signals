@@ -211,16 +211,14 @@ public class SidePanel {
         infoEntity.clearChildren();
 
         final UIEntity helpScroll = new UIEntity();
-        helpScroll.setInheritHeight(true);
-        helpScroll.setInheritWidth(true);
+        helpScroll.setInherits(true);
         helpScroll.add(new UIBox(UIBox.HBOX, 0));
         helpScroll.add(new UIScissor());
         infoEntity.add(helpScroll);
 
         final UIEntity helpList = new UIEntity();
         helpScroll.add(helpList);
-        helpList.setInheritHeight(true);
-        helpList.setInheritWidth(true);
+        helpList.setInherits(true);
 
         final UIScrollBox helpScrollbox = new UIScrollBox(UIBox.VBOX, 2);
 
@@ -237,8 +235,8 @@ public class SidePanel {
 
         final UIEntity shButton = GuiElements.createButton(I18Wrapper.format("info.usage.sh"),
                 e -> gui.resetAllSignals());
-        shButton.setScaleX(0.8f);
-        shButton.setScaleY(0.8f);
+        shButton.add(new UIToolTip(I18Wrapper.format("info.usage.sh.desc")));
+        shButton.setScale(0.8f);
         shButton.setX(5);
         helpList.add(shButton);
 
@@ -246,16 +244,14 @@ public class SidePanel {
         counterButton.setHeight(20);
         counterButton.setInheritWidth(true);
         counterButton.setX(5);
-        counterButton.setScaleX(0.8f);
-        counterButton.setScaleY(0.8f);
+        counterButton.setScale(0.8f);
 
         counterButton.add(new UITexture(COUNTER_TEXTURE));
         final UIEntity labelEntity = GuiElements.createLabel(
                 String.format("%04d", gui.container.grid.getCurrentCounter()), 0xFFFFFFFF);
         labelEntity.setX(43);
         labelEntity.setY(3);
-        labelEntity.setScaleX(1.4f);
-        labelEntity.setScaleY(1.4f);
+        labelEntity.setScale(1.4f);
         counterButton.add(labelEntity);
 
         labelEntity.findRecursive(UILabel.class).forEach(label -> counterLabel = label);
@@ -426,8 +422,7 @@ public class SidePanel {
                         screen.add(new UIClickable(e1 -> gui.pop(), 1));
                         gui.push(screen);
                     });
-            manuelButton.setScaleX(0.8f);
-            manuelButton.setScaleY(0.8f);
+            manuelButton.setScale(0.8f);
             manuelButton.setX(5);
             helpList.add(manuelButton);
             manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
@@ -437,8 +432,7 @@ public class SidePanel {
                 .createButton(I18Wrapper.format("info.usage.savedpathways"), e -> {
                     final UIEntity screen = GuiElements.createScreen(entity -> {
                         final UIEntity listWithScroll = new UIEntity();
-                        listWithScroll.setInheritHeight(true);
-                        listWithScroll.setInheritWidth(true);
+                        listWithScroll.setInherits(true);
                         listWithScroll.add(new UIBox(UIBox.HBOX, 2));
                         listWithScroll.add(new UIScissor());
                         listWithScroll.add(new UIBorder(0xFF00FFFF));
@@ -494,8 +488,7 @@ public class SidePanel {
                     screen.add(new UIClickable(_u -> gui.pop(), 1));
                     gui.push(screen);
                 });
-        savedPathways.setScaleX(0.8f);
-        savedPathways.setScaleY(0.8f);
+        savedPathways.setScale(0.8f);
         savedPathways.setX(5);
         helpList.add(savedPathways);
 
@@ -541,8 +534,7 @@ public class SidePanel {
                         });
                         gui.push(screen);
                     });
-            reset.setScaleX(0.8f);
-            reset.setScaleY(0.8f);
+            reset.setScale(0.8f);
             reset.setX(5);
             helpList.add(reset);
             reset.add(new UIToolTip(I18Wrapper.format("button.reset.desc")));
@@ -552,8 +544,7 @@ public class SidePanel {
                             gui.setAutoPoint(node.getPoint(), (byte) e);
                             node.setAutoPoint(e == 1 ? true : false);
                         }, node.isAutoPoint() ? 1 : 0);
-                entity.setScaleX(0.8f);
-                entity.setScaleY(0.8f);
+                entity.setScale(0.8f);
                 entity.setX(5);
                 helpList.add(entity);
             }
@@ -636,8 +627,7 @@ public class SidePanel {
                                 });
                                 gui.push(screen);
                             });
-                    entity.setScaleX(0.8f);
-                    entity.setScaleY(0.8f);
+                    entity.setScale(0.8f);
                     entity.setX(5);
                     helpList.add(entity);
                     entity.add(new UIToolTip(I18Wrapper.format("btn.subsidiary.desc")));
@@ -648,8 +638,7 @@ public class SidePanel {
                         helpUsageMode(subsidiaries, null, allNodes, possibleSubsidiaries);
                         gui.initializePageTileConfig(node);
                     });
-            edit.setScaleX(0.8f);
-            edit.setScaleY(0.8f);
+            edit.setScale(0.8f);
             edit.setX(5);
             helpList.add(edit);
             edit.add(new UIToolTip(I18Wrapper.format("info.usage.edit.desc")));
@@ -696,8 +685,7 @@ public class SidePanel {
                     });
                     gui.push(screen);
                 });
-                button.setScaleX(0.8f);
-                button.setScaleY(0.8f);
+                button.setScale(0.8f);
                 button.setX(5);
                 helpList.add(button);
             });
