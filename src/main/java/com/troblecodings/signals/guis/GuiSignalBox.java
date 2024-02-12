@@ -1189,6 +1189,14 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
+    protected void resetAllSignals() {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.RESET_ALL_SIGNALS);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
     private void reset() {
         lowerEntity.clear();
     }

@@ -235,6 +235,13 @@ public class SidePanel {
         helpList.add(GuiElements.createLabel("[RMB] = " + I18Wrapper.format("info.usage.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
 
+        final UIEntity shButton = GuiElements.createButton(I18Wrapper.format("info.usage.sh"),
+                e -> gui.resetAllSignals());
+        shButton.setScaleX(0.8f);
+        shButton.setScaleY(0.8f);
+        shButton.setX(5);
+        helpList.add(shButton);
+
         final UIEntity counterButton = new UIEntity();
         counterButton.setHeight(20);
         counterButton.setInheritWidth(true);

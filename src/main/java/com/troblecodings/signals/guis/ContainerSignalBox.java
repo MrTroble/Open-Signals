@@ -438,6 +438,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 grid.updateTrainNumber(point, number);
                 break;
             }
+            case RESET_ALL_SIGNALS: {
+                grid.resetAllSignals();
+                break;
+            }
             default:
                 break;
         }

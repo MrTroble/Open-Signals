@@ -174,6 +174,10 @@ public class SignalBoxGrid implements INetworkSavable {
         clearPaths();
     }
 
+    public void resetAllSignals() {
+        this.startsToPath.values().forEach(pathway -> pathway.resetAllSignals());
+    }
+
     private void clearPaths() {
         startsToPath.clear();
         endsToPath.clear();

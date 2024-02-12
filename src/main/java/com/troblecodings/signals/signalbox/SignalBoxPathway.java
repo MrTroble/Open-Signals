@@ -603,6 +603,11 @@ public class SignalBoxPathway implements IChunkLoadable {
         resetPathway(null);
     }
 
+    public void resetAllSignals() {
+        resetFirstSignal();
+        resetOther();
+    }
+
     private void resetFirstSignal() {
         this.signalPositions.ifPresent(entry -> {
             final Signal current = SignalBoxHandler.getSignal(new StateInfo(world, tilePos),
