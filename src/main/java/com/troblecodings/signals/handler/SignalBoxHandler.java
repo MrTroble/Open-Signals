@@ -15,7 +15,6 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.ChunkLoadable;
 import com.troblecodings.signals.core.LinkedPositions;
 import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PathGetter;
@@ -32,6 +31,7 @@ import com.troblecodings.signals.signalbox.SignalBoxPathway;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.core.BlockPos;
@@ -72,7 +72,8 @@ public final class SignalBoxHandler {
             return false;
 
         final AtomicBoolean returnBoolean = new AtomicBoolean(true);
-        final ChunkLoadable chunkLoader = new ChunkLoadable();
+        final IChunkLoadable chunkLoader = new IChunkLoadable() {
+        };
         chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) startBox.world,
                 startBox.pos, (startTile, _u) -> {
                     final SignalBoxGrid startGrid = startTile.getSignalBoxGrid();
