@@ -58,7 +58,7 @@ public class SignalBridgeBuilder {
     }
 
     public Point getStartPoint() {
-        return startPoint == null ? new Point(5, 5) : startPoint;
+        return hasStartPoint() ? startPoint : new Point(13, 13);
     }
 
     public void addBlock(final Point point, final SignalBridgeBasicBlock block) {

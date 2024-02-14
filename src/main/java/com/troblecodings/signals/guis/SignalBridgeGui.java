@@ -236,8 +236,7 @@ public class SignalBridgeGui extends GuiBase {
                             SignalBridgeBuilder.EMPTY_WRAPPER);
                     tile.add(blockEntity);
                 }
-                if (container.builder.hasStartPoint()
-                        && point.equals(container.builder.getStartPoint())) {
+                if (point.equals(container.builder.getStartPoint())) {
                     tile.add(new UIBorder(0xFF0000FF, 2));
                 }
                 tile.add(new UIClickable(e -> {
@@ -260,7 +259,8 @@ public class SignalBridgeGui extends GuiBase {
                     tile.update();
                 }));
                 tile.add(new UIClickable(e -> {
-                    if (Screen.hasControlDown()) {
+                    if (Screen.hasControlDown()
+                            && !point.equals(container.builder.getStartPoint())) {
                         container.builder.changeStartPoint(point);
                         sendNewStartPoint(point);
                         buildGrid();
@@ -735,9 +735,11 @@ public class SignalBridgeGui extends GuiBase {
         blockEntity.setHeight(height);
         blockEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
         if (showName) {
-            final UILabel label = new UILabel(customName.isEmpty()
-                    ? I18Wrapper.format("block." + OpenSignalsMain.MODID + "." + block.delegate.name().getPath())
-                    : customName);
+            final UILabel label = new UILabel(
+                    customName.isEmpty()
+                            ? I18Wrapper.format("block." + OpenSignalsMain.MODID + "."
+                                    + block.delegate.name().getPath())
+                            : customName);
             label.setCenterY(false);
             label.setTextColor(blockEntity.getBasicTextColor());
             blockEntity.add(label);
