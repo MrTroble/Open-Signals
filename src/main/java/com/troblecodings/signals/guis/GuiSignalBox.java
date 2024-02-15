@@ -869,15 +869,11 @@ public class GuiSignalBox extends GuiBase {
             allLines.setColor(GRID_COLOR);
             plane.add(allLines);
         }
-        final UIBox vbox = new UIBox(UIBox.VBOX, 0);
-        vbox.setPageable(false);
-        plane.add(vbox);
+        plane.add(new UIBox(UIBox.VBOX, 0).setPageable(false));
         allTiles.clear();
         for (int x = 0; x < TILE_COUNT; x++) {
             final UIEntity row = new UIEntity();
-            final UIBox hbox = new UIBox(UIBox.HBOX, 0);
-            hbox.setPageable(false);
-            row.add(hbox);
+            row.add(new UIBox(UIBox.HBOX, 0).setPageable(false));
             row.setHeight(TILE_WIDTH);
             row.setWidth(TILE_WIDTH);
             for (int y = 0; y < TILE_COUNT; y++) {

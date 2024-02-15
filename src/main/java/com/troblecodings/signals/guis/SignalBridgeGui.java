@@ -164,7 +164,7 @@ public class SignalBridgeGui extends GuiBase {
         final UIEntity list = new UIEntity();
         scroll.add(list);
         list.setInherits(true);
-        list.add(new UIBox(UIBox.VBOX, 1));
+        list.add(new UIBox(UIBox.VBOX, 1).setPageable(false));
 
         final List<SignalBridgeBasicBlock> typeBlocks = SignalBridgeBlockParser.SIGNAL_BRIDGE_BLOCKS
                 .getOrDefault(type, new ArrayList<>());
@@ -212,14 +212,10 @@ public class SignalBridgeGui extends GuiBase {
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
         plane.add(new UIBorder(GuiSignalBox.GRID_COLOR, 2));
         plane.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
-        final UIBox vbox = new UIBox(UIBox.VBOX, 0);
-        vbox.setPageable(false);
-        plane.add(vbox);
+        plane.add(new UIBox(UIBox.VBOX, 0).setPageable(false));
         for (int x = 0; x < TILE_COUNT; x++) {
             final UIEntity row = new UIEntity();
-            final UIBox hbox = new UIBox(UIBox.HBOX, 0);
-            hbox.setPageable(false);
-            row.add(hbox);
+            row.add(new UIBox(UIBox.HBOX, 0).setPageable(false));
             row.setHeight(TILE_WIDTH);
             row.setWidth(TILE_WIDTH);
             for (int y = 0; y < TILE_COUNT; y++) {
@@ -316,9 +312,7 @@ public class SignalBridgeGui extends GuiBase {
         final UIEntity list = new UIEntity();
         scroll.add(list);
         list.setInherits(true);
-        final UIBox vbox = new UIBox(UIBox.VBOX, 1);
-        vbox.setPageable(false);
-        list.add(vbox);
+        list.add(new UIBox(UIBox.VBOX, 1).setPageable(false));
         final IIntegerable<Signal> availableSignals = SizeIntegerables.of(
                 I18Wrapper.format("gui.signalbridge.signals"), SIGNALS_FOR_BRIDGE.size(),
                 i -> SIGNALS_FOR_BRIDGE.get(i));

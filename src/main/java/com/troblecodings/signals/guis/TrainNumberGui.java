@@ -118,14 +118,10 @@ public class TrainNumberGui extends GuiBase {
             plane.setY(plane.getY() + y);
             plane.update();
         }, 2));
-        final UIBox vbox = new UIBox(UIBox.VBOX, 0);
-        vbox.setPageable(false);
-        plane.add(vbox);
+        plane.add(new UIBox(UIBox.VBOX, 0).setPageable(false));
         for (int x = 0; x < GuiSignalBox.TILE_COUNT; x++) {
             final UIEntity row = new UIEntity();
-            final UIBox hbox = new UIBox(UIBox.HBOX, 0);
-            hbox.setPageable(false);
-            row.add(hbox);
+            row.add(new UIBox(UIBox.HBOX, 0).setPageable(false));
             row.setHeight(GuiSignalBox.TILE_WIDTH);
             row.setWidth(GuiSignalBox.TILE_WIDTH);
             for (int y = 0; y < GuiSignalBox.TILE_COUNT; y++) {
