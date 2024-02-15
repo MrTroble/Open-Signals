@@ -603,6 +603,10 @@
 	"block.opensignals.signalbridge_mast": "Mast",
 	"block.opensignals.signalbridge_mast_cage": "Mast Cage",
 	"block.opensignals.signalbridge_cantilever": "Cantilever",
-	"block.opensignals.signalbridge_cantilever_end": "Cantilever End",
-	"block.opensignals.signalbridge_mast_head": "Mast Head"
+	"block.opensignals.signalbridge_cantilever_end_left": "Cantilever End Left",
+	"block.opensignals.signalbridge_cantilever_end_right": "Cantilever End Right",
+	"block.opensignals.signalbridge_mast_head_left": "Mast Head Left",
+	"block.opensignals.signalbridge_mast_head_right": "Mast Head Right",
+	"block.opensignals.signalbridge_mast_head_middle": "Mast Head Middle",
+	"signalbridge.nostartblock": "No start block selected! Please select a start block with shift+rightclick in the editor."
 }

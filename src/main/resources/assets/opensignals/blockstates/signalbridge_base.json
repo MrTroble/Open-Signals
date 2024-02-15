@@ -1,18 +1,18 @@
 {
     "variants": {
         "facing=east": {
-            "model": "opensignals:block/signalbridge_base",
+            "model": "opensignals:block/signalbridge/default/signalbridge_base",
             "y": 90
         },
         "facing=north": {
-            "model": "opensignals:block/signalbridge_base"
+            "model": "opensignals:block/signalbridge/default/signalbridge_base"
         },
         "facing=south": {
-            "model": "opensignals:block/signalbridge_base",
+            "model": "opensignals:block/signalbridge/default/signalbridge_base",
             "y": 180
         },
         "facing=west": {
-            "model": "opensignals:block/signalbridge_base",
+            "model": "opensignals:block/signalbridge/default/signalbridge_base",
             "y": 270
         }
     }
