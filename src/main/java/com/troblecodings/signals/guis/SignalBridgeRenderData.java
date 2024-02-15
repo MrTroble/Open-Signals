@@ -7,6 +7,7 @@ import java.util.Map.Entry;
 import com.google.common.collect.Maps;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
 
 import net.minecraft.core.Vec3i;
@@ -35,12 +36,32 @@ public class SignalBridgeRenderData {
         signalHeights.put(newName, signalHeights.remove(oldName));
     }
 
-    public void putSignal(final String name, final Map<SEProperty, String> properties,
+    public void updateRenderProperties(final String name, final Map<SEProperty, Integer> properties,
             final Signal signal) {
         final Map<SEProperty, String> allProperties = nameForRenderProperties.computeIfAbsent(name,
                 _u -> new HashMap<>());
-        allProperties.putAll(properties);
+        properties.forEach(
+                (property, valueID) -> addToRenderNormal(allProperties, property, valueID));
         signalHeights.put(name, signal.getHeight(allProperties));
+    }
+
+    private static void addToRenderNormal(final Map<SEProperty, String> properties,
+            final SEProperty property, final int valueID) {
+        if (valueID < 0) {
+            properties.remove(property);
+            return;
+        }
+        if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
+            properties.put(property, property.getObjFromID(valueID));
+        } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+            if (valueID > 0) {
+                properties.put(property, property.getDefault());
+            } else {
+                properties.remove(property);
+            }
+        } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
+            properties.put(property, property.getDefault());
+        }
     }
 
     public boolean checkCollision(final String name, final Vec3i signalVec, final Signal signal) {

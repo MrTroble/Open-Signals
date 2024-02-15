@@ -383,7 +383,8 @@ public class SignalBridgeGui extends GuiBase {
                                     sendCreateSignal(signalName, signal);
                                     final Map<SEProperty, Integer> properties = new HashMap<>();
                                     fillRenderPropertiesUp(signal, properties);
-                                    updateRenderProperties(signalName, properties, signal);
+                                    renderData.updateRenderProperties(signalName, properties,
+                                            signal);
                                 })));
                         nameEntity.add(GuiElements.createSpacerV(7));
                         nameEntity.add(infoEntity);
@@ -823,34 +824,7 @@ public class SignalBridgeGui extends GuiBase {
         previewSidebar.addToRenderList(property, valueId);
         previewSidebar.update(signal);
         properties.put(property, valueId);
-        updateRenderProperties(signalName, properties, signal);
-    }
-
-    private void updateRenderProperties(final String name,
-            final Map<SEProperty, Integer> properties, final Signal signal) {
-        final Map<SEProperty, String> renderProperties = new HashMap<>();
-        properties.forEach(
-                (property, valueID) -> addToRenderNormal(renderProperties, property, valueID));
-        renderData.putSignal(name, renderProperties, signal);
-    }
-
-    private static void addToRenderNormal(final Map<SEProperty, String> properties,
-            final SEProperty property, final int valueID) {
-        if (valueID < 0) {
-            properties.remove(property);
-            return;
-        }
-        if (property.isChangabelAtStage(ChangeableStage.GUISTAGE)) {
-            properties.put(property, property.getObjFromID(valueID));
-        } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
-            if (valueID > 0) {
-                properties.put(property, property.getDefault());
-            } else {
-                properties.remove(property);
-            }
-        } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)) {
-            properties.put(property, property.getDefault());
-        }
+        renderData.updateRenderProperties(signalName, properties, signal);
     }
 
     private static UIEntity createSpacerLine(final UIEntity middle) {
@@ -978,7 +952,7 @@ public class SignalBridgeGui extends GuiBase {
         container.allSignals.forEach((name, entry) -> {
             final Map<SEProperty, Integer> properties = new HashMap<>(entry.getValue());
             fillRenderPropertiesUp(entry.getKey(), properties);
-            updateRenderProperties(name, properties, entry.getKey());
+            renderData.updateRenderProperties(name, properties, entry.getKey());
         });
     }
 

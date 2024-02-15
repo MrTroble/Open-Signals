@@ -104,7 +104,8 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
                 if (!property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
                     signalProperties.put(property,
                             property.getObjFromID(propertiesToInt.get(property)));
-                } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)) {
+                } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE)
+                        && propertiesToInt.get(property) > 0) {
                     signalProperties.put(property, property.getDefault());
                 }
             } else if (property.isChangabelAtStage(ChangeableStage.APISTAGE_NONE_CONFIG)
