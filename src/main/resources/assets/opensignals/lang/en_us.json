@@ -608,5 +608,7 @@
 	"block.opensignals.signalbridge_mast_head_left": "Mast Head Left",
 	"block.opensignals.signalbridge_mast_head_right": "Mast Head Right",
 	"block.opensignals.signalbridge_mast_head_middle": "Mast Head Middle",
-	"signalbridge.nostartblock": "No start block selected! Please select a start block with shift+rightclick in the editor."
+	"signalbridge.nostartblock": "No start block selected! Please select a start block with shift+rightclick in the editor.",
+	"tile.hvsignalbridge.name": "HV - Main/Distant bridge signal",
+	"block.opensignals.hvsignalbridge": "HV - Main/Distant bridge signal"
 }
