@@ -450,6 +450,7 @@ public final class SignalBoxHandler {
         try {
             final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
                     .toFile();
+            Files.createDirectories(file.toPath());
             if (file.delete()) {
                 file.createNewFile();
             }
