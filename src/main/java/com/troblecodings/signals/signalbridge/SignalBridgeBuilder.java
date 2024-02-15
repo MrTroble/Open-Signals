@@ -44,7 +44,7 @@ public class SignalBridgeBuilder {
     private final Map<Entry<String, Signal>, Vec3i> vecForSignal = new HashMap<>();
     private List<Map.Entry<Vec3i, BasicBlock>> relativesToStart = ImmutableList.of();
     private Function<String, ModelInfoWrapper> function = (_u) -> EMPTY_WRAPPER;
-    private Point startPoint;
+    private Point startPoint = new Point(13, 13);
 
     public void changeStartPoint(final Point newPoint) {
         if (newPoint.equals(startPoint))
@@ -53,12 +53,8 @@ public class SignalBridgeBuilder {
         this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 
-    public boolean hasStartPoint() {
-        return startPoint != null;
-    }
-
     public Point getStartPoint() {
-        return hasStartPoint() ? startPoint : new Point(13, 13);
+        return startPoint;
     }
 
     public void addBlock(final Point point, final SignalBridgeBasicBlock block) {
