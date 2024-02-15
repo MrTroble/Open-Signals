@@ -12,6 +12,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
@@ -138,7 +139,7 @@ public class GuiSignalBox extends GuiBase {
         return;
     }
 
-    public void updateSignals(final List<Point> updated) {
+    public void updateSignals(final Iterable<Point> updated) {
         updated.forEach(point -> {
             final UISignalBoxTile tile = allTiles.get(point);
             tile.setGreenSignals(container.greenSignals.getOrDefault(point, new ArrayList<>()));
@@ -1191,6 +1192,9 @@ public class GuiSignalBox extends GuiBase {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.RESET_ALL_SIGNALS);
         OpenSignalsMain.network.sendTo(info.player, buffer);
+        final Set<Point> set = ImmutableSet.copyOf(container.greenSignals.keySet());
+        container.greenSignals.clear();
+        updateSignals(set);
     }
 
     private void reset() {

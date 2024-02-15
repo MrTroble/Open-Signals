@@ -640,8 +640,6 @@ public class SignalBoxPathway implements IChunkLoadable {
             }
         });
         updateSignalsOnClient(redSignals);
-        resetAllTrainNumbers();
-        sendTrainNumberUpdates();
     }
 
     public void resetPathway(final @Nullable Point point) {
@@ -652,6 +650,8 @@ public class SignalBoxPathway implements IChunkLoadable {
             this.emptyOrBroken = true;
             this.isBlocked = false;
             resetOther();
+            resetAllTrainNumbers();
+            sendTrainNumberUpdates();
             if (pathwayToReset != null) {
                 pathwayToReset.loadTileAndExecute(tile -> tile.getSignalBoxGrid()
                         .resetPathway(pathwayToReset.getFirstPoint()));
