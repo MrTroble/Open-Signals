@@ -450,8 +450,7 @@ public final class SignalBoxHandler {
         try {
             final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
                     .toFile();
-            Files.createDirectories(file.toPath());
-            if (file.delete()) {
+            if (file.delete() || !Files.exists(file.toPath())) {
                 file.createNewFile();
             }
             CompressedStreamTools.write(wrapper.tag, file);
