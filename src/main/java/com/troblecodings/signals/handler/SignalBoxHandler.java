@@ -17,7 +17,6 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.ChunkLoadable;
 import com.troblecodings.signals.core.LinkedPositions;
 import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PathGetter;
@@ -34,6 +33,7 @@ import com.troblecodings.signals.signalbox.SignalBoxPathway;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
+import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.block.BlockState;
@@ -73,7 +73,8 @@ public final class SignalBoxHandler {
         if (startBox.isWorldNullOrClientSide())
             return false;
         final AtomicBoolean returnBoolean = new AtomicBoolean(true);
-        final ChunkLoadable chunkLoader = new ChunkLoadable();
+        final IChunkLoadable chunkLoader = new IChunkLoadable() {
+        };
         chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerWorld) startBox.world,
                 startBox.pos, (startTile, _u) -> {
                     final SignalBoxGrid startGrid = startTile.getSignalBoxGrid();
@@ -449,9 +450,10 @@ public final class SignalBoxHandler {
         try {
             final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
                     .toFile();
-            if (file.exists())
-                file.delete();
-            Files.createFile(file.toPath());
+            Files.createDirectories(file.toPath());
+            if (file.delete()) {
+                file.createNewFile();
+            }
             CompressedStreamTools.write(wrapper.tag, file);
         } catch (final IOException e) {
             e.printStackTrace();
@@ -466,6 +468,8 @@ public final class SignalBoxHandler {
         migrateFilesToNewDirectory(world);
         try {
             final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            if (!Files.exists(newPath))
+                return;
             final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(newPath.toFile()));
             if (wrapper.isTagNull())
                 return;

@@ -68,8 +68,7 @@ public final class SignalConfig {
                 if (property.test(object)) {
                     propertiesToSet.putAll(property.state.entrySet().stream()
                             .filter(entry -> oldProperties.containsKey(entry.getKey()))
-                            .collect(Collectors.toMap(Map.Entry::getKey,
-                                    Map.Entry::getValue)));
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                 }
             });
             if (!propertiesToSet.isEmpty())
@@ -105,8 +104,7 @@ public final class SignalConfig {
             if (property.test(object)) {
                 propertiesToSet.putAll(property.state.entrySet().stream()
                         .filter(entry -> oldProperties.containsKey(entry.getKey()))
-                        .collect(Collectors.toMap(Map.Entry::getKey,
-                                Map.Entry::getValue)));
+                        .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             }
         });
         if (!propertiesToSet.isEmpty())
@@ -121,8 +119,7 @@ public final class SignalConfig {
                 values.forEach(property -> {
                     propertiesToSet.putAll(property.state.entrySet().stream()
                             .filter(entry -> oldProperties.containsKey(entry.getKey()))
-                            .collect(Collectors.toMap(Map.Entry::getKey,
-                                    Map.Entry::getValue)));
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                 });
                 if (!propertiesToSet.isEmpty())
                     SignalStateHandler.setStates(current, propertiesToSet);

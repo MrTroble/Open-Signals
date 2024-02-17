@@ -175,6 +175,17 @@ public class SignalBoxGrid implements INetworkSavable {
         clearPaths();
     }
 
+    public void resetAllSignals() {
+        this.startsToPath.values().forEach(pathway -> pathway.resetAllSignals());
+        final Map<Point, Map<ModeSet, SubsidiaryEntry>> copy = ImmutableMap
+                .copyOf(enabledSubsidiaryTypes);
+        copy.forEach((point, map) -> {
+            final Map<ModeSet, SubsidiaryEntry> entryCopy = ImmutableMap.copyOf(map);
+            entryCopy.forEach((mode, entry) -> updateSubsidiarySignal(point, mode,
+                    new SubsidiaryEntry(entry.enumValue, false)));
+        });
+    }
+
     private void clearPaths() {
         startsToPath.clear();
         endsToPath.clear();
