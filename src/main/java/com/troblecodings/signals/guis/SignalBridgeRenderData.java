@@ -5,12 +5,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.common.collect.Maps;
+import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
 import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
-
-import net.minecraft.core.Vec3i;
 
 public class SignalBridgeRenderData {
 
@@ -64,11 +63,13 @@ public class SignalBridgeRenderData {
         }
     }
 
-    public boolean checkCollision(final String name, final Vec3i signalVec, final Signal signal) {
+    public boolean checkCollision(final String name, final VectorWrapper signalVec,
+            final Signal signal) {
         final Entry<String, Signal> entry = Maps.immutableEntry(name, signal);
         final int height = signalHeights.getOrDefault(name, 0);
         for (int i = 0; i <= height; i++) {
-            final Vec3i vec = new Vec3i(signalVec.getX(), signalVec.getY() - i, signalVec.getZ());
+            final VectorWrapper vec = new VectorWrapper(signalVec.getX(), signalVec.getY() - i,
+                    signalVec.getZ());
             if (builder.hasBlockOn(vec, entry)) {
                 return true;
             }

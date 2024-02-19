@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.MessageWrapper;
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.BasicBlock;
@@ -24,7 +25,6 @@ import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Vec3i;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -147,28 +147,28 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
         return blocks;
     }
 
-    private static BlockPos calculatePosForVectorAndDirection(final Vec3i blockVec,
+    private static BlockPos calculatePosForVectorAndDirection(final VectorWrapper blockVec,
             final Direction direction, final BlockPos startPos) {
-        Vec3i vec = new Vec3i(blockVec.getX(), blockVec.getY(), blockVec.getZ());
+        VectorWrapper vec = new VectorWrapper(blockVec.getX(), blockVec.getY(), blockVec.getZ());
         switch (direction) {
             case NORTH: {
                 break;
             }
             case SOUTH: {
-                vec = new Vec3i(-vec.getX(), vec.getY(), -vec.getZ());
+                vec = new VectorWrapper(-vec.getX(), vec.getY(), -vec.getZ());
                 break;
             }
             case EAST: {
-                vec = new Vec3i(-vec.getZ(), vec.getY(), vec.getX());
+                vec = new VectorWrapper(-vec.getZ(), vec.getY(), vec.getX());
                 break;
             }
             case WEST: {
-                vec = new Vec3i(vec.getZ(), vec.getY(), -vec.getX());
+                vec = new VectorWrapper(vec.getZ(), vec.getY(), -vec.getX());
                 break;
             }
             default:
                 break;
         }
-        return startPos.offset(vec);
+        return vec.addToPos(startPos);
     }
 }
