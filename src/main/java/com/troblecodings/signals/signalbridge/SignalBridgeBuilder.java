@@ -13,17 +13,16 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRenderInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.Vector3iHelper;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.util.registry.Registry;
 import net.minecraftforge.client.model.data.EmptyModelData;
 
@@ -39,11 +38,11 @@ public class SignalBridgeBuilder {
     public static final String VECTOR_Z = "vectorZ";
     public static final String START_POINT = "startPoint";
     public static final String CUSTOMNAME = "signalCustomName";
-    private static final Vector3i RENDER_START = new Vector3i(15, 15, 0);
+    private static final VectorWrapper RENDER_START = new VectorWrapper(15, 15, 0);
 
     private final Map<Point, SignalBridgeBasicBlock> pointForBlocks = new HashMap<>();
-    private final Map<Entry<String, Signal>, Vector3i> vecForSignal = new HashMap<>();
-    private List<Map.Entry<Vector3i, BasicBlock>> relativesToStart = ImmutableList.of();
+    private final Map<Entry<String, Signal>, VectorWrapper> vecForSignal = new HashMap<>();
+    private List<Entry<VectorWrapper, BasicBlock>> relativesToStart = ImmutableList.of();
     private Function<String, ModelInfoWrapper> function = (_u) -> EMPTY_WRAPPER;
     private Point startPoint = new Point(13, 13);
 
@@ -68,7 +67,8 @@ public class SignalBridgeBuilder {
         this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 
-    public Vector3i addSignal(final Vector3i vec, final Signal signal, final String name) {
+    public VectorWrapper addSignal(final VectorWrapper vec, final Signal signal,
+            final String name) {
         final Entry<String, Signal> entry = Maps.immutableEntry(name, signal);
         if (vecForSignal.containsKey(entry))
             return vecForSignal.get(entry);
@@ -77,7 +77,7 @@ public class SignalBridgeBuilder {
         return vec;
     }
 
-    public void setNewSignalPos(final Signal signal, final String name, final Vector3i vec) {
+    public void setNewSignalPos(final Signal signal, final String name, final VectorWrapper vec) {
         final Entry<String, Signal> entry = Maps.immutableEntry(name, signal);
         vecForSignal.put(entry, vec);
     }
@@ -91,15 +91,15 @@ public class SignalBridgeBuilder {
         return pointForBlocks.get(point);
     }
 
-    public Vector3i getVecForSignal(final Entry<String, Signal> entry) {
+    public VectorWrapper getVecForSignal(final Entry<String, Signal> entry) {
         return vecForSignal.get(entry);
     }
 
-    public boolean hasBlockOn(final Vector3i vec, final Entry<String, Signal> entry) {
+    public boolean hasBlockOn(final VectorWrapper vec, final Entry<String, Signal> entry) {
         final boolean isCollidingWithBlock = vec.getZ() == 0
                 ? pointForBlocks.containsKey(new Point(vec.getX(), vec.getY()))
                 : false;
-        final Vector3i signalVec = vecForSignal.get(entry);
+        final VectorWrapper signalVec = vecForSignal.get(entry);
         return isCollidingWithBlock || (!vec.equals(signalVec) && vecForSignal.containsValue(vec));
     }
 
@@ -116,53 +116,51 @@ public class SignalBridgeBuilder {
         this.function = function;
     }
 
-    private List<Entry<Vector3i, BasicBlock>> calculateRelativesToPoint(final Point startPoint) {
+    private List<Entry<VectorWrapper, BasicBlock>> calculateRelativesToPoint(
+            final Point startPoint) {
         if (startPoint == null) {
             return new ArrayList<>();
         }
-        final Builder<Map.Entry<Vector3i, BasicBlock>> builder = ImmutableList.builder();
-        final Vector3i startVec = new Vector3i(startPoint.getX(), startPoint.getY(), 0);
+        final Builder<Map.Entry<VectorWrapper, BasicBlock>> builder = ImmutableList.builder();
+        final VectorWrapper startVec = new VectorWrapper(startPoint.getX(), startPoint.getY(), 0);
         pointForBlocks.forEach((point, block) -> {
-            final Vector3i vector = new Vector3i(point.getX(), point.getY(), 0);
-
-            builder.add(Maps.immutableEntry(Vector3iHelper.subtract(startVec, vector), block));
+            final VectorWrapper vector = new VectorWrapper(point.getX(), point.getY(), 0);
+            builder.add(Maps.immutableEntry(startVec.subtract(vector), block));
         });
-        vecForSignal.forEach((entry, vec) -> builder.add(
-                Maps.immutableEntry(Vector3iHelper.subtract(startVec, vec), entry.getValue())));
+        vecForSignal.forEach((entry, vec) -> builder
+                .add(Maps.immutableEntry(startVec.subtract(vec), entry.getValue())));
         return builder.build();
     }
 
-    public Map<Entry<String, Signal>, Vector3i> getAllSignalsInRelativeToStart() {
+    public Map<Entry<String, Signal>, VectorWrapper> getAllSignalsInRelativeToStart() {
         if (startPoint == null) {
             return new HashMap<>();
         }
-        final Vector3i startVec = new Vector3i(startPoint.getX(), startPoint.getY(), 0);
-        final Map<Entry<String, Signal>, Vector3i> map = new HashMap<>();
-        vecForSignal
-                .forEach((entry, vec) -> map.put(entry, Vector3iHelper.subtract(startVec, vec)));
+        final VectorWrapper startVec = new VectorWrapper(startPoint.getX(), startPoint.getY(), 0);
+        final Map<Entry<String, Signal>, VectorWrapper> map = new HashMap<>();
+        vecForSignal.forEach((entry, vec) -> map.put(entry, startVec.subtract(vec)));
         return map;
     }
 
     public List<UIBlockRenderInfo> getRenderPosAndBlocks() {
         final Builder<UIBlockRenderInfo> builder = ImmutableList.builder();
         pointForBlocks.forEach((point, block) -> {
-            final Vector3i vector = new Vector3i(point.getX(), point.getY(), 0);
+            final VectorWrapper vector = new VectorWrapper(point.getX(), point.getY(), 0);
             builder.add(new UIBlockRenderInfo(block.defaultBlockState(), EMPTY_WRAPPER,
-                    Vector3iHelper.subtract(RENDER_START, vector)));
+                    RENDER_START.subtract(vector)));
         });
-        vecForSignal.forEach((entry,
-                vec) -> builder.add(new UIBlockRenderInfo(entry.getValue().defaultBlockState(),
-                        function.apply(entry.getKey()),
-                        Vector3iHelper.subtract(RENDER_START, vec))));
+        vecForSignal.forEach((entry, vec) -> builder
+                .add(new UIBlockRenderInfo(entry.getValue().defaultBlockState(),
+                        function.apply(entry.getKey()), RENDER_START.subtract(vec))));
         return builder.build();
 
     }
 
-    public List<Entry<Vector3i, BasicBlock>> getRelativesToStart() {
+    public List<Entry<VectorWrapper, BasicBlock>> getRelativesToStart() {
         return relativesToStart;
     }
 
-    public Map<Entry<String, Signal>, Vector3i> getAllSignals() {
+    public Map<Entry<String, Signal>, VectorWrapper> getAllSignals() {
         return ImmutableMap.copyOf(vecForSignal);
     }
 
@@ -177,9 +175,7 @@ public class SignalBridgeBuilder {
         final List<NBTWrapper> signalList = new ArrayList<>();
         vecForSignal.forEach((entry, vec) -> {
             final NBTWrapper tag = new NBTWrapper();
-            tag.putInteger(VECTOR_X, vec.getX());
-            tag.putInteger(VECTOR_Y, vec.getY());
-            tag.putInteger(VECTOR_Z, vec.getZ());
+            vec.writeNBT(tag);
             tag.putString(SIGNALS_ON_BRIDGE, entry.getValue().getRegistryName().getPath());
             tag.putString(CUSTOMNAME, entry.getKey());
             signalList.add(tag);
@@ -207,8 +203,7 @@ public class SignalBridgeBuilder {
                             OpenSignalsMain.MODID, tag.getString(SIGNALBRIDGE_BLOCKS))));
         });
         wrapper.getList(SIGNALS_ON_BRIDGE).forEach(tag -> {
-            final Vector3i vector = new Vector3i(tag.getInteger(VECTOR_X), tag.getInteger(VECTOR_Y),
-                    tag.getInteger(VECTOR_Z));
+            final VectorWrapper vector = VectorWrapper.of(tag);
             vecForSignal.put(Maps.immutableEntry(tag.getString(CUSTOMNAME),
                     (Signal) Registry.BLOCK.get(new ResourceLocation(OpenSignalsMain.MODID,
                             tag.getString(SIGNALS_ON_BRIDGE)))),
@@ -232,13 +227,9 @@ public class SignalBridgeBuilder {
         vecForSignal.forEach((entry, vec) -> {
             buffer.putString(entry.getKey());
             buffer.putInt(entry.getValue().getID());
-            buffer.putInt(vec.getX());
-            buffer.putInt(vec.getY());
-            buffer.putInt(vec.getZ());
+            vec.writeNetwork(buffer);
         });
-        buffer.putBoolean(startPoint != null);
-        if (startPoint != null)
-            startPoint.writeNetwork(buffer);
+        startPoint.writeNetwork(buffer);
     }
 
     public void readNetwork(final ReadBuffer buffer) {
@@ -253,10 +244,9 @@ public class SignalBridgeBuilder {
         for (int i = 0; i < signalsSize; i++) {
             vecForSignal.put(
                     Maps.immutableEntry(buffer.getString(), Signal.SIGNAL_IDS.get(buffer.getInt())),
-                    new Vector3i(buffer.getInt(), buffer.getInt(), buffer.getInt()));
+                    VectorWrapper.of(buffer));
         }
-        if (buffer.getBoolean())
-            this.startPoint = Point.of(buffer);
+        this.startPoint = Point.of(buffer);
         this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 }
