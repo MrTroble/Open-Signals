@@ -11,6 +11,7 @@ import java.util.function.IntConsumer;
 import com.google.common.collect.Maps;
 import com.mojang.math.Quaternion;
 import com.troblecodings.core.I18Wrapper;
+import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.DrawUtil.NamedEnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -53,7 +54,6 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Direction.Axis;
 import net.minecraft.core.Direction.AxisDirection;
-import net.minecraft.core.Vec3i;
 import net.minecraft.world.entity.player.Player;
 
 public class SignalBridgeGui extends GuiBase {
@@ -479,8 +479,9 @@ public class SignalBridgeGui extends GuiBase {
             inner.add(createSpacerLine(GuiElements.createButton(
                     I18Wrapper.format("btn.signalbridge.editonplane"), consumer.andThen(e -> {
                         final Point startPoint = container.builder.getStartPoint();
-                        final Vec3i vec = container.builder.addSignal(
-                                new Vec3i(startPoint.getX(), startPoint.getY(), 1), signal, name);
+                        final VectorWrapper vec = container.builder.addSignal(
+                                new VectorWrapper(startPoint.getX(), startPoint.getY(), 1), signal,
+                                name);
                         sendSignalPos(vec, signal, name);
                         updateMultiRenderer();
                         buildSystemToAddSignal(name, signal, vec);
@@ -550,7 +551,7 @@ public class SignalBridgeGui extends GuiBase {
     private final Map<String, UIEntity> nameForButton = new HashMap<>();
 
     private void buildSystemToAddSignal(final String name, final Signal signal,
-            final Vec3i startVec) {
+            final VectorWrapper startVec) {
         nameForButton.clear();
         addUISelection(name);
         final Entry<String, Signal> entry = Maps.immutableEntry(name, signal);
@@ -569,23 +570,9 @@ public class SignalBridgeGui extends GuiBase {
                 final String buttonName = axis.getName()
                         + (axisDirection == AxisDirection.POSITIVE ? "+" : "-");
                 final UIEntity button = GuiElements.createButton(buttonName, e -> {
-                    Vec3i vector = container.builder.getVecForSignal(entry);
                     final int step = axisDirection == AxisDirection.POSITIVE ? -1 : 1;
-                    switch (axis) {
-                        case X: {
-                            vector = new Vec3i(vector.getX() + step, vector.getY(), vector.getZ());
-                            break;
-                        }
-                        case Y: {
-                            vector = new Vec3i(vector.getX(), vector.getY() + step, vector.getZ());
-                            break;
-                        }
-                        case Z: {
-                            vector = new Vec3i(vector.getX(), vector.getY(), vector.getZ() + step);
-                        }
-                        default:
-                            break;
-                    }
+                    final VectorWrapper vector = container.builder.getVecForSignal(entry)
+                            .addOnAxis(axis, step);
                     checkCollision(name, vector, signal);
                     container.builder.setNewSignalPos(signal, name, vector);
                     updateMultiRenderer();
@@ -601,7 +588,7 @@ public class SignalBridgeGui extends GuiBase {
         this.entity.update();
     }
 
-    private void checkCollision(final String signalName, final Vec3i signalVec,
+    private void checkCollision(final String signalName, final VectorWrapper signalVec,
             final Signal signal) {
         if (!renderData.checkCollision(signalName, signalVec, signal)) {
             entity.remove(COLLISION_TOOLTIP);
@@ -617,7 +604,7 @@ public class SignalBridgeGui extends GuiBase {
         entity.remove(COLLISION_TOOLTIP);
     }
 
-    private void checkMaxAndMins(final Vec3i vector) {
+    private void checkMaxAndMins(final VectorWrapper vector) {
         for (final Axis axis : Axis.values()) {
             for (final AxisDirection axisDirection : AxisDirection.values()) {
                 final String buttonName = axis.getName()
@@ -918,14 +905,12 @@ public class SignalBridgeGui extends GuiBase {
         OpenSignalsMain.network.sendTo(player, buffer);
     }
 
-    private void sendSignalPos(final Vec3i vec, final Signal signal, final String name) {
+    private void sendSignalPos(final VectorWrapper vec, final Signal signal, final String name) {
         if (!loaded)
             return;
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBridgeNetwork.SET_SIGNAL);
-        buffer.putInt(vec.getX());
-        buffer.putInt(vec.getY());
-        buffer.putInt(vec.getZ());
+        vec.writeNetwork(buffer);
         buffer.putInt(signal.getID());
         buffer.putString(name);
         OpenSignalsMain.network.sendTo(player, buffer);

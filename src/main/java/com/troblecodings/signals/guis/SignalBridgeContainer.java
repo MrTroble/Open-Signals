@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
+import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.GuiInfo;
@@ -19,8 +20,6 @@ import com.troblecodings.signals.enums.SignalBridgeNetwork;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
-
-import net.minecraft.core.Vec3i;
 
 public class SignalBridgeContainer extends ContainerBase {
 
@@ -104,7 +103,7 @@ public class SignalBridgeContainer extends ContainerBase {
                 break;
             }
             case SET_SIGNAL: {
-                final Vec3i vec = new Vec3i(buf.getInt(), buf.getInt(), buf.getInt());
+                final VectorWrapper vec = VectorWrapper.of(buf);
                 builder.setNewSignalPos(Signal.SIGNAL_IDS.get(buf.getInt()), buf.getString(), vec);
                 break;
             }
