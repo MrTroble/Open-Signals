@@ -2,7 +2,7 @@
     "systemProperties": {
         "placementToolName": "placementtool",
         "canLink": true,
-        "defaultHeight": 4,
+        "defaultHeight": 3,
         "customNameRenderHeight": 0.275,
         "offsetY": -67,
         "colors": [
@@ -10,71 +10,68 @@
             16761344
         ],
         "renderHeights": {
-            "!(config(HPTYPE.STOPSIGNAL) || config(HPTYPE.HPHOME) || config(HPTYPE.HPBLOCK)) ": -1
+            "config(KOMBITYPE.DISTANT)": -1
         },
         "isBridgeSignal": true
     },
     "seProperties": [
         {
-            "name": "hptype",
-            "enumClass": "HPType",
+            "name": "kombitype",
+            "enumClass": "KSType",
             "defaultState": "OFF",
             "changeableStage": "GUISTAGE"
         },
         {
-            "name": "stopsignal",
-            "enumClass": "HP",
+            "name": "kombisignal",
+            "enumClass": "KS",
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "config(HPTYPE.STOPSIGNAL)"
+            "dependencies": "config(KOMBITYPE.KS_STOPSIGNAL)"
         },
         {
-            "name": "hphome",
-            "enumClass": "HPHome",
+            "name": "kombisignal_main",
+            "enumClass": "KSMain",
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "config(HPTYPE.HPHOME)"
+            "dependencies": "config(KOMBITYPE.KS_MAIN)"
         },
         {
-            "name": "hpblock",
-            "enumClass": "HPBlock",
+            "name": "kombisignal_distant",
+            "enumClass": "KSDistant",
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "config(HPTYPE.HPBLOCK)"
-        },
-        {
-            "name": "identifier",
-            "defaultState": false,
-            "autoname": true,
-            "changeableStage": "APISTAGE"
-        },
-        {
-            "name": "distantsignal",
-            "enumClass": "VR",
-            "defaultState": "OFF",
-            "autoname": true,
-            "changeableStage": "APISTAGE"
-        },
-        {
-            "name": "vrlight",
-            "defaultState": false,
-            "autoname": true,
-            "changeableStage": "APISTAGE"
-        },
-        {
-            "name": "ne2",
-            "defaultState": false,
-            "autoname": true,
-            "changeableStage": "GUISTAGE"
+            "dependencies": "config(KOMBITYPE.DISTANT)"
         },
         {
             "name": "mastsign",
             "enumClass": "MastSignal",
             "defaultState": "OFF",
             "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "mastsigndistant",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "ne2",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs2",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs2v",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
         },
         {
             "name": "zs3",
@@ -86,16 +83,6 @@
             "name": "zs3v",
             "enumClass": "ZS32",
             "defaultState": "OFF",
-            "autoname": true
-        },
-        {
-            "name": "zs1",
-            "defaultState": false,
-            "autoname": true
-        },
-        {
-            "name": "zs7",
-            "defaultState": false,
             "autoname": true
         },
         {

@@ -29,6 +29,14 @@
 			],
 			"y": 1
 		},
+		"hv/hv_ne2": {
+			"textures": [
+				{
+					"blockstate": "hasandis(ne2)"
+				}
+			],
+			"y": 2.5
+		},
 		"hv/hv_zs1": {
 			"textures": [
 				{
