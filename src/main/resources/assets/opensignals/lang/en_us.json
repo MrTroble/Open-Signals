@@ -587,14 +587,15 @@
 	"gui.signalbridge.plusbutton.desc": "",
 	"gui.return": "Return",
 	"property.value.CANTILEVER_END": "Cantilever End",
-	"btn.gui.editsignal": "Edit",
+	"btn.gui.editsignal": "Edit Signal",
 	"btn.remove": "Remove",
-	"btn.signalbridge.editonplane": "Add",
+	"btn.signalbridge.editonplane": "Add / Edit",
 	"gui.signalbridge.create": "Create",
 	"btn.signalbridge.rename": "Rename",
 	"gui.signalbridge.signals": "Signal",
 	"gui.signalbridge.name": "Signal Name",
 	"gui.signalbridge.rename": "Rename",
+	"gui.signalbridge,info": "",
 	"property.Signal.name": "Signal",
 	"gui.signalbridge.namenotvalid": "Name not valid!",
 	"gui.trainnumber.setpoint": "Select point",
@@ -612,5 +613,7 @@
 	"tile.hvsignalbridge.name": "HV - Main/Distant bridge signal",
 	"block.opensignals.hvsignalbridge": "HV - Main/Distant bridge signal",
 	"tile.kssignalbridge.name": "KS bridge signal",
-	"block.opensignals.kssignalbridge": "KS bridge signal"
+	"block.opensignals.kssignalbridge": "KS bridge signal",
+	"tile.hlsignalbridge.name": "KS bridge signal",
+	"block.opensignals.hlsignalbridge": "KS bridge signal"
 }

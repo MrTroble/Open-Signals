@@ -9,6 +9,53 @@
         "lamp_white_blink": "opensignals:blocks/lamps/lamp_white_blink"
     },
     "models": {
+        "hl/hl_ne2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2) && has(MAINLIGHTSIGNAL_DISTANT)"
+                }
+            ],
+            "y": -0.1875,
+            "z": 0.4375
+        },
+        "hl/hl_ne2_4": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2_4) && has(MAINLIGHTSIGNAL_DISTANT)"
+                }
+            ],
+            "y": -0.0625,
+            "z": 0.4375
+        },
+        "hl/hl_ne2_2": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(NE2) && hasandis(NE2_2) && has(MAINLIGHTSIGNAL_DISTANT)"
+                }
+            ],
+            "y": 0.8125,
+            "z": 0.375
+        },
+        "hl/hl_sign_distant": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(MASTSIGNDISTANT)"
+                }
+            ],
+            "y": 0,
+            "x": 0.4,
+            "z": 0.5625
+        },
+        "hl/hl_number": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(CUSTOMNAME) && !with(HLTYPE.DISTANT)"
+                }
+            ],
+            "y": 0.125,
+            "x": -0.5,
+            "z": 0.5625
+        },
         "hl/hl_shield2": {
             "textures": [
                 {
@@ -26,9 +73,11 @@
                         "lamp_yellownorth": "lamp_yellow"
                     }
                 }
-            ]
+            ],
+            "y": 0.0,
+            "z": 0.625
         },
-        "hl/hl_block1": {
+        "hl/bridge_hl_block1": {
             "textures": [
                 {
                     "blockstate": "with(BLOCKSIGNAL.OFF) && (with(HLTYPE.BLOCK) || !has(HLTYPE))"
@@ -71,9 +120,10 @@
                     }
                 }
             ],
-            "y": 1
+            "y": 1,
+            "z": 0.5625
         },
-        "hl/hl_block2": {
+        "hl/bridge_hl_block2": {
             "textures": [
                 {
                     "blockstate": "with(BLOCKEXITSIGNAL.OFF) && (with(HLTYPE.BLOCK_EXIT) || !has(HLTYPE))"
@@ -112,9 +162,10 @@
                     }
                 }
             ],
-            "y": 1
+            "y": 1,
+            "z": 0.5625
         },
-        "hl/hl_main": {
+        "hl/bridge_hl_main": {
             "textures": [
                 {
                     "blockstate": "with(EXITSIGNAL.OFF) && (with(HLTYPE.EXIT) || !has(HLTYPE))"
@@ -166,9 +217,10 @@
                     }
                 }
             ],
-            "y": 1
+            "y": 1,
+            "z": 0.5625
         },
-        "hl/hl_shield_dist": {
+        "hl/bridge_hl_shield_dist": {
             "textures": [
                 {
                     "blockstate": "with(MAINLIGHTSIGNAL_DISTANT.OFF) && (with(HLTYPE.DISTANT) || !has(HLTYPE))"
@@ -204,9 +256,10 @@
                     }
                 }
             ],
-            "y": 1
+            "y": 1,
+            "z": 0.5625
         },
-        "hl/hl_shield1": {
+        "hl/bridge_hl_shield1": {
             "textures": [
                 {
                     "blockstate": "with(MAINLIGHTSIGNAL.OFF) && (with(HLTYPE.HL_MAIN) || !has(HLTYPE))"
@@ -297,7 +350,95 @@
                     }
                 }
             ],
-            "y": 1
+            "y": 1,
+            "z": 0.5625
+        },
+        "hl/hl_sign_main": {
+            "textures": [
+                {
+                    "blockstate": "",
+                    "extentions": {
+                        "mastsigns.json": {
+                            "mastsign": "9"
+                        }
+                    }
+                }
+            ],
+            "y": 1,
+            "x": 0.4,
+            "z": 0.5625
+        },
+        "hl/hl_zs2": {
+            "textures": [
+                {
+                    "blockstate": "",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 0,
+            "x": 1,
+            "z": 0.6875
+        },
+        "hl/hl_zs2v": {
+            "textures": [
+                {
+                    "blockstate": "",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 0,
+            "x": -1,
+            "z": 0.6875
+        },
+        "zs/zs3": {
+            "textures": [
+                {
+                    "loadOFFstate": false,
+                    "blockstate": "",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS3PLATE": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 0.5625,
+            "x": 1,
+            "z": 0.6875
+        },
+        "zs/zs3v": {
+            "textures": [
+                {
+                    "loadOFFstate": false,
+                    "blockstate": "",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS3VPLATE": "overlay"
+                        }
+                    }
+                }
+            ],
+            "y": 0.5625,
+            "x": -1,
+            "z": 0.625
+        },
+        "zs/zs12": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(ZS12)"
+                }
+            ],
+            "y": 1.3125,
+            "x": -0.5,
+            "z": 0.5625
         }
     }
 }
