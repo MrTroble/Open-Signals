@@ -614,8 +614,8 @@
 	"block.opensignals.hvsignalbridge": "HV - Main/Distant bridge signal",
 	"tile.kssignalbridge.name": "KS bridge signal",
 	"block.opensignals.kssignalbridge": "KS bridge signal",
-	"tile.hlsignalbridge.name": "KS bridge signal",
-	"block.opensignals.hlsignalbridge": "KS bridge signal",
+	"tile.hlsignalbridge.name": "HL bridge signal",
+	"block.opensignals.hlsignalbridge": "HL bridge signal",
 	"tile.semaphoresignalbridge.name": "HV Semaphore bridge signal",
 	"block.opensignals.semaphoresignalbridge": "HV Semaphore bridge signal"
 }
