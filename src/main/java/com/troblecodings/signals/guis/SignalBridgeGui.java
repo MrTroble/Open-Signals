@@ -342,7 +342,9 @@ public class SignalBridgeGui extends GuiBase {
                 final Map<String, UIEntity> nameToUIEntity = new HashMap<>();
                 for (int i = 0; i < availableSignals.count(); i++) {
                     final int index = i;
-                    final String name = availableSignals.getNamedObj(i);
+                    final Signal signal = availableSignals.getObjFromID(index);
+                    final String name = availableSignals.getLocalizedName() + ": "
+                            + I18Wrapper.format(signal.toString());
                     final UIEntity button = GuiElements.createButton(name, e2 -> {
                         final UIEntity nameEntity = new UIEntity();
                         nameEntity.setInherits(true);
@@ -376,7 +378,6 @@ public class SignalBridgeGui extends GuiBase {
                                         return;
                                     }
                                     pop();
-                                    final Signal signal = availableSignals.getObjFromID(index);
                                     container.allSignals.put(signalName,
                                             Maps.immutableEntry(signal, new HashMap<>()));
                                     buildSignalPropertiesSelection(signal, signalName);
