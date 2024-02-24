@@ -26,10 +26,12 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     private BlockPos linkedSignalBox;
     private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(-1, -1),
             new Point(-1, -1));
+    private boolean addPWToSaver = true;
 
     private static final String LINKED_SIGNALBOX = "linkedSignalBox";
     private static final String START_POINT = "startPoint";
     private static final String END_POINT = "endPoint";
+    private static final String ADD_TO_PW_SAVER = "addToPWSaver";
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
@@ -39,6 +41,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         final Point end = new Point();
         end.read(wrapper.getWrapper(END_POINT));
         pathway = Maps.immutableEntry(start, end);
+        addPWToSaver = wrapper.getBoolean(ADD_TO_PW_SAVER);
     }
 
     @Override
@@ -51,6 +54,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         pathway.getValue().write(endPoint);
         wrapper.putWrapper(START_POINT, startPoint);
         wrapper.putWrapper(END_POINT, endPoint);
+        wrapper.putBoolean(ADD_TO_PW_SAVER, addPWToSaver);
     }
 
     public void requestPathway() {
@@ -61,12 +65,16 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
                 SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
                         pathway.getValue());
             } else {
-                if (!grid.requestWay(pathway.getKey(), pathway.getValue())) {
+                if (!grid.requestWay(pathway.getKey(), pathway.getValue()) && addPWToSaver) {
                     grid.addNextPathway(pathway.getKey(), pathway.getValue());
                 }
             }
         });
 
+    }
+
+    public void setAddPWToSaver(final boolean addPWToSaver) {
+        this.addPWToSaver = addPWToSaver;
     }
 
     public void setNextPathway(final Point start, final Point end) {
@@ -101,6 +109,10 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
 
     public Map.Entry<Point, Point> getNextPathway() {
         return pathway;
+    }
+
+    public boolean shouldPWBeAddedToSaver() {
+        return addPWToSaver;
     }
 
     @Override

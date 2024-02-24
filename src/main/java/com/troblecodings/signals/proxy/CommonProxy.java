@@ -21,12 +21,14 @@ import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.guis.NamableContainer;
 import com.troblecodings.signals.guis.PathwayRequesterContainer;
+import com.troblecodings.signals.guis.SignalBridgeContainer;
 import com.troblecodings.signals.guis.TrainNumberContainer;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.init.OSSounds;
 import com.troblecodings.signals.items.Placementtool;
+import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -51,6 +53,7 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(RedstoneIO.class, NamableContainer::new);
         OpenSignalsMain.handler.addServer(PathwayRequester.class, PathwayRequesterContainer::new);
         OpenSignalsMain.handler.addServer(TrainNumberBlock.class, TrainNumberContainer::new);
+        OpenSignalsMain.handler.addServer(SignalBridgeBasicBlock.class, SignalBridgeContainer::new);
     }
 
     public void init(final FMLInitializationEvent event) {

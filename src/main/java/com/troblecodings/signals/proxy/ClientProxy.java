@@ -12,6 +12,7 @@ import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.GuiSignalController;
 import com.troblecodings.signals.guis.NamableGui;
 import com.troblecodings.signals.guis.PathwayRequesterGui;
+import com.troblecodings.signals.guis.SignalBridgeGui;
 import com.troblecodings.signals.guis.TrainNumberGui;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.handler.ClientSignalStateHandler;
@@ -20,6 +21,7 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSModels;
 import com.troblecodings.signals.items.Placementtool;
 import com.troblecodings.signals.models.CustomModelLoader;
+import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.tileentitys.SignalSpecialRenderer;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
@@ -42,6 +44,7 @@ public class ClientProxy extends CommonProxy {
         OpenSignalsMain.handler.addGui(Signal.class, NamableGui::new);
         OpenSignalsMain.handler.addGui(PathwayRequester.class, PathwayRequesterGui::new);
         OpenSignalsMain.handler.addGui(TrainNumberBlock.class, TrainNumberGui::new);
+        OpenSignalsMain.handler.addGui(SignalBridgeBasicBlock.class, SignalBridgeGui::new);
 
         ModelLoaderRegistry.registerLoader(CustomModelLoader.INSTANCE);
         ClientRegistry.bindTileEntitySpecialRenderer(SignalTileEntity.class,

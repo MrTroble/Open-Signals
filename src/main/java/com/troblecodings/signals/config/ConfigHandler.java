@@ -25,6 +25,10 @@ public final class ConfigHandler {
     })
     public static int lightEmission = 1;
 
+    @Name("enable signalbridge items")
+    @Comment("Enable Items to place the signalbridge parts by hand. Default: false")
+    public static boolean enableSignalBridgeItems = false;
+
     @Name("Signalbox background color")
     @Comment("Change the background color of the signalbox gui. Default: -7631989")
     public static int signalboxBackgroundColor = 0xFF8B8B8B;
