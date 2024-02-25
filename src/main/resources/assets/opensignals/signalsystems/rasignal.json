@@ -8,6 +8,12 @@
             "config(RATYPE.RA11A)": 3,
             "config(RATYPE.RA11B)": 3,
             "config(RATYPE.RA6_9)": 4
+        },
+        "customNameRenderHeight": 2.775,
+        "offsetY": -2,
+        "renderHeights": {
+            "config(RATYPE.RA10) || config(RATYPE.RA12)": -1,
+            "config(RATYPE.RA11_DWARF)": 1.35
         }
     },
     "seProperties": [
