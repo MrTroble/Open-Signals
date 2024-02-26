@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
@@ -37,7 +38,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -290,17 +290,11 @@ public final class NameHandler implements INetworkSync {
         unloadNames(states);
     }
 
-    @SubscribeEvent
-    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
-        final Player player = event.getPlayer();
-        Map<StateInfo, String> map;
-        synchronized (ALL_NAMES) {
-            map = ImmutableMap.copyOf(ALL_NAMES);
-        }
-        map.forEach((state, name) -> sendTo(player, packToBuffer(state.pos, name)));
+    public static void loadName(final StateInfo info) {
+        loadNames(ImmutableList.of(info), null);
     }
 
-    private static void loadNames(final List<StateInfo> infos, final @Nullable Player player) {
+    public static void loadNames(final List<StateInfo> infos, final @Nullable Player player) {
         if (infos == null || infos.isEmpty())
             return;
         new Thread(() -> {
@@ -348,7 +342,11 @@ public final class NameHandler implements INetworkSync {
         }, "OSNameHandler:loadNames").start();
     }
 
-    private static void unloadNames(final List<StateInfo> infos) {
+    public static void unloadName(final StateInfo info) {
+        unloadNames(ImmutableList.of(info));
+    }
+
+    public static void unloadNames(final List<StateInfo> infos) {
         if (infos == null || infos.isEmpty() || writeService == null)
             return;
         writeService.execute(() -> {
