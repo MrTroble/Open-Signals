@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
@@ -40,7 +41,6 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -265,18 +265,11 @@ public final class NameHandler implements INetworkSync {
         unloadNames(states);
     }
 
-    @SubscribeEvent
-    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
-        final EntityPlayer player = event.player;
-        final Map<StateInfo, String> names;
-        synchronized (ALL_NAMES) {
-            names = ImmutableMap.copyOf(ALL_NAMES);
-        }
-        names.forEach((info, name) -> sendTo(player, packToBuffer(info.pos, name)));
+    public static void loadName(final StateInfo info) {
+        loadNames(ImmutableList.of(info), null);
     }
 
-    private static void loadNames(final List<StateInfo> infos,
-            final @Nullable EntityPlayer player) {
+    public static void loadNames(final List<StateInfo> infos, final @Nullable EntityPlayer player) {
         if (infos == null || infos.isEmpty())
             return;
         new Thread(() -> {
@@ -320,7 +313,11 @@ public final class NameHandler implements INetworkSync {
 
     }
 
-    private static void unloadNames(final List<StateInfo> infos) {
+    public static void unloadName(final StateInfo info) {
+        unloadNames(ImmutableList.of(info));
+    }
+
+    public static void unloadNames(final List<StateInfo> infos) {
         if (infos == null || infos.isEmpty() || writeService.isShutdown())
             return;
         writeService.execute(() -> {
