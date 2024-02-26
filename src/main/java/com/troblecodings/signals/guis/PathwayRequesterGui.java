@@ -72,7 +72,6 @@ public class PathwayRequesterGui extends GuiBase {
         final UIEntity checkbox = GuiElements.createBoolElement(
                 BoolIntegerables.of(I18Wrapper.format("gui.pwr.addtosave")),
                 i -> updateAddToSaverOnServer(i), container.addToPWToSavedPW);
-        checkbox.add(new UIToolTip("gui.pwr.addtosave.desc"));
         higherEntity.add(checkbox);
 
         final UIEntity middleEntity = new UIEntity();
