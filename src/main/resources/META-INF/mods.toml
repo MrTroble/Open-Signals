@@ -8,8 +8,8 @@ modId="opensignals"
 version="${file.jarVersion}"
 displayName="Open Signals"
 displayURL="https://troblecodings.com/"
-authors="MrTroble, Jeronimo, Uhotown"
-description="This mod adds a lot of German railway signals. You are able to controlle with a manuell interface or redstone!"
+authors="MrTroble, Jeronimo, Uhutown"
+description="This mod adds a lot of German railway signals. You are able to controlle them via a manuell interface, redstone or our own signal box! You can also add your own signals via a contentpack. Please read the wiki."
 
 [[dependencies.opensignals]]
     modId="forge" 

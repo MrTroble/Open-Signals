@@ -23,6 +23,7 @@ public final class ConfigHandler {
     public static class General {
 
         public final ConfigValue<Integer> lightEmission;
+        public final ConfigValue<Boolean> enableSignalBridgeItems;
 
         public General(final ForgeConfigSpec.Builder builder) {
             String desc;
@@ -32,6 +33,10 @@ public final class ConfigHandler {
                     + " When you change the value, the signal block lights "
                     + "up and illuminates the environment. Default: 1";
             lightEmission = builder.comment(desc).defineInRange("Signal light emission", 1, 0, 15);
+
+            desc = "Enable Items to place the signalbridge parts by hand. Default: false";
+            enableSignalBridgeItems = builder.comment(desc).define("enable signalbridge items",
+                    false);
 
             builder.pop();
         }

@@ -37,7 +37,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.IChunk;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -131,13 +130,10 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static ByteBuffer packToBuffer(final BlockPos pos, final String name) {
-        final byte[] bytes = name.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(pos);
-        buffer.putByte((byte) bytes.length);
-        for (final byte b : bytes) {
-            buffer.putByte(b);
-        }
+        buffer.putBoolean(false);
+        buffer.putString(name);
         return buffer.build();
     }
 
@@ -158,7 +154,7 @@ public final class NameHandler implements INetworkSync {
     private static void sendRemoved(final StateInfo info) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
-        buffer.putByte((byte) 255);
+        buffer.putBoolean(true);
         info.world.players().forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
@@ -283,16 +279,6 @@ public final class NameHandler implements INetworkSync {
         unloadNames(states);
     }
 
-    @SubscribeEvent
-    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
-        final PlayerEntity player = event.getPlayer();
-        Map<StateInfo, String> map;
-        synchronized (ALL_NAMES) {
-            map = ImmutableMap.copyOf(ALL_NAMES);
-        }
-        map.forEach((state, name) -> sendTo(player, packToBuffer(state.pos, name)));
-    }
-
     private static void loadNames(final List<StateInfo> infos,
             final @Nullable PlayerEntity player) {
         if (infos == null || infos.isEmpty())
@@ -353,6 +339,8 @@ public final class NameHandler implements INetworkSync {
                     synchronized (ALL_NAMES) {
                         name = ALL_NAMES.remove(info);
                     }
+                    if (name == null)
+                        return;
                     createToFile(info, name);
                 }
             });
