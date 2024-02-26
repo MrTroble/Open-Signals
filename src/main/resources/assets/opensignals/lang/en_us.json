@@ -617,5 +617,11 @@
 	"tile.hlsignalbridge.name": "HL bridge signal",
 	"block.opensignals.hlsignalbridge": "HL bridge signal",
 	"tile.semaphoresignalbridge.name": "HV Semaphore bridge signal",
-	"block.opensignals.semaphoresignalbridge": "HV Semaphore bridge signal"
+	"block.opensignals.semaphoresignalbridge": "HV Semaphore bridge signal",
+	"gui.pwr.newpath": "New path",
+	"gui.pwr.newpath.desc": "",
+	"property.gui.pwr.addtosave.name": "Path saving",
+	"property.gui.pwr.addtosave.desc": "",
+	"gui.pwr.newpath.set": "Select...",
+	"gui.saved": "Saved"
 }
