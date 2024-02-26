@@ -12,6 +12,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -82,11 +83,12 @@ public class LinkedPositions {
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
             SignalConfig.reset(new ResetInfo(info, false));
-            signalsToUnload.add(new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, tilePos))));
+            signalsToUnload.add(
+                    new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, tilePos))));
         });
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
-                .forEach(entry -> SignalBoxHandler
-                        .unlinkTileFromPos(new StateInfo(world, tilePos), entry.getKey()));
+                .forEach(entry -> SignalBoxHandler.unlinkTileFromPos(new StateInfo(world, tilePos),
+                        entry.getKey()));
         linkedBlocks.clear();
         signals.clear();
         SignalStateHandler.unloadSignals(signalsToUnload);
@@ -135,6 +137,10 @@ public class LinkedPositions {
                     (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
         });
         SignalStateHandler.loadSignals(signalInfos);
+        NameHandler.loadNames(
+                signalInfos.stream().map(info -> new StateInfo(info.info.world, info.info.pos))
+                        .collect(Collectors.toList()),
+                null);
     }
 
     public void unloadSignals(final World world) {
@@ -145,6 +151,9 @@ public class LinkedPositions {
                 .add(new StateLoadHolder(new SignalStateInfo(world, pos, signal),
                         new LoadHolder<>(new StateInfo(world, thisPos)))));
         SignalStateHandler.unloadSignals(signalInfos);
+        NameHandler.unloadNames(
+                signalInfos.stream().map(info -> new StateInfo(info.info.world, info.info.pos))
+                        .collect(Collectors.toList()));
     }
 
     private void loadPossibleSubsidiaires(final SignalStateInfo info,
