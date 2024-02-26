@@ -12,7 +12,6 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.enums.LinkType;
-import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -138,10 +137,6 @@ public class LinkedPositions {
                     (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
         });
         SignalStateHandler.loadSignals(signalInfos);
-        NameHandler.loadNames(
-                signalInfos.stream().map(info -> new StateInfo(info.info.world, info.info.pos))
-                        .collect(Collectors.toList()),
-                null);
     }
 
     public void unloadSignals(final Level world) {
@@ -152,9 +147,6 @@ public class LinkedPositions {
                 .add(new StateLoadHolder(new SignalStateInfo(world, pos, signal),
                         new LoadHolder<>(new StateInfo(world, thisPos)))));
         SignalStateHandler.unloadSignals(signalInfos);
-        NameHandler.unloadNames(
-                signalInfos.stream().map(info -> new StateInfo(info.info.world, info.info.pos))
-                        .collect(Collectors.toList()));
         possibleSubsidiaries.clear();
     }
 
