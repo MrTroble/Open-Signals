@@ -364,7 +364,8 @@ public class SignalBoxGrid implements INetworkSavable {
                 final ModeSet mode = new ModeSet(subsidiaryTag);
                 states.put(mode, SubsidiaryEntry.of(subsidiaryTag));
             });
-            enabledSubsidiaryTypes.put(node.getPoint(), states);
+            if (!states.isEmpty())
+                enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
         counter = tag.getInteger(SUBSIDIARY_COUNTER);
     }
@@ -559,11 +560,11 @@ public class SignalBoxGrid implements INetworkSavable {
         final Signal signal = SignalBoxHandler
                 .getSignal(new StateInfo(tile.getWorld(), tile.getPos()), pos.get());
         if (!entry.state) {
-            if (!enabledSubsidiaryTypes.containsKey(point))
+            final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
+            if (states == null || !states.containsKey(mode))
                 return;
             SignalConfig.reset(
                     new ResetInfo(new SignalStateInfo(tile.getWorld(), pos.get(), signal), false));
-            final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
             states.remove(mode);
             if (states.isEmpty()) {
                 enabledSubsidiaryTypes.remove(point);
