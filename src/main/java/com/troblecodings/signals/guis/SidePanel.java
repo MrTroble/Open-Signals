@@ -560,6 +560,8 @@ public class SidePanel {
                             (signalName.isEmpty() ? "Rotaion: " + mode.rotation.toString()
                                     : signalName) + " - " + mode.mode.toString(),
                             new UIEntity().getBasicTextColor(), 0.8f));
+                    if (!(mode.mode == EnumGuiMode.HP || mode.mode == EnumGuiMode.RS))
+                        continue;
                     final UIEntity entity = GuiElements
                             .createButton(I18Wrapper.format("btn.subsidiary"), e -> {
                                 final UIBox hbox = new UIBox(UIBox.VBOX, 1);
