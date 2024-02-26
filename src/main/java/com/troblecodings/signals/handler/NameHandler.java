@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
@@ -280,11 +279,8 @@ public final class NameHandler implements INetworkSync {
         unloadNames(states);
     }
 
-    public static void loadName(final StateInfo info) {
-        loadNames(ImmutableList.of(info), null);
-    }
-
-    public static void loadNames(final List<StateInfo> infos, final @Nullable PlayerEntity player) {
+    private static void loadNames(final List<StateInfo> infos,
+            final @Nullable PlayerEntity player) {
         if (infos == null || infos.isEmpty())
             return;
         new Thread(() -> {
@@ -327,11 +323,7 @@ public final class NameHandler implements INetworkSync {
         }, "NameHandler:loadNames").start();
     }
 
-    public static void unloadName(final StateInfo info) {
-        unloadNames(ImmutableList.of(info));
-    }
-
-    public static void unloadNames(final List<StateInfo> infos) {
+    private static void unloadNames(final List<StateInfo> infos) {
         if (infos == null || infos.isEmpty() || writeService == null)
             return;
         writeService.execute(() -> {

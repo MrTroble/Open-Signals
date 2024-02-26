@@ -22,7 +22,6 @@ import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
-import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSItems;
@@ -239,7 +238,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
                 SignalStateHandler.loadSignal(new StateLoadHolder(info,
                         new LoadHolder<>(new StateInfo(level, worldPosition))));
                 SignalStateHandler.addListener(info, listener);
-                NameHandler.loadName(new StateInfo(level, worldPosition));
             }
         }
     }
@@ -250,7 +248,6 @@ public class SignalControllerTileEntity extends SyncableTileEntity
                     linkedSignal);
             SignalStateHandler.unloadSignal(new StateLoadHolder(info,
                     new LoadHolder<>(new StateInfo(level, worldPosition))));
-            NameHandler.unloadName(new StateInfo(level, worldPosition));
         }
     }
 
