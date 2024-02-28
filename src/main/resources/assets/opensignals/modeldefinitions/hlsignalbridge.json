@@ -101,6 +101,18 @@
                     }
                 },
                 {
+                    "blockstate": "with(BLOCKSIGNAL.HL4) && (with(HLTYPE.BLOCK) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_greennorth": "lamp_green_blink"
+                    }
+                },
+                {
+                    "blockstate": "with(BLOCKSIGNAL.HL7) && (with(HLTYPE.BLOCK) || !has(HLTYPE))",
+                    "retexture": {
+                        "lamp_yellownorth": "lamp_yellow_blink"
+                    }
+                },
+                {
                     "blockstate": "with(BLOCKSIGNAL.HL10) && (with(HLTYPE.BLOCK) || !has(HLTYPE))",
                     "retexture": {
                         "lamp_yellownorth": "lamp_yellow"
