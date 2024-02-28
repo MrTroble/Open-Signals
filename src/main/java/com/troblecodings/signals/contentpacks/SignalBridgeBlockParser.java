@@ -16,19 +16,20 @@ import com.troblecodings.signals.signalbridge.SignalBridgeBlockProperties;
 public class SignalBridgeBlockParser {
 
     private static final Gson GSON = new Gson();
-    public static final Map<SignalBridgeType, List<SignalBridgeBasicBlock>> SIGNAL_BRIDGE_BLOCKS = //
+    public static final Map<SignalBridgeType, List<SignalBridgeBasicBlock>> SIGNAL_BRIDGE_BLOCKS =
             new HashMap<>();
 
+    @SuppressWarnings("serial")
     public static void loadSignalBridgeBlocks() {
         final Type typeOfMap = new TypeToken<Map<String, SignalBridgeBlockProperties>>() {
         }.getType();
         OpenSignalsMain.contentPacks.getFiles("signalbridge").forEach(entry -> {
-            final Map<String, SignalBridgeBlockProperties> stats = GSON.fromJson(entry.getValue(),
-                    typeOfMap);
+            final Map<String, SignalBridgeBlockProperties> stats =
+                    GSON.fromJson(entry.getValue(), typeOfMap);
             stats.forEach((blockName, properties) -> {
                 final SignalBridgeType bridgeType = properties.getType();
-                final List<SignalBridgeBasicBlock> blocks = SIGNAL_BRIDGE_BLOCKS
-                        .computeIfAbsent(bridgeType, _u -> new ArrayList<>());
+                final List<SignalBridgeBasicBlock> blocks =
+                        SIGNAL_BRIDGE_BLOCKS.computeIfAbsent(bridgeType, _u -> new ArrayList<>());
                 blocks.add(bridgeType.createNewBlock(blockName, properties));
             });
         });
