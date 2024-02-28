@@ -91,6 +91,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
                     .loadSignal(new StateLoadHolder(new SignalStateInfo(level, pos, (Signal) block),
                             new LoadHolder<>(new StateInfo(level, pos))));
         }
+        setChanged();
         return SignalBoxHandler.linkPosToSignalBox(new StateInfo(level, worldPosition), pos,
                 (BasicBlock) block, type);
     }
@@ -122,6 +123,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public boolean isValid(final Player player) {
         if (clientSyncs.isEmpty())
             return false;
+        setChanged();
         return this.clientSyncs.get(0).getPlayer().equals(player);
     }
 

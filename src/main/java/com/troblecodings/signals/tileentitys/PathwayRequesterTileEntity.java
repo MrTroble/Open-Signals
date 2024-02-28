@@ -95,6 +95,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
         if (block instanceof SignalBox) {
             linkedSignalBox = pos;
+            setChanged();
             return true;
         }
         return false;

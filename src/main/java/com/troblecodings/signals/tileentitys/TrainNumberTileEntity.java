@@ -65,6 +65,7 @@ public class TrainNumberTileEntity extends SyncableTileEntity implements ILinkab
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
         if (block instanceof SignalBox) {
             linkedSignalBox = pos;
+            setChanged();
             return true;
         }
         return false;
