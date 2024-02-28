@@ -253,6 +253,7 @@ public class ContainerSignalController extends ContainerBase
             default:
                 break;
         }
+        controllerEntity.setChanged();
     }
 
     private static Direction deserializeDirection(final ReadBuffer buffer) {

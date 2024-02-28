@@ -37,6 +37,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStoppingEvent;
 import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -287,6 +288,16 @@ public final class NameHandler implements INetworkSync {
             }
         });
         unloadNames(states);
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
+        final Player player = event.getPlayer();
+        Map<StateInfo, String> map;
+        synchronized (ALL_NAMES) {
+            map = ImmutableMap.copyOf(ALL_NAMES);
+        }
+        map.forEach((state, name) -> sendTo(player, packToBuffer(state.pos, name)));
     }
 
     private static void loadNames(final List<StateInfo> infos, final @Nullable Player player) {

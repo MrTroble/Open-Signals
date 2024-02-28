@@ -103,6 +103,7 @@ public class SignalBoxGrid implements INetworkSavable {
         resetPathway(pathway);
         updateToNet(pathway);
         tryNextPathways();
+        tile.setChanged();
         return true;
     }
 
@@ -144,6 +145,7 @@ public class SignalBoxGrid implements INetworkSavable {
             this.onWayAdd(way);
             updateToNet(way);
         });
+        tile.setChanged();
         return ways.isPresent();
     }
 
@@ -218,6 +220,7 @@ public class SignalBoxGrid implements INetworkSavable {
             tryBlock(nodeCopy, update.pos);
             tryReset(nodeCopy, update.pos);
         }
+        tile.setChanged();
     }
 
     private void tryBlock(final List<SignalBoxPathway> pathways, final BlockPos pos) {
@@ -302,6 +305,7 @@ public class SignalBoxGrid implements INetworkSavable {
     public void updateTrainNumber(final Point point, final TrainNumber number) {
         final SignalBoxNode node = modeGrid.getOrDefault(point, new SignalBoxNode());
         startsToPath.values().forEach(pathway -> pathway.checkTrainNumberUpdate(number, node));
+        tile.setChanged();
     }
 
     public void removeNextPathway(final Point start, final Point end) {

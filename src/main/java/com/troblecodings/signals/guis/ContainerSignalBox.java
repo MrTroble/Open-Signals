@@ -445,6 +445,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             default:
                 break;
         }
+        tile.setChanged();
     }
 
     @SuppressWarnings("unchecked")

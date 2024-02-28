@@ -112,6 +112,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public boolean unlink() {
         SignalBoxHandler.unlinkAll(new StateInfo(level, worldPosition));
+        setChanged();
         return true;
     }
 
@@ -123,7 +124,6 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public boolean isValid(final Player player) {
         if (clientSyncs.isEmpty())
             return false;
-        setChanged();
         return this.clientSyncs.get(0).getPlayer().equals(player);
     }
 
