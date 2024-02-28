@@ -19,15 +19,15 @@
         "map(drive) && speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL2_3", "mainlightsignal_distant.HL1", "exitsignal.HL2_3", "blocksignal.HL1", "blockexitsignal.HL1"],
         "map(drive) && speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL2_3", "mainlightsignal_distant.HL1", "exitsignal.HL2_3", "blocksignal.HL1", "blockexitsignal.HL1"],
 
-        "(map(slow) && map(40_60) || map(slow) && !map(40_60) || map(drive) && map(40_60)) && (speed(<.1) || speed(>=.11))": ["mainlightsignallightbar.OFF", "mainlightsignal.HL7", "mainlightsignal_distant.HL7", "exitsignal.HL1", "blocksignal.HL1", "blockexitsignal.HL1"],
-        "(map(slow) && map(40_60) || map(slow) && !map(40_60) || map(drive) && map(40_60)) && speed(>=.1) && speed(<=.5)": ["mainlightsignallightbar.OFF", "mainlightsignal.HL8_9", "mainlightsignal_distant.HL7", "exitsignal.HL1", "blocksignal.HL1", "blockexitsignal.HL1"],
-        "(map(slow) && map(40_60) || map(slow) && !map(40_60) || map(drive) && map(40_60)) && speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL8_9", "mainlightsignal_distant.HL7", "exitsignal.HL1", "blocksignal.HL1", "blockexitsignal.HL1"],
-        "(map(slow) && map(40_60) || map(slow) && !map(40_60) || map(drive) && map(40_60)) && speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL8_9", "mainlightsignal_distant.HL7", "exitsignal.HL1", "blocksignal.HL1", "blockexitsignal.HL1"],
+        "(map(slow) && map(40_60) || map(slow) && !map(40_60) || map(drive) && map(40_60)) && (speed(<.1) || speed(>=.11))": ["mainlightsignallightbar.OFF", "mainlightsignal.HL7", "mainlightsignal_distant.HL7", "exitsignal.HL1", "blocksignal.HL4", "blockexitsignal.HL1"],
+        "(map(slow) && map(40_60) || map(slow) && !map(40_60) || map(drive) && map(40_60)) && speed(>=.1) && speed(<=.5)": ["mainlightsignallightbar.OFF", "mainlightsignal.HL8_9", "mainlightsignal_distant.HL7", "exitsignal.HL1", "blocksignal.HL4", "blockexitsignal.HL1"],
+        "(map(slow) && map(40_60) || map(slow) && !map(40_60) || map(drive) && map(40_60)) && speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL8_9", "mainlightsignal_distant.HL7", "exitsignal.HL1", "blocksignal.HL4", "blockexitsignal.HL1"],
+        "(map(slow) && map(40_60) || map(slow) && !map(40_60) || map(drive) && map(40_60)) && speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL8_9", "mainlightsignal_distant.HL7", "exitsignal.HL1", "blocksignal.HL4", "blockexitsignal.HL1"],
 
-        "map(drive) && map(100) && (speed(<.1) || speed(>=.11))": ["mainlightsignallightbar.OFF", "mainlightsignal.HL4", "mainlightsignal_distant.HL4", "exitsignal.HL1", "blocksignal.HL1", "blockexitsignal.HL1"],
-        "map(drive) && map(100) && speed(>=.1) && speed(<=.5)": ["mainlightsignallightbar.OFF", "mainlightsignal.HL5_6", "mainlightsignal_distant.HL4", "exitsignal.HL1", "blocksignal.HL1", "blockexitsignal.HL1"],
-        "map(drive) && map(100) && speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL5_6", "mainlightsignal_distant.HL4", "exitsignal.HL1", "blocksignal.HL1", "blockexitsignal.HL1"],
-        "map(drive) && map(100) && speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL5_6", "mainlightsignal_distant.HL4", "exitsignal.HL1", "blocksignal.HL1", "blockexitsignal.HL1"],
+        "map(drive) && map(100) && (speed(<.1) || speed(>=.11))": ["mainlightsignallightbar.OFF", "mainlightsignal.HL4", "mainlightsignal_distant.HL4", "exitsignal.HL1", "blocksignal.HL4", "blockexitsignal.HL1"],
+        "map(drive) && map(100) && speed(>=.1) && speed(<=.5)": ["mainlightsignallightbar.OFF", "mainlightsignal.HL5_6", "mainlightsignal_distant.HL4", "exitsignal.HL1", "blocksignal.HL4", "blockexitsignal.HL1"],
+        "map(drive) && map(100) && speed(>=.6) && speed(<=.9)": ["mainlightsignallightbar.YELLOW", "mainlightsignal.HL5_6", "mainlightsignal_distant.HL4", "exitsignal.HL1", "blocksignal.HL4", "blockexitsignal.HL1"],
+        "map(drive) && map(100) && speed(==.10)": ["mainlightsignallightbar.GREEN", "mainlightsignal.HL5_6", "mainlightsignal_distant.HL4", "exitsignal.HL1", "blocksignal.HL4", "blockexitsignal.HL1"],
 
         "zs2value(A)": ["zs2.A"],
         "zs2value(B)": ["zs2.B"],
