@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.18.2 - 3.3.1.1]
+*fix: server crash when starting
+
 ## [1.18.2 - 3.3.1]
 
 * fix: issue in SignalStateFileV2
