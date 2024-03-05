@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.18.2 - 3.3.1.1]
+## [1.18.2 - 3.3.2]
 *fix: server crash when starting
 
 ## [1.18.2 - 3.3.1]
