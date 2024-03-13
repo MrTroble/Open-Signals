@@ -1,9 +1,9 @@
 package com.troblecodings.signals.enums;
 
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.FREE_COLOR;
+import static com.troblecodings.signals.signalbox.SignalBoxUtil.PREPARED_COLOR;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.SELECTED_COLOR;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.USED_COLOR;
-import static com.troblecodings.signals.signalbox.SignalBoxUtil.PREPARED_COLOR;
 
 public enum EnumPathUsage {
 

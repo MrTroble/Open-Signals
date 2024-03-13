@@ -40,7 +40,6 @@ import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -123,13 +122,10 @@ public final class NameHandler implements INetworkSync {
     }
 
     private static ByteBuffer packToBuffer(final BlockPos pos, final String name) {
-        final byte[] bytes = name.getBytes();
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(pos);
-        buffer.putByte((byte) bytes.length);
-        for (final byte b : bytes) {
-            buffer.putByte(b);
-        }
+        buffer.putBoolean(false);
+        buffer.putString(name);
         return buffer.build();
     }
 
@@ -149,7 +145,7 @@ public final class NameHandler implements INetworkSync {
     public static void sendRemoved(final StateInfo info) {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putBlockPos(info.pos);
-        buffer.putByte((byte) 255);
+        buffer.putBoolean(true);
         info.world.playerEntities.forEach(player -> sendTo(player, buffer.getBuildedBuffer()));
     }
 
@@ -266,16 +262,6 @@ public final class NameHandler implements INetworkSync {
             }
         });
         unloadNames(states);
-    }
-
-    @SubscribeEvent
-    public static void onPlayerJoin(final PlayerEvent.PlayerLoggedInEvent event) {
-        final EntityPlayer player = event.player;
-        final Map<StateInfo, String> names;
-        synchronized (ALL_NAMES) {
-            names = ImmutableMap.copyOf(ALL_NAMES);
-        }
-        names.forEach((info, name) -> sendTo(player, packToBuffer(info.pos, name)));
     }
 
     private static void loadNames(final List<StateInfo> infos,

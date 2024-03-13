@@ -174,6 +174,17 @@ public class SignalBoxGrid implements INetworkSavable {
         clearPaths();
     }
 
+    public void resetAllSignals() {
+        this.startsToPath.values().forEach(pathway -> pathway.resetAllSignals());
+        final Map<Point, Map<ModeSet, SubsidiaryEntry>> copy = ImmutableMap
+                .copyOf(enabledSubsidiaryTypes);
+        copy.forEach((point, map) -> {
+            final Map<ModeSet, SubsidiaryEntry> entryCopy = ImmutableMap.copyOf(map);
+            entryCopy.forEach((mode, entry) -> updateSubsidiarySignal(point, mode,
+                    new SubsidiaryEntry(entry.enumValue, false)));
+        });
+    }
+
     private void clearPaths() {
         startsToPath.clear();
         endsToPath.clear();
@@ -353,7 +364,8 @@ public class SignalBoxGrid implements INetworkSavable {
                 final ModeSet mode = new ModeSet(subsidiaryTag);
                 states.put(mode, SubsidiaryEntry.of(subsidiaryTag));
             });
-            enabledSubsidiaryTypes.put(node.getPoint(), states);
+            if (!states.isEmpty())
+                enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
         counter = tag.getInteger(SUBSIDIARY_COUNTER);
     }
@@ -548,11 +560,11 @@ public class SignalBoxGrid implements INetworkSavable {
         final Signal signal = SignalBoxHandler
                 .getSignal(new StateInfo(tile.getWorld(), tile.getPos()), pos.get());
         if (!entry.state) {
-            if (!enabledSubsidiaryTypes.containsKey(point))
+            final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
+            if (states == null || !states.containsKey(mode))
                 return;
             SignalConfig.reset(
                     new ResetInfo(new SignalStateInfo(tile.getWorld(), pos.get(), signal), false));
-            final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
             states.remove(mode);
             if (states.isEmpty()) {
                 enabledSubsidiaryTypes.remove(point);

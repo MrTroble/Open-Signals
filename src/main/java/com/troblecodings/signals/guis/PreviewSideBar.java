@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.troblecodings.core.QuaternionWrapper;
 import com.troblecodings.guilib.ecs.entitys.UIBlockRender;
+import com.troblecodings.guilib.ecs.entitys.UIBlockRenderInfo;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
@@ -70,7 +71,8 @@ public class PreviewSideBar {
     }
 
     public void update(final Signal signal) {
-        blockRender.setBlockState(new ModelInfoWrapper(signal, properties));
+        blockRender.setBlockState(new UIBlockRenderInfo(signal.getDefaultState(),
+                new ModelInfoWrapper(signal, properties)));
     }
 
 }

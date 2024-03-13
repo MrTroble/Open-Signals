@@ -239,10 +239,13 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     public void unloadSignal() {
-        if (linkedSignalPosition != null & linkedSignal != null)
-            SignalStateHandler.unloadSignal(new StateLoadHolder(
-                    new SignalStateInfo(world, linkedSignalPosition, linkedSignal),
-                    new LoadHolder<>(new StateInfo(world, pos))));
+        if (linkedSignalPosition != null & linkedSignal != null) {
+            final SignalStateInfo info = new SignalStateInfo(world, linkedSignalPosition,
+                    linkedSignal);
+            SignalStateHandler.unloadSignal(
+                    new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, pos))));
+        }
+
     }
 
     public BlockPos getLinkedPosition() {

@@ -1,7 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.ReadBuffer;
@@ -15,6 +13,7 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
+import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import com.troblecodings.signals.tileentitys.TrainNumberTileEntity;
 
@@ -23,10 +22,10 @@ import net.minecraft.util.math.BlockPos;
 public class TrainNumberContainer extends ContainerBase implements IChunkLoadable {
 
     private TrainNumberTileEntity tile;
-    protected final List<Point> validPoints = new ArrayList<>();
     protected Point setPoint;
     protected TrainNumber number = TrainNumber.DEFAULT;
     protected BlockPos linkedPos;
+    protected SignalBoxGrid grid;
 
     public TrainNumberContainer(final GuiInfo info) {
         super(info);
@@ -50,11 +49,7 @@ public class TrainNumberContainer extends ContainerBase implements IChunkLoadabl
         }
         if (grid.get() == null)
             return;
-        final List<Point> validPoints = grid.get().getAllPoints();
-        buffer.putInt(validPoints.size());
-        for (final Point point : validPoints) {
-            point.writeNetwork(buffer);
-        }
+        grid.get().writeNetwork(buffer);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -66,11 +61,8 @@ public class TrainNumberContainer extends ContainerBase implements IChunkLoadabl
         }
         this.setPoint = Point.of(buf);
         this.number = TrainNumber.of(buf);
-        validPoints.clear();
-        final int size = buf.getInt();
-        for (int i = 0; i < size; i++) {
-            validPoints.add(Point.of(buf));
-        }
+        this.grid = SignalBoxFactory.getFactory().getGrid();
+        grid.readNetwork(buf);
         update();
     }
 

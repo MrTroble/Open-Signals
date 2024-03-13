@@ -147,6 +147,7 @@ public class LinkedPositions {
                 .add(new StateLoadHolder(new SignalStateInfo(world, pos, signal),
                         new LoadHolder<>(new StateInfo(world, thisPos)))));
         SignalStateHandler.unloadSignals(signalInfos);
+        possibleSubsidiaries.clear();
     }
 
     private void loadPossibleSubsidiaires(final SignalStateInfo info,

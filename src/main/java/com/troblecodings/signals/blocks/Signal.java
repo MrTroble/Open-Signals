@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
@@ -97,6 +98,16 @@ public class Signal extends BasicBlock {
 
     public int getID() {
         return id;
+    }
+
+    @Override
+    public boolean shouldHaveItem() {
+        return false;
+    }
+
+    @Override
+    public boolean shouldBeDestroyedWithOtherBlocks() {
+        return true;
     }
 
     @Override
@@ -233,7 +244,7 @@ public class Signal extends BasicBlock {
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
-        GhostBlock.destroyUpperBlock(worldIn, pos);
+        DestroyHelper.checkAndDestroyOtherBlocks(worldIn, pos, state);
         if (!worldIn.isRemote) {
             final SignalStateInfo info = new SignalStateInfo(worldIn, pos, this);
             SignalStateHandler.sendRemoved(info);
@@ -256,6 +267,10 @@ public class Signal extends BasicBlock {
 
     public boolean canHaveCustomname(final Map<SEProperty, String> map) {
         return this.prop.customNameRenderHeight != -1 || !this.prop.customRenderHeights.isEmpty();
+    }
+
+    public final boolean isForSignalBridge() {
+        return this.prop.isBridgeSignal;
     }
 
     @Override
