@@ -97,7 +97,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void createStates(final SignalStateInfo info,
             final Map<SEProperty, String> states, final Player creator) {
-        if (info.world.isClientSide)
+        if (!info.isValid() || info.isWorldNullOrClientSide())
             return;
         synchronized (CURRENTLY_LOADED_STATES) {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
@@ -115,7 +115,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static boolean isSignalLoaded(final SignalStateInfo info) {
-        if (info.world.isClientSide)
+        if (!info.isValid() || info.isWorldNullOrClientSide())
             return false;
         synchronized (CURRENTLY_LOADED_STATES) {
             return CURRENTLY_LOADED_STATES.containsKey(info);
@@ -124,7 +124,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void runTaskWhenSignalLoaded(final SignalStateInfo info,
             final SignalStateListener listener) {
-        if (info == null || info.world.isClientSide)
+        if (!info.isValid() || info.isWorldNullOrClientSide())
             return;
         if (isSignalLoaded(info)) {
             synchronized (CURRENTLY_LOADED_STATES) {
@@ -141,7 +141,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void addListener(final SignalStateInfo info, final SignalStateListener listener) {
-        if (info.world.isClientSide)
+        if (!info.isValid() || info.isWorldNullOrClientSide())
             return;
         synchronized (ALL_LISTENERS) {
             final List<SignalStateListener> listeners = ALL_LISTENERS.computeIfAbsent(info,
@@ -152,7 +152,7 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void removeListener(final SignalStateInfo info,
             final SignalStateListener listener) {
-        if (info.world.isClientSide)
+        if (!info.isValid() || info.isWorldNullOrClientSide())
             return;
         final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
@@ -211,9 +211,8 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static void setStates(final SignalStateInfo info, final Map<SEProperty, String> states) {
-        if (info.world.isClientSide || states == null || states.isEmpty()) {
+        if (!info.isValid() || info.isWorldNullOrClientSide() || states.isEmpty())
             return;
-        }
         final AtomicBoolean contains = new AtomicBoolean(false);
         final Map<SEProperty, String> changedProperties = new HashMap<>();
         synchronized (CURRENTLY_LOADED_STATES) {
@@ -242,6 +241,8 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static Map<SEProperty, String> getStates(final SignalStateInfo info) {
+        if (!info.isValid() || info.isWorldNullOrClientSide())
+            return new HashMap<>();
         final Map<SEProperty, String> states;
         synchronized (CURRENTLY_LOADED_STATES) {
             final Map<SEProperty, String> stateVolitile = CURRENTLY_LOADED_STATES.get(info);
@@ -290,6 +291,8 @@ public final class SignalStateHandler implements INetworkSync {
 
     public static void setState(final SignalStateInfo info, final SEProperty property,
             final String value) {
+        if (!info.isValid() || info.isWorldNullOrClientSide())
+            return;
         final Map<SEProperty, String> map = new HashMap<>();
         synchronized (CURRENTLY_LOADED_STATES) {
             final Map<SEProperty, String> savedProperties = CURRENTLY_LOADED_STATES.get(info);
@@ -300,6 +303,8 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     public static Optional<String> getState(final SignalStateInfo info, final SEProperty property) {
+        if (!info.isValid() || info.isWorldNullOrClientSide())
+            return Optional.empty();
         final Map<SEProperty, String> properties = getStates(info);
         return Optional.ofNullable(properties.get(property));
     }

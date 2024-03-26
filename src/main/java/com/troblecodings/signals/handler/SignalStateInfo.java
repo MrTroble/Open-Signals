@@ -18,6 +18,11 @@ public class SignalStateInfo extends StateInfo {
     }
 
     @Override
+    public boolean isValid() {
+        return super.isValid() && signal != null;
+    }
+
+    @Override
     public String toString() {
         return "SignalStateInfo [world=" + world + ", pos=" + pos + ", signal=" + signal + "]";
     }
