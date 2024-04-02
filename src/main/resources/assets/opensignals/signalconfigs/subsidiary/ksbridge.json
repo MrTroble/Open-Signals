@@ -1,0 +1,28 @@
+{
+    "currentSignal": "kssignalbridge",
+    "allStates": {
+        "ZS1": [
+            "kombisignal.KS_ZS1",
+            "kombisignal_main.KS_ZS1"
+        ],
+        "ZS7": [
+            "kombisignal.KS_ZS7",
+            "kombisignal_main.KS_ZS7"
+        ],
+        "ZS8": [
+            "zs2.ZS8"
+        ],
+        "ZP9": [
+            "zs2.ZP9"
+        ],
+        "SH1": [
+            "kombisignal.KS_SHUNTING",
+            "kombisignal_main.KS_SHUNTING"
+        ],
+        "STATUSLIGHT": [
+            "kombisignal.KS_STATUS_LIGHT",
+            "kombisignal_main.KS_STATUS_LIGHT",
+            "kombisignal_distant.KS_STATUS_LIGHT"
+        ]
+    }
+}

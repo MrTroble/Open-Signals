@@ -1,0 +1,8 @@
+{
+    "currentSignal": "hlsignalbridge",
+    "values": [
+        "exitsignal.HL_SHUNTING",
+        "mainlightsignal.HL_SHUNTING",
+        "blockexitsignal.HL_SHUNTING"
+    ]
+}

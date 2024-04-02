@@ -1,0 +1,68 @@
+{
+    "systemProperties": {
+        "placementToolName": "placementtool",
+        "canLink": true,
+        "defaultHeight": 3,
+        "offsetX": -12,
+        "offsetY": -25,
+        "customNameRenderHeight": -0.03,
+        "colors": [
+            16777215,
+            16761344
+        ],
+        "isBridgeSignal": true
+    },
+    "seProperties": [
+        {
+            "name": "hp2",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "wing1",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true
+        },
+        {
+            "name": "wing2",
+            "defaultState": false,
+            "changeableStage": "APISTAGE_NONE_CONFIG",
+            "autoname": true,
+            "dependencies": "config(HP2.TRUE)"
+        },
+        {
+            "name": "zs3",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs3plate",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true,
+            "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "zs1",
+            "defaultState": false,
+            "autoname": true
+        },
+        {
+            "name": "zs7",
+            "defaultState": false,
+            "autoname": true
+        },
+        {
+            "name": "ra12",
+            "defaultState": false,
+            "autoname": true
+        },
+        {
+            "name": "zs12",
+            "defaultState": false,
+            "changeableStage": "GUISTAGE"
+        }
+    ]
+}
