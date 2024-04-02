@@ -8,7 +8,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IWorld;
 
-public class DestroyHelper {
+public final class DestroyHelper {
 
     private DestroyHelper() {
     }
