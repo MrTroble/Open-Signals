@@ -1,0 +1,20 @@
+{
+    "currentSignal": "semaphoresignalbridge",
+    "allStates": {
+        "ZS1": [
+            "zs1.TRUE"
+        ],
+        "ZS7": [
+            "zs7.TRUE"
+        ],
+        "ZS8": [
+            "zs3.ZS8"
+        ],
+        "ZP9": [
+            "zs3.ZP9"
+        ],
+        "SH1": [
+            "ra12.TRUE"
+        ]
+    }
+}

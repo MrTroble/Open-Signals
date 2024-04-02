@@ -11,7 +11,7 @@
         "map(stop) && signalRepeater(true)": ["kombisignal_distant.KS2_REPEAT"],
         "map(drive)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
 
-        "map(slow) && config(mainlightsignallightbar.OFF)": ["zs3v.Z4", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
+        "map(slow) && config(mainlightsignallightbar.OFF)": ["zs3v.Z4", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],        
         "map(slow) && config(mainlightsignallightbar.GREEN)": ["zs3v.Z10", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
         "map(slow) && config(mainlightsignallightbar.YELLOW)": ["zs3v.Z6", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
         "map(slow) && signalRepeater(true)": ["kombisignal_distant.KS1_BLINK_REPEAT"],
