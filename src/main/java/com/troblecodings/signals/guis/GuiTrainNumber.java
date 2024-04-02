@@ -1,17 +1,14 @@
 package com.troblecodings.signals.guis;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.ContainerBase;
-import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.GuiBase;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
 import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
@@ -22,87 +19,95 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.guis.ContainerTrainNumber.TrainNumberNetwork;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
 
-public class PathwayRequesterGui extends GuiBase {
+public class GuiTrainNumber extends GuiBase {
 
-    private final PathwayRequesterContainer container;
+    private final ContainerTrainNumber container;
     private final EntityPlayer player;
-    private final Map<Point, UIEntity> allTiles = new HashMap<>();
 
-    public PathwayRequesterGui(final GuiInfo info) {
+    public GuiTrainNumber(final GuiInfo info) {
         super(info);
-        this.container = (PathwayRequesterContainer) info.base;
+        this.container = (ContainerTrainNumber) info.base;
         this.player = info.player;
-        entity.clear();
-        entity.add(new UILabel("Not connected"));
+        this.entity.clear();
+        this.entity.add(new UILabel("Not connected"));
+    }
+
+    @Override
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new ContainerTrainNumber(info);
     }
 
     private void initOwn() {
-        entity.clear();
-        entity.add(new UIBox(UIBox.VBOX, 5));
+        this.entity.clear();
+        this.entity.add(new UIBox(UIBox.VBOX, 5));
 
-        final UIEntity higherEntity = new UIEntity();
-        higherEntity.setInheritWidth(true);
-        higherEntity.setHeight(20);
-        higherEntity.add(new UIBox(UIBox.HBOX, 5));
+        final UIEntity inner = new UIEntity();
+        inner.setWidth(200);
+        inner.setInheritHeight(true);
+        inner.setX(70);
+        inner.add(new UIBox(UIBox.VBOX, 5));
+        inner.add(GuiElements.createSpacerV(10));
 
-        final UIEntity label = GuiElements.createLabel(I18Wrapper.format("tile.pathwayrequester"),
-                0x7678a0, 1.2f);
-        higherEntity.add(label);
+        final UIEntity label =
+                GuiElements.createLabel(I18Wrapper.format("tile.trainnumberchanger"), 0x7678a0);
+        label.setScaleX(1.5f);
+        label.setScaleY(1.5f);
+        label.setX(-6);
+        inner.add(label);
+        inner.add(GuiElements.createSpacerV(20));
 
-        final UIEntity newPathButton = GuiElements
-                .createButton(I18Wrapper.format("gui.pwr.newpath"), e -> {
-                    final UIEntity start = allTiles.getOrDefault(container.start, new UIEntity());
-                    start.findRecursive(UIColor.class).forEach(start::remove);
-                    final UIEntity end = allTiles.getOrDefault(container.end, new UIEntity());
-                    start.findRecursive(UIColor.class).forEach(end::remove);
-                    container.start = null;
-                    container.end = null;
-                    infoUpdate(I18Wrapper.format("gui.pwr.newpath.set"));
+        final UIEntity inputEntity = new UIEntity();
+        inputEntity.setHeight(20);
+        inputEntity.setInheritWidth(true);
+        inputEntity.add(new UIBox(UIBox.HBOX, 0));
+        final UITextInput textInput = new UITextInput(container.number.trainNumber);
+        textInput.setOnTextUpdate(this::sendNewTrainNumber);
+        final UIEntity input = new UIEntity();
+        input.add(textInput);
+        input.setHeight(20);
+        input.setWidth(150);
+        inputEntity.add(input);
+        inputEntity.add(GuiElements.createSpacerH(5));
+        inputEntity.add(
+                GuiElements.createButton(I18Wrapper.format("gui.trainnumber.change_set"), e -> {
+                    setTrainNumber();
+                    textInput.setText("");
+                }));
+        inputEntity.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.info.change")));
+        inner.add(inputEntity);
+
+        final UIEntity changeButton =
+                GuiElements.createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e -> {
+                    final UIEntity grid = new UIEntity();
+                    grid.setInherits(true);
+                    initializeGrid(grid);
+                    push(GuiElements.createScreen(screen -> screen.add(grid)));
                 });
+        changeButton.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.setpoint.desc")));
+        inner.add(changeButton);
 
-        newPathButton.add(new UIToolTip(I18Wrapper.format("gui.pwr.newpath.desc")));
-        higherEntity.add(newPathButton);
-
-        final UIEntity checkbox = GuiElements.createBoolElement(
-                BoolIntegerables.of(I18Wrapper.format("gui.pwr.addtosave")),
-                i -> updateAddToSaverOnServer(i), container.addToPWToSavedPW);
-        higherEntity.add(checkbox);
-
-        final UIEntity middleEntity = new UIEntity();
-        middleEntity.setInherits(true);
-        middleEntity.add(new UIBox(UIBox.HBOX, 5));
-        middleEntity.add(GuiElements.createSpacerH(20));
-        initializeGrid(middleEntity);
-        middleEntity.add(GuiElements.createSpacerH(20));
-
-        final UIEntity lowerEntity = new UIEntity();
-        lowerEntity.setHeight(20);
-        lowerEntity.setInheritWidth(true);
-        lowerEntity.add(new UIBox(UIBox.HBOX, 5));
+        inner.add(GuiElements.createSpacerV(5));
 
         final BlockPos pos = container.linkedPos;
-        lowerEntity
-                .add(GuiElements
+        inner.add(
+                GuiElements
                         .createLabel(
                                 "Linked SignalBox: " + (pos == null ? "Not linked!"
                                         : pos.getX() + ", " + pos.getY() + ", " + pos.getZ()),
-                                1.3f));
-
-        entity.add(higherEntity);
-        entity.add(middleEntity);
-        entity.add(lowerEntity);
+                                1.2f));
+        entity.add(inner);
     }
 
     private void initializeGrid(final UIEntity lowerEntity) {
         final UIEntity splitter = new UIEntity();
         splitter.setInherits(true);
-        allTiles.clear();
         final UIEntity plane = new UIEntity();
         plane.setWidth(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
         plane.setHeight(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
@@ -145,23 +150,18 @@ public class PathwayRequesterGui extends GuiBase {
                     inputEntity.setX(5);
                     tile.add(inputEntity);
                 }
+                final SignalBoxNode finalNode = node;
                 tile.add(new UIClickable(e -> {
-                    if (container.start == null && sbt.isValidStart()) {
-                        container.start = name;
-                        e.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
-                    } else if (container.start != null && container.end == null
-                            && sbt.isValidEnd()) {
-                        container.end = name;
-                        e.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
-                        sendPWToServer();
-                        infoUpdate(I18Wrapper.format("gui.saved"));
-                    }
+                    if (finalNode.isEmpty())
+                        return;
+                    container.setPoint = name;
+                    sendNewPoint();
+                    pop();
                 }));
-                if (name.equals(container.start) || name.equals(container.end)) {
+                if (name.equals(container.setPoint)) {
                     tile.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
                 }
                 row.add(tile);
-                allTiles.put(name, tile);
             }
             plane.add(row);
         }
@@ -169,6 +169,7 @@ public class PathwayRequesterGui extends GuiBase {
         splitter.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
         splitter.add(new UIBorder(0xFF000000, 4));
         splitter.add(plane);
+        lowerEntity.add(new UIBox(UIBox.HBOX, 2));
         lowerEntity.add(splitter);
     }
 
@@ -177,37 +178,23 @@ public class PathwayRequesterGui extends GuiBase {
         initOwn();
     }
 
-    private void sendPWToServer() {
+    private void sendNewPoint() {
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) 0);
-        container.start.writeNetwork(buffer);
-        container.end.writeNetwork(buffer);
+        buffer.putEnumValue(TrainNumberNetwork.SEND_NEW_POINT);
+        container.setPoint.writeNetwork(buffer);
         OpenSignalsMain.network.sendTo(player, buffer);
     }
 
-    private void updateAddToSaverOnServer(final int value) {
+    private void sendNewTrainNumber(final String number) {
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putByte((byte) 1);
-        buffer.putByte((byte) value);
+        buffer.putEnumValue(TrainNumberNetwork.SEND_NEW_TRAINNUMBER);
+        buffer.putString(number);
         OpenSignalsMain.network.sendTo(player, buffer);
     }
 
-    private void infoUpdate(final String tip) {
-        final UIToolTip tooltip = new UIToolTip(tip, true);
-        entity.add(tooltip);
-        new Thread(() -> {
-            try {
-                Thread.sleep(3000);
-            } catch (final InterruptedException e) {
-                e.printStackTrace();
-            }
-            entity.remove(tooltip);
-        }).start();
+    private void setTrainNumber() {
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(TrainNumberNetwork.SET_TRAINNUMBER);
+        OpenSignalsMain.network.sendTo(player, buffer);
     }
-
-    @Override
-    public ContainerBase getNewGuiContainer(final GuiInfo info) {
-        return new PathwayRequesterContainer(info);
-    }
-
 }

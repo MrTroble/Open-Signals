@@ -20,9 +20,9 @@ import com.troblecodings.signals.guis.ContainerPlacementtool;
 import com.troblecodings.signals.guis.ContainerSignalBox;
 import com.troblecodings.signals.guis.ContainerSignalController;
 import com.troblecodings.signals.guis.NamableContainer;
-import com.troblecodings.signals.guis.PathwayRequesterContainer;
-import com.troblecodings.signals.guis.SignalBridgeContainer;
-import com.troblecodings.signals.guis.TrainNumberContainer;
+import com.troblecodings.signals.guis.ContainerPathwayRequester;
+import com.troblecodings.signals.guis.ContainerSignalBridge;
+import com.troblecodings.signals.guis.ContainerTrainNumber;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.init.OSBlocks;
@@ -51,9 +51,9 @@ public class CommonProxy {
         OpenSignalsMain.handler.addServer(SignalBox.class, ContainerSignalBox::new);
         OpenSignalsMain.handler.addServer(Signal.class, NamableContainer::new);
         OpenSignalsMain.handler.addServer(RedstoneIO.class, NamableContainer::new);
-        OpenSignalsMain.handler.addServer(PathwayRequester.class, PathwayRequesterContainer::new);
-        OpenSignalsMain.handler.addServer(TrainNumberBlock.class, TrainNumberContainer::new);
-        OpenSignalsMain.handler.addServer(SignalBridgeBasicBlock.class, SignalBridgeContainer::new);
+        OpenSignalsMain.handler.addServer(PathwayRequester.class, ContainerPathwayRequester::new);
+        OpenSignalsMain.handler.addServer(TrainNumberBlock.class, ContainerTrainNumber::new);
+        OpenSignalsMain.handler.addServer(SignalBridgeBasicBlock.class, ContainerSignalBridge::new);
     }
 
     public void init(final FMLInitializationEvent event) {

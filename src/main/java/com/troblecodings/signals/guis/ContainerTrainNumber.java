@@ -19,7 +19,7 @@ import com.troblecodings.signals.tileentitys.TrainNumberTileEntity;
 
 import net.minecraft.util.math.BlockPos;
 
-public class TrainNumberContainer extends ContainerBase implements IChunkLoadable {
+public class ContainerTrainNumber extends ContainerBase implements IChunkLoadable {
 
     private TrainNumberTileEntity tile;
     protected Point setPoint;
@@ -27,7 +27,7 @@ public class TrainNumberContainer extends ContainerBase implements IChunkLoadabl
     protected BlockPos linkedPos;
     protected SignalBoxGrid grid;
 
-    public TrainNumberContainer(final GuiInfo info) {
+    public ContainerTrainNumber(final GuiInfo info) {
         super(info);
         if (info.pos != null) {
             this.tile = info.getTile();

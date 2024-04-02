@@ -14,7 +14,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.guis.SignalBridgeContainer;
+import com.troblecodings.signals.guis.ContainerSignalBridge;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -33,8 +33,9 @@ import net.minecraft.world.World;
 public class SignalBridgeItem extends Item implements MessageWrapper {
 
     @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos,
-            EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
+            final BlockPos pos, final EnumHand hand, final EnumFacing facing, final float hitX,
+            final float hitY, final float hitZ) {
         if (player.isSneaking()) {
             OpenSignalsMain.handler.invokeGui(SignalBridgeBasicBlock.class, player, worldIn,
                     player.getPosition(), "signalbridge");
@@ -43,7 +44,7 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
         if (worldIn.isRemote)
             return EnumActionResult.PASS;
         final NBTWrapper tag = NBTWrapper.getOrCreateWrapper(player.getHeldItemMainhand())
-                .getWrapper(SignalBridgeContainer.SIGNALBRIDGE_TAG);
+                .getWrapper(ContainerSignalBridge.SIGNALBRIDGE_TAG);
         if (tag.isTagNull())
             return EnumActionResult.FAIL;
         final SignalBridgeBuilder builder = new SignalBridgeBuilder();
@@ -66,12 +67,12 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
                 3));
 
         final Map<String, Entry<Signal, Map<SEProperty, Integer>>> allSignals = new HashMap<>();
-        (tag.isTagNull() ? new NBTWrapper() : tag).getList(SignalBridgeContainer.SIGNALPROPERTIES)
+        (tag.isTagNull() ? new NBTWrapper() : tag).getList(ContainerSignalBridge.SIGNALPROPERTIES)
                 .forEach(wrapper -> {
                     final Map<SEProperty, Integer> properties = new HashMap<>();
-                    final String name = wrapper.getString(SignalBridgeContainer.SIGNAL_NAME);
-                    final Signal signal = Signal.SIGNALS
-                            .get(wrapper.getString(SignalBridgeContainer.SIGNAL_ID));
+                    final String name = wrapper.getString(ContainerSignalBridge.SIGNAL_NAME);
+                    final Signal signal =
+                            Signal.SIGNALS.get(wrapper.getString(ContainerSignalBridge.SIGNAL_ID));
                     signal.getProperties().forEach(
                             property -> property.readFromNBT(wrapper).ifPresent(value -> properties
                                     .put(property, property.getParent().getIDFromValue(value))));
