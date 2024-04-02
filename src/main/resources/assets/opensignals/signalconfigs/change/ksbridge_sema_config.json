@@ -28,7 +28,7 @@
         "map(stop) && signalRepeater(true)": ["kombisignal_distant.KS2_REPEAT"],
         "map(drive) || map(slow)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
         "(map(drive) || map(slow)) && map(zs3)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
-        "(map(drive) || map(slow)) && map(zs3) && signalRepeater(true)": ["kombisignal_distant.KS1_REPEAT"],
+        "(map(drive) || map(slow)) && map(zs3) && signalRepeater(true)": ["kombisignal_distant.KS1_BLINK_REPEAT"],
 
         "speed(==.1)": ["zs3.Z1"],
         "speed(==.2)": ["zs3.Z2"],
