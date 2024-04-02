@@ -8,7 +8,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class DestroyHelper {
+public final class DestroyHelper {
 
     private DestroyHelper() {
     }

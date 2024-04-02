@@ -13,7 +13,7 @@ import com.troblecodings.signals.enums.SignalBridgeType;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.signalbridge.SignalBridgeBlockProperties;
 
-public class SignalBridgeBlockParser {
+public final class SignalBridgeBlockParser {
 
     private SignalBridgeBlockParser() {
     }
