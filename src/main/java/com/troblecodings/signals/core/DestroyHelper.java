@@ -10,10 +10,14 @@ import net.minecraft.world.World;
 
 public class DestroyHelper {
 
+    private DestroyHelper() {
+    }
+
     public static void checkAndDestroyOtherBlocks(final World worldIn, final BlockPos pos,
             final IBlockState state) {
-        for (final EnumFacing direction : EnumFacing.values())
+        for (final EnumFacing direction : EnumFacing.values()) {
             checkAndDestroyBlockInDirection(worldIn, pos, state, direction);
+        }
     }
 
     private static void checkAndDestroyBlockInDirection(final World worldIn, final BlockPos basePos,
