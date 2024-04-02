@@ -20,7 +20,7 @@ import com.troblecodings.signals.tileentitys.PathwayRequesterTileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.server.ServerWorld;
 
-public class PathwayRequesterContainer extends ContainerBase implements IChunkLoadable {
+public class ContainerPathwayRequester extends ContainerBase implements IChunkLoadable {
 
     protected SignalBoxGrid grid;
     protected PathwayRequesterTileEntity tile;
@@ -29,7 +29,7 @@ public class PathwayRequesterContainer extends ContainerBase implements IChunkLo
     protected BlockPos linkedPos;
     protected int addToPWToSavedPW;
 
-    public PathwayRequesterContainer(final GuiInfo info) {
+    public ContainerPathwayRequester(final GuiInfo info) {
         super(info);
         if (info.pos != null)
             this.tile = info.getTile();

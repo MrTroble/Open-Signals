@@ -21,7 +21,7 @@ import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
 
-public class SignalBridgeContainer extends ContainerBase {
+public class ContainerSignalBridge extends ContainerBase {
 
     public static final String SIGNALBRIDGE_TAG = "signalBridgeTag";
     public static final String SIGNALPROPERTIES = "signalProperties";
@@ -31,7 +31,7 @@ public class SignalBridgeContainer extends ContainerBase {
     protected final SignalBridgeBuilder builder = new SignalBridgeBuilder();
     protected final Map<String, Map.Entry<Signal, Map<SEProperty, Integer>>> allSignals = new HashMap<>();
 
-    public SignalBridgeContainer(final GuiInfo info) {
+    public ContainerSignalBridge(final GuiInfo info) {
         super(info);
     }
 

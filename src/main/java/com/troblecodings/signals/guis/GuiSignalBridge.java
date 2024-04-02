@@ -56,7 +56,7 @@ import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
 import net.minecraft.util.Direction.AxisDirection;
 
-public class SignalBridgeGui extends GuiBase {
+public class GuiSignalBridge extends GuiBase {
 
     private static final List<Signal> SIGNALS_FOR_BRIDGE = new ArrayList<>();
     private static final UIBorder SELECTED_BORDER = new UIBorder(0xFF00FF00, 1);
@@ -70,7 +70,7 @@ public class SignalBridgeGui extends GuiBase {
     private final UIEntity rightEntity = new UIEntity();
     private final Map<SignalBridgeBasicBlock, UIEntity> blockForEntity = new HashMap<>();
     private final Map<String, UIEntity> signalNameForEntity = new HashMap<>();
-    private final SignalBridgeContainer container;
+    private final ContainerSignalBridge container;
     private final PlayerEntity player;
     private final PreviewSideBar previewSidebar = new PreviewSideBar(-5);
     private final SignalBridgeRenderData renderData;
@@ -84,9 +84,9 @@ public class SignalBridgeGui extends GuiBase {
                 .forEach(SIGNALS_FOR_BRIDGE::add);
     }
 
-    public SignalBridgeGui(final GuiInfo info) {
+    public GuiSignalBridge(final GuiInfo info) {
         super(info);
-        this.container = (SignalBridgeContainer) info.base;
+        this.container = (ContainerSignalBridge) info.base;
         this.player = info.player;
         this.renderData = new SignalBridgeRenderData(container.builder);
     }
