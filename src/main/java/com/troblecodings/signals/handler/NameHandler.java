@@ -321,21 +321,21 @@ public final class NameHandler implements INetworkSync {
                         return;
                     }
                     LOAD_COUNTER.remove(info);
+                    String name;
+                    synchronized (ALL_NAMES) {
+                        name = ALL_NAMES.remove(info);
+                    }
+                    if (name == null)
+                        return;
+                    createToFile(info, name);
                 }
-                String name;
-                synchronized (ALL_NAMES) {
-                    name = ALL_NAMES.remove(info);
-                }
-                if (name == null)
-                    return;
-                createToFile(info, name);
             });
         });
     }
 
     private static void sendTo(final EntityPlayer player, final ByteBuffer buf) {
-        final PacketBuffer buffer = new PacketBuffer(
-                Unpooled.copiedBuffer((ByteBuffer) buf.position(0)));
+        final PacketBuffer buffer =
+                new PacketBuffer(Unpooled.copiedBuffer((ByteBuffer) buf.position(0)));
         if (player instanceof EntityPlayerMP) {
             final EntityPlayerMP server = (EntityPlayerMP) player;
             channel.sendTo(new FMLProxyPacket(buffer, CHANNELNAME), server);

@@ -19,6 +19,10 @@ public class StateInfo {
         return world == null || world.isRemote;
     }
 
+    public boolean isValid() {
+        return pos != null && world != null;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(pos, world);

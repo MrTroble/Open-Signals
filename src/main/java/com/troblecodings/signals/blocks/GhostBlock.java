@@ -68,15 +68,6 @@ public class GhostBlock extends BasicBlock {
         return Block.FULL_BLOCK_AABB;
     }
 
-    public static void destroyUpperBlock(final World worldIn, final BlockPos pos) {
-        final BlockPos posUp = pos.up();
-        final IBlockState state = worldIn.getBlockState(posUp);
-        final Block blockUp = state.getBlock();
-        if (blockUp instanceof GhostBlock) {
-            worldIn.destroyBlock(posUp, false);
-        }
-    }
-
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
