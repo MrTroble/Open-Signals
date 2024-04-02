@@ -75,8 +75,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         buffer.putBlockPos(info.pos);
         grid.writeNetwork(buffer);
         final StateInfo identifier = new StateInfo(info.world, tile.getBlockPos());
-        final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = SignalBoxHandler
-                .getPossibleSubsidiaries(identifier);
+        final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries =
+                SignalBoxHandler.getPossibleSubsidiaries(identifier);
         final Map<BlockPos, LinkType> positions = SignalBoxHandler.getAllLinkedPos(identifier);
         buffer.putInt(possibleSubsidiaries.size());
         possibleSubsidiaries.forEach((pos, list) -> {
@@ -100,12 +100,14 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 .forEach(entry -> {
                     final AtomicReference<SignalBoxGrid> grid = new AtomicReference<>();
                     grid.set(SignalBoxHandler.getGrid(new StateInfo(info.world, entry.getKey())));
-                    if (grid.get() == null)
+                    if (grid.get() == null) {
                         loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerWorld) info.world,
                                 entry.getKey(),
                                 (otherTile, _u) -> grid.set(otherTile.getSignalBoxGrid()));
-                    if (grid.get() != null)
+                    }
+                    if (grid.get() != null) {
                         validInConnections.put(entry.getKey(), grid.get().getAllInConnections());
+                    }
                 });
         buffer.putByte((byte) validInConnections.size());
         validInConnections.forEach((pos, list) -> {
@@ -178,8 +180,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                             .getOrDefault(identifier.getPoint(), new HashMap<>());
                     final SubsidiaryEntry entry = subsidiary.get(identifier.getModeSet());
                     if (entry != null) {
-                        identifier.state = SignalState
-                                .combine(entry.enumValue.getSubsidiaryShowType());
+                        identifier.state =
+                                SignalState.combine(entry.enumValue.getSubsidiaryShowType());
                     }
 
                     final List<MainSignalIdentifier> greenSignals = this.greenSignals
@@ -253,11 +255,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                             .getOrDefault(modeIdentifier.getPoint(), new HashMap<>());
                     final SubsidiaryEntry entry = subsidiary.get(modeIdentifier.getModeSet());
                     if (entry != null) {
-                        modeIdentifier.state = SignalState
-                                .combine(entry.enumValue.getSubsidiaryShowType());
+                        modeIdentifier.state =
+                                SignalState.combine(entry.enumValue.getSubsidiaryShowType());
                     }
-                    if (!greenSignals.contains(modeIdentifier))
+                    if (!greenSignals.contains(modeIdentifier)) {
                         greenSignals.add(modeIdentifier);
+                    }
 
                     pointUpdates.add(modeIdentifier.getPoint());
                 }
@@ -288,8 +291,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     @Override
     public void deserializeServer(final ReadBuffer buffer) {
-        if (grid == null)
+        if (grid == null) {
             grid = tile.getSignalBoxGrid();
+        }
         final SignalBoxNetwork mode = buffer.getEnumValue(SignalBoxNetwork.class);
         switch (mode) {
             case SEND_INT_ENTRY: {
@@ -300,8 +304,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final Point point = Point.of(buffer);
                 final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
                 final Rotation rotation = deserializeRotation(buffer);
-                final PathEntryType<?> entryType = PathEntryType.ALL_ENTRIES
-                        .get(buffer.getByteToUnsignedInt());
+                final PathEntryType<?> entryType =
+                        PathEntryType.ALL_ENTRIES.get(buffer.getByteToUnsignedInt());
                 final ModeSet modeSet = new ModeSet(guiMode, rotation);
                 grid.getNode(point).getOption(modeSet).ifPresent(entry -> {
                     entry.removeEntry(entryType);
@@ -447,6 +451,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             default:
                 break;
         }
+        tile.setChanged();
     }
 
     @SuppressWarnings("unchecked")
@@ -454,8 +459,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         final Point point = Point.of(buffer);
         final EnumGuiMode guiMode = EnumGuiMode.of(buffer);
         final Rotation rotation = deserializeRotation(buffer);
-        final PathEntryType<T> entryType = (PathEntryType<T>) PathEntryType.ALL_ENTRIES
-                .get(buffer.getByteToUnsignedInt());
+        final PathEntryType<T> entryType =
+                (PathEntryType<T>) PathEntryType.ALL_ENTRIES.get(buffer.getByteToUnsignedInt());
         final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
         final ModeSet modeSet = new ModeSet(guiMode, rotation);
         final Optional<PathOptionEntry> option = node.getOption(modeSet);
@@ -475,15 +480,17 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
         if (map == null)
             return;
         map.remove(identifier.getModeSet());
-        if (map.isEmpty())
+        if (map.isEmpty()) {
             enabledSubsidiaryTypes.remove(identifier.getPoint());
+        }
     }
 
     @Override
     public void removed(final PlayerEntity playerIn) {
         super.removed(playerIn);
-        if (this.tile != null)
+        if (this.tile != null) {
             this.tile.remove(this);
+        }
     }
 
     @Override

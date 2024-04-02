@@ -14,9 +14,13 @@ public class StateInfo {
         this.pos = pos;
         this.world = world;
     }
-    
+
     public boolean isWorldNullOrClientSide() {
         return world == null || world.isClientSide;
+    }
+
+    public boolean isValid() {
+        return pos != null && world != null;
     }
 
     @Override
