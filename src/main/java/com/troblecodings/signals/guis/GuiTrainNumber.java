@@ -18,20 +18,20 @@ import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.guis.TrainNumberContainer.TrainNumberNetwork;
+import com.troblecodings.signals.guis.ContainerTrainNumber.TrainNumberNetwork;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.world.entity.player.Player;
 
-public class TrainNumberGui extends GuiBase {
+public class GuiTrainNumber extends GuiBase {
 
-    private final TrainNumberContainer container;
+    private final ContainerTrainNumber container;
     private final Player player;
 
-    public TrainNumberGui(final GuiInfo info) {
+    public GuiTrainNumber(final GuiInfo info) {
         super(info);
-        this.container = (TrainNumberContainer) info.base;
+        this.container = (ContainerTrainNumber) info.base;
         this.player = info.player;
         this.entity.clear();
         this.entity.add(new UILabel("Not connected"));
