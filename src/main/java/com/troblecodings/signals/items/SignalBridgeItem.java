@@ -19,6 +19,7 @@ import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.init.OSBlocks;
+import com.troblecodings.signals.init.OSTabs;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
 
@@ -31,6 +32,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class SignalBridgeItem extends Item implements MessageWrapper {
+
+    public SignalBridgeItem() {
+        setCreativeTab(OSTabs.TAB);
+        setMaxDamage(100);
+        setNoRepair();
+        setMaxStackSize(1);
+    }
 
     @Override
     public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
