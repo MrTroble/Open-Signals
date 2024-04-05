@@ -26,15 +26,15 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.world.entity.player.Player;
 
-public class PathwayRequesterGui extends GuiBase {
+public class GuiPathwayRequester extends GuiBase {
 
-    private final PathwayRequesterContainer container;
+    private final ContainerPathwayRequester container;
     private final Player player;
     private final Map<Point, UIEntity> allTiles = new HashMap<>();
 
-    public PathwayRequesterGui(final GuiInfo info) {
+    public GuiPathwayRequester(final GuiInfo info) {
         super(info);
-        this.container = (PathwayRequesterContainer) info.base;
+        this.container = (ContainerPathwayRequester) info.base;
         this.player = info.player;
         entity.clear();
         entity.add(new UILabel("Not connected"));

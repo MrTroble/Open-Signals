@@ -14,7 +14,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.guis.SignalBridgeContainer;
+import com.troblecodings.signals.guis.ContainerSignalBridge;
 import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -50,7 +50,7 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
         if (worldIn.isClientSide)
             return InteractionResult.PASS;
         final NBTWrapper tag = NBTWrapper.getOrCreateWrapper(player.getMainHandItem())
-                .getWrapper(SignalBridgeContainer.SIGNALBRIDGE_TAG);
+                .getWrapper(ContainerSignalBridge.SIGNALBRIDGE_TAG);
         if (tag.isTagNull())
             return InteractionResult.FAIL;
         final SignalBridgeBuilder builder = new SignalBridgeBuilder();
@@ -73,12 +73,12 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
                 (pos, block) -> worldIn.setBlock(pos, block.getStateForPlacement(placeContext), 3));
 
         final Map<String, Entry<Signal, Map<SEProperty, Integer>>> allSignals = new HashMap<>();
-        (tag.isTagNull() ? new NBTWrapper() : tag).getList(SignalBridgeContainer.SIGNALPROPERTIES)
+        (tag.isTagNull() ? new NBTWrapper() : tag).getList(ContainerSignalBridge.SIGNALPROPERTIES)
                 .forEach(wrapper -> {
                     final Map<SEProperty, Integer> properties = new HashMap<>();
-                    final String name = wrapper.getString(SignalBridgeContainer.SIGNAL_NAME);
-                    final Signal signal = Signal.SIGNALS
-                            .get(wrapper.getString(SignalBridgeContainer.SIGNAL_ID));
+                    final String name = wrapper.getString(ContainerSignalBridge.SIGNAL_NAME);
+                    final Signal signal =
+                            Signal.SIGNALS.get(wrapper.getString(ContainerSignalBridge.SIGNAL_ID));
                     signal.getProperties().forEach(
                             property -> property.readFromNBT(wrapper).ifPresent(value -> properties
                                     .put(property, property.getParent().getIDFromValue(value))));

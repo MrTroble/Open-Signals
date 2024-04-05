@@ -13,7 +13,10 @@ import com.troblecodings.signals.enums.SignalBridgeType;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
 import com.troblecodings.signals.signalbridge.SignalBridgeBlockProperties;
 
-public class SignalBridgeBlockParser {
+public final class SignalBridgeBlockParser {
+
+    private SignalBridgeBlockParser() {
+    }
 
     private static final Gson GSON = new Gson();
     public static final Map<SignalBridgeType, List<SignalBridgeBasicBlock>> SIGNAL_BRIDGE_BLOCKS =

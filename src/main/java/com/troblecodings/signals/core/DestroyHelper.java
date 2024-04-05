@@ -8,12 +8,16 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class DestroyHelper {
+public final class DestroyHelper {
+
+    private DestroyHelper() {
+    }
 
     public static void checkAndDestroyOtherBlocks(final LevelAccessor worldIn, final BlockPos pos,
             final BlockState state) {
-        for (final Direction direction : Direction.values())
+        for (final Direction direction : Direction.values()) {
             checkAndDestroyBlockInDirection(worldIn, pos, state, direction);
+        }
     }
 
     private static void checkAndDestroyBlockInDirection(final LevelAccessor acess,
