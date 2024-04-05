@@ -41,7 +41,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         final Point end = new Point();
         end.read(wrapper.getWrapper(END_POINT));
         pathway = Maps.immutableEntry(start, end);
-        addPWToSaver = wrapper.getBoolean(ADD_TO_PW_SAVER);
+        if (wrapper.contains(ADD_TO_PW_SAVER))
+            addPWToSaver = wrapper.getBoolean(ADD_TO_PW_SAVER);
     }
 
     @Override
