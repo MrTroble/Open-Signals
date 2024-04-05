@@ -629,3 +629,4 @@ property.gui.pwr.addtosave.name=Pfad gespeichert
 property.gui.pwr.addtosave.desc=
 gui.pwr.newpath.set=Auswählen...
 gui.saved=Gespeichert
+gui.signalbridge.info=

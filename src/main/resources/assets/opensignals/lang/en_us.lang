@@ -630,3 +630,4 @@ property.gui.pwr.addtosave.desc=
 gui.pwr.newpath.set=Select...
 gui.saved=Saved
 sb.trainnumber.remove=Remove
+gui.signalbridge.info=

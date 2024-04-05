@@ -1,18 +1,18 @@
 {
     "variants": {
         "facing=east": {
-            "model": "opensignals:block/signalbridge/default/signalbridge_mast_cage",
+            "model": "opensignals:signalbridge/default/signalbridge_mast_cage",
             "y": 90
         },
         "facing=north": {
-            "model": "opensignals:block/signalbridge/default/signalbridge_mast_cage"
+            "model": "opensignals:signalbridge/default/signalbridge_mast_cage"
         },
         "facing=south": {
-            "model": "opensignals:block/signalbridge/default/signalbridge_mast_cage",
+            "model": "opensignals:signalbridge/default/signalbridge_mast_cage",
             "y": 180
         },
         "facing=west": {
-            "model": "opensignals:block/signalbridge/default/signalbridge_mast_cage",
+            "model": "opensignals:signalbridge/default/signalbridge_mast_cage",
             "y": 270
         }
     }
