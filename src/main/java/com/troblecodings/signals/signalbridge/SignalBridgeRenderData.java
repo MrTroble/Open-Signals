@@ -1,21 +1,31 @@
-package com.troblecodings.signals.guis;
+package com.troblecodings.signals.signalbridge;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.BiFunction;
 
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableList.Builder;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.VectorWrapper;
+import com.troblecodings.guilib.ecs.entitys.UIBlockRenderInfo;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.enums.ChangeableStage;
-import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 
 public class SignalBridgeRenderData {
+
+    public static final ModelInfoWrapper EMPTY_WRAPPER = new ModelInfoWrapper(
+            new SignalBridgeBasicBlock(null));
+    private static final VectorWrapper RENDER_START = new VectorWrapper(15, 15, 0);
 
     private final Map<String, Map<SEProperty, String>> nameForRenderProperties = new HashMap<>();
     private final Map<String, Integer> signalHeights = new HashMap<>();
     private final SignalBridgeBuilder builder;
+    private BiFunction<String, Signal, ModelInfoWrapper> function = (_u, _u1) -> EMPTY_WRAPPER;
 
     public SignalBridgeRenderData(final SignalBridgeBuilder builder) {
         this.builder = builder;
@@ -75,6 +85,25 @@ public class SignalBridgeRenderData {
             }
         }
         return false;
+    }
+
+    public List<UIBlockRenderInfo> getRenderPosAndBlocks() {
+        final Builder<UIBlockRenderInfo> builder = ImmutableList.builder();
+        this.builder.getPointsForBlocks().forEach((point, block) -> {
+            final VectorWrapper vector = new VectorWrapper(point.getX(), point.getY(), 0);
+            builder.add(new UIBlockRenderInfo(block.getDefaultState(), EMPTY_WRAPPER,
+                    RENDER_START.subtract(vector)));
+        });
+        this.builder.getVecsForSignals().forEach((entry,
+                vec) -> builder.add(new UIBlockRenderInfo(entry.getValue().getDefaultState(),
+                        function.apply(entry.getKey(), entry.getValue()),
+                        RENDER_START.subtract(vec))));
+        return builder.build();
+    }
+
+    public void setFunctionForModelData(
+            final BiFunction<String, Signal, ModelInfoWrapper> function) {
+        this.function = function;
     }
 
 }

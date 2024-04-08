@@ -51,7 +51,7 @@ import com.troblecodings.signals.enums.SignalBridgeType;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbridge.SignalBridgeBasicBlock;
-import com.troblecodings.signals.signalbridge.SignalBridgeBuilder;
+import com.troblecodings.signals.signalbridge.SignalBridgeRenderData;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.EnumFacing;
@@ -94,7 +94,7 @@ public class GuiSignalBridge extends GuiBase {
     }
 
     private void initInternal() {
-        container.builder.setFunctionForModelData(
+        renderData.setFunctionForModelData(
                 (name, block) -> new ModelInfoWrapper(block, renderData.getDataForName(name)));
         this.entity.add(new UIBox(UIBox.VBOX, 5));
         final UIEntity lowerEntity = new UIEntity();
@@ -172,7 +172,7 @@ public class GuiSignalBridge extends GuiBase {
                 .getOrDefault(type, new ArrayList<>());
         typeBlocks.forEach(block -> {
             final UIEntity blockEntity = createPreviewForBlock(block, 14, -2, 1.9f, 80, 60, true, 0,
-                    0, true, SignalBridgeBuilder.EMPTY_WRAPPER);
+                    0, true, SignalBridgeRenderData.EMPTY_WRAPPER);
             blockEntity.add(new UIClickable(e -> {
                 if (currentBlock != null)
                     removeUISelection(currentBlock);
@@ -231,7 +231,7 @@ public class GuiSignalBridge extends GuiBase {
                 if (savedBlock != null) {
                     final UIEntity blockEntity = createPreviewForBlock(savedBlock, 15, -1, 0.7f,
                             TILE_WIDTH, TILE_WIDTH, false, -9.5f, 1.5f, false,
-                            SignalBridgeBuilder.EMPTY_WRAPPER);
+                            SignalBridgeRenderData.EMPTY_WRAPPER);
                     tile.add(blockEntity);
                 }
                 if (point.equals(container.builder.getStartPoint())) {
@@ -244,7 +244,7 @@ public class GuiSignalBridge extends GuiBase {
                     final SignalBridgeBasicBlock block = container.builder.getBlockOnPoint(point);
                     final UIEntity blockEntity = createPreviewForBlock(currentBlock, 15, -1, 0.7f,
                             TILE_WIDTH, TILE_WIDTH, false, -9.5f, 1.5f, false,
-                            SignalBridgeBuilder.EMPTY_WRAPPER);
+                            SignalBridgeRenderData.EMPTY_WRAPPER);
                     if (block == null) {
                         tile.add(blockEntity);
                         container.builder.addBlock(point, currentBlock);
@@ -296,8 +296,7 @@ public class GuiSignalBridge extends GuiBase {
 
     private void updateMultiRenderer() {
         multiRenderer.clear();
-        container.builder.getRenderPosAndBlocks()
-                .forEach(info -> multiRenderer.setBlockState(info));
+        renderData.getRenderPosAndBlocks().forEach(info -> multiRenderer.setBlockState(info));
     }
 
     private void buildBridgeList() {

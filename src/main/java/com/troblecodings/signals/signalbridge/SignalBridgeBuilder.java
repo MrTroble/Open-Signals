@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.function.BiFunction;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableList.Builder;
@@ -15,11 +14,9 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.guilib.ecs.entitys.UIBlockRenderInfo;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.signalbox.Point;
 
 import net.minecraft.block.Block;
@@ -27,19 +24,14 @@ import net.minecraft.util.ResourceLocation;
 
 public class SignalBridgeBuilder {
 
-    public static final ModelInfoWrapper EMPTY_WRAPPER = new ModelInfoWrapper(
-            new SignalBridgeBasicBlock(null));
-
     public static final String SIGNALBRIDGE_BLOCKS = "signalBridgeBlocks";
     public static final String SIGNALS_ON_BRIDGE = "signalsOnBridge";
     public static final String START_POINT = "startPoint";
     public static final String CUSTOMNAME = "signalCustomName";
-    private static final VectorWrapper RENDER_START = new VectorWrapper(15, 15, 0);
 
     private final Map<Point, SignalBridgeBasicBlock> pointForBlocks = new HashMap<>();
     private final Map<Entry<String, Signal>, VectorWrapper> vecForSignal = new HashMap<>();
     private List<Entry<VectorWrapper, BasicBlock>> relativesToStart = ImmutableList.of();
-    private BiFunction<String, Signal, ModelInfoWrapper> function = (_u, _u1) -> EMPTY_WRAPPER;
     private Point startPoint = new Point(13, 13);
 
     public void changeStartPoint(final Point newPoint) {
@@ -108,11 +100,6 @@ public class SignalBridgeBuilder {
         this.relativesToStart = calculateRelativesToPoint(startPoint);
     }
 
-    public void setFunctionForModelData(
-            final BiFunction<String, Signal, ModelInfoWrapper> function) {
-        this.function = function;
-    }
-
     private List<Entry<VectorWrapper, BasicBlock>> calculateRelativesToPoint(
             final Point startPoint) {
         if (startPoint == null) {
@@ -139,19 +126,12 @@ public class SignalBridgeBuilder {
         return map;
     }
 
-    public List<UIBlockRenderInfo> getRenderPosAndBlocks() {
-        final Builder<UIBlockRenderInfo> builder = ImmutableList.builder();
-        pointForBlocks.forEach((point, block) -> {
-            final VectorWrapper vector = new VectorWrapper(point.getX(), point.getY(), 0);
-            builder.add(new UIBlockRenderInfo(block.getDefaultState(), EMPTY_WRAPPER,
-                    RENDER_START.subtract(vector)));
-        });
-        vecForSignal.forEach((entry,
-                vec) -> builder.add(new UIBlockRenderInfo(entry.getValue().getDefaultState(),
-                        function.apply(entry.getKey(), entry.getValue()),
-                        RENDER_START.subtract(vec))));
-        return builder.build();
+    protected Map<Point, SignalBridgeBasicBlock> getPointsForBlocks() {
+        return ImmutableMap.copyOf(pointForBlocks);
+    }
 
+    protected Map<Entry<String, Signal>, VectorWrapper> getVecsForSignals() {
+        return ImmutableMap.copyOf(vecForSignal);
     }
 
     public List<Entry<VectorWrapper, BasicBlock>> getRelativesToStart() {
