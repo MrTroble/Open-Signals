@@ -42,7 +42,7 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
 
     @Override
     public EnumActionResult onItemUse(final EntityPlayer player, final World worldIn,
-            final BlockPos pos, final EnumHand hand, final EnumFacing facing, final float hitX,
+            final BlockPos pos, final EnumHand hand, final EnumFacing enumFacing, final float hitX,
             final float hitY, final float hitZ) {
         if (player.isSneaking()) {
             OpenSignalsMain.handler.invokeGui(SignalBridgeBasicBlock.class, player, worldIn,
@@ -58,6 +58,7 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
         final SignalBridgeBuilder builder = new SignalBridgeBuilder();
         builder.read(tag);
         final BlockPos startPos = pos.up();
+        final EnumFacing facing = player.getHorizontalFacing().getOpposite();
         final Map<BlockPos, BasicBlock> blocks = calculatePositions(builder, startPos, facing);
         if (blocks.isEmpty()) {
             translateMessageWrapper(player, "signalbridge.nostartblock");
@@ -70,7 +71,7 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
             }
         }
         blocks.forEach((blockPos, block) -> worldIn.setBlockState(blockPos,
-                block.getStateForPlacement(worldIn, blockPos, facing, hitX, hitY, hitZ,
+                block.getStateForPlacement(worldIn, blockPos, enumFacing, hitX, hitY, hitZ,
                         maxStackSize, player, hand),
                 3));
 
@@ -79,8 +80,8 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
                 .forEach(wrapper -> {
                     final Map<SEProperty, Integer> properties = new HashMap<>();
                     final String name = wrapper.getString(ContainerSignalBridge.SIGNAL_NAME);
-                    final Signal signal =
-                            Signal.SIGNALS.get(wrapper.getString(ContainerSignalBridge.SIGNAL_ID));
+                    final Signal signal = Signal.SIGNALS
+                            .get(wrapper.getString(ContainerSignalBridge.SIGNAL_ID));
                     signal.getProperties().forEach(
                             property -> property.readFromNBT(wrapper).ifPresent(value -> properties
                                     .put(property, property.getParent().getIDFromValue(value))));
