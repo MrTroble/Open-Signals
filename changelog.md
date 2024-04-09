@@ -35,7 +35,9 @@
 * fix: issue with reverse reset and rerequest of PW
 * fix: missing models
 * fix: scroll in Info&Help page
-* fix: issue with next PWs 
+* fix: issue with next PWs
+* fix: visual signal feedback in signalbox
+* fix: issue in UIPreview
 
 **When starting the world for the first time, the migration of the SignalFiles may take a moment.**
 
