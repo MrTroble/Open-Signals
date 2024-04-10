@@ -64,8 +64,8 @@ public class GuiSignalBridge extends GuiBase {
     private static final UIBorder SELECTED_BORDER = new UIBorder(0xFF00FF00, 1);
     private static final int TILE_WIDTH = 13;
     private static final int TILE_COUNT = 15;
-    private static final UIToolTip COLLISION_TOOLTIP = new UIToolTip(
-            I18Wrapper.format("gui.signalbridge.collision"), true);
+    private static final UIToolTip COLLISION_TOOLTIP =
+            new UIToolTip(I18Wrapper.format("gui.signalbridge.collision"), true);
 
     private final UIEntity leftEntity = new UIEntity();
     private final UIEntity middleEntity = new UIEntity();
@@ -110,8 +110,8 @@ public class GuiSignalBridge extends GuiBase {
         header.add(GuiElements.createLabel(I18Wrapper.format("gui.signalbridge.title"),
                 header.getBasicTextColor(), 1.1f));
         header.add(GuiElements.createSpacerH(10));
-        final UIEntity editButton = GuiElements
-                .createButton(I18Wrapper.format("gui.signalbridge.edit"), e -> {
+        final UIEntity editButton =
+                GuiElements.createButton(I18Wrapper.format("gui.signalbridge.edit"), e -> {
                     updateAvailableBridgeParts(SignalBridgeType.BASE);
                     buildGrid();
                     resetSelection(e);
@@ -119,8 +119,8 @@ public class GuiSignalBridge extends GuiBase {
         editButton.add(new UIToolTip(I18Wrapper.format("gui.signalbridge.edit.desc")));
         header.add(editButton);
         resetSelection(editButton);
-        final UIEntity preview = GuiElements
-                .createButton(I18Wrapper.format("gui.signalbridge.preview"), e -> {
+        final UIEntity preview =
+                GuiElements.createButton(I18Wrapper.format("gui.signalbridge.preview"), e -> {
                     buildBridgePreview();
                     buildBridgeList();
                     resetSelection(e);
@@ -168,14 +168,15 @@ public class GuiSignalBridge extends GuiBase {
         list.setInherits(true);
         list.add(new UIBox(UIBox.VBOX, 1).setPageable(false));
 
-        final List<SignalBridgeBasicBlock> typeBlocks = SignalBridgeBlockParser.SIGNAL_BRIDGE_BLOCKS
-                .getOrDefault(type, new ArrayList<>());
+        final List<SignalBridgeBasicBlock> typeBlocks =
+                SignalBridgeBlockParser.SIGNAL_BRIDGE_BLOCKS.getOrDefault(type, new ArrayList<>());
         typeBlocks.forEach(block -> {
             final UIEntity blockEntity = createPreviewForBlock(block, 14, -2, 1.9f, 80, 60, true, 0,
                     0, true, SignalBridgeRenderData.EMPTY_WRAPPER);
             blockEntity.add(new UIClickable(e -> {
-                if (currentBlock != null)
+                if (currentBlock != null) {
                     removeUISelection(currentBlock);
+                }
                 if (currentBlock == block) {
                     currentBlock = null;
                     return;
@@ -238,9 +239,8 @@ public class GuiSignalBridge extends GuiBase {
                     tile.add(new UIBorder(0xFF0000FF, 2));
                 }
                 tile.add(new UIClickable(e -> {
-                    if (currentBlock == null) {
+                    if (currentBlock == null)
                         return;
-                    }
                     final SignalBridgeBasicBlock block = container.builder.getBlockOnPoint(point);
                     final UIEntity blockEntity = createPreviewForBlock(currentBlock, 15, -1, 0.7f,
                             TILE_WIDTH, TILE_WIDTH, false, -9.5f, 1.5f, false,
@@ -314,9 +314,9 @@ public class GuiSignalBridge extends GuiBase {
         scroll.add(list);
         list.setInherits(true);
         list.add(new UIBox(UIBox.VBOX, 1).setPageable(false));
-        final IIntegerable<Signal> availableSignals = SizeIntegerables.of(
-                I18Wrapper.format("gui.signalbridge.signals"), SIGNALS_FOR_BRIDGE.size(),
-                i -> SIGNALS_FOR_BRIDGE.get(i));
+        final IIntegerable<Signal> availableSignals =
+                SizeIntegerables.of(I18Wrapper.format("gui.signalbridge.signals"),
+                        SIGNALS_FOR_BRIDGE.size(), i -> SIGNALS_FOR_BRIDGE.get(i));
         final UIEntity addButton = GuiElements.createButton("+", e -> {
             disableMultiRenderer();
             push(GuiElements.createScreen(searchPanel -> {
@@ -345,7 +345,7 @@ public class GuiSignalBridge extends GuiBase {
                     final int index = i;
                     final Signal signal = availableSignals.getObjFromID(index);
                     final String name = availableSignals.getLocalizedName() + ": "
-                            + I18Wrapper.format(signal.toString());
+                            + I18Wrapper.format(signal.toString() + ".name");
                     final UIEntity button = GuiElements.createButton(name, e2 -> {
                         final UIEntity nameEntity = new UIEntity();
                         nameEntity.setInherits(true);
@@ -569,12 +569,12 @@ public class GuiSignalBridge extends GuiBase {
         }));
         for (final Axis axis : EnumFacing.Axis.values()) {
             for (final AxisDirection axisDirection : EnumFacing.AxisDirection.values()) {
-                final String buttonName = axis.getName()
-                        + (axisDirection == AxisDirection.POSITIVE ? "+" : "-");
+                final String buttonName =
+                        axis.getName() + (axisDirection == AxisDirection.POSITIVE ? "+" : "-");
                 final UIEntity button = GuiElements.createButton(buttonName, e -> {
                     final int step = axisDirection == AxisDirection.POSITIVE ? -1 : 1;
-                    final VectorWrapper vector = container.builder.getVecForSignal(entry)
-                            .addOnAxis(axis, step);
+                    final VectorWrapper vector =
+                            container.builder.getVecForSignal(entry).addOnAxis(axis, step);
                     checkCollision(name, vector, signal);
                     container.builder.setNewSignalPos(signal, name, vector);
                     updateMultiRenderer();
@@ -609,8 +609,8 @@ public class GuiSignalBridge extends GuiBase {
     private void checkMaxAndMins(final VectorWrapper vector) {
         for (final Axis axis : Axis.values()) {
             for (final AxisDirection axisDirection : AxisDirection.values()) {
-                final String buttonName = axis.getName()
-                        + (axisDirection == AxisDirection.POSITIVE ? "+" : "-");
+                final String buttonName =
+                        axis.getName() + (axisDirection == AxisDirection.POSITIVE ? "+" : "-");
                 final UIEntity button = nameForButton.get(buttonName);
                 switch (axis) {
                     case X: {
@@ -681,9 +681,9 @@ public class GuiSignalBridge extends GuiBase {
 
         final Map.Entry<Signal, Map<SEProperty, Integer>> entry = container.allSignals.get(name);
         signal.getProperties().forEach(property -> {
-            final int value = entry.getValue().containsKey(property)
-                    ? entry.getValue().get(property)
-                    : property.getParent().getIDFromValue(property.getDefault());
+            final int value =
+                    entry.getValue().containsKey(property) ? entry.getValue().get(property)
+                            : property.getParent().getIDFromValue(property.getDefault());
             of(property, inp -> applyPropertyChanges(name, property, inp), value);
         });
         previewSidebar.update(signal);
@@ -743,9 +743,10 @@ public class GuiSignalBridge extends GuiBase {
         preview.setY(previewY);
         preview.add(new UIScale(previewScale, previewScale, previewScale));
 
-        if (enableRotation)
+        if (enableRotation) {
             preview.add(new UIDrag((x, y) -> renderer
                     .updateRotation(QuaternionWrapper.fromXYZ(0, (float) x * 0.1f, 0)), 1));
+        }
 
         preview.add(new UIScissor());
         preview.add(renderer);
@@ -803,8 +804,8 @@ public class GuiSignalBridge extends GuiBase {
             final int valueId) {
         if (!loaded)
             return;
-        final Map.Entry<Signal, Map<SEProperty, Integer>> entry = container.allSignals
-                .get(signalName);
+        final Map.Entry<Signal, Map<SEProperty, Integer>> entry =
+                container.allSignals.get(signalName);
         final Signal signal = entry.getKey();
         final int propertyId = signal.getIDFromProperty(property);
         final WriteBuffer buffer = new WriteBuffer();
@@ -951,9 +952,10 @@ public class GuiSignalBridge extends GuiBase {
     private void fillRenderPropertiesUp(final Signal signal,
             final Map<SEProperty, Integer> properties) {
         signal.getProperties().forEach(property -> {
-            if (!properties.containsKey(property))
+            if (!properties.containsKey(property)) {
                 properties.put(property,
                         property.getParent().getIDFromValue(property.getDefault()));
+            }
         });
     }
 

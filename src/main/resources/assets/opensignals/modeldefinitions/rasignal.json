@@ -164,16 +164,16 @@
         "hv/hv_number": {
             "textures": [
                 {
-                    "blockstate": "with(RATYPE.RA6_9)",
+                    "blockstate": "hasandis(CUSTOMNAME) && with(RATYPE.RA6_9)",
                     "y": 2
                 },
                 {
-                    "blockstate": "with(RATYPE.RA11A) || with(RATYPE.RA11B)",
+                    "blockstate": "hasandis(CUSTOMNAME) && (with(RATYPE.RA11A) || with(RATYPE.RA11B))",
                     "y": 2,
                     "z": -0.02
                 },
                 {
-                    "blockstate": "with(RATYPE.RA11_DWARF)",
+                    "blockstate": "hasandis(CUSTOMNAME) && with(RATYPE.RA11_DWARF)",
                     "y": 0.5625
                 }
             ],
