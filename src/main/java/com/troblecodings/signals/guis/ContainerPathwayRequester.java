@@ -45,9 +45,12 @@ public class ContainerPathwayRequester extends ContainerBase implements IChunkLo
         if (signalBoxPos != null) {
             final AtomicReference<SignalBoxGrid> grid = new AtomicReference<>();
             grid.set(SignalBoxHandler.getGrid(new StateInfo(info.world, signalBoxPos)));
-            if (grid.get() == null)
+            if (grid.get() == null) {
                 loadChunkAndGetTile(SignalBoxTileEntity.class, info.world, signalBoxPos,
                         (tile, _u) -> grid.set(tile.getSignalBoxGrid()));
+            }
+            if (grid.get() == null)
+                return;
             grid.get().writeNetwork(buffer);
         }
         if (signalBoxPos != null)
