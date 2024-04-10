@@ -50,10 +50,6 @@ public class BasicBlock extends Block {
         return true;
     }
 
-    public boolean shouldBeDestroyedWithOtherBlocks() {
-        return false;
-    }
-
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> {
             final String name = BLOCK_NAMES.get(wrapper);

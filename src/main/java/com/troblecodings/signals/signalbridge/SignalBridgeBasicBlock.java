@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.troblecodings.signals.blocks.BasicBlock;
+import com.troblecodings.signals.blocks.GhostBlock;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.enums.SignalBridgeType;
@@ -78,11 +80,6 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     }
 
     @Override
-    public boolean shouldBeDestroyedWithOtherBlocks() {
-        return true;
-    }
-
-    @Override
     public ItemStack getCloneItemStack(final IBlockReader reader, final BlockPos pos,
             final BlockState state) {
         return null;
@@ -91,6 +88,8 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     @Override
     public void destroy(final IWorld acess, final BlockPos pos, final BlockState state) {
         super.destroy(acess, pos, state);
-        DestroyHelper.checkAndDestroyOtherBlocks(acess, pos, state);
+        DestroyHelper.checkAndDestroyOtherBlocks(acess, pos, state,
+                block -> block instanceof SignalBridgeBasicBlock || block instanceof Signal
+                        || block instanceof GhostBlock);
     }
 }

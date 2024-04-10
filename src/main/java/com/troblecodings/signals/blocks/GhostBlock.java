@@ -11,6 +11,7 @@ import net.minecraft.block.material.Material;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraft.state.StateContainer;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
@@ -34,11 +35,6 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public boolean shouldBeDestroyedWithOtherBlocks() {
-        return true;
-    }
-
-    @Override
     public BlockRenderType getRenderShape(final BlockState state) {
         return BlockRenderType.INVISIBLE;
     }
@@ -52,7 +48,9 @@ public class GhostBlock extends BasicBlock {
     @Override
     public void destroy(final IWorld worldIn, final BlockPos pos, final BlockState state) {
         super.destroy(worldIn, pos, state);
-        DestroyHelper.checkAndDestroyOtherBlocks(worldIn, pos, state);
+        DestroyHelper.checkAndDestroyBlockInDirection(worldIn, pos, state, new Direction[] {
+                Direction.UP, Direction.DOWN
+        }, block -> block instanceof GhostBlock || block instanceof Signal);
     }
 
     @OnlyIn(Dist.CLIENT)

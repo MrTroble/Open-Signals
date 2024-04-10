@@ -103,11 +103,6 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public boolean shouldBeDestroyedWithOtherBlocks() {
-        return true;
-    }
-
-    @Override
     public boolean propagatesSkylightDown(final BlockState state, final IBlockReader getter,
             final BlockPos pos) {
         return true;
@@ -185,7 +180,9 @@ public class Signal extends BasicBlock {
     @Override
     public void destroy(final IWorld worldIn, final BlockPos pos, final BlockState state) {
         super.destroy(worldIn, pos, state);
-        DestroyHelper.checkAndDestroyOtherBlocks(worldIn, pos, state);
+        DestroyHelper.checkAndDestroyBlockInDirection(worldIn, pos, state, new Direction[] {
+                Direction.UP, Direction.DOWN
+        }, block -> block instanceof GhostBlock);
         if (!worldIn.isClientSide() && worldIn instanceof World) {
             SignalStateHandler.setRemoved(new SignalStateInfo((World) worldIn, pos, this));
             NameHandler.setRemoved(new StateInfo((World) worldIn, pos));
