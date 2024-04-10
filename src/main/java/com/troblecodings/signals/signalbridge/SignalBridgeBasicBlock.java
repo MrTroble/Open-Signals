@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.troblecodings.signals.blocks.BasicBlock;
+import com.troblecodings.signals.blocks.GhostBlock;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.enums.SignalBridgeType;
