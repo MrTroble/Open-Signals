@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.troblecodings.signals.blocks.BasicBlock;
+import com.troblecodings.signals.blocks.GhostBlock;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.enums.SignalBridgeType;
@@ -97,11 +99,6 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     }
 
     @Override
-    public boolean shouldBeDestroyedWithOtherBlocks() {
-        return true;
-    }
-
-    @Override
     public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target,
             final World world, final BlockPos pos, final EntityPlayer player) {
         return new ItemStack(OSItems.SIGNAL_BRIDGE_ITEM);
@@ -110,6 +107,8 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
-        DestroyHelper.checkAndDestroyOtherBlocks(worldIn, pos, state);
+        DestroyHelper.checkAndDestroyOtherBlocks(worldIn, pos, state,
+                block -> block instanceof SignalBridgeBasicBlock || block instanceof Signal
+                        || block instanceof GhostBlock);
     }
 }

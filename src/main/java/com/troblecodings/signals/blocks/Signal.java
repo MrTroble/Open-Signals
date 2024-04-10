@@ -106,11 +106,6 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public boolean shouldBeDestroyedWithOtherBlocks() {
-        return true;
-    }
-
-    @Override
     public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
             final BlockPos pos) {
         final TileEntity te = source.getTileEntity(pos);
@@ -246,7 +241,9 @@ public class Signal extends BasicBlock {
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
-        DestroyHelper.checkAndDestroyOtherBlocks(worldIn, pos, state);
+        DestroyHelper.checkAndDestroyBlockInDirection(worldIn, pos, state, new EnumFacing[] {
+                EnumFacing.UP, EnumFacing.DOWN
+        }, block -> block instanceof GhostBlock);
         if (!worldIn.isRemote) {
             final SignalStateInfo info = new SignalStateInfo(worldIn, pos, this);
             SignalStateHandler.sendRemoved(info);

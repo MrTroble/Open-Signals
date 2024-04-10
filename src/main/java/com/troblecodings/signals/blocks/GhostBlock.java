@@ -53,11 +53,6 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public boolean shouldBeDestroyedWithOtherBlocks() {
-        return true;
-    }
-
-    @Override
     public EnumBlockRenderType getRenderType(final IBlockState state) {
         return EnumBlockRenderType.INVISIBLE;
     }
@@ -71,6 +66,8 @@ public class GhostBlock extends BasicBlock {
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
-        DestroyHelper.checkAndDestroyOtherBlocks(worldIn, pos, state);
+        DestroyHelper.checkAndDestroyBlockInDirection(worldIn, pos, state, new EnumFacing[] {
+                EnumFacing.UP, EnumFacing.DOWN
+        }, block -> block instanceof GhostBlock || block instanceof Signal);
     }
 }
