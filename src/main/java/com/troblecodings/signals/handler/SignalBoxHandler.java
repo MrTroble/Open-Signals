@@ -81,8 +81,8 @@ public final class SignalBoxHandler {
                     final SignalBoxNode endNode = startGrid.getNode(end);
                     PathOptionEntry outConnectionEntry = null;
                     for (final Rotation rot : Rotation.values()) {
-                        final Optional<PathOptionEntry> entry = endNode
-                                .getOption(new ModeSet(EnumGuiMode.OUT_CONNECTION, rot));
+                        final Optional<PathOptionEntry> entry =
+                                endNode.getOption(new ModeSet(EnumGuiMode.OUT_CONNECTION, rot));
                         if (entry.isPresent()) {
                             outConnectionEntry = entry.get();
                             break;
@@ -92,10 +92,10 @@ public final class SignalBoxHandler {
                         returnBoolean.set(false);
                         return;
                     }
-                    final Optional<BlockPos> otherPos = outConnectionEntry
-                            .getEntry(PathEntryType.SIGNALBOX);
-                    final Optional<Point> otherStartPoint = outConnectionEntry
-                            .getEntry(PathEntryType.POINT);
+                    final Optional<BlockPos> otherPos =
+                            outConnectionEntry.getEntry(PathEntryType.SIGNALBOX);
+                    final Optional<Point> otherStartPoint =
+                            outConnectionEntry.getEntry(PathEntryType.POINT);
                     if (!otherPos.isPresent() || !otherStartPoint.isPresent()) {
                         returnBoolean.set(false);
                         return;
@@ -103,8 +103,8 @@ public final class SignalBoxHandler {
                     chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class,
                             (ServerWorld) startBox.world, otherPos.get(), (endTile, _u2) -> {
                                 final SignalBoxGrid endGrid = endTile.getSignalBoxGrid();
-                                final SignalBoxNode otherStartNode = endGrid
-                                        .getNode(otherStartPoint.get());
+                                final SignalBoxNode otherStartNode =
+                                        endGrid.getNode(otherStartPoint.get());
                                 if (otherStartNode == null) {
                                     returnBoolean.set(false);
                                     return;
@@ -122,8 +122,8 @@ public final class SignalBoxHandler {
                                     returnBoolean.set(false);
                                     return;
                                 }
-                                final Optional<Point> otherEndPoint = inConnectionEntry
-                                        .getEntry(PathEntryType.POINT);
+                                final Optional<Point> otherEndPoint =
+                                        inConnectionEntry.getEntry(PathEntryType.POINT);
                                 if (!otherEndPoint.isPresent()) {
                                     returnBoolean.set(false);
                                     return;
@@ -132,17 +132,19 @@ public final class SignalBoxHandler {
                                 final boolean endRequeset = endGrid
                                         .requestWay(otherStartPoint.get(), otherEndPoint.get());
                                 if (!startRequeset || !endRequeset) {
-                                    if (startRequeset)
+                                    if (startRequeset) {
                                         startGrid.resetPathway(start);
-                                    if (endRequeset)
+                                    }
+                                    if (endRequeset) {
                                         endGrid.resetPathway(otherStartPoint.get());
+                                    }
                                     returnBoolean.set(false);
                                     return;
                                 }
-                                final SignalBoxPathway startPath = startGrid
-                                        .getPathwayByLastPoint(end);
-                                final SignalBoxPathway endPath = endGrid
-                                        .getPathwayByLastPoint(otherEndPoint.get());
+                                final SignalBoxPathway startPath =
+                                        startGrid.getPathwayByLastPoint(end);
+                                final SignalBoxPathway endPath =
+                                        endGrid.getPathwayByLastPoint(otherEndPoint.get());
                                 startPath.setOtherPathwayToBlock(endPath);
                                 endPath.setOtherPathwayToReset(startPath);
                             });
@@ -197,11 +199,13 @@ public final class SignalBoxHandler {
         final boolean linked = holder.addLinkedPos(linkPos, type);
         if (!linked)
             return false;
-        if (block instanceof Signal)
+        if (block instanceof Signal) {
             holder.addSignal(linkPos, (Signal) block, identifier.world);
+        }
         if (block == OSBlocks.REDSTONE_IN || block == OSBlocks.REDSTONE_OUT
-                || block == OSBlocks.COMBI_REDSTONE_INPUT)
+                || block == OSBlocks.COMBI_REDSTONE_INPUT) {
             linkTileToPos(identifier, linkPos);
+        }
         return linked;
     }
 
@@ -271,8 +275,9 @@ public final class SignalBoxHandler {
             return;
         synchronized (ALL_LINKED_POS) {
             ALL_LINKED_POS.forEach((pos, holder) -> {
-                if (pos.world.equals(identifier.world))
+                if (pos.world.equals(identifier.world)) {
                     holder.removeLinkedPos(identifier.pos, identifier.world);
+                }
             });
         }
         synchronized (POS_UPDATES) {
@@ -448,8 +453,11 @@ public final class SignalBoxHandler {
         }
         wrapper.putList(OUTPUT_UPDATE, wrapperList);
         try {
-            final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
-                    .toFile();
+            final Path path = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            if (Files.notExists(path)) {
+                Files.createDirectories(path);
+            }
+            final File file = path.toFile();
             if (file.delete() || !Files.exists(file.toPath())) {
                 file.createNewFile();
             }
@@ -495,9 +503,8 @@ public final class SignalBoxHandler {
         final Path oldPath = Paths.get("osfiles/signalboxhandler/",
                 world.getServer().getWorldData().getLevelName().replace("/", "") + "_"
                         + world.dimension().location().toString().replace(":", "_"));
-        if (!Files.exists(oldPath)) {
+        if (!Files.exists(oldPath))
             return;
-        }
         final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
         try {
             Files.createDirectories(newPath);
