@@ -448,8 +448,10 @@ public final class SignalBoxHandler {
         }
         wrapper.putList(OUTPUT_UPDATE, wrapperList);
         try {
-            final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
-                    .toFile();
+            final Path path = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
+            if (Files.notExists(path))
+                Files.createDirectories(path);
+            final File file = path.toFile();
             if (file.delete() || !Files.exists(file.toPath())) {
                 file.createNewFile();
             }
