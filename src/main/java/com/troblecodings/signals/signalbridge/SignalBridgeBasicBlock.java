@@ -7,6 +7,7 @@ import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.enums.SignalBridgeType;
+import com.troblecodings.signals.init.OSItems;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -87,7 +88,7 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     @Override
     public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
             final BlockGetter level, final BlockPos pos, final Player player) {
-        return null;
+        return new ItemStack(OSItems.SIGNAL_BRIDGE_ITEM);
     }
 
     @Override
