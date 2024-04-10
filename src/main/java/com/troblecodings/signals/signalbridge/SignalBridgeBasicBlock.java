@@ -77,7 +77,7 @@ public class SignalBridgeBasicBlock extends BasicBlock {
 
     @Override
     public boolean shouldHaveItem() {
-        return ConfigHandler.GENERAL.enableSignalBridgeItems.get();
+        return false;
     }
 
     @Override
