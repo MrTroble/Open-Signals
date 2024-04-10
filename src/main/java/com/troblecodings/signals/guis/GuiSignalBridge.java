@@ -125,19 +125,6 @@ public class GuiSignalBridge extends GuiBase {
                 });
         preview.add(new UIToolTip(I18Wrapper.format("gui.signalbridge.preview.desc")));
         header.add(preview);
-        header.add(GuiElements.createButton("?", 20, e -> {
-            final UIEntity screen = GuiElements.createScreen(screenEntity -> {
-                screenEntity.add(GuiElements.createButton(I18Wrapper.format("gui.return"), _u -> {
-                    pop();
-                    enableMultiRenderer();
-                }));
-                screenEntity.add(GuiElements.createSpacerV(50));
-                screenEntity.add(GuiElements.createLabel(I18Wrapper.format("gui.signalbridge.info"),
-                        screenEntity.getBasicTextColor(), 1.1f));
-            });
-            disableMultiRenderer();
-            push(screen);
-        }));
         entity.add(header);
         entity.add(lowerEntity);
         updateAvailableBridgeParts(SignalBridgeType.BASE);
