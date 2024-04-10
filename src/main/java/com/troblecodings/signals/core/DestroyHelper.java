@@ -1,6 +1,6 @@
 package com.troblecodings.signals.core;
 
-import com.troblecodings.signals.blocks.BasicBlock;
+import java.util.function.Predicate;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,20 +14,20 @@ public final class DestroyHelper {
     }
 
     public static void checkAndDestroyOtherBlocks(final LevelAccessor worldIn, final BlockPos pos,
-            final BlockState state) {
-        for (final Direction direction : Direction.values()) {
-            checkAndDestroyBlockInDirection(worldIn, pos, state, direction);
-        }
+            final BlockState state, final Predicate<Block> predicate) {
+        checkAndDestroyBlockInDirection(worldIn, pos, state, Direction.values(), predicate);
     }
 
-    private static void checkAndDestroyBlockInDirection(final LevelAccessor acess,
-            final BlockPos basePos, final BlockState baseState, final Direction direction) {
-        final BlockPos thisPos = basePos.relative(direction);
-        final Block otherBlock = acess.getBlockState(thisPos).getBlock();
-        if (otherBlock instanceof BasicBlock
-                && ((BasicBlock) otherBlock).shouldBeDestroyedWithOtherBlocks()) {
-            acess.destroyBlock(thisPos, false);
-            otherBlock.destroy(acess, thisPos, baseState);
+    public static void checkAndDestroyBlockInDirection(final LevelAccessor worldIn,
+            final BlockPos basePos, final BlockState baseState, final Direction[] directions,
+            final Predicate<Block> predicate) {
+        for (final Direction direction : directions) {
+            final BlockPos thisPos = basePos.relative(direction);
+            final Block otherBlock = worldIn.getBlockState(thisPos).getBlock();
+            if (predicate.test(otherBlock)) {
+                worldIn.destroyBlock(thisPos, false);
+                otherBlock.destroy(worldIn, thisPos, baseState);
+            }
         }
     }
 

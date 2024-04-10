@@ -81,11 +81,6 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     }
 
     @Override
-    public boolean shouldBeDestroyedWithOtherBlocks() {
-        return true;
-    }
-
-    @Override
     public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
             final BlockGetter level, final BlockPos pos, final Player player) {
         return new ItemStack(OSItems.SIGNAL_BRIDGE_ITEM);
@@ -94,6 +89,8 @@ public class SignalBridgeBasicBlock extends BasicBlock {
     @Override
     public void destroy(final LevelAccessor acess, final BlockPos pos, final BlockState state) {
         super.destroy(acess, pos, state);
-        DestroyHelper.checkAndDestroyOtherBlocks(acess, pos, state);
+        DestroyHelper.checkAndDestroyOtherBlocks(acess, pos, state,
+                block -> block instanceof SignalBridgeBasicBlock || block instanceof Signal
+                        || block instanceof GhostBlock);
     }
 }
