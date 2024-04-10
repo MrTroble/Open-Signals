@@ -6,7 +6,6 @@ import java.util.List;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.GhostBlock;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.enums.SignalBridgeType;
 import com.troblecodings.signals.init.OSItems;
@@ -95,7 +94,7 @@ public class SignalBridgeBasicBlock extends BasicBlock {
 
     @Override
     public boolean shouldHaveItem() {
-        return ConfigHandler.enableSignalBridgeItems;
+        return false;
     }
 
     @Override
