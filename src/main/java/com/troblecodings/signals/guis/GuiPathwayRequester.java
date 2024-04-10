@@ -171,6 +171,7 @@ public class GuiPathwayRequester extends GuiBase {
 
     private void sendPWToServer() {
         final WriteBuffer buffer = new WriteBuffer();
+        buffer.putByte((byte) 0);
         container.start.writeNetwork(buffer);
         container.end.writeNetwork(buffer);
         OpenSignalsMain.network.sendTo(player, buffer);
