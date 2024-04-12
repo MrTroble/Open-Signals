@@ -433,6 +433,10 @@ public class SignalBoxGrid implements INetworkSavable {
         return modeGrid.get(point);
     }
 
+    public boolean containsNode(final Point point) {
+        return modeGrid.containsKey(point);
+    }
+
     public List<SignalBoxNode> getNodes() {
         return ImmutableList.copyOf(this.modeGrid.values());
     }
