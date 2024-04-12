@@ -62,6 +62,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         loadChunkAndGetTile(SignalBoxTileEntity.class, world, linkedSignalBox, (tile, _u) -> {
             final StateInfo identifier = new StateInfo(world, linkedSignalBox);
             final SignalBoxGrid grid = tile.getSignalBoxGrid();
+            if (!grid.containsNode(pathway.getKey()) || !grid.containsNode(pathway.getValue()))
+                return;
             if (grid.getNode(pathway.getValue()).containsOutConnection()) {
                 SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
                         pathway.getValue());
