@@ -3,7 +3,6 @@
 ## [1.16.5 - 3.4.0]
 
 * feat: added signalbridge
-* feat: added config option to place signalbridge blocks by hand
 * feat: added signal bridge signalsystems
 * feat: better ui for PathwayRequester
 * feat: better ui for TrainNumber
