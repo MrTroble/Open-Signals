@@ -13,6 +13,7 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
@@ -97,6 +98,11 @@ public class Signal extends BasicBlock {
 
     public int getID() {
         return id;
+    }
+
+    @Override
+    public boolean shouldHaveItem() {
+        return false;
     }
 
     @Override
@@ -185,8 +191,10 @@ public class Signal extends BasicBlock {
         final Map<SEProperty, String> properties = world.isRemote
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
                 : tile.getProperties();
-        properties.forEach((property, value) -> blockState
-                .getAndUpdate(oldState -> oldState.withProperty(property, value)));
+        properties.forEach((property, value) -> {
+            if (signalProperties.contains(property))
+                blockState.getAndUpdate(oldState -> oldState.withProperty(property, value));
+        });
         return blockState.get();
     }
 
@@ -233,7 +241,9 @@ public class Signal extends BasicBlock {
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
-        GhostBlock.destroyUpperBlock(worldIn, pos);
+        DestroyHelper.checkAndDestroyBlockInDirection(worldIn, pos, state, new EnumFacing[] {
+                EnumFacing.UP, EnumFacing.DOWN
+        }, block -> block instanceof GhostBlock);
         if (!worldIn.isRemote) {
             final SignalStateInfo info = new SignalStateInfo(worldIn, pos, this);
             SignalStateHandler.sendRemoved(info);
@@ -256,6 +266,10 @@ public class Signal extends BasicBlock {
 
     public boolean canHaveCustomname(final Map<SEProperty, String> map) {
         return this.prop.customNameRenderHeight != -1 || !this.prop.customRenderHeights.isEmpty();
+    }
+
+    public final boolean isForSignalBridge() {
+        return this.prop.isBridgeSignal;
     }
 
     @Override

@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "opensignals:signalbridge/default/signalbridge_mast_cage",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "opensignals:signalbridge/default/signalbridge_mast_cage"
+        },
+        "facing=south": {
+            "model": "opensignals:signalbridge/default/signalbridge_mast_cage",
+            "y": 180
+        },
+        "facing=west": {
+            "model": "opensignals:signalbridge/default/signalbridge_mast_cage",
+            "y": 270
+        }
+    }
+}

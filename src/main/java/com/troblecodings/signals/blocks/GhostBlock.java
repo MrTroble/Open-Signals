@@ -1,6 +1,7 @@
 package com.troblecodings.signals.blocks;
 
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.DestroyHelper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
@@ -33,16 +34,21 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target, final World world,
-            final BlockPos pos, final EntityPlayer player) {
+    public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target,
+            final World world, final BlockPos pos, final EntityPlayer player) {
         final BlockPos downPos = pos.down();
         final Block lowerBlock = world.getBlockState(downPos).getBlock();
         return lowerBlock.getPickBlock(state, target, world, downPos, player);
     }
 
     @Override
-    public boolean shouldSideBeRendered(final IBlockState blockState, final IBlockAccess blockAccess,
-            final BlockPos pos, final EnumFacing side) {
+    public boolean shouldSideBeRendered(final IBlockState blockState,
+            final IBlockAccess blockAccess, final BlockPos pos, final EnumFacing side) {
+        return false;
+    }
+
+    @Override
+    public boolean shouldHaveItem() {
         return false;
     }
 
@@ -52,29 +58,16 @@ public class GhostBlock extends BasicBlock {
     }
 
     @Override
-    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source, final BlockPos pos) {
+    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
+            final BlockPos pos) {
         return Block.FULL_BLOCK_AABB;
-    }
-
-    public static void destroyUpperBlock(final World worldIn, final BlockPos pos) {
-        final BlockPos posUp = pos.up();
-        final IBlockState state = worldIn.getBlockState(posUp);
-        final Block blockUp = state.getBlock();
-        if (blockUp instanceof GhostBlock) {
-            worldIn.destroyBlock(posUp, false);
-        }
     }
 
     @Override
     public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
         super.breakBlock(worldIn, pos, state);
-        destroyUpperBlock(worldIn, pos);
-
-        final BlockPos posdown = pos.down();
-        final Block lowerBlock = worldIn.getBlockState(posdown).getBlock();
-        if (lowerBlock instanceof GhostBlock || lowerBlock instanceof Signal) {
-            worldIn.destroyBlock(posdown, false);
-            lowerBlock.breakBlock(worldIn, posdown, state);
-        }
+        DestroyHelper.checkAndDestroyBlockInDirection(worldIn, pos, state, new EnumFacing[] {
+                EnumFacing.UP, EnumFacing.DOWN
+        }, block -> block instanceof GhostBlock || block instanceof Signal);
     }
 }

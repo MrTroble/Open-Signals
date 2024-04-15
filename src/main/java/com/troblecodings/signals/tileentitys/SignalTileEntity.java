@@ -13,6 +13,7 @@ import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 
+import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 
@@ -48,16 +49,24 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     public void renderOverlay(final RenderOverlayInfo info) {
         getSignal().renderOverlay(info.with(this));
+        final Signal signal = getSignal();
+        if (signal == null)
+            return;
+        signal.renderOverlay(info.with(this));
     }
 
     @Override
     public String getNameWrapper() {
         final String name = super.getNameWrapper();
-        return name == null || name.isEmpty() ? getSignal().getSignalTypeName() : name;
+        final Signal signal = getSignal();
+        return name == null || name.isEmpty()
+                ? signal != null ? signal.getSignalTypeName() : "signal"
+                : name;
     }
 
     public Signal getSignal() {
-        return (Signal) getBlockType();
+        final Block block = getBlockType();
+        return block instanceof Signal ? (Signal) block : null;
     }
 
     public Map<SEProperty, String> getProperties() {

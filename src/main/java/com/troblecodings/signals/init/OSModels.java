@@ -18,14 +18,11 @@ public final class OSModels {
     @SubscribeEvent
     public static void register(final ModelRegistryEvent event) {
         OSItems.registeredItems.forEach(OSModels::registerModel);
-        registerModel(Item.getItemFromBlock(OSBlocks.HV_SIGNAL_CONTROLLER));
-        registerModel(Item.getItemFromBlock(OSBlocks.POST));
-        registerModel(Item.getItemFromBlock(OSBlocks.SIGNAL_BOX));
-        registerModel(Item.getItemFromBlock(OSBlocks.REDSTONE_IN));
-        registerModel(Item.getItemFromBlock(OSBlocks.REDSTONE_OUT));
-        registerModel(Item.getItemFromBlock(OSBlocks.COMBI_REDSTONE_INPUT));
-        registerModel(Item.getItemFromBlock(OSBlocks.PATHWAY_REQUESTER));
-        registerModel(Item.getItemFromBlock(OSBlocks.TRAIN_NUMBER_BLOCK));
+        OSBlocks.BLOCKS_TO_REGISTER.forEach(block -> {
+            if (block.shouldHaveItem()) {
+                registerModel(Item.getItemFromBlock(block));
+            }
+        });
     }
 
     @SubscribeEvent

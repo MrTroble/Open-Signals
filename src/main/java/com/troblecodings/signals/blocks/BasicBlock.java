@@ -58,6 +58,11 @@ public class BasicBlock extends Block implements ITileEntityProvider {
         return getSupplierWrapper().map(BLOCK_ENTITYS::get);
     }
 
+    public boolean shouldHaveItem() {
+        return true;
+    }
+
+
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> BLOCK_ENTITYS.put(wrapper, wrapper.supply()));
     }

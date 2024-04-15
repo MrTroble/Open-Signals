@@ -1,0 +1,19 @@
+{
+    "variants": {
+        "facing=east": {
+            "model": "opensignals:signalbridge/default/signalbridge_cantilever_end_right",
+            "y": 90
+        },
+        "facing=north": {
+            "model": "opensignals:signalbridge/default/signalbridge_cantilever_end_right"
+        },
+        "facing=south": {
+            "model": "opensignals:signalbridge/default/signalbridge_cantilever_end_right",
+            "y": 180
+        },
+        "facing=west": {
+            "model": "opensignals:signalbridge/default/signalbridge_cantilever_end_right",
+            "y": 270
+        }
+    }
+}

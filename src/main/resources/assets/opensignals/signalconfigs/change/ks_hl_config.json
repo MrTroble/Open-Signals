@@ -10,12 +10,11 @@
         "map(stop)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF", "zs2v.OFF"],
         "map(stop) && signalRepeater(true)": ["kombisignal_distant.KS2_REPEAT"],
         "map(drive)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
-        "map(drive) && signalRepeater(true)": ["kombisignal_distant.KS1_REPEAT"],
 
-        "map(slow) && config(mainlightsignallightbar.OFF)": ["zs3v.Z4", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
+        "map(slow) && config(mainlightsignallightbar.OFF)": ["zs3v.Z4", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],        
         "map(slow) && config(mainlightsignallightbar.GREEN)": ["zs3v.Z10", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
         "map(slow) && config(mainlightsignallightbar.YELLOW)": ["zs3v.Z6", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
-        "map(slow) && signalRepeater(true)": ["kombisignal_distant.KS1_REPEAT"],
+        "map(slow) && signalRepeater(true)": ["kombisignal_distant.KS1_BLINK_REPEAT"],
 
         "speed(==.1)": ["zs3.Z1"],
         "speed(==.2)": ["zs3.Z2"],
