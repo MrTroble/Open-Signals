@@ -4,7 +4,7 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.linkableapi.ILinkableTile;
+import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.StateInfo;
@@ -27,6 +27,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     private BlockPos linkedSignalBox;
     private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(-1, -1),
             new Point(-1, -1));
+    private boolean addPWToSaver = true;
 
     public PathwayRequesterTileEntity(final TileEntityInfo info) {
         super(info);
@@ -35,6 +36,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     private static final String LINKED_SIGNALBOX = "linkedSignalBox";
     private static final String START_POINT = "startPoint";
     private static final String END_POINT = "endPoint";
+    private static final String ADD_TO_PW_SAVER = "addToPWSaver";
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
@@ -44,6 +46,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         final Point end = new Point();
         end.read(wrapper.getWrapper(END_POINT));
         pathway = Maps.immutableEntry(start, end);
+        if (wrapper.contains(ADD_TO_PW_SAVER))
+            addPWToSaver = wrapper.getBoolean(ADD_TO_PW_SAVER);
     }
 
     @Override
@@ -56,6 +60,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         pathway.getValue().write(endPoint);
         wrapper.putWrapper(START_POINT, startPoint);
         wrapper.putWrapper(END_POINT, endPoint);
+        wrapper.putBoolean(ADD_TO_PW_SAVER, addPWToSaver);
     }
 
     public void requestPathway() {
@@ -63,11 +68,15 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
                 (tile, _u) -> {
                     final StateInfo identifier = new StateInfo(level, linkedSignalBox);
                     final SignalBoxGrid grid = tile.getSignalBoxGrid();
+                    if (!grid.containsNode(pathway.getKey())
+                            || !grid.containsNode(pathway.getValue()))
+                        return;
                     if (grid.getNode(pathway.getValue()).containsOutConnection()) {
                         SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
                                 pathway.getValue());
                     } else {
-                        if (!grid.requestWay(pathway.getKey(), pathway.getValue())) {
+                        if (!grid.requestWay(pathway.getKey(), pathway.getValue())
+                                && addPWToSaver) {
                             grid.addNextPathway(pathway.getKey(), pathway.getValue());
                         }
                     }
@@ -79,6 +88,10 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         pathway = Maps.immutableEntry(start, end);
     }
 
+    public void setAddPWToSaver(final boolean addPWToSaver) {
+        this.addPWToSaver = addPWToSaver;
+    }
+
     @Override
     public boolean link(final BlockPos pos, final CompoundTag tag) {
         @SuppressWarnings("deprecation")
@@ -86,6 +99,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
         if (block instanceof SignalBox) {
             linkedSignalBox = pos;
+            setChanged();
             return true;
         }
         return false;
@@ -108,6 +122,10 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
 
     public Map.Entry<Point, Point> getNextPathway() {
         return pathway;
+    }
+
+    public boolean shouldPWBeAddedToSaver() {
+        return addPWToSaver;
     }
 
 }

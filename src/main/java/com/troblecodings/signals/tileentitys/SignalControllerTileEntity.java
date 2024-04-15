@@ -9,7 +9,7 @@ import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
-import com.troblecodings.linkableapi.ILinkableTile;
+import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.RedstoneInput;
@@ -223,10 +223,12 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     }
 
     public void unloadSignal() {
-        if (linkedSignalPosition != null & linkedSignal != null)
-            SignalStateHandler.unloadSignal(new StateLoadHolder(
-                    new SignalStateInfo(level, linkedSignalPosition, linkedSignal),
+        if (linkedSignalPosition != null & linkedSignal != null) {
+            final SignalStateInfo info = new SignalStateInfo(level, linkedSignalPosition,
+                    linkedSignal);
+            SignalStateHandler.unloadSignal(new StateLoadHolder(info,
                     new LoadHolder<>(new StateInfo(level, worldPosition))));
+        }
     }
 
     public BlockPos getLinkedPosition() {
@@ -252,11 +254,13 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             linkedSignalPosition = pos;
             linkedSignal = (Signal) block;
             SignalStateHandler.addListener(new SignalStateInfo(level, pos, linkedSignal), listener);
+            setChanged();
             return true;
         } else if (block instanceof RedstoneInput) {
             linkedRSInput = pos;
             loadChunkAndGetTile(RedstoneIOTileEntity.class, (ServerLevel) level, pos,
                     (tile, _u) -> tile.linkController(getBlockPos()));
+            setChanged();
             return true;
         }
         return false;

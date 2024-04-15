@@ -2,7 +2,7 @@ package com.troblecodings.signals.signalbox;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
-import com.troblecodings.linkableapi.ILinkableTile;
+import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
@@ -91,6 +91,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
                     .loadSignal(new StateLoadHolder(new SignalStateInfo(level, pos, (Signal) block),
                             new LoadHolder<>(new StateInfo(level, pos))));
         }
+        setChanged();
         return SignalBoxHandler.linkPosToSignalBox(new StateInfo(level, worldPosition), pos,
                 (BasicBlock) block, type);
     }
@@ -111,6 +112,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public boolean unlink() {
         SignalBoxHandler.unlinkAll(new StateInfo(level, worldPosition));
+        setChanged();
         return true;
     }
 

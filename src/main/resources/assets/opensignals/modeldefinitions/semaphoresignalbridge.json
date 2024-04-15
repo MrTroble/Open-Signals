@@ -1,0 +1,182 @@
+{
+	"textures": {
+		"lamp_green": "opensignals:blocks/lamps/lamp_green",
+		"lamp_white": "opensignals:blocks/lamps/lamp_white",
+		"lamp_red": "opensignals:blocks/lamps/lamp_red",
+		"lamp_yellow": "opensignals:blocks/lamps/lamp_yellow"
+	},
+	"models": {
+		"semaphore_signals/sema_main_base": {
+			"textures": [
+				{}
+			],
+			"y": -1
+		},
+		"semaphore_signals/sema_main_base_hp2": {
+			"textures": [
+				{
+					"blockstate": "hasandis(HP2)"
+				}
+			],
+			"y": -1
+		},
+		"semaphore_signals/sema_main_mast1_hp2": {
+			"textures": [
+				{
+					"blockstate": "hasandis(HP2)"
+				}
+			],
+			"y": 0
+		},
+		"semaphore_signals/sema_mainsmall_mast1": {
+			"textures": [
+				{}
+			],
+			"y": 0
+		},
+		"semaphore_signals/sema_main_mast2": {
+			"textures": [
+				{}
+			],
+			"y": 1
+		},
+		"semaphore_signals/sema_mainsmall_mast2_hp2": {
+			"textures": [
+				{}
+			],
+			"y": 1
+		},
+		"semaphore_signals/sema_main_mast3": {
+			"textures": [
+				{}
+			],
+			"y": 2
+		},
+		"semaphore_signals/sema_mainsmall_mast4": {
+			"textures": [
+				{}
+			],
+			"y": 3
+		},
+		"semaphore_signals/sema_mainsmall_number": {
+			"textures": [
+				{
+					"blockstate": "hasandis(CUSTOMNAME)"
+				}
+			],
+			"y": -1.0625,
+			"z": -0.2
+		},
+		"semaphore_signals/sema_main_zs1": {
+			"textures": [
+				{
+					"blockstate": "hasandis(ZS1)",
+					"retexture": {
+						"lamp_white": "lamp_white"
+					}
+				},
+				{
+					"blockstate": "hasandisnot(ZS1)"
+				}
+			],
+			"y": 0.375
+		},
+		"semaphore_signals/sema_main_zs7": {
+			"textures": [
+				{
+					"blockstate": "hasandis(ZS7)",
+					"retexture": {
+						"lamp_yellow": "lamp_yellow"
+					}
+				},
+				{
+					"blockstate": "hasandisnot(ZS7)"
+				}
+			],
+			"y": 0.375
+		},
+		"semaphore_signals/sema_main_ra12": {
+			"textures": [
+				{
+					"blockstate": "hasandis(RA12)",
+					"retexture": {
+						"lamp_white": "lamp_white"
+					}
+				},
+				{
+					"blockstate": "hasandisnot(RA12)"
+				}
+			],
+			"y": -0.625
+		},
+		"semaphore_signals/sema_main_zs3": {
+			"textures": [
+				{
+					"blockstate": "",
+					"extentions": {
+						"zs32.json": {
+							"zs3": "overlay"
+						}
+					}
+				}
+			],
+			"y": -1.125
+		},
+		"semaphore_signals/sema_main_zs3_plate": {
+			"textures": [
+				{
+					"loadOFFstate": false,
+					"blockstate": "!has(ZS3)",
+					"extentions": {
+						"zs32.json": {
+							"zs3plate": "overlay"
+						}
+					}
+				}
+			],
+			"y": -1.125
+		},
+		"semaphore_signals/sema_main_wing1": {
+			"textures": [
+				{
+					"blockstate": "hasandisnot(WING1)"
+				}
+			],
+			"y": 3
+		},
+		"semaphore_signals/sema_main_wing1_on": {
+			"textures": [
+				{
+					"blockstate": "hasandis(WING1)"
+				}
+			],
+			"y": 3
+		},
+		"semaphore_signals/sema_main_wing2": {
+			"textures": [
+				{
+					"blockstate": "hasandis(HP2) && hasandisnot(WING2)"
+				}
+			],
+			"y": 1
+		},
+		"semaphore_signals/sema_main_wing2_on": {
+			"textures": [
+				{
+					"blockstate": "hasandis(HP2) && hasandis(WING2)"
+				}
+			],
+			"y": 1
+		},
+        "zs/zs12": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(ZS12)"
+                }
+            ],
+            "y": -0.5625,
+			"z": -0.35,
+			"x": 0.1875
+        }
+	}
+}

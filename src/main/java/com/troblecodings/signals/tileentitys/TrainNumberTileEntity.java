@@ -1,7 +1,7 @@
 package com.troblecodings.signals.tileentitys;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.linkableapi.ILinkableTile;
+import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.TileEntityInfo;
@@ -19,26 +19,31 @@ import net.minecraft.world.level.block.Block;
 public class TrainNumberTileEntity extends SyncableTileEntity implements ILinkableTile {
 
     private static final String LINKED_SIGNALBOX = "linkedSignalBox";
+    private static final String POINT_WRAPPER = "pointWrapper";
 
     public TrainNumberTileEntity(final TileEntityInfo info) {
         super(info);
     }
 
     private BlockPos linkedSignalBox = null;
-    private Point point = new Point();
+    private Point point = new Point(-1, -1);
     private TrainNumber number = TrainNumber.DEFAULT;
 
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
-        point.read(wrapper);
+        final NBTWrapper pointWrapper = wrapper.getWrapper(POINT_WRAPPER);
+        if (!pointWrapper.isTagNull())
+            point.read(pointWrapper);
         number = TrainNumber.of(wrapper);
         linkedSignalBox = wrapper.getBlockPos(LINKED_SIGNALBOX);
     }
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
-        point.write(wrapper);
+        final NBTWrapper pointWrapper = new NBTWrapper();
+        point.write(pointWrapper);
         number.writeTag(wrapper);
+        wrapper.putWrapper(POINT_WRAPPER, pointWrapper);
         if (linkedSignalBox != null) {
             wrapper.putBlockPos(LINKED_SIGNALBOX, linkedSignalBox);
         }
@@ -65,6 +70,7 @@ public class TrainNumberTileEntity extends SyncableTileEntity implements ILinkab
                 new ResourceLocation(OpenSignalsMain.MODID, tag.getString(pos.toShortString())));
         if (block instanceof SignalBox) {
             linkedSignalBox = pos;
+            setChanged();
             return true;
         }
         return false;

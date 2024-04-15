@@ -17,6 +17,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.blocks.SignalController;
 import com.troblecodings.signals.blocks.TrainNumberBlock;
+import com.troblecodings.signals.contentpacks.SignalBridgeBlockParser;
 import com.troblecodings.signals.core.SignalLoader;
 
 import net.minecraft.resources.ResourceLocation;
@@ -65,6 +66,7 @@ public final class OSBlocks {
         OSItems.init();
         SignalLoader.loadAllSignals();
         BasicBlock.prepare();
+        SignalBridgeBlockParser.loadSignalBridgeBlocks();
     }
 
     public static void loadBlock(final BasicBlock block, final String pName) {
@@ -105,10 +107,9 @@ public final class OSBlocks {
             OSBlocks.init();
         final IForgeRegistry<Item> registry = event.getRegistry();
         BLOCKS_TO_REGISTER.forEach(block -> {
-            if (block instanceof Signal || block instanceof GhostBlock)
-                return;
-            registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
-                    .setRegistryName(block.getRegistryName()));
+            if (block.shouldHaveItem())
+                registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
+                        .setRegistryName(block.getRegistryName()));
         });
     }
 }

@@ -44,6 +44,10 @@ public class BasicBlock extends Block implements EntityBlock {
         return getSupplierWrapper().map(BLOCK_ENTITYS::get);
     }
 
+    public boolean shouldHaveItem() {
+        return true;
+    }
+
     @SuppressWarnings({
             "rawtypes", "unchecked"
     })

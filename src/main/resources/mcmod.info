@@ -1,11 +1,11 @@
 [
 {
-  "modid": "girsignals",
-  "name": "GIRSignals",
-  "description": "This mod adds a lot of German railway signals. You are able to controlle them via open computers, a manuell interface or redstone!",
+  "modid": "opensignals",
+  "name": "Open Signals",
+  "description": "This mod adds a lot of German railway signals. You are able to controlle them via a manuell interface, redstone or our own signal box! You can also add your own signals via a contentpack. Please read the wiki.",
   "version": "${version}",
   "mcversion": "${mcversion}",
-  "url": "https://discord.gg/Va5P7KBry6",
+  "url": "https://discord.gg/E7qhYeR",
   "updateUrl": "",
   "authorList": ["MrTroble", "Jeronimo", "Uhutown"],
   "credits": "Donators: FGBxRamel. Additional thanks to codingbytimo, Der Zauberer and HyCraftHD for their help!",

@@ -13,6 +13,7 @@ import com.mojang.math.Quaternion;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
@@ -97,6 +98,11 @@ public class Signal extends BasicBlock {
     }
 
     @Override
+    public boolean shouldHaveItem() {
+        return false;
+    }
+
+    @Override
     public boolean propagatesSkylightDown(final BlockState state, final BlockGetter getter,
             final BlockPos pos) {
         return true;
@@ -173,7 +179,9 @@ public class Signal extends BasicBlock {
     @Override
     public void destroy(final LevelAccessor worldIn, final BlockPos pos, final BlockState state) {
         super.destroy(worldIn, pos, state);
-        GhostBlock.destroyUpperBlock(worldIn, pos);
+        DestroyHelper.checkAndDestroyBlockInDirection(worldIn, pos, state, new Direction[] {
+                Direction.UP, Direction.DOWN
+        }, block -> block instanceof GhostBlock);
         if (!worldIn.isClientSide() && worldIn instanceof Level) {
             SignalStateHandler.setRemoved(new SignalStateInfo((Level) worldIn, pos, this));
             NameHandler.setRemoved(new StateInfo((Level) worldIn, pos));
@@ -205,6 +213,10 @@ public class Signal extends BasicBlock {
 
     public final boolean canBeLinked() {
         return this.prop.canLink;
+    }
+
+    public final boolean isForSignalBridge() {
+        return this.prop.isBridgeSignal;
     }
 
     @OnlyIn(Dist.CLIENT)

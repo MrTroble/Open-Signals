@@ -103,6 +103,7 @@ public class SignalBoxGrid implements INetworkSavable {
         resetPathway(pathway);
         updateToNet(pathway);
         tryNextPathways();
+        tile.setChanged();
         return true;
     }
 
@@ -144,6 +145,7 @@ public class SignalBoxGrid implements INetworkSavable {
             this.onWayAdd(way);
             updateToNet(way);
         });
+        tile.setChanged();
         return ways.isPresent();
     }
 
@@ -172,6 +174,17 @@ public class SignalBoxGrid implements INetworkSavable {
     public void resetAllPathways() {
         this.startsToPath.values().forEach(pathway -> pathway.resetPathway());
         clearPaths();
+    }
+
+    public void resetAllSignals() {
+        this.startsToPath.values().forEach(pathway -> pathway.resetAllSignals());
+        final Map<Point, Map<ModeSet, SubsidiaryEntry>> copy = ImmutableMap
+                .copyOf(enabledSubsidiaryTypes);
+        copy.forEach((point, map) -> {
+            final Map<ModeSet, SubsidiaryEntry> entryCopy = ImmutableMap.copyOf(map);
+            entryCopy.forEach((mode, entry) -> updateSubsidiarySignal(point, mode,
+                    new SubsidiaryEntry(entry.enumValue, false)));
+        });
     }
 
     private void clearPaths() {
@@ -207,6 +220,7 @@ public class SignalBoxGrid implements INetworkSavable {
             tryBlock(nodeCopy, update.pos);
             tryReset(nodeCopy, update.pos);
         }
+        tile.setChanged();
     }
 
     private void tryBlock(final List<SignalBoxPathway> pathways, final BlockPos pos) {
@@ -291,11 +305,10 @@ public class SignalBoxGrid implements INetworkSavable {
     public void updateTrainNumber(final Point point, final TrainNumber number) {
         final SignalBoxNode node = modeGrid.getOrDefault(point, new SignalBoxNode());
         startsToPath.values().forEach(pathway -> pathway.checkTrainNumberUpdate(number, node));
+        tile.setChanged();
     }
 
     public void removeNextPathway(final Point start, final Point end) {
-        System.out.println(
-                "Removing [" + Maps.immutableEntry(start, end) + "]! " + Thread.currentThread());
         nextPathways.remove(Maps.immutableEntry(start, end));
     }
 
@@ -355,7 +368,8 @@ public class SignalBoxGrid implements INetworkSavable {
                 final ModeSet mode = new ModeSet(subsidiaryTag);
                 states.put(mode, SubsidiaryEntry.of(subsidiaryTag));
             });
-            enabledSubsidiaryTypes.put(node.getPoint(), states);
+            if (!states.isEmpty())
+                enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
         counter = tag.getInteger(SUBSIDIARY_COUNTER);
     }
@@ -417,6 +431,10 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public SignalBoxNode getNode(final Point point) {
         return modeGrid.get(point);
+    }
+
+    public boolean containsNode(final Point point) {
+        return modeGrid.containsKey(point);
     }
 
     public List<SignalBoxNode> getNodes() {
@@ -549,11 +567,11 @@ public class SignalBoxGrid implements INetworkSavable {
         final Signal signal = SignalBoxHandler
                 .getSignal(new StateInfo(tile.getLevel(), tile.getBlockPos()), pos.get());
         if (!entry.state) {
-            if (!enabledSubsidiaryTypes.containsKey(point))
+            final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
+            if (states == null || !states.containsKey(mode))
                 return;
             SignalConfig.reset(
                     new ResetInfo(new SignalStateInfo(tile.getLevel(), pos.get(), signal), false));
-            final Map<ModeSet, SubsidiaryEntry> states = enabledSubsidiaryTypes.get(point);
             states.remove(mode);
             if (states.isEmpty()) {
                 enabledSubsidiaryTypes.remove(point);

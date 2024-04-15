@@ -603,6 +603,11 @@ public class SignalBoxPathway implements IChunkLoadable {
         resetPathway(null);
     }
 
+    public void resetAllSignals() {
+        resetFirstSignal();
+        resetOther();
+    }
+
     private void resetFirstSignal() {
         this.signalPositions.ifPresent(entry -> {
             final Signal current = SignalBoxHandler.getSignal(new StateInfo(world, tilePos),
@@ -635,8 +640,6 @@ public class SignalBoxPathway implements IChunkLoadable {
             }
         });
         updateSignalsOnClient(redSignals);
-        resetAllTrainNumbers();
-        sendTrainNumberUpdates();
     }
 
     public void resetPathway(final @Nullable Point point) {
@@ -647,6 +650,8 @@ public class SignalBoxPathway implements IChunkLoadable {
             this.emptyOrBroken = true;
             this.isBlocked = false;
             resetOther();
+            resetAllTrainNumbers();
+            sendTrainNumberUpdates();
             if (pathwayToReset != null) {
                 pathwayToReset.loadTileAndExecute(tile -> tile.getSignalBoxGrid()
                         .resetPathway(pathwayToReset.getFirstPoint()));
