@@ -12,6 +12,7 @@ import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
@@ -76,8 +77,8 @@ public class GuiSignalBox extends GuiBase {
     public static final int OUTPUT_COLOR = 0xffff00;
 
     private static final float[] ALL_LINES = getLines();
-    private static final int TILE_WIDTH = 10;
-    private static final int TILE_COUNT = 100;
+    protected static final int TILE_WIDTH = 10;
+    protected static final int TILE_COUNT = 100;
 
     private static float[] getLines() {
         final float[] lines = new float[2 * (TILE_COUNT + 1) * 4];
@@ -138,7 +139,7 @@ public class GuiSignalBox extends GuiBase {
         return;
     }
 
-    public void updateSignals(final List<Point> updated) {
+    public void updateSignals(final Iterable<Point> updated) {
         updated.forEach(point -> {
             final UISignalBoxTile tile = allTiles.get(point);
             tile.setGreenSignals(container.greenSignals.getOrDefault(point, new ArrayList<>()));
@@ -860,15 +861,11 @@ public class GuiSignalBox extends GuiBase {
             allLines.setColor(GRID_COLOR);
             plane.add(allLines);
         }
-        final UIBox vbox = new UIBox(UIBox.VBOX, 0);
-        vbox.setPageable(false);
-        plane.add(vbox);
+        plane.add(new UIBox(UIBox.VBOX, 0).setPageable(false));
         allTiles.clear();
         for (int x = 0; x < TILE_COUNT; x++) {
             final UIEntity row = new UIEntity();
-            final UIBox hbox = new UIBox(UIBox.HBOX, 0);
-            hbox.setPageable(false);
-            row.add(hbox);
+            row.add(new UIBox(UIBox.HBOX, 0).setPageable(false));
             row.setHeight(TILE_WIDTH);
             row.setWidth(TILE_WIDTH);
             for (int y = 0; y < TILE_COUNT; y++) {
@@ -1178,6 +1175,17 @@ public class GuiSignalBox extends GuiBase {
         point.writeNetwork(buffer);
         buffer.putString(TrainNumber.DEFAULT.trainNumber);
         OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
+    protected void resetAllSignals() {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.RESET_ALL_SIGNALS);
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+        final Set<Point> set = ImmutableSet.copyOf(container.greenSignals.keySet());
+        container.greenSignals.clear();
+        updateSignals(set);
     }
 
     private void reset() {

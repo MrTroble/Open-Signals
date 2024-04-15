@@ -19,6 +19,7 @@ import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.models.ModelInfoWrapper;
 
+import net.minecraft.block.Block;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.client.model.data.IModelData;
 
@@ -27,7 +28,7 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
     }
-    
+
     private final Map<SEProperty, String> properties = new HashMap<>();
 
     private final SignalStateListener listener = (info, states, changed) -> {
@@ -58,18 +59,25 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     public void renderOverlay(final RenderOverlayInfo info) {
         getSignal().renderOverlay(info.with(this));
+        final Signal signal = getSignal();
+        if (signal == null)
+            return;
+        signal.renderOverlay(info.with(this));
     }
 
     @Override
     public String getNameWrapper() {
         final String name = super.getNameWrapper();
-        return name == null || name.isEmpty() ? getSignal().getSignalTypeName() : name;
+        final Signal signal = getSignal();
+        return name == null || name.isEmpty()
+                ? signal != null ? signal.getSignalTypeName() : "signal"
+                : name;
     }
 
     public Signal getSignal() {
-        return ((Signal) getBlockState().getBlock());
+        final Block block = getBlockState().getBlock();
+        return block instanceof Signal ? (Signal) block : null;
     }
-    
 
     public Map<SEProperty, String> getProperties() {
         return ImmutableMap.copyOf(properties);
@@ -77,11 +85,11 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public @Nonnull IModelData getModelData() {
-        final Map<SEProperty, String> states = ClientSignalStateHandler
-                .getClientStates(new StateInfo(level, worldPosition));
+        final Map<SEProperty, String> states =
+                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
         return new ModelInfoWrapper(states);
     }
-    
+
     @Override
     public void onLoad() {
         if (!level.isClientSide) {

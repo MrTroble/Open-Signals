@@ -54,17 +54,14 @@ public class ContainerSignalController extends ContainerBase
     }
 
     private void sendProperitesToClient() {
-        if (info.pos == null) {
+        if (info.pos == null)
             return;
-        }
         controllerEntity = (SignalControllerTileEntity) info.world.getBlockEntity(getInfo().pos);
         linkedPos = controllerEntity.getLinkedPosition();
-        if (linkedPos == null) {
+        if (linkedPos == null)
             return;
-        }
         currentSignal = controllerEntity.getLinkedSignal();
-        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos,
-                getSignal());
+        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, linkedPos, getSignal());
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
         if (properties == null || properties.isEmpty())
             return;
@@ -78,8 +75,8 @@ public class ContainerSignalController extends ContainerBase
                 propertiesToSend.put(property, value);
             }
         });
-        final Map<Byte, Map<SEProperty, String>> allStates = new HashMap<>(
-                controllerEntity.getAllStates());
+        final Map<Byte, Map<SEProperty, String>> allStates =
+                new HashMap<>(controllerEntity.getAllStates());
         final Map<Byte, Map<SEProperty, String>> allStatesToSend = new HashMap<>();
         allStates.forEach((profile, props) -> {
             final Map<SEProperty, String> propsForProfile = new HashMap<>();
@@ -92,8 +89,8 @@ public class ContainerSignalController extends ContainerBase
             });
             allStatesToSend.put(profile, propsForProfile);
         });
-        final Map<Direction, Map<EnumState, Byte>> enabledStates = controllerEntity
-                .getEnabledStates();
+        final Map<Direction, Map<EnumState, Byte>> enabledStates =
+                controllerEntity.getEnabledStates();
         currentMode = controllerEntity.getLastMode();
 
         final WriteBuffer buffer = new WriteBuffer();
@@ -124,11 +121,13 @@ public class ContainerSignalController extends ContainerBase
         });
         final BlockPos linkedRSInput = controllerEntity.getLinkedRSInput();
         buffer.putBoolean(linkedRSInput != null);
-        if (linkedRSInput != null)
+        if (linkedRSInput != null) {
             buffer.putBlockPos(linkedRSInput);
+        }
         buffer.putBoolean(controllerEntity.getProfileRSInput() != -1);
-        if (controllerEntity.getProfileRSInput() != -1)
+        if (controllerEntity.getProfileRSInput() != -1) {
             buffer.putByte(controllerEntity.getProfileRSInput());
+        }
         OpenSignalsMain.network.sendTo(info.player, buffer.build());
     }
 
@@ -178,11 +177,13 @@ public class ContainerSignalController extends ContainerBase
             enabledRSStates.put(direction, states);
         }
         final boolean isInputConnected = buffer.getByte() == 1 ? true : false;
-        if (isInputConnected)
+        if (isInputConnected) {
             linkedRSInput = buffer.getBlockPos();
+        }
         final boolean isProfileInputenabled = buffer.getByte() == 1 ? true : false;
-        if (isProfileInputenabled)
+        if (isProfileInputenabled) {
             linkedRSInputProfile = buffer.getByteToUnsignedInt();
+        }
         update();
     }
 
@@ -255,6 +256,7 @@ public class ContainerSignalController extends ContainerBase
             default:
                 break;
         }
+        controllerEntity.setChanged();
     }
 
     private static Direction deserializeDirection(final ReadBuffer buffer) {

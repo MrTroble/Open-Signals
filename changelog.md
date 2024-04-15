@@ -1,5 +1,21 @@
 # Changelog
 
+## [1.16.5 - 3.4.0]
+
+* feat: added signalbridge
+* feat: added signal bridge signalsystems
+* feat: better ui for PathwayRequester
+* feat: better ui for TrainNumber
+* feat: new counter design
+* feat: added sh button to signalbox
+* feat: added text on ra signals
+* feat/fix: umlauts text rendering
+* fix: issue in signalboxhandler file
+* fix: several issues in signal configs
+* ref: update mod info
+* ref: added more null checks
+* ref: better code performance
+
 ## [1.16.5 - 3.3.1]
 
 * fix: issue in SignalStateFileV2

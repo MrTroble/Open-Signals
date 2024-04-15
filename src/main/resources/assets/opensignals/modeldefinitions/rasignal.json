@@ -160,6 +160,24 @@
                 }
             ],
             "y": "4"
+        },
+        "hv/hv_number": {
+            "textures": [
+                {
+                    "blockstate": "hasandis(CUSTOMNAME) && with(RATYPE.RA6_9)",
+                    "y": 2
+                },
+                {
+                    "blockstate": "hasandis(CUSTOMNAME) && (with(RATYPE.RA11A) || with(RATYPE.RA11B))",
+                    "y": 2,
+                    "z": -0.02
+                },
+                {
+                    "blockstate": "hasandis(CUSTOMNAME) && with(RATYPE.RA11_DWARF)",
+                    "y": 0.5625
+                }
+            ],
+            "y": 0
         }
     }
 }

@@ -82,11 +82,12 @@ public class LinkedPositions {
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
             SignalConfig.reset(new ResetInfo(info, false));
-            signalsToUnload.add(new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, tilePos))));
+            signalsToUnload.add(
+                    new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, tilePos))));
         });
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
-                .forEach(entry -> SignalBoxHandler
-                        .unlinkTileFromPos(new StateInfo(world, tilePos), entry.getKey()));
+                .forEach(entry -> SignalBoxHandler.unlinkTileFromPos(new StateInfo(world, tilePos),
+                        entry.getKey()));
         linkedBlocks.clear();
         signals.clear();
         SignalStateHandler.unloadSignals(signalsToUnload);
@@ -145,6 +146,7 @@ public class LinkedPositions {
                 .add(new StateLoadHolder(new SignalStateInfo(world, pos, signal),
                         new LoadHolder<>(new StateInfo(world, thisPos)))));
         SignalStateHandler.unloadSignals(signalInfos);
+        possibleSubsidiaries.clear();
     }
 
     private void loadPossibleSubsidiaires(final SignalStateInfo info,

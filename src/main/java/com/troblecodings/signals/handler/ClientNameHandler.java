@@ -1,6 +1,5 @@
 package com.troblecodings.signals.handler;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,21 +28,12 @@ public class ClientNameHandler implements INetworkSync {
     public void deserializeClient(final ReadBuffer buffer) {
         final Minecraft mc = Minecraft.getInstance();
         final BlockPos pos = buffer.getBlockPos();
-        final int byteLength = buffer.getByteToUnsignedInt();
-        if (byteLength == 255) {
+        final boolean removed = buffer.getBoolean();
+        if (removed) {
             setRemoved(pos);
             return;
         }
-        final byte[] array = new byte[byteLength];
-        for (int i = 0; i < byteLength; i++) {
-            array[i] = buffer.getByte();
-        }
-        String name = "";
-        try {
-            name = new String(array, "UTF-8");
-        } catch (final UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
+        final String name = buffer.getString();
         synchronized (CLIENT_NAMES) {
             CLIENT_NAMES.put(new StateInfo(mc.level, pos), name);
         }

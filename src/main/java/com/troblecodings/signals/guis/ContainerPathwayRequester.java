@@ -1,7 +1,5 @@
 package com.troblecodings.signals.guis;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -15,6 +13,7 @@ import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
+import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import com.troblecodings.signals.tileentitys.PathwayRequesterTileEntity;
 
@@ -23,12 +22,12 @@ import net.minecraft.world.server.ServerWorld;
 
 public class ContainerPathwayRequester extends ContainerBase implements IChunkLoadable {
 
-    protected final List<Point> validStarts = new ArrayList<>();
-    protected final List<Point> validEnds = new ArrayList<>();
+    protected SignalBoxGrid grid;
     protected PathwayRequesterTileEntity tile;
     protected Point start = null;
     protected Point end = null;
     protected BlockPos linkedPos;
+    protected int addToPWToSavedPW;
 
     public ContainerPathwayRequester(final GuiInfo info) {
         super(info);
@@ -45,20 +44,17 @@ public class ContainerPathwayRequester extends ContainerBase implements IChunkLo
         final Map.Entry<Point, Point> previousPathway = tile.getNextPathway();
         previousPathway.getKey().writeNetwork(buffer);
         previousPathway.getValue().writeNetwork(buffer);
+        buffer.putBoolean(tile.shouldPWBeAddedToSaver());
         if (signalBoxPos != null) {
             final AtomicReference<SignalBoxGrid> grid = new AtomicReference<>();
             grid.set(SignalBoxHandler.getGrid(new StateInfo(info.world, signalBoxPos)));
             if (grid.get() == null)
                 loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerWorld) info.world,
                         signalBoxPos, (tile, _u) -> grid.set(tile.getSignalBoxGrid()));
-            final List<Point> validStarts = grid.get().getValidStarts();
-            final List<Point> validEnds = grid.get().getValidEnds();
-            buffer.putByte((byte) validStarts.size());
-            validStarts.forEach(point -> point.writeNetwork(buffer));
-            buffer.putByte((byte) validEnds.size());
-            validEnds.forEach(point -> point.writeNetwork(buffer));
+            grid.get().writeNetwork(buffer);
         }
-        OpenSignalsMain.network.sendTo(info.player, buffer);
+        if (signalBoxPos != null)
+            OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     @Override
@@ -68,26 +64,22 @@ public class ContainerPathwayRequester extends ContainerBase implements IChunkLo
             this.linkedPos = null;
         start = Point.of(buffer);
         end = Point.of(buffer);
+        addToPWToSavedPW = buffer.getByte();
 
-        validStarts.clear();
-        validEnds.clear();
-        if (linkedPos == null)
-            return;
-        final int validStartsSize = buffer.getByteToUnsignedInt();
-        for (int i = 0; i < validStartsSize; i++) {
-            validStarts.add(Point.of(buffer));
-        }
-        final int validEndsSize = buffer.getByteToUnsignedInt();
-        for (int i = 0; i < validEndsSize; i++) {
-            validEnds.add(Point.of(buffer));
-        }
+        grid = SignalBoxFactory.getFactory().getGrid();
+        grid.readNetwork(buffer);
         update();
     }
 
     @Override
     public void deserializeServer(final ReadBuffer buffer) {
-        final Point start = Point.of(buffer);
-        final Point end = Point.of(buffer);
-        tile.setNextPathway(start, end);
+        final int mode = buffer.getByte();
+        if (mode == 0) {
+            final Point start = Point.of(buffer);
+            final Point end = Point.of(buffer);
+            tile.setNextPathway(start, end);
+        } else if (mode == 1) {
+            tile.setAddPWToSaver(buffer.getBoolean());
+        }
     }
 }

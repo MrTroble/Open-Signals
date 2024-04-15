@@ -46,6 +46,10 @@ public class BasicBlock extends Block {
         return getSupplierWrapper().map(BLOCK_ENTITYS::get);
     }
 
+    public boolean shouldHaveItem() {
+        return true;
+    }
+
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> {
             final String name = BLOCK_NAMES.get(wrapper);

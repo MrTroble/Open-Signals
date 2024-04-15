@@ -12,6 +12,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.ItemArmorTemplate;
 import com.troblecodings.signals.items.Placementtool;
+import com.troblecodings.signals.items.SignalBridgeItem;
 import com.troblecodings.signals.items.ToolParser;
 
 import net.minecraft.block.Block;
@@ -112,6 +113,7 @@ public final class OSItems {
     public static final Item ELECTRIC_PARTS = new Item(
             new Properties().tab(ItemGroup.TAB_MATERIALS));
     public static final Item MANIPULATOR = new Item(new Properties().tab(OSTabs.TAB));
+    public static final SignalBridgeItem SIGNAL_BRIDGE_ITEM = new SignalBridgeItem();
 
     public static ArrayList<Item> registeredItems = new ArrayList<>();
 
