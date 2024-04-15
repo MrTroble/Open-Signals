@@ -1,7 +1,7 @@
 package com.troblecodings.signals.tileentitys;
 
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.linkableapi.ILinkableTile;
+import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.TileEntityInfo;

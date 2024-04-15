@@ -6,8 +6,8 @@ import java.util.ArrayList;
 
 import com.google.gson.Gson;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.linkableapi.Linkingtool;
-import com.troblecodings.linkableapi.MultiLinkingTool;
+import com.troblecodings.opensignals.linkableapi.Linkingtool;
+import com.troblecodings.opensignals.linkableapi.MultiLinkingTool;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.items.ItemArmorTemplate;
