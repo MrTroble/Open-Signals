@@ -624,5 +624,6 @@
     "gui.pwr.newpath.set": "Auswählen...",
     "gui.saved": "Gespeichert",
     "info.usage.sh": "Schutzhalt",
-	"info.usage.sh.desc": "Stellt alle Signale auf Halt."
+	"info.usage.sh.desc": "Stellt alle Signale auf Halt.",
+    "gui.signalbridge.collision": "Du kannst die Signalbrücke nicht platzieren, da ein Block im Weg ist."
 }

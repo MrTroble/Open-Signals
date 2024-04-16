@@ -624,5 +624,6 @@
 	"gui.saved": "Saved",
 	"sb.trainnumber.remove": "Remove",
 	"info.usage.sh": "Protection Stop",
-	"info.usage.sh.desc": "Sets all signals to stop."
+	"info.usage.sh.desc": "Sets all signals to stop.",
+	"gui.signalbridge.collision": "You can't place the signalbridge because there is a block in the way."
 }
