@@ -27,7 +27,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.SignalStateListener;
-import com.troblecodings.signals.core.StateLoadHolder;
+import com.troblecodings.signals.core.SignalStateLoadHoler;
 import com.troblecodings.signals.enums.ChangedState;
 
 import io.netty.buffer.Unpooled;
@@ -467,12 +467,12 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final ChunkAccess chunk = world.getChunk(event.getPos().getWorldPosition());
         final Player player = event.getPlayer();
-        final List<StateLoadHolder> states = new ArrayList<>();
+        final List<SignalStateLoadHoler> states = new ArrayList<>();
         chunk.getBlockEntitiesPos().forEach(pos -> {
             final Block block = chunk.getBlockState(pos).getBlock();
             if (block instanceof Signal) {
                 final SignalStateInfo info = new SignalStateInfo(world, pos, (Signal) block);
-                states.add(new StateLoadHolder(info, new LoadHolder<>(player)));
+                states.add(new SignalStateLoadHoler(info, new LoadHolder<>(player)));
             }
         });
         loadSignals(states, player);
@@ -484,30 +484,30 @@ public final class SignalStateHandler implements INetworkSync {
         if (world.isClientSide)
             return;
         final ChunkAccess chunk = world.getChunk(event.getPos().getWorldPosition());
-        final List<StateLoadHolder> states = new ArrayList<>();
+        final List<SignalStateLoadHoler> states = new ArrayList<>();
         chunk.getBlockEntitiesPos().forEach(pos -> {
             final Block block = chunk.getBlockState(pos).getBlock();
             if (block instanceof Signal) {
-                states.add(new StateLoadHolder(new SignalStateInfo(world, pos, (Signal) block),
+                states.add(new SignalStateLoadHoler(new SignalStateInfo(world, pos, (Signal) block),
                         new LoadHolder<>(event.getPlayer())));
             }
         });
         unloadSignals(states);
     }
 
-    public static void loadSignal(final StateLoadHolder info) {
+    public static void loadSignal(final SignalStateLoadHoler info) {
         loadSignal(info, null);
     }
 
-    public static void loadSignals(final List<StateLoadHolder> signals) {
+    public static void loadSignals(final List<SignalStateLoadHoler> signals) {
         loadSignals(signals, null);
     }
 
-    public static void loadSignal(final StateLoadHolder info, final @Nullable Player player) {
+    public static void loadSignal(final SignalStateLoadHoler info, final @Nullable Player player) {
         loadSignals(ImmutableList.of(info), player);
     }
 
-    public static void loadSignals(final List<StateLoadHolder> signals,
+    public static void loadSignals(final List<SignalStateLoadHoler> signals,
             final @Nullable Player player) {
         if (signals == null || signals.isEmpty())
             return;
@@ -549,11 +549,11 @@ public final class SignalStateHandler implements INetworkSync {
 
     }
 
-    public static void unloadSignal(final StateLoadHolder info) {
+    public static void unloadSignal(final SignalStateLoadHoler info) {
         unloadSignals(ImmutableList.of(info));
     }
 
-    public static void unloadSignals(final List<StateLoadHolder> signals) {
+    public static void unloadSignals(final List<SignalStateLoadHoler> signals) {
         if (signals == null || signals.isEmpty() || writeService == null)
             return;
         writeService.execute(() -> {

@@ -194,7 +194,7 @@ public final class SignalBoxHandler {
             holder = ALL_LINKED_POS.computeIfAbsent(identifier,
                     _u -> new LinkedPositions(identifier.pos));
         }
-        final boolean linked = holder.addLinkedPos(linkPos, type);
+        final boolean linked = holder.addLinkedPos(linkPos, identifier.world, type);
         if (!linked)
             return false;
         if (block instanceof Signal)
