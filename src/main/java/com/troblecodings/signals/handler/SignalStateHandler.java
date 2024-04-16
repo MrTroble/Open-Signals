@@ -29,7 +29,6 @@ import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.enums.ChangedState;
-import com.troblecodings.signals.signalbox.debug.DebugSignalStateFileV2;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;

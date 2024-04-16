@@ -9,7 +9,6 @@ import java.util.function.Predicate;
 
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.contentpacks.ContentPackException;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 import com.troblecodings.signals.parser.LogicParser;
@@ -49,7 +48,7 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
             final Map<String, String> extentionProperties = extentions.getValue();
             final ModelExtention extentionValues = extention.get(extentionName);
             if (extentionValues == null)
-                throw new ContentPackException(
+                OpenSignalsMain.exitMinecraftWithMessage(
                         String.format("There doesn't exists an extention named [%s]!",
                                 extentionName) + " Valid Extentions: " + extention.keySet());
 
@@ -79,11 +78,10 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
                                             models.getZ(texturestate.getOffsetZ()),
                                             states.createRetexture(texturestate.getRetextures())));
                         } catch (final LogicalParserException e) {
-                            throw new ContentPackException(
+                            OpenSignalsMain.exitMinecraftWithMessage(
                                     "There was an problem during loading an extention into "
                                             + modelname + " with the blockstate '"
-                                            + texturestate.getBlockstate() + "'!",
-                                    e);
+                                            + texturestate.getBlockstate() + "'! " + e);
                         } finally {
                             texturestate.resetStates(blockstate, retexture);
                         }

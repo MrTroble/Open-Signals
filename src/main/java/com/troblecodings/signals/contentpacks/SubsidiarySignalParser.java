@@ -45,11 +45,11 @@ public class SubsidiarySignalParser {
                     SubsidiarySignalParser.class);
             final Signal signal = Signal.SIGNALS.get(parser.currentSignal.toLowerCase());
             if (signal == null)
-                throw new ContentPackException(
+                OpenSignalsMain.exitMinecraftWithMessage(
                         "There doesn't exists a signal with the name '" + parser.currentSignal
                                 + "'! Valid Signals are: " + Signal.SIGNALS.keySet());
             if (SUBSIDIARY_SIGNALS.containsKey(signal))
-                throw new ContentPackException(
+                OpenSignalsMain.exitMinecraftWithMessage(
                         "There already exists a Subsidiary Config for " + signal + "!");
             final FunctionParsingInfo info = new FunctionParsingInfo(signal);
             parser.allStates.forEach((name, properties) -> {
@@ -71,7 +71,7 @@ public class SubsidiarySignalParser {
             }
         }
         if (enumState == null)
-            throw new ContentPackException(enumName + " is not a valid Subsidiary State! "
+            OpenSignalsMain.exitMinecraftWithMessage(enumName + " is not a valid Subsidiary State! "
                     + "Valid Subsidiary States: " + SubsidiaryState.ALL_STATES);
         final Map<SEProperty, String> allValues = new HashMap<>();
         values.forEach(str -> {

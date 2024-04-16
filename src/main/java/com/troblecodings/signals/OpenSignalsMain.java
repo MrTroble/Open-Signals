@@ -103,4 +103,9 @@ public class OpenSignalsMain {
             log = LogManager.getLogger(MODID);
         return log;
     }
+
+    public static void exitMinecraftWithMessage(final String message) {
+        getLogger().error(message);
+        System.exit(0);
+    }
 }
