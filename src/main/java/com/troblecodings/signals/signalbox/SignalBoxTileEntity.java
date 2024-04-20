@@ -88,12 +88,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         } else if (block == OSBlocks.SIGNAL_BOX) {
             type = LinkType.SIGNALBOX;
         }
-        final SignalStateInfo info = new SignalStateInfo(level, pos, (Signal) block);
         final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(level, pos));
         if (type.equals(LinkType.SIGNAL)) {
+            final SignalStateInfo info = new SignalStateInfo(level, pos, (Signal) block);
             SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, holder));
         }
-        NameHandler.loadName(new StateLoadHolder(info, holder));
+        NameHandler.loadName(new StateLoadHolder(new StateInfo(level, pos), holder));
         setChanged();
         return SignalBoxHandler.linkPosToSignalBox(new StateInfo(level, worldPosition), pos,
                 (BasicBlock) block, type);

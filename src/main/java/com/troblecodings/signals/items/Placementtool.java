@@ -140,7 +140,7 @@ public class Placementtool extends Item
         }
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
         SignalStateHandler.createStates(info, signalProperties, player);
-        NameHandler.createName(nameInfo, nametoSet);
+        NameHandler.createName(nameInfo, nametoSet, player);
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockPlaceContext(context)), 3);
         return InteractionResult.SUCCESS;
     }

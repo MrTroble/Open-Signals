@@ -86,11 +86,16 @@ public final class NameHandler implements INetworkSync {
         channel.registerObject(obj);
     }
 
-    public static void createName(final StateInfo info, final String name) {
+    public static void createName(final StateInfo info, final String name, final Player creator) {
         if (info.world.isClientSide || name == null)
             return;
         new Thread(() -> {
             setNameForNonSignal(info, name);
+            final List<LoadHolder<?>> list = new ArrayList<>();
+            list.add(new LoadHolder<>(creator));
+            synchronized (LOAD_COUNTER) {
+                LOAD_COUNTER.put(info, list);
+            }
             createToFile(info, name);
         }, "OSNameHandler:createName").start();
     }
