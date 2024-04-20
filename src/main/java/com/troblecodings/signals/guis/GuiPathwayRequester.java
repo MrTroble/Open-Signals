@@ -107,7 +107,7 @@ public class GuiPathwayRequester extends GuiBase {
         plane.setWidth(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
         plane.setHeight(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
         splitter.add(new UIScroll(s -> {
-            final float newScale = (float) (plane.getScaleX() + s * 0.05f);
+            final float newScale = (float) (plane.getScaleX() + s * 0.001f);
             if (newScale <= 0)
                 return;
             plane.setScaleX(newScale);
