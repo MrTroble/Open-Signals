@@ -3,12 +3,12 @@ package com.troblecodings.signals.signalbox;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -44,13 +44,32 @@ public final class SignalBoxUtil {
         }
     }
 
-    public static class ConnectionChecker {
+    public static class PathIdentifier {
 
         public Path path;
-        public SignalBoxNode nextNode;
+        public ModeIdentifier identifier;
+
+        public PathIdentifier(final Path path, final Point point, final ModeSet mode) {
+            this.path = path;
+            this.identifier = new ModeIdentifier(point, mode);
+        }
+
+        public ModeSet getMode() {
+            return identifier.mode;
+        }
+
+        public Point getPoint() {
+            return identifier.point;
+        }
+
+    }
+
+    public static class ConnectionChecker {
+
         public PathType type;
-        public SignalBoxNode lastNode;
-        public Point previous;
+        public SignalBoxNode nextNode;
+        public Point previousPoint;
+        public Path path;
         public Set<Path> visited;
 
         public boolean check() {
@@ -60,14 +79,13 @@ public final class SignalBoxUtil {
                     .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
             if (optional.isPresent() && !optional.get().equals(EnumPathUsage.FREE))
                 return false;
-            if (nextNode.equals(lastNode))
-                return true;
-            return previous.equals(path.point1) && !visited.contains(path);
+            return path.point1.equals(previousPoint) && !visited.contains(path);
         }
+
     }
 
-    public static Optional<SignalBoxPathway> requestWay(final Map<Point, SignalBoxNode> modeGrid,
-            final Point p1, final Point p2) {
+    public static Optional<SignalBoxPathway> requestPathway(
+            final Map<Point, SignalBoxNode> modeGrid, final Point p1, final Point p2) {
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
             return Optional.empty();
         final SignalBoxNode lastNode = modeGrid.get(p2);
@@ -77,61 +95,67 @@ public final class SignalBoxUtil {
             return Optional.empty();
 
         final Map<Point, Point> closedList = new HashMap<>();
-        final Map<Point, Double> fscores = new HashMap<>();
-        final Map<Point, Double> gscores = new HashMap<>();
-
-        final List<Point> openList = new ArrayList<>();
-        final Set<Path> visitedPaths = new HashSet<>();
-
-        openList.add(p1);
-        gscores.put(p1, 0.0);
-        fscores.put(p1, calculateHeuristic(p1, p2));
+        final Map<PathIdentifier, Double> scores = new HashMap<>();
+        final Set<Path> visited = new HashSet<>();
 
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         final ConnectionChecker checker = factory.getConnectionChecker();
-        checker.visited = visitedPaths;
-        checker.lastNode = lastNode;
         checker.type = pathType;
+        checker.visited = visited;
 
-        while (!openList.isEmpty()) {
-            final Point currentNode = openList.stream().min((n1, n2) -> {
-                return Double.compare(fscores.getOrDefault(n1, Double.MAX_VALUE),
-                        fscores.getOrDefault(n2, Double.MAX_VALUE));
-            }).get();
-            openList.remove(currentNode);
-            final SignalBoxNode nextSignalnode = modeGrid.get(currentNode);
-            if (currentNode.equals(p2)) {
+        for (final PathIdentifier pathIdent : firstNode.toPathIdentifier())
+            scores.put(pathIdent, getCosts(pathIdent.getMode(), p1, p2));
+
+        while (!scores.isEmpty()) {
+            final PathIdentifier currentPath = scores.entrySet().stream()
+                    .min((ident1, ident2) -> Double.compare(ident1.getValue(), ident2.getValue()))
+                    .get().getKey();
+            scores.remove(currentPath);
+
+            final Point previousPoint = currentPath.getPoint();
+            final Point nextPoint = currentPath.path.point2;
+            if (previousPoint.equals(p2)) {
                 final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
-                for (Point point = currentNode; point != null; point = closedList.get(point)) {
+                for (Point point = previousPoint; point != null; point = closedList.get(point)) {
                     final SignalBoxNode boxNode = modeGrid.get(point);
                     nodes.add(boxNode);
                 }
                 return Optional.of(factory.getPathway(modeGrid, nodes, pathType));
             }
-            if (nextSignalnode == null)
+            checker.previousPoint = previousPoint;
+            final SignalBoxNode nextNode = modeGrid.get(nextPoint);
+            if (nextNode == null)
                 continue;
-            checker.nextNode = nextSignalnode;
-            for (final Path entry : nextSignalnode.connections()) {
-                final Point neighbour = entry.point2;
-                checker.previous = closedList.get(currentNode);
-                if (checker.previous != null)
-                    checker.path = new Path(checker.previous, neighbour);
-                if (currentNode.equals(p1) || checker.check()) {
-                    final double tScore = gscores.getOrDefault(currentNode, Double.MAX_VALUE - 1)
-                            + 1;
-                    if (tScore < gscores.getOrDefault(neighbour, Double.MAX_VALUE)) {
-                        closedList.put(neighbour, currentNode);
-                        gscores.put(neighbour, tScore);
-                        fscores.put(neighbour, tScore + calculateHeuristic(neighbour, p2));
-                        visitedPaths.add(entry);
-                        visitedPaths.add(entry.getInverse());
-                        if (!openList.contains(neighbour)) {
-                            openList.add(neighbour);
-                        }
-                    }
+
+            checker.nextNode = nextNode;
+            for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
+                checker.path = pathIdent.path;
+                if (nextPoint.equals(p2) || checker.check()) {
+                    scores.put(pathIdent, getCosts(pathIdent.getMode(), nextPoint, p2));
+                    closedList.put(nextPoint, previousPoint);
+                    visited.add(pathIdent.path);
+                    visited.add(pathIdent.path.getInverse());
                 }
             }
         }
         return Optional.empty();
     }
+
+    private static double getCosts(final ModeSet mode, final Point currentPoint,
+            final Point endPoint) {
+        switch (mode.mode) {
+            case STRAIGHT:
+            case IN_CONNECTION:
+            case END: {
+                return calculateHeuristic(currentPoint, endPoint);
+            }
+            case CORNER: {
+                return calculateHeuristic(currentPoint, endPoint) + 1;
+            }
+            default:
+                break;
+        }
+        return Double.MAX_VALUE;
+    }
+
 }

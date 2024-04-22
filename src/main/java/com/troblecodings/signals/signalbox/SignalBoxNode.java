@@ -20,6 +20,7 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.signalbox.SignalBoxUtil.PathIdentifier;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
@@ -338,6 +339,16 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public Set<Path> connections() {
         return ImmutableSet.copyOf(this.possibleConnections.keySet());
+    }
+
+    public List<PathIdentifier> toPathIdentifier() {
+        return possibleConnections.entrySet().stream()
+                .map(entry -> new PathIdentifier(entry.getKey(), point, entry.getValue()))
+                .collect(Collectors.toList());
+    }
+
+    public Map<Path, ModeSet> getAllPaths() {
+        return ImmutableMap.copyOf(possibleConnections);
     }
 
     @Override
