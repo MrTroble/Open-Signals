@@ -288,6 +288,16 @@ public class GuiSignalBox extends GuiBase {
 
                 selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
                         mode, rotation);
+
+                final SizeIntegerables<Integer> pathwayCosts = new SizeIntegerables<>(
+                        "pathway_costs", 20, i -> i);
+                final UIEntity costSelection = GuiElements.createEnumElement(pathwayCosts, i -> {
+                    option.setEntry(PathEntryType.PATHWAY_COSTS, i);
+                    sendIntEntryToServer(i, node, mode, rotation, PathEntryType.PATHWAY_COSTS);
+                }, option.getEntry(PathEntryType.PATHWAY_COSTS)
+                        .orElse(SignalBoxUtil.getDefaultCosts(modeSet)));
+                parent.add(costSelection);
+
                 if (option.getEntry(PathEntryType.OUTPUT).isPresent()) {
                     final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
                     for (final Map.Entry<ModeSet, PathOptionEntry> entry : node.getModes()

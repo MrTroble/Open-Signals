@@ -9,6 +9,7 @@ import java.util.Set;
 
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -104,7 +105,7 @@ public final class SignalBoxUtil {
         checker.visited = visited;
 
         for (final PathIdentifier pathIdent : firstNode.toPathIdentifier())
-            scores.put(pathIdent, getCosts(pathIdent.getMode(), p1, p2));
+            scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
 
         while (!scores.isEmpty()) {
             final PathIdentifier currentPath = scores.entrySet().stream()
@@ -131,7 +132,7 @@ public final class SignalBoxUtil {
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
                 if (nextPoint.equals(p2) || checker.check()) {
-                    scores.put(pathIdent, getCosts(pathIdent.getMode(), nextPoint, p2));
+                    scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
                     visited.add(pathIdent.path);
                     visited.add(pathIdent.path.getInverse());
@@ -141,21 +142,21 @@ public final class SignalBoxUtil {
         return Optional.empty();
     }
 
-    private static double getCosts(final ModeSet mode, final Point currentPoint,
-            final Point endPoint) {
-        switch (mode.mode) {
-            case STRAIGHT:
-            case IN_CONNECTION:
-            case END: {
-                return calculateHeuristic(currentPoint, endPoint);
-            }
-            case CORNER: {
-                return calculateHeuristic(currentPoint, endPoint) + 1;
-            }
-            default:
-                break;
-        }
-        return Double.MAX_VALUE;
+    private static double getCosts(final ModeSet mode, final SignalBoxNode currentNode,
+            final Point currentPoint, final Point endPoint) {
+        final double costs = calculateHeuristic(currentPoint, endPoint)
+                + currentNode.getOption(mode).get().getEntry(PathEntryType.PATHWAY_COSTS)
+                        .orElse(getDefaultCosts(mode));
+        return costs;
+    }
+
+    public static int getDefaultCosts(final ModeSet mode) {
+        final EnumGuiMode guiMode = mode.mode;
+        if (guiMode == EnumGuiMode.STRAIGHT)
+            return 0;
+        if (guiMode == EnumGuiMode.CORNER)
+            return 1;
+        return Integer.MAX_VALUE;
     }
 
 }
