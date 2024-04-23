@@ -6,8 +6,8 @@ import com.troblecodings.signals.signalbox.SignalBoxPathway;
 
 public enum PathwayRequestResult {
 
-    NO_EQUAL_PATH_TYPE("no_equal_path_type"), NOT_IN_GRID("not_in_grid"), ALREDY_USED("alredy_used"),
-    OVERSTEPPING("overstepping"), NO_PATH("no_path"),
+    NO_EQUAL_PATH_TYPE("no_equal_path_type"), NOT_IN_GRID("not_in_grid"),
+    ALREDY_USED("alredy_used"), OVERSTEPPING("overstepping"), NO_PATH("no_path"),
     NO_INTERSIGNALBOX_SELECTED("no_intersignalbox_selected"), PASS("pass");
 
     private final String name;
@@ -22,7 +22,7 @@ public enum PathwayRequestResult {
     }
 
     public PathwayRequestResult setPathway(final SignalBoxPathway pathway) {
-        if (this != PASS)
+        if (!isPass())
             return this;
         this.pathway = pathway;
         return this;
@@ -35,6 +35,10 @@ public enum PathwayRequestResult {
 
     public boolean wouldPathwayBePossilbe() {
         return this == ALREDY_USED;
+    }
+
+    public boolean isPass() {
+        return this == PASS;
     }
 
 }

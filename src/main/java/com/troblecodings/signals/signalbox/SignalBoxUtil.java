@@ -75,8 +75,11 @@ public final class SignalBoxUtil {
         public Set<Path> visited;
 
         public PathwayRequestResult check() {
-            if (nextNode == null || !nextNode.canMakePath(path, type))
-                return PathwayRequestResult.OVERSTEPPING;
+            if (nextNode == null)
+                return PathwayRequestResult.NO_PATH;
+            final PathwayRequestResult nodeResult = nextNode.canMakePath(path, type);
+            if (!nodeResult.isPass())
+                return nodeResult;
             final Optional<EnumPathUsage> optional = nextNode.getOption(path)
                     .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
             if (optional.isPresent() && !optional.get().equals(EnumPathUsage.FREE))

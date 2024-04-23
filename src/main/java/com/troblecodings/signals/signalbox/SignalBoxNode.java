@@ -20,6 +20,7 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.PathIdentifier;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
@@ -274,17 +275,18 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return PathType.NONE;
     }
 
-    public boolean canMakePath(final Path path, final PathType type) {
+    public PathwayRequestResult canMakePath(final Path path, final PathType type) {
         final ModeSet modeSet = this.possibleConnections.get(path);
         if (modeSet == null)
-            return false;
+            return PathwayRequestResult.NO_PATH;
         final Rotation rotation = SignalBoxUtil.getRotationFromDelta(path.point1.delta(this.point));
         for (final EnumGuiMode mode : type.getModes()) {
             final ModeSet possibleOverStepping = new ModeSet(mode, rotation);
             if (this.possibleModes.containsKey(possibleOverStepping))
-                return false; // Found another signal on the path that is not the target
+                return PathwayRequestResult.OVERSTEPPING; // Found another signal on the path that
+                                                          // is not the target
         }
-        return true;
+        return PathwayRequestResult.PASS;
     }
 
     public boolean containsManuellOutput(final ModeSet mode) {

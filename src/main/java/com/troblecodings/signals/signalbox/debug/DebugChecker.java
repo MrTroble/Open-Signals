@@ -9,7 +9,7 @@ public class DebugChecker extends ConnectionChecker {
     @Override
     public PathwayRequestResult check() {
         final PathwayRequestResult flag = super.check();
-        if (flag != PathwayRequestResult.PASS) {
+        if (!flag.isPass()) {
             OpenSignalsMain.getLogger().debug("Check failed for " + this.path);
         }
         return flag;

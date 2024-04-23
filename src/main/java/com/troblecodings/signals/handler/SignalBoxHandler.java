@@ -135,8 +135,8 @@ public final class SignalBoxHandler {
                                         .requestWay(start, end);
                                 final PathwayRequestResult endRequeset = endGrid
                                         .requestWay(otherStartPoint.get(), otherEndPoint.get());
-                                final boolean startDone = startRequeset == PathwayRequestResult.PASS;
-                                final boolean endDone = endRequeset == PathwayRequestResult.PASS;
+                                final boolean startDone = startRequeset.isPass();
+                                final boolean endDone = endRequeset.isPass();
 
                                 if (!startDone || !endDone) {
                                     if (startDone) {

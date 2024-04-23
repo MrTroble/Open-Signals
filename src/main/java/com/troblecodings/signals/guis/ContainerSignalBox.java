@@ -344,7 +344,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                     final PathwayRequestResult request = SignalBoxHandler
                             .requesetInterSignalBoxPathway(new StateInfo(info.world, info.pos),
                                     start, end);
-                    if (request != PathwayRequestResult.PASS) {
+                    if (!request.isPass()) {
                         final WriteBuffer error = new WriteBuffer();
                         error.putEnumValue(SignalBoxNetwork.PW_REQUEST_RESPONSE);
                         error.putEnumValue(request);
