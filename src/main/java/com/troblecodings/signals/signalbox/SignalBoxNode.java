@@ -337,18 +337,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                 .anyMatch(modeSet -> modeSet.mode.equals(EnumGuiMode.OUT_CONNECTION));
     }
 
-    public Set<Path> connections() {
-        return ImmutableSet.copyOf(this.possibleConnections.keySet());
-    }
-
     public List<PathIdentifier> toPathIdentifier() {
         return possibleConnections.entrySet().stream()
                 .map(entry -> new PathIdentifier(entry.getKey(), point, entry.getValue()))
                 .collect(Collectors.toList());
-    }
-
-    public Map<Path, ModeSet> getAllPaths() {
-        return ImmutableMap.copyOf(possibleConnections);
     }
 
     @Override
