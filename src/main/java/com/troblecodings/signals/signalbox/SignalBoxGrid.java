@@ -24,6 +24,7 @@ import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumPathUsage;
+import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
@@ -128,25 +129,26 @@ public class SignalBoxGrid implements INetworkSavable {
         OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
     }
 
-    public boolean requestWay(final Point p1, final Point p2) {
+    public PathwayRequestResult requestWay(final Point p1, final Point p2) {
         if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
-            return false;
-        final Optional<SignalBoxPathway> ways = SignalBoxUtil.requestPathway(modeGrid, p1, p2);
-        ways.ifPresent(way -> {
-            way.setTile(tile);
-            way.deactivateAllOutputsOnPathway();
-            way.setUpdater(pathway -> {
-                updatePrevious(pathway);
-                updateToNet(pathway);
-            });
-            way.setSignalBoxGrid(this);
-            way.setPathStatus(EnumPathUsage.SELECTED);
-            way.updatePathwaySignals();
-            this.onWayAdd(way);
-            updateToNet(way);
+            return PathwayRequestResult.ALREDY_USED;
+        final PathwayRequestResult result = SignalBoxUtil.requestPathway(modeGrid, p1, p2);
+        if (result != PathwayRequestResult.PASS)
+            return result;
+        final SignalBoxPathway way = result.getPathway();
+        way.setTile(tile);
+        way.deactivateAllOutputsOnPathway();
+        way.setUpdater(pathway -> {
+            updatePrevious(pathway);
+            updateToNet(pathway);
         });
+        way.setSignalBoxGrid(this);
+        way.setPathStatus(EnumPathUsage.SELECTED);
+        way.updatePathwaySignals();
+        this.onWayAdd(way);
+        updateToNet(way);
         tile.setChanged();
-        return ways.isPresent();
+        return result;
     }
 
     private void updatePrevious(final SignalBoxPathway pathway) {
@@ -258,17 +260,17 @@ public class SignalBoxGrid implements INetworkSavable {
     private void tryNextPathways() {
         executingForEach = true;
         nextPathways.removeIf(entry -> {
-            final boolean request = requestWay(entry.getKey(), entry.getValue());
-            if (request) {
+            final PathwayRequestResult request = requestWay(entry.getKey(), entry.getValue());
+            if (request == PathwayRequestResult.PASS) {
                 if (tile == null || !tile.isBlocked())
-                    return request;
+                    return true;
                 final WriteBuffer buffer = new WriteBuffer();
                 buffer.putEnumValue(SignalBoxNetwork.REMOVE_SAVEDPW);
                 entry.getKey().writeNetwork(buffer);
                 entry.getValue().writeNetwork(buffer);
                 OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
             }
-            return request;
+            return false;
         });
         executingForEach = false;
         toAdd.forEach(nextPathways::add);

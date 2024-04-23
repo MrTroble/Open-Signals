@@ -12,6 +12,7 @@ import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
@@ -73,27 +74,28 @@ public final class SignalBoxUtil {
         public Path path;
         public Set<Path> visited;
 
-        public boolean check() {
+        public PathwayRequestResult check() {
             if (nextNode == null || !nextNode.canMakePath(path, type))
-                return false;
+                return PathwayRequestResult.OVERSTEPPING;
             final Optional<EnumPathUsage> optional = nextNode.getOption(path)
                     .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
             if (optional.isPresent() && !optional.get().equals(EnumPathUsage.FREE))
-                return false;
-            return path.point1.equals(previousPoint) && !visited.contains(path);
+                return PathwayRequestResult.ALREDY_USED;
+            final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
+            return isValid ? PathwayRequestResult.PASS : PathwayRequestResult.NO_PATH;
         }
 
     }
 
-    public static Optional<SignalBoxPathway> requestPathway(
-            final Map<Point, SignalBoxNode> modeGrid, final Point p1, final Point p2) {
+    public static PathwayRequestResult requestPathway(final Map<Point, SignalBoxNode> modeGrid,
+            final Point p1, final Point p2) {
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
-            return Optional.empty();
+            return PathwayRequestResult.NOT_IN_GRID;
         final SignalBoxNode lastNode = modeGrid.get(p2);
         final SignalBoxNode firstNode = modeGrid.get(p1);
         final PathType pathType = firstNode.getPathType(lastNode);
         if (pathType.equals(PathType.NONE))
-            return Optional.empty();
+            return PathwayRequestResult.NO_PATH_TYPE;
 
         final Map<Point, Point> closedList = new HashMap<>();
         final Map<PathIdentifier, Double> scores = new HashMap<>();
@@ -103,6 +105,7 @@ public final class SignalBoxUtil {
         final ConnectionChecker checker = factory.getConnectionChecker();
         checker.type = pathType;
         checker.visited = visited;
+        PathwayRequestResult result = PathwayRequestResult.NO_PATH;
 
         for (final PathIdentifier pathIdent : firstNode.toPathIdentifier())
             scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
@@ -121,17 +124,21 @@ public final class SignalBoxUtil {
                     final SignalBoxNode boxNode = modeGrid.get(point);
                     nodes.add(boxNode);
                 }
-                return Optional.of(factory.getPathway(modeGrid, nodes, pathType));
+                result = PathwayRequestResult.PASS;
+                return result.setPathway(factory.getPathway(modeGrid, nodes, pathType));
             }
             checker.previousPoint = previousPoint;
             final SignalBoxNode nextNode = modeGrid.get(nextPoint);
-            if (nextNode == null)
+            if (nextNode == null) {
+                result = PathwayRequestResult.NO_PATH;
                 continue;
+            }
 
             checker.nextNode = nextNode;
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
-                if (nextPoint.equals(p2) || checker.check()) {
+                result = checker.check();
+                if (nextPoint.equals(p2) || result == PathwayRequestResult.PASS) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
                     visited.add(pathIdent.path);
@@ -139,7 +146,7 @@ public final class SignalBoxUtil {
                 }
             }
         }
-        return Optional.empty();
+        return result;
     }
 
     private static double getCosts(final ModeSet mode, final SignalBoxNode currentNode,

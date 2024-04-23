@@ -23,6 +23,7 @@ import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
@@ -204,15 +205,18 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 colorUpdates.accept(grid.readUpdateNetwork(buffer, false));
                 break;
             }
-            case NO_PW_FOUND: {
-                infoUpdates.accept(I18Wrapper.format("error.nopathfound"));
+            case PW_REQUEST_RESPONSE: {
+                final PathwayRequestResult result = buffer.getEnumValue(PathwayRequestResult.class);
+                infoUpdates.accept(I18Wrapper.format("error." + result.getName()));
                 break;
             }
             case ADDED_TO_SAVER: {
+                final PathwayRequestResult result = buffer.getEnumValue(PathwayRequestResult.class);
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
                 nextPathways.add(Maps.immutableEntry(start, end));
-                infoUpdates.accept(I18Wrapper.format("info.pathwaysaver"));
+                infoUpdates.accept(I18Wrapper.format("error." + result.getName()) + " - "
+                        + I18Wrapper.format("info.pathwaysaver"));
                 break;
             }
             case OUTPUT_UPDATE: {
@@ -337,25 +341,31 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
                 if (grid.getNode(end).containsOutConnection()) {
-                    if (!SignalBoxHandler.requesetInterSignalBoxPathway(
-                            new StateInfo(info.world, info.pos), start, end)) {
+                    final PathwayRequestResult request = SignalBoxHandler
+                            .requesetInterSignalBoxPathway(new StateInfo(info.world, info.pos),
+                                    start, end);
+                    if (request != PathwayRequestResult.PASS) {
                         final WriteBuffer error = new WriteBuffer();
-                        error.putEnumValue(SignalBoxNetwork.NO_PW_FOUND);
+                        error.putEnumValue(SignalBoxNetwork.PW_REQUEST_RESPONSE);
+                        error.putEnumValue(request);
                         OpenSignalsMain.network.sendTo(info.player, error);
                     }
                     break;
                 }
-                if (!grid.requestWay(start, end)) {
-                    if (grid.addNextPathway(start, end)) {
+                final PathwayRequestResult requset = grid.requestWay(start, end);
+                if (requset != PathwayRequestResult.PASS) {
+                    if (requset.wouldPathwayBePossilbe() && grid.addNextPathway(start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
+                        sucess.putEnumValue(requset);
                         start.writeNetwork(sucess);
                         end.writeNetwork(sucess);
                         OpenSignalsMain.network.sendTo(info.player, sucess);
                         break;
                     }
                     final WriteBuffer error = new WriteBuffer();
-                    error.putEnumValue(SignalBoxNetwork.NO_PW_FOUND);
+                    error.putEnumValue(SignalBoxNetwork.PW_REQUEST_RESPONSE);
+                    error.putEnumValue(requset);
                     OpenSignalsMain.network.sendTo(info.player, error);
                 }
                 break;
