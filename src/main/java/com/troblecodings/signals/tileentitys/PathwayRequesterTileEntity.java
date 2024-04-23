@@ -26,8 +26,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         implements ILinkableTile, IChunkLoadable {
 
     private BlockPos linkedSignalBox;
-    private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(-1, -1),
-            new Point(-1, -1));
+    private Map.Entry<Point, Point> pathway =
+            Maps.immutableEntry(new Point(-1, -1), new Point(-1, -1));
     private boolean addPWToSaver = true;
 
     public PathwayRequesterTileEntity(final TileEntityInfo info) {
@@ -47,14 +47,16 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         final Point end = new Point();
         end.read(wrapper.getWrapper(END_POINT));
         pathway = Maps.immutableEntry(start, end);
-        if (wrapper.contains(ADD_TO_PW_SAVER))
+        if (wrapper.contains(ADD_TO_PW_SAVER)) {
             addPWToSaver = wrapper.getBoolean(ADD_TO_PW_SAVER);
+        }
     }
 
     @Override
     public void saveWrapper(final NBTWrapper wrapper) {
-        if (linkedSignalBox != null)
+        if (linkedSignalBox != null) {
             wrapper.putBlockPos(LINKED_SIGNALBOX, linkedSignalBox);
+        }
         final NBTWrapper startPoint = new NBTWrapper();
         pathway.getKey().write(startPoint);
         final NBTWrapper endPoint = new NBTWrapper();
@@ -76,9 +78,9 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
                         SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
                                 pathway.getValue());
                     } else {
-                        final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
-                                pathway.getValue());
-                        if (!result.isPass() && result.wouldPathwayBePossilbe() && addPWToSaver) {
+                        final PathwayRequestResult result =
+                                grid.requestWay(pathway.getKey(), pathway.getValue());
+                        if (!result.isPass() && result.isPathwayInUse() && addPWToSaver) {
                             grid.addNextPathway(pathway.getKey(), pathway.getValue());
                         }
                     }

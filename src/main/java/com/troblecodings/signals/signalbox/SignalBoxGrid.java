@@ -131,7 +131,7 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public PathwayRequestResult requestWay(final Point p1, final Point p2) {
         if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
-            return PathwayRequestResult.ALREDY_USED;
+            return PathwayRequestResult.ALREADY_USED;
         final PathwayRequestResult result = SignalBoxUtil.requestPathway(modeGrid, p1, p2);
         if (result != PathwayRequestResult.PASS)
             return result;

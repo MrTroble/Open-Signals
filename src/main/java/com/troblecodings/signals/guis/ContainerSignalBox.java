@@ -352,12 +352,12 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                     }
                     break;
                 }
-                final PathwayRequestResult requset = grid.requestWay(start, end);
-                if (requset != PathwayRequestResult.PASS) {
-                    if (requset.wouldPathwayBePossilbe() && grid.addNextPathway(start, end)) {
+                final PathwayRequestResult request = grid.requestWay(start, end);
+                if (request != PathwayRequestResult.PASS) {
+                    if (request.isPathwayInUse() && grid.addNextPathway(start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
-                        sucess.putEnumValue(requset);
+                        sucess.putEnumValue(request);
                         start.writeNetwork(sucess);
                         end.writeNetwork(sucess);
                         OpenSignalsMain.network.sendTo(info.player, sucess);
@@ -365,7 +365,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                     }
                     final WriteBuffer error = new WriteBuffer();
                     error.putEnumValue(SignalBoxNetwork.PW_REQUEST_RESPONSE);
-                    error.putEnumValue(requset);
+                    error.putEnumValue(request);
                     OpenSignalsMain.network.sendTo(info.player, error);
                 }
                 break;

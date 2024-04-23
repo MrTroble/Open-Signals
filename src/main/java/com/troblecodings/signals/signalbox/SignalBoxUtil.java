@@ -83,7 +83,7 @@ public final class SignalBoxUtil {
             final Optional<EnumPathUsage> optional = nextNode.getOption(path)
                     .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
             if (optional.isPresent() && !optional.get().equals(EnumPathUsage.FREE))
-                return PathwayRequestResult.ALREDY_USED;
+                return PathwayRequestResult.ALREADY_USED;
             final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
             return isValid ? PathwayRequestResult.PASS : PathwayRequestResult.NO_PATH;
         }
