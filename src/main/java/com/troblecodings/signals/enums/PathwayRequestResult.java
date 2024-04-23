@@ -33,7 +33,7 @@ public enum PathwayRequestResult {
         return pathway;
     }
 
-    public boolean isPathwayInUse() {
+    public boolean isPathwayPossibleButCurrentyBlocked() {
         return this == ALREADY_USED;
     }
 

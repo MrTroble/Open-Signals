@@ -110,8 +110,11 @@ public final class SignalBoxUtil {
         checker.visited = visited;
         PathwayRequestResult result = PathwayRequestResult.NO_PATH;
 
-        for (final PathIdentifier pathIdent : firstNode.toPathIdentifier())
-            scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
+        final Point startPoint = firstNode.getStartPoint(pathType);
+        for (final PathIdentifier pathIdent : firstNode.toPathIdentifier()) {
+            if (startPoint.equals(pathIdent.path.point2))
+                scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
+        }
 
         while (!scores.isEmpty()) {
             final PathIdentifier currentPath = scores.entrySet().stream()
