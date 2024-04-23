@@ -95,7 +95,7 @@ public final class SignalBoxUtil {
         final SignalBoxNode firstNode = modeGrid.get(p1);
         final PathType pathType = firstNode.getPathType(lastNode);
         if (pathType.equals(PathType.NONE))
-            return PathwayRequestResult.NO_PATH_TYPE;
+            return PathwayRequestResult.NO_EQUAL_PATH_TYPE;
 
         final Map<Point, Point> closedList = new HashMap<>();
         final Map<PathIdentifier, Double> scores = new HashMap<>();

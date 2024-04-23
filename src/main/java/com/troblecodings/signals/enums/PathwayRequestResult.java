@@ -6,7 +6,7 @@ import com.troblecodings.signals.signalbox.SignalBoxPathway;
 
 public enum PathwayRequestResult {
 
-    NO_PATH_TYPE("no_path_type"), NOT_IN_GRID("not_in_grid"), ALREDY_USED("alredy_used"),
+    NO_EQUAL_PATH_TYPE("no_equal_path_type"), NOT_IN_GRID("not_in_grid"), ALREDY_USED("alredy_used"),
     OVERSTEPPING("overstepping"), NO_PATH("no_path"),
     NO_INTERSIGNALBOX_SELECTED("no_intersignalbox_selected"), PASS("pass");
 
