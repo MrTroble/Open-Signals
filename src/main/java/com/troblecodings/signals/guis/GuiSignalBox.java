@@ -1267,6 +1267,8 @@ public class GuiSignalBox extends GuiBase {
             final Path path = new Path(oldPos, newPos);
             final SignalBoxNode current = listOfNodes.get(i);
             final UISignalBoxTile uiTile = allTiles.get(current.getPoint());
+            if (uiTile == null)
+                continue;
             final ModeSet modeSet = current.getMode(path);
             current.getOption(modeSet)
                     .ifPresent(poe -> uiTile.setColor(modeSet, poe.getEntry(PathEntryType.PATHUSAGE)

@@ -159,7 +159,8 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                             break;
                     }
                     break;
-                case IN_CONNECTION: {
+                case IN_CONNECTION:
+                case OUT_CONNECTION: {
                     switch (mode.rotation) {
                         case NONE:
                         case CLOCKWISE_180: {
