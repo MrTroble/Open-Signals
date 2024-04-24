@@ -192,8 +192,12 @@ public class Signal extends BasicBlock {
                 ? ClientSignalStateHandler.getClientStates(new StateInfo(info.world, info.pos))
                 : tile.getProperties();
         properties.forEach((property, value) -> {
-            if (signalProperties.contains(property))
+            if (signalProperties.contains(property)) {
                 blockState.getAndUpdate(oldState -> oldState.withProperty(property, value));
+            } else {
+                OpenSignalsMain.getLogger().error("Tried to set invalid SEProperty [" + property
+                        + "] on [" + this + "]. Rejected!");
+            }
         });
         return blockState.get();
     }
