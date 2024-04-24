@@ -2,8 +2,7 @@
 	"systemProperties": {
 		"placementToolName": "signplacementtool",
 		"defaultHeight": 0,
-		"offsetY": -2,
-		"customNameRenderHeight": 0.5,
+		"customNameRenderHeight": 0.75,
 		"signWidth": 56,
 		"autoscale": true,
 		"textColor": 16777215,

@@ -67,8 +67,8 @@ public class Signal extends BasicBlock {
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
     public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
-    public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
-            SignalAngel.class);
+    public static final EnumProperty<SignalAngel> ANGEL =
+            EnumProperty.create("angel", SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
@@ -122,8 +122,8 @@ public class Signal extends BasicBlock {
 
     @Override
     public BlockState getStateForPlacement(final BlockPlaceContext context) {
-        final int angel = Integer
-                .valueOf(Mth.floor(context.getRotation() * 16.0F / 360.0F + 0.5D) & 15);
+        final int angel =
+                Integer.valueOf(Mth.floor(context.getRotation() * 16.0F / 360.0F + 0.5D) & 15);
         return defaultBlockState().setValue(ANGEL, SignalAngel.values()[angel]);
     }
 
@@ -231,75 +231,7 @@ public class Signal extends BasicBlock {
 
     @OnlyIn(Dist.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
-        if (this.prop.autoscale) {
-            this.renderScaleOverlay(info, this.prop.customNameRenderHeight);
-            return;
-        }
-        this.renderOverlay(info, this.prop.customNameRenderHeight);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
-        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
-                new StateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos()));
-        final String customNameState = map.get(CUSTOMNAME);
-        if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
-            return;
-        float customRenderHeight = renderHeight;
-        for (final PredicateProperty<Float> property : this.prop.customRenderHeights) {
-            if (property.test(map)) {
-                customRenderHeight = property.state;
-            }
-            if (customRenderHeight == -1)
-                return;
-        }
-        final Level world = info.tileEntity.getLevel();
-        final BlockPos pos = info.tileEntity.getBlockPos();
-        final BlockState state = world.getBlockState(pos);
-        if (!(state.getBlock() instanceof Signal)) {
-            return;
-        }
-        boolean doubleSidedText = false;
-        for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
-            if (boolProp.test(map)) {
-                doubleSidedText = boolProp.state;
-            }
-        }
-        final SignalAngel face = state.getValue(Signal.ANGEL);
-        final Quaternion angle = face.getQuaternion();
-
-        info.stack.pushPose();
-        info.stack.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
-        info.stack.mulPose(angle);
-
-        renderSingleScaleOverlay(info);
-
-        if (doubleSidedText) {
-            final Quaternion quad = new Quaternion(
-                    Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
-            info.stack.mulPose(quad);
-            info.stack.mulPose(face.getQuaternion());
-            renderSingleScaleOverlay(info);
-        }
-        info.stack.popPose();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void renderSingleScaleOverlay(final RenderOverlayInfo info) {
-        final String name = info.tileEntity.getNameWrapper();
-        final float nameWidth = info.font.width(name);
-        final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
-
-        info.stack.pushPose();
-        info.stack.scale(-scale, -scale, 1);
-        info.stack.translate(-nameWidth / 2, 0, -0.32f);
-        info.font.draw(info.stack, name, 0, 0, this.prop.textColor);
-        info.stack.popPose();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
-        float customRenderHeight = renderHeight;
+        float customRenderHeight = this.prop.customNameRenderHeight;
 
         final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
                 new StateInfo(info.tileEntity.getLevel(), info.tileEntity.getBlockPos()));
@@ -316,9 +248,8 @@ public class Signal extends BasicBlock {
         final Level world = info.tileEntity.getLevel();
         final BlockPos pos = info.tileEntity.getBlockPos();
         final BlockState state = world.getBlockState(pos);
-        if (!(state.getBlock() instanceof Signal)) {
+        if (!(state.getBlock() instanceof Signal))
             return;
-        }
         boolean doubleSidedText = false;
         for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
             if (boolProp.test(map)) {
@@ -326,43 +257,68 @@ public class Signal extends BasicBlock {
             }
         }
 
-        final String name = info.tileEntity.getNameWrapper();
-        final String[] splitNames = name.split("\\[n\\]");
         final SignalAngel face = state.getValue(Signal.ANGEL);
         final Quaternion angle = face.getQuaternion();
-        final float scale = this.prop.signScale;
 
         info.stack.pushPose();
         info.stack.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
         info.stack.mulPose(angle);
-        info.stack.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
 
-        renderSingleOverlay(info, splitNames);
+        if (!this.prop.autoscale) {
+            renderSingleOverlay(info);
+        } else {
+            renderSingleScaleOverlay(info);
+        }
 
         if (doubleSidedText) {
             final Quaternion quad = new Quaternion(
                     Quaternion.fromXYZ(0, (float) (-face.getRadians() + Math.PI), 0));
             info.stack.mulPose(quad);
             info.stack.mulPose(face.getQuaternion());
-            renderSingleOverlay(info, splitNames);
+
+            if (!this.prop.autoscale) {
+                renderSingleOverlay(info);
+            } else {
+                renderSingleScaleOverlay(info);
+            }
         }
         info.stack.popPose();
     }
 
     @OnlyIn(Dist.CLIENT)
-    public void renderSingleOverlay(final RenderOverlayInfo info, final String[] splitNames) {
+    private void renderSingleOverlay(final RenderOverlayInfo info) {
+        final String name = info.tileEntity.getNameWrapper();
+        final String[] splitNames = name.split("\\[n\\]");
         final float signWidth = this.prop.signWidth;
+        final float scale = this.prop.signScale;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
+
         info.stack.pushPose();
+        info.stack.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
         info.stack.translate(offsetX, 0, -4.2f + offsetZ);
 
         for (int j = 0; j < splitNames.length; j++) {
-            final String name = splitNames[j];
-            final float nameWidth = info.font.width(name);
-            final float center = (signWidth - nameWidth) / 2;
-            info.font.draw(info.stack, name, (int) center - 10, j * 10, this.prop.textColor);
+            final String text = splitNames[j];
+            final float textWidth = info.font.width(text);
+            final float center = (signWidth - textWidth) / 2;
+            info.font.draw(info.stack, text, (int) center - 10, j * 10, this.prop.textColor);
         }
+        info.stack.popPose();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    private void renderSingleScaleOverlay(final RenderOverlayInfo info) {
+        final String name = info.tileEntity.getNameWrapper();
+        final float nameWidth = info.font.width(name);
+        final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
+        final float offsetX = this.prop.offsetX;
+        final float offsetZ = this.prop.offsetY;
+
+        info.stack.pushPose();
+        info.stack.translate(-offsetX * 0.015f, 0, offsetZ * 0.013f);
+        info.stack.scale(-scale, -scale, 1);
+        info.font.draw(info.stack, name, -nameWidth / 2, 0, this.prop.textColor);
         info.stack.popPose();
     }
 
@@ -378,9 +334,8 @@ public class Signal extends BasicBlock {
     public InteractionResult use(final BlockState blockstate, final Level level,
             final BlockPos blockPos, final Player placer, final InteractionHand hand,
             final BlockHitResult blockHit) {
-        if (!(blockstate.getBlock() instanceof Signal)) {
+        if (!(blockstate.getBlock() instanceof Signal))
             return InteractionResult.FAIL;
-        }
         final SignalStateInfo stateInfo = new SignalStateInfo(level, blockPos, this);
         final boolean customname = canHaveCustomname(SignalStateHandler.getStates(stateInfo));
         final Item item = placer.getItemInHand(InteractionHand.MAIN_HAND).getItem();
@@ -431,9 +386,8 @@ public class Signal extends BasicBlock {
     @Override
     public int getDirectSignal(final BlockState blockState, final BlockGetter blockAccess,
             final BlockPos pos, final Direction side) {
-        if (!hasRedstoneOut() || !(blockAccess instanceof Level)) {
+        if (!hasRedstoneOut() || !(blockAccess instanceof Level))
             return 0;
-        }
         final SignalStateInfo stateInfo = new SignalStateInfo((Level) blockAccess, pos, this);
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
         for (final List<ValuePack> valuePacks : ImmutableList.of(this.prop.redstoneOutputPacks,
@@ -441,9 +395,8 @@ public class Signal extends BasicBlock {
             for (final ValuePack pack : valuePacks) {
                 if (properties.containsKey(pack.property) && pack.predicate.test(properties)
                         && !properties.get(pack.property)
-                                .equalsIgnoreCase(pack.property.getDefault())) {
+                                .equalsIgnoreCase(pack.property.getDefault()))
                     return 15;
-                }
             }
         }
         return 0;
@@ -462,9 +415,9 @@ public class Signal extends BasicBlock {
             if (sound.duration == 1) {
                 world.playSound(null, pos, sound.state, SoundSource.BLOCKS, 1.0F, 1.0F);
             } else {
-                if (world.getBlockTicks().hasScheduledTick(pos, this)) {
+                if (world.getBlockTicks().hasScheduledTick(pos, this))
                     return;
-                } else {
+                else {
                     if (sound.predicate.test(properties)) {
                         world.scheduleTick(pos, this, 1);
                     }
@@ -475,9 +428,8 @@ public class Signal extends BasicBlock {
 
     public SoundProperty getSound(final Map<SEProperty, String> map) {
         for (final SoundProperty property : this.prop.sounds) {
-            if (property.predicate.test(map)) {
+            if (property.predicate.test(map))
                 return property;
-            }
         }
         return new SoundProperty(t -> true, null, 0);
     }
@@ -485,15 +437,13 @@ public class Signal extends BasicBlock {
     @Override
     public void tick(final BlockState state, final ServerLevel world, final BlockPos pos,
             final Random rand) {
-        if (this.prop.sounds.isEmpty() || world.isClientSide) {
+        if (this.prop.sounds.isEmpty() || world.isClientSide)
             return;
-        }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
         SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
             final SoundProperty sound = getSound(properties);
-            if (sound.duration <= 1) {
+            if (sound.duration <= 1)
                 return;
-            }
             world.playSound(null, pos, sound.state, SoundSource.BLOCKS, 1.0F, 1.0F);
             world.scheduleTick(pos, this, sound.duration);
         });
