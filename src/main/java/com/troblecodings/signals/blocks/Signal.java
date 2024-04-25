@@ -15,6 +15,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.core.JsonEnum;
+import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.core.SignalProperties;
@@ -48,6 +49,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition.Builder;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -77,6 +79,8 @@ public class Signal extends BasicBlock {
     private final int id;
     private List<SEProperty> signalProperties;
     private final Map<SEProperty, Integer> signalPropertiesToInt = new HashMap<>();
+
+    private float animationProgress = 0.0f;
 
     public Signal(final SignalProperties prop) {
         super(Properties.of(Material.STONE).noOcclusion()
@@ -452,5 +456,34 @@ public class Signal extends BasicBlock {
     @Override
     public Optional<TileEntitySupplierWrapper> getSupplierWrapper() {
         return Optional.of(SUPPLIER);
+    }
+
+    public boolean hasAnimation() {
+        return true;
+    }
+
+    private float getAnimationProgress() {
+        return this.animationProgress;
+    }
+
+    private void setAnimationProgress(final float animationProgress) {
+        this.animationProgress = animationProgress + 0.005f;
+    }
+
+    @SuppressWarnings("deprecation")
+    public void renderAnimation(final RenderAnimationInfo info) {
+        info.stack.pushPose(); // erst Berechnungen ausführen, dann Block rendern
+        info.stack.translate(0.5f, 1, 0.5f); // Block verschieben
+
+        info.stack.mulPose(Quaternion.fromXYZ(0, getAnimationProgress(), 0));
+        setAnimationProgress(getAnimationProgress()); // Progress aktualisieren
+
+        info.stack.translate(-0.5f, 0, -0.5f); // Pivot Punkt verschieben
+
+        info.dispatcher.renderSingleBlock(Blocks.GLASS.defaultBlockState(), info.stack, info.source,
+                info.lightColor, info.overlayTexture); // Block rendern
+        // Minecraft.getInstance().getModelManager().getBlockModelShaper()
+        // .getBlockModel(tile.getBlockState());
+        info.stack.popPose();
     }
 }

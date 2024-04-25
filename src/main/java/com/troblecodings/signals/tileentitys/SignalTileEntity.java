@@ -10,6 +10,7 @@ import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
@@ -64,6 +65,13 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         signal.renderOverlay(info.with(this));
     }
 
+    public void renderAnimation(final RenderAnimationInfo info) {
+        final Signal signal = getSignal();
+        if (signal == null)
+            return;
+        signal.renderAnimation(info.with(this));
+    }
+
     @Override
     public String getNameWrapper() {
         final String name = super.getNameWrapper();
@@ -84,8 +92,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
 
     @Override
     public @Nonnull IModelData getModelData() {
-        final Map<SEProperty, String> states = ClientSignalStateHandler
-                .getClientStates(new StateInfo(level, worldPosition));
+        final Map<SEProperty, String> states =
+                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
         return new ModelInfoWrapper(states);
     }
 

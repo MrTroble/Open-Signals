@@ -1,6 +1,7 @@
 package com.troblecodings.signals.tileentitys;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,8 +19,12 @@ public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnti
     @Override
     public void render(final SignalTileEntity tile, final float tick, final PoseStack stack,
             final MultiBufferSource source, final int rand1, final int rand2) {
-        if (!tile.hasCustomName())
-            return;
-        tile.renderOverlay(new RenderOverlayInfo(stack, 0, 0, 0, context.getFont()));
+        if (tile.hasCustomName()) {
+            tile.renderOverlay(new RenderOverlayInfo(stack, 0, 0, 0, context.getFont()));
+        }
+        if (tile.getSignal().hasAnimation()) {
+            tile.renderAnimation(new RenderAnimationInfo(stack, context.getBlockRenderDispatcher(),
+                    source, rand1, rand2));
+        }
     }
 }
