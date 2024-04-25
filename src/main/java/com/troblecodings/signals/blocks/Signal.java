@@ -71,8 +71,8 @@ public class Signal extends BasicBlock {
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
     public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
-    public static final PropertyEnum<SignalAngel> ANGEL = PropertyEnum.create("angel",
-            SignalAngel.class);
+    public static final PropertyEnum<SignalAngel> ANGEL =
+            PropertyEnum.create("angel", SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
@@ -148,8 +148,8 @@ public class Signal extends BasicBlock {
     public IBlockState getStateForPlacement(final World world, final BlockPos pos,
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ,
             final int meta, final EntityLivingBase placer, final EnumHand hand) {
-        final int index = 15
-                - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
+        final int index =
+                15 - (MathHelper.floor(placer.getRotationYawHead() * 16.0F / 360.0F - 0.5D) & 15);
         return getDefaultState().withProperty(ANGEL, SignalAngel.values()[index]);
     }
 
@@ -303,76 +303,7 @@ public class Signal extends BasicBlock {
 
     @SideOnly(Side.CLIENT)
     public void renderOverlay(final RenderOverlayInfo info) {
-        if (this.prop.autoscale) {
-            this.renderScaleOverlay(info, this.prop.customNameRenderHeight);
-            return;
-        }
-        this.renderOverlay(info, this.prop.customNameRenderHeight);
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void renderScaleOverlay(final RenderOverlayInfo info, final float renderHeight) {
-        final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
-                new StateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
-        final String customNameState = map.get(CUSTOMNAME);
-        if (customNameState == null || customNameState.equalsIgnoreCase("FALSE"))
-            return;
-        float customRenderHeight = renderHeight;
-        for (final PredicateProperty<Float> property : this.prop.customRenderHeights) {
-            if (property.predicate.test(map)) {
-                customRenderHeight = property.state;
-            }
-            if (customRenderHeight == -1)
-                return;
-        }
-        final World world = info.tileEntity.getWorld();
-        final BlockPos pos = info.tileEntity.getPos();
-        final IBlockState state = world.getBlockState(pos);
-        if (!(state.getBlock() instanceof Signal)) {
-            return;
-        }
-        boolean doubleSidedText = false;
-        for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
-            if (boolProp.predicate.test(map)) {
-                doubleSidedText = boolProp.state;
-            }
-        }
-        final SignalAngel face = state.getValue(Signal.ANGEL);
-        final float angel = face.getDregree();
-
-        GlStateManager.enableAlpha();
-        GlStateManager.disableLighting();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate(info.x + 0.5f, info.y + 0.75f, info.z + 0.5f);
-        GlStateManager.rotate(angel, 0, 1, 0);
-
-        renderSingleScaleOverlay(info);
-
-        if (doubleSidedText) {
-            GlStateManager.rotate(180, 0, 1, 0);
-            renderSingleScaleOverlay(info);
-        }
-
-        GlStateManager.popMatrix();
-        GlStateManager.enableLighting();
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void renderSingleScaleOverlay(final RenderOverlayInfo info) {
-        final String name = info.tileEntity.getNameWrapper();
-        final float nameWidth = info.font.getStringWidth(name);
-        final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
-
-        GlStateManager.pushMatrix();
-        GlStateManager.scale(-scale, -scale, 1);
-        GlStateManager.translate(-nameWidth / 2, 0, -0.32f);
-        info.font.drawString(name, 0, 0, this.prop.textColor);
-        GlStateManager.popMatrix();
-    }
-
-    @SideOnly(Side.CLIENT)
-    public void renderOverlay(final RenderOverlayInfo info, final float renderHeight) {
-        float customRenderHeight = renderHeight;
+        float customRenderHeight = this.prop.customNameRenderHeight;
         final Map<SEProperty, String> map = ClientSignalStateHandler.getClientStates(
                 new StateInfo(info.tileEntity.getWorld(), info.tileEntity.getPos()));
         final String customNameState = map.get(CUSTOMNAME);
@@ -388,9 +319,8 @@ public class Signal extends BasicBlock {
         final World world = info.tileEntity.getWorld();
         final BlockPos pos = info.tileEntity.getPos();
         final IBlockState state = world.getBlockState(pos);
-        if (!(state.getBlock() instanceof Signal)) {
+        if (!(state.getBlock() instanceof Signal))
             return;
-        }
         boolean doubleSidedText = false;
         for (final PredicateProperty<Boolean> boolProp : this.prop.doubleSidedText) {
             if (boolProp.predicate.test(map)) {
@@ -398,41 +328,67 @@ public class Signal extends BasicBlock {
             }
         }
 
-        final String name = info.tileEntity.getNameWrapper();
-        final String[] splitNames = name.split("\\[n\\]");
         final SignalAngel angle = state.getValue(Signal.ANGEL);
-        final float scale = this.prop.signScale;
 
         GlStateManager.enableAlpha();
         GlStateManager.pushMatrix();
         GlStateManager.translate(info.x + 0.5f, info.y + customRenderHeight, info.z + 0.5f);
         GlStateManager.rotate(angle.getDregree(), 0, 1, 0);
-        GlStateManager.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
 
-        renderSingleOverlay(info, splitNames);
+        if (!this.prop.autoscale) {
+            renderSingleOverlay(info);
+        } else {
+            renderSingleScaleOverlay(info);
+        }
 
         if (doubleSidedText) {
             GlStateManager.rotate(180, 0, 1, 0);
-            renderSingleOverlay(info, splitNames);
+
+            if (!this.prop.autoscale) {
+                renderSingleOverlay(info);
+            } else {
+                renderSingleScaleOverlay(info);
+            }
+
         }
         GlStateManager.popMatrix();
     }
 
     @SideOnly(Side.CLIENT)
-    public void renderSingleOverlay(final RenderOverlayInfo info, final String[] splitNames) {
+    public void renderSingleOverlay(final RenderOverlayInfo info) {
+        final String name = info.tileEntity.getNameWrapper();
+        final String[] splitNames = name.split("\\[n\\]");
         final float signWidth = this.prop.signWidth;
+        final float scale = this.prop.signScale;
         final float offsetX = this.prop.offsetX;
         final float offsetZ = this.prop.offsetY;
 
         GlStateManager.pushMatrix();
+        GlStateManager.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
         GlStateManager.translate(offsetX, 0, -4.2f + offsetZ);
+
         for (int j = 0; j < splitNames.length; j++) {
-            final String name = splitNames[j];
-            final float nameWidth = info.font.getStringWidth(name);
+            final String text = splitNames[j];
+            final float nameWidth = info.font.getStringWidth(text);
             final float center = (signWidth - nameWidth) / 2;
-            info.font.drawSplitString(name, (int) center - 10, j * 10, (int) signWidth,
+            info.font.drawSplitString(text, (int) center - 10, j * 10, (int) signWidth,
                     this.prop.textColor);
         }
+        GlStateManager.popMatrix();
+    }
+
+    @SideOnly(Side.CLIENT)
+    private void renderSingleScaleOverlay(final RenderOverlayInfo info) {
+        final String name = info.tileEntity.getNameWrapper();
+        final float nameWidth = info.font.getStringWidth(name);
+        final float scale = Math.min(1 / (22 * (nameWidth / this.prop.signWidth)), 0.1f);
+        final float offsetX = this.prop.offsetX;
+        final float offsetZ = this.prop.offsetY;
+
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(-offsetX * 0.015f, 0, offsetZ * 0.013f - 0.33f);
+        GlStateManager.scale(-scale, -scale, 1);
+        info.font.drawString(name, (int) (-nameWidth / 2), 0, this.prop.textColor);
         GlStateManager.popMatrix();
     }
 
@@ -450,9 +406,8 @@ public class Signal extends BasicBlock {
             final float hitX, final float hitY, final float hitZ) {
         final Item item = player.getHeldItemMainhand().getItem();
         if (!(state.getBlock() instanceof Signal)
-                || (item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL))) {
+                || (item.equals(OSItems.LINKING_TOOL) || item.equals(OSItems.MULTI_LINKING_TOOL)))
             return false;
-        }
         final SignalStateInfo stateInfo = new SignalStateInfo(world, pos, this);
         final Map<SEProperty, String> states = SignalStateHandler.getStates(stateInfo);
         final boolean customname = canHaveCustomname(states);
@@ -505,9 +460,8 @@ public class Signal extends BasicBlock {
     @Override
     public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess,
             final BlockPos pos, final EnumFacing side) {
-        if (!hasRedstoneOut() || !(blockAccess instanceof World)) {
+        if (!hasRedstoneOut() || !(blockAccess instanceof World))
             return 0;
-        }
         final SignalStateInfo stateInfo = new SignalStateInfo((World) blockAccess, pos, this);
         final Map<SEProperty, String> properties = SignalStateHandler.getStates(stateInfo);
         for (final List<ValuePack> valuePacks : ImmutableList.of(this.prop.redstoneOutputPacks,
@@ -515,9 +469,8 @@ public class Signal extends BasicBlock {
             for (final ValuePack pack : valuePacks) {
                 if (properties.containsKey(pack.property) && pack.predicate.test(properties)
                         && !properties.get(pack.property)
-                                .equalsIgnoreCase(pack.property.getDefault())) {
+                                .equalsIgnoreCase(pack.property.getDefault()))
                     return 15;
-                }
             }
         }
         return 0;
@@ -536,9 +489,9 @@ public class Signal extends BasicBlock {
             if (sound.duration == 1) {
                 world.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
             } else {
-                if (world.isUpdateScheduled(pos, this)) {
+                if (world.isUpdateScheduled(pos, this))
                     return;
-                } else {
+                else {
                     if (sound.predicate.test(properties)) {
                         world.scheduleUpdate(pos, this, 1);
                     }
@@ -549,9 +502,8 @@ public class Signal extends BasicBlock {
 
     public SoundProperty getSound(final Map<SEProperty, String> map) {
         for (final SoundProperty property : this.prop.sounds) {
-            if (property.predicate.test(map)) {
+            if (property.predicate.test(map))
                 return property;
-            }
         }
         return new SoundProperty(null, t -> true, 0);
     }
@@ -559,15 +511,13 @@ public class Signal extends BasicBlock {
     @Override
     public void updateTick(final World worldIn, final BlockPos pos, final IBlockState state,
             final Random rand) {
-        if (this.prop.sounds.isEmpty() || worldIn.isRemote) {
+        if (this.prop.sounds.isEmpty() || worldIn.isRemote)
             return;
-        }
         final SignalStateInfo stateInfo = new SignalStateInfo(worldIn, pos, this);
         SignalStateHandler.runTaskWhenSignalLoaded(stateInfo, (info, properties, _u) -> {
             final SoundProperty sound = getSound(properties);
-            if (sound.duration <= 1) {
+            if (sound.duration <= 1)
                 return;
-            }
             worldIn.playSound(null, pos, sound.state, SoundCategory.BLOCKS, 1.0F, 1.0F);
             worldIn.scheduleUpdate(pos, this, sound.duration);
         });
