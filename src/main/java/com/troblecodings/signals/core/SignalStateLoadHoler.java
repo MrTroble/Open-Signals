@@ -2,12 +2,14 @@ package com.troblecodings.signals.core;
 
 import java.util.Objects;
 
-public class StateLoadHolder {
+import com.troblecodings.signals.handler.SignalStateInfo;
 
-    public final StateInfo info;
+public class SignalStateLoadHoler {
+
+    public final SignalStateInfo info;
     public final LoadHolder<?> holder;
 
-    public StateLoadHolder(final StateInfo info, final LoadHolder<?> holder) {
+    public SignalStateLoadHoler(final SignalStateInfo info, final LoadHolder<?> holder) {
         this.info = info;
         this.holder = holder;
     }
@@ -25,7 +27,7 @@ public class StateLoadHolder {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        final StateLoadHolder other = (StateLoadHolder) obj;
+        final SignalStateLoadHoler other = (SignalStateLoadHoler) obj;
         return Objects.equals(holder, other.holder) && Objects.equals(info, other.info);
     }
 

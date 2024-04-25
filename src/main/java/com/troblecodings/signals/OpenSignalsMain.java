@@ -106,6 +106,11 @@ public class OpenSignalsMain {
         return log;
     }
 
+    public static void exitMinecraftWithMessage(final String message) {
+        getLogger().error(message);
+        System.exit(0);
+    }
+
     private static FileSystem fileSystemCache;
 
     private static Optional<Path> getRessourceLocation(final String location) {

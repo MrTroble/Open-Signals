@@ -690,6 +690,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         this.initalize();
         updateSignalsOnClient(redSignals);
         updateTrainNumber(trainNumber);
+        updateSignalStates();
     }
 
     public Optional<Point> tryReset(final BlockPos position) {

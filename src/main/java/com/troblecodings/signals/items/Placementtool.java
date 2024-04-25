@@ -125,7 +125,7 @@ public class Placementtool extends Item
             checkPos = checkPos.up();
         }
         SignalStateHandler.createStates(info, signalProperties, player);
-        NameHandler.createName(nameInfo, nametoSet);
+        NameHandler.createName(nameInfo, nametoSet, player);
 
         worldIn.setBlockState(placePos, signal.getStateForPlacement(worldIn, placePos, facing, hitX,
                 hitY, hitZ, 0, player, hand), 3);

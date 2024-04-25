@@ -44,13 +44,13 @@ public class SignalSystemParser {
                                     + "earth to try to register more than 254 SEProperties. We "
                                     + "don't want to ruin your work, but 254 is the maximum "
                                     + "number of SEProperties!");
-                    throw new ContentPackException(
+                    OpenSignalsMain.exitMinecraftWithMessage(
                             "You added to many properties to your signalsystem. Max. is 254!");
                 }
             });
         } catch (final Exception e) {
-            throw new ContentPackException(
-                    String.format("Error in file %s caused by parsing!", fileName), e);
+            OpenSignalsMain.exitMinecraftWithMessage(
+                    String.format("Error in file %s caused by parsing!" + e, fileName));
         }
         Signal.nextConsumer = list -> {
             list.addAll(properties);

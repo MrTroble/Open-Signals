@@ -40,7 +40,8 @@ public class RedstoneIO extends BasicBlock {
             final EnumFacing facing, final float hitX, final float hitY, final float hitZ,
             final int meta, final EntityLivingBase placer, final EnumHand hand) {
         if (!world.isRemote)
-            NameHandler.createName(new StateInfo(world, pos), getLocalizedName());
+            NameHandler.createName(new StateInfo(world, pos), getLocalizedName(),
+                    (EntityPlayer) placer);
         return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, placer, hand);
     }
 
