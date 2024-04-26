@@ -270,6 +270,7 @@ public class SignalBoxGrid implements INetworkSavable {
                 entry.getKey().writeNetwork(buffer);
                 entry.getValue().writeNetwork(buffer);
                 OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
+                return true;
             }
             return false;
         });
