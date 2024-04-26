@@ -47,28 +47,6 @@ public class Point implements INetworkSavable {
         this.y += y;
     }
 
-    public Point translate(final Rotation rotation) {
-        final Point point = new Point(this);
-        switch (rotation) {
-            case NONE: {
-                point.x += 1;
-                break;
-            }
-            case CLOCKWISE_90: {
-                point.y -= 1;
-                break;
-            }
-            case CLOCKWISE_180: {
-                point.x -= 1;
-                break;
-            }
-            case COUNTERCLOCKWISE_90: {
-                point.y += 1;
-            }
-        }
-        return point;
-    }
-
     public Point delta(final Point other) {
         final Point point = new Point(this);
         point.translate(-other.getX(), -other.getY());
