@@ -289,18 +289,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return PathwayRequestResult.PASS;
     }
 
-    public Point getStartPoint(final PathType type) {
-        for (final EnumGuiMode mode : type.getModes()) {
-            for (final Rotation rotation : Rotation.values()) {
-                final ModeSet modeSet = new ModeSet(mode, rotation);
-                if (!possibleModes.containsKey(modeSet))
-                    continue;
-                return point.translate(rotation);
-            }
-        }
-        return null;
-    }
-
     public boolean containsManuellOutput(final ModeSet mode) {
         return manuellEnabledOutputs.contains(mode);
     }

@@ -5,8 +5,6 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
-import net.minecraft.util.Rotation;
-
 public class Point implements INetworkSavable {
 
     private int x, y;
@@ -45,28 +43,6 @@ public class Point implements INetworkSavable {
     public void translate(final int x, final int y) {
         this.x += x;
         this.y += y;
-    }
-
-    public Point translate(final Rotation rotation) {
-        final Point point = new Point(this);
-        switch (rotation) {
-            case NONE: {
-                point.x += 1;
-                break;
-            }
-            case CLOCKWISE_90: {
-                point.y -= 1;
-                break;
-            }
-            case CLOCKWISE_180: {
-                point.x -= 1;
-                break;
-            }
-            case COUNTERCLOCKWISE_90: {
-                point.y += 1;
-            }
-        }
-        return point;
     }
 
     public Point delta(final Point other) {
