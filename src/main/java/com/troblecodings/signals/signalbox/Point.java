@@ -5,8 +5,6 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.signalbox.entrys.INetworkSavable;
 
-import net.minecraft.world.level.block.Rotation;
-
 public class Point implements INetworkSavable {
 
     private int x, y;
