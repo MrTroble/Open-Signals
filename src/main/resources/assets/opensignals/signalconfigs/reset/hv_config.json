@@ -1,7 +1,7 @@
 {
     "currentSignal": "hvsignal",
     "values": {
-        "true": ["stopsignal.HP0","hphome.HP0","hpblock.HP0","distantsignal.VR0","zs3.OFF","zs3v.OFF","zs1.FALSE","zs7.FALSE"],
+        "true": ["stopsignal.HP0","hphome.HP0","hpblock.HP0","distantsignal.VR0","zs3.OFF","zs3v.OFF","zs1.FALSE","zs7.FALSE", "identifier.FALSE"],
         "!config(HPTYPE.OFF)": ["distantsignal.OFF"]
     }
 }
