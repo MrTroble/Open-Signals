@@ -354,7 +354,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 }
                 final PathwayRequestResult request = grid.requestWay(start, end);
                 if (request != PathwayRequestResult.PASS) {
-                    if (request.isPathwayPossibleButCurrentyBlocked()
+                    if (request.canBeAddedToSaver()
                             && grid.addNextPathway(start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);

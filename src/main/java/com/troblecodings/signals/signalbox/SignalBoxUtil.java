@@ -142,7 +142,7 @@ public final class SignalBoxUtil {
             for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
                 checker.path = pathIdent.path;
                 result = checker.check();
-                if (nextPoint.equals(p2) || result == PathwayRequestResult.PASS) {
+                if (nextPoint.equals(p2) || result.isPass()) {
                     scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
                     closedList.put(nextPoint, previousPoint);
                     visited.add(pathIdent.path);
@@ -153,20 +153,29 @@ public final class SignalBoxUtil {
         return result;
     }
 
+    private static final int MAX_COSTS = 100000;
+
     private static double getCosts(final ModeSet mode, final SignalBoxNode currentNode,
             final Point currentPoint, final Point endPoint) {
-        final double costs = calculateHeuristic(currentPoint, endPoint)
-                + currentNode.getOption(mode).get().getEntry(PathEntryType.PATHWAY_COSTS)
-                        .orElse(getDefaultCosts(mode));
-        return costs;
+        return calculateHeuristic(currentPoint, endPoint) + currentNode.getOption(mode).get()
+                .getEntry(PathEntryType.PATHWAY_COSTS).orElse(getDefaultCosts(mode));
     }
 
     public static int getDefaultCosts(final ModeSet mode) {
         final EnumGuiMode guiMode = mode.mode;
-        if (guiMode == EnumGuiMode.STRAIGHT)
-            return 0;
-        if (guiMode == EnumGuiMode.CORNER)
-            return 1;
-        return Integer.MAX_VALUE;
+        switch (guiMode) {
+            case STRAIGHT:
+            case END:
+            case IN_CONNECTION:
+            case OUT_CONNECTION: {
+                return 0;
+            }
+            case CORNER: {
+                return 1;
+            }
+            default: {
+                return MAX_COSTS;
+            }
+        }
     }
 }
