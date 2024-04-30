@@ -80,7 +80,7 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
                     } else {
                         final PathwayRequestResult result =
                                 grid.requestWay(pathway.getKey(), pathway.getValue());
-                        if (!result.isPass() && result.isPathwayPossibleButCurrentyBlocked() && addPWToSaver) {
+                        if (!result.isPass() && result.canBeAddedToSaver() && addPWToSaver) {
                             grid.addNextPathway(pathway.getKey(), pathway.getValue());
                         }
                     }

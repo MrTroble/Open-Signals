@@ -33,8 +33,8 @@ public enum PathwayRequestResult {
         return pathway;
     }
 
-    public boolean isPathwayPossibleButCurrentyBlocked() {
-        return this == ALREADY_USED;
+    public boolean canBeAddedToSaver() {
+        return this == ALREADY_USED || this == NO_PATH;
     }
 
     public boolean isPass() {

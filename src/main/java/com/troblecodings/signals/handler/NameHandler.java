@@ -334,7 +334,7 @@ public final class NameHandler implements INetworkSync {
                         return;
                     String name;
                     synchronized (ALL_NAMES) {
-                        name = ALL_NAMES.getOrDefault(info, "");
+                        name = ALL_NAMES.getOrDefault(info.info, "");
                     }
                     if (name.isEmpty())
                         return;
