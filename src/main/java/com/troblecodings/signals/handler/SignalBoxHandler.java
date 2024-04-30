@@ -465,9 +465,7 @@ public final class SignalBoxHandler {
         try {
             final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
                     .toFile();
-            if (file.delete() || !Files.exists(file.toPath())) {
-                file.createNewFile();
-            }
+            file.delete();
             CompressedStreamTools.write(wrapper.tag, file);
         } catch (final IOException e) {
             e.printStackTrace();
@@ -481,10 +479,11 @@ public final class SignalBoxHandler {
             return;
         migrateFilesToNewDirectory(world);
         try {
-            final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
-            if (!Files.exists(newPath))
+            final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
+                    .toFile();
+            if (!file.exists())
                 return;
-            final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(newPath.toFile()));
+            final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(file));
             if (wrapper.isTagNull())
                 return;
             wrapper.getList(LINKING_UPDATE).forEach(tag -> {
