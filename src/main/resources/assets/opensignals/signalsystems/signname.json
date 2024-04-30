@@ -2,6 +2,7 @@
 	"systemProperties": {
 		"placementToolName": "signplacementtool",
 		"defaultHeight": 0,
+		"offsetY": -21,
 		"customNameRenderHeight": 0.75,
 		"signWidth": 56,
 		"autoscale": true,

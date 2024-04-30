@@ -364,6 +364,7 @@ public class Signal extends BasicBlock {
         final float offsetZ = this.prop.offsetY;
 
         GlStateManager.pushMatrix();
+        // TODO Eig erst Translate, dann Scale
         GlStateManager.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
         GlStateManager.translate(offsetX, 0, -4.2f + offsetZ);
 
@@ -386,7 +387,7 @@ public class Signal extends BasicBlock {
         final float offsetZ = this.prop.offsetY;
 
         GlStateManager.pushMatrix();
-        GlStateManager.translate(-offsetX * 0.015f, 0, offsetZ * 0.013f - 0.33f);
+        GlStateManager.translate(offsetX * 0.015f, 0, offsetZ * 0.015f);
         GlStateManager.scale(-scale, -scale, 1);
         info.font.drawString(name, (int) (-nameWidth / 2), 0, this.prop.textColor);
         GlStateManager.popMatrix();
