@@ -465,6 +465,8 @@ public final class SignalBoxHandler {
         try {
             final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
                     .toFile();
+            if (!file.exists())
+                return;
             file.delete();
             CompressedStreamTools.write(wrapper.tag, file);
         } catch (final IOException e) {
