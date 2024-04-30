@@ -1,6 +1,5 @@
 package com.troblecodings.signals.handler;
 
-import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.file.Path;
 
@@ -31,12 +30,7 @@ public class NameHandlerFileV2 extends SignalStateFileV2 {
     public synchronized String getString(final SignalStatePosV2 pos) {
         if (pos == null)
             return "";
-        try {
-            return new String(read(pos).array(), "UTF-8").trim();
-        } catch (final UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        return "";
+        return new String(read(pos).array()).trim();
     }
 
 }
