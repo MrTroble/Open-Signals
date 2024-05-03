@@ -1,15 +1,5 @@
 package com.troblecodings.signals;
 
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
@@ -114,34 +104,8 @@ public class OpenSignalsMain {
         return log;
     }
 
-    private static FileSystem fileSystemCache;
-
-    public static Path getRessourceLocation(final String location) {
-        String filelocation = location;
-        final URL url = OSBlocks.class.getResource("/assets/opensignals");
-        try {
-            if (url != null) {
-                final URI uri = url.toURI();
-                if ("file".equals(uri.getScheme())) {
-                    if (!location.startsWith("/"))
-                        filelocation = "/" + filelocation;
-                    final URL resource = OSBlocks.class.getResource(filelocation);
-                    if (resource == null)
-                        return null;
-                    return Paths.get(resource.toURI());
-                } else {
-                    if (!"jar".equals(uri.getScheme())) {
-                        return null;
-                    }
-                    if (fileSystemCache == null) {
-                        fileSystemCache = FileSystems.newFileSystem(uri, Collections.emptyMap());
-                    }
-                    return fileSystemCache.getPath(filelocation);
-                }
-            }
-        } catch (final IOException | URISyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
+    public static void exitMinecraftWithMessage(final String message) {
+        getLogger().error(message);
+        System.exit(0);
     }
 }

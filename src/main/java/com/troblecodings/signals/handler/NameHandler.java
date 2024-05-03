@@ -15,14 +15,17 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.Nullable;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.core.StateLoadHolder;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.block.Block;
@@ -49,7 +52,7 @@ public final class NameHandler implements INetworkSync {
 
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFileV2> ALL_LEVEL_FILES = new HashMap<>();
-    private static final Map<StateInfo, Integer> LOAD_COUNTER = new HashMap<>();
+    private static final Map<StateInfo, List<LoadHolder<?>>> LOAD_COUNTER = new HashMap<>();
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
@@ -82,11 +85,17 @@ public final class NameHandler implements INetworkSync {
         channel.registerObject(obj);
     }
 
-    public static void createName(final StateInfo info, final String name) {
+    public static void createName(final StateInfo info, final String name,
+            final PlayerEntity creator) {
         if (info.world.isClientSide || name == null)
             return;
         new Thread(() -> {
             setNameForNonSignal(info, name);
+            final List<LoadHolder<?>> list = new ArrayList<>();
+            list.add(new LoadHolder<>(creator));
+            synchronized (LOAD_COUNTER) {
+                LOAD_COUNTER.put(info, list);
+            }
             createToFile(info, name);
         }, "OSNameHandler:createName").start();
     }
@@ -145,6 +154,8 @@ public final class NameHandler implements INetworkSync {
         synchronized (ALL_LEVEL_FILES) {
             file = ALL_LEVEL_FILES.get(info.world);
         }
+        if (file == null)
+            return;
         synchronized (file) {
             file.deleteIndex(info.pos);
         }
@@ -252,12 +263,12 @@ public final class NameHandler implements INetworkSync {
             return;
         final IChunk chunk = world.getChunk(event.getPos().getWorldPosition());
         final PlayerEntity player = event.getPlayer();
-        final List<StateInfo> states = new ArrayList<>();
+        final List<StateLoadHolder> states = new ArrayList<>();
         chunk.getBlockEntitiesPos().forEach(pos -> {
             final Block block = chunk.getBlockState(pos).getBlock();
             if (block instanceof Signal || block instanceof RedstoneIO) {
                 final StateInfo info = new StateInfo(world, pos);
-                states.add(info);
+                states.add(new StateLoadHolder(info, new LoadHolder<>(player)));
             }
         });
         loadNames(states, player);
@@ -269,17 +280,31 @@ public final class NameHandler implements INetworkSync {
         if (world.isClientSide)
             return;
         final IChunk chunk = world.getChunk(event.getPos().getWorldPosition());
-        final List<StateInfo> states = new ArrayList<>();
+        final List<StateLoadHolder> states = new ArrayList<>();
+        final PlayerEntity player = event.getPlayer();
         chunk.getBlockEntitiesPos().forEach(pos -> {
             final Block block = chunk.getBlockState(pos).getBlock();
             if (block instanceof Signal || block instanceof RedstoneIO) {
-                states.add(new StateInfo(world, pos));
+                states.add(
+                        new StateLoadHolder(new StateInfo(world, pos), new LoadHolder<>(player)));
             }
         });
         unloadNames(states);
     }
 
-    private static void loadNames(final List<StateInfo> infos,
+    public static void loadName(final StateLoadHolder holder) {
+        loadName(holder, null);
+    }
+
+    public static void loadNames(final List<StateLoadHolder> holders) {
+        loadNames(holders, null);
+    }
+
+    public static void loadName(final StateLoadHolder holder, final @Nullable PlayerEntity player) {
+        loadNames(ImmutableList.of(holder), player);
+    }
+
+    public static void loadNames(final List<StateLoadHolder> infos,
             final @Nullable PlayerEntity player) {
         if (infos == null || infos.isEmpty())
             return;
@@ -287,62 +312,66 @@ public final class NameHandler implements INetworkSync {
             infos.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
-                    Integer count = LOAD_COUNTER.get(info);
-                    if (count != null && count > 0) {
-                        LOAD_COUNTER.put(info, ++count);
+                    final List<LoadHolder<?>> holders = LOAD_COUNTER.computeIfAbsent(info.info,
+                            _u -> new ArrayList<>());
+                    if (holders.size() > 0) {
                         isLoaded = true;
-                    } else {
-                        LOAD_COUNTER.put(info, 1);
                     }
+                    if (!holders.contains(info.holder))
+                        holders.add(info.holder);
                 }
                 if (isLoaded) {
                     if (player == null)
                         return;
                     String name;
                     synchronized (ALL_NAMES) {
-                        name = ALL_NAMES.getOrDefault(info, "");
+                        name = ALL_NAMES.getOrDefault(info.info, "");
                     }
                     if (name.isEmpty())
                         return;
-                    sendTo(player, packToBuffer(info.pos, name));
+                    sendTo(player, packToBuffer(info.info.pos, name));
                     return;
                 }
                 NameHandlerFileV2 file;
                 synchronized (ALL_LEVEL_FILES) {
-                    file = ALL_LEVEL_FILES.get(info.world);
+                    file = ALL_LEVEL_FILES.get(info.info.world);
                 }
                 String name;
                 synchronized (file) {
-                    name = file.getString(info.pos);
+                    name = file.getString(info.info.pos);
                 }
                 synchronized (ALL_NAMES) {
-                    ALL_NAMES.put(info, name);
+                    ALL_NAMES.put(info.info, name);
                 }
-                sendToAll(info, name);
+                sendToAll(info.info, name);
             });
         }, "NameHandler:loadNames").start();
     }
 
-    private static void unloadNames(final List<StateInfo> infos) {
+    public static void unloadName(final StateLoadHolder holder) {
+        unloadNames(ImmutableList.of(holder));
+    }
+
+    public static void unloadNames(final List<StateLoadHolder> infos) {
         if (infos == null || infos.isEmpty() || writeService == null)
             return;
         writeService.execute(() -> {
             infos.forEach(info -> {
                 synchronized (LOAD_COUNTER) {
-                    Integer count = LOAD_COUNTER.get(info);
-                    if (count != null && count > 1) {
-                        LOAD_COUNTER.put(info, --count);
+                    final List<LoadHolder<?>> holders = LOAD_COUNTER.getOrDefault(info.info,
+                            new ArrayList<>());
+                    holders.remove(info.holder);
+                    if (!holders.isEmpty())
                         return;
-                    }
-                    LOAD_COUNTER.remove(info);
-                    String name;
-                    synchronized (ALL_NAMES) {
-                        name = ALL_NAMES.remove(info);
-                    }
-                    if (name == null)
-                        return;
-                    createToFile(info, name);
+                    LOAD_COUNTER.remove(info.info);
                 }
+                String name;
+                synchronized (ALL_NAMES) {
+                    name = ALL_NAMES.remove(info.info);
+                }
+                if (name == null)
+                    return;
+                createToFile(info.info, name);
             });
         });
     }

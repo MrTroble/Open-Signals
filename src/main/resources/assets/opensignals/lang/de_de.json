@@ -625,5 +625,15 @@
     "gui.pwr.newpath.set": "Auswählen...",
     "gui.saved": "Gespeichert",
     "info.usage.sh": "Schutzhalt",
-	"info.usage.sh.desc": "Stellt alle Signale auf Halt."
+	"info.usage.sh.desc": "Stellt alle Signale auf Halt.",
+    "gui.signalbridge.collision": "Du kannst die Signalbrücke nicht platzieren, da ein Block im Weg ist.",
+	"error.no_equal_path_type": "Keine gleichen Typen",
+	"error.not_in_grid": "Nicht im Raster",
+	"error.already_used": "Bereits in Benutzung",
+	"error.overstepping": "Überschreiten",
+	"error.no_path": "Kein Fahrstraße möglich",
+	"error.no_intersignalbox_selected": "Kein Stellwerk verbunden",
+	"error.pass": "Erfolg",
+	"property.pathway_costs.name": "Zusätzliche Fahrstraßenkosten",
+	"property.pathay_costs.desc": "Mit dieser Option können Sie die \"Kosten\" für bestimmte Fahrstraßenelemente erhöhen, so dass der Pfadalgorithmus diesen Pfad nach Möglichkeit vermeidet. Dies ist besonders hilfreich, wenn Sie den Fahrstraße manuell beeinflussen wollen."
 }

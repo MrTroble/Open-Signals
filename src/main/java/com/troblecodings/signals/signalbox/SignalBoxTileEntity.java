@@ -7,10 +7,12 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.SignalStateLoadHoler;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -87,11 +89,12 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
         } else if (block == OSBlocks.SIGNAL_BOX) {
             type = LinkType.SIGNALBOX;
         }
+        final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(level, pos));
         if (type.equals(LinkType.SIGNAL)) {
-            SignalStateHandler
-                    .loadSignal(new StateLoadHolder(new SignalStateInfo(level, pos, (Signal) block),
-                            new LoadHolder<>(new StateInfo(level, pos))));
+            final SignalStateInfo info = new SignalStateInfo(level, pos, (Signal) block);
+            SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, holder));
         }
+        NameHandler.loadName(new StateLoadHolder(new StateInfo(level, pos), holder));
         return SignalBoxHandler.linkPosToSignalBox(new StateInfo(level, worldPosition), pos,
                 (BasicBlock) block, type);
     }

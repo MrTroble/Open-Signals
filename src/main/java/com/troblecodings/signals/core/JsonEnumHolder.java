@@ -6,7 +6,6 @@ import java.util.Map;
 
 import com.google.gson.Gson;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.contentpacks.ContentPackException;
 
 public final class JsonEnumHolder {
 
@@ -33,8 +32,12 @@ public final class JsonEnumHolder {
                                     + "earth to try to register more than 256 EnumValues. We "
                                     + "don't want to ruin your work, but 256 is the maximum "
                                     + "number of EnumValues!");
-                    throw new ContentPackException(
+                    OpenSignalsMain.exitMinecraftWithMessage(
                             "You have added to many EnumValues! Max. is 256!");
+                }
+                if (returnmap.containsKey(name.toLowerCase())) {
+                    OpenSignalsMain.exitMinecraftWithMessage(
+                            "The JsonEnum [" + name.toLowerCase() + "] alredy exists!");
                 }
                 returnmap.put(name.toLowerCase(), new JsonEnum(name, list));
             });

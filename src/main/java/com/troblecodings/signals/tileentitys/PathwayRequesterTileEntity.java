@@ -9,6 +9,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.Point;
@@ -75,8 +76,9 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
                         SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
                                 pathway.getValue());
                     } else {
-                        if (!grid.requestWay(pathway.getKey(), pathway.getValue())
-                                && addPWToSaver) {
+                        final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
+                                pathway.getValue());
+                        if (!result.isPass() && result.canBeAddedToSaver() && addPWToSaver) {
                             grid.addNextPathway(pathway.getKey(), pathway.getValue());
                         }
                     }
