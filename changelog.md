@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.16.5 - 3.5.0]
+
+* feat: new path finding algorithm
+* feat: added possibility to add additional costs to pathway tiles
+* feat/fix: better loading system for names by signalbox
+* fix: ks signalbrigde signal offsets
+* fix: ks default configs
+* fix: hv status light not turning off
+* fix: shunting signals not turning red in partial-pathways
+* fix: NPE in signalbridge
+* fix: umlauts text rendering
+* fix: disappearing yellow path by custom texts
+* fix: disabled distant signals on shunting paths
+* fix: problems with signalboxhandler files
+* ref: better linkingapi classes
+* ref: change error system and replace exceptions
+* ref: better checker for pathways
+* ref: better handling with invalid properties
+* ref: improve textrenderer
+
+**CAUTION minor braking changes! signalsystems with autoscale textrenderer needs to add +0.25 to customNameRenderHeight and may have changes for offsetY**
+
 ## [1.16.5 - 3.4.0]
 
 * feat: added signalbridge
