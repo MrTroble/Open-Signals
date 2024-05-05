@@ -48,6 +48,7 @@ public class LinkedPositions {
         SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, holder));
         SignalStateHandler.runTaskWhenSignalLoaded(info,
                 (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
+        NameHandler.loadName(new StateLoadHolder(info, holder));
         SignalConfig.reset(new ResetInfo(info, false));
     }
 
@@ -141,6 +142,7 @@ public class LinkedPositions {
             final BlockPos pos = nbt.getAsPos();
             final Signal signal = Signal.SIGNALS.get(nbt.getString(SIGNAL_NAME));
             signals.put(pos, signal);
+            linkedBlocks.put(pos, LinkType.SIGNAL);
         });
     }
 
