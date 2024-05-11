@@ -17,7 +17,7 @@ public class NameHandlerFileV2 extends SignalStateFileV2 {
             throw new IllegalArgumentException("Max Name length is 128!");
         try {
             return create(pos, name.getBytes("UTF-8"));
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
         }
         return null;
     }
@@ -27,7 +27,7 @@ public class NameHandlerFileV2 extends SignalStateFileV2 {
             throw new IllegalArgumentException("Max Name length is 128!");
         try {
             write(pos, ByteBuffer.allocate(STATE_BLOCK_SIZE).put(name.getBytes("UTF-8")));
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
         }
     }
 
@@ -40,7 +40,7 @@ public class NameHandlerFileV2 extends SignalStateFileV2 {
             return "";
         try {
             return new String(read(pos).array(), "UTF-8").trim();
-        } catch (UnsupportedEncodingException e) {
+        } catch (final UnsupportedEncodingException e) {
         }
         return "";
     }
