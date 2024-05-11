@@ -54,6 +54,9 @@ public final class PathEntryType<T> {
     public static final PathEntryType<BlockPos> SIGNALBOX = new PathEntryType<>(BlockposEntry.class,
             "signalbox");
 
+    public static final PathEntryType<Integer> PATHWAY_COSTS = new PathEntryType<>(
+            IntegerEntry.class, "pathway_costs");
+
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 
         public EnumPathUsageEntry() {

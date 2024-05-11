@@ -1,6 +1,6 @@
 package com.troblecodings.signals.signalbridge;
 
-import com.troblecodings.signals.contentpacks.ContentPackException;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.enums.SignalBridgeType;
 
 public class SignalBridgeBlockProperties {
@@ -11,7 +11,8 @@ public class SignalBridgeBlockProperties {
     public SignalBridgeType getType() {
         if (bridgeType == null) {
             if (type == null) {
-                throw new ContentPackException("You need to define a Type for the SignalBridge!");
+                OpenSignalsMain.exitMinecraftWithMessage(
+                        "You need to define a Type for the SignalBridge!");
             }
             bridgeType = Enum.valueOf(SignalBridgeType.class, type);
         }

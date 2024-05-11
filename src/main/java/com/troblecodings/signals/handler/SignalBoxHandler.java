@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.BasicBlock;
@@ -24,6 +24,7 @@ import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.init.OSBlocks;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -68,11 +69,12 @@ public final class SignalBoxHandler {
         }
     }
 
-    public static boolean requesetInterSignalBoxPathway(final StateInfo startBox, final Point start,
-            final Point end) {
+    public static PathwayRequestResult requesetInterSignalBoxPathway(final StateInfo startBox,
+            final Point start, final Point end) {
         if (startBox.worldNullOrClientSide())
-            return false;
-        final AtomicBoolean returnBoolean = new AtomicBoolean(true);
+            return PathwayRequestResult.NO_PATH;
+
+        final AtomicReference<PathwayRequestResult> returnResult = new AtomicReference<>();
         final IChunkLoadable chunkLoader = new IChunkLoadable() {
         };
         chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class, startBox.world, startBox.pos,
@@ -89,7 +91,7 @@ public final class SignalBoxHandler {
                         }
                     }
                     if (outConnectionEntry == null) {
-                        returnBoolean.set(false);
+                        returnResult.set(PathwayRequestResult.NO_INTERSIGNALBOX_SELECTED);
                         return;
                     }
                     final Optional<BlockPos> otherPos = outConnectionEntry
@@ -97,7 +99,7 @@ public final class SignalBoxHandler {
                     final Optional<Point> otherStartPoint = outConnectionEntry
                             .getEntry(PathEntryType.POINT);
                     if (!otherPos.isPresent() || !otherStartPoint.isPresent()) {
-                        returnBoolean.set(false);
+                        returnResult.set(PathwayRequestResult.NO_INTERSIGNALBOX_SELECTED);
                         return;
                     }
                     chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class, startBox.world,
@@ -106,7 +108,7 @@ public final class SignalBoxHandler {
                                 final SignalBoxNode otherStartNode = endGrid
                                         .getNode(otherStartPoint.get());
                                 if (otherStartNode == null) {
-                                    returnBoolean.set(false);
+                                    returnResult.set(PathwayRequestResult.NOT_IN_GRID);
                                     return;
                                 }
                                 PathOptionEntry inConnectionEntry = null;
@@ -119,24 +121,36 @@ public final class SignalBoxHandler {
                                     }
                                 }
                                 if (inConnectionEntry == null) {
-                                    returnBoolean.set(false);
+                                    returnResult
+                                            .set(PathwayRequestResult.NO_INTERSIGNALBOX_SELECTED);
                                     return;
                                 }
                                 final Optional<Point> otherEndPoint = inConnectionEntry
                                         .getEntry(PathEntryType.POINT);
                                 if (!otherEndPoint.isPresent()) {
-                                    returnBoolean.set(false);
+                                    returnResult
+                                            .set(PathwayRequestResult.NO_INTERSIGNALBOX_SELECTED);
                                     return;
                                 }
-                                final boolean startRequeset = startGrid.requestWay(start, end);
-                                final boolean endRequeset = endGrid
+                                final PathwayRequestResult startRequeset = startGrid
+                                        .requestWay(start, end);
+                                final PathwayRequestResult endRequeset = endGrid
                                         .requestWay(otherStartPoint.get(), otherEndPoint.get());
-                                if (!startRequeset || !endRequeset) {
-                                    if (startRequeset)
+                                final boolean startDone = startRequeset.isPass();
+                                final boolean endDone = endRequeset.isPass();
+
+                                if (!startDone || !endDone) {
+                                    if (startDone) {
                                         startGrid.resetPathway(start);
-                                    if (endRequeset)
+                                        returnResult.set(endRequeset);
+                                    }
+                                    if (endDone) {
                                         endGrid.resetPathway(otherStartPoint.get());
-                                    returnBoolean.set(false);
+                                        returnResult.set(startRequeset);
+                                    }
+                                    if (!startDone && !endDone) {
+                                        returnResult.set(startRequeset);
+                                    }
                                     return;
                                 }
                                 final SignalBoxPathway startPath = startGrid
@@ -145,9 +159,10 @@ public final class SignalBoxHandler {
                                         .getPathwayByLastPoint(otherEndPoint.get());
                                 startPath.setOtherPathwayToBlock(endPath);
                                 endPath.setOtherPathwayToReset(startPath);
+                                returnResult.set(PathwayRequestResult.PASS);
                             });
                 });
-        return returnBoolean.get();
+        return returnResult.get();
     }
 
     public static void writeTileNBT(final StateInfo identifier, final NBTWrapper wrapper) {
@@ -194,7 +209,7 @@ public final class SignalBoxHandler {
             holder = ALL_LINKED_POS.computeIfAbsent(identifier,
                     _u -> new LinkedPositions(identifier.pos));
         }
-        final boolean linked = holder.addLinkedPos(linkPos, type);
+        final boolean linked = holder.addLinkedPos(linkPos, identifier.world, type);
         if (!linked)
             return false;
         if (block instanceof Signal)
@@ -450,9 +465,9 @@ public final class SignalBoxHandler {
         try {
             final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
                     .toFile();
-            if (file.delete() || !Files.exists(file.toPath())) {
-                file.createNewFile();
-            }
+            if (!file.exists())
+                return;
+            file.delete();
             CompressedStreamTools.write(wrapper.tag, file);
         } catch (final IOException e) {
             e.printStackTrace();
@@ -466,10 +481,11 @@ public final class SignalBoxHandler {
             return;
         migrateFilesToNewDirectory(world);
         try {
-            final Path newPath = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles");
-            if (!Files.exists(newPath))
+            final File file = PathGetter.getNewPathForFiles(world, "signalboxhandlerfiles")
+                    .toFile();
+            if (!file.exists())
                 return;
-            final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(newPath.toFile()));
+            final NBTWrapper wrapper = new NBTWrapper(CompressedStreamTools.read(file));
             if (wrapper.isTagNull())
                 return;
             wrapper.getList(LINKING_UPDATE).forEach(tag -> {

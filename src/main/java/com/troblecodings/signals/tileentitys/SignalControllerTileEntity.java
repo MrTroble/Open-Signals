@@ -16,11 +16,13 @@ import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.SignalStateLoadHoler;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.EnumMode;
 import com.troblecodings.signals.enums.EnumState;
+import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 
@@ -211,9 +213,10 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             if (linkedSignalPosition != null && linkedSignal != null) {
                 final SignalStateInfo info = new SignalStateInfo(world, linkedSignalPosition,
                         linkedSignal);
-                SignalStateHandler.loadSignal(
-                        new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, pos))));
+                final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(world, pos));
+                SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, holder));
                 SignalStateHandler.addListener(info, listener);
+                NameHandler.loadName(new StateLoadHolder(info, holder));
             }
         }
     }
@@ -222,8 +225,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (linkedSignalPosition != null & linkedSignal != null) {
             final SignalStateInfo info = new SignalStateInfo(world, linkedSignalPosition,
                     linkedSignal);
-            SignalStateHandler.unloadSignal(
-                    new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, pos))));
+            final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(world, pos));
+            SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, holder));
+            NameHandler.unloadName(new StateLoadHolder(info, holder));
         }
 
     }

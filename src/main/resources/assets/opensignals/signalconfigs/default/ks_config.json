@@ -17,6 +17,7 @@
         "speed(==.14)": ["zs3.Z14"],
         "speed(==.15)": ["zs3.Z15"],
         "true": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF"],
+        "signalRepeater(true)": ["kombisignal_distant.KS2_REPEAT"],
 
         "zs2value(A)": ["zs2.A"],
         "zs2value(B)": ["zs2.B"],

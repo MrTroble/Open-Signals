@@ -55,8 +55,8 @@ public class GuiTrainNumber extends GuiBase {
         inner.add(new UIBox(UIBox.VBOX, 5));
         inner.add(GuiElements.createSpacerV(10));
 
-        final UIEntity label =
-                GuiElements.createLabel(I18Wrapper.format("tile.trainnumberchanger"), 0x7678a0);
+        final UIEntity label = GuiElements.createLabel(I18Wrapper.format("tile.trainnumberchanger"),
+                0x7678a0);
         label.setScaleX(1.5f);
         label.setScaleY(1.5f);
         label.setX(-6);
@@ -83,8 +83,8 @@ public class GuiTrainNumber extends GuiBase {
         inputEntity.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.info.change")));
         inner.add(inputEntity);
 
-        final UIEntity changeButton =
-                GuiElements.createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e -> {
+        final UIEntity changeButton = GuiElements
+                .createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e -> {
                     final UIEntity grid = new UIEntity();
                     grid.setInherits(true);
                     initializeGrid(grid);
@@ -112,7 +112,7 @@ public class GuiTrainNumber extends GuiBase {
         plane.setWidth(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
         plane.setHeight(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
         splitter.add(new UIScroll(s -> {
-            final float newScale = (float) (plane.getScaleX() + s * 0.05f);
+            final float newScale = (float) (plane.getScaleX() + s * 0.001f);
             if (newScale <= 0)
                 return;
             plane.setScaleX(newScale);
