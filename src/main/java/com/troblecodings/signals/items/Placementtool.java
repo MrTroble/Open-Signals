@@ -105,7 +105,7 @@ public class Placementtool extends Item
                 signalProperties.put(property, property.getDefault());
             }
         }
-        
+
         final ItemStack item = context.getItemInHand();
         item.hurtAndBreak(Math.abs(cost), player,
                 (user) -> user.broadcastBreakEvent(context.getHand()));
@@ -138,7 +138,7 @@ public class Placementtool extends Item
         }
         final SignalStateInfo info = new SignalStateInfo(worldIn, pos, signal);
         SignalStateHandler.createStates(info, signalProperties, player);
-        NameHandler.createName(nameInfo, nametoSet);
+        NameHandler.createName(nameInfo, nametoSet, player);
         worldIn.setBlock(pos, signal.getStateForPlacement(new BlockItemUseContext(context)), 3);
         return ActionResultType.SUCCESS;
     }

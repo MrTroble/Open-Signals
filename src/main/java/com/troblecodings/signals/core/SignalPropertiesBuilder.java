@@ -9,7 +9,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
-import com.troblecodings.signals.contentpacks.ContentPackException;
 import com.troblecodings.signals.contentpacks.SoundPropertyParser;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.init.OSSounds;
@@ -57,8 +56,9 @@ public class SignalPropertiesBuilder {
             }
         }
         if (placementtool == null)
-            throw new ContentPackException("There doesn't exists a placementtool with the name '"
-                    + placementToolName + "'!");
+            OpenSignalsMain
+                    .exitMinecraftWithMessage("There doesn't exists a placementtool with the name '"
+                            + placementToolName + "'!");
 
         final List<PredicateProperty<Integer>> signalheights = new ArrayList<>();
         if (signalHeights != null) {

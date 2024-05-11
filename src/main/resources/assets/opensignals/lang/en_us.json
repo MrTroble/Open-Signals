@@ -625,5 +625,15 @@
 	"gui.saved": "Saved",
 	"sb.trainnumber.remove": "Remove",
 	"info.usage.sh": "Protection Stop",
-	"info.usage.sh.desc": "Sets all signals to stop."
+	"info.usage.sh.desc": "Sets all signals to stop.",
+	"gui.signalbridge.collision": "You can't place the signalbridge because there is a block in the way.",
+	"error.no_equal_path_type": "No equal path types",
+	"error.not_in_grid": "Not in grid",
+	"error.already_used": "Already used",
+	"error.overstepping": "Overstepped",
+	"error.no_path": "No path available",
+	"error.no_intersignalbox_selected": "No signalbox connected",
+	"error.pass": "Pass",
+	"property.pathway_costs.name": "Additional pathway costs",
+	"property.pathway_costs.desc": "This option can be used to increase the 'costs' for certain path elements so that the path algorithm avoids this path if possible. This is particularly helpful if you want to influence the pathway manually."
 }

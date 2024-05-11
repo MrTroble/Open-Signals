@@ -77,8 +77,8 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
                 .forEach(wrapper -> {
                     final Map<SEProperty, Integer> properties = new HashMap<>();
                     final String name = wrapper.getString(ContainerSignalBridge.SIGNAL_NAME);
-                    final Signal signal =
-                            Signal.SIGNALS.get(wrapper.getString(ContainerSignalBridge.SIGNAL_ID));
+                    final Signal signal = Signal.SIGNALS
+                            .get(wrapper.getString(ContainerSignalBridge.SIGNAL_ID));
                     signal.getProperties().forEach(
                             property -> property.readFromNBT(wrapper).ifPresent(value -> properties
                                     .put(property, property.getParent().getIDFromValue(value))));
@@ -134,7 +134,7 @@ public class SignalBridgeItem extends Item implements MessageWrapper {
         }
         final SignalStateInfo info = new SignalStateInfo(worldIn, posToSet, signal);
         SignalStateHandler.createStates(info, signalProperties, player);
-        NameHandler.createName(info, nametoSet);
+        NameHandler.createName(info, nametoSet, player);
     }
 
     private static Map<BlockPos, BasicBlock> calculatePositions(final SignalBridgeBuilder builder,

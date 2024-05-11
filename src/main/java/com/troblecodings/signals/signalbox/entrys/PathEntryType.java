@@ -41,7 +41,7 @@ public final class PathEntryType<T> {
             "speed");
 
     public static final PathEntryType<Byte> ZS2 = new PathEntryType<>(ByteEntry.class, "zs2");
-    
+
     public static final PathEntryType<Boolean> SIGNAL_REPEATER = new PathEntryType<>(
             BoolEntry.class, "signal_repeater");
 
@@ -53,6 +53,9 @@ public final class PathEntryType<T> {
 
     public static final PathEntryType<BlockPos> SIGNALBOX = new PathEntryType<>(BlockposEntry.class,
             "signalbox");
+
+    public static final PathEntryType<Integer> PATHWAY_COSTS = new PathEntryType<>(
+            IntegerEntry.class, "pathway_costs");
 
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 

@@ -12,6 +12,7 @@ import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SubsidiarySignalParser;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.handler.NameHandler;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -43,8 +44,11 @@ public class LinkedPositions {
             return;
         signals.put(signalPos, signal);
         final SignalStateInfo info = new SignalStateInfo(world, signalPos, signal);
+        final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(world, thisPos));
+        SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, holder));
         SignalStateHandler.runTaskWhenSignalLoaded(info,
                 (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
+        NameHandler.loadName(new StateLoadHolder(info, holder));
         SignalConfig.reset(new ResetInfo(info, false));
     }
 
@@ -52,19 +56,32 @@ public class LinkedPositions {
         return signals.get(pos);
     }
 
-    public boolean addLinkedPos(final BlockPos pos, final LinkType type) {
+    public boolean addLinkedPos(final BlockPos pos, final World world, final LinkType type) {
         if (linkedBlocks.containsKey(pos))
             return false;
         linkedBlocks.put(pos, type);
+        if (type == LinkType.SIGNALBOX)
+            return true;
+        final StateInfo info = new StateInfo(world, pos);
+        NameHandler.loadName(
+                new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, thisPos))));
         return true;
     }
 
     public void removeLinkedPos(final BlockPos pos, final World world) {
         if (world.isClientSide)
             return;
-        linkedBlocks.remove(pos);
-        signals.remove(pos);
-        possibleSubsidiaries.remove(pos);
+        final StateInfo info = new StateInfo(world, thisPos);
+        final LinkType type = linkedBlocks.remove(pos);
+        if (type != null && type == LinkType.SIGNAL) {
+            final Signal signal = signals.remove(pos);
+            possibleSubsidiaries.remove(pos);
+            SignalStateHandler.unloadSignal(new SignalStateLoadHoler(
+                    new SignalStateInfo(world, pos, signal), new LoadHolder<>(info)));
+        }
+        if (type != null && type != LinkType.SIGNALBOX)
+            NameHandler.unloadName(
+                    new StateLoadHolder(new StateInfo(world, pos), new LoadHolder<>(info)));
     }
 
     public boolean isEmpty() {
@@ -78,12 +95,12 @@ public class LinkedPositions {
     public void unlink(final BlockPos tilePos, final World world) {
         if (world.isClientSide)
             return;
-        final List<StateLoadHolder> signalsToUnload = new ArrayList<>();
+        final List<SignalStateLoadHoler> signalsToUnload = new ArrayList<>();
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
             SignalConfig.reset(new ResetInfo(info, false));
-            signalsToUnload.add(
-                    new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, tilePos))));
+            signalsToUnload.add(new SignalStateLoadHoler(info,
+                    new LoadHolder<>(new StateInfo(world, tilePos))));
         });
         linkedBlocks.entrySet().stream().filter(entry -> !entry.getValue().equals(LinkType.SIGNAL))
                 .forEach(entry -> SignalBoxHandler.unlinkTileFromPos(new StateInfo(world, tilePos),
@@ -91,6 +108,10 @@ public class LinkedPositions {
         linkedBlocks.clear();
         signals.clear();
         SignalStateHandler.unloadSignals(signalsToUnload);
+        NameHandler.unloadNames(linkedBlocks.entrySet().stream()
+                .map(entry -> new StateLoadHolder(new StateInfo(world, entry.getKey()),
+                        new LoadHolder<>(new StateInfo(world, tilePos))))
+                .collect(Collectors.toList()));
     }
 
     public void write(final NBTWrapper wrapper) {
@@ -121,31 +142,38 @@ public class LinkedPositions {
             final BlockPos pos = nbt.getAsPos();
             final Signal signal = Signal.SIGNALS.get(nbt.getString(SIGNAL_NAME));
             signals.put(pos, signal);
+            linkedBlocks.put(pos, LinkType.SIGNAL);
         });
     }
 
     public void loadSignals(final World world) {
         if (world.isClientSide)
             return;
-        final List<StateLoadHolder> signalInfos = new ArrayList<>();
+        final List<SignalStateLoadHoler> signalInfos = new ArrayList<>();
+        final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(world, thisPos));
         signals.forEach((pos, signal) -> {
             final SignalStateInfo info = new SignalStateInfo(world, pos, signal);
-            signalInfos.add(
-                    new StateLoadHolder(info, new LoadHolder<>(new StateInfo(world, thisPos))));
+            signalInfos.add(new SignalStateLoadHoler(info, holder));
             SignalStateHandler.runTaskWhenSignalLoaded(info,
                     (stateInfo, properties, _u) -> loadPossibleSubsidiaires(stateInfo, properties));
         });
         SignalStateHandler.loadSignals(signalInfos);
+        NameHandler.loadNames(linkedBlocks.entrySet().stream()
+                .map(entry -> new StateLoadHolder(new StateInfo(world, entry.getKey()), holder))
+                .collect(Collectors.toList()));
     }
 
     public void unloadSignals(final World world) {
         if (world.isClientSide)
             return;
-        final List<StateLoadHolder> signalInfos = new ArrayList<>();
+        final List<SignalStateLoadHoler> signalInfos = new ArrayList<>();
+        final LoadHolder<StateInfo> holder = new LoadHolder<>(new StateInfo(world, thisPos));
         signals.forEach((pos, signal) -> signalInfos
-                .add(new StateLoadHolder(new SignalStateInfo(world, pos, signal),
-                        new LoadHolder<>(new StateInfo(world, thisPos)))));
+                .add(new SignalStateLoadHoler(new SignalStateInfo(world, pos, signal), holder)));
         SignalStateHandler.unloadSignals(signalInfos);
+        NameHandler.unloadNames(linkedBlocks.entrySet().stream()
+                .map(entry -> new StateLoadHolder(new StateInfo(world, entry.getKey()), holder))
+                .collect(Collectors.toList()));
         possibleSubsidiaries.clear();
     }
 

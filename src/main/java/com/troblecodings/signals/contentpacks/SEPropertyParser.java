@@ -3,6 +3,7 @@ package com.troblecodings.signals.contentpacks;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.SEProperty.SEAutoNameProp;
 import com.troblecodings.signals.core.JsonEnum;
@@ -32,9 +33,9 @@ public class SEPropertyParser {
         }
 
         if (parent == null)
-            throw new ContentPackException(String.format("Property[%s], with class %s not found!",
-                    name, enumClass.toLowerCase()) + " Valid EnumClasses: "
-                    + JsonEnumHolder.PROPERTIES.keySet());
+            OpenSignalsMain.exitMinecraftWithMessage(String
+                    .format("Property[%s], with class %s not found!", name, enumClass.toLowerCase())
+                    + " Valid EnumClasses: " + JsonEnumHolder.PROPERTIES.keySet());
 
         ChangeableStage stage = ChangeableStage.APISTAGE;
         if (changeableStage != null && !changeableStage.isEmpty()) {

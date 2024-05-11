@@ -6,9 +6,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.contentpacks.ContentPackException;
 
 @SuppressWarnings("rawtypes")
 public class FunctionParsingInfo {
@@ -89,8 +89,8 @@ public class FunctionParsingInfo {
             final SEProperty property = (SEProperty) getProperty();
             final String value = parts[1].toUpperCase();
             if (!property.getParent().isValid(new String(value)))
-                throw new ContentPackException("[" + value + "] is not a valid state of " + property
-                        + "! Valid States: " + property.getParent().getAllowedValues());
+                OpenSignalsMain.exitMinecraftWithMessage("[" + value + "] is not a valid state of "
+                        + property + "! Valid States: " + property.getParent().getAllowedValues());
             return new ValuePack(property, ext -> ext.equals(value));
         });
         if (predicate == null)
@@ -114,7 +114,7 @@ public class FunctionParsingInfo {
     public Object getString() {
         return argument;
     }
-    
+
     public Object getBoolean() {
         return Boolean.valueOf(argument);
     }
