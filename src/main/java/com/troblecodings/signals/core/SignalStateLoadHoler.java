@@ -2,12 +2,14 @@ package com.troblecodings.signals.core;
 
 import java.util.Objects;
 
-public class StateLoadHolder {
+import com.troblecodings.signals.handler.SignalStateInfo;
 
-    public final StateInfo info;
+public class SignalStateLoadHoler {
+
+    public final SignalStateInfo info;
     public final LoadHolder<?> holder;
 
-    public StateLoadHolder(final StateInfo info, final LoadHolder<?> holder) {
+    public SignalStateLoadHoler(final SignalStateInfo info, final LoadHolder<?> holder) {
         this.info = info;
         this.holder = holder;
     }

@@ -92,7 +92,7 @@ public class OneSignalPredicateConfigParser {
                             mapKey += current;
                             continue;
                         } catch (final Exception e) {
-                            throw new ContentPackException(
+                            OpenSignalsMain.exitMinecraftWithMessage(
                                     "Something went wrong with the predicate saver in "
                                             + files.getKey() + "! Did you used it correctly?");
                         }

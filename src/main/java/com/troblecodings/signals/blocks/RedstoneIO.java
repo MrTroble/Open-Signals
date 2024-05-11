@@ -46,7 +46,7 @@ public class RedstoneIO extends BasicBlock {
         final Level world = context.getLevel();
         if (!world.isClientSide) {
             NameHandler.createName(new StateInfo(world, context.getClickedPos()),
-                    this.getRegistryName().getPath());
+                    this.getRegistryName().getPath(), context.getPlayer());
         }
         return super.getStateForPlacement(context);
     }

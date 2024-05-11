@@ -126,19 +126,22 @@ public class SignalBoxPathway implements IChunkLoadable {
             optionEntry.getEntry(PathEntryType.ZS2).ifPresent(value -> zs2Value.set(value));
         });
         foreachPath((path, node) -> {
-            final Rotation rotation = SignalBoxUtil
-                    .getRotationFromDelta(node.getPoint().delta(path.point1));
-            for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
-                final ModeSet modeSet = new ModeSet(mode, rotation);
-                node.getOption(modeSet).ifPresent(
-                        option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
-                            final Optional<Boolean> repeaterOption = option
-                                    .getEntry(PathEntryType.SIGNAL_REPEATER);
-                            distantPosBuilder.put(position,
-                                    new OtherSignalIdentifier(node.getPoint(), modeSet, position,
-                                            repeaterOption.isPresent() && repeaterOption.get(),
-                                            mode.equals(EnumGuiMode.RS)));
-                        }));
+            if (!type.equals(PathType.SHUNTING)) {
+                final Rotation rotation = SignalBoxUtil
+                        .getRotationFromDelta(node.getPoint().delta(path.point1));
+                for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
+                    final ModeSet modeSet = new ModeSet(mode, rotation);
+                    node.getOption(modeSet).ifPresent(
+                            option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
+                                final Optional<Boolean> repeaterOption = option
+                                        .getEntry(PathEntryType.SIGNAL_REPEATER);
+                                distantPosBuilder.put(position,
+                                        new OtherSignalIdentifier(node.getPoint(), modeSet,
+                                                position,
+                                                repeaterOption.isPresent() && repeaterOption.get(),
+                                                mode.equals(EnumGuiMode.RS)));
+                            }));
+                }
             }
             node.getModes().entrySet().stream()
                     .filter(entry -> entry.getKey().mode.equals(EnumGuiMode.BUE))
@@ -692,6 +695,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         this.initalize();
         updateSignalsOnClient(redSignals);
         updateTrainNumber(trainNumber);
+        updateSignalStates();
     }
 
     public Optional<Point> tryReset(final BlockPos position) {
