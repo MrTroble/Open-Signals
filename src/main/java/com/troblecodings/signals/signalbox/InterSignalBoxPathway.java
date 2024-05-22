@@ -230,6 +230,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         updateSignalsOnClient(redSignals, greenSignals);
     }
 
+    public void setOtherPathwayToBlock(final InterSignalBoxPathway pathway) {
+        this.pathwayToBlock = pathway;
+    }
+
+    public void setOtherPathwayToReset(final InterSignalBoxPathway pathway) {
+        this.pathwayToReset = pathway;
+    }
+
     @Override
     public String toString() {
         return "InterSignalBoxPathway [start=" + getFirstPoint() + ", end=" + getLastPoint() + "]";

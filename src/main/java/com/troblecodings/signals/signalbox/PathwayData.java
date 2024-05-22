@@ -43,8 +43,8 @@ public class PathwayData {
     private final Map<BlockPos, SignalBoxNode> mapOfBlockingPositions = new HashMap<>();
     private List<SignalBoxNode> listOfNodes = ImmutableList.of();
     private PathType type = PathType.NONE;
-    private Point firstPoint = new Point();
-    private Point lastPoint = new Point();
+    private Point firstPoint = new Point(-1, -1);
+    private Point lastPoint = new Point(-1, -1);
     private int speed = -1;
     private String zs2Value = "";
     private int delay = 0;
@@ -52,6 +52,8 @@ public class PathwayData {
     private Optional<MainSignalIdentifier> endSignal = Optional.empty();
     private Map<BlockPos, OtherSignalIdentifier> otherSignals = ImmutableMap.of();
     private boolean emptyOrBroken = false;
+
+    private SignalBoxPathway pathway;
 
     public static PathwayData of(final SignalBoxGrid grid, final List<SignalBoxNode> pNodes,
             final PathType type) {
@@ -62,6 +64,11 @@ public class PathwayData {
             if (otherData == EMPTY_DATA)
                 return EMPTY_DATA;
             data.combineData(otherData);
+
+            final InterSignalBoxPathway startPath = (InterSignalBoxPathway) data.createPathway();
+            final InterSignalBoxPathway endPath = (InterSignalBoxPathway) otherData.createPathway();
+            startPath.setOtherPathwayToBlock(endPath);
+            endPath.setOtherPathwayToReset(startPath);
             otherData.grid.addPathway(otherData);
         }
         return data;
@@ -74,17 +81,20 @@ public class PathwayData {
     }
 
     public SignalBoxPathway createPathway() {
-        final boolean isInterSignalBoxPathway = isInterSignalBoxPathway();
-        if (delay > 0) {
-            if (isInterSignalBoxPathway) {
-                return new DelayableInterSignalBoxPathway(this);
+        if (pathway == null) {
+            final boolean isInterSignalBoxPathway = isInterSignalBoxPathway();
+            if (delay > 0) {
+                if (isInterSignalBoxPathway) {
+                    pathway = new DelayableInterSignalBoxPathway(this);
+                }
+                pathway = new DelayableSignalBoxPathway(this);
+            } else if (isInterSignalBoxPathway) {
+                pathway = new InterSignalBoxPathway(this);
+            } else {
+                pathway = new SignalBoxPathway(this);
             }
-            return new DelayableSignalBoxPathway(this);
         }
-        if (isInterSignalBoxPathway) {
-            return new InterSignalBoxPathway(this);
-        }
-        return new SignalBoxPathway(this);
+        return pathway;
     }
 
     private void prepareData(final SignalBoxGrid grid, final List<SignalBoxNode> pNodes,
@@ -266,13 +276,13 @@ public class PathwayData {
     }
 
     private boolean isStartOfInterSignalBox() {
-        final SignalBoxNode endNode = listOfNodes.get(0);
-        return endNode.containsOutConnection();
+        final SignalBoxNode startNode = listOfNodes.get(listOfNodes.size() - 1);
+        return startNode.containsInConnection();
     }
 
     private boolean isEndOfInterSignalBox() {
-        final SignalBoxNode startNode = listOfNodes.get(listOfNodes.size() - 1);
-        return startNode.containsInConnection();
+        final SignalBoxNode endNode = listOfNodes.get(0);
+        return endNode.containsOutConnection();
     }
 
     public boolean isInterSignalBoxPathway() {
@@ -411,5 +421,11 @@ public class PathwayData {
         return Objects.equals(firstPoint, other.firstPoint)
                 && Objects.equals(lastPoint, other.lastPoint)
                 && Objects.equals(listOfNodes, other.listOfNodes);
+    }
+
+    @Override
+    public String toString() {
+        return "PathwayData [firstPoint=" + firstPoint + ",lastPoint=" + lastPoint + ",listOfNodes="
+                + listOfNodes + "]";
     }
 }
