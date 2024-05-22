@@ -15,16 +15,20 @@ import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.TrainNumber;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
@@ -39,15 +43,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class SignalBoxPathway implements IChunkLoadable {
+public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
 
     protected final PathwayData data;
 
     protected boolean isBlocked;
     protected boolean isAutoPathway = false;
     protected Point originalFirstPoint = null;
-    protected Consumer<SignalBoxPathway> consumer;
-    protected SignalBoxGrid holder = null;
+    protected SignalBoxGrid grid = null;
     protected SignalBoxTileEntity tile;
     protected TrainNumber trainNumber;
     protected boolean isExecutingSignalSet = false;
@@ -135,20 +138,40 @@ public class SignalBoxPathway implements IChunkLoadable {
         final Level world = tile.getLevel();
         if (world == null || world.isClientSide || isExecutingSignalSet)
             return;
-        isExecutingSignalSet = true;
         setSignals();
-        isExecutingSignalSet = false;
     }
 
     protected SignalBoxPathway getNextPathway() {
-        return holder.startsToPath.get(getLastPoint());
+        return grid.startsToPath.get(getLastPoint());
     }
 
-    public void setSignals() {
+    protected void setSignals() {
         setSignals(getLastSignalInfo());
     }
 
+    public void registerSignalUpdater() {
+        final SignalStateInfo info = getLastSignalInfo();
+        if (info == null)
+            return;
+        SignalStateHandler.addListener(info, this);
+    }
+
+    public void unregisterSignalUpdater() {
+        final SignalStateInfo info = getLastSignalInfo();
+        if (info == null)
+            return;
+        SignalStateHandler.removeListener(info, this);
+    }
+
+    @Override
+    public void update(final SignalStateInfo info, final Map<SEProperty, String> changedProperties,
+            final ChangedState changedState) {
+        setSignals();
+    }
+
     protected void setSignals(final SignalStateInfo lastSignal) {
+        if (isExecutingSignalSet)
+            return;
         final Level world = tile.getLevel();
         final StateInfo identifier = new StateInfo(world, tile.getBlockPos());
         final MainSignalIdentifier startSignal = data.getStartSignal();
@@ -226,16 +249,12 @@ public class SignalBoxPathway implements IChunkLoadable {
         return returnList;
     }
 
-    protected void executeConsumer() {
-        this.consumer.accept(this);
+    protected void updateToNet() {
+        grid.updateToNet(this);
     }
 
-    public void setUpdater(final Consumer<SignalBoxPathway> consumer) {
-        this.consumer = consumer;
-    }
-
-    public void setSignalBoxGrid(final SignalBoxGrid holder) {
-        this.holder = holder;
+    protected void setSignalBoxGrid(final SignalBoxGrid grid) {
+        this.grid = grid;
     }
 
     private void updateSignalsOnClient(final List<MainSignalIdentifier> redSignals) {
@@ -255,7 +274,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             buffer.putByte((byte) redSignals.size());
             redSignals.forEach(signal -> {
                 signal.writeNetwork(buffer);
-                holder.updateSubsidiarySignal(signal.getPoint(), signal.getModeSet(),
+                grid.updateSubsidiarySignal(signal.getPoint(), signal.getModeSet(),
                         new SubsidiaryEntry(null, false));
             });
             buffer.putByte((byte) greenSignals.size());
@@ -441,7 +460,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private void getTrainNumberFromPrevious() {
-        final SignalBoxPathway previous = holder.getPathwayByLastPoint(getFirstPoint());
+        final SignalBoxPathway previous = grid.getPathwayByLastPoint(getFirstPoint());
         if (previous != null) {
             updateTrainNumber(previous.trainNumber);
         }
@@ -510,7 +529,7 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     public void checkReRequest() {
         if (isAutoPathway) {
-            holder.requestWay(originalFirstPoint, getLastPoint());
+            grid.requestWay(originalFirstPoint, getLastPoint());
         }
     }
 

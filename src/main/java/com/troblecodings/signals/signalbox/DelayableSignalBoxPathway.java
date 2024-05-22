@@ -32,16 +32,16 @@ public class DelayableSignalBoxPathway extends SignalBoxPathway {
             }
             final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data
                     .getOtherSignals();
+            this.isExecutingSignalSet = false;
             synchronized (distantSignalPositions) {
                 setSignals(getLastSignalInfo());
             }
-            this.isExecutingSignalSet = false;
             tile.getLevel().getServer().execute(() -> {
                 loadTileAndExecute(thisTile -> {
                     final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
                             .getPathwayByLastPoint(getLastPoint());
                     pw.setPathStatus(EnumPathUsage.SELECTED);
-                    pw.executeConsumer();
+                    pw.updateToNet();
                 });
             });
         });

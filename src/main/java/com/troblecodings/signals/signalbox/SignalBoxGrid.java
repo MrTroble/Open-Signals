@@ -83,7 +83,7 @@ public class SignalBoxGrid implements INetworkSavable {
     private void onWayAdd(final SignalBoxPathway pathway) {
         startsToPath.put(pathway.getFirstPoint(), pathway);
         endsToPath.put(pathway.getLastPoint(), pathway);
-        updatePrevious(pathway);
+        pathway.registerSignalUpdater();
     }
 
     public List<MainSignalIdentifier> getGreenSignals() {
@@ -110,12 +110,12 @@ public class SignalBoxGrid implements INetworkSavable {
 
     protected void resetPathway(final SignalBoxPathway pathway) {
         pathway.resetPathway();
-        updatePrevious(pathway);
+        pathway.unregisterSignalUpdater();
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
     }
 
-    private void updateToNet(final SignalBoxPathway pathway) {
+    protected void updateToNet(final SignalBoxPathway pathway) {
         if (tile == null || !tile.isBlocked())
             return;
         final List<SignalBoxNode> nodes = pathway.getListOfNodes();
@@ -147,37 +147,11 @@ public class SignalBoxGrid implements INetworkSavable {
         final SignalBoxPathway way = data.createPathway();
         way.setTile(tile);
         way.deactivateAllOutputsOnPathway();
-        way.setUpdater(pathway -> {
-            updatePrevious(pathway);
-            updateToNet(pathway);
-        });
         way.setSignalBoxGrid(this);
         way.setPathStatus(EnumPathUsage.SELECTED);
         way.updatePathwaySignals();
         onWayAdd(way);
         updateToNet(way);
-    }
-
-    private void updatePrevious(final SignalBoxPathway pathway) {
-        SignalBoxPathway previousPath = pathway;
-        int count = 0;
-        while ((previousPath = endsToPath.get(previousPath.getFirstPoint())) != null) {
-            if (count > endsToPath.size()) {
-                OpenSignalsMain.getLogger().error("Detected signalpath cycle, aborting!");
-                startsToPath.values().forEach(path -> {
-                    path.resetPathway();
-                    updateToNet(path);
-                });
-                this.clearPaths();
-                break;
-            }
-            previousPath.setSignals();
-            count++;
-        }
-        if (count == 0) {
-            if (OpenSignalsMain.isDebug())
-                OpenSignalsMain.getLogger().debug("Could not find previous! " + pathway);
-        }
     }
 
     public void resetAllPathways() {
@@ -235,7 +209,6 @@ public class SignalBoxGrid implements INetworkSavable {
     private void tryBlock(final List<SignalBoxPathway> pathways, final BlockPos pos) {
         pathways.forEach(pathway -> {
             if (pathway.tryBlock(pos)) {
-                updatePrevious(pathway);
                 updateToNet(pathway);
             }
         });
@@ -391,10 +364,6 @@ public class SignalBoxGrid implements INetworkSavable {
         tag.getList(PATHWAY_LIST).forEach(comp -> {
             final PathwayData data = PathwayData.of(this, comp);
             final SignalBoxPathway pathway = data.createPathway();
-            pathway.setUpdater(way -> {
-                updatePrevious(way);
-                updateToNet(way);
-            });
             pathway.setSignalBoxGrid(this);
             pathway.setTile(tile);
             pathway.read(comp);

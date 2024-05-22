@@ -23,7 +23,7 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
             pathwayToBlock.loadTileAndExecute(_u -> {
                 pathwayToBlock.isExecutingSignalSet = true;
                 pathwayToBlock.setPathStatus(EnumPathUsage.PREPARED);
-                pathwayToBlock.executeConsumer();
+                pathwayToBlock.updateToNet();
             });
         }
         if (isExecutingSignalSet)
@@ -39,8 +39,8 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
             }
             final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data
                     .getOtherSignals();
+            this.isExecutingSignalSet = false;
             synchronized (distantSignalPositions) {
-                this.isExecutingSignalSet = false;
                 setSignals(getLastSignalInfo());
             }
             tile.getLevel().getServer().execute(() -> {
@@ -48,7 +48,7 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
                     final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
                             .getPathwayByLastPoint(getLastPoint());
                     pw.setPathStatus(EnumPathUsage.SELECTED);
-                    pw.executeConsumer();
+                    pw.updateToNet();
                 });
                 if (pathwayToBlock != null) {
                     pathwayToBlock.loadTileAndExecute(otherTile -> {
@@ -56,7 +56,7 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
                                 .getSignalBoxGrid()
                                 .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
                         pathwayToBlock.setPathStatus(EnumPathUsage.SELECTED);
-                        pathwayToBlock.executeConsumer();
+                        pathwayToBlock.updateToNet();
                         pathwayToBlock.isExecutingSignalSet = false;
                     });
                 }
