@@ -90,8 +90,9 @@ public final class SignalBoxUtil {
 
     }
 
-    public static PathwayRequestResult requestPathway(final Map<Point, SignalBoxNode> modeGrid,
-            final Point p1, final Point p2) {
+    public static PathwayRequestResult requestPathway(final SignalBoxGrid grid, final Point p1,
+            final Point p2) {
+        final Map<Point, SignalBoxNode> modeGrid = grid.modeGrid;
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
             return PathwayRequestResult.NOT_IN_GRID;
         final SignalBoxNode lastNode = modeGrid.get(p2);
@@ -129,7 +130,7 @@ public final class SignalBoxUtil {
                     nodes.add(boxNode);
                 }
                 result = PathwayRequestResult.PASS;
-                return result.setPathway(factory.getPathway(modeGrid, nodes, pathType));
+                return result.setPathwayData(PathwayData.of(grid, nodes, pathType));
             }
             checker.previousPoint = previousPoint;
             final SignalBoxNode nextNode = modeGrid.get(nextPoint);

@@ -54,9 +54,9 @@ public class SignalBoxGrid implements INetworkSavable {
     protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final SignalBoxFactory factory;
+    protected SignalBoxTileEntity tile;
     private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     private int counter;
-    private SignalBoxTileEntity tile;
 
     public SignalBoxGrid() {
         this.factory = SignalBoxFactory.getFactory();
@@ -68,7 +68,7 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void onLoad() {
-        startsToPath.values().forEach(pw -> pw.linkPathways());
+        startsToPath.values().forEach(pw -> pw.onLoad());
     }
 
     public void updatePathwayToAutomatic(final Point point) {
@@ -132,10 +132,19 @@ public class SignalBoxGrid implements INetworkSavable {
     public PathwayRequestResult requestWay(final Point p1, final Point p2) {
         if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
             return PathwayRequestResult.ALREADY_USED;
-        final PathwayRequestResult result = SignalBoxUtil.requestPathway(modeGrid, p1, p2);
-        if (result != PathwayRequestResult.PASS)
+        final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2);
+        if (!result.isPass())
             return result;
-        final SignalBoxPathway way = result.getPathway();
+        final PathwayData data = result.getPathwayData();
+        if (data.isEmpty())
+            return PathwayRequestResult.NO_PATH;
+        addPathway(data);
+        tile.setChanged();
+        return result;
+    }
+
+    protected void addPathway(final PathwayData data) {
+        final SignalBoxPathway way = data.createPathway();
         way.setTile(tile);
         way.deactivateAllOutputsOnPathway();
         way.setUpdater(pathway -> {
@@ -145,10 +154,8 @@ public class SignalBoxGrid implements INetworkSavable {
         way.setSignalBoxGrid(this);
         way.setPathStatus(EnumPathUsage.SELECTED);
         way.updatePathwaySignals();
-        this.onWayAdd(way);
+        onWayAdd(way);
         updateToNet(way);
-        tile.setChanged();
-        return result;
     }
 
     private void updatePrevious(final SignalBoxPathway pathway) {
@@ -378,12 +385,12 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void readPathways(final NBTWrapper tag) {
-        final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         if (!tag.contains(PATHWAY_LIST))
             return;
         clearPaths();
         tag.getList(PATHWAY_LIST).forEach(comp -> {
-            final SignalBoxPathway pathway = factory.getPathway(modeGrid);
+            final PathwayData data = PathwayData.of(tag);
+            final SignalBoxPathway pathway = data.createPathway();
             pathway.setUpdater(way -> {
                 updatePrevious(way);
                 updateToNet(way);
@@ -397,7 +404,7 @@ public class SignalBoxGrid implements INetworkSavable {
                 return;
             }
             onWayAdd(pathway);
-            pathway.readLinkedPathways(comp);
+            pathway.postRead(comp);
         });
         tag.getList(NEXT_PATHWAYS).forEach(comp -> {
             final Point start = new Point();

@@ -1,13 +1,8 @@
 package com.troblecodings.signals.signalbox.debug;
 
-import java.util.List;
-import java.util.Map;
-
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.enums.PathType;
-import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbox.PathwayData;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
-import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxPathway;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -30,13 +25,8 @@ public class SignalBoxFactory {
         return new ConnectionChecker();
     }
 
-    public SignalBoxPathway getPathway(final Map<Point, SignalBoxNode> modeGrid,
-            final List<SignalBoxNode> pNodes, final PathType type) {
-        return new SignalBoxPathway(modeGrid, pNodes, type);
-    }
-
-    public SignalBoxPathway getPathway(final Map<Point, SignalBoxNode> modeGrid) {
-        return new SignalBoxPathway(modeGrid);
+    public SignalBoxPathway getPathway(final PathwayData data) {
+        return new SignalBoxPathway(data);
     }
 
     public SignalBoxGrid getGrid() {
@@ -45,5 +35,9 @@ public class SignalBoxFactory {
 
     public PathOptionEntry getEntry() {
         return new PathOptionEntry();
+    }
+
+    public PathwayData getPathwayData() {
+        return new PathwayData();
     }
 }

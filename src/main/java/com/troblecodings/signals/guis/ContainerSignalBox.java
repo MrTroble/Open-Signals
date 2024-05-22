@@ -340,20 +340,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             case REQUEST_PW: {
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
-                if (grid.getNode(end).containsOutConnection()) {
-                    final PathwayRequestResult request = SignalBoxHandler
-                            .requesetInterSignalBoxPathway(new StateInfo(info.world, info.pos),
-                                    start, end);
-                    if (!request.isPass()) {
-                        final WriteBuffer error = new WriteBuffer();
-                        error.putEnumValue(SignalBoxNetwork.PW_REQUEST_RESPONSE);
-                        error.putEnumValue(request);
-                        OpenSignalsMain.network.sendTo(info.player, error);
-                    }
-                    break;
-                }
                 final PathwayRequestResult request = grid.requestWay(start, end);
-                if (request != PathwayRequestResult.PASS) {
+                if (!request.isPass()) {
                     if (request.canBeAddedToSaver() && grid.addNextPathway(start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
