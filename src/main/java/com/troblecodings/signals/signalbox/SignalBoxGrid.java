@@ -389,7 +389,7 @@ public class SignalBoxGrid implements INetworkSavable {
             return;
         clearPaths();
         tag.getList(PATHWAY_LIST).forEach(comp -> {
-            final PathwayData data = PathwayData.of(tag);
+            final PathwayData data = PathwayData.of(this, comp);
             final SignalBoxPathway pathway = data.createPathway();
             pathway.setUpdater(way -> {
                 updatePrevious(way);

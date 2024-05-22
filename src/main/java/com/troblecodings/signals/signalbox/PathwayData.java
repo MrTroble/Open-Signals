@@ -74,8 +74,9 @@ public class PathwayData {
         return data;
     }
 
-    public static PathwayData of(final NBTWrapper tag) {
+    public static PathwayData of(final SignalBoxGrid grid, final NBTWrapper tag) {
         final PathwayData data = SignalBoxFactory.getFactory().getPathwayData();
+        data.grid = grid;
         data.read(tag);
         return data;
     }
