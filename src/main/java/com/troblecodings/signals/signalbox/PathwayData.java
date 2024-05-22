@@ -87,8 +87,9 @@ public class PathwayData {
             if (delay > 0) {
                 if (isInterSignalBoxPathway) {
                     pathway = new DelayableInterSignalBoxPathway(this);
+                } else {
+                    pathway = new DelayableSignalBoxPathway(this);
                 }
-                pathway = new DelayableSignalBoxPathway(this);
             } else if (isInterSignalBoxPathway) {
                 pathway = new InterSignalBoxPathway(this);
             } else {
