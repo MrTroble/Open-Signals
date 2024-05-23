@@ -189,8 +189,14 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
             final Signal current = SignalBoxHandler.getSignal(identifier, position.pos);
             if (current == null)
                 return;
-            SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position.pos, current),
-                    lastSignal, data, position.isRepeater));
+            final ConfigInfo info = new ConfigInfo(
+                    new SignalStateInfo(world, position.pos, current), lastSignal, data,
+                    position.isRepeater);
+            if (position.guiMode.equals(EnumGuiMode.HP)) {
+                SignalConfig.loadDisable(info);
+            } else {
+                SignalConfig.change(info);
+            }
         });
         updateSignalStates();
     }
@@ -218,15 +224,18 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
             } else {
                 position.state = SignalState.RED;
             }
-            if (position.isRSSignal) {
+            if (position.guiMode.equals(EnumGuiMode.RS)) {
                 position.state = SignalState.GREEN;
+            } else if (position.guiMode.equals(EnumGuiMode.HP)) {
+                position.state = SignalState.OFF;
             }
             if (position.state.equals(previous)) {
                 return;
             } else {
                 if (position.state.equals(SignalState.RED)) {
                     redSignals.add(position);
-                } else if (position.state.equals(SignalState.GREEN)) {
+                } else if (position.state.equals(SignalState.GREEN)
+                        || position.state.equals(SignalState.OFF)) {
                     greenSignals.add(position);
                 }
             }
@@ -243,7 +252,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
         }
         final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
         distantSignalPositions.values().forEach(signal -> {
-            if (signal.state.equals(SignalState.GREEN))
+            if (signal.state.equals(SignalState.GREEN) || signal.state.equals(SignalState.OFF))
                 returnList.add(signal);
         });
         return returnList;
@@ -357,10 +366,8 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
                             final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data
                                     .getOtherSignals();
                             final OtherSignalIdentifier identifier = distantSignalPositions
-                                    .getOrDefault(position,
-                                            new OtherSignalIdentifier(point,
-                                                    new ModeSet(mode, rotation), position, false,
-                                                    mode.equals(EnumGuiMode.RS)));
+                                    .getOrDefault(position, new OtherSignalIdentifier(point,
+                                            new ModeSet(mode, rotation), position, false, mode));
                             SignalConfig.reset(new ResetInfo(
                                     new SignalStateInfo(tile.getLevel(), position, current),
                                     identifier.isRepeater));

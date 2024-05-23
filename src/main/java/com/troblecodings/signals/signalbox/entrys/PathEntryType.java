@@ -57,6 +57,9 @@ public final class PathEntryType<T> {
     public static final PathEntryType<Integer> PATHWAY_COSTS = new PathEntryType<>(
             IntegerEntry.class, "pathway_costs");
 
+    public static final PathEntryType<Boolean> CAN_BE_OVERSTPEPPED = new PathEntryType<>(
+            BoolEntry.class, "can_be_overstepped");
+
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 
         public EnumPathUsageEntry() {

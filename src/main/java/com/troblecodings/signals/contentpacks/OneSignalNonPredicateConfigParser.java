@@ -35,7 +35,7 @@ public class OneSignalNonPredicateConfigParser {
                 .getFiles("signalconfigs/reset");
         list.forEach(entry -> {
             try {
-                OneSignalPredicateConfigParser.loadOneSignalPredicateConfigs(RESETCONFIGS, entry);
+                OneSignalPredicateConfigParser.loadOneSignalPredicateConfigEntry(RESETCONFIGS, entry);
             } catch (final Exception e) {
                 OpenSignalsMain.getLogger()
                         .error("Reset Config '" + entry.getKey() + "' is still in old "

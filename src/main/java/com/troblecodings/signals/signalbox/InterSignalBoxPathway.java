@@ -9,6 +9,7 @@ import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.StateInfo;
+import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
@@ -214,8 +215,10 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             } else {
                 position.state = SignalState.RED;
             }
-            if (position.isRSSignal) {
+            if (position.guiMode.equals(EnumGuiMode.RS)) {
                 position.state = SignalState.GREEN;
+            } else if (position.guiMode.equals(EnumGuiMode.HP)) {
+                position.state = SignalState.OFF;
             }
             if (position.state.equals(previous)) {
                 return;

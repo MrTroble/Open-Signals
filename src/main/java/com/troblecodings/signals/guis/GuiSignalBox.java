@@ -424,7 +424,8 @@ public class GuiSignalBox extends GuiBase {
                 parent.add(
                         GuiElements.createBoolElement(BoolIntegerables.of("signal_repeater"), e -> {
                             final boolean state = e == 1 ? true : false;
-                            sendSignalRepeater(node.getPoint(), modeSet, state);
+                            sendBoolEntry(state, node.getPoint(), modeSet,
+                                    PathEntryType.SIGNAL_REPEATER);
                             option.setEntry(PathEntryType.SIGNAL_REPEATER, state);
                         }, opt.isPresent() && opt.get() ? 1 : 0));
                 break;
@@ -435,6 +436,14 @@ public class GuiSignalBox extends GuiBase {
                 }, node.isAutoPoint() ? 1 : 0));
             }
             case RS: {
+                parent.add(GuiElements.createBoolElement(BoolIntegerables.of("can_be_overstepped"),
+                        e -> {
+                            final boolean state = e == 1 ? true : false;
+                            option.setEntry(PathEntryType.CAN_BE_OVERSTPEPPED, state);
+                            sendBoolEntry(state, node.getPoint(), modeSet,
+                                    PathEntryType.CAN_BE_OVERSTPEPPED);
+                        },
+                        option.getEntry(PathEntryType.CAN_BE_OVERSTPEPPED).orElse(false) ? 1 : 0));
                 if (option.containsEntry(PathEntryType.SIGNAL))
                     parent.add(GuiElements.createButton(I18Wrapper.format("btn.subsidiary"), e -> {
                         final UIBox hbox = new UIBox(UIBox.VBOX, 1);
@@ -1146,14 +1155,16 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void sendSignalRepeater(final Point point, final ModeSet mode, final boolean state) {
+    private void sendBoolEntry(final boolean state, final Point point, final ModeSet mode,
+            final PathEntryType<Boolean> entry) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_SIGNAL_REPEATER);
+        buffer.putEnumValue(SignalBoxNetwork.SEND_BOOL_ENTRY);
+        buffer.putBoolean(state);
         point.writeNetwork(buffer);
         mode.writeNetwork(buffer);
-        buffer.putBoolean(state);
+        buffer.putByte((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 

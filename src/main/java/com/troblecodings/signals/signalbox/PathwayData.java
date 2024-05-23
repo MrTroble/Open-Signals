@@ -152,42 +152,40 @@ public class PathwayData {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final AtomicInteger delayAtomic = new AtomicInteger(0);
-        final Builder<BlockPos, OtherSignalIdentifier> distantPosBuilder = ImmutableMap.builder();
+        final Builder<BlockPos, OtherSignalIdentifier> otherBuilder = ImmutableMap.builder();
         mapOfBlockingPositions.clear();
         mapOfResetPositions.clear();
-        foreachEntry((optionEntry, node) -> {
-            optionEntry.getEntry(PathEntryType.SPEED)
-                    .ifPresent(value -> atomic.updateAndGet(in -> Math.min(in, value)));
-            optionEntry.getEntry(PathEntryType.BLOCKING)
-                    .ifPresent(position -> mapOfBlockingPositions.put(position, node));
-            optionEntry.getEntry(PathEntryType.RESETING)
-                    .ifPresent(position -> mapOfResetPositions.put(position, node));
-            optionEntry.getEntry(PathEntryType.ZS2).ifPresent(value -> zs2Value.set(value));
-        });
         foreachPath((path, node) -> {
-            if (!type.equals(PathType.SHUNTING)) {
-                final Rotation rotation = SignalBoxUtil
-                        .getRotationFromDelta(node.getPoint().delta(path.point1));
-                for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
-                    final ModeSet modeSet = new ModeSet(mode, rotation);
-                    node.getOption(modeSet).ifPresent(
-                            option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
-                                final Optional<Boolean> repeaterOption = option
-                                        .getEntry(PathEntryType.SIGNAL_REPEATER);
-                                distantPosBuilder.put(position,
-                                        new OtherSignalIdentifier(node.getPoint(), modeSet,
-                                                position,
-                                                repeaterOption.isPresent() && repeaterOption.get(),
-                                                mode.equals(EnumGuiMode.RS)));
-                            }));
-                }
+            node.getOption(path).ifPresent(optionEntry -> {
+                optionEntry.getEntry(PathEntryType.SPEED)
+                        .ifPresent(value -> atomic.updateAndGet(in -> Math.min(in, value)));
+                optionEntry.getEntry(PathEntryType.BLOCKING)
+                        .ifPresent(position -> mapOfBlockingPositions.put(position, node));
+                optionEntry.getEntry(PathEntryType.RESETING)
+                        .ifPresent(position -> mapOfResetPositions.put(position, node));
+                optionEntry.getEntry(PathEntryType.ZS2).ifPresent(value -> zs2Value.set(value));
+            });
+            final Rotation rotation = SignalBoxUtil
+                    .getRotationFromDelta(node.getPoint().delta(path.point1));
+            for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS,
+                    EnumGuiMode.HP)) {
+                final ModeSet modeSet = new ModeSet(mode, rotation);
+                node.getOption(modeSet).ifPresent(
+                        option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
+                            final Optional<Boolean> repeaterOption = option
+                                    .getEntry(PathEntryType.SIGNAL_REPEATER);
+                            final OtherSignalIdentifier ident = new OtherSignalIdentifier(
+                                    node.getPoint(), modeSet, position,
+                                    repeaterOption.isPresent() && repeaterOption.get(), mode);
+                            otherBuilder.put(position, ident);
+                        }));
             }
             node.getModes().entrySet().stream()
                     .filter(entry -> entry.getKey().mode.equals(EnumGuiMode.BUE))
                     .forEach(entry -> entry.getValue().getEntry(PathEntryType.DELAY).ifPresent(
                             value -> delayAtomic.updateAndGet(in -> Math.max(in, value))));
         }, null);
-        this.otherSignals = distantPosBuilder.build();
+        this.otherSignals = otherBuilder.build();
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
         this.firstPoint = firstNode.getPoint();
         final MainSignalIdentifier firstPos = makeFromNext(type, firstNode,

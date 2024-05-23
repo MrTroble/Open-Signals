@@ -282,9 +282,14 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final Rotation rotation = SignalBoxUtil.getRotationFromDelta(path.point1.delta(this.point));
         for (final EnumGuiMode mode : type.getModes()) {
             final ModeSet possibleOverStepping = new ModeSet(mode, rotation);
-            if (this.possibleModes.containsKey(possibleOverStepping))
+            if (this.possibleModes.containsKey(possibleOverStepping)) {
+                final PathOptionEntry option = possibleModes.get(possibleOverStepping);
+                if (option.getEntry(PathEntryType.CAN_BE_OVERSTPEPPED).orElse(false)) {
+                    continue;
+                }
                 return PathwayRequestResult.OVERSTEPPING; // Found another signal on the path that
                                                           // is not the target
+            }
         }
         return PathwayRequestResult.PASS;
     }

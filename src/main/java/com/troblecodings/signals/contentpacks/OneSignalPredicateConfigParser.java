@@ -23,21 +23,24 @@ public class OneSignalPredicateConfigParser {
 
     public static final Map<Signal, List<ConfigProperty>> DEFAULTCONFIGS = new HashMap<>();
 
+    public static final Map<Signal, List<ConfigProperty>> DISABLECONFIGS = new HashMap<>();
+
     private static final Gson GSON = new Gson();
 
-    public static void loadDefaultConfigs() {
-        loadOneSignalPredicateConfigs(DEFAULTCONFIGS, "signalconfigs/default");
+    public static void loadAllOneSignalPredicateConfigs() {
+        loadOneSignalPredicateConfig(DEFAULTCONFIGS, "signalconfigs/default");
+        loadOneSignalPredicateConfig(DISABLECONFIGS, "signalconfigs/disable");
     }
 
-    public static void loadOneSignalPredicateConfigs(final Map<Signal, List<ConfigProperty>> map,
+    private static void loadOneSignalPredicateConfig(final Map<Signal, List<ConfigProperty>> map,
             final String internal) {
         final List<Map.Entry<String, String>> list = OpenSignalsMain.contentPacks
                 .getFiles(internal);
-        list.forEach(entry -> loadOneSignalPredicateConfigs(map, entry));
+        list.forEach(entry -> loadOneSignalPredicateConfigEntry(map, entry));
     }
 
-    public static void loadOneSignalPredicateConfigs(final Map<Signal, List<ConfigProperty>> map,
-            final Map.Entry<String, String> files) {
+    public static void loadOneSignalPredicateConfigEntry(
+            final Map<Signal, List<ConfigProperty>> map, final Map.Entry<String, String> files) {
         final OneSignalPredicateConfigParser parser = GSON.fromJson(files.getValue(),
                 OneSignalPredicateConfigParser.class);
 
