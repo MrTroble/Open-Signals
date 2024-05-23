@@ -40,6 +40,7 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
             final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data
                     .getOtherSignals();
             this.isExecutingSignalSet = false;
+            pathwayToBlock.isExecutingSignalSet = false;
             synchronized (distantSignalPositions) {
                 setSignals(getLastSignalInfo());
             }
@@ -57,7 +58,6 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
                                 .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
                         pathwayToBlock.setPathStatus(EnumPathUsage.SELECTED);
                         pathwayToBlock.updateToNet();
-                        pathwayToBlock.isExecutingSignalSet = false;
                     });
                 }
             });

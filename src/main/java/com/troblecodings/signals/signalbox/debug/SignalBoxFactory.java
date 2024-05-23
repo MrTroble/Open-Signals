@@ -1,10 +1,12 @@
 package com.troblecodings.signals.signalbox.debug;
 
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.signalbox.ConnectionChecker;
+import com.troblecodings.signals.signalbox.ConnectionChecker.ConnectionCheckerNormal;
+import com.troblecodings.signals.signalbox.ConnectionChecker.ConnectionCheckerShunting;
 import com.troblecodings.signals.signalbox.PathwayData;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxPathway;
-import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 public class SignalBoxFactory {
@@ -21,8 +23,12 @@ public class SignalBoxFactory {
         return factory;
     }
 
-    public ConnectionChecker getConnectionChecker() {
-        return new ConnectionChecker();
+    public ConnectionChecker getConnectionCheckerNormal() {
+        return new ConnectionCheckerNormal();
+    }
+
+    public ConnectionChecker getConnectionCheckerShunting() {
+        return new ConnectionCheckerShunting();
     }
 
     public SignalBoxPathway getPathway(final PathwayData data) {

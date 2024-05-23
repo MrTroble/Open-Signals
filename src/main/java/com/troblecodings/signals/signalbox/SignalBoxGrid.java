@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
@@ -109,8 +110,8 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     protected void resetPathway(final SignalBoxPathway pathway) {
-        pathway.resetPathway();
         pathway.unregisterSignalUpdater();
+        pathway.resetPathway();
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
     }
@@ -130,17 +131,22 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public PathwayRequestResult requestWay(final Point p1, final Point p2) {
-        if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
-            return PathwayRequestResult.ALREADY_USED;
         final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2);
         if (!result.isPass())
             return result;
         final PathwayData data = result.getPathwayData();
         if (data.isEmpty())
             return PathwayRequestResult.NO_PATH;
+        if (checkPathwayData(data))
+            return PathwayRequestResult.ALREADY_USED;
         addPathway(data);
         tile.setChanged();
         return result;
+    }
+
+    private boolean checkPathwayData(final PathwayData data) {
+        return startsToPath.containsKey(data.getFirstPoint())
+                || endsToPath.containsKey(data.getLastPoint());
     }
 
     protected void addPathway(final PathwayData data) {
@@ -155,7 +161,7 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void resetAllPathways() {
-        this.startsToPath.values().forEach(pathway -> pathway.resetPathway());
+        ImmutableSet.copyOf(this.startsToPath.values()).forEach(this::resetPathway);
         clearPaths();
     }
 

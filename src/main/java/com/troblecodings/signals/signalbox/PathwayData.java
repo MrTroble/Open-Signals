@@ -1,5 +1,6 @@
 package com.troblecodings.signals.signalbox;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
@@ -59,6 +61,9 @@ public class PathwayData {
             final PathType type) {
         final PathwayData data = SignalBoxFactory.getFactory().getPathwayData();
         data.prepareData(grid, pNodes, type);
+        if (!data.checkForShuntingPath()) {
+            return EMPTY_DATA;
+        }
         if (data.isEndOfInterSignalBox()) {
             final PathwayData otherData = data.requestInterSignalBoxPathway(grid);
             if (otherData == EMPTY_DATA)
@@ -97,6 +102,38 @@ public class PathwayData {
             }
         }
         return pathway;
+    }
+
+    private boolean checkForShuntingPath() {
+        if (!type.equals(PathType.SHUNTING))
+            return true;
+        final Map<Point, Point> newNodes = new HashMap<>();
+        Point previous = listOfNodes.get(listOfNodes.size() - 1).getPoint();
+        for (int i = listOfNodes.size() - 2; i > 0; i--) {
+            final Point oldPos = listOfNodes.get(i - 1).getPoint();
+            final Point newPos = listOfNodes.get(i + 1).getPoint();
+            final SignalBoxNode current = listOfNodes.get(i);
+            newNodes.put(current.getPoint(), new Point(previous));
+            previous = current.getPoint();
+            final PathOptionEntry option = current.getOption(new Path(oldPos, newPos)).orElse(null);
+            if (option == null) {
+                continue;
+            }
+            final EnumPathUsage usage = option.getEntry(PathEntryType.PATHUSAGE)
+                    .orElse(EnumPathUsage.FREE);
+            if (!usage.equals(EnumPathUsage.FREE)) {
+                final ArrayList<SignalBoxNode> listOfNodes = new ArrayList<>();
+                for (Point point = previous; point != null; point = newNodes.get(point)) {
+                    listOfNodes.add(grid.getNode(point));
+                }
+                this.listOfNodes = ImmutableList.copyOf(listOfNodes);
+                if (this.listOfNodes.size() < 3)
+                    return false;
+                this.initalize();
+                break;
+            }
+        }
+        return true;
     }
 
     private void prepareData(final SignalBoxGrid grid, final List<SignalBoxNode> pNodes,

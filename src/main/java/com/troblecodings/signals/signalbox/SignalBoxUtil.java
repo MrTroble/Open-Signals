@@ -4,16 +4,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
-import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
-import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.world.level.block.Rotation;
@@ -66,30 +63,6 @@ public final class SignalBoxUtil {
 
     }
 
-    public static class ConnectionChecker {
-
-        public PathType type;
-        public SignalBoxNode nextNode;
-        public Point previousPoint;
-        public Path path;
-        public Set<Path> visited;
-
-        public PathwayRequestResult check() {
-            if (nextNode == null)
-                return PathwayRequestResult.NO_PATH;
-            final PathwayRequestResult nodeResult = nextNode.canMakePath(path, type);
-            if (!nodeResult.isPass())
-                return nodeResult;
-            final Optional<EnumPathUsage> optional = nextNode.getOption(path)
-                    .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
-            if (optional.isPresent() && !optional.get().equals(EnumPathUsage.FREE))
-                return PathwayRequestResult.ALREADY_USED;
-            final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
-            return isValid ? PathwayRequestResult.PASS : PathwayRequestResult.NO_PATH;
-        }
-
-    }
-
     public static PathwayRequestResult requestPathway(final SignalBoxGrid grid, final Point p1,
             final Point p2) {
         final Map<Point, SignalBoxNode> modeGrid = grid.modeGrid;
@@ -105,8 +78,7 @@ public final class SignalBoxUtil {
         final Map<PathIdentifier, Double> scores = new HashMap<>();
         final Set<Path> visited = new HashSet<>();
 
-        final SignalBoxFactory factory = SignalBoxFactory.getFactory();
-        final ConnectionChecker checker = factory.getConnectionChecker();
+        final ConnectionChecker checker = ConnectionChecker.getCheckerForType(pathType);
         checker.type = pathType;
         checker.visited = visited;
         PathwayRequestResult result = PathwayRequestResult.NO_PATH;
