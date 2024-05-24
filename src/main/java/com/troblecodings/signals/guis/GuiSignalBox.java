@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -42,6 +43,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
@@ -430,6 +432,53 @@ public class GuiSignalBox extends GuiBase {
                         }, opt.isPresent() && opt.get() ? 1 : 0));
                 break;
             case HP: {
+                final List<PosIdentifier> preSignalsList = option.getEntry(PathEntryType.PRESIGNALS)
+                        .orElse(new ArrayList<>());
+                parent.add(GuiElements.createButton(I18Wrapper.format("btn.presignals"), e -> {
+                    final UIEntity screen = new UIEntity();
+                    screen.setInherits(true);
+                    screen.add(new UIBox(UIBox.VBOX, 5));
+                    screen.add(
+                            GuiElements.createButton(I18Wrapper.format("btn.return"), e1 -> pop()));
+                    SignalBoxUIHelper.initializeGrid(screen, container.grid, (tile, sbt) -> {
+                        final AtomicReference<PosIdentifier> vp = new AtomicReference<>();
+                        sbt.getNode().getModes().forEach((nodeMode, entry) -> {
+                            if (!nodeMode.mode.equals(EnumGuiMode.VP))
+                                return;
+                            final BlockPos linkedSignal = entry.getEntry(PathEntryType.SIGNAL)
+                                    .orElse(null);
+                            if (linkedSignal == null)
+                                return;
+                            vp.set(new PosIdentifier(sbt.getPoint(), nodeMode, linkedSignal));
+                        });
+                        final PosIdentifier ident = vp.get();
+                        if (ident == null)
+                            return;
+                        final UIColor color = new UIColor(SELECTION_COLOR);
+                        tile.add(new UIClickable(e1 -> {
+                            if (preSignalsList.contains(ident)) {
+                                preSignalsList.remove(ident);
+                                tile.remove(color);
+                            } else {
+                                preSignalsList.add(ident);
+                                tile.add(color);
+                            }
+                            if (preSignalsList.isEmpty()) {
+                                option.removeEntry(PathEntryType.PRESIGNALS);
+                                removeEntryFromServer(node, mode, rotation,
+                                        PathEntryType.PRESIGNALS);
+                            } else {
+                                option.setEntry(PathEntryType.PRESIGNALS, preSignalsList);
+                                sendPosIdentList(preSignalsList, node, mode, rotation,
+                                        PathEntryType.PRESIGNALS);
+                            }
+                        }));
+                        if (preSignalsList.contains(ident)) {
+                            tile.add(color);
+                        }
+                    });
+                    push(GuiElements.createScreen(e1 -> e1.add(screen)));
+                }));
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
                     setAutoPoint(node.getPoint(), (byte) e);
                     node.setAutoPoint(e == 1 ? true : false);
@@ -1216,6 +1265,24 @@ public class GuiSignalBox extends GuiBase {
         final Set<Point> set = ImmutableSet.copyOf(container.greenSignals.keySet());
         container.greenSignals.clear();
         updateSignals(set);
+    }
+
+    private void sendPosIdentList(final List<PosIdentifier> list, final SignalBoxNode node,
+            final EnumGuiMode mode, final Rotation rotation,
+            final PathEntryType<List<PosIdentifier>> entry) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_POSIDENT_LIST);
+        buffer.putInt(list.size());
+        for (final PosIdentifier posIdent : list) {
+            posIdent.writeNetwork(buffer);
+        }
+        node.getPoint().writeNetwork(buffer);
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+        buffer.putByte((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     private void reset() {

@@ -11,7 +11,6 @@ import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
@@ -183,6 +182,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
                 return;
             final SignalStateInfo firstInfo = new SignalStateInfo(world, startSignal.pos, first);
             SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, data));
+            updatePreSignals();
         }
         final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
         distantSignalPositions.values().forEach(position -> {
@@ -201,6 +201,26 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
         updateSignalStates();
     }
 
+    private void updatePreSignals() {
+        final MainSignalIdentifier startSignal = data.getStartSignal();
+        if (startSignal == null)
+            return;
+        final StateInfo identifier = new StateInfo(tile.getLevel(), tile.getBlockPos());
+        final Signal first = SignalBoxHandler.getSignal(identifier, startSignal.pos);
+        if (first == null)
+            return;
+        final SignalStateInfo firstInfo = new SignalStateInfo(tile.getLevel(), startSignal.pos,
+                first);
+        data.getPreSignals().forEach(posIdent -> {
+            final Signal current = SignalBoxHandler.getSignal(identifier, posIdent.pos);
+            if (current == null)
+                return;
+            SignalConfig.change(
+                    new ConfigInfo(new SignalStateInfo(tile.getLevel(), posIdent.pos, current),
+                            firstInfo, data, posIdent.isRepeater));
+        });
+    }
+
     protected void updateSignalStates() {
         final List<MainSignalIdentifier> redSignals = new ArrayList<>();
         final List<MainSignalIdentifier> greenSignals = new ArrayList<>();
@@ -213,6 +233,10 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
             startSignal.state = SignalState.GREEN;
             if (!startSignal.state.equals(previous))
                 greenSignals.add(startSignal);
+            data.getPreSignals().forEach(signalIdent -> {
+                signalIdent.state = SignalState.GREEN;
+                greenSignals.add(signalIdent);
+            });
         }
         final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
         distantSignalPositions.values().forEach(position -> {
@@ -254,6 +278,10 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
         distantSignalPositions.values().forEach(signal -> {
             if (signal.state.equals(SignalState.GREEN) || signal.state.equals(SignalState.OFF))
                 returnList.add(signal);
+        });
+        data.getPreSignals().forEach(ident -> {
+            if (ident.state.equals(SignalState.GREEN))
+                returnList.add(ident);
         });
         return returnList;
     }
@@ -306,8 +334,9 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     private void resetFirstSignal() {
         final MainSignalIdentifier startSignal = data.getStartSignal();
         if (startSignal != null) {
-            final Signal current = SignalBoxHandler
-                    .getSignal(new StateInfo(tile.getLevel(), tile.getBlockPos()), startSignal.pos);
+            final StateInfo stateInfo = new StateInfo(tile.getLevel(), tile.getBlockPos());
+            final List<MainSignalIdentifier> signals = new ArrayList<>();
+            final Signal current = SignalBoxHandler.getSignal(stateInfo, startSignal.pos);
             if (current == null)
                 return;
             SignalConfig.reset(new ResetInfo(
@@ -315,8 +344,22 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
             final SignalState previous = startSignal.state;
             startSignal.state = SignalState.RED;
             if (!startSignal.state.equals(previous)) {
-                updateSignalsOnClient(ImmutableList.of(startSignal));
+                signals.add(startSignal);
             }
+            data.getPreSignals().forEach(ident -> {
+                final Signal currentPreSignal = SignalBoxHandler.getSignal(stateInfo, ident.pos);
+                if (currentPreSignal == null)
+                    return;
+                SignalConfig.reset(new ResetInfo(
+                        new SignalStateInfo(tile.getLevel(), ident.pos, currentPreSignal),
+                        ident.isRepeater));
+                final SignalState previousState = ident.state;
+                ident.state = SignalState.RED;
+                if (!ident.state.equals(previousState)) {
+                    signals.add(ident);
+                }
+            });
+            updateSignalsOnClient(signals);
         }
     }
 
@@ -348,6 +391,11 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
             resetOther();
             resetAllTrainNumbers();
             sendTrainNumberUpdates();
+            final SignalBoxPathway next = getNextPathway();
+            if (next != null) {
+                next.updatePreSignals();
+                next.updateSignalStates();
+            }
         }
     }
 

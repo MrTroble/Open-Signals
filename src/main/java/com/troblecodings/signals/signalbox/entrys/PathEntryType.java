@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.signalbox.Point;
 
@@ -59,6 +60,9 @@ public final class PathEntryType<T> {
 
     public static final PathEntryType<Boolean> CAN_BE_OVERSTPEPPED = new PathEntryType<>(
             BoolEntry.class, "can_be_overstepped");
+
+    public static final PathEntryType<List<PosIdentifier>> PRESIGNALS = new PathEntryType<>(
+            ListBlockPosEntry.class, "listblockposentry");
 
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 

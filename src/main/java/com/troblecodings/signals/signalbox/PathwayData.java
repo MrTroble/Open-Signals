@@ -11,6 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
@@ -20,6 +21,7 @@ import com.google.common.collect.ImmutableMap.Builder;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.JsonEnumHolder;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -53,6 +55,7 @@ public class PathwayData {
     private Optional<MainSignalIdentifier> startSignal = Optional.empty();
     private Optional<MainSignalIdentifier> endSignal = Optional.empty();
     private Map<BlockPos, OtherSignalIdentifier> otherSignals = ImmutableMap.of();
+    private List<OtherSignalIdentifier> preSignals = ImmutableList.of();
     private boolean emptyOrBroken = false;
 
     private SignalBoxPathway pathway;
@@ -199,6 +202,17 @@ public class PathwayData {
         }
         if (firstPos != null) {
             startSignal = Optional.of(firstPos);
+            final PathOptionEntry entry = grid.getNode(firstPos.getPoint())
+                    .getOption(firstPos.getModeSet()).orElse(null);
+            final List<PosIdentifier> posIdents = entry.getEntry(PathEntryType.PRESIGNALS)
+                    .orElse(new ArrayList<>());
+            this.preSignals = ImmutableList.copyOf(posIdents.stream().map(ident -> {
+                final PathOptionEntry vpEntry = grid.getNode(ident.getPoint())
+                        .getOption(ident.getModeSet()).orElse(null);
+                return new OtherSignalIdentifier(ident.getPoint(), ident.getModeSet(), ident.pos,
+                        vpEntry.getEntry(PathEntryType.SIGNAL_REPEATER).orElse(false),
+                        EnumGuiMode.VP);
+            }).collect(Collectors.toList()));
         }
         this.speed = atomic.get();
         this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
@@ -302,6 +316,10 @@ public class PathwayData {
 
     public Map<BlockPos, OtherSignalIdentifier> getOtherSignals() {
         return otherSignals;
+    }
+
+    public List<OtherSignalIdentifier> getPreSignals() {
+        return preSignals;
     }
 
     public MainSignalIdentifier getStartSignal() {

@@ -17,6 +17,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -429,6 +430,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             }
             case RESET_ALL_SIGNALS: {
                 grid.resetAllSignals();
+                break;
+            }
+            case SEND_POSIDENT_LIST: {
+                final List<PosIdentifier> list = new ArrayList<>();
+                final int size = buffer.getInt();
+                for (int i = 0; i < size; i++) {
+                    list.add(PosIdentifier.of(buffer));
+                }
+                deserializeEntry(buffer, list);
                 break;
             }
             default:
