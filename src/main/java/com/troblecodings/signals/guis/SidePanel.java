@@ -3,7 +3,6 @@ package com.troblecodings.signals.guis;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -54,16 +53,11 @@ public class SidePanel {
     private final UIEntity label = new UIEntity();
     private final UIEntity spacerEntity = new UIEntity();
     private final UIEntity helpPageSpacer = new UIEntity();
-    private UILabel counterLabel = new UILabel("");
     private final GuiSignalBox gui;
-
-    private BiConsumer<BlockPos, SubsidiaryHolder> disableSubsidiary;
 
     public SidePanel(final UIEntity lowerEntity, final GuiSignalBox gui) {
         this.lowerEntity = lowerEntity;
         this.gui = gui;
-
-        counterLabel.setCenterY(false);
 
         infoEntity.setInherits(true);
         infoEntity.add(new UIBox(UIBox.VBOX, 2));
@@ -181,9 +175,7 @@ public class SidePanel {
         addHelpPageToPlane();
     }
 
-    public void helpUsageMode(final Map<BlockPos, SubsidiaryHolder> subsidiaries,
-            final SignalBoxNode node,
-            final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries) {
+    public void helpUsageMode(final SignalBoxNode node) {
         infoEntity.clearChildren();
 
         final UIEntity helpScroll = new UIEntity();
@@ -209,6 +201,8 @@ public class SidePanel {
         helpList.add(GuiElements.createLabel("[RMB] = " + I18Wrapper.format("info.usage.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
 
+        final Map<BlockPos, SubsidiaryHolder> subsidiaries = gui.enabledSubsidiaries;
+        final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = gui.container.possibleSubsidiaries;
         final Minecraft mc = Minecraft.getInstance();
         if (node != null) {
             final Map<ModeSet, PathOptionEntry> modes = node.getModes();
@@ -313,8 +307,7 @@ public class SidePanel {
                                                     }
                                                 }
                                                 gui.pop();
-                                                helpUsageMode(subsidiaries, node,
-                                                        possibleSubsidiaries);
+                                                helpUsageMode(node);
                                                 final MainSignalIdentifier identifier = //
                                                         new MainSignalIdentifier(
                                                                 new ModeIdentifier(node.getPoint(),
@@ -355,7 +348,7 @@ public class SidePanel {
             }
             final UIEntity edit = GuiElements.createButton(I18Wrapper.format("info.usage.edit"),
                     e -> {
-                        helpUsageMode(subsidiaries, null, possibleSubsidiaries);
+                        helpUsageMode(null);
                         gui.initializePageTileConfig(node);
                     });
             edit.setScale(0.8f);
@@ -392,7 +385,7 @@ public class SidePanel {
                         final UIEntity buttonYes = GuiElements
                                 .createButton(I18Wrapper.format("btn.yes"), e1 -> {
                                     gui.pop();
-                                    disableSubsidiary.accept(pos, holder);
+                                    gui.disableSubsidiary(pos, holder);
                                 });
                         final UIEntity buttonNo = GuiElements
                                 .createButton(I18Wrapper.format("btn.no"), e2 -> gui.pop());
@@ -423,9 +416,5 @@ public class SidePanel {
         });
         helpList.add(helpScrollbox);
         addHelpPageToPlane();
-    }
-
-    public void setDisableSubdsidiary(final BiConsumer<BlockPos, SubsidiaryHolder> consumer) {
-        this.disableSubsidiary = consumer;
     }
 }

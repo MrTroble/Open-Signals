@@ -120,7 +120,7 @@ public class GuiSignalBox extends GuiBase {
     private boolean allPacketsRecived = false;
     protected final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
-    private final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
+    protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
     private final Map<Point, UIColor> colors = new HashMap<>();
     private UILabel counterLabel = new UILabel("");
     private UIEntity infoLine = new UIEntity();
@@ -228,12 +228,12 @@ public class GuiSignalBox extends GuiBase {
                 : customName, signalPos.getX(), signalPos.getY(), signalPos.getZ());
     }
 
-    private void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
+    protected void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
         final SubsidiaryEntry entry = new SubsidiaryEntry(holder.entry.enumValue, false);
         sendSubsidiaryRequest(entry, holder.point, holder.modeSet);
         container.grid.setClientState(holder.point, holder.modeSet, entry);
         enabledSubsidiaries.remove(pos);
-        helpPage.helpUsageMode(enabledSubsidiaries, null, container.possibleSubsidiaries);
+        helpPage.helpUsageMode(null);
         this.resetTileSelection();
 
         final MainSignalIdentifier identifier = new MainSignalIdentifier(
@@ -303,7 +303,7 @@ public class GuiSignalBox extends GuiBase {
             return;
         final UIColor previous = colors.get(node.getPoint());
         if (previous != null && previous.getColor() == EDIT_COLOR) {
-            helpPage.helpUsageMode(enabledSubsidiaries, null, container.possibleSubsidiaries);
+            helpPage.helpUsageMode(null);
             helpPage.setShowHelpPage(false);
             this.resetTileSelection();
             return;
@@ -313,7 +313,7 @@ public class GuiSignalBox extends GuiBase {
         final UIColor newColor = new UIColor(EDIT_COLOR);
         entity.add(newColor);
         colors.put(node.getPoint(), newColor);
-        helpPage.helpUsageMode(enabledSubsidiaries, node, container.possibleSubsidiaries);
+        helpPage.helpUsageMode(node);
         helpPage.setShowHelpPage(true);
     }
 
@@ -491,7 +491,7 @@ public class GuiSignalBox extends GuiBase {
         sendModeChanges();
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
-        helpPage.helpUsageMode(enabledSubsidiaries, null, container.possibleSubsidiaries);
+        helpPage.helpUsageMode(null);
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -609,7 +609,6 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(new UIBox(UIBox.HBOX, 2));
         lowerEntity.add(splitter);
         helpPage = new SidePanel(lowerEntity, this);
-        helpPage.setDisableSubdsidiary(this::disableSubsidiary);
 
         buildColors(container.grid.getNodes());
     }
@@ -668,7 +667,7 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-        helpPage.helpUsageMode(enabledSubsidiaries, null, container.possibleSubsidiaries);
+        helpPage.helpUsageMode(null);
     }
 
     private void addInfoLine(final UIEntity entity) {
