@@ -327,6 +327,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     }
 
     public void resetAllSignals() {
+        unregisterSignalUpdater();
         resetFirstSignal();
         resetOther();
     }
