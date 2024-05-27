@@ -369,10 +369,7 @@ public class GuiSignalBox extends GuiBase {
             dropDown.addElements(list);
         });
         lowerEntity.add(GuiElements.createPageSelect(box));
-        lowerEntity.add(new UIClickable(e -> {
-            enableInfoLine();
-            initializeFieldUsage(mainButton);
-        }, 1));
+        lowerEntity.add(new UIClickable(e -> initializeFieldUsage(mainButton), 1));
     }
 
     private void initializePageSettings(final UIEntity entity) {

@@ -41,6 +41,8 @@ public class PathwayData {
 
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
+    private static final String LIST_OF_PROTECTION_NODES = "listOfProtectionNodes";
+    private static final String PROTECTION_WAY_RESET = "protectionWayReset";
 
     protected SignalBoxGrid grid = null;
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
@@ -57,6 +59,8 @@ public class PathwayData {
     private Map<BlockPos, OtherSignalIdentifier> otherSignals = ImmutableMap.of();
     private List<OtherSignalIdentifier> preSignals = ImmutableList.of();
     private boolean emptyOrBroken = false;
+    private List<SignalBoxNode> protectionWayNodes = ImmutableList.of();
+    private BlockPos protectionWayReset = null;
 
     private SignalBoxPathway pathway;
 
@@ -64,7 +68,8 @@ public class PathwayData {
             final PathType type) {
         final PathwayData data = SignalBoxFactory.getFactory().getPathwayData();
         data.prepareData(grid, pNodes, type);
-        if (!data.checkForShuntingPath()) {
+        if (!data.checkForShuntingPath() || !data.checkForPreviousProtectionWay()
+                || !data.checkForProtectionWay()) {
             return EMPTY_DATA;
         }
         if (data.isEndOfInterSignalBox()) {
@@ -139,6 +144,53 @@ public class PathwayData {
         return true;
     }
 
+    private boolean checkForProtectionWay() {
+        if (!type.equals(PathType.NORMAL) || !endSignal.isPresent())
+            return true;
+        final MainSignalIdentifier signalIdent = endSignal.get();
+        final PathOptionEntry option = grid.getNode(signalIdent.getPoint())
+                .getOption(signalIdent.getModeSet()).orElse(null);
+        if (option == null)
+            return true;
+        final Point protectionWayEnd = option.getEntry(PathEntryType.PROTECTIONWAY_END)
+                .orElse(lastPoint);
+        if (lastPoint.equals(protectionWayEnd))
+            return true;
+        this.protectionWayNodes = ImmutableList
+                .copyOf(SignalBoxUtil.requestProtectionWay(lastPoint, protectionWayEnd, grid));
+        if (protectionWayNodes.isEmpty())
+            return false;
+        if (protectionWayNodes.size() < 3) {
+            this.protectionWayNodes = ImmutableList.of();
+            return true;
+        }
+        this.protectionWayReset = option.getEntry(PathEntryType.PROTECTIONWAY_RESET).orElse(null);
+        final AtomicInteger atomicDelay = new AtomicInteger(delay);
+        protectionWayNodes.forEach(
+                node -> node.getModes().forEach((_u, entry) -> entry.getEntry(PathEntryType.DELAY)
+                        .ifPresent(value -> atomicDelay.updateAndGet(in -> Math.max(in, value)))));
+        this.delay = atomicDelay.get();
+        return true;
+    }
+
+    private boolean checkForPreviousProtectionWay() {
+        final SignalBoxPathway previous = grid.getPathwayByLastPoint(firstPoint);
+        if (previous == null)
+            return true;
+        final PathwayData otherData = previous.data;
+        if (otherData.protectionWayNodes.isEmpty())
+            return true;
+        final boolean containsAll = listOfNodes.containsAll(otherData.protectionWayNodes);
+        if (containsAll) {
+            otherData.protectionWayNodes = ImmutableList.of();
+        }
+        return containsAll;
+    }
+
+    protected void resetProtectionWay() {
+        this.protectionWayNodes = ImmutableList.of();
+    }
+
     private void prepareData(final SignalBoxGrid grid, final List<SignalBoxNode> pNodes,
             final PathType type) {
         this.grid = grid;
@@ -183,10 +235,8 @@ public class PathwayData {
                             otherBuilder.put(position, ident);
                         }));
             }
-            node.getModes().entrySet().stream()
-                    .filter(entry -> entry.getKey().mode.equals(EnumGuiMode.BUE))
-                    .forEach(entry -> entry.getValue().getEntry(PathEntryType.DELAY).ifPresent(
-                            value -> delayAtomic.updateAndGet(in -> Math.max(in, value))));
+            node.getModes().forEach((_u, entry) -> entry.getEntry(PathEntryType.DELAY)
+                    .ifPresent(value -> delayAtomic.updateAndGet(in -> Math.max(in, value))));
         }, null);
         this.otherSignals = otherBuilder.build();
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
@@ -254,6 +304,16 @@ public class PathwayData {
         }
     }
 
+    protected void forEachEntryProtectionWay(final Consumer<PathOptionEntry> consumer) {
+        for (int i = protectionWayNodes.size() - 2; i > 0; i--) {
+            final Point oldPos = protectionWayNodes.get(i - 1).getPoint();
+            final Point newPos = protectionWayNodes.get(i + 1).getPoint();
+            final SignalBoxNode current = protectionWayNodes.get(i);
+            final PathOptionEntry entry = current.getOption(new Path(oldPos, newPos)).get();
+            consumer.accept(entry);
+        }
+    }
+
     protected void foreachEntry(final BiConsumer<PathOptionEntry, SignalBoxNode> consumer,
             final @Nullable Point point) {
         foreachPath((path, current) -> current.getOption(path)
@@ -266,28 +326,55 @@ public class PathwayData {
             node.getPoint().write(entry);
             return entry;
         })::iterator);
+        tag.putList(LIST_OF_PROTECTION_NODES, protectionWayNodes.stream().map(node -> {
+            final NBTWrapper entry = new NBTWrapper();
+            node.getPoint().write(entry);
+            return entry;
+        })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
+        if (protectionWayReset != null) {
+            tag.putWrapper(PROTECTION_WAY_RESET, NBTWrapper.getBlockPosWrapper(protectionWayReset));
+        }
     }
 
     public void read(final NBTWrapper tag) {
         final com.google.common.collect.ImmutableList.Builder<SignalBoxNode> nodeBuilder = ImmutableList
                 .builder();
-        final Map<Point, SignalBoxNode> modeGrid = grid.getModeGrid();
+        final com.google.common.collect.ImmutableList.Builder<SignalBoxNode> protectionNodeBuilder = ImmutableList
+                .builder();
         tag.getList(LIST_OF_NODES).forEach(nodeNBT -> {
-            final Point point = new Point();
-            point.read(nodeNBT);
-            final SignalBoxNode node = modeGrid.get(point);
-            if (node == null) {
-                OpenSignalsMain.getLogger().error("Detecting broken pathway at {}!",
-                        point.toString());
-                this.emptyOrBroken = true;
+            final SignalBoxNode node = getNodeFromNBT(nodeNBT);
+            if (node == null)
                 return;
-            }
             nodeBuilder.add(node);
         });
+        tag.getList(LIST_OF_PROTECTION_NODES).forEach(nodeNBT -> {
+            final SignalBoxNode node = getNodeFromNBT(nodeNBT);
+            if (node == null)
+                return;
+            protectionNodeBuilder.add(node);
+        });
         this.listOfNodes = nodeBuilder.build();
+        this.protectionWayNodes = protectionNodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
+        final NBTWrapper posTag = tag.getWrapper(PROTECTION_WAY_RESET);
+        if (!posTag.isTagNull()) {
+            this.protectionWayReset = posTag.getAsPos();
+        }
         this.initalize();
+    }
+
+    private SignalBoxNode getNodeFromNBT(final NBTWrapper nodeNBT) {
+        final Map<Point, SignalBoxNode> modeGrid = grid.modeGrid;
+        final Point point = new Point();
+        point.read(nodeNBT);
+        final SignalBoxNode node = modeGrid.get(point);
+        if (node == null) {
+            OpenSignalsMain.getLogger().error("Detecting broken pathway at {}!", point.toString());
+            this.emptyOrBroken = true;
+            return null;
+        }
+        return node;
     }
 
     public boolean tryBlock(final BlockPos position) {
@@ -296,6 +383,10 @@ public class PathwayData {
 
     public SignalBoxNode tryReset(final BlockPos positon) {
         return mapOfResetPositions.get(positon);
+    }
+
+    public boolean canResetProtectionWay(final BlockPos pos) {
+        return pos.equals(protectionWayReset) || this.emptyOrBroken;
     }
 
     public boolean totalPathwayReset(final @Nullable Point point) {
@@ -457,6 +548,10 @@ public class PathwayData {
      */
     public List<SignalBoxNode> getListOfNodes() {
         return listOfNodes;
+    }
+
+    public List<SignalBoxNode> getProtectionWayNodes() {
+        return protectionWayNodes;
     }
 
     @Override

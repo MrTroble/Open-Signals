@@ -64,6 +64,12 @@ public final class PathEntryType<T> {
     public static final PathEntryType<List<PosIdentifier>> PRESIGNALS = new PathEntryType<>(
             ListBlockPosEntry.class, "listblockposentry");
 
+    public static final PathEntryType<Point> PROTECTIONWAY_END = new PathEntryType<>(
+            PointEntry.class, "protectionWayEnd");
+
+    public static final PathEntryType<BlockPos> PROTECTIONWAY_RESET = new PathEntryType<>(
+            BlockposEntry.class, "protectionway_reset");
+
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 
         public EnumPathUsageEntry() {

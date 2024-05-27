@@ -110,6 +110,36 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
                             !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
+        if (status.equals(EnumPathUsage.SELECTED) || status.equals(EnumPathUsage.PREPARED)) {
+            setProtectionWay();
+        }
+    }
+
+    private void setProtectionWay() {
+        data.forEachEntryProtectionWay(option -> {
+            option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), true));
+            option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.PROTECTED);
+        });
+    }
+
+    public boolean checkResetOfProtectionWay(final BlockPos position) {
+        if (!data.canResetProtectionWay(position))
+            return false;
+        resetProtectionWay();
+        return true;
+    }
+
+    private void resetProtectionWay() {
+        data.forEachEntryProtectionWay(option -> {
+            option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), false));
+            option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE);
+        });
+    }
+
+    public void removeProtectionWay() {
+        data.resetProtectionWay();
     }
 
     public void setPathStatus(final EnumPathUsage status) {
@@ -393,6 +423,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
             resetOther();
             resetAllTrainNumbers();
             sendTrainNumberUpdates();
+            resetProtectionWay();
             final SignalBoxPathway next = getNextPathway();
             if (next != null) {
                 next.updatePreSignals();
@@ -631,6 +662,10 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
      */
     public List<SignalBoxNode> getListOfNodes() {
         return data.getListOfNodes();
+    }
+
+    public List<SignalBoxNode> getProtectionWayNodes() {
+        return data.getProtectionWayNodes();
     }
 
     /**

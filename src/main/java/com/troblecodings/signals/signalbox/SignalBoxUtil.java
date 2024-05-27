@@ -3,9 +3,11 @@ package com.troblecodings.signals.signalbox;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
 import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -125,6 +127,59 @@ public final class SignalBoxUtil {
             }
         }
         return result;
+    }
+
+    public static List<SignalBoxNode> requestProtectionWay(final Point p1, final Point p2,
+            final SignalBoxGrid grid) {
+        final Map<Point, SignalBoxNode> modeGrid = grid.modeGrid;
+        final SignalBoxNode firstNode = modeGrid.get(p1);
+        final Map<Point, Point> closedList = new HashMap<>();
+        final Map<PathIdentifier, Double> scores = new HashMap<>();
+        final Set<Path> visited = new HashSet<>();
+
+        final ConnectionChecker checker = ConnectionChecker.getCheckerForType(PathType.NORMAL);
+        checker.type = PathType.NORMAL;
+        checker.visited = visited;
+
+        for (final PathIdentifier pathIdent : firstNode.toPathIdentifier()) {
+            scores.put(pathIdent, getCosts(pathIdent.getMode(), firstNode, p1, p2));
+        }
+
+        while (!scores.isEmpty()) {
+            final PathIdentifier currentPath = scores.entrySet().stream()
+                    .min((ident1, ident2) -> Double.compare(ident1.getValue(), ident2.getValue()))
+                    .get().getKey();
+            scores.remove(currentPath);
+
+            final Point previousPoint = currentPath.getPoint();
+            final Point nextPoint = currentPath.path.point2;
+            if (previousPoint.equals(p2)) {
+                final ArrayList<SignalBoxNode> nodes = new ArrayList<>();
+                for (Point point = previousPoint; point != null; point = closedList.get(point)) {
+                    final SignalBoxNode boxNode = modeGrid.get(point);
+                    nodes.add(boxNode);
+                }
+                return ImmutableList.copyOf(nodes);
+            }
+            checker.previousPoint = previousPoint;
+            final SignalBoxNode nextNode = modeGrid.get(nextPoint);
+            if (nextNode == null) {
+                continue;
+            }
+
+            checker.nextNode = nextNode;
+            for (final PathIdentifier pathIdent : nextNode.toPathIdentifier()) {
+                checker.path = pathIdent.path;
+                final PathwayRequestResult result = checker.check();
+                if (nextPoint.equals(p2) || result.isPass()) {
+                    scores.put(pathIdent, getCosts(pathIdent.getMode(), nextNode, nextPoint, p2));
+                    closedList.put(nextPoint, previousPoint);
+                    visited.add(pathIdent.path);
+                    visited.add(pathIdent.path.getInverse());
+                }
+            }
+        }
+        return ImmutableList.of();
     }
 
     private static final int MAX_COSTS = 100000;

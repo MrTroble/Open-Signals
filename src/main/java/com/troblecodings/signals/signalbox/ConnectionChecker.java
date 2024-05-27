@@ -63,12 +63,12 @@ public abstract class ConnectionChecker {
                 return nodeResult;
             final Optional<EnumPathUsage> optional = nextNode.getOption(path)
                     .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
-            if (optional.isPresent() && !optional.get().equals(EnumPathUsage.FREE))
+            if (optional.isPresent() && !(optional.get().equals(EnumPathUsage.FREE)
+                    || optional.get().equals(EnumPathUsage.PROTECTED)))
                 return PathwayRequestResult.ALREADY_USED;
             final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
             return isValid ? PathwayRequestResult.PASS : PathwayRequestResult.NO_PATH;
         }
-
     }
 
     public static class ConnectionCheckerShunting extends ConnectionChecker {

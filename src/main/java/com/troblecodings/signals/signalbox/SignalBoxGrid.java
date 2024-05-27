@@ -120,10 +120,15 @@ public class SignalBoxGrid implements INetworkSavable {
         if (tile == null || !tile.isBlocked())
             return;
         final List<SignalBoxNode> nodes = pathway.getListOfNodes();
+        final List<SignalBoxNode> protectionWayNodes = pathway.getProtectionWayNodes();
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_PW_UPDATE);
-        buffer.putInt(nodes.size());
+        buffer.putInt(nodes.size() + protectionWayNodes.size());
         nodes.forEach(node -> {
+            node.getPoint().writeNetwork(buffer);
+            node.writeUpdateNetwork(buffer);
+        });
+        protectionWayNodes.forEach(node -> {
             node.getPoint().writeNetwork(buffer);
             node.writeUpdateNetwork(buffer);
         });
@@ -235,6 +240,10 @@ public class SignalBoxGrid implements INetworkSavable {
                     this.startsToPath.remove(first);
                     this.startsToPath.put(pathway.getFirstPoint(), pathway);
                 }
+            }
+            if (pathway.checkResetOfProtectionWay(pos)) {
+                updateToNet(pathway);
+                pathway.removeProtectionWay();
             }
         });
         tryNextPathways();
