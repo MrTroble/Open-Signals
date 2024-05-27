@@ -488,6 +488,7 @@ public class GuiSignalBox extends GuiBase {
 
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
+        enableInfoLine();
         sendModeChanges();
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
@@ -516,6 +517,7 @@ public class GuiSignalBox extends GuiBase {
             final UIEntity buttonYes = GuiElements.createButton(I18Wrapper.format("btn.yes"), e -> {
                 pop();
                 reset();
+                disableInfoLine();
                 final UIMenu menu = new UIMenu();
                 menu.setVisible(false);
                 initializeFieldTemplate(
