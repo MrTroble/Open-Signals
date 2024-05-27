@@ -85,6 +85,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
         data.read(tag);
         if (isEmptyOrBroken())
             return;
+        this.isBlocked = tag.getBoolean(IS_BLOCKED);
         final NBTWrapper originalFirstPoint = tag.getWrapper(ORIGINAL_FIRST_POINT);
         if (!originalFirstPoint.isTagNull()) {
             this.originalFirstPoint = new Point();
