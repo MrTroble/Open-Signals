@@ -384,6 +384,7 @@ public class GuiSignalBox extends GuiBase {
     private void initializePageSettings(final UIEntity entity,
             final Map<BlockPos, LinkType> types) {
         reset();
+        disableInfoLine();
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
