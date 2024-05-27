@@ -508,6 +508,7 @@ public class SidePanel {
                             layout.add(new UIClickable(e1 -> gui.pop(), 1));
                             gui.push(GuiElements.createScreen(screen -> screen.add(layout)));
                         });
+                trainNumberButton.add(new UIToolTip("info.usage.trainnumber.desc"));
                 trainNumberButton.setScale(0.8f);
                 trainNumberButton.setX(5);
                 helpList.add(trainNumberButton);
