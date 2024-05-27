@@ -634,5 +634,14 @@
 	"error.no_intersignalbox_selected": "Kein Stellwerk verbunden",
 	"error.pass": "Erfolg",
 	"property.pathway_costs.name": "Zusätzliche Fahrstraßenkosten",
-	"property.pathay_costs.desc": "Mit dieser Option können Sie die \"Kosten\" für bestimmte Fahrstraßenelemente erhöhen, so dass der Pfadalgorithmus diesen Pfad nach Möglichkeit vermeidet. Dies ist besonders hilfreich, wenn Sie den Fahrstraße manuell beeinflussen wollen."
+	"property.pathay_costs.desc": "Mit dieser Option können Sie die \"Kosten\" für bestimmte Fahrstraßenelemente erhöhen, so dass der Pfadalgorithmus diesen Pfad nach Möglichkeit vermeidet. Dies ist besonders hilfreich, wenn Sie den Fahrstraße manuell beeinflussen wollen.",
+    "info.node.text": "Beschriftung",
+    "property.can_be_overstepped.name": "Kann übersprungen werden",
+    "property.can_be_overstepped.desc": "Das Signal kann betrieblich übersprungen werden. Das heißt, dass die Fahrstraße zum nächsten Signal gestellt werden kann und dieses Signal Kennlicht zeigt.",
+	"property.presignals.name": "Vorsignale festlegen",
+	"property.presignals.desc": "Hier kannst du entsprechende Vorsignale festlegen, die bei Fahrtstellung des Hauptsignals auch ohne anliegende Fahrstraße mitschalten.",
+	"info.usage.trainnumber": "Zugnummer",
+    "info.usage.trainnumer.desc": "Hier kannst du für den jeweiligen Zug in der Fahrstraße eine Zugnummer eingeben, die dann durch das Stellwerk mitläuft.",
+	"sb.trainnumber.save": "Speichern",
+	"info.usage.changetrainnumber": "Zugnummer setzen"
 }
