@@ -17,6 +17,7 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
+import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.core.JsonEnumHolder;
@@ -160,51 +161,58 @@ public class ModeDropDownBoxUI {
             case HP: {
                 final List<PosIdentifier> preSignalsList = option.getEntry(PathEntryType.PRESIGNALS)
                         .orElse(new ArrayList<>());
-                parent.add(GuiElements.createButton(I18Wrapper.format("btn.presignals"), e -> {
-                    final UIEntity screen = new UIEntity();
-                    screen.setInherits(true);
-                    screen.add(new UIBox(UIBox.VBOX, 5));
-                    screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
-                            e1 -> gui.pop()));
-                    SignalBoxUIHelper.initializeGrid(screen, gui.container.grid, (tile, sbt) -> {
-                        final AtomicReference<PosIdentifier> vp = new AtomicReference<>();
-                        sbt.getNode().getModes().forEach((nodeMode, entry) -> {
-                            if (!nodeMode.mode.equals(EnumGuiMode.VP))
-                                return;
-                            final BlockPos linkedSignal = entry.getEntry(PathEntryType.SIGNAL)
-                                    .orElse(null);
-                            if (linkedSignal == null)
-                                return;
-                            vp.set(new PosIdentifier(sbt.getPoint(), nodeMode, linkedSignal));
+                final UIEntity preSignalEntity = GuiElements
+                        .createButton(I18Wrapper.format(" property.presignals.name"), e -> {
+                            final UIEntity screen = new UIEntity();
+                            screen.setInherits(true);
+                            screen.add(new UIBox(UIBox.VBOX, 5));
+                            screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
+                                    e1 -> gui.pop()));
+                            SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
+                                    (tile, sbt) -> {
+                                        final AtomicReference<PosIdentifier> vp = new AtomicReference<>();
+                                        sbt.getNode().getModes().forEach((nodeMode, entry) -> {
+                                            if (!nodeMode.mode.equals(EnumGuiMode.VP))
+                                                return;
+                                            final BlockPos linkedSignal = entry
+                                                    .getEntry(PathEntryType.SIGNAL).orElse(null);
+                                            if (linkedSignal == null)
+                                                return;
+                                            vp.set(new PosIdentifier(sbt.getPoint(), nodeMode,
+                                                    linkedSignal));
+                                        });
+                                        final PosIdentifier ident = vp.get();
+                                        if (ident == null)
+                                            return;
+                                        final UIColor color = new UIColor(
+                                                GuiSignalBox.SELECTION_COLOR);
+                                        tile.add(new UIClickable(e1 -> {
+                                            if (preSignalsList.contains(ident)) {
+                                                preSignalsList.remove(ident);
+                                                tile.remove(color);
+                                            } else {
+                                                preSignalsList.add(ident);
+                                                tile.add(color);
+                                            }
+                                            if (preSignalsList.isEmpty()) {
+                                                option.removeEntry(PathEntryType.PRESIGNALS);
+                                                gui.removeEntryFromServer(node, mode, rotation,
+                                                        PathEntryType.PRESIGNALS);
+                                            } else {
+                                                option.setEntry(PathEntryType.PRESIGNALS,
+                                                        preSignalsList);
+                                                gui.sendPosIdentList(preSignalsList, node, mode,
+                                                        rotation, PathEntryType.PRESIGNALS);
+                                            }
+                                        }));
+                                        if (preSignalsList.contains(ident)) {
+                                            tile.add(color);
+                                        }
+                                    });
+                            gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
                         });
-                        final PosIdentifier ident = vp.get();
-                        if (ident == null)
-                            return;
-                        final UIColor color = new UIColor(GuiSignalBox.SELECTION_COLOR);
-                        tile.add(new UIClickable(e1 -> {
-                            if (preSignalsList.contains(ident)) {
-                                preSignalsList.remove(ident);
-                                tile.remove(color);
-                            } else {
-                                preSignalsList.add(ident);
-                                tile.add(color);
-                            }
-                            if (preSignalsList.isEmpty()) {
-                                option.removeEntry(PathEntryType.PRESIGNALS);
-                                gui.removeEntryFromServer(node, mode, rotation,
-                                        PathEntryType.PRESIGNALS);
-                            } else {
-                                option.setEntry(PathEntryType.PRESIGNALS, preSignalsList);
-                                gui.sendPosIdentList(preSignalsList, node, mode, rotation,
-                                        PathEntryType.PRESIGNALS);
-                            }
-                        }));
-                        if (preSignalsList.contains(ident)) {
-                            tile.add(color);
-                        }
-                    });
-                    gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
-                }));
+                preSignalEntity.add(new UIToolTip("property.presignals.name.desc"));
+                parent.add(preSignalEntity);
             }
             case RS: {
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("can_be_overstepped"),
