@@ -2,11 +2,9 @@ package com.troblecodings.signals.guis;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.I18Wrapper;
@@ -16,12 +14,9 @@ import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
-import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.guilib.ecs.entitys.render.UITexture;
-import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.core.JsonEnumHolder;
@@ -106,32 +101,6 @@ public class ModeDropDownBoxUI {
                 stateEntity.add(new UILabel(pathUsageName + pathUsage));
                 parent.add(stateEntity);
 
-                if (path.equals(EnumPathUsage.BLOCKED)) {
-                    final UIEntity layout = new UIEntity();
-                    layout.add(new UIBox(UIBox.HBOX, 2));
-                    layout.setHeight(20);
-                    layout.setInheritWidth(true);
-                    final UIEntity inputEntity = new UIEntity();
-                    inputEntity.setInheritHeight(true);
-                    inputEntity.setWidth(250);
-                    final UITextInput input = new UITextInput("");
-                    inputEntity.add(input);
-                    inputEntity.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.change")));
-                    layout.add(inputEntity);
-                    final UIEntity save = GuiElements.createButton(I18Wrapper.format("btn.save"),
-                            e -> {
-                                gui.sendTrainNumber(node.getPoint(), input.getText());
-                                input.setText("");
-                            });
-                    save.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.save")));
-                    layout.add(save);
-                    final UIEntity remove = GuiElements.createButton("x",
-                            e -> gui.deleteTrainNumber(node.getPoint()));
-                    remove.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.remove")));
-                    layout.add(remove);
-                    parent.add(layout);
-                }
-
                 final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
                 final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
                     final int speed = id > 0 ? id : 127;
@@ -159,102 +128,6 @@ public class ModeDropDownBoxUI {
                         .orElse(SignalBoxUtil.getDefaultCosts(modeSet)));
                 parent.add(costSelection);
 
-                if (option.getEntry(PathEntryType.OUTPUT).isPresent()) {
-                    final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
-                    for (final Map.Entry<ModeSet, PathOptionEntry> entry : node.getModes()
-                            .entrySet()) {
-                        final Optional<EnumPathUsage> usage = entry.getValue()
-                                .getEntry(PathEntryType.PATHUSAGE);
-                        if (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)) {
-                            canBeManuelChanged.set(false);
-                            break;
-                        }
-                    }
-                    final UILabel currentStatus = new UILabel(I18Wrapper.format("info.usage.status")
-                            + " : " + I18Wrapper.format("info.usage.status.free"));
-                    currentStatus.setTextColor(new UIEntity().getBasicTextColor());
-                    final UIEntity statusEntity = new UIEntity();
-                    statusEntity.setInheritWidth(true);
-                    statusEntity.setHeight(20);
-                    statusEntity.add(new UIScale(1.1f, 1.1f, 1));
-                    statusEntity.add(currentStatus);
-                    final UIEntity manuelButton = GuiElements
-                            .createButton(I18Wrapper.format("info.usage.manuel"), e1 -> {
-                                final Optional<EnumPathUsage> usage = option
-                                        .getEntry(PathEntryType.PATHUSAGE);
-                                final UIEntity info = new UIEntity();
-                                info.setInherits(true);
-                                info.add(new UIBox(UIBox.VBOX, 5));
-                                info.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
-                                info.add(new UIClickable(_u -> gui.pop(), 1));
-                                info.add(statusEntity);
-                                final UIEntity textureEntity = new UIEntity();
-                                textureEntity.setHeight(40);
-                                textureEntity.setWidth(40);
-                                textureEntity.setX(120);
-                                textureEntity.add(
-                                        new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
-                                if (canBeManuelChanged.get()) {
-                                    if (node.containsManuellOutput(modeSet)) {
-                                        textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON));
-                                    } else {
-                                        textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
-                                    }
-                                } else {
-                                    if (usage.isPresent()
-                                            && !usage.get().equals(EnumPathUsage.FREE)) {
-                                        textureEntity.add(
-                                                new UITexture(GuiSignalBox.REDSTONE_ON_BLOCKED));
-                                    } else {
-                                        textureEntity.add(
-                                                new UITexture(GuiSignalBox.REDSTONE_OFF_BLOCKED));
-                                    }
-                                }
-                                info.add(textureEntity);
-                                final UILabel outputStatus = new UILabel(((usage.isPresent()
-                                        && !usage.get().equals(EnumPathUsage.FREE))
-                                        || node.containsManuellOutput(modeSet))
-                                                ? I18Wrapper.format("info.usage.rs.true")
-                                                : I18Wrapper.format("info.usage.rs.false"));
-                                outputStatus.setCenterY(false);
-                                outputStatus.setTextColor(new UIEntity().getBasicTextColor());
-                                final UIEntity outputEntity = new UIEntity();
-                                outputEntity.setInheritWidth(true);
-                                outputEntity.setHeight(20);
-                                outputEntity.add(outputStatus);
-                                info.add(outputEntity);
-                                if (canBeManuelChanged.get()) {
-                                    info.add(GuiElements.createButton(
-                                            I18Wrapper.format("info.usage.change"), i -> {
-                                                final boolean turnOff = node
-                                                        .containsManuellOutput(modeSet);
-                                                textureEntity.clear();
-                                                textureEntity.add(new UIToolTip(
-                                                        I18Wrapper.format("info.usage.rs.desc")));
-                                                if (turnOff) {
-                                                    gui.changeRedstoneOutput(node.getPoint(),
-                                                            modeSet, false);
-                                                    outputStatus.setText(I18Wrapper
-                                                            .format("info.usage.rs.false"));
-                                                    textureEntity.add(new UITexture(
-                                                            GuiSignalBox.REDSTONE_OFF));
-                                                } else {
-                                                    gui.changeRedstoneOutput(node.getPoint(),
-                                                            modeSet, true);
-                                                    outputStatus.setText(I18Wrapper
-                                                            .format("info.usage.rs.true"));
-                                                    textureEntity.add(new UITexture(
-                                                            GuiSignalBox.REDSTONE_ON));
-                                                }
-                                            }));
-                                }
-                                final UIEntity screen = GuiElements.createScreen(e -> e.add(info));
-                                gui.push(screen);
-                            });
-                    manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
-                    parent.add(manuelButton);
-
-                }
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.BLOCKING, mode, rotation, ".blocking");
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
