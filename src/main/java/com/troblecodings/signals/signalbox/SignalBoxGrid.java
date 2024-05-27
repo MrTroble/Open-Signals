@@ -192,11 +192,6 @@ public class SignalBoxGrid implements INetworkSavable {
                 .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
     }
 
-    public List<Point> getValidStarts() {
-        return modeGrid.values().stream().filter(SignalBoxNode::isValidStart)
-                .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
-    }
-
     public List<Point> getValidEnds() {
         return modeGrid.values().stream().filter(SignalBoxNode::isValidEnd)
                 .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
@@ -427,10 +422,6 @@ public class SignalBoxGrid implements INetworkSavable {
         return modeGrid.get(point);
     }
 
-    public boolean containsNode(final Point point) {
-        return modeGrid.containsKey(point);
-    }
-
     public List<SignalBoxNode> getNodes() {
         return ImmutableList.copyOf(this.modeGrid.values());
     }
@@ -457,10 +448,6 @@ public class SignalBoxGrid implements INetworkSavable {
 
     protected Map<Point, SignalBoxNode> getModeGrid() {
         return modeGrid;
-    }
-
-    public void putNode(final Point point, final SignalBoxNode node) {
-        modeGrid.put(point, node);
     }
 
     public void putAllNodes(final Map<Point, SignalBoxNode> nodes) {

@@ -42,7 +42,7 @@ public class ModeDropDownBoxUI {
     private final PathOptionEntry option;
     private final GuiSignalBox gui;
     private final SignalBoxNode node;
-    private boolean open;
+    private boolean open = false;
 
     public ModeDropDownBoxUI(final ModeSet modeSet, final PathOptionEntry option,
             final SignalBoxNode node, final GuiSignalBox gui, final Runnable update) {
