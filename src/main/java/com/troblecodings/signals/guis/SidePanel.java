@@ -76,7 +76,7 @@ public class SidePanel {
         final UILabel labelComponent = new UILabel(I18Wrapper.format("info.infolabel"));
         labelComponent.setTextColor(new UIEntity().getBasicTextColor());
         label.add(labelComponent);
-        label.setX(2);
+        label.setX(5);
 
         button.setInheritWidth(true);
         button.setHeight(20);
@@ -106,17 +106,17 @@ public class SidePanel {
 
     public void addHelpPageToPlane() {
         if (showHelpPage) {
-            helpPageButton.setText(I18Wrapper.format("info.info") + "  >");
+            helpPageButton.setText(I18Wrapper.format("info.info") + "  →");
             spacerEntity.setWidth(80);
             helpPage.clearChildren();
             helpPage.add(infoEntity);
             lowerEntity.update();
         } else {
-            helpPageButton.setText("<");
+            helpPageButton.setText("←");
             helpPage.clearChildren();
             helpPage.add(helpPageSpacer);
             helpPage.add(label);
-            spacerEntity.setWidth(12);
+            spacerEntity.setWidth(20);
             lowerEntity.update();
         }
         infoEntity.forEach(entity -> entity.setVisible(showHelpPage));
@@ -157,7 +157,7 @@ public class SidePanel {
         preview.add(new UIBorder(new UIEntity().getBasicTextColor()));
 
         infoEntity.add(preview);
-        infoEntity.add(GuiElements.createSpacerV(2));
+        infoEntity.add(getSpacerLine());
         infoEntity.add(GuiElements.createLabel("[R] = " + I18Wrapper.format("info.editor.key.r"),
                 new UIEntity().getInfoTextColor(), 0.5f));
         infoEntity
@@ -166,7 +166,7 @@ public class SidePanel {
         infoEntity
                 .add(GuiElements.createLabel("[RMB] = " + I18Wrapper.format("info.editor.key.rmb"),
                         new UIEntity().getInfoTextColor(), 0.5f));
-        infoEntity.add(GuiElements.createSpacerV(2));
+        infoEntity.add(getSpacerLine());
         infoEntity.add(GuiElements.createLabel(I18Wrapper.format("info.description"),
                 new UIEntity().getBasicTextColor(), 0.8f));
         infoEntity.add(
@@ -188,18 +188,21 @@ public class SidePanel {
         helpScroll.add(helpList);
         helpList.setInherits(true);
 
-        final UIScrollBox helpScrollbox = new UIScrollBox(UIBox.VBOX, 2);
+        final UIScrollBox helpScrollbox = new UIScrollBox(UIBox.VBOX, 1);
 
-        if (node != null)
+        if (node != null) {
             helpList.add(GuiElements.createLabel(node.getPoint().toShortString(),
                     new UIEntity().getBasicTextColor(), 0.8f));
-
+            helpList.add(getSpacerLine());
+        }
         helpList.add(GuiElements.createLabel(I18Wrapper.format("info.keys"),
                 new UIEntity().getBasicTextColor(), 0.8f));
         helpList.add(GuiElements.createLabel("[LMB] = " + I18Wrapper.format("info.usage.key.lmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
         helpList.add(GuiElements.createLabel("[RMB] = " + I18Wrapper.format("info.usage.key.rmb"),
                 new UIEntity().getInfoTextColor(), 0.5f));
+
+        helpList.add(getSpacerLine());
 
         final Map<BlockPos, SubsidiaryHolder> subsidiaries = gui.enabledSubsidiaries;
         final Map<BlockPos, List<SubsidiaryState>> possibleSubsidiaries = gui.container.possibleSubsidiaries;
@@ -592,5 +595,13 @@ public class SidePanel {
         });
         helpList.add(helpScrollbox);
         addHelpPageToPlane();
+    }
+
+    private static UIEntity getSpacerLine() {
+        final UIEntity line = new UIEntity();
+        line.setWidth(71);
+        line.setHeight(2);
+        line.add(new UIColor(-16777216));
+        return line;
     }
 }
