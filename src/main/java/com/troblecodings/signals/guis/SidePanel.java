@@ -17,7 +17,6 @@ import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIScrollBox;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
-import com.troblecodings.guilib.ecs.entitys.input.UIOnUpdate;
 import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
 import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIButton;
@@ -50,7 +49,7 @@ import net.minecraft.world.level.block.Rotation;
 
 public class SidePanel {
 
-    private boolean showHelpPage = false;
+    private boolean showHelpPage = true;
     private final UIEntity helpPage = new UIEntity();
     private final UIEntity infoEntity = new UIEntity();
     private final UIButton helpPageButton = new UIButton(">");
@@ -132,14 +131,6 @@ public class SidePanel {
         addHelpPageToPlane();
     }
 
-    public void reset() {
-
-    }
-
-    public void add(final UIEntity entity) {
-        this.helpPage.add(entity);
-    }
-
     public void updateNextNode(final int selection, final int rotation) {
         infoEntity.clearChildren();
         infoEntity.add(GuiElements.createSpacerV(2));
@@ -147,19 +138,22 @@ public class SidePanel {
                 new UIEntity().getBasicTextColor(), 0.8f));
 
         final UIEntity preview = new UIEntity();
-        preview.setInheritWidth(true);
-        preview.add(new UIOnUpdate(() -> {
-            if (preview.getHeight() != preview.getWidth()) {
-                preview.setHeight(preview.getWidth());
-                helpPage.update();
-            }
-        }));
+        preview.setWidth(70);
+        preview.setHeight(70);
         preview.add(new UIColor(0xFFAFAFAF));
         final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
         node.add(new ModeSet(modes, Rotation.values()[rotation]));
+
         final UISignalBoxTile sbt = new UISignalBoxTile(node);
-        preview.add(sbt);
+        final UIEntity sbtEntity = new UIEntity();
+        sbtEntity.setWidth(50);
+        sbtEntity.setHeight(50);
+        sbtEntity.setX(10);
+        sbtEntity.setY(10);
+        sbtEntity.add(sbt);
+
+        preview.add(sbtEntity);
         preview.add(new UIBorder(new UIEntity().getBasicTextColor()));
 
         infoEntity.add(preview);
