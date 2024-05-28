@@ -200,7 +200,7 @@ public final class SignalBoxUtil {
                 return 0;
             }
             case CORNER: {
-                return 1;
+                return 5;
             }
             default: {
                 return MAX_COSTS;
