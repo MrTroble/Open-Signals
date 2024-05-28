@@ -111,6 +111,7 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private final UIEntity lowerEntity = new UIEntity();
+    private final UIEntity bottomEntity = new UIEntity();
     protected final ContainerSignalBox container;
     private UISignalBoxTile lastTile = null;
     private UIEntity mainButton;
@@ -246,20 +247,25 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
-        tile.add(new UIClickable(e -> {
-            if (!splitter.isHovered())
-                return;
-            final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
-            final Rotation rotation = Rotation.values()[menu.getRotation()];
-            final ModeSet modeSet = new ModeSet(mode, rotation);
-            final SignalBoxNode node = sbt.getNode();
-            if (sbt.has(modeSet)) {
-                sbt.remove(modeSet);
-            } else {
+        tile.add(new UIClickable(e -> updateTileWithMode(menu, sbt, true), 0));
+        tile.add(new UIClickable(e -> updateTileWithMode(menu, sbt, false), 1));
+    }
+
+    private void updateTileWithMode(final UIMenu menu, final UISignalBoxTile sbt,
+            final boolean remove) {
+        if (!splitter.isHovered())
+            return;
+        final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
+        final Rotation rotation = Rotation.values()[menu.getRotation()];
+        final ModeSet modeSet = new ModeSet(mode, rotation);
+        final SignalBoxNode node = sbt.getNode();
+        if (remove) {
+            sbt.remove(modeSet);
+        } else {
+            if (!sbt.has(modeSet))
                 sbt.add(modeSet);
-            }
-            changedModes.put(sbt.getPoint(), node);
-        }));
+        }
+        changedModes.put(sbt.getPoint(), node);
     }
 
     private void tileNormal(final UIEntity tile, final UISignalBoxTile currentTile) {
@@ -491,6 +497,9 @@ public class GuiSignalBox extends GuiBase {
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
         helpPage.helpUsageMode(null);
+        bottomEntity.clear();
+        bottomEntity.setHeight(0);
+        bottomEntity.getParent().update();
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -517,20 +526,28 @@ public class GuiSignalBox extends GuiBase {
                 reset();
                 disableInfoLine();
                 final UIMenu menu = new UIMenu();
-                menu.setVisible(false);
                 initializeFieldTemplate(
                         (fieldEntity, name) -> this.tileEdit(fieldEntity, menu, name), true);
-                lowerEntity.add(menu);
                 menu.setConsumer(
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
                 resetSelection(entity);
                 resetAllPathways();
                 helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
                 this.lastTile = null;
+
+                bottomEntity.setHeight(24);
+                bottomEntity.setWidth(22 * EnumGuiMode.values().length + 2);
+                bottomEntity.add(new UIColor(BACKGROUND_COLOR));
+                bottomEntity.add(new UIBorder(0xFF000000, 2));
+
+                final UIEntity menuEntity = menu.getEntity();
+                menuEntity.setY(2);
+                menuEntity.setX(2);
+                bottomEntity.add(menuEntity);
+                bottomEntity.getParent().update();
             });
-            final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"), e -> {
-                pop();
-            });
+            final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"),
+                    e -> pop());
             buttons.setInherits(true);
             final UIBox vbox = new UIBox(UIBox.HBOX, 1);
             buttons.add(vbox);
@@ -651,6 +668,9 @@ public class GuiSignalBox extends GuiBase {
         infoLine.add(GuiElements.createSpacerH(10));
         addInfoLine(infoLine);
 
+        bottomEntity.setWidth(22 * EnumGuiMode.values().length);
+        bottomEntity.setHeight(0);
+
         final UIEntity middlePart = new UIEntity();
         middlePart.setInheritHeight(true);
         middlePart.setInheritWidth(true);
@@ -658,6 +678,7 @@ public class GuiSignalBox extends GuiBase {
         middlePart.add(header);
         middlePart.add(infoLine);
         middlePart.add(lowerEntity);
+        middlePart.add(bottomEntity);
 
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
