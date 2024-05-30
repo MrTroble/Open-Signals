@@ -23,7 +23,6 @@ public final class SignalBoxUtil {
     public static final int SELECTED_COLOR = ConfigHandler.CLIENT.signalboxSelectColor.get();
     public static final int USED_COLOR = ConfigHandler.CLIENT.signalboxUsedColor.get();
     public static final int PREPARED_COLOR = ConfigHandler.CLIENT.signalboxPreparedColor.get();
-    public static final int PROTECTION_COLOR = ConfigHandler.CLIENT.signalBoxProtectionColor.get();
 
     private SignalBoxUtil() {
     }

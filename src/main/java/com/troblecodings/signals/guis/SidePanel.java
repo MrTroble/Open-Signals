@@ -270,21 +270,18 @@ public class SidePanel {
         shButton.setScale(0.95f);
         helpList.add(shButton);
 
-        final List<SignalBoxNode> allNodes = gui.container.grid.getNodes();
-        if (!allNodes.isEmpty()) {
-            final UIEntity manuelButton = GuiElements.createButton(
-                    "     " + I18Wrapper.format("info.usage.manuel"), e -> addManuellRStoUI());
+        final UIEntity manuelButton = GuiElements.createButton(
+                "     " + I18Wrapper.format("info.usage.manuel"), e -> addManuellRStoUI());
 
-            final UIEntity rsOutputEntity = new UIEntity();
-            rsOutputEntity.setHeight(20);
-            rsOutputEntity.setWidth(20);
-            rsOutputEntity.add(new UITexture(REDSTONE));
-            manuelButton.add(rsOutputEntity);
-            manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
+        final UIEntity rsOutputEntity = new UIEntity();
+        rsOutputEntity.setHeight(20);
+        rsOutputEntity.setWidth(20);
+        rsOutputEntity.add(new UITexture(REDSTONE));
+        manuelButton.add(rsOutputEntity);
+        manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
 
-            manuelButton.setScale(0.95f);
-            helpList.add(manuelButton);
-        }
+        manuelButton.setScale(0.95f);
+        helpList.add(manuelButton);
 
         final UIEntity savedPathways = GuiElements.createButton(
                 "       " + I18Wrapper.format("info.usage.savedpathways"),
@@ -450,7 +447,7 @@ public class SidePanel {
                     final String modeName = I18Wrapper.format("property." + mode.mode.name());
                     final String rotationName = I18Wrapper
                             .format("property." + mode.rotation.name() + ".rotation");
-                    final UIEntity manuelButton = GuiElements
+                    final UIEntity manuelButtonEntity = GuiElements
                             .createButton(I18Wrapper.format("info.usage.manuel") + " : " + modeName
                                     + " - " + rotationName, e1 -> {
                                         final Optional<EnumPathUsage> usage = option
@@ -529,8 +526,9 @@ public class SidePanel {
                                                 .createScreen(e -> e.add(info));
                                         gui.push(screen);
                                     });
-                    manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
-                    manuellOutputs.add(manuelButton);
+                    manuelButtonEntity
+                            .add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
+                    manuellOutputs.add(manuelButtonEntity);
                 }
                 final EnumPathUsage path = option.getEntry(PathEntryType.PATHUSAGE)
                         .orElse(EnumPathUsage.FREE);
@@ -670,8 +668,6 @@ public class SidePanel {
 
     private void addManuellRStoUI() {
         final List<SignalBoxNode> allNodes = gui.container.grid.getNodes();
-        if (allNodes.isEmpty())
-            return;
         final Minecraft mc = Minecraft.getInstance();
         final UIEntity screen = GuiElements.createScreen(searchPanel -> {
             final UIEntity searchBar = new UIEntity();
@@ -896,7 +892,7 @@ public class SidePanel {
 
     private static UIEntity getSpacerLine() {
         final UIEntity line = new UIEntity();
-        line.setWidth(71);
+        line.setWidth(76);
         line.setHeight(2);
         line.add(new UIColor(-16777216));
         return line;
