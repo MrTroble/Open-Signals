@@ -18,8 +18,12 @@ public enum EnumGuiMode {
     }, 3)), BUE(new float[] {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
     }), HP(0, true), VP(1, true), RS(2, true), RA10(3), SH2(4),
-    IN_CONNECTION((_u) -> new UITexture(UISignalBoxTile.ARROW_ICON)),
-    OUT_CONNECTION((_u) -> new UITexture(UISignalBoxTile.ARROW_ICON));
+    IN_CONNECTION((_u) -> new UITexture(UISignalBoxTile.INCOMING_ICON)),
+    OUT_CONNECTION((_u) -> new UITexture(UISignalBoxTile.OUTGOING__ICON)),
+    ARROW((_u) -> new UITexture(UISignalBoxTile.ARROW_ICON)),
+    NE1((_u) -> new UITexture(UISignalBoxTile.NE1_ICON)),
+    NE5((_u) -> new UITexture(UISignalBoxTile.NE5_ICON)),
+    ZS3((_u) -> new UITexture(UISignalBoxTile.ZS3_ICON));
 
     /**
      * Naming
