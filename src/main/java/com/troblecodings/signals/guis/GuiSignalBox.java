@@ -530,10 +530,7 @@ public class GuiSignalBox extends GuiBase {
                 bottomEntity.add(new UIColor(BACKGROUND_COLOR));
                 bottomEntity.add(new UIBorder(0xFF000000, 2));
 
-                final UIEntity menuEntity = menu.getEntity();
-                menuEntity.setY(2);
-                menuEntity.setX(2);
-                bottomEntity.add(menuEntity);
+                bottomEntity.add(menu);
                 bottomEntity.getParent().update();
             });
             final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"),

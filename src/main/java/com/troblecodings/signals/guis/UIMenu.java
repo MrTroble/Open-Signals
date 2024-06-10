@@ -31,6 +31,8 @@ public class UIMenu extends UIComponentEntity {
         super(new UIEntity());
         entity.setHeight(20);
         entity.setWidth(22 * EnumGuiMode.values().length);
+        entity.setX(2);
+        entity.setY(2);
         entity.add(new UIBox(UIBox.HBOX, 2));
         for (final EnumGuiMode mode : EnumGuiMode.values()) {
             final UIEntity preview = new UIEntity();
@@ -49,15 +51,6 @@ public class UIMenu extends UIComponentEntity {
         }
     }
 
-    public UIEntity getEntity() {
-        return entity;
-    }
-
-    @Override
-    public void update() {
-        entity.update();
-    }
-
     private void updateSelection(final EnumGuiMode newMode) {
         final UIEntity previousEntity = modeForEntity.get(EnumGuiMode.values()[selection]);
         if (previousEntity != null) {
@@ -67,6 +60,12 @@ public class UIMenu extends UIComponentEntity {
         newEntity.add(new UIBorder(0xFF00FF00, 1));
         this.selection = newMode.ordinal();
         consumer.accept(selection, rotation);
+    }
+
+    @Override
+    public void update() {
+        this.entity.onAdd(this.getParent());
+        super.update();
     }
 
     public int getSelection() {
