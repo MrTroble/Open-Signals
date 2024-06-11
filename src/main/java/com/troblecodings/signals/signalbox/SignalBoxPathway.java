@@ -116,7 +116,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     }
 
     private void setProtectionWay() {
-        data.forEachEntryProtectionWay(option -> {
+        data.forEachEntryProtectionWay((option, _u) -> {
             option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
                     .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), true));
             option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.PROTECTED);
@@ -131,7 +131,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     }
 
     private void resetProtectionWay() {
-        data.forEachEntryProtectionWay(option -> {
+        data.forEachEntryProtectionWay((option, _u) -> {
             option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
                     .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), false));
             option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE);
@@ -595,6 +595,11 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
             outputs.forEach(pos -> SignalBoxHandler
                     .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), false));
         }, null);
+        data.forEachEntryProtectionWay((_u, node) -> {
+            final List<BlockPos> outputs = node.clearAllManuellOutputs();
+            outputs.forEach(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), false));
+        });
     }
 
     public void updatePathwayToAutomatic() {

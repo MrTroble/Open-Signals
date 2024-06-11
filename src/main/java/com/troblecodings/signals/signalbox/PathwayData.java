@@ -304,13 +304,14 @@ public class PathwayData {
         }
     }
 
-    protected void forEachEntryProtectionWay(final Consumer<PathOptionEntry> consumer) {
+    protected void forEachEntryProtectionWay(
+            final BiConsumer<PathOptionEntry, SignalBoxNode> consumer) {
         for (int i = protectionWayNodes.size() - 2; i > 0; i--) {
             final Point oldPos = protectionWayNodes.get(i - 1).getPoint();
             final Point newPos = protectionWayNodes.get(i + 1).getPoint();
             final SignalBoxNode current = protectionWayNodes.get(i);
             final PathOptionEntry entry = current.getOption(new Path(oldPos, newPos)).get();
-            consumer.accept(entry);
+            consumer.accept(entry, current);
         }
     }
 
