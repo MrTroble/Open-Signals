@@ -36,6 +36,7 @@ import com.troblecodings.signals.core.SubsidiaryHolder;
 import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
+import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
@@ -141,6 +142,10 @@ public class SidePanel {
     }
 
     private UIEntity getIcons() {
+        final SignalBoxPage page = gui.getPage();
+        if (page.equals(SignalBoxPage.EDITOR)) {
+            return GuiElements.createSpacerV(25);
+        }
         final UIEntity list = new UIEntity();
         list.setInheritWidth(true);
         list.setHeight(100);

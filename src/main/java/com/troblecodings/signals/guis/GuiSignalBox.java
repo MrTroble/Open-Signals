@@ -49,6 +49,7 @@ import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
@@ -109,6 +110,7 @@ public class GuiSignalBox extends GuiBase {
     private final UIEntity lowerEntity = new UIEntity();
     private final UIEntity bottomEntity = new UIEntity();
     protected final ContainerSignalBox container;
+    private SignalBoxPage page = SignalBoxPage.OPERATION;
     private UISignalBoxTile lastTile = null;
     private UIEntity mainButton;
     private final GuiInfo info;
@@ -129,6 +131,10 @@ public class GuiSignalBox extends GuiBase {
         container.setConuterUpdater(this::updateCounter);
         container.setTrainNumberUpdater(this::updateTrainNumber);
         this.info = info;
+    }
+
+    public SignalBoxPage getPage() {
+        return page;
     }
 
     public void infoUpdate(final String errorString) {
@@ -304,7 +310,6 @@ public class GuiSignalBox extends GuiBase {
         final UIColor previous = colors.get(node.getPoint());
         if (previous != null && previous.getColor() == EDIT_COLOR) {
             helpPage.helpUsageMode(null);
-            helpPage.setShowHelpPage(false);
             this.resetTileSelection();
             return;
         }
@@ -380,6 +385,7 @@ public class GuiSignalBox extends GuiBase {
     private void initializePageSettings(final UIEntity entity,
             final Map<BlockPos, LinkType> types) {
         reset();
+        page = SignalBoxPage.LINKING;
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
@@ -485,6 +491,7 @@ public class GuiSignalBox extends GuiBase {
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
         sendModeChanges();
+        page = SignalBoxPage.OPERATION;
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
         helpPage.helpUsageMode(null);
@@ -515,6 +522,7 @@ public class GuiSignalBox extends GuiBase {
             final UIEntity buttonYes = GuiElements.createButton(I18Wrapper.format("btn.yes"), e -> {
                 pop();
                 reset();
+                page = SignalBoxPage.EDITOR;
                 final UIMenu menu = new UIMenu();
                 initializeFieldTemplate(
                         (fieldEntity, name) -> this.tileEdit(fieldEntity, menu, name), true);
