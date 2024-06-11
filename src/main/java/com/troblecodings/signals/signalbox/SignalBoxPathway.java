@@ -126,20 +126,19 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     public boolean checkResetOfProtectionWay(final BlockPos position) {
         if (!data.canResetProtectionWay(position))
             return false;
-        resetProtectionWay();
-        return true;
+        return resetProtectionWay();
     }
 
-    private void resetProtectionWay() {
-        data.forEachEntryProtectionWay((option, _u) -> {
-            option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
-                    .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), false));
-            option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE);
-        });
+    public boolean resetProtectionWay() {
+        return data.resetProtectionWay();
+    }
+
+    public boolean directResetOfProtectionWay() {
+        return data.directResetOfProtectionWay();
     }
 
     public void removeProtectionWay() {
-        data.resetProtectionWay();
+        data.removeProtectionWay();
     }
 
     public void setPathStatus(final EnumPathUsage status) {

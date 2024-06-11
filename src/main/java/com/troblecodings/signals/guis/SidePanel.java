@@ -342,6 +342,45 @@ public class SidePanel {
                 helpList.add(entity);
             }
 
+            final UIEntity reset = GuiElements.createButton(I18Wrapper.format("button.reset"),
+                    e -> {
+                        final UIEntity screen = GuiElements.createScreen(selectionEntity -> {
+                            final UIBox hbox = new UIBox(UIBox.VBOX, 3);
+                            selectionEntity.add(hbox);
+                            final UIEntity question = new UIEntity();
+                            final UILabel label = new UILabel(I18Wrapper.format("sb.resetpage"));
+                            label.setTextColor(0xFFFFFFFF);
+                            question.setScaleX(1.1f);
+                            question.setScaleY(1.1f);
+                            question.add(label);
+                            question.setInherits(true);
+                            final UILabel info = new UILabel(I18Wrapper.format("sb.pathwayreset"));
+                            info.setTextColor(0xFFFFFFFF);
+                            final UIEntity infoEntity = new UIEntity();
+                            infoEntity.add(info);
+                            infoEntity.setInherits(true);
+                            selectionEntity.add(question);
+                            selectionEntity.add(infoEntity);
+                            final UIEntity buttons = new UIEntity();
+                            final UIEntity buttonYes = GuiElements
+                                    .createButton(I18Wrapper.format("btn.yes"), e1 -> {
+                                        gui.pop();
+                                        gui.resetPathwayOnServer(node);
+                                    });
+                            final UIEntity buttonNo = GuiElements
+                                    .createButton(I18Wrapper.format("btn.no"), e2 -> gui.pop());
+                            buttons.setInherits(true);
+                            final UIBox vbox = new UIBox(UIBox.HBOX, 1);
+                            buttons.add(vbox);
+                            buttons.add(buttonYes);
+                            buttons.add(buttonNo);
+                            selectionEntity.add(buttons);
+                        });
+                        gui.push(screen);
+                    });
+            reset.setScale(0.95f);
+            helpList.add(reset);
+
             final List<UIEntity> manuellOutputs = new ArrayList<>();
             final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
             boolean isPathBlocked = false;

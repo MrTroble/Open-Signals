@@ -99,6 +99,10 @@ public class SignalBoxGrid implements INetworkSavable {
             return false;
         final SignalBoxPathway pathway = startsToPath.get(p1);
         if (pathway == null) {
+            if (checkManuellResetOfProtectionWay(p1)) {
+                tryNextPathways();
+                return true;
+            }
             OpenSignalsMain.getLogger().warn("No Pathway to reset on [" + p1 + "]!");
             return false;
         }
@@ -107,6 +111,18 @@ public class SignalBoxGrid implements INetworkSavable {
         tryNextPathways();
         tile.setChanged();
         return true;
+    }
+
+    private boolean checkManuellResetOfProtectionWay(final Point p1) {
+        final SignalBoxPathway pathway = endsToPath.get(p1);
+        if (pathway == null)
+            return false;
+        final boolean isReset = pathway.directResetOfProtectionWay();
+        if (isReset) {
+            updateToNet(pathway);
+            pathway.removeProtectionWay();
+        }
+        return isReset;
     }
 
     protected void resetPathway(final SignalBoxPathway pathway) {

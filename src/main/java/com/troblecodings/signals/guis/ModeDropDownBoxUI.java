@@ -259,6 +259,11 @@ public class ModeDropDownBoxUI {
                 parent.add(protectionWay);
                 gui.selectLink(parent, node, option, entrySet, LinkType.INPUT,
                         PathEntryType.PROTECTIONWAY_RESET, mode, rotation, ".protectionway_reset");
+                parent.add(GuiElements.createEnumElement(new SizeIntegerables<>(
+                        "reset_protectionway_delay", 60, get -> String.valueOf(get)), i -> {
+                            option.setEntry(PathEntryType.DELAY, i);
+                            gui.sendIntEntryToServer(i, node, mode, rotation, PathEntryType.DELAY);
+                        }, option.getEntry(PathEntryType.DELAY).orElse(0)));
             }
             case RS: {
                 parent.add(GuiElements.createBoolElement(BoolIntegerables.of("can_be_overstepped"),

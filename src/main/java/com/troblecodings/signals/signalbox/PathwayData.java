@@ -22,10 +22,12 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
+import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.debug.SignalBoxFactory;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
@@ -33,6 +35,7 @@ import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 
 public class PathwayData {
@@ -42,7 +45,6 @@ public class PathwayData {
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
     private static final String LIST_OF_PROTECTION_NODES = "listOfProtectionNodes";
-    private static final String PROTECTION_WAY_RESET = "protectionWayReset";
 
     protected SignalBoxGrid grid = null;
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
@@ -61,6 +63,7 @@ public class PathwayData {
     private boolean emptyOrBroken = false;
     private List<SignalBoxNode> protectionWayNodes = ImmutableList.of();
     private BlockPos protectionWayReset = null;
+    private int protectionWayResetDelay = 0;
 
     private SignalBoxPathway pathway;
 
@@ -152,6 +155,9 @@ public class PathwayData {
                 .getOption(signalIdent.getModeSet()).orElse(null);
         if (option == null)
             return true;
+        if (grid.startsToPath.containsKey(lastPoint)) {
+            return true;
+        }
         final Point protectionWayEnd = option.getEntry(PathEntryType.PROTECTIONWAY_END)
                 .orElse(lastPoint);
         if (lastPoint.equals(protectionWayEnd))
@@ -164,11 +170,12 @@ public class PathwayData {
             this.protectionWayNodes = ImmutableList.of();
             return true;
         }
-        this.protectionWayReset = option.getEntry(PathEntryType.PROTECTIONWAY_RESET).orElse(null);
         final AtomicInteger atomicDelay = new AtomicInteger(delay);
-        protectionWayNodes.forEach(
-                node -> node.getModes().forEach((_u, entry) -> entry.getEntry(PathEntryType.DELAY)
-                        .ifPresent(value -> atomicDelay.updateAndGet(in -> Math.max(in, value)))));
+        protectionWayNodes.forEach(node -> node.getModes().forEach((mode, entry) -> {
+            if (mode.mode.equals(EnumGuiMode.BUE))
+                entry.getEntry(PathEntryType.DELAY)
+                        .ifPresent(value -> atomicDelay.updateAndGet(in -> Math.max(in, value)));
+        }));
         this.delay = atomicDelay.get();
         return true;
     }
@@ -187,7 +194,45 @@ public class PathwayData {
         return containsAll;
     }
 
-    protected void resetProtectionWay() {
+    protected boolean resetProtectionWay() {
+        if (protectionWayNodes.isEmpty())
+            return false;
+        if (protectionWayResetDelay > 0) {
+            final List<SignalBoxNode> copy = ImmutableList.copyOf(protectionWayNodes);
+            new Thread(() -> {
+                try {
+                    Thread.sleep(protectionWayResetDelay * 1000);
+                } catch (final InterruptedException e) {
+                }
+                this.protectionWayNodes = copy;
+                directResetOfProtectionWay();
+                final Level world = pathway.tile.getLevel();
+                world.getServer().execute(() -> {
+                    pathway.grid.updateToNet(pathway);
+                    removeProtectionWay();
+                });
+            }).start();
+            return true;
+        }
+        directResetOfProtectionWay();
+        return true;
+    }
+
+    protected boolean directResetOfProtectionWay() {
+        if (protectionWayNodes.isEmpty())
+            return false;
+        forEachEntryProtectionWay((option, _u) -> {
+            if (!option.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE)
+                    .equals(EnumPathUsage.PROTECTED))
+                return;
+            option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(new StateInfo(pathway.tile.getLevel(), pos), false));
+            option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE);
+        });
+        return true;
+    }
+
+    protected void removeProtectionWay() {
         this.protectionWayNodes = ImmutableList.of();
     }
 
@@ -235,8 +280,11 @@ public class PathwayData {
                             otherBuilder.put(position, ident);
                         }));
             }
-            node.getModes().forEach((_u, entry) -> entry.getEntry(PathEntryType.DELAY)
-                    .ifPresent(value -> delayAtomic.updateAndGet(in -> Math.max(in, value))));
+            node.getModes().forEach((mode, entry) -> {
+                if (mode.mode.equals(EnumGuiMode.BUE))
+                    entry.getEntry(PathEntryType.DELAY).ifPresent(
+                            value -> delayAtomic.updateAndGet(in -> Math.max(in, value)));
+            });
         }, null);
         this.otherSignals = otherBuilder.build();
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
@@ -249,6 +297,11 @@ public class PathwayData {
                 Rotation.CLOCKWISE_180);
         if (lastPos != null) {
             endSignal = Optional.of(lastPos);
+            final PathOptionEntry option = grid.getNode(lastPos.getPoint())
+                    .getOption(lastPos.getModeSet()).orElse(null);
+            this.protectionWayReset = option.getEntry(PathEntryType.PROTECTIONWAY_RESET)
+                    .orElse(null);
+            this.protectionWayResetDelay = option.getEntry(PathEntryType.DELAY).orElse(0);
         }
         if (firstPos != null) {
             startSignal = Optional.of(firstPos);
@@ -333,9 +386,6 @@ public class PathwayData {
             return entry;
         })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
-        if (protectionWayReset != null) {
-            tag.putWrapper(PROTECTION_WAY_RESET, NBTWrapper.getBlockPosWrapper(protectionWayReset));
-        }
     }
 
     public void read(final NBTWrapper tag) {
@@ -358,10 +408,6 @@ public class PathwayData {
         this.listOfNodes = nodeBuilder.build();
         this.protectionWayNodes = protectionNodeBuilder.build();
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
-        final NBTWrapper posTag = tag.getWrapper(PROTECTION_WAY_RESET);
-        if (!posTag.isTagNull()) {
-            this.protectionWayReset = posTag.getAsPos();
-        }
         this.initalize();
     }
 
