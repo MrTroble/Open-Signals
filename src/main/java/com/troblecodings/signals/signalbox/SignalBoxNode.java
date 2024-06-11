@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
@@ -31,9 +30,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Rotation;
 
 public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
-
-    public static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
-            EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
 
     private final HashMap<Path, ModeSet> possibleConnections = new HashMap<>();
     private final HashMap<ModeSet, PathOptionEntry> possibleModes = new HashMap<>();
@@ -326,13 +322,12 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public boolean isValidStart() {
         return this.possibleModes.keySet().stream()
-                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode));
+                .anyMatch(modeSet -> modeSet.mode.getModeType().isValidStart());
     }
 
     public boolean isValidEnd() {
         return this.possibleModes.keySet().stream()
-                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode)
-                        || modeSet.mode.equals(EnumGuiMode.OUT_CONNECTION));
+                .anyMatch(modeSet -> modeSet.mode.getModeType().isValidEnd());
     }
 
     public boolean containsInConnection() {

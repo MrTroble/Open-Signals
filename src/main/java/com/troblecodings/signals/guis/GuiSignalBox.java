@@ -650,6 +650,8 @@ public class GuiSignalBox extends GuiBase {
 
         bottomEntity.setWidth(22 * EnumGuiMode.values().length);
         bottomEntity.setHeight(0);
+        bottomEntity.setX(-7);
+        bottomEntity.setScale(0.95f);
 
         final UIEntity middlePart = new UIEntity();
         middlePart.setInheritHeight(true);

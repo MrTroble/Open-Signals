@@ -335,6 +335,11 @@ public class ModeDropDownBoxUI {
                         .orElse(-1)));
                 break;
             }
+            case ZS3: {
+                gui.selectLink(parent, node, option, entrySet, LinkType.SIGNAL,
+                        PathEntryType.SIGNAL, mode, rotation);
+                break;
+            }
             default:
                 break;
         }
