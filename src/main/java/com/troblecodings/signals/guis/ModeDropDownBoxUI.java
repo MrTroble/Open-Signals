@@ -172,7 +172,8 @@ public class ModeDropDownBoxUI {
                                     (tile, sbt) -> {
                                         final AtomicReference<PosIdentifier> vp = new AtomicReference<>();
                                         sbt.getNode().getModes().forEach((nodeMode, entry) -> {
-                                            if (!nodeMode.mode.equals(EnumGuiMode.VP))
+                                            if (!(nodeMode.mode.equals(EnumGuiMode.VP)
+                                                    || nodeMode.mode.equals(EnumGuiMode.ZS3)))
                                                 return;
                                             final BlockPos linkedSignal = entry
                                                     .getEntry(PathEntryType.SIGNAL).orElse(null);
