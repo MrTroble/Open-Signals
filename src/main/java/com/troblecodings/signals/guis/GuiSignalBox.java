@@ -247,23 +247,20 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
-        tile.add(new UIClickable(e -> updateTileWithMode(menu, sbt, true), 0));
-        tile.add(new UIClickable(e -> updateTileWithMode(menu, sbt, false), 1));
+        tile.add(new UIClickable(e -> updateTileWithMode(menu, sbt)));
     }
 
-    private void updateTileWithMode(final UIMenu menu, final UISignalBoxTile sbt,
-            final boolean remove) {
+    private void updateTileWithMode(final UIMenu menu, final UISignalBoxTile sbt) {
         if (!splitter.isHovered())
             return;
         final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
         final Rotation rotation = Rotation.values()[menu.getRotation()];
         final ModeSet modeSet = new ModeSet(mode, rotation);
         final SignalBoxNode node = sbt.getNode();
-        if (remove) {
-            sbt.remove(modeSet);
+        if (sbt.has(modeSet)) {
+            sbt.add(modeSet);
         } else {
-            if (!sbt.has(modeSet))
-                sbt.add(modeSet);
+            sbt.remove(modeSet);
         }
         changedModes.put(sbt.getPoint(), node);
     }
