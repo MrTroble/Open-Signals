@@ -649,5 +649,11 @@
     "info.ne5": "Ne5 - Holding sign",
     "info.zs3": "Zs3 - Speed indicator signal",
 	"block.opensignals.zs32": "Zs3/Zs2",
-    "tile.zs32.name": "Zs3/Zs2"
+    "tile.zs32.name": "Zs3/Zs2",
+    "property.ZS3": "Zs3/Zs2",
+    "property.protectionway.name": "Overlap",
+    "property.protectionway.desc": "Select a section of path behind the destination signal. The overlap is set up to this point. The overlap (pass-through path) is a protective section behind the destination signal that must be secured and kept clear if trains do not come to a stop in front of the signal as planned and path-through past the signal.",
+	"property.reset_protectionway_delay.name": "Delay-Overlap-reset",
+    "property.reset_protectionway_delay.desc": "",
+	"info.usage.savedpathways.desc": "All saved pathways are listed here. You can display or delete the pathways."
 }
