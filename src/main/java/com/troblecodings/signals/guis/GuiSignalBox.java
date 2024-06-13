@@ -258,9 +258,9 @@ public class GuiSignalBox extends GuiBase {
         final ModeSet modeSet = new ModeSet(mode, rotation);
         final SignalBoxNode node = sbt.getNode();
         if (sbt.has(modeSet)) {
-            sbt.add(modeSet);
-        } else {
             sbt.remove(modeSet);
+        } else {
+            sbt.add(modeSet);
         }
         changedModes.put(sbt.getPoint(), node);
     }
