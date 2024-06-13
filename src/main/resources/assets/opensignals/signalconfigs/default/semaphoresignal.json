@@ -1,5 +1,5 @@
 {
-    "currentSignal": "semaphoresignal",
+    "currentSignals": ["semaphoresignal"],
     "values": {
         "speed(<.1) || speed(>.15)": ["wing1.TRUE", "wing2.FALSE"],
         "speed(==.1)": ["zs3.ZS13", "wing1.TRUE", "wing2.TRUE"],

@@ -1,6 +1,6 @@
 {
-    "currentSignal": "semaphoresignal",
-    "nextSignal": "semaphoresignal",
+    "currentSignals": ["semaphoresignal"],
+    "nextSignals": ["semaphoresignal", "semaphoresignalbridge"],
     "savedPredicates": {
         "stop": "(config(wing1.FALSE) && config(wing2.FALSE)) || config(wing1.FALSE)",
         "drive": "(config(wing1.TRUE) && config(wing2.FALSE)) || config(wing1.TRUE)",

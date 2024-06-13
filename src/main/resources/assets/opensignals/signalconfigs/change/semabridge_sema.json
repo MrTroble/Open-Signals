@@ -1,6 +1,11 @@
 {
-    "currentSignal": "semaphoresignalbridge",
-    "nextSignal": "semaphoresignalbridge",
+    "currentSignals": ["semaphoresignalbridge"],
+    "nextSignals": ["semaphoresignal", "semaphoresignalbridge"],
+    "savedPredicates": {
+        "stop": "(config(wing1.FALSE) && config(wing2.FALSE)) || config(wing1.FALSE)",
+        "drive": "(config(wing1.TRUE) && config(wing2.FALSE)) || config(wing1.TRUE)",
+        "slow": "config(wing1.TRUE) && config(wing2.TRUE)"
+    },
     "values": {
         "speed(<.1) || speed(>.15)": ["wing1.TRUE", "wing2.FALSE"],
         "speed(==.1)": ["zs3.Z1", "wing1.TRUE", "wing2.TRUE"],

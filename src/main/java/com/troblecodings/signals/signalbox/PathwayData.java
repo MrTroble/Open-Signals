@@ -268,7 +268,7 @@ public class PathwayData {
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));
             for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS,
-                    EnumGuiMode.HP)) {
+                    EnumGuiMode.HP, EnumGuiMode.ZS3)) {
                 final ModeSet modeSet = new ModeSet(mode, rotation);
                 node.getOption(modeSet).ifPresent(
                         option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
