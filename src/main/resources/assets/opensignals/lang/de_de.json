@@ -248,7 +248,7 @@
     "property.buetype.name": "Bü Signale",
     "property.bueadd.name": "Bü4 & Bü5 Zusatz",
     "property.bueshort.name": "Bü2 Verkürzter Bremsweg",
-    "property.customname.desc": "Hier kann du eine Signalbezeichnung/-beschriftung eintragen. Mit §l[n]§r wechselst du in die nächste Zeile.",
+    "property.customname.desc": "Hier kann du eine Signalbezeichnung/-beschriftung eintragen. Mit §l[n]§r wechselst du in die nächste Zeile, sofern das Signal keine Autoskalierung hat.",
     "property.sh_high.desc": "Schutzhaltsignale erteilen ein Fahrverbot oder heben dieses auf.",
     "property.sh_mech.desc": "§nSH0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben%n§nGsp2§r: Gleissperre abgelegt",
     "property.sh_light_bottom.desc": "§nSH0§r: Fahrverbot%n§nSh1§r: Fahrtverbot aufgehoben%n§nKennlicht§r: Das Signal ist betrieblich abgeschaltet",
@@ -489,8 +489,8 @@
     "property.lfarrow.desc": "Gibt die Richtung an.",
     "info.nextelement": "Nächstes Element",
     "info.editor.key.r": "Element Rotieren",
-    "info.editor.key.lmb": "Element entfernen",
-    "info.editor.key.rmb": "Element platzieren",
+    "info.editor.key.lmb": "Element platzieren/entfernen",
+    "info.editor.key.rmb": "---",
     "info.infolabel": "Info & Hilfe",
     "info.description": "Beschreibung",
     "info.straight": "Gerader Pfad",
@@ -647,5 +647,7 @@
     "info.arrow": "Tod-Signal",
     "info.ne1": "Ne1 - Trapeztafel",
     "info.ne5": "Ne5 - Haltetafel",
-    "info.zs3": "Zs3 - Geschwindigkeitsanzeiger"
+    "info.zs3": "Zs3 - Geschwindigkeitsanzeiger",
+    "block.opensignals.zs32": "Zs3/Zs2",
+    "tile.zs32.name": "Zs3/Zs2"
 }

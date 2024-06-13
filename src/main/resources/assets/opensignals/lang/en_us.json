@@ -248,7 +248,7 @@
 	"property.buetype.name": "Bü Signals",
 	"property.bueadd.name": "Bü4 & Bü5 Addition",
 	"property.bueshort.name": "Bü2 Short Brake Distance",
-	"property.customname.desc": "Here you can enter a signal label/caption. Use §l[n]§r to move to the next line.",
+	"property.customname.desc": "Here you can enter a signal label/caption. Use §l[n]§r to move to the next line if the signal does not have autoscaling.",
 	"property.sh_high.desc": "Protection holding signals give or lift a prohibition on driving.",
 	"property.sh_mech.desc": "§nSH0§r: Prohibition on driving%n§nSh1§r: Prohibition on driving lifted%n§nGsp2§r: Track block removed",
 	"property.sh_light_bottom.desc": "§nSH0§r: Prohibition on driving%n§nSh1§r: Prohibition on driving lifted%n§nIdentification light§r: The signal is operationally switched off",
@@ -489,8 +489,8 @@
 	"property.lfarrow.desc": "Indicates the direction",
 	"info.nextelement": "Next element",
 	"info.editor.key.r": "Rotate element",
-	"info.editor.key.lmb": "Remove element",
-	"info.editor.key.rmb": "Place element",
+	"info.editor.key.lmb": "Place/Remove element",
+	"info.editor.key.rmb": "---",
 	"info.infolabel": "Info & Help",
 	"info.description": "Description",
 	"info.straight": "Straight path",
@@ -647,5 +647,7 @@
 	"info.arrow": "Dead signal",
 	"info.ne1": "Ne1 - Trapezoid sign",
     "info.ne5": "Ne5 - Holding sign",
-    "info.zs3": "Zs3 - Speed indicator signal"
+    "info.zs3": "Zs3 - Speed indicator signal",
+	"block.opensignals.zs32": "Zs3/Zs2",
+    "tile.zs32.name": "Zs3/Zs2"
 }
