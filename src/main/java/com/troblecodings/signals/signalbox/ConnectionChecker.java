@@ -12,7 +12,7 @@ import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 public abstract class ConnectionChecker {
 
-    private static final SignalBoxFactory factory = SignalBoxFactory.getFactory();
+    private static final SignalBoxFactory FACTORY = SignalBoxFactory.getFactory();
 
     public PathType type;
     public SignalBoxNode nextNode;
@@ -44,9 +44,9 @@ public abstract class ConnectionChecker {
     public static ConnectionChecker getCheckerForType(final PathType type) {
         switch (type) {
             case NORMAL:
-                return factory.getConnectionCheckerNormal();
+                return FACTORY.getConnectionCheckerNormal();
             case SHUNTING:
-                return factory.getConnectionCheckerShunting();
+                return FACTORY.getConnectionCheckerShunting();
             default:
                 return null;
         }

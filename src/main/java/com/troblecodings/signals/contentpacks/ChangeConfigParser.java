@@ -51,7 +51,7 @@ public class ChangeConfigParser {
     }
 
     private static void loadConfigForPair(final String fileName, final String currentSignal,
-            final String nextSignal, Map<String, String> savedPredicates,
+            final String nextSignal, final Map<String, String> savedPredicates,
             final Map<String, List<String>> values) {
         final Signal start = Signal.SIGNALS.get(currentSignal.toLowerCase());
         final Signal end = Signal.SIGNALS.get(nextSignal.toLowerCase());
