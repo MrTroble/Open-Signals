@@ -30,7 +30,7 @@ public class ContainerTrainNumber extends ContainerBase implements IChunkLoadabl
     public ContainerTrainNumber(final GuiInfo info) {
         super(info);
         if (info.pos != null) {
-            this.tile = info.getTile();
+            this.tile = info.getTile(TrainNumberTileEntity.class);
         }
     }
 

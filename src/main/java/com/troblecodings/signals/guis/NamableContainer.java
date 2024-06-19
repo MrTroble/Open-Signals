@@ -25,13 +25,13 @@ public class NamableContainer extends ContainerBase {
 
     public NamableContainer(final GuiInfo info) {
         super(info);
-        this.tile = info.getTile();
+        this.tile = info.getTile(BasicBlockEntity.class);
     }
 
     private void sendSignalPos() {
         final WriteBuffer buffer = new WriteBuffer();
         if (tile == null)
-            tile = info.getTile();
+            tile = info.getTile(BasicBlockEntity.class);
         buffer.putBlockPos(info.pos);
         final List<BlockPos> linkedPos = tile.getLinkedPos();
         buffer.putByte((byte) linkedPos.size());

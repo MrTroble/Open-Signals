@@ -61,7 +61,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
-        this.tile = info.getTile();
+        this.tile = info.getTile(SignalBoxTileEntity.class);
     }
 
     @Override
@@ -354,8 +354,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 }
                 final PathwayRequestResult request = grid.requestWay(start, end);
                 if (request != PathwayRequestResult.PASS) {
-                    if (request.canBeAddedToSaver()
-                            && grid.addNextPathway(start, end)) {
+                    if (request.canBeAddedToSaver() && grid.addNextPathway(start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
                         sucess.putEnumValue(request);

@@ -30,7 +30,7 @@ public class ContainerPathwayRequester extends ContainerBase implements IChunkLo
 
     public ContainerPathwayRequester(final GuiInfo info) {
         super(info);
-        this.tile = info.getTile();
+        this.tile = info.getTile(PathwayRequesterTileEntity.class);
     }
 
     @Override
