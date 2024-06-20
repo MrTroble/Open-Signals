@@ -382,6 +382,7 @@ public class GuiSignalBox extends GuiBase {
     private void initializePageSettings(final UIEntity entity,
             final Map<BlockPos, LinkType> types) {
         reset();
+        disableBottomEntity();
         page = SignalBoxPage.LINKING;
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
@@ -492,9 +493,7 @@ public class GuiSignalBox extends GuiBase {
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
         helpPage.helpUsageMode(null);
-        bottomEntity.clear();
-        bottomEntity.setHeight(0);
-        bottomEntity.getParent().update();
+        disableBottomEntity();
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -675,6 +674,12 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
         helpPage.helpUsageMode(null);
+    }
+
+    private void disableBottomEntity() {
+        bottomEntity.clear();
+        bottomEntity.setHeight(0);
+        bottomEntity.getParent().update();
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {
