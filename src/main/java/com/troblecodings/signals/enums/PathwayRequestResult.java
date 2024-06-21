@@ -2,6 +2,8 @@ package com.troblecodings.signals.enums;
 
 import javax.annotation.Nullable;
 
+import com.troblecodings.signals.signalbox.PathwayData;
+
 public enum PathwayRequestResult {
 
     NO_EQUAL_PATH_TYPE("no_equal_path_type"), NOT_IN_GRID("not_in_grid"),

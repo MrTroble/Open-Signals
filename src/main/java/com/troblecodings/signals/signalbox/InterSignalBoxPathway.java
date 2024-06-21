@@ -36,7 +36,7 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     public void write(final NBTWrapper tag) {
         if (pathwayToBlock != null) {
             final NBTWrapper blockWrapper = new NBTWrapper();
-            blockWrapper.putBlockPos(TILE_POS, pathwayToBlock.tile.getBlockPos());
+            blockWrapper.putBlockPos(TILE_POS, pathwayToBlock.tile.getPos());
             final NBTWrapper pointWrapper = new NBTWrapper();
             pathwayToBlock.getLastPoint().write(pointWrapper);
             blockWrapper.putWrapper(END_POINT, pointWrapper);
@@ -44,7 +44,7 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         }
         if (pathwayToReset != null) {
             final NBTWrapper resetWrapper = new NBTWrapper();
-            resetWrapper.putBlockPos(TILE_POS, pathwayToReset.tile.getBlockPos());
+            resetWrapper.putBlockPos(TILE_POS, pathwayToReset.tile.getPos());
             final NBTWrapper pointWrapper = new NBTWrapper();
             pathwayToReset.getLastPoint().write(pointWrapper);
             resetWrapper.putWrapper(END_POINT, pointWrapper);
@@ -63,8 +63,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             final Point end = new Point();
             end.read(blockWrapper.getWrapper(END_POINT));
             final BlockPos otherPos = blockWrapper.getBlockPos(TILE_POS);
-            final World world = tile.getLevel();
-            if (world == null || world.isClientSide) {
+            final World world = tile.getWorld();
+            if (world == null || world.isRemote) {
                 blockPW = Maps.immutableEntry(otherPos, end);
             } else {
                 final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
@@ -81,8 +81,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             final Point end = new Point();
             end.read(resetWrapper.getWrapper(END_POINT));
             final BlockPos otherPos = resetWrapper.getBlockPos(TILE_POS);
-            final World world = tile.getLevel();
-            if (world == null || world.isClientSide) {
+            final World world = tile.getWorld();
+            if (world == null || world.isRemote) {
                 resetPW = Maps.immutableEntry(otherPos, end);
             } else {
                 final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
@@ -138,11 +138,11 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (pathwayToBlock != null) {
             final MainSignalIdentifier otherLastSignal = pathwayToBlock.data.getEndSignal();
             if (otherLastSignal != null) {
-                final Signal nextSignal = SignalBoxHandler
-                        .getSignal(new StateInfo(pathwayToBlock.tile.getLevel(),
-                                pathwayToBlock.tile.getBlockPos()), otherLastSignal.pos);
+                final Signal nextSignal = SignalBoxHandler.getSignal(
+                        new StateInfo(pathwayToBlock.tile.getWorld(), pathwayToBlock.tile.getPos()),
+                        otherLastSignal.pos);
                 if (nextSignal != null)
-                    lastSignalInfo = new SignalStateInfo(tile.getLevel(), otherLastSignal.pos,
+                    lastSignalInfo = new SignalStateInfo(tile.getWorld(), otherLastSignal.pos,
                             nextSignal);
             }
         }
@@ -151,12 +151,12 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
 
     @Override
     protected void setSignals(final SignalStateInfo lastSignal) {
-        final StateInfo identifier = new StateInfo(tile.getLevel(), tile.getBlockPos());
+        final StateInfo identifier = new StateInfo(tile.getWorld(), tile.getPos());
         if (lastSignal != null && pathwayToReset != null) {
             final Signal signal = SignalBoxHandler.getSignal(identifier, lastSignal.pos);
             if (signal == null)
                 return;
-            pathwayToReset.setSignals(new SignalStateInfo(tile.getLevel(), lastSignal.pos, signal));
+            pathwayToReset.setSignals(new SignalStateInfo(tile.getWorld(), lastSignal.pos, signal));
         }
         super.setSignals(lastSignal);
     }

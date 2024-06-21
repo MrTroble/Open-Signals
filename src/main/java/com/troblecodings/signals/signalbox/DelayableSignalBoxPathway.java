@@ -36,7 +36,7 @@ public class DelayableSignalBoxPathway extends SignalBoxPathway {
             synchronized (distantSignalPositions) {
                 setSignals(getLastSignalInfo());
             }
-            tile.getLevel().getServer().execute(() -> {
+            tile.getWorld().getMinecraftServer().addScheduledTask(() -> {
                 loadTileAndExecute(thisTile -> {
                     final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
                             .getPathwayByLastPoint(getLastPoint());

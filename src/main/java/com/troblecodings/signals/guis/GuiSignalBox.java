@@ -14,6 +14,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
+import com.troblecodings.guilib.ecs.ContainerBase;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -133,6 +134,11 @@ public class GuiSignalBox extends GuiBase {
         this.info = info;
     }
 
+    @Override
+    public ContainerBase getNewGuiContainer(final GuiInfo info) {
+        return new ContainerSignalBox(info);
+    }
+
     public SignalBoxPage getPage() {
         return page;
     }
@@ -204,7 +210,7 @@ public class GuiSignalBox extends GuiBase {
             final UIEntity blockSelect = GuiElements.createEnumElement(blockPos, id -> {
                 final BlockPos setPos = id >= 0 ? positions.get(id) : null;
                 if (setPos == null) {
-                    if (option.getEntry(entryType).isEmpty())
+                    if (!option.getEntry(entryType).isPresent())
                         return;
                     option.removeEntry(entryType);
                     removeEntryFromServer(node, mode, rotation, entryType);

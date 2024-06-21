@@ -203,12 +203,12 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public List<Point> getAllInConnections() {
         return modeGrid.values().stream().filter(SignalBoxNode::containsInConnection)
-                .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
+                .map(SignalBoxNode::getPoint).collect(Collectors.toList());
     }
 
     public List<Point> getValidEnds() {
         return modeGrid.values().stream().filter(SignalBoxNode::isValidEnd)
-                .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
+                .map(SignalBoxNode::getPoint).collect(Collectors.toList());
     }
 
     public void updateInput(final RedstoneUpdatePacket update) {

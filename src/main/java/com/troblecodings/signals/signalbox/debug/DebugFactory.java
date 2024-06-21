@@ -1,7 +1,7 @@
 package com.troblecodings.signals.signalbox.debug;
 
+import com.troblecodings.signals.signalbox.ConnectionChecker;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
-import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 public class DebugFactory extends SignalBoxFactory {

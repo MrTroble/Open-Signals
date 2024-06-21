@@ -206,7 +206,7 @@ public class PathwayData {
                 this.protectionWayNodes = copy;
                 directResetOfProtectionWay();
                 final World world = pathway.tile.getWorld();
-                world.getServer().execute(() -> {
+                world.getMinecraftServer().addScheduledTask(() -> {
                     pathway.grid.updateToNet(pathway);
                     removeProtectionWay();
                 });
@@ -225,7 +225,7 @@ public class PathwayData {
                     .equals(EnumPathUsage.PROTECTED))
                 return;
             option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
-                    .updateRedstoneOutput(new StateInfo(pathway.tile.getLevel(), pos), false));
+                    .updateRedstoneOutput(new StateInfo(pathway.tile.getWorld(), pos), false));
             option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE);
         });
         return true;
@@ -324,7 +324,7 @@ public class PathwayData {
     private MainSignalIdentifier makeFromNext(final PathType type, final SignalBoxNode first,
             final SignalBoxNode next, final Rotation pRotation) {
         final Point delta = first.getPoint().delta(next.getPoint());
-        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta).getRotated(pRotation);
+        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta).add(pRotation);
         for (final EnumGuiMode mode : type.getModes()) {
             final ModeSet modeSet = new ModeSet(mode, rotation);
             final BlockPos possiblePosition = first.getOption(modeSet)
@@ -517,8 +517,8 @@ public class PathwayData {
         if (!otherPos.isPresent() || !otherStartPoint.isPresent()) {
             return EMPTY_DATA;
         }
-        chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class,
-                (ServerLevel) grid.tile.getLevel(), otherPos.get(), (endTile, _u2) -> {
+        chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class, grid.tile.getWorld(),
+                otherPos.get(), (endTile, _u2) -> {
                     final SignalBoxGrid endGrid = endTile.getSignalBoxGrid();
                     final SignalBoxNode otherStartNode = endGrid.getNode(otherStartPoint.get());
                     if (otherStartNode == null) {
