@@ -1,6 +1,8 @@
 {
     "currentSignals": ["shmech"],
     "values": {
-        "": ["sh_mech.SH1"]
+        "true": [
+            "sh_mech.SH1_GSP2"
+        ]
     }
 }

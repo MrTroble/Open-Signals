@@ -1,5 +1,5 @@
 {
-    "currentSignal": "rasignal",
+    "currentSignals": ["rasignal"],
     "values": [
         "ralight.TRUE"
     ]

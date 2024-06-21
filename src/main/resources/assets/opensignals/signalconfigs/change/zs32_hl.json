@@ -1,20 +1,13 @@
 {
-    "currentSignals": ["kssignal", "kssignalbridge"],
+    "currentSignals": ["zs32"],
     "nextSignals": ["hlsignal", "hlsignalbridge"],
     "savedPredicates": {
-        "stop": "(config(mainlightsignal.HP0) || config(mainlightsignal.HP0_ALTERNATE_RED) || config(mainlightsignal.HL_ZS1) || config(mainlightsignal.HL_SHUNTING) || config(exitsignal.HP0) || config(exitsignal.HP0_ALTERNATE_RED) || config(exitsignal.HL_ZS1) || config(exitsignal.HL_SHUNTING) || config(blocksignal.HP0) || config(blocksignal.HP0_ALTERNATE_RED) || config(blocksignal.HL_ZS1) || config(blockexitsignal.HP0) || config(blockexitsignal.HL_ZS1) || config(blockexitsignal.HL_SHUNTING)) && !(config(mainlightsignallightbar.YELLOW) || config(mainlightsignallightbar.GREEN))",
-        "drive": "(config(mainlightsignal.HL1) || config(mainlightsignal.HL4) || config(mainlightsignal.HL7) || config(mainlightsignal.HL10) || config(exitsignal.HL1) || config(blocksignal.HL1) || config(blocksignal.HL10) || config(blockexitsignal.HL1)) && (config(mainlightsignallightbar.OFF) || !(config(mainlightsignallightbar.OFF) || config(mainlightsignallightbar.YELLOW) || config(mainlightsignallightbar.GREEN)))",
         "slow": "config(mainlightsignal.HL2_3) || config(mainlightsignal.HL5_6) || config(mainlightsignal.HL8_9) || config(mainlightsignal.HL11_12) || config(exitsignal.HL2_3)"
     },
     "values": {
-        "map(stop)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF", "zs2v.OFF"],
-        "map(stop) && signalRepeater(true)": ["kombisignal_distant.KS2_REPEAT"],
-        "map(drive)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
-
-        "map(slow) && config(mainlightsignallightbar.OFF)": ["zs3v.Z4", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],        
-        "map(slow) && config(mainlightsignallightbar.GREEN)": ["zs3v.Z10", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
-        "map(slow) && config(mainlightsignallightbar.YELLOW)": ["zs3v.Z6", "kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
-        "map(slow) && signalRepeater(true)": ["kombisignal_distant.KS1_BLINK_REPEAT"],
+        "map(slow) && config(mainlightsignallightbar.OFF)": ["zs3v.Z4"],
+        "map(slow) && config(mainlightsignallightbar.GREEN)": ["zs3v.Z10"],
+        "map(slow) && config(mainlightsignallightbar.YELLOW)": ["zs3v.Z6"],
 
         "speed(==.1)": ["zs3.Z1"],
         "speed(==.2)": ["zs3.Z2"],
