@@ -1,5 +1,5 @@
 {
-    "currentSignal": "kssignal",
+    "currentSignals": ["kssignal", "kssignalbridge"],
     "values": {
         "true": ["kombisignal_distant.KS_STATUS_LIGHT","kombisignal.KS_STATUS_LIGHT","kombisignal_main.KS_STATUS_LIGHT","zs2.OFF", "zs2v.OFF","zs3v.OFF", "zs3.OFF"]
     }
