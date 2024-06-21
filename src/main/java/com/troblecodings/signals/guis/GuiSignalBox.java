@@ -554,7 +554,7 @@ public class GuiSignalBox extends GuiBase {
         plane.setWidth(TILE_COUNT * TILE_WIDTH);
         plane.setHeight(TILE_COUNT * TILE_WIDTH);
         splitter.add(new UIScroll(s -> {
-            final float newScale = (float) (plane.getScaleX() + s * 0.05f);
+            final float newScale = (float) (plane.getScaleX() + s * 0.001f);
             if (newScale <= 0)
                 return;
             plane.setScaleX(newScale);

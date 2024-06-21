@@ -33,7 +33,7 @@ public final class SignalBoxUIHelper {
         plane.setHeight(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
         plane.setScale(0.5f);
         splitter.add(new UIScroll(s -> {
-            final float newScale = (float) (plane.getScaleX() + s * 0.05f);
+            final float newScale = (float) (plane.getScaleX() + s * 0.001f);
             if (newScale <= 0)
                 return;
             plane.setScaleX(newScale);

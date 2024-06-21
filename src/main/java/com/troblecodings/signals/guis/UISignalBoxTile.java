@@ -85,7 +85,7 @@ public class UISignalBoxTile extends UIComponentEntity {
         final UIEntity entity = new UIEntity();
         if (!modeSet.rotation.equals(Rotation.NONE)) {
             final UIRotate rotation = new UIRotate();
-            rotation.setRotateZ(modeSet.rotation.ordinal() * ((float) Math.PI / 2.0f));
+            rotation.setRotateZ(modeSet.rotation.ordinal() * ((float) 90));
             entity.add(rotation);
         }
         entity.add(new UIIndependentTranslate(0, 0, 1));

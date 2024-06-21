@@ -58,6 +58,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     private Consumer<List<Point>> signalUpdates;
     private Runnable counterUpdater;
     private Consumer<List<Point>> trainNumberUpdater;
+    private EntityPlayer player;
 
     public ContainerSignalBox(final GuiInfo info) {
         super(info);
@@ -491,8 +492,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
     public boolean canInteractWith(final EntityPlayer playerIn) {
         if (tile.isBlocked() && !tile.isValid(playerIn))
             return false;
-        if (this.info.player == null) {
-            this.info.player = playerIn;
+        if (this.player == null) {
+            this.player = playerIn;
             this.tile.add(this);
         }
         return true;
