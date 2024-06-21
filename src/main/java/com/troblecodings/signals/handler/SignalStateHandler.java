@@ -156,6 +156,8 @@ public final class SignalStateHandler implements INetworkSync {
 
     private static void updateListeners(final SignalStateInfo info,
             final Map<SEProperty, String> changedProperties, final ChangedState changedState) {
+        if (changedProperties == null || changedProperties.isEmpty())
+            return;
         final List<SignalStateListener> listeners;
         synchronized (ALL_LISTENERS) {
             listeners = ALL_LISTENERS.get(info);

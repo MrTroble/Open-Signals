@@ -76,6 +76,14 @@ public final class SignalConfig {
         });
     }
 
+    public static void loadDisable(final ConfigInfo info) {
+        final List<ConfigProperty> disableValues = OneSignalPredicateConfigParser.DISABLECONFIGS
+                .get(info.currentinfo.signal);
+        if (disableValues != null) {
+            changeIfPresent(disableValues, info);
+        }
+    }
+
     private static void changeIfPresent(final List<ConfigProperty> values, final ConfigInfo info) {
         SignalStateHandler.runTaskWhenSignalLoaded(info.currentinfo,
                 (stateInfo, oldProperties, _u) -> {

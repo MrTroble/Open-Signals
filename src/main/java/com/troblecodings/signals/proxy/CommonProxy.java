@@ -59,7 +59,7 @@ public class CommonProxy {
     public void init(final FMLInitializationEvent event) {
         OneSignalNonPredicateConfigParser.loadOneSignalConfigs();
         ChangeConfigParser.loadChangeConfigs();
-        OneSignalPredicateConfigParser.loadDefaultConfigs();
+        OneSignalPredicateConfigParser.loadAllOneSignalPredicateConfigs();
         SubsidiarySignalParser.loadAllSubsidiarySignals();
     }
 }

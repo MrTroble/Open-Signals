@@ -15,19 +15,30 @@ public enum EnumGuiMode {
             0.9f, 0.2f, 0.9f, 0.8f
     }), PLATFORM((state) -> new UILines(new float[] {
             0, 0.15f, 1, 0.15f
-    }, 3)), BUE(new float[] {
+    }, 3), PathwayModeType.NONE), BUE(new float[] {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
-    }), HP(0, true), VP(1, true), RS(2, true), RA10(3), SH2(4),
-    IN_CONNECTION((_u) -> new UITexture(UISignalBoxTile.ARROW_ICON)),
-    OUT_CONNECTION((_u) -> new UITexture(UISignalBoxTile.ARROW_ICON));
+    }), HP(0, true, PathwayModeType.START_END), VP(1, true, PathwayModeType.NONE),
+    RS(2, true, PathwayModeType.START_END), RA10(3, PathwayModeType.END),
+    SH2(4, PathwayModeType.NONE),
+    IN_CONNECTION((_u) -> new UITexture(UISignalBoxTile.INCOMING_ICON), PathwayModeType.START),
+    OUT_CONNECTION((_u) -> new UITexture(UISignalBoxTile.OUTGOING_ICON), PathwayModeType.END),
+    ARROW((_u) -> new UITexture(UISignalBoxTile.ARROW_ICON), PathwayModeType.END),
+    NE1((_u) -> new UITexture(UISignalBoxTile.NE1_ICON), PathwayModeType.START_END),
+    NE5((_u) -> new UITexture(UISignalBoxTile.NE5_ICON), PathwayModeType.END),
+    ZS3((_u) -> new UITexture(UISignalBoxTile.ZS3_ICON), PathwayModeType.NONE);
 
     /**
      * Naming
      */
 
     public final OSSupplier<Object> consumer;
+    private final PathwayModeType type;
 
-    private EnumGuiMode(final int id, final boolean unused) {
+    private EnumGuiMode(final int id, final PathwayModeType type) {
+        this((_u) -> new UITexture(UISignalBoxTile.ICON, id * 0.2, 0, id * 0.2 + 0.2, 0.5), type);
+    }
+
+    private EnumGuiMode(final int id, final boolean unused, final PathwayModeType type) {
         this((state) -> {
             switch (state) {
                 case GREEN: {
@@ -60,19 +71,20 @@ public enum EnumGuiMode {
                 default:
                     return new UITexture(UISignalBoxTile.SIGNALS);
             }
-        });
-    }
-
-    private EnumGuiMode(final int id) {
-        this((state) -> new UITexture(UISignalBoxTile.ICON, id * 0.2, 0, id * 0.2 + 0.2, 0.5));
+        }, type);
     }
 
     private EnumGuiMode(final float[] array) {
-        this((state) -> new UILines(array, 2));
+        this((_u) -> new UILines(array, 2), PathwayModeType.NONE);
     }
 
-    private EnumGuiMode(final OSSupplier<Object> consumer) {
+    private EnumGuiMode(final OSSupplier<Object> consumer, final PathwayModeType type) {
         this.consumer = consumer;
+        this.type = type;
+    }
+
+    public PathwayModeType getModeType() {
+        return type;
     }
 
     public static EnumGuiMode of(final ReadBuffer buffer) {

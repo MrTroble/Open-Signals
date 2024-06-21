@@ -2,6 +2,7 @@ package com.troblecodings.signals.signalbox.config;
 
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalStateInfo;
+import com.troblecodings.signals.signalbox.PathwayData;
 
 public class ConfigInfo {
 
@@ -13,19 +14,17 @@ public class ConfigInfo {
     public final boolean isSignalRepeater;
 
     public ConfigInfo(final SignalStateInfo currentinfo, final SignalStateInfo nextinfo,
-            final int speed, final String zs2Value, final PathType type) {
-        this(currentinfo, nextinfo, speed, zs2Value, type, false);
+            final PathwayData data) {
+        this(currentinfo, nextinfo, data, false);
     }
 
     public ConfigInfo(final SignalStateInfo currentinfo, final SignalStateInfo nextinfo,
-            final int speed, final String zs2Value, final PathType type,
-            final boolean isSignalRepeater) {
+            final PathwayData data, final boolean isSignalRepeater) {
         this.currentinfo = currentinfo;
         this.nextinfo = nextinfo;
-        this.speed = speed;
-        this.zs2Value = zs2Value;
-        this.type = type;
+        this.speed = data.getSpeed();
+        this.zs2Value = data.getZS2Value();
+        this.type = data.getPathType();
         this.isSignalRepeater = isSignalRepeater;
     }
-
 }

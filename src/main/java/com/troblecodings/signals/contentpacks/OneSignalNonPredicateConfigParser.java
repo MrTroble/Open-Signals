@@ -35,12 +35,13 @@ public class OneSignalNonPredicateConfigParser {
                 .getFiles("signalconfigs/reset");
         list.forEach(entry -> {
             try {
-                OneSignalPredicateConfigParser.loadOneSignalPredicateConfigs(RESETCONFIGS, entry);
+                OneSignalPredicateConfigParser.loadOneSignalPredicateConfigEntry(RESETCONFIGS,
+                        entry, "signalconfigs/reset");
             } catch (final Exception e) {
                 OpenSignalsMain.getLogger()
                         .error("Reset Config '" + entry.getKey() + "' is still in old "
                                 + "ResetConfig system. Please update with Predicate system!");
-                loadOneSignalNonPredicateConfig(RESETCONFIGS, entry);
+                loadOneSignalNonPredicateConfig(RESETCONFIGS, entry, "signalconfigs/reset");
             }
         });
     }
@@ -49,27 +50,42 @@ public class OneSignalNonPredicateConfigParser {
             final String internal) {
         final List<Map.Entry<String, String>> list = OpenSignalsMain.contentPacks
                 .getFiles(internal);
-        list.forEach(entry -> loadOneSignalNonPredicateConfig(map, entry));
+        list.forEach(entry -> loadOneSignalNonPredicateConfig(map, entry, internal));
     }
 
     public static void loadOneSignalNonPredicateConfig(final Map<Signal, List<ConfigProperty>> map,
-            final Map.Entry<String, String> files) {
-        final OneSignalNonPredicateConfigParser parser = GSON.fromJson(files.getValue(),
-                OneSignalNonPredicateConfigParser.class);
+            final Map.Entry<String, String> files, final String path) {
+        try {
+            final OneSignalNonPredicateConfigParserV2 parser = GSON.fromJson(files.getValue(),
+                    OneSignalNonPredicateConfigParserV2.class);
+            for (final String currentSignal : parser.currentSignals) {
+                loadConfig(map, files.getKey(), currentSignal, parser.values);
+            }
+        } catch (final Exception e) {
+            OpenSignalsMain.getLogger().error("Please update your config [" + files.getKey()
+                    + "] located in [" + path + "]!");
+            final OneSignalNonPredicateConfigParser parser = GSON.fromJson(files.getValue(),
+                    OneSignalNonPredicateConfigParser.class);
+            loadConfig(map, files.getKey(), parser.currentSignal, parser.values);
+        }
 
-        final Signal signal = checkSignal(parser.currentSignal, files.getKey());
+    }
+
+    private static void loadConfig(final Map<Signal, List<ConfigProperty>> map,
+            final String fileName, final String currentSignal, final List<String> values) {
+        final Signal signal = checkSignal(currentSignal, fileName);
         if (signal == null)
             return;
 
         if (map.containsKey(signal)) {
             throw new LogicalParserException("A signalconfig with the signals ["
-                    + signal.getSignalTypeName() + "] does alredy exists! '" + files.getKey()
+                    + signal.getSignalTypeName() + "] does alredy exists! '" + fileName
                     + "' tried to register the same signalconfig!");
         }
 
         final FunctionParsingInfo info = new FunctionParsingInfo(signal);
         final List<ConfigProperty> propertes = new ArrayList<>();
-        for (final String property : parser.values) {
+        for (final String property : values) {
             final String[] value = property.split("\\.");
             propertes.add(new ConfigProperty(t -> true,
                     ImmutableMap.of((SEProperty) info.getProperty(value[0]), value[1])));
@@ -87,4 +103,10 @@ public class OneSignalNonPredicateConfigParser {
         return signal;
     }
 
+    private static class OneSignalNonPredicateConfigParserV2 {
+
+        private String[] currentSignals;
+        private List<String> values;
+
+    }
 }

@@ -2,6 +2,7 @@ package com.troblecodings.signals.core;
 
 import java.util.Objects;
 
+import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.signalbox.ModeSet;
@@ -24,6 +25,15 @@ public class ModeIdentifier {
 
     public static ModeIdentifier of(final ReadBuffer buffer) {
         return new ModeIdentifier(Point.of(buffer), ModeSet.of(buffer));
+    }
+
+    public static ModeIdentifier of(final NBTWrapper tag) {
+        return new ModeIdentifier(Point.of(tag), new ModeSet(tag));
+    }
+
+    public void write(final NBTWrapper tag) {
+        point.write(tag);
+        mode.write(tag);
     }
 
     @Override

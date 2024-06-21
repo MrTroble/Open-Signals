@@ -11,10 +11,10 @@ public class DebugFactory extends SignalBoxFactory {
     private final boolean enableDebugPathEntry = false;
 
     @Override
-    public ConnectionChecker getConnectionChecker() {
+    public ConnectionChecker getConnectionCheckerNormal() {
         if (enableConnectionChecker)
             return new DebugChecker();
-        return super.getConnectionChecker();
+        return super.getConnectionCheckerNormal();
     }
 
     @Override
