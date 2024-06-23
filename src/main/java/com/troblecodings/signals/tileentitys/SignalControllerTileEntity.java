@@ -185,6 +185,8 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             final Map<EnumState, Byte> map = new HashMap<>();
             comp.keySet().stream().forEach(str -> {
                 final EnumState state = EnumState.of(str);
+                if (state == null)
+                    return;
                 map.put(state, (byte) comp.getInteger(state.getNameWrapper()));
             });
             enabledStates.put(direction, map);
