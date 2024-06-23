@@ -65,9 +65,9 @@ public class ModeDropDownBoxUI {
         top.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
 
         if (open) {
-            top.add(GuiElements.createButton("↓", 20, e -> changeShowState()));
+            top.add(GuiElements.createButton("-", 20, e -> changeShowState()));
         } else {
-            top.add(GuiElements.createButton("→", 20, e -> changeShowState()));
+            top.add(GuiElements.createButton("+", 20, e -> changeShowState()));
         }
 
         final UIEntity modeInfo = new UIEntity();

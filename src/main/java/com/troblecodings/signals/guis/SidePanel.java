@@ -120,13 +120,13 @@ public class SidePanel {
 
     public void addHelpPageToPlane() {
         if (showHelpPage) {
-            helpPageButton.setText(I18Wrapper.format("info.info") + "  →");
+            helpPageButton.setText(I18Wrapper.format("info.info") + "  ->");
             spacerEntity.setWidth(85);
             helpPage.clearChildren();
             helpPage.add(infoEntity);
             lowerEntity.update();
         } else {
-            helpPageButton.setText("←");
+            helpPageButton.setText("<-");
             helpPage.clearChildren();
             helpPage.add(helpPageSpacer);
             helpPage.add(getIcons());
