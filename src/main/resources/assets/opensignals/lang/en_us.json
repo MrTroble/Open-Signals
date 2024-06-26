@@ -655,5 +655,7 @@
     "property.protectionway.desc": "Select a section of path behind the destination signal. The overlap is set up to this point. The overlap (pass-through path) is a protective section behind the destination signal that must be secured and kept clear if trains do not come to a stop in front of the signal as planned and path-through past the signal.",
 	"property.reset_protectionway_delay.name": "Delay-Overlap-reset",
     "property.reset_protectionway_delay.desc": "",
-	"info.usage.savedpathways.desc": "All saved pathways are listed here. You can display or delete the pathways."
+	"info.usage.savedpathways.desc": "All saved pathways are listed here. You can display or delete the pathways.",
+	"propety.prop.INPUT.protectionway.reset.name": "Overlap reset",
+	"propety.prop.INPUT.protectionway.reset.desc": "Select a redstone input which will trigger the overlap reset."
 }
