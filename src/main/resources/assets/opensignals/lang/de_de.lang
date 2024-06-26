@@ -658,3 +658,5 @@ property.protectionway.desc=Wähle ein Streckenstück hinter dem Zielsignal aus.
 property.reset_protectionway_delay.name=Verzögerung-Durchrutschweg-zurücksetzen
 property.reset_protectionway_delay.desc=
 info.usage.savedpathways.desc=Hier werden alle eingespeicherten Fahrstraßen aufgelistet. Du kannst dir die Fahrstraßen anzeigen lassen oder löschen.
+propety.prop.INPUT.protectionway.reset.name=Durchrutschweg zurücksetzen
+propety.prop.INPUT.protectionway.reset.desc=Wähle ein Redstone Input aus, welcher die Durchrutschweg-Zurücksetzung ansteuert.

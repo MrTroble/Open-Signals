@@ -657,3 +657,5 @@ property.protectionway.desc=Select a section of path behind the destination sign
 property.reset_protectionway_delay.name=Delay-Overlap-reset
 property.reset_protectionway_delay.desc=
 info.usage.savedpathways.desc=All saved pathways are listed here. You can display or delete the pathways.
+propety.prop.INPUT.protectionway.reset.name=Overlap reset
+propety.prop.INPUT.protectionway.reset.desc=Select a redstone input which will trigger the overlap reset.
