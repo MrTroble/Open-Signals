@@ -43,6 +43,7 @@ import net.minecraftforge.event.world.ChunkWatchEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.fml.common.event.FMLServerStoppingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.network.FMLEventChannel;
 import net.minecraftforge.fml.common.network.FMLNetworkEvent.ClientCustomPacketEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
@@ -437,6 +438,16 @@ public final class SignalStateHandler implements INetworkSync {
             return;
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
         stateInfo.world.playerEntities.forEach(player -> sendTo(player, buffer));
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoin(final PlayerLoggedInEvent event) {
+        final EntityPlayer player = event.player;
+        final Map<SignalStateInfo, Map<SEProperty, String>> properties;
+        synchronized (CURRENTLY_LOADED_STATES) {
+            properties = ImmutableMap.copyOf(CURRENTLY_LOADED_STATES);
+        }
+        properties.forEach((info, map) -> sendTo(info, map, player));
     }
 
     @SubscribeEvent
