@@ -2,7 +2,7 @@ package com.troblecodings.signals.enums;
 
 import javax.annotation.Nullable;
 
-import com.troblecodings.signals.signalbox.SignalBoxPathway;
+import com.troblecodings.signals.signalbox.PathwayData;
 
 public enum PathwayRequestResult {
 
@@ -21,7 +21,7 @@ public enum PathwayRequestResult {
         return name;
     }
 
-    public PathwayRequestResult setPathway(final PathwayData data) {
+    public PathwayRequestResult setPathwayData(final PathwayData data) {
         if (!isPass())
             return this;
         this.data = data;

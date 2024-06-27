@@ -1,8 +1,7 @@
 package com.troblecodings.signals.signalbox.debug;
 
-import com.troblecodings.signals.signalbox.ConnectionChecker.ConnectionCheckerNormal;
+import com.troblecodings.signals.signalbox.ConnectionChecker;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
-import com.troblecodings.signals.signalbox.SignalBoxUtil.ConnectionChecker;
 import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 
 public class DebugFactory extends SignalBoxFactory {
@@ -12,7 +11,7 @@ public class DebugFactory extends SignalBoxFactory {
     private final boolean enableDebugPathEntry = false;
 
     @Override
-    public ConnectionCheckerNormal getConnectionCheckerNormal() {
+    public ConnectionChecker getConnectionCheckerNormal() {
         if (enableConnectionChecker)
             return new DebugChecker();
         return super.getConnectionCheckerNormal();

@@ -399,35 +399,27 @@ public class GuiSignalBox extends GuiBase {
                     break;
                 }
                 case INPUT: {
-                    initializePageSettings(entity,
-                            container.getPositionForTypes().entrySet().stream()
-                                    .filter(entry -> entry.getValue().equals(LinkType.INPUT))
-                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
-                                            Map.Entry::getValue)));
+                    initializePageSettings(entity, container.getPositionForTypes().entrySet()
+                            .stream().filter(entry -> entry.getValue().equals(LinkType.INPUT))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                     break;
                 }
                 case OUTPUT: {
-                    initializePageSettings(entity,
-                            container.getPositionForTypes().entrySet().stream()
-                                    .filter(entry -> entry.getValue().equals(LinkType.OUTPUT))
-                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
-                                            Map.Entry::getValue)));
+                    initializePageSettings(entity, container.getPositionForTypes().entrySet()
+                            .stream().filter(entry -> entry.getValue().equals(LinkType.OUTPUT))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                     break;
                 }
                 case SIGNAL: {
-                    initializePageSettings(entity,
-                            container.getPositionForTypes().entrySet().stream()
-                                    .filter(entry -> entry.getValue().equals(LinkType.SIGNAL))
-                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
-                                            Map.Entry::getValue)));
+                    initializePageSettings(entity, container.getPositionForTypes().entrySet()
+                            .stream().filter(entry -> entry.getValue().equals(LinkType.SIGNAL))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                     break;
                 }
                 case SIGNALBOX: {
-                    initializePageSettings(entity,
-                            container.getPositionForTypes().entrySet().stream()
-                                    .filter(entry -> entry.getValue().equals(LinkType.SIGNALBOX))
-                                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey,
-                                            Map.Entry::getValue)));
+                    initializePageSettings(entity, container.getPositionForTypes().entrySet()
+                            .stream().filter(entry -> entry.getValue().equals(LinkType.SIGNALBOX))
+                            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
                     break;
                 }
                 default:

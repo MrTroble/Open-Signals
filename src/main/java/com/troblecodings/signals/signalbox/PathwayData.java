@@ -1,9 +1,11 @@
 package com.troblecodings.signals.signalbox;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -33,6 +35,8 @@ import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public class PathwayData {
 
@@ -202,7 +206,7 @@ public class PathwayData {
                 }
                 this.protectionWayNodes = copy;
                 directResetOfProtectionWay();
-                final Level world = pathway.tile.getLevel();
+                final World world = pathway.tile.getLevel();
                 world.getServer().execute(() -> {
                     pathway.grid.updateToNet(pathway);
                     removeProtectionWay();
@@ -515,7 +519,7 @@ public class PathwayData {
             return EMPTY_DATA;
         }
         chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class,
-                (ServerLevel) grid.tile.getLevel(), otherPos.get(), (endTile, _u2) -> {
+                (ServerWorld) grid.tile.getLevel(), otherPos.get(), (endTile, _u2) -> {
                     final SignalBoxGrid endGrid = endTile.getSignalBoxGrid();
                     final SignalBoxNode otherStartNode = endGrid.getNode(otherStartPoint.get());
                     if (otherStartNode == null) {

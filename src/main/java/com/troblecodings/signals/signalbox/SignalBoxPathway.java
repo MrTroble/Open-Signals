@@ -39,6 +39,8 @@ import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraft.world.server.ServerWorld;
 
 public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
 
@@ -148,7 +150,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     protected SignalStateInfo getLastSignalInfo() {
         if (lastSignalInfo != null)
             return lastSignalInfo;
-        final Level world = tile.getLevel();
+        final World world = tile.getLevel();
         if (world == null || world.isClientSide)
             return null;
         final StateInfo identifier = new StateInfo(world, tile.getBlockPos());
@@ -162,7 +164,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     }
 
     public void updatePathwaySignals() {
-        final Level world = tile.getLevel();
+        final World world = tile.getLevel();
         if (world == null || world.isClientSide || isExecutingSignalSet)
             return;
         setSignals();
@@ -199,7 +201,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     protected void setSignals(final SignalStateInfo lastSignal) {
         if (isExecutingSignalSet)
             return;
-        final Level world = tile.getLevel();
+        final World world = tile.getLevel();
         final StateInfo identifier = new StateInfo(world, tile.getBlockPos());
         final MainSignalIdentifier startSignal = data.getStartSignal();
         if (startSignal != null) {
@@ -330,7 +332,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
             final List<MainSignalIdentifier> greenSignals) {
         if (redSignals.isEmpty() && greenSignals.isEmpty())
             return;
-        final Level world = tile.getLevel();
+        final World world = tile.getLevel();
         if (world == null || world.isClientSide)
             return;
         world.getServer().execute(() -> {
@@ -614,7 +616,7 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
 
     protected boolean loadTileAndExecute(final BlockPos tilePos,
             final Consumer<SignalBoxTileEntity> consumer) {
-        return loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) tile.getLevel(),
+        return loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerWorld) tile.getLevel(),
                 tilePos, (blockTile, _u) -> consumer.accept(blockTile));
     }
 

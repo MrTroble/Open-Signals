@@ -2,6 +2,7 @@ package com.troblecodings.signals.signalbox;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.collect.Maps;
@@ -15,6 +16,7 @@ import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
 
 public class InterSignalBoxPathway extends SignalBoxPathway {
 
@@ -61,7 +63,7 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             final Point end = new Point();
             end.read(blockWrapper.getWrapper(END_POINT));
             final BlockPos otherPos = blockWrapper.getBlockPos(TILE_POS);
-            final Level world = tile.getLevel();
+            final World world = tile.getLevel();
             if (world == null || world.isClientSide) {
                 blockPW = Maps.immutableEntry(otherPos, end);
             } else {
@@ -79,7 +81,7 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             final Point end = new Point();
             end.read(resetWrapper.getWrapper(END_POINT));
             final BlockPos otherPos = resetWrapper.getBlockPos(TILE_POS);
-            final Level world = tile.getLevel();
+            final World world = tile.getLevel();
             if (world == null || world.isClientSide) {
                 resetPW = Maps.immutableEntry(otherPos, end);
             } else {
@@ -97,7 +99,7 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
 
     @Override
     public void onLoad() {
-        final Level world = tile.getLevel();
+        final World world = tile.getLevel();
         if (world == null || world.isClientSide)
             return;
         if (blockPW != null) {
