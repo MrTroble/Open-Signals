@@ -2,225 +2,77 @@ package com.troblecodings.signals.signalbox;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
-import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.JsonEnumHolder;
+import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.TrainNumber;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
+import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
-import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
 
-public class SignalBoxPathway implements IChunkLoadable {
+public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
 
-    private final ExecutorService service = Executors.newFixedThreadPool(1);
+    protected final PathwayData data;
 
-    private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
-    private final Map<BlockPos, SignalBoxNode> mapOfBlockingPositions = new HashMap<>();
-    private ImmutableList<SignalBoxNode> listOfNodes = ImmutableList.of();
-    private PathType type = PathType.NONE;
-    private Point firstPoint = new Point();
-    private Point lastPoint = new Point();
-    private int speed = -1;
-    private String zs2Value = "";
-    private int delay = 0;
-    private Optional<Entry<MainSignalIdentifier, MainSignalIdentifier>> signalPositions = Optional
-            .empty();
-    private Optional<MainSignalIdentifier> lastSignal = Optional.empty();
-    private ImmutableMap<BlockPos, OtherSignalIdentifier> distantSignalPositions = ImmutableMap
-            .of();
-    private Map<Point, SignalBoxNode> modeGrid = null;
-    private boolean emptyOrBroken = false;
-    private World world;
-    private BlockPos tilePos;
-    private boolean isBlocked = false;
-    private boolean isAutoPathway = false;
-    private Point originalFirstPoint = null;
-    private Consumer<SignalBoxPathway> consumer;
-    private SignalBoxGrid holder = null;
-    private SignalBoxTileEntity tile;
-    private TrainNumber trainNumber;
-
-    private SignalBoxPathway pathwayToBlock;
-    private SignalBoxPathway pathwayToReset;
-
-    public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid) {
-        this.modeGrid = modeGrid;
-    }
+    protected boolean isBlocked;
+    protected boolean isAutoPathway = false;
+    protected Point originalFirstPoint = null;
+    protected SignalBoxGrid grid = null;
+    protected SignalBoxTileEntity tile;
+    protected TrainNumber trainNumber;
+    protected boolean isExecutingSignalSet = false;
 
     public void setTile(final SignalBoxTileEntity tile) {
-        this.world = tile.getLevel();
-        this.tilePos = tile.getBlockPos();
         this.tile = tile;
     }
 
-    public SignalBoxPathway(final Map<Point, SignalBoxNode> modeGrid,
-            final List<SignalBoxNode> pNodes, final PathType type) {
-        this(modeGrid);
-        this.listOfNodes = ImmutableList.copyOf(pNodes);
-        this.type = Objects.requireNonNull(type);
-        if (listOfNodes.size() < 2)
-            throw new IndexOutOfBoundsException();
-        if (this.type.equals(PathType.NONE))
-            throw new IllegalArgumentException();
-        initalize();
-        this.originalFirstPoint = new Point(firstPoint);
+    public SignalBoxPathway(final PathwayData data) {
+        this.data = data;
+        this.originalFirstPoint = new Point(data.getFirstPoint());
         updatePathwayToAutomatic();
         resetAllTrainNumbers();
     }
 
-    private void initalize() {
-        final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
-        final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
-        final AtomicInteger delayAtomic = new AtomicInteger(0);
-        final Builder<BlockPos, OtherSignalIdentifier> distantPosBuilder = ImmutableMap.builder();
-        mapOfBlockingPositions.clear();
-        mapOfResetPositions.clear();
-        foreachEntry((optionEntry, node) -> {
-            optionEntry.getEntry(PathEntryType.SPEED)
-                    .ifPresent(value -> atomic.updateAndGet(in -> Math.min(in, value)));
-            optionEntry.getEntry(PathEntryType.BLOCKING)
-                    .ifPresent(position -> mapOfBlockingPositions.put(position, node));
-            optionEntry.getEntry(PathEntryType.RESETING)
-                    .ifPresent(position -> mapOfResetPositions.put(position, node));
-            optionEntry.getEntry(PathEntryType.ZS2).ifPresent(value -> zs2Value.set(value));
-        });
-        foreachPath((path, node) -> {
-            if (!type.equals(PathType.SHUNTING)) {
-                final Rotation rotation = SignalBoxUtil
-                        .getRotationFromDelta(node.getPoint().delta(path.point1));
-                for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
-                    final ModeSet modeSet = new ModeSet(mode, rotation);
-                    node.getOption(modeSet).ifPresent(
-                            option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
-                                final Optional<Boolean> repeaterOption = option
-                                        .getEntry(PathEntryType.SIGNAL_REPEATER);
-                                distantPosBuilder.put(position,
-                                        new OtherSignalIdentifier(node.getPoint(), modeSet,
-                                                position,
-                                                repeaterOption.isPresent() && repeaterOption.get(),
-                                                mode.equals(EnumGuiMode.RS)));
-                            }));
-                }
-            }
-            node.getModes().entrySet().stream()
-                    .filter(entry -> entry.getKey().mode.equals(EnumGuiMode.BUE))
-                    .forEach(entry -> entry.getValue().getEntry(PathEntryType.DELAY).ifPresent(
-                            value -> delayAtomic.updateAndGet(in -> Math.max(in, value))));
-        }, null);
-        this.distantSignalPositions = distantPosBuilder.build();
-        final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
-        this.firstPoint = firstNode.getPoint();
-        final MainSignalIdentifier firstPos = makeFromNext(type, firstNode,
-                this.listOfNodes.get(this.listOfNodes.size() - 2), Rotation.NONE);
-        final SignalBoxNode lastNode = this.listOfNodes.get(0);
-        this.lastPoint = lastNode.getPoint();
-        final MainSignalIdentifier lastPos = makeFromNext(type, lastNode, this.listOfNodes.get(1),
-                Rotation.CLOCKWISE_180);
-        if (lastPos != null) {
-            lastSignal = Optional.of(lastPos);
-        }
-        if (firstPos != null) {
-            this.signalPositions = Optional.of(Maps.immutableEntry(firstPos, lastPos));
-        } else {
-            this.signalPositions = Optional.empty();
-        }
-        this.speed = atomic.get();
-        this.zs2Value = JsonEnumHolder.ZS32.getObjFromID(Byte.toUnsignedInt(zs2Value.get()));
-        this.delay = delayAtomic.get();
-    }
-
-    private MainSignalIdentifier makeFromNext(final PathType type, final SignalBoxNode first,
-            final SignalBoxNode next, final Rotation pRotation) {
-        final Point delta = first.getPoint().delta(next.getPoint());
-        final Rotation rotation = SignalBoxUtil.getRotationFromDelta(delta).getRotated(pRotation);
-        for (final EnumGuiMode mode : type.getModes()) {
-            final ModeSet modeSet = new ModeSet(mode, rotation);
-            final BlockPos possiblePosition = first.getOption(modeSet)
-                    .flatMap(option -> option.getEntry(PathEntryType.SIGNAL)).orElse(null);
-            if (possiblePosition != null)
-                return new MainSignalIdentifier(first.getPoint(), modeSet, possiblePosition);
-        }
-        return null;
-    }
-
-    private static final String LIST_OF_NODES = "listOfNodes";
-    private static final String PATH_TYPE = "pathType";
     private static final String IS_BLOCKED = "isBlocked";
     private static final String ORIGINAL_FIRST_POINT = "origianlFirstPoint";
-    private static final String PATHWAY_TO_BLOCK = "pathwayToBlock";
-    private static final String PATHWAY_TO_RESET = "pathwayToReset";
-    private static final String END_POINT = "endPoint";
-    private static final String TILE_POS = "signalBoxPos";
 
     public void write(final NBTWrapper tag) {
-        tag.putList(LIST_OF_NODES, listOfNodes.stream().map(node -> {
-            final NBTWrapper entry = new NBTWrapper();
-            node.getPoint().write(entry);
-            return entry;
-        })::iterator);
-        tag.putString(PATH_TYPE, this.type.name());
+        data.write(tag);
         tag.putBoolean(IS_BLOCKED, isBlocked);
         if (originalFirstPoint != null) {
             final NBTWrapper originalFirstPoint = new NBTWrapper();
             this.originalFirstPoint.write(originalFirstPoint);
             tag.putWrapper(ORIGINAL_FIRST_POINT, originalFirstPoint);
-        }
-        if (pathwayToBlock != null) {
-            final NBTWrapper blockWrapper = new NBTWrapper();
-            blockWrapper.putBlockPos(TILE_POS, pathwayToBlock.tilePos);
-            final NBTWrapper pointWrapper = new NBTWrapper();
-            pathwayToBlock.lastPoint.write(pointWrapper);
-            blockWrapper.putWrapper(END_POINT, pointWrapper);
-            tag.putWrapper(PATHWAY_TO_BLOCK, blockWrapper);
-        }
-        if (pathwayToReset != null) {
-            final NBTWrapper resetWrapper = new NBTWrapper();
-            resetWrapper.putBlockPos(TILE_POS, pathwayToReset.tilePos);
-            final NBTWrapper pointWrapper = new NBTWrapper();
-            pathwayToReset.lastPoint.write(pointWrapper);
-            resetWrapper.putWrapper(END_POINT, pointWrapper);
-            tag.putWrapper(PATHWAY_TO_RESET, resetWrapper);
         }
         if (trainNumber != null) {
             this.trainNumber.writeTag(tag);
@@ -228,28 +80,10 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public void read(final NBTWrapper tag) {
-        final ImmutableList.Builder<SignalBoxNode> nodeBuilder = ImmutableList.builder();
-        tag.getList(LIST_OF_NODES).forEach(nodeNBT -> {
-            final Point point = new Point();
-            point.read(nodeNBT);
-            final SignalBoxNode node = modeGrid.get(point);
-            if (node == null) {
-                OpenSignalsMain.getLogger().error("Detecting broken pathway at {}!",
-                        point.toString());
-                this.emptyOrBroken = true;
-                return;
-            }
-            nodeBuilder.add(node);
-        });
-        this.listOfNodes = nodeBuilder.build();
-        this.type = PathType.valueOf(tag.getString(PATH_TYPE));
-        this.isBlocked = tag.getBoolean(IS_BLOCKED);
-        if (this.listOfNodes.size() < 2) {
-            OpenSignalsMain.getLogger().error("Detecting pathway with only 2 elements!");
-            this.emptyOrBroken = true;
+        data.read(tag);
+        if (isEmptyOrBroken())
             return;
-        }
-        this.initalize();
+        this.isBlocked = tag.getBoolean(IS_BLOCKED);
         final NBTWrapper originalFirstPoint = tag.getWrapper(ORIGINAL_FIRST_POINT);
         if (!originalFirstPoint.isTagNull()) {
             this.originalFirstPoint = new Point();
@@ -260,273 +94,200 @@ public class SignalBoxPathway implements IChunkLoadable {
         updateSignalStates();
     }
 
-    private Map.Entry<BlockPos, Point> blockPW = null;
-    private Map.Entry<BlockPos, Point> resetPW = null;
-
-    public void readLinkedPathways(final NBTWrapper tag) {
-        final NBTWrapper blockWrapper = tag.getWrapper(PATHWAY_TO_BLOCK);
-        if (!blockWrapper.isTagNull()) {
-            final Point end = new Point();
-            end.read(blockWrapper.getWrapper(END_POINT));
-            final BlockPos otherPos = blockWrapper.getBlockPos(TILE_POS);
-            if (world == null || world.isClientSide) {
-                blockPW = Maps.immutableEntry(otherPos, end);
-            } else {
-                final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
-                otherGrid.set(SignalBoxHandler.getGrid(new StateInfo(world, otherPos)));
-                if (otherGrid.get() == null)
-                    loadTileAndExecute(otherPos, tile -> otherGrid.set(tile.getSignalBoxGrid()));
-
-                final SignalBoxPathway otherPathway = otherGrid.get().getPathwayByLastPoint(end);
-                pathwayToBlock = otherPathway;
-            }
-        }
-        final NBTWrapper resetWrapper = tag.getWrapper(PATHWAY_TO_RESET);
-        if (!resetWrapper.isTagNull()) {
-            final Point end = new Point();
-            end.read(resetWrapper.getWrapper(END_POINT));
-            final BlockPos otherPos = resetWrapper.getBlockPos(TILE_POS);
-            if (world == null || world.isClientSide) {
-                resetPW = Maps.immutableEntry(otherPos, end);
-            } else {
-                final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
-                otherGrid.set(SignalBoxHandler.getGrid(new StateInfo(world, otherPos)));
-                if (otherGrid.get() == null)
-                    loadTileAndExecute(otherPos, tile -> otherGrid.set(tile.getSignalBoxGrid()));
-
-                final SignalBoxPathway otherPathway = otherGrid.get().getPathwayByLastPoint(end);
-                pathwayToReset = otherPathway;
-            }
-        }
+    public void postRead(final NBTWrapper tag) {
     }
 
-    public void linkPathways() {
-        if (world == null || world.isClientSide)
-            return;
-        if (blockPW != null) {
-            final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
-            otherGrid.set(SignalBoxHandler.getGrid(new StateInfo(world, blockPW.getKey())));
-            if (otherGrid.get() == null)
-                loadTileAndExecute(blockPW.getKey(),
-                        tile -> otherGrid.set(tile.getSignalBoxGrid()));
-
-            if (otherGrid.get() != null) {
-                final SignalBoxPathway otherPathway = otherGrid.get()
-                        .getPathwayByLastPoint(blockPW.getValue());
-                pathwayToBlock = otherPathway;
-                blockPW = null;
-            }
-        }
-        if (resetPW != null) {
-            final AtomicReference<SignalBoxGrid> otherGrid = new AtomicReference<>();
-            otherGrid.set(SignalBoxHandler.getGrid(new StateInfo(world, resetPW.getKey())));
-            if (otherGrid.get() == null)
-                loadTileAndExecute(resetPW.getKey(),
-                        tile -> otherGrid.set(tile.getSignalBoxGrid()));
-
-            if (otherGrid.get() != null) {
-                final SignalBoxPathway otherPathway = otherGrid.get()
-                        .getPathwayByLastPoint(resetPW.getValue());
-                pathwayToReset = otherPathway;
-                resetPW = null;
-            }
-        }
-    }
-
-    private void foreachEntry(final Consumer<PathOptionEntry> consumer,
-            final @Nullable Point point) {
-        foreachEntry((entry, _u) -> consumer.accept(entry), point);
-    }
-
-    private void foreachEntry(final BiConsumer<PathOptionEntry, SignalBoxNode> consumer) {
-        foreachEntry(consumer, null);
-    }
-
-    private void foreachPath(final BiConsumer<Path, SignalBoxNode> consumer,
-            final @Nullable Point point) {
-        for (int i = listOfNodes.size() - 2; i > 0; i--) {
-            final Point oldPos = listOfNodes.get(i - 1).getPoint();
-            final Point newPos = listOfNodes.get(i + 1).getPoint();
-            final SignalBoxNode current = listOfNodes.get(i);
-            consumer.accept(new Path(oldPos, newPos), current);
-            if (current.getPoint().equals(point))
-                break;
-        }
-
-    }
-
-    private void foreachEntry(final BiConsumer<PathOptionEntry, SignalBoxNode> consumer,
-            final @Nullable Point point) {
-        foreachPath((path, current) -> current.getOption(path)
-                .ifPresent(entry -> consumer.accept(entry, current)), point);
+    public void onLoad() {
     }
 
     public void setPathStatus(final EnumPathUsage status, final @Nullable Point point) {
-        foreachEntry(option -> {
-            option.getEntry(PathEntryType.OUTPUT).ifPresent(
-                    pos -> SignalBoxHandler.updateRedstoneOutput(new StateInfo(world, pos),
+        data.foreachEntry(option -> {
+            option.getEntry(PathEntryType.OUTPUT)
+                    .ifPresent(pos -> SignalBoxHandler.updateRedstoneOutput(
+                            new StateInfo(tile.getLevel(), pos),
                             !status.equals(EnumPathUsage.FREE)));
             option.setEntry(PathEntryType.PATHUSAGE, status);
         }, point);
+        if (status.equals(EnumPathUsage.SELECTED) || status.equals(EnumPathUsage.PREPARED)) {
+            setProtectionWay();
+        }
+    }
+
+    private void setProtectionWay() {
+        data.forEachEntryProtectionWay((option, _u) -> {
+            option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), true));
+            option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.PROTECTED);
+        });
+    }
+
+    public boolean checkResetOfProtectionWay(final BlockPos position) {
+        if (!data.canResetProtectionWay(position))
+            return false;
+        return resetProtectionWay();
+    }
+
+    public boolean resetProtectionWay() {
+        return data.resetProtectionWay();
+    }
+
+    public boolean directResetOfProtectionWay() {
+        return data.directResetOfProtectionWay();
+    }
+
+    public void removeProtectionWay() {
+        data.removeProtectionWay();
     }
 
     public void setPathStatus(final EnumPathUsage status) {
         setPathStatus(status, null);
     }
 
-    private final SignalStateInfo lastSignalInfo = null;
+    protected SignalStateInfo lastSignalInfo = null;
 
-    private SignalStateInfo getLastSignalInfo() {
+    protected SignalStateInfo getLastSignalInfo() {
         if (lastSignalInfo != null)
             return lastSignalInfo;
+        final Level world = tile.getLevel();
         if (world == null || world.isClientSide)
             return null;
-        final StateInfo identifier = new StateInfo(world, tilePos);
-        SignalStateInfo lastInfo = null;
-        if (lastSignal.isPresent()) {
-            final Signal nextSignal = SignalBoxHandler.getSignal(identifier, lastSignal.get().pos);
+        final StateInfo identifier = new StateInfo(world, tile.getBlockPos());
+        final MainSignalIdentifier lastSignal = data.getEndSignal();
+        if (lastSignal != null) {
+            final Signal nextSignal = SignalBoxHandler.getSignal(identifier, lastSignal.pos);
             if (nextSignal != null)
-                lastInfo = new SignalStateInfo(world, lastSignal.get().pos, nextSignal);
+                lastSignalInfo = new SignalStateInfo(world, lastSignal.pos, nextSignal);
         }
-        if (pathwayToBlock != null && pathwayToBlock.lastSignal.isPresent()) {
-            final Signal nextSignal = SignalBoxHandler.getSignal(
-                    new StateInfo(pathwayToBlock.world, pathwayToBlock.tilePos),
-                    pathwayToBlock.lastSignal.get().pos);
-            if (nextSignal != null)
-                lastInfo = new SignalStateInfo(world, pathwayToBlock.lastSignal.get().pos,
-                        nextSignal);
-        }
-        return lastInfo;
+        return lastSignalInfo;
     }
-
-    private boolean isExecutingSignalSet = false;
 
     public void updatePathwaySignals() {
-        if (world == null || world.isClientSide)
+        final Level world = tile.getLevel();
+        if (world == null || world.isClientSide || isExecutingSignalSet)
             return;
-        final SignalStateInfo lastSignal = getLastSignalInfo();
-        if (delay > 0) {
-            setPathStatus(EnumPathUsage.PREPARED);
-            if (pathwayToBlock != null) {
-                pathwayToBlock.loadTileAndExecute(_u -> {
-                    pathwayToBlock.isExecutingSignalSet = true;
-                    pathwayToBlock.setPathStatus(EnumPathUsage.PREPARED);
-                    pathwayToBlock.executeConsumer();
-                });
-            }
-            if (isExecutingSignalSet)
-                return;
-            this.isExecutingSignalSet = true;
-            service.execute(() -> {
-                try {
-                    Thread.sleep(delay * 1000);
-                } catch (final InterruptedException e) {
-                }
-                if (emptyOrBroken) {
-                    return;
-                }
-                synchronized (distantSignalPositions) {
-                    this.isExecutingSignalSet = false;
-                    setSignals(getLastSignalInfo());
-                }
-                world.getServer().execute(() -> {
-                    loadTileAndExecute(thisTile -> {
-                        final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
-                                .getPathwayByLastPoint(getLastPoint());
-                        pw.setPathStatus(EnumPathUsage.SELECTED);
-                        pw.executeConsumer();
-                    });
-                    if (pathwayToBlock != null) {
-                        pathwayToBlock.loadTileAndExecute(otherTile -> {
-                            pathwayToBlock = otherTile.getSignalBoxGrid()
-                                    .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
-                            pathwayToBlock.setPathStatus(EnumPathUsage.SELECTED);
-                            pathwayToBlock.executeConsumer();
-                            pathwayToBlock.isExecutingSignalSet = false;
-                        });
-                    }
-                });
-            });
-            return;
-        }
-        setSignals(lastSignal);
+        setSignals();
     }
 
-    private SignalBoxPathway getNextPathway() {
-        return holder.startsToPath.get(lastPoint);
+    protected SignalBoxPathway getNextPathway() {
+        return grid.startsToPath.get(getLastPoint());
     }
 
-    public void setSignals() {
+    protected void setSignals() {
         setSignals(getLastSignalInfo());
     }
 
-    private void setSignals(final SignalStateInfo lastSignal) {
-        if (isExecutingSignalSet || world == null || world.isClientSide)
+    public void registerSignalUpdater() {
+        final SignalStateInfo info = getLastSignalInfo();
+        if (info == null)
             return;
-        final StateInfo identifier = new StateInfo(world, tilePos);
-        this.signalPositions.ifPresent(entry -> {
+        SignalStateHandler.addListener(info, this);
+    }
+
+    public void unregisterSignalUpdater() {
+        final SignalStateInfo info = getLastSignalInfo();
+        if (info == null)
+            return;
+        SignalStateHandler.removeListener(info, this);
+    }
+
+    @Override
+    public void update(final SignalStateInfo info, final Map<SEProperty, String> changedProperties,
+            final ChangedState changedState) {
+        setSignals();
+    }
+
+    protected void setSignals(final SignalStateInfo lastSignal) {
+        if (isExecutingSignalSet)
+            return;
+        final Level world = tile.getLevel();
+        final StateInfo identifier = new StateInfo(world, tile.getBlockPos());
+        final MainSignalIdentifier startSignal = data.getStartSignal();
+        if (startSignal != null) {
             if (isBlocked)
                 return;
-            final Signal first = SignalBoxHandler.getSignal(identifier, entry.getKey().pos);
+            final Signal first = SignalBoxHandler.getSignal(identifier, startSignal.pos);
             if (first == null)
                 return;
-            final SignalStateInfo firstInfo = new SignalStateInfo(world, entry.getKey().pos, first);
-            SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, speed, zs2Value, type));
-        });
+            final SignalStateInfo firstInfo = new SignalStateInfo(world, startSignal.pos, first);
+            SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, data));
+            updatePreSignals();
+        }
+        final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
         distantSignalPositions.values().forEach(position -> {
             final Signal current = SignalBoxHandler.getSignal(identifier, position.pos);
             if (current == null)
                 return;
-            SignalConfig.change(new ConfigInfo(new SignalStateInfo(world, position.pos, current),
-                    lastSignal, speed, zs2Value, type, position.isRepeater));
+            final ConfigInfo info = new ConfigInfo(
+                    new SignalStateInfo(world, position.pos, current), lastSignal, data,
+                    position.isRepeater);
+            if (position.guiMode.equals(EnumGuiMode.HP)) {
+                SignalConfig.loadDisable(info);
+            } else {
+                SignalConfig.change(info);
+            }
         });
-        if (this.lastSignal.isPresent() && pathwayToReset != null) {
-            final Signal signal = SignalBoxHandler.getSignal(identifier, this.lastSignal.get().pos);
-            if (signal == null)
-                return;
-            pathwayToReset
-                    .setSignals(new SignalStateInfo(world, this.lastSignal.get().pos, signal));
-        }
         updateSignalStates();
     }
 
-    private void updateSignalStates() {
+    private void updatePreSignals() {
+        final MainSignalIdentifier startSignal = data.getStartSignal();
+        if (startSignal == null)
+            return;
+        final StateInfo identifier = new StateInfo(tile.getLevel(), tile.getBlockPos());
+        final Signal first = SignalBoxHandler.getSignal(identifier, startSignal.pos);
+        if (first == null)
+            return;
+        final SignalStateInfo firstInfo = new SignalStateInfo(tile.getLevel(), startSignal.pos,
+                first);
+        data.getPreSignals().forEach(posIdent -> {
+            final Signal current = SignalBoxHandler.getSignal(identifier, posIdent.pos);
+            if (current == null)
+                return;
+            SignalConfig.change(
+                    new ConfigInfo(new SignalStateInfo(tile.getLevel(), posIdent.pos, current),
+                            firstInfo, data, posIdent.isRepeater));
+        });
+    }
+
+    protected void updateSignalStates() {
         final List<MainSignalIdentifier> redSignals = new ArrayList<>();
         final List<MainSignalIdentifier> greenSignals = new ArrayList<>();
-        this.signalPositions.ifPresent(entry -> {
+        final MainSignalIdentifier startSignal = data.getStartSignal();
+        final MainSignalIdentifier endSignal = data.getEndSignal();
+        if (startSignal != null) {
             if (isBlocked)
                 return;
-            final SignalState previous = entry.getKey().state;
-            entry.getKey().state = SignalState.GREEN;
-            if (!entry.getKey().state.equals(previous))
-                greenSignals.add(entry.getKey());
-        });
+            final SignalState previous = startSignal.state;
+            startSignal.state = SignalState.GREEN;
+            if (!startSignal.state.equals(previous))
+                greenSignals.add(startSignal);
+            data.getPreSignals().forEach(signalIdent -> {
+                signalIdent.state = SignalState.GREEN;
+                greenSignals.add(signalIdent);
+            });
+        }
+        final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
         distantSignalPositions.values().forEach(position -> {
             final SignalBoxPathway next = getNextPathway();
             final SignalState previous = position.state;
-            if (lastSignal != null && next != null && !next.isEmptyOrBroken()) {
+            if (endSignal != null && next != null && !next.isEmptyOrBroken()) {
                 if (!next.isExecutingSignalSet)
                     position.state = SignalState.GREEN;
-            } else if (pathwayToBlock != null) {
-                final SignalBoxPathway otherNext = pathwayToBlock.getNextPathway();
-                if (otherNext != null && !otherNext.isEmptyOrBroken()) {
-                    if (!otherNext.isExecutingSignalSet)
-                        position.state = SignalState.GREEN;
-                } else {
-                    position.state = SignalState.RED;
-                }
             } else {
                 position.state = SignalState.RED;
             }
-            if (position.isRSSignal) {
+            if (position.guiMode.equals(EnumGuiMode.RS)) {
                 position.state = SignalState.GREEN;
+            } else if (position.guiMode.equals(EnumGuiMode.HP)) {
+                position.state = SignalState.OFF;
             }
             if (position.state.equals(previous)) {
                 return;
             } else {
                 if (position.state.equals(SignalState.RED)) {
                     redSignals.add(position);
-                } else if (position.state.equals(SignalState.GREEN)) {
+                } else if (position.state.equals(SignalState.GREEN)
+                        || position.state.equals(SignalState.OFF)) {
                     greenSignals.add(position);
                 }
             }
@@ -536,52 +297,40 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     public List<MainSignalIdentifier> getGreenSignals() {
         final List<MainSignalIdentifier> returnList = new ArrayList<>();
-        signalPositions.ifPresent(entry -> {
-            if (entry.getKey().state.equals(SignalState.GREEN))
-                returnList.add(entry.getKey());
-        });
+        final MainSignalIdentifier startSignal = data.getStartSignal();
+        if (startSignal != null) {
+            if (startSignal.state.equals(SignalState.GREEN))
+                returnList.add(startSignal);
+        }
+        final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
         distantSignalPositions.values().forEach(signal -> {
-            if (signal.state.equals(SignalState.GREEN))
+            if (signal.state.equals(SignalState.GREEN) || signal.state.equals(SignalState.OFF))
                 returnList.add(signal);
+        });
+        data.getPreSignals().forEach(ident -> {
+            if (ident.state.equals(SignalState.GREEN))
+                returnList.add(ident);
         });
         return returnList;
     }
 
-    private void executeConsumer() {
-        this.consumer.accept(this);
+    protected void updateToNet() {
+        grid.updateToNet(this);
     }
 
-    public void setUpdater(final Consumer<SignalBoxPathway> consumer) {
-        this.consumer = consumer;
-    }
-
-    public void setOtherPathwayToBlock(final SignalBoxPathway pathway) {
-        this.pathwayToBlock = pathway;
-        if (this.delay == 0 && pathwayToBlock.delay > 0) {
-            resetFirstSignal();
-            resetOther();
-        }
-        this.delay = Math.max(delay, pathwayToBlock.delay);
-        updatePathwaySignals();
-        executeConsumer();
-    }
-
-    public void setOtherPathwayToReset(final SignalBoxPathway pathway) {
-        this.pathwayToReset = pathway;
-    }
-
-    public void setSignalBoxGrid(final SignalBoxGrid holder) {
-        this.holder = holder;
+    protected void setSignalBoxGrid(final SignalBoxGrid grid) {
+        this.grid = grid;
     }
 
     private void updateSignalsOnClient(final List<MainSignalIdentifier> redSignals) {
         updateSignalsOnClient(redSignals, new ArrayList<>());
     }
 
-    private void updateSignalsOnClient(final List<MainSignalIdentifier> redSignals,
+    protected void updateSignalsOnClient(final List<MainSignalIdentifier> redSignals,
             final List<MainSignalIdentifier> greenSignals) {
         if (redSignals.isEmpty() && greenSignals.isEmpty())
             return;
+        final Level world = tile.getLevel();
         if (world == null || world.isClientSide)
             return;
         world.getServer().execute(() -> {
@@ -590,7 +339,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             buffer.putByte((byte) redSignals.size());
             redSignals.forEach(signal -> {
                 signal.writeNetwork(buffer);
-                holder.updateSubsidiarySignal(signal.getPoint(), signal.getModeSet(),
+                grid.updateSubsidiarySignal(signal.getPoint(), signal.getModeSet(),
                         new SubsidiaryEntry(null, false));
             });
             buffer.putByte((byte) greenSignals.size());
@@ -606,35 +355,55 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public void resetAllSignals() {
+        unregisterSignalUpdater();
         resetFirstSignal();
         resetOther();
+        isBlocked = true;
     }
 
     private void resetFirstSignal() {
-        this.signalPositions.ifPresent(entry -> {
-            final Signal current = SignalBoxHandler.getSignal(new StateInfo(world, tilePos),
-                    entry.getKey().pos);
+        final MainSignalIdentifier startSignal = data.getStartSignal();
+        if (startSignal != null) {
+            final StateInfo stateInfo = new StateInfo(tile.getLevel(), tile.getBlockPos());
+            final List<MainSignalIdentifier> signals = new ArrayList<>();
+            final Signal current = SignalBoxHandler.getSignal(stateInfo, startSignal.pos);
             if (current == null)
                 return;
-            SignalConfig.reset(
-                    new ResetInfo(new SignalStateInfo(world, entry.getKey().pos, current), false));
-            final SignalState previous = entry.getKey().state;
-            entry.getKey().state = SignalState.RED;
-            if (!entry.getKey().state.equals(previous)) {
-                updateSignalsOnClient(ImmutableList.of(entry.getKey()));
+            SignalConfig.reset(new ResetInfo(
+                    new SignalStateInfo(tile.getLevel(), startSignal.pos, current), false));
+            final SignalState previous = startSignal.state;
+            startSignal.state = SignalState.RED;
+            if (!startSignal.state.equals(previous)) {
+                signals.add(startSignal);
             }
-        });
+            data.getPreSignals().forEach(ident -> {
+                final Signal currentPreSignal = SignalBoxHandler.getSignal(stateInfo, ident.pos);
+                if (currentPreSignal == null)
+                    return;
+                SignalConfig.reset(new ResetInfo(
+                        new SignalStateInfo(tile.getLevel(), ident.pos, currentPreSignal),
+                        ident.isRepeater));
+                final SignalState previousState = ident.state;
+                ident.state = SignalState.RED;
+                if (!ident.state.equals(previousState)) {
+                    signals.add(ident);
+                }
+            });
+            updateSignalsOnClient(signals);
+        }
     }
 
     private void resetOther() {
         final List<MainSignalIdentifier> redSignals = new ArrayList<>();
+        final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
         distantSignalPositions.values().forEach(position -> {
-            final Signal current = SignalBoxHandler.getSignal(new StateInfo(world, tilePos),
-                    position.pos);
+            final Signal current = SignalBoxHandler
+                    .getSignal(new StateInfo(tile.getLevel(), tile.getBlockPos()), position.pos);
             if (current == null)
                 return;
-            SignalConfig.reset(new ResetInfo(new SignalStateInfo(world, position.pos, current),
-                    position.isRepeater));
+            SignalConfig.reset(
+                    new ResetInfo(new SignalStateInfo(tile.getLevel(), position.pos, current),
+                            position.isRepeater));
             final SignalState previous = position.state;
             position.state = SignalState.RED;
             if (!position.state.equals(previous)) {
@@ -647,40 +416,40 @@ public class SignalBoxPathway implements IChunkLoadable {
     public void resetPathway(final @Nullable Point point) {
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
-        if (point == null || point.equals(this.getLastPoint())
-                || point.equals(this.listOfNodes.get(1).getPoint())) {
-            this.emptyOrBroken = true;
+        if (data.totalPathwayReset(point)) {
             this.isBlocked = false;
             resetOther();
             resetAllTrainNumbers();
             sendTrainNumberUpdates();
-            if (pathwayToReset != null) {
-                pathwayToReset.loadTileAndExecute(tile -> tile.getSignalBoxGrid()
-                        .resetPathway(pathwayToReset.getFirstPoint()));
+            resetProtectionWay();
+            final SignalBoxPathway next = getNextPathway();
+            if (next != null) {
+                next.updatePreSignals();
+                next.updateSignalStates();
             }
         }
     }
 
     public void compact(final Point point) {
         final List<MainSignalIdentifier> redSignals = new ArrayList<>();
-        foreachPath((path, node) -> {
+        data.foreachPath((path, node) -> {
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));
             for (final EnumGuiMode mode : Arrays.asList(EnumGuiMode.VP, EnumGuiMode.RS)) {
                 node.getOption(new ModeSet(mode, rotation)).ifPresent(
                         option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
-                            final Signal current = SignalBoxHandler
-                                    .getSignal(new StateInfo(world, tilePos), position);
+                            final Signal current = SignalBoxHandler.getSignal(
+                                    new StateInfo(tile.getLevel(), tile.getBlockPos()), position);
                             if (current == null)
                                 return;
+                            final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data
+                                    .getOtherSignals();
                             final OtherSignalIdentifier identifier = distantSignalPositions
-                                    .getOrDefault(position,
-                                            new OtherSignalIdentifier(point,
-                                                    new ModeSet(mode, rotation), position, false,
-                                                    mode.equals(EnumGuiMode.RS)));
-                            SignalConfig.reset(
-                                    new ResetInfo(new SignalStateInfo(world, position, current),
-                                            identifier.isRepeater));
+                                    .getOrDefault(position, new OtherSignalIdentifier(point,
+                                            new ModeSet(mode, rotation), position, false, mode));
+                            SignalConfig.reset(new ResetInfo(
+                                    new SignalStateInfo(tile.getLevel(), position, current),
+                                    identifier.isRepeater));
                             final SignalState previous = identifier.state;
                             identifier.state = SignalState.RED;
                             if (!identifier.state.equals(previous)) {
@@ -689,26 +458,24 @@ public class SignalBoxPathway implements IChunkLoadable {
                         }));
             }
         }, point);
-        this.listOfNodes = ImmutableList.copyOf(this.listOfNodes.subList(0,
-                this.listOfNodes.indexOf(this.modeGrid.get(point)) + 1));
-        this.initalize();
+        data.compact(point);
         updateSignalsOnClient(redSignals);
         updateTrainNumber(trainNumber);
         updateSignalStates();
     }
 
     public Optional<Point> tryReset(final BlockPos position) {
-        final SignalBoxNode node = this.mapOfResetPositions.get(position);
+        final SignalBoxNode node = data.tryReset(position);
         if (node == null) {
             if (checkReverseReset(position)) {
-                return Optional.of(firstPoint);
+                return Optional.of(getFirstPoint());
             } else {
                 return Optional.empty();
             }
         }
         final Point point = node.getPoint();
         final AtomicBoolean atomic = new AtomicBoolean(false);
-        foreachEntry((option, cNode) -> {
+        data.foreachEntry((option, cNode) -> {
             option.getEntry(PathEntryType.BLOCKING).ifPresent(pos -> {
                 if (isPowerd(pos))
                     atomic.set(true);
@@ -724,6 +491,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         if (!isBlocked || getFirstPoint().equals(originalFirstPoint)) {
             return false;
         }
+        final List<SignalBoxNode> listOfNodes = data.getListOfNodes();
         final SignalBoxNode firstNode = listOfNodes.get(listOfNodes.size() - 1);
         for (final Rotation rot : Rotation.values()) {
             if (tryReversReset(pos, firstNode, rot)) {
@@ -742,7 +510,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                         if (!blockPos.equals(pos))
                             return;
                         final AtomicBoolean atomic = new AtomicBoolean(false);
-                        foreachEntry((option, cNode) -> {
+                        data.foreachEntry((option, cNode) -> {
                             option.getEntry(PathEntryType.BLOCKING).ifPresent(blockingPos -> {
                                 if (isPowerd(blockingPos)) {
                                     atomic.set(true);
@@ -759,14 +527,14 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private boolean isPowerd(final BlockPos pos) {
-        final BlockState state = world.getBlockState(pos);
+        final BlockState state = tile.getLevel().getBlockState(pos);
         if (state == null || !(state.getBlock() instanceof RedstoneIO))
             return false;
         return state.getValue(RedstoneIO.POWER);
     }
 
     public boolean tryBlock(final BlockPos position) {
-        if (!mapOfBlockingPositions.containsKey(position))
+        if (!data.tryBlock(position))
             return false;
         resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
@@ -774,32 +542,25 @@ public class SignalBoxPathway implements IChunkLoadable {
             getTrainNumberFromPrevious();
         }
         isBlocked = true;
-        if (pathwayToBlock != null) {
-            pathwayToBlock.loadTileAndExecute(otherTile -> {
-                pathwayToBlock = otherTile.getSignalBoxGrid()
-                        .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
-                pathwayToBlock.setPathStatus(EnumPathUsage.BLOCKED);
-                pathwayToBlock.updateTrainNumber(trainNumber);
-            });
-        }
         return true;
     }
 
     private void getTrainNumberFromPrevious() {
-        final SignalBoxPathway previous = holder.getPathwayByLastPoint(firstPoint);
+        final SignalBoxPathway previous = grid.getPathwayByLastPoint(getFirstPoint());
         if (previous != null) {
             updateTrainNumber(previous.trainNumber);
         }
     }
 
     public void checkTrainNumberUpdate(final TrainNumber number, final SignalBoxNode node) {
-        if (!listOfNodes.contains(node))
+        if (!data.getListOfNodes().contains(node))
             return;
         updateTrainNumber(number);
     }
 
-    private void updateTrainNumber(final TrainNumber number) {
+    protected void updateTrainNumber(final TrainNumber number) {
         resetAllTrainNumbers();
+        final List<SignalBoxNode> listOfNodes = data.getListOfNodes();
         final SignalBoxNode setNode = listOfNodes.get((listOfNodes.size() - 1) / 2);
         setNode.setTrainNumber(number);
         this.trainNumber = number;
@@ -809,6 +570,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     private void sendTrainNumberUpdates() {
         if (!this.tile.isBlocked())
             return;
+        final List<SignalBoxNode> listOfNodes = data.getListOfNodes();
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
         buffer.putInt(listOfNodes.size());
@@ -820,19 +582,25 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private void resetAllTrainNumbers() {
+        final List<SignalBoxNode> listOfNodes = data.getListOfNodes();
         listOfNodes.forEach(node -> node.removeTrainNumber());
     }
 
     public void deactivateAllOutputsOnPathway() {
-        foreachPath((_u, node) -> {
+        data.foreachPath((_u, node) -> {
             final List<BlockPos> outputs = node.clearAllManuellOutputs();
-            outputs.forEach(
-                    pos -> SignalBoxHandler.updateRedstoneOutput(new StateInfo(world, pos), false));
+            outputs.forEach(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), false));
         }, null);
+        data.forEachEntryProtectionWay((_u, node) -> {
+            final List<BlockPos> outputs = node.clearAllManuellOutputs();
+            outputs.forEach(pos -> SignalBoxHandler
+                    .updateRedstoneOutput(new StateInfo(tile.getLevel(), pos), false));
+        });
     }
 
     public void updatePathwayToAutomatic() {
-        final SignalBoxNode first = modeGrid.get(originalFirstPoint);
+        final SignalBoxNode first = data.grid.getModeGrid().get(originalFirstPoint);
         if (first == null) {
             isAutoPathway = false;
             return;
@@ -840,19 +608,19 @@ public class SignalBoxPathway implements IChunkLoadable {
         this.isAutoPathway = first.isAutoPoint();
     }
 
-    private boolean loadTileAndExecute(final Consumer<SignalBoxTileEntity> consumer) {
-        return loadTileAndExecute(this.tilePos, consumer);
+    protected boolean loadTileAndExecute(final Consumer<SignalBoxTileEntity> consumer) {
+        return loadTileAndExecute(this.tile.getBlockPos(), consumer);
     }
 
-    private boolean loadTileAndExecute(final BlockPos tilePos,
+    protected boolean loadTileAndExecute(final BlockPos tilePos,
             final Consumer<SignalBoxTileEntity> consumer) {
-        return loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerWorld) world, tilePos,
-                (blockTile, _u) -> consumer.accept(blockTile));
+        return loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) tile.getLevel(),
+                tilePos, (blockTile, _u) -> consumer.accept(blockTile));
     }
 
     public void checkReRequest() {
         if (isAutoPathway) {
-            holder.requestWay(originalFirstPoint, getLastPoint());
+            grid.requestWay(originalFirstPoint, getLastPoint());
         }
     }
 
@@ -862,19 +630,19 @@ public class SignalBoxPathway implements IChunkLoadable {
      * @return the firstPoint
      */
     public Point getFirstPoint() {
-        return firstPoint;
+        return data.getFirstPoint();
     }
 
     /**
      * @return the lastPoint
      */
     public Point getLastPoint() {
-        return lastPoint;
+        return data.getLastPoint();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstPoint, lastPoint, listOfNodes, modeGrid, type);
+        return Objects.hash(data);
     }
 
     @Override
@@ -884,32 +652,33 @@ public class SignalBoxPathway implements IChunkLoadable {
         if ((obj == null) || (getClass() != obj.getClass()))
             return false;
         final SignalBoxPathway other = (SignalBoxPathway) obj;
-        return Objects.equals(firstPoint, other.firstPoint)
-                && Objects.equals(lastPoint, other.lastPoint)
-                && Objects.equals(listOfNodes, other.listOfNodes)
-                && Objects.equals(modeGrid, other.modeGrid) && type == other.type;
+        return Objects.equals(data, other.data);
     }
 
     @Override
     public String toString() {
-        return "SignalBoxPathway [start=" + firstPoint + ", end=" + lastPoint + "]";
+        return "SignalBoxPathway [start=" + getFirstPoint() + ", end=" + getLastPoint() + "]";
     }
 
     /**
      * @return the listOfNodes
      */
-    public ImmutableList<SignalBoxNode> getListOfNodes() {
-        return listOfNodes;
+    public List<SignalBoxNode> getListOfNodes() {
+        return data.getListOfNodes();
+    }
+
+    public List<SignalBoxNode> getProtectionWayNodes() {
+        return data.getProtectionWayNodes();
     }
 
     /**
      * @return the emptyOrBroken
      */
     public boolean isEmptyOrBroken() {
-        return emptyOrBroken;
+        return data.isEmptyOrBroken();
     }
 
     public boolean isShuntingPath() {
-        return type.equals(PathType.SHUNTING);
+        return data.getPathType().equals(PathType.SHUNTING);
     }
 }

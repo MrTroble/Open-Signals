@@ -249,8 +249,7 @@ public class GuiSignalController extends GuiBase {
         final UIEntity titel = new UIEntity();
         titel.add(new UIScale(1.2f, 1.2f, 1));
         titel.add(titlelabel);
-        titel.setInheritHeight(true);
-        titel.setInheritWidth(true);
+        titel.setInherits(true);
 
         final UIEntity header = new UIEntity();
         header.setInheritWidth(true);
@@ -267,8 +266,7 @@ public class GuiSignalController extends GuiBase {
         header.add(rsMode);
 
         final UIEntity middlePart = new UIEntity();
-        middlePart.setInheritHeight(true);
-        middlePart.setInheritWidth(true);
+        middlePart.setInherits(true);
         middlePart.add(new UIBox(UIBox.VBOX, 4));
         middlePart.add(header);
         middlePart.add(lowerEntity);
@@ -281,14 +279,12 @@ public class GuiSignalController extends GuiBase {
 
     private void addManuellMode() {
         final UIEntity list = new UIEntity();
-        list.setInheritHeight(true);
-        list.setInheritWidth(true);
+        list.setInherits(true);
         final UIBox vbox = new UIBox(UIBox.VBOX, 1);
         list.add(vbox);
 
         final UIEntity leftSide = new UIEntity();
-        leftSide.setInheritHeight(true);
-        leftSide.setInheritWidth(true);
+        leftSide.setInherits(true);
         leftSide.add(list);
         leftSide.add(GuiElements.createPageSelect(vbox));
         leftSide.add(new UIBox(UIBox.VBOX, 5));

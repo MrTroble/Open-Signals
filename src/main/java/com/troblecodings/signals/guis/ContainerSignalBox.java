@@ -17,6 +17,7 @@ import com.troblecodings.guilib.ecs.GuiInfo;
 import com.troblecodings.guilib.ecs.interfaces.UIClientSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryState;
@@ -346,20 +347,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             case REQUEST_PW: {
                 final Point start = Point.of(buffer);
                 final Point end = Point.of(buffer);
-                if (grid.getNode(end).containsOutConnection()) {
-                    final PathwayRequestResult request = SignalBoxHandler
-                            .requesetInterSignalBoxPathway(new StateInfo(info.world, info.pos),
-                                    start, end);
-                    if (!request.isPass()) {
-                        final WriteBuffer error = new WriteBuffer();
-                        error.putEnumValue(SignalBoxNetwork.PW_REQUEST_RESPONSE);
-                        error.putEnumValue(request);
-                        OpenSignalsMain.network.sendTo(info.player, error);
-                    }
-                    break;
-                }
                 final PathwayRequestResult request = grid.requestWay(start, end);
-                if (request != PathwayRequestResult.PASS) {
+                if (!request.isPass()) {
                     if (request.canBeAddedToSaver() && grid.addNextPathway(start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
@@ -421,17 +410,8 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 node.setCustomText(buffer.getString());
                 break;
             }
-            case SEND_SIGNAL_REPEATER: {
-                final Point point = Point.of(buffer);
-                final ModeSet modeSet = ModeSet.of(buffer);
-                final boolean state = buffer.getBoolean();
-                final SignalBoxNode node = tile.getSignalBoxGrid().getNode(point);
-                final Optional<PathOptionEntry> option = node.getOption(modeSet);
-                if (option.isPresent()) {
-                    option.get().setEntry(PathEntryType.SIGNAL_REPEATER, state);
-                } else {
-                    node.addAndSetEntry(modeSet, PathEntryType.SIGNAL_REPEATER, state);
-                }
+            case SEND_BOOL_ENTRY: {
+                deserializeEntry(buffer, buffer.getBoolean());
                 break;
             }
             case REMOVE_SAVEDPW: {
@@ -456,6 +436,15 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
             }
             case RESET_ALL_SIGNALS: {
                 grid.resetAllSignals();
+                break;
+            }
+            case SEND_POSIDENT_LIST: {
+                final List<PosIdentifier> list = new ArrayList<>();
+                final int size = buffer.getInt();
+                for (int i = 0; i < size; i++) {
+                    list.add(PosIdentifier.of(buffer));
+                }
+                deserializeEntry(buffer, list);
                 break;
             }
             default:
