@@ -74,6 +74,7 @@ public class GuiTrainNumber extends GuiBase {
                 .createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e -> {
                     final UIEntity grid = new UIEntity();
                     grid.setInherits(true);
+                    grid.add(new UIBox(UIBox.VBOX, 0));
                     SignalBoxUIHelper.initializeGrid(grid, container.grid, (tile, sbt) -> {
                         final Point name = sbt.getPoint();
                         tile.add(new UIClickable(e1 -> {
