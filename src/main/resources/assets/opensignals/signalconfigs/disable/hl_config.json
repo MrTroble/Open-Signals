@@ -1,0 +1,6 @@
+{
+    "currentSignals": ["hlsignal", "hlsignalbridge"],
+    "values": {
+        "true": [ "mainlightsignallightbar.OFF", "mainlightsignal_distant.HL_STATUS_LIGHT", "mainlightsignal.HL_STATUS_LIGHT", "exitsignal.HL_STATUS_LIGHT", "zs2.OFF", "zs2v.OFF", "blocksignal.HL_STATUS_LIGHT","blockexitsignal.HL_STATUS_LIGHT"]
+    }
+}

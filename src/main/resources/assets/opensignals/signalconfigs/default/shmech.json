@@ -1,5 +1,5 @@
 {
-    "currentSignal": "shmech",
+    "currentSignals": ["shmech"],
     "values": {
         "": ["sh_mech.SH1"]
     }
