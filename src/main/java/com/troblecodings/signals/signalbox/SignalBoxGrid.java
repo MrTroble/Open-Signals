@@ -416,7 +416,6 @@ public class SignalBoxGrid implements INetworkSavable {
             }
             onWayAdd(pathway);
             pathway.postRead(comp);
-            System.out.println("Read out " + pathway + " on " + tile.getPos());
         });
         tag.getList(NEXT_PATHWAYS).forEach(comp -> {
             final Point start = new Point();
