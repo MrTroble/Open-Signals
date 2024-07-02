@@ -601,6 +601,10 @@ public class PathwayData {
         return protectionWayNodes;
     }
 
+    public SignalBoxGrid getGrid() {
+        return grid;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(firstPoint, lastPoint, listOfNodes);

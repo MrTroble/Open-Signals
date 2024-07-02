@@ -14,20 +14,16 @@ import javax.annotation.Nullable;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.TrainNumber;
-import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.handler.SignalBoxHandler;
-import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.config.ConfigInfo;
@@ -42,7 +38,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
+public class SignalBoxPathway implements IChunkLoadable {
 
     protected final PathwayData data;
 
@@ -178,26 +174,6 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
         setSignals(getLastSignalInfo());
     }
 
-    public void registerSignalUpdater() {
-        final SignalStateInfo info = getLastSignalInfo();
-        if (info == null)
-            return;
-        SignalStateHandler.addListener(info, this);
-    }
-
-    public void unregisterSignalUpdater() {
-        final SignalStateInfo info = getLastSignalInfo();
-        if (info == null)
-            return;
-        SignalStateHandler.removeListener(info, this);
-    }
-
-    @Override
-    public void update(final SignalStateInfo info, final Map<SEProperty, String> changedProperties,
-            final ChangedState changedState) {
-        setSignals();
-    }
-
     protected void setSignals(final SignalStateInfo lastSignal) {
         if (isExecutingSignalSet)
             return;
@@ -316,7 +292,8 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
         return returnList;
     }
 
-    protected void updateToNet() {
+    protected void updatePathwayOnGrid() {
+        grid.updatePrevious(this);
         grid.updateToNet(this);
     }
 
@@ -357,7 +334,6 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     }
 
     public void resetAllSignals() {
-        unregisterSignalUpdater();
         resetFirstSignal();
         resetOther();
         isBlocked = true;
@@ -681,6 +657,10 @@ public class SignalBoxPathway implements IChunkLoadable, SignalStateListener {
     }
 
     public boolean isShuntingPath() {
-        return data.getPathType().equals(PathType.SHUNTING);
+        return getPathType().equals(PathType.SHUNTING);
+    }
+
+    public PathType getPathType() {
+        return data.getPathType();
     }
 }

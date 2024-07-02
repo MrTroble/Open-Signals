@@ -101,6 +101,7 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (CURRENTLY_LOADED_STATES) {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
+        updateListeners(info, states, ChangedState.ADDED_TO_FILE);
         new Thread(() -> {
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
@@ -109,7 +110,6 @@ public final class SignalStateHandler implements INetworkSync {
             }
             sendToAll(info, states);
             createToFile(info, states);
-            updateListeners(info, states, ChangedState.ADDED_TO_FILE);
         }, "OSSignalStateHandler:createStates").start();
     }
 
@@ -145,7 +145,8 @@ public final class SignalStateHandler implements INetworkSync {
         synchronized (ALL_LISTENERS) {
             final List<SignalStateListener> listeners = ALL_LISTENERS.computeIfAbsent(info,
                     _u -> new ArrayList<>());
-            listeners.add(listener);
+            if (!listeners.contains(listener))
+                listeners.add(listener);
         }
     }
 
@@ -231,9 +232,9 @@ public final class SignalStateHandler implements INetworkSync {
                 changedProperties.putAll(states);
             }
         }
+        updateListeners(info, changedProperties, ChangedState.UPDATED);
         new Thread(() -> {
             sendToAll(info, changedProperties);
-            updateListeners(info, changedProperties, ChangedState.UPDATED);
             info.signal.getUpdate(info.world, info.pos);
             if (!contains.get())
                 createToFile(info, changedProperties);
