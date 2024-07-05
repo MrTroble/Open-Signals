@@ -43,7 +43,7 @@ curseforge {
   project {
     id = '440990'
     changelog = file('changelog.md')
-    releaseType = 'release'
+    releaseType = 'beta'
     changelogType = 'markdown'
     addGameVersion '1.16.5'
   }
