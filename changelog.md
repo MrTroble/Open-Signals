@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.12.2 - 3.6.0 beta]
+
+* feat: added shunting path to blocked path
+* feat: added possibility to skip signals
+* feat: added system to add distant signals to mainsignals without passing pathway
+* feat: added overlap (protection way) system behind signals
+* feat: added possiblity to rename signal on all blocks
+* feat: ne, ne5 & standalone zs3 to signalbox
+* feat: added standalone zs3
+* feat: added end arrow
+* fix: Intersignalbox pathways
+* fix: more pathway issues
+* fix: issue with delayable-intersignal pathway
+* fix: issue with protection stop
+* fix: signalconfigs, added new system
+* fix: issue with signalcontroller
+* fix: issue with chunkloading
+* ref: changed upadte system to signalstatehandler
+* ref: change pathway backend system
+* ref: better UI
+* ref: better code performance
+* ref: made corner tiles more expensive
+
 ## [1.12.2 - 3.5.0]
 
 * feat: new path finding algorithm
