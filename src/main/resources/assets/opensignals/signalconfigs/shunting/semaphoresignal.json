@@ -1,5 +1,5 @@
 {
-    "currentSignal": "semaphoresignal",
+    "currentSignals": ["semaphoresignal", "semaphoresignalbridge"],
     "values": [
         "wing1.FALSE",
         "wing2.FALSE",

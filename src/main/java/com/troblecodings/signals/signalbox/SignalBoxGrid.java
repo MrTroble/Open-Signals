@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
@@ -54,9 +55,9 @@ public class SignalBoxGrid implements INetworkSavable {
     protected final List<Map.Entry<Point, Point>> nextPathways = new ArrayList<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
     protected final SignalBoxFactory factory;
+    protected SignalBoxTileEntity tile;
     private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     private int counter;
-    private SignalBoxTileEntity tile;
 
     public SignalBoxGrid() {
         this.factory = SignalBoxFactory.getFactory();
@@ -68,7 +69,7 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void onLoad() {
-        startsToPath.values().forEach(pw -> pw.linkPathways());
+        startsToPath.values().forEach(pw -> pw.onLoad());
     }
 
     public void updatePathwayToAutomatic(final Point point) {
@@ -98,6 +99,10 @@ public class SignalBoxGrid implements INetworkSavable {
             return false;
         final SignalBoxPathway pathway = startsToPath.get(p1);
         if (pathway == null) {
+            if (checkManuellResetOfProtectionWay(p1)) {
+                tryNextPathways();
+                return true;
+            }
             OpenSignalsMain.getLogger().warn("No Pathway to reset on [" + p1 + "]!");
             return false;
         }
@@ -108,6 +113,18 @@ public class SignalBoxGrid implements INetworkSavable {
         return true;
     }
 
+    private boolean checkManuellResetOfProtectionWay(final Point p1) {
+        final SignalBoxPathway pathway = endsToPath.get(p1);
+        if (pathway == null)
+            return false;
+        final boolean isReset = pathway.directResetOfProtectionWay();
+        if (isReset) {
+            updateToNet(pathway);
+            pathway.removeProtectionWay();
+        }
+        return isReset;
+    }
+
     protected void resetPathway(final SignalBoxPathway pathway) {
         pathway.resetPathway();
         updatePrevious(pathway);
@@ -115,14 +132,19 @@ public class SignalBoxGrid implements INetworkSavable {
         this.endsToPath.remove(pathway.getLastPoint());
     }
 
-    private void updateToNet(final SignalBoxPathway pathway) {
+    protected void updateToNet(final SignalBoxPathway pathway) {
         if (tile == null || !tile.isBlocked())
             return;
         final List<SignalBoxNode> nodes = pathway.getListOfNodes();
+        final List<SignalBoxNode> protectionWayNodes = pathway.getProtectionWayNodes();
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_PW_UPDATE);
-        buffer.putInt(nodes.size());
+        buffer.putInt(nodes.size() + protectionWayNodes.size());
         nodes.forEach(node -> {
+            node.getPoint().writeNetwork(buffer);
+            node.writeUpdateNetwork(buffer);
+        });
+        protectionWayNodes.forEach(node -> {
             node.getPoint().writeNetwork(buffer);
             node.writeUpdateNetwork(buffer);
         });
@@ -130,51 +152,54 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public PathwayRequestResult requestWay(final Point p1, final Point p2) {
-        if (startsToPath.containsKey(p1) || endsToPath.containsKey(p2))
-            return PathwayRequestResult.ALREADY_USED;
-        final PathwayRequestResult result = SignalBoxUtil.requestPathway(modeGrid, p1, p2);
-        if (result != PathwayRequestResult.PASS)
+        final PathwayRequestResult result = SignalBoxUtil.requestPathway(this, p1, p2);
+        if (!result.isPass())
             return result;
-        final SignalBoxPathway way = result.getPathway();
-        way.setTile(tile);
-        way.deactivateAllOutputsOnPathway();
-        way.setUpdater(pathway -> {
-            updatePrevious(pathway);
-            updateToNet(pathway);
-        });
-        way.setSignalBoxGrid(this);
-        way.setPathStatus(EnumPathUsage.SELECTED);
-        way.updatePathwaySignals();
-        this.onWayAdd(way);
-        updateToNet(way);
+        final PathwayData data = result.getPathwayData();
+        if (data.isEmpty())
+            return PathwayRequestResult.NO_PATH;
+        if (checkPathwayData(data))
+            return PathwayRequestResult.ALREADY_USED;
+        addPathway(data);
         tile.setChanged();
         return result;
     }
 
-    private void updatePrevious(final SignalBoxPathway pathway) {
+    private boolean checkPathwayData(final PathwayData data) {
+        return startsToPath.containsKey(data.getFirstPoint())
+                || endsToPath.containsKey(data.getLastPoint());
+    }
+
+    protected void addPathway(final PathwayData data) {
+        final SignalBoxPathway way = data.createPathway();
+        way.setTile(tile);
+        way.deactivateAllOutputsOnPathway();
+        way.setSignalBoxGrid(this);
+        way.setPathStatus(EnumPathUsage.SELECTED);
+        way.updatePathwaySignals();
+        onWayAdd(way);
+        updateToNet(way);
+    }
+
+    protected void updatePrevious(final SignalBoxPathway pathway) {
         SignalBoxPathway previousPath = pathway;
         int count = 0;
         while ((previousPath = endsToPath.get(previousPath.getFirstPoint())) != null) {
             if (count > endsToPath.size()) {
-                OpenSignalsMain.getLogger().error("Detected signalpath cycle, aborting!");
-                startsToPath.values().forEach(path -> {
-                    path.resetPathway();
-                    updateToNet(path);
-                });
-                this.clearPaths();
                 break;
             }
             previousPath.setSignals();
             count++;
         }
         if (count == 0) {
-            if (OpenSignalsMain.isDebug())
+            if (OpenSignalsMain.isDebug()) {
                 OpenSignalsMain.getLogger().debug("Could not find previous! " + pathway);
+            }
         }
     }
 
     public void resetAllPathways() {
-        this.startsToPath.values().forEach(pathway -> pathway.resetPathway());
+        ImmutableSet.copyOf(this.startsToPath.values()).forEach(this::resetPathway);
         clearPaths();
     }
 
@@ -197,11 +222,6 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public List<Point> getAllInConnections() {
         return modeGrid.values().stream().filter(SignalBoxNode::containsInConnection)
-                .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
-    }
-
-    public List<Point> getValidStarts() {
-        return modeGrid.values().stream().filter(SignalBoxNode::isValidStart)
                 .map(SignalBoxNode::getPoint).collect(Collectors.toUnmodifiableList());
     }
 
@@ -249,6 +269,10 @@ public class SignalBoxGrid implements INetworkSavable {
                     this.startsToPath.remove(first);
                     this.startsToPath.put(pathway.getFirstPoint(), pathway);
                 }
+            }
+            if (pathway.checkResetOfProtectionWay(pos)) {
+                updateToNet(pathway);
+                pathway.removeProtectionWay();
             }
         });
         tryNextPathways();
@@ -378,16 +402,12 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void readPathways(final NBTWrapper tag) {
-        final SignalBoxFactory factory = SignalBoxFactory.getFactory();
         if (!tag.contains(PATHWAY_LIST))
             return;
         clearPaths();
         tag.getList(PATHWAY_LIST).forEach(comp -> {
-            final SignalBoxPathway pathway = factory.getPathway(modeGrid);
-            pathway.setUpdater(way -> {
-                updatePrevious(way);
-                updateToNet(way);
-            });
+            final PathwayData data = PathwayData.of(this, comp);
+            final SignalBoxPathway pathway = data.createPathway();
             pathway.setSignalBoxGrid(this);
             pathway.setTile(tile);
             pathway.read(comp);
@@ -397,7 +417,7 @@ public class SignalBoxGrid implements INetworkSavable {
                 return;
             }
             onWayAdd(pathway);
-            pathway.readLinkedPathways(comp);
+            pathway.postRead(comp);
         });
         tag.getList(NEXT_PATHWAYS).forEach(comp -> {
             final Point start = new Point();
@@ -436,10 +456,6 @@ public class SignalBoxGrid implements INetworkSavable {
         return modeGrid.get(point);
     }
 
-    public boolean containsNode(final Point point) {
-        return modeGrid.containsKey(point);
-    }
-
     public List<SignalBoxNode> getNodes() {
         return ImmutableList.copyOf(this.modeGrid.values());
     }
@@ -466,10 +482,6 @@ public class SignalBoxGrid implements INetworkSavable {
 
     protected Map<Point, SignalBoxNode> getModeGrid() {
         return modeGrid;
-    }
-
-    public void putNode(final Point point, final SignalBoxNode node) {
-        modeGrid.put(point, node);
     }
 
     public void putAllNodes(final Map<Point, SignalBoxNode> nodes) {

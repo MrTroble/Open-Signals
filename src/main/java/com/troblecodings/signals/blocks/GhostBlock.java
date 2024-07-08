@@ -7,15 +7,19 @@ import com.troblecodings.signals.models.CustomModelLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -68,5 +72,15 @@ public class GhostBlock extends BasicBlock {
     public ItemStack getCloneItemStack(final BlockState state, final HitResult target,
             final BlockGetter level, final BlockPos pos, final Player player) {
         return ItemStack.EMPTY;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public InteractionResult use(final BlockState state, final Level world, final BlockPos pos,
+            final Player player, final InteractionHand hand, final BlockHitResult result) {
+        final BlockPos lowerPos = pos.below();
+        final BlockState lowerState = world.getBlockState(lowerPos);
+        return lowerState.getBlock().use(lowerState, world, lowerPos, player, hand,
+                result.withPosition(lowerPos));
     }
 }

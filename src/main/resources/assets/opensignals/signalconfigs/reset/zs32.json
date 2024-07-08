@@ -1,0 +1,6 @@
+{
+    "currentSignals": ["zs32"],
+    "values": {
+        "true": ["zs3.OFF", "zs3v.OFF", "zs2.OFF", "zs2v.OFF"]
+    }
+}

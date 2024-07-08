@@ -1,6 +1,6 @@
 {
-    "currentSignal": "hvsignal",
-    "nextSignal": "hvsignal",
+    "currentSignals": ["hvsignal", "hvsignalbridge"],
+    "nextSignals": ["hvsignal", "hvsignalbridge"],
     "savedPredicates": {
         "stop": "config(stopsignal.HP0) || config(stopsignal.SHUNTING) || config(hphome.HP0) || config(hphome.HP0_ALTERNATE_RED) || config(hpblock.HP0)",
         "drive": "config(stopsignal.HP1) || config(hphome.HP1) || config(hpblock.HP1)",
