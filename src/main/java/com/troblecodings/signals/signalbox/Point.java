@@ -55,6 +55,11 @@ public class Point implements INetworkSavable {
         return new Point(buffer.getByteToUnsignedInt(), buffer.getByteToUnsignedInt());
     }
 
+    public static Point of(final NBTWrapper tag) {
+        return new Point(Byte.toUnsignedInt(tag.getByte("x")),
+                Byte.toUnsignedInt(tag.getByte("y")));
+    }
+
     @Override
     public boolean equals(final Object obj) {
         if (obj == null || !(obj instanceof Point))

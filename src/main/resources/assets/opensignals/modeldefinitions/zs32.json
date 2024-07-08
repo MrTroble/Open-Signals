@@ -1,0 +1,178 @@
+{
+    "models": {
+        "ks/ks_base": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        },
+        "ks/ks_mast1": {
+            "textures": [
+                {}
+            ],
+            "y": 1
+        },
+        "ks/ks_mast2": {
+            "textures": [
+                {}
+            ],
+            "y": 2
+        },
+        "ks/ks_mast3": {
+            "textures": [
+                {}
+            ],
+            "y": 3
+        },
+        "ks/ks_mast4": {
+            "textures": [
+                {}
+            ],
+            "y": 4
+        },
+        "ks/ks_zs2": {
+            "textures": [
+                {
+                    "blockstate": "",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS3": "overlay"
+                        }
+                    }
+                },
+                {
+                    "blockstate": "has(ZS3)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2": "overlay"
+                        }
+                    },
+                    "y": -0.625
+                },
+                {
+                    "blockstate": "!has(ZS3)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2": "overlay"
+                        }
+                    },
+                    "y": 0
+                }
+            ],
+            "y": 4.125
+        },
+        "ks/ks_zs2v": {
+            "textures": [
+                {
+                    "blockstate": "has(ZS3) && has(ZS2)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS3V": "overlay"
+                        }
+                    },
+                    "y": -1.25
+                },
+                {
+                    "blockstate": "has(ZS3) && !has(ZS2)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS3V": "overlay"
+                        }
+                    },
+                    "y": -0.625
+                },
+                {
+                    "blockstate": "!has(ZS3) && has(ZS2)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS3V": "overlay"
+                        }
+                    },
+                    "y": -0.625
+                },
+                {
+                    "blockstate": "!has(ZS3) && !has(ZS2)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS3V": "overlay"
+                        }
+                    },
+                    "y": 0
+                },
+                {
+                    "blockstate": "has(ZS3) && has(ZS2) && has(ZS3V)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    },
+                    "y": -1.875
+                },
+                {
+                    "blockstate": "has(ZS3) && has(ZS2) && !has(ZS3V)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    },
+                    "y": -1.25
+                },
+                {
+                    "blockstate": "has(ZS3) && !has(ZS2) && has(ZS3V)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    },
+                    "y": -1.25
+                },
+                {
+                    "blockstate": "!has(ZS3) && has(ZS2) && has(ZS3V)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    },
+                    "y": -1.25
+                },
+                {
+                    "blockstate": "has(ZS3) && !has(ZS2) && !has(ZS3V)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    },
+                    "y": -0.625
+                },
+                {
+                    "blockstate": "!has(ZS3) && has(ZS2) && !has(ZS3V)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    },
+                    "y": -0.625
+                },
+                {
+                    "blockstate": "!has(ZS3) && !has(ZS2) && has(ZS3V)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    },
+                    "y": -0.625
+                },
+                {
+                    "blockstate": "!has(ZS3) && !has(ZS2) && !has(ZS3V)",
+                    "extentions": {
+                        "zs32.json": {
+                            "ZS2V": "overlay"
+                        }
+                    },
+                    "y": 0
+                }
+            ],
+            "y": 4.125
+        }
+    }
+}

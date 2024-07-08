@@ -10,18 +10,12 @@ import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UITextInput;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
-import com.troblecodings.guilib.ecs.entitys.input.UIDrag;
-import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
-import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
-import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
-import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.guis.ContainerTrainNumber.TrainNumberNetwork;
 import com.troblecodings.signals.signalbox.Point;
-import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.math.BlockPos;
@@ -87,7 +81,20 @@ public class GuiTrainNumber extends GuiBase {
                 .createButton(I18Wrapper.format("gui.trainnumber.setpoint"), e -> {
                     final UIEntity grid = new UIEntity();
                     grid.setInherits(true);
-                    initializeGrid(grid);
+                    grid.add(new UIBox(UIBox.VBOX, 0));
+                    SignalBoxUIHelper.initializeGrid(grid, container.grid, (tile, sbt) -> {
+                        final Point name = sbt.getPoint();
+                        tile.add(new UIClickable(e1 -> {
+                            if (sbt.getNode().isEmpty())
+                                return;
+                            container.setPoint = name;
+                            sendNewPoint();
+                            pop();
+                        }));
+                        if (name.equals(container.setPoint)) {
+                            tile.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
+                        }
+                    });
                     push(GuiElements.createScreen(screen -> screen.add(grid)));
                 });
         changeButton.add(new UIToolTip(I18Wrapper.format("gui.trainnumber.setpoint.desc")));
@@ -103,74 +110,6 @@ public class GuiTrainNumber extends GuiBase {
                                         : pos.getX() + ", " + pos.getY() + ", " + pos.getZ()),
                                 1.2f));
         entity.add(inner);
-    }
-
-    private void initializeGrid(final UIEntity lowerEntity) {
-        final UIEntity splitter = new UIEntity();
-        splitter.setInherits(true);
-        final UIEntity plane = new UIEntity();
-        plane.setWidth(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
-        plane.setHeight(GuiSignalBox.TILE_COUNT * GuiSignalBox.TILE_WIDTH);
-        splitter.add(new UIScroll(s -> {
-            final float newScale = (float) (plane.getScaleX() + s * 0.001f);
-            if (newScale <= 0)
-                return;
-            plane.setScaleX(newScale);
-            plane.setScaleY(newScale);
-            plane.update();
-        }));
-        splitter.add(new UIDrag((x, y) -> {
-            plane.setX(plane.getX() + x);
-            plane.setY(plane.getY() + y);
-            plane.update();
-        }, 2));
-        plane.add(new UIBox(UIBox.VBOX, 0).setPageable(false));
-        for (int x = 0; x < GuiSignalBox.TILE_COUNT; x++) {
-            final UIEntity row = new UIEntity();
-            row.add(new UIBox(UIBox.HBOX, 0).setPageable(false));
-            row.setHeight(GuiSignalBox.TILE_WIDTH);
-            row.setWidth(GuiSignalBox.TILE_WIDTH);
-            for (int y = 0; y < GuiSignalBox.TILE_COUNT; y++) {
-                final UIEntity tile = new UIEntity();
-                tile.setHeight(GuiSignalBox.TILE_WIDTH);
-                tile.setWidth(GuiSignalBox.TILE_WIDTH);
-                final Point name = new Point(y, x);
-                SignalBoxNode node = container.grid.getNode(name);
-                if (node == null) {
-                    node = new SignalBoxNode(name);
-                }
-                final UISignalBoxTile sbt = new UISignalBoxTile(node);
-                tile.add(sbt);
-                if (!node.getCustomText().isEmpty()) {
-                    final UIEntity inputEntity = new UIEntity();
-                    inputEntity.add(new UIScale(0.7f, 0.7f, 0.7f));
-                    final UILabel label = new UILabel(node.getCustomText());
-                    label.setTextColor(0xFFFFFFFF);
-                    inputEntity.add(label);
-                    inputEntity.setX(5);
-                    tile.add(inputEntity);
-                }
-                final SignalBoxNode finalNode = node;
-                tile.add(new UIClickable(e -> {
-                    if (finalNode.isEmpty())
-                        return;
-                    container.setPoint = name;
-                    sendNewPoint();
-                    pop();
-                }));
-                if (name.equals(container.setPoint)) {
-                    tile.add(new UIColor(GuiSignalBox.SELECTION_COLOR));
-                }
-                row.add(tile);
-            }
-            plane.add(row);
-        }
-        splitter.add(new UIScissor());
-        splitter.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
-        splitter.add(new UIBorder(0xFF000000, 4));
-        splitter.add(plane);
-        lowerEntity.add(new UIBox(UIBox.HBOX, 2));
-        lowerEntity.add(splitter);
     }
 
     @Override

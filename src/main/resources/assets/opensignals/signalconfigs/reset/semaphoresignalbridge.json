@@ -1,5 +1,5 @@
 {
-    "currentSignal": "semaphoresignalbridge",
+    "currentSignals": ["semaphoresignalbridge"],
     "values": {
         "true": [
             "zs3.OFF",

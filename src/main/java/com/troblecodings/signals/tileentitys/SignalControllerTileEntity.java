@@ -63,6 +63,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private static final String ENUM_MODE = "enummode";
     private static final String LINKED_RS_INPUT = "linkedrsinput";
     private static final String RS_INPUT_PROFILE = "rsinputprofile";
+    private static final String RS_BOOLEAN = "rs_boolean";
 
     public SignalControllerTileEntity() {
         super();
@@ -148,6 +149,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             final NBTWrapper comp = new NBTWrapper();
             enabledStates.get(direction)
                     .forEach((state, profile) -> comp.putInteger(state.getNameWrapper(), profile));
+            final NBTWrapper rsBool = new NBTWrapper();
+            rsBool.putBoolean(RS_BOOLEAN, currentStates[direction.ordinal()]);
+            comp.putWrapper(RS_BOOLEAN, rsBool);
             wrapper.putWrapper(direction.getName(), comp);
         }
         final List<NBTWrapper> list = new ArrayList<>();
@@ -181,9 +185,14 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             final Map<EnumState, Byte> map = new HashMap<>();
             comp.keySet().stream().forEach(str -> {
                 final EnumState state = EnumState.of(str);
+                if (state == null)
+                    return;
                 map.put(state, (byte) comp.getInteger(state.getNameWrapper()));
             });
             enabledStates.put(direction, map);
+            if (comp.contains(RS_BOOLEAN))
+                currentStates[direction.ordinal()] = comp.getWrapper(RS_BOOLEAN)
+                        .getBoolean(RS_BOOLEAN);
         }
         final List<NBTWrapper> list = wrapper.getList(ALLSTATES);
         final List<SEProperty> properites = linkedSignal == null ? new ArrayList<>()
@@ -253,7 +262,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             unlink();
             linkedSignalPosition = pos;
             linkedSignal = (Signal) block;
-            SignalStateHandler.addListener(new SignalStateInfo(world, pos, linkedSignal), listener);
+            onLoad();
             return true;
         } else if (block instanceof RedstoneInput) {
             linkedRSInput = pos;

@@ -1,5 +1,5 @@
 {
-    "currentSignal": "hvsignal",
+    "currentSignals": ["hvsignal", "hvsignalbridge"],
     "values": {
         "speed(<.1) || speed(>.15)": ["stopsignal.HP1", "hphome.HP1", "hpblock.HP1"],
         "speed(==.1)": ["zs3.Z1", "stopsignal.HP2", "hphome.HP2", "hpblock.HP1"],

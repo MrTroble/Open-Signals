@@ -28,9 +28,19 @@ public class UISignalBoxTile extends UIComponentEntity {
     public static final ResourceLocation ICON = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/symbols.png");
     public static final ResourceLocation ARROW_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/connection.png");
+            "gui/textures/arrow.png");
+    public static final ResourceLocation INCOMING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/connection_in.png");
+    public static final ResourceLocation OUTGOING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/connection_out.png");
     public static final ResourceLocation SIGNALS = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/signals.png");
+    public static final ResourceLocation NE1_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/ne1.png");
+    public static final ResourceLocation NE5_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/ne5.png");
+    public static final ResourceLocation ZS3_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/zs3.png");
 
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
@@ -40,8 +50,9 @@ public class UISignalBoxTile extends UIComponentEntity {
     public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
         this.node = node;
-        if (this.node != null)
+        if (this.node != null) {
             this.node.forEach(this::localAdd);
+        }
     }
 
     public void setGreenSignals(final List<MainSignalIdentifier> list) {
@@ -55,16 +66,19 @@ public class UISignalBoxTile extends UIComponentEntity {
     public void updateModeSet(final ModeSet mode) {
         localRemove(mode);
         localAdd(mode);
-        if (hasParent())
+        if (hasParent()) {
             update();
+        }
     }
 
     public void setNode(final SignalBoxNode node) {
-        if (this.node != null)
+        if (this.node != null) {
             this.node.forEach(this::localRemove);
+        }
         this.node = node;
-        if (this.node != null)
+        if (this.node != null) {
             this.node.forEach(this::localAdd);
+        }
     }
 
     private void localAdd(final ModeSet modeSet) {
@@ -153,12 +167,12 @@ public class UISignalBoxTile extends UIComponentEntity {
         this.localRemove(modeSet);
     }
 
-    public boolean isValidEnd() {
-        return this.node.isValidEnd();
-    }
-
     public boolean isValidStart() {
         return this.node.isValidStart();
+    }
+
+    public boolean isValidEnd() {
+        return this.node.isValidEnd();
     }
 
     public Point getPoint() {
@@ -171,15 +185,17 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     public void setColor(final ModeSet mode, final int color) {
         final UIEntity entity = setToEntity.get(mode);
-        if (entity != null)
+        if (entity != null) {
             entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
+        }
     }
 
     public void updateTrainNumber() {
         this.getParent().remove(uiTrainNumber);
         final TrainNumber number = this.node.getTrainNumber();
         uiTrainNumber.setTrainNumber(number);
-        if (!number.trainNumber.isEmpty())
+        if (!number.trainNumber.isEmpty()) {
             this.getParent().add(uiTrainNumber);
+        }
     }
 }

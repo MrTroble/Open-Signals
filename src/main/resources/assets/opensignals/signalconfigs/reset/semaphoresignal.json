@@ -1,5 +1,5 @@
 {
-    "currentSignal": "semaphoresignal",
+    "currentSignals": ["semaphoresignal"],
     "values": {
         "true": [
             "semavr.VR0",
