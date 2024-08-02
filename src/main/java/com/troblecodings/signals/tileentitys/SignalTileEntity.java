@@ -10,7 +10,6 @@ import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.blocks.Signal;
-import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.StateInfo;
@@ -26,8 +25,11 @@ import net.minecraftforge.client.model.data.IModelData;
 
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
+    public float animProgress;
+
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
+        animProgress = 0.0F;
     }
 
     private final Map<SEProperty, String> properties = new HashMap<>();
@@ -65,11 +67,8 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         signal.renderOverlay(info.with(this));
     }
 
-    public void renderAnimation(final RenderAnimationInfo info) {
-        final Signal signal = getSignal();
-        if (signal == null)
-            return;
-        signal.renderAnimation(info.with(this));
+    public void updateAnim() {
+        ++animProgress;
     }
 
     @Override
