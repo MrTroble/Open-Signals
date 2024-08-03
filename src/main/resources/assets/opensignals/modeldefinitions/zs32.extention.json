@@ -51,6 +51,7 @@
         "ZS8": "opensignals:blocks/zs3/zs8",
         "ZS13": "opensignals:blocks/zs3/zs13",
         "ZP8": "opensignals:blocks/zs3/zp8",
-        "ZP9": "opensignals:blocks/zs3/zp9"
+        "ZP9": "opensignals:blocks/zs3/zp9",
+        "ZP9_LINE": "opensignals:blocks/zs3/zp9_line"
     }
 }

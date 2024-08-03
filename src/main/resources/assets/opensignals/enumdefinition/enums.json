@@ -82,7 +82,8 @@
         "ZS8",
         "ZS13",
         "ZP8",
-        "ZP9"
+        "ZP9",
+        "ZP9_LINE"
     ],
     "MastSignal": [
         "OFF",
