@@ -22,7 +22,6 @@ import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -45,10 +44,19 @@ public class GhostBlock extends BasicBlock {
         return RenderShape.INVISIBLE;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getShape(final BlockState state, final BlockGetter getter, final BlockPos pos,
             final CollisionContext context) {
-        return Shapes.block();
+        final BlockPos lowerPos = pos.below();
+        final BlockState lowerState = getter.getBlockState(lowerPos);
+        return lowerState.getBlock().getShape(lowerState, getter, lowerPos, context).move(0, -1, 0);
+    }
+
+    @Override
+    public VoxelShape getCollisionShape(final BlockState state, final BlockGetter getter,
+            final BlockPos pos, final CollisionContext context) {
+        return getShape(state, getter, pos, context);
     }
 
     @Override
