@@ -368,6 +368,15 @@
 			],
 			"y": 0
 		},
+		"hv/hv_ne2": {
+			"textures": [
+				{
+					"blockstate": "with(SEMATYPE.DIST) && hasandis(ne2)"
+				}
+			],
+			"y": -0.0625,
+			"z": -0.0625 
+		},
 		"semaphore_signals/sema_distant_mast1": {
 			"textures": [
 				{
