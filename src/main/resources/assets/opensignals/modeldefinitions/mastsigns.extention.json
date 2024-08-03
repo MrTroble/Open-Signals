@@ -2,6 +2,7 @@
     "extention": {
         "WRW": "opensignals:blocks/mast_sign/wrw",
         "WYWYW": "opensignals:blocks/mast_sign/wywyw",
-        "WBWBW": "opensignals:blocks/mast_sign/wbwbw"
+        "WBWBW": "opensignals:blocks/mast_sign/wbwbw",
+        "BLACK_DOTS": "opensignals:blocks/mast_sign/black_dots"
     }
 }
