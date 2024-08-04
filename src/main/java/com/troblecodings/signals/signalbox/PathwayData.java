@@ -142,6 +142,9 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
+            if (current.isUsed()) {
+                return false;
+            }
         }
         return true;
     }
