@@ -382,7 +382,7 @@ public class SidePanel {
             helpList.add(reset);
 
             final List<UIEntity> manuellOutputs = new ArrayList<>();
-            final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
+            final boolean canBeManuelChanged = !node.isUsed();
             boolean isPathBlocked = false;
 
             for (final Map.Entry<ModeSet, PathOptionEntry> mapEntry : modes.entrySet()) {
@@ -470,15 +470,6 @@ public class SidePanel {
                     entity.add(new UIToolTip(I18Wrapper.format("btn.subsidiary.desc")));
 
                 } else if (option.containsEntry(PathEntryType.OUTPUT)) {
-                    if (canBeManuelChanged.get())
-                        for (final Map.Entry<ModeSet, PathOptionEntry> entry : modes.entrySet()) {
-                            final Optional<EnumPathUsage> usage = entry.getValue()
-                                    .getEntry(PathEntryType.PATHUSAGE);
-                            if (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)) {
-                                canBeManuelChanged.set(false);
-                                break;
-                            }
-                        }
                     final UILabel currentStatus = new UILabel(I18Wrapper.format("info.usage.status")
                             + " : " + I18Wrapper.format("info.usage.status.free"));
                     currentStatus.setTextColor(new UIEntity().getBasicTextColor());
@@ -508,7 +499,7 @@ public class SidePanel {
                                         textureEntity.setX(120);
                                         textureEntity.add(new UIToolTip(
                                                 I18Wrapper.format("info.usage.rs.desc")));
-                                        if (canBeManuelChanged.get()) {
+                                        if (canBeManuelChanged) {
                                             if (node.containsManuellOutput(mode)) {
                                                 textureEntity.add(
                                                         new UITexture(GuiSignalBox.REDSTONE_ON));
@@ -540,7 +531,7 @@ public class SidePanel {
                                         outputEntity.setHeight(20);
                                         outputEntity.add(outputStatus);
                                         info.add(outputEntity);
-                                        if (canBeManuelChanged.get()) {
+                                        if (canBeManuelChanged) {
                                             info.add(GuiElements.createButton(
                                                     I18Wrapper.format("info.usage.change"), i -> {
                                                         final boolean turnOff = node

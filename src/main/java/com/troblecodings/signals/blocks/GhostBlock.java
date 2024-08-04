@@ -34,6 +34,21 @@ public class GhostBlock extends BasicBlock {
         return 1.0F;
     }
 
+    @SuppressWarnings("deprecation")
+    @Override
+    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
+            final BlockPos pos) {
+        final BlockPos downPos = pos.down();
+        final Block lowerBlock = source.getBlockState(downPos).getBlock();
+        return lowerBlock.getBoundingBox(state, source, downPos).offset(0, -1, 0);
+    }
+
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(final IBlockState blockState,
+            final IBlockAccess worldIn, final BlockPos pos) {
+        return getBoundingBox(blockState, worldIn, pos);
+    }
+
     @Override
     public ItemStack getPickBlock(final IBlockState state, final RayTraceResult target,
             final World world, final BlockPos pos, final EntityPlayer player) {
@@ -56,12 +71,6 @@ public class GhostBlock extends BasicBlock {
     @Override
     public EnumBlockRenderType getRenderType(final IBlockState state) {
         return EnumBlockRenderType.INVISIBLE;
-    }
-
-    @Override
-    public AxisAlignedBB getBoundingBox(final IBlockState state, final IBlockAccess source,
-            final BlockPos pos) {
-        return Block.FULL_BLOCK_AABB;
     }
 
     @Override

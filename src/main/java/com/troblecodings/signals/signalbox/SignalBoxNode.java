@@ -18,6 +18,7 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.PathIdentifier;
@@ -271,6 +272,16 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             }
         }
         return PathwayRequestResult.PASS;
+    }
+
+    public boolean isUsed() {
+        for (final PathOptionEntry entry : possibleModes.values()) {
+            if (!entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE)
+                    .equals(EnumPathUsage.FREE)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean containsManuellOutput(final ModeSet mode) {
