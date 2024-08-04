@@ -658,5 +658,11 @@
 	"info.usage.savedpathways.desc": "Hier werden alle eingespeicherten Fahrstraßen aufgelistet. Du kannst dir die Fahrstraßen anzeigen lassen oder löschen.",
     "property.prop.INPUT.protectionway_reset.name": "Durchrutschweg zurücksetzen",
 	"property.prop.INPUT.protectionway_reset.desc": "Wähle ein Redstone Input aus, welcher die Durchrutschweg-Zurücksetzung ansteuert.",
-    "property.value.BLACK_DOTS": "Schwarze Punkte"
+    "property.value.BLACK_DOTS": "Schwarze Punkte",
+	"property.value.KS_STOPSIGNAL_LEFT": "Mehrabschnittssignal Links",
+	"property.value.KS_STOPSIGNAL_RIGHT": "Mehrabschnittssignal Rechts",
+	"property.value.KS_MAIN_LEFT": "Ausfahrsignal links",
+	"property.value.KS_MAIN_RIGHT": "Ausfahrsignal rechts",
+	"property.value.DISTANT_LEFT": "Vorsignal links",
+	"property.value.DISTANT_RIGHT": "Vorsignal rechts"
 }

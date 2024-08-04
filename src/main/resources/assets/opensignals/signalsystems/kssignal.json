@@ -9,7 +9,8 @@
             16761344
         ],
         "renderHeights": {
-            "config(KOMBITYPE.DISTANT)": -1
+            "config(KOMBITYPE.DISTANT) || config(KOMBITYPE.DISTANT_LEFT) || config(KOMBITYPE.DISTANT_RIGHT)": -1,
+            "config(KOMBITYPE.KS_STOPSIGNAL_LEFT) || config(KOMBITYPE.KS_STOPSIGNAL_RIGHT) || config(KOMBITYPE.KS_MAIN_LEFT) || config(KOMBITYPE.KS_MAIN_RIGHT)": 3.95
         }
     },
     "seProperties": [
@@ -25,7 +26,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "config(KOMBITYPE.KS_STOPSIGNAL)"
+            "dependencies": "config(KOMBITYPE.KS_STOPSIGNAL) || config(KOMBITYPE.KS_STOPSIGNAL_LEFT) || config(KOMBITYPE.KS_STOPSIGNAL_RIGHT)"
         },
         {
             "name": "kombisignal_main",
@@ -33,7 +34,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "config(KOMBITYPE.KS_MAIN)"
+            "dependencies": "config(KOMBITYPE.KS_MAIN) || config(KOMBITYPE.KS_MAIN_LEFT) || config(KOMBITYPE.KS_MAIN_RIGHT)"
         },
         {
             "name": "kombisignal_distant",
@@ -41,7 +42,7 @@
             "defaultState": "OFF",
             "changeableStage": "APISTAGE_NONE_CONFIG",
             "autoname": true,
-            "dependencies": "config(KOMBITYPE.DISTANT)"
+            "dependencies": "config(KOMBITYPE.DISTANT) || config(KOMBITYPE.DISTANT_LEFT) || config(KOMBITYPE.DISTANT_RIGHT)"
         },
         {
             "name": "mastsign",

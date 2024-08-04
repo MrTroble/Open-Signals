@@ -658,5 +658,11 @@
 	"info.usage.savedpathways.desc": "All saved pathways are listed here. You can display or delete the pathways.",
 	"property.prop.INPUT.protectionway_reset.name": "Overlap reset",
 	"property.prop.INPUT.protectionway_reset.desc": "Select a redstone input which will trigger the overlap reset.",
-	"property.value.BLACK_DOTS": "Black Dots"
+	"property.value.BLACK_DOTS": "Black Dots",
+	"property.value.KS_STOPSIGNAL_LEFT": "Multi-section signal left",
+	"property.value.KS_STOPSIGNAL_RIGHT": "Multi-section signal right",
+	"property.value.KS_MAIN_LEFT": "Exit signal left",
+	"property.value.KS_MAIN_RIGHT": "Exit signal right",
+	"property.value.DISTANT_LEFT": "Distant signal left",
+	"property.value.DISTANT_RIGHT": "Distant signal right"
 }
