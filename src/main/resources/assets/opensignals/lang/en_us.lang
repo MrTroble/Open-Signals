@@ -659,3 +659,4 @@ property.reset_protectionway_delay.desc=
 info.usage.savedpathways.desc=All saved pathways are listed here. You can display or delete the pathways.
 property.prop.INPUT.protectionway_reset.name=Overlap reset
 property.prop.INPUT.protectionway_reset.desc=Select a redstone input which will trigger the overlap reset.
+tile.postconnectable.name=Connectable Pole

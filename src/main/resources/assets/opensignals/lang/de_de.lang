@@ -660,3 +660,4 @@ property.reset_protectionway_delay.desc=
 info.usage.savedpathways.desc=Hier werden alle eingespeicherten Fahrstraßen aufgelistet. Du kannst dir die Fahrstraßen anzeigen lassen oder löschen.
 property.prop.INPUT.protectionway_reset.name=Durchrutschweg zurücksetzen
 property.prop.INPUT.protectionway_reset.desc=Wähle ein Redstone Input aus, welcher die Durchrutschweg-Zurücksetzung ansteuert.
+tile.postconnectable.name=Verbindungsfähiger Mast
