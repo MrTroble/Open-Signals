@@ -82,19 +82,27 @@
         "ZS8",
         "ZS13",
         "ZP8",
-        "ZP9"
+        "ZP9",
+        "ZP9_LINE"
     ],
     "MastSignal": [
         "OFF",
         "WRW",
         "WYWYW",
-        "WBWBW"
+        "WBWBW",
+        "BLACK_DOTS"
     ],
     "KSType": [
         "OFF",
         "KS_STOPSIGNAL",
         "KS_MAIN",
-        "DISTANT"
+        "DISTANT",
+        "KS_STOPSIGNAL_LEFT",
+        "KS_STOPSIGNAL_RIGHT",
+        "KS_MAIN_LEFT",
+        "KS_MAIN_RIGHT",
+        "DISTANT_LEFT",
+        "DISTANT_RIGHT"
     ],
     "KS": [
         "OFF",

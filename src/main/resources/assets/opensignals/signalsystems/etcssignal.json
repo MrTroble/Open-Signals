@@ -2,7 +2,12 @@
     "systemProperties": {
         "placementToolName": "signplacementtool",
         "canLink": false,
-        "defaultHeight": 3
+        "defaultHeight": 3,
+        "customNameRenderHeight": 3.2,
+        "offsetY": -5,
+        "renderHeights": {
+            "config(ETCS_TYPE.BLOCK)": 3.7
+        }
     },
     "seProperties": [
         {

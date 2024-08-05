@@ -69,6 +69,28 @@
 				}
 			],
 			"y": 0
+		},
+		"sh/sh_light_mast_sign": {
+			"textures": [
+				{
+					"blockstate": "hasandisnot(sh_high)",
+					"extentions": {
+						"mastsigns.json": {
+							"mastsign": "0"
+						}
+					}
+				},
+				{
+					"blockstate": "hasandis(sh_high)",
+					"extentions": {
+						"mastsigns.json": {
+							"mastsign": "0"
+						}
+					},
+					"y": 2
+				}
+			],
+			"y": 0
 		}
 	}
 }
