@@ -93,6 +93,30 @@
                     "retexture": {
                         "2": "opensignals:blocks/bue/auto_het"
                     }
+                },
+                {
+                    "blockstate": "with(BUETYPE.ET)",
+                    "retexture": {
+                        "2": "opensignals:blocks/bue/et"
+                    }
+                },
+                {
+                    "blockstate": "with(BUETYPE.AUTO_ET)",
+                    "retexture": {
+                        "2": "opensignals:blocks/bue/auto_et"
+                    }
+                },
+                {
+                    "blockstate": "with(BUETYPE.BUE_DISTANT)",
+                    "retexture": {
+                        "2": "opensignals:blocks/bue/bue_distant"
+                    }
+                },
+                {
+                    "blockstate": "with(BUETYPE.BUE_IDENTIFICATION)",
+                    "retexture": {
+                        "2": "opensignals:blocks/bue/bue_identification"
+                    }
                 }
             ],
             "y": 1

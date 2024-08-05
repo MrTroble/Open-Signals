@@ -347,7 +347,11 @@
         "BUE4",
         "BUE5",
         "HET",
-        "AUTO_HET"
+        "AUTO_HET",
+        "ET",
+        "AUTO_ET",
+        "BUE_DISTANT",
+        "BUE_IDENTIFICATION"
     ],
     "BUEAdd": [
         "OFF",
@@ -369,7 +373,8 @@
         "RC1",
         "RC2",
         "RC3",
-        "STOP_PROTECTING"
+        "STOP_PROTECTING",
+        "GSMR"
     ],
     "CrossingSign": [
         "OFF",
