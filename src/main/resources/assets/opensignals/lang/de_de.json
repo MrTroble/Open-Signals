@@ -665,5 +665,6 @@
 	"property.value.KS_MAIN_RIGHT": "Ausfahrsignal rechts",
 	"property.value.DISTANT_LEFT": "Vorsignal links",
 	"property.value.DISTANT_RIGHT": "Vorsignal rechts",
-	"block.opensignals.postconnectable": "Verbindungsfähiger Mast"
+	"block.opensignals.postconnectable": "Verbindungsfähiger Mast",
+	"property.value.GSMR": "GSMR Tafel"
 }

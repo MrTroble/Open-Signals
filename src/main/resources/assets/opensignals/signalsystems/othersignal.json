@@ -10,7 +10,8 @@
 		},
 		"renderHeights": {
 			"config(OTHERTYPE.HM)": 2.1,
-			"config(OTHERTYPE.HM2)": 2.1
+			"config(OTHERTYPE.HM2)": 2.1,
+			"config(OTHERTYPE.GSMR)": 2
 		},
 		"signalHeights": {
 			"config(OTHERTYPE.CROSS)": 0,
