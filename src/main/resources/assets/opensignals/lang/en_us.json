@@ -664,5 +664,6 @@
 	"property.value.KS_MAIN_LEFT": "Exit signal left",
 	"property.value.KS_MAIN_RIGHT": "Exit signal right",
 	"property.value.DISTANT_LEFT": "Distant signal left",
-	"property.value.DISTANT_RIGHT": "Distant signal right"
+	"property.value.DISTANT_RIGHT": "Distant signal right",
+	"block.opensignals.postconnectable": "Connectable Pole"
 }
