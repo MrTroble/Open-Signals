@@ -1,0 +1,37 @@
+{
+	"credit": "Made with Blockbench by Mc_Jeronimo",
+	"textures": {
+		"0": "opensignals:blocks/default/shield_gray",
+		"1": "opensignals:blocks/default/shield_black",
+		"3": "opensignals:blocks/other_signals/gsmr",
+		"particle": "opensignals:blocks/default/shield_gray"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 7],
+			"to": [9, 16, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 16], "texture": "#0"},
+				"east": {"uv": [0, 0, 2, 16], "texture": "#0"},
+				"south": {"uv": [0, 0, 2, 16], "texture": "#0"},
+				"west": {"uv": [0, 0, 2, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 2, 2], "texture": "#0"},
+				"down": {"uv": [0, 0, 2, 2], "texture": "#0"}
+			}
+		},
+		{
+			"from": [-1, 6, 6],
+			"to": [21, 20, 7],
+			"rotation": {"angle": 0, "axis": "z", "origin": [11, 13, 8]},
+			"faces": {
+				"north": {"uv": [0, 1, 16, 14], "texture": "#3"},
+				"east": {"uv": [0, 0, 14, 1], "rotation": 270, "texture": "#1"},
+				"south": {"uv": [0, 0, 14, 16], "rotation": 270, "texture": "#1"},
+				"west": {"uv": [0, 0, 14, 1], "rotation": 270, "texture": "#1"},
+				"up": {"uv": [0, 0, 1, 16], "rotation": 270, "texture": "#1"},
+				"down": {"uv": [0, 0, 1, 16], "rotation": 270, "texture": "#1"}
+			}
+		}
+	]
+}

@@ -152,6 +152,14 @@
                 }
             ],
             "y": 1
+        },
+        "other_signals/gsmr": {
+            "textures": [
+                {
+                    "blockstate": "with(OTHERTYPE.GSMR)"
+                }
+            ],
+            "y": 1
         }
     }
 }
