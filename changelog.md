@@ -1,5 +1,22 @@
 # Changelog
 
+## [1.12.2 - 3.6.0]
+
+* feat: added black dots mast sign
+* feat: added different sh light mast signs
+* feat: Ne5 can now start and end of PW
+* feat: added rectangular zs6 signs
+* feat: added ne1 custom text
+* feat: added one signal shape
+* feat: added angled ks signals
+* feat: added connectable post block
+* feat: added bue identification signs
+* fix: issue with doubled entries
+* fix: shunting path can only be set on blocked BW
+* fix: problems with shunting pathways and NPE
+* ref: better handling of null check
+* ref: change zs6 position
+
 ## [1.12.2 - 3.6.0 beta]
 
 * feat: added shunting path to blocked path
