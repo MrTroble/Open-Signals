@@ -19,7 +19,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
 import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IWorld;
 import net.minecraft.world.World;
@@ -44,10 +43,13 @@ public class GhostBlock extends BasicBlock {
         return BlockRenderType.INVISIBLE;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getShape(final BlockState state, final IBlockReader getter,
             final BlockPos pos, final ISelectionContext context) {
-        return VoxelShapes.block();
+        final BlockPos downPos = pos.below();
+        final Block lowerBlock = getter.getBlockState(downPos).getBlock();
+        return lowerBlock.getShape(state, getter, downPos, context).move(0, -1, 0);
     }
 
     @Override

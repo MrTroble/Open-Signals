@@ -24,7 +24,7 @@ public enum EnumGuiMode {
     OUT_CONNECTION((_u) -> new UITexture(UISignalBoxTile.OUTGOING_ICON), PathwayModeType.END),
     ARROW((_u) -> new UITexture(UISignalBoxTile.ARROW_ICON), PathwayModeType.END),
     NE1((_u) -> new UITexture(UISignalBoxTile.NE1_ICON), PathwayModeType.START_END),
-    NE5((_u) -> new UITexture(UISignalBoxTile.NE5_ICON), PathwayModeType.END),
+    NE5((_u) -> new UITexture(UISignalBoxTile.NE5_ICON), PathwayModeType.START_END),
     ZS3((_u) -> new UITexture(UISignalBoxTile.ZS3_ICON), PathwayModeType.NONE);
 
     /**
