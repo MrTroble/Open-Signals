@@ -11,6 +11,7 @@ import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.blocks.GhostBlock;
 import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.Post;
+import com.troblecodings.signals.blocks.PostConnectable;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
@@ -44,6 +45,7 @@ public final class OSBlocks {
     public static final CombinedRedstoneInput COMBI_REDSTONE_INPUT = new CombinedRedstoneInput();
     public static final PathwayRequester PATHWAY_REQUESTER = new PathwayRequester();
     public static final TrainNumberBlock TRAIN_NUMBER_BLOCK = new TrainNumberBlock();
+    public static final PostConnectable POST_CONNECTABLE = new PostConnectable();
 
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 
@@ -56,8 +58,9 @@ public final class OSBlocks {
                 final String name = field.getName().toLowerCase().replace("_", "");
                 try {
                     final Object object = field.get(null);
-                    if (object instanceof BasicBlock)
+                    if (object instanceof BasicBlock) {
                         loadBlock((BasicBlock) object, name);
+                    }
                 } catch (final IllegalArgumentException | IllegalAccessException ex) {
                     ex.printStackTrace();
                 }
@@ -76,39 +79,42 @@ public final class OSBlocks {
         block.setRegistryName(new ResourceLocation(OpenSignalsMain.MODID, name));
         BLOCKS_TO_REGISTER.add(block);
         if (block instanceof Signal) {
-            if (Signal.SIGNALS.containsKey(name)) {
+            if (Signal.SIGNALS.containsKey(name))
                 throw new IllegalArgumentException(
                         "A Signal with the name '" + name + "' alredy exists!");
-            }
             Signal.SIGNALS.put(name, (Signal) block);
         }
     }
 
     @SubscribeEvent
     public static void registerBlock(final RegistryEvent.Register<Block> event) {
-        if (POST.getRegistryName() == null)
+        if (POST.getRegistryName() == null || POST_CONNECTABLE.getRegistryName() == null) {
             OSBlocks.init();
+        }
         final IForgeRegistry<Block> registry = event.getRegistry();
         BLOCKS_TO_REGISTER.forEach(registry::register);
     }
 
     @SubscribeEvent
     public static void registerBlockEntitys(final RegistryEvent.Register<TileEntityType<?>> event) {
-        if (POST.getRegistryName() == null)
+        if (POST.getRegistryName() == null || POST_CONNECTABLE.getRegistryName() == null) {
             OSBlocks.init();
+        }
         final IForgeRegistry<TileEntityType<?>> registry = event.getRegistry();
         BasicBlock.BLOCK_ENTITYS.values().forEach(registry::register);
     }
 
     @SubscribeEvent
     public static void registerItem(final RegistryEvent.Register<Item> event) {
-        if (POST.getRegistryName() == null)
+        if (POST.getRegistryName() == null || POST_CONNECTABLE.getRegistryName() == null) {
             OSBlocks.init();
+        }
         final IForgeRegistry<Item> registry = event.getRegistry();
         BLOCKS_TO_REGISTER.forEach(block -> {
-            if (block.shouldHaveItem())
+            if (block.shouldHaveItem()) {
                 registry.register(new BlockItem(block, new Properties().tab(OSTabs.TAB))
                         .setRegistryName(block.getRegistryName()));
+            }
         });
 
     }

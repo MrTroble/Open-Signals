@@ -1,0 +1,8 @@
+{
+    "currentSignals": ["shlight"],
+    "values": {
+        "true": [
+            "sh_light_bottom.STATUS_LIGHT"
+        ]
+    }
+}

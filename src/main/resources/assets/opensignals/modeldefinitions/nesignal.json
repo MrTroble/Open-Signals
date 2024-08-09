@@ -352,6 +352,15 @@
                 }
             ],
             "y": 0
-        }
+        },
+        "ne/ne1_text": {
+			"textures": [
+				{
+					"blockstate": "hasandis(CUSTOMNAME) && with(NETYPE.NE1)"
+				}
+			],
+			"y": 0.75,
+            "z": -0.095
+		}
     }
 }

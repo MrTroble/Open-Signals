@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.PathIdentifier;
@@ -31,9 +31,6 @@ import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 
 public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
-
-    public static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
-            EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
 
     private final HashMap<Path, ModeSet> possibleConnections = new HashMap<>();
     private final HashMap<ModeSet, PathOptionEntry> possibleModes = new HashMap<>();
@@ -145,6 +142,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                     break;
                 case STRAIGHT:
                 case END:
+                case IN_CONNECTION:
+                case OUT_CONNECTION:
+                case ARROW:
                     switch (mode.rotation) {
                         case NONE:
                         case CLOCKWISE_180:
@@ -160,26 +160,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                             break;
                     }
                     break;
-                case IN_CONNECTION:
-                case OUT_CONNECTION: {
-                    switch (mode.rotation) {
-                        case NONE:
-                        case CLOCKWISE_180: {
-                            p1.translate(1, 0);
-                            p2.translate(-1, 0);
-                            break;
-                        }
-                        case CLOCKWISE_90:
-                        case COUNTERCLOCKWISE_90: {
-                            p1.translate(0, 1);
-                            p2.translate(0, -1);
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                    break;
-                }
                 default:
                     continue;
             }
@@ -282,11 +262,26 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final Rotation rotation = SignalBoxUtil.getRotationFromDelta(path.point1.delta(this.point));
         for (final EnumGuiMode mode : type.getModes()) {
             final ModeSet possibleOverStepping = new ModeSet(mode, rotation);
-            if (this.possibleModes.containsKey(possibleOverStepping))
+            if (this.possibleModes.containsKey(possibleOverStepping)) {
+                final PathOptionEntry option = possibleModes.get(possibleOverStepping);
+                if (option.getEntry(PathEntryType.CAN_BE_OVERSTPEPPED).orElse(false)) {
+                    continue;
+                }
                 return PathwayRequestResult.OVERSTEPPING; // Found another signal on the path that
                                                           // is not the target
+            }
         }
         return PathwayRequestResult.PASS;
+    }
+
+    public boolean isUsed() {
+        for (final PathOptionEntry entry : possibleModes.values()) {
+            if (!entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE)
+                    .equals(EnumPathUsage.FREE)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean containsManuellOutput(final ModeSet mode) {
@@ -321,13 +316,12 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public boolean isValidStart() {
         return this.possibleModes.keySet().stream()
-                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode));
+                .anyMatch(modeSet -> modeSet.mode.getModeType().isValidStart());
     }
 
     public boolean isValidEnd() {
         return this.possibleModes.keySet().stream()
-                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode)
-                        || modeSet.mode.equals(EnumGuiMode.OUT_CONNECTION));
+                .anyMatch(modeSet -> modeSet.mode.getModeType().isValidEnd());
     }
 
     public boolean containsInConnection() {

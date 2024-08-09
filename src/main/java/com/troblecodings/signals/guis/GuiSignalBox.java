@@ -7,7 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -15,7 +14,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
 import com.troblecodings.guilib.ecs.DrawUtil.DisableIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.EnumIntegerable;
 import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
@@ -40,18 +38,18 @@ import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.config.ConfigHandler;
-import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.SubsidiaryHolder;
-import com.troblecodings.signals.core.SubsidiaryState;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
+import com.troblecodings.signals.enums.SignalBoxPage;
 import com.troblecodings.signals.handler.ClientNameHandler;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
@@ -75,6 +73,15 @@ public class GuiSignalBox extends GuiBase {
     public static final int GRID_COLOR = 0xFF5B5B5B;
     public static final int EDIT_COLOR = 0x5000A2FF;
     public static final int OUTPUT_COLOR = 0xffff00;
+
+    public static final ResourceLocation REDSTONE_OFF = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_off.png");
+    public static final ResourceLocation REDSTONE_OFF_BLOCKED = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
+    public static final ResourceLocation REDSTONE_ON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_on.png");
+    public static final ResourceLocation REDSTONE_ON_BLOCKED = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
 
     private static final float[] ALL_LINES = getLines();
     protected static final int TILE_WIDTH = 10;
@@ -101,7 +108,9 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private final UIEntity lowerEntity = new UIEntity();
+    private final UIEntity bottomEntity = new UIEntity();
     protected final ContainerSignalBox container;
+    private SignalBoxPage page = SignalBoxPage.OPERATION;
     private UISignalBoxTile lastTile = null;
     private UIEntity mainButton;
     private final GuiInfo info;
@@ -110,7 +119,7 @@ public class GuiSignalBox extends GuiBase {
     private boolean allPacketsRecived = false;
     protected final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
-    private final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
+    protected final Map<BlockPos, SubsidiaryHolder> enabledSubsidiaries = new HashMap<>();
     private final Map<Point, UIColor> colors = new HashMap<>();
 
     public GuiSignalBox(final GuiInfo info) {
@@ -122,6 +131,10 @@ public class GuiSignalBox extends GuiBase {
         container.setConuterUpdater(this::updateCounter);
         container.setTrainNumberUpdater(this::updateTrainNumber);
         this.info = info;
+    }
+
+    public SignalBoxPage getPage() {
+        return page;
     }
 
     public void infoUpdate(final String errorString) {
@@ -166,14 +179,14 @@ public class GuiSignalBox extends GuiBase {
         this.lastTile = null;
     }
 
-    private void selectLink(final UIEntity parent, final SignalBoxNode node,
+    protected void selectLink(final UIEntity parent, final SignalBoxNode node,
             final PathOptionEntry option, final Set<Entry<BlockPos, LinkType>> entrySet,
             final LinkType type, final PathEntryType<BlockPos> entryType, final EnumGuiMode mode,
             final Rotation rotation) {
         this.selectLink(parent, node, option, entrySet, type, entryType, mode, rotation, "");
     }
 
-    private void selectLink(final UIEntity parent, final SignalBoxNode node,
+    protected void selectLink(final UIEntity parent, final SignalBoxNode node,
             final PathOptionEntry option, final Set<Entry<BlockPos, LinkType>> entrySet,
             final LinkType type, final PathEntryType<BlockPos> entryType, final EnumGuiMode mode,
             final Rotation rotation, final String suffix) {
@@ -216,368 +229,14 @@ public class GuiSignalBox extends GuiBase {
                 : customName, signalPos.getX(), signalPos.getY(), signalPos.getZ());
     }
 
-    private void setupModeSettings(final UIEntity parent, final EnumGuiMode mode,
-            final Rotation rotation, final SignalBoxNode node, final PathOptionEntry option) {
-        final String modeName = I18Wrapper.format("property." + mode.name());
-        final String rotationName = I18Wrapper.format("property." + rotation.name() + ".rotation");
-        final UIEntity entity = new UIEntity();
-        entity.setInheritWidth(true);
-        entity.setHeight(20);
-        entity.add(new UIColor(BACKGROUND_COLOR));
-        entity.add(new UIScale(1.1f, 1.1f, 1));
-        final UILabel modeLabel = new UILabel(modeName + " - " + rotationName);
-        modeLabel.setCenterX(false);
-        entity.add(modeLabel);
-        parent.add(entity);
-        final Set<Entry<BlockPos, LinkType>> entrySet = container.getPositionForTypes().entrySet();
-        final ModeSet modeSet = new ModeSet(mode, rotation);
-
-        switch (mode) {
-            case CORNER:
-            case STRAIGHT: {
-                final EnumPathUsage path = option.getEntry(PathEntryType.PATHUSAGE)
-                        .orElse(EnumPathUsage.FREE);
-                final UIEntity stateEntity = new UIEntity();
-                stateEntity.setInheritWidth(true);
-                stateEntity.setHeight(15);
-                final String pathUsageName = I18Wrapper.format("property.status") + ": ";
-                final String pathUsage = I18Wrapper.format("property." + path);
-                stateEntity.add(new UILabel(pathUsageName + pathUsage));
-                parent.add(stateEntity);
-
-                if (path.equals(EnumPathUsage.BLOCKED)) {
-                    final UIEntity layout = new UIEntity();
-                    layout.add(new UIBox(UIBox.HBOX, 2));
-                    layout.setHeight(20);
-                    layout.setInheritWidth(true);
-                    final UIEntity inputEntity = new UIEntity();
-                    inputEntity.setInheritHeight(true);
-                    inputEntity.setWidth(250);
-                    final UITextInput input = new UITextInput("");
-                    inputEntity.add(input);
-                    inputEntity.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.change")));
-                    layout.add(inputEntity);
-                    final UIEntity save = GuiElements.createButton(I18Wrapper.format("btn.save"),
-                            e -> {
-                                sendTrainNumber(node.getPoint(), input.getText());
-                                input.setText("");
-                            });
-                    save.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.save")));
-                    layout.add(save);
-                    final UIEntity remove = GuiElements.createButton("x",
-                            e -> deleteTrainNumber(node.getPoint()));
-                    remove.add(new UIToolTip(I18Wrapper.format("sb.trainnumber.remove")));
-                    layout.add(remove);
-                    parent.add(layout);
-                }
-
-                final SizeIntegerables<Integer> size = new SizeIntegerables<>("speed", 15, i -> i);
-                final UIEntity speedSelection = GuiElements.createEnumElement(size, id -> {
-                    final int speed = id > 0 ? id : 127;
-                    final Optional<Integer> opt = option.getEntry(PathEntryType.SPEED);
-                    if (speed == 127 && opt.isPresent()) {
-                        removeEntryFromServer(node, mode, rotation, PathEntryType.SPEED);
-                        option.removeEntry(PathEntryType.SPEED);
-                    } else if ((opt.isPresent() && opt.get() != speed)
-                            || (!opt.isPresent() && speed != 127)) {
-                        sendIntEntryToServer(speed, node, mode, rotation, PathEntryType.SPEED);
-                        option.setEntry(PathEntryType.SPEED, speed);
-                    }
-                }, option.getEntry(PathEntryType.SPEED).filter(n -> n < 16).orElse(127));
-                parent.add(speedSelection);
-
-                selectLink(parent, node, option, entrySet, LinkType.OUTPUT, PathEntryType.OUTPUT,
-                        mode, rotation);
-
-                final SizeIntegerables<Integer> pathwayCosts = new SizeIntegerables<>(
-                        "pathway_costs", 20, i -> i);
-                final UIEntity costSelection = GuiElements.createEnumElement(pathwayCosts, i -> {
-                    option.setEntry(PathEntryType.PATHWAY_COSTS, i);
-                    sendIntEntryToServer(i, node, mode, rotation, PathEntryType.PATHWAY_COSTS);
-                }, option.getEntry(PathEntryType.PATHWAY_COSTS)
-                        .orElse(SignalBoxUtil.getDefaultCosts(modeSet)));
-                parent.add(costSelection);
-
-                if (option.getEntry(PathEntryType.OUTPUT).isPresent()) {
-                    final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
-                    for (final Map.Entry<ModeSet, PathOptionEntry> entry : node.getModes()
-                            .entrySet()) {
-                        final Optional<EnumPathUsage> usage = entry.getValue()
-                                .getEntry(PathEntryType.PATHUSAGE);
-                        if (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)) {
-                            canBeManuelChanged.set(false);
-                            break;
-                        }
-                    }
-                    final UILabel currentStatus = new UILabel(I18Wrapper.format("info.usage.status")
-                            + " : " + I18Wrapper.format("info.usage.status.free"));
-                    currentStatus.setTextColor(new UIEntity().getBasicTextColor());
-                    final UIEntity statusEntity = new UIEntity();
-                    statusEntity.setInheritWidth(true);
-                    statusEntity.setHeight(20);
-                    statusEntity.add(new UIScale(1.1f, 1.1f, 1));
-                    statusEntity.add(currentStatus);
-                    final UIEntity manuelButton = GuiElements
-                            .createButton(I18Wrapper.format("info.usage.manuel"), e1 -> {
-                                final Optional<EnumPathUsage> usage = option
-                                        .getEntry(PathEntryType.PATHUSAGE);
-                                final UIEntity info = new UIEntity();
-                                info.setInherits(true);
-                                info.add(new UIBox(UIBox.VBOX, 5));
-                                info.add(new UIColor(BACKGROUND_COLOR));
-                                info.add(new UIClickable(_u -> pop(), 1));
-                                info.add(statusEntity);
-                                final UIEntity textureEntity = new UIEntity();
-                                textureEntity.setHeight(40);
-                                textureEntity.setWidth(40);
-                                textureEntity.setX(120);
-                                textureEntity.add(
-                                        new UIToolTip(I18Wrapper.format("info.usage.rs.desc")));
-                                if (canBeManuelChanged.get()) {
-                                    if (node.containsManuellOutput(modeSet)) {
-                                        textureEntity.add(new UITexture(SidePanel.REDSTONE_ON));
-                                    } else {
-                                        textureEntity.add(new UITexture(SidePanel.REDSTONE_OFF));
-                                    }
-                                } else {
-                                    if (usage.isPresent()
-                                            && !usage.get().equals(EnumPathUsage.FREE)) {
-                                        textureEntity
-                                                .add(new UITexture(SidePanel.REDSTONE_ON_BLOCKED));
-                                    } else {
-                                        textureEntity
-                                                .add(new UITexture(SidePanel.REDSTONE_OFF_BLOCKED));
-                                    }
-                                }
-                                info.add(textureEntity);
-                                final UILabel outputStatus = new UILabel(((usage.isPresent()
-                                        && !usage.get().equals(EnumPathUsage.FREE))
-                                        || node.containsManuellOutput(modeSet))
-                                                ? I18Wrapper.format("info.usage.rs.true")
-                                                : I18Wrapper.format("info.usage.rs.false"));
-                                outputStatus.setCenterY(false);
-                                outputStatus.setTextColor(new UIEntity().getBasicTextColor());
-                                final UIEntity outputEntity = new UIEntity();
-                                outputEntity.setInheritWidth(true);
-                                outputEntity.setHeight(20);
-                                outputEntity.add(outputStatus);
-                                info.add(outputEntity);
-                                if (canBeManuelChanged.get()) {
-                                    info.add(GuiElements.createButton(
-                                            I18Wrapper.format("info.usage.change"), i -> {
-                                                final boolean turnOff = node
-                                                        .containsManuellOutput(modeSet);
-                                                textureEntity.clear();
-                                                textureEntity.add(new UIToolTip(
-                                                        I18Wrapper.format("info.usage.rs.desc")));
-                                                if (turnOff) {
-                                                    changeRedstoneOutput(node.getPoint(), modeSet,
-                                                            false);
-                                                    outputStatus.setText(I18Wrapper
-                                                            .format("info.usage.rs.false"));
-                                                    textureEntity.add(
-                                                            new UITexture(SidePanel.REDSTONE_OFF));
-                                                } else {
-                                                    changeRedstoneOutput(node.getPoint(), modeSet,
-                                                            true);
-                                                    outputStatus.setText(I18Wrapper
-                                                            .format("info.usage.rs.true"));
-                                                    textureEntity.add(
-                                                            new UITexture(SidePanel.REDSTONE_ON));
-                                                }
-                                            }));
-                                }
-                                final UIEntity screen = GuiElements.createScreen(e -> e.add(info));
-                                push(screen);
-                            });
-                    manuelButton.add(new UIToolTip(I18Wrapper.format("info.usage.manuel.desc")));
-                    parent.add(manuelButton);
-
-                }
-                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.BLOCKING,
-                        mode, rotation, ".blocking");
-                selectLink(parent, node, option, entrySet, LinkType.INPUT, PathEntryType.RESETING,
-                        mode, rotation, ".resetting");
-
-                final UIEntity zs2Entity = GuiElements.createEnumElement(JsonEnumHolder.ZS32, e -> {
-                    if (e == 0) {
-                        removeEntryFromServer(node, mode, rotation, PathEntryType.ZS2);
-                        option.removeEntry(PathEntryType.ZS2);
-                    } else {
-                        sendZS2Entry((byte) e, node, mode, rotation, PathEntryType.ZS2);
-                        option.setEntry(PathEntryType.ZS2, (byte) e);
-                    }
-                }, option.getEntry(PathEntryType.ZS2).orElse((byte) 0));
-                parent.add(zs2Entity);
-
-                parent.add(GuiElements.createButton(I18Wrapper.format("button.reset"), e -> {
-                    reset();
-                    initializeFieldUsage(mainButton);
-                    resetPathwayOnServer(node);
-                }));
-            }
-                break;
-            case VP:
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
-                        mode, rotation);
-                final Optional<Boolean> opt = option.getEntry(PathEntryType.SIGNAL_REPEATER);
-                parent.add(
-                        GuiElements.createBoolElement(BoolIntegerables.of("signal_repeater"), e -> {
-                            final boolean state = e == 1 ? true : false;
-                            sendSignalRepeater(node.getPoint(), modeSet, state);
-                            option.setEntry(PathEntryType.SIGNAL_REPEATER, state);
-                        }, opt.isPresent() && opt.get() ? 1 : 0));
-                break;
-            case HP: {
-                parent.add(GuiElements.createBoolElement(BoolIntegerables.of("auto_pathway"), e -> {
-                    setAutoPoint(node.getPoint(), (byte) e);
-                    node.setAutoPoint(e == 1 ? true : false);
-                }, node.isAutoPoint() ? 1 : 0));
-            }
-            case RS: {
-                if (option.containsEntry(PathEntryType.SIGNAL))
-                    parent.add(GuiElements.createButton(I18Wrapper.format("btn.subsidiary"), e -> {
-                        final UIBox hbox = new UIBox(UIBox.VBOX, 1);
-                        final UIEntity list = new UIEntity();
-                        list.setInherits(true);
-                        list.add(hbox);
-                        list.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
-                                a -> pop()));
-                        final BlockPos pos = option.getEntry(PathEntryType.SIGNAL).get();
-                        final List<SubsidiaryState> subsidiaries = container.possibleSubsidiaries
-                                .getOrDefault(pos, SubsidiaryState.ALL_STATES);
-                        subsidiaries.forEach(state -> {
-                            final int defaultValue = container.grid
-                                    .getSubsidiaryState(node.getPoint(), modeSet, state) ? 0 : 1;
-                            list.add(GuiElements.createEnumElement(new SizeIntegerables<>(
-                                    state.getName(), 2, i -> i == 1 ? "false" : "true"), a -> {
-                                        final SubsidiaryEntry entry = new SubsidiaryEntry(state,
-                                                a == 0 ? true : false);
-                                        sendSubsidiaryRequest(entry, node.getPoint(), modeSet);
-                                        container.grid.setClientState(node.getPoint(), modeSet,
-                                                entry);
-                                        final BlockPos signalPos = option
-                                                .getEntry(PathEntryType.SIGNAL).orElse(null);
-                                        if (signalPos != null) {
-                                            if (entry.state) {
-                                                enabledSubsidiaries.put(signalPos,
-                                                        new SubsidiaryHolder(entry, node.getPoint(),
-                                                                modeSet));
-                                            } else {
-                                                enabledSubsidiaries.remove(signalPos);
-                                            }
-                                        }
-                                        pop();
-                                        helpPage.helpUsageMode(enabledSubsidiaries, null,
-                                                container.grid.getNodes(),
-                                                container.possibleSubsidiaries);
-                                        final MainSignalIdentifier identifier = new MainSignalIdentifier(
-                                                new ModeIdentifier(node.getPoint(), modeSet), pos,
-                                                SignalState.combine(state.getSubsidiaryShowType()));
-                                        final List<MainSignalIdentifier> greenSignals = //
-                                                container.greenSignals.computeIfAbsent(
-                                                        identifier.getPoint(),
-                                                        _u -> new ArrayList<>());
-                                        if (entry.state) {
-                                            if (greenSignals.contains(identifier))
-                                                greenSignals.remove(identifier);
-                                            greenSignals.add(identifier);
-                                        } else {
-                                            greenSignals.remove(identifier);
-                                        }
-                                        updateSignals(ImmutableList.of(node.getPoint()));
-                                        if (state.isCountable() && entry.state) {
-                                            container.grid.countOne();
-                                            updateCounter();
-                                            sendCurrentCounterToServer();
-                                        }
-                                    }, defaultValue));
-                        });
-                        final UIEntity screen = GuiElements.createScreen(selection -> {
-                            selection.add(list);
-                            selection.add(GuiElements.createPageSelect(hbox));
-                        });
-                        push(screen);
-                    }));
-                selectLink(parent, node, option, entrySet, LinkType.SIGNAL, PathEntryType.SIGNAL,
-                        mode, rotation);
-                break;
-            }
-            case BUE: {
-                parent.add(GuiElements.createEnumElement(
-                        new SizeIntegerables<>("delay", 60, get -> String.valueOf(get)), i -> {
-                            option.setEntry(PathEntryType.DELAY, i);
-                            sendIntEntryToServer(i, node, mode, rotation, PathEntryType.DELAY);
-                        }, option.getEntry(PathEntryType.DELAY).orElse(0)));
-                break;
-            }
-            case OUT_CONNECTION: {
-                selectLink(parent, node, option, entrySet, LinkType.SIGNALBOX,
-                        PathEntryType.SIGNALBOX, mode, rotation);
-                final Optional<BlockPos> boxPos = option.getEntry(PathEntryType.SIGNALBOX);
-                if (!boxPos.isPresent())
-                    break;
-                final List<Point> validInConnections = container.validInConnections
-                        .getOrDefault(boxPos.get(), new ArrayList<>());
-                if (validInConnections.isEmpty())
-                    break;
-                final IIntegerable<String> integerable = new DisableIntegerable<>(
-                        SizeIntegerables.of("inconnection", validInConnections.size(), id -> {
-                            final Point point = validInConnections.get(id);
-                            if (point == null)
-                                return "Disabled";
-                            return point.toShortString();
-                        }));
-                parent.add(GuiElements.createEnumElement(integerable, e -> {
-                    final Point point = e >= 0 ? validInConnections.get(e) : null;
-                    if (point == null) {
-                        option.removeEntry(PathEntryType.POINT);
-                        removeEntryFromServer(node, mode, rotation, PathEntryType.POINT);
-                    } else {
-                        option.setEntry(PathEntryType.POINT, point);
-                        sendPointEntry(point, node, mode, rotation, PathEntryType.POINT);
-                    }
-                }, option.getEntry(PathEntryType.POINT)
-                        .map(point -> validInConnections.indexOf(point)).orElse(-1)));
-                break;
-            }
-            case IN_CONNECTION: {
-                final List<Point> validEnds = container.grid.getValidEnds();
-                if (validEnds.isEmpty())
-                    break;
-                final IIntegerable<String> integerable = new DisableIntegerable<>(
-                        SizeIntegerables.of("inconnection", validEnds.size(), id -> {
-                            final Point point = validEnds.get(id);
-                            if (point == null)
-                                return "Disabled";
-                            return point.toShortString();
-                        }));
-                parent.add(GuiElements.createEnumElement(integerable, e -> {
-                    final Point point = e >= 0 ? validEnds.get(e) : null;
-                    if (point == null) {
-                        option.removeEntry(PathEntryType.POINT);
-                        removeEntryFromServer(node, mode, rotation, PathEntryType.POINT);
-                    } else {
-                        option.setEntry(PathEntryType.POINT, point);
-                        sendPointEntry(point, node, mode, rotation, PathEntryType.POINT);
-                    }
-                }, option.getEntry(PathEntryType.POINT).map(point -> validEnds.indexOf(point))
-                        .orElse(-1)));
-                break;
-            }
-            default:
-                break;
-        }
-    }
-
-    private void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
+    protected void disableSubsidiary(final BlockPos pos, final SubsidiaryHolder holder) {
         final SubsidiaryEntry entry = new SubsidiaryEntry(holder.entry.enumValue, false);
         sendSubsidiaryRequest(entry, holder.point, holder.modeSet);
         container.grid.setClientState(holder.point, holder.modeSet, entry);
         enabledSubsidiaries.remove(pos);
-        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
-                container.possibleSubsidiaries);
+        helpPage.helpUsageMode(null);
         this.resetTileSelection();
+
         final MainSignalIdentifier identifier = new MainSignalIdentifier(
                 new ModeIdentifier(holder.point, holder.modeSet), pos,
                 SignalState.combine(entry.enumValue.getSubsidiaryShowType()));
@@ -588,20 +247,22 @@ public class GuiSignalBox extends GuiBase {
     }
 
     private void tileEdit(final UIEntity tile, final UIMenu menu, final UISignalBoxTile sbt) {
-        tile.add(new UIClickable(e -> {
-            if (!splitter.isHovered())
-                return;
-            final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
-            final Rotation rotation = Rotation.values()[menu.getRotation()];
-            final ModeSet modeSet = new ModeSet(mode, rotation);
-            final SignalBoxNode node = sbt.getNode();
-            if (sbt.has(modeSet)) {
-                sbt.remove(modeSet);
-            } else {
-                sbt.add(modeSet);
-            }
-            changedModes.put(sbt.getPoint(), node);
-        }));
+        tile.add(new UIClickable(e -> updateTileWithMode(menu, sbt)));
+    }
+
+    private void updateTileWithMode(final UIMenu menu, final UISignalBoxTile sbt) {
+        if (!splitter.isHovered())
+            return;
+        final EnumGuiMode mode = EnumGuiMode.values()[menu.getSelection()];
+        final Rotation rotation = Rotation.values()[menu.getRotation()];
+        final ModeSet modeSet = new ModeSet(mode, rotation);
+        final SignalBoxNode node = sbt.getNode();
+        if (sbt.has(modeSet)) {
+            sbt.remove(modeSet);
+        } else {
+            sbt.add(modeSet);
+        }
+        changedModes.put(sbt.getPoint(), node);
     }
 
     private void tileNormal(final UIEntity tile, final UISignalBoxTile currentTile) {
@@ -645,57 +306,84 @@ public class GuiSignalBox extends GuiBase {
             return;
         final UIColor previous = colors.get(node.getPoint());
         if (previous != null && previous.getColor() == EDIT_COLOR) {
-            helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
-                    container.possibleSubsidiaries);
-            helpPage.setShowHelpPage(false);
+            helpPage.helpUsageMode(null);
             this.resetTileSelection();
             return;
         }
         this.resetTileSelection();
+
         final UIColor newColor = new UIColor(EDIT_COLOR);
         entity.add(newColor);
         colors.put(node.getPoint(), newColor);
-        helpPage.helpUsageMode(enabledSubsidiaries, node, container.grid.getNodes(),
-                container.possibleSubsidiaries);
+        helpPage.helpUsageMode(node);
         helpPage.setShowHelpPage(true);
     }
 
     protected void initializePageTileConfig(final SignalBoxNode node) {
         if (node.isEmpty())
             return;
+        final List<ModeDropDownBoxUI> dropDowns = new ArrayList<>();
+        final Runnable update = () -> buildTileConfigList(node, dropDowns);
+        node.forEach(modeSet -> dropDowns.add(
+                new ModeDropDownBoxUI(modeSet, node.getOption(modeSet).get(), node, this, update)));
+        buildTileConfigList(node, dropDowns);
+    }
+
+    private void buildTileConfigList(final SignalBoxNode node,
+            final List<ModeDropDownBoxUI> dropDowns) {
         reset();
         final UIEntity list = new UIEntity();
-        list.setInheritHeight(true);
-        list.setInheritWidth(true);
+        list.setInherits(true);
         final UIBox box = new UIBox(UIBox.VBOX, 1);
         list.add(box);
         lowerEntity.add(new UIBox(UIBox.VBOX, 3));
         lowerEntity.add(list);
-        final UIEntity input = new UIEntity();
-        input.setInheritWidth(true);
+
+        final UIEntity nameEntity = new UIEntity();
+        nameEntity.setInheritWidth(true);
+        nameEntity.setHeight(20);
+        nameEntity.add(new UIBox(UIBox.HBOX, 5));
+
+        final UIEntity labelEntity = GuiElements.createLabel(I18Wrapper.format("info.node.text"),
+                1.25f);
+        labelEntity.setInheritWidth(false);
+        labelEntity.setWidth(100);
+        nameEntity.add(labelEntity);
+
         final UITextInput namingInput = new UITextInput(node.getCustomText());
-        input.add(namingInput);
-        input.setHeight(20);
-        list.add(input);
+        final UIEntity inputEntity = new UIEntity();
+        inputEntity.setHeight(20);
+        inputEntity.setInheritWidth(true);
+
+        inputEntity.add(namingInput);
+        nameEntity.add(inputEntity);
+        list.add(nameEntity);
+        list.add(GuiElements.createSpacerV(5));
+
         namingInput.setOnTextUpdate(str -> {
             node.setCustomText(str);
             sendName(node.getPoint(), str);
         });
-        node.forEach(modeSet -> setupModeSettings(list, modeSet.mode, modeSet.rotation, node,
-                node.getOption(modeSet).get()));
+
+        dropDowns.forEach(dropDown -> {
+            list.add(dropDown.getTop());
+            dropDown.addElements(list);
+        });
         lowerEntity.add(GuiElements.createPageSelect(box));
         lowerEntity.add(new UIClickable(e -> initializeFieldUsage(mainButton), 1));
     }
-
-    private int lastValue = 0;
 
     private void initializePageSettings(final UIEntity entity) {
         this.initializePageSettings(entity, container.getPositionForTypes());
     }
 
+    private int lastValue = 0;
+
     private void initializePageSettings(final UIEntity entity,
             final Map<BlockPos, LinkType> types) {
         reset();
+        disableBottomEntity();
+        page = SignalBoxPage.LINKING;
         lowerEntity.add(new UIBox(UIBox.VBOX, 2));
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
@@ -749,7 +437,6 @@ public class GuiSignalBox extends GuiBase {
         final UIBox uibox = new UIBox(UIBox.VBOX, 2);
         list.add(uibox);
         final Map<String, UIEntity> nameToUIEntity = new HashMap<>();
-        list.add(uibox);
         types.forEach((p, t) -> {
             final String name = getSignalInfo(p, t);
             final UIEntity layout = new UIEntity();
@@ -794,10 +481,11 @@ public class GuiSignalBox extends GuiBase {
     private void initializeFieldUsage(final UIEntity entity) {
         reset();
         sendModeChanges();
+        page = SignalBoxPage.OPERATION;
         initializeFieldTemplate(this::tileNormal, false);
         resetSelection(entity);
-        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
-                container.possibleSubsidiaries);
+        helpPage.helpUsageMode(null);
+        disableBottomEntity();
     }
 
     private void initializeFieldEdit(final UIEntity entity) {
@@ -822,21 +510,27 @@ public class GuiSignalBox extends GuiBase {
             final UIEntity buttonYes = GuiElements.createButton(I18Wrapper.format("btn.yes"), e -> {
                 pop();
                 reset();
+                page = SignalBoxPage.EDITOR;
                 final UIMenu menu = new UIMenu();
-                menu.setVisible(false);
                 initializeFieldTemplate(
                         (fieldEntity, name) -> this.tileEdit(fieldEntity, menu, name), true);
-                lowerEntity.add(menu);
                 menu.setConsumer(
                         (selection, rotation) -> helpPage.updateNextNode(selection, rotation));
                 resetSelection(entity);
                 resetAllPathways();
                 helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
                 this.lastTile = null;
+
+                bottomEntity.setHeight(24);
+                bottomEntity.setWidth(22 * EnumGuiMode.values().length + 2);
+                bottomEntity.add(new UIColor(BACKGROUND_COLOR));
+                bottomEntity.add(new UIBorder(0xFF000000, 2));
+
+                bottomEntity.add(menu);
+                bottomEntity.getParent().update();
             });
-            final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"), e -> {
-                pop();
-            });
+            final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"),
+                    e -> pop());
             buttons.setInherits(true);
             final UIBox vbox = new UIBox(UIBox.HBOX, 1);
             buttons.add(vbox);
@@ -915,7 +609,7 @@ public class GuiSignalBox extends GuiBase {
         lowerEntity.add(new UIBox(UIBox.HBOX, 2));
         lowerEntity.add(splitter);
         helpPage = new SidePanel(lowerEntity, this);
-        helpPage.setDisableSubdsidiary(this::disableSubsidiary);
+
         buildColors(container.grid.getNodes());
     }
 
@@ -948,8 +642,12 @@ public class GuiSignalBox extends GuiBase {
         mainButton = GuiElements.createButton(I18Wrapper.format("btn.main"),
                 this::initializeFieldUsage);
         header.add(mainButton);
-        header.add(GuiElements.createSpacerH(5));
         resetSelection(mainButton);
+
+        bottomEntity.setWidth(22 * EnumGuiMode.values().length);
+        bottomEntity.setHeight(0);
+        bottomEntity.setX(-7);
+        bottomEntity.setScale(0.95f);
 
         final UIEntity middlePart = new UIEntity();
         middlePart.setInheritHeight(true);
@@ -957,6 +655,7 @@ public class GuiSignalBox extends GuiBase {
         middlePart.add(new UIBox(UIBox.VBOX, 4));
         middlePart.add(header);
         middlePart.add(lowerEntity);
+        middlePart.add(bottomEntity);
 
         lowerEntity.setInheritHeight(true);
         lowerEntity.setInheritWidth(true);
@@ -966,8 +665,13 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(middlePart);
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
-        helpPage.helpUsageMode(enabledSubsidiaries, null, container.grid.getNodes(),
-                container.possibleSubsidiaries);
+        helpPage.helpUsageMode(null);
+    }
+
+    private void disableBottomEntity() {
+        bottomEntity.clear();
+        bottomEntity.setHeight(0);
+        bottomEntity.getParent().update();
     }
 
     private void sendPWRequest(final SignalBoxNode currentNode) {
@@ -1003,7 +707,7 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void sendIntEntryToServer(final int speed, final SignalBoxNode node,
+    protected void sendIntEntryToServer(final int speed, final SignalBoxNode node,
             final EnumGuiMode mode, final Rotation rotation, final PathEntryType<Integer> entry) {
         if (speed == 127 || !allPacketsRecived)
             return;
@@ -1017,7 +721,7 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void sendZS2Entry(final byte value, final SignalBoxNode node, final EnumGuiMode mode,
+    protected void sendZS2Entry(final byte value, final SignalBoxNode node, final EnumGuiMode mode,
             final Rotation rotation, final PathEntryType<Byte> entry) {
         if (!allPacketsRecived)
             return;
@@ -1031,8 +735,8 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void sendPointEntry(final Point point, final SignalBoxNode node, final EnumGuiMode mode,
-            final Rotation rotation, final PathEntryType<Point> entry) {
+    protected void sendPointEntry(final Point point, final SignalBoxNode node,
+            final EnumGuiMode mode, final Rotation rotation, final PathEntryType<Point> entry) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
@@ -1045,7 +749,7 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void removeEntryFromServer(final SignalBoxNode node, final EnumGuiMode mode,
+    protected void removeEntryFromServer(final SignalBoxNode node, final EnumGuiMode mode,
             final Rotation rotation, final PathEntryType<?> entry) {
         if (!allPacketsRecived)
             return;
@@ -1137,14 +841,16 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void sendSignalRepeater(final Point point, final ModeSet mode, final boolean state) {
+    protected void sendBoolEntry(final boolean state, final Point point, final ModeSet mode,
+            final PathEntryType<Boolean> entry) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
-        buffer.putEnumValue(SignalBoxNetwork.SEND_SIGNAL_REPEATER);
+        buffer.putEnumValue(SignalBoxNetwork.SEND_BOOL_ENTRY);
+        buffer.putBoolean(state);
         point.writeNetwork(buffer);
         mode.writeNetwork(buffer);
-        buffer.putBoolean(state);
+        buffer.putByte((byte) entry.getID());
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -1167,7 +873,7 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void sendTrainNumber(final Point point, final String number) {
+    protected void sendTrainNumber(final Point point, final String number) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
@@ -1177,7 +883,7 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
-    private void deleteTrainNumber(final Point point) {
+    protected void deleteTrainNumber(final Point point) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
@@ -1196,6 +902,24 @@ public class GuiSignalBox extends GuiBase {
         final Set<Point> set = ImmutableSet.copyOf(container.greenSignals.keySet());
         container.greenSignals.clear();
         updateSignals(set);
+    }
+
+    protected void sendPosIdentList(final List<PosIdentifier> list, final SignalBoxNode node,
+            final EnumGuiMode mode, final Rotation rotation,
+            final PathEntryType<List<PosIdentifier>> entry) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_POSIDENT_LIST);
+        buffer.putInt(list.size());
+        for (final PosIdentifier posIdent : list) {
+            posIdent.writeNetwork(buffer);
+        }
+        node.getPoint().writeNetwork(buffer);
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+        buffer.putByte((byte) entry.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
     private void reset() {

@@ -1,5 +1,44 @@
 # Changelog
 
+## [1.16.5 - 3.6.0]
+
+* feat: added black dots mast sign
+* feat: added different sh light mast signs
+* feat: Ne5 can now start and end of PW
+* feat: added rectangular zs6 signs
+* feat: added ne1 custom text
+* feat: added one signal shape
+* feat: added angled ks signals
+* feat: added connectable post block
+* feat: added bue identification signs
+* fix: issue with doubled entries
+* fix: shunting path can only be set on blocked BW
+* fix: problems with shunting pathways and NPE
+* ref: better handling of null check
+* ref: change zs6 position
+
+## [1.16.5 - 3.6.0 beta]
+
+* feat: added shunting path to blocked path
+* feat: added possibility to skip signals
+* feat: added system to add distant signals to mainsignals without passing pathway
+* feat: added overlap (protection way) system behind signals
+* feat: added possiblity to rename signal on all blocks
+* feat: ne, ne5 & standalone zs3 to signalbox
+* feat: added standalone zs3
+* feat: added end arrow
+* fix: Intersignalbox pathways
+* fix: more pathway issues
+* fix: issue with delayable-intersignal pathway
+* fix: issue with protection stop
+* fix: signalconfigs, added new system
+* fix: issue with signalcontroller
+* ref: changed upadte system to signalstatehandler
+* ref: change pathway backend system
+* ref: better UI
+* ref: better code performance
+* ref: made corner tiles more expensive
+
 ## [1.16.5 - 3.5.0]
 
 * feat: new path finding algorithm

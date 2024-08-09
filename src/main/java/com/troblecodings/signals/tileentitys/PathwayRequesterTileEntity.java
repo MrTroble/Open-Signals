@@ -7,10 +7,8 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.SignalBox;
-import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.PathwayRequestResult;
-import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.init.OSItems;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
@@ -67,21 +65,13 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     public void requestPathway() {
         loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerWorld) level, linkedSignalBox,
                 (tile, _u) -> {
-                    final StateInfo identifier = new StateInfo(level, linkedSignalBox);
                     final SignalBoxGrid grid = tile.getSignalBoxGrid();
-                    if (!grid.containsNode(pathway.getKey())
-                            || !grid.containsNode(pathway.getValue()))
-                        return;
-                    if (grid.getNode(pathway.getValue()).containsOutConnection()) {
-                        SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
-                                pathway.getValue());
-                    } else {
-                        final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
-                                pathway.getValue());
-                        if (!result.isPass() && result.canBeAddedToSaver() && addPWToSaver) {
-                            grid.addNextPathway(pathway.getKey(), pathway.getValue());
-                        }
+                    final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
+                            pathway.getValue());
+                    if (!result.isPass() && result.canBeAddedToSaver() && addPWToSaver) {
+                        grid.addNextPathway(pathway.getKey(), pathway.getValue());
                     }
+
                 });
     }
 

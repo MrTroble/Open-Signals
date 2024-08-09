@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.blocks.BasicBlock;
@@ -22,25 +20,14 @@ import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryState;
-import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.LinkType;
-import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.init.OSBlocks;
-import com.troblecodings.signals.signalbox.ModeSet;
-import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
-import com.troblecodings.signals.signalbox.SignalBoxNode;
-import com.troblecodings.signals.signalbox.SignalBoxPathway;
-import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
-import com.troblecodings.signals.signalbox.entrys.PathEntryType;
-import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
-import com.troblecodings.signals.tileentitys.IChunkLoadable;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.Rotation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
@@ -67,101 +54,6 @@ public final class SignalBoxHandler {
         synchronized (ALL_GRIDS) {
             return ALL_GRIDS.get(info);
         }
-    }
-
-    public static PathwayRequestResult requesetInterSignalBoxPathway(final StateInfo startBox,
-            final Point start, final Point end) {
-        if (startBox.isWorldNullOrClientSide())
-            return PathwayRequestResult.NO_PATH;
-        final AtomicReference<PathwayRequestResult> returnResult = new AtomicReference<>();
-        final IChunkLoadable chunkLoader = new IChunkLoadable() {
-        };
-        chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerWorld) startBox.world,
-                startBox.pos, (startTile, _u) -> {
-                    final SignalBoxGrid startGrid = startTile.getSignalBoxGrid();
-                    final SignalBoxNode endNode = startGrid.getNode(end);
-                    PathOptionEntry outConnectionEntry = null;
-                    for (final Rotation rot : Rotation.values()) {
-                        final Optional<PathOptionEntry> entry = endNode
-                                .getOption(new ModeSet(EnumGuiMode.OUT_CONNECTION, rot));
-                        if (entry.isPresent()) {
-                            outConnectionEntry = entry.get();
-                            break;
-                        }
-                    }
-                    if (outConnectionEntry == null) {
-                        returnResult.set(PathwayRequestResult.NO_INTERSIGNALBOX_SELECTED);
-                        return;
-                    }
-                    final Optional<BlockPos> otherPos = outConnectionEntry
-                            .getEntry(PathEntryType.SIGNALBOX);
-                    final Optional<Point> otherStartPoint = outConnectionEntry
-                            .getEntry(PathEntryType.POINT);
-                    if (!otherPos.isPresent() || !otherStartPoint.isPresent()) {
-                        returnResult.set(PathwayRequestResult.NO_INTERSIGNALBOX_SELECTED);
-                        return;
-                    }
-                    chunkLoader.loadChunkAndGetTile(SignalBoxTileEntity.class,
-                            (ServerWorld) startBox.world, otherPos.get(), (endTile, _u2) -> {
-                                final SignalBoxGrid endGrid = endTile.getSignalBoxGrid();
-                                final SignalBoxNode otherStartNode = endGrid
-                                        .getNode(otherStartPoint.get());
-                                if (otherStartNode == null) {
-                                    returnResult.set(PathwayRequestResult.NOT_IN_GRID);
-                                    return;
-                                }
-                                PathOptionEntry inConnectionEntry = null;
-                                for (final Rotation rot : Rotation.values()) {
-                                    final Optional<PathOptionEntry> entry = otherStartNode
-                                            .getOption(new ModeSet(EnumGuiMode.IN_CONNECTION, rot));
-                                    if (entry.isPresent()) {
-                                        inConnectionEntry = entry.get();
-                                        break;
-                                    }
-                                }
-                                if (inConnectionEntry == null) {
-                                    returnResult
-                                            .set(PathwayRequestResult.NO_INTERSIGNALBOX_SELECTED);
-                                    return;
-                                }
-                                final Optional<Point> otherEndPoint = inConnectionEntry
-                                        .getEntry(PathEntryType.POINT);
-                                if (!otherEndPoint.isPresent()) {
-                                    returnResult
-                                            .set(PathwayRequestResult.NO_INTERSIGNALBOX_SELECTED);
-                                    return;
-                                }
-                                final PathwayRequestResult startRequeset = startGrid
-                                        .requestWay(start, end);
-                                final PathwayRequestResult endRequeset = endGrid
-                                        .requestWay(otherStartPoint.get(), otherEndPoint.get());
-                                final boolean startDone = startRequeset.isPass();
-                                final boolean endDone = endRequeset.isPass();
-
-                                if (!startDone || !endDone) {
-                                    if (startDone) {
-                                        startGrid.resetPathway(start);
-                                        returnResult.set(endRequeset);
-                                    }
-                                    if (endDone) {
-                                        endGrid.resetPathway(otherStartPoint.get());
-                                        returnResult.set(startRequeset);
-                                    }
-                                    if (!startDone && !endDone) {
-                                        returnResult.set(startRequeset);
-                                    }
-                                    return;
-                                }
-                                final SignalBoxPathway startPath = startGrid
-                                        .getPathwayByLastPoint(end);
-                                final SignalBoxPathway endPath = endGrid
-                                        .getPathwayByLastPoint(otherEndPoint.get());
-                                startPath.setOtherPathwayToBlock(endPath);
-                                endPath.setOtherPathwayToReset(startPath);
-                                returnResult.set(PathwayRequestResult.PASS);
-                            });
-                });
-        return returnResult.get();
     }
 
     public static void writeTileNBT(final StateInfo identifier, final NBTWrapper wrapper) {

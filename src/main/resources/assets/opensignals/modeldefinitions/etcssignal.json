@@ -46,6 +46,15 @@
                 }
             ],
             "y": 3
-        }
+        },
+        "hv/hv_number": {
+			"textures": [
+				{
+					"blockstate": "hasandis(CUSTOMNAME) && (with(ETCS_TYPE.NE14_LEFT) || with(ETCS_TYPE.NE14_RIGHT) || with(ETCS_TYPE.NE14_DOWN))"
+				}
+			],
+			"y": 2.43,
+            "z": -0.0625
+		}
     }
 }
