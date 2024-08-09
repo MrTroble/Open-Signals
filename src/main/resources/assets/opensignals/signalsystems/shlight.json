@@ -25,6 +25,12 @@
             "name": "sh_high",
             "defaultState": false,
             "changeableStage": "GUISTAGE"
+        },
+        {
+            "name": "mastsign",
+            "enumClass": "MastSignal",
+            "defaultState": "WRW",
+            "changeableStage": "GUISTAGE"
         }
     ]
 }

@@ -11,6 +11,7 @@ import com.troblecodings.signals.blocks.CombinedRedstoneInput;
 import com.troblecodings.signals.blocks.GhostBlock;
 import com.troblecodings.signals.blocks.PathwayRequester;
 import com.troblecodings.signals.blocks.Post;
+import com.troblecodings.signals.blocks.PostConnectable;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
@@ -44,6 +45,7 @@ public final class OSBlocks {
     public static final CombinedRedstoneInput COMBI_REDSTONE_INPUT = new CombinedRedstoneInput();
     public static final PathwayRequester PATHWAY_REQUESTER = new PathwayRequester();
     public static final TrainNumberBlock TRAIN_NUMBER_BLOCK = new TrainNumberBlock();
+    public static final PostConnectable POST_CONNECTABLE = new PostConnectable();
 
     public static final List<BasicBlock> BLOCKS_TO_REGISTER = new ArrayList<>();
 
@@ -57,8 +59,9 @@ public final class OSBlocks {
                 final String name = field.getName().toLowerCase().replace("_", "");
                 try {
                     final Object object = field.get(null);
-                    if (object instanceof BasicBlock)
+                    if (object instanceof BasicBlock) {
                         loadBlock((BasicBlock) object, name);
+                    }
                 } catch (final IllegalArgumentException | IllegalAccessException ex) {
                     ex.printStackTrace();
                 }
@@ -79,12 +82,13 @@ public final class OSBlocks {
         block.setUnlocalizedName(name);
         BLOCKS_TO_REGISTER.add(block);
         if (block instanceof ITileEntityProvider && block.hasTileEntity()) {
-            final ITileEntityProvider provider = (ITileEntityProvider) block;
+            final ITileEntityProvider provider = block;
             try {
-                final Class<? extends TileEntity> tileclass = provider.createNewTileEntity(null, 0)
-                        .getClass();
-                if (TileEntity.getKey(tileclass) == null)
+                final Class<? extends TileEntity> tileclass =
+                        provider.createNewTileEntity(null, 0).getClass();
+                if (TileEntity.getKey(tileclass) == null) {
                     TileEntity.register(tileclass.getSimpleName().toLowerCase(), tileclass);
+                }
             } catch (final NullPointerException ex) {
                 OpenSignalsMain.getLogger().trace(
                         "All tileentity provide need to call back a default entity if the world is null!",
@@ -92,10 +96,9 @@ public final class OSBlocks {
             }
         }
         if (block instanceof Signal) {
-            if (Signal.SIGNALS.containsKey(name)) {
+            if (Signal.SIGNALS.containsKey(name))
                 throw new IllegalArgumentException(
                         "A Signal with the name '" + name + "' alredy exists!");
-            }
             Signal.SIGNALS.put(name, (Signal) block);
         }
     }
@@ -110,8 +113,9 @@ public final class OSBlocks {
     public static void registerItem(final RegistryEvent.Register<Item> event) {
         final IForgeRegistry<Item> registry = event.getRegistry();
         BLOCKS_TO_REGISTER.forEach(block -> {
-            if (block.shouldHaveItem())
+            if (block.shouldHaveItem()) {
                 registry.register(new ItemBlock(block).setRegistryName(block.getRegistryName()));
+            }
         });
 
     }

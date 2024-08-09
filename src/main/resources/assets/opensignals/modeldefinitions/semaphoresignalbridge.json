@@ -126,7 +126,7 @@
 			"textures": [
 				{
 					"loadOFFstate": false,
-					"blockstate": "!has(ZS3)",
+					"blockstate": "!has(ZS3) && !with(ZS3PLATE.ZS6)",
 					"extentions": {
 						"zs32.json": {
 							"zs3plate": "overlay"
@@ -134,8 +134,19 @@
 					}
 				}
 			],
-			"y": -1.125
+			"y": -1.125,
+			"z": -0.125
 		},
+		"zs/zs6": {
+            "textures": [
+                {
+                    "blockstate": "with(ZS3PLATE.ZS6)"
+                }
+            ],
+			"y": -1.5,
+			"x": 0.1875,
+			"z": -0.4375
+        },
 		"semaphore_signals/sema_main_wing1": {
 			"textures": [
 				{

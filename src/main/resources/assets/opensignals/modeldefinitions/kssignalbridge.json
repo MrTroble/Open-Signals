@@ -325,7 +325,7 @@
             "textures": [
                 {
                     "loadOFFstate": false,
-                    "blockstate": "",
+                    "blockstate": "!with(ZS3PLATE.ZS6)",
                     "extentions": {
                         "zs32.json": {
                             "ZS3PLATE": "overlay"
@@ -334,6 +334,14 @@
                 }
             ],
             "y": 2.875
+        },
+        "zs/zs6": {
+            "textures": [
+                {
+                    "blockstate": "with(ZS3PLATE.ZS6)"
+                }
+            ],
+            "y": 0.1875
         },
         "zs/zs3v": {
             "textures": [
