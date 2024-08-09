@@ -34,7 +34,8 @@ public enum PathwayRequestResult {
     }
 
     public boolean canBeAddedToSaver() {
-        return this == ALREADY_USED || this == NO_PATH;
+        return this == ALREADY_USED
+                || this == NO_PATH || !(data != null && !data.isInterSignalBoxPathway());
     }
 
     public boolean isPass() {

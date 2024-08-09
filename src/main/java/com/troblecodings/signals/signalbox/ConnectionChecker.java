@@ -80,6 +80,11 @@ public abstract class ConnectionChecker {
             final PathwayRequestResult nodeResult = nextNode.canMakePath(path, type);
             if (!nodeResult.isPass())
                 return nodeResult;
+            final Optional<EnumPathUsage> optional = nextNode.getOption(path)
+                    .flatMap(entry -> entry.getEntry(PathEntryType.PATHUSAGE));
+            if (optional.isPresent() && !(optional.get().equals(EnumPathUsage.BLOCKED)
+                    || optional.get().equals(EnumPathUsage.FREE)))
+                return PathwayRequestResult.ALREADY_USED;
             final boolean isValid = path.point1.equals(previousPoint) && !visited.contains(path);
             return isValid ? PathwayRequestResult.PASS : PathwayRequestResult.NO_PATH;
         }

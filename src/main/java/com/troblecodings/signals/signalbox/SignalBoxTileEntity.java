@@ -7,9 +7,9 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.BasicBlock;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.SignalStateLoadHoler;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
-import com.troblecodings.signals.core.SignalStateLoadHoler;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.handler.NameHandler;
@@ -103,9 +103,8 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     public void onLoad() {
         grid.setTile(this);
         grid.onLoad();
-        if (level.isClientSide) {
+        if (level.isClientSide)
             return;
-        }
         final StateInfo identifier = new StateInfo(level, worldPosition);
         SignalBoxHandler.putGrid(identifier, grid);
         SignalBoxHandler.readTileNBT(identifier, copy == null ? new NBTWrapper() : copy);

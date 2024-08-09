@@ -32,8 +32,9 @@ public class TrainNumberTileEntity extends SyncableTileEntity implements ILinkab
     @Override
     public void loadWrapper(final NBTWrapper wrapper) {
         final NBTWrapper pointWrapper = wrapper.getWrapper(POINT_WRAPPER);
-        if (!pointWrapper.isTagNull())
+        if (!pointWrapper.isTagNull()) {
             point.read(pointWrapper);
+        }
         number = TrainNumber.of(wrapper);
         linkedSignalBox = wrapper.getBlockPos(LINKED_SIGNALBOX);
     }

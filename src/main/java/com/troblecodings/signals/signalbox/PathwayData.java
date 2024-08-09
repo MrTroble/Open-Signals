@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableMap.Builder;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.JsonEnumHolder;
@@ -143,6 +142,9 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
+            if (current.isUsed()) {
+                return false;
+            }
         }
         return true;
     }
@@ -252,7 +254,7 @@ public class PathwayData {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final AtomicInteger delayAtomic = new AtomicInteger(0);
-        final Builder<BlockPos, OtherSignalIdentifier> otherBuilder = ImmutableMap.builder();
+        final Map<BlockPos, OtherSignalIdentifier> otherBuilder = new HashMap<>();
         mapOfBlockingPositions.clear();
         mapOfResetPositions.clear();
         foreachPath((path, node) -> {
@@ -286,7 +288,7 @@ public class PathwayData {
                             value -> delayAtomic.updateAndGet(in -> Math.max(in, value)));
             });
         }, null);
-        this.otherSignals = otherBuilder.build();
+        this.otherSignals = ImmutableMap.copyOf(otherBuilder);
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
         this.firstPoint = firstNode.getPoint();
         final MainSignalIdentifier firstPos = makeFromNext(type, firstNode,
@@ -311,7 +313,7 @@ public class PathwayData {
                     .orElse(new ArrayList<>());
             this.preSignals = ImmutableList.copyOf(posIdents.stream().map(ident -> {
                 final PathOptionEntry vpEntry = grid.getNode(ident.getPoint())
-                        .getOption(ident.getModeSet()).orElse(null);
+                        .getOption(ident.getModeSet()).orElse(new PathOptionEntry());
                 return new OtherSignalIdentifier(ident.getPoint(), ident.getModeSet(), ident.pos,
                         vpEntry.getEntry(PathEntryType.SIGNAL_REPEATER).orElse(false),
                         EnumGuiMode.VP);

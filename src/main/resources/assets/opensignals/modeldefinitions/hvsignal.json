@@ -256,7 +256,7 @@
 			"textures": [
 				{
 					"loadOFFstate": false,
-					"blockstate": "(has(STOPSIGNAL) || has(HPHOME) || has(HPBLOCK)) && !has(ZS3)",
+					"blockstate": "(has(STOPSIGNAL) || has(HPHOME) || has(HPBLOCK)) && !has(ZS3) && !with(ZS3PLATE.ZS6)",
 					"extentions": {
 						"zs32.json": {
 							"zs3plate": "overlay"
@@ -266,6 +266,14 @@
 			],
 			"y": 6.9
 		},
+		"zs/zs6": {
+            "textures": [
+                {
+                    "blockstate": "with(ZS3PLATE.ZS6)"
+                }
+            ],
+            "y": 3.5
+        },
 		"zs/zs3v": {
 			"textures": [
 				{
