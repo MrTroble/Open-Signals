@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.18.2 - 3.6.1]
+
+* fix: issue with InterSignalBoxPathway
+* fix: Zs3V on HV
+
 ## [1.18.2 - 3.6.0]
 
 * feat: added black dots mast sign
