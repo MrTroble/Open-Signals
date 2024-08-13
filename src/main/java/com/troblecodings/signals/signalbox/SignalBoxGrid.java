@@ -309,6 +309,10 @@ public class SignalBoxGrid implements INetworkSavable {
     public boolean addNextPathway(final Point start, final Point end) {
         final Map.Entry<Point, Point> entry = Maps.immutableEntry(start, end);
         if (!nextPathways.contains(entry)) {
+            final SignalBoxPathway pw = startsToPath.get(start);
+            if (pw != null && pw.isInterSignalBoxPathway()) {
+                return false;
+            }
             if (executingForEach) {
                 toAdd.add(entry);
             } else {

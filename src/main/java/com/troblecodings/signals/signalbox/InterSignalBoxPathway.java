@@ -151,6 +151,8 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
 
     @Override
     protected void setSignals(final SignalStateInfo lastSignal) {
+        if (tile == null)
+            return;
         final StateInfo identifier = new StateInfo(tile.getWorld(), tile.getPos());
         if (lastSignal != null && pathwayToReset != null) {
             final Signal signal = SignalBoxHandler.getSignal(identifier, lastSignal.pos);
@@ -188,20 +190,20 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     protected void updateSignalStates() {
         final List<MainSignalIdentifier> redSignals = new ArrayList<>();
         final List<MainSignalIdentifier> greenSignals = new ArrayList<>();
-        final MainSignalIdentifier lastSignal = data.getEndSignal();
-        if (lastSignal != null) {
+        final MainSignalIdentifier startSignal = data.getStartSignal();
+        if (startSignal != null) {
             if (isBlocked)
                 return;
-            final SignalState previous = lastSignal.state;
-            lastSignal.state = SignalState.GREEN;
-            if (!lastSignal.state.equals(previous))
-                greenSignals.add(lastSignal);
+            final SignalState previous = startSignal.state;
+            startSignal.state = SignalState.GREEN;
+            if (!startSignal.state.equals(previous))
+                greenSignals.add(startSignal);
         }
         final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
         distantSignalPositions.values().forEach(position -> {
             final SignalBoxPathway next = getNextPathway();
             final SignalState previous = position.state;
-            if (lastSignal != null && next != null && !next.isEmptyOrBroken()) {
+            if (startSignal != null && next != null && !next.isEmptyOrBroken()) {
                 if (!next.isExecutingSignalSet)
                     position.state = SignalState.GREEN;
             } else if (pathwayToBlock != null) {
