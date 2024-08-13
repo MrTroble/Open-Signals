@@ -7,10 +7,6 @@
         "slow": "config(wing1.TRUE) && config(wing2.TRUE)"
     },
     "values": {
-        "map(stop)": ["distantsignal.VR0", "zs3v.OFF"],
-        "map(drive)": ["distantsignal.VR1"],
-        "map(slow)": ["distantsignal.VR2"],
-        "signalRepeater(true)": ["vrlight.true"],
 
         "(config(zs3.Z1) || config(zs3plate.Z1))": ["zs3v.Z1"],
         "(config(zs3.Z2) || config(zs3plate.Z2))": ["zs3v.Z2"],
@@ -27,6 +23,11 @@
         "(config(zs3.Z13) || config(zs3plate.Z13))": ["zs3v.Z13"],
         "(config(zs3.Z14) || config(zs3plate.Z14))": ["zs3v.Z14"],
         "(config(zs3.Z15) || config(zs3plate.Z15))": ["zs3v.Z15"],
+
+        "map(stop)": ["distantsignal.VR0", "zs3v.OFF"],
+        "map(drive)": ["distantsignal.VR1"],
+        "map(slow)": ["distantsignal.VR2"],
+        "signalRepeater(true)": ["vrlight.true"],
 
         "speed(<.1) || speed(>.15)": ["stopsignal.HP1", "hphome.HP1", "hpblock.HP1"],
         "speed(==.1)": ["zs3.Z1", "stopsignal.HP2", "hphome.HP2", "hpblock.HP1"],
