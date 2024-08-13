@@ -13,7 +13,7 @@ public enum EnumGuiMode {
             0, 0.5f, 0.5f, 1
     }), END(new float[] {
             0.9f, 0.2f, 0.9f, 0.8f
-    }), PLATFORM((state) -> new UILines(new float[] {
+    }, PathwayModeType.END), PLATFORM((state) -> new UILines(new float[] {
             0, 0.15f, 1, 0.15f
     }, 3), PathwayModeType.NONE), BUE(new float[] {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
@@ -75,7 +75,11 @@ public enum EnumGuiMode {
     }
 
     private EnumGuiMode(final float[] array) {
-        this((_u) -> new UILines(array, 2), PathwayModeType.NONE);
+        this(array, PathwayModeType.NONE);
+    }
+
+    private EnumGuiMode(final float[] array, final PathwayModeType type) {
+        this((_u) -> new UILines(array, 2), type);
     }
 
     private EnumGuiMode(final OSSupplier<Object> consumer, final PathwayModeType type) {
