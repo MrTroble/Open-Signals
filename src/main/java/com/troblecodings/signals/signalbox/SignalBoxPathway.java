@@ -663,6 +663,10 @@ public class SignalBoxPathway implements IChunkLoadable {
     public PathType getPathType() {
         return data.getPathType();
     }
+    
+    public boolean isInterSignalBoxPathway() {
+        return this instanceof InterSignalBoxPathway;
+    }
 
     public SignalBoxGrid getGrid() {
         return grid;
