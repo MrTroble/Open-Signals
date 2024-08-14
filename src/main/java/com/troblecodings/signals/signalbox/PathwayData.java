@@ -311,6 +311,7 @@ public class PathwayData {
                     .getOption(firstPos.getModeSet()).orElse(null);
             final List<PosIdentifier> posIdents = entry.getEntry(PathEntryType.PRESIGNALS)
                     .orElse(new ArrayList<>());
+            posIdents.removeIf(ident -> !grid.getNode(ident.getPoint()).has(ident.getModeSet()));
             this.preSignals = ImmutableList.copyOf(posIdents.stream().map(ident -> {
                 final PathOptionEntry vpEntry = grid.getNode(ident.getPoint())
                         .getOption(ident.getModeSet()).orElse(new PathOptionEntry());
