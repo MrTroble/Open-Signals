@@ -26,6 +26,7 @@
         "map(stop)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF", "zs2v.OFF"],
         "map(stop) && signalRepeater(true)": ["kombisignal_distant.KS2_REPEAT"],
         "map(drive)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
+        "config(stopsignal.HP2) || config(hphome.HP2)" : ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z4"],
         "map(drive) && map(zs3)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
         "map(drive) && map(zs3) && signalRepeater(true)": ["kombisignal_distant.KS1_BLINK_REPEAT"],
 
