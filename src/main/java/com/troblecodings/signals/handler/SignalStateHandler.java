@@ -187,6 +187,8 @@ public final class SignalStateHandler implements INetworkSync {
     private static void statesToBuffer(final Signal signal, final Map<SEProperty, String> states,
             final byte[] readData) {
         states.forEach((property, string) -> {
+            if (property.equals(Signal.CUSTOMNAME))
+                return;
             readData[signal.getIDFromProperty(
                     property)] = (byte) (property.getParent().getIDFromValue(string) + 1);
         });
@@ -339,12 +341,21 @@ public final class SignalStateHandler implements INetworkSync {
         final byte[] byteArray = buffer.array();
         for (int i = 0; i < properties.size(); i++) {
             final SEProperty property = properties.get(i);
+            if (property.equals(Signal.CUSTOMNAME)) {
+                continue;
+            }
             final int typeID = Byte.toUnsignedInt(byteArray[i]);
             if (typeID <= 0) {
                 continue;
             }
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
+        }
+        final String customName = NameHandler.getName(stateInfo);
+        if (customName == null || customName.equals(stateInfo.signal.getSignalTypeName())) {
+            map.put(Signal.CUSTOMNAME, "false");
+        } else {
+            map.put(Signal.CUSTOMNAME, "true");
         }
         return map;
     }
