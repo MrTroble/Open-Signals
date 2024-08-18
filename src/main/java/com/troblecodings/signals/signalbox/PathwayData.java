@@ -19,6 +19,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.JsonEnumHolder;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
@@ -56,7 +57,7 @@ public class PathwayData {
     private int delay = 0;
     private Optional<MainSignalIdentifier> startSignal = Optional.empty();
     private Optional<MainSignalIdentifier> endSignal = Optional.empty();
-    private Map<BlockPos, OtherSignalIdentifier> otherSignals = ImmutableMap.of();
+    private Map<BlockPosSignalHolder, OtherSignalIdentifier> otherSignals = ImmutableMap.of();
     private List<OtherSignalIdentifier> preSignals = ImmutableList.of();
     private boolean emptyOrBroken = false;
     private List<SignalBoxNode> protectionWayNodes = ImmutableList.of();
@@ -253,7 +254,7 @@ public class PathwayData {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final AtomicInteger delayAtomic = new AtomicInteger(0);
-        final Map<BlockPos, OtherSignalIdentifier> otherBuilder = new HashMap<>();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> otherBuilder = new HashMap<>();
         mapOfBlockingPositions.clear();
         mapOfResetPositions.clear();
         foreachPath((path, node) -> {
@@ -278,7 +279,20 @@ public class PathwayData {
                             final OtherSignalIdentifier ident = new OtherSignalIdentifier(
                                     node.getPoint(), modeSet, position,
                                     repeaterOption.isPresent() && repeaterOption.get(), mode);
-                            otherBuilder.put(position, ident);
+                            final BlockPosSignalHolder holder = new BlockPosSignalHolder(position);
+                            if (otherBuilder.containsKey(holder)) {
+                                final OtherSignalIdentifier otherIdent = otherBuilder.get(holder);
+                                if (ident.guiMode.ordinal() < otherIdent.guiMode.ordinal()) {
+                                    otherBuilder.put(holder, ident);
+                                    otherBuilder.put(new BlockPosSignalHolder(position, true),
+                                            otherIdent);
+                                } else {
+                                    otherBuilder.put(new BlockPosSignalHolder(position, true),
+                                            ident);
+                                }
+                            } else {
+                                otherBuilder.put(holder, ident);
+                            }
                         }));
             }
             node.getModes().forEach((mode, entry) -> {
@@ -454,7 +468,7 @@ public class PathwayData {
         this.initalize();
     }
 
-    public Map<BlockPos, OtherSignalIdentifier> getOtherSignals() {
+    public Map<BlockPosSignalHolder, OtherSignalIdentifier> getOtherSignals() {
         return otherSignals;
     }
 

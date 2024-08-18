@@ -16,6 +16,7 @@ import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
+import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.TrainNumber;
@@ -189,8 +190,11 @@ public class SignalBoxPathway implements IChunkLoadable {
             SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, data));
             updatePreSignals();
         }
-        final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
-        distantSignalPositions.values().forEach(position -> {
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
+                .getOtherSignals();
+        distantSignalPositions.forEach((holder, position) -> {
+            if (holder.shouldTurnSignalOff())
+                return;
             final Signal current = SignalBoxHandler.getSignal(identifier, position.pos);
             if (current == null)
                 return;
@@ -243,8 +247,14 @@ public class SignalBoxPathway implements IChunkLoadable {
                 greenSignals.add(signalIdent);
             });
         }
-        final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
-        distantSignalPositions.values().forEach(position -> {
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
+                .getOtherSignals();
+        distantSignalPositions.forEach((holder, position) -> {
+            if (holder.shouldTurnSignalOff()) {
+                position.state = SignalState.OFF;
+                greenSignals.add(position);
+                return;
+            }
             final SignalBoxPathway next = getNextPathway();
             final SignalState previous = position.state;
             if (endSignal != null && next != null && !next.isEmptyOrBroken()) {
@@ -279,7 +289,8 @@ public class SignalBoxPathway implements IChunkLoadable {
             if (startSignal.state.equals(SignalState.GREEN))
                 returnList.add(startSignal);
         }
-        final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
+                .getOtherSignals();
         distantSignalPositions.values().forEach(signal -> {
             if (signal.state.equals(SignalState.GREEN) || signal.state.equals(SignalState.OFF))
                 returnList.add(signal);
@@ -372,8 +383,13 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     private void resetOther() {
         final List<MainSignalIdentifier> redSignals = new ArrayList<>();
-        final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data.getOtherSignals();
-        distantSignalPositions.values().forEach(position -> {
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
+                .getOtherSignals();
+        distantSignalPositions.forEach((holder, position) -> {
+            if (holder.shouldTurnSignalOff()) {
+                position.state = SignalState.RED;
+                redSignals.add(position);
+            }
             final Signal current = SignalBoxHandler
                     .getSignal(new StateInfo(tile.getWorld(), tile.getPos()), position.pos);
             if (current == null)
@@ -420,11 +436,13 @@ public class SignalBoxPathway implements IChunkLoadable {
                                     new StateInfo(tile.getWorld(), tile.getPos()), position);
                             if (current == null)
                                 return;
-                            final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data
+                            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                                     .getOtherSignals();
                             final OtherSignalIdentifier identifier = distantSignalPositions
-                                    .getOrDefault(position, new OtherSignalIdentifier(point,
-                                            new ModeSet(mode, rotation), position, false, mode));
+                                    .getOrDefault(new BlockPosSignalHolder(position),
+                                            new OtherSignalIdentifier(point,
+                                                    new ModeSet(mode, rotation), position, false,
+                                                    mode));
                             SignalConfig.reset(new ResetInfo(
                                     new SignalStateInfo(tile.getWorld(), position, current),
                                     identifier.isRepeater));
@@ -432,6 +450,12 @@ public class SignalBoxPathway implements IChunkLoadable {
                             identifier.state = SignalState.RED;
                             if (!identifier.state.equals(previous)) {
                                 redSignals.add(identifier);
+                            }
+                            final OtherSignalIdentifier otherIdent = distantSignalPositions
+                                    .get(new BlockPosSignalHolder(position, true));
+                            if (otherIdent != null) {
+                                otherIdent.state = SignalState.RED;
+                                redSignals.add(otherIdent);
                             }
                         }));
             }
@@ -663,7 +687,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     public PathType getPathType() {
         return data.getPathType();
     }
-    
+
     public boolean isInterSignalBoxPathway() {
         return this instanceof InterSignalBoxPathway;
     }
