@@ -340,7 +340,8 @@ public final class SignalStateHandler implements INetworkSync {
             map.put(property, value);
         }
         final String customName = NameHandler.getName(stateInfo);
-        if (customName == null || customName.equals(stateInfo.signal.getSignalTypeName())) {
+        if (customName == null || customName.isEmpty()
+                || customName.equals(stateInfo.signal.getSignalTypeName())) {
             map.put(Signal.CUSTOMNAME, "false");
         } else {
             map.put(Signal.CUSTOMNAME, "true");

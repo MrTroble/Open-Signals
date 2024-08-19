@@ -331,9 +331,23 @@ public final class NameHandler implements INetworkSync {
                     ALL_NAMES.put(info.info, name);
                 }
                 sendToAll(info.info, name);
+                checkSignalUpdate(info.info, name);
             });
         }, "OSNameHandler:loadNames").start();
+    }
 
+    private static void checkSignalUpdate(final StateInfo info, final String name) {
+        final Block block = info.world.getBlockState(info.pos).getBlock();
+        if (!(block instanceof Signal)) {
+            return;
+        }
+        final Signal signal = (Signal) block;
+        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, info.pos, signal);
+        if (name == null || name.isEmpty() || name.equals(signal.getSignalTypeName())) {
+            SignalStateHandler.setState(stateInfo, Signal.CUSTOMNAME, "false");
+        } else {
+            SignalStateHandler.setState(stateInfo, Signal.CUSTOMNAME, "true");
+        }
     }
 
     public static void unloadName(final StateLoadHolder holder) {
