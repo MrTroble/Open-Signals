@@ -8,6 +8,7 @@
         "M200": "opensignals:blocks/ne/ne5_add_200",
         "M250": "opensignals:blocks/ne/ne5_add_250",
         "KURZ": "opensignals:blocks/ne/ne5_add_kurzzug",
-        "LANG": "opensignals:blocks/ne/ne5_add_langzug"
+        "LANG": "opensignals:blocks/ne/ne5_add_langzug",
+        "FREE": "opensignals:blocks/default/white"
     }
 }
