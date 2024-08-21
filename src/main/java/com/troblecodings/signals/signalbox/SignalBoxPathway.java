@@ -460,6 +460,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                         }));
             }
         }, point);
+        resetAllTrainNumbers(getListOfNodes());
         data.compact(point);
         updateSignalsOnClient(redSignals);
         updateTrainNumber(trainNumber);
@@ -584,7 +585,10 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private void resetAllTrainNumbers() {
-        final List<SignalBoxNode> listOfNodes = data.getListOfNodes();
+        resetAllTrainNumbers(getListOfNodes());
+    }
+
+    private void resetAllTrainNumbers(final List<SignalBoxNode> listOfNodes) {
         listOfNodes.forEach(node -> node.removeTrainNumber());
     }
 
