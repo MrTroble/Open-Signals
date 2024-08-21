@@ -22,9 +22,11 @@ import com.troblecodings.core.interfaces.INetworkSync;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.NameStateListener;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
+import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.tileentitys.RedstoneIOTileEntity;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
@@ -53,6 +55,7 @@ public final class NameHandler implements INetworkSync {
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFileV2> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<StateInfo, List<NameStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
     private static final Map<StateInfo, List<LoadHolder<?>>> LOAD_COUNTER = new HashMap<>();
     private static final String CHANNELNAME = "namehandlernet";
     private static FMLEventChannel channel;
@@ -136,6 +139,31 @@ public final class NameHandler implements INetworkSync {
         buffer.putBoolean(false);
         buffer.putString(name);
         return buffer.build();
+    }
+
+    public static boolean isNameLoaded(final StateInfo info) {
+        synchronized (ALL_NAMES) {
+            return ALL_NAMES.containsKey(info);
+        }
+    }
+
+    public static void runTaskWhenNameLoaded(final StateInfo info,
+            final NameStateListener listener) {
+        if (!info.isValid() || info.worldNullOrClientSide())
+            return;
+        if (isNameLoaded(info)) {
+            synchronized (ALL_NAMES) {
+                listener.update(info, ALL_NAMES.get(info), ChangedState.UPDATED);
+            }
+        } else {
+            synchronized (TASKS_WHEN_LOAD) {
+                final List<NameStateListener> list = TASKS_WHEN_LOAD.computeIfAbsent(info,
+                        _u -> new ArrayList<>());
+                if (!list.contains(listener)) {
+                    list.add(listener);
+                }
+            }
+        }
     }
 
     public static void setRemoved(final StateInfo info) {
@@ -331,23 +359,15 @@ public final class NameHandler implements INetworkSync {
                     ALL_NAMES.put(info.info, name);
                 }
                 sendToAll(info.info, name);
-                checkSignalUpdate(info.info, name);
+                synchronized (TASKS_WHEN_LOAD) {
+                    final List<NameStateListener> tasks = TASKS_WHEN_LOAD.remove(info.info);
+                    if (tasks != null) {
+                        tasks.forEach(listener -> listener.update(info.info, name,
+                                ChangedState.ADDED_TO_CACHE));
+                    }
+                }
             });
         }, "OSNameHandler:loadNames").start();
-    }
-
-    private static void checkSignalUpdate(final StateInfo info, final String name) {
-        final Block block = info.world.getBlockState(info.pos).getBlock();
-        if (!(block instanceof Signal)) {
-            return;
-        }
-        final Signal signal = (Signal) block;
-        final SignalStateInfo stateInfo = new SignalStateInfo(info.world, info.pos, signal);
-        if (name == null || name.isEmpty() || name.equals(signal.getSignalTypeName())) {
-            SignalStateHandler.setState(stateInfo, Signal.CUSTOMNAME, "false");
-        } else {
-            SignalStateHandler.setState(stateInfo, Signal.CUSTOMNAME, "true");
-        }
     }
 
     public static void unloadName(final StateLoadHolder holder) {
