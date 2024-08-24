@@ -142,7 +142,7 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
-            if (current.isUsed()) {
+            if (current.isUsedInDirection(newPos)) {
                 return false;
             }
         }

@@ -275,9 +275,27 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     }
 
     public boolean isUsed() {
-        for (final PathOptionEntry entry : possibleModes.values()) {
-            if (!entry.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE)
-                    .equals(EnumPathUsage.FREE)) {
+        for (final Point point : Arrays.asList(this.point.delta(new Point(1, 0)),
+                this.point.delta(new Point(-1, 0)), this.point.delta(new Point(0, 1)),
+                this.point.delta(new Point(0, -1)))) {
+            if (isUsedInDirection(point)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isUsedInDirection(final Point point) {
+        for (final Path path : possibleConnections.keySet()) {
+            if (!(path.point1.equals(point) || path.point2.equals(point))) {
+                continue;
+            }
+            final ModeSet mode = getMode(path);
+            if (mode == null) {
+                continue;
+            }
+            if (!getOption(mode).orElse(new PathOptionEntry()).getEntry(PathEntryType.PATHUSAGE)
+                    .orElse(EnumPathUsage.FREE).equals(EnumPathUsage.FREE)) {
                 return true;
             }
         }
