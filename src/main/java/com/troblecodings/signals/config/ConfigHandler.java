@@ -60,4 +60,12 @@ public final class ConfigHandler {
     @Name("Error text color")
     @Comment("Change the color of an error text. Default: -16776961")
     public static int errorTextColor = GuiConfigHandler.errorTextColor;
+
+    @Name("Signalbox trainnumber text color")
+    @Comment("Change the color of trainnumber in the signalbox. Default: -65536")
+    public static int signalboxTrainnumberColor = 0xFFFF0000;
+
+    @Name("Signalbox trainnumber background color")
+    @Comment("Change the background color of trainnumber in the signalbox. Default: -11534336")
+    public static int signalboxTrainnumberBackgroundColor = 0xFF500000;
 }

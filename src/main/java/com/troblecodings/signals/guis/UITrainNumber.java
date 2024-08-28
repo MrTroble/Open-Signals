@@ -5,11 +5,14 @@ import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.TrainNumber;
 
 import net.minecraft.client.renderer.GlStateManager;
 
 public class UITrainNumber extends UIComponent {
+
+    public static final int TRAIN_NUMBER_TEXT = ConfigHandler.signalboxTrainnumberColor;
 
     private TrainNumber number;
 
@@ -36,7 +39,7 @@ public class UITrainNumber extends UIComponent {
             trainNumberEntity.setHeight(20);
             trainNumberEntity.add(new UIScale(0.45f, 0.45f, 0.45f));
             final UILabel label = new UILabel(number.trainNumber);
-            label.setTextColor(0xFFFFFFFF);
+            label.setTextColor(TRAIN_NUMBER_TEXT);
             trainNumberEntity.add(label);
             trainNumberEntity.updateEvent(parent.getLastUpdateEvent());
             trainNumberEntity.draw(info);

@@ -25,7 +25,10 @@ public enum EnumGuiMode {
     ARROW((_u) -> new UITexture(UISignalBoxTile.ARROW_ICON), PathwayModeType.END),
     NE1((_u) -> new UITexture(UISignalBoxTile.NE1_ICON), PathwayModeType.START_END),
     NE5((_u) -> new UITexture(UISignalBoxTile.NE5_ICON), PathwayModeType.START_END),
-    ZS3((_u) -> new UITexture(UISignalBoxTile.ZS3_ICON), PathwayModeType.NONE);
+    ZS3((_u) -> new UITexture(UISignalBoxTile.ZS3_ICON), PathwayModeType.NONE),
+    TRAIN_NUMBER((_u) -> new UILines(new float[] {
+            0, 0.5f, 2, 0.5f
+    }, 6), PathwayModeType.NONE);
 
     /**
      * Naming
