@@ -531,7 +531,7 @@ public class GuiSignalBox extends GuiBase {
 
                 bottomEntity.setHeight(24);
                 bottomEntity.setWidth(22 * EnumGuiMode.values().length + 2);
-                bottomEntity.add(new UIColor(BACKGROUND_COLOR));
+                bottomEntity.add(new UIColor(0xFF8B8B8B));
                 bottomEntity.add(new UIBorder(0xFF000000, 2));
 
                 bottomEntity.add(menu);
