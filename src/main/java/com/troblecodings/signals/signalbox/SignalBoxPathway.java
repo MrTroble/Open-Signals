@@ -17,6 +17,7 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.BlockPosSignalHolder;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.SubsidiaryEntry;
 import com.troblecodings.signals.core.TrainNumber;
@@ -31,6 +32,7 @@ import com.troblecodings.signals.signalbox.config.ConfigInfo;
 import com.troblecodings.signals.signalbox.config.ResetInfo;
 import com.troblecodings.signals.signalbox.config.SignalConfig;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
+import com.troblecodings.signals.signalbox.entrys.PathOptionEntry;
 import com.troblecodings.signals.tileentitys.IChunkLoadable;
 
 import net.minecraft.block.state.IBlockState;
@@ -460,7 +462,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                         }));
             }
         }, point);
-        resetAllTrainNumbers(getListOfNodes());
+        resetAllTrainNumbers(data.getTrainNumberDisplays());
         data.compact(point);
         updateSignalsOnClient(redSignals);
         updateTrainNumber(trainNumber);
@@ -563,9 +565,9 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     protected void updateTrainNumber(final TrainNumber number) {
         resetAllTrainNumbers();
-        final List<SignalBoxNode> listOfNodes = data.getListOfNodes();
-        final SignalBoxNode setNode = listOfNodes.get((listOfNodes.size() - 1) / 2);
-        setNode.setTrainNumber(number);
+        final List<ModeIdentifier> trainNumberDisplays = data.getTrainNumberDisplays();
+        trainNumberDisplays.forEach(ident -> grid.getNode(ident.point).getOption(ident.mode)
+                .orElse(new PathOptionEntry()).setEntry(PathEntryType.TRAINNUMBER, number));
         this.trainNumber = number;
         sendTrainNumberUpdates();
     }
@@ -573,23 +575,26 @@ public class SignalBoxPathway implements IChunkLoadable {
     private void sendTrainNumberUpdates() {
         if (!this.tile.isBlocked())
             return;
-        final List<SignalBoxNode> listOfNodes = data.getListOfNodes();
+        final List<ModeIdentifier> trainNumberDisplays = data.getTrainNumberDisplays();
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
-        buffer.putInt(listOfNodes.size());
-        listOfNodes.forEach(node -> {
+        buffer.putInt(trainNumberDisplays.size());
+        trainNumberDisplays.forEach(ident -> {
+            final SignalBoxNode node = grid.getNode(ident.point);
             node.getPoint().writeNetwork(buffer);
-            node.getTrainNumber().writeNetwork(buffer);
+            node.writeUpdateNetwork(buffer);
         });
         OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
     }
 
     private void resetAllTrainNumbers() {
-        resetAllTrainNumbers(getListOfNodes());
+        resetAllTrainNumbers(data.getTrainNumberDisplays());
     }
 
-    private void resetAllTrainNumbers(final List<SignalBoxNode> listOfNodes) {
-        listOfNodes.forEach(node -> node.removeTrainNumber());
+    private void resetAllTrainNumbers(final List<ModeIdentifier> trainNumberDisplays) {
+        if (grid != null)
+            trainNumberDisplays.forEach(ident -> grid.getNode(ident.point).getOption(ident.mode)
+                    .orElse(new PathOptionEntry()).removeEntry(PathEntryType.TRAINNUMBER));
     }
 
     public void deactivateAllOutputsOnPathway() {

@@ -74,17 +74,16 @@ public class GuiSignalBox extends GuiBase {
     public static final int GRID_COLOR = 0xFF5B5B5B;
     public static final int EDIT_COLOR = 0x5000A2FF;
     public static final int OUTPUT_COLOR = 0xffff00;
-    public static final int TRAIN_NUMBER_BACKGROUND_COLOR =
-            ConfigHandler.signalboxTrainnumberBackgroundColor;
+    public static final int TRAIN_NUMBER_BACKGROUND_COLOR = ConfigHandler.signalboxTrainnumberBackgroundColor;
 
-    public static final ResourceLocation REDSTONE_OFF =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off.png");
-    public static final ResourceLocation REDSTONE_OFF_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
-    public static final ResourceLocation REDSTONE_ON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on.png");
-    public static final ResourceLocation REDSTONE_ON_BLOCKED =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
+    public static final ResourceLocation REDSTONE_OFF = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_off.png");
+    public static final ResourceLocation REDSTONE_OFF_BLOCKED = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/redstone_off_blocked.png");
+    public static final ResourceLocation REDSTONE_ON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/redstone_on.png");
+    public static final ResourceLocation REDSTONE_ON_BLOCKED = new ResourceLocation(
+            OpenSignalsMain.MODID, "gui/textures/redstone_on_blocked.png");
 
     private static final float[] ALL_LINES = getLines();
     protected static final int TILE_WIDTH = 10;
@@ -176,7 +175,7 @@ public class GuiSignalBox extends GuiBase {
     private void updateTrainNumber(final List<Point> points) {
         points.forEach(point -> {
             final UISignalBoxTile tile = allTiles.get(point);
-            tile.updateTrainNumber();
+            tile.setNode(tile.getNode());
         });
         lowerEntity.update();
     }
@@ -230,8 +229,8 @@ public class GuiSignalBox extends GuiBase {
 
     public static String getSignalInfo(final BlockPos signalPos, final LinkType type) {
         final Minecraft mc = Minecraft.getMinecraft();
-        final String customName =
-                ClientNameHandler.getClientName(new StateInfo(mc.world, signalPos));
+        final String customName = ClientNameHandler
+                .getClientName(new StateInfo(mc.world, signalPos));
         return String.format("%s (x=%d, y=%d. z=%d)", customName == null
                 ? (type.equals(LinkType.SIGNAL) ? "" : I18Wrapper.format("type." + type.name()))
                 : customName, signalPos.getX(), signalPos.getY(), signalPos.getZ());
@@ -245,9 +244,9 @@ public class GuiSignalBox extends GuiBase {
         helpPage.helpUsageMode(null);
         this.resetTileSelection();
 
-        final MainSignalIdentifier identifier =
-                new MainSignalIdentifier(new ModeIdentifier(holder.point, holder.modeSet), pos,
-                        SignalState.combine(entry.enumValue.getSubsidiaryShowType()));
+        final MainSignalIdentifier identifier = new MainSignalIdentifier(
+                new ModeIdentifier(holder.point, holder.modeSet), pos,
+                SignalState.combine(entry.enumValue.getSubsidiaryShowType()));
         final List<MainSignalIdentifier> greenSignals = container.greenSignals
                 .computeIfAbsent(identifier.getPoint(), _u -> new ArrayList<>());
         greenSignals.remove(identifier);
@@ -353,8 +352,8 @@ public class GuiSignalBox extends GuiBase {
         nameEntity.setHeight(20);
         nameEntity.add(new UIBox(UIBox.HBOX, 5));
 
-        final UIEntity labelEntity =
-                GuiElements.createLabel(I18Wrapper.format("info.node.text"), 1.25f);
+        final UIEntity labelEntity = GuiElements.createLabel(I18Wrapper.format("info.node.text"),
+                1.25f);
         labelEntity.setInheritWidth(false);
         labelEntity.setWidth(100);
         nameEntity.add(labelEntity);
@@ -538,8 +537,8 @@ public class GuiSignalBox extends GuiBase {
                 bottomEntity.add(menu);
                 bottomEntity.getParent().update();
             });
-            final UIEntity buttonNo =
-                    GuiElements.createButton(I18Wrapper.format("btn.no"), e -> pop());
+            final UIEntity buttonNo = GuiElements.createButton(I18Wrapper.format("btn.no"),
+                    e -> pop());
             buttons.setInherits(true);
             final UIBox vbox = new UIBox(UIBox.HBOX, 1);
             buttons.add(vbox);
@@ -607,7 +606,6 @@ public class GuiSignalBox extends GuiBase {
                 }
                 consumer.accept(tile, sbt);
                 row.add(tile);
-                sbt.updateTrainNumber();
             }
             plane.add(row);
         }
@@ -649,8 +647,8 @@ public class GuiSignalBox extends GuiBase {
                 this::initializePageSettings));
         header.add(
                 GuiElements.createButton(I18Wrapper.format("btn.edit"), this::initializeFieldEdit));
-        mainButton =
-                GuiElements.createButton(I18Wrapper.format("btn.main"), this::initializeFieldUsage);
+        mainButton = GuiElements.createButton(I18Wrapper.format("btn.main"),
+                this::initializeFieldUsage);
         header.add(mainButton);
         resetSelection(mainButton);
 
@@ -932,6 +930,20 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
+    protected void sendConnetedTrainNumbers(final ModeIdentifier ident, final SignalBoxNode node,
+            final EnumGuiMode mode, final Rotation rotation) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_CONNECTED_TRAINNUMBERS);
+        ident.writeNetwork(buffer);
+        node.getPoint().writeNetwork(buffer);
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+        buffer.putByte((byte) PathEntryType.CONNECTED_TRAINNUMBER.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
     private void reset() {
         lowerEntity.clear();
     }
@@ -969,9 +981,6 @@ public class GuiSignalBox extends GuiBase {
                 final int color = node.getOption(mode).get().getEntry(PathEntryType.PATHUSAGE)
                         .orElseGet(() -> EnumPathUsage.FREE).getColor();
                 tile.setColor(mode, color);
-                if (mode.mode.equals(EnumGuiMode.TRAIN_NUMBER)) {
-                    tile.setColor(mode, TRAIN_NUMBER_BACKGROUND_COLOR);
-                }
             });
         });
     }
@@ -984,6 +993,8 @@ public class GuiSignalBox extends GuiBase {
                 final PathOptionEntry entry = node.getOption(mode).get();
                 entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
                         _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));
+                entry.getEntry(PathEntryType.TRAINNUMBER)
+                        .ifPresent(_u -> entry.removeEntry(PathEntryType.TRAINNUMBER));
             });
         });
     }

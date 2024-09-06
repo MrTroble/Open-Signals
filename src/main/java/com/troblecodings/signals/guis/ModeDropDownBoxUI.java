@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import com.troblecodings.core.I18Wrapper;
 import com.troblecodings.guilib.ecs.DrawUtil.BoolIntegerables;
@@ -14,6 +16,7 @@ import com.troblecodings.guilib.ecs.DrawUtil.SizeIntegerables;
 import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
+import com.troblecodings.guilib.ecs.entitys.UIEnumerable;
 import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
 import com.troblecodings.guilib.ecs.entitys.render.UILabel;
@@ -21,12 +24,14 @@ import com.troblecodings.guilib.ecs.entitys.render.UIToolTip;
 import com.troblecodings.guilib.ecs.entitys.transform.UIScale;
 import com.troblecodings.guilib.ecs.interfaces.IIntegerable;
 import com.troblecodings.signals.core.JsonEnumHolder;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
+import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
 import com.troblecodings.signals.signalbox.SignalBoxUtil;
 import com.troblecodings.signals.signalbox.entrys.PathEntryType;
@@ -37,11 +42,11 @@ import net.minecraft.util.math.BlockPos;
 
 public class ModeDropDownBoxUI {
 
-    private final ModeSet modeSet;
+    private ModeSet modeSet = null;
     private final Runnable update;
-    private final PathOptionEntry option;
-    private final GuiSignalBox gui;
-    private final SignalBoxNode node;
+    private PathOptionEntry option = null;
+    private GuiSignalBox gui = null;
+    private SignalBoxNode node = null;
     private boolean open = false;
 
     public ModeDropDownBoxUI(final ModeSet modeSet, final PathOptionEntry option,
@@ -348,9 +353,150 @@ public class ModeDropDownBoxUI {
                         PathEntryType.SIGNAL, mode, rotation);
                 break;
             }
+            case TRAIN_NUMBER: {
+                final UIEntity button = GuiElements
+                        .createButton(I18Wrapper.format("btn.conntect.rainnumber"), e -> {
+                            final ModeIdentifier identifier = option
+                                    .getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
+                                    .orElse(new ModeIdentifier(new Point(-1, -1), null));
+                            final UIEntity screen = new UIEntity();
+                            screen.setInherits(true);
+                            screen.add(new UIBox(UIBox.VBOX, 5));
+                            screen.add(GuiElements.createButton(I18Wrapper.format("btn.return"),
+                                    e1 -> gui.pop()));
+                            SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
+                                    (nodeEntity, tile) -> {
+                                        if (tile.getPoint().equals(identifier.point)) {
+                                            nodeEntity
+                                                    .add(new UIColor(GuiSignalBox.SELECTION_COLOR));
+                                        }
+                                        final SignalBoxNode node = tile.getNode();
+                                        if (node.isEmpty()) {
+                                            return;
+                                        }
+                                        nodeEntity.add(new UIClickable(e1 -> {
+                                            final Set<ModeSet> pathModesSet = node
+                                                    .toPathIdentifier().stream()
+                                                    .map(ident -> ident.getMode())
+                                                    .collect(Collectors.toSet());
+                                            final List<ModeSet> pathModes = new ArrayList<>(
+                                                    pathModesSet);
+                                            if (pathModes.size() > 1) {
+                                                final UIEnumerable enumerable = new UIEnumerable(
+                                                        pathModes.size(), "mode_select");
+                                                enumerable.setMin(-1);
+                                                enumerable.setIndex(-1);
+                                                enumerable.setOnChange(i -> {
+                                                    if (i < 0)
+                                                        return;
+                                                    consumer.accept(node, pathModes.get(i));
+                                                    enumerable.setIndex(-1);
+                                                });
+                                                final UIEntity entity = GuiElements
+                                                        .createSelectionScreen(enumerable,
+                                                                SizeIntegerables.of("mode_select",
+                                                                        pathModes.size(), get -> {
+                                                                            final ModeSet modeSet = pathModes
+                                                                                    .get(get);
+                                                                            final PathOptionEntry entry = node
+                                                                                    .getOption(
+                                                                                            modeSet)
+                                                                                    .get();
+                                                                            if (entry.containsEntry(
+                                                                                    PathEntryType.CONNECTED_TRAINNUMBER)) {
+                                                                                return "Remove "
+                                                                                        + modeSet.mode
+                                                                                                .toString();
+                                                                            } else {
+                                                                                return modeSet.mode
+                                                                                        .toString();
+                                                                            }
+                                                                        }));
+                                                entity.setInherits(true);
+                                                gui.push(entity);
+                                            } else {
+                                                consumer.accept(node, pathModes.get(0));
+                                            }
+                                        }));
+                                    });
+                            gui.push(GuiElements.createScreen(e1 -> e1.add(screen)));
+                        });
+                parent.add(button);
+                break;
+            }
             default:
                 break;
         }
+    }
+
+    private final BiConsumer<SignalBoxNode, ModeSet> consumer = (node, mode) -> {
+        final PathOptionEntry optionEntry = node.getOption(mode).get();
+        final ModeIdentifier thisIdent = new ModeIdentifier(this.node.getPoint(), modeSet);
+        if (optionEntry.containsEntry(PathEntryType.CONNECTED_TRAINNUMBER)) {
+            final ModeIdentifier otherIdent = optionEntry
+                    .getEntry(PathEntryType.CONNECTED_TRAINNUMBER).get();
+            if (!thisIdent.equals(otherIdent)) {
+                gui.pop();
+                gui.push(GuiElements.createScreen(screen -> {
+                    final UIEntity entity = new UIEntity();
+                    entity.setInherits(true);
+                    entity.add(new UIBox(UIBox.VBOX, 5));
+                    entity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+                    entity.add(GuiElements.createSpacerV(30));
+                    entity.add(GuiElements.createLabel(I18Wrapper.format("info.key.removeother")));
+                    entity.add(GuiElements.createSpacerV(30));
+
+                    final UIEntity lowerEntity = new UIEntity();
+                    lowerEntity.setInherits(true);
+                    lowerEntity.add(new UIBox(UIBox.HBOX, 5));
+                    lowerEntity.add(GuiElements.createSpacerH(10));
+                    lowerEntity.add(GuiElements.createButton(I18Wrapper.format("btn.yes"), e -> {
+                        disconnectFromEachOther(thisIdent, otherIdent, gui.container.grid, gui);
+                        connectToEachOther(thisIdent, new ModeIdentifier(node.getPoint(), mode),
+                                gui.container.grid, gui);
+                        gui.pop();
+                    }));
+                    lowerEntity.add(GuiElements.createSpacerH(20));
+                    lowerEntity.add(GuiElements.createButton(I18Wrapper.format("btn.no"), e -> {
+                        gui.pop();
+                    }));
+                    entity.add(lowerEntity);
+                    screen.add(entity);
+                }));
+                return;
+            }
+            disconnectFromEachOther(thisIdent, new ModeIdentifier(node.getPoint(), mode),
+                    gui.container.grid, gui);
+            gui.pop();
+        } else {
+            connectToEachOther(new ModeIdentifier(node.getPoint(), mode), thisIdent,
+                    gui.container.grid, gui);
+            gui.pop();
+        }
+    };
+
+    private static void connectToEachOther(final ModeIdentifier ident1, final ModeIdentifier ident2,
+            final SignalBoxGrid grid, final GuiSignalBox gui) {
+        final SignalBoxNode node1 = grid.getNode(ident1.point);
+        node1.getOption(ident1.mode).get().setEntry(PathEntryType.CONNECTED_TRAINNUMBER, ident2);
+        gui.sendConnetedTrainNumbers(ident2, node1, ident1.mode.mode, ident1.mode.rotation);
+
+        final SignalBoxNode node2 = grid.getNode(ident2.point);
+        node2.getOption(ident2.mode).get().setEntry(PathEntryType.CONNECTED_TRAINNUMBER, ident1);
+        gui.sendConnetedTrainNumbers(ident1, node2, ident2.mode.mode, ident2.mode.rotation);
+    }
+
+    private static void disconnectFromEachOther(final ModeIdentifier ident1,
+            final ModeIdentifier ident2, final SignalBoxGrid grid, final GuiSignalBox gui) {
+        final SignalBoxNode node1 = grid.getNode(ident1.point);
+        node1.getOption(ident1.mode).get().removeEntry(PathEntryType.CONNECTED_TRAINNUMBER);
+        gui.removeEntryFromServer(node1, ident1.mode.mode, ident1.mode.rotation,
+                PathEntryType.CONNECTED_TRAINNUMBER);
+
+        final SignalBoxNode node2 = grid.getNode(ident2.point);
+        node2.getOption(ident2.mode).get().removeEntry(PathEntryType.CONNECTED_TRAINNUMBER);
+        gui.removeEntryFromServer(node2, ident2.mode.mode, ident2.mode.rotation,
+                PathEntryType.CONNECTED_TRAINNUMBER);
     }
 
     private void changeShowState() {

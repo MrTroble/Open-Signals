@@ -274,8 +274,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final int size = buffer.getInt();
                 for (int i = 0; i < size; i++) {
                     final Point point = Point.of(buffer);
-                    final TrainNumber number = TrainNumber.of(buffer);
-                    grid.getNode(point).setTrainNumber(number);
+                    grid.getNode(point).readUpdateNetwork(buffer);
                     updates.add(point);
                 }
                 trainNumberUpdater.accept(updates);
@@ -435,6 +434,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                     list.add(PosIdentifier.of(buffer));
                 }
                 deserializeEntry(buffer, list);
+                break;
+            }
+            case SEND_CONNECTED_TRAINNUMBERS: {
+                deserializeEntry(buffer, ModeIdentifier.of(buffer));
                 break;
             }
             default:

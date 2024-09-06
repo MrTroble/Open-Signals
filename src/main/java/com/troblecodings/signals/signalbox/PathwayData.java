@@ -21,6 +21,7 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.JsonEnumHolder;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -63,6 +64,7 @@ public class PathwayData {
     private List<SignalBoxNode> protectionWayNodes = ImmutableList.of();
     private BlockPos protectionWayReset = null;
     private int protectionWayResetDelay = 0;
+    private List<ModeIdentifier> trainNumberDisplays = ImmutableList.of();
 
     private SignalBoxPathway pathway;
 
@@ -255,6 +257,7 @@ public class PathwayData {
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final AtomicInteger delayAtomic = new AtomicInteger(0);
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> otherBuilder = new HashMap<>();
+        final List<ModeIdentifier> trainNumberDisplays = new ArrayList<>();
         mapOfBlockingPositions.clear();
         mapOfResetPositions.clear();
         foreachPath((path, node) -> {
@@ -266,6 +269,8 @@ public class PathwayData {
                 optionEntry.getEntry(PathEntryType.RESETING)
                         .ifPresent(position -> mapOfResetPositions.put(position, node));
                 optionEntry.getEntry(PathEntryType.ZS2).ifPresent(value -> zs2Value.set(value));
+                optionEntry.getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
+                        .ifPresent(ident -> trainNumberDisplays.add(ident));
             });
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));
@@ -301,6 +306,7 @@ public class PathwayData {
                             value -> delayAtomic.updateAndGet(in -> Math.max(in, value)));
             });
         }, null);
+        this.trainNumberDisplays = ImmutableList.copyOf(trainNumberDisplays);
         this.otherSignals = ImmutableMap.copyOf(otherBuilder);
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
         this.firstPoint = firstNode.getPoint();
@@ -619,6 +625,10 @@ public class PathwayData {
 
     public SignalBoxGrid getGrid() {
         return grid;
+    }
+
+    public List<ModeIdentifier> getTrainNumberDisplays() {
+        return trainNumberDisplays;
     }
 
     @Override

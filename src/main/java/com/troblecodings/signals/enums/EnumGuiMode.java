@@ -4,6 +4,7 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.signals.core.OSSupplier;
+import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.UISignalBoxTile;
 
 public enum EnumGuiMode {
@@ -28,7 +29,7 @@ public enum EnumGuiMode {
     ZS3((_u) -> new UITexture(UISignalBoxTile.ZS3_ICON), PathwayModeType.NONE),
     TRAIN_NUMBER((_u) -> new UILines(new float[] {
             0, 0.5f, 2, 0.5f
-    }, 6), PathwayModeType.NONE);
+    }, 6).setColor(GuiSignalBox.TRAIN_NUMBER_BACKGROUND_COLOR), PathwayModeType.NONE);
 
     /**
      * Naming

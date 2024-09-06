@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -12,6 +13,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
@@ -19,33 +21,33 @@ import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Rotation;
 
 public class UISignalBoxTile extends UIComponentEntity {
 
-    public static final ResourceLocation ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/symbols.png");
-    public static final ResourceLocation ARROW_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/arrow.png");
-    public static final ResourceLocation INCOMING_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/connection_in.png");
-    public static final ResourceLocation OUTGOING_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/connection_out.png");
-    public static final ResourceLocation SIGNALS =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/signals.png");
-    public static final ResourceLocation NE1_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/ne1.png");
-    public static final ResourceLocation NE5_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/ne5.png");
-    public static final ResourceLocation ZS3_ICON =
-            new ResourceLocation(OpenSignalsMain.MODID, "gui/textures/zs3.png");
+    public static final ResourceLocation ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/symbols.png");
+    public static final ResourceLocation ARROW_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/arrow.png");
+    public static final ResourceLocation INCOMING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/connection_in.png");
+    public static final ResourceLocation OUTGOING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/connection_out.png");
+    public static final ResourceLocation SIGNALS = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/signals.png");
+    public static final ResourceLocation NE1_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/ne1.png");
+    public static final ResourceLocation NE5_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/ne5.png");
+    public static final ResourceLocation ZS3_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/zs3.png");
 
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
     private final Map<ModeSet, SignalState> greenSignals = new HashMap<>();
-    private final UITrainNumber uiTrainNumber = new UITrainNumber();
 
     public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
@@ -119,6 +121,16 @@ public class UISignalBoxTile extends UIComponentEntity {
             }
         }
 
+        if (modeSet.mode.equals(EnumGuiMode.TRAIN_NUMBER)) {
+            final TrainNumber number = node.getOption(modeSet).get()
+                    .getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
+            final UIEntity label = GuiElements.createLabel(number.trainNumber,
+                    ConfigHandler.signalboxTrainnumberColor, 0.5f);
+            label.setX(6);
+            label.setY(3);
+            entity.add(label);
+        }
+
         entity.add((UIComponent) modeSet.mode.consumer.get(state));
         this.entity.add(entity);
         setToEntity.put(modeSet, entity);
@@ -187,15 +199,6 @@ public class UISignalBoxTile extends UIComponentEntity {
         final UIEntity entity = setToEntity.get(mode);
         if (entity != null) {
             entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
-        }
-    }
-
-    public void updateTrainNumber() {
-        this.getParent().remove(uiTrainNumber);
-        final TrainNumber number = this.node.getTrainNumber();
-        uiTrainNumber.setTrainNumber(number);
-        if (!number.trainNumber.isEmpty()) {
-            this.getParent().add(uiTrainNumber);
         }
     }
 }

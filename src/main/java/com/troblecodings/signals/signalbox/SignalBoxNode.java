@@ -16,7 +16,6 @@ import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
@@ -38,7 +37,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
     private final Point point;
     private boolean isAutoPoint = false;
     private String customText = "";
-    private TrainNumber trainNumber = TrainNumber.DEFAULT;
 
     public SignalBoxNode() {
         this(new Point());
@@ -93,18 +91,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public boolean isAutoPoint() {
         return isAutoPoint;
-    }
-
-    public void setTrainNumber(final TrainNumber number) {
-        this.trainNumber = number;
-    }
-
-    public void removeTrainNumber() {
-        this.trainNumber = TrainNumber.DEFAULT;
-    }
-
-    public TrainNumber getTrainNumber() {
-        return trainNumber == null ? TrainNumber.DEFAULT : trainNumber;
     }
 
     public void post() {
@@ -196,8 +182,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         this.point.write(compound);
         compound.putBoolean(IS_AUTO_POINT, isAutoPoint);
         compound.putString(CUSTOM_NAME, customText);
-        if (this.trainNumber != null)
-            trainNumber.writeTag(compound);
     }
 
     @Override
@@ -216,7 +200,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         this.point.read(compound);
         this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
         this.customText = compound.getString(CUSTOM_NAME);
-        this.trainNumber = TrainNumber.of(compound);
         post();
     }
 
@@ -383,7 +366,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         }
         this.isAutoPoint = buffer.getBoolean();
         this.customText = buffer.getString();
-        this.trainNumber = TrainNumber.of(buffer);
         post();
     }
 
@@ -406,7 +388,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         }
         this.isAutoPoint = buffer.getBoolean();
         this.customText = buffer.getString();
-        this.trainNumber = TrainNumber.of(buffer);
         post();
     }
 
@@ -421,22 +402,19 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         manuellEnabledOutputs.forEach(mode -> mode.writeNetwork(buffer));
         buffer.putBoolean(isAutoPoint);
         buffer.putString(customText);
-        if (trainNumber != null) {
-            trainNumber.writeNetwork(buffer);
-        } else {
-            TrainNumber.DEFAULT.writeNetwork(buffer);
-        }
     }
 
     public void writeUpdateNetwork(final WriteBuffer buffer) {
         int size = 0;
         for (final PathOptionEntry entry : possibleModes.values()) {
-            if (entry.containsEntry(PathEntryType.PATHUSAGE))
+            if (entry.containsEntry(PathEntryType.PATHUSAGE)
+                    || entry.containsEntry(PathEntryType.TRAINNUMBER))
                 size++;
         }
         buffer.putByte((byte) size);
         possibleModes.forEach((mode, entry) -> {
-            if (entry.containsEntry(PathEntryType.PATHUSAGE)) {
+            if (entry.containsEntry(PathEntryType.PATHUSAGE)
+                    || entry.containsEntry(PathEntryType.TRAINNUMBER)) {
                 mode.writeNetwork(buffer);
                 entry.writeUpdateNetwork(buffer);
             }
@@ -444,11 +422,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         buffer.putByte((byte) 0);
         buffer.putBoolean(isAutoPoint);
         buffer.putString(customText);
-        if (trainNumber != null) {
-            trainNumber.writeNetwork(buffer);
-        } else {
-            TrainNumber.DEFAULT.writeNetwork(buffer);
-        }
     }
 
     public String getCustomText() {
