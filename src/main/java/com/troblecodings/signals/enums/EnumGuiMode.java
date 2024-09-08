@@ -17,7 +17,7 @@ public enum EnumGuiMode {
             0.9f, 0.2f, 0.9f, 0.8f
     }, PathwayModeType.END), PLATFORM((state) -> new UILines(new float[] {
             0, 0.15f, 1, 0.15f
-    }, 3), PathwayModeType.NONE), BUE(new float[] {
+    }, 3).setColor(SignalBoxUtil.FREE_COLOR), PathwayModeType.NONE), BUE(new float[] {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
     }), HP(0, true, PathwayModeType.START_END), VP(1, true, PathwayModeType.NONE),
     RS(2, true, PathwayModeType.START_END), RA10(3, PathwayModeType.END),
