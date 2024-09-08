@@ -46,8 +46,8 @@ public final class ConfigHandler {
     public static int signalboxPreparedColor = 0xffff00;
 
     @Name("Signalbox shunting color")
-    @Comment("Change the color of a selected shunting path. Default: -65536")
-    public static int signalboxShuntingColor = 0xFFFF0000;
+    @Comment("Change the color of a selected shunting path. Default: -16711936")
+    public static int signalboxShuntingColor = 0xFF00FF00;
 
     @Name("Signalbox TrainNumber color")
     @Comment("Change the color of the TrainNumber in the UI. Default: -1")
