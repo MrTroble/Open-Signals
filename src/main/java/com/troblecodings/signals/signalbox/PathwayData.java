@@ -3,10 +3,12 @@ package com.troblecodings.signals.signalbox;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -261,7 +263,7 @@ public class PathwayData {
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final AtomicInteger delayAtomic = new AtomicInteger(0);
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> otherBuilder = new HashMap<>();
-        final List<ModeIdentifier> trainNumberDisplays = new ArrayList<>();
+        final Set<ModeIdentifier> trainNumberDisplays = new HashSet<>();
         mapOfBlockingPositions.clear();
         mapOfResetPositions.clear();
         foreachPath((path, node) -> {
