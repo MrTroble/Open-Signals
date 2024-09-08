@@ -139,6 +139,10 @@ public class SignalBoxPathway implements IChunkLoadable {
         data.removeProtectionWay();
     }
 
+    public void setUpPathwayStatus() {
+        setPathStatus(EnumPathUsage.SELECTED);
+    }
+
     public void setPathStatus(final EnumPathUsage status) {
         setPathStatus(status, null);
     }

@@ -100,17 +100,21 @@ public class PathwayData {
 
     public SignalBoxPathway createPathway() {
         if (pathway == null) {
-            final boolean isInterSignalBoxPathway = isInterSignalBoxPathway();
-            if (delay > 0) {
-                if (isInterSignalBoxPathway) {
-                    pathway = new DelayableInterSignalBoxPathway(this);
-                } else {
-                    pathway = new DelayableSignalBoxPathway(this);
-                }
-            } else if (isInterSignalBoxPathway) {
-                pathway = new InterSignalBoxPathway(this);
+            if (type.equals(PathType.SHUNTING)) {
+                pathway = new ShuntingPathway(this);
             } else {
-                pathway = new SignalBoxPathway(this);
+                final boolean isInterSignalBoxPathway = isInterSignalBoxPathway();
+                if (delay > 0) {
+                    if (isInterSignalBoxPathway) {
+                        pathway = new DelayableInterSignalBoxPathway(this);
+                    } else {
+                        pathway = new DelayableSignalBoxPathway(this);
+                    }
+                } else if (isInterSignalBoxPathway) {
+                    pathway = new InterSignalBoxPathway(this);
+                } else {
+                    pathway = new SignalBoxPathway(this);
+                }
             }
         }
         return pathway;

@@ -4,11 +4,12 @@ import static com.troblecodings.signals.signalbox.SignalBoxUtil.FREE_COLOR;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.PREPARED_COLOR;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.SELECTED_COLOR;
 import static com.troblecodings.signals.signalbox.SignalBoxUtil.USED_COLOR;
+import static com.troblecodings.signals.signalbox.SignalBoxUtil.SHUNTING_COLOR;
 
 public enum EnumPathUsage {
 
     FREE(FREE_COLOR), SELECTED(SELECTED_COLOR), BLOCKED(USED_COLOR), PREPARED(PREPARED_COLOR),
-    PROTECTED(PREPARED_COLOR);
+    PROTECTED(PREPARED_COLOR), SHUNTING(SHUNTING_COLOR);
 
     private final int color;
 

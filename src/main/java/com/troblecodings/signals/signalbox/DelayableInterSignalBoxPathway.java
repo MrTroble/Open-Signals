@@ -14,10 +14,14 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
     public DelayableInterSignalBoxPathway(final PathwayData data) {
         super(data);
     }
+    
+    @Override
+    public void setUpPathwayStatus() {
+        setPathStatus(EnumPathUsage.PREPARED);
+    }
 
     @Override
     public void updatePathwaySignals() {
-        setPathStatus(EnumPathUsage.PREPARED);
         if (pathwayToBlock != null) {
             pathwayToBlock.loadTileAndExecute(_u -> {
                 pathwayToBlock.isExecutingSignalSet = true;

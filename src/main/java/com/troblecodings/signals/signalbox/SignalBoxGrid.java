@@ -173,7 +173,7 @@ public class SignalBoxGrid implements INetworkSavable {
         way.setTile(tile);
         way.deactivateAllOutputsOnPathway();
         way.setSignalBoxGrid(this);
-        way.setPathStatus(EnumPathUsage.SELECTED);
+        way.setUpPathwayStatus();
         way.updatePathwaySignals();
         onWayAdd(way);
         updateToNet(way);

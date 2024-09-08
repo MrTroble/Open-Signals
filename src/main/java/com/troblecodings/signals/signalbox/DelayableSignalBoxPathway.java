@@ -16,8 +16,12 @@ public class DelayableSignalBoxPathway extends SignalBoxPathway {
     }
 
     @Override
-    public void updatePathwaySignals() {
+    public void setUpPathwayStatus() {
         setPathStatus(EnumPathUsage.PREPARED);
+    }
+
+    @Override
+    public void updatePathwaySignals() {
         if (isExecutingSignalSet)
             return;
         this.isExecutingSignalSet = true;
