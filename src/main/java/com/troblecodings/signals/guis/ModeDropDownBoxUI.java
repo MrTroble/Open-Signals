@@ -241,6 +241,9 @@ public class ModeDropDownBoxUI {
                                             previous.set(tile);
                                         }
                                         tile.add(new UIClickable(e1 -> {
+                                            if (!tile.getParent().getParent().getParent()
+                                                    .isHovered())
+                                                return;
                                             if (previous.get() != null) {
                                                 previous.get().findRecursive(UIColor.class)
                                                         .forEach(previous.get()::remove);
