@@ -529,11 +529,9 @@ public class GuiSignalBox extends GuiBase {
                 helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
                 this.lastTile = null;
 
-                bottomEntity.setHeight(24);
-                bottomEntity.setWidth(22 * EnumGuiMode.values().length + 2);
+                bottomEntity.setHeight(34);
                 bottomEntity.add(new UIColor(0xFF8B8B8B));
                 bottomEntity.add(new UIBorder(0xFF000000, 2));
-
                 bottomEntity.add(menu);
                 bottomEntity.getParent().update();
             });
@@ -652,10 +650,7 @@ public class GuiSignalBox extends GuiBase {
         header.add(mainButton);
         resetSelection(mainButton);
 
-        bottomEntity.setWidth(22 * EnumGuiMode.values().length);
         bottomEntity.setHeight(0);
-        bottomEntity.setX(-7);
-        bottomEntity.setScale(0.95f);
 
         final UIEntity middlePart = new UIEntity();
         middlePart.setInheritHeight(true);
@@ -674,6 +669,8 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
         helpPage.helpUsageMode(null);
+
+        bottomEntity.setWidth(middlePart.getWidth() - 4);
     }
 
     private void disableBottomEntity() {
