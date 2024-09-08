@@ -99,11 +99,11 @@ public class UISignalBoxTile extends UIComponentEntity {
             if (setToEntity.containsKey(hpMode)) {
                 if (hpState.equals(SignalState.RED)) {
                     switch (state) {
-                        case SUBSIDIARY_RED:
-                        case GREEN: {
+                        case SUBSIDIARY_RED: {
                             hpState = SignalState.SUBSIDIARY_RED;
                             break;
                         }
+                        case GREEN:
                         case SUBSIDIARY_OFF: {
                             hpState = SignalState.SUBSIDIARY_OFF;
                             break;
