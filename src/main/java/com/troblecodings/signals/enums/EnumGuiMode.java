@@ -6,6 +6,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.signals.core.OSSupplier;
 import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.UISignalBoxTile;
+import com.troblecodings.signals.signalbox.SignalBoxUtil;
 
 public enum EnumGuiMode {
     STRAIGHT(new float[] {
@@ -83,7 +84,7 @@ public enum EnumGuiMode {
     }
 
     private EnumGuiMode(final float[] array, final PathwayModeType type) {
-        this((_u) -> new UILines(array, 2), type);
+        this((_u) -> new UILines(array, 2).setColor(SignalBoxUtil.FREE_COLOR), type);
     }
 
     private EnumGuiMode(final OSSupplier<Object> consumer, final PathwayModeType type) {
