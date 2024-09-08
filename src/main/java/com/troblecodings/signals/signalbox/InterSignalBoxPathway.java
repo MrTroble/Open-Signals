@@ -152,7 +152,7 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
 
     @Override
     protected void setSignals(final SignalStateInfo lastSignal) {
-        if (tile == null)
+        if (tile == null || isExecutingSignalSet)
             return;
         final StateInfo identifier = new StateInfo(tile.getWorld(), tile.getPos());
         if (lastSignal != null && pathwayToReset != null) {
