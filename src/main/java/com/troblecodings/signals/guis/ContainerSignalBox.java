@@ -338,7 +338,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final Point end = Point.of(buffer);
                 final PathwayRequestResult request = grid.requestWay(start, end);
                 if (!request.isPass()) {
-                    if (request.canBeAddedToSaver() && grid.addNextPathway(start, end)) {
+                    final SignalBoxNode endNode = grid.getNode(end);
+                    if (request.canBeAddedToSaver() && !endNode.containsOutConnection()
+                            && grid.addNextPathway(start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
                         sucess.putEnumValue(request);
