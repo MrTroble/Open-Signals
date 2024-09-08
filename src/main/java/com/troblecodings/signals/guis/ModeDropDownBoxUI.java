@@ -387,7 +387,7 @@ public class ModeDropDownBoxUI {
                                                 new Thread(() -> {
                                                     try {
                                                         Thread.sleep(3000);
-                                                    } catch (final InterruptedException e2) {
+                                                    } catch (final InterruptedException _u) {
                                                     }
                                                     screen.remove(tip);
                                                 }).start();
