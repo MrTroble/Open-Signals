@@ -112,7 +112,7 @@ public class SidePanel {
         spacerEntity.add(new UIBox(UIBox.VBOX, 0));
         spacerEntity.add(button);
         spacerEntity.add(entity);
-        spacerEntity.add(new UIColor(GuiSignalBox.BACKGROUND_COLOR));
+        spacerEntity.add(new UIColor(0xFF8B8B8B));
         lowerEntity.add(spacerEntity);
 
         helpPageSpacer.setHeight(5);
@@ -196,8 +196,9 @@ public class SidePanel {
                 new UIEntity().getBasicTextColor(), 0.8f));
 
         final UIEntity preview = new UIEntity();
-        preview.setWidth(70);
-        preview.setHeight(70);
+        preview.setWidth(60);
+        preview.setHeight(60);
+        preview.setX(7);
         preview.add(new UIColor(0xFFAFAFAF));
         final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
         final EnumGuiMode modes = EnumGuiMode.values()[selection];
@@ -213,6 +214,7 @@ public class SidePanel {
 
         preview.add(sbtEntity);
         preview.add(new UIBorder(new UIEntity().getBasicTextColor()));
+        preview.add(new UIScale(0.9f, 0.9f, 0));
 
         infoEntity.add(preview);
         infoEntity.add(getSpacerLine());

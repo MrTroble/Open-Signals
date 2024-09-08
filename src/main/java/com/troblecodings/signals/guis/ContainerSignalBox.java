@@ -282,8 +282,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final int size = buffer.getInt();
                 for (int i = 0; i < size; i++) {
                     final Point point = Point.of(buffer);
-                    final TrainNumber number = TrainNumber.of(buffer);
-                    grid.getNode(point).setTrainNumber(number);
+                    grid.getNode(point).readUpdateNetwork(buffer);
                     updates.add(point);
                 }
                 trainNumberUpdater.accept(updates);
@@ -349,7 +348,9 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final Point end = Point.of(buffer);
                 final PathwayRequestResult request = grid.requestWay(start, end);
                 if (!request.isPass()) {
-                    if (request.canBeAddedToSaver() && grid.addNextPathway(start, end)) {
+                    final SignalBoxNode endNode = grid.getNode(end);
+                    if (request.canBeAddedToSaver() && !endNode.containsOutConnection()
+                            && grid.addNextPathway(start, end)) {
                         final WriteBuffer sucess = new WriteBuffer();
                         sucess.putEnumValue(SignalBoxNetwork.ADDED_TO_SAVER);
                         sucess.putEnumValue(request);
@@ -445,6 +446,10 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                     list.add(PosIdentifier.of(buffer));
                 }
                 deserializeEntry(buffer, list);
+                break;
+            }
+            case SEND_CONNECTED_TRAINNUMBERS: {
+                deserializeEntry(buffer, ModeIdentifier.of(buffer));
                 break;
             }
             default:

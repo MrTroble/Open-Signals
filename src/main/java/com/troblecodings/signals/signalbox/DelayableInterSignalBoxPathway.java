@@ -17,6 +17,11 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
     }
 
     @Override
+    public void setUpPathwayStatus() {
+        setPathStatus(EnumPathUsage.PREPARED);
+    }
+
+    @Override
     public void updatePathwaySignals() {
         setPathStatus(EnumPathUsage.PREPARED);
         if (pathwayToBlock != null) {
@@ -37,7 +42,7 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
             if (isEmptyOrBroken()) {
                 return;
             }
-            final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data
+            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                     .getOtherSignals();
             this.isExecutingSignalSet = false;
             pathwayToBlock.isExecutingSignalSet = false;

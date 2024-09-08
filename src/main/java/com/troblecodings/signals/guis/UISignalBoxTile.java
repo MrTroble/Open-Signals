@@ -45,7 +45,6 @@ public class UISignalBoxTile extends UIComponentEntity {
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
     private final Map<ModeSet, SignalState> greenSignals = new HashMap<>();
-    private final UITrainNumber uiTrainNumber = new UITrainNumber();
 
     public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
@@ -97,11 +96,11 @@ public class UISignalBoxTile extends UIComponentEntity {
             if (setToEntity.containsKey(hpMode)) {
                 if (hpState.equals(SignalState.RED)) {
                     switch (state) {
-                        case SUBSIDIARY_RED:
-                        case GREEN: {
+                        case SUBSIDIARY_RED: {
                             hpState = SignalState.SUBSIDIARY_RED;
                             break;
                         }
+                        case GREEN:
                         case SUBSIDIARY_OFF: {
                             hpState = SignalState.SUBSIDIARY_OFF;
                             break;
@@ -116,6 +115,18 @@ public class UISignalBoxTile extends UIComponentEntity {
                 localRemove(modeSet);
                 updateModeSet(hpMode);
                 return;
+            }
+        }
+
+        if (modeSet.mode.equals(EnumGuiMode.TRAIN_NUMBER)) {
+            final TrainNumber number = node.getOption(modeSet).get()
+                    .getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
+            if (!number.equals(TrainNumber.DEFAULT)) {
+                final UIEntity label = GuiElements.createLabel(number.trainNumber,
+                        ConfigHandler.signalboxTrainnumberColor, 0.5f);
+                label.setX(6);
+                label.setY(3);
+                entity.add(label);
             }
         }
 
@@ -187,15 +198,6 @@ public class UISignalBoxTile extends UIComponentEntity {
         final UIEntity entity = setToEntity.get(mode);
         if (entity != null) {
             entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
-        }
-    }
-
-    public void updateTrainNumber() {
-        this.getParent().remove(uiTrainNumber);
-        final TrainNumber number = this.node.getTrainNumber();
-        uiTrainNumber.setTrainNumber(number);
-        if (!number.trainNumber.isEmpty()) {
-            this.getParent().add(uiTrainNumber);
         }
     }
 }

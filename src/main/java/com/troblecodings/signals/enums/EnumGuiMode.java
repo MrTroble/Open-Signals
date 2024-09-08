@@ -4,7 +4,9 @@ import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.render.UITexture;
 import com.troblecodings.signals.core.OSSupplier;
+import com.troblecodings.signals.guis.GuiSignalBox;
 import com.troblecodings.signals.guis.UISignalBoxTile;
+import com.troblecodings.signals.signalbox.SignalBoxUtil;
 
 public enum EnumGuiMode {
     STRAIGHT(new float[] {
@@ -15,7 +17,7 @@ public enum EnumGuiMode {
             0.9f, 0.2f, 0.9f, 0.8f
     }, PathwayModeType.END), PLATFORM((state) -> new UILines(new float[] {
             0, 0.15f, 1, 0.15f
-    }, 3), PathwayModeType.NONE), BUE(new float[] {
+    }, 3).setColor(SignalBoxUtil.FREE_COLOR), PathwayModeType.NONE), BUE(new float[] {
             0.3f, 0, 0.3f, 1, 0.7f, 0, 0.7f, 1
     }), HP(0, true, PathwayModeType.START_END), VP(1, true, PathwayModeType.NONE),
     RS(2, true, PathwayModeType.START_END), RA10(3, PathwayModeType.END),
@@ -25,7 +27,10 @@ public enum EnumGuiMode {
     ARROW((_u) -> new UITexture(UISignalBoxTile.ARROW_ICON), PathwayModeType.END),
     NE1((_u) -> new UITexture(UISignalBoxTile.NE1_ICON), PathwayModeType.START_END),
     NE5((_u) -> new UITexture(UISignalBoxTile.NE5_ICON), PathwayModeType.START_END),
-    ZS3((_u) -> new UITexture(UISignalBoxTile.ZS3_ICON), PathwayModeType.NONE);
+    ZS3((_u) -> new UITexture(UISignalBoxTile.ZS3_ICON), PathwayModeType.NONE),
+    TRAIN_NUMBER((_u) -> new UILines(new float[] {
+            0, 0.5f, 2, 0.5f
+    }, 6).setColor(GuiSignalBox.TRAIN_NUMBER_BACKGROUND_COLOR), PathwayModeType.NONE);
 
     /**
      * Naming
@@ -79,7 +84,7 @@ public enum EnumGuiMode {
     }
 
     private EnumGuiMode(final float[] array, final PathwayModeType type) {
-        this((_u) -> new UILines(array, 2), type);
+        this((_u) -> new UILines(array, 2).setColor(SignalBoxUtil.FREE_COLOR), type);
     }
 
     private EnumGuiMode(final OSSupplier<Object> consumer, final PathwayModeType type) {

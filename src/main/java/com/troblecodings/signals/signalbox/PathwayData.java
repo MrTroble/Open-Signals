@@ -3,10 +3,12 @@ package com.troblecodings.signals.signalbox;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
@@ -19,7 +21,9 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.JsonEnumHolder;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.EnumGuiMode;
@@ -57,12 +61,13 @@ public class PathwayData {
     private int delay = 0;
     private Optional<MainSignalIdentifier> startSignal = Optional.empty();
     private Optional<MainSignalIdentifier> endSignal = Optional.empty();
-    private Map<BlockPos, OtherSignalIdentifier> otherSignals = ImmutableMap.of();
+    private Map<BlockPosSignalHolder, OtherSignalIdentifier> otherSignals = ImmutableMap.of();
     private List<OtherSignalIdentifier> preSignals = ImmutableList.of();
     private boolean emptyOrBroken = false;
     private List<SignalBoxNode> protectionWayNodes = ImmutableList.of();
     private BlockPos protectionWayReset = null;
     private int protectionWayResetDelay = 0;
+    private List<ModeIdentifier> trainNumberDisplays = ImmutableList.of();
 
     private SignalBoxPathway pathway;
 
@@ -98,17 +103,21 @@ public class PathwayData {
 
     public SignalBoxPathway createPathway() {
         if (pathway == null) {
-            final boolean isInterSignalBoxPathway = isInterSignalBoxPathway();
-            if (delay > 0) {
-                if (isInterSignalBoxPathway) {
-                    pathway = new DelayableInterSignalBoxPathway(this);
-                } else {
-                    pathway = new DelayableSignalBoxPathway(this);
-                }
-            } else if (isInterSignalBoxPathway) {
-                pathway = new InterSignalBoxPathway(this);
+            if (type.equals(PathType.SHUNTING)) {
+                pathway = new ShuntingPathway(this);
             } else {
-                pathway = new SignalBoxPathway(this);
+                final boolean isInterSignalBoxPathway = isInterSignalBoxPathway();
+                if (delay > 0) {
+                    if (isInterSignalBoxPathway) {
+                        pathway = new DelayableInterSignalBoxPathway(this);
+                    } else {
+                        pathway = new DelayableSignalBoxPathway(this);
+                    }
+                } else if (isInterSignalBoxPathway) {
+                    pathway = new InterSignalBoxPathway(this);
+                } else {
+                    pathway = new SignalBoxPathway(this);
+                }
             }
         }
         return pathway;
@@ -142,7 +151,7 @@ public class PathwayData {
                 this.initalize();
                 break;
             }
-            if (current.isUsed()) {
+            if (current.isUsedInDirection(newPos)) {
                 return false;
             }
         }
@@ -254,7 +263,8 @@ public class PathwayData {
         final AtomicInteger atomic = new AtomicInteger(Integer.MAX_VALUE);
         final AtomicReference<Byte> zs2Value = new AtomicReference<>((byte) -1);
         final AtomicInteger delayAtomic = new AtomicInteger(0);
-        final Map<BlockPos, OtherSignalIdentifier> otherBuilder = new HashMap<>();
+        final Map<BlockPosSignalHolder, OtherSignalIdentifier> otherBuilder = new HashMap<>();
+        final Set<ModeIdentifier> trainNumberDisplays = new HashSet<>();
         mapOfBlockingPositions.clear();
         mapOfResetPositions.clear();
         foreachPath((path, node) -> {
@@ -266,6 +276,8 @@ public class PathwayData {
                 optionEntry.getEntry(PathEntryType.RESETING)
                         .ifPresent(position -> mapOfResetPositions.put(position, node));
                 optionEntry.getEntry(PathEntryType.ZS2).ifPresent(value -> zs2Value.set(value));
+                optionEntry.getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
+                        .ifPresent(ident -> trainNumberDisplays.add(ident));
             });
             final Rotation rotation = SignalBoxUtil
                     .getRotationFromDelta(node.getPoint().delta(path.point1));
@@ -279,7 +291,20 @@ public class PathwayData {
                             final OtherSignalIdentifier ident = new OtherSignalIdentifier(
                                     node.getPoint(), modeSet, position,
                                     repeaterOption.isPresent() && repeaterOption.get(), mode);
-                            otherBuilder.put(position, ident);
+                            final BlockPosSignalHolder holder = new BlockPosSignalHolder(position);
+                            if (otherBuilder.containsKey(holder)) {
+                                final OtherSignalIdentifier otherIdent = otherBuilder.get(holder);
+                                if (ident.guiMode.ordinal() < otherIdent.guiMode.ordinal()) {
+                                    otherBuilder.put(holder, ident);
+                                    otherBuilder.put(new BlockPosSignalHolder(position, true),
+                                            otherIdent);
+                                } else {
+                                    otherBuilder.put(new BlockPosSignalHolder(position, true),
+                                            ident);
+                                }
+                            } else {
+                                otherBuilder.put(holder, ident);
+                            }
                         }));
             }
             node.getModes().forEach((mode, entry) -> {
@@ -288,6 +313,7 @@ public class PathwayData {
                             value -> delayAtomic.updateAndGet(in -> Math.max(in, value)));
             });
         }, null);
+        this.trainNumberDisplays = ImmutableList.copyOf(trainNumberDisplays);
         this.otherSignals = ImmutableMap.copyOf(otherBuilder);
         final SignalBoxNode firstNode = this.listOfNodes.get(this.listOfNodes.size() - 1);
         this.firstPoint = firstNode.getPoint();
@@ -455,7 +481,7 @@ public class PathwayData {
         this.initalize();
     }
 
-    public Map<BlockPos, OtherSignalIdentifier> getOtherSignals() {
+    public Map<BlockPosSignalHolder, OtherSignalIdentifier> getOtherSignals() {
         return otherSignals;
     }
 
@@ -606,6 +632,10 @@ public class PathwayData {
 
     public SignalBoxGrid getGrid() {
         return grid;
+    }
+
+    public List<ModeIdentifier> getTrainNumberDisplays() {
+        return trainNumberDisplays;
     }
 
     @Override
