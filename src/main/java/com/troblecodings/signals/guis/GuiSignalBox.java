@@ -974,6 +974,8 @@ public class GuiSignalBox extends GuiBase {
         nodes.forEach(node -> {
             final UISignalBoxTile tile = allTiles.get(node.getPoint());
             node.forEach(mode -> {
+                if (!(mode.mode == EnumGuiMode.STRAIGHT || mode.mode == EnumGuiMode.CORNER))
+                    return;
                 if (node.containsManuellOutput(mode)) {
                     tile.setColor(mode, OUTPUT_COLOR);
                     return;
@@ -989,12 +991,22 @@ public class GuiSignalBox extends GuiBase {
         nodes.forEach(node -> {
             final UISignalBoxTile tile = allTiles.get(node.getPoint());
             node.forEach(mode -> {
-                tile.setColor(mode, SignalBoxUtil.FREE_COLOR);
+                final EnumGuiMode guiMode = mode.mode;
                 final PathOptionEntry entry = node.getOption(mode).get();
-                entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
-                        _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));
-                entry.getEntry(PathEntryType.TRAINNUMBER)
-                        .ifPresent(_u -> entry.removeEntry(PathEntryType.TRAINNUMBER));
+                switch (guiMode) {
+                    case STRAIGHT:
+                    case CORNER:
+                        tile.setColor(mode, SignalBoxUtil.FREE_COLOR);
+                        entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
+                                _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));
+                        break;
+                    case TRAIN_NUMBER:
+                        entry.getEntry(PathEntryType.TRAINNUMBER)
+                                .ifPresent(_u -> entry.removeEntry(PathEntryType.TRAINNUMBER));
+                        break;
+                    default:
+                        break;
+                }
             });
         });
     }

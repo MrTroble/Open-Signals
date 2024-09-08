@@ -60,8 +60,8 @@ public class ModeDropDownBoxUI {
 
     public UIEntity getTop() {
         final String modeName = I18Wrapper.format("property." + modeSet.mode.name());
-        final String rotationName =
-                I18Wrapper.format("property." + modeSet.rotation.name() + ".rotation");
+        final String rotationName = I18Wrapper
+                .format("property." + modeSet.rotation.name() + ".rotation");
 
         final UIEntity top = new UIEntity();
         top.setInheritWidth(true);
@@ -89,15 +89,15 @@ public class ModeDropDownBoxUI {
     public void addElements(final UIEntity parent) {
         if (!open)
             return;
-        final Set<Map.Entry<BlockPos, LinkType>> entrySet =
-                gui.container.getPositionForTypes().entrySet();
+        final Set<Map.Entry<BlockPos, LinkType>> entrySet = gui.container.getPositionForTypes()
+                .entrySet();
         final EnumGuiMode mode = modeSet.mode;
         final Rotation rotation = modeSet.rotation;
         switch (mode) {
             case CORNER:
             case STRAIGHT: {
-                final EnumPathUsage path =
-                        option.getEntry(PathEntryType.PATHUSAGE).orElse(EnumPathUsage.FREE);
+                final EnumPathUsage path = option.getEntry(PathEntryType.PATHUSAGE)
+                        .orElse(EnumPathUsage.FREE);
                 final UIEntity stateEntity = new UIEntity();
                 stateEntity.setInheritWidth(true);
                 stateEntity.setHeight(15);
@@ -124,8 +124,8 @@ public class ModeDropDownBoxUI {
                 gui.selectLink(parent, node, option, entrySet, LinkType.OUTPUT,
                         PathEntryType.OUTPUT, mode, rotation);
 
-                final SizeIntegerables<Integer> pathwayCosts =
-                        new SizeIntegerables<>("pathway_costs", 20, i -> i);
+                final SizeIntegerables<Integer> pathwayCosts = new SizeIntegerables<>(
+                        "pathway_costs", 20, i -> i);
                 final UIEntity costSelection = GuiElements.createEnumElement(pathwayCosts, i -> {
                     option.setEntry(PathEntryType.PATHWAY_COSTS, i);
                     gui.sendIntEntryToServer(i, node, mode, rotation, PathEntryType.PATHWAY_COSTS);
@@ -163,8 +163,8 @@ public class ModeDropDownBoxUI {
                         }, opt.isPresent() && opt.get() ? 1 : 0));
                 break;
             case HP: {
-                final List<PosIdentifier> preSignalsList =
-                        option.getEntry(PathEntryType.PRESIGNALS).orElse(new ArrayList<>());
+                final List<PosIdentifier> preSignalsList = option.getEntry(PathEntryType.PRESIGNALS)
+                        .orElse(new ArrayList<>());
                 final UIEntity preSignalEntity = GuiElements
                         .createButton(I18Wrapper.format("property.presignals.name"), e -> {
                             final UIEntity screen = new UIEntity();
@@ -174,8 +174,7 @@ public class ModeDropDownBoxUI {
                                     e1 -> gui.pop()));
                             SignalBoxUIHelper.initializeGrid(screen, gui.container.grid,
                                     (tile, sbt) -> {
-                                        final AtomicReference<PosIdentifier> vp =
-                                                new AtomicReference<>();
+                                        final AtomicReference<PosIdentifier> vp = new AtomicReference<>();
                                         sbt.getNode().getModes().forEach((nodeMode, entry) -> {
                                             if (!(nodeMode.mode.equals(EnumGuiMode.VP)
                                                     || nodeMode.mode.equals(EnumGuiMode.ZS3)))
@@ -190,8 +189,8 @@ public class ModeDropDownBoxUI {
                                         final PosIdentifier ident = vp.get();
                                         if (ident == null)
                                             return;
-                                        final UIColor color =
-                                                new UIColor(GuiSignalBox.SELECTION_COLOR);
+                                        final UIColor color = new UIColor(
+                                                GuiSignalBox.SELECTION_COLOR);
                                         tile.add(new UIClickable(e1 -> {
                                             if (preSignalsList.contains(ident)) {
                                                 preSignalsList.remove(ident);
@@ -220,8 +219,8 @@ public class ModeDropDownBoxUI {
                 preSignalEntity.add(new UIToolTip(I18Wrapper.format("property.presignals.desc")));
                 parent.add(preSignalEntity);
 
-                final Point selcetedPoint =
-                        option.getEntry(PathEntryType.PROTECTIONWAY_END).orElse(new Point(-1, -1));
+                final Point selcetedPoint = option.getEntry(PathEntryType.PROTECTIONWAY_END)
+                        .orElse(new Point(-1, -1));
                 final UIEntity protectionWay = GuiElements
                         .createButton(I18Wrapper.format("property.protectionway.name"), e -> {
                             final UIEntity screen = new UIEntity();
@@ -235,8 +234,8 @@ public class ModeDropDownBoxUI {
                                         if (sbt.getNode().isEmpty())
                                             return;
                                         final Point point = sbt.getPoint();
-                                        final UIColor color =
-                                                new UIColor(GuiSignalBox.SELECTION_COLOR);
+                                        final UIColor color = new UIColor(
+                                                GuiSignalBox.SELECTION_COLOR);
                                         if (point.equals(selcetedPoint)) {
                                             tile.add(color);
                                             previous.set(tile);
@@ -380,6 +379,20 @@ public class ModeDropDownBoxUI {
                                                     .toPathIdentifier().stream()
                                                     .map(ident -> ident.getMode())
                                                     .collect(Collectors.toSet());
+                                            if (pathModesSet.isEmpty()) {
+                                                final UIToolTip tip = new UIToolTip(
+                                                        I18Wrapper.format("gui.tile.notvalid"),
+                                                        true);
+                                                screen.add(tip);
+                                                new Thread(() -> {
+                                                    try {
+                                                        Thread.sleep(3000);
+                                                    } catch (final InterruptedException e2) {
+                                                    }
+                                                    screen.remove(tip);
+                                                }).start();
+                                                return;
+                                            }
                                             final List<ModeSet> pathModes = new ArrayList<>(
                                                     pathModesSet);
                                             if (pathModes.size() > 1) {

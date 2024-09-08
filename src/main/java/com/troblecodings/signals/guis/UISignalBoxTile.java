@@ -124,11 +124,13 @@ public class UISignalBoxTile extends UIComponentEntity {
         if (modeSet.mode.equals(EnumGuiMode.TRAIN_NUMBER)) {
             final TrainNumber number = node.getOption(modeSet).get()
                     .getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
-            final UIEntity label = GuiElements.createLabel(number.trainNumber,
-                    ConfigHandler.signalboxTrainnumberColor, 0.5f);
-            label.setX(6);
-            label.setY(3);
-            entity.add(label);
+            if (!number.equals(TrainNumber.DEFAULT)) {
+                final UIEntity label = GuiElements.createLabel(number.trainNumber,
+                        ConfigHandler.signalboxTrainnumberColor, 0.5f);
+                label.setX(6);
+                label.setY(3);
+                entity.add(label);
+            }
         }
 
         entity.add((UIComponent) modeSet.mode.consumer.get(state));
