@@ -175,6 +175,8 @@ public class GuiSignalBox extends GuiBase {
     private void updateTrainNumber(final List<Point> points) {
         points.forEach(point -> {
             final UISignalBoxTile tile = allTiles.get(point);
+            if (tile == null)
+                return;
             tile.setNode(tile.getNode());
         });
         lowerEntity.update();
