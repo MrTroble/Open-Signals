@@ -219,9 +219,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return mode.flatMap(this::getOption);
     }
 
-    public PathType getPathType(final SignalBoxNode other) {
+    public List<PathType> getPossibleTypes(final SignalBoxNode other) {
+        final List<PathType> possibleTypes = new ArrayList<>();
         if (other == null || other.getPoint().equals(this.getPoint()))
-            return PathType.NONE;
+            return possibleTypes;
         final Set<EnumGuiMode> thisMode = this.possibleModes.keySet().stream()
                 .map(mode -> mode.mode).collect(Collectors.toSet());
 
@@ -233,9 +234,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             final boolean otherContains = Arrays.stream(type.getModes())
                     .anyMatch(otherMode::contains);
             if (thisContains && otherContains)
-                return type;
+                possibleTypes.add(type);
         }
-        return PathType.NONE;
+        return possibleTypes;
     }
 
     public PathwayRequestResult canMakePath(final Path path, final PathType type) {

@@ -48,6 +48,8 @@ import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.SignalBoxPage;
@@ -294,13 +296,36 @@ public class GuiSignalBox extends GuiBase {
                     return;
                 }
                 if (currentTile.isValidEnd()) {
-                    sendPWRequest(currentTile.getNode());
+                    checkForMultiplePathTypes(lastTile.getNode(), currentTile.getNode());
                     this.resetTileSelection();
                     return;
                 }
             }
         }));
         tile.add(new UIClickable(e -> openNodeShortcuts(currentTile.getNode(), e), 1));
+    }
+
+    private void checkForMultiplePathTypes(final SignalBoxNode start, final SignalBoxNode end) {
+        final List<PathType> possibleTypes = start.getPossibleTypes(end);
+        if (possibleTypes.isEmpty()) {
+            infoUpdate(I18Wrapper
+                    .format("error." + PathwayRequestResult.NO_EQUAL_PATH_TYPE.getName()));
+        } else if (possibleTypes.size() == 1) {
+            sendPWRequest(lastTile.getPoint(), end.getPoint(), possibleTypes.get(0));
+        } else if (possibleTypes.size() > 1) {
+            push(GuiElements.createScreen(entity -> {
+                entity.add(GuiElements.createButton(I18Wrapper.format("btn.return"), e -> pop()));
+                entity.add(GuiElements.createSpacerV(10));
+                entity.add(GuiElements.createLabel(I18Wrapper.format("gui.signalbox.choosetypes"),
+                        0xffffff));
+                entity.add(GuiElements.createSpacerV(10));
+                possibleTypes
+                        .forEach(type -> entity.add(GuiElements.createButton(type.name(), e -> {
+                            sendPWRequest(start.getPoint(), end.getPoint(), type);
+                            pop();
+                        })));
+            }));
+        }
     }
 
     private void resetSelection(final UIEntity entity) {
@@ -681,13 +706,14 @@ public class GuiSignalBox extends GuiBase {
         bottomEntity.getParent().update();
     }
 
-    private void sendPWRequest(final SignalBoxNode currentNode) {
+    private void sendPWRequest(final Point start, final Point end, final PathType type) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.REQUEST_PW);
-        lastTile.getPoint().writeNetwork(buffer);
-        currentNode.getPoint().writeNetwork(buffer);
+        start.writeNetwork(buffer);
+        end.writeNetwork(buffer);
+        buffer.putEnumValue(type);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 

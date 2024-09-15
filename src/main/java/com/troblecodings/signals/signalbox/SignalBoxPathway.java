@@ -635,7 +635,7 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     public void checkReRequest() {
         if (isAutoPathway) {
-            grid.requestWay(originalFirstPoint, getLastPoint());
+            grid.requestWay(originalFirstPoint, getLastPoint(), getPathType());
         }
     }
 

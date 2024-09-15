@@ -865,14 +865,13 @@ public class SidePanel {
             final UIScrollBox scrollbox = new UIScrollBox(UIBox.VBOX, 2);
             list.add(scrollbox);
 
-            gui.container.nextPathways.forEach(entry -> {
+            gui.container.nextPathways.forEach((entry, pathType) -> {
                 final UIEntity layout = new UIEntity();
                 layout.setHeight(20);
                 layout.setInheritWidth(true);
                 layout.add(new UIBox(UIBox.HBOX, 2));
-                final UIEntity button = GuiElements
-                        .createButton("Start: " + entry.getKey().toShortString() + ", End: "
-                                + entry.getValue().toShortString());
+                final UIEntity button = GuiElements.createButton(entry.getKey().toShortString()
+                        + " to " + entry.getValue().toShortString() + " as " + pathType.name());
                 layout.add(button);
                 layout.add(
                         GuiElements.createButton(I18Wrapper.format("info.usage.show"), 40, _u -> {

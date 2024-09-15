@@ -575,7 +575,7 @@ public class PathwayData {
                         return;
                     }
                     final PathwayRequestResult endRequeset = SignalBoxUtil.requestPathway(endGrid,
-                            otherStartPoint.get(), otherEndPoint.get());
+                            otherStartPoint.get(), otherEndPoint.get(), PathType.NORMAL);
                     if (endRequeset.isPass()) {
                         returnResult.set(endRequeset.getPathwayData());
                     }
