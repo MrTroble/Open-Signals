@@ -103,7 +103,11 @@ public class PathwayData {
     public SignalBoxPathway createPathway() {
         if (pathway == null) {
             if (type.equals(PathType.SHUNTING)) {
-                pathway = new ShuntingPathway(this);
+                if (delay > 0) {
+                    pathway = new DelayableShuntingPathway(this);
+                } else {
+                    pathway = new ShuntingPathway(this);
+                }
             } else {
                 final boolean isInterSignalBoxPathway = isInterSignalBoxPathway();
                 if (delay > 0) {
