@@ -674,3 +674,5 @@ info.train_number=Zugnummernfeld
 property.TRAIN_NUMBER=Zugnummernfeld
 btn.connect.trainnumber=Zugnummernfeld verbinden
 gui.tile.notvalid=Nicht erlaubt
+property.SHUNTING=Rangieren
+gui.signalbox.choosetypes=Wähle Fahrstraßentyp

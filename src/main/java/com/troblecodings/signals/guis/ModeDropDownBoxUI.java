@@ -358,7 +358,7 @@ public class ModeDropDownBoxUI {
             }
             case TRAIN_NUMBER: {
                 final UIEntity button = GuiElements
-                        .createButton(I18Wrapper.format("btn.conntect.trainnumber"), e -> {
+                        .createButton(I18Wrapper.format("btn.connect.trainnumber"), e -> {
                             final ModeIdentifier identifier = option
                                     .getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
                                     .orElse(new ModeIdentifier(new Point(-1, -1), null));

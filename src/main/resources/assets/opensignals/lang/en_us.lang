@@ -673,3 +673,5 @@ info.train_number=Train number field
 property.TRAIN_NUMBER=Train number field
 btn.connect.trainnumber=Connect trainnumber
 gui.tile.notvalid=Not valid
+property.SHUNTING=Shunting
+gui.signalbox.choosetypes=Choose pathway type
