@@ -494,12 +494,14 @@ public class ModeDropDownBoxUI {
     private static void disconnectFromEachOther(final ModeIdentifier ident1,
             final ModeIdentifier ident2, final SignalBoxGrid grid, final GuiSignalBox gui) {
         final SignalBoxNode node1 = grid.getNode(ident1.point);
-        node1.getOption(ident1.mode).get().removeEntry(PathEntryType.CONNECTED_TRAINNUMBER);
+        node1.getOption(ident1.mode)
+                .ifPresent(entry -> entry.removeEntry(PathEntryType.CONNECTED_TRAINNUMBER));
         gui.removeEntryFromServer(node1, ident1.mode.mode, ident1.mode.rotation,
                 PathEntryType.CONNECTED_TRAINNUMBER);
 
         final SignalBoxNode node2 = grid.getNode(ident2.point);
-        node2.getOption(ident2.mode).get().removeEntry(PathEntryType.CONNECTED_TRAINNUMBER);
+        node2.getOption(ident2.mode)
+                .ifPresent(entry -> entry.removeEntry(PathEntryType.CONNECTED_TRAINNUMBER));
         gui.removeEntryFromServer(node2, ident2.mode.mode, ident2.mode.rotation,
                 PathEntryType.CONNECTED_TRAINNUMBER);
     }
