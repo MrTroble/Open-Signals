@@ -570,7 +570,7 @@ public class SidePanel {
                 }
                 final EnumPathUsage path = option.getEntry(PathEntryType.PATHUSAGE)
                         .orElse(EnumPathUsage.FREE);
-                if (path.equals(EnumPathUsage.BLOCKED)) {
+                if (!(path.equals(EnumPathUsage.FREE) || path.equals(EnumPathUsage.PROTECTED))) {
                     isPathBlocked = true;
                 }
             }
