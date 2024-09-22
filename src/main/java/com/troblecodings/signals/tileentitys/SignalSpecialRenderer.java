@@ -43,18 +43,19 @@ public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnti
     public void renderAnimation(final RenderAnimationInfo info, final SignalTileEntity tile) {
 
         final BlockState state = tile.getBlockState();
-        final SignalAngel angel = state.getValue(Signal.ANGEL);
+        final SignalAngel angle = state.getValue(Signal.ANGEL);
 
         info.stack.pushPose(); // erst Berechnungen ausführen, dann Block rendern
 
-        info.stack.translate(0.5f, 0, 0.5f);
-        info.stack.mulPose(angel.getQuaternion());
+        info.stack.translate(0.5f, 0.5f, 0.5f);
 
-        info.stack.translate(0.5f, 7.5f, -0.5f); // Block verschieben
+        info.stack.mulPose(angle.getQuaternion());
+        info.stack.translate(0.15f, 7f, -0.5f); // Block verschieben
+
         info.stack.mulPose(Quaternion.fromXYZ(0, 0, -tile.animProgress * 0.005f));
         tile.updateAnim(); // Progress aktualisieren
 
-        info.stack.translate(-1, -4.5f, 0); // Pivot Punkt verschieben
+        info.stack.translate(-0.7f, -4.5f, 0f); // Pivot Punkt verschieben
 
         // info.dispatcher.renderSingleBlock(Blocks.GLASS.defaultBlockState(),
         // info.stack, info.source,
@@ -68,7 +69,8 @@ public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnti
 
         info.stack.popPose();
 
-        if (tile.animProgress > 180)
+        if (tile.animProgress > 158) {
             tile.animProgress = 0;
+        }
     }
 }
