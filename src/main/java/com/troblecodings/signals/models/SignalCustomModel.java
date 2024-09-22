@@ -84,9 +84,8 @@ public class SignalCustomModel implements UnbakedModel {
         }
     }
 
-    private static BakedModelPair transform(final SignalModelLoaderInfo info,
-            final ModelBakery bakery, final ResourceLocation location,
-            final Function<Material, TextureAtlasSprite> function,
+    private BakedModelPair transform(final SignalModelLoaderInfo info, final ModelBakery bakery,
+            final ResourceLocation location, final Function<Material, TextureAtlasSprite> function,
             final Map<String, Either<Material, String>> material, final Quaternion rotation) {
         final Transformation transformation = new Transformation(
                 new Vector3f(info.x, info.y, info.z), null, null, null);
@@ -113,7 +112,8 @@ public class SignalCustomModel implements UnbakedModel {
             model.getQuads(null, direction, RANDOM, EmptyModelData.INSTANCE)
                     .forEach(quad -> transform(quad, matrix));
         }
-        locationToModel.put(new ResourceLocation(OpenSignalsMain.MODID, info.name), model);
+        if (angel.equals(SignalAngel.ANGEL0))
+            locationToModel.put(new ResourceLocation(OpenSignalsMain.MODID, info.name), model);
         return new BakedModelPair(info.state, model);
     }
 

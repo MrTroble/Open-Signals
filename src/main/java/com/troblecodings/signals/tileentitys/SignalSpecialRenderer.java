@@ -3,8 +3,10 @@ package com.troblecodings.signals.tileentitys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.RenderOverlayInfo;
+import com.troblecodings.signals.core.SignalAngel;
 import com.troblecodings.signals.models.SignalCustomModel;
 
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -39,28 +41,34 @@ public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnti
 
     // @SuppressWarnings("deprecation")
     public void renderAnimation(final RenderAnimationInfo info, final SignalTileEntity tile) {
-        info.stack.pushPose(); // erst Berechnungen ausführen, dann Block rendern
-        info.stack.translate(1, 1, 0.5f); // Block verschieben
 
-        info.stack.mulPose(
-                Quaternion.fromXYZ(0, 0, tile.animProgress * 0.005f));
+        final BlockState state = tile.getBlockState();
+        final SignalAngel angel = state.getValue(Signal.ANGEL);
+
+        info.stack.pushPose(); // erst Berechnungen ausführen, dann Block rendern
+
+        info.stack.translate(0.5f, 0, 0.5f);
+        info.stack.mulPose(angel.getQuaternion());
+
+        info.stack.translate(0.5f, 7.5f, -0.5f); // Block verschieben
+        info.stack.mulPose(Quaternion.fromXYZ(0, 0, -tile.animProgress * 0.005f));
         tile.updateAnim(); // Progress aktualisieren
 
-        info.stack.translate(-1, 0, -0.5f); // Pivot Punkt verschieben
+        info.stack.translate(-1, -4.5f, 0); // Pivot Punkt verschieben
 
         // info.dispatcher.renderSingleBlock(Blocks.GLASS.defaultBlockState(),
         // info.stack, info.source,
-        // info.lightColor, info.overlayTexture); // Block rendern
+        // info.lightColor, info.overlayTexture); // Block render
         final BakedModel model = SignalCustomModel.getModelFromLocation(
                 new ResourceLocation(OpenSignalsMain.MODID, "semaphore_signals/sema_main_wing1"));
-        final BlockState state = tile.getBlockState();
         info.dispatcher.getModelRenderer().renderModel(info.stack.last(),
                 info.source
                         .getBuffer(ItemBlockRenderTypes.getRenderType(tile.getBlockState(), false)),
                 state, model, 0, 0, 0, info.lightColor, info.overlayTexture, tile.getModelData());
+
         info.stack.popPose();
 
-        if (tile.animProgress > 100)
+        if (tile.animProgress > 180)
             tile.animProgress = 0;
     }
 }
