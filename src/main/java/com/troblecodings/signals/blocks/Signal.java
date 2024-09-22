@@ -463,6 +463,6 @@ public class Signal extends BasicBlock {
                 animation = boolProp.state;
             }
         }
-        return animation;
+        return true;
     }
 }

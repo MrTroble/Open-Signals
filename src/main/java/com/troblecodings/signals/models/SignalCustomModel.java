@@ -25,6 +25,7 @@ import com.mojang.math.Vector4f;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.SignalAngel;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -44,6 +45,8 @@ import net.minecraftforge.client.model.data.EmptyModelData;
 
 @OnlyIn(Dist.CLIENT)
 public class SignalCustomModel implements UnbakedModel {
+
+    private static final Map<ResourceLocation, BakedModel> locationToModel = new HashMap<>();
 
     @Nonnull
     public static final Random RANDOM = new Random();
@@ -110,6 +113,7 @@ public class SignalCustomModel implements UnbakedModel {
             model.getQuads(null, direction, RANDOM, EmptyModelData.INSTANCE)
                     .forEach(quad -> transform(quad, matrix));
         }
+        locationToModel.put(new ResourceLocation(OpenSignalsMain.MODID, info.name), model);
         return new BakedModelPair(info.state, model);
     }
 
@@ -152,5 +156,10 @@ public class SignalCustomModel implements UnbakedModel {
                         .map(info -> transform(info, bakery, resource, function,
                                 materialsFromString, quaternion))
                         .collect(Collectors.toUnmodifiableList()));
+    }
+
+    public static BakedModel getModelFromLocation(final ResourceLocation location) {
+        return locationToModel.getOrDefault(location,
+                Minecraft.getInstance().getModelManager().getMissingModel());
     }
 }

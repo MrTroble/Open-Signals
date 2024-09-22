@@ -2,13 +2,18 @@ package com.troblecodings.signals.tileentitys;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.RenderOverlayInfo;
+import com.troblecodings.signals.models.SignalCustomModel;
 
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEntity> {
 
@@ -26,26 +31,36 @@ public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnti
         }
         if (tile.getSignal().hasAnimation(tile.getLevel(), tile.getBlockPos())) {
             renderAnimation(new RenderAnimationInfo(stack, context.getBlockRenderDispatcher(),
-                    source, rand1, rand2), tile);
+                    source, rand1, rand2).with(tile), tile);
         } else if (!tile.getSignal().hasAnimation(tile.getLevel(), tile.getBlockPos())) {
             tile.animProgress = 0.0F;
         }
     }
 
-    @SuppressWarnings("deprecation")
+    // @SuppressWarnings("deprecation")
     public void renderAnimation(final RenderAnimationInfo info, final SignalTileEntity tile) {
         info.stack.pushPose(); // erst Berechnungen ausführen, dann Block rendern
-        info.stack.translate(0.5f, 1, 0.5f); // Block verschieben
+        info.stack.translate(1, 1, 0.5f); // Block verschieben
 
-        info.stack.mulPose(Quaternion.fromXYZ(0, tile.animProgress * 0.005f, 0));
+        info.stack.mulPose(
+                Quaternion.fromXYZ(0, 0, tile.animProgress * 0.005f));
         tile.updateAnim(); // Progress aktualisieren
 
-        info.stack.translate(-0.5f, 0, -0.5f); // Pivot Punkt verschieben
+        info.stack.translate(-1, 0, -0.5f); // Pivot Punkt verschieben
 
-        info.dispatcher.renderSingleBlock(Blocks.GLASS.defaultBlockState(), info.stack, info.source,
-                info.lightColor, info.overlayTexture); // Block rendern
-        // Minecraft.getInstance().getModelManager().getBlockModelShaper()
-        // .getBlockModel(tile.getBlockState());
+        // info.dispatcher.renderSingleBlock(Blocks.GLASS.defaultBlockState(),
+        // info.stack, info.source,
+        // info.lightColor, info.overlayTexture); // Block rendern
+        final BakedModel model = SignalCustomModel.getModelFromLocation(
+                new ResourceLocation(OpenSignalsMain.MODID, "semaphore_signals/sema_main_wing1"));
+        final BlockState state = tile.getBlockState();
+        info.dispatcher.getModelRenderer().renderModel(info.stack.last(),
+                info.source
+                        .getBuffer(ItemBlockRenderTypes.getRenderType(tile.getBlockState(), false)),
+                state, model, 0, 0, 0, info.lightColor, info.overlayTexture, tile.getModelData());
         info.stack.popPose();
+
+        if (tile.animProgress > 100)
+            tile.animProgress = 0;
     }
 }
