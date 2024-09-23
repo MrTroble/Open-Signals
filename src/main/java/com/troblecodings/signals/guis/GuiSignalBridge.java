@@ -622,7 +622,7 @@ public class GuiSignalBridge extends GuiBase {
     }
 
     private static void checkEnableAndDisable(final AxisDirection axisDirection, final int min,
-            final int max, final int value, final UIEntity button) {
+            final int max, final float value, final UIEntity button) {
         if (value >= max && axisDirection == AxisDirection.POSITIVE) {
             disableSelection(button);
         } else if (value <= min && axisDirection == AxisDirection.NEGATIVE) {

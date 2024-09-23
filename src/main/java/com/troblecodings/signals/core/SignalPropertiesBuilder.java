@@ -44,7 +44,6 @@ public class SignalPropertiesBuilder {
     private Map<String, String> remoteRedstoneOutputs;
     private int defaultItemDamage = 1;
     private boolean isBridgeSignal = false;
-    private Map<String, Boolean> animate;
 
     public SignalProperties build(final FunctionParsingInfo info) {
         if (placementToolName != null) {
@@ -122,8 +121,8 @@ public class SignalPropertiesBuilder {
                 .forEach((entry) -> {
                     if (entry.getKey() != null) {
                         entry.getKey().forEach((key, value) -> {
-                            final Predicate<Map<SEProperty, String>> predicate =
-                                    LogicParser.predicate(key, info);
+                            final Predicate<Map<SEProperty, String>> predicate = LogicParser
+                                    .predicate(key, info);
                             final SEProperty property = (SEProperty) info.getProperty(value);
                             entry.getValue().add(new ValuePack(property, predicate));
                         });
@@ -144,21 +143,6 @@ public class SignalPropertiesBuilder {
                 }
             });
         }
-
-        final List<PredicateProperty<Boolean>> animation = new ArrayList<>();
-        if (animate != null) {
-            animate.forEach((property, bool) -> {
-                try {
-                    animation.add(new PredicateProperty<Boolean>(
-                            LogicParser.predicate(property, info), bool));
-                } catch (final LogicalParserException e) {
-                    OpenSignalsMain.getLogger()
-                            .error("Something went wrong during the registry of a predicate in "
-                                    + info.signalName + "!\nWith statement:" + property);
-                    e.printStackTrace();
-                }
-            });
-        }
         this.colors = this.colors == null ? new ArrayList<>() : this.colors;
 
         return new SignalProperties(placementtool, customNameRenderHeight, defaultHeight,
@@ -166,7 +150,6 @@ public class SignalPropertiesBuilder {
                 autoscale, ImmutableList.copyOf(doubleText), textColor, canLink, colors,
                 ImmutableList.copyOf(renderheights), ImmutableList.copyOf(soundProperties),
                 ImmutableList.copyOf(redstoneValuePacks), defaultItemDamage,
-                ImmutableList.copyOf(remoteRedstoneValuePacks), isBridgeSignal,
-                ImmutableList.copyOf(animation));
+                ImmutableList.copyOf(remoteRedstoneValuePacks), isBridgeSignal);
     }
 }

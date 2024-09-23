@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.troblecodings.core.interfaces.NamableWrapper;
 import com.troblecodings.guilib.ecs.interfaces.ISyncable;
 import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.animation.SignalAnimationHandler;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.RenderOverlayInfo;
 import com.troblecodings.signals.core.SignalStateListener;
@@ -26,10 +27,12 @@ import net.minecraftforge.client.model.data.IModelData;
 public class SignalTileEntity extends SyncableTileEntity implements NamableWrapper, ISyncable {
 
     public float animProgress;
+    protected final SignalAnimationHandler handler;
 
     public SignalTileEntity(final TileEntityInfo info) {
         super(info);
         animProgress = 0.0F;
+        this.handler = new SignalAnimationHandler(this);
     }
 
     private final Map<SEProperty, String> properties = new HashMap<>();
@@ -89,11 +92,23 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         return ImmutableMap.copyOf(properties);
     }
 
+    public SignalAnimationHandler getAnimationHandler() {
+        return handler;
+    }
+
     @Override
     public @Nonnull IModelData getModelData() {
-        final Map<SEProperty, String> states =
-                ClientSignalStateHandler.getClientStates(new StateInfo(level, worldPosition));
-        return new ModelInfoWrapper(states);
+        return new ModelInfoWrapper(properties);
+    }
+
+    @Override
+    public void requestModelDataUpdate() {
+        final Map<SEProperty, String> newProperties = ClientSignalStateHandler
+                .getClientStates(new StateInfo(level, worldPosition));
+        handler.updateStates(newProperties, properties);
+        this.properties.clear();
+        this.properties.putAll(newProperties);
+        super.requestModelDataUpdate();
     }
 
     @Override
@@ -101,6 +116,9 @@ public class SignalTileEntity extends SyncableTileEntity implements NamableWrapp
         if (!level.isClientSide) {
             SignalStateHandler.addListener(new SignalStateInfo(level, worldPosition, getSignal()),
                     listener);
+        } else {
+            if (getSignal().hasAnimation())
+                handler.updateAnimationListFromBlock();
         }
     }
 

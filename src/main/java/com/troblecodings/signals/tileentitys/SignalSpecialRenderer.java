@@ -31,11 +31,9 @@ public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnti
         if (tile.hasCustomName()) {
             tile.renderOverlay(new RenderOverlayInfo(stack, 0, 0, 0, context.getFont()));
         }
-        if (tile.getSignal().hasAnimation(tile.getLevel(), tile.getBlockPos())) {
-            renderAnimation(new RenderAnimationInfo(stack, context.getBlockRenderDispatcher(),
-                    source, rand1, rand2).with(tile), tile);
-        } else if (!tile.getSignal().hasAnimation(tile.getLevel(), tile.getBlockPos())) {
-            tile.animProgress = 0.0F;
+        if (tile.getSignal().hasAnimation()) {
+            tile.getAnimationHandler().render(new RenderAnimationInfo(stack,
+                    context.getBlockRenderDispatcher(), source, rand1, rand2).with(tile));
         }
     }
 
@@ -63,9 +61,8 @@ public class SignalSpecialRenderer implements BlockEntityRenderer<SignalTileEnti
         final BakedModel model = SignalCustomModel.getModelFromLocation(
                 new ResourceLocation(OpenSignalsMain.MODID, "semaphore_signals/sema_main_wing1"));
         info.dispatcher.getModelRenderer().renderModel(info.stack.last(),
-                info.source
-                        .getBuffer(ItemBlockRenderTypes.getRenderType(tile.getBlockState(), false)),
-                state, model, 0, 0, 0, info.lightColor, info.overlayTexture, tile.getModelData());
+                info.source.getBuffer(ItemBlockRenderTypes.getRenderType(state, false)), state,
+                model, 0, 0, 0, info.lightColor, info.overlayTexture, tile.getModelData());
 
         info.stack.popPose();
 

@@ -13,6 +13,7 @@ import com.mojang.math.Quaternion;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.SEProperty;
 import com.troblecodings.signals.config.ConfigHandler;
+import com.troblecodings.signals.contentpacks.SignalAnimationConfigParser;
 import com.troblecodings.signals.core.DestroyHelper;
 import com.troblecodings.signals.core.JsonEnum;
 import com.troblecodings.signals.core.RenderOverlayInfo;
@@ -67,8 +68,8 @@ public class Signal extends BasicBlock {
 
     public static final Map<String, Signal> SIGNALS = new HashMap<>();
     public static final List<Signal> SIGNAL_IDS = new ArrayList<>();
-    public static final EnumProperty<SignalAngel> ANGEL =
-            EnumProperty.create("angel", SignalAngel.class);
+    public static final EnumProperty<SignalAngel> ANGEL = EnumProperty.create("angel",
+            SignalAngel.class);
     public static final SEProperty CUSTOMNAME = new SEProperty("customname", JsonEnum.BOOLEAN,
             "false", ChangeableStage.AUTOMATICSTAGE, t -> true, 0);
     public static final TileEntitySupplierWrapper SUPPLIER = SignalTileEntity::new;
@@ -122,8 +123,8 @@ public class Signal extends BasicBlock {
 
     @Override
     public BlockState getStateForPlacement(final BlockPlaceContext context) {
-        final int angel =
-                Integer.valueOf(Mth.floor(context.getRotation() * 16.0F / 360.0F + 0.5D) & 15);
+        final int angel = Integer
+                .valueOf(Mth.floor(context.getRotation() * 16.0F / 360.0F + 0.5D) & 15);
         return defaultBlockState().setValue(ANGEL, SignalAngel.values()[angel]);
     }
 
@@ -454,15 +455,7 @@ public class Signal extends BasicBlock {
         return Optional.of(SUPPLIER);
     }
 
-    public boolean hasAnimation(final Level world, final BlockPos pos) {
-        final Map<SEProperty, String> map =
-                ClientSignalStateHandler.getClientStates(new StateInfo(world, pos));
-        boolean animation = false;
-        for (final PredicateProperty<Boolean> boolProp : this.prop.animate) {
-            if (boolProp.test(map)) {
-                animation = boolProp.state;
-            }
-        }
-        return true;
+    public boolean hasAnimation() {
+        return SignalAnimationConfigParser.ALL_ANIMATIONS.containsKey(this);
     }
 }
