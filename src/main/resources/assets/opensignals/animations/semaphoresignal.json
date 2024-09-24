@@ -4,7 +4,7 @@
             {
                 "predicate": "config(WING1.FALSE)",
                 "mode": "ROTATION",
-                "rotaionAxis": "X",
+                "rotationAxis": "Z",
                 "rotation": 0,
                 "pivotX": 0,
                 "pivotY": 0,
@@ -13,7 +13,7 @@
             {
                 "predicate": "config(WING1.TRUE)",
                 "mode": "ROTATION",
-                "rotaionAxis": "X",
+                "rotationAxis": "Z",
                 "rotation": 100,
                 "pivotX": 0,
                 "pivotY": 0,
@@ -24,7 +24,7 @@
             {
                 "predicate": "config(WING2.FALSE)",
                 "mode": "ROTATION",
-                "rotaionAxis": "X",
+                "rotationAxis": "Z",
                 "rotation": 0,
                 "pivotX": 0,
                 "pivotY": 0,
@@ -33,7 +33,7 @@
             {
                 "predicate": "config(WING2.TRUE)",
                 "mode": "ROTATION",
-                "rotaionAxis": "X",
+                "rotationAxis": "Z",
                 "rotation": -100,
                 "pivotX": 0,
                 "pivotY": 0,

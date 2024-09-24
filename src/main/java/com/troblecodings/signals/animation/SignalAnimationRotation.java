@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
-import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.SEProperty;
@@ -43,20 +42,35 @@ public class SignalAnimationRotation implements SignalAnimationState {
 
     @Override
     public void setUpAnimationValues(final ModelTranslation currentTranslation) {
-        final Vector3f vec = currentTranslation.getQuaternion().toXYZ();
-        final Vector3f maxPos = new Vector3f(0, 0, -rotation * 0.005f * animationSpeed);
-        this.calc = new AnimationRotionCalc(vec, maxPos, animationSpeed);
+        final Vector3f vec = currentTranslation.getQuaternion().toYXZ();
+        Vector3f maxPos = new Vector3f(0, 0, 0);
+        switch (axis) {
+            case X: {
+                maxPos = new Vector3f(-rotation * 0.005f * animationSpeed, 0, 0);
+                break;
+            }
+            case Y: {
+                maxPos = new Vector3f(0, -rotation * 0.005f * animationSpeed, 0);
+                break;
+            }
+            case Z: {
+                maxPos = new Vector3f(0, 0, -rotation * 0.005f * animationSpeed);
+                break;
+            }
+            default:
+                break;
+        }
+        this.calc = new AnimationRotionCalc(vec, maxPos, animationSpeed, axis);
     }
 
     @Override
     public ModelTranslation getFinalModelTranslation() {
-        return new ModelTranslation(pivot,
-                Quaternion.fromXYZ(0, 0, -rotation * 0.005f * animationSpeed), pivot);
+        return new ModelTranslation(pivot, axis.getForAxis(-rotation * 0.005f * animationSpeed),
+                pivot);
     }
 
     @Override
     public ModelTranslation getModelTranslation() {
-        // TODO Apply Axis
         return new ModelTranslation(pivot, calc.getQuaternion(), pivot);
     }
 

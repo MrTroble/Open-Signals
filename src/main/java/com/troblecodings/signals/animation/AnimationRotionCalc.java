@@ -9,21 +9,38 @@ public class AnimationRotionCalc {
 
     private final float animationSpeed;
     private final float step;
+    private final RotationAxis axis;
     private float progress;
     private float max;
     private boolean calculatePlus = true;
     private Quaternion quaternion;
 
     public AnimationRotionCalc(final Vector3f startPosition, final Vector3f finalPosition,
-            final float animationSpeed) {
+            final float animationSpeed, final RotationAxis axis) {
         this.animationSpeed = animationSpeed;
         this.step = 0.005f * animationSpeed;
+        this.axis = axis;
         calculateWayAndValues(startPosition, finalPosition);
     }
 
     private void calculateWayAndValues(final Vector3f start, final Vector3f end) {
-        progress = start.z();
-        max = end.z();
+        switch (axis) {
+            case X: {
+                progress = start.x();
+                max = end.x();
+                break;
+            }
+            case Y: {
+                progress = start.y();
+                max = end.y();
+                break;
+            }
+            case Z: {
+                progress = start.z();
+                max = end.z();
+                break;
+            }
+        }
         if (max < progress) {
             calculatePlus = false;
         }
@@ -52,14 +69,7 @@ public class AnimationRotionCalc {
     }
 
     public Quaternion getQuaternion() {
-        return Quaternion.fromXYZ(0, 0, progress);
-    }
-
-    public static double distanceBetween(final Vector3f vec1, final Vector3f vec2) {
-        final float dx = vec2.x() - vec1.x();
-        final float dy = vec2.y() - vec1.y();
-        final float dz = vec2.z() - vec1.z();
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        return axis.getForAxis(progress);
     }
 
     @Override
