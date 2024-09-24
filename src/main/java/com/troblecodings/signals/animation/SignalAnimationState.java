@@ -17,6 +17,8 @@ public interface SignalAnimationState extends Predicate<Map<SEProperty, String>>
 
     public boolean isFinished();
 
+    public void reset();
+
     public void setUpAnimationValues(final ModelTranslation currentTranslation);
 
 }

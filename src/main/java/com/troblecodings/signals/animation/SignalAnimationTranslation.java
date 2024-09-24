@@ -60,6 +60,12 @@ public class SignalAnimationTranslation implements SignalAnimationState {
     }
 
     @Override
+    public void reset() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
     public boolean test(Map<SEProperty, String> properties) {
         return predicate.test(properties);
     }
@@ -82,4 +88,5 @@ public class SignalAnimationTranslation implements SignalAnimationState {
                 && Objects.equals(dest, other.dest) && Objects.equals(model, other.model)
                 && Float.floatToIntBits(progress) == Float.floatToIntBits(other.progress);
     }
+
 }

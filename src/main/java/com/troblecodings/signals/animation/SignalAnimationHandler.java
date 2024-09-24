@@ -67,6 +67,7 @@ public class SignalAnimationHandler {
         if (animation.isFinished()) {
             translation.setUpNewTranslation(animation.getFinalModelTranslation());
             translation.removeAnimation();
+            animation.reset();
             return;
         }
         animation.updateAnimation();
@@ -93,6 +94,10 @@ public class SignalAnimationHandler {
             for (final SignalAnimationState animation : entry.getValue()) {
                 if (animation.test(changedProperties)) {
                     final ModelTranslation translation = entry.getKey();
+                    if (translation.isAnimationAssigned()) {
+                        final SignalAnimationState other = translation.getAssigendAnimation();
+                        other.reset();
+                    }
                     animation.setUpAnimationValues(translation);
                     translation.setUpNewTranslation(animation.getModelTranslation());
                     translation.assignAnimation(animation);

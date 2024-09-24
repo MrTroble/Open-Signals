@@ -11,9 +11,7 @@ import com.troblecodings.signals.SEProperty;
 
 public class SignalAnimationRotation implements SignalAnimationState {
 
-    private float progress = 0;
-    private double max = 0;
-    private float step = 0;
+    private AnimationRotionCalc calc;
 
     private final Predicate<Map<SEProperty, String>> predicate;
     private String model;
@@ -21,8 +19,6 @@ public class SignalAnimationRotation implements SignalAnimationState {
     private final RotationAxis axis;
     private final float rotation;
     private final VectorWrapper pivot;
-
-    private boolean calculatePlus = true;
 
     public SignalAnimationRotation(final Predicate<Map<SEProperty, String>> predicate,
             final float animationSpeed, final RotationAxis axis, final float rotation,
@@ -42,29 +38,14 @@ public class SignalAnimationRotation implements SignalAnimationState {
 
     @Override
     public void updateAnimation() {
-        if (calculatePlus)
-            ++progress;
-        else
-            --progress;
+        calc.updateAnimation();
     }
 
     @Override
     public void setUpAnimationValues(final ModelTranslation currentTranslation) {
         final Vector3f vec = currentTranslation.getQuaternion().toXYZ();
         final Vector3f maxPos = new Vector3f(0, 0, -rotation * 0.005f * animationSpeed);
-        final float d = (float) (distanceBetween(vec, maxPos) / (0.005f * animationSpeed));
-        max = d;
-        if (rotation > 0) {
-            step = 0.005f * animationSpeed;
-        } else if (rotation < 0) {
-            step = -0.005f * animationSpeed;
-        } else {
-            step = -0.005f * animationSpeed;
-            max = 0;
-            progress = d;
-            calculatePlus = false;
-        }
-        System.out.println();
+        this.calc = new AnimationRotionCalc(vec, maxPos, animationSpeed);
     }
 
     @Override
@@ -76,23 +57,17 @@ public class SignalAnimationRotation implements SignalAnimationState {
     @Override
     public ModelTranslation getModelTranslation() {
         // TODO Apply Axis
-        return new ModelTranslation(pivot, Quaternion.fromYXZ(0, 0, -progress * step), pivot);
+        return new ModelTranslation(pivot, calc.getQuaternion(), pivot);
     }
 
     @Override
     public boolean isFinished() {
-        if (calculatePlus) {
-            if (progress < max) {
-                return false;
-            }
-        } else {
-            if (progress > max) {
-                return false;
-            }
-        }
-        progress = 0;
-        calculatePlus = true;
-        return true;
+        return calc.isAnimationFinished();
+    }
+
+    @Override
+    public void reset() {
+        calc = null;
     }
 
     @Override
@@ -102,7 +77,7 @@ public class SignalAnimationRotation implements SignalAnimationState {
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, axis, model, pivot, progress, rotation);
+        return Objects.hash(animationSpeed, axis, model, pivot, calc, rotation);
     }
 
     @Override
@@ -116,16 +91,8 @@ public class SignalAnimationRotation implements SignalAnimationState {
         final SignalAnimationRotation other = (SignalAnimationRotation) obj;
         return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
                 && axis == other.axis && Objects.equals(model, other.model)
-                && Objects.equals(pivot, other.pivot)
-                && Float.floatToIntBits(progress) == Float.floatToIntBits(other.progress)
+                && Objects.equals(pivot, other.pivot) && Objects.equals(calc, other.calc)
                 && Objects.equals(rotation, other.rotation);
-    }
-
-    private static double distanceBetween(final Vector3f vec1, final Vector3f vec2) {
-        final float dx = vec2.x() - vec1.x();
-        final float dy = vec2.y() - vec1.y();
-        final float dz = vec2.z() - vec1.z();
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
 }
