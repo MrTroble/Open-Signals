@@ -5,9 +5,9 @@ import java.util.function.Predicate;
 
 import com.troblecodings.signals.SEProperty;
 
-public interface SignalAnimationState extends Predicate<Map<SEProperty, String>> {
+public interface SignalAnimation extends Predicate<Map<SEProperty, String>> {
 
-    public SignalAnimationState with(final String model);
+    public SignalAnimation with(final String model);
 
     public void updateAnimation();
 

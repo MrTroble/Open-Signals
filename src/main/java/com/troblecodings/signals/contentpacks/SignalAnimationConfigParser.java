@@ -4,20 +4,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
+import com.google.common.collect.Maps;
 import com.google.gson.Gson;
+import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.animation.SignalAnimationState;
+import com.troblecodings.signals.animation.SignalAnimation;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.parser.FunctionParsingInfo;
 
 public class SignalAnimationConfigParser {
 
-    private Map<String, List<SignalAnimationConfig>> animations;
+    private Map<String, ModelAnimationConfig> animations;
 
     private static final Gson GSON = new Gson();
 
-    public static final Map<Signal, Map<String, List<SignalAnimationState>>> ALL_ANIMATIONS = new HashMap<>();
+    public static final Map<Signal, Map<Entry<String, VectorWrapper>, List<SignalAnimation>>>//
+    ALL_ANIMATIONS = new HashMap<>();
 
     public static void loadAllAnimations() {
         OpenSignalsMain.contentPacks.getFiles("animations").forEach(entry -> {
@@ -34,18 +38,29 @@ public class SignalAnimationConfigParser {
 
             final SignalAnimationConfigParser parser = GSON.fromJson(entry.getValue(),
                     SignalAnimationConfigParser.class);
-            final Map<String, List<SignalAnimationState>> modelToAnimation = new HashMap<>();
+            final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> modelToAnimation = new HashMap<>();
             parser.animations.forEach((modelName, configs) -> {
-                final List<SignalAnimationState> animatinos = new ArrayList<>();
-                for (final SignalAnimationConfig config : configs) {
+                final VectorWrapper vec = new VectorWrapper(configs.translationX,
+                        configs.translationY, configs.translationZ);
+                final List<SignalAnimation> animatinos = new ArrayList<>();
+                for (final SignalAnimationConfig config : configs.animationConfigs) {
                     animatinos.add(config.createAnimation(info).with(modelName));
                 }
                 if (!animatinos.isEmpty())
-                    modelToAnimation.put(modelName, animatinos);
+                    modelToAnimation.put(Maps.immutableEntry(modelName, vec), animatinos);
             });
             if (!modelToAnimation.isEmpty())
                 ALL_ANIMATIONS.put(signal, modelToAnimation);
         });
+    }
+
+    private class ModelAnimationConfig {
+
+        private float translationX = 0;
+        private float translationY = 0;
+        private float translationZ = 0;
+        private List<SignalAnimationConfig> animationConfigs;
+
     }
 
 }

@@ -8,7 +8,7 @@ import com.mojang.math.Vector3f;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.SEProperty;
 
-public class SignalAnimationRotation implements SignalAnimationState {
+public class SignalAnimationRotation implements SignalAnimation {
 
     private AnimationRotionCalc calc;
 
@@ -30,7 +30,7 @@ public class SignalAnimationRotation implements SignalAnimationState {
     }
 
     @Override
-    public SignalAnimationState with(final String model) {
+    public SignalAnimation with(final String model) {
         this.model = model;
         return this;
     }

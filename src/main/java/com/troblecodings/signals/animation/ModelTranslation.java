@@ -11,7 +11,8 @@ public class ModelTranslation {
     private VectorWrapper firstTranslation;
     private Quaternion quaternion = new Quaternion(0, 0, 0, 0);
     private VectorWrapper lastTranslation;
-    private SignalAnimationState animation;
+    private SignalAnimation animation;
+    private VectorWrapper modelTranslation = VectorWrapper.ZERO;
     private boolean renderModel = false;
 
     public ModelTranslation(final VectorWrapper firstTranslation, final Quaternion quaternion,
@@ -27,6 +28,10 @@ public class ModelTranslation {
         info.stack.mulPose(quaternion);
         info.stack.translate(lastTranslation.getX(), lastTranslation.getY(),
                 lastTranslation.getZ());
+        if (!modelTranslation.equals(VectorWrapper.ZERO)) {
+            info.stack.translate(modelTranslation.getX(), modelTranslation.getY(),
+                    modelTranslation.getZ());
+        }
     }
 
     public Quaternion getQuaternion() {
@@ -48,7 +53,11 @@ public class ModelTranslation {
         this.lastTranslation = other.lastTranslation;
     }
 
-    public void assignAnimation(final SignalAnimationState animation) {
+    public void setModelTranslation(final VectorWrapper translation) {
+        this.modelTranslation = translation;
+    }
+
+    public void assignAnimation(final SignalAnimation animation) {
         this.animation = animation;
     }
 
@@ -60,7 +69,7 @@ public class ModelTranslation {
         return animation != null;
     }
 
-    public SignalAnimationState getAssigendAnimation() {
+    public SignalAnimation getAssigendAnimation() {
         return animation;
     }
 

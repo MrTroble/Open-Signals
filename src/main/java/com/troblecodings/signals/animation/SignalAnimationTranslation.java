@@ -7,7 +7,7 @@ import java.util.function.Predicate;
 import com.troblecodings.core.VectorWrapper;
 import com.troblecodings.signals.SEProperty;
 
-public class SignalAnimationTranslation implements SignalAnimationState {
+public class SignalAnimationTranslation implements SignalAnimation {
 
     private float progress;
 
@@ -24,7 +24,7 @@ public class SignalAnimationTranslation implements SignalAnimationState {
     }
 
     @Override
-    public SignalAnimationState with(final String model) {
+    public SignalAnimation with(final String model) {
         this.model = model;
         return this;
     }

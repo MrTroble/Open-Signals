@@ -33,7 +33,7 @@ public class SignalAnimationHandler {
         this.tile = tile;
     }
 
-    private final Map<BakedModel, Entry<ModelTranslation, List<SignalAnimationState>>>//
+    private final Map<BakedModel, Entry<ModelTranslation, List<SignalAnimation>>>//
     animationPerModel = new HashMap<>();
 
     public void render(final RenderAnimationInfo info) {
@@ -63,7 +63,7 @@ public class SignalAnimationHandler {
     }
 
     private void updateAnimation(final ModelTranslation translation) {
-        final SignalAnimationState animation = translation.getAssigendAnimation();
+        final SignalAnimation animation = translation.getAssigendAnimation();
         if (animation.isFinished()) {
             translation.setUpNewTranslation(animation.getFinalModelTranslation());
             translation.removeAnimation();
@@ -91,11 +91,11 @@ public class SignalAnimationHandler {
 
     private void updateAnimations(final Map<SEProperty, String> changedProperties) {
         animationPerModel.values().forEach(entry -> {
-            for (final SignalAnimationState animation : entry.getValue()) {
+            for (final SignalAnimation animation : entry.getValue()) {
                 if (animation.test(changedProperties)) {
                     final ModelTranslation translation = entry.getKey();
                     if (translation.isAnimationAssigned()) {
-                        final SignalAnimationState other = translation.getAssigendAnimation();
+                        final SignalAnimation other = translation.getAssigendAnimation();
                         other.reset();
                     }
                     animation.setUpAnimationValues(translation);
@@ -108,7 +108,7 @@ public class SignalAnimationHandler {
 
     private void updateToFinalizedAnimations(final Map<SEProperty, String> newProperties) {
         animationPerModel.values().forEach((entry) -> {
-            for (final SignalAnimationState animation : entry.getValue()) {
+            for (final SignalAnimation animation : entry.getValue()) {
                 if (animation.test(newProperties)) {
                     final ModelTranslation translation = entry.getKey();
                     translation.setUpNewTranslation(animation.getFinalModelTranslation());
@@ -120,13 +120,14 @@ public class SignalAnimationHandler {
 
     public void updateAnimationListFromBlock() {
         animationPerModel.clear();
-        final Map<String, List<SignalAnimationState>> map = SignalAnimationConfigParser.ALL_ANIMATIONS
-                .get(tile.getSignal());
-        map.forEach((modelName, animations) -> {
-            final BakedModel model = SignalCustomModel
-                    .getModelFromLocation(new ResourceLocation(OpenSignalsMain.MODID, modelName));
+        final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> map = //
+                SignalAnimationConfigParser.ALL_ANIMATIONS.get(tile.getSignal());
+        map.forEach((entry, animations) -> {
+            final BakedModel model = SignalCustomModel.getModelFromLocation(
+                    new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
             final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
                     new Quaternion(0, 0, 0, 0), VectorWrapper.ZERO);
+            translation.setModelTranslation(entry.getValue());
             animationPerModel.put(model, Maps.immutableEntry(translation, animations));
         });
     }

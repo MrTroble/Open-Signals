@@ -1,44 +1,49 @@
 {
     "animations": {
-        "semaphore_signals/sema_main_wing1": [
-            {
-                "predicate": "config(WING1.FALSE)",
-                "mode": "ROTATION",
-                "rotationAxis": "Z",
-                "rotation": 0,
-                "pivotX": 0,
-                "pivotY": 0,
-                "pivotZ": 0
-            },
-            {
-                "predicate": "config(WING1.TRUE)",
-                "mode": "ROTATION",
-                "rotationAxis": "Z",
-                "rotation": 100,
-                "pivotX": 0,
-                "pivotY": 0,
-                "pivotZ": 0
-            }
-        ],
-        "semaphore_signals/sema_main_wing2": [
-            {
-                "predicate": "config(WING2.FALSE)",
-                "mode": "ROTATION",
-                "rotationAxis": "Z",
-                "rotation": 0,
-                "pivotX": 0,
-                "pivotY": 0,
-                "pivotZ": 0
-            },
-            {
-                "predicate": "config(WING2.TRUE)",
-                "mode": "ROTATION",
-                "rotationAxis": "Z",
-                "rotation": -100,
-                "pivotX": 0,
-                "pivotY": 0,
-                "pivotZ": 0
-            }
-        ]
+        "semaphore_signals/sema_main_wing1": {
+            "translationX": 5,
+            "animationConfigs": [
+                {
+                    "predicate": "config(WING1.FALSE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                },
+                {
+                    "predicate": "config(WING1.TRUE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 100,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                }
+            ]
+        },
+        "semaphore_signals/sema_main_wing2": {
+            "animationConfigs": [
+                {
+                    "predicate": "config(WING2.FALSE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                },
+                {
+                    "predicate": "config(WING2.TRUE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": -100,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                }
+            ]
+        }
     }
 }
