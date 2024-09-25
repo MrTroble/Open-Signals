@@ -8,30 +8,26 @@ import com.troblecodings.signals.core.RenderAnimationInfo;
 
 public class ModelTranslation {
 
-    private VectorWrapper firstTranslation;
+    private VectorWrapper pivotTranslation;
     private Quaternion quaternion = new Quaternion(0, 0, 0, 0);
-    private VectorWrapper lastTranslation;
     private SignalAnimation animation;
     private VectorWrapper modelTranslation = VectorWrapper.ZERO;
     private boolean renderModel = false;
 
-    public ModelTranslation(final VectorWrapper firstTranslation, final Quaternion quaternion,
-            final VectorWrapper lastTranslation) {
-        this.firstTranslation = firstTranslation;
+    public ModelTranslation(final VectorWrapper firstTranslation, final Quaternion quaternion) {
+        this.pivotTranslation = firstTranslation;
         this.quaternion = quaternion;
-        this.lastTranslation = lastTranslation;
     }
 
     public void translate(final RenderAnimationInfo info) {
-        info.stack.translate(firstTranslation.getX(), firstTranslation.getY(),
-                firstTranslation.getZ());
-        info.stack.mulPose(quaternion);
-        info.stack.translate(lastTranslation.getX(), lastTranslation.getY(),
-                lastTranslation.getZ());
+
         if (!modelTranslation.equals(VectorWrapper.ZERO)) {
             info.stack.translate(modelTranslation.getX(), modelTranslation.getY(),
-                    modelTranslation.getZ());
+                    modelTranslation.getZ()); // Modell verschieben
         }
+        info.stack.mulPose(quaternion);
+        info.stack.translate(pivotTranslation.getX(), pivotTranslation.getY(),
+                pivotTranslation.getZ()); // Pivot Punkt
     }
 
     public Quaternion getQuaternion() {
@@ -48,9 +44,8 @@ public class ModelTranslation {
     }
 
     public void setUpNewTranslation(final ModelTranslation other) {
-        this.firstTranslation = other.firstTranslation;
+        this.pivotTranslation = other.pivotTranslation;
         this.quaternion = other.quaternion;
-        this.lastTranslation = other.lastTranslation;
     }
 
     public void setModelTranslation(final VectorWrapper translation) {
@@ -75,7 +70,7 @@ public class ModelTranslation {
 
     @Override
     public int hashCode() {
-        return Objects.hash(firstTranslation, lastTranslation, quaternion, renderModel);
+        return Objects.hash(pivotTranslation, quaternion, renderModel);
     }
 
     @Override
@@ -87,8 +82,7 @@ public class ModelTranslation {
         if (getClass() != obj.getClass())
             return false;
         final ModelTranslation other = (ModelTranslation) obj;
-        return Objects.equals(firstTranslation, other.firstTranslation)
-                && Objects.equals(lastTranslation, other.lastTranslation)
+        return Objects.equals(pivotTranslation, other.pivotTranslation)
                 && Objects.equals(quaternion, other.quaternion) && renderModel == other.renderModel;
     }
 

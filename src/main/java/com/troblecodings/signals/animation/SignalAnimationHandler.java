@@ -40,8 +40,8 @@ public class SignalAnimationHandler {
         final BlockState state = tile.getBlockState();
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final ModelBlockRenderer renderer = info.dispatcher.getModelRenderer();
-        final VertexConsumer vertex = info.source
-                .getBuffer(ItemBlockRenderTypes.getRenderType(state, false));
+        final VertexConsumer vertex =
+                info.source.getBuffer(ItemBlockRenderTypes.getRenderType(state, false));
         final IModelData data = tile.getModelData();
 
         animationPerModel.forEach((model, entry) -> {
@@ -57,8 +57,9 @@ public class SignalAnimationHandler {
                     info.overlayTexture, data);
             info.stack.popPose();
 
-            if (translation.isAnimationAssigned())
+            if (translation.isAnimationAssigned()) {
                 updateAnimation(translation);
+            }
         });
     }
 
@@ -125,8 +126,8 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final BakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
-                    new Quaternion(0, 0, 0, 0), VectorWrapper.ZERO);
+            final ModelTranslation translation =
+                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
             translation.setModelTranslation(entry.getValue());
             animationPerModel.put(model, Maps.immutableEntry(translation, animations));
         });

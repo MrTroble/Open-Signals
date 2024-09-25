@@ -65,17 +65,18 @@ public class SignalAnimationRotation implements SignalAnimation {
 
     @Override
     public ModelTranslation getFinalModelTranslation() {
-        return new ModelTranslation(pivot, axis.getForAxis(-rotation * 0.005f * animationSpeed),
-                pivot);
+        return new ModelTranslation(pivot, axis.getForAxis(-rotation * 0.005f * animationSpeed));
     }
 
     @Override
     public ModelTranslation getModelTranslation() {
-        return new ModelTranslation(pivot, calc.getQuaternion(), pivot);
+        return new ModelTranslation(pivot, calc.getQuaternion());
     }
 
     @Override
     public boolean isFinished() {
+        if (calc == null)
+            return true;
         return calc.isAnimationFinished();
     }
 
