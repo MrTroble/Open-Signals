@@ -23,6 +23,11 @@ public final class SignalConfig {
 
     public static void change(final ConfigInfo info) {
         final Signal currentSignal = info.currentinfo.signal;
+        System.out.println("Changeing Signal " + info.currentinfo + "!");
+        System.out.println("Call:");
+        for (final StackTraceElement el : Thread.currentThread().getStackTrace()) {
+            System.out.println("          " + el.toString());
+        }
         if (info.type.equals(PathType.NORMAL)) {
             if (info.nextinfo != null) {
                 final Signal nextSignal = info.nextinfo.signal;
@@ -54,6 +59,11 @@ public final class SignalConfig {
     }
 
     public static void reset(final ResetInfo info) {
+        System.out.println("Resetting Signal " + info.current + "!");
+        System.out.println("Call:");
+        for (final StackTraceElement el : Thread.currentThread().getStackTrace()) {
+            System.out.println("          " + el.toString());
+        }
         final List<ConfigProperty> resetValues = OneSignalNonPredicateConfigParser.RESETCONFIGS
                 .get(info.current.signal);
         if (resetValues == null)
