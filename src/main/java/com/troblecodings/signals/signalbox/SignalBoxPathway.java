@@ -106,7 +106,11 @@ public class SignalBoxPathway implements IChunkLoadable {
                     .ifPresent(pos -> SignalBoxHandler.updateRedstoneOutput(
                             new StateInfo(tile.getWorld(), pos),
                             !status.equals(EnumPathUsage.FREE)));
-            option.setEntry(PathEntryType.PATHUSAGE, status);
+            if (!status.equals(EnumPathUsage.FREE)) {
+                option.setEntry(PathEntryType.PATHUSAGE, status);
+            } else {
+                option.removeEntry(PathEntryType.PATHUSAGE);
+            }
         }, point);
         if (status.equals(EnumPathUsage.SELECTED) || status.equals(EnumPathUsage.PREPARED)) {
             setProtectionWay();
@@ -415,6 +419,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     public void resetPathway(final @Nullable Point point) {
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
+        System.out.println(getListOfNodes());
         if (data.totalPathwayReset(point)) {
             this.isBlocked = false;
             resetOther();

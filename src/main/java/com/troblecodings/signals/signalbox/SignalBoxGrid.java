@@ -370,23 +370,25 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void writePathways(final NBTWrapper tag) {
-        tag.putList(PATHWAY_LIST,
-                startsToPath.values().stream().filter(pw -> !pw.isEmptyOrBroken()).map(pathway -> {
-                    final NBTWrapper path = new NBTWrapper();
-                    pathway.write(path);
-                    return path;
-                })::iterator);
-        tag.putList(NEXT_PATHWAYS, nextPathways.entrySet().stream().map(entry -> {
-            final NBTWrapper wrapper = new NBTWrapper();
-            final NBTWrapper start = new NBTWrapper();
-            entry.getKey().getKey().write(start);
-            final NBTWrapper end = new NBTWrapper();
-            entry.getKey().getValue().write(end);
-            wrapper.putWrapper(START_POINT, start);
-            wrapper.putWrapper(END_POINT, end);
-            wrapper.putString(PATH_TYPE, entry.getValue().name());
-            return wrapper;
-        })::iterator);
+        if (!startsToPath.isEmpty())
+            tag.putList(PATHWAY_LIST, startsToPath.values().stream()
+                    .filter(pw -> !pw.isEmptyOrBroken()).map(pathway -> {
+                        final NBTWrapper path = new NBTWrapper();
+                        pathway.write(path);
+                        return path;
+                    })::iterator);
+        if (!nextPathways.isEmpty())
+            tag.putList(NEXT_PATHWAYS, nextPathways.entrySet().stream().map(entry -> {
+                final NBTWrapper wrapper = new NBTWrapper();
+                final NBTWrapper start = new NBTWrapper();
+                entry.getKey().getKey().write(start);
+                final NBTWrapper end = new NBTWrapper();
+                entry.getKey().getValue().write(end);
+                wrapper.putWrapper(START_POINT, start);
+                wrapper.putWrapper(END_POINT, end);
+                wrapper.putString(PATH_TYPE, entry.getValue().name());
+                return wrapper;
+            })::iterator);
     }
 
     @Override
@@ -412,36 +414,37 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     public void readPathways(final NBTWrapper tag) {
-        if (!tag.contains(PATHWAY_LIST))
-            return;
-        clearPaths();
-        tag.getList(PATHWAY_LIST).forEach(comp -> {
-            final PathwayData data = PathwayData.of(this, comp);
-            final SignalBoxPathway pathway = data.createPathway();
-            pathway.setSignalBoxGrid(this);
-            pathway.setTile(tile);
-            pathway.read(comp);
-            if (pathway.isEmptyOrBroken()) {
-                OpenSignalsMain.getLogger()
-                        .error("Remove empty or broken pathway, try to recover!");
-                return;
-            }
-            onWayAdd(pathway);
-            pathway.postRead(comp);
-        });
-        tag.getList(NEXT_PATHWAYS).forEach(comp -> {
-            final Point start = new Point();
-            start.read(comp.getWrapper(START_POINT));
-            final Point end = new Point();
-            end.read(comp.getWrapper(END_POINT));
-            if (comp.contains(PATH_TYPE)) {
-                nextPathways.put(Maps.immutableEntry(start, end),
-                        PathType.valueOf(comp.getString(PATH_TYPE)));
-            } else {
-                nextPathways.put(Maps.immutableEntry(start, end),
-                        SignalBoxUtil.getPathTypeFrom(modeGrid.get(start), modeGrid.get(end)));
-            }
-        });
+        if (tag.contains(PATHWAY_LIST)) {
+            clearPaths();
+            tag.getList(PATHWAY_LIST).forEach(comp -> {
+                final PathwayData data = PathwayData.of(this, comp);
+                final SignalBoxPathway pathway = data.createPathway();
+                pathway.setSignalBoxGrid(this);
+                pathway.setTile(tile);
+                pathway.read(comp);
+                if (pathway.isEmptyOrBroken()) {
+                    OpenSignalsMain.getLogger()
+                            .error("Remove empty or broken pathway, try to recover!");
+                    return;
+                }
+                onWayAdd(pathway);
+                pathway.postRead(comp);
+            });
+        }
+        if (tag.contains(NEXT_PATHWAYS))
+            tag.getList(NEXT_PATHWAYS).forEach(comp -> {
+                final Point start = new Point();
+                start.read(comp.getWrapper(START_POINT));
+                final Point end = new Point();
+                end.read(comp.getWrapper(END_POINT));
+                if (comp.contains(PATH_TYPE)) {
+                    nextPathways.put(Maps.immutableEntry(start, end),
+                            PathType.valueOf(comp.getString(PATH_TYPE)));
+                } else {
+                    nextPathways.put(Maps.immutableEntry(start, end),
+                            SignalBoxUtil.getPathTypeFrom(modeGrid.get(start), modeGrid.get(end)));
+                }
+            });
     }
 
     @Override
@@ -576,9 +579,9 @@ public class SignalBoxGrid implements INetworkSavable {
             return null;
         final PathOptionEntry entry = node.getOption(mode).get();
         final Optional<BlockPos> outputPos = entry.getEntry(PathEntryType.OUTPUT);
-        final Optional<EnumPathUsage> usage = entry.getEntry(PathEntryType.PATHUSAGE);
-        if (!outputPos.isPresent()
-                || (usage.isPresent() && !usage.get().equals(EnumPathUsage.FREE)))
+        final EnumPathUsage usage = entry.getEntry(PathEntryType.PATHUSAGE)
+                .orElse(EnumPathUsage.FREE);
+        if (!outputPos.isPresent() || !usage.equals(EnumPathUsage.FREE))
             return null;
         if (state) {
             node.addManuellOutput(mode);

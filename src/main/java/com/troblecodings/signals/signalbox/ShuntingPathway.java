@@ -18,7 +18,11 @@ public class ShuntingPathway extends SignalBoxPathway {
                     .ifPresent(pos -> SignalBoxHandler.updateRedstoneOutput(
                             new StateInfo(tile.getWorld(), pos),
                             !status.equals(EnumPathUsage.FREE)));
-            option.setEntry(PathEntryType.PATHUSAGE, status);
+            if (!status.equals(EnumPathUsage.FREE)) {
+                option.setEntry(PathEntryType.PATHUSAGE, status);
+            } else {
+                option.removeEntry(PathEntryType.PATHUSAGE);
+            }
         }, point);
     }
 

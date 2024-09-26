@@ -170,36 +170,46 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             final NBTWrapper wrapper = new NBTWrapper();
             entry.getKey().write(wrapper);
             entry.getValue().write(wrapper);
+            if (manuellEnabledOutputs.contains(entry.getKey())) {
+                wrapper.putBoolean(ENABLED_OUTPUTS, true);
+            } else {
+                wrapper.putBoolean(ENABLED_OUTPUTS, false);
+            }
             return wrapper;
         })::iterator);
-        final List<NBTWrapper> enabledOutputs = new ArrayList<>();
-        manuellEnabledOutputs.forEach(mode -> {
-            final NBTWrapper wrapper = new NBTWrapper();
-            mode.write(wrapper);
-            enabledOutputs.add(wrapper);
-        });
-        compound.putList(ENABLED_OUTPUTS, enabledOutputs);
         this.point.write(compound);
-        compound.putBoolean(IS_AUTO_POINT, isAutoPoint);
-        compound.putString(CUSTOM_NAME, customText);
+        if (isAutoPoint)
+            compound.putBoolean(IS_AUTO_POINT, isAutoPoint);
+        if (!customText.isEmpty())
+            compound.putString(CUSTOM_NAME, customText);
     }
 
     @Override
     public void read(final NBTWrapper compound) {
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
+        final boolean oldOutputSystem = compound.contains(ENABLED_OUTPUTS);
         compound.getList(POINT_LIST).forEach(tag -> {
             final PathOptionEntry entry = factory.getEntry();
             entry.read(tag);
-            possibleModes.put(new ModeSet(tag), entry);
+            final ModeSet mode = new ModeSet(tag);
+            possibleModes.put(mode, entry);
+            if (!oldOutputSystem)
+                if (tag.getBoolean(ENABLED_OUTPUTS)) {
+                    if (!manuellEnabledOutputs.contains(mode))
+                        manuellEnabledOutputs.add(mode);
+                }
         });
-        compound.getList(ENABLED_OUTPUTS).forEach(tag -> {
-            final ModeSet modeSet = new ModeSet(tag);
-            if (!manuellEnabledOutputs.contains(modeSet))
-                manuellEnabledOutputs.add(modeSet);
-        });
+        if (oldOutputSystem)
+            compound.getList(ENABLED_OUTPUTS).forEach(tag -> {
+                final ModeSet modeSet = new ModeSet(tag);
+                if (!manuellEnabledOutputs.contains(modeSet))
+                    manuellEnabledOutputs.add(modeSet);
+            });
         this.point.read(compound);
-        this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
-        this.customText = compound.getString(CUSTOM_NAME);
+        if (compound.contains(IS_AUTO_POINT))
+            this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
+        if (compound.contains(CUSTOM_NAME))
+            this.customText = compound.getString(CUSTOM_NAME);
         post();
     }
 

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -488,8 +487,9 @@ public class SidePanel {
                     final UIEntity manuelButtonEntity = GuiElements
                             .createButton(I18Wrapper.format("info.usage.manuel") + " : " + modeName
                                     + " - " + rotationName, e1 -> {
-                                        final Optional<EnumPathUsage> usage = option
-                                                .getEntry(PathEntryType.PATHUSAGE);
+                                        final EnumPathUsage usage = option
+                                                .getEntry(PathEntryType.PATHUSAGE)
+                                                .orElse(EnumPathUsage.FREE);
                                         final UIEntity info = new UIEntity();
                                         info.setInherits(true);
                                         info.add(new UIBox(UIBox.VBOX, 5));
@@ -511,8 +511,7 @@ public class SidePanel {
                                                         new UITexture(GuiSignalBox.REDSTONE_OFF));
                                             }
                                         } else {
-                                            if (usage.isPresent()
-                                                    && !usage.get().equals(EnumPathUsage.FREE)) {
+                                            if (!usage.equals(EnumPathUsage.FREE)) {
                                                 textureEntity.add(new UITexture(
                                                         GuiSignalBox.REDSTONE_ON_BLOCKED));
                                             } else {
@@ -521,11 +520,13 @@ public class SidePanel {
                                             }
                                         }
                                         info.add(textureEntity);
-                                        final UILabel outputStatus = new UILabel(((usage.isPresent()
-                                                && !usage.get().equals(EnumPathUsage.FREE))
-                                                || node.containsManuellOutput(mode))
-                                                        ? I18Wrapper.format("info.usage.rs.true")
-                                                        : I18Wrapper.format("info.usage.rs.false"));
+                                        final UILabel outputStatus = new UILabel(
+                                                ((!usage.equals(EnumPathUsage.FREE))
+                                                        || node.containsManuellOutput(mode))
+                                                                ? I18Wrapper.format(
+                                                                        "info.usage.rs.true")
+                                                                : I18Wrapper.format(
+                                                                        "info.usage.rs.false"));
                                         outputStatus.setCenterY(false);
                                         outputStatus
                                                 .setTextColor(new UIEntity().getBasicTextColor());
@@ -741,9 +742,9 @@ public class SidePanel {
                 statusEntity.add(currentStatus);
                 final AtomicBoolean canBeManuelChanged = new AtomicBoolean(true);
                 currentNode.getModes().forEach((mode, entry) -> {
-                    final Optional<EnumPathUsage> pathUsage = entry
-                            .getEntry(PathEntryType.PATHUSAGE);
-                    if (pathUsage.isPresent() && !pathUsage.get().equals(EnumPathUsage.FREE)) {
+                    final EnumPathUsage pathUsage = entry.getEntry(PathEntryType.PATHUSAGE)
+                            .orElse(EnumPathUsage.FREE);
+                    if (!pathUsage.equals(EnumPathUsage.FREE)) {
                         currentStatus.setText(I18Wrapper.format("info.usage.status") + " : "
                                 + I18Wrapper.format("info.usage.status.blocked"));
                         canBeManuelChanged.set(false);
@@ -773,19 +774,18 @@ public class SidePanel {
                                 textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF));
                             }
                         } else {
-                            if (pathUsage.isPresent()
-                                    && !pathUsage.get().equals(EnumPathUsage.FREE)) {
+                            if (!pathUsage.equals(EnumPathUsage.FREE)) {
                                 textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_ON_BLOCKED));
                             } else {
                                 textureEntity.add(new UITexture(GuiSignalBox.REDSTONE_OFF_BLOCKED));
                             }
                         }
                         info.add(textureEntity);
-                        final UILabel outputStatus = new UILabel(((pathUsage.isPresent()
-                                && !pathUsage.get().equals(EnumPathUsage.FREE))
-                                || currentNode.containsManuellOutput(mode))
-                                        ? I18Wrapper.format("info.usage.rs.true")
-                                        : I18Wrapper.format("info.usage.rs.false"));
+                        final UILabel outputStatus = new UILabel(
+                                ((!pathUsage.equals(EnumPathUsage.FREE))
+                                        || currentNode.containsManuellOutput(mode))
+                                                ? I18Wrapper.format("info.usage.rs.true")
+                                                : I18Wrapper.format("info.usage.rs.false"));
                         outputStatus.setCenterY(false);
                         outputStatus.setTextColor(new UIEntity().getBasicTextColor());
                         final UIEntity outputEntity = new UIEntity();
