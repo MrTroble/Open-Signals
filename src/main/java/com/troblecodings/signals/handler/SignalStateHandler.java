@@ -563,6 +563,8 @@ public final class SignalStateHandler implements INetworkSync {
                 synchronized (TASKS_WHEN_LOAD) {
                     final List<SignalStateListener> tasks = TASKS_WHEN_LOAD.remove(info.info);
                     if (tasks != null) {
+                        System.out
+                                .println("Executing Tasks for " + info.info + "! Tasks: " + tasks);
                         tasks.forEach(listener -> listener.update(info.info, properties,
                                 ChangedState.ADDED_TO_CACHE));
                     }
