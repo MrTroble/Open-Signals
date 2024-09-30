@@ -15,14 +15,14 @@ public class SignalAnimationConfig {
     private float animationSpeed = 1.0f;
     private String mode;
     private String rotationAxis;
-    private float rotation;
+    private float rotation = 0;
     private float pivotX = 0;
     private float pivotY = 0;
     private float pivotZ = 0;
 
-    private float destX;
-    private float destY;
-    private float destZ;
+    private float destX = 0;
+    private float destY = 0;
+    private float destZ = 0;
 
     public SignalAnimation createAnimation(final FunctionParsingInfo info) {
         final AnimationMode mode = AnimationMode.of(this.mode);

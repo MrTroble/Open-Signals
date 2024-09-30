@@ -46,6 +46,21 @@
                     "pivotZ": 0
                 }
             ]
+        },
+        "semaphore_signals/sema_main_zs3": {
+            "animationConfigs": [
+                {
+                    "predicate": "!config(ZS3.OFF)" ,
+                    "mode": "TRANSLATION",
+                    "destX": 2,
+                    "destY": 2,
+                    "destZ": 2
+                },
+                {
+                    "predicate": "config(ZS3.OFF)" ,
+                    "mode": "TRANSLATION"
+                }
+            ]
         }
     }
 }

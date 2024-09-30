@@ -8,10 +8,11 @@ import com.troblecodings.signals.core.RenderAnimationInfo;
 
 public class ModelTranslation {
 
-    private VectorWrapper pivotTranslation;
-    private Quaternion quaternion = new Quaternion(0, 0, 0, 0);
+    private VectorWrapper pivotTranslation = VectorWrapper.ZERO;
+    private Quaternion quaternion = Quaternion.ONE;
     private SignalAnimation animation;
     private VectorWrapper modelTranslation = VectorWrapper.ZERO;
+    private VectorWrapper translation = VectorWrapper.ZERO;
     private boolean renderModel = false;
 
     public ModelTranslation(final VectorWrapper firstTranslation, final Quaternion quaternion) {
@@ -19,19 +20,33 @@ public class ModelTranslation {
         this.quaternion = quaternion;
     }
 
-    public void translate(final RenderAnimationInfo info) {
+    public ModelTranslation(final VectorWrapper translation) {
+        this.translation = translation;
+    }
 
+    public void translate(final RenderAnimationInfo info) {
         if (!modelTranslation.equals(VectorWrapper.ZERO)) {
             info.stack.translate(modelTranslation.getX(), modelTranslation.getY(),
                     modelTranslation.getZ()); // Modell verschieben
         }
-        info.stack.mulPose(quaternion);
-        info.stack.translate(pivotTranslation.getX(), pivotTranslation.getY(),
-                pivotTranslation.getZ()); // Pivot Punkt
+        if (!quaternion.equals(Quaternion.ONE)) {
+            info.stack.mulPose(quaternion);
+        }
+        if (!translation.equals(VectorWrapper.ZERO)) {
+            info.stack.translate(translation.getX(), translation.getY(), translation.getZ());
+        }
+        if (!pivotTranslation.equals(VectorWrapper.ZERO)) {
+            info.stack.translate(pivotTranslation.getX(), pivotTranslation.getY(),
+                    pivotTranslation.getZ()); // Pivot Punkt
+        }
     }
 
     public Quaternion getQuaternion() {
         return quaternion;
+    }
+
+    public VectorWrapper getTranslation() {
+        return translation;
     }
 
     public boolean shouldRenderModel() {
@@ -46,6 +61,7 @@ public class ModelTranslation {
     public void setUpNewTranslation(final ModelTranslation other) {
         this.pivotTranslation = other.pivotTranslation;
         this.quaternion = other.quaternion;
+        this.translation = other.translation;
     }
 
     public void setModelTranslation(final VectorWrapper translation) {

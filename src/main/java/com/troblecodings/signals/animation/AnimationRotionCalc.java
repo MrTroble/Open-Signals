@@ -8,12 +8,10 @@ import com.mojang.math.Vector3f;
 public class AnimationRotionCalc {
 
     private final float animationSpeed;
-    private final float step;
+    private float step;
     private final RotationAxis axis;
     private float progress;
     private float max;
-    private boolean calculatePlus = true;
-    private Quaternion quaternion;
 
     public AnimationRotionCalc(final Vector3f startPosition, final Vector3f finalPosition,
             final float animationSpeed, final RotationAxis axis) {
@@ -42,21 +40,16 @@ public class AnimationRotionCalc {
             }
         }
         if (max < progress) {
-            calculatePlus = false;
+            this.step = -step;
         }
     }
 
     public void updateAnimation() {
-        if (calculatePlus) {
-            progress += step;
-        } else {
-            progress -= step;
-        }
-
+        progress += step;
     }
 
     public boolean isAnimationFinished() {
-        if (calculatePlus) {
+        if (step > 0) {
             if (progress < max) {
                 return false;
             }
@@ -74,7 +67,7 @@ public class AnimationRotionCalc {
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, quaternion);
+        return Objects.hash(animationSpeed, axis, max, progress, step);
     }
 
     @Override
@@ -87,7 +80,10 @@ public class AnimationRotionCalc {
             return false;
         final AnimationRotionCalc other = (AnimationRotionCalc) obj;
         return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
-                && Objects.equals(quaternion, other.quaternion);
+                && axis == other.axis
+                && Float.floatToIntBits(max) == Float.floatToIntBits(other.max)
+                && Float.floatToIntBits(progress) == Float.floatToIntBits(other.progress)
+                && Float.floatToIntBits(step) == Float.floatToIntBits(other.step);
     }
 
 }

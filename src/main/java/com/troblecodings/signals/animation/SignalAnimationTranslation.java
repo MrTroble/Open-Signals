@@ -9,7 +9,7 @@ import com.troblecodings.signals.SEProperty;
 
 public class SignalAnimationTranslation implements SignalAnimation {
 
-    private float progress;
+    private AnimationTranslationCalc calc;
 
     private final Predicate<Map<SEProperty, String>> predicate;
     private String model;
@@ -31,48 +31,45 @@ public class SignalAnimationTranslation implements SignalAnimation {
 
     @Override
     public void updateAnimation() {
-        // TODO Auto-generated method stub
+        calc.updateAnimation();
+    }
 
+    @Override
+    public void setUpAnimationValues(final ModelTranslation currentTranslation) {
+        this.calc = new AnimationTranslationCalc(currentTranslation.getTranslation(), dest,
+                animationSpeed);
     }
 
     @Override
     public ModelTranslation getFinalModelTranslation() {
-        // TODO Auto-generated method stub
-        return null;
+        return new ModelTranslation(dest);
     }
 
     @Override
     public ModelTranslation getModelTranslation() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public void setUpAnimationValues(ModelTranslation currentTranslation) {
-        // TODO Auto-generated method stub
-
+        return new ModelTranslation(calc.getTranslation());
     }
 
     @Override
     public boolean isFinished() {
-        // TODO Auto-generated method stub
-        return false;
+        if (calc == null)
+            return true;
+        return calc.isAnimationFinished();
     }
 
     @Override
     public void reset() {
-        // TODO Auto-generated method stub
-
+        calc = null;
     }
 
     @Override
-    public boolean test(Map<SEProperty, String> properties) {
+    public boolean test(final Map<SEProperty, String> properties) {
         return predicate.test(properties);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, dest, model, progress);
+        return Objects.hash(animationSpeed, dest, model);
     }
 
     @Override
@@ -85,8 +82,7 @@ public class SignalAnimationTranslation implements SignalAnimation {
             return false;
         final SignalAnimationTranslation other = (SignalAnimationTranslation) obj;
         return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
-                && Objects.equals(dest, other.dest) && Objects.equals(model, other.model)
-                && Float.floatToIntBits(progress) == Float.floatToIntBits(other.progress);
+                && Objects.equals(dest, other.dest) && Objects.equals(model, other.model);
     }
 
 }
