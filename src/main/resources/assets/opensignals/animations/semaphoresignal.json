@@ -4,6 +4,7 @@
             "translationX": 0.15,
             "translationY": 6.95,
             "translationZ": -0.5,
+            
             "animationConfigs": [
                 {
                     "predicate": "config(WING1.FALSE)",
@@ -18,7 +19,7 @@
                     "predicate": "config(WING1.TRUE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": 155,
+                    "rotation": -45,
                     "pivotX": -0.65,
                     "pivotY": -4.45,
                     "pivotZ": 0
@@ -40,7 +41,7 @@
                     "predicate": "config(WING2.TRUE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": -100,
+                    "rotation": 45,
                     "pivotX": 0,
                     "pivotY": 0,
                     "pivotZ": 0

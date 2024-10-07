@@ -18,7 +18,7 @@
                     "predicate": "config(BARRIER_OPEN.TRUE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": -310,
+                    "rotation": 90,
                     "pivotX": 0,
                     "pivotY": 0,
                     "pivotZ": 0
@@ -43,7 +43,7 @@
                     "predicate": "config(BARRIER_OPEN.TRUE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": -310,
+                    "rotation": 90,
                     "pivotX": 0,
                     "pivotY": 0,
                     "pivotZ": 0
@@ -68,7 +68,7 @@
                     "predicate": "config(BARRIER_OPEN.TRUE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": -310,
+                    "rotation": 90,
                     "pivotX": 0,
                     "pivotY": 0,
                     "pivotZ": 0

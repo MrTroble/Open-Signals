@@ -10,6 +10,8 @@ import com.troblecodings.signals.SEProperty;
 
 public class SignalAnimationRotation implements SignalAnimation {
 
+    private static float factor = 3.49065f;
+
     private AnimationRotionCalc calc;
 
     private final Predicate<Map<SEProperty, String>> predicate;
@@ -39,15 +41,15 @@ public class SignalAnimationRotation implements SignalAnimation {
         Vector3f maxPos = new Vector3f(0, 0, 0);
         switch (axis) {
             case X: {
-                maxPos = new Vector3f(-rotation * 0.005f * animationSpeed, 0, 0);
+                maxPos = new Vector3f(rotation * 0.005f * factor, 0, 0);
                 break;
             }
             case Y: {
-                maxPos = new Vector3f(0, -rotation * 0.005f * animationSpeed, 0);
+                maxPos = new Vector3f(0, rotation * 0.005f * factor, 0);
                 break;
             }
             case Z: {
-                maxPos = new Vector3f(0, 0, -rotation * 0.005f * animationSpeed);
+                maxPos = new Vector3f(0, 0, rotation * 0.005f * factor);
                 break;
             }
             default:
@@ -58,7 +60,7 @@ public class SignalAnimationRotation implements SignalAnimation {
 
     @Override
     public ModelTranslation getFinalModelTranslation() {
-        return new ModelTranslation(pivot, axis.getForAxis(-rotation * 0.005f * animationSpeed));
+        return new ModelTranslation(pivot, axis.getForAxis(rotation * 0.005f * factor));
     }
 
     @Override

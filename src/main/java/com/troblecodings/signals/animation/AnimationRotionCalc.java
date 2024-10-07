@@ -50,13 +50,11 @@ public class AnimationRotionCalc {
 
     public boolean isAnimationFinished() {
         if (step > 0) {
-            if (progress < max) {
+            if (progress < max)
                 return false;
-            }
         } else {
-            if (max < progress) {
+            if (max < progress)
                 return false;
-            }
         }
         return true;
     }
