@@ -7,8 +7,6 @@ import com.troblecodings.signals.SEProperty;
 
 public interface SignalAnimation extends Predicate<Map<SEProperty, String>> {
 
-    public SignalAnimation with(final String model);
-
     public void updateAnimation();
 
     public ModelTranslation getModelTranslation();

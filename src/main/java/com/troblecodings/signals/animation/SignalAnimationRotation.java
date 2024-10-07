@@ -13,7 +13,6 @@ public class SignalAnimationRotation implements SignalAnimation {
     private AnimationRotionCalc calc;
 
     private final Predicate<Map<SEProperty, String>> predicate;
-    private String model;
     private final float animationSpeed;
     private final RotationAxis axis;
     private final float rotation;
@@ -27,12 +26,6 @@ public class SignalAnimationRotation implements SignalAnimation {
         this.axis = axis;
         this.rotation = rotation;
         this.pivot = pivot;
-    }
-
-    @Override
-    public SignalAnimation with(final String model) {
-        this.model = model;
-        return this;
     }
 
     @Override
@@ -92,7 +85,7 @@ public class SignalAnimationRotation implements SignalAnimation {
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, axis, model, pivot, calc, rotation);
+        return Objects.hash(animationSpeed, axis, pivot, calc, rotation);
     }
 
     @Override
@@ -105,9 +98,8 @@ public class SignalAnimationRotation implements SignalAnimation {
             return false;
         final SignalAnimationRotation other = (SignalAnimationRotation) obj;
         return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
-                && axis == other.axis && Objects.equals(model, other.model)
-                && Objects.equals(pivot, other.pivot) && Objects.equals(calc, other.calc)
-                && Objects.equals(rotation, other.rotation);
+                && axis == other.axis && Objects.equals(pivot, other.pivot)
+                && Objects.equals(calc, other.calc) && Objects.equals(rotation, other.rotation);
     }
 
 }

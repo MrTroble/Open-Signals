@@ -24,12 +24,6 @@ public class SignalAnimationTranslation implements SignalAnimation {
     }
 
     @Override
-    public SignalAnimation with(final String model) {
-        this.model = model;
-        return this;
-    }
-
-    @Override
     public void updateAnimation() {
         calc.updateAnimation();
     }

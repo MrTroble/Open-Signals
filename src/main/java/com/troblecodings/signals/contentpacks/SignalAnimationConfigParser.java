@@ -44,7 +44,7 @@ public class SignalAnimationConfigParser {
                         configs.translationY, configs.translationZ);
                 final List<SignalAnimation> animatinos = new ArrayList<>();
                 for (final SignalAnimationConfig config : configs.animationConfigs) {
-                    animatinos.add(config.createAnimation(info).with(modelName));
+                    animatinos.add(config.createAnimation(info));
                 }
                 if (!animatinos.isEmpty())
                     modelToAnimation.put(Maps.immutableEntry(modelName, vec), animatinos);
