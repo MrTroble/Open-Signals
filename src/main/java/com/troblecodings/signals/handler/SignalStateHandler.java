@@ -255,13 +255,13 @@ public final class SignalStateHandler implements INetworkSync {
             }
         }
         if (contains.get()) {
-            synchronized (TASKS_WHEN_LOAD) {
+            //synchronized (TASKS_WHEN_LOAD) {
                 if (TASKS_WHEN_LOAD.containsKey(info)) {
                     System.out.println(
                             "There are tasks to load but the signal is already loaded! Tasks: "
                                     + TASKS_WHEN_LOAD.get(info));
                 }
-            }
+            //}
         }
         updateListeners(info, changedProperties, ChangedState.UPDATED);
         new Thread(() -> {
