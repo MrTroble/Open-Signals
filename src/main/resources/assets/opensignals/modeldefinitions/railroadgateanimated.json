@@ -1,0 +1,11 @@
+{
+    "textures": {},
+    "models": {
+        "railroad_gate/barrier_base": {
+            "textures": [
+                {}
+            ],
+            "y": 0
+        }
+    }
+}

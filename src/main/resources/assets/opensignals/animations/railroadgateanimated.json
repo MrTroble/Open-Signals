@@ -1,0 +1,79 @@
+{
+    "animations": {
+        "railroad_gate/barrier_base_top": {
+            "translationX": 0,
+            "translationY": 0,
+            "translationZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "config(BARRIER_OPEN.FALSE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                },
+                {
+                    "predicate": "config(BARRIER_OPEN.TRUE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": -310,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                }
+            ]
+        },
+        "railroad_gate/barrier_1": {
+            "translationX": 0,
+            "translationY": 0,
+            "translationZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "config(BARRIER_OPEN.FALSE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                },
+                {
+                    "predicate": "config(BARRIER_OPEN.TRUE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": -310,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                }
+            ]
+        },
+        "railroad_gate/barrier_2": {
+            "translationX": 0,
+            "translationY": 0,
+            "translationZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "config(BARRIER_OPEN.FALSE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                },
+                {
+                    "predicate": "config(BARRIER_OPEN.TRUE)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": -310,
+                    "pivotX": 0,
+                    "pivotY": 0,
+                    "pivotZ": 0
+                }
+            ]
+        }
+    }
+}
