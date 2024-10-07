@@ -202,7 +202,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 break;
             }
             case SEND_PW_UPDATE: {
-                colorUpdates.accept(grid.readUpdateNetwork(buffer, false));
+                colorUpdates.accept(grid.readUpdateNetwork(buffer, true));
                 break;
             }
             case PW_REQUEST_RESPONSE: {

@@ -143,11 +143,11 @@ public class SignalBoxGrid implements INetworkSavable {
         buffer.putInt(nodes.size() + protectionWayNodes.size());
         nodes.forEach(node -> {
             node.getPoint().writeNetwork(buffer);
-            node.writeUpdateNetwork(buffer);
+            node.writeNetwork(buffer);
         });
         protectionWayNodes.forEach(node -> {
             node.getPoint().writeNetwork(buffer);
-            node.writeUpdateNetwork(buffer);
+            node.writeNetwork(buffer);
         });
         OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
     }
