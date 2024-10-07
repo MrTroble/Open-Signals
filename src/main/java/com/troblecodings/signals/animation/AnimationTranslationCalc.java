@@ -6,7 +6,6 @@ import com.troblecodings.core.VectorWrapper;
 
 public class AnimationTranslationCalc {
 
-    private final float animationSpeed;
     private float stepX;
     private float stepY;
     private float stepZ;
@@ -23,7 +22,6 @@ public class AnimationTranslationCalc {
 
     public AnimationTranslationCalc(final VectorWrapper startPosition,
             final VectorWrapper finalPosition, final float animationSpeed) {
-        this.animationSpeed = animationSpeed;
         this.stepX = 0.005f * animationSpeed;
         this.stepY = 0.005f * animationSpeed;
         this.stepZ = 0.005f * animationSpeed;
@@ -89,7 +87,7 @@ public class AnimationTranslationCalc {
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, maxX, maxY, maxZ, progressX, progressY, progressZ);
+        return Objects.hash(maxX, maxY, maxZ, progressX, progressY, progressZ);
     }
 
     @Override
@@ -101,8 +99,7 @@ public class AnimationTranslationCalc {
         if (getClass() != obj.getClass())
             return false;
         final AnimationTranslationCalc other = (AnimationTranslationCalc) obj;
-        return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
-                && Float.floatToIntBits(maxX) == Float.floatToIntBits(other.maxX)
+        return Float.floatToIntBits(maxX) == Float.floatToIntBits(other.maxX)
                 && Float.floatToIntBits(maxY) == Float.floatToIntBits(other.maxY)
                 && Float.floatToIntBits(maxZ) == Float.floatToIntBits(other.maxZ)
                 && Float.floatToIntBits(progressX) == Float.floatToIntBits(other.progressX)

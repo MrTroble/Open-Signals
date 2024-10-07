@@ -10,8 +10,6 @@ import com.troblecodings.signals.SEProperty;
 
 public class SignalAnimationRotation implements SignalAnimation {
 
-    private static float factor = 3.49065f;
-
     private AnimationRotionCalc calc;
 
     private final Predicate<Map<SEProperty, String>> predicate;
@@ -19,6 +17,7 @@ public class SignalAnimationRotation implements SignalAnimation {
     private final RotationAxis axis;
     private final float rotation;
     private final VectorWrapper pivot;
+    private final float finalRotationValue;
 
     public SignalAnimationRotation(final Predicate<Map<SEProperty, String>> predicate,
             final float animationSpeed, final RotationAxis axis, final float rotation,
@@ -28,6 +27,7 @@ public class SignalAnimationRotation implements SignalAnimation {
         this.axis = axis;
         this.rotation = rotation;
         this.pivot = pivot;
+        this.finalRotationValue = rotation * 0.005f * 3.49065f;
     }
 
     @Override
@@ -41,15 +41,15 @@ public class SignalAnimationRotation implements SignalAnimation {
         Vector3f maxPos = new Vector3f(0, 0, 0);
         switch (axis) {
             case X: {
-                maxPos = new Vector3f(rotation * 0.005f * factor, 0, 0);
+                maxPos = new Vector3f(finalRotationValue, 0, 0);
                 break;
             }
             case Y: {
-                maxPos = new Vector3f(0, rotation * 0.005f * factor, 0);
+                maxPos = new Vector3f(0, finalRotationValue, 0);
                 break;
             }
             case Z: {
-                maxPos = new Vector3f(0, 0, rotation * 0.005f * factor);
+                maxPos = new Vector3f(0, 0, finalRotationValue);
                 break;
             }
             default:
@@ -60,7 +60,7 @@ public class SignalAnimationRotation implements SignalAnimation {
 
     @Override
     public ModelTranslation getFinalModelTranslation() {
-        return new ModelTranslation(pivot, axis.getForAxis(rotation * 0.005f * factor));
+        return new ModelTranslation(pivot, axis.getForAxis(finalRotationValue));
     }
 
     @Override

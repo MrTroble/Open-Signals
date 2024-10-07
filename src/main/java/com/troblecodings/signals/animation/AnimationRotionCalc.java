@@ -7,7 +7,6 @@ import com.mojang.math.Vector3f;
 
 public class AnimationRotionCalc {
 
-    private final float animationSpeed;
     private float step;
     private final RotationAxis axis;
     private float progress;
@@ -15,7 +14,6 @@ public class AnimationRotionCalc {
 
     public AnimationRotionCalc(final Vector3f startPosition, final Vector3f finalPosition,
             final float animationSpeed, final RotationAxis axis) {
-        this.animationSpeed = animationSpeed;
         this.step = 0.005f * animationSpeed;
         this.axis = axis;
         calculateWayAndValues(startPosition, finalPosition);
@@ -65,7 +63,7 @@ public class AnimationRotionCalc {
 
     @Override
     public int hashCode() {
-        return Objects.hash(animationSpeed, axis, max, progress, step);
+        return Objects.hash(axis, max, progress, step);
     }
 
     @Override
@@ -77,9 +75,7 @@ public class AnimationRotionCalc {
         if (getClass() != obj.getClass())
             return false;
         final AnimationRotionCalc other = (AnimationRotionCalc) obj;
-        return Float.floatToIntBits(animationSpeed) == Float.floatToIntBits(other.animationSpeed)
-                && axis == other.axis
-                && Float.floatToIntBits(max) == Float.floatToIntBits(other.max)
+        return axis == other.axis && Float.floatToIntBits(max) == Float.floatToIntBits(other.max)
                 && Float.floatToIntBits(progress) == Float.floatToIntBits(other.progress)
                 && Float.floatToIntBits(step) == Float.floatToIntBits(other.step);
     }
