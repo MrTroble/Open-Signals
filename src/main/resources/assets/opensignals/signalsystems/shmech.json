@@ -12,9 +12,6 @@
         },
         "signalHeights": {
             "config(SH_HIGH.TRUE)": 2
-        },
-        "animate": {
-            "config(ANIMATE.TRUE)": true
         }
     },
     "seProperties": [
@@ -29,11 +26,6 @@
             "name": "sh_high",
             "defaultState": false,
             "changeableStage": "GUISTAGE"
-        },
-        {
-            "name": "animate",
-            "defaultState": false,
-            "changeableStage": "APISTAGE_NONE_CONFIG"
         }
     ]
 }

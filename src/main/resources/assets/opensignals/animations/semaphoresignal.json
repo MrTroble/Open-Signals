@@ -4,24 +4,21 @@
             "translationX": 0.6875,
             "translationY": 7.5625,
             "translationZ": 0,
+            "pivotX": -0.6875,
+            "pivotY": -0.5625,
+            "pivotZ": 0,
             "animationConfigs": [
                 {
                     "predicate": "with(WING1.FALSE) && with(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": 0,
-                    "pivotX": -0.6875,
-                    "pivotY": -0.5625,
-                    "pivotZ": 0
+                    "rotation": 0
                 },
                 {
                     "predicate": "with(WING1.TRUE) && with(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": -45,
-                    "pivotX": -0.6875,
-                    "pivotY": -0.5625,
-                    "pivotZ": 0
+                    "rotation": -45
                 }
             ]
         },
@@ -29,24 +26,21 @@
             "translationX": 0.6875,
             "translationY": 5.5625,
             "translationZ": 0,
+            "pivotX": -0.6875,
+            "pivotY": -0.5625,
+            "pivotZ": 0,
             "animationConfigs": [
                 {
                     "predicate": "with(WING2.FALSE) && with(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": 0,
-                    "pivotX": -0.6875,
-                    "pivotY": -0.5625,
-                    "pivotZ": 0
+                    "rotation": 0
                 },
                 {
                     "predicate": "with(WING2.TRUE) && with(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": 45,
-                    "pivotX": -0.6875,
-                    "pivotY": -0.5625,
-                    "pivotZ": 0
+                    "rotation": 45
                 }
             ]
         },
@@ -54,24 +48,21 @@
             "translationX": 0.6875,
             "translationY": 4.5625,
             "translationZ": 0,
+            "pivotX": -0.6875,
+            "pivotY": -0.5625,
+            "pivotZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "with(WING1.FALSE) && with(SEMATYPE.MAIN_SMALL)",
+                    "predicate": "!hasandis(WING1) && with(SEMATYPE.MAIN_SMALL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": 0,
-                    "pivotX": -0.6875,
-                    "pivotY": -0.5625,
-                    "pivotZ": 0
+                    "rotation": 0
                 },
                 {
-                    "predicate": "with(WING1.TRUE) && with(SEMATYPE.MAIN_SMALL)",
+                    "predicate": "hasandis(WING1) && with(SEMATYPE.MAIN_SMALL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": -45,
-                    "pivotX": -0.6875,
-                    "pivotY": -0.5625,
-                    "pivotZ": 0
+                    "rotation": -45
                 }
             ]
         },
@@ -79,39 +70,21 @@
             "translationX": 0.6875,
             "translationY": 2.5625,
             "translationZ": 0,
+            "pivotX": -0.6875,
+            "pivotY": -0.5625,
+            "pivotZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "with(WING2.FALSE) && with(SEMATYPE.MAIN_SMALL)",
+                    "predicate": "!hasandis(WING2) && with(SEMATYPE.MAIN_SMALL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": 0,
-                    "pivotX": -0.6875,
-                    "pivotY": -0.5625,
-                    "pivotZ": 0
+                    "rotation": 0
                 },
                 {
-                    "predicate": "with(WING2.TRUE) && with(SEMATYPE.MAIN_SMALL)",
+                    "predicate": "hasandis(WING2) && with(SEMATYPE.MAIN_SMALL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
-                    "rotation": 45,
-                    "pivotX": -0.6875,
-                    "pivotY": -0.5625,
-                    "pivotZ": 0
-                }
-            ]
-        },
-        "semaphore_signals/sema_main_zs3": {
-            "animationConfigs": [
-                {
-                    "predicate": "!with(ZS3.OFF)" ,
-                    "mode": "TRANSLATION",
-                    "destX": 2,
-                    "destY": 2,
-                    "destZ": 2
-                },
-                {
-                    "predicate": "with(ZS3.OFF)" ,
-                    "mode": "TRANSLATION"
+                    "rotation": 45
                 }
             ]
         }

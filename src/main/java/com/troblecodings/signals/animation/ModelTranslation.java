@@ -26,7 +26,7 @@ public class ModelTranslation {
 
     public void translate(final RenderAnimationInfo info) {
         info.stack.translate(modelTranslation.getX() - 0.5f, modelTranslation.getY() - 0.5f,
-                modelTranslation.getZ() - 0.5f); // Modell verschieben
+                modelTranslation.getZ() - 0.5f);
 
         if (!quaternion.equals(Quaternion.ONE)) {
             info.stack.mulPose(quaternion);
@@ -35,7 +35,7 @@ public class ModelTranslation {
             info.stack.translate(translation.getX(), translation.getY(), translation.getZ());
         }
         info.stack.translate(pivotTranslation.getX(), pivotTranslation.getY(),
-                pivotTranslation.getZ()); // Pivot Punkt
+                pivotTranslation.getZ());
     }
 
     public Quaternion getQuaternion() {
