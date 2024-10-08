@@ -1,11 +1,10 @@
 package com.troblecodings.signals.animation;
 
-import java.util.Map;
 import java.util.function.Predicate;
 
-import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 
-public interface SignalAnimation extends Predicate<Map<SEProperty, String>> {
+public interface SignalAnimation extends Predicate<ModelInfoWrapper> {
 
     public void updateAnimation();
 
@@ -18,5 +17,7 @@ public interface SignalAnimation extends Predicate<Map<SEProperty, String>> {
     public void reset();
 
     public void setUpAnimationValues(final ModelTranslation currentTranslation);
+
+    public SignalAnimation copy();
 
 }

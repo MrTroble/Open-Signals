@@ -6,7 +6,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(WING1.FALSE) && config(SEMATYPE.MAIN)",
+                    "predicate": "with(WING1.FALSE) && with(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -15,7 +15,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(WING1.TRUE) && config(SEMATYPE.MAIN)",
+                    "predicate": "with(WING1.TRUE) && with(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": -45,
@@ -31,7 +31,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(WING2.FALSE) && config(SEMATYPE.MAIN)",
+                    "predicate": "with(WING2.FALSE) && with(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -40,7 +40,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(WING2.TRUE) && config(SEMATYPE.MAIN)",
+                    "predicate": "with(WING2.TRUE) && with(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 45,
@@ -56,7 +56,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(WING1.FALSE) && config(SEMATYPE.MAIN_SMALL)",
+                    "predicate": "with(WING1.FALSE) && with(SEMATYPE.MAIN_SMALL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -65,7 +65,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(WING1.TRUE) && config(SEMATYPE.MAIN_SMALL)",
+                    "predicate": "with(WING1.TRUE) && with(SEMATYPE.MAIN_SMALL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": -45,
@@ -81,7 +81,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(WING2.FALSE) && config(SEMATYPE.MAIN_SMALL)",
+                    "predicate": "with(WING2.FALSE) && with(SEMATYPE.MAIN_SMALL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -90,7 +90,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(WING2.TRUE) && config(SEMATYPE.MAIN_SMALL)",
+                    "predicate": "with(WING2.TRUE) && with(SEMATYPE.MAIN_SMALL)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 45,
@@ -103,14 +103,14 @@
         "semaphore_signals/sema_main_zs3": {
             "animationConfigs": [
                 {
-                    "predicate": "!config(ZS3.OFF)" ,
+                    "predicate": "!with(ZS3.OFF)" ,
                     "mode": "TRANSLATION",
                     "destX": 2,
                     "destY": 2,
                     "destZ": 2
                 },
                 {
-                    "predicate": "config(ZS3.OFF)" ,
+                    "predicate": "with(ZS3.OFF)" ,
                     "mode": "TRANSLATION"
                 }
             ]

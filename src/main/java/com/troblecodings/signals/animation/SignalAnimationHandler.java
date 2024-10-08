@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.Maps;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -15,6 +16,7 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.SignalAnimationConfigParser;
 import com.troblecodings.signals.core.RenderAnimationInfo;
 import com.troblecodings.signals.core.SignalAngel;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 import com.troblecodings.signals.models.SignalCustomModel;
 import com.troblecodings.signals.tileentitys.SignalTileEntity;
 
@@ -40,8 +42,8 @@ public class SignalAnimationHandler {
         final BlockState state = tile.getBlockState();
         final SignalAngel angle = state.getValue(Signal.ANGEL);
         final ModelBlockRenderer renderer = info.dispatcher.getModelRenderer();
-        final VertexConsumer vertex =
-                info.source.getBuffer(ItemBlockRenderTypes.getRenderType(state, false));
+        final VertexConsumer vertex = info.source
+                .getBuffer(ItemBlockRenderTypes.getRenderType(state, false));
         final IModelData data = tile.getModelData();
 
         animationPerModel.forEach((model, entry) -> {
@@ -77,24 +79,20 @@ public class SignalAnimationHandler {
 
     public void updateStates(final Map<SEProperty, String> newProperties,
             final Map<SEProperty, String> oldProperties) {
-        final Map<SEProperty, String> changedProperties = new HashMap<>();
-        newProperties.entrySet().stream().filter(entry -> {
-            final String oldState = oldProperties.get(entry.getKey());
-            return oldState != null && !entry.getValue().equals(oldState);
-        }).forEach(entry -> changedProperties.put(entry.getKey(), entry.getValue()));
-
-        if (changedProperties.isEmpty()) {
-            updateToFinalizedAnimations(newProperties);
+        if (oldProperties.isEmpty()) {
+            updateToFinalizedAnimations(new ModelInfoWrapper(newProperties));
         } else {
-            updateAnimations(changedProperties);
+            updateAnimations(new ModelInfoWrapper(newProperties));
         }
     }
 
-    private void updateAnimations(final Map<SEProperty, String> changedProperties) {
+    private void updateAnimations(final ModelInfoWrapper wrapper) {
         animationPerModel.values().forEach(entry -> {
+            entry.getKey().setRenderModel(false);
             for (final SignalAnimation animation : entry.getValue()) {
-                if (animation.test(changedProperties)) {
+                if (animation.test(wrapper)) {
                     final ModelTranslation translation = entry.getKey();
+                    translation.setRenderModel(true);
                     if (translation.isAnimationAssigned()) {
                         final SignalAnimation other = translation.getAssigendAnimation();
                         other.reset();
@@ -107,10 +105,10 @@ public class SignalAnimationHandler {
         });
     }
 
-    private void updateToFinalizedAnimations(final Map<SEProperty, String> newProperties) {
+    private void updateToFinalizedAnimations(final ModelInfoWrapper wrapper) {
         animationPerModel.values().forEach((entry) -> {
             for (final SignalAnimation animation : entry.getValue()) {
-                if (animation.test(newProperties)) {
+                if (animation.test(wrapper)) {
                     final ModelTranslation translation = entry.getKey();
                     translation.setUpNewTranslation(animation.getFinalModelTranslation());
                     translation.setRenderModel(true);
@@ -126,10 +124,11 @@ public class SignalAnimationHandler {
         map.forEach((entry, animations) -> {
             final BakedModel model = SignalCustomModel.getModelFromLocation(
                     new ResourceLocation(OpenSignalsMain.MODID, entry.getKey()));
-            final ModelTranslation translation =
-                    new ModelTranslation(VectorWrapper.ZERO, new Quaternion(0, 0, 0, 0));
-            translation.setModelTranslation(entry.getValue());
-            animationPerModel.put(model, Maps.immutableEntry(translation, animations));
+            final ModelTranslation translation = new ModelTranslation(VectorWrapper.ZERO,
+                    new Quaternion(0, 0, 0, 0));
+            translation.setModelTranslation(entry.getValue().copy());
+            animationPerModel.put(model, Maps.immutableEntry(translation, animations.stream()
+                    .map(animation -> animation.copy()).collect(Collectors.toList())));
         });
     }
 

@@ -6,7 +6,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(BARRIER_OPEN.FALSE)",
+                    "predicate": "with(BARRIER_OPEN.FALSE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -15,7 +15,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(BARRIER_OPEN.TRUE)",
+                    "predicate": "with(BARRIER_OPEN.TRUE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 90,
@@ -31,7 +31,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(BARRIER_OPEN.FALSE)",
+                    "predicate": "with(BARRIER_OPEN.FALSE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -40,7 +40,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(BARRIER_OPEN.TRUE)",
+                    "predicate": "with(BARRIER_OPEN.TRUE)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 90,
@@ -56,7 +56,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(BARRIER_OPEN.FALSE) && (config(BARRIER_LENGTH.L1) || config(BARRIER_LENGTH.L2) || config(BARRIER_LENGTH.L3) || config(BARRIER_LENGTH.L4) || config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L1) || with(BARRIER_LENGTH.L2) || with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -65,7 +65,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(BARRIER_OPEN.TRUE) && (config(BARRIER_LENGTH.L1) || config(BARRIER_LENGTH.L2) || config(BARRIER_LENGTH.L3) || config(BARRIER_LENGTH.L4) || config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L1) || with(BARRIER_LENGTH.L2) || with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 90,
@@ -81,7 +81,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(BARRIER_OPEN.FALSE) && (config(BARRIER_LENGTH.L2) || config(BARRIER_LENGTH.L3) || config(BARRIER_LENGTH.L4) || config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L2) || with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -90,7 +90,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(BARRIER_OPEN.TRUE) && (config(BARRIER_LENGTH.L2) || config(BARRIER_LENGTH.L3) || config(BARRIER_LENGTH.L4) || config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L2) || with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 90,
@@ -106,7 +106,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(BARRIER_OPEN.FALSE) && (config(BARRIER_LENGTH.L3) || config(BARRIER_LENGTH.L4) || config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -115,7 +115,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(BARRIER_OPEN.TRUE) && (config(BARRIER_LENGTH.L3) || config(BARRIER_LENGTH.L4) || config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L3) || with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 90,
@@ -131,7 +131,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(BARRIER_OPEN.FALSE) && (config(BARRIER_LENGTH.L4) || config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -140,7 +140,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(BARRIER_OPEN.TRUE) && (config(BARRIER_LENGTH.L4) || config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L4) || with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 90,
@@ -156,7 +156,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(BARRIER_OPEN.FALSE) && (config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.FALSE) && (with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -165,7 +165,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(BARRIER_OPEN.TRUE) && (config(BARRIER_LENGTH.L5) || config(BARRIER_LENGTH.L6))",
+                    "predicate": "with(BARRIER_OPEN.TRUE) && (with(BARRIER_LENGTH.L5) || with(BARRIER_LENGTH.L6))",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 90,
@@ -181,7 +181,7 @@
             "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(BARRIER_OPEN.FALSE) && config(BARRIER_LENGTH.L6)",
+                    "predicate": "with(BARRIER_OPEN.FALSE) && with(BARRIER_LENGTH.L6)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
@@ -190,7 +190,7 @@
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(BARRIER_OPEN.TRUE) && config(BARRIER_LENGTH.L6)",
+                    "predicate": "with(BARRIER_OPEN.TRUE) && with(BARRIER_LENGTH.L6)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 90,

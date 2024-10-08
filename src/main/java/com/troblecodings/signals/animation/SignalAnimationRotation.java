@@ -1,25 +1,24 @@
 package com.troblecodings.signals.animation;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.mojang.math.Vector3f;
 import com.troblecodings.core.VectorWrapper;
-import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 
 public class SignalAnimationRotation implements SignalAnimation {
 
     private AnimationRotionCalc calc;
 
-    private final Predicate<Map<SEProperty, String>> predicate;
+    private final Predicate<ModelInfoWrapper> predicate;
     private final float animationSpeed;
     private final RotationAxis axis;
     private final float rotation;
     private final VectorWrapper pivot;
     private final float finalRotationValue;
 
-    public SignalAnimationRotation(final Predicate<Map<SEProperty, String>> predicate,
+    public SignalAnimationRotation(final Predicate<ModelInfoWrapper> predicate,
             final float animationSpeed, final RotationAxis axis, final float rotation,
             final VectorWrapper pivot) {
         this.predicate = predicate;
@@ -81,8 +80,13 @@ public class SignalAnimationRotation implements SignalAnimation {
     }
 
     @Override
-    public boolean test(final Map<SEProperty, String> properties) {
-        return predicate.test(properties);
+    public boolean test(final ModelInfoWrapper wrapper) {
+        return predicate.test(wrapper);
+    }
+
+    @Override
+    public SignalAnimation copy() {
+        return new SignalAnimationRotation(predicate, animationSpeed, axis, rotation, pivot);
     }
 
     @Override

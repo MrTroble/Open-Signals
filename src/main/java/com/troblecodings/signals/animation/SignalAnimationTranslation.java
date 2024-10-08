@@ -1,22 +1,21 @@
 package com.troblecodings.signals.animation;
 
-import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
 
 import com.troblecodings.core.VectorWrapper;
-import com.troblecodings.signals.SEProperty;
+import com.troblecodings.signals.models.ModelInfoWrapper;
 
 public class SignalAnimationTranslation implements SignalAnimation {
 
     private AnimationTranslationCalc calc;
 
-    private final Predicate<Map<SEProperty, String>> predicate;
+    private final Predicate<ModelInfoWrapper> predicate;
     private String model;
     private final float animationSpeed;
     private final VectorWrapper dest;
 
-    public SignalAnimationTranslation(Predicate<Map<SEProperty, String>> predicate,
+    public SignalAnimationTranslation(Predicate<ModelInfoWrapper> predicate,
             final float animationSpeed, final VectorWrapper dest) {
         this.predicate = predicate;
         this.animationSpeed = animationSpeed;
@@ -57,8 +56,13 @@ public class SignalAnimationTranslation implements SignalAnimation {
     }
 
     @Override
-    public boolean test(final Map<SEProperty, String> properties) {
-        return predicate.test(properties);
+    public boolean test(final ModelInfoWrapper wrapper) {
+        return predicate.test(wrapper);
+    }
+
+    @Override
+    public SignalAnimation copy() {
+        return new SignalAnimationTranslation(predicate, animationSpeed, dest);
     }
 
     @Override
