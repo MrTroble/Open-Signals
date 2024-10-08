@@ -24,6 +24,8 @@ public class SignalAnimationConfigParser {
     ALL_ANIMATIONS = new HashMap<>();
 
     public static void loadAllAnimations() {
+        if (!ALL_ANIMATIONS.isEmpty())
+            return;
         OpenSignalsMain.contentPacks.getFiles("animations").forEach(entry -> {
             final String signalName = entry.getKey().replace(".json", "").toLowerCase();
             final Signal signal = Signal.SIGNALS.get(signalName);

@@ -23,7 +23,6 @@ import com.mojang.math.Transformation;
 import com.mojang.math.Vector3f;
 import com.mojang.math.Vector4f;
 import com.troblecodings.signals.OpenSignalsMain;
-import com.troblecodings.signals.contentpacks.SignalAnimationConfigParser;
 import com.troblecodings.signals.core.SignalAngel;
 
 import net.minecraft.client.Minecraft;
@@ -113,6 +112,10 @@ public class SignalCustomModel implements UnbakedModel {
             model.getQuads(null, direction, RANDOM, EmptyModelData.INSTANCE)
                     .forEach(quad -> transform(quad, matrix));
         }
+
+        if (angel.equals(SignalAngel.ANGEL0) && info.isAnimation) {
+            locationToModel.put(new ResourceLocation(OpenSignalsMain.MODID, info.name), model);
+        }
         return new BakedModelPair(info.state, model);
     }
 
@@ -149,33 +152,12 @@ public class SignalCustomModel implements UnbakedModel {
                 }
             }
         });
-        loadAnimationModels(bakery, function, resource);
         final Quaternion quaternion = angel.getQuaternion();
         return new SignalBakedModel(
                 list.stream()
                         .map(info -> transform(info, bakery, resource, function,
                                 materialsFromString, quaternion))
                         .collect(Collectors.toUnmodifiableList()));
-    }
-
-    private void loadAnimationModels(final ModelBakery bakery,
-            final Function<Material, TextureAtlasSprite> function,
-            final ResourceLocation resource) {
-        if (!angel.equals(SignalAngel.ANGEL0))
-            return;
-        final List<String> modelNames = new ArrayList<>();
-        SignalAnimationConfigParser.ALL_ANIMATIONS.values()
-                .forEach(map -> map.keySet().forEach(entry -> modelNames.add(entry.getKey())));
-        for (final String name : modelNames) {
-            final UnbakedModel unbaked = bakery
-                    .getModel(new ResourceLocation(OpenSignalsMain.MODID, "block/" + name));
-            final BakedModel baked = unbaked.bake(bakery, function,
-                    new SimpleModelState(new Transformation(Vector3f.ZERO, null, null, null)),
-                    resource);
-            final ResourceLocation location = new ResourceLocation(OpenSignalsMain.MODID, name);
-            if (!locationToModel.containsKey(location))
-                locationToModel.put(new ResourceLocation(OpenSignalsMain.MODID, name), baked);
-        }
     }
 
     public static BakedModel getModelFromLocation(final ResourceLocation location) {
