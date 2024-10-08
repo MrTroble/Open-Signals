@@ -44,7 +44,8 @@ public class SignalAnimationConfigParser {
                         configs.translationY, configs.translationZ);
                 final List<SignalAnimation> animatinos = new ArrayList<>();
                 for (final SignalAnimationConfig config : configs.animationConfigs) {
-                    animatinos.add(config.createAnimation(info));
+                    animatinos.add(config.createAnimation(info,
+                            new VectorWrapper(configs.pivotX, configs.pivotY, configs.pivotZ)));
                 }
                 if (!animatinos.isEmpty())
                     modelToAnimation.put(Maps.immutableEntry(modelName, vec), animatinos);
@@ -59,6 +60,11 @@ public class SignalAnimationConfigParser {
         private float translationX = 0;
         private float translationY = 0;
         private float translationZ = 0;
+
+        private float pivotX = 0;
+        private float pivotY = 0;
+        private float pivotZ = 0;
+
         private List<SignalAnimationConfig> animationConfigs;
 
     }

@@ -16,6 +16,7 @@ public class SignalAnimationConfig {
     private String mode;
     private String rotationAxis;
     private float rotation = 0;
+
     private float pivotX = 0;
     private float pivotY = 0;
     private float pivotZ = 0;
@@ -24,13 +25,15 @@ public class SignalAnimationConfig {
     private float destY = 0;
     private float destZ = 0;
 
-    public SignalAnimation createAnimation(final FunctionParsingInfo info) {
+    public SignalAnimation createAnimation(final FunctionParsingInfo info,
+            final VectorWrapper pivot) {
         final AnimationMode mode = AnimationMode.of(this.mode);
         switch (mode) {
             case ROTATION: {
                 final RotationAxis axis = RotationAxis.of(rotationAxis);
                 return new SignalAnimationRotation(LogicParser.predicate(predicate, info),
-                        animationSpeed, axis, rotation, new VectorWrapper(pivotX, pivotY, pivotZ));
+                        animationSpeed, axis, rotation, new VectorWrapper(pivotX + pivot.getX(),
+                                pivotY + pivot.getY(), pivotZ + pivot.getZ()));
             }
             case TRANSLATION: {
                 return new SignalAnimationTranslation(LogicParser.predicate(predicate, info),
@@ -40,5 +43,4 @@ public class SignalAnimationConfig {
                 return null;
         }
     }
-
 }
