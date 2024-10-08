@@ -25,20 +25,17 @@ public class ModelTranslation {
     }
 
     public void translate(final RenderAnimationInfo info) {
-        if (!modelTranslation.equals(VectorWrapper.ZERO)) {
-            info.stack.translate(modelTranslation.getX(), modelTranslation.getY(),
-                    modelTranslation.getZ()); // Modell verschieben
-        }
+        info.stack.translate(modelTranslation.getX() - 0.5f, modelTranslation.getY() - 0.5f,
+                modelTranslation.getZ() - 0.5f); // Modell verschieben
+
         if (!quaternion.equals(Quaternion.ONE)) {
             info.stack.mulPose(quaternion);
         }
         if (!translation.equals(VectorWrapper.ZERO)) {
             info.stack.translate(translation.getX(), translation.getY(), translation.getZ());
         }
-        if (!pivotTranslation.equals(VectorWrapper.ZERO)) {
-            info.stack.translate(pivotTranslation.getX(), pivotTranslation.getY(),
-                    pivotTranslation.getZ()); // Pivot Punkt
-        }
+        info.stack.translate(pivotTranslation.getX(), pivotTranslation.getY(),
+                pivotTranslation.getZ()); // Pivot Punkt
     }
 
     public Quaternion getQuaternion() {

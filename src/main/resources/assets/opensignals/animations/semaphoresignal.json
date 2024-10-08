@@ -1,49 +1,101 @@
 {
     "animations": {
         "semaphore_signals/sema_main_wing1": {
-            "translationX": 0.15,
-            "translationY": 6.95,
-            "translationZ": -0.5,
-            
+            "translationX": 0.6875,
+            "translationY": 7.5625,
+            "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(WING1.FALSE)",
+                    "predicate": "config(WING1.FALSE) && config(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
-                    "pivotX": -0.65,
-                    "pivotY": -4.45,
+                    "pivotX": -0.6875,
+                    "pivotY": -0.5625,
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(WING1.TRUE)",
+                    "predicate": "config(WING1.TRUE) && config(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": -45,
-                    "pivotX": -0.65,
-                    "pivotY": -4.45,
+                    "pivotX": -0.6875,
+                    "pivotY": -0.5625,
                     "pivotZ": 0
                 }
             ]
         },
         "semaphore_signals/sema_main_wing2": {
+            "translationX": 0.6875,
+            "translationY": 5.5625,
+            "translationZ": 0,
             "animationConfigs": [
                 {
-                    "predicate": "config(WING2.FALSE)",
+                    "predicate": "config(WING2.FALSE) && config(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 0,
-                    "pivotX": 0,
-                    "pivotY": 0,
+                    "pivotX": -0.6875,
+                    "pivotY": -0.5625,
                     "pivotZ": 0
                 },
                 {
-                    "predicate": "config(WING2.TRUE)",
+                    "predicate": "config(WING2.TRUE) && config(SEMATYPE.MAIN)",
                     "mode": "ROTATION",
                     "rotationAxis": "Z",
                     "rotation": 45,
-                    "pivotX": 0,
-                    "pivotY": 0,
+                    "pivotX": -0.6875,
+                    "pivotY": -0.5625,
+                    "pivotZ": 0
+                }
+            ]
+        },
+        "semaphore_signals/sema_main_wing1_small": {
+            "translationX": 0.6875,
+            "translationY": 4.5625,
+            "translationZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "config(WING1.FALSE) && config(SEMATYPE.MAIN_SMALL)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0,
+                    "pivotX": -0.6875,
+                    "pivotY": -0.5625,
+                    "pivotZ": 0
+                },
+                {
+                    "predicate": "config(WING1.TRUE) && config(SEMATYPE.MAIN_SMALL)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": -45,
+                    "pivotX": -0.6875,
+                    "pivotY": -0.5625,
+                    "pivotZ": 0
+                }
+            ]
+        },
+        "semaphore_signals/sema_main_wing2_small": {
+            "translationX": 0.6875,
+            "translationY": 2.5625,
+            "translationZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "config(WING2.FALSE) && config(SEMATYPE.MAIN_SMALL)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0,
+                    "pivotX": -0.6875,
+                    "pivotY": -0.5625,
+                    "pivotZ": 0
+                },
+                {
+                    "predicate": "config(WING2.TRUE) && config(SEMATYPE.MAIN_SMALL)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 45,
+                    "pivotX": -0.6875,
+                    "pivotY": -0.5625,
                     "pivotZ": 0
                 }
             ]
