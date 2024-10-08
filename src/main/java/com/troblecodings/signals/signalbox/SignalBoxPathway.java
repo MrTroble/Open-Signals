@@ -107,7 +107,11 @@ public class SignalBoxPathway implements IChunkLoadable {
                     .ifPresent(pos -> SignalBoxHandler.updateRedstoneOutput(
                             new StateInfo(tile.getLevel(), pos),
                             !status.equals(EnumPathUsage.FREE)));
-            option.setEntry(PathEntryType.PATHUSAGE, status);
+            if (!status.equals(EnumPathUsage.FREE)) {
+                option.setEntry(PathEntryType.PATHUSAGE, status);
+            } else {
+                option.removeEntry(PathEntryType.PATHUSAGE);
+            }
         }, point);
         if (status.equals(EnumPathUsage.SELECTED) || status.equals(EnumPathUsage.PREPARED)) {
             setProtectionWay();
@@ -329,7 +333,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         final World world = tile.getLevel();
         if (world == null || world.isClientSide)
             return;
-        world.getServer().execute(() -> {
+        tile.getLevel().getServer().execute(() -> {
             final WriteBuffer buffer = new WriteBuffer();
             buffer.putEnumValue(SignalBoxNetwork.SET_SIGNALS);
             buffer.putByte((byte) redSignals.size());
@@ -416,6 +420,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     public void resetPathway(final @Nullable Point point) {
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
+        System.out.println(getListOfNodes());
         if (data.totalPathwayReset(point)) {
             this.isBlocked = false;
             resetOther();
@@ -446,8 +451,10 @@ public class SignalBoxPathway implements IChunkLoadable {
                             final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                                     .getOtherSignals();
                             final OtherSignalIdentifier identifier = distantSignalPositions
-                                    .getOrDefault(position, new OtherSignalIdentifier(point,
-                                            new ModeSet(mode, rotation), position, false, mode));
+                                    .getOrDefault(new BlockPosSignalHolder(position),
+                                            new OtherSignalIdentifier(point,
+                                                    new ModeSet(mode, rotation), position, false,
+                                                    mode));
                             SignalConfig.reset(new ResetInfo(
                                     new SignalStateInfo(tile.getLevel(), position, current),
                                     identifier.isRepeater));
@@ -634,7 +641,7 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     public void checkReRequest() {
         if (isAutoPathway) {
-            grid.requestWay(originalFirstPoint, getLastPoint());
+            grid.requestWay(originalFirstPoint, getLastPoint(), getPathType());
         }
     }
 
@@ -702,5 +709,9 @@ public class SignalBoxPathway implements IChunkLoadable {
 
     public boolean isInterSignalBoxPathway() {
         return this instanceof InterSignalBoxPathway;
+    }
+
+    public SignalBoxGrid getGrid() {
+        return grid;
     }
 }

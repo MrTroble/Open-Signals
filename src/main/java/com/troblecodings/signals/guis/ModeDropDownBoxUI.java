@@ -192,9 +192,6 @@ public class ModeDropDownBoxUI {
                                         final UIColor color = new UIColor(
                                                 GuiSignalBox.SELECTION_COLOR);
                                         tile.add(new UIClickable(e1 -> {
-                                            if (!tile.getParent().getParent().getParent()
-                                                    .isHovered())
-                                                return;
                                             if (preSignalsList.contains(ident)) {
                                                 preSignalsList.remove(ident);
                                                 tile.remove(color);
@@ -244,6 +241,9 @@ public class ModeDropDownBoxUI {
                                             previous.set(tile);
                                         }
                                         tile.add(new UIClickable(e1 -> {
+                                            if (!tile.getParent().getParent().getParent()
+                                                    .isHovered())
+                                                return;
                                             if (previous.get() != null) {
                                                 previous.get().findRecursive(UIColor.class)
                                                         .forEach(previous.get()::remove);
@@ -358,7 +358,7 @@ public class ModeDropDownBoxUI {
             }
             case TRAIN_NUMBER: {
                 final UIEntity button = GuiElements
-                        .createButton(I18Wrapper.format("btn.conntect.trainnumber"), e -> {
+                        .createButton(I18Wrapper.format("btn.connect.trainnumber"), e -> {
                             final ModeIdentifier identifier = option
                                     .getEntry(PathEntryType.CONNECTED_TRAINNUMBER)
                                     .orElse(new ModeIdentifier(new Point(-1, -1), null));
@@ -494,12 +494,14 @@ public class ModeDropDownBoxUI {
     private static void disconnectFromEachOther(final ModeIdentifier ident1,
             final ModeIdentifier ident2, final SignalBoxGrid grid, final GuiSignalBox gui) {
         final SignalBoxNode node1 = grid.getNode(ident1.point);
-        node1.getOption(ident1.mode).get().removeEntry(PathEntryType.CONNECTED_TRAINNUMBER);
+        node1.getOption(ident1.mode)
+                .ifPresent(entry -> entry.removeEntry(PathEntryType.CONNECTED_TRAINNUMBER));
         gui.removeEntryFromServer(node1, ident1.mode.mode, ident1.mode.rotation,
                 PathEntryType.CONNECTED_TRAINNUMBER);
 
         final SignalBoxNode node2 = grid.getNode(ident2.point);
-        node2.getOption(ident2.mode).get().removeEntry(PathEntryType.CONNECTED_TRAINNUMBER);
+        node2.getOption(ident2.mode)
+                .ifPresent(entry -> entry.removeEntry(PathEntryType.CONNECTED_TRAINNUMBER));
         gui.removeEntryFromServer(node2, ident2.mode.mode, ident2.mode.rotation,
                 PathEntryType.CONNECTED_TRAINNUMBER);
     }

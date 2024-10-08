@@ -47,7 +47,6 @@ public class PathwayData {
 
     private static final String LIST_OF_NODES = "listOfNodes";
     private static final String PATH_TYPE = "pathType";
-    private static final String LIST_OF_PROTECTION_NODES = "listOfProtectionNodes";
 
     protected SignalBoxGrid grid = null;
     private final Map<BlockPos, SignalBoxNode> mapOfResetPositions = new HashMap<>();
@@ -104,7 +103,11 @@ public class PathwayData {
     public SignalBoxPathway createPathway() {
         if (pathway == null) {
             if (type.equals(PathType.SHUNTING)) {
-                pathway = new ShuntingPathway(this);
+                if (delay > 0) {
+                    pathway = new DelayableShuntingPathway(this);
+                } else {
+                    pathway = new ShuntingPathway(this);
+                }
             } else {
                 final boolean isInterSignalBoxPathway = isInterSignalBoxPathway();
                 if (delay > 0) {
@@ -238,7 +241,7 @@ public class PathwayData {
                 return;
             option.getEntry(PathEntryType.OUTPUT).ifPresent(pos -> SignalBoxHandler
                     .updateRedstoneOutput(new StateInfo(pathway.tile.getLevel(), pos), false));
-            option.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE);
+            option.removeEntry(PathEntryType.PATHUSAGE);
         });
         return true;
     }
@@ -409,18 +412,11 @@ public class PathwayData {
             node.getPoint().write(entry);
             return entry;
         })::iterator);
-        tag.putList(LIST_OF_PROTECTION_NODES, protectionWayNodes.stream().map(node -> {
-            final NBTWrapper entry = new NBTWrapper();
-            node.getPoint().write(entry);
-            return entry;
-        })::iterator);
         tag.putString(PATH_TYPE, this.type.name());
     }
 
     public void read(final NBTWrapper tag) {
         final com.google.common.collect.ImmutableList.Builder<SignalBoxNode> nodeBuilder = ImmutableList
-                .builder();
-        final com.google.common.collect.ImmutableList.Builder<SignalBoxNode> protectionNodeBuilder = ImmutableList
                 .builder();
         tag.getList(LIST_OF_NODES).forEach(nodeNBT -> {
             final SignalBoxNode node = getNodeFromNBT(nodeNBT);
@@ -428,14 +424,11 @@ public class PathwayData {
                 return;
             nodeBuilder.add(node);
         });
-        tag.getList(LIST_OF_PROTECTION_NODES).forEach(nodeNBT -> {
-            final SignalBoxNode node = getNodeFromNBT(nodeNBT);
-            if (node == null)
-                return;
-            protectionNodeBuilder.add(node);
-        });
         this.listOfNodes = nodeBuilder.build();
-        this.protectionWayNodes = protectionNodeBuilder.build();
+        if (!checkForProtectionWay()) {
+            this.emptyOrBroken = true;
+            return;
+        }
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         this.initalize();
     }
@@ -572,7 +565,7 @@ public class PathwayData {
                         return;
                     }
                     final PathwayRequestResult endRequeset = SignalBoxUtil.requestPathway(endGrid,
-                            otherStartPoint.get(), otherEndPoint.get());
+                            otherStartPoint.get(), otherEndPoint.get(), PathType.NORMAL);
                     if (endRequeset.isPass()) {
                         returnResult.set(endRequeset.getPathwayData());
                     }

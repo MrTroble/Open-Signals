@@ -157,7 +157,7 @@ public final class NameHandler implements INetworkSync {
 
     public static void runTaskWhenNameLoaded(final StateInfo info,
             final NameStateListener listener) {
-        if (!info.isValid() || info.worldNullOrClientSide())
+        if (!info.isValid() || info.isWorldNullOrClientSide())
             return;
         if (isNameLoaded(info)) {
             synchronized (ALL_NAMES) {
