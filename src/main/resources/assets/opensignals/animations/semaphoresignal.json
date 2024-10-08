@@ -87,6 +87,50 @@
                     "rotation": 45
                 }
             ]
+        },
+        "semaphore_signals/sema_distant_plate_on": {
+            "translationX": 0,
+            "translationY": 3.875,
+            "translationZ": 0.59375,
+            "pivotX": 0,
+            "pivotY": 0.125,
+            "pivotZ": -0.59375,
+            "animationConfigs": [
+                {
+                    "predicate": "with(SEMATYPE.DIST) && !with(SEMAVR.VR1)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "X",
+                    "rotation": 0
+                },
+                {
+                    "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR1)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "X",
+                    "rotation": 90
+                }
+            ]
+        },
+        "semaphore_signals/sema_distant_vr0": {
+            "translationX": 0.5,
+            "translationY": 2.5,
+            "translationZ": 0,
+            "pivotX": -0.5,
+            "pivotY": -0.5,
+            "pivotZ": 0,
+            "animationConfigs": [
+                {
+                    "predicate": "with(SEMATYPE.DIST) && !with(SEMAVR.VR2)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": 0
+                },
+                {
+                    "predicate": "with(SEMATYPE.DIST) && with(SEMAVR.VR2)",
+                    "mode": "ROTATION",
+                    "rotationAxis": "Z",
+                    "rotation": -45
+                }
+            ]
         }
     }
 }
