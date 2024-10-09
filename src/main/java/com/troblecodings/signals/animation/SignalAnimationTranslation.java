@@ -66,6 +66,11 @@ public class SignalAnimationTranslation implements SignalAnimation {
     }
 
     @Override
+    public Predicate<ModelInfoWrapper> getPredicate() {
+        return predicate;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(animationSpeed, dest, model);
     }

@@ -218,9 +218,10 @@ public final class CustomModelLoader implements ResourceManagerReloadListener {
                 final Map<Entry<String, VectorWrapper>, List<SignalAnimation>> animations = //
                         SignalAnimationConfigParser.ALL_ANIMATIONS.get(signaltype);
                 if (animations != null) {
-                    animations.keySet().forEach(
-                            entry -> accumulator.add(new SignalModelLoaderInfo(entry.getKey(),
-                                    predicate -> false, 0, 0, 0, new HashMap<>()).setOnAnimation()));
+                    animations.keySet()
+                            .forEach(entry -> accumulator.add(
+                                    new SignalModelLoaderInfo(entry.getKey(), predicate -> false, 0,
+                                            0, 0, new HashMap<>()).setOnAnimation()));
                 }
                 registeredModels.put(lowercaseName, accumulator);
             }

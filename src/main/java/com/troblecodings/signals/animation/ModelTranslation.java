@@ -2,9 +2,9 @@ package com.troblecodings.signals.animation;
 
 import java.util.Objects;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.troblecodings.core.VectorWrapper;
-import com.troblecodings.signals.core.RenderAnimationInfo;
 
 public class ModelTranslation {
 
@@ -24,18 +24,17 @@ public class ModelTranslation {
         this.translation = translation;
     }
 
-    public void translate(final RenderAnimationInfo info) {
-        info.stack.translate(modelTranslation.getX() - 0.5f, modelTranslation.getY() - 0.5f,
+    public void translate(final PoseStack stack) {
+        stack.translate(modelTranslation.getX() - 0.5f, modelTranslation.getY() - 0.5f,
                 modelTranslation.getZ() - 0.5f);
 
         if (!quaternion.equals(Quaternion.ONE)) {
-            info.stack.mulPose(quaternion);
+            stack.mulPose(quaternion);
         }
         if (!translation.equals(VectorWrapper.ZERO)) {
-            info.stack.translate(translation.getX(), translation.getY(), translation.getZ());
+            stack.translate(translation.getX(), translation.getY(), translation.getZ());
         }
-        info.stack.translate(pivotTranslation.getX(), pivotTranslation.getY(),
-                pivotTranslation.getZ());
+        stack.translate(pivotTranslation.getX(), pivotTranslation.getY(), pivotTranslation.getZ());
     }
 
     public Quaternion getQuaternion() {

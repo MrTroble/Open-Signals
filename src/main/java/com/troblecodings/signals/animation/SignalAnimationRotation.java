@@ -90,6 +90,11 @@ public class SignalAnimationRotation implements SignalAnimation {
     }
 
     @Override
+    public Predicate<ModelInfoWrapper> getPredicate() {
+        return predicate;
+    }
+
+    @Override
     public int hashCode() {
         return Objects.hash(animationSpeed, axis, pivot, calc, rotation);
     }

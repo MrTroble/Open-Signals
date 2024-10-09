@@ -54,7 +54,7 @@ public class SignalAnimationHandler {
             info.stack.pushPose();
             info.stack.translate(0.5f, 0.5f, 0.5f);
             info.stack.mulPose(angle.getQuaternion());
-            translation.translate(info);
+            translation.translate(info.stack);
             renderer.renderModel(info.stack.last(), vertex, state, model, 0, 0, 0, info.lightColor,
                     info.overlayTexture, data);
             info.stack.popPose();

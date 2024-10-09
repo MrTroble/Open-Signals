@@ -20,4 +20,6 @@ public interface SignalAnimation extends Predicate<ModelInfoWrapper> {
 
     public SignalAnimation copy();
 
+    public Predicate<ModelInfoWrapper> getPredicate();
+
 }
