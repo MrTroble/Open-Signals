@@ -159,14 +159,6 @@ public class Signal extends BasicBlock {
     }
 
     @Override
-    public List<ItemStack> getDrops(final BlockState state,
-            final net.minecraft.loot.LootContext.Builder builder) {
-        List<ItemStack> drops = new ArrayList<ItemStack>();
-        drops.add(getPlacementtool().getDefaultInstance());
-        return drops;
-    }
-
-    @Override
     protected void createBlockStateDefinition(final Builder<Block, BlockState> builder) {
         final List<SEProperty> properties = new ArrayList<>();
         nextConsumer.accept(properties);
