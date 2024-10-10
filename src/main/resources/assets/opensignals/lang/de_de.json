@@ -666,5 +666,13 @@
 	"property.value.DISTANT_LEFT": "Vorsignal links",
 	"property.value.DISTANT_RIGHT": "Vorsignal rechts",
 	"block.opensignals.postconnectable": "Verbindungsfähiger Mast",
-	"property.value.GSMR": "GSMR Tafel"
+	"property.value.GSMR": "GSMR Tafel",
+    "info.key.removeother": "Andere entfernen?",
+	"info.train_number": "Zugnummernfeld",
+	"property.TRAIN_NUMBER": "Zugnummernfeld",
+	"btn.connect.trainnumber": "Zugnummernfeld verbinden",
+	"gui.tile.notvalid": "Nicht erlaubt",
+	"property.SHUNTING": "Rangieren",
+	"gui.signalbox.choosetypes": "Wähle Fahrstraßentyp",
+	"property.mode_select.name": "Wähle Streckenelement"
 }
