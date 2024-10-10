@@ -254,15 +254,6 @@ public final class SignalStateHandler implements INetworkSync {
                 changedProperties.putAll(states);
             }
         }
-        if (contains.get()) {
-            //synchronized (TASKS_WHEN_LOAD) {
-                if (TASKS_WHEN_LOAD.containsKey(info)) {
-                    System.out.println(
-                            "There are tasks to load but the signal is already loaded! Tasks: "
-                                    + TASKS_WHEN_LOAD.get(info));
-                }
-            //}
-        }
         updateListeners(info, changedProperties, ChangedState.UPDATED);
         new Thread(() -> {
             sendToAll(info, changedProperties);
@@ -572,8 +563,6 @@ public final class SignalStateHandler implements INetworkSync {
                 synchronized (TASKS_WHEN_LOAD) {
                     final List<SignalStateListener> tasks = TASKS_WHEN_LOAD.remove(info.info);
                     if (tasks != null) {
-                        System.out
-                                .println("Executing Tasks for " + info.info + "! Tasks: " + tasks);
                         tasks.forEach(listener -> listener.update(info.info, properties,
                                 ChangedState.ADDED_TO_CACHE));
                     }

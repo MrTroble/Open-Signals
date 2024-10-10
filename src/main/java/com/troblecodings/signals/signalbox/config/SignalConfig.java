@@ -54,11 +54,6 @@ public final class SignalConfig {
     }
 
     public static void reset(final ResetInfo info) {
-        System.out.println("Resetting Signal " + info.current + "!");
-        System.out.println("Call:");
-        for (final StackTraceElement el : Thread.currentThread().getStackTrace()) {
-            System.out.println("          " + el.toString());
-        }
         final List<ConfigProperty> resetValues = OneSignalNonPredicateConfigParser.RESETCONFIGS
                 .get(info.current.signal);
         if (resetValues == null)
@@ -119,8 +114,6 @@ public final class SignalConfig {
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             }
         });
-        System.out
-                .println("Setting States [" + propertiesToSet + "] on [" + info.currentinfo + "]!");
         if (!propertiesToSet.isEmpty())
             SignalStateHandler.setStates(info.currentinfo, propertiesToSet);
     }
