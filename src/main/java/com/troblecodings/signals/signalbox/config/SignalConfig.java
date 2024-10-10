@@ -109,6 +109,7 @@ public final class SignalConfig {
     private static void changeSignals(final List<ConfigProperty> values, final ConfigInfo info,
             final Map<SEProperty, String> oldProperties,
             final Map<SEProperty, String> nextProperties) {
+        System.out.println("Changeing " + info.currentinfo + " with Next " + info.nextinfo);
         final Map<Class<?>, Object> object = new HashMap<>();
         object.put(Map.class, nextProperties != null ? nextProperties : new HashMap<>());
         object.put(Integer.class, info.speed);
@@ -122,8 +123,11 @@ public final class SignalConfig {
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             }
         });
-        if (!propertiesToSet.isEmpty())
+        if (!propertiesToSet.isEmpty()) {
             SignalStateHandler.setStates(info.currentinfo, propertiesToSet);
+        } else {
+            System.out.println(info.currentinfo + " has no Properties to Change!");
+        }
     }
 
     private static void loadWithoutPredicate(final List<ConfigProperty> values,
