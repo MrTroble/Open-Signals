@@ -278,7 +278,7 @@ public class ContainerSignalBox extends ContainerBase implements UIClientSync, I
                 final int size = buffer.getInt();
                 for (int i = 0; i < size; i++) {
                     final Point point = Point.of(buffer);
-                    grid.getNode(point).readUpdateNetwork(buffer);
+                    grid.getNode(point).readNetwork(buffer);
                     updates.add(point);
                 }
                 trainNumberUpdater.accept(updates);

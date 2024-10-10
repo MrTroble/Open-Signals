@@ -472,6 +472,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             }
         }, point);
         resetAllTrainNumbers(data.getTrainNumberDisplays());
+        sendTrainNumberUpdates();
         data.compact(point);
         updateSignalsOnClient(redSignals);
         updateTrainNumber(trainNumber);
@@ -588,10 +589,11 @@ public class SignalBoxPathway implements IChunkLoadable {
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.SEND_TRAIN_NUMBER);
         buffer.putInt(trainNumberDisplays.size());
+        System.out.println(trainNumberDisplays);
         trainNumberDisplays.forEach(ident -> {
             final SignalBoxNode node = grid.getNode(ident.point);
             node.getPoint().writeNetwork(buffer);
-            node.writeUpdateNetwork(buffer);
+            node.writeNetwork(buffer);
         });
         OpenSignalsMain.network.sendTo(tile.get(0).getPlayer(), buffer);
     }
