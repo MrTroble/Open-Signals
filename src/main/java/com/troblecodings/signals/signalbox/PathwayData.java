@@ -71,6 +71,7 @@ public class PathwayData {
 
     public static PathwayData of(final SignalBoxGrid grid, final List<SignalBoxNode> pNodes,
             final PathType type) {
+        System.out.println("PathwayNodes: " + pNodes);
         final PathwayData data = SignalBoxFactory.getFactory().getPathwayData();
         data.prepareData(grid, pNodes, type);
         if (!data.checkForShuntingPath() || !data.checkForPreviousProtectionWay()
