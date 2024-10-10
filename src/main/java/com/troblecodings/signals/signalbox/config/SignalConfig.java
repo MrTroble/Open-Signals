@@ -103,9 +103,7 @@ public final class SignalConfig {
             final Map<SEProperty, String> oldProperties,
             final Map<SEProperty, String> nextProperties) {
         final Map<Class<?>, Object> object = new HashMap<>();
-        if (info.nextinfo != null) {
-            object.put(Map.class, nextProperties);
-        }
+        object.put(Map.class, nextProperties != null ? nextProperties : new HashMap<>());
         object.put(Integer.class, info.speed);
         object.put(String.class, info.zs2Value);
         object.put(Boolean.class, info.isSignalRepeater);

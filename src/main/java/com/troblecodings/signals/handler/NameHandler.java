@@ -23,9 +23,11 @@ import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.RedstoneIO;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.NameStateListener;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
+import com.troblecodings.signals.enums.ChangedState;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
@@ -53,6 +55,7 @@ public final class NameHandler implements INetworkSync {
 
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<Level, NameHandlerFileV2> ALL_LEVEL_FILES = new HashMap<>();
+    private static final Map<StateInfo, List<NameStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
     private static final Map<StateInfo, List<LoadHolder<?>>> LOAD_COUNTER = new HashMap<>();
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
     private static EventNetworkChannel channel;
@@ -144,6 +147,31 @@ public final class NameHandler implements INetworkSync {
         buffer.putBoolean(false);
         buffer.putString(name);
         return buffer.build();
+    }
+
+    public static boolean isNameLoaded(final StateInfo info) {
+        synchronized (ALL_NAMES) {
+            return ALL_NAMES.containsKey(info);
+        }
+    }
+
+    public static void runTaskWhenNameLoaded(final StateInfo info,
+            final NameStateListener listener) {
+        if (!info.isValid() || info.isWorldNullOrClientSide())
+            return;
+        if (isNameLoaded(info)) {
+            synchronized (ALL_NAMES) {
+                listener.update(info, ALL_NAMES.get(info), ChangedState.UPDATED);
+            }
+        } else {
+            synchronized (TASKS_WHEN_LOAD) {
+                final List<NameStateListener> list = TASKS_WHEN_LOAD.computeIfAbsent(info,
+                        _u -> new ArrayList<>());
+                if (!list.contains(listener)) {
+                    list.add(listener);
+                }
+            }
+        }
     }
 
     public static void setRemoved(final StateInfo info) {
@@ -355,6 +383,13 @@ public final class NameHandler implements INetworkSync {
                     ALL_NAMES.put(info.info, name);
                 }
                 sendToAll(info.info, name);
+                synchronized (TASKS_WHEN_LOAD) {
+                    final List<NameStateListener> tasks = TASKS_WHEN_LOAD.remove(info.info);
+                    if (tasks != null) {
+                        tasks.forEach(listener -> listener.update(info.info, name,
+                                ChangedState.ADDED_TO_CACHE));
+                    }
+                }
             });
         }, "OSNameHandler:loadNames").start();
     }
