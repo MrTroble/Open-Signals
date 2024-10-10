@@ -13,15 +13,19 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 public class BasicBlock extends Block implements ITileEntityProvider {
 
     private static final Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
-    private static final Map<TileEntitySupplierWrapper, List<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
+    private static final Map<TileEntitySupplierWrapper, List<BasicBlock>> BLOCK_SUPPLIER =
+            new HashMap<>();
     public static final Map<TileEntitySupplierWrapper, TileEntity> BLOCK_ENTITYS = new HashMap<>();
 
     public BasicBlock(final Material material) {
@@ -34,11 +38,6 @@ public class BasicBlock extends Block implements ITileEntityProvider {
                 BLOCK_NAMES.computeIfAbsent(supplier, _u -> name);
             });
         });
-    }
-
-    @Override
-    public void dropBlockAsItemWithChance(final World worldIn, final BlockPos pos,
-            final IBlockState state, final float chance, final int fortune) {
     }
 
     @Override
@@ -62,7 +61,6 @@ public class BasicBlock extends Block implements ITileEntityProvider {
         return true;
     }
 
-
     public static void prepare() {
         BLOCK_SUPPLIER.forEach((wrapper, blocks) -> BLOCK_ENTITYS.put(wrapper, wrapper.supply()));
     }
@@ -85,5 +83,19 @@ public class BasicBlock extends Block implements ITileEntityProvider {
     @Override
     public TileEntity createNewTileEntity(final World worldIn, final int meta) {
         return null;
+    }
+
+    @Override
+    public List<ItemStack> getDrops(final IBlockAccess world, final BlockPos pos,
+            final IBlockState state, final int fortune) {
+        List<ItemStack> drops = new ArrayList<ItemStack>();
+        drops.add(new ItemStack(this.getBlockState().getBlock()));
+        return drops;
+    }
+
+    @Override
+    public boolean canHarvestBlock(final IBlockAccess world, final BlockPos pos,
+            final EntityPlayer player) {
+        return true;
     }
 }
