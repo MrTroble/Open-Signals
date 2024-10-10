@@ -290,6 +290,8 @@ public class PathwayData {
                         option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
                             final Optional<Boolean> repeaterOption = option
                                     .getEntry(PathEntryType.SIGNAL_REPEATER);
+                            System.out.println("Found OtherSignal! Pos: " + position + ", Point: "
+                                    + node.getPoint() + ", Mode: " + modeSet);
                             final OtherSignalIdentifier ident = new OtherSignalIdentifier(
                                     node.getPoint(), modeSet, position,
                                     repeaterOption.isPresent() && repeaterOption.get(), mode);
