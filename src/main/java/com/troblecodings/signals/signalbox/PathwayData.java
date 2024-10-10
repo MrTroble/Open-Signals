@@ -71,7 +71,6 @@ public class PathwayData {
 
     public static PathwayData of(final SignalBoxGrid grid, final List<SignalBoxNode> pNodes,
             final PathType type) {
-        System.out.println("PathwayNodes: " + pNodes);
         final PathwayData data = SignalBoxFactory.getFactory().getPathwayData();
         data.prepareData(grid, pNodes, type);
         if (!data.checkForShuntingPath() || !data.checkForPreviousProtectionWay()
@@ -291,8 +290,6 @@ public class PathwayData {
                         option -> option.getEntry(PathEntryType.SIGNAL).ifPresent(position -> {
                             final Optional<Boolean> repeaterOption = option
                                     .getEntry(PathEntryType.SIGNAL_REPEATER);
-                            System.out.println("Found OtherSignal! Pos: " + position + ", Point: "
-                                    + node.getPoint() + ", Mode: " + modeSet);
                             final OtherSignalIdentifier ident = new OtherSignalIdentifier(
                                     node.getPoint(), modeSet, position,
                                     repeaterOption.isPresent() && repeaterOption.get(), mode);

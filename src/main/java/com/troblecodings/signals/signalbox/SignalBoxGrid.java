@@ -410,7 +410,6 @@ public class SignalBoxGrid implements INetworkSavable {
             if (!states.isEmpty())
                 enabledSubsidiaryTypes.put(node.getPoint(), states);
         });
-        System.out.println(modeGrid.keySet());
         counter = tag.getInteger(SUBSIDIARY_COUNTER);
     }
 

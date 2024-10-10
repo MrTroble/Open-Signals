@@ -68,7 +68,6 @@ public final class SignalBoxUtil {
 
     public static PathwayRequestResult requestPathway(final SignalBoxGrid grid, final Point p1,
             final Point p2, final PathType pathType) {
-        System.out.println("Requesting PW from " + p1 + " to " + p2 + "!");
         final Map<Point, SignalBoxNode> modeGrid = grid.modeGrid;
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
             return PathwayRequestResult.NOT_IN_GRID;
