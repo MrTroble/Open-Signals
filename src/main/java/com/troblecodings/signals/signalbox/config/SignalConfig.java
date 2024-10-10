@@ -11,12 +11,18 @@ import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.contentpacks.ChangeConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalNonPredicateConfigParser;
 import com.troblecodings.signals.contentpacks.OneSignalPredicateConfigParser;
+import com.troblecodings.signals.core.LoadHolder;
+import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.SignalStateLoadHoler;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.handler.SignalStateHandler;
 import com.troblecodings.signals.handler.SignalStateInfo;
 import com.troblecodings.signals.properties.PredicatedPropertyBase.ConfigProperty;
 
 public final class SignalConfig {
+
+    private static final LoadHolder<Class<SignalConfig>> LOAD_HOLDER = new LoadHolder<>(
+            SignalConfig.class);
 
     private SignalConfig() {
     }
@@ -58,7 +64,7 @@ public final class SignalConfig {
                 .get(info.current.signal);
         if (resetValues == null)
             return;
-        SignalStateHandler.runTaskWhenSignalLoaded(info.current, (stateInfo, oldProperties, _u) -> {
+        loadSignalAndRunTask(info.current, (stateInfo, oldProperties, _u) -> {
             final Map<Class<?>, Object> object = new HashMap<>();
             object.put(Boolean.class, info.isRepeater);
             object.put(Map.class, oldProperties);
@@ -73,6 +79,7 @@ public final class SignalConfig {
             });
             if (!propertiesToSet.isEmpty())
                 SignalStateHandler.setStates(info.current, propertiesToSet);
+            unloadSignal(stateInfo);
         });
     }
 
@@ -85,16 +92,17 @@ public final class SignalConfig {
     }
 
     private static void changeIfPresent(final List<ConfigProperty> values, final ConfigInfo info) {
-        SignalStateHandler.runTaskWhenSignalLoaded(info.currentinfo,
-                (stateInfo, oldProperties, _u) -> {
-                    if (info.nextinfo != null) {
-                        SignalStateHandler.runTaskWhenSignalLoaded(info.nextinfo,
-                                (nextInfo, nextProperties, _u2) -> changeSignals(values, info,
-                                        oldProperties, nextProperties));
-                    } else {
-                        changeSignals(values, info, oldProperties, null);
-                    }
+        loadSignalAndRunTask(info.currentinfo, (stateInfo, oldProperties, _u) -> {
+            if (info.nextinfo != null) {
+                loadSignalAndRunTask(info.nextinfo, (nextInfo, nextProperties, _u2) -> {
+                    changeSignals(values, info, oldProperties, nextProperties);
+                    unloadSignal(nextInfo);
                 });
+            } else {
+                changeSignals(values, info, oldProperties, null);
+            }
+            unloadSignal(stateInfo);
+        });
 
     }
 
@@ -121,7 +129,7 @@ public final class SignalConfig {
     private static void loadWithoutPredicate(final List<ConfigProperty> values,
             final SignalStateInfo current) {
         if (values != null) {
-            SignalStateHandler.runTaskWhenSignalLoaded(current, (info, oldProperties, _u) -> {
+            loadSignalAndRunTask(current, (info, oldProperties, _u) -> {
                 final Map<SEProperty, String> propertiesToSet = new HashMap<>();
                 values.forEach(property -> {
                     propertiesToSet.putAll(property.state.entrySet().stream()
@@ -130,7 +138,18 @@ public final class SignalConfig {
                 });
                 if (!propertiesToSet.isEmpty())
                     SignalStateHandler.setStates(current, propertiesToSet);
+                unloadSignal(info);
             });
         }
+    }
+
+    private static void loadSignalAndRunTask(final SignalStateInfo info,
+            final SignalStateListener task) {
+        SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, LOAD_HOLDER));
+        SignalStateHandler.runTaskWhenSignalLoaded(info, task);
+    }
+
+    private static void unloadSignal(final SignalStateInfo info) {
+        SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, LOAD_HOLDER));
     }
 }
