@@ -97,11 +97,12 @@ public final class SignalConfig {
                 loadSignalAndRunTask(info.nextinfo, (nextInfo, nextProperties, _u2) -> {
                     changeSignals(values, info, oldProperties, nextProperties);
                     unloadSignal(nextInfo);
+                    unloadSignal(stateInfo);
                 });
             } else {
                 changeSignals(values, info, oldProperties, null);
+                unloadSignal(stateInfo);
             }
-            unloadSignal(stateInfo);
         });
 
     }
