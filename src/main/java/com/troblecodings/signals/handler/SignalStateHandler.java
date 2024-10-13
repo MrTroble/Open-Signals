@@ -104,9 +104,7 @@ public final class SignalStateHandler implements INetworkSync {
     public static boolean isSignalLoaded(final SignalStateInfo info) {
         if (!info.isValid() || info.worldNullOrClientSide())
             return false;
-        synchronized (CURRENTLY_LOADED_STATES) {
-            return CURRENTLY_LOADED_STATES.containsKey(info);
-        }
+        return CURRENTLY_LOADED_STATES.containsKey(info);
     }
 
     public static void runTaskWhenSignalLoaded(final SignalStateInfo info,
