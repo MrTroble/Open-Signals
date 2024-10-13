@@ -13,6 +13,8 @@ import com.troblecodings.signals.core.TileEntitySupplierWrapper;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext.Builder;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.world.IBlockReader;
@@ -20,8 +22,10 @@ import net.minecraft.world.IBlockReader;
 public class BasicBlock extends Block {
 
     private static final Map<TileEntitySupplierWrapper, String> BLOCK_NAMES = new HashMap<>();
-    private static final Map<TileEntitySupplierWrapper, List<BasicBlock>> BLOCK_SUPPLIER = new HashMap<>();
-    public static final Map<TileEntitySupplierWrapper, TileEntityType<?>> BLOCK_ENTITYS = new HashMap<>();
+    private static final Map<TileEntitySupplierWrapper, List<BasicBlock>> BLOCK_SUPPLIER =
+            new HashMap<>();
+    public static final Map<TileEntitySupplierWrapper, TileEntityType<?>> BLOCK_ENTITYS =
+            new HashMap<>();
 
     public BasicBlock(final Properties properties) {
         super(properties);
@@ -58,8 +62,8 @@ public class BasicBlock extends Block {
             for (int i = 0; i < blocks.size(); i++) {
                 allBlocks[i] = blocks.get(i);
             }
-            final Supplier<TileEntity> supplier = () -> wrapper
-                    .supply(new TileEntityInfo().with(type.get()));
+            final Supplier<TileEntity> supplier =
+                    () -> wrapper.supply(new TileEntityInfo().with(type.get()));
             type.set(TileEntityType.Builder.of(supplier, allBlocks).build(null));
             type.get().setRegistryName(name);
             BLOCK_ENTITYS.put(wrapper, type.get());
@@ -74,5 +78,12 @@ public class BasicBlock extends Block {
     @Override
     public TileEntity createTileEntity(final BlockState state, final IBlockReader world) {
         return BLOCK_ENTITYS.get(getSupplierWrapper().get()).create();
+    }
+
+    @Override
+    public List<ItemStack> getDrops(final BlockState state, final Builder builder) {
+        List<ItemStack> drops = new ArrayList<ItemStack>();
+        drops.add(new ItemStack(this.getBlock().asItem()));
+        return drops;
     }
 }

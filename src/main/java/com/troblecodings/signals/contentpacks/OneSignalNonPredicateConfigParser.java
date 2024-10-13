@@ -59,38 +59,45 @@ public class OneSignalNonPredicateConfigParser {
             final OneSignalNonPredicateConfigParserV2 parser = GSON.fromJson(files.getValue(),
                     OneSignalNonPredicateConfigParserV2.class);
             for (final String currentSignal : parser.currentSignals) {
-                loadConfig(map, files.getKey(), currentSignal, parser.values);
+                loadConfig(map, files.getKey(), currentSignal, parser.values, path);
             }
         } catch (final Exception e) {
             OpenSignalsMain.getLogger().error("Please update your config [" + files.getKey()
                     + "] located in [" + path + "]!");
             final OneSignalNonPredicateConfigParser parser = GSON.fromJson(files.getValue(),
                     OneSignalNonPredicateConfigParser.class);
-            loadConfig(map, files.getKey(), parser.currentSignal, parser.values);
+            loadConfig(map, files.getKey(), parser.currentSignal, parser.values, path);
         }
 
     }
 
     private static void loadConfig(final Map<Signal, List<ConfigProperty>> map,
-            final String fileName, final String currentSignal, final List<String> values) {
-        final Signal signal = checkSignal(currentSignal, fileName);
-        if (signal == null)
-            return;
+            final String fileName, final String currentSignal, final List<String> values,
+            final String path) {
+        try {
+            final Signal signal = checkSignal(currentSignal, fileName);
+            if (signal == null)
+                return;
 
-        if (map.containsKey(signal)) {
-            throw new LogicalParserException("A signalconfig with the signals ["
-                    + signal.getSignalTypeName() + "] does alredy exists! '" + fileName
-                    + "' tried to register the same signalconfig!");
-        }
+            if (map.containsKey(signal)) {
+                throw new LogicalParserException("A signalconfig with the signals ["
+                        + signal.getSignalTypeName() + "] does alredy exists! '" + fileName
+                        + "' tried to register the same signalconfig!");
+            }
 
-        final FunctionParsingInfo info = new FunctionParsingInfo(signal);
-        final List<ConfigProperty> propertes = new ArrayList<>();
-        for (final String property : values) {
-            final String[] value = property.split("\\.");
-            propertes.add(new ConfigProperty(t -> true,
-                    ImmutableMap.of((SEProperty) info.getProperty(value[0]), value[1])));
+            final FunctionParsingInfo info = new FunctionParsingInfo(signal);
+            final List<ConfigProperty> propertes = new ArrayList<>();
+            for (final String property : values) {
+                final String[] value = property.split("\\.");
+                propertes.add(new ConfigProperty(t -> true,
+                        ImmutableMap.of((SEProperty) info.getProperty(value[0]), value[1])));
+            }
+            map.put(signal, propertes);
+        } catch (final Exception e) {
+            OpenSignalsMain.getLogger().error("There was a problem loading the config [" + fileName
+                    + "] located in [" + path + "]! Please check the file!");
+            e.printStackTrace();
         }
-        map.put(signal, propertes);
     }
 
     private static Signal checkSignal(final String signalName, final String filename) {

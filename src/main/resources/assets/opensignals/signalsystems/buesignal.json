@@ -6,7 +6,7 @@
 		"signalHeights": {
 			"config(BUETYPE.BUE4) || config(BUETYPE.BUE5) || config(BUETYPE.HET) || config(BUETYPE.AUTO_HET) || config(BUETYPE.ET) || config(BUETYPE.AUTO_ET) || config(BUETYPE.BUE_DISTANT) || config(BUETYPE.BUE_IDENTIFICATION)": 1
 		},
-        "customNameRenderHeight": 1.5,
+        "customNameRenderHeight": 1.55,
         "offsetY": -5,
         "renderHeights": {
             "!(config(BUETYPE.BUE_IDENTIFICATION) || config(BUETYPE.BUE_DISTANT)) ": -1
