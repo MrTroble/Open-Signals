@@ -34,27 +34,33 @@ public class SubsidiarySignalParser {
                         OldSubsidiaryEnumParser.class);
                 parser.subsidiaryStates.forEach(name -> new SubsidiaryState(name));
             }
-
         });
     }
 
     public static void loadAllSubsidiarySignals() {
         loadSubsidiaryStates();
         OpenSignalsMain.contentPacks.getFiles("signalconfigs/subsidiary").forEach(entry -> {
-            final SubsidiarySignalParser parser = GSON.fromJson(entry.getValue(),
-                    SubsidiarySignalParser.class);
-            final Signal signal = Signal.SIGNALS.get(parser.currentSignal.toLowerCase());
-            if (signal == null)
-                OpenSignalsMain.exitMinecraftWithMessage(
-                        "There doesn't exists a signal with the name '" + parser.currentSignal
-                                + "'! Valid Signals are: " + Signal.SIGNALS.keySet());
-            if (SUBSIDIARY_SIGNALS.containsKey(signal))
-                OpenSignalsMain.exitMinecraftWithMessage(
-                        "There already exists a Subsidiary Config for " + signal + "!");
-            final FunctionParsingInfo info = new FunctionParsingInfo(signal);
-            parser.allStates.forEach((name, properties) -> {
-                convertToProperites(signal, info, properties, name);
-            });
+            try {
+                final SubsidiarySignalParser parser = GSON.fromJson(entry.getValue(),
+                        SubsidiarySignalParser.class);
+                final Signal signal = Signal.SIGNALS.get(parser.currentSignal.toLowerCase());
+                if (signal == null)
+                    OpenSignalsMain.exitMinecraftWithMessage(
+                            "There doesn't exists a signal with the name '" + parser.currentSignal
+                                    + "'! Valid Signals are: " + Signal.SIGNALS.keySet());
+                if (SUBSIDIARY_SIGNALS.containsKey(signal))
+                    OpenSignalsMain.exitMinecraftWithMessage(
+                            "There already exists a Subsidiary Config for " + signal + "!");
+                final FunctionParsingInfo info = new FunctionParsingInfo(signal);
+                parser.allStates.forEach((name, properties) -> {
+                    convertToProperites(signal, info, properties, name);
+                });
+            } catch (final Exception e) {
+                OpenSignalsMain.getLogger().error("There was a problem loading the config ["
+                        + entry.getKey()
+                        + "] located in [signalconfigs/subsidiary]! Please check the file!");
+                e.printStackTrace();
+            }
         });
     }
 

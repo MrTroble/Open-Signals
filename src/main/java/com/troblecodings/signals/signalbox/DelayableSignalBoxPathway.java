@@ -4,9 +4,8 @@ import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.enums.EnumPathUsage;
-
-import net.minecraft.core.BlockPos;
 
 public class DelayableSignalBoxPathway extends SignalBoxPathway {
 
@@ -14,6 +13,11 @@ public class DelayableSignalBoxPathway extends SignalBoxPathway {
 
     public DelayableSignalBoxPathway(final PathwayData data) {
         super(data);
+    }
+
+    @Override
+    public void setUpPathwayStatus() {
+        setPathStatus(EnumPathUsage.PREPARED);
     }
 
     @Override
@@ -30,7 +34,7 @@ public class DelayableSignalBoxPathway extends SignalBoxPathway {
             if (isEmptyOrBroken()) {
                 return;
             }
-            final Map<BlockPos, OtherSignalIdentifier> distantSignalPositions = data
+            final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                     .getOtherSignals();
             this.isExecutingSignalSet = false;
             synchronized (distantSignalPositions) {

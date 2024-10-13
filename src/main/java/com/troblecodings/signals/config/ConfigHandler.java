@@ -46,6 +46,8 @@ public final class ConfigHandler {
         public final ConfigValue<Integer> signalboxUsedColor;
         public final ConfigValue<Integer> signalboxPreparedColor;
         public final ConfigValue<Integer> signalboxTrainNumberColor;
+        public final ConfigValue<Integer> signalboxShuntingColor;
+        public final ConfigValue<Integer> signalboxTrainnumberBackgroundColor;
 
         public Client(final ForgeConfigSpec.Builder builder) {
             String desc;
@@ -69,9 +71,17 @@ public final class ConfigHandler {
             signalboxPreparedColor = builder.comment(desc).define("Signalbox prepared color",
                     0xffff00);
 
-            desc = "Change the color of the TrainNumber in the UI. Default: -1";
-            signalboxTrainNumberColor = builder.comment(desc).define("Signalbox TrainNumber color",
-                    0xFFFFFFFF);
+            desc = "Change the color of a selected shunting path. Default: -16711936";
+            signalboxShuntingColor = builder.comment(desc).define("Signalbox shunting color",
+                    0xFF00FF00);
+
+            desc = "Change the color of trainnumber in the signalbox. Default: -65536";
+            signalboxTrainNumberColor = builder.comment(desc)
+                    .define("Signalbox trainnumber text color", 0xFFFF0000);
+
+            desc = "Change the background color of trainnumber in the signalbox. Default: -11534336";
+            signalboxTrainnumberBackgroundColor = builder.comment(desc)
+                    .define("Signalbox trainnumber background color", 0xFF500000);
 
             desc = "Change the color of a default text. Default: -16777216";
             GuiConfigHandler.basicTextColor = builder.comment(desc).define("Basic text color",

@@ -7,11 +7,11 @@ import java.util.concurrent.Executors;
 import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.enums.EnumPathUsage;
 
-public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
+public class DelayableShuntingPathway extends ShuntingPathway {
 
     private final ExecutorService service = Executors.newFixedThreadPool(1);
 
-    public DelayableInterSignalBoxPathway(final PathwayData data) {
+    public DelayableShuntingPathway(final PathwayData data) {
         super(data);
     }
 
@@ -22,14 +22,6 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
 
     @Override
     public void updatePathwaySignals() {
-        setPathStatus(EnumPathUsage.PREPARED);
-        if (pathwayToBlock != null) {
-            pathwayToBlock.loadTileAndExecute(_u -> {
-                pathwayToBlock.isExecutingSignalSet = true;
-                pathwayToBlock.setPathStatus(EnumPathUsage.PREPARED);
-                pathwayToBlock.updatePathwayOnGrid();
-            });
-        }
         if (isExecutingSignalSet)
             return;
         this.isExecutingSignalSet = true;
@@ -44,7 +36,6 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
             final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                     .getOtherSignals();
             this.isExecutingSignalSet = false;
-            pathwayToBlock.isExecutingSignalSet = false;
             synchronized (distantSignalPositions) {
                 setSignals(getLastSignalInfo());
             }
@@ -52,25 +43,17 @@ public class DelayableInterSignalBoxPathway extends InterSignalBoxPathway {
                 loadTileAndExecute(thisTile -> {
                     final SignalBoxPathway pw = thisTile.getSignalBoxGrid()
                             .getPathwayByLastPoint(getLastPoint());
-                    pw.setPathStatus(EnumPathUsage.SELECTED);
+                    pw.setPathStatus(EnumPathUsage.SHUNTING);
                     pw.updatePathwayOnGrid();
                 });
-                if (pathwayToBlock != null) {
-                    pathwayToBlock.loadTileAndExecute(otherTile -> {
-                        pathwayToBlock = (DelayableInterSignalBoxPathway) otherTile
-                                .getSignalBoxGrid()
-                                .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
-                        pathwayToBlock.setPathStatus(EnumPathUsage.SELECTED);
-                        pathwayToBlock.updatePathwayOnGrid();
-                    });
-                }
             });
         });
     }
 
     @Override
     public String toString() {
-        return "DelayableInterSignalBoxPathway [start=" + getFirstPoint() + ", end="
-                + getLastPoint() + ", delay=" + data.getDelay() + "]";
+        return "DelayableShuntingPathway [start=" + getFirstPoint() + ", end=" + getLastPoint()
+                + ", delay=" + data.getDelay() + "]";
     }
+
 }
