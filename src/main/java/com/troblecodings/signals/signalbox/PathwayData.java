@@ -424,12 +424,11 @@ public class PathwayData {
             nodeBuilder.add(node);
         });
         this.listOfNodes = nodeBuilder.build();
-        if (!checkForProtectionWay()) {
-            this.emptyOrBroken = true;
-            return;
-        }
         this.type = PathType.valueOf(tag.getString(PATH_TYPE));
         this.initalize();
+        if (!checkForProtectionWay()) {
+            this.emptyOrBroken = true;
+        }
     }
 
     private SignalBoxNode getNodeFromNBT(final NBTWrapper nodeNBT) {

@@ -152,16 +152,25 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
 
     @Override
     protected void setSignals(final SignalStateInfo lastSignal) {
-        if (tile == null || isExecutingSignalSet)
-            return;
-        final StateInfo identifier = new StateInfo(tile.getWorld(), tile.getPos());
-        if (lastSignal != null && pathwayToReset != null) {
-            final Signal signal = SignalBoxHandler.getSignal(identifier, lastSignal.pos);
-            if (signal == null)
-                return;
-            pathwayToReset.setSignals(new SignalStateInfo(tile.getWorld(), lastSignal.pos, signal));
+        if (pathwayToReset != null && lastSignal != null) {
+            if (tile != null) {
+                final StateInfo identifier = new StateInfo(tile.getWorld(), tile.getPos());
+                final Signal signal = SignalBoxHandler.getSignal(identifier, lastSignal.pos);
+                if (signal != null) {
+                    pathwayToReset.setSignals(
+                            new SignalStateInfo(tile.getWorld(), lastSignal.pos, signal));
+                }
+            }
         }
         super.setSignals(lastSignal);
+    }
+
+    @Override
+    public void compact(final Point point) {
+        super.compact(point);
+        if (pathwayToBlock != null) {
+            pathwayToBlock.loadTileAndExecute(tile -> pathwayToReset = this);
+        }
     }
 
     @Override
