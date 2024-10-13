@@ -7,6 +7,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
+import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.StateInfo;
@@ -169,7 +170,16 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     public void compact(final Point point) {
         super.compact(point);
         if (pathwayToBlock != null) {
-            pathwayToBlock.loadTileAndExecute(tile -> pathwayToReset = this);
+            pathwayToBlock.loadTileAndExecute(tile -> {
+                final InterSignalBoxPathway pw = (InterSignalBoxPathway) tile.getSignalBoxGrid()
+                        .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
+                if (pw == null) {
+                    OpenSignalsMain.getLogger()
+                            .error("PW to block is zero! This should't be the case!");
+                    return;
+                }
+                pw.setOtherPathwayToReset(this);
+            });
         }
     }
 
