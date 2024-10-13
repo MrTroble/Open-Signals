@@ -127,7 +127,7 @@ public final class SignalConfig {
         System.out.println("Old Properties from " + info.currentinfo.pos + ": " + oldProperties);
         System.out
                 .println("Properties to Set from " + info.currentinfo.pos + ": " + propertiesToSet);
-        System.out.println("Next Properties from " + info.currentinfo.pos + ": " + nextProperties);
+        System.out.println("Next Properties from " + info.nextinfo.pos + ": " + nextProperties);
         if (!propertiesToSet.isEmpty())
             SignalStateHandler.setStates(info.currentinfo, propertiesToSet);
     }
