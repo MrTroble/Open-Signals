@@ -123,6 +123,10 @@ public final class SignalConfig {
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             }
         });
+        System.out.println("Changeing Signal " + info.currentinfo + "!");
+        System.out.println("Old Properties: " + oldProperties);
+        System.out.println("Properties to Set: " + propertiesToSet);
+        System.out.println("Next Properties: " + nextProperties);
         if (!propertiesToSet.isEmpty())
             SignalStateHandler.setStates(info.currentinfo, propertiesToSet);
     }
