@@ -43,6 +43,7 @@ import net.minecraft.world.World;
 public class SignalBoxPathway implements IChunkLoadable {
 
     protected final PathwayData data;
+    protected final SignalConfig config;
 
     protected boolean isBlocked;
     protected boolean isAutoPathway = false;
@@ -57,6 +58,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public SignalBoxPathway(final PathwayData data) {
+        this.config = new SignalConfig(this);
         this.data = data;
         this.originalFirstPoint = new Point(data.getFirstPoint());
         updatePathwayToAutomatic();
@@ -151,6 +153,12 @@ public class SignalBoxPathway implements IChunkLoadable {
         setPathStatus(status, null);
     }
 
+    public void updatePrevious() {
+        if (grid == null)
+            return;
+        grid.updatePrevious(this);
+    }
+
     protected SignalStateInfo lastSignalInfo = null;
 
     protected SignalStateInfo getLastSignalInfo() {
@@ -197,7 +205,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             if (first == null)
                 return;
             final SignalStateInfo firstInfo = new SignalStateInfo(world, startSignal.pos, first);
-            SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, data));
+            config.change(new ConfigInfo(firstInfo, lastSignal, data));
             updatePreSignals();
         }
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
@@ -212,9 +220,9 @@ public class SignalBoxPathway implements IChunkLoadable {
                     new SignalStateInfo(world, position.pos, current), lastSignal, data,
                     position.isRepeater);
             if (position.guiMode.equals(EnumGuiMode.HP)) {
-                SignalConfig.loadDisable(info);
+                config.loadDisable(info);
             } else {
-                SignalConfig.change(info);
+                config.change(info);
             }
         });
         updateSignalStates();
@@ -234,7 +242,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             final Signal current = SignalBoxHandler.getSignal(identifier, posIdent.pos);
             if (current == null)
                 return;
-            SignalConfig.change(
+            config.change(
                     new ConfigInfo(new SignalStateInfo(tile.getWorld(), posIdent.pos, current),
                             firstInfo, data, posIdent.isRepeater));
         });
@@ -367,7 +375,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             final Signal current = SignalBoxHandler.getSignal(stateInfo, startSignal.pos);
             if (current == null)
                 return;
-            SignalConfig.reset(new ResetInfo(
+            config.reset(new ResetInfo(
                     new SignalStateInfo(tile.getWorld(), startSignal.pos, current), false));
             final SignalState previous = startSignal.state;
             startSignal.state = SignalState.RED;
@@ -378,7 +386,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                 final Signal currentPreSignal = SignalBoxHandler.getSignal(stateInfo, ident.pos);
                 if (currentPreSignal == null)
                     return;
-                SignalConfig.reset(new ResetInfo(
+                config.reset(new ResetInfo(
                         new SignalStateInfo(tile.getWorld(), ident.pos, currentPreSignal),
                         ident.isRepeater));
                 final SignalState previousState = ident.state;
@@ -404,9 +412,8 @@ public class SignalBoxPathway implements IChunkLoadable {
                     .getSignal(new StateInfo(tile.getWorld(), tile.getPos()), position.pos);
             if (current == null)
                 return;
-            SignalConfig.reset(
-                    new ResetInfo(new SignalStateInfo(tile.getWorld(), position.pos, current),
-                            position.isRepeater));
+            config.reset(new ResetInfo(new SignalStateInfo(tile.getWorld(), position.pos, current),
+                    position.isRepeater));
             final SignalState previous = position.state;
             position.state = SignalState.RED;
             if (!position.state.equals(previous)) {
@@ -453,7 +460,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                                             new OtherSignalIdentifier(point,
                                                     new ModeSet(mode, rotation), position, false,
                                                     mode));
-                            SignalConfig.reset(new ResetInfo(
+                            config.reset(new ResetInfo(
                                     new SignalStateInfo(tile.getWorld(), position, current),
                                     identifier.isRepeater));
                             final SignalState previous = identifier.state;
