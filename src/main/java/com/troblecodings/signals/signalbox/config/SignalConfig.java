@@ -124,9 +124,10 @@ public final class SignalConfig {
             }
         });
         System.out.println("Changeing Signal " + info.currentinfo + "!");
-        System.out.println("Old Properties: " + oldProperties);
-        System.out.println("Properties to Set: " + propertiesToSet);
-        System.out.println("Next Properties: " + nextProperties);
+        System.out.println("Old Properties from " + info.currentinfo.pos + ": " + oldProperties);
+        System.out
+                .println("Properties to Set from " + info.currentinfo.pos + ": " + propertiesToSet);
+        System.out.println("Next Properties from " + info.currentinfo.pos + ": " + nextProperties);
         if (!propertiesToSet.isEmpty())
             SignalStateHandler.setStates(info.currentinfo, propertiesToSet);
     }
