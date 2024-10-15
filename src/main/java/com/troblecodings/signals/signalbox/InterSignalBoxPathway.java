@@ -7,7 +7,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.collect.Maps;
 import com.troblecodings.core.NBTWrapper;
-import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.BlockPosSignalHolder;
 import com.troblecodings.signals.core.StateInfo;
@@ -175,8 +174,6 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
                 pathwayToBlock = (InterSignalBoxPathway) otherGrid
                         .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
                 if (pathwayToBlock == null) {
-                    OpenSignalsMain.getLogger()
-                            .error("PW to block is zero! This should't be the case!");
                     return;
                 }
                 pathwayToBlock.setOtherPathwayToReset(this);
@@ -193,8 +190,6 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
                 final SignalBoxPathway pw = otherGrid
                         .getPathwayByLastPoint(pathwayToReset.getLastPoint());
                 if (pw == null) {
-                    OpenSignalsMain.getLogger()
-                            .error("PW to reset is zero! This should't be the case!");
                     return;
                 }
                 otherGrid.resetPathway(pw.getFirstPoint());
