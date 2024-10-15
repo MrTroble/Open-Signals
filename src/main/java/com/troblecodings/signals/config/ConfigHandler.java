@@ -45,6 +45,10 @@ public final class ConfigHandler {
     @Comment("Change the color of a prepared path. Default: 16776960")
     public static int signalboxPreparedColor = 0xffff00;
 
+    @Name("Signalbox shunting color")
+    @Comment("Change the color of a selected shunting path. Default: -16711936")
+    public static int signalboxShuntingColor = 0xFF00FF00;
+
     @Name("Signalbox TrainNumber color")
     @Comment("Change the color of the TrainNumber in the UI. Default: -1")
     public static int signalboxTrainNumberColor = 0xFFFFFFFF;
@@ -60,4 +64,12 @@ public final class ConfigHandler {
     @Name("Error text color")
     @Comment("Change the color of an error text. Default: -16776961")
     public static int errorTextColor = GuiConfigHandler.errorTextColor;
+
+    @Name("Signalbox trainnumber text color")
+    @Comment("Change the color of trainnumber in the signalbox. Default: -65536")
+    public static int signalboxTrainnumberColor = 0xFFFF0000;
+
+    @Name("Signalbox trainnumber background color")
+    @Comment("Change the background color of trainnumber in the signalbox. Default: -11534336")
+    public static int signalboxTrainnumberBackgroundColor = 0xFF500000;
 }

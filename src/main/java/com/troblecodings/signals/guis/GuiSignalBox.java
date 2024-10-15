@@ -48,6 +48,8 @@ import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.LinkType;
+import com.troblecodings.signals.enums.PathType;
+import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.enums.ShowTypes;
 import com.troblecodings.signals.enums.SignalBoxNetwork;
 import com.troblecodings.signals.enums.SignalBoxPage;
@@ -74,6 +76,7 @@ public class GuiSignalBox extends GuiBase {
     public static final int GRID_COLOR = 0xFF5B5B5B;
     public static final int EDIT_COLOR = 0x5000A2FF;
     public static final int OUTPUT_COLOR = 0xffff00;
+    public static final int TRAIN_NUMBER_BACKGROUND_COLOR = ConfigHandler.signalboxTrainnumberBackgroundColor;
 
     public static final ResourceLocation REDSTONE_OFF = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/redstone_off.png");
@@ -116,7 +119,7 @@ public class GuiSignalBox extends GuiBase {
     private UIEntity mainButton;
     private final GuiInfo info;
     private final Map<Point, SignalBoxNode> changedModes = new HashMap<>();
-    private UIEntity splitter = new UIEntity();
+    private final UIEntity splitter = new UIEntity();
     private boolean allPacketsRecived = false;
     protected final Map<Point, UISignalBoxTile> allTiles = new HashMap<>();
     private SidePanel helpPage;
@@ -174,7 +177,9 @@ public class GuiSignalBox extends GuiBase {
     private void updateTrainNumber(final List<Point> points) {
         points.forEach(point -> {
             final UISignalBoxTile tile = allTiles.get(point);
-            tile.updateTrainNumber();
+            if (tile == null)
+                return;
+            tile.setNode(tile.getNode());
         });
         lowerEntity.update();
     }
@@ -277,8 +282,9 @@ public class GuiSignalBox extends GuiBase {
                 if (currentTile.isValidStart()) {
                     this.lastTile = currentTile;
                     final UIColor previous = colors.get(currentTile.getPoint());
-                    if (previous != null)
+                    if (previous != null) {
                         previous.getParent().remove(previous);
+                    }
 
                     final UIColor newColor = new UIColor(SELECTION_COLOR);
                     c.add(newColor);
@@ -290,13 +296,36 @@ public class GuiSignalBox extends GuiBase {
                     return;
                 }
                 if (currentTile.isValidEnd()) {
-                    sendPWRequest(currentTile.getNode());
+                    checkForMultiplePathTypes(lastTile.getNode(), currentTile.getNode());
                     this.resetTileSelection();
                     return;
                 }
             }
         }));
         tile.add(new UIClickable(e -> openNodeShortcuts(currentTile.getNode(), e), 1));
+    }
+
+    private void checkForMultiplePathTypes(final SignalBoxNode start, final SignalBoxNode end) {
+        final List<PathType> possibleTypes = start.getPossibleTypes(end);
+        if (possibleTypes.isEmpty()) {
+            infoUpdate(I18Wrapper
+                    .format("error." + PathwayRequestResult.NO_EQUAL_PATH_TYPE.getName()));
+        } else if (possibleTypes.size() == 1) {
+            sendPWRequest(lastTile.getPoint(), end.getPoint(), possibleTypes.get(0));
+        } else if (possibleTypes.size() > 1) {
+            push(GuiElements.createScreen(entity -> {
+                entity.add(GuiElements.createButton(I18Wrapper.format("btn.return"), e -> pop()));
+                entity.add(GuiElements.createSpacerV(10));
+                entity.add(GuiElements.createLabel(I18Wrapper.format("gui.signalbox.choosetypes"),
+                        0xffffff));
+                entity.add(GuiElements.createSpacerV(10));
+                possibleTypes
+                        .forEach(type -> entity.add(GuiElements.createButton(type.name(), e -> {
+                            sendPWRequest(start.getPoint(), end.getPoint(), type);
+                            pop();
+                        })));
+            }));
+        }
     }
 
     private void resetSelection(final UIEntity entity) {
@@ -527,11 +556,9 @@ public class GuiSignalBox extends GuiBase {
                 helpPage.updateNextNode(menu.getSelection(), menu.getRotation());
                 this.lastTile = null;
 
-                bottomEntity.setHeight(24);
-                bottomEntity.setWidth(22 * EnumGuiMode.values().length + 2);
-                bottomEntity.add(new UIColor(BACKGROUND_COLOR));
+                bottomEntity.setHeight(34);
+                bottomEntity.add(new UIColor(0xFF8B8B8B));
                 bottomEntity.add(new UIBorder(0xFF000000, 2));
-
                 bottomEntity.add(menu);
                 bottomEntity.getParent().update();
             });
@@ -588,8 +615,9 @@ public class GuiSignalBox extends GuiBase {
                     node = new SignalBoxNode(name);
                 }
                 final UISignalBoxTile sbt = new UISignalBoxTile(node);
-                if (!node.isEmpty())
+                if (!node.isEmpty()) {
                     allTiles.put(name, sbt);
+                }
                 tile.add(sbt);
                 sbt.setGreenSignals(container.greenSignals.getOrDefault(name, new ArrayList<>()));
                 if (!node.getCustomText().isEmpty()) {
@@ -603,7 +631,6 @@ public class GuiSignalBox extends GuiBase {
                 }
                 consumer.accept(tile, sbt);
                 row.add(tile);
-                sbt.updateTrainNumber();
             }
             plane.add(row);
         }
@@ -650,10 +677,7 @@ public class GuiSignalBox extends GuiBase {
         header.add(mainButton);
         resetSelection(mainButton);
 
-        bottomEntity.setWidth(22 * EnumGuiMode.values().length);
         bottomEntity.setHeight(0);
-        bottomEntity.setX(-7);
-        bottomEntity.setScale(0.95f);
 
         final UIEntity middlePart = new UIEntity();
         middlePart.setInheritHeight(true);
@@ -672,6 +696,8 @@ public class GuiSignalBox extends GuiBase {
         this.entity.add(GuiElements.createSpacerH(10));
         this.entity.add(new UIBox(UIBox.HBOX, 1));
         helpPage.helpUsageMode(null);
+
+        bottomEntity.setWidth(middlePart.getWidth() - 4);
     }
 
     private void disableBottomEntity() {
@@ -680,13 +706,14 @@ public class GuiSignalBox extends GuiBase {
         bottomEntity.getParent().update();
     }
 
-    private void sendPWRequest(final SignalBoxNode currentNode) {
+    private void sendPWRequest(final Point start, final Point end, final PathType type) {
         if (!allPacketsRecived)
             return;
         final WriteBuffer buffer = new WriteBuffer();
         buffer.putEnumValue(SignalBoxNetwork.REQUEST_PW);
-        lastTile.getPoint().writeNetwork(buffer);
-        currentNode.getPoint().writeNetwork(buffer);
+        start.writeNetwork(buffer);
+        end.writeNetwork(buffer);
+        buffer.putEnumValue(type);
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
@@ -928,6 +955,20 @@ public class GuiSignalBox extends GuiBase {
         OpenSignalsMain.network.sendTo(info.player, buffer);
     }
 
+    protected void sendConnetedTrainNumbers(final ModeIdentifier ident, final SignalBoxNode node,
+            final EnumGuiMode mode, final Rotation rotation) {
+        if (!allPacketsRecived)
+            return;
+        final WriteBuffer buffer = new WriteBuffer();
+        buffer.putEnumValue(SignalBoxNetwork.SEND_CONNECTED_TRAINNUMBERS);
+        ident.writeNetwork(buffer);
+        node.getPoint().writeNetwork(buffer);
+        buffer.putByte((byte) mode.ordinal());
+        buffer.putByte((byte) rotation.ordinal());
+        buffer.putByte((byte) PathEntryType.CONNECTED_TRAINNUMBER.getID());
+        OpenSignalsMain.network.sendTo(info.player, buffer);
+    }
+
     private void reset() {
         lowerEntity.clear();
     }
@@ -958,6 +999,8 @@ public class GuiSignalBox extends GuiBase {
         nodes.forEach(node -> {
             final UISignalBoxTile tile = allTiles.get(node.getPoint());
             node.forEach(mode -> {
+                if (!(mode.mode == EnumGuiMode.STRAIGHT || mode.mode == EnumGuiMode.CORNER))
+                    return;
                 if (node.containsManuellOutput(mode)) {
                     tile.setColor(mode, OUTPUT_COLOR);
                     return;
@@ -973,10 +1016,22 @@ public class GuiSignalBox extends GuiBase {
         nodes.forEach(node -> {
             final UISignalBoxTile tile = allTiles.get(node.getPoint());
             node.forEach(mode -> {
-                tile.setColor(mode, SignalBoxUtil.FREE_COLOR);
+                final EnumGuiMode guiMode = mode.mode;
                 final PathOptionEntry entry = node.getOption(mode).get();
-                entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
-                        _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));
+                switch (guiMode) {
+                    case STRAIGHT:
+                    case CORNER:
+                        tile.setColor(mode, SignalBoxUtil.FREE_COLOR);
+                        entry.getEntry(PathEntryType.PATHUSAGE).ifPresent(
+                                _u -> entry.setEntry(PathEntryType.PATHUSAGE, EnumPathUsage.FREE));
+                        break;
+                    case TRAIN_NUMBER:
+                        entry.getEntry(PathEntryType.TRAINNUMBER)
+                                .ifPresent(_u -> entry.removeEntry(PathEntryType.TRAINNUMBER));
+                        break;
+                    default:
+                        break;
+                }
             });
         });
     }
@@ -988,8 +1043,9 @@ public class GuiSignalBox extends GuiBase {
             final Path path = new Path(oldPos, newPos);
             final SignalBoxNode current = listOfNodes.get(i);
             final UISignalBoxTile uiTile = allTiles.get(current.getPoint());
-            if (uiTile == null)
+            if (uiTile == null) {
                 continue;
+            }
             final ModeSet modeSet = current.getMode(path);
             current.getOption(modeSet)
                     .ifPresent(poe -> uiTile.setColor(modeSet, poe.getEntry(PathEntryType.PATHUSAGE)

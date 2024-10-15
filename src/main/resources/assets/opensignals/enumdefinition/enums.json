@@ -457,7 +457,8 @@
         "SO19_1",
         "SO19_2",
         "SO19_3",
-        "SO106"
+        "SO106",
+        "TRAIN_LENGTH"
     ],
     "NEAddition": [
         "OFF",
@@ -474,7 +475,8 @@
         "M200",
         "M250",
         "KURZ",
-        "LANG"
+        "LANG",
+        "FREE"
     ],
     "WNMech": [
         "WN1",
