@@ -13,7 +13,6 @@ import com.troblecodings.signals.core.LinkingUpdates;
 import com.troblecodings.signals.core.RedstoneUpdatePacket;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.handler.SignalBoxHandler;
-import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
 
 import net.minecraft.block.state.IBlockState;
@@ -66,11 +65,8 @@ public class RedstoneIOTileEntity extends SyncableTileEntity implements ISyncabl
         final boolean power = this.world.getBlockState(this.pos).getValue(RedstoneIO.POWER);
         final RedstoneUpdatePacket update = new RedstoneUpdatePacket(world, pos, power,
                 (RedstoneInput) getBlockType());
-        linkedPositions.forEach(
-                pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, pos, (tile, _u) -> {
-                    final SignalBoxGrid grid = tile.getSignalBoxGrid();
-                    grid.addTask(() -> grid.updateInput(update));
-                }));
+        linkedPositions.forEach(pos -> loadChunkAndGetTile(SignalBoxTileEntity.class, world, pos,
+                (tile, _u) -> tile.getSignalBoxGrid().updateInput(update)));
         linkedSignalController.forEach(pos -> loadChunkAndGetTile(SignalControllerTileEntity.class,
                 world, pos, (tile, _u) -> tile.updateFromRSInput()));
 

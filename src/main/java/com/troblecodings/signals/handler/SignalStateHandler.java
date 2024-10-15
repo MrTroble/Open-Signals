@@ -463,7 +463,8 @@ public final class SignalStateHandler implements INetworkSync {
         if (properties == null || properties.isEmpty())
             return;
         final ByteBuffer buffer = packToByteBuffer(stateInfo, properties);
-        stateInfo.world.playerEntities.forEach(player -> sendTo(player, buffer));
+        final List<EntityPlayer> players = ImmutableList.copyOf(stateInfo.world.playerEntities);
+        players.forEach(player -> sendTo(player, buffer));
     }
 
     @SubscribeEvent

@@ -172,16 +172,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (pathwayToBlock != null) {
             pathwayToBlock.loadTileAndExecute(tile -> {
                 final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
-                otherGrid.addTask(() -> {
-                    pathwayToBlock = (InterSignalBoxPathway) otherGrid
-                            .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
-                    if (pathwayToBlock == null) {
-                        OpenSignalsMain.getLogger()
-                                .error("PW to block is zero! This should't be the case!");
-                        return;
-                    }
-                    pathwayToBlock.setOtherPathwayToReset(this);
-                });
+                pathwayToBlock = (InterSignalBoxPathway) otherGrid
+                        .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
+                if (pathwayToBlock == null) {
+                    OpenSignalsMain.getLogger()
+                            .error("PW to block is zero! This should't be the case!");
+                    return;
+                }
+                pathwayToBlock.setOtherPathwayToReset(this);
             });
         }
     }
@@ -189,25 +187,17 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     @Override
     public void resetPathway(final Point point) {
         super.resetPathway(point);
-        System.out.println("Resetting " + pathwayToReset);
         if (data.totalPathwayReset(point) && pathwayToReset != null) {
             pathwayToReset.loadTileAndExecute(tile -> {
                 final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
-                otherGrid.addTask(() -> {
-                    final Point p = pathwayToReset.getLastPoint();
-                    final SignalBoxPathway pw = otherGrid
-                            .getPathwayByLastPoint(pathwayToReset.getLastPoint());
-                    System.out.println(
-                            "Found Pathway " + pw + " by searching for the last point " + p);
-                    if (pw == null) {
-                        OpenSignalsMain.getLogger()
-                                .error("PW to reset is zero! This should't be the case!");
-                        return;
-                    }
-                    System.out.println("Pathwaymap befor reset: " + otherGrid.startsToPath);
-                    otherGrid.resetPathway(pw.getFirstPoint());
-                    System.out.println("Pathwaymap after reset: " + otherGrid.startsToPath);
-                });
+                final SignalBoxPathway pw = otherGrid
+                        .getPathwayByLastPoint(pathwayToReset.getLastPoint());
+                if (pw == null) {
+                    OpenSignalsMain.getLogger()
+                            .error("PW to reset is zero! This should't be the case!");
+                    return;
+                }
+                otherGrid.resetPathway(pw.getFirstPoint());
             });
         }
     }
@@ -218,16 +208,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         if (result && pathwayToBlock != null) {
             pathwayToBlock.loadTileAndExecute(otherTile -> {
                 final SignalBoxGrid otherGrid = otherTile.getSignalBoxGrid();
-                otherGrid.addTask(() -> {
-                    final SignalBoxPathway pw = otherGrid
-                            .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
-                    if (pw == null || !(pw instanceof InterSignalBoxPathway)) {
-                        pathwayToBlock = null;
-                    }
-                    pathwayToBlock = (InterSignalBoxPathway) pw;
-                    pathwayToBlock.setPathStatus(EnumPathUsage.BLOCKED);
-                    pathwayToBlock.updateTrainNumber(trainNumber);
-                });
+                final SignalBoxPathway pw = otherGrid
+                        .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
+                if (pw == null || !(pw instanceof InterSignalBoxPathway)) {
+                    pathwayToBlock = null;
+                }
+                pathwayToBlock = (InterSignalBoxPathway) pw;
+                pathwayToBlock.setPathStatus(EnumPathUsage.BLOCKED);
+                pathwayToBlock.updateTrainNumber(trainNumber);
             });
         }
         return result;

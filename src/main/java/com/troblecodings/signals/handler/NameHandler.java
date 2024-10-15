@@ -130,7 +130,8 @@ public final class NameHandler implements INetworkSync {
 
     private static void sendToAll(final StateInfo info, final String name) {
         final ByteBuffer buffer = packToBuffer(info.pos, name);
-        info.world.playerEntities.forEach(player -> sendTo(player, buffer));
+        final List<EntityPlayer> players = ImmutableList.copyOf(info.world.playerEntities);
+        players.forEach(player -> sendTo(player, buffer));
     }
 
     private static ByteBuffer packToBuffer(final BlockPos pos, final String name) {

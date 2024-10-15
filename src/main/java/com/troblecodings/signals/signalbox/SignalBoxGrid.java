@@ -56,12 +56,10 @@ public class SignalBoxGrid implements INetworkSavable {
     protected final Map<Point, SignalBoxPathway> endsToPath = new HashMap<>();
     protected final Map<Map.Entry<Point, Point>, PathType> nextPathways = new HashMap<>();
     protected final Map<Point, SignalBoxNode> modeGrid = new HashMap<>();
-    protected final List<Runnable> tasks = new ArrayList<>();
     protected final SignalBoxFactory factory;
     protected SignalBoxTileEntity tile;
     private final Map<Point, Map<ModeSet, SubsidiaryEntry>> enabledSubsidiaryTypes = new HashMap<>();
     private int counter;
-    private boolean isLoaded = false;
 
     public SignalBoxGrid() {
         this.factory = SignalBoxFactory.getFactory();
@@ -74,21 +72,6 @@ public class SignalBoxGrid implements INetworkSavable {
 
     public void onLoad() {
         startsToPath.values().forEach(SignalBoxPathway::onLoad);
-        tasks.forEach(task -> task.run());
-        tasks.clear();
-        isLoaded = true;
-    }
-
-    public void onUnLoad() {
-        isLoaded = false;
-    }
-
-    public void addTask(final Runnable consumer) {
-        if (isLoaded) {
-            consumer.run();
-        } else if (!tasks.contains(consumer)) {
-            tasks.add(consumer);
-        }
     }
 
     public void updatePathwayToAutomatic(final Point point) {
