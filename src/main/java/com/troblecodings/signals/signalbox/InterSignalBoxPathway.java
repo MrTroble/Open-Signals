@@ -189,6 +189,7 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
     @Override
     public void resetPathway(final Point point) {
         super.resetPathway(point);
+        System.out.println("Resetting " + pathwayToReset);
         if (data.totalPathwayReset(point) && pathwayToReset != null) {
             pathwayToReset.loadTileAndExecute(tile -> {
                 final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
