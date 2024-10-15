@@ -197,7 +197,7 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
                             .getPathwayByLastPoint(pathwayToReset.getLastPoint());
                     if (pw == null) {
                         OpenSignalsMain.getLogger()
-                                .error("PW to block is zero! This should't be the case!");
+                                .error("PW to reset is zero! This should't be the case!");
                         return;
                     }
                     otherGrid.resetPathway(pw.getFirstPoint());
