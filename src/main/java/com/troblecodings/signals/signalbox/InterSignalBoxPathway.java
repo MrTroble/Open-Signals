@@ -193,14 +193,19 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
             pathwayToReset.loadTileAndExecute(tile -> {
                 final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
                 otherGrid.addTask(() -> {
+                    final Point p = pathwayToReset.getLastPoint();
                     final SignalBoxPathway pw = otherGrid
                             .getPathwayByLastPoint(pathwayToReset.getLastPoint());
+                    System.out.println(
+                            "Found Pathway " + pw + " by searching for the last point " + p);
                     if (pw == null) {
                         OpenSignalsMain.getLogger()
                                 .error("PW to reset is zero! This should't be the case!");
                         return;
                     }
+                    System.out.println("Pathwaymap befor reset: " + otherGrid.startsToPath);
                     otherGrid.resetPathway(pw.getFirstPoint());
+                    System.out.println("Pathwaymap after reset: " + otherGrid.startsToPath);
                 });
             });
         }
