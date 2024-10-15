@@ -171,14 +171,14 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         super.compact(point);
         if (pathwayToBlock != null) {
             pathwayToBlock.loadTileAndExecute(tile -> {
-                final InterSignalBoxPathway pw = (InterSignalBoxPathway) tile.getSignalBoxGrid()
+                pathwayToBlock = (InterSignalBoxPathway) tile.getSignalBoxGrid()
                         .getPathwayByLastPoint(pathwayToBlock.getLastPoint());
-                if (pw == null) {
+                if (pathwayToBlock == null) {
                     OpenSignalsMain.getLogger()
                             .error("PW to block is zero! This should't be the case!");
                     return;
                 }
-                pw.setOtherPathwayToReset(this);
+                pathwayToBlock.setOtherPathwayToReset(this);
             });
         }
     }
@@ -188,8 +188,19 @@ public class InterSignalBoxPathway extends SignalBoxPathway {
         System.out.println("Resetting " + this + " to " + point + "!");
         super.resetPathway(point);
         if (data.totalPathwayReset(point) && pathwayToReset != null) {
-            pathwayToReset.loadTileAndExecute(
-                    tile -> tile.getSignalBoxGrid().resetPathway(pathwayToReset.getFirstPoint()));
+            pathwayToReset.loadTileAndExecute(tile -> {
+                final SignalBoxGrid otherGrid = tile.getSignalBoxGrid();
+                final SignalBoxPathway pw = otherGrid
+                        .getPathwayByLastPoint(pathwayToReset.getLastPoint());
+                if (pw == null) {
+                    OpenSignalsMain.getLogger()
+                            .error("PW to block is zero! This should't be the case!");
+                    return;
+                }
+                otherGrid.resetPathway(pw);
+                otherGrid.updateToNet(pw);
+                grid.tryNextPathways();
+            });
             System.out.println("Resetting Pathway To Reset! " + pathwayToReset);
         }
     }

@@ -271,7 +271,7 @@ public class SignalBoxGrid implements INetworkSavable {
     private final Map<Map.Entry<Point, Point>, PathType> toAdd = new HashMap<>();
     private boolean executingForEach = false;
 
-    private void tryNextPathways() {
+    protected void tryNextPathways() {
         executingForEach = true;
         final Map<Map.Entry<Point, Point>, PathType> toRemove = new HashMap<>();
         nextPathways.forEach((entry, type) -> {
