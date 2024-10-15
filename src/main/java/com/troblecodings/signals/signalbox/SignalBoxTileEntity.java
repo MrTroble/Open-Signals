@@ -109,6 +109,7 @@ public class SignalBoxTileEntity extends SyncableTileEntity implements ISyncable
     @Override
     public void onChunkUnload() {
         SignalBoxHandler.unloadSignals(new StateInfo(world, pos));
+        grid.onUnLoad();
     }
 
     @Override

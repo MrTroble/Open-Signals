@@ -375,7 +375,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             final Signal current = SignalBoxHandler.getSignal(stateInfo, startSignal.pos);
             if (current == null)
                 return;
-            config.reset(new ResetInfo(
+            SignalConfig.reset(new ResetInfo(
                     new SignalStateInfo(tile.getWorld(), startSignal.pos, current), false));
             final SignalState previous = startSignal.state;
             startSignal.state = SignalState.RED;
@@ -386,7 +386,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                 final Signal currentPreSignal = SignalBoxHandler.getSignal(stateInfo, ident.pos);
                 if (currentPreSignal == null)
                     return;
-                config.reset(new ResetInfo(
+                SignalConfig.reset(new ResetInfo(
                         new SignalStateInfo(tile.getWorld(), ident.pos, currentPreSignal),
                         ident.isRepeater));
                 final SignalState previousState = ident.state;
@@ -412,8 +412,9 @@ public class SignalBoxPathway implements IChunkLoadable {
                     .getSignal(new StateInfo(tile.getWorld(), tile.getPos()), position.pos);
             if (current == null)
                 return;
-            config.reset(new ResetInfo(new SignalStateInfo(tile.getWorld(), position.pos, current),
-                    position.isRepeater));
+            SignalConfig.reset(
+                    new ResetInfo(new SignalStateInfo(tile.getWorld(), position.pos, current),
+                            position.isRepeater));
             final SignalState previous = position.state;
             position.state = SignalState.RED;
             if (!position.state.equals(previous)) {
@@ -460,7 +461,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                                             new OtherSignalIdentifier(point,
                                                     new ModeSet(mode, rotation), position, false,
                                                     mode));
-                            config.reset(new ResetInfo(
+                            SignalConfig.reset(new ResetInfo(
                                     new SignalStateInfo(tile.getWorld(), position, current),
                                     identifier.isRepeater));
                             final SignalState previous = identifier.state;
