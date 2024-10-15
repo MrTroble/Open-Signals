@@ -153,8 +153,8 @@ public final class SignalConfig {
 
     private static void loadSignalAndRunTask(final SignalStateInfo info,
             final SignalStateListener task) {
-        SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, LOAD_HOLDER));
         SignalStateHandler.runTaskWhenSignalLoaded(info, task);
+        SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, LOAD_HOLDER));
     }
 
     private static void unloadSignal(final SignalStateInfo info) {
