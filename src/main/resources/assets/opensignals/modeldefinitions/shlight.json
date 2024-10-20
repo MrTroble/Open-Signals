@@ -25,7 +25,7 @@
 				{
 					"blockstate": "with(sh_light_bottom.STATUS_LIGHT) && hasandisnot(sh_high)",
 					"retexture": {
-						"lamp_whitenorth": "lamp_white"
+						"lamp_white2north": "lamp_white"
 					}
 				},
 				{
@@ -50,7 +50,7 @@
 				{
 					"blockstate": "with(sh_light_bottom.STATUS_LIGHT) && hasandis(sh_high)",
 					"retexture": {
-						"lamp_whitenorth": "lamp_white"
+						"lamp_white2north": "lamp_white"
 					},
 					"y": 2
 				}

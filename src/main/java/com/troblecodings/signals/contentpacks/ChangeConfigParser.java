@@ -53,97 +53,105 @@ public class ChangeConfigParser {
     private static void loadConfigForPair(final String fileName, final String currentSignal,
             final String nextSignal, final Map<String, String> savedPredicates,
             final Map<String, List<String>> values) {
-        final Signal start = Signal.SIGNALS.get(currentSignal.toLowerCase());
-        final Signal end = Signal.SIGNALS.get(nextSignal.toLowerCase());
-        if (start == null || end == null) {
-            OpenSignalsMain.getLogger()
-                    .warn("The signal '" + nextSignal + "' or the signal '" + nextSignal
-                            + "' doen't exists! " + "This config with filename '" + fileName
-                            + "' will be skiped!");
-            return;
-        }
-        final Map.Entry<Signal, Signal> pair = Maps.immutableEntry(start, end);
-        if (CHANGECONFIGS.containsKey(pair)) {
-            throw new LogicalParserException(
-                    "A signalconfig with the signals [" + start.getSignalTypeName() + ", "
-                            + end.getSignalTypeName() + "] does alredy exists! '" + fileName
-                            + "' tried to register a chaneconfig for the same signalpair!");
-        }
-        final FunctionParsingInfo startInfo = new FunctionParsingInfo(start);
-        final FunctionParsingInfo endInfo = new FunctionParsingInfo(
-                LogicParser.UNIVERSAL_TRANSLATION_TABLE, end);
-        final List<ConfigProperty> properties = new ArrayList<>();
+        try {
 
-        for (final Map.Entry<String, List<String>> entry : values.entrySet()) {
+            final Signal start = Signal.SIGNALS.get(currentSignal.toLowerCase());
+            final Signal end = Signal.SIGNALS.get(nextSignal.toLowerCase());
+            if (start == null || end == null) {
+                OpenSignalsMain.getLogger()
+                        .warn("The signal '" + nextSignal + "' or the signal '" + nextSignal
+                                + "' doen't exists! " + "This config with filename '" + fileName
+                                + "' will be skiped!");
+                return;
+            }
+            final Map.Entry<Signal, Signal> pair = Maps.immutableEntry(start, end);
+            if (CHANGECONFIGS.containsKey(pair)) {
+                throw new LogicalParserException(
+                        "A signalconfig with the signals [" + start.getSignalTypeName() + ", "
+                                + end.getSignalTypeName() + "] does alredy exists! '" + fileName
+                                + "' tried to register a chaneconfig for the same signalpair!");
+            }
+            final FunctionParsingInfo startInfo = new FunctionParsingInfo(start);
+            final FunctionParsingInfo endInfo = new FunctionParsingInfo(
+                    LogicParser.UNIVERSAL_TRANSLATION_TABLE, end);
+            final List<ConfigProperty> properties = new ArrayList<>();
 
-            String valueToParse = entry.getKey().toLowerCase();
-            Predicate<Map<Class<?>, Object>> predicate = t -> true;
+            for (final Map.Entry<String, List<String>> entry : values.entrySet()) {
 
-            if (valueToParse.contains("map(") && savedPredicates != null
-                    && !savedPredicates.isEmpty()) {
-                final char[] chars = entry.getKey().toCharArray();
-                String names = "";
-                boolean readKey = false;
-                final StringBuilder builder = new StringBuilder();
-                String mapKey = "";
-                for (final char letter : chars) {
+                String valueToParse = entry.getKey().toLowerCase();
+                Predicate<Map<Class<?>, Object>> predicate = t -> true;
 
-                    final String current = builder.append(letter).toString();
-                    final boolean isOpenBracket = current.equals("(");
-                    final boolean isCloseBracket = current.equals(")");
-                    builder.setLength(0);
+                if (valueToParse.contains("map(") && savedPredicates != null
+                        && !savedPredicates.isEmpty()) {
+                    final char[] chars = entry.getKey().toCharArray();
+                    String names = "";
+                    boolean readKey = false;
+                    final StringBuilder builder = new StringBuilder();
+                    String mapKey = "";
+                    for (final char letter : chars) {
 
-                    if (readKey) {
-                        try {
-                            if (isCloseBracket) {
-                                valueToParse = valueToParse.replace("map(" + mapKey + ")",
-                                        "(" + savedPredicates.get(mapKey).toLowerCase() + ")");
-                                names = "";
-                                mapKey = "";
-                                readKey = false;
+                        final String current = builder.append(letter).toString();
+                        final boolean isOpenBracket = current.equals("(");
+                        final boolean isCloseBracket = current.equals(")");
+                        builder.setLength(0);
+
+                        if (readKey) {
+                            try {
+                                if (isCloseBracket) {
+                                    valueToParse = valueToParse.replace("map(" + mapKey + ")",
+                                            "(" + savedPredicates.get(mapKey).toLowerCase() + ")");
+                                    names = "";
+                                    mapKey = "";
+                                    readKey = false;
+                                    continue;
+                                }
+                                mapKey += current;
                                 continue;
+                            } catch (final Exception e) {
+                                OpenSignalsMain.exitMinecraftWithMessage(
+                                        "Something went wrong with the predicate saver in "
+                                                + fileName + "! Did you used it correctly?");
                             }
-                            mapKey += current;
-                            continue;
-                        } catch (final Exception e) {
-                            OpenSignalsMain.exitMinecraftWithMessage(
-                                    "Something went wrong with the predicate saver in " + fileName
-                                            + "! Did you used it correctly?");
                         }
+                        if (current.equals("(") && names.equals("map")) {
+                            readKey = true;
+                            mapKey = "";
+                            continue;
+                        }
+                        final boolean isBracket = isCloseBracket || isOpenBracket;
+                        if (Character.isWhitespace(letter) || current.equals("!") || isBracket) {
+                            names = "";
+                            mapKey = "";
+                            continue;
+                        }
+                        names += current;
                     }
-                    if (current.equals("(") && names.equals("map")) {
-                        readKey = true;
-                        mapKey = "";
-                        continue;
-                    }
-                    final boolean isBracket = isCloseBracket || isOpenBracket;
-                    if (Character.isWhitespace(letter) || current.equals("!") || isBracket) {
-                        names = "";
-                        mapKey = "";
-                        continue;
-                    }
-                    names += current;
                 }
+
+                if (valueToParse != null && !valueToParse.isEmpty()
+                        && !valueToParse.equalsIgnoreCase("true")) {
+                    predicate = LogicParser.predicate(valueToParse, endInfo);
+                }
+
+                final Map<SEProperty, String> propertiesToSet = new HashMap<>();
+
+                for (final String value : entry.getValue()) {
+
+                    final String[] valuetoChange = value.split("\\.");
+                    final SEProperty property = (SEProperty) startInfo
+                            .getProperty(valuetoChange[0]);
+                    propertiesToSet.put(property, valuetoChange[1]);
+                }
+
+                properties.add(new ConfigProperty(predicate, propertiesToSet));
+
             }
-
-            if (valueToParse != null && !valueToParse.isEmpty()
-                    && !valueToParse.equalsIgnoreCase("true")) {
-                predicate = LogicParser.predicate(valueToParse, endInfo);
-            }
-
-            final Map<SEProperty, String> propertiesToSet = new HashMap<>();
-
-            for (final String value : entry.getValue()) {
-
-                final String[] valuetoChange = value.split("\\.");
-                final SEProperty property = (SEProperty) startInfo.getProperty(valuetoChange[0]);
-                propertiesToSet.put(property, valuetoChange[1]);
-            }
-
-            properties.add(new ConfigProperty(predicate, propertiesToSet));
-
+            CHANGECONFIGS.put(pair, properties);
+        } catch (final Exception e) {
+            OpenSignalsMain.getLogger().error("There was a problem loading the ChangeConfig ["
+                    + fileName + "]! Please check the file!");
+            e.printStackTrace();
         }
-        CHANGECONFIGS.put(pair, properties);
     }
 
     private static class ChangeConfigParserV2 {

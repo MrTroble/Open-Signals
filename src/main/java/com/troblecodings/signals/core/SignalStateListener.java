@@ -11,4 +11,11 @@ public interface SignalStateListener {
     public void update(final SignalStateInfo info, final Map<SEProperty, String> changedProperties,
             final ChangedState changedState);
 
+    default SignalStateListener andThen(final SignalStateListener otherTask) {
+        return (info, properties, state) -> {
+            this.update(info, properties, state);
+            otherTask.update(info, properties, state);
+        };
+    }
+
 }
