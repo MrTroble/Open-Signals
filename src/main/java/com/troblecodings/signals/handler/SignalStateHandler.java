@@ -56,6 +56,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
+    private static final ExecutorService readService = Executors.newCachedThreadPool();
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<World, SignalStateFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
@@ -532,7 +533,7 @@ public final class SignalStateHandler implements INetworkSync {
             final @Nullable EntityPlayer player) {
         if (signals == null || signals.isEmpty())
             return;
-        new Thread(() -> {
+        readService.execute(() -> {
             signals.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (SIGNAL_COUNTER) {
@@ -567,7 +568,7 @@ public final class SignalStateHandler implements INetworkSync {
                     }
                 }
             });
-        }, "OSSignalStateHandler:loadSignals").start();
+        });
     }
 
     public static void unloadSignal(final SignalStateLoadHoler info) {

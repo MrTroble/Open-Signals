@@ -53,6 +53,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 public final class NameHandler implements INetworkSync {
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
+    private static final ExecutorService readService = Executors.newCachedThreadPool();
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<StateInfo, List<NameStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
@@ -322,7 +323,7 @@ public final class NameHandler implements INetworkSync {
             final @Nullable EntityPlayer player) {
         if (infos == null || infos.isEmpty())
             return;
-        new Thread(() -> {
+        readService.execute(() -> {
             infos.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
@@ -368,7 +369,7 @@ public final class NameHandler implements INetworkSync {
                     }
                 }
             });
-        }, "OSNameHandler:loadNames").start();
+        });
     }
 
     public static void unloadName(final StateLoadHolder holder) {
