@@ -432,7 +432,6 @@ public class SignalBoxPathway implements IChunkLoadable {
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
         if (data.totalPathwayReset(point)) {
-            this.isBlocked = false;
             resetOther();
             resetAllTrainNumbers();
             sendTrainNumberUpdates();
@@ -442,6 +441,7 @@ public class SignalBoxPathway implements IChunkLoadable {
                 next.updatePreSignals();
                 next.updateSignalStates();
             }
+            this.isBlocked = false;
         }
     }
 
@@ -562,12 +562,12 @@ public class SignalBoxPathway implements IChunkLoadable {
     public boolean tryBlock(final BlockPos position) {
         if (!data.tryBlock(position))
             return false;
+        isBlocked = true;
         resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
         if (!isBlocked) {
             getTrainNumberFromPrevious();
         }
-        isBlocked = true;
         return true;
     }
 
