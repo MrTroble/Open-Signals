@@ -34,7 +34,7 @@ public final class SignalConfig {
     public void change(final ConfigInfo info) {
         final Signal currentSignal = info.currentinfo.signal;
         if (info.type.equals(PathType.NORMAL)) {
-            if (info.nextinfo != null) {
+            if (info.nextinfo != null && info.nextinfo.isValid()) {
                 final Signal nextSignal = info.nextinfo.signal;
                 final List<ConfigProperty> values = ChangeConfigParser.CHANGECONFIGS
                         .get(Maps.immutableEntry(currentSignal, nextSignal));
@@ -49,13 +49,15 @@ public final class SignalConfig {
         } else if (info.type.equals(PathType.SHUNTING)) {
             final List<ConfigProperty> shuntingValues = OneSignalNonPredicateConfigParser.SHUNTINGCONFIGS
                     .get(currentSignal);
-            if (shuntingValues != null) {
+            if (shuntingValues != null && info.currentinfo.isValid()) {
                 loadWithoutPredicate(shuntingValues, info.currentinfo);
             }
         }
     }
 
     private void loadDefault(final ConfigInfo info) {
+        if (!info.currentinfo.isValid())
+            return;
         final List<ConfigProperty> defaultValues = OneSignalPredicateConfigParser.DEFAULTCONFIGS
                 .get(info.currentinfo.signal);
         if (defaultValues != null) {
@@ -148,8 +150,6 @@ public final class SignalConfig {
 
     private static void loadSignalAndRunTask(final SignalStateInfo info,
             final SignalStateListener task) {
-        if (!info.isValid() || info.worldNullOrClientSide())
-            return;
         final boolean isSignalLoaded = SignalStateHandler.isSignalLoaded(info);
         if (!isSignalLoaded) {
             SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, LOAD_HOLDER));
