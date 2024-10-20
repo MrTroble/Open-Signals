@@ -91,7 +91,7 @@ public final class SignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
         updateListeners(info, states, ChangedState.ADDED_TO_FILE);
-        new Thread(() -> {
+        writeService.execute(() -> {
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
             synchronized (SIGNAL_COUNTER) {
@@ -99,7 +99,7 @@ public final class SignalStateHandler implements INetworkSync {
             }
             sendToAll(info, states);
             createToFile(info, states);
-        }, "OSSignalStateHandler:createStates").start();
+        });
     }
 
     public static boolean isSignalLoaded(final SignalStateInfo info) {
@@ -254,14 +254,14 @@ public final class SignalStateHandler implements INetworkSync {
             }
         }
         updateListeners(info, changedProperties, ChangedState.UPDATED);
-        new Thread(() -> {
+        writeService.execute(() -> {
             sendToAll(info, changedProperties);
             info.world.getMinecraftServer()
                     .addScheduledTask(() -> info.signal.getUpdate(info.world, info.pos));
             if (!contains.get()) {
                 createToFile(info, changedProperties);
             }
-        }, "OSSignalStateHandler:setStates").start();
+        });
         info.world.getMinecraftServer().addScheduledTask(
                 () -> info.world.notifyNeighborsOfStateChange(info.pos, info.signal, true));
     }

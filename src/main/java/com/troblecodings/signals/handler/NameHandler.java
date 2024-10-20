@@ -85,7 +85,7 @@ public final class NameHandler implements INetworkSync {
             final EntityPlayer creator) {
         if (info.world.isRemote || name == null)
             return;
-        new Thread(() -> {
+        readService.execute(() -> {
             setNameForNonSignal(info, name);
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
@@ -93,7 +93,7 @@ public final class NameHandler implements INetworkSync {
                 LOAD_COUNTER.put(info, list);
             }
             createToFile(info, name);
-        }, "OSNameHandler:createName").start();
+        });
     }
 
     public static void setNameForSignal(final StateInfo info, final String name) {
@@ -110,12 +110,12 @@ public final class NameHandler implements INetworkSync {
     public static void setNameForNonSignal(final StateInfo info, final String name) {
         if (info.world.isRemote || name == null)
             return;
-        new Thread(() -> {
+        readService.execute(() -> {
             synchronized (ALL_NAMES) {
                 ALL_NAMES.put(info, name);
             }
             sendToAll(info, name);
-        }, "OSNameHandler:setName").start();
+        });
     }
 
     public static String getName(final StateInfo info) {
