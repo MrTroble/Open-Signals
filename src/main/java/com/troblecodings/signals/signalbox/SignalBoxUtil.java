@@ -23,6 +23,7 @@ public final class SignalBoxUtil {
     public static final int SELECTED_COLOR = ConfigHandler.CLIENT.signalboxSelectColor.get();
     public static final int USED_COLOR = ConfigHandler.CLIENT.signalboxUsedColor.get();
     public static final int PREPARED_COLOR = ConfigHandler.CLIENT.signalboxPreparedColor.get();
+    public static final int SHUNTING_COLOR = ConfigHandler.CLIENT.signalboxShuntingColor.get();
 
     private SignalBoxUtil() {
     }
@@ -66,13 +67,11 @@ public final class SignalBoxUtil {
     }
 
     public static PathwayRequestResult requestPathway(final SignalBoxGrid grid, final Point p1,
-            final Point p2) {
+            final Point p2, final PathType pathType) {
         final Map<Point, SignalBoxNode> modeGrid = grid.modeGrid;
         if (!modeGrid.containsKey(p1) || !modeGrid.containsKey(p2))
             return PathwayRequestResult.NOT_IN_GRID;
-        final SignalBoxNode lastNode = modeGrid.get(p2);
         final SignalBoxNode firstNode = modeGrid.get(p1);
-        final PathType pathType = firstNode.getPathType(lastNode);
         if (pathType.equals(PathType.NONE))
             return PathwayRequestResult.NO_EQUAL_PATH_TYPE;
 
@@ -195,6 +194,7 @@ public final class SignalBoxUtil {
             case STRAIGHT:
             case END:
             case IN_CONNECTION:
+            case ARROW:
             case OUT_CONNECTION: {
                 return 0;
             }
@@ -207,4 +207,12 @@ public final class SignalBoxUtil {
         }
     }
 
+    public static PathType getPathTypeFrom(final SignalBoxNode start, final SignalBoxNode end) {
+        final List<PathType> possilbeTypes = start.getPossibleTypes(end);
+        if (!possilbeTypes.isEmpty()) {
+            return possilbeTypes.get(0);
+        } else {
+            return PathType.NONE;
+        }
+    }
 }

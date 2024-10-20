@@ -28,6 +28,7 @@ import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.PathGetter;
 import com.troblecodings.signals.core.SignalStateListener;
 import com.troblecodings.signals.core.SignalStateLoadHoler;
+import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.enums.ChangedState;
 
 import io.netty.buffer.Unpooled;
@@ -185,6 +186,8 @@ public final class SignalStateHandler implements INetworkSync {
     private static void statesToBuffer(final Signal signal, final Map<SEProperty, String> states,
             final byte[] readData) {
         states.forEach((property, string) -> {
+            if (property.equals(Signal.CUSTOMNAME))
+                return;
             readData[signal.getIDFromProperty(
                     property)] = (byte) (property.getParent().getIDFromValue(string) + 1);
         });
@@ -342,11 +345,35 @@ public final class SignalStateHandler implements INetworkSync {
         final byte[] byteArray = buffer.array();
         for (int i = 0; i < properties.size(); i++) {
             final SEProperty property = properties.get(i);
+            if (property.equals(Signal.CUSTOMNAME)) {
+                continue;
+            }
             final int typeID = Byte.toUnsignedInt(byteArray[i]);
             if (typeID <= 0)
                 continue;
             final String value = property.getObjFromID(typeID - 1);
             map.put(property, value);
+        }
+        if (NameHandler.isNameLoaded(stateInfo)) {
+            final String customName = NameHandler.getName(stateInfo);
+            if (customName == null || customName.isEmpty()
+                    || customName.equals(stateInfo.signal.getSignalTypeName())) {
+                map.put(Signal.CUSTOMNAME, "false");
+            } else {
+                map.put(Signal.CUSTOMNAME, "true");
+            }
+        } else {
+            NameHandler.runTaskWhenNameLoaded(new StateInfo(stateInfo.world, stateInfo.pos),
+                    (info, name, changed) -> {
+                        if (name == null || name.isEmpty()
+                                || name.equals(stateInfo.signal.getSignalTypeName())) {
+                            runTaskWhenSignalLoaded(stateInfo, (_u1, _u2,
+                                    _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "false"));
+                        } else {
+                            runTaskWhenSignalLoaded(stateInfo, (_u1, _u2,
+                                    _u3) -> setState(stateInfo, Signal.CUSTOMNAME, "true"));
+                        }
+                    });
         }
         return map;
     }

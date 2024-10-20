@@ -2,19 +2,39 @@
     "currentSignal": "semaphoresignal",
     "allStates": {
         "ZS1": [
+            "wing1.FALSE",
+            "wing2.FALSE",
+            "zs3.OFF",
+            "ra12.FALSE",
+            "zs7.FALSE",
             "zs1.TRUE"
         ],
         "ZS7": [
-            "zs7.TRUE"
+            "wing1.FALSE",
+            "wing2.FALSE",
+            "zs3.OFF",
+            "ra12.FALSE",
+            "zs7.TRUE",
+            "zs1.FALSE"
         ],
         "ZS8": [
-            "zs3.ZS8"
+            "wing1.FALSE",
+            "wing2.FALSE",
+            "zs3.ZS8",
+            "ra12.FALSE",
+            "zs7.FALSE",
+            "zs1.FALSE"
         ],
         "ZP9": [
             "zs3.ZP9"
         ],
         "SH1": [
-            "ra12.TRUE"
+            "wing1.FALSE",
+            "wing2.FALSE",
+            "zs3.OFF",
+            "ra12.TRUE",
+            "zs7.FALSE",
+            "zs1.FALSE"
         ]
     }
 }

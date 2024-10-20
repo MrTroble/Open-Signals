@@ -336,6 +336,15 @@
                         }
                     },
                     "y": 2.0
+                },
+                {
+                    "blockstate": "with(NETYPE.TRAIN_LENGTH)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.0
                 }
             ],
             "y": 0
@@ -344,6 +353,14 @@
             "textures": [
                 {
                     "blockstate": "with(NETYPE.NE5)",
+                    "extentions": {
+                        "ne5_addition.json": {
+                            "NE5_ADDITION": "2"
+                        }
+                    }
+                },
+                {
+                    "blockstate": "with(NETYPE.TRAIN_LENGTH)",
                     "extentions": {
                         "ne5_addition.json": {
                             "NE5_ADDITION": "2"

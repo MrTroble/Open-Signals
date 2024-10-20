@@ -6,7 +6,7 @@ public enum PathType {
 
     NORMAL(EnumGuiMode.HP, EnumGuiMode.END, EnumGuiMode.IN_CONNECTION, EnumGuiMode.OUT_CONNECTION,
             EnumGuiMode.NE1, EnumGuiMode.NE5, EnumGuiMode.ARROW),
-    SHUNTING(EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END), NONE();
+    SHUNTING(EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END, EnumGuiMode.ARROW), NONE();
 
     private final EnumGuiMode[] modes;
 

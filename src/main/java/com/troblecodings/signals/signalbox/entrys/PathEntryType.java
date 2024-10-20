@@ -7,7 +7,9 @@ import java.util.Map;
 import java.util.Objects;
 
 import com.google.common.collect.ImmutableList;
+import com.troblecodings.signals.core.ModeIdentifier;
 import com.troblecodings.signals.core.PosIdentifier;
+import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.signalbox.Point;
 
@@ -69,6 +71,12 @@ public final class PathEntryType<T> {
 
     public static final PathEntryType<BlockPos> PROTECTIONWAY_RESET = new PathEntryType<>(
             BlockposEntry.class, "protectionway_reset");
+
+    public static final PathEntryType<ModeIdentifier> CONNECTED_TRAINNUMBER = new PathEntryType<>(
+            ModeIdentifierEntry.class, "connected_point");
+
+    public static final PathEntryType<TrainNumber> TRAINNUMBER = new PathEntryType<>(
+            TrainNumberEntry.class, "trainnumber");
 
     private static final class EnumPathUsageEntry extends EnumEntry<EnumPathUsage> {
 
