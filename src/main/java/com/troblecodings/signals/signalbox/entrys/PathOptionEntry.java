@@ -109,8 +109,17 @@ public class PathOptionEntry implements INetworkSavable {
     }
 
     public void writeUpdateNetwork(final WriteBuffer builder) {
-        builder.putByte((byte) 1);
-        builder.putByte((byte) PathEntryType.PATHUSAGE.getID());
-        pathEntrys.get(PathEntryType.PATHUSAGE).writeNetwork(builder);
+        int size = 0;
+        for (final PathEntryType<?> entry : pathEntrys.keySet()) {
+            if (entry.equals(PathEntryType.PATHUSAGE) || entry.equals(PathEntryType.TRAINNUMBER))
+                size++;
+        }
+        builder.putByte((byte) size);
+        pathEntrys.forEach((mode, entry) -> {
+            if (mode.equals(PathEntryType.PATHUSAGE) || mode.equals(PathEntryType.TRAINNUMBER)) {
+                builder.putByte((byte) mode.getID());
+                entry.writeNetwork(builder);
+            }
+        });
     }
 }

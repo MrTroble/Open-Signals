@@ -5,10 +5,16 @@
             "mainlightsignal.HL_ZS1",
             "exitsignal.HL_ZS1",
             "blocksignal.HL_ZS1",
-            "blockexitsignal.HL_ZS1"
+            "blockexitsignal.HL_ZS1",
+            "mainlightsignallightbar.OFF",
+            "zs2.OFF",
+            "zs2v.OFF"
         ],
         "ZS8": [
-            "zs2.ZS8"
+            "zs2.ZS8",
+            "mainlightsignallightbar.OFF",
+            "zs2.OFF",
+            "zs2v.OFF"
         ],
         "ZP9": [
             "zs2.ZP9"
@@ -16,14 +22,20 @@
         "SH1": [
             "mainlightsignal.HL_SHUNTING",
             "exitsignal.HL_SHUNTING",
-            "blockexitsignal.HL_SHUNTING"
+            "blockexitsignal.HL_SHUNTING",
+            "mainlightsignallightbar.OFF",
+            "zs2.OFF",
+            "zs2v.OFF"
         ],
         "STATUSLIGHT": [
             "mainlightsignal.HL_STATUS_LIGHT",
             "mainlightsignal_distant.HL_STATUS_LIGHT",
             "exitsignal.HL_STATUS_LIGHT",
             "blocksignal.HL_STATUS_LIGHT",
-            "blockexitsignal.HL_STATUS_LIGHT"
+            "blockexitsignal.HL_STATUS_LIGHT",
+            "mainlightsignallightbar.OFF",
+            "zs2.OFF",
+            "zs2v.OFF"
         ]
     }
 }
