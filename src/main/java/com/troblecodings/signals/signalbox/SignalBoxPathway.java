@@ -195,6 +195,10 @@ public class SignalBoxPathway implements IChunkLoadable {
     protected void setSignals(final SignalStateInfo lastSignal) {
         if (isExecutingSignalSet || tile == null)
             return;
+        System.out.println("Changeing signals for " + this + "! Call:");
+        for (final StackTraceElement el : Thread.currentThread().getStackTrace()) {
+            System.out.println("      " + el);
+        }
         final World world = tile.getWorld();
         final StateInfo identifier = new StateInfo(world, tile.getPos());
         final MainSignalIdentifier startSignal = data.getStartSignal();
