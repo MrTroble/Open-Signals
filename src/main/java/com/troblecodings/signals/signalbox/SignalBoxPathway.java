@@ -609,7 +609,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private void resetAllTrainNumbers(final List<ModeIdentifier> trainNumberDisplays) {
-        if (grid != null)
+        if (grid != null && trainNumberDisplays != null)
             trainNumberDisplays.forEach(ident -> grid.getNode(ident.point).getOption(ident.mode)
                     .orElse(new PathOptionEntry()).removeEntry(PathEntryType.TRAINNUMBER));
     }
