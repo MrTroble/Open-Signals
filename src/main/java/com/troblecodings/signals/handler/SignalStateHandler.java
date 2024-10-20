@@ -529,12 +529,14 @@ public final class SignalStateHandler implements INetworkSync {
         loadSignals(ImmutableList.of(info), player);
     }
 
+    private static int count = 0;
+
     public static void loadSignals(final List<SignalStateLoadHoler> signals,
             final @Nullable EntityPlayer player) {
         if (signals == null || signals.isEmpty())
             return;
         threadService.execute(() -> {
-            System.out.println("Starting Executing Thread " + Thread.currentThread());
+            System.out.println("Count: " + ++count);
             signals.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (SIGNAL_COUNTER) {
@@ -569,7 +571,7 @@ public final class SignalStateHandler implements INetworkSync {
                     }
                 }
             });
-            System.out.println("Finished Executing Thread " + Thread.currentThread());
+            System.out.println("Count: " + --count);
         });
     }
 
