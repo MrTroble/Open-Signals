@@ -83,7 +83,6 @@ public final class SignalConfig {
             });
             if (!propertiesToSet.isEmpty())
                 SignalStateHandler.setStates(info.current, propertiesToSet);
-            unloadSignal(stateInfo);
         });
     }
 
@@ -100,13 +99,10 @@ public final class SignalConfig {
             if (info.nextinfo != null) {
                 loadSignalAndRunTask(info.nextinfo, (nextInfo, nextProperties, _u2) -> {
                     changeSignals(values, info, oldProperties, nextProperties);
-                    unloadSignal(nextInfo);
-                    unloadSignal(stateInfo);
                     pathway.updatePrevious();
                 });
             } else {
                 changeSignals(values, info, oldProperties, null);
-                unloadSignal(stateInfo);
                 pathway.updatePrevious();
             }
         });
@@ -145,7 +141,6 @@ public final class SignalConfig {
                 });
                 if (!propertiesToSet.isEmpty())
                     SignalStateHandler.setStates(current, propertiesToSet);
-                unloadSignal(info);
                 pathway.updatePrevious();
             });
         }
@@ -153,11 +148,14 @@ public final class SignalConfig {
 
     private static void loadSignalAndRunTask(final SignalStateInfo info,
             final SignalStateListener task) {
+        if (!info.isValid() || info.worldNullOrClientSide())
+            return;
+        final boolean isSignalLoaded = SignalStateHandler.isSignalLoaded(info);
+        if (!isSignalLoaded) {
+            SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, LOAD_HOLDER));
+            task.andThen((_u1, _u2, _u3) -> SignalStateHandler
+                    .unloadSignal(new SignalStateLoadHoler(info, LOAD_HOLDER)));
+        }
         SignalStateHandler.runTaskWhenSignalLoaded(info, task);
-        SignalStateHandler.loadSignal(new SignalStateLoadHoler(info, LOAD_HOLDER));
-    }
-
-    private static void unloadSignal(final SignalStateInfo info) {
-        SignalStateHandler.unloadSignal(new SignalStateLoadHoler(info, LOAD_HOLDER));
     }
 }
