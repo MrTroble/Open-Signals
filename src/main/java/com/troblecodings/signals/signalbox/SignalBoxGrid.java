@@ -191,6 +191,9 @@ public class SignalBoxGrid implements INetworkSavable {
     public void resetAllPathways() {
         ImmutableSet.copyOf(this.startsToPath.values()).forEach(this::resetPathway);
         clearPaths();
+        modeGrid.values().forEach(node -> node.getModes().values()
+                .forEach(optionEntry -> optionEntry.getEntry(PathEntryType.PATHUSAGE)
+                        .ifPresent(_u -> optionEntry.removeEntry(PathEntryType.PATHUSAGE))));
     }
 
     public void resetAllSignals() {
