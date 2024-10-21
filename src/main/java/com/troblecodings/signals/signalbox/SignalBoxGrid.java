@@ -127,12 +127,10 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     protected void resetPathway(final SignalBoxPathway pathway) {
-        System.out.println("Resetting " + pathway);
         pathway.resetPathway();
         updatePrevious(pathway);
         this.startsToPath.remove(pathway.getFirstPoint());
         this.endsToPath.remove(pathway.getLastPoint());
-        System.out.println("Removed " + pathway);
     }
 
     protected void updateToNet(final SignalBoxPathway pathway) {
@@ -244,8 +242,6 @@ public class SignalBoxGrid implements INetworkSavable {
         pathways.forEach(pathway -> {
             if (pathway.tryBlock(pos)) {
                 updatePrevious(pathway);
-                System.out.println(
-                        "Updateing Previous PW from " + pathway + " due to blocking request!");
                 updateToNet(pathway);
             }
         });

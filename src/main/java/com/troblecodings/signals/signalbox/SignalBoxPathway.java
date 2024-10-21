@@ -265,7 +265,6 @@ public class SignalBoxPathway implements IChunkLoadable {
         if (startSignal != null) {
             if (isBlocked)
                 return;
-            System.out.println("Setting " + startSignal + " on " + this);
             final SignalState previous = startSignal.state;
             startSignal.state = SignalState.GREEN;
             if (!startSignal.state.equals(previous))
