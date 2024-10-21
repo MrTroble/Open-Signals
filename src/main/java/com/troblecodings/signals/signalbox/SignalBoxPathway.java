@@ -280,9 +280,6 @@ public class SignalBoxPathway implements IChunkLoadable {
                 if (!next.isExecutingSignalSet) {
                     position.state = SignalState.GREEN;
                 }
-                if (next.isBlocked) {
-                    position.state = SignalState.RED;
-                }
             } else {
                 position.state = SignalState.RED;
             }
