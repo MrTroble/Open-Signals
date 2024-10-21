@@ -208,6 +208,11 @@ public class SignalBoxPathway implements IChunkLoadable {
             config.change(new ConfigInfo(firstInfo, lastSignal, data));
             updatePreSignals();
         }
+        final SignalBoxPathway next = getNextPathway();
+        if (next != null && (next.isEmptyOrBroken() || next.isBlocked)) {
+            updateSignalStates();
+            return;
+        }
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                 .getOtherSignals();
         distantSignalPositions.forEach((holder, position) -> {
@@ -232,6 +237,10 @@ public class SignalBoxPathway implements IChunkLoadable {
         final MainSignalIdentifier startSignal = data.getStartSignal();
         if (startSignal == null)
             return;
+        final SignalBoxPathway next = getNextPathway();
+        if (next != null && (next.isEmptyOrBroken() || next.isBlocked)) {
+            return;
+        }
         final StateInfo identifier = new StateInfo(tile.getWorld(), tile.getPos());
         final Signal first = SignalBoxHandler.getSignal(identifier, startSignal.pos);
         if (first == null)
@@ -279,6 +288,9 @@ public class SignalBoxPathway implements IChunkLoadable {
             if (endSignal != null && next != null && !next.isEmptyOrBroken()) {
                 if (!next.isExecutingSignalSet) {
                     position.state = SignalState.GREEN;
+                }
+                if (next.isBlocked) {
+                    position.state = SignalState.RED;
                 }
             } else {
                 position.state = SignalState.RED;
@@ -439,7 +451,6 @@ public class SignalBoxPathway implements IChunkLoadable {
                 next.updatePreSignals();
                 next.updateSignalStates();
             }
-            this.isBlocked = false;
         }
     }
 
