@@ -44,6 +44,7 @@ import net.minecraft.world.level.block.state.BlockState;
 public class SignalBoxPathway implements IChunkLoadable {
 
     protected final PathwayData data;
+    protected final SignalConfig config;
 
     protected boolean isBlocked;
     protected boolean isAutoPathway = false;
@@ -58,6 +59,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public SignalBoxPathway(final PathwayData data) {
+        this.data = new SignalConfig(this);
         this.data = data;
         this.originalFirstPoint = new Point(data.getFirstPoint());
         updatePathwayToAutomatic();
@@ -152,6 +154,12 @@ public class SignalBoxPathway implements IChunkLoadable {
         setPathStatus(status, null);
     }
 
+    public void updatePrevious() {
+        if (grid == null)
+            return;
+        grid.updatePrevious(this);
+    }
+
     protected SignalStateInfo lastSignalInfo = null;
 
     protected SignalStateInfo getLastSignalInfo() {
@@ -201,6 +209,11 @@ public class SignalBoxPathway implements IChunkLoadable {
             SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, data));
             updatePreSignals();
         }
+        final SignalBoxPathway next = getNextPathway();
+        if (next != null && (next.isEmptyOrBroken() || next.isBlocked)) {
+            updateSignalStates();
+            return;
+        }
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                 .getOtherSignals();
         distantSignalPositions.forEach((holder, position) -> {
@@ -225,6 +238,10 @@ public class SignalBoxPathway implements IChunkLoadable {
         final MainSignalIdentifier startSignal = data.getStartSignal();
         if (startSignal == null)
             return;
+        final SignalBoxPathway next = getNextPathway();
+        if (next != null && (next.isEmptyOrBroken() || next.isBlocked)) {
+            return;
+        }
         final StateInfo identifier = new StateInfo(tile.getLevel(), tile.getBlockPos());
         final Signal first = SignalBoxHandler.getSignal(identifier, startSignal.pos);
         if (first == null)
@@ -269,8 +286,12 @@ public class SignalBoxPathway implements IChunkLoadable {
             final SignalBoxPathway next = getNextPathway();
             final SignalState previous = position.state;
             if (endSignal != null && next != null && !next.isEmptyOrBroken()) {
-                if (!next.isExecutingSignalSet)
+                if (!next.isExecutingSignalSet) {
                     position.state = SignalState.GREEN;
+                }
+                if (next.isBlocked) {
+                    position.state = SignalState.RED;
+                }
             } else {
                 position.state = SignalState.RED;
             }
@@ -422,7 +443,6 @@ public class SignalBoxPathway implements IChunkLoadable {
         resetFirstSignal();
         System.out.println(getListOfNodes());
         if (data.totalPathwayReset(point)) {
-            this.isBlocked = false;
             resetOther();
             resetAllTrainNumbers();
             sendTrainNumberUpdates();
@@ -603,7 +623,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     private void resetAllTrainNumbers(final List<ModeIdentifier> trainNumberDisplays) {
-        if (grid != null)
+        if (grid != null && trainNumberDisplays != null)
             trainNumberDisplays.forEach(ident -> grid.getNode(ident.point).getOption(ident.mode)
                     .orElse(new PathOptionEntry()).removeEntry(PathEntryType.TRAINNUMBER));
     }

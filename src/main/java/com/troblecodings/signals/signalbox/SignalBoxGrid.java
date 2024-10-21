@@ -183,19 +183,9 @@ public class SignalBoxGrid implements INetworkSavable {
     }
 
     protected void updatePrevious(final SignalBoxPathway pathway) {
-        SignalBoxPathway previousPath = pathway;
-        int count = 0;
-        while ((previousPath = endsToPath.get(previousPath.getFirstPoint())) != null) {
-            if (count > endsToPath.size()) {
-                break;
-            }
+        SignalBoxPathway previousPath = endsToPath.get(pathway.getFirstPoint());
+        if (previousPath != null) {
             previousPath.setSignals();
-            count++;
-        }
-        if (count == 0) {
-            if (OpenSignalsMain.isDebug()) {
-                OpenSignalsMain.getLogger().debug("Could not find previous! " + pathway);
-            }
         }
     }
 

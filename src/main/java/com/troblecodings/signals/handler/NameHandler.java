@@ -58,6 +58,7 @@ public final class NameHandler implements INetworkSync {
     private static final Map<StateInfo, List<NameStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
     private static final Map<StateInfo, List<LoadHolder<?>>> LOAD_COUNTER = new HashMap<>();
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
+    private static final ExecutorService threadService = Executors.newCachedThreadPool();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
 
@@ -92,7 +93,7 @@ public final class NameHandler implements INetworkSync {
     public static void createName(final StateInfo info, final String name, final Player creator) {
         if (info.world.isClientSide || name == null)
             return;
-        new Thread(() -> {
+        threadService.execute(() -> {
             setNameForNonSignal(info, name);
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
@@ -100,7 +101,7 @@ public final class NameHandler implements INetworkSync {
                 LOAD_COUNTER.put(info, list);
             }
             createToFile(info, name);
-        }, "OSNameHandler:createName").start();
+        });
     }
 
     public static void setNameForSignal(final StateInfo info, final String name) {
@@ -117,12 +118,12 @@ public final class NameHandler implements INetworkSync {
     public static void setNameForNonSignal(final StateInfo info, final String name) {
         if (info.world.isClientSide || name == null)
             return;
-        new Thread(() -> {
+        threadService.execute(() -> {
             synchronized (ALL_NAMES) {
                 ALL_NAMES.put(info, name);
             }
             sendToAll(info, name);
-        }, "OSNameHandler:setName").start();
+        });
     }
 
     public static String getName(final StateInfo info) {
@@ -345,7 +346,7 @@ public final class NameHandler implements INetworkSync {
     public static void loadNames(final List<StateLoadHolder> infos, final @Nullable Player player) {
         if (infos == null || infos.isEmpty())
             return;
-        new Thread(() -> {
+        threadService.execute(() -> {
             infos.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
@@ -391,7 +392,7 @@ public final class NameHandler implements INetworkSync {
                     }
                 }
             });
-        }, "OSNameHandler:loadNames").start();
+        });
     }
 
     public static void unloadName(final StateLoadHolder holder) {
