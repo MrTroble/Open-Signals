@@ -53,7 +53,7 @@ import net.minecraftforge.fml.common.network.internal.FMLProxyPacket;
 public final class NameHandler implements INetworkSync {
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
-    private static final ExecutorService threadService = Executors.newCachedThreadPool();
+    private static final ExecutorService THREAD_SERVICE = Executors.newCachedThreadPool();
     private static final Map<StateInfo, String> ALL_NAMES = new HashMap<>();
     private static final Map<World, NameHandlerFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<StateInfo, List<NameStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
@@ -85,7 +85,7 @@ public final class NameHandler implements INetworkSync {
             final EntityPlayer creator) {
         if (info.world.isRemote || name == null)
             return;
-        threadService.execute(() -> {
+        THREAD_SERVICE.execute(() -> {
             setNameForNonSignal(info, name);
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
@@ -110,7 +110,7 @@ public final class NameHandler implements INetworkSync {
     public static void setNameForNonSignal(final StateInfo info, final String name) {
         if (info.world.isRemote || name == null)
             return;
-        threadService.execute(() -> {
+        THREAD_SERVICE.execute(() -> {
             synchronized (ALL_NAMES) {
                 ALL_NAMES.put(info, name);
             }
@@ -323,7 +323,7 @@ public final class NameHandler implements INetworkSync {
             final @Nullable EntityPlayer player) {
         if (infos == null || infos.isEmpty())
             return;
-        threadService.execute(() -> {
+        THREAD_SERVICE.execute(() -> {
             infos.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {

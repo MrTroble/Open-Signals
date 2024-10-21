@@ -56,7 +56,7 @@ public final class SignalStateHandler implements INetworkSync {
     }
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
-    private static final ExecutorService threadService = Executors.newCachedThreadPool();
+    private static final ExecutorService THREAD_SERVICE = Executors.newCachedThreadPool();
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<World, SignalStateFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
@@ -91,7 +91,7 @@ public final class SignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
         updateListeners(info, states, ChangedState.ADDED_TO_FILE);
-        threadService.execute(() -> {
+        THREAD_SERVICE.execute(() -> {
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
             synchronized (SIGNAL_COUNTER) {
@@ -254,7 +254,7 @@ public final class SignalStateHandler implements INetworkSync {
             }
         }
         updateListeners(info, changedProperties, ChangedState.UPDATED);
-        threadService.execute(() -> {
+        THREAD_SERVICE.execute(() -> {
             sendToAll(info, changedProperties);
             info.world.getMinecraftServer()
                     .addScheduledTask(() -> info.signal.getUpdate(info.world, info.pos));
@@ -533,7 +533,7 @@ public final class SignalStateHandler implements INetworkSync {
             final @Nullable EntityPlayer player) {
         if (signals == null || signals.isEmpty())
             return;
-        threadService.execute(() -> {
+        THREAD_SERVICE.execute(() -> {
             signals.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (SIGNAL_COUNTER) {
