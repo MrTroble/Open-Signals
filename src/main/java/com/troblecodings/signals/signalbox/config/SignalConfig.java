@@ -101,11 +101,9 @@ public final class SignalConfig {
             if (info.nextinfo != null) {
                 loadSignalAndRunTask(info.nextinfo, (nextInfo, nextProperties, _u2) -> {
                     changeSignals(values, info, oldProperties, nextProperties);
-                    pathway.updatePrevious();
                 });
             } else {
                 changeSignals(values, info, oldProperties, null);
-                pathway.updatePrevious();
             }
         });
 
@@ -127,8 +125,10 @@ public final class SignalConfig {
                         .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
             }
         });
-        if (!propertiesToSet.isEmpty())
+        if (!propertiesToSet.isEmpty()) {
             SignalStateHandler.setStates(info.currentinfo, propertiesToSet);
+            pathway.updatePrevious();
+        }
     }
 
     private void loadWithoutPredicate(final List<ConfigProperty> values,

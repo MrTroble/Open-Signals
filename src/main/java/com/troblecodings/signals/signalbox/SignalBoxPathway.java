@@ -195,10 +195,6 @@ public class SignalBoxPathway implements IChunkLoadable {
     protected void setSignals(final SignalStateInfo lastSignal) {
         if (isExecutingSignalSet || tile == null)
             return;
-        System.out.println("Changeing signals for " + this + "! Call:");
-        for (final StackTraceElement el : Thread.currentThread().getStackTrace()) {
-            System.out.println("      " + el);
-        }
         final World world = tile.getWorld();
         final StateInfo identifier = new StateInfo(world, tile.getPos());
         final MainSignalIdentifier startSignal = data.getStartSignal();
@@ -260,6 +256,7 @@ public class SignalBoxPathway implements IChunkLoadable {
         if (startSignal != null) {
             if (isBlocked)
                 return;
+            System.out.println("Setting " + startSignal + " on " + this);
             final SignalState previous = startSignal.state;
             startSignal.state = SignalState.GREEN;
             if (!startSignal.state.equals(previous))
@@ -280,8 +277,12 @@ public class SignalBoxPathway implements IChunkLoadable {
             final SignalBoxPathway next = getNextPathway();
             final SignalState previous = position.state;
             if (endSignal != null && next != null && !next.isEmptyOrBroken()) {
-                if (!next.isExecutingSignalSet)
+                if (!next.isExecutingSignalSet) {
                     position.state = SignalState.GREEN;
+                }
+                if (next.isBlocked) {
+                    position.state = SignalState.RED;
+                }
             } else {
                 position.state = SignalState.RED;
             }
@@ -562,12 +563,12 @@ public class SignalBoxPathway implements IChunkLoadable {
     public boolean tryBlock(final BlockPos position) {
         if (!data.tryBlock(position))
             return false;
-        isBlocked = true;
         resetFirstSignal();
         this.setPathStatus(EnumPathUsage.BLOCKED);
         if (!isBlocked) {
             getTrainNumberFromPrevious();
         }
+        isBlocked = true;
         return true;
     }
 
