@@ -57,7 +57,7 @@ public final class NameHandler implements INetworkSync {
     private static final Map<StateInfo, List<NameStateListener>> TASKS_WHEN_LOAD = new HashMap<>();
     private static final Map<StateInfo, List<LoadHolder<?>>> LOAD_COUNTER = new HashMap<>();
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
-    private static final ExecutorService threadService = Executors.newCachedThreadPool();
+    private static final ExecutorService THREAD_SERVICE = Executors.newCachedThreadPool();
     private static EventNetworkChannel channel;
     private static ResourceLocation channelName;
 
@@ -93,7 +93,7 @@ public final class NameHandler implements INetworkSync {
             final PlayerEntity creator) {
         if (info.world.isClientSide || name == null)
             return;
-        threadService.execute(() -> {
+        THREAD_SERVICE.execute(() -> {
             setNameForNonSignal(info, name);
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
@@ -118,7 +118,7 @@ public final class NameHandler implements INetworkSync {
     public static void setNameForNonSignal(final StateInfo info, final String name) {
         if (info.world.isClientSide || name == null)
             return;
-        threadService.execute(() -> {
+        THREAD_SERVICE.execute(() -> {
             synchronized (ALL_NAMES) {
                 ALL_NAMES.put(info, name);
             }
@@ -337,7 +337,7 @@ public final class NameHandler implements INetworkSync {
             final @Nullable PlayerEntity player) {
         if (infos == null || infos.isEmpty())
             return;
-        threadService.execute(() -> {
+        THREAD_SERVICE.execute(() -> {
             infos.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (LOAD_COUNTER) {
