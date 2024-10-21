@@ -59,7 +59,7 @@ public class SignalBoxPathway implements IChunkLoadable {
     }
 
     public SignalBoxPathway(final PathwayData data) {
-        this.data = new SignalConfig(this);
+        this.config = new SignalConfig(this);
         this.data = data;
         this.originalFirstPoint = new Point(data.getFirstPoint());
         updatePathwayToAutomatic();
@@ -206,7 +206,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             if (first == null)
                 return;
             final SignalStateInfo firstInfo = new SignalStateInfo(world, startSignal.pos, first);
-            SignalConfig.change(new ConfigInfo(firstInfo, lastSignal, data));
+            config.change(new ConfigInfo(firstInfo, lastSignal, data));
             updatePreSignals();
         }
         final SignalBoxPathway next = getNextPathway();
@@ -226,9 +226,9 @@ public class SignalBoxPathway implements IChunkLoadable {
                     new SignalStateInfo(world, position.pos, current), lastSignal, data,
                     position.isRepeater);
             if (position.guiMode.equals(EnumGuiMode.HP)) {
-                SignalConfig.loadDisable(info);
+                config.loadDisable(info);
             } else {
-                SignalConfig.change(info);
+                config.change(info);
             }
         });
         updateSignalStates();
@@ -252,7 +252,7 @@ public class SignalBoxPathway implements IChunkLoadable {
             final Signal current = SignalBoxHandler.getSignal(identifier, posIdent.pos);
             if (current == null)
                 return;
-            SignalConfig.change(
+            config.change(
                     new ConfigInfo(new SignalStateInfo(tile.getLevel(), posIdent.pos, current),
                             firstInfo, data, posIdent.isRepeater));
         });
