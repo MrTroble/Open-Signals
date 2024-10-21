@@ -56,6 +56,7 @@ import net.minecraftforge.fml.network.event.EventNetworkChannel;
 public final class SignalStateHandler implements INetworkSync {
 
     private static ExecutorService writeService = Executors.newFixedThreadPool(5);
+    private static final ExecutorService threadService = Executors.newCachedThreadPool();
     private static final Map<SignalStateInfo, Map<SEProperty, String>> CURRENTLY_LOADED_STATES = new HashMap<>();
     private static final Map<World, SignalStateFileV2> ALL_LEVEL_FILES = new HashMap<>();
     private static final Map<SignalStateInfo, List<LoadHolder<?>>> SIGNAL_COUNTER = new HashMap<>();
@@ -104,7 +105,7 @@ public final class SignalStateHandler implements INetworkSync {
             CURRENTLY_LOADED_STATES.put(info, ImmutableMap.copyOf(states));
         }
         updateListeners(info, states, ChangedState.ADDED_TO_FILE);
-        new Thread(() -> {
+        threadService.execute(() -> {
             final List<LoadHolder<?>> list = new ArrayList<>();
             list.add(new LoadHolder<>(creator));
             synchronized (SIGNAL_COUNTER) {
@@ -112,7 +113,7 @@ public final class SignalStateHandler implements INetworkSync {
             }
             sendToAll(info, states);
             createToFile(info, states);
-        }, "OSSignalStateHandler:createStates").start();
+        });
     }
 
     public static boolean isSignalLoaded(final SignalStateInfo info) {
@@ -237,13 +238,13 @@ public final class SignalStateHandler implements INetworkSync {
             }
         }
         updateListeners(info, changedProperties, ChangedState.UPDATED);
-        new Thread(() -> {
+        threadService.execute(() -> {
             sendToAll(info, changedProperties);
             info.signal.getUpdate(info.world, info.pos);
             if (!contains.get()) {
                 createToFile(info, changedProperties);
             }
-        }, "OSSignalStateHandler:setStates").start();
+        });
         info.world.getServer().execute(() -> info.world.updateNeighborsAt(info.pos, info.signal));
     }
 
@@ -547,7 +548,7 @@ public final class SignalStateHandler implements INetworkSync {
             final @Nullable PlayerEntity player) {
         if (signals == null || signals.isEmpty())
             return;
-        new Thread(() -> {
+        threadService.execute(() -> {
             signals.forEach(info -> {
                 boolean isLoaded = false;
                 synchronized (SIGNAL_COUNTER) {
@@ -582,7 +583,7 @@ public final class SignalStateHandler implements INetworkSync {
                     }
                 }
             });
-        }, "OSSignalStateHandler:loadSignals").start();
+        });
     }
 
     public static void unloadSignal(final SignalStateLoadHoler info) {
