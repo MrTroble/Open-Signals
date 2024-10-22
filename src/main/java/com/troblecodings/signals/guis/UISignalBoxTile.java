@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.troblecodings.guilib.ecs.GuiElements;
+import com.troblecodings.guilib.ecs.entitys.DrawInfo;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -159,6 +160,13 @@ public class UISignalBoxTile extends UIComponentEntity {
     public void updateEvent(final UpdateEvent event) {
         super.updateEvent(event);
         this.update();
+    }
+
+    @Override
+    public void draw(final DrawInfo info) {
+        info.alphaOn();
+        super.draw(info);
+        info.alphaOff();
     }
 
     private void localRemove(final ModeSet modeSet) {
