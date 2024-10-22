@@ -441,7 +441,6 @@ public class SignalBoxPathway implements IChunkLoadable {
     public void resetPathway(final @Nullable Point point) {
         this.setPathStatus(EnumPathUsage.FREE, point);
         resetFirstSignal();
-        System.out.println(getListOfNodes());
         if (data.totalPathwayReset(point)) {
             resetOther();
             resetAllTrainNumbers();
