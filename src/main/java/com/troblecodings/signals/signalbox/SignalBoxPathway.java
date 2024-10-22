@@ -264,16 +264,16 @@ public class SignalBoxPathway implements IChunkLoadable {
         final MainSignalIdentifier startSignal = data.getStartSignal();
         final MainSignalIdentifier endSignal = data.getEndSignal();
         if (startSignal != null) {
-            if (isBlocked)
-                return;
-            final SignalState previous = startSignal.state;
-            startSignal.state = SignalState.GREEN;
-            if (!startSignal.state.equals(previous))
-                greenSignals.add(startSignal);
-            data.getPreSignals().forEach(signalIdent -> {
-                signalIdent.state = SignalState.GREEN;
-                greenSignals.add(signalIdent);
-            });
+            if (!isBlocked) {
+                final SignalState previous = startSignal.state;
+                startSignal.state = SignalState.GREEN;
+                if (!startSignal.state.equals(previous))
+                    greenSignals.add(startSignal);
+                data.getPreSignals().forEach(signalIdent -> {
+                    signalIdent.state = SignalState.GREEN;
+                    greenSignals.add(signalIdent);
+                });
+            }
         }
         final Map<BlockPosSignalHolder, OtherSignalIdentifier> distantSignalPositions = data
                 .getOtherSignals();
