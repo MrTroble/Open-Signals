@@ -8,10 +8,12 @@ import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.SignalBox;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
+import com.troblecodings.signals.signalbox.SignalBoxUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -68,10 +70,14 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) level, linkedSignalBox,
                 (tile, _u) -> {
                     final SignalBoxGrid grid = tile.getSignalBoxGrid();
-                    final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
-                            pathway.getValue());
-                    if (!result.isPass() && result.canBeAddedToSaver() && addPWToSaver) {
-                        grid.addNextPathway(pathway.getKey(), pathway.getValue());
+                    final PathType type = SignalBoxUtil.getPathTypeFrom(
+                            grid.getNode(pathway.getKey()), grid.getNode(pathway.getValue()));
+                    if (!type.equals(PathType.NONE)) {
+                        final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
+                                pathway.getValue(), type);
+                        if (!result.isPass() && result.canBeAddedToSaver() && addPWToSaver) {
+                            grid.addNextPathway(pathway.getKey(), pathway.getValue(), type);
+                        }
                     }
                 });
 
