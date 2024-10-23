@@ -1,0 +1,37 @@
+{
+    "systemProperties": {
+        "placementToolName": "signplacementtool",
+        "canLink": true,
+        "defaultHeight": 4,
+        "colors": [
+            16777215,
+            16761344
+        ]
+    },
+    "seProperties": [
+        {
+            "name": "zs3",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs2",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs3v",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        },
+        {
+            "name": "zs2v",
+            "enumClass": "ZS32",
+            "defaultState": "OFF",
+            "autoname": true
+        }
+    ]
+}

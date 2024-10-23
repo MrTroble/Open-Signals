@@ -25,7 +25,7 @@
 				{
 					"blockstate": "with(sh_light_bottom.STATUS_LIGHT) && hasandisnot(sh_high)",
 					"retexture": {
-						"lamp_whitenorth": "lamp_white"
+						"lamp_white2north": "lamp_white"
 					}
 				},
 				{
@@ -50,7 +50,7 @@
 				{
 					"blockstate": "with(sh_light_bottom.STATUS_LIGHT) && hasandis(sh_high)",
 					"retexture": {
-						"lamp_whitenorth": "lamp_white"
+						"lamp_white2north": "lamp_white"
 					},
 					"y": 2
 				}
@@ -66,6 +66,28 @@
 				{
 					"blockstate": "hasandis(sh_high)",
 					"y": 1
+				}
+			],
+			"y": 0
+		},
+		"sh/sh_light_mast_sign": {
+			"textures": [
+				{
+					"blockstate": "hasandisnot(sh_high)",
+					"extentions": {
+						"mastsigns.json": {
+							"mastsign": "0"
+						}
+					}
+				},
+				{
+					"blockstate": "hasandis(sh_high)",
+					"extentions": {
+						"mastsigns.json": {
+							"mastsign": "0"
+						}
+					},
+					"y": 2
 				}
 			],
 			"y": 0

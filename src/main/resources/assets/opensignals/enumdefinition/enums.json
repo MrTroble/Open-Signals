@@ -82,19 +82,27 @@
         "ZS8",
         "ZS13",
         "ZP8",
-        "ZP9"
+        "ZP9",
+        "ZP9_LINE"
     ],
     "MastSignal": [
         "OFF",
         "WRW",
         "WYWYW",
-        "WBWBW"
+        "WBWBW",
+        "BLACK_DOTS"
     ],
     "KSType": [
         "OFF",
         "KS_STOPSIGNAL",
         "KS_MAIN",
-        "DISTANT"
+        "DISTANT",
+        "KS_STOPSIGNAL_LEFT",
+        "KS_STOPSIGNAL_RIGHT",
+        "KS_MAIN_LEFT",
+        "KS_MAIN_RIGHT",
+        "DISTANT_LEFT",
+        "DISTANT_RIGHT"
     ],
     "KS": [
         "OFF",
@@ -339,7 +347,11 @@
         "BUE4",
         "BUE5",
         "HET",
-        "AUTO_HET"
+        "AUTO_HET",
+        "ET",
+        "AUTO_ET",
+        "BUE_DISTANT",
+        "BUE_IDENTIFICATION"
     ],
     "BUEAdd": [
         "OFF",
@@ -361,7 +373,8 @@
         "RC1",
         "RC2",
         "RC3",
-        "STOP_PROTECTING"
+        "STOP_PROTECTING",
+        "GSMR"
     ],
     "CrossingSign": [
         "OFF",
@@ -444,7 +457,8 @@
         "SO19_1",
         "SO19_2",
         "SO19_3",
-        "SO106"
+        "SO106",
+        "TRAIN_LENGTH"
     ],
     "NEAddition": [
         "OFF",
@@ -461,7 +475,8 @@
         "M200",
         "M250",
         "KURZ",
-        "LANG"
+        "LANG",
+        "FREE"
     ],
     "WNMech": [
         "WN1",

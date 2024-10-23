@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIComponent;
 import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
@@ -12,6 +13,7 @@ import com.troblecodings.guilib.ecs.entitys.render.UILines;
 import com.troblecodings.guilib.ecs.entitys.transform.UIIndependentTranslate;
 import com.troblecodings.guilib.ecs.entitys.transform.UIRotate;
 import com.troblecodings.signals.OpenSignalsMain;
+import com.troblecodings.signals.config.ConfigHandler;
 import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.MainSignalIdentifier;
@@ -19,6 +21,7 @@ import com.troblecodings.signals.signalbox.MainSignalIdentifier.SignalState;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxNode;
+import com.troblecodings.signals.signalbox.entrys.PathEntryType;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Rotation;
@@ -28,20 +31,30 @@ public class UISignalBoxTile extends UIComponentEntity {
     public static final ResourceLocation ICON = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/symbols.png");
     public static final ResourceLocation ARROW_ICON = new ResourceLocation(OpenSignalsMain.MODID,
-            "gui/textures/connection.png");
+            "gui/textures/arrow.png");
+    public static final ResourceLocation INCOMING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/connection_in.png");
+    public static final ResourceLocation OUTGOING_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/connection_out.png");
     public static final ResourceLocation SIGNALS = new ResourceLocation(OpenSignalsMain.MODID,
             "gui/textures/signals.png");
+    public static final ResourceLocation NE1_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/ne1.png");
+    public static final ResourceLocation NE5_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/ne5.png");
+    public static final ResourceLocation ZS3_ICON = new ResourceLocation(OpenSignalsMain.MODID,
+            "gui/textures/zs3.png");
 
     private SignalBoxNode node;
     private final Map<ModeSet, UIEntity> setToEntity = new HashMap<>();
     private final Map<ModeSet, SignalState> greenSignals = new HashMap<>();
-    private final UITrainNumber uiTrainNumber = new UITrainNumber();
 
     public UISignalBoxTile(final SignalBoxNode node) {
         super(new UIEntity());
         this.node = node;
-        if (this.node != null)
+        if (this.node != null) {
             this.node.forEach(this::localAdd);
+        }
     }
 
     public void setGreenSignals(final List<MainSignalIdentifier> list) {
@@ -55,26 +68,29 @@ public class UISignalBoxTile extends UIComponentEntity {
     public void updateModeSet(final ModeSet mode) {
         localRemove(mode);
         localAdd(mode);
-        if (hasParent())
+        if (hasParent()) {
             update();
+        }
     }
 
     public void setNode(final SignalBoxNode node) {
-        if (this.node != null)
+        if (this.node != null) {
             this.node.forEach(this::localRemove);
+        }
         this.node = node;
-        if (this.node != null)
+        if (this.node != null) {
             this.node.forEach(this::localAdd);
+        }
     }
 
     private void localAdd(final ModeSet modeSet) {
         final UIEntity entity = new UIEntity();
         if (!modeSet.rotation.equals(Rotation.NONE)) {
             final UIRotate rotation = new UIRotate();
-            rotation.setRotateZ(modeSet.rotation.ordinal() * ((float) Math.PI / 2.0f));
+            rotation.setRotateZ(modeSet.rotation.ordinal() * ((float) 90));
             entity.add(rotation);
         }
-        entity.add(new UIIndependentTranslate(0, 0, 1));
+        entity.add(new UIIndependentTranslate(0, 0, modeSet.mode.translation + 1));
 
         SignalState state = greenSignals.getOrDefault(modeSet, SignalState.RED);
         if (modeSet.mode.equals(EnumGuiMode.RS)) {
@@ -83,11 +99,11 @@ public class UISignalBoxTile extends UIComponentEntity {
             if (setToEntity.containsKey(hpMode)) {
                 if (hpState.equals(SignalState.RED)) {
                     switch (state) {
-                        case SUBSIDIARY_RED:
-                        case GREEN: {
+                        case SUBSIDIARY_RED: {
                             hpState = SignalState.SUBSIDIARY_RED;
                             break;
                         }
+                        case GREEN:
                         case SUBSIDIARY_OFF: {
                             hpState = SignalState.SUBSIDIARY_OFF;
                             break;
@@ -102,6 +118,18 @@ public class UISignalBoxTile extends UIComponentEntity {
                 localRemove(modeSet);
                 updateModeSet(hpMode);
                 return;
+            }
+        }
+
+        if (modeSet.mode.equals(EnumGuiMode.TRAIN_NUMBER)) {
+            final TrainNumber number = node.getOption(modeSet).get()
+                    .getEntry(PathEntryType.TRAINNUMBER).orElse(TrainNumber.DEFAULT);
+            if (!number.equals(TrainNumber.DEFAULT)) {
+                final UIEntity label = GuiElements.createLabel(number.trainNumber,
+                        ConfigHandler.CLIENT.signalboxTrainNumberColor.get(), 0.5f);
+                label.setX(6);
+                label.setY(3);
+                entity.add(label);
             }
         }
 
@@ -171,15 +199,8 @@ public class UISignalBoxTile extends UIComponentEntity {
 
     public void setColor(final ModeSet mode, final int color) {
         final UIEntity entity = setToEntity.get(mode);
-        if (entity != null)
+        if (entity != null) {
             entity.findRecursive(UILines.class).forEach(lines -> lines.setColor(color));
-    }
-
-    public void updateTrainNumber() {
-        this.getParent().remove(uiTrainNumber);
-        final TrainNumber number = this.node.getTrainNumber();
-        uiTrainNumber.setTrainNumber(number);
-        if (!number.trainNumber.isEmpty())
-            this.getParent().add(uiTrainNumber);
+        }
     }
 }

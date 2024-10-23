@@ -5,39 +5,29 @@ import java.util.Objects;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
 import com.troblecodings.signals.core.ModeIdentifier;
+import com.troblecodings.signals.core.PosIdentifier;
 import com.troblecodings.signals.enums.ShowSubsidiary;
 
 import net.minecraft.core.BlockPos;
 
-public class MainSignalIdentifier {
+public class MainSignalIdentifier extends PosIdentifier {
 
-    public final ModeIdentifier identifier;
-    public final BlockPos pos;
     public SignalState state = SignalState.RED;
 
     public MainSignalIdentifier(final ModeIdentifier identifier, final BlockPos pos,
             final SignalState state) {
-        this(identifier.point, identifier.mode, pos);
+        super(identifier, pos);
         this.state = state;
     }
 
     public MainSignalIdentifier(final Point point, final ModeSet mode, final BlockPos pos) {
-        this.identifier = new ModeIdentifier(point, mode);
-        this.pos = pos;
+        super(point, mode, pos);
     }
 
+    @Override
     public void writeNetwork(final WriteBuffer buffer) {
-        identifier.writeNetwork(buffer);
-        buffer.putBlockPos(pos);
+        super.writeNetwork(buffer);
         buffer.putEnumValue(state);
-    }
-
-    public Point getPoint() {
-        return identifier.point;
-    }
-
-    public ModeSet getModeSet() {
-        return identifier.mode;
     }
 
     public static MainSignalIdentifier of(final ReadBuffer buffer) {
@@ -47,7 +37,7 @@ public class MainSignalIdentifier {
 
     @Override
     public int hashCode() {
-        return Objects.hash(identifier, pos);
+        return Objects.hash(identifier, pos, state);
     }
 
     @Override
@@ -59,7 +49,8 @@ public class MainSignalIdentifier {
         if (getClass() != obj.getClass())
             return false;
         final MainSignalIdentifier other = (MainSignalIdentifier) obj;
-        return Objects.equals(identifier, other.identifier) && Objects.equals(pos, other.pos);
+        return Objects.equals(identifier, other.identifier) && Objects.equals(pos, other.pos)
+                && state == other.state;
     }
 
     @Override

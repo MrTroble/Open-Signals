@@ -336,6 +336,15 @@
                         }
                     },
                     "y": 2.0
+                },
+                {
+                    "blockstate": "with(NETYPE.TRAIN_LENGTH)",
+                    "extentions": {
+                        "arrow.json": {
+                            "ARROW": "1"
+                        }
+                    },
+                    "y": 1.0
                 }
             ],
             "y": 0
@@ -349,9 +358,26 @@
                             "NE5_ADDITION": "2"
                         }
                     }
+                },
+                {
+                    "blockstate": "with(NETYPE.TRAIN_LENGTH)",
+                    "extentions": {
+                        "ne5_addition.json": {
+                            "NE5_ADDITION": "2"
+                        }
+                    }
                 }
             ],
             "y": 0
-        }
+        },
+        "ne/ne1_text": {
+			"textures": [
+				{
+					"blockstate": "hasandis(CUSTOMNAME) && with(NETYPE.NE1)"
+				}
+			],
+			"y": 0.75,
+            "z": -0.095
+		}
     }
 }

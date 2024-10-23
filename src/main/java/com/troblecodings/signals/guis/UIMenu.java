@@ -1,15 +1,20 @@
 package com.troblecodings.signals.guis;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 
-import com.troblecodings.guilib.ecs.entitys.DrawInfo;
+import com.troblecodings.guilib.ecs.GuiElements;
 import com.troblecodings.guilib.ecs.entitys.UIBox;
-import com.troblecodings.guilib.ecs.entitys.UIComponent;
+import com.troblecodings.guilib.ecs.entitys.UIComponentEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity;
 import com.troblecodings.guilib.ecs.entitys.UIEntity.KeyEvent;
-import com.troblecodings.guilib.ecs.entitys.UIEntity.MouseEvent;
+import com.troblecodings.guilib.ecs.entitys.UIScrollBox;
+import com.troblecodings.guilib.ecs.entitys.input.UIClickable;
+import com.troblecodings.guilib.ecs.entitys.input.UIScroll;
 import com.troblecodings.guilib.ecs.entitys.render.UIBorder;
 import com.troblecodings.guilib.ecs.entitys.render.UIColor;
+import com.troblecodings.guilib.ecs.entitys.render.UIScissor;
 import com.troblecodings.signals.enums.EnumGuiMode;
 import com.troblecodings.signals.signalbox.ModeSet;
 import com.troblecodings.signals.signalbox.Point;
@@ -17,51 +22,70 @@ import com.troblecodings.signals.signalbox.SignalBoxNode;
 
 import net.minecraft.world.level.block.Rotation;
 
-public class UIMenu extends UIComponent {
+public class UIMenu extends UIComponentEntity {
 
-    private double mX;
-    private double mY;
+    private final Map<EnumGuiMode, UIEntity> modeForEntity = new HashMap<>();
+
     private int selection = 0;
     private int rotation = 0;
     private BiConsumer<Integer, Integer> consumer = (i1, i2) -> {
     };
 
-    @Override
-    public void draw(final DrawInfo info) {
+    public UIMenu() {
+        super(new UIEntity());
+        entity.setInheritWidth(true);
+        entity.setHeight(32);
+        entity.add(new UIBox(UIBox.VBOX, 0));
+        entity.add(new UIScissor());
+
+        final UIEntity list = new UIEntity();
+        entity.add(list);
+        list.setInherits(true);
+
+        final UIScrollBox scrollbox = new UIScrollBox(UIBox.HBOX, 2);
+        list.add(scrollbox);
+        for (final EnumGuiMode mode : EnumGuiMode.values()) {
+            final UIEntity preview = new UIEntity();
+            preview.add(new UIColor(0xFFAFAFAF));
+            final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
+            node.add(new ModeSet(mode, Rotation.values()[this.rotation]));
+            final UISignalBoxTile sbt = new UISignalBoxTile(node);
+            preview.add(sbt);
+            preview.setHeight(20);
+            preview.setWidth(20);
+            if (mode.ordinal() == this.selection)
+                preview.add(new UIBorder(0xFF00FF00, 1));
+            preview.add(new UIClickable(e -> updateSelection(mode)));
+            list.add(preview);
+            modeForEntity.put(mode, preview);
+        }
+        final UIScroll scroll = new UIScroll();
+        final UIEntity scrollBar = GuiElements.createScrollBar(scrollbox, 10, scroll);
+        scrollbox.setConsumer(i -> {
+        });
+        entity.add(scroll);
+        entity.add(scrollBar);
+    }
+
+    private void updateSelection(final EnumGuiMode newMode) {
+        final UIEntity previousEntity = modeForEntity.get(EnumGuiMode.values()[selection]);
+        if (previousEntity != null) {
+            previousEntity.findRecursive(UIBorder.class).forEach(previousEntity::remove);
+        }
+        final UIEntity newEntity = modeForEntity.get(newMode);
+        newEntity.add(new UIBorder(0xFF00FF00, 1));
+        this.selection = newMode.ordinal();
+        consumer.accept(selection, rotation);
     }
 
     @Override
     public void update() {
-    }
-
-    @Override
-    public void postDraw(final DrawInfo info) {
-        if (this.isVisible()) {
-            info.stack.pushPose();
-            info.stack.translate(0, 0, 5);
-            final UIEntity selection = new UIEntity();
-            selection.setX(mX);
-            selection.setY(mY);
-            selection.setHeight(20);
-            selection.setWidth(22 * EnumGuiMode.values().length);
-            selection.add(new UIBox(UIBox.HBOX, 2));
-            for (final EnumGuiMode mode : EnumGuiMode.values()) {
-                final UIEntity preview = new UIEntity();
-                preview.add(new UIColor(0xFFAFAFAF));
-                final SignalBoxNode node = new SignalBoxNode(new Point(-1, -1));
-                node.add(new ModeSet(mode, Rotation.values()[this.rotation]));
-                final UISignalBoxTile sbt = new UISignalBoxTile(node);
-                preview.add(sbt);
-                preview.setHeight(20);
-                preview.setWidth(20);
-                if (mode.ordinal() == this.selection)
-                    preview.add(new UIBorder(0xFF00FF00, 1));
-                selection.add(preview);
-            }
-            selection.updateEvent(parent.getLastUpdateEvent());
-            selection.draw(info);
-            info.stack.popPose();
-        }
+        this.entity.onAdd(this.getParent());
+        entity.setHeight(32);
+        entity.setWidth(parent.getWidth() - 4);
+        entity.setX(entity.getX() + 1);
+        entity.setY(entity.getY() + 1);
+        entity.update();
     }
 
     public int getSelection() {
@@ -70,29 +94,6 @@ public class UIMenu extends UIComponent {
 
     public void setConsumer(final BiConsumer<Integer, Integer> consumer) {
         this.consumer = consumer;
-    }
-
-    @Override
-    public void mouseEvent(final MouseEvent event) {
-        switch (event.state) {
-            case CLICKED:
-                if (event.key != 1)
-                    return;
-                if (!this.isVisible()) {
-                    this.mX = event.x;
-                    this.mY = event.y;
-                }
-                this.selection = Math.max(0, Math.min(EnumGuiMode.values().length - 1,
-                        (int) ((event.x - this.mX) / 22.0f)));
-                consumer.accept(selection, rotation);
-                this.setVisible(true);
-                break;
-            case RELEASE:
-                this.setVisible(false);
-                break;
-            default:
-                break;
-        }
     }
 
     @Override

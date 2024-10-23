@@ -76,7 +76,7 @@ public class LinkedPositions {
             SignalStateHandler.unloadSignal(new SignalStateLoadHoler(
                     new SignalStateInfo(world, pos, signal), new LoadHolder<>(info)));
         }
-        if (type != null && type != LinkType.SIGNAL)
+        if (type != null && type != LinkType.SIGNALBOX)
             NameHandler.unloadName(
                     new StateLoadHolder(new StateInfo(world, pos), new LoadHolder<>(info)));
     }

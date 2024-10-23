@@ -13,7 +13,16 @@
             "config(NETYPE.NE1)": 1,
             "config(NETYPE.NE5)": 1,
             "config(NETYPE.NE6)": 1,
-            "config(NETYPE.SO106)": 1
+            "config(NETYPE.SO106)": 1,
+            "config(NETYPE.TRAIN_LENGTH)": 0
+        },
+        "customNameRenderHeight": 1.52,
+        "offsetY": -7,
+        "offsetX": -15,
+        "signWidth": 50,
+        "renderHeights": {
+            "!config(NETYPE.NE1)": -1,
+            "config(NETYPE.TRAIN_LENGTH)": 0.9
         }
     },
     "seProperties": [

@@ -1,5 +1,102 @@
 # Changelog
 
+## [1.18.2 - 3.6.2]
+* feat: added train length signs
+* feat: added trainnumber element
+* feat: added configurable shunting pw color
+* feat: added system to select pathway type when several are possible
+* fix: problems with 'dead signal'
+* fix: end is not a valid end point
+* fix: disappearing signals in signalbox
+* fix: issue in signal configs
+* fix: skipping same signals
+* fix: issue with names not shown every time
+* fix: issue with trainnumbers
+* fix: problem with shunting and normal pathway
+* fix: UI line and background coloring
+* fix: issue with delay intersignalbox pathway
+* fix: issue with wrong feedback signal
+* fix: intersignalbox can be added to saver
+* fix: delay with shunting pathway
+* fix: wn signals
+* fix: item dropping
+* fix: sh statuslight wrong lamp
+* fix: issues with intersignalbox pathway
+* fix: not updating signals in signalbox
+* ref: remove CUSTOMNAME from saving into files
+* ref: better signalbox UI
+* ref: better error handling
+* ref: better code performance
+* ref: added arrow to possible shunting pathway end
+* ref: better signalbox NBT saving
+* ref: better signalbox loading system for names and signals
+
+## [1.18.2 - 3.6.1]
+
+* fix: issue with InterSignalBoxPathway
+* fix: Zs3V on HV
+
+## [1.18.2 - 3.6.0]
+
+* feat: added black dots mast sign
+* feat: added different sh light mast signs
+* feat: Ne5 can now start and end of PW
+* feat: added rectangular zs6 signs
+* feat: added ne1 custom text
+* feat: added one signal shape
+* feat: added angled ks signals
+* feat: added connectable post block
+* feat: added bue identification signs
+* fix: issue with doubled entries
+* fix: shunting path can only be set on blocked BW
+* fix: problems with shunting pathways and NPE
+* ref: better handling of null check
+* ref: change zs6 position
+
+## [1.18.2 - 3.6.0 beta]
+
+* feat: added shunting path to blocked path
+* feat: added possibility to skip signals
+* feat: added system to add distant signals to mainsignals without passing pathway
+* feat: added overlap (protection way) system behind signals
+* feat: added possiblity to rename signal on all blocks
+* feat: ne, ne5 & standalone zs3 to signalbox
+* feat: added standalone zs3
+* feat: added end arrow
+* fix: Intersignalbox pathways
+* fix: more pathway issues
+* fix: issue with delayable-intersignal pathway
+* fix: issue with protection stop
+* fix: signalconfigs, added new system
+* fix: issue with signalcontroller
+* ref: changed upadte system to signalstatehandler
+* ref: change pathway backend system
+* ref: better UI
+* ref: better code performance
+* ref: made corner tiles more expensive
+
+## [1.18.2 - 3.5.0]
+
+* feat: new path finding algorithm
+* feat: added possibility to add additional costs to pathway tiles
+* feat/fix: better loading system for names by signalbox
+* fix: ks signalbrigde signal offsets
+* fix: ks default configs
+* fix: hv status light not turning off
+* fix: shunting signals not turning red in partial-pathways
+* fix: NPE in signalbridge
+* fix: umlauts text rendering
+* fix: disappearing yellow path by custom texts
+* fix: disabled distant signals on shunting paths
+* fix: problems with signalboxhandler files
+* ref: better linkingapi classes
+* ref: change error system and replace exceptions
+* ref: better checker for pathways
+* ref: better handling with invalid properties
+* ref: improve textrenderer
+
+**CAUTION minor braking changes! signalsystems with autoscale textrenderer needs to add +0.25 to customNameRenderHeight and may have changes for offsetY**
+
 ## [1.18.2 - 3.4.0]
 
 * feat: added signalbridge

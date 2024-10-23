@@ -660,6 +660,7 @@ public class GuiSignalBridge extends GuiBase {
         lowerEntity.setInherits(true);
 
         final Map.Entry<Signal, Map<SEProperty, Integer>> entry = container.allSignals.get(name);
+        previewSidebar.clear();
         signal.getProperties().forEach(property -> {
             final int value = entry.getValue().containsKey(property)
                     ? entry.getValue().get(property)

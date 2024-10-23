@@ -1,6 +1,6 @@
 {
-    "currentSignal": "hlsignal",
-    "nextSignal": "kssignal",
+    "currentSignals":["hlsignal", "hlsignalbridge"],
+    "nextSignals": ["kssignal", "kssignalbridge"],
     "savedPredicates": {
         "stop": "config(kombisignal.HP0) || config(kombisignal.KS_ZS1) || config(kombisignal.KS_ZS7) || config(kombisignal.KS_SHUNTING) || config(kombisignal_main.HP0) || config(kombisignal_main.KS_ZS1) || config(kombisignal_main.KS_ZS7) || config(kombisignal_main.KS_SHUNTING)",
         "drive": "config(kombisignal.KS1) || config(kombisignal_main.KS1) || config(kombisignal.KS1_BLINK) || config(kombisignal.KS1_BLINK_LIGHT) || config(kombisignal.KS2) || config(kombisignal.KS2_LIGHT)",

@@ -16,9 +16,9 @@ import com.troblecodings.signals.blocks.RedstoneInput;
 import com.troblecodings.signals.blocks.Signal;
 import com.troblecodings.signals.core.LoadHolder;
 import com.troblecodings.signals.core.SignalStateListener;
+import com.troblecodings.signals.core.SignalStateLoadHoler;
 import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.StateLoadHolder;
-import com.troblecodings.signals.core.SignalStateLoadHoler;
 import com.troblecodings.signals.core.TileEntityInfo;
 import com.troblecodings.signals.enums.ChangedState;
 import com.troblecodings.signals.enums.EnumMode;
@@ -66,6 +66,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
     private static final String ENUM_MODE = "enummode";
     private static final String LINKED_RS_INPUT = "linkedrsinput";
     private static final String RS_INPUT_PROFILE = "rsinputprofile";
+    private static final String RS_BOOLEAN = "rs_boolean";
 
     public SignalControllerTileEntity(final TileEntityInfo info) {
         super(info);
@@ -91,14 +92,16 @@ public class SignalControllerTileEntity extends SyncableTileEntity
 
     public void removePropertyFromProfile(final Byte profile, final SEProperty property) {
         final Map<SEProperty, String> properties = allStates.get(profile);
-        if (properties != null)
+        if (properties != null) {
             properties.remove(property);
+        }
     }
 
     public void removeProfileFromDirection(final Direction direction, final EnumState state) {
         final Map<EnumState, Byte> properties = enabledStates.get(direction);
-        if (properties != null)
+        if (properties != null) {
             properties.remove(state);
+        }
     }
 
     public void updateRedstoneProfile(final Byte profile, final SEProperty property,
@@ -142,15 +145,20 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         wrapper.putBlockPos(BLOCK_POS_ID, linkedSignalPosition);
         wrapper.putString(SIGNAL_NAME, linkedSignal.getSignalTypeName());
         wrapper.putInteger(LAST_PROFILE, lastProfile);
-        if (lastState != null)
+        if (lastState != null) {
             wrapper.putInteger(ENUM_MODE, lastState.ordinal());
+        }
         for (final Direction direction : Direction.values()) {
-            if (!enabledStates.containsKey(direction))
+            if (!enabledStates.containsKey(direction)) {
                 continue;
+            }
 
             final NBTWrapper comp = new NBTWrapper();
             enabledStates.get(direction)
                     .forEach((state, profile) -> comp.putInteger(state.getNameWrapper(), profile));
+            final NBTWrapper rsBool = new NBTWrapper();
+            rsBool.putBoolean(RS_BOOLEAN, currentStates[direction.ordinal()]);
+            comp.putWrapper(RS_BOOLEAN, rsBool);
             wrapper.putWrapper(direction.getName(), comp);
         }
         final List<NBTWrapper> list = new ArrayList<>();
@@ -178,15 +186,22 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         lastProfile = wrapper.getInteger(LAST_PROFILE);
         lastState = EnumMode.values()[wrapper.getInteger(ENUM_MODE)];
         for (final Direction direction : Direction.values()) {
-            if (!wrapper.contains(direction.getName()))
+            if (!wrapper.contains(direction.getName())) {
                 continue;
+            }
             final NBTWrapper comp = wrapper.getWrapper(direction.getName());
             final Map<EnumState, Byte> map = new HashMap<>();
             comp.keySet().stream().forEach(str -> {
                 final EnumState state = EnumState.of(str);
+                if (state == null)
+                    return;
                 map.put(state, (byte) comp.getInteger(state.getNameWrapper()));
             });
             enabledStates.put(direction, map);
+            if (comp.contains(RS_BOOLEAN)) {
+                currentStates[direction.ordinal()] = comp.getWrapper(RS_BOOLEAN)
+                        .getBoolean(RS_BOOLEAN);
+            }
         }
         final List<NBTWrapper> list = wrapper.getList(ALLSTATES);
         final List<SEProperty> properites = linkedSignal == null ? new ArrayList<>()
@@ -203,8 +218,9 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             });
             allStates.put((byte) profile, properties);
         });
-        if (wrapper.contains(LINKED_RS_INPUT))
+        if (wrapper.contains(LINKED_RS_INPUT)) {
             linkedRSInput = wrapper.getBlockPos(LINKED_RS_INPUT);
+        }
         profileRSInput = (byte) (wrapper.contains(RS_INPUT_PROFILE)
                 ? wrapper.getInteger(RS_INPUT_PROFILE)
                 : -1);
@@ -259,7 +275,7 @@ public class SignalControllerTileEntity extends SyncableTileEntity
             unlink();
             linkedSignalPosition = pos;
             linkedSignal = (Signal) block;
-            SignalStateHandler.addListener(new SignalStateInfo(level, pos, linkedSignal), listener);
+            onLoad();
             setChanged();
             return true;
         } else if (block instanceof RedstoneInput) {
@@ -292,12 +308,14 @@ public class SignalControllerTileEntity extends SyncableTileEntity
         if (level.isClientSide || linkedSignalPosition == null)
             return;
         for (final Direction face : Direction.values()) {
-            if (!this.enabledStates.containsKey(face))
+            if (!this.enabledStates.containsKey(face)) {
                 continue;
+            }
             final boolean state = this.level.hasSignal(worldPosition.relative(face), face);
             final boolean old = this.currentStates[face.ordinal()];
-            if (state == old)
+            if (state == old) {
                 continue;
+            }
             this.currentStates[face.ordinal()] = state;
             final EnumState currenState = state ? EnumState.ONSTATE : EnumState.OFFSTATE;
             final Byte profile = this.enabledStates.get(face).get(currenState);

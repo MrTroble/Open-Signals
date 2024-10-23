@@ -13,12 +13,11 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.core.ReadBuffer;
 import com.troblecodings.core.WriteBuffer;
-import com.troblecodings.signals.core.TrainNumber;
 import com.troblecodings.signals.enums.EnumGuiMode;
+import com.troblecodings.signals.enums.EnumPathUsage;
 import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
 import com.troblecodings.signals.signalbox.SignalBoxUtil.PathIdentifier;
@@ -32,16 +31,12 @@ import net.minecraft.world.level.block.Rotation;
 
 public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
-    public static final Set<EnumGuiMode> VALID_MODES = ImmutableSet.of(EnumGuiMode.HP,
-            EnumGuiMode.RS, EnumGuiMode.RA10, EnumGuiMode.END);
-
     private final HashMap<Path, ModeSet> possibleConnections = new HashMap<>();
     private final HashMap<ModeSet, PathOptionEntry> possibleModes = new HashMap<>();
     private final List<ModeSet> manuellEnabledOutputs = new ArrayList<>();
     private final Point point;
     private boolean isAutoPoint = false;
     private String customText = "";
-    private TrainNumber trainNumber = TrainNumber.DEFAULT;
 
     public SignalBoxNode() {
         this(new Point());
@@ -98,18 +93,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return isAutoPoint;
     }
 
-    public void setTrainNumber(final TrainNumber number) {
-        this.trainNumber = number;
-    }
-
-    public void removeTrainNumber() {
-        this.trainNumber = TrainNumber.DEFAULT;
-    }
-
-    public TrainNumber getTrainNumber() {
-        return trainNumber == null ? TrainNumber.DEFAULT : trainNumber;
-    }
-
     public void post() {
         possibleConnections.clear();
         for (final Map.Entry<ModeSet, PathOptionEntry> entry : possibleModes.entrySet()) {
@@ -145,6 +128,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                     break;
                 case STRAIGHT:
                 case END:
+                case IN_CONNECTION:
+                case OUT_CONNECTION:
+                case ARROW:
                     switch (mode.rotation) {
                         case NONE:
                         case CLOCKWISE_180:
@@ -160,26 +146,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
                             break;
                     }
                     break;
-                case IN_CONNECTION:
-                case OUT_CONNECTION: {
-                    switch (mode.rotation) {
-                        case NONE:
-                        case CLOCKWISE_180: {
-                            p1.translate(1, 0);
-                            p2.translate(-1, 0);
-                            break;
-                        }
-                        case CLOCKWISE_90:
-                        case COUNTERCLOCKWISE_90: {
-                            p1.translate(0, 1);
-                            p2.translate(0, -1);
-                            break;
-                        }
-                        default:
-                            break;
-                    }
-                    break;
-                }
                 default:
                     continue;
             }
@@ -204,39 +170,46 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             final NBTWrapper wrapper = new NBTWrapper();
             entry.getKey().write(wrapper);
             entry.getValue().write(wrapper);
+            if (manuellEnabledOutputs.contains(entry.getKey())) {
+                wrapper.putBoolean(ENABLED_OUTPUTS, true);
+            } else {
+                wrapper.putBoolean(ENABLED_OUTPUTS, false);
+            }
             return wrapper;
         })::iterator);
-        final List<NBTWrapper> enabledOutputs = new ArrayList<>();
-        manuellEnabledOutputs.forEach(mode -> {
-            final NBTWrapper wrapper = new NBTWrapper();
-            mode.write(wrapper);
-            enabledOutputs.add(wrapper);
-        });
-        compound.putList(ENABLED_OUTPUTS, enabledOutputs);
         this.point.write(compound);
-        compound.putBoolean(IS_AUTO_POINT, isAutoPoint);
-        compound.putString(CUSTOM_NAME, customText);
-        if (this.trainNumber != null)
-            trainNumber.writeTag(compound);
+        if (isAutoPoint)
+            compound.putBoolean(IS_AUTO_POINT, isAutoPoint);
+        if (!customText.isEmpty())
+            compound.putString(CUSTOM_NAME, customText);
     }
 
     @Override
     public void read(final NBTWrapper compound) {
         final SignalBoxFactory factory = SignalBoxFactory.getFactory();
+        final boolean oldOutputSystem = compound.contains(ENABLED_OUTPUTS);
         compound.getList(POINT_LIST).forEach(tag -> {
             final PathOptionEntry entry = factory.getEntry();
             entry.read(tag);
-            possibleModes.put(new ModeSet(tag), entry);
+            final ModeSet mode = new ModeSet(tag);
+            possibleModes.put(mode, entry);
+            if (!oldOutputSystem)
+                if (tag.getBoolean(ENABLED_OUTPUTS)) {
+                    if (!manuellEnabledOutputs.contains(mode))
+                        manuellEnabledOutputs.add(mode);
+                }
         });
-        compound.getList(ENABLED_OUTPUTS).forEach(tag -> {
-            final ModeSet modeSet = new ModeSet(tag);
-            if (!manuellEnabledOutputs.contains(modeSet))
-                manuellEnabledOutputs.add(modeSet);
-        });
+        if (oldOutputSystem)
+            compound.getList(ENABLED_OUTPUTS).forEach(tag -> {
+                final ModeSet modeSet = new ModeSet(tag);
+                if (!manuellEnabledOutputs.contains(modeSet))
+                    manuellEnabledOutputs.add(modeSet);
+            });
         this.point.read(compound);
-        this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
-        this.customText = compound.getString(CUSTOM_NAME);
-        this.trainNumber = TrainNumber.of(compound);
+        if (compound.contains(IS_AUTO_POINT))
+            this.isAutoPoint = compound.getBoolean(IS_AUTO_POINT);
+        if (compound.contains(CUSTOM_NAME))
+            this.customText = compound.getString(CUSTOM_NAME);
         post();
     }
 
@@ -256,9 +229,10 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         return mode.flatMap(this::getOption);
     }
 
-    public PathType getPathType(final SignalBoxNode other) {
+    public List<PathType> getPossibleTypes(final SignalBoxNode other) {
+        final List<PathType> possibleTypes = new ArrayList<>();
         if (other == null || other.getPoint().equals(this.getPoint()))
-            return PathType.NONE;
+            return possibleTypes;
         final Set<EnumGuiMode> thisMode = this.possibleModes.keySet().stream()
                 .map(mode -> mode.mode).collect(Collectors.toSet());
 
@@ -270,9 +244,9 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
             final boolean otherContains = Arrays.stream(type.getModes())
                     .anyMatch(otherMode::contains);
             if (thisContains && otherContains)
-                return type;
+                possibleTypes.add(type);
         }
-        return PathType.NONE;
+        return possibleTypes;
     }
 
     public PathwayRequestResult canMakePath(final Path path, final PathType type) {
@@ -282,23 +256,44 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         final Rotation rotation = SignalBoxUtil.getRotationFromDelta(path.point1.delta(this.point));
         for (final EnumGuiMode mode : type.getModes()) {
             final ModeSet possibleOverStepping = new ModeSet(mode, rotation);
-            if (this.possibleModes.containsKey(possibleOverStepping))
+            if (this.possibleModes.containsKey(possibleOverStepping)) {
+                final PathOptionEntry option = possibleModes.get(possibleOverStepping);
+                if (option.getEntry(PathEntryType.CAN_BE_OVERSTPEPPED).orElse(false)) {
+                    continue;
+                }
                 return PathwayRequestResult.OVERSTEPPING; // Found another signal on the path that
                                                           // is not the target
+            }
         }
         return PathwayRequestResult.PASS;
     }
 
-    public Point getStartPoint(final PathType type) {
-        for (final EnumGuiMode mode : type.getModes()) {
-            for (final Rotation rotation : Rotation.values()) {
-                final ModeSet modeSet = new ModeSet(mode, rotation);
-                if (!possibleModes.containsKey(modeSet))
-                    continue;
-                return point.translate(rotation);
+    public boolean isUsed() {
+        for (final Point point : Arrays.asList(this.point.delta(new Point(1, 0)),
+                this.point.delta(new Point(-1, 0)), this.point.delta(new Point(0, 1)),
+                this.point.delta(new Point(0, -1)))) {
+            if (isUsedInDirection(point)) {
+                return true;
             }
         }
-        return null;
+        return false;
+    }
+
+    public boolean isUsedInDirection(final Point point) {
+        for (final Path path : possibleConnections.keySet()) {
+            if (!(path.point1.equals(point) || path.point2.equals(point))) {
+                continue;
+            }
+            final ModeSet mode = getMode(path);
+            if (mode == null) {
+                continue;
+            }
+            if (!getOption(mode).orElse(new PathOptionEntry()).getEntry(PathEntryType.PATHUSAGE)
+                    .orElse(EnumPathUsage.FREE).equals(EnumPathUsage.FREE)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean containsManuellOutput(final ModeSet mode) {
@@ -333,13 +328,12 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
 
     public boolean isValidStart() {
         return this.possibleModes.keySet().stream()
-                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode));
+                .anyMatch(modeSet -> modeSet.mode.getModeType().isValidStart());
     }
 
     public boolean isValidEnd() {
         return this.possibleModes.keySet().stream()
-                .anyMatch(modeSet -> VALID_MODES.contains(modeSet.mode)
-                        || modeSet.mode.equals(EnumGuiMode.OUT_CONNECTION));
+                .anyMatch(modeSet -> modeSet.mode.getModeType().isValidEnd());
     }
 
     public boolean containsInConnection() {
@@ -383,7 +377,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         }
         this.isAutoPoint = buffer.getBoolean();
         this.customText = buffer.getString();
-        this.trainNumber = TrainNumber.of(buffer);
         post();
     }
 
@@ -406,7 +399,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         }
         this.isAutoPoint = buffer.getBoolean();
         this.customText = buffer.getString();
-        this.trainNumber = TrainNumber.of(buffer);
         post();
     }
 
@@ -421,22 +413,19 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         manuellEnabledOutputs.forEach(mode -> mode.writeNetwork(buffer));
         buffer.putBoolean(isAutoPoint);
         buffer.putString(customText);
-        if (trainNumber != null) {
-            trainNumber.writeNetwork(buffer);
-        } else {
-            TrainNumber.DEFAULT.writeNetwork(buffer);
-        }
     }
 
     public void writeUpdateNetwork(final WriteBuffer buffer) {
         int size = 0;
         for (final PathOptionEntry entry : possibleModes.values()) {
-            if (entry.containsEntry(PathEntryType.PATHUSAGE))
+            if (entry.containsEntry(PathEntryType.PATHUSAGE)
+                    || entry.containsEntry(PathEntryType.TRAINNUMBER))
                 size++;
         }
         buffer.putByte((byte) size);
         possibleModes.forEach((mode, entry) -> {
-            if (entry.containsEntry(PathEntryType.PATHUSAGE)) {
+            if (entry.containsEntry(PathEntryType.PATHUSAGE)
+                    || entry.containsEntry(PathEntryType.TRAINNUMBER)) {
                 mode.writeNetwork(buffer);
                 entry.writeUpdateNetwork(buffer);
             }
@@ -444,11 +433,6 @@ public class SignalBoxNode implements INetworkSavable, Iterable<ModeSet> {
         buffer.putByte((byte) 0);
         buffer.putBoolean(isAutoPoint);
         buffer.putString(customText);
-        if (trainNumber != null) {
-            trainNumber.writeNetwork(buffer);
-        } else {
-            TrainNumber.DEFAULT.writeNetwork(buffer);
-        }
     }
 
     public String getCustomText() {

@@ -2,21 +2,55 @@
     "currentSignal": "hvsignal",
     "allStates": {
         "ZS1": [
-            "zs1.TRUE"
+            "stopsignal.HP0",
+            "hphome.HP0",
+            "hpblock.HP0",
+            "zs1.TRUE",
+            "zs7.FALSE",
+            "identifier.FALSE",
+            "zs3.OFF",
+            "zs3v.OFF",
+            "distantsignal.VR0"
         ],
         "ZS7": [
-            "zs7.TRUE"
+            "stopsignal.HP0",
+            "hphome.HP0",
+            "hpblock.HP0",
+            "zs1.FALSE",
+            "zs7.TRUE",
+            "identifier.FALSE",
+            "zs3.OFF",
+            "zs3v.OFF",
+            "distantsignal.OFF"
         ],
         "ZS8": [
-            "zs3.ZS8"
+            "stopsignal.HP0",
+            "hphome.HP0",
+            "hpblock.HP0",
+            "zs1.FALSE",
+            "zs7.FALSE",
+            "identifier.FALSE",
+            "zs3.ZS8",
+            "zs3v.OFF",
+            "distantsignal.VR0"
         ],
         "ZP9": [
             "zs3.ZP9"
         ],
         "SH1": [
-            "stopsignal.SHUNTING"
+            "stopsignal.SHUNTING",
+            "zs1.FALSE",
+            "zs7.FALSE",
+            "identifier.FALSE",
+            "zs3.OFF",
+            "zs3v.OFF",
+            "distantsignal.OFF"
         ],
         "STATUSLIGHT": [
+            "zs1.FALSE",
+            "zs7.FALSE",
+            "zs3.OFF",
+            "zs3v.OFF",
             "stopsignal.OFF",
             "hphome.OFF",
             "hpblock.OFF",

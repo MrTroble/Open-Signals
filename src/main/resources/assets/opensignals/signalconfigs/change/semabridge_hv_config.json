@@ -1,6 +1,11 @@
 {
-    "currentSignal": "semaphoresignalbridge",
-    "nextSignal": "hvsignal",
+    "currentSignals": ["semaphoresignalbridge"],
+    "nextSignals": ["hvsignal", "hvsignalbridge"],
+    "savedPredicates": {
+        "stop": "config(stopsignal.HP0) || config(stopsignal.SHUNTING) || config(hphome.HP0) || config(hphome.HP0_ALTERNATE_RED) || config(hpblock.HP0)",
+        "drive": "config(stopsignal.HP1) || config(hphome.HP1) || config(hpblock.HP1)",
+        "slow": "config(stopsignal.HP2) || config(hphome.HP2)"
+    },
     "values": {
         "speed(<.1) || speed(>.15)": ["wing1.TRUE", "wing2.FALSE"],
         "speed(==.1)": ["zs3.Z1", "wing1.TRUE", "wing2.TRUE"],

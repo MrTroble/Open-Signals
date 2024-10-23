@@ -60,7 +60,7 @@ public class CommonProxy {
 
         OneSignalNonPredicateConfigParser.loadOneSignalConfigs();
         ChangeConfigParser.loadChangeConfigs();
-        OneSignalPredicateConfigParser.loadDefaultConfigs();
+        OneSignalPredicateConfigParser.loadAllOneSignalPredicateConfigs();
         SubsidiarySignalParser.loadAllSubsidiarySignals();
         SignalAnimationConfigParser.loadAllAnimations();
     }

@@ -296,6 +296,7 @@ public class Signal extends BasicBlock {
         final float offsetZ = this.prop.offsetY;
 
         info.stack.pushPose();
+        // TODO Eig erst Translate, dann Scale
         info.stack.scale(-0.015f * scale, -0.015f * scale, 0.015f * scale);
         info.stack.translate(offsetX, 0, -4.2f + offsetZ);
 
@@ -317,7 +318,7 @@ public class Signal extends BasicBlock {
         final float offsetZ = this.prop.offsetY;
 
         info.stack.pushPose();
-        info.stack.translate(-offsetX * 0.015f, 0, offsetZ * 0.013f);
+        info.stack.translate(offsetX * 0.015f, 0, offsetZ * 0.015f);
         info.stack.scale(-scale, -scale, 1);
         info.font.draw(info.stack, name, -nameWidth / 2, 0, this.prop.textColor);
         info.stack.popPose();

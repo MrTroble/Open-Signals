@@ -7,13 +7,13 @@ import com.troblecodings.core.NBTWrapper;
 import com.troblecodings.opensignals.linkableapi.ILinkableTile;
 import com.troblecodings.signals.OpenSignalsMain;
 import com.troblecodings.signals.blocks.SignalBox;
-import com.troblecodings.signals.core.StateInfo;
 import com.troblecodings.signals.core.TileEntityInfo;
+import com.troblecodings.signals.enums.PathType;
 import com.troblecodings.signals.enums.PathwayRequestResult;
-import com.troblecodings.signals.handler.SignalBoxHandler;
 import com.troblecodings.signals.signalbox.Point;
 import com.troblecodings.signals.signalbox.SignalBoxGrid;
 import com.troblecodings.signals.signalbox.SignalBoxTileEntity;
+import com.troblecodings.signals.signalbox.SignalBoxUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -26,8 +26,8 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
         implements ILinkableTile, IChunkLoadable {
 
     private BlockPos linkedSignalBox;
-    private Map.Entry<Point, Point> pathway =
-            Maps.immutableEntry(new Point(-1, -1), new Point(-1, -1));
+    private Map.Entry<Point, Point> pathway = Maps.immutableEntry(new Point(-1, -1),
+            new Point(-1, -1));
     private boolean addPWToSaver = true;
 
     public PathwayRequesterTileEntity(final TileEntityInfo info) {
@@ -69,19 +69,14 @@ public class PathwayRequesterTileEntity extends SyncableTileEntity
     public void requestPathway() {
         loadChunkAndGetTile(SignalBoxTileEntity.class, (ServerLevel) level, linkedSignalBox,
                 (tile, _u) -> {
-                    final StateInfo identifier = new StateInfo(level, linkedSignalBox);
                     final SignalBoxGrid grid = tile.getSignalBoxGrid();
-                    if (!grid.containsNode(pathway.getKey())
-                            || !grid.containsNode(pathway.getValue()))
-                        return;
-                    if (grid.getNode(pathway.getValue()).containsOutConnection()) {
-                        SignalBoxHandler.requesetInterSignalBoxPathway(identifier, pathway.getKey(),
-                                pathway.getValue());
-                    } else {
-                        final PathwayRequestResult result =
-                                grid.requestWay(pathway.getKey(), pathway.getValue());
-                        if (!result.isPass() && result.isPathwayPossibleButCurrentyBlocked() && addPWToSaver) {
-                            grid.addNextPathway(pathway.getKey(), pathway.getValue());
+                    final PathType type = SignalBoxUtil.getPathTypeFrom(
+                            grid.getNode(pathway.getKey()), grid.getNode(pathway.getValue()));
+                    if (!type.equals(PathType.NONE)) {
+                        final PathwayRequestResult result = grid.requestWay(pathway.getKey(),
+                                pathway.getValue(), type);
+                        if (!result.isPass() && result.canBeAddedToSaver() && addPWToSaver) {
+                            grid.addNextPathway(pathway.getKey(), pathway.getValue(), type);
                         }
                     }
                 });

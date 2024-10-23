@@ -1,6 +1,6 @@
 {
-    "currentSignal": "kssignal",
-    "nextSignal": "semaphoresignal",
+    "currentSignals": ["kssignal", "kssignalbridge"],
+    "nextSignals": ["semaphoresignal", "semaphoresignalbridge"],
     "savedPredicates": {
         "stop": "(config(wing1.FALSE) && config(wing2.FALSE)) || config(wing1.FALSE)",
         "drive": "(config(wing1.TRUE) && config(wing2.FALSE)) || config(wing1.TRUE)",
@@ -26,7 +26,8 @@
 
         "map(stop)": ["kombisignal.KS2", "kombisignal_main.KS1", "kombisignal_distant.KS2", "zs3v.OFF", "zs2v.OFF"],
         "map(stop) && signalRepeater(true)": ["kombisignal_distant.KS2_REPEAT"],
-        "map(drive) || map(slow)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
+        "map(drive)": ["kombisignal.KS1", "kombisignal_main.KS1", "kombisignal_distant.KS1"],
+        "map(slow)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK", "zs3v.Z4"],
         "(map(drive) || map(slow)) && map(zs3)": ["kombisignal.KS1_BLINK", "kombisignal_main.KS1", "kombisignal_distant.KS1_BLINK"],
         "(map(drive) || map(slow)) && map(zs3) && signalRepeater(true)": ["kombisignal_distant.KS1_BLINK_REPEAT"],
 
